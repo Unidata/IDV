@@ -1223,7 +1223,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected void addRequest(Element node, Hashtable props)
+    protected void addRequest(Element node, Hashtable props,Hashtable handlers)
             throws Exception {
         String request    = XmlUtil.getAttribute(node,
                                 ApiMethod.ATTR_REQUEST);
@@ -1238,35 +1238,41 @@ public class Repository implements Constants, Tables, RequestHandler,
                                    ApiMethod.ATTR_CANCACHE, true));
 
 
-        RequestHandler handler = this;
+
         String handlerName = XmlUtil.getAttribute(node,
                                  ApiMethod.ATTR_HANDLER,
                                  Misc.getProperty(props,
                                      ApiMethod.ATTR_HANDLER, "repository"));
 
 
-        if (handlerName.equals("usermanager")) {
-            handler = getUserManager();
-        } else if (handlerName.equals("admin")) {
-            handler = getAdmin();
-        } else if (handlerName.equals("harvestermanager")) {
-            handler = getHarvesterManager();
-        } else if (handlerName.equals("actionmanager")) {
-            handler = getActionManager();
-        } else if (handlerName.equals("accessmanager")) {
-            handler = getAccessManager();
-        } else if (handlerName.equals("metadatamanager")) {
-            handler = getMetadataManager();
-        } else if (handlerName.equals("repository")) {
+        RequestHandler handler = (RequestHandler) handlers.get(handlerName);
+        
+        if(handler == null) {
             handler = this;
-        } else {
-            Class c = Misc.findClass(handlerName);
-            Constructor ctor = Misc.findConstructor(c,
-                                   new Class[] { Repository.class,
-                    Element.class });
-            handler = (RequestHandler) ctor.newInstance(new Object[] { this,
-                    node });
+            if (handlerName.equals("usermanager")) {
+                handler = getUserManager();
+            } else if (handlerName.equals("admin")) {
+                handler = getAdmin();
+            } else if (handlerName.equals("harvestermanager")) {
+                handler = getHarvesterManager();
+            } else if (handlerName.equals("actionmanager")) {
+                handler = getActionManager();
+            } else if (handlerName.equals("accessmanager")) {
+                handler = getAccessManager();
+            } else if (handlerName.equals("metadatamanager")) {
+                handler = getMetadataManager();
+            } else if (handlerName.equals("repository")) {
+                handler = this;
+            } else {
+                Constructor ctor = Misc.findConstructor(Misc.findClass(handlerName),
+                                                        new Class[] { Repository.class,
+                                                                      Element.class });
+                handler = (RequestHandler) ctor.newInstance(new Object[] { this,
+                                                                           node });
+            }
+            handlers.put(handlerName, handler);
         }
+
 
         String    url       = getUrlBase() + request;
         ApiMethod oldMethod = requestMap.get(url);
@@ -1328,6 +1334,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected void initApi() throws Exception {
+        Hashtable handlers = new Hashtable();
 
         for (String file : apiDefFiles) {
             file = getStorageManager().localizePath(file);
@@ -1335,6 +1342,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (apiRoot == null) {
                 continue;
             }
+            
             NodeList  children = XmlUtil.getElements(apiRoot);
             Hashtable props    = new Hashtable();
             for (int i = 0; i < children.getLength(); i++) {
@@ -1345,7 +1353,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                             ApiMethod.ATTR_NAME), XmlUtil.getAttribute(node,
                                 ApiMethod.ATTR_VALUE));
                 } else if (tag.equals(ApiMethod.TAG_METHOD)) {
-                    addRequest(node, props);
+                    addRequest(node, props, handlers);
                 } else {
                     throw new IllegalArgumentException("Unknown api.xml tag:"
                             + tag);

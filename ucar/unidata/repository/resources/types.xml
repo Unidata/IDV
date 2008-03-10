@@ -10,6 +10,16 @@
   <type name="report1"  description="Report 1" handler="ucar.unidata.repository.ReportTypeHandler" formtemplate="/ucar/unidata/repository/resources/report1.form.html">
 	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" />
 	<column name="forecast1" type="text"     label="Forecast 1" rows="8"/>
+<!--
+        <column type="status" name="instrumentsstatus" label="INSTRUMENTS/SYSTEMS STATUS">
+             <item id="aircraft" label="Aircaft"/>
+             <item id="cloudradar" label="Cloud Radar"/>
+             <item id="particleprobes" label="Particle Probes"/>
+             <item id="navigation" label="Navigation, State Parameters"/>
+             <item id="datasystem" label="Data System"/>
+             <item id="communications" label="Communications"/>
+        </column>
+-->
   </type>
 
 
