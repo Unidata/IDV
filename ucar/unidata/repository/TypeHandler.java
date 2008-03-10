@@ -67,6 +67,30 @@ import java.util.Properties;
 public class TypeHandler extends RepositoryManager {
 
     /** _more_ */
+    public static final String TAG_COLUMN = "column";
+
+    /** _more_ */
+    public static final String TAG_PROPERTY = "property";
+
+    /** _more_ */
+    public static final String ATTR_NAME = "name";
+
+    /** _more_ */
+    public static final String ATTR_VALUE = "value";
+
+    /** _more_          */
+    public static final String ATTR_DATATYPE = "datatype";
+
+    /** _more_ */
+    public static final String TAG_TYPE = "type";
+
+    /** _more_ */
+    public static final String TAG_HANDLER = "handler";
+
+
+
+
+    /** _more_ */
     public static final int MATCH_UNKNOWN = 0;
 
     /** _more_ */
@@ -326,15 +350,14 @@ public class TypeHandler extends RepositoryManager {
      */
     public Entry getEntry(ResultSet results, boolean abbreviated)
             throws Exception {
-        //id,type,name,desc,group,user,file,createdata,fromdate,todate
+        //id,type,name,desc,group,topGroup, user,file,createdata,fromdate,todate
         int    col   = 3;
         String id    = results.getString(1);
         Entry  entry = createEntry(id);
         entry.initEntry(results.getString(col++), results
-            .getString(col++), getRepository()
-            .findGroup(results.getString(col++)), getRepository()
-            .getUserManager()
-            .findUser(results.getString(col++), true), new Resource(results
+            .getString(col++), getRepository().findGroup(results.getString(col++)), 
+                        results.getString(col++), 
+                        getUserManager().findUser(results.getString(col++), true), new Resource(results
                 .getString(col++), results.getString(col++)), results
                     .getString(col++), results
                     .getTimestamp(col++, getRepository().calendar)
@@ -872,9 +895,116 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToEntryForm(Request request, StringBuffer formBuffer,
+    public void addToEntryForm(Request request, StringBuffer sb,
                                Entry entry)
-            throws Exception {}
+           throws Exception {
+            String size = HtmlUtil.SIZE_70;
+            sb.append(HtmlUtil.formEntry("Name:",
+                                         HtmlUtil.input(ARG_NAME,
+                                             ((entry != null)
+                    ? entry.getName()
+                    : BLANK), size)));
+            int rows = getProperty("form.rows.desc", 3);
+            sb.append(
+                HtmlUtil.formEntryTop(
+                    "Description:",
+                    HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
+                    ? entry.getDescription()
+                    : BLANK), rows, 50)));
+
+            if (okToShowInForm(ARG_RESOURCE)) {
+                if (entry == null) {
+                    sb.append(HtmlUtil.formEntry(msgLabel("File"),
+                            HtmlUtil.fileInput(ARG_FILE, size)
+                            + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
+                                false) + HtmlUtil.space(1)
+                                       + msg("Unzip archive")));
+                    String download =
+                        HtmlUtil.space(1)
+                        + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true",
+                                            false) + HtmlUtil.space(1)
+                                                + msg("Download");
+                    sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
+                            HtmlUtil.input(ARG_RESOURCE, BLANK, size)
+                            + download));
+                } else {
+                    sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                            entry.getResource().getPath()));
+                }
+                if ( !hasDefaultDataType()
+                        && okToShowInForm(ARG_DATATYPE)) {
+                    String selected = "";
+                    if (entry != null) {
+                        selected = entry.getDataType();
+                    }
+                    List   types  = getRepository().getDefaultDataTypes();
+                    String widget = ((types.size() > 0)
+                                     ? HtmlUtil.select(ARG_DATATYPE_SELECT,
+                                         types, selected) + HtmlUtil.space(1)
+                                             + msgLabel("Or")
+                                     : "") + HtmlUtil.input(ARG_DATATYPE);
+                    sb.append(HtmlUtil.formEntry(msgLabel("Data Type"),
+                            widget));
+                }
+
+            }
+
+            String dateHelp = " (e.g., 2007-12-11 00:00:00)";
+            String fromDate = ((entry != null)
+                               ? formatDate(request,
+                                            new Date(entry.getStartDate()))
+                               : BLANK);
+            String toDate = ((entry != null)
+                             ? formatDate(request,
+                                          new Date(entry.getEndDate()))
+                             : BLANK);
+            if (okToShowInForm(ARG_DATE)) {
+                sb.append(
+                    HtmlUtil.formEntry(
+                        "Date Range:",
+                        HtmlUtil.input(
+                            ARG_FROMDATE, fromDate,
+                            HtmlUtil.SIZE_30) + " -- "
+                                + HtmlUtil.input(
+                                    ARG_TODATE, toDate,
+                                    HtmlUtil.SIZE_30) + dateHelp));
+                if (entry == null) {
+                    List datePatterns = new ArrayList();
+
+                    datePatterns.add(new TwoFacedObject("All", BLANK));
+                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
+                        datePatterns.add(DateUtil.DATE_FORMATS[i]);
+                    }
+
+                    if (okToShowInForm(ARG_RESOURCE)) {
+                        sb.append(HtmlUtil.formEntry("Date Pattern:",
+                                HtmlUtil.select(ARG_DATE_PATTERN,
+                                    datePatterns) + " (use file name)"));
+                    }
+
+                }
+            }
+
+
+            if (okToShowInForm(ARG_AREA)) {
+                sb.append(HtmlUtil.formEntry("Location:",
+                                             HtmlUtil.makeLatLonBox(ARG_AREA,
+                                                 ((entry != null)
+                                                     && entry.hasSouth())
+                        ? entry.getSouth()
+                        : Double.NaN, ((entry != null) && entry.hasNorth())
+                                      ? entry.getNorth()
+                                      : Double.NaN, ((entry != null)
+                                      && entry.hasEast())
+                        ? entry.getEast()
+                        : Double.NaN, ((entry != null) && entry.hasWest())
+                                      ? entry.getWest()
+                                      : Double.NaN)));
+            }
+
+}
+
+
 
 
     /**

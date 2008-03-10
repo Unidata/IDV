@@ -7,6 +7,12 @@
                 properties="/ucar/unidata/repository/resources/level3radar.product.properties"/>
   </type>
 
+  <type name="report1"  description="Report 1" handler="ucar.unidata.repository.ReportTypeHandler" formtemplate="/ucar/unidata/repository/resources/report1.form.html">
+	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" />
+	<column name="forecast1" type="text"     label="Forecast 1" rows="8"/>
+  </type>
+
+
 
   <type name="blogpost"  description="Blog Post">
      <property name="form.rows.desc" value="10"/>

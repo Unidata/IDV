@@ -1,5 +1,6 @@
 <outputhandlers>
   <outputhandler class="ucar.unidata.repository.HtmlOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.DateGridOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.ImageOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.XmlOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.RssOutputHandler"/>

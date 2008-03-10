@@ -287,7 +287,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     private Hashtable resources = new Hashtable();
 
 
-
     /** _more_ */
     private Group topGroup;
 
@@ -362,8 +361,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private StorageManager storageManager;
-
-
 
     /** _more_ */
     private DatabaseManager databaseManager;
@@ -1518,9 +1515,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         msgSB.append(HtmlUtil.p());
         msgSB.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
                              HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
+
         sb.append(question(msgSB.toString()));
         sb.append(HtmlUtil.hidden(ARG_IDS, idBuffer.toString()));
         sb.append(HtmlUtil.formClose());
+
         sb.append("<ul>");
         new OutputHandler(this).getEntryHtml(sb, entries, request, false,
                           false, true);
@@ -2007,18 +2006,18 @@ public class Repository implements Constants, Tables, RequestHandler,
                 continue;
             }
             List children = XmlUtil.findChildren(entriesRoot,
-                                GenericTypeHandler.TAG_TYPE);
+                                TypeHandler.TAG_TYPE);
             for (int i = 0; i < children.size(); i++) {
                 Element entryNode = (Element) children.get(i);
                 Class handlerClass =
                     Misc.findClass(XmlUtil.getAttribute(entryNode,
-                        GenericTypeHandler.TAG_HANDLER,
+                        TypeHandler.TAG_HANDLER,
                         "ucar.unidata.repository.GenericTypeHandler"));
                 Constructor ctor = Misc.findConstructor(handlerClass,
                                        new Class[] { Repository.class,
                         Element.class });
-                GenericTypeHandler typeHandler =
-                    (GenericTypeHandler) ctor.newInstance(new Object[] { this,
+                TypeHandler typeHandler =
+                    (TypeHandler) ctor.newInstance(new Object[] { this,
                         entryNode });
                 addTypeHandler(typeHandler.getType(), typeHandler);
             }
@@ -3245,13 +3244,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(makeEntryHeader(request, entry));
         }
 
-        sb.append(HtmlUtil.formTable());
         if (type == null) {
             sb.append(HtmlUtil.form(URL_ENTRY_FORM, BLANK));
         } else {
             sb.append(HtmlUtil.uploadForm(URL_ENTRY_CHANGE, BLANK));
         }
 
+        sb.append(HtmlUtil.formTable());
         String title = BLANK;
 
         if (type == null) {
@@ -3281,126 +3280,22 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             String deleteButton = HtmlUtil.submit(msg("Delete"), ARG_DELETE);
             String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
-            String buttons = buttons(submitButton, deleteButton,
-                                     cancelButton);
+            String buttons = (entry!=null?buttons(submitButton, deleteButton,
+                                                  cancelButton):buttons(submitButton,
+                                                                        cancelButton));
 
-            sb.append(HtmlUtil.formEntry(BLANK, buttons));
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
             }
-            sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
-
-            String size = HtmlUtil.SIZE_70;
-            sb.append(HtmlUtil.formEntry("Name:",
-                                         HtmlUtil.input(ARG_NAME,
-                                             ((entry != null)
-                    ? entry.getName()
-                    : BLANK), size)));
-            int rows = typeHandler.getProperty("form.rows.desc", 3);
-            sb.append(
-                HtmlUtil.formEntryTop(
-                    "Description:",
-                    HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
-                    ? entry.getDescription()
-                    : BLANK), rows, 50)));
-
-            if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
-                if (entry == null) {
-                    sb.append(HtmlUtil.formEntry(msgLabel("File"),
-                            HtmlUtil.fileInput(ARG_FILE, size)
-                            + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
-                                false) + HtmlUtil.space(1)
-                                       + msg("Unzip archive")));
-                    String download =
-                        HtmlUtil.space(1)
-                        + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true",
-                                            false) + HtmlUtil.space(1)
-                                                + msg("Download");
-                    sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
-                            HtmlUtil.input(ARG_RESOURCE, BLANK, size)
-                            + download));
-                } else {
-                    sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                            entry.getResource().getPath()));
-                }
-                if ( !typeHandler.hasDefaultDataType()
-                        && typeHandler.okToShowInForm(ARG_DATATYPE)) {
-                    String selected = "";
-                    if (entry != null) {
-                        selected = entry.getDataType();
-                    }
-                    List   types  = getDefaultDataTypes();
-                    String widget = ((types.size() > 0)
-                                     ? HtmlUtil.select(ARG_DATATYPE_SELECT,
-                                         types, selected) + HtmlUtil.space(1)
-                                             + msgLabel("Or")
-                                     : "") + HtmlUtil.input(ARG_DATATYPE);
-                    sb.append(HtmlUtil.formEntry(msgLabel("Data Type"),
-                            widget));
-                }
-
-            }
-
-            String dateHelp = " (e.g., 2007-12-11 00:00:00)";
-            String fromDate = ((entry != null)
-                               ? formatDate(request,
-                                            new Date(entry.getStartDate()))
-                               : BLANK);
-            String toDate = ((entry != null)
-                             ? formatDate(request,
-                                          new Date(entry.getEndDate()))
-                             : BLANK);
-            if (typeHandler.okToShowInForm(ARG_DATE)) {
-                sb.append(
-                    HtmlUtil.formEntry(
-                        "Date Range:",
-                        HtmlUtil.input(
-                            ARG_FROMDATE, fromDate,
-                            HtmlUtil.SIZE_30) + " -- "
-                                + HtmlUtil.input(
-                                    ARG_TODATE, toDate,
-                                    HtmlUtil.SIZE_30) + dateHelp));
-                if (entry == null) {
-                    List datePatterns = new ArrayList();
-
-                    datePatterns.add(new TwoFacedObject("All", BLANK));
-                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
-                        datePatterns.add(DateUtil.DATE_FORMATS[i]);
-                    }
-
-                    if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
-                        sb.append(HtmlUtil.formEntry("Date Pattern:",
-                                HtmlUtil.select(ARG_DATE_PATTERN,
-                                    datePatterns) + " (use file name)"));
-                    }
-
-                }
-            }
-
-
-            if (typeHandler.okToShowInForm(ARG_AREA)) {
-                sb.append(HtmlUtil.formEntry("Location:",
-                                             HtmlUtil.makeLatLonBox(ARG_AREA,
-                                                 ((entry != null)
-                                                     && entry.hasSouth())
-                        ? entry.getSouth()
-                        : Double.NaN, ((entry != null) && entry.hasNorth())
-                                      ? entry.getNorth()
-                                      : Double.NaN, ((entry != null)
-                                      && entry.hasEast())
-                        ? entry.getEast()
-                        : Double.NaN, ((entry != null) && entry.hasWest())
-                                      ? entry.getWest()
-                                      : Double.NaN)));
-            }
-
+            //            sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
             typeHandler.addToEntryForm(request, sb, entry);
-            sb.append(HtmlUtil.formEntry(BLANK, buttons));
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
         }
-        sb.append("</table>\n");
+        sb.append(HtmlUtil.formTableClose());
         if (entry == null) {
             return new Result(title, sb);
         }
@@ -3796,8 +3691,8 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-        sb.append(HtmlUtil.form(URL_ENTRY_DELETE, BLANK));
         StringBuffer inner = new StringBuffer();
+        inner.append(HtmlUtil.form(URL_ENTRY_DELETE, BLANK));
         if (entry.isGroup()) {
             inner.append(
                 msgLabel("Are you sure you want to delete the group"));
@@ -3814,9 +3709,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         inner.append(HtmlUtil.p());
         inner.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
                              HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
+        inner.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        inner.append(HtmlUtil.formClose());
         sb.append(question(inner.toString()));
-        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-        sb.append(HtmlUtil.formClose());
         return makeEntryEditResult(request, entry,
                                    msg("Entry delete confirm"), sb);
     }
@@ -4127,6 +4022,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
                     entry = typeHandler.createEntry(id);
                     entry.initEntry(name, description, parentGroup,
+                                    "",
                                     request.getUser(),
                                     new Resource(theResource,
                                         Resource.TYPE_LOCALFILE), dataType,
@@ -4227,6 +4123,27 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /*
+    public List<Group> getTopGroups(Request request) throws Exception {
+        Statement statement = getDataBaseManager().execute(
+                                                           SqlUtil.makeSelect(COL_ENTRIES_ID, 
+                                                                              TABLE_ENTRIES,
+                                                                              SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                                                                         "null")));
+        String[]  ids = SqlUtil.readString(statement, 1);
+        List<Group> groups = new ArrayList<Group>();
+        for(int i=0;i<ids.length;i++) {
+            Group g = (Group)  getEntry(ids[i], request);
+            if (g == null) {
+                continue;
+            }
+            groups.add(g);
+        }
+        return groups;
+    }
+    */
+
+
     /**
      * _more_
      *
@@ -4291,7 +4208,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                                           OutputHandler.OUTPUT_HTML)));
             }
         }
-
 
 
         if (entry.isGroup()) {
@@ -6082,6 +5998,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         statement.setString(col++, entry.getName());
         statement.setString(col++, entry.getDescription());
         statement.setString(col++, entry.getParentGroupId());
+        statement.setString(col++, entry.getTopGroupId());
         statement.setString(col++, entry.getUser().getId());
         if (entry.getResource() == null) {
             entry.setResource(new Resource());

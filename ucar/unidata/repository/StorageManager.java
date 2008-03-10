@@ -100,7 +100,6 @@ import javax.swing.*;
  */
 public class StorageManager extends RepositoryManager {
 
-
     /**
      * _more_
      *

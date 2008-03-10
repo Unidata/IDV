@@ -120,6 +120,32 @@ public class OutputHandler extends RepositoryManager {
         this(repository);
     }
 
+    public void showNext(Request request, List<Group> subGroups, List<Entry> entries,  StringBuffer sb) throws Exception {
+        int cnt = subGroups.size() + entries.size();
+        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+        //        System.err.println ("cnt:" + cnt + " " + max);
+
+        if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
+            int skip = Math.max(0, request.get(ARG_SKIP, 0));
+            sb.append(msgLabel("Results") + (skip + 1) + "-" + (skip + cnt));
+            sb.append(HtmlUtil.space(4));
+            if (skip > 0) {
+                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
+                                        + ARG_SKIP + "="
+                                        + (skip - max), msg("Previous")));
+                sb.append(HtmlUtil.space(1));
+            }
+            if (cnt >= max) {
+                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
+                                        + ARG_SKIP + "="
+                                        + (skip + max), msg("Next")));
+            }
+        }
+
+    }
+
+
+
     /**
      * _more_
      *

@@ -215,6 +215,10 @@ public interface Tables {
         TABLE_ENTRIES + ".parent_group_id";
 
     /** _more_          */
+    public static final String COL_ENTRIES_TOP_GROUP_ID =
+        TABLE_ENTRIES + ".top_group_id";
+
+    /** _more_          */
     public static final String COL_ENTRIES_USER_ID = TABLE_ENTRIES
                                                      + ".user_id";
 
@@ -253,6 +257,7 @@ public interface Tables {
     public static final String[] ARRAY_ENTRIES = new String[] {
         COL_ENTRIES_ID, COL_ENTRIES_TYPE, COL_ENTRIES_NAME,
         COL_ENTRIES_DESCRIPTION, COL_ENTRIES_PARENT_GROUP_ID,
+        COL_ENTRIES_TOP_GROUP_ID,
         COL_ENTRIES_USER_ID, COL_ENTRIES_RESOURCE, COL_ENTRIES_RESOURCE_TYPE,
         COL_ENTRIES_DATATYPE, COL_ENTRIES_CREATEDATE, COL_ENTRIES_FROMDATE,
         COL_ENTRIES_TODATE, COL_ENTRIES_SOUTH, COL_ENTRIES_NORTH,

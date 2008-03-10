@@ -21,8 +21,18 @@ function noop()
 {
 }
 
+function print(s) {
+  var obj = new getObj("output");
+  if(!obj) return;
+  obj.obj.innerHTML  =s;
+}
+
+var cnt = 0;
 function tooltipHide(event,id)  
 {
+  cnt++;
+//  print('got hide ' + cnt);
+  lastMove++;
   var obj = new getObj("tooltipdiv");
   if(!obj) return;
   obj.style.visibility = "hidden";
@@ -33,21 +43,34 @@ function tooltipHide(event,id)
 var lastMove = 0;
 function tooltipShow(event,id) 
 {
-    return;
     lastMove++;
-    setTimeout("tooltipNowShow(" + lastMove+"," +event.clientX+","+ event.clientY +"," + "'" + id +"'"+")", 1000);
+    setTimeout("tooltipNowShow(" + lastMove+"," +event.clientX+","+ event.clientY +"," + "'" + id +"'"+")", 2000);
 }
 
 
 function handleMouseMove() {
-//   lastMove++;
+   cnt++;
+   print('mouse move ' + cnt);
+   lastMove++;
 }
+
 
 //document.addEventListener("mousemove",handleMouseMove,false); 
 
 
 function tooltipNowShow(moveId,x,y,id) 
 {
+
+   var link = new getObj(id);
+
+   if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
+      x= link.obj.offsetLeft;
+      y = link.obj.offsetTop+link.obj.offsetHeight+2;
+   } else {
+	x+=20;
+     //	y+=20;
+   }
+
   if(lastMove!=moveId) return
   var obj = new getObj("tooltipdiv");
   if(!obj) return;
@@ -62,7 +85,7 @@ function tooltipNowShow(moveId,x,y,id)
           var xmlDoc=request.responseXML.documentElement;
 	  obj.style.visibility = "visible";
 	  obj.style.display = "block";
-          block.obj.innerHTML = getChildText(xmlDoc);
+          obj.obj.innerHTML = getChildText(xmlDoc);
        }
       };
       request.open("GET", url);

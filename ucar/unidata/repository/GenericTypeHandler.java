@@ -61,27 +61,6 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
-    /** _more_ */
-    public static final String TAG_COLUMN = "column";
-
-    /** _more_ */
-    public static final String TAG_PROPERTY = "property";
-
-    /** _more_ */
-    public static final String ATTR_NAME = "name";
-
-    /** _more_ */
-    public static final String ATTR_VALUE = "value";
-
-    /** _more_          */
-    public static final String ATTR_DATATYPE = "datatype";
-
-    /** _more_ */
-    public static final String TAG_TYPE = "type";
-
-    /** _more_ */
-    public static final String TAG_HANDLER = "handler";
-
 
     /** _more_ */
     public static final String COL_ID = "id";
@@ -403,14 +382,6 @@ public class GenericTypeHandler extends TypeHandler {
         return true;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getTableName() {
-        return type;
-    }
 
     /**
      * _more_
@@ -620,6 +591,17 @@ public class GenericTypeHandler extends TypeHandler {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public String getTableName() {
+        return type;
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @param request _more_
      * @param formBuffer _more_
      * @param entry _more_
@@ -629,6 +611,7 @@ public class GenericTypeHandler extends TypeHandler {
     public void addToEntryForm(Request request, StringBuffer formBuffer,
                                Entry entry)
             throws Exception {
+        super.addToEntryForm(request, formBuffer, entry);
         for (Column column : columns) {
             column.addToEntryForm(request, formBuffer, entry);
         }

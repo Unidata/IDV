@@ -124,10 +124,12 @@ public class Entry extends Entity {
      * @param values _more_
      */
     public void initEntry(String name, String description, Group group,
+                          String topGroupId,
                           User user, Resource resource, String dataType,
                           long createDate, long startDate, long endDate,
                           Object[] values) {
         super.init(name, description, group, user, createDate);
+        //topGroup id is a noop
         this.resource = resource;
         this.dataType = dataType;
         if ((dataType == null) || (dataType.length() == 0)) {

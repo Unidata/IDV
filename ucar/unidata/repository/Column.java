@@ -53,7 +53,6 @@ import java.util.List;
 public class Column implements Tables, Constants {
 
 
-
     /** _more_ */
 
     public static final String EXPR_EQUALS = "=";
@@ -153,9 +152,8 @@ public class Column implements Tables, Constants {
     private static final String ATTR_SEARCHTYPE = "searchtype";
 
 
-
     /** _more_ */
-    private GenericTypeHandler typeHandler;
+    private TypeHandler typeHandler;
 
     /** _more_ */
     private String name;
@@ -215,7 +213,7 @@ public class Column implements Tables, Constants {
      *
      * @throws Exception _more_
      */
-    public Column(GenericTypeHandler typeHandler, Element element, int offset)
+    public Column(TypeHandler typeHandler, Element element, int offset)
             throws Exception {
         this.typeHandler = typeHandler;
         this.offset      = offset;
@@ -612,6 +610,18 @@ public class Column implements Tables, Constants {
     public void addToEntryForm(Request request, StringBuffer formBuffer,
                                Entry entry)
             throws Exception {
+        String widget = getFormWidget(request, entry);
+        //        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
+        //                                             HtmlUtil.hbox(widget, suffix)));
+        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
+                                             HtmlUtil.hbox(widget, suffix)));
+        formBuffer.append("\n");
+    }
+
+
+    public String getFormWidget(Request request, 
+                            Entry entry)
+            throws Exception {
         String   widget = "";
         Object[] values = ((entry == null)
                            ? null
@@ -685,10 +695,10 @@ public class Column implements Tables, Constants {
                                         "size=\"" + columns + "\"");
             }
         }
-        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
-                                             HtmlUtil.hbox(widget, suffix)));
-        formBuffer.append("\n");
+        return HtmlUtil.hbox(widget, suffix);
     }
+
+
 
 
     /**
