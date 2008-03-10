@@ -390,6 +390,10 @@ public class HtmlUtil {
         return "<tr>" + row + "</tr>";
     }
 
+    public static String row(String row, String extra) {
+        return "<tr " + extra+">" + row + "</tr>";
+    }
+
     /**
      * _more_
      *
