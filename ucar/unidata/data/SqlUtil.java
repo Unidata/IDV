@@ -707,6 +707,10 @@ public class SqlUtil {
         return " " + validName(name) + "=" + value + " ";
     }
 
+    public static String isNull(String name) {
+        return " " + validName(name) + " is NULL ";
+    }
+
     /**
      * _more_
      *
