@@ -44,7 +44,8 @@ var lastMove = 0;
 function tooltipShow(event,id) 
 {
     lastMove++;
-    setTimeout("tooltipNowShow(" + lastMove+"," +event.clientX+","+ event.clientY +"," + "'" + id +"'"+")", 2000);
+    //    setTimeout("tooltipNowShow(" + lastMove+"," +event.clientX+","+ event.clientY +"," + "'" + id +"'"+")", 2000);
+    setTimeout("tooltipNowShow(" + lastMove+"," +event.clientX+","+ event.clientY +"," + "'" + id +"'"+")", 1000);
 }
 
 
@@ -58,14 +59,26 @@ function handleMouseMove() {
 //document.addEventListener("mousemove",handleMouseMove,false); 
 
 
+function getTop(obj) {
+    if(!obj) return 0;
+    return obj.offsetTop+getTop(obj.offsetParent);
+}
+
+function getLeft(obj) {
+    if(!obj) return 0;
+    return obj.offsetLeft+getLeft(obj.offsetParent);
+}
+
+
 function tooltipNowShow(moveId,x,y,id) 
 {
 
    var link = new getObj(id);
 
    if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
-      x= link.obj.offsetLeft;
-      y = link.obj.offsetTop+link.obj.offsetHeight+2;
+       x= getLeft(link.obj);
+       y = link.obj.offsetHeight+getTop(link.obj) + 2;
+       //       print("link:" +x + " " + y);
    } else {
 	x+=20;
      //	y+=20;

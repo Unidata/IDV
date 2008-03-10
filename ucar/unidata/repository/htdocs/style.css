@@ -130,6 +130,10 @@ text-decoration: none
    margin-top:5px;
 }
 
+.block {
+   margin-top:10px;
+}
+
 a.pagesubheadinglink {
    color:black;
    font-weight: bold;

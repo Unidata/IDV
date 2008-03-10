@@ -177,18 +177,8 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer();
         boolean didOne = false;
         sb.append("<table>");
-        if (entry.getDescription().length() > 0) {
-            sb.append(HtmlUtil.formEntry("Description:",
-                                         entry.getDescription()));
-        }
-
-        TypeHandler typeHandler =
-            getRepository().getTypeHandler(entry.getType());
-        if(!entry.isGroup()) {
-            sb.append(HtmlUtil.formEntry("Type:",
-                                         typeHandler.getLabel()));
-        }
-
+        sb.append(entry.getTypeHandler().getInnerEntryContent( entry,  request,
+                                                               OutputHandler.OUTPUT_HTML, false));
         getMetadataHtml(request, entry, sb,false);
 
         sb.append("</table>");
@@ -255,26 +245,6 @@ public class HtmlOutputHandler extends OutputHandler {
                                           entry.getId()), entry.getName());
     }
 
-    protected String getGroupLink(Request request, Group group) {
-        String folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
-        StringBuffer sb = new StringBuffer();
-        String folderImg = HtmlUtil.img(folder,"Open Group"," id=" + HtmlUtil.quote("img_" +group.getId())); 
-        sb.append("<a href=\"JavaScript: noop()\" onclick=" + HtmlUtil.quote("folderClick('" + group.getId() +"')")+
-                        "/>" +
-                  folderImg +"</a>");
-        sb.append(HtmlUtil.space(1));
-        String linkText = group.getName();
-        sb.append(
-            HtmlUtil.href(
-                          HtmlUtil.url(
-                                       getRepository().URL_ENTRY_SHOW, ARG_ID,
-                                       group.getId()), linkText,
-                          " id=\"" + group.getId() +"\" " +
-                          " onmouseover=" + HtmlUtil.quote("tooltipShow(event,'" + group.getId() +"');") + 
-                          " onmouseout=" + HtmlUtil.quote("tooltipHide(event,'" + group.getId() +"');")));
-        
-        return sb.toString();
-    }
 
 
 
@@ -593,7 +563,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
         StringBuffer detailsSB = new StringBuffer();
         if(decorate) {
-            sb.append(HtmlUtil.p());
             detailsSB.append("<table cellspacing=\"5\">\n");
         }
 
@@ -631,23 +600,14 @@ public class HtmlOutputHandler extends OutputHandler {
         String folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
             sb.append("<li>");
-            String groupLink = getGroupLink(request, subGroup);
+            String groupLink = getAjaxLink(request, subGroup);
             sb.append(groupLink);
             sb.append("<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id=" + HtmlUtil.quote("block_" + subGroup.getId()) +"></ul>");
         }
 
         for (Entry entry : entries) {
             sb.append("<li>");            
-            sb.append(HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
-                                          ARG_ID,
-                                          entry.getId()), 
-                                     HtmlUtil.img(getRepository().fileUrl(ICON_FILE))
-                                     + HtmlUtil.space(1) +
-                                     entry.getName(),
-                                    " id=\"" + entry.getId() +"\" " +
-                                    " onmouseover=" + HtmlUtil.quote("tooltipShow(event,'" + entry.getId() +"');") + 
-                                    " onmouseout=" + HtmlUtil.quote("tooltipHide(event,'" + entry.getId() +"');")));
-
+            sb.append(getAjaxLink(request, entry));
         }
 
         if(subGroups.size()==0 && entries.size()==0) {
@@ -730,7 +690,7 @@ public class HtmlOutputHandler extends OutputHandler {
             if ( !showApplet) {
                 getMetadataHtml(request, group, sb,true);
             }
-            sb.append(HtmlUtil.p());
+
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
                 groupsSB.append("<ul class=\"folderblock\" style=\"list-style-image : url("
@@ -739,7 +699,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     List<Metadata> metadataList =
                         getMetadataManager().getMetadata(subGroup);
                     groupsSB.append("<li>");
-                    String groupLink = getGroupLink(request, subGroup);
+                    String groupLink = getAjaxLink(request, subGroup);
                     groupsSB.append(groupLink);
                     groupsSB.append("<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id=" + HtmlUtil.quote("block_" + subGroup.getId()) +"></ul>");
                 }
@@ -750,7 +710,6 @@ public class HtmlOutputHandler extends OutputHandler {
                 //sb.append("</div>");
             }
             if (entries.size() > 0) {
-                sb.append(HtmlUtil.p());
                 StringBuffer entriesSB = new StringBuffer();
                 if (showApplet) {
                     entriesSB.append(getTimelineApplet(request, entries));

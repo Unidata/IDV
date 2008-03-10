@@ -294,6 +294,40 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {}
 
 
+
+    protected String getAjaxLink(Request request, Entry entry) {
+        return getAjaxLink(request, entry, entry.getName(),true);
+    }
+
+    protected String getAjaxLink(Request request, Entry entry, String linkText, boolean includeIcon) {
+        String icon = (entry.isGroup()?getRepository().fileUrl(ICON_FOLDER_CLOSED):getRepository().fileUrl(ICON_FILE));
+        StringBuffer sb = new StringBuffer();
+        if(includeIcon) {
+            String img = HtmlUtil.img(icon,entry.isGroup()?"Open Group":""," id=" + HtmlUtil.quote("img_" +entry.getId())); 
+            if(entry.isGroup()) {
+                sb.append("<a href=\"JavaScript: noop()\" onclick=" + HtmlUtil.quote("folderClick('" + entry.getId() +"')")+
+                          "/>" +
+                          img +"</a>");
+            } else {
+                sb.append(img);
+            }
+            sb.append(HtmlUtil.space(1));
+        }
+        String elementId =  entry.getId();
+        sb.append(
+            HtmlUtil.href(
+                          HtmlUtil.url(
+                                       getRepository().URL_ENTRY_SHOW, ARG_ID,
+                                       entry.getId()), linkText,
+                          " id=" + HtmlUtil.quote(elementId) +" " +
+                          " onmouseover=" + HtmlUtil.quote("tooltipShow(event,'" + elementId +"');") + 
+                          " onmouseout=" + HtmlUtil.quote("tooltipHide(event,'" + elementId +"');")));
+        
+        return sb.toString();
+    }
+
+
+
     /**
      * _more_
      *
@@ -401,15 +435,15 @@ public class OutputHandler extends RepositoryManager {
                 sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",
                                             dfltSelected));
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                sb.append(HtmlUtil.space(1));
             }
-            sb.append(HtmlUtil.space(1));
             if (showCrumbs) {
                 String crumbs = getRepository().getBreadCrumbs(request,
                                     entry);
 
                 sb.append(crumbs);
             } else {
-                sb.append(getEntryUrl(entry));
+                sb.append(getEntryUrl(request, entry));
             }
             //            sb.append(HtmlUtil.br());
         }
@@ -429,7 +463,9 @@ public class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String getEntryUrl(Entry entry) {
+    protected String getEntryUrl(Request request, Entry entry) {
+        if(true)
+            return getAjaxLink(request,  entry, entry.getName(), false);
         return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ID,
                                           entry.getId()), entry.getName());

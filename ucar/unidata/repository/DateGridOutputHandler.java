@@ -204,7 +204,7 @@ public class DateGridOutputHandler extends OutputHandler {
                 colSB = new StringBuffer();
                 contents.put(key, colSB);
             }
-            colSB.append(HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW, ARG_ID, entry.getId()), time));
+            colSB.append(getAjaxLink(request, entry, time,false));
             colSB.append(HtmlUtil.br());
         }
 

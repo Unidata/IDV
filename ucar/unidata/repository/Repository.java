@@ -2570,6 +2570,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             label +"</a>";
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
+        sb.append("<div class=\"block\">");
         sb.append(RepositoryManager.subHeader(link));
         sb.append("<div class=\"hideshowblock\" id=\"" + id +"\" style=\"display:block;visibility:visible\">");
         if(!visible) {
@@ -2577,6 +2578,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }  
 
         sb.append(content.toString());
+        sb.append("</div>");
         sb.append("</div>");
         return sb.toString();
     }
@@ -2645,7 +2647,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         metadataSB.append(HtmlUtil.formTable());
         getMetadataManager().addToSearchForm(request, metadataSB);
         metadataSB.append(HtmlUtil.formTableClose());
-        sb.append(HtmlUtil.p());
         sb.append(makeShowHideBlock(request, "form.metadata",msg("Metadata"),metadataSB,false));
 
 
@@ -2681,9 +2682,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-        sb.append(HtmlUtil.p());
         sb.append(makeShowHideBlock(request, "form.output",msg("Output"),outputForm,false));
-        sb.append(HtmlUtil.p());
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);

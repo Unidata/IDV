@@ -284,7 +284,7 @@ public class ImageOutputHandler extends OutputHandler {
                 if (cnt == 0) {
                     firstImage = url;
                 }
-                String entryUrl = getEntryUrl(entry);
+                String entryUrl = getEntryUrl(request, entry);
                 String title =
                     "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
                 title += "<tr><td><b>Image:</b> " + entryUrl
@@ -309,7 +309,7 @@ public class ImageOutputHandler extends OutputHandler {
                                       + entry.getName(), ARG_ID,
                                           entry.getId(), ARG_IMAGEWIDTH,
                                           "" + 50);
-                String entryUrl = getEntryUrl(entry);
+                String entryUrl = getEntryUrl(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
                 String title = entry.getTypeHandler().getEntryContent(entry,
                                    request, false).toString();
@@ -340,7 +340,7 @@ public class ImageOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.img(url, "",
                                        XmlUtil.attr(ARG_WIDTH, "400")));
                 sb.append("<br>\n");
-                sb.append(getEntryUrl(entry));
+                sb.append(getEntryUrl(request, entry));
                 sb.append(" " + new Date(entry.getStartDate()));
                 sb.append("<p></td>");
             }
