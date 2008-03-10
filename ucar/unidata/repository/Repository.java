@@ -2680,7 +2680,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         outputForm.append(HtmlUtil.formTableClose());
 
 
-        System.err.println(outputForm);
+
         sb.append(HtmlUtil.p());
         sb.append(makeShowHideBlock(request, "form.output",msg("Output"),outputForm,false));
         sb.append(HtmlUtil.p());
