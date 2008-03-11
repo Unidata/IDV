@@ -4921,9 +4921,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     Robot robot = new Robot();
                     toFront();
                     Misc.sleep(250);
-                    BufferedImage image =
-                        robot.createScreenCapture(new Rectangle(loc.x, loc.y,
-                            dim.width, dim.height));
+                    BufferedImage image;
+
+                    try {
+                        image =
+                            robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+                                                                    dim.width, dim.height));
+                    } catch(Exception exc) {
+                        logException("Error capturing image for component:" + whichComponent +" location:" + loc.x +"x" + loc.y +" dimension:" + dim.width +"x" + dim.height,  
+                                     exc);
+                        return;
+                    }
 
 
                     if (backgroundTransparentBtn.isSelected()) {
