@@ -965,13 +965,15 @@ public class SqlUtil {
             throws Exception {
         for (String command : parseSql(sql)) {
             try {
+
                 statement.execute(command);
-                //                System.err.println ("OK:" + command);
+                if(!ignoreErrors)
+                    System.err.println ("OK:" + command);
             } catch (Exception exc) {
-                //                System.err.println ("bad sql:" + command+ " " + exc);
                 if ( !ignoreErrors) {
-                    //                    System.err.println("bad query:" + command);
-                    throw exc;
+                    System.err.println("Bad sql:" + command);
+                    System.err.println("" + exc);
+                    //                    throw exc;
                 }
             }
         }
@@ -1002,6 +1004,9 @@ public class SqlUtil {
                 result.add(lineSql);
                 sb = new StringBuffer();
             }
+        }
+        if(sb.toString().length()>0) {
+            result.add(sb.toString());
         }
         return result;
     }
