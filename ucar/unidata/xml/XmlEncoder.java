@@ -22,46 +22,49 @@
 
 
 
+
+
 package ucar.unidata.xml;
-
-
-
-
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.util.IOUtil;
-
-import ucar.unidata.util.ObjectArray;
-import ucar.unidata.util.ObjectListener;
-
-import ucar.unidata.xml.test.*;
-
-
-
-import java.io.*;
-
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Hashtable;
-
-import java.lang.reflect.*;
 
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+
+
+
+
+import ucar.unidata.util.GuiUtils;
+
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+
+import ucar.unidata.util.ObjectArray;
+import ucar.unidata.util.ObjectListener;
+import ucar.unidata.util.StringUtil;
+
+import ucar.unidata.xml.test.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+
+
+
+import java.io.*;
+
+import java.lang.reflect.*;
+
+import java.util.ArrayList;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.swing.*;
 
 
 
@@ -113,7 +116,7 @@ public class XmlEncoder extends XmlUtil {
      * A fixed array holding the XmlEncoder Class. This is used to see if an object has
      * an initAfterXml method.
      */
-    private static final Class[] ENCODER_ARRAY = new Class[]{
+    private static final Class[] ENCODER_ARRAY = new Class[] {
                                                      XmlEncoder.class };
 
     /**
@@ -400,7 +403,8 @@ public class XmlEncoder extends XmlUtil {
         addDelegateForClass(Point.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 Point p     = (Point) o;
-                List  args = Misc.newList(new Integer(p.x), new Integer(p.y));
+                List  args  = Misc.newList(new Integer(p.x),
+                                           new Integer(p.y));
                 List  types = Misc.newList(Integer.TYPE, Integer.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
@@ -462,7 +466,6 @@ public class XmlEncoder extends XmlUtil {
     /**
      *  Convert the  given object to xml.
      *
-     *  @param theObject The object to convert.
      *
      * @param o
      *  @param formatXml Do we format the result xml with newlines and spaces to make it readable.
@@ -476,10 +479,10 @@ public class XmlEncoder extends XmlUtil {
                 Element element = toElement(o);
                 if (element != null) {
                     xml = XmlUtil.toStringWithHeader(element, (formatXml
-                                                               ? "    "
-                                                               : ""), (formatXml
-                                                                       ? "\n"
-                                                                       : ""));
+                            ? "    "
+                            : ""), (formatXml
+                                    ? "\n"
+                                    : ""));
                 }
             } catch (Exception exc) {
                 logException("Error:", exc);
@@ -515,25 +518,17 @@ public class XmlEncoder extends XmlUtil {
         if ((xml == null) || (xml.length() == 0)) {
             return null;
         }
-        synchronized (MUTEX) {
-            init();
-            Object obj = null;
-            try {
-                //      System.err.println("toObject-1");
-                Element root = XmlUtil.getRoot(xml);
-                //      System.err.println("toObject-2");
-                if (root == null) {
-                    return null;
-                }
-                obj = toObject(root);
-                //      System.err.println("toObject-3");
-            } catch (Exception exc) {
-                logException("Error:", exc);
+        try {
+            Element root = XmlUtil.getRoot(xml);
+            if (root == null) {
+                return null;
             }
-            LogUtil.printExceptions(errorMessages, exceptions);
-            clear();
-            return obj;
+            return toObjectInner(root);
+        } catch (Exception exc) {
+            logException("Error:", exc);
+            return null;
         }
+
     }
 
 
@@ -544,7 +539,30 @@ public class XmlEncoder extends XmlUtil {
      *  @return the newly created object.
      */
     public Object toObject(Element node) {
-        return createObject(node);
+        return toObjectInner(node);
+    }
+
+
+
+    /**
+     *  Create an object from the given dom subtree.
+     *
+     *  @param node The xml.
+     *  @return the newly created object.
+     */
+    private Object toObjectInner(Element node) {
+        synchronized (MUTEX) {
+            Object object = null;
+            init();
+            try {
+                object = createObject(node);
+            } catch (Exception exc) {
+                logException("Error:", exc);
+            }
+            LogUtil.printExceptions(errorMessages, exceptions);
+            clear();
+            return object;
+        }
     }
 
 
@@ -617,7 +635,7 @@ public class XmlEncoder extends XmlUtil {
      *  @param delegate The delegate that handles the class.
      */
     public void addHighPriorityDelegateForClass(Class theClass,
-                                                XmlDelegate delegate) {
+            XmlDelegate delegate) {
         if (delegates == null) {
             delegates = new ArrayList();
         }
@@ -933,8 +951,7 @@ public class XmlEncoder extends XmlUtil {
             nameToPrimitiveClass.put(bclasses[i].getName(), bclasses[i]);
             primitiveClasses.put(bclasses[i], bclasses[i]);
             Constructor ctor = Misc.findConstructor(wclasses[i],
-                                                    new Class[]{
-                                                        String.class });
+                                   new Class[] { String.class });
             if (ctor != null) {
                 primitiveClassToCtor.put(bclasses[i], ctor);
             }
@@ -943,8 +960,7 @@ public class XmlEncoder extends XmlUtil {
             primitiveClassToName.put(wclasses[i], wclasses[i].getName());
             nameToPrimitiveClass.put(wclasses[i].getName(), wclasses[i]);
             Constructor ctor = Misc.findConstructor(wclasses[i],
-                                                    new Class[]{
-                                                        String.class });
+                                   new Class[] { String.class });
             if (ctor != null) {
                 primitiveClassToCtor.put(wclasses[i], ctor);
             }
@@ -1440,11 +1456,10 @@ public class XmlEncoder extends XmlUtil {
                     Class  type = (Class) types.get(i);
                     Object arg  = arguments.get(i);
                     element.appendChild(createElement(arg, ((type != null)
-                                                            ? type
-                                                            : ((arg != null)
-                                                               ? arg
-                                                               .getClass()
-                                                               : Object.class))));
+                            ? type
+                            : ((arg != null)
+                               ?arg.getClass()
+                               :Object.class))));
                 } else {
                     element.appendChild(createElement(arguments.get(i)));
                 }
@@ -1462,9 +1477,17 @@ public class XmlEncoder extends XmlUtil {
      *  @return The list of property Method-s.
      */
     public static List findPropertyMethods(Class c) {
-        return findPropertyMethods(c,true);
+        return findPropertyMethods(c, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     * @param returnGetters _more_
+     *
+     * @return _more_
+     */
     public static List findPropertyMethods(Class c, boolean returnGetters) {
         Method[]  methods = c.getMethods();
         ArrayList v       = new ArrayList();
@@ -1483,10 +1506,11 @@ public class XmlEncoder extends XmlUtil {
             Method  setter       = null;
             try {
                 setter = c.getMethod("set" + propertyName, setterParams);
-                if(returnGetters)
+                if (returnGetters) {
                     v.add(getter);
-                else
+                } else {
                     v.add(setter);
+                }
             } catch (NoSuchMethodException nsme) {
                 continue;
             }
@@ -1656,7 +1680,7 @@ public class XmlEncoder extends XmlUtil {
         //by the parser.
         if (isString) {
             String stringValue = getAttribute(element, ATTR_STRINGVALUE,
-                                              NULL_STRING);
+                                     NULL_STRING);
             if (stringValue != null) {
                 return new ObjectClass(stringValue, primitiveClass);
             }
@@ -1729,7 +1753,7 @@ public class XmlEncoder extends XmlUtil {
             }
             Constructor ctor = getPrimitiveCtor(primitiveClass);
             if (ctor != null) {
-                return ctor.newInstance(new Object[]{ value });
+                return ctor.newInstance(new Object[] { value });
             }
             String className = primitiveClass.getName();
 
@@ -1838,7 +1862,7 @@ public class XmlEncoder extends XmlUtil {
         if (tagName.equals(TAG_NULL)) {
             try {
                 String nullClassName = getAttribute(element, ATTR_CLASS,
-                                                    NULL_STRING);
+                                           NULL_STRING);
                 if (nullClassName != null) {
                     return new ObjectClass(null, getClass(nullClassName));
                 }
@@ -1899,7 +1923,7 @@ public class XmlEncoder extends XmlUtil {
             } else {
                 //Else it is an "object" tag (i.e., <object class=...>)
                 Element constructorNode = XmlUtil.findChild(element,
-                                                            TAG_CONSTRUCTOR);
+                                              TAG_CONSTRUCTOR);
                 if (constructorNode != null) {
                     NodeList children = XmlUtil.getElements(constructorNode);
                     Object[] args     = new Object[children.getLength()];
@@ -2006,7 +2030,7 @@ public class XmlEncoder extends XmlUtil {
             Method theMethod = newObject.getClass().getMethod(METHOD_INIT,
                                    ENCODER_ARRAY);
             if (theMethod != null) {
-                theMethod.invoke(newObject, new Object[]{ this });
+                theMethod.invoke(newObject, new Object[] { this });
             }
         } catch (NoSuchMethodException nsme) {}
         catch (Exception exc) {
@@ -2062,14 +2086,13 @@ public class XmlEncoder extends XmlUtil {
         try {
             //TODO: Cache the results of method lookup.
             Method theMethod = Misc.findMethod(object.getClass(), methodName,
-                                               paramTypes);
+                                   paramTypes);
             if (theMethod == null) {
                 for (int i = 0; i < paramTypes.length; i++) {
                     // System.err.println("type:" + paramTypes[i]);
                 }
-                throw new IllegalArgumentException(
-                    "Unable to find method: " + object.getClass().getName()
-                    + "." + methodName);
+                throw new IllegalArgumentException("Unable to find method: "
+                        + object.getClass().getName() + "." + methodName);
             } else {
                 theMethod.invoke(object, params);
             }
@@ -2308,8 +2331,8 @@ public class XmlEncoder extends XmlUtil {
                     p.flush();
                     ostream.close();
                     byte[] bytes = ostream.toByteArray();
-                    newElement = createSerialElement(
-                        theClass, new String(XmlUtil.encodeBase64(bytes)));
+                    newElement = createSerialElement(theClass,
+                            new String(XmlUtil.encodeBase64(bytes)));
                     ctorOk = true;
                 } catch (Exception exc) {
                     logException("Error serializing class: "
@@ -2414,13 +2437,13 @@ public class XmlEncoder extends XmlUtil {
         for (int i = 0; i < methods.size(); i++) {
             Method getter = (Method) methods.get(i);
             try {
-                Object value = getter.invoke(object, new Object[]{});
+                Object value = getter.invoke(object, new Object[] {});
                 //See if we have a prototype
                 if (prototype != null) {
                     try {
                         //If the value is the same as the prototype's then skip this
                         Object protoTypeValue = getter.invoke(prototype,
-                                                              new Object[]{});
+                                                    new Object[] {});
                         if (Misc.equals(value, protoTypeValue)) {
                             //System.err.println ("skipping: " +getter);
                             continue;
@@ -2434,7 +2457,7 @@ public class XmlEncoder extends XmlUtil {
                 Element valueElement;
                 if (primitiveName != null) {
                     valueElement = createPrimitiveElement(primitiveName,
-                                                          value);
+                            value);
                 } else {
                     if (value == null) {
                         valueElement = createNullElement(returnType);
@@ -2449,7 +2472,7 @@ public class XmlEncoder extends XmlUtil {
                                           propertyName);
                     }
                     elements.add(createPropertyElement(propertyName,
-                                                       valueElement));
+                            valueElement));
                 }
             } catch (Exception exc) {
                 logException("Error evaluating method: " + getter.getName()
@@ -2476,7 +2499,7 @@ public class XmlEncoder extends XmlUtil {
                 Element argumentElement = createElement(v.get(i));
                 if (argumentElement != null) {
                     elements.add(createMethodElement(METHOD_ADD,
-                                                     argumentElement));
+                            argumentElement));
                 }
             }
             return elements;
@@ -2593,8 +2616,7 @@ public class XmlEncoder extends XmlUtil {
 
         try {
             String xmltest = IOUtil.readContents("test.xml",
-                                                 XmlEncoder.class,
-                                                 (String) null);
+                                 XmlEncoder.class, (String) null);
             XmlEncoder enc1 = new XmlEncoder();
             Object     o1   = enc1.toObject(xmltest);
             System.err.println("o1:" + o1);
@@ -2688,10 +2710,4 @@ public class XmlEncoder extends XmlUtil {
 
 
 }
-
-
-
-
-
-
 
