@@ -57,6 +57,13 @@
      label="Point data database"/>
 
 
+  <datasource
+     id="DB.TRAJECTORY"
+     fileselection="true"
+     factory="ucar.unidata.data.sounding.DbTrajectoryDataSource"
+     label="Trajectory database"/>
+
+
 
   <datasource
      id="EOL.TRACKDB"
