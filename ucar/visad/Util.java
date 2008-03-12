@@ -3084,14 +3084,15 @@ public final class Util {
      * @param data   the VisAD data to export
      * @throws Exception  can't write data as netCDF
      */
-    public static void exportAsNetcdf(Data data) throws Exception {
+    public static boolean exportAsNetcdf(Data data) throws Exception {
         String filename = FileManager.getWriteFile(FileManager.FILTER_NETCDF,
                               FileManager.SUFFIX_NETCDF);
         if (filename == null) {
-            return;
+            return false;
         }
         Plain p = new Plain();
         p.save(filename, data, true);
+        return true;
     }
 
 
