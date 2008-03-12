@@ -1293,10 +1293,8 @@ public class TextPointDataSource extends PointDataSource {
      */
     public void doMakeDataChoices() {
         super.doMakeDataChoices();
-        System.err.println ("isTrajectoryEnabled()= " + isTrajectoryEnabled());
         if (isTrajectoryEnabled()) {
             if (getDataChoices().size() == 0) {
-                System.err.println ("no data choices");
                 return;
             }
             try {
@@ -1306,7 +1304,6 @@ public class TextPointDataSource extends PointDataSource {
                 Data sample = makeObs(dataChoice, null, null, null, true,
                                       true);
                 //                System.err.println ("sample:" + sample);
-                System.err.println ("varnames:" + varNames);
 
                 List cats = DataCategory.parseCategories("Track" + ";trace",
                                 true);
