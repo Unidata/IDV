@@ -3298,6 +3298,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     msg("Make top level");
 
             }
+            topLevelCheckbox = "";
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons+topLevelCheckbox,2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));

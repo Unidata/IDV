@@ -68,7 +68,7 @@ public class ReportTypeHandler extends TypeHandler {
 
     private String formTemplatePath;
 
-    private String displayTemplatePath;
+
 
 
     /** _more_ */
@@ -118,8 +118,6 @@ public class ReportTypeHandler extends TypeHandler {
         }
 
         formTemplatePath = XmlUtil.getAttribute(entryNode, "formtemplate");
-        displayTemplatePath = XmlUtil.getAttribute(entryNode, "displaytemplate",(String)null);
-
         setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
                                             getType()));
 
@@ -148,17 +146,6 @@ public class ReportTypeHandler extends TypeHandler {
 
     }
 
-
-    public StringBuffer getEntryContent(Entry entry, Request request,
-                                        boolean showResource)
-            throws Exception {
-
-        StringBuffer sb     = new StringBuffer();
-        if(displayTemplatePath==null) return super.getEntryContent(entry, request, showResource);
-        String html = getRepository().getResource(displayTemplatePath);
-        sb.append(html);
-        return sb;
-    }
 
 
     public void addToEntryForm(Request request, StringBuffer formBuffer,

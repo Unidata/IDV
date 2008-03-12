@@ -109,6 +109,10 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_NAME = "name";
 
+    private static final String ATTR_GROUP = "group";
+
+    private static final String ATTR_OLDNAMES = "oldnames";
+
     /** _more_ */
     private static final String ATTR_SUFFIX = "suffix";
 
@@ -157,6 +161,10 @@ public class Column implements Tables, Constants {
 
     /** _more_ */
     private String name;
+
+    private String group;
+
+    private List oldNames;
 
     /** _more_ */
     private String label;
@@ -218,6 +226,8 @@ public class Column implements Tables, Constants {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
+        group            = XmlUtil.getAttribute(element, ATTR_GROUP,(String)null);
+        oldNames         = StringUtil.split(XmlUtil.getAttribute(element, ATTR_OLDNAMES,""), ",",true, true);
         suffix           = XmlUtil.getAttribute(element, ATTR_SUFFIX, "");
         label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
@@ -426,31 +436,57 @@ public class Column implements Tables, Constants {
     }
 
 
+    private void defineColumn(Statement statement, String name, String type)  throws Exception {
+        String sql = "alter table " + getTableName() + " add column " +  name + " " + type;
+        SqlUtil.loadSql(sql, statement, true);
+    }
+
+
     /**
      * _more_
      *
      * @return _more_
      */
-    public String getSqlCreate() {
-        String def = " " + name + " ";
+    public void createTable(Statement statement)  throws Exception {
+        
+
         if (type.equals(TYPE_STRING)) {
-            return def + "varchar(" + size + ") ";
+            defineColumn(statement, name,  "varchar(" + size + ") ");
         } else if (type.equals(TYPE_ENUMERATION)) {
-            return def + "varchar(" + size + ") ";
+            defineColumn(statement, name,  "varchar(" + size + ") ");
         } else if (type.equals(TYPE_INT)) {
-            return def + "int ";
+            defineColumn(statement, name,  "int");
         } else if (type.equals(TYPE_DOUBLE)) {
-            return def
-                   + typeHandler.getRepository().getDatabaseManager()
-                       .convertType("double") + " ";
+            defineColumn(statement, name,  typeHandler.getRepository().getDatabaseManager()
+                         .convertType("double"));
         } else if (type.equals(TYPE_BOOLEAN)) {
-            return def + "int ";
+            //use int as boolean for database compatibility
+            defineColumn(statement, name,  "int");
         } else if (type.equals(TYPE_LATLON)) {
-            return " " + name + "_lat double, " + name + "_lon double ";
+            defineColumn(statement, name+"_lat", typeHandler.getRepository().getDatabaseManager()
+                         .convertType("double")); 
+            defineColumn(statement, name+"_lon", typeHandler.getRepository().getDatabaseManager()
+                         .convertType("double")); 
+
         } else {
             throw new IllegalArgumentException("Unknown column type:" + type
                     + " for " + name);
         }
+
+
+        for(int i=0;i<oldNames.size();i++) {
+            String sql = "update " + getTableName() + " set " + name + " = " + oldNames.get(i);
+            SqlUtil.loadSql(sql, statement, true);
+            sql = "alter table " + getTableName() + " drop " + oldNames.get(i);
+            SqlUtil.loadSql(sql, statement, true);
+        }
+
+        if (isIndex) {
+            SqlUtil.loadSql("CREATE INDEX " + getTableName() + "_INDEX_"
+                            + name + "  ON " + getTableName() + " ("
+                            + name + ")", statement, true);
+        }
+
     }
 
 
@@ -477,20 +513,10 @@ public class Column implements Tables, Constants {
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getSqlIndex() {
-        if (isIndex) {
-            return "CREATE INDEX " + typeHandler.getTableName() + "_INDEX_"
-                   + name + "  ON " + typeHandler.getTableName() + " ("
-                   + name + ");\n";
-        } else {
-            return "";
-        }
+    public String getTableName() {
+        return typeHandler.getTableName();
     }
+
 
 
     /**
@@ -608,11 +634,16 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     public void addToEntryForm(Request request, StringBuffer formBuffer,
-                               Entry entry)
+                               Entry entry,Hashtable state)
             throws Exception {
         String widget = getFormWidget(request, entry);
         //        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
         //                                             HtmlUtil.hbox(widget, suffix)));
+        if(group!=null && state.get(group)==null) {
+            formBuffer.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.div(group," class=\"formgroupheader\" "),2)));
+            state.put(group,group);
+        }
+
         formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
                                              HtmlUtil.hbox(widget, suffix)));
         formBuffer.append("\n");

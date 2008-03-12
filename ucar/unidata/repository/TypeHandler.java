@@ -134,6 +134,9 @@ public class TypeHandler extends RepositoryManager {
     /** _more_          */
     private String defaultDataType;
 
+    private String displayTemplatePath;
+
+
     /**
      * _more_
      *
@@ -143,6 +146,11 @@ public class TypeHandler extends RepositoryManager {
         super(repository);
     }
 
+
+    public TypeHandler(Repository repository, Element entryNode) {
+        this(repository);
+        displayTemplatePath = XmlUtil.getAttribute(entryNode, "displaytemplate",(String)null);
+    }
 
     /**
      * _more_
@@ -390,9 +398,18 @@ public class TypeHandler extends RepositoryManager {
                                         boolean showResource)
             throws Exception {
 
+
+
+
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
+            if(displayTemplatePath!=null) {
+                String html = getRepository().getResource(displayTemplatePath);
+                sb.append(html);
+                return sb;
+            }
+
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
                                            showResource));

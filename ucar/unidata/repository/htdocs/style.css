@@ -47,6 +47,9 @@ text-decoration: none
 }
 
 
+
+
+
 .tooltip {
    border : 1px black solid;
    background-color : #FFFFCC;
@@ -113,8 +116,6 @@ text-decoration: none
 }
 
 
-
-
 .pagesubheading {
    margin:0px;
    padding:0px;
@@ -161,6 +162,8 @@ form {
 }
 
 
+
+
 .nav {
    font-size: 12pt;
    background-color : #77aa77;
@@ -184,6 +187,15 @@ form {
    padding-bottom:0;
    padding-left:10;
 
+}
+
+
+.formgroupheader {
+   background-color : #ccccCC;
+   font-size: 10pt;
+   font-weight: bold;
+   padding-left: 5px;
+   padding-top: 5px;
 }
 
 

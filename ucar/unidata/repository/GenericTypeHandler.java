@@ -39,6 +39,7 @@ import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
 import java.sql.PreparedStatement;
+import java.lang.reflect.*;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -61,6 +62,7 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
+    public static final String ATTR_CLASS = "class";
 
     /** _more_ */
     public static final String COL_ID = "id";
@@ -84,7 +86,7 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public GenericTypeHandler(Repository repository, Element entryNode)
             throws Exception {
-        super(repository);
+        super(repository,entryNode);
         init(entryNode);
     }
 
@@ -125,28 +127,13 @@ public class GenericTypeHandler extends TypeHandler {
         }
 
 
-        colNames.add(COL_ID);
-        StringBuffer tableDef = new StringBuffer("create table "
-                                    + getTableName() + " (\n");
-        StringBuffer indexDef = new StringBuffer();
-        tableDef.append(COL_ID + " varchar(200)");
-        indexDef.append("CREATE INDEX " + getTableName() + "_INDEX_" + COL_ID
-                        + "  ON " + getTableName() + " (" + COL_ID + ");\n");
-        for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
-            Element columnNode = (Element) columnNodes.get(colIdx);
-            Column  column = new Column(this, columnNode,
-                                        colNames.size() - 1);
-            columns.add(column);
-            colNames.addAll(column.getColumnNames());
-            tableDef.append(",\n");
-            tableDef.append(column.getSqlCreate());
-            indexDef.append(column.getSqlIndex());
-        }
-        tableDef.append(")");
-        //            System.err.println("table:" + tableDef);
-        //            System.err.println("index:" + indexDef);
         Statement statement =
             getRepository().getConnection().createStatement();
+        colNames.add(COL_ID);
+        StringBuffer tableDef = new StringBuffer("CREATE TABLE "
+                                    + getTableName() + " (\n");
+
+        tableDef.append(COL_ID + " varchar(200))");
         try {
             statement.execute(tableDef.toString());
         } catch (Throwable exc) {
@@ -155,12 +142,36 @@ public class GenericTypeHandler extends TypeHandler {
                 //                throw new WrapperException(exc);
             }
         }
+
+        StringBuffer indexDef = new StringBuffer();
+        indexDef.append("CREATE INDEX " + getTableName() + "_INDEX_" + COL_ID
+                        + "  ON " + getTableName() + " (" + COL_ID + ");\n");
+
         try {
-            SqlUtil.loadSql(indexDef.toString(), statement, false);
+            SqlUtil.loadSql(indexDef.toString(), statement, true);
         } catch (Throwable exc) {
             //TODO:
             //            throw new WrapperException(exc);
         }
+
+        for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
+            Element columnNode = (Element) columnNodes.get(colIdx);
+            String className = XmlUtil.getAttribute(columnNode, ATTR_CLASS, Column.class.getName());
+            Class  c         = Misc.findClass(className);
+            Constructor ctor = Misc.findConstructor(c,
+                                       new Class[] { getClass(),
+                                                     Element.class, Integer.TYPE});
+            Column column =  (Column) ctor.newInstance(new Object[] {
+                this, columnNode,
+                new Integer(colNames.size() - 1)});
+            columns.add(column);
+            colNames.addAll(column.getColumnNames());
+            column.createTable(statement);
+        }
+
+        //TODO: Run through the table and delete any columns and indices that aren't defined anymore
+
+
     }
 
     /**
@@ -612,8 +623,9 @@ public class GenericTypeHandler extends TypeHandler {
                                Entry entry)
             throws Exception {
         super.addToEntryForm(request, formBuffer, entry);
+        Hashtable state = new Hashtable();
         for (Column column : columns) {
-            column.addToEntryForm(request, formBuffer, entry);
+            column.addToEntryForm(request, formBuffer, entry,state);
         }
 
     }
