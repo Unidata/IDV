@@ -1192,6 +1192,7 @@ public class TextPointDataSource extends PointDataSource {
             times = PointObFactory.binTimes(times, getBinRoundTo(),
                                             getBinWidth());
 
+
             for (int i = 0; i < numObs; i++) {
                 DateTime dateTime  = (DateTime) times.get(i);
                 Data[]   tupleData = (Data[]) tuples.get(i);
@@ -1219,14 +1220,21 @@ public class TextPointDataSource extends PointDataSource {
                         //if (i == 0) {
                         //    System.err.println("name:" + others[j].getType());
                         //}
-                        if ((i == 0) && (others[j] instanceof Real)) {
-                            Real r = (Real) others[j];
-                            varNames.add(((RealType) r.getType()).getName());
-                        }
                     }
                 } else {
                     others = new Real[] { dfltReal };
                 }
+
+
+                if (i == 0)  {
+                    for(int otherIdx=0;otherIdx<others.length;otherIdx++) { 
+                        if(others[otherIdx] instanceof Real) {
+                            Real r = (Real) others[otherIdx];
+                            varNames.add(((RealType) r.getType()).getName());
+                        }
+                    }
+                }
+
 
                 if (dataTupleType == null) {
                     Tuple tmp = (allReals == true)
@@ -1285,15 +1293,20 @@ public class TextPointDataSource extends PointDataSource {
      */
     public void doMakeDataChoices() {
         super.doMakeDataChoices();
+        System.err.println ("isTrajectoryEnabled()= " + isTrajectoryEnabled());
         if (isTrajectoryEnabled()) {
             if (getDataChoices().size() == 0) {
+                System.err.println ("no data choices");
                 return;
             }
             try {
                 DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
+
+
                 Data sample = makeObs(dataChoice, null, null, null, true,
                                       true);
-                //            System.err.println ("sample:" + sample);
+                //                System.err.println ("sample:" + sample);
+                System.err.println ("varnames:" + varNames);
 
                 List cats = DataCategory.parseCategories("Track" + ";trace",
                                 true);
