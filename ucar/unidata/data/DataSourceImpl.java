@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -1646,6 +1647,22 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
+     * Add to the given list the set of derived data choices
+     *
+     * @param dataChoices base list of choices
+     */
+    protected void makeDerivedDataChoices(List dataChoices) {
+        List derivedList =
+            getDataContext().getIdv().getDerivedDataChoices(this,
+                dataChoices);
+        if (derivedList != null) {
+            dataChoices.addAll(derivedList);
+        }
+    }
+
+
+
+    /**
      * This will lazily create the actual list of DataChoice-s
      * with a call to doMakeDataChoices which creates the
      * DataChoice objects concretely defined by this DataSource (e.g., the
@@ -1662,12 +1679,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if (dataChoices == null) {
                 dataChoices = new ArrayList();
                 doMakeDataChoices();
-                List derivedList =
-                    getDataContext().getIdv().getDerivedDataChoices(this,
-                        dataChoices);
-                if (derivedList != null) {
-                    dataChoices.addAll(derivedList);
-                }
+                makeDerivedDataChoices(dataChoices);
                 for (int i = 0; i < dataChoices.size(); i++) {
                     initDataChoice((DataChoice) dataChoices.get(i));
                 }
