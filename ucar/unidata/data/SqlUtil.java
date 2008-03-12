@@ -965,10 +965,12 @@ public class SqlUtil {
             throws Exception {
         for (String command : parseSql(sql)) {
             try {
-
-                statement.execute(command);
-                if(!ignoreErrors)
-                    System.err.println ("OK:" + command);
+                command = command.trim();
+                if(command.length()>0) {
+                    statement.execute(command);
+                    //                    if(!ignoreErrors)
+                    //                        System.err.println ("OK:" + command);
+                }
             } catch (Exception exc) {
                 if ( !ignoreErrors) {
                     System.err.println("Bad sql:" + command);
