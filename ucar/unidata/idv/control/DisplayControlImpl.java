@@ -10552,7 +10552,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (d == null) {
                 return;
             }
-            Util.exportAsNetcdf(getDisplayedData());
+            if(Util.exportAsNetcdf(getDisplayedData())) {
+                userMessage("<html>The displayed data has been exported.<p>Note: this facility is experimental. The exported NetCDF file is not CF compliant and cannot be used within the IDV</html>");
+            }
         } catch (Exception e) {
             logException("Unable to export the data", e);
         }
