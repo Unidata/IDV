@@ -820,7 +820,7 @@ public class TypeHandler extends RepositoryManager {
         String whatString  = cleanQueryString(what);
         String extraString = cleanQueryString(extra);
 
-        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_USERS,
+        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA, TABLE_USERS,
                                 TABLE_ASSOCIATIONS };
         //        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA,
         //                                TABLE_USERS, TABLE_ASSOCIATIONS };
@@ -849,7 +849,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (didMeta) {
-            whereList.add(SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
+            //            whereList.add(SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
             tables.add(TABLE_METADATA);
             didEntries = true;
         }
@@ -1144,20 +1144,27 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        String name = (String) request.getString(ARG_NAME, "");
+        String name = (String) request.getString(ARG_TEXT, "");
         String searchMetaData = " "
                                 + HtmlUtil.checkbox(ARG_SEARCHMETADATA,
                                     "true",
                                     request.get(ARG_SEARCHMETADATA,
                                         false)) + " "
                                             + msg("Search metadata");
+
+        String searchExact = " "
+                                + HtmlUtil.checkbox(ARG_EXACT,
+                                    "true",
+                                    request.get(ARG_EXACT,
+                                        false)) + " "
+                                            + msg("Match exactly");
         if (name.trim().length() == 0) {
             basicSB.append(HtmlUtil.formEntry(msgLabel("Text"),
-                    HtmlUtil.input(ARG_NAME) + searchMetaData));
+                    HtmlUtil.input(ARG_TEXT) + searchExact + searchMetaData));
         } else {
-            HtmlUtil.hidden(ARG_NAME, name);
+            HtmlUtil.hidden(ARG_TEXT, name);
             basicSB.append(HtmlUtil.formEntry(msgLabel("Name"),
-                    name + searchMetaData));
+                    name + searchExact + searchMetaData));
         }
         basicSB.append("\n");
 
@@ -1504,27 +1511,33 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        String name = (String) request.getString(ARG_NAME, "").trim();
-        if ((name != null) && (name.length() > 0)) {
+        String name = (String) request.getString(ARG_TEXT, "").trim();
+        if (name.length() > 0) {
+            if(!request.get(ARG_EXACT, false)) {
+                List tmp = StringUtil.split(name,",",true,true);
+                name = "%" + StringUtil.join("%,%", tmp) +"%";
+            }
             List ors = new ArrayList();
-            ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_NAME, name, true));
-            ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_DESCRIPTION, name, true));
-            if (request.get(ARG_SEARCHMETADATA, false)) {
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR1, name, true));
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR2, name, true));
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR3, name, true));
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR4, name, true));
+            boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
+            if (searchMetadata) {
+                List metadataOrs = new ArrayList();
+                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR1, name, true));
+                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR2, name, true));
+                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR3, name, true));
+                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR4, name, true));
+                String sql  =SqlUtil.makeAnd(SqlUtil.group(StringUtil.join(" OR ", metadataOrs)), 
+                                             SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
+                ors.add(SqlUtil.group(sql));
+            } else {
+                ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_NAME, name, true));
+                ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_DESCRIPTION, name, true));
             }
 
-            where.add("(" + StringUtil.join(" OR ", ors) + ")");
+            where.add(SqlUtil.group(StringUtil.join(" OR ", ors)));
+            //            where.add("(" + StringUtil.join(" OR ", ors) + ")");
             //            System.err.println("where:" + where);
         }
         //        System.err.println("where:" + where);
-
-
-
-
-
 
         return where;
 

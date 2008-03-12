@@ -237,6 +237,7 @@ public class UserManager extends RepositoryManager {
         }
 
 
+
         //Check for url auth
         if ((user == null) && request.exists(ARG_AUTH_USER)
                 && request.exists(ARG_AUTH_PASSWORD)) {

@@ -215,6 +215,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_TEXT = "text";
+
+    public static final String ARG_EXACT = "exact";
+
     /** _more_          */
     public static final String ARG_DATATYPE = "datatype";
 

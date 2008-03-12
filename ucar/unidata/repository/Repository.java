@@ -1618,7 +1618,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         if ((result != null) && (request.getSessionId() != null)) {
-            result.addCookie("repository-session", request.getSessionId());
+            result.addCookie("repository-session", request.getSessionId()+"; path=" + getUrlBase());
         }
         return result;
 
@@ -5628,9 +5628,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
-        return new List[] { getAccessManager().filterEntries(request, groups),
-                            getAccessManager().filterEntries(request,
-                            entries) };
+        entries = getAccessManager().filterEntries(request, entries);
+        groups = getAccessManager().filterEntries(request, groups);
+
+
+        return new List[] { groups, entries};
     }
 
 

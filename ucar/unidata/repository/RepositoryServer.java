@@ -216,7 +216,9 @@ public class RepositoryServer extends HttpServer implements Constants {
             cache = result.getCacheOk();
             if (result.getRedirectUrl() != null) {
                 cache = false;
+                System.err.println("redirecting");
                 redirect(result.getRedirectUrl());
+                System.err.println("done redirecting");
             } else if (result.getInputStream() != null) {
                 cache = false;
                 writeResult(result.getResponseCode(),
