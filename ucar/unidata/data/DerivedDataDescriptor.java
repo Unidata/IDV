@@ -174,15 +174,15 @@ public class DerivedDataDescriptor {
      *  kinds of parameters are needed for the {@link DerivedDataChoice}
      *  described by this descriptor to be created.
      */
-    List myNeeds = new ArrayList();
+    private List myNeeds = new ArrayList();
 
     /**
      *  This is the category for the operands
      */
-    String operandsCategories;
+    private String operandsCategories;
 
     /** categories for operands */
-    List operandsCategoryList;
+    private     List operandsCategoryList;
 
     /**
      *  This is the  identifier used for the created {@link DerivedDataChoice}
@@ -270,7 +270,6 @@ public class DerivedDataDescriptor {
                                  String desc, String formula,
                                  List categories) {
         this.dataContext = dataContext;
-        myNeeds          = new ArrayList();
         this.categories  = ((categories != null)
                             ? new ArrayList(categories)
                             : new ArrayList());
@@ -289,7 +288,6 @@ public class DerivedDataDescriptor {
      */
     public DerivedDataDescriptor(DataContext dataContext) {
         this.dataContext = dataContext;
-        myNeeds          = new ArrayList();
         this.categories  = new ArrayList();
     }
 
@@ -315,7 +313,6 @@ public class DerivedDataDescriptor {
                                        NULL_STRING);
 
 
-        myNeeds = new ArrayList();
 
         Element operandsNode = XmlUtil.findChild(derivedNode, TAG_OPERANDS);
         if (operandsNode != null) {
@@ -374,7 +371,7 @@ public class DerivedDataDescriptor {
     /**
      * Constructor for the descriptor. Pass in the operands, id, etc.
      *
-     * @param myNeeds         list of operands needed
+     * @param needs         list of operands needed
      * @param id              identifier
      * @param description     long name
      * @param categories      list of categories
@@ -384,12 +381,11 @@ public class DerivedDataDescriptor {
      * @param properties      extra properties
      */
 
-    public DerivedDataDescriptor(ArrayList myNeeds, String id,
+    public DerivedDataDescriptor(ArrayList needs, String id,
                                  String description, ArrayList categories,
                                  String method, String formula, String code,
                                  Properties properties) {
-        this.myNeeds = myNeeds;
-        checkNeeds();
+        setNeeds(needs);
         this.id          = id;
         this.description = description;
         this.categories  = categories;
@@ -399,6 +395,7 @@ public class DerivedDataDescriptor {
         this.properties  = properties;
     }
 
+    StringBuffer sb = new StringBuffer();
 
     /**
      * Copy constructor.  Effectively clones this.
@@ -410,10 +407,7 @@ public class DerivedDataDescriptor {
         this.isLocalUsers = other.isLocalUsers;
         this.isDefault    = other.isDefault;
         this.dataContext  = other.dataContext;
-        if (other.myNeeds != null) {
-            this.myNeeds = new ArrayList(other.myNeeds);
-            checkNeeds();
-        }
+        setNeeds(other.myNeeds);
         this.id          = other.id;
         this.description = other.description;
         this.categories  = (ArrayList) other.categories.clone();
@@ -510,7 +504,10 @@ public class DerivedDataDescriptor {
      * @return derived needs
      */
     public List getNeeds() {
-        return myNeeds;
+        if(myNeeds!=null) {
+            return new ArrayList(myNeeds);
+        }
+        return null;
     }
 
 
@@ -519,10 +516,16 @@ public class DerivedDataDescriptor {
      *
      * @param needs The needs
      */
-    public void setNeeds(List needs) {
-        myNeeds = needs;
+    public void setNeeds(List<DerivedNeed> needs) {
+        if(needs!=null) {
+            myNeeds = new ArrayList<DerivedNeed>(needs);
+        } else {
+            myNeeds = null;
+        }
         checkNeeds();
     }
+
+
 
 
     /**
@@ -530,12 +533,14 @@ public class DerivedDataDescriptor {
      */
     private void checkNeeds() {
         if (myNeeds != null) {
+            List tmp = new ArrayList();
             for (int i = 0; i < myNeeds.size(); i++) {
-                if ( !(myNeeds.get(i) instanceof DerivedNeed)) {
-                    throw new IllegalStateException(
-                        "Bad value in myNeeds list");
+                Object obj = myNeeds.get(i);
+                if ( obj instanceof DerivedNeed) {
+                    tmp.add(obj);
                 }
             }
+            myNeeds = tmp;
         }
     }
 
@@ -568,8 +573,9 @@ public class DerivedDataDescriptor {
      *  on the set of {@link DerivedNeed}-s
      */
     public void initForSearch() {
-        for (int needIdx = 0; needIdx < myNeeds.size(); needIdx++) {
-            DerivedNeed need = (DerivedNeed) myNeeds.get(needIdx);
+        if(myNeeds==null) return;
+        for (int i = 0; i < myNeeds.size(); i++) {
+            DerivedNeed need = (DerivedNeed) myNeeds.get(i);
             need.initForSearch();
         }
     }
@@ -581,8 +587,8 @@ public class DerivedDataDescriptor {
      *  on the set of {@link DerivedNeed}-s
      */
     public void clearAfterSearch() {
-        for (int needIdx = 0; needIdx < myNeeds.size(); needIdx++) {
-            DerivedNeed need = (DerivedNeed) myNeeds.get(needIdx);
+        for (int i = 0; i < myNeeds.size(); i++) {
+            DerivedNeed need = (DerivedNeed) myNeeds.get(i);
             need.clearAfterSearch();
         }
     }
@@ -615,10 +621,9 @@ public class DerivedDataDescriptor {
     public NamedList getDataChoices(Hashtable choicesSoFar) {
         //Find the first DerivedNeed that is satisfied with the
         //DataChoice-s held in choicesSoFar
-        for (int needIdx = 0; needIdx < myNeeds.size(); needIdx++) {
-            DerivedNeed need        = (DerivedNeed) myNeeds.get(needIdx);
+        for (int i = 0; i < myNeeds.size(); i++) {
+            DerivedNeed need = (DerivedNeed) myNeeds.get(i);
             List        dataChoices = need.getDataChoices(choicesSoFar);
-
             if (dataChoices != null) {
                 return new NamedList(getDescription(), dataChoices);
             }
@@ -681,7 +686,7 @@ public class DerivedDataDescriptor {
         }
         node.appendChild(opNode);
         for (int needIdx = 0; needIdx < myNeeds.size(); needIdx++) {
-            DerivedNeed need      = (DerivedNeed) myNeeds.get(needIdx);
+            DerivedNeed need = (DerivedNeed) myNeeds.get(needIdx);
             String      groupName = need.getGroupName();
             Element     needNode;
             if (groupName != null) {
@@ -1058,8 +1063,8 @@ public class DerivedDataDescriptor {
      * Update derived needs when the DataGroups change
      */
     public void updateDataGroups() {
-        for (int needIdx = 0; needIdx < myNeeds.size(); needIdx++) {
-            DerivedNeed need = (DerivedNeed) myNeeds.get(needIdx);
+        for (int i = 0; i < myNeeds.size(); i++) {
+            DerivedNeed need = (DerivedNeed) myNeeds.get(i);
             need.reInitialize();
         }
     }
