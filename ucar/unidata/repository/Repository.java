@@ -3030,10 +3030,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         Group toGroup = (Group) toEntry;
 
 
-        //TODO: Check for loops
         if(!getAccessManager().canDoAction(request, fromEntry,
-                                          Permission.ACTION_VIEW)) {
-            throw new AccessException("Cannot view:" + fromEntry.getName());
+                                          Permission.ACTION_EDIT)) {
+            throw new AccessException("Cannot move:" + fromEntry.getName());
         }
 
 

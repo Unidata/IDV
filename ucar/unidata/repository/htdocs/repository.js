@@ -65,23 +65,23 @@ function mouseDown(ev){
 
 function mouseUp(ev){
     mouseIsDown = 0;
-    return false;
+    setCursor('default')
+    return true;
 }
 
 function mouseMove(ev){
-    return false;
+    return true;
 }
 
 
-function makeClickable(object){
-}
 
 
 var draggedEntry;
 
 
 function mouseOverOnEntry(event, id) {
-   var obj = new getObj(id);
+    //    if(id == draggedEntry) return;
+   var obj = new getObj("span_" + id);
    if(!obj)  return;
    if(mouseIsDown)  {
        obj.style.borderBottom="2px black solid; ";
@@ -89,7 +89,8 @@ function mouseOverOnEntry(event, id) {
 }
 
 function mouseOutOnEntry(event, id) {
-   var obj = new getObj(id);
+    //   if(id == draggedEntry) return;
+   var obj = new getObj("span_" + id);
    if(!obj)  return;
    if(mouseIsDown)  {
        obj.style.borderBottom="";
@@ -97,14 +98,30 @@ function mouseOutOnEntry(event, id) {
 }
 
 
+function setCursor(c) {
+    var cursor = document.cursor;
+    if(!cursor && document.getElementById)
+        cursor =  document.getElementById('cursor');
+    if(!cursor) {
+        document.body.style.cursor = c;
+    }
+    //    if(!cursor)
+    //        cursor =  document.all.cursor;
+
+}
+
+
 function mouseDownOnEntry(event, id) {
     draggedEntry = id;
+    mouseIsDown = 1;
+    setCursor('move')
     event.preventDefault();
 }
 
 
 function mouseUpOnEntry(event, id) {
-   var obj = new getObj(id);
+    //    if(id == draggedEntry) return;
+   var obj = new getObj("span_" + id);
    if(!obj)  return;
    if(mouseIsDown)  {
        obj.style.borderBottom="";

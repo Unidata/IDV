@@ -300,21 +300,24 @@ public class OutputHandler extends RepositoryManager {
     }
 
     protected String getAjaxLink(Request request, Entry entry, String linkText, boolean includeIcon) {
-        String icon = (entry.isGroup()?getRepository().fileUrl(ICON_FOLDER_CLOSED):getRepository().fileUrl(ICON_FILE));
         StringBuffer sb = new StringBuffer();
         if(includeIcon) {
+            boolean okToMove = !request.getUser().getAnonymous();
+            String icon = (entry.isGroup()?getRepository().fileUrl(ICON_FOLDER_CLOSED):getRepository().fileUrl(ICON_FILE));
             String dropEvent =   " onmouseup=" + HtmlUtil.quote("mouseUpOnEntry(event,'" + entry.getId()+"');");
-            String event = 
-                " onmouseover=" + HtmlUtil.quote("mouseOverOnEntry(event,'" + entry.getId() +"');") + 
-                " onmouseout=" + HtmlUtil.quote("mouseOutOnEntry(event,'" + entry.getId() +"');") + 
-                " onmousedown=" + HtmlUtil.quote("mouseDownOnEntry(event,'" + entry.getId() +"');") + 
-                " onclick=" + HtmlUtil.quote("folderClick('" + entry.getId() +"')") +
-                (entry.isGroup()?dropEvent:"");
-            if(request.getUser().getAnonymous()) {
-                event = "";
+            String event = (entry.isGroup()?
+                            " onclick=" + HtmlUtil.quote("folderClick('" + entry.getId() +"')") : "");
+            
+            if(okToMove) {
+                event += 
+                    (entry.isGroup()?" onmouseover=" + HtmlUtil.quote("mouseOverOnEntry(event,'" + entry.getId() +"');"):"") + 
+                    " onmouseout=" + HtmlUtil.quote("mouseOutOnEntry(event,'" + entry.getId() +"');") + 
+                    " onmousedown=" + HtmlUtil.quote("mouseDownOnEntry(event,'" + entry.getId() +"');") + 
+                    (entry.isGroup()?dropEvent:"");
             }
 
-            String img = HtmlUtil.img(icon,entry.isGroup()?"Open Group":""," id=" + HtmlUtil.quote("img_" +entry.getId()) + event); 
+
+            String img = HtmlUtil.img(icon,(entry.isGroup()?"Click to open group; ":"") + (okToMove?"Drag to move":"") ," id=" + HtmlUtil.quote("img_" +entry.getId()) + event); 
             if(entry.isGroup()) {
                 //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
                 sb.append(img);
@@ -333,7 +336,7 @@ public class OutputHandler extends RepositoryManager {
                           " onmouseover=" + HtmlUtil.quote("tooltipShow(event,'" + elementId +"');") + 
                           " onmouseout=" + HtmlUtil.quote("tooltipHide(event,'" + elementId +"');")));
         
-        return sb.toString();
+        return HtmlUtil.span(sb.toString(), " id=" + HtmlUtil.quote("span_" + entry.getId()));
     }
 
 
@@ -447,21 +450,23 @@ public class OutputHandler extends RepositoryManager {
         int cnt = 0;
         for (Entry entry : entries) {
             sb.append("<li>");
-            sb.append(img);
-            sb.append(HtmlUtil.space(1));
             if (doForm) {
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
                 sb.append(HtmlUtil.span(
                                         HtmlUtil.checkbox("entry_" + entry.getId(), "true",
                                                           dfltSelected)," id=\"entryform" + (cnt++)+"\" "));
             }
+
             if (showCrumbs) {
+                sb.append(img);
+                sb.append(HtmlUtil.space(1));
                 String crumbs = getRepository().getBreadCrumbs(request,
                                     entry);
 
                 sb.append(crumbs);
             } else {
-                sb.append(getEntryUrl(request, entry));
+                sb.append(getAjaxLink(request,  entry, entry.getName(), true));
+                          //                sb.append(getEntryUrl(request, entry));
             }
             //            sb.append(HtmlUtil.br());
         }
