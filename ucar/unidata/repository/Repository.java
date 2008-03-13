@@ -1618,7 +1618,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         if ((result != null) && (request.getSessionId() != null)) {
-            result.addCookie("repository-session", request.getSessionId()+"; path=" + getUrlBase());
+            result.addCookie("repository-session", request.getSessionId()+"; path=" + getUrlBase() + "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
         }
         return result;
 
@@ -3426,6 +3426,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(HtmlUtil.formEntryTop("Comment:",
                                             comment.getComment()));
         }
+        sb.append("</table>");
         return sb.toString();
     }
 

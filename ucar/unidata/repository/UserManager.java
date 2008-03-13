@@ -288,8 +288,6 @@ public class UserManager extends RepositoryManager {
             }
         }
 
-
-
         if (user == null) {
             String requestIp = request.getIp();
             if (requestIp != null) {

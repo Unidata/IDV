@@ -214,9 +214,15 @@ public class HtmlOutputHandler extends OutputHandler {
                               false, "");
         StringBuffer sb = new StringBuffer();
         sb.append(crumbs[1]);
-        sb.append(typeHandler.getEntryContent(entry, request, true));
-        getMetadataHtml(request, entry, sb,true);
 
+        StringBuffer infoSB  = typeHandler.getEntryContent(entry, request, true);
+        sb.append(getRepository().makeShowHideBlock(request, "block.info",msg("Information"),
+                                                    infoSB,true));
+
+
+        getMetadataHtml(request, entry, sb,true);
+        getCommentBlock(request, entry, sb);
+        getAssociationBlock(request, entry, sb);
         Result result = new Result(msgLabel("Entry") + entry.getName(), sb,
                                    getMimeType(request.getOutput()));
         result.putProperty(
@@ -229,6 +235,55 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
+
+    public void getAssociationBlock(Request request, Entry entry, StringBuffer sb) throws Exception {
+        List<Association> associations =
+            getRepository().getAssociations(request, entry.getId());
+        if (associations.size() == 0) {return;}
+        StringBuffer assocSB = new StringBuffer();
+        assocSB.append("<table>");
+        for (Association association : associations) {
+            Entry fromEntry = null;
+            Entry toEntry   = null;
+            if (association.getFromId().equals(entry.getId())) {
+                fromEntry = entry;
+            } else {
+                fromEntry =
+                    getRepository().getEntry(association.getFromId(),
+                                             request);
+            }
+            if (association.getToId().equals(entry.getId())) {
+                toEntry = entry;
+            } else {
+                toEntry =
+                    getRepository().getEntry(association.getToId(),
+                                             request);
+            }
+            if ((fromEntry == null) || (toEntry == null)) {
+                continue;
+            }
+            assocSB.append("<tr><td>");
+            assocSB.append(((fromEntry == entry)
+                            ? fromEntry.getName()
+                            : getRepository().getEntryUrl(
+                                                          fromEntry)));
+            assocSB.append("&nbsp;&nbsp;");
+            assocSB.append("</td><td>");
+            assocSB.append(HtmlUtil.bold(association.getName()));
+            assocSB.append("</td><td>");
+            assocSB.append(
+                           HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)));
+            assocSB.append("&nbsp;&nbsp;");
+            assocSB.append("</td><td>");
+            assocSB.append(((toEntry == entry)
+                            ? toEntry.getName()
+                            : getRepository().getEntryUrl(toEntry)));
+            assocSB.append("</td></tr>");
+        }
+        assocSB.append("</table>");
+        sb.append(getRepository().makeShowHideBlock(request, "block.associations",msg("Associations"),
+                                                    assocSB,false));
+    }
 
 
 
@@ -544,6 +599,18 @@ public class HtmlOutputHandler extends OutputHandler {
 
     }
 
+    public void getCommentBlock(Request request, Entry entry, StringBuffer sb) throws Exception {
+        List<Comment> comments = getRepository().getComments(request, entry);
+        if(comments.size()>0) {
+            String commentHtml = getRepository().getCommentHtml(request, entry);
+            sb.append(getRepository().makeShowHideBlock(request, "comments",msg("Comments"),
+                                                        new StringBuffer(commentHtml),false));
+            
+        }
+
+    }
+
+
     /**
      * _more_
      *
@@ -686,9 +753,10 @@ public class HtmlOutputHandler extends OutputHandler {
             }
 
 
-
             if ( !showApplet) {
                 getMetadataHtml(request, group, sb,true);
+                getCommentBlock(request, group, sb);
+                getAssociationBlock(request, group, sb);
             }
 
             if (subGroups.size() > 0) {
