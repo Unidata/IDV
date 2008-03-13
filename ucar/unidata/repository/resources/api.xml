@@ -19,7 +19,7 @@
   <method request="/graph/get"   method="processGraphGet"/>
 
 
-  <method request="/entry/copy"      method="processEntryCopy"      actions="view"/>
+  <method request="/entry/copy"      method="processEntryCopy"      />
 
 
   <method request="/entry/form"      method="processEntryForm"      actions="edit"/>

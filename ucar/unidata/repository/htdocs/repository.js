@@ -24,23 +24,97 @@ function noop()
 {
 }
 
+
+
 function print(s) {
   var obj = new getObj("output");
   if(!obj) return;
   obj.obj.innerHTML  =s;
 }
 
+
 var cnt = 0;
 function tooltipHide(event,id)  
 {
   cnt++;
-//  print('got hide ' + cnt);
+//  print('got hjavascript: noop()ide ' + cnt);
   lastMove++;
   var obj = new getObj("tooltipdiv");
   if(!obj) return;
   obj.style.visibility = "hidden";
   obj.style.display = "none";
 }
+
+
+
+var mouseIsDown = 0;
+
+
+document.onmousemove = mouseMove;
+document.onmousedown = mouseDown;
+document.onmouseup   = mouseUp;
+
+
+
+function mouseDown(ev){
+    mouseIsDown = 1;
+    return true;
+}
+
+
+
+function mouseUp(ev){
+    mouseIsDown = 0;
+    return false;
+}
+
+function mouseMove(ev){
+    return false;
+}
+
+
+function makeClickable(object){
+}
+
+
+var draggedEntry;
+
+
+function mouseOverOnEntry(event, id) {
+   var obj = new getObj(id);
+   if(!obj)  return;
+   if(mouseIsDown)  {
+       obj.style.borderBottom="2px black solid; ";
+   }
+}
+
+function mouseOutOnEntry(event, id) {
+   var obj = new getObj(id);
+   if(!obj)  return;
+   if(mouseIsDown)  {
+       obj.style.borderBottom="";
+   }
+}
+
+
+function mouseDownOnEntry(event, id) {
+    draggedEntry = id;
+    event.preventDefault();
+}
+
+
+function mouseUpOnEntry(event, id) {
+   var obj = new getObj(id);
+   if(!obj)  return;
+   if(mouseIsDown)  {
+       obj.style.borderBottom="";
+   }
+   if(draggedEntry && draggedEntry!=id) {
+       url = "${urlroot}/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + id;
+       document.location = url
+   }
+}
+
 
 
 var lastMove = 0;
@@ -138,6 +212,8 @@ function hideShow(id,imgid,showimg,hideimg)
 	  if(img) img.obj.src = hideimg;
     }
 }
+
+
 
 
 function folderClickHandler() {

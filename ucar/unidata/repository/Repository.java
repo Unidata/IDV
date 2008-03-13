@@ -2952,6 +2952,17 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+
+
+    protected boolean okToMove(Entry fromEntry, Entry toEntry) {
+        if(!toEntry.isGroup()) return false;
+
+        if(toEntry.getId().equals(fromEntry.getId())) return false;
+        if(toEntry.getParentGroup() == null) return true;
+        return okToMove(fromEntry, toEntry.getParentGroup());
+    }
+
+
     /**
      * _more_
      *
@@ -2962,8 +2973,163 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processEntryCopy(Request request) throws Exception {
-        Entry        entry  = getEntry(request);
+
+        String fromId =  request.getString(ARG_FROM,"");
+        if (fromId == null) {
+            throw new IllegalArgumentException("No " + ARG_FROM + " given");
+        }
+        Entry fromEntry = getEntry(fromId, request);
+        if(fromEntry==null) {
+            throw new IllegalArgumentException("Could not find entry "  + fromId);
+        }
+
+
+
+        if(!request.exists(ARG_TO)) {
+            StringBuffer sb = new StringBuffer();
+            List<Entry>  cart = getUserManager().getCart(request);
+            boolean didOne = false;
+            sb.append(makeEntryHeader(request, fromEntry));
+            for(Entry entry: cart) {
+                if(!entry.isGroup()) continue;
+                if(!okToMove(fromEntry, entry)) continue;
+                if(!didOne) {
+                    sb.append(header("Move to:"));
+                    sb.append("<ul>");
+                }
+                sb.append("<li> ");
+                sb.append(HtmlUtil.href(HtmlUtil.url(
+                                       getRepository().URL_ENTRY_COPY, ARG_FROM,
+                                       fromEntry.getId(), ARG_TO,entry.getId(),ARG_ACTION,ACTION_MOVE ), entry.getName()));
+                sb.append(HtmlUtil.br());
+                didOne = true;
+
+            }
+            if(!didOne) {
+                sb.append(note(msg("You need to add a destination group to your cart")));
+            }   else {
+                sb.append("</ul>");
+            }
+
+            return new Result(msg("Entry Move/Copy"), sb);
+        }
+
+
+        String toId =  request.getString(ARG_TO,"");
+        if (toId == null) {
+            throw new IllegalArgumentException("No " + ARG_TO + " given");
+        }
+
+        Entry toEntry = getEntry(toId, request);
+        if(toEntry==null) {
+            throw new IllegalArgumentException("Could not find entry "  + toId);
+        }
+        if(!toEntry.isGroup()) {
+            throw new IllegalArgumentException("Can only copy/move to a group");
+        }
+        Group toGroup = (Group) toEntry;
+
+
+        //TODO: Check for loops
+        if(!getAccessManager().canDoAction(request, fromEntry,
+                                          Permission.ACTION_VIEW)) {
+            throw new AccessException("Cannot view:" + fromEntry.getName());
+        }
+
+
+        if(!getAccessManager().canDoAction(request, toEntry,
+                                          Permission.ACTION_NEW)) {
+            throw new AccessException("Cannot copy to:" + toEntry.getName());
+        }
+
+
+
         String       action = request.getString(ARG_ACTION, ACTION_COPY);
+
+        if(request.exists(ARG_CANCEL)) {
+            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                           fromEntry.getId()));
+        }
+
+
+        if(!request.exists(ARG_MOVE_CONFIRM)) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(msgLabel("Are you sure you want to move"));
+            sb.append(HtmlUtil.br());
+            sb.append(HtmlUtil.space(3));
+            sb.append(fromEntry.getName());
+            sb.append(HtmlUtil.br());
+            sb.append(msgLabel("To"));
+            sb.append(HtmlUtil.br());
+            sb.append(HtmlUtil.space(3));
+            sb.append(toEntry.getName());
+            sb.append(HtmlUtil.br());
+
+
+            sb.append(HtmlUtil.form(URL_ENTRY_COPY));
+            sb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
+            sb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
+            sb.append(HtmlUtil.hidden(ARG_ACTION, action));
+            sb.append(HtmlUtil.hidden(ARG_ACTION, action));
+            String okButton = HtmlUtil.submit(msg("OK"), ARG_MOVE_CONFIRM);
+            String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
+            String buttons = buttons(okButton, cancelButton);
+            sb.append(buttons);
+            sb.append(HtmlUtil.formClose());
+            return new Result(msg("Move confirm"), new StringBuffer(question(sb.toString())));
+        }
+
+
+        Connection connection = getConnection(true);
+        connection.setAutoCommit(false);
+        Statement statement = connection.createStatement();
+        try {
+            if(action.equals(ACTION_MOVE)) {
+                fromEntry.setParentGroup(toGroup);
+                String oldId = fromEntry.getId();
+                String newId = oldId;
+                //TODO: critical section around new group id
+                if(fromEntry.isGroup()) {
+                    newId = getGroupId(toGroup);
+                    fromEntry.setId(newId);
+
+                    String [] info = {TABLE_ENTRIES,COL_ENTRIES_ID,
+                                      TABLE_ENTRIES,COL_ENTRIES_PARENT_GROUP_ID,
+                                      TABLE_METADATA,COL_METADATA_ENTRY_ID,
+                                      TABLE_COMMENTS,COL_COMMENTS_ENTRY_ID,
+                                      TABLE_ASSOCIATIONS,COL_ASSOCIATIONS_FROM_ENTRY_ID,
+                                      TABLE_ASSOCIATIONS,COL_ASSOCIATIONS_TO_ENTRY_ID,
+                                      TABLE_PERMISSIONS,COL_PERMISSIONS_ENTRY_ID};
+
+                    for(int i=0;i<info.length;i+=2) {
+                        String sql = "UPDATE  " + info[i] + " SET " + SqlUtil.unDot(info[i+1]) +" = " +
+                            SqlUtil.quote(newId) +" WHERE " +
+                            SqlUtil.eq(info[i+1], SqlUtil.quote(oldId));
+                        //                        System.err.println (sql);
+                        statement.execute(sql);
+                    }
+                    entryCache.remove(oldId);
+                    entryCache.put(fromEntry.getId(), fromEntry);
+                    groupCache.remove(fromEntry.getId());
+                    groupCache.put(fromEntry.getId(),(Group) fromEntry);
+
+                }
+
+                //Change the parent
+                String sql = "UPDATE  " + TABLE_ENTRIES + " SET " + SqlUtil.unDot(COL_ENTRIES_PARENT_GROUP_ID) +" = " +
+                    SqlUtil.quote(fromEntry.getParentGroupId()) +" WHERE " +
+                    SqlUtil.eq(COL_ENTRIES_ID, SqlUtil.quote(fromEntry.getId()));
+                statement.execute(sql);
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                               fromEntry.getId()));
+            }
+            connection.commit();
+            connection.setAutoCommit(true);
+        } finally {
+            try {connection.close();} catch (Exception exc) {}
+        }
+
+
         String       title  = (action.equals(ACTION_COPY)
                                ? "Entry Copy"
                                : "Entry Move");
@@ -5104,6 +5270,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
+        tmp.add(0,"");
         return dataTypeList = tmp;
     }
 
@@ -5268,12 +5435,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
+        /*
         Statement statement =
             getDatabaseManager().execute(SqlUtil.makeSelect(COLUMNS_ENTRIES,
                 Misc.newList(TABLE_ENTRIES),
                 SqlUtil.eq(COL_ENTRIES_TYPE,
                            SqlUtil.quote(TypeHandler.TYPE_GROUP))));
         readGroups(statement);
+        */
     }
 
 

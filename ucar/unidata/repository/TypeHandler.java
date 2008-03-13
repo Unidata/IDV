@@ -470,6 +470,15 @@ public class TypeHandler extends RepositoryManager {
                     entry.getId()), getRepository().fileUrl(ICON_COMMENTS),
                                     msg("Add/View Comments")));
 
+        if(!request.getUser().getAnonymous()) {
+            links.add(
+                      new Link(
+                               HtmlUtil.url(
+                                            getRepository().URL_ENTRY_COPY, ARG_FROM,
+                                            entry.getId()), getRepository().fileUrl(ICON_MOVE),
+                               msg("Copy/Move Entry")));
+        }
+
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(
                 new Link(
@@ -907,7 +916,7 @@ public class TypeHandler extends RepositoryManager {
                         selected = entry.getDataType();
                     }
                     List   types  = getRepository().getDefaultDataTypes();
-                    String widget = ((types.size() > 0)
+                    String widget = ((types.size() > 1)
                                      ? HtmlUtil.select(ARG_DATATYPE_SELECT,
                                          types, selected) + HtmlUtil.space(1)
                                              + msgLabel("Or")
@@ -940,7 +949,7 @@ public class TypeHandler extends RepositoryManager {
                 if (entry == null) {
                     List datePatterns = new ArrayList();
 
-                    datePatterns.add(new TwoFacedObject("All", BLANK));
+                    datePatterns.add(new TwoFacedObject("", BLANK));
                     for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
                         datePatterns.add(DateUtil.DATE_FORMATS[i]);
                     }

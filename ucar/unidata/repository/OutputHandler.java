@@ -303,11 +303,21 @@ public class OutputHandler extends RepositoryManager {
         String icon = (entry.isGroup()?getRepository().fileUrl(ICON_FOLDER_CLOSED):getRepository().fileUrl(ICON_FILE));
         StringBuffer sb = new StringBuffer();
         if(includeIcon) {
-            String img = HtmlUtil.img(icon,entry.isGroup()?"Open Group":""," id=" + HtmlUtil.quote("img_" +entry.getId())); 
+            String dropEvent =   " onmouseup=" + HtmlUtil.quote("mouseUpOnEntry(event,'" + entry.getId()+"');");
+            String event = 
+                " onmouseover=" + HtmlUtil.quote("mouseOverOnEntry(event,'" + entry.getId() +"');") + 
+                " onmouseout=" + HtmlUtil.quote("mouseOutOnEntry(event,'" + entry.getId() +"');") + 
+                " onmousedown=" + HtmlUtil.quote("mouseDownOnEntry(event,'" + entry.getId() +"');") + 
+                " onclick=" + HtmlUtil.quote("folderClick('" + entry.getId() +"')") +
+                (entry.isGroup()?dropEvent:"");
+            if(request.getUser().getAnonymous()) {
+                event = "";
+            }
+
+            String img = HtmlUtil.img(icon,entry.isGroup()?"Open Group":""," id=" + HtmlUtil.quote("img_" +entry.getId()) + event); 
             if(entry.isGroup()) {
-                sb.append("<a href=\"JavaScript: noop()\" onclick=" + HtmlUtil.quote("folderClick('" + entry.getId() +"')")+
-                          "/>" +
-                          img +"</a>");
+                //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
+                sb.append(img);
             } else {
                 sb.append(img);
             }

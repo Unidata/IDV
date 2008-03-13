@@ -140,11 +140,8 @@ public class Entity implements Cloneable {
      */
     public Object clone() throws CloneNotSupportedException {
         Entity that = (Entity) super.clone();
-        that.comments      = null;
-        that.permissions   = null;
-        that.permissionMap = new Hashtable();
+        //TODO: how do we handle associations
         that.associations  = null;
-        that.metadata      = null;
         return that;
     }
 
@@ -194,6 +191,8 @@ public class Entity implements Cloneable {
         parentGroup = value;
         if (parentGroup != null) {
             parentGroupId = parentGroup.getId();
+        } else {
+            parentGroupId = null;
         }
     }
 
