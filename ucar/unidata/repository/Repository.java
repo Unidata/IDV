@@ -3041,6 +3041,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             throw new AccessException("Cannot copy to:" + toEntry.getName());
         }
 
+        if(!okToMove(fromEntry, toEntry)) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(makeEntryHeader(request, fromEntry));
+            sb.append(error(msg("Cannot move a group to its descendent")));
+            return new Result("", sb);
+        }
 
 
         String       action = request.getString(ARG_ACTION, ACTION_COPY);

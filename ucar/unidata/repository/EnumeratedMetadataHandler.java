@@ -262,10 +262,15 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String content;
         if (predefinedValues != null) {
-            content = HtmlUtil.formEntry(submit,
-                                         HtmlUtil.select(arg1,
-                                             predefinedValues,
-                                             metadata.getAttr1(), 100));
+            content = HtmlUtil.row(HtmlUtil.colspan(submit,2)) +
+                HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.select(arg1,
+                                                   predefinedValues,
+                                                              metadata.getAttr1(), 100),2));
+            //            content = HtmlUtil.formEntry(submit,
+            //                                         HtmlUtil.select(arg1,
+            //                                             predefinedValues,
+            //                                             metadata.getAttr1(), 100));
+
         } else {
             List values = getValues(request);
             if (values != null) {

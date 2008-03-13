@@ -80,7 +80,7 @@ var draggedEntry;
 
 
 function mouseOverOnEntry(event, id) {
-    //    if(id == draggedEntry) return;
+   if(id == draggedEntry) return;
    var obj = new getObj("span_" + id);
    if(!obj)  return;
    if(mouseIsDown)  {
@@ -89,7 +89,7 @@ function mouseOverOnEntry(event, id) {
 }
 
 function mouseOutOnEntry(event, id) {
-    //   if(id == draggedEntry) return;
+   if(id == draggedEntry) return;
    var obj = new getObj("span_" + id);
    if(!obj)  return;
    if(mouseIsDown)  {
@@ -120,7 +120,7 @@ function mouseDownOnEntry(event, id) {
 
 
 function mouseUpOnEntry(event, id) {
-    //    if(id == draggedEntry) return;
+   if(id == draggedEntry) return;
    var obj = new getObj("span_" + id);
    if(!obj)  return;
    if(mouseIsDown)  {
