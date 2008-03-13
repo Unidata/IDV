@@ -714,8 +714,8 @@ public class HtmlOutputHandler extends OutputHandler {
                 if (showApplet) {
                     entriesSB.append(getTimelineApplet(request, entries));
                 }
-                getEntryHtml(entriesSB, entries, request, true, false, false);
-                sb.append(getRepository().makeShowHideBlock(request, "entries",msg("Entries"),
+                String link = getEntryHtml(entriesSB, entries, request, true, false, false);
+                sb.append(getRepository().makeShowHideBlock(request, "entries",msg("Entries") + link,
                                                             entriesSB,true));
 
             }

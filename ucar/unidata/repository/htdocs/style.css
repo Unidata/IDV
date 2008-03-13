@@ -95,7 +95,8 @@ text-decoration: none
    font-weight: bold;
    font-size: 12pt;
    color: #9C9C9C;
-   border-bottom : 2px #9C9C9C solid;
+#border-bottom : 2px #9C9C9C solid;
+   border-bottom : 2px #aabbaa solid;
 }
 
 
@@ -109,12 +110,24 @@ text-decoration: none
    vertical-align: bottom;
 }
 
+.hideshowblock {
+   margin-top:5px;
+}
+
+.block {
+   margin-top:5px;
+}
+
+
 .folderblock {
    margin:0px;
    padding:0px;
    padding-left:18px;
 }
 
+.folderblock li {
+   margin-top:1px;
+}
 
 .pagesubheading {
    margin:0px;
@@ -127,13 +140,6 @@ text-decoration: none
 }
 
 
-.hideshowblock {
-   margin-top:5px;
-}
-
-.block {
-   margin-top:10px;
-}
 
 a.pagesubheadinglink {
    color:black;

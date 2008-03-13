@@ -146,6 +146,11 @@ public class DateGridOutputHandler extends OutputHandler {
 
 
 
+    protected void getOutputTypesForEntry(Request request, Entry entry,
+                                          List types)
+            throws Exception {
+    }
+
 
     /**
      * _more_

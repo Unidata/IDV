@@ -407,35 +407,43 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void getEntryHtml(StringBuffer sb, List<Entry> entries,
+    public String  getEntryHtml(StringBuffer sb, List<Entry> entries,
                              Request request, boolean doForm,
                              boolean dfltSelected, boolean showCrumbs)
             throws Exception {
 
+        String link = "";
         if (doForm) {
-            sb.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
+            StringBuffer formSB = new StringBuffer();
+            formSB.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
                                     "getentries"));
-            sb.append(HtmlUtil.space(1));
-
+            //            formSB.append(HtmlUtil.space(1));
             List outputList =
                 getRepository().getOutputTypesForEntries(request, entries);
-            sb.append(msgLabel("View As"));
-            sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
-            sb.append(HtmlUtil.submit(msg("Selected"), "getselected"));
-            sb.append(HtmlUtil.submit(msg("All"), "getall"));
+            sb.append("\n");
+            formSB.append(HtmlUtil.space(4));
+            formSB.append(msgLabel("View As"));
+            formSB.append(HtmlUtil.select(ARG_OUTPUT, outputList));
+            formSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
+            formSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
+            String arrowImg = HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),"Show/Hide Form"," id=\"entryformimg\" ");
+            link = HtmlUtil.space(2) + "<a href=\"JavaScript: noop()\" onclick=\"toggleEntryForm()\">" + arrowImg +"</a>";
+            sb.append(HtmlUtil.span(formSB.toString()," id = \"entryform\" "));
             sb.append("<ul class=\"folderblock\" style=\"list-style-image : url("
                       + getRepository().fileUrl(ICON_BLANK) + ")\">");
         }
         String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
+        int cnt = 0;
         for (Entry entry : entries) {
             sb.append("<li>");
             sb.append(img);
+            sb.append(HtmlUtil.space(1));
             if (doForm) {
-                sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",
-                                            dfltSelected));
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                sb.append(HtmlUtil.space(1));
+                sb.append(HtmlUtil.span(
+                                        HtmlUtil.checkbox("entry_" + entry.getId(), "true",
+                                                          dfltSelected)," id=\"entryform" + (cnt++)+"\" "));
             }
             if (showCrumbs) {
                 String crumbs = getRepository().getBreadCrumbs(request,
@@ -450,7 +458,9 @@ public class OutputHandler extends RepositoryManager {
         if (doForm) {
             sb.append("</ul>");
             sb.append(HtmlUtil.formClose());
+            sb.append("\n<SCRIPT LANGUAGE=\"JavaScript\">toggleEntryForm();</script>\n"); 
         }
+        return link;
     }
 
 

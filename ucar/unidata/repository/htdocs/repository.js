@@ -1,13 +1,16 @@
 
 
 function getObj(name)	{
+          this.obj = null;
 	  if (document.getElementById)	{    	// DOM level 1 browsers: IE 5+, NN 6+
 	  	this.obj = document.getElementById(name);
-		this.style = document.getElementById(name).style;
+                if(this.obj) 
+                     this.style = this.obj.style;
 	  }
 	  else if (document.all)	{  			// IE 4
 		this.obj = document.all[name];
-		this.style = document.all[name].style;
+                if(this.obj) 
+                    this.style = this.obj.style;
 	  }
 	  else if (document.layers)  { 			// NN 4
 	   	this.obj = document.layers[name];
@@ -106,6 +109,25 @@ function tooltipNowShow(moveId,x,y,id)
 //  alert("tooltip:" + event.clientX);
 }
 
+function toggleEntryForm() {
+    var obj = new getObj('entryform');
+    var img = new getObj('entryformimg');
+    if(obj) {
+	if(toggleVisibilityOnObject(obj,'')) {
+              if(img) img.obj.src =  "${urlroot}/downarrow.gif";
+         } else {
+              if(img) img.obj.src =  "${urlroot}/rightarrow.gif";
+         }
+    }
+    var cnt = 0;
+    while(1) {
+        obj = new getObj('entryform' + (cnt++))
+	if(!obj.obj) break;
+	toggleVisibilityOnObject(obj,'');
+    }
+}
+
+
 function hideShow(id,imgid,showimg,hideimg) 
 {
     var img = new getObj(imgid);
@@ -187,11 +209,17 @@ function folderClick(id) {
 function toggleVisibility(id) 
 {
   var obj = new getObj(id);
+  return toggleVisibilityOnObject(obj,'block');
+}
+
+function toggleVisibilityOnObject(obj, display) 
+{
+
   if(!obj) return 0;
   if(obj.style.visibility == "hidden") {
       obj.style.visibility = "visible";
-      obj.style.display = "block";
-	return 1
+      obj.style.display = display;
+      return 1
    } else {
       obj.style.visibility = "hidden";
       obj.style.display = "none";
