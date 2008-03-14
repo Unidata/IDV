@@ -1440,18 +1440,21 @@ public class ImageGenerator extends IdvManager {
      */
     protected boolean processTagDatasource(Element node) throws Throwable {
         debug("Creating data source");
-        String url    = applyMacros(node, ATTR_URL, (String) null);
+        Object dataObject =  applyMacros(node, ATTR_URL, (String) null);
+        if(dataObject == null) {
+            dataObject = StringUtil.toString(findFiles(node));
+        }
         String bundle = applyMacros(node, ATTR_BUNDLE, (String) null);
         String type   = applyMacros(node, ATTR_TYPE, (String) null);
-        if ((bundle == null) && (url == null)) {
+        if ((bundle == null) && (dataObject == null)) {
             return error(
-                "datasource tag requires either a url or a bundle attribute");
+                "datasource tag requires either a url, fileset or a bundle");
         }
         DataSource dataSource = null;
-        if (url != null) {
-            dataSource = getIdv().makeOneDataSource(url, type, null);
+        if (dataObject != null) {
+            dataSource = getIdv().makeOneDataSource(dataObject, type, null);
             if (dataSource == null) {
-                return error("Failed to create data source:" + url + " "
+                return error("Failed to create data source:" +dataObject + " "
                              + type);
             }
         } else {

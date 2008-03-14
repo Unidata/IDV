@@ -146,15 +146,36 @@ public class IdvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List types)
+    protected void xxxgetOutputTypesForGroup(Request request, Group group,
+                                          List<Group> subGroups,
+                                          List<Entry> entries, List types)
+
             throws Exception {
-        String type = entry.getTypeHandler().getType();
-        if (type.equals("level3radar") || type.equals("level2radar")) {
+        getOutputTypesForEntries(request, entries,types);
+    }
+
+
+    protected void getOutputTypesForEntries(Request request,
+                                            List<Entry> entries, List types)
+            throws Exception {
+
+        List<Entry> theEntries = getRadarEntries(entries);
+        if(theEntries.size()>0) {
             types.add(new TwoFacedObject("Preview Image", OUTPUT_IDV));
         }
     }
 
+
+    private List<Entry> getRadarEntries(List<Entry> entries) {
+        List<Entry> theEntries = new ArrayList<Entry>();
+        for(Entry entry: entries) {
+            String type = entry.getTypeHandler().getType();
+            if (type.equals("level3radar") || type.equals("level2radar")) {
+                theEntries.add(entry);
+            }
+        }
+        return theEntries;
+    }
 
     /**
      * _more_
@@ -166,20 +187,41 @@ public class IdvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputGroup(Request request, Group group,
+                              List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+        
+        final List<Entry> theEntries = getRadarEntries(entries);
+        if(theEntries.size() == 0) {
+            return new Result(msg("Image Preview"),  new StringBuffer("No radar entries found"));
+        }
+
+        Entry theEntry = null;
+        String id = group.getId();
+        if (group.isDummy()) {
+            if(theEntries.size()==1) {
+                theEntry = theEntries.get(0);
+                id = theEntries.get(0).getId();
+            } 
+        }
+
         if ( !request.exists("doimage")) {
             StringBuffer sb = new StringBuffer();
+            //TODO: the id is wrong if we are a search result
             String url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW
-                                      + "/preview.png", ARG_ID,
-                                          entry.getId(), ARG_OUTPUT,
+                                      + "/preview.gif", ARG_ID,
+                                      id, ARG_OUTPUT,
                                           OUTPUT_IDV, "doimage", "true");
 
             request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
-            String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                  false, "");
+            String title="";
+            if (!group.isDummy() || theEntry!=null) {
+                String[] crumbs = getRepository().getBreadCrumbs(request,
+                                                                 (theEntry!=null?theEntry:(Entry)group), false,"");
+                title = crumbs[0];
+                sb.append(crumbs[1]);
+            }
 
-            String title = crumbs[0];
-            sb.append(crumbs[1]);
             sb.append("&nbsp;<p>");
             sb.append(HtmlUtil.img(url));
             Result result = new Result("Preview - " + title, sb);
@@ -187,38 +229,53 @@ public class IdvOutputHandler extends OutputHandler {
                 PROP_NAVSUBLINKS,
                 getHeader(
                     request, OUTPUT_IDV,
-                    getRepository().getOutputTypesForEntry(request, entry)));
+                    getRepository().getOutputTypesForGroup(
+                                                           request, group, subGroups, entries)));
             return result;
         }
 
-        String type     = entry.getTypeHandler().getType();
         String thumbDir = getStorageManager().getThumbDir();
         File image = new File(IOUtil.joinDir(thumbDir,
-                                             "preview_" + entry.getId()
-                                             + ".png"));
+                                             "preview_" + id.replace("/","_")
+                                             + ".gif"));
         if (image.exists()) {
-            return new Result("preview.png", new FileInputStream(image),
-                              "image/png");
+            return new Result("preview.gif", new FileInputStream(image),
+                              "image/gif");
         }
 
 
         StringBuffer isl = new StringBuffer();
-        //        isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"false\">\n");
         isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
         String datasource;
         datasource = "FILE.RADAR";
-        isl.append("<datasource type=\"" + datasource + "\" url=\""
-                   + entry.getResource().getPath() + "\">\n");
+        //        isl.append("<datasource type=\"" + datasource + "\" url=\""
+        //                   + entry.getResource().getPath() + "\">\n");
+        isl.append("<datasource type=\"" + datasource + "\" >\n");
+        int cnt = 0;
+        for(Entry entry: theEntries) {
+            isl.append("<fileset file=\"" + entry.getResource().getPath() +"\"/>\n");
+        }
         isl.append(
             "<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
         isl.append("</datasource>\n");
         //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
-        //        isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
+        isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
         isl.append("<pause/>\n");
         //        isl.append("<pause seconds=\"60\"/>\n");
-        isl.append("<image file=\"" + image + "\"/>\n");
-        isl.append("</isl>\n");
 
+        if(cnt==1) {
+            isl.append("<image file=\"" + image + "\"/>\n");
+        } else {
+            isl.append("<movie file=\"" + image + "\"/>\n");
+        }
+        isl.append("</isl>\n");
+        //        System.out.println(isl);
+        executeIsl(request, isl);
+        return new Result("preview.png", new FileInputStream(image),
+                          "image/png");
+    }
+
+    private void executeIsl(Request request, StringBuffer isl) throws Exception {
         //        System.err.println(isl);
         //For now just have one
         synchronized (IDV_MUTEX) {
@@ -243,9 +300,9 @@ public class IdvOutputHandler extends OutputHandler {
             idv.cleanup();
             //            ucar.unidata.util.Trace.stopTrace();
         }
-        return new Result("preview.png", new FileInputStream(image),
-                          "image/png");
+
     }
+
 
 
 }
