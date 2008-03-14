@@ -47,44 +47,52 @@ function tooltipHide(event,id)
 
 
 
-var mouseIsDown = 0;
+
 
 
 document.onmousemove = mouseMove;
 document.onmousedown = mouseDown;
 document.onmouseup   = mouseUp;
 
-
+var mouseIsDown = 0;
+var draggedEntry;
+var mouseMoveCnt =0;
 
 function mouseDown(ev){
     mouseIsDown = 1;
+    mouseMoveCnt =0;
     return true;
 }
-
 
 
 function mouseUp(ev){
     mouseIsDown = 0;
+    draggedEntry   = null;
     setCursor('default')
     return true;
 }
 
-function mouseMove(ev){
-    return true;
+function mouseMove(event) {
+    if(draggedEntry && mouseIsDown) {
+        mouseMoveCnt++;
+        if(mouseMoveCnt>5) {
+	        setCursor('move')
+        }
+    }    
+    return false;
+//    return true;
 }
 
 
 
-
-var draggedEntry;
-
-
 function mouseOverOnEntry(event, id) {
    if(id == draggedEntry) return;
-   var obj = new getObj("span_" + id);
-   if(!obj)  return;
    if(mouseIsDown)  {
-       obj.style.borderBottom="2px black solid; ";
+      var obj = new getObj("span_" + id);
+      if(!obj)  return;
+//       if(obj.style && obj.style.borderBottom) {
+           obj.style.borderBottom="2px black solid";
+//        }
    }
 }
 
@@ -114,8 +122,12 @@ function setCursor(c) {
 function mouseDownOnEntry(event, id) {
     draggedEntry = id;
     mouseIsDown = 1;
-    setCursor('move')
-    event.preventDefault();
+    if(event.preventDefault) {
+	    event.preventDefault();
+     } else {
+	event.returnValue = false;
+        return false;
+     }
 }
 
 
@@ -143,14 +155,8 @@ function tooltipShow(event,id)
 }
 
 
-function handleMouseMove() {
-   cnt++;
-   print('mouse move ' + cnt);
-   lastMove++;
-}
 
 
-//document.addEventListener("mousemove",handleMouseMove,false); 
 
 
 function getTop(obj) {

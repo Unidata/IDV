@@ -223,7 +223,7 @@ public class HtmlOutputHandler extends OutputHandler {
         getMetadataHtml(request, entry, sb,true);
         getCommentBlock(request, entry, sb);
         getAssociationBlock(request, entry, sb);
-        Result result = new Result(msgLabel("Entry") + entry.getName(), sb,
+        Result result = new Result(msgLabel("Entry") + entry.getLabel(), sb,
                                    getMimeType(request.getOutput()));
         result.putProperty(
             PROP_NAVSUBLINKS,
@@ -264,7 +264,7 @@ public class HtmlOutputHandler extends OutputHandler {
             }
             assocSB.append("<tr><td>");
             assocSB.append(((fromEntry == entry)
-                            ? fromEntry.getName()
+                            ? fromEntry.getLabel()
                             : getRepository().getEntryUrl(
                                                           fromEntry)));
             assocSB.append("&nbsp;&nbsp;");
@@ -276,7 +276,7 @@ public class HtmlOutputHandler extends OutputHandler {
             assocSB.append("&nbsp;&nbsp;");
             assocSB.append("</td><td>");
             assocSB.append(((toEntry == entry)
-                            ? toEntry.getName()
+                            ? toEntry.getLabel()
                             : getRepository().getEntryUrl(toEntry)));
             assocSB.append("</td></tr>");
         }
@@ -297,7 +297,7 @@ public class HtmlOutputHandler extends OutputHandler {
     protected String getEntryUrl(Entry entry) {
         return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ID,
-                                          entry.getId()), entry.getName());
+                                          entry.getId()), entry.getLabel());
     }
 
 
@@ -824,7 +824,7 @@ public class HtmlOutputHandler extends OutputHandler {
         List ids    = new ArrayList();
         for (Entry entry : entries) {
             times.add(SqlUtil.format(new Date(entry.getStartDate())));
-            labels.add(entry.getName());
+            labels.add(entry.getLabel());
             ids.add(entry.getId());
         }
         String tmp = StringUtil.replace(timelineAppletTemplate, "%times%",

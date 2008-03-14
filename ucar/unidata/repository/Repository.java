@@ -371,9 +371,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private GroupTypeHandler groupTypeHandler;
 
-    /** _more_ */
-    private Group dummyGroup;
-
 
     /** _more_ */
     private Hashtable pageCache = new Hashtable();
@@ -2232,8 +2229,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         groupTypeHandler.putProperty("form.show." + ARG_RESOURCE, "false");
         addTypeHandler(TypeHandler.TYPE_FILE,
                        new TypeHandler(this, "file", "File"));
-        dummyGroup = new Group(groupTypeHandler, true);
     }
+
+    public Group getDummyGroup() {
+        Group dummyGroup = new Group(groupTypeHandler, true);
+        dummyGroup.setId(getGUID());
+        return dummyGroup;
+    }
+
 
 
     /**
@@ -3000,7 +3003,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 sb.append("<li> ");
                 sb.append(HtmlUtil.href(HtmlUtil.url(
                                        getRepository().URL_ENTRY_COPY, ARG_FROM,
-                                       fromEntry.getId(), ARG_TO,entry.getId(),ARG_ACTION,ACTION_MOVE ), entry.getName()));
+                                       fromEntry.getId(), ARG_TO,entry.getId(),ARG_ACTION,ACTION_MOVE ), entry.getLabel()));
                 sb.append(HtmlUtil.br());
                 didOne = true;
 
@@ -3032,13 +3035,13 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         if(!getAccessManager().canDoAction(request, fromEntry,
                                           Permission.ACTION_EDIT)) {
-            throw new AccessException("Cannot move:" + fromEntry.getName());
+            throw new AccessException("Cannot move:" + fromEntry.getLabel());
         }
 
 
         if(!getAccessManager().canDoAction(request, toEntry,
                                           Permission.ACTION_NEW)) {
-            throw new AccessException("Cannot copy to:" + toEntry.getName());
+            throw new AccessException("Cannot copy to:" + toEntry.getLabel());
         }
 
         if(!okToMove(fromEntry, toEntry)) {
@@ -3062,12 +3065,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(msgLabel("Are you sure you want to move"));
             sb.append(HtmlUtil.br());
             sb.append(HtmlUtil.space(3));
-            sb.append(fromEntry.getName());
+            sb.append(fromEntry.getLabel());
             sb.append(HtmlUtil.br());
             sb.append(msgLabel("To"));
             sb.append(HtmlUtil.br());
             sb.append(HtmlUtil.space(3));
-            sb.append(toEntry.getName());
+            sb.append(toEntry.getLabel());
             sb.append(HtmlUtil.br());
 
 
@@ -3797,8 +3800,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append("Add association between " + fromEntry.getName());
-        sb.append(" and  " + toEntry.getName());
+        sb.append("Add association between " + fromEntry.getLabel());
+        sb.append(" and  " + toEntry.getLabel());
         sb.append(HtmlUtil.form(URL_ASSOCIATION_ADD, BLANK));
         sb.append("Association Name: ");
         sb.append(HtmlUtil.input(ARG_NAME));
@@ -3883,7 +3886,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entry.isGroup()) {
             inner.append(
                 msgLabel("Are you sure you want to delete the group"));
-            inner.append(entry.getName());
+            inner.append(entry.getLabel());
             inner.append(HtmlUtil.p());
             inner.append(
                 msg(
@@ -3891,7 +3894,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         } else {
             inner.append(
                 msgLabel("Are you sure you want to delete the entry"));
-            inner.append(entry.getName());
+            inner.append(entry.getLabel());
         }
         inner.append(HtmlUtil.p());
         inner.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
@@ -4143,12 +4146,16 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 new File(theResource)).toString();
                     }
                     String name = request.getString(ARG_NAME, BLANK);
+                    if(name.indexOf("${") >=0) {
+                        
+                    }
+
                     if (name.trim().length() == 0) {
                         name = IOUtil.getFileTail(origName);
                     }
                     if (name.trim().length() == 0) {
-                        throw new IllegalArgumentException(
-                            "You must specify a name");
+                        //                        throw new IllegalArgumentException(
+                        //                            "You must specify a name");
                     }
 
                     if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
@@ -4223,7 +4230,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 Date createDate = new Date();
                 Date[] dateRange = request.getDateRange(ARG_FROMDATE,
                                        ARG_TODATE, createDate);
-                String newName = request.getString(ARG_NAME, entry.getName());
+                String newName = request.getString(ARG_NAME, entry.getLabel());
                 if (entry.isTopGroup()) {
                     throw new IllegalArgumentException(
                         "Cannot edit top-level group");
@@ -4367,7 +4374,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entry = topGroups.get(0);
             } else {
                 OutputHandler outputHandler = getOutputHandler(request);
-                return outputHandler.outputGroup(request, dummyGroup, topGroups,new ArrayList<Entry>());
+                return outputHandler.outputGroup(request, getDummyGroup(), topGroups,new ArrayList<Entry>());
 
                 
 
@@ -4469,7 +4476,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         entries = getAccessManager().filterEntries(request, entries);
 
-        return getOutputHandler(request).outputGroup(request, dummyGroup,
+        return getOutputHandler(request).outputGroup(request, getDummyGroup(),
                                 new ArrayList<Group>(), entries);
 
     }
@@ -4592,12 +4599,12 @@ public class Repository implements Constants, Tables, RequestHandler,
                     output) + extraArgs, name));
             parent = findGroup(parent.getParentGroupId());
         }
-        titleList.add(entry.getName());
+        titleList.add(entry.getLabel());
         String nav;
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
                     ARG_ID, entry.getId(), ARG_OUTPUT,
-                    output), entry.getName()));
+                    output), entry.getLabel()));
             nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
             //            if(breadcrumbs.size()>1) {
             //            nav = HtmlUtil.div(HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")), HtmlUtil.cssClass("entryheader"));
@@ -4606,14 +4613,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         } else {
             nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
             String links = getHeaderLinksForEntry(request, entry);
-            //            String   header = HtmlUtil.div(entry.getName() + 
+            //            String   header = HtmlUtil.div(entry.getLabel() + 
             //                                           HtmlUtil.space(1) +
             //                                           links,
             //                                           HtmlUtil.cssClass("entryheader"));
-            //                + HtmlUtil.div(entry.getName(), HtmlUtil.cssClass("entryname"))
+            //                + HtmlUtil.div(entry.getLabel(), HtmlUtil.cssClass("entryname"))
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr valign=\"bottom\"><td class=\"entryname\" >"
-                + entry.getName()
+                + entry.getLabel()
                 + "</td><td align=\"right\">" + links + "</tr></td></table>";
 
             if (breadcrumbs.size() > 0) {
@@ -4623,7 +4630,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                   + HtmlUtil.div(
                       HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))
                       + "\n" + header, HtmlUtil.cssClass("entryheader"));
-            //            breadcrumbs.add(HtmlUtil.bold(entry.getName()) + HtmlUtil.space(1)
+            //            breadcrumbs.add(HtmlUtil.bold(entry.getLabel()) + HtmlUtil.space(1)
             //                            + getHeaderLinksForEntry(request, entry));
         }
         String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
@@ -4672,7 +4679,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             parent = findGroup(parent.getParentGroupId());
         }
         breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                entry.getId()), entry.getName()));
+                entry.getId()), entry.getLabel()));
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -5929,7 +5936,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected String getEntryUrl(Entry entry) {
         return HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                          entry.getId()), entry.getName());
+                                          entry.getId()), entry.getLabel());
     }
 
     /**
@@ -6171,19 +6178,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         List[] pair = getEntries(request);
-        return getOutputHandler(request).outputGroup(request, dummyGroup,
+        return getOutputHandler(request).outputGroup(request, getDummyGroup(),
                                 (List<Group>) pair[0], (List<Entry>) pair[1]);
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public Group getDummyGroup() {
-        return dummyGroup;
-    }
+
 
 
 

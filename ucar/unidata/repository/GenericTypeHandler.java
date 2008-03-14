@@ -577,6 +577,27 @@ public class GenericTypeHandler extends TypeHandler {
         return sb;
     }
 
+    protected String processDisplayTemplate(Request request, Entry entry, String html) 
+            throws Exception {
+        html = super.processDisplayTemplate(request, entry, html);
+        Object[] values   = entry.getValues();
+        String       output = request.getOutput();
+        if (values != null) {
+            int valueIdx=0;
+            for (Column column : columns) {
+                StringBuffer tmpSb = new StringBuffer();
+                valueIdx = column.formatValue(tmpSb, output, values,
+                                              valueIdx);
+                html = html.replace("${" + column.getName() +".content}", tmpSb.toString());
+                html = html.replace("${" + column.getName() +".label}", column.getLabel());
+            }
+        }
+
+        return html;
+    }
+
+
+
     /**
      * _more_
      *

@@ -7,6 +7,20 @@
                 properties="/ucar/unidata/repository/resources/level3radar.product.properties"/>
   </type>
 
+
+  <type name="weathersummary"  description="Weather Summary" displaytemplate="/ucar/unidata/repository/resources/templates/weathersummary.display.html">
+	<column name="review" type="string"     label="Review of yesterday's forecast" rows="8"/>
+	<column name="day1" type="string"     label="Day 1" rows="8"/>
+	<column name="day2" type="string"     label="Day 2" rows="8"/>
+	<column name="longterm" type="string"     label="Long Term" rows="8"/>
+        <property name="form.dflt.name" value="Weather Summary for ${fromdate}"/>
+        <property name="form.show.name" value="false"/>
+        <property name="form.show.description" value="false"/>
+        <property name="form.show.resource" value="false"/>
+        <property name="form.show.todate" value="false"/>
+        <property name="form.show.area" value="false"/>
+  </type>
+
   <type name="report1"  description="Report 1"  formtemplate="/ucar/unidata/repository/resources/report1.form.html">
 	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" />
 	<column name="newforecast1" oldnames="forecast1" type="string"     label="New Forecast 1" rows="8"/>

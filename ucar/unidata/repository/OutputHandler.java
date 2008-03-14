@@ -264,9 +264,7 @@ public class OutputHandler extends RepositoryManager {
         entries.add(entry);
         return outputGroup(request, getRepository().getDummyGroup(),
                            new ArrayList<Group>(), entries);
-
     }
-
 
 
     /**
@@ -296,7 +294,7 @@ public class OutputHandler extends RepositoryManager {
 
 
     protected String getAjaxLink(Request request, Entry entry) {
-        return getAjaxLink(request, entry, entry.getName(),true);
+        return getAjaxLink(request, entry, entry.getLabel(),true);
     }
 
     protected String getAjaxLink(Request request, Entry entry, String linkText, boolean includeIcon) {
@@ -465,7 +463,7 @@ public class OutputHandler extends RepositoryManager {
 
                 sb.append(crumbs);
             } else {
-                sb.append(getAjaxLink(request,  entry, entry.getName(), true));
+                sb.append(getAjaxLink(request,  entry, entry.getLabel(), true));
                           //                sb.append(getEntryUrl(request, entry));
             }
             //            sb.append(HtmlUtil.br());
@@ -490,10 +488,10 @@ public class OutputHandler extends RepositoryManager {
      */
     protected String getEntryUrl(Request request, Entry entry) {
         if(true)
-            return getAjaxLink(request,  entry, entry.getName(), false);
+            return getAjaxLink(request,  entry, entry.getLabel(), false);
         return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ID,
-                                          entry.getId()), entry.getName());
+                                          entry.getId()), entry.getLabel());
     }
 
     /**

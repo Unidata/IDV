@@ -260,6 +260,12 @@ public class TypeHandler extends RepositoryManager {
         return getProperty("form.show." + arg, true);
     }
 
+    public String getFormDefault(String arg, String dflt) {
+        String prop = getProperty("form.default." + arg);
+        if(prop == null) return dflt;
+        return prop;
+    }
+
 
     /**
      * _more_
@@ -382,6 +388,21 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    protected String processDisplayTemplate(Request request, Entry entry, String html)             throws Exception {
+        html = html.replace("${" + ARG_NAME+"}", entry.getName());
+        html = html.replace("${" + ARG_LABEL+"}", entry.getLabel());
+        html = html.replace("${" + ARG_DESCRIPTION+"}", entry.getDescription());
+        html = html.replace("${" + ARG_CREATEDATE+"}",formatDate(request,
+                                                                 entry.getCreateDate()));
+        html = html.replace("${" + ARG_FROMDATE+"}",formatDate(request,
+                                                                 entry.getStartDate()));
+        html = html.replace("${" + ARG_TODATE+"}",formatDate(request,
+                                                                 entry.getEndDate()));
+        html = html.replace("${" + ARG_CREATOR+"}", entry.getUser().getLabel());
+
+        return html;
+    }
+
 
     /**
      * _more_
@@ -398,18 +419,13 @@ public class TypeHandler extends RepositoryManager {
                                         boolean showResource)
             throws Exception {
 
-
-
-
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             if(displayTemplatePath!=null) {
                 String html = getRepository().getResource(displayTemplatePath);
-                sb.append(html);
-                return sb;
+                return new StringBuffer(processDisplayTemplate(request, entry, html));
             }
-
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
                                            showResource));
@@ -570,9 +586,8 @@ public class TypeHandler extends RepositoryManager {
             String nextPrev = outputHandler.getNextPrevLink(request, entry,
                                   output);
             //            sb.append(HtmlUtil.formEntry("", nextPrev));
-            //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getName()));
+            //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), entry.getName()));
-
 
 
 
@@ -877,18 +892,27 @@ public class TypeHandler extends RepositoryManager {
                                Entry entry)
            throws Exception {
             String size = HtmlUtil.SIZE_70;
-            sb.append(HtmlUtil.formEntry("Name:",
-                                         HtmlUtil.input(ARG_NAME,
-                                             ((entry != null)
-                    ? entry.getName()
-                    : BLANK), size)));
+            if (okToShowInForm(ARG_NAME)) {
+                sb.append(HtmlUtil.formEntry("Name:",
+                                             HtmlUtil.input(ARG_NAME,
+                                                            ((entry != null)
+                                                             ? entry.getName()
+                                                             : getFormDefault(ARG_NAME,"")), size)));
+            } else {
+                String nameDefault = getFormDefault(ARG_NAME,null);
+                if(nameDefault!=null) {
+                    sb.append(HtmlUtil.hidden(ARG_NAME, nameDefault));
+                }
+            }
             int rows = getProperty("form.rows.desc", 3);
-            sb.append(
-                HtmlUtil.formEntryTop(
-                    "Description:",
-                    HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
-                    ? entry.getDescription()
-                    : BLANK), rows, 50)));
+            if (okToShowInForm(ARG_DESCRIPTION)) {
+                sb.append(
+                          HtmlUtil.formEntryTop(
+                                                "Description:",
+                                                HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
+                                                                                    ? entry.getDescription()
+                                                                                    : BLANK), rows, 50)));
+            }
 
             if (okToShowInForm(ARG_RESOURCE)) {
                 if (entry == null) {
@@ -937,6 +961,14 @@ public class TypeHandler extends RepositoryManager {
                                           new Date(entry.getEndDate()))
                              : BLANK);
             if (okToShowInForm(ARG_DATE)) {
+                if (!okToShowInForm(ARG_TODATE)) {
+                sb.append(
+                    HtmlUtil.formEntry(
+                        "Date:",
+                        HtmlUtil.input(
+                            ARG_FROMDATE, fromDate,
+                            HtmlUtil.SIZE_30)));
+                } else {
                 sb.append(
                     HtmlUtil.formEntry(
                         "Date Range:",
@@ -946,6 +978,7 @@ public class TypeHandler extends RepositoryManager {
                                 + HtmlUtil.input(
                                     ARG_TODATE, toDate,
                                     HtmlUtil.SIZE_30) + dateHelp));
+                }
                 if (entry == null) {
                     List datePatterns = new ArrayList();
 

@@ -331,6 +331,14 @@ public class Entry extends Entity {
         return false;
     }
 
+    public String getLabel() {
+        String label = super.getLabel();
+        if(label.length()>0) return label;
+        return getTypeHandler().getLabel() + ": " + new Date(startDate);
+    }
+
+
+
     /**
      * Set the South property.
      *

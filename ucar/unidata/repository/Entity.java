@@ -252,6 +252,18 @@ public class Entity implements Cloneable {
         return name;
     }
 
+
+    public String getLabel() {
+        if(name!=null && name.trim().length()>0) {
+            return name;
+        }
+        if(description!=null && description.trim().length()>0) {
+            return description;
+        }
+        return "";
+        
+    }
+
     /**
      * Set the Description property.
      *
