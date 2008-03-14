@@ -272,7 +272,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
         long      t1               = System.currentTimeMillis();
         int cnt = 0;
         for (Iterator iter = files.iterator(); iter.hasNext(); ) {
-            String       filename = (String) iter.next();
+            String       filename = iter.next().toString();
             RadarAdapter adapter  =
                 (RadarAdapter) oldAdapterMap.get(filename);
             cnt++;
