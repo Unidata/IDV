@@ -282,7 +282,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(Object path, String n1, String v1) {
+    public static String url(String path, String n1, String v1) {
         return url(path, new String[] { n1, v1 });
     }
 
@@ -298,7 +298,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(Object path, String n1, String v1, String n2,
+    public static String url(String path, String n1, String v1, String n2,
                              String v2) {
         return url(path, new String[] { n1, v1, n2, v2 });
     }
@@ -316,7 +316,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(Object path, String n1, String v1, String n2,
+    public static String url(String path, String n1, String v1, String n2,
                              String v2, String n3, String v3) {
         return url(path, new String[] {
             n1, v1, n2, v2, n3, v3
@@ -338,7 +338,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(Object path, String n1, String v1, String n2,
+    public static String url(String path, String n1, String v1, String n2,
                              String v2, String n3, String v3, String n4,
                              String v4) {
         return url(path, new String[] {
@@ -354,7 +354,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(Object path, String[] args) {
+    public static String url(String path, String[] args) {
         if (args.length == 0) {
             return path.toString();
         }
@@ -600,8 +600,14 @@ public class HtmlUtil {
      */
     public static String checkbox(String name, String value,
                                   boolean checked) {
-        return "<input "
-               + attrs("type", "checkbox", "name", name, "value", value)
+        return checkbox(name, value, checked, "");
+    }
+
+    public static String checkbox(String name, String value,
+                                  boolean checked, String extra) {
+        return "<input " +
+            extra +
+            attrs("type", "checkbox", "name", name, "value", value)
                + (checked
                   ? " checked "
                   : "") + ">";
@@ -614,7 +620,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String form(Object url) {
+    public static String form(String url) {
         return form(url, "");
     }
 
@@ -626,7 +632,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String form(Object url, String extra) {
+    public static String form(String  url, String extra) {
         return "<form action=\"" + url + "\"" + " " + extra + " >";
     }
 
@@ -637,7 +643,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String formPost(Object url) {
+    public static String formPost(String url) {
         return "<form method=\"post\" action=\"" + url + "\">";
     }
 
@@ -650,7 +656,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String uploadForm(Object url, String extra) {
+    public static String uploadForm(String url, String extra) {
         return "<form method=\"post\" enctype=\"multipart/form-data\"  action=\""
                + url + "\"" + " " + extra + " >";
     }
@@ -665,7 +671,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String href(Object url, String label) {
+    public static String href(String url, String label) {
         return "<a href=\"" + url.toString() + "\">" + label + "</a>";
     }
 
@@ -678,7 +684,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String href(Object url, String label, String extra) {
+    public static String href(String url, String label, String extra) {
         return "<a href=\"" + url.toString() + "\"" + " " + extra + ">"
                + label + "</a>";
     }
