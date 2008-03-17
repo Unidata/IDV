@@ -1674,8 +1674,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @return  the real type of request variable
      *
      */
-    private RealType getMomentType(String vname) {
-        return RealType.getRealType(vname);
+    private RealTupleType getMomentType(String vname) throws VisADException {
+        //        return RealType.getRealType(vname);
+        return new RealTupleType(RealType.getRealType(vname));
     }
 
     /**
