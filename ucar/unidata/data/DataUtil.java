@@ -111,6 +111,8 @@ public class DataUtil {
                 for (int i = 0; i < fromArray.length; ++i) {
                     values[i] = (float) fromArray[i];
                 }
+            } else {
+                throw new IllegalArgumentException("Unknown array type:" + fromClass.getName());
             }
             return values;
         }
