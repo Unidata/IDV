@@ -673,7 +673,7 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
-                HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
+                request.url(repository.URL_ENTRY_SHOW, ARG_ID,
                              group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
 
             Element ref = XmlUtil.create(catalogInfo.doc, TAG_CATALOGREF,

@@ -330,7 +330,7 @@ public class Admin extends RepositoryManager {
             }
         }
         sb.append("<p>");
-        sb.append(HtmlUtil.form(URL_ADMIN_STARTSTOP, " name=\"admin\""));
+        sb.append(request.form(URL_ADMIN_STARTSTOP, " name=\"admin\""));
         if (repository.getConnection() == null) {
             sb.append(HtmlUtil.hidden(ARG_ADMIN_WHAT, "restart"));
             sb.append(HtmlUtil.submit("Restart Database"));
@@ -431,13 +431,13 @@ public class Admin extends RepositoryManager {
         sb.append(header("Repository Administration"));
         sb.append("<ul>\n");
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(URL_ADMIN_STARTSTOP, "Administer Database"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_STARTSTOP), "Administer Database"));
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(URL_ADMIN_TABLES, "Show Tables"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES), "Show Tables"));
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(URL_ADMIN_STATS, "Statistics"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_STATS), "Statistics"));
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(URL_ADMIN_SQL, "Execute SQL"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_SQL), "Execute SQL"));
         sb.append("</ul>");
         return makeResult(request, "Administration", sb);
 
@@ -457,7 +457,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Repository Settings"));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.form(URL_ADMIN_SETTINGS_DO));
+        sb.append(request.form(URL_ADMIN_SETTINGS_DO));
         String size = " size=\"40\" ";
         sb.append(tableSubHeader(msg("Display")));
         sb.append(HtmlUtil.formEntry(msgLabel("Title"),
@@ -544,7 +544,7 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_ACCESS_REQUIRELOGIN,
                                     request.get(PROP_ACCESS_REQUIRELOGIN,
                                         false));
-        return new Result(URL_ADMIN_SETTINGS.toString());
+        return new Result(request.url(URL_ADMIN_SETTINGS));
     }
 
 
@@ -592,7 +592,7 @@ public class Admin extends RepositoryManager {
 
             String url =
                 HtmlUtil.href(
-                    HtmlUtil.url(
+                              request.url(
                         getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
                         typeHandler.getType()), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
@@ -621,9 +621,9 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("SQL"));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.href(URL_ADMIN_TABLES, msg("View Schema")));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES), msg("View Schema")));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.form(URL_ADMIN_SQL));
+        sb.append(request.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit(msg("Execute")));
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.textArea(ARG_QUERY, (query == null)
@@ -706,14 +706,14 @@ public class Admin extends RepositoryManager {
      */
     public Result adminCleanup(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtil.form(URL_ADMIN_CLEANUP));
+        sb.append(request.form(URL_ADMIN_CLEANUP));
         if (request.defined(ACTION_STOP)) {
             runningCleanup = false;
             cleanupTimeStamp++;
-            return new Result(URL_ADMIN_CLEANUP.toString());
+            return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_START)) {
             Misc.run(this, "runDatabaseCleanUp", request);
-            return new Result(URL_ADMIN_CLEANUP.toString());
+            return new Result(request.url(URL_ADMIN_CLEANUP));
         }
         String status = cleanupStatus.toString();
         if (runningCleanup) {

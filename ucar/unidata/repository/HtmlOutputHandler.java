@@ -265,7 +265,7 @@ public class HtmlOutputHandler extends OutputHandler {
             assocSB.append("<tr><td>");
             assocSB.append(((fromEntry == entry)
                             ? fromEntry.getLabel()
-                            : getRepository().getEntryUrl(
+                            : getRepository().getEntryUrl(request,
                                                           fromEntry)));
             assocSB.append("&nbsp;&nbsp;");
             assocSB.append("</td><td>");
@@ -277,7 +277,7 @@ public class HtmlOutputHandler extends OutputHandler {
             assocSB.append("</td><td>");
             assocSB.append(((toEntry == entry)
                             ? toEntry.getLabel()
-                            : getRepository().getEntryUrl(toEntry)));
+                            : getRepository().getEntryUrl(request,toEntry)));
             assocSB.append("</td></tr>");
         }
         assocSB.append("</table>");
@@ -294,8 +294,8 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
+    protected String getEntryUrl(Request request,Entry entry) {
+        return HtmlUtil.href(request.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ID,
                                           entry.getId()), entry.getLabel());
     }
@@ -329,14 +329,14 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append("<li>");
                 sb.append(
                     HtmlUtil.href(
-                        HtmlUtil.url(
-                            getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
-                            theTypeHandler.getType()), HtmlUtil.img(
-                                getRepository().fileUrl(ICON_SEARCH),
-                                msg("Search in Group"))));
+                                  request.url(
+                                              getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
+                                              theTypeHandler.getType()), HtmlUtil.img(
+                                                                                      getRepository().fileUrl(ICON_SEARCH),
+                                                                                      msg("Search in Group"))));
                 sb.append(" ");
                 sb.append(HtmlUtil
-                    .href(HtmlUtil
+                    .href(request
                         .url(getRepository().URL_LIST_HOME, ARG_TYPE,
                              theTypeHandler.getType()), theTypeHandler
                                  .getType()));
@@ -432,7 +432,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                              "Count:" + tag.getCount());
                 sb.append(
                     HtmlUtil.href(
-                        HtmlUtil.url(
+                        request.url(
                             getRepository().URL_GRAPH_VIEW, ARG_ID, tag.getName(),
                             ARG_NODETYPE, TYPE_TAG), tag.getName(), extra));
                 sb.append("</span>");
@@ -579,7 +579,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                              msgLabel("Count") + count);
                 sb.append(
                     HtmlUtil.href(
-                        HtmlUtil.url(
+                        request.url(
                             getRepository().URL_GRAPH_VIEW, ARG_ID,
                             association, ARG_NODETYPE,
                             TYPE_ASSOCIATION), association, extra));
@@ -835,7 +835,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                  StringUtil.join(",", labels));
         tmp = StringUtil.replace(tmp, "%ids%", StringUtil.join(",", ids));
         tmp = StringUtil.replace(tmp, "%loadurl%",
-                                 HtmlUtil.url(getRepository().URL_GETENTRIES,
+                                 request.url(getRepository().URL_GETENTRIES,
                                      ARG_IDS, "%ids%", ARG_OUTPUT,
                                      OUTPUT_HTML));
         return tmp;

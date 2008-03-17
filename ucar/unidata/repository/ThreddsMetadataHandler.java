@@ -75,54 +75,54 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final Metadata.Type TYPE_CREATOR =
-        new Metadata.Type("creator", "Creator");
+        new Metadata.Type("thredds.creator", "Creator");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_LINK = new Metadata.Type("link",
+    public static final Metadata.Type TYPE_LINK = new Metadata.Type("thredds.link",
                                                       "Link");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DATAFORMAT =
-        new Metadata.Type("dataFormat", "Data Format");
+        new Metadata.Type("thredds.dataFormat", "Data Format");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DATATYPE =
-        new Metadata.Type("dataType", "Data Type");
+        new Metadata.Type("thredds.dataType", "Data Type");
 
     /** _more_ */
     public static final Metadata.Type TYPE_AUTHORITY =
-        new Metadata.Type("authority", "Authority");
+        new Metadata.Type("thredds.authority", "Authority");
 
     /** _more_ */
     public static final Metadata.Type TYPE_VARIABLES =
-        new Metadata.Type("variables", "Variables");
+        new Metadata.Type("thredds.variables", "Variables");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PUBLISHER =
-        new Metadata.Type("publisher", "Publisher");
+        new Metadata.Type("thredds.publisher", "Publisher");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PROJECT =
-        new Metadata.Type("project", "Project");
+        new Metadata.Type("thredds.project", "Project");
 
     /** _more_ */
     public static final Metadata.Type TYPE_KEYWORD =
-        new Metadata.Type("keyword", "Keyword");
+        new Metadata.Type("thredds.keyword", "Keyword");
 
     /** _more_ */
     public static final Metadata.Type TYPE_CONTRIBUTOR =
-        new Metadata.Type("contributor", "Contributor");
+        new Metadata.Type("thredds.contributor", "Contributor");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PROPERTY =
-        new Metadata.Type("property", "Property");
+        new Metadata.Type("thredds.property", "Property");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DOCUMENTATION =
-        new Metadata.Type("documentation", "Documentation");
+        new Metadata.Type("thredds.documentation", "Documentation");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_ICON = new Metadata.Type("icon",
+    public static final Metadata.Type TYPE_ICON = new Metadata.Type("thredds.icon",
                                                       "Icon");
 
 
@@ -154,6 +154,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
+    private String getTag(Metadata.Type type) {
+        int idx= type.getType().indexOf(".");
+        if(idx<0) return type.getType();
+        return type.getType().substring(idx);
+    }
+
+    protected String getHandlerGroupName() {
+        return "Thredds";
+    }
+
     /**
      * _more_
      *
@@ -171,33 +181,33 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             throws Exception {
         Metadata.Type type = getType(metadata.getType());
         if (type.equals(TYPE_LINK)) {
-            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,
+            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            new String[] { "xlink:href",
                                           metadata.getAttr2(), "xlink:title",
                                           metadata.getAttr1() });
         } else if (type.equals(TYPE_DOCUMENTATION)) {
-            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,
+            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            metadata.getAttr2(), new String[] { ATTR_TYPE,
                     metadata.getAttr1() });
         } else if (type.equals(TYPE_PROPERTY)) {
-            XmlUtil.create(doc, TYPE_PROPERTY.toString(), datasetNode,
+            XmlUtil.create(doc, getTag(TYPE_PROPERTY), datasetNode,
                            new String[] { ATTR_NAME,
                                           metadata.getAttr1(), ATTR_VALUE,
                                           metadata.getAttr2() });
         } else if (type.equals(TYPE_KEYWORD)) {
-            XmlUtil.create(doc, TYPE_KEYWORD.toString(), datasetNode,
+            XmlUtil.create(doc, getTag(TYPE_KEYWORD), datasetNode,
                            metadata.getAttr1());
         } else if (type.equals(TYPE_CONTRIBUTOR)) {
-            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,
+            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            metadata.getAttr1(), new String[] { ATTR_ROLE,
                     metadata.getAttr2() });
         } else if (type.equals(TYPE_ICON)) {
-            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,
+            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            new String[] { "xlink:href",
                                           metadata.getAttr1(), "xlink:title",
                                           "icon" });
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
-            Element node = XmlUtil.create(doc, type.toString(), datasetNode);
+            Element node = XmlUtil.create(doc, getTag(type), datasetNode);
             XmlUtil.create(doc, CatalogOutputHandler.TAG_NAME, node,
                            metadata.getAttr1(), new String[] { ATTR_ROLE,
                     metadata.getAttr2() });
@@ -471,7 +481,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public boolean isTag(String tag, Metadata.Type type) {
-        return tag.toLowerCase().equals(type.getType());
+        return ("thredds."+tag).toLowerCase().equals(type.getType());
     }
 
 

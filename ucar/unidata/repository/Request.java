@@ -109,7 +109,7 @@ public class Request implements Constants {
     /** _more_ */
     private String ip;
 
-
+    private Entry collectionEntry;
 
     /**
      * _more_
@@ -126,6 +126,46 @@ public class Request implements Constants {
         this.originalParameters = new Hashtable();
         originalParameters.putAll(parameters);
     }
+
+
+    public String url(RequestUrl theUrl) {
+        if(collectionEntry!=null) {
+            String collectionPath = repository.getPathFromEntry(collectionEntry);
+            return theUrl.getUrl(collectionPath);
+        }
+        return theUrl.toString();
+    }
+
+    public String form(RequestUrl theUrl) {
+        return HtmlUtil.form(url(theUrl));
+    }
+
+    public String form(RequestUrl theUrl, String extra) {
+        return HtmlUtil.form(url(theUrl), extra);
+    }
+
+    public String uploadForm(RequestUrl theUrl) {
+        return HtmlUtil.uploadForm(url(theUrl),"");
+    }
+
+
+    public String url(RequestUrl theUrl, String arg1, String value1) {
+        return HtmlUtil.url(url(theUrl), arg1, value1);
+    }
+
+    public String url(RequestUrl theUrl, String arg1, String value1, String arg2, String value2) {
+        return HtmlUtil.url(url(theUrl), arg1, value1, arg2,value2);
+    }
+
+    public String url(RequestUrl theUrl, String arg1, String value1, String arg2, String value2, String arg3, String value3) {
+        return HtmlUtil.url(url(theUrl), arg1, value1, arg2,value2,arg3, value3);
+    }
+
+    public String url(RequestUrl theUrl, String arg1, String value1, String arg2, String value2, String arg3, String value3, String arg4, String value4) {
+        return HtmlUtil.url(url(theUrl), arg1, value1, arg2,value2,arg3, value3, arg4, value4);
+    }
+
+
 
 
     /**
@@ -888,6 +928,24 @@ public class Request implements Constants {
         return ip;
     }
 
+
+    /**
+       Set the CollectionEntry property.
+
+       @param value The new value for CollectionEntry
+    **/
+    public void setCollectionEntry (Entry value) {
+	collectionEntry = value;
+    }
+
+    /**
+       Get the CollectionEntry property.
+
+       @return The CollectionEntry
+    **/
+    public Entry getCollectionEntry () {
+	return collectionEntry;
+    }
 
 
 

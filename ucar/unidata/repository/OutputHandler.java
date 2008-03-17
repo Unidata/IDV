@@ -327,7 +327,7 @@ public class OutputHandler extends RepositoryManager {
         String elementId =  entry.getId();
         sb.append(
             HtmlUtil.href(
-                          HtmlUtil.url(
+                          request.url(
                                        getRepository().URL_ENTRY_SHOW, ARG_ID,
                                        entry.getId()), linkText,
                           " id=" + HtmlUtil.quote(elementId) +" " +
@@ -351,14 +351,14 @@ public class OutputHandler extends RepositoryManager {
     public String getNextPrevLink(Request request, Entry entry,
                                   String output) {
         String nextLink = HtmlUtil.href(
-                              HtmlUtil.url(
+                                        request.url(
                                   getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_NEXT, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_RIGHT),
                                       msg("View Next Entry")));
         String prevLink = HtmlUtil.href(
-                              HtmlUtil.url(
+                                        request.url(
                                   getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
@@ -426,7 +426,7 @@ public class OutputHandler extends RepositoryManager {
         String link = "";
         if (doForm) {
             StringBuffer formSB = new StringBuffer();
-            formSB.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
+            formSB.append(request.form(getRepository().URL_GETENTRIES,
                                     "getentries"));
             //            formSB.append(HtmlUtil.space(1));
             List outputList =
@@ -489,7 +489,7 @@ public class OutputHandler extends RepositoryManager {
     protected String getEntryUrl(Request request, Entry entry) {
         if(true)
             return getAjaxLink(request,  entry, entry.getLabel(), false);
-        return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
+        return HtmlUtil.href(request.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ID,
                                           entry.getId()), entry.getLabel());
     }

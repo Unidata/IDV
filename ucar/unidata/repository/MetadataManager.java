@@ -153,6 +153,17 @@ public class MetadataManager extends RepositoryManager {
     MetadataHandler dfltMetadataHandler;
 
 
+    public Metadata findMetadata(Entry entry, Metadata.Type type, boolean checkInherited) throws Exception {
+        if(entry == null)return null;
+        for(Metadata metadata: getMetadata(entry)) {
+            if(metadata.getType().equals(type.getType())) return metadata;
+        }
+        if(checkInherited) {
+            return findMetadata(entry.getParentGroup(), type, checkInherited);
+        }
+        return null;
+    }
+
 
     /**
      * _more_
@@ -357,7 +368,7 @@ public class MetadataManager extends RepositoryManager {
                 }
             }
             entry.setMetadata(null);
-            return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
+            return new Result(request.url(URL_METADATA_FORM, ARG_ID,
                                            entry.getId()));
         }
     }
@@ -384,7 +395,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(
                 getRepository().note(msg("No metadata defined for entry")));
         } else {
-            sb.append(HtmlUtil.formPost(URL_METADATA_CHANGE));
+            sb.append(HtmlUtil.formPost(request.url(URL_METADATA_CHANGE)));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
@@ -436,20 +447,37 @@ public class MetadataManager extends RepositoryManager {
         sb.append(getRepository().makeEntryHeader(request, entry));
         sb.append(HtmlUtil.p());
         if ( !request.exists(ARG_TYPE)) {
+            List<String> groups = new ArrayList<String>();
+            Hashtable groupMap = new Hashtable();
+
             for (MetadataHandler handler : metadataHandlers) {
-                for (Metadata.Type type : handler.getTypes()) {
-                    sb.append(
-                        HtmlUtil.form(
-                            getMetadataManager().URL_METADATA_ADDFORM));
-                    sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-                    sb.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
-                    sb.append(HtmlUtil.submit(msg("Add")));
-                    sb.append(HtmlUtil.space(1)
+                String name = handler.getHandlerGroupName();
+                StringBuffer groupSB = null;
+                for (Metadata.Type type : handler.getTypes(request)) {
+                    if(groupSB == null) {
+                        groupSB = (StringBuffer) groupMap.get(name);
+                        if(groupSB == null) {
+                            groupMap.put(name, groupSB = new StringBuffer());
+                            groups.add(name);
+                        }
+                    }
+                    groupSB.append(
+                        request.form(URL_METADATA_ADDFORM));
+                    groupSB.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+                    groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
+                    groupSB.append(HtmlUtil.submit(msg("Add")));
+                    groupSB.append(HtmlUtil.space(1)
                               + HtmlUtil.bold(type.getLabel()));
-                    sb.append(HtmlUtil.formClose());
-                    sb.append(HtmlUtil.p());
-                    sb.append(NEWLINE);
+                    groupSB.append(HtmlUtil.formClose());
+                    groupSB.append(HtmlUtil.p());
+                    groupSB.append(NEWLINE);
                 }
+            }
+            for(String name: groups) {
+                sb.append(header(name));
+                sb.append("<ul>");
+                sb.append(groupMap.get(name));
+                sb.append("</ul>");
             }
         } else {
             String type = request.getString(ARG_TYPE, BLANK);
@@ -484,7 +512,7 @@ public class MetadataManager extends RepositoryManager {
         synchronized (MUTEX_METADATA) {
             Entry entry = getRepository().getEntry(request);
             if (request.exists(ARG_CANCEL)) {
-                return new Result(HtmlUtil.url(URL_METADATA_ADDFORM, ARG_ID,
+                return new Result(request.url(URL_METADATA_ADDFORM, ARG_ID,
                         entry.getId()));
             }
             List<Metadata> newMetadata = new ArrayList<Metadata>();
@@ -496,9 +524,7 @@ public class MetadataManager extends RepositoryManager {
                 insertMetadata(metadata);
             }
             entry.setMetadata(null);
-
-
-            return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
+            return new Result(request.url(URL_METADATA_FORM, ARG_ID,
                                            entry.getId()));
 
         }

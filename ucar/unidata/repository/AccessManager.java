@@ -383,7 +383,7 @@ public class AccessManager extends RepositoryManager {
             return;
         }
         List<Permission> permissions = getPermissions(request, entry);
-        String entryUrl = HtmlUtil.href(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
+        String entryUrl = HtmlUtil.href(request.url(URL_ACCESS_FORM, ARG_ID,
                               entry.getId()), entry.getName());
 
         Hashtable map = new Hashtable();
@@ -529,7 +529,7 @@ public class AccessManager extends RepositoryManager {
             map.put(permission.getAction(),
                     StringUtil.join("\n", permission.getRoles()));
         }
-        sb.append(HtmlUtil.form(URL_ACCESS_CHANGE, ""));
+        sb.append(request.form(URL_ACCESS_CHANGE, ""));
 
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.submit("Change Access"));
@@ -606,7 +606,7 @@ public class AccessManager extends RepositoryManager {
             insertPermissions(request, entry, permissions);
 
 
-            return new Result(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
+            return new Result(request.url(URL_ACCESS_FORM, ARG_ID,
                                            entry.getId(), ARG_MESSAGE,
                                            message));
         }

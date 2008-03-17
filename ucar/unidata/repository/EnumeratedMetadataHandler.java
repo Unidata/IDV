@@ -95,6 +95,10 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     }
 
 
+    protected String getHandlerGroupName() {
+        return "Tags";
+    }
+
 
     /**
      * _more_

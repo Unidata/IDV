@@ -79,9 +79,6 @@ public class MetadataHandler extends RepositoryManager {
     public static String ARG_ATTR4 = "attr4";
 
 
-
-
-
     /** _more_ */
     private Hashtable typeMap = new Hashtable();
 
@@ -98,6 +95,10 @@ public class MetadataHandler extends RepositoryManager {
     public MetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository);
+    }
+
+    protected String getHandlerGroupName() {
+        return "Metadata";
     }
 
     /**
@@ -307,7 +308,7 @@ public class MetadataHandler extends RepositoryManager {
         if (html == null) {
             return;
         }
-        sb.append(HtmlUtil.form(getMetadataManager().URL_METADATA_ADD));
+        sb.append(request.form(getMetadataManager().URL_METADATA_ADD));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(html[1]);
         sb.append(HtmlUtil.formClose());
@@ -335,7 +336,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public List<Metadata.Type> getTypes() {
+    public List<Metadata.Type> getTypes(Request request) {
         return types;
     }
 

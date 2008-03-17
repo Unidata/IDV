@@ -97,6 +97,11 @@ public class RequestUrl {
     }
 
 
+    public String getUrl(String collectionPath) {
+        return repositorySource.getRepository().getUrlBase() + "/" +collectionPath + path;
+    }
+
+
 
     /**
      * _more_

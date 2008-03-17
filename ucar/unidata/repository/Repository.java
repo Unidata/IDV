@@ -1271,7 +1271,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        String    url       = getUrlBase() + request;
+        String    url       = request;
         ApiMethod oldMethod = requestMap.get(url);
         if (oldMethod != null) {
             requestMap.remove(url);
@@ -1436,7 +1436,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     idBuffer.append(",");
                     idBuffer.append(entry.getId());
                 }
-                return new Result(HtmlUtil.url(URL_ENTRY_DELETELIST, ARG_IDS,
+                return new Result(request.url(URL_ENTRY_DELETELIST, ARG_IDS,
                         idBuffer.toString()));
             }
         };
@@ -1491,10 +1491,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         if (request.exists(ARG_CANCEL)) {
             if (entries.size() == 0) {
-                return new Result(URL_ENTRY_SHOW);
+                return new Result(request.url(URL_ENTRY_SHOW));
             }
             String id = entries.get(0).getParentGroupId();
-            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, id));
+            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID, id));
         }
 
 
@@ -1508,7 +1508,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 "", new StringBuffer(warning(msg("No entries selected"))));
         }
 
-        sb.append(HtmlUtil.form(URL_ENTRY_DELETELIST));
+        sb.append(request.form(URL_ENTRY_DELETELIST));
         StringBuffer msgSB    = new StringBuffer();
         StringBuffer idBuffer = new StringBuffer();
         for (Entry entry : entries) {
@@ -1622,6 +1622,50 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     }
 
+    protected ApiMethod findMethod(Request request) throws Exception {
+        String incoming = request.getRequestPath().trim();
+        if (incoming.endsWith("/")) {
+            incoming = incoming.substring(0, incoming.length() - 1);
+        }
+        String urlBase = getUrlBase();
+        if(!incoming.startsWith(urlBase)) {
+            return null;
+        }
+        incoming = incoming.substring(urlBase.length());
+        //        System.err.println(incoming);
+
+        List<Group> topGroups = getTopGroups(request);
+        for(Group group: topGroups) {
+            String name  = "/"+getPathFromEntry(group);
+            if(incoming.startsWith(name)) {
+                request.setCollectionEntry(group);
+                incoming = incoming.substring(name.length());
+                break;
+            }
+        }
+
+
+
+        ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
+        if (apiMethod == null) {
+            for (ApiMethod tmp : apiMethods) {
+                String path = tmp.getRequest();
+                if (path.endsWith("/*")) {
+                    path = path.substring(0, path.length() - 2);
+                    if (incoming.startsWith(urlBase + path)) {
+                        apiMethod = tmp;
+                        break;
+                    }
+                }
+            }
+        }
+        if ((apiMethod == null) && incoming.equals(urlBase)) {
+            apiMethod = homeApi;
+        }
+
+        return apiMethod;
+    }
+
     /**
      * _more_
      *
@@ -1632,27 +1676,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Result getResult(Request request) throws Exception {
-        String incoming = request.getRequestPath().trim();
-        if (incoming.endsWith("/")) {
-            incoming = incoming.substring(0, incoming.length() - 1);
-        }
-        ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
-        if (apiMethod == null) {
-            for (ApiMethod tmp : apiMethods) {
-                String path = tmp.getRequest();
-                if (path.endsWith("/*")) {
-                    path = path.substring(0, path.length() - 2);
-                    if (incoming.startsWith(getUrlBase() + path)) {
-                        apiMethod = tmp;
-                        break;
-                    }
-                }
-            }
-        }
-        if ((apiMethod == null) && incoming.equals(getUrlBase())) {
-            apiMethod = homeApi;
-        }
-
+        ApiMethod apiMethod = findMethod(request);
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }
@@ -1688,8 +1712,9 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         boolean cachingOk = canCache();
 
-        if ( !getDatabaseManager().hasConnection()
-                && !incoming.startsWith(getUrlBase() + "/admin")) {
+        //TODO: how to handle when the DB is shutdown
+        if ( !getDatabaseManager().hasConnection()) {
+             //                && !incoming.startsWith(getUrlBase() + "/admin")) {
             cachingOk = false;
             result = new Result("No Database",
                                 new StringBuffer("Database is shutdown"));
@@ -1782,6 +1807,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         return result;
     }
 
+    protected String getPathFromEntry(Entry entry) {
+        String name = entry.getName();
+        name = name.toLowerCase();
+        name = name.replace(" ","_");
+        return name;
+    }
+
     /**
      * _more_
      *
@@ -1793,7 +1825,28 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected void decorateResult(Request request, Result result)
             throws Exception {
-        String template = getResource(PROP_HTML_TEMPLATE);
+        String template = null;
+        Metadata metadata = getMetadataManager().findMetadata(request.getCollectionEntry()!=null?
+                                                              request.getCollectionEntry():topGroup,
+                                                              AdminMetadataHandler.TYPE_TEMPLATE,
+                                                              true);
+        if(metadata!=null) {
+            template = metadata.getAttr1();
+            if (template.startsWith("file:")) {
+                template = getStorageManager().localizePath(template.trim());
+                template = IOUtil.readContents(
+                                               template.substring("file:".length()), getClass());
+            }
+            if(template.indexOf("${content}")<0) {
+                template = null;
+            }
+        }
+
+
+        if(template == null)
+            template = getResource(PROP_HTML_TEMPLATE);
+
+
         String html = StringUtil.replace(template, "${content}",
                                          new String(result.getContent()));
         String userLink = getUserManager().getUserLinks(request);
@@ -2480,7 +2533,7 @@ public class Repository implements Constants, Tables, RequestHandler,
           sb.append("<ul>");
           for(TwoFacedObject tfo: typeList) {
           sb.append("<li>");
-          sb.append(HtmlUtil.href(HtmlUtil.url(URL_LIST_SHOW,ARG_WHAT, tfo.getId(),ARG_TYPE,,typeHandler.getType()) , tfo.toString())));
+          sb.append(HtmlUtil.href(request.url(URL_LIST_SHOW,ARG_WHAT, tfo.getId(),ARG_TYPE,,typeHandler.getType()) , tfo.toString())));
           sb.append("\n");
           }
           sb.append("</ul>");
@@ -2528,7 +2581,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (what.equals(tfo.getId())) {
                     links.add(HtmlUtil.span(tfo.toString(), extra1));
                 } else {
-                    links.add(HtmlUtil.href(HtmlUtil.url(URL_LIST_SHOW,
+                    links.add(HtmlUtil.href(request.url(URL_LIST_SHOW,
                             ARG_WHAT, (String) tfo.getId(), ARG_TYPE,
                             (String) typeHandler.getType()), tfo.toString(),
                                 extra2));
@@ -2547,7 +2600,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (what.equals(whats[i])) {
                 links.add(HtmlUtil.span(names[i], extra1));
             } else {
-                links.add(HtmlUtil.href(HtmlUtil.url(URL_LIST_SHOW, ARG_WHAT,
+                links.add(HtmlUtil.href(request.url(URL_LIST_SHOW, ARG_WHAT,
                         whats[i]) + typeAttr, names[i], extra2));
             }
         }
@@ -2612,7 +2665,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb           = new StringBuffer();
 
 
-        sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
+        sb.append(HtmlUtil.form(request.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
 
 
@@ -2742,7 +2795,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (urls[i].toString().equals(type)) {
                 links.add(HtmlUtil.span(label, notextra));
             } else {
-                links.add(HtmlUtil.href(urls[i].toString() + arg, label,
+                links.add(HtmlUtil.href(request.url(urls[i]) + arg, label,
                                         extra));
             }
         }
@@ -2779,7 +2832,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
-                item = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,
+                item = HtmlUtil.href(request.url(URL_ENTRY_SEARCHFORM,
                         ARG_WHAT, whats[i], ARG_FORM_TYPE,
                         formType), names[i], extra2);
             }
@@ -2795,7 +2848,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (tfo.getId().equals(what)) {
                 links.add(HtmlUtil.span(tfo.toString(), extra1));
             } else {
-                links.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,
+                links.add(HtmlUtil.href(request.url(URL_ENTRY_SEARCHFORM,
                         ARG_WHAT, BLANK + tfo.getId(), ARG_TYPE,
                         typeHandler.getType()), tfo.toString(), extra2));
             }
@@ -3001,8 +3054,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                     sb.append("<ul>");
                 }
                 sb.append("<li> ");
-                sb.append(HtmlUtil.href(HtmlUtil.url(
-                                       getRepository().URL_ENTRY_COPY, ARG_FROM,
+                sb.append(HtmlUtil.href(request.url(
+                                       URL_ENTRY_COPY, ARG_FROM,
                                        fromEntry.getId(), ARG_TO,entry.getId(),ARG_ACTION,ACTION_MOVE ), entry.getLabel()));
                 sb.append(HtmlUtil.br());
                 didOne = true;
@@ -3055,7 +3108,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String       action = request.getString(ARG_ACTION, ACTION_COPY);
 
         if(request.exists(ARG_CANCEL)) {
-            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                                            fromEntry.getId()));
         }
 
@@ -3074,7 +3127,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(HtmlUtil.br());
 
 
-            sb.append(HtmlUtil.form(URL_ENTRY_COPY));
+            sb.append(request.form(URL_ENTRY_COPY));
             sb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
             sb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
             sb.append(HtmlUtil.hidden(ARG_ACTION, action));
@@ -3128,7 +3181,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     SqlUtil.quote(fromEntry.getParentGroupId()) +" WHERE " +
                     SqlUtil.eq(COL_ENTRIES_ID, SqlUtil.quote(fromEntry.getId()));
                 statement.execute(sql);
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                                                fromEntry.getId()));
             }
             connection.commit();
@@ -3259,6 +3312,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entryId == null) {
             return null;
         }
+        if(entryId.equals(topGroup.getId())) return topGroup;
         Entry entry = (Entry) entryCache.get(entryId);
         if (entry != null) {
             if ( !andFilter) {
@@ -3341,7 +3395,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if ((parentGroup != null) && request.getUser().getAdmin()) {
             sb.append("<p>&nbsp;");
             sb.append(
-                HtmlUtil.form(
+                request.form(
                     getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
             sb.append(HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
@@ -3373,7 +3427,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb    = new StringBuffer();
         sb.append(makeGroupHeader(request, group));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.form(URL_ENTRY_FORM, BLANK));
+        sb.append(request.form(URL_ENTRY_FORM));
         sb.append(makeTypeSelect(request, false));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Create new entry"));
@@ -3426,9 +3480,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         if (type == null) {
-            sb.append(HtmlUtil.form(URL_ENTRY_FORM, BLANK));
+            sb.append(request.form(URL_ENTRY_FORM));
         } else {
-            sb.append(HtmlUtil.uploadForm(URL_ENTRY_CHANGE, BLANK));
+            sb.append(request.uploadForm(URL_ENTRY_CHANGE));
         }
 
         sb.append(HtmlUtil.formTable());
@@ -3565,7 +3619,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getComments(request, entry);
         if (canComment) {
-            sb.append(HtmlUtil.form(URL_COMMENTS_ADD, BLANK));
+            sb.append(request.form(URL_COMMENTS_ADD, BLANK));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             sb.append(HtmlUtil.formEntry(BLANK,
                                          HtmlUtil.submit("Add Comment",
@@ -3582,7 +3636,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
             //TODO: Check for access
             String deleteLink = HtmlUtil.href(
-                                    HtmlUtil.url(
+                                    request.url(
                                         URL_COMMENTS_EDIT, ARG_DELETE,
                                         "true", ARG_ID, entry.getId(),
                                         ARG_COMMENT_ID,
@@ -3684,7 +3738,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             TABLE_COMMENTS, COL_COMMENTS_ID,
             SqlUtil.quote(request.getString(ARG_COMMENT_ID, BLANK)));
         entry.setComments(null);
-        return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
+        return new Result(request.url(URL_COMMENTS_SHOW, ARG_ID,
                                        entry.getId(), ARG_MESSAGE,
                                        "Comment deleted"));
     }
@@ -3710,7 +3764,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
+            return new Result(request.url(URL_COMMENTS_SHOW, ARG_ID,
                                            entry.getId()));
         }
 
@@ -3734,13 +3788,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             insert.execute();
             insert.close();
             entry.setComments(null);
-            return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
+            return new Result(request.url(URL_COMMENTS_SHOW, ARG_ID,
                                            entry.getId(), ARG_MESSAGE,
                                            "Comment added"));
         }
 
-        sb.append(msgLabel("Add comment for") + getEntryUrl(entry));
-        sb.append(HtmlUtil.form(URL_COMMENTS_ADD, BLANK));
+        sb.append(msgLabel("Add comment for") + getEntryUrl(request,entry));
+        sb.append(request.form(URL_COMMENTS_ADD, BLANK));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("Subject"),
@@ -3795,14 +3849,14 @@ public class Repository implements Constants, Tables, RequestHandler,
             assocInsert.setString(col++, toEntry.getId());
             assocInsert.execute();
             assocInsert.close();
-            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                                            fromEntry.getId()));
         }
 
         StringBuffer sb = new StringBuffer();
         sb.append("Add association between " + fromEntry.getLabel());
         sb.append(" and  " + toEntry.getLabel());
-        sb.append(HtmlUtil.form(URL_ASSOCIATION_ADD, BLANK));
+        sb.append(request.form(URL_ASSOCIATION_ADD, BLANK));
         sb.append("Association Name: ");
         sb.append(HtmlUtil.input(ARG_NAME));
         sb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
@@ -3834,7 +3888,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 deleteEntries(theRequest, entries, actionId);
             }
         };
-        String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+        String href = HtmlUtil.href(request.url(URL_ENTRY_SHOW, ARG_ID,
                           groupId), "Continue");
         return getActionManager().doAction(request, action, "Deleting entry",
                                            "Continue: " + href);
@@ -3860,7 +3914,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(HtmlUtil.url(URL_ENTRY_FORM, ARG_ID,
+            return new Result(request.url(URL_ENTRY_FORM, ARG_ID,
                                            entry.getId()));
         }
 
@@ -3873,7 +3927,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 return asynchDeleteEntries(request, entries);
             } else {
                 deleteEntries(request, entries, null);
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                         group.getId()));
             }
         }
@@ -3882,7 +3936,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         StringBuffer inner = new StringBuffer();
-        inner.append(HtmlUtil.form(URL_ENTRY_DELETE, BLANK));
+        inner.append(request.form(URL_ENTRY_DELETE, BLANK));
         if (entry.isGroup()) {
             inner.append(
                 msgLabel("Are you sure you want to delete the group"));
@@ -3979,13 +4033,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             newEntry    = false;
 
             if (entry.isTopGroup()) {
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                         entry.getId(), ARG_MESSAGE,
                         "Cannot edit top-level group"));
             }
 
             if (request.exists(ARG_CANCEL)) {
-                return new Result(HtmlUtil.url(URL_ENTRY_FORM, ARG_ID,
+                return new Result(request.url(URL_ENTRY_FORM, ARG_ID,
                         entry.getId()));
             }
 
@@ -3995,13 +4049,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entries.add(entry);
                 deleteEntries(request, entries, null);
                 Group group = findGroup(entry.getParentGroupId());
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                         group.getId(), ARG_MESSAGE, "Entry is deleted"));
             }
 
 
             if (request.exists(ARG_DELETE)) {
-                return new Result(HtmlUtil.url(URL_ENTRY_DELETE, ARG_ID,
+                return new Result(request.url(URL_ENTRY_DELETE, ARG_ID,
                         entry.getId()));
             }
         } else {
@@ -4085,7 +4139,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                        new FileOutputStream(newFile),
                                        actionId, length) < 0) {
                         System.err.println("got cancel");
-                        return new Result(HtmlUtil.url(URL_ENTRY_SHOW,
+                        return new Result(request.url(URL_ENTRY_SHOW,
                                 ARG_ID, parentGroup.getId()));
                     }
                 }
@@ -4115,7 +4169,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
 
                 if (request.exists(ARG_CANCEL)) {
-                    return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                    return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                             parentGroup.getId()));
                 }
 
@@ -4279,12 +4333,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
-            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                                            entry.getId()));
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
             return new Result(
-                HtmlUtil.url(
+                request.url(
                     URL_ENTRY_SHOW, ARG_ID, entry.getParentGroupId(),
                     ARG_MESSAGE,
                     entries.size() + HtmlUtil.pad(msg("files uploaded"))));
@@ -4318,21 +4372,26 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    List<Group> topGroups;
+
     public List<Group> getTopGroups(Request request) throws Exception {
+        if(topGroups!=null) return topGroups;
         Statement statement = getDatabaseManager().execute(
                                                            SqlUtil.makeSelect(COL_ENTRIES_ID, 
                                                                               TABLE_ENTRIES,
-                                                                              SqlUtil.isNull(COL_ENTRIES_PARENT_GROUP_ID)));
+                                                                              SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID, SqlUtil.quote(topGroup.getId()))));
         String[]  ids = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for(int i=0;i<ids.length;i++) {
-            Group g = (Group)  getEntry(ids[i], request);
-            if (g == null) {
+            Entry e =   getEntry(ids[i], request);
+            if (e == null) {
                 continue;
             }
+            if(!e.isGroup()) continue;
+            Group g = (Group) e;
             groups.add(g);
         }
-        return toGroupList(getAccessManager().filterEntries(request, groups));
+        return topGroups = new ArrayList<Group>(toGroupList(getAccessManager().filterEntries(request, groups)));
     }
 
     private List<Group> toGroupList(List<Entry> entries) {
@@ -4369,16 +4428,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         } else if (request.defined(ARG_GROUP)) {
             entry = findGroup(request);
         } else {
-            List<Group> topGroups = getTopGroups(request);
-            if(topGroups.size()==1) {
-                entry = topGroups.get(0);
-            } else {
-                OutputHandler outputHandler = getOutputHandler(request);
-                return outputHandler.outputGroup(request, getDummyGroup(), topGroups,new ArrayList<Entry>());
-
-                
-
-            }
+            entry = topGroup;
         }
         if (entry == null) {
             throw new IllegalArgumentException("No entry specified");
@@ -4412,7 +4462,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             //Do a redirect
             if (nextId != null) {
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                         nextId, ARG_OUTPUT,
                         request.getString(ARG_OUTPUT,
                                           OutputHandler.OUTPUT_HTML)));
@@ -4594,7 +4644,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             length += name.length();
             titleList.add(0, name);
-            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+            breadcrumbs.add(0, HtmlUtil.href(request.url(URL_ENTRY_SHOW,
                     ARG_ID, parent.getId(), ARG_OUTPUT,
                     output) + extraArgs, name));
             parent = findGroup(parent.getParentGroupId());
@@ -4602,7 +4652,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         titleList.add(entry.getLabel());
         String nav;
         if (makeLinkForLastGroup) {
-            breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+            breadcrumbs.add(HtmlUtil.href(request.url(URL_ENTRY_SHOW,
                     ARG_ID, entry.getId(), ARG_OUTPUT,
                     output), entry.getLabel()));
             nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
@@ -4674,11 +4724,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+            breadcrumbs.add(0, HtmlUtil.href(request.url(URL_ENTRY_SHOW,
                     ARG_ID, parent.getId()), name));
             parent = findGroup(parent.getParentGroupId());
         }
-        breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+        breadcrumbs.add(HtmlUtil.href(request.url(URL_ENTRY_SHOW, ARG_ID,
                 entry.getId()), entry.getLabel()));
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
@@ -5934,8 +5984,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+    protected String getEntryUrl(Request request, Entry entry) {
+        return HtmlUtil.href(request.url(URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getLabel());
     }
 
@@ -6035,7 +6085,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             return BLANK;
         }
         String search = HtmlUtil.href(
-                            HtmlUtil.url(
+                            request.url(
                                 URL_ENTRY_SEARCHFORM, ARG_ASSOCIATION,
                                 encode(association)), HtmlUtil.img(
                                     fileUrl(ICON_SEARCH),
@@ -6104,8 +6154,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             return BLANK;
         }
         return HtmlUtil
-            .href(HtmlUtil
-                .url(URL_GRAPH_VIEW, ARG_ID, group.getFullName(),
+            .href(request.url(URL_GRAPH_VIEW, ARG_ID, group.getFullName(),
                      ARG_NODETYPE, NODETYPE_GROUP), HtmlUtil
                          .img(fileUrl(ICON_GRAPH), "Show group in graph"));
     }

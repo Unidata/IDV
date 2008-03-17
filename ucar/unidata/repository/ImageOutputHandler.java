@@ -277,7 +277,7 @@ public class ImageOutputHandler extends OutputHandler {
             int cnt = 0;
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry  entry = entries.get(i);
-                String url   = getImageUrl(entry);
+                String url   = getImageUrl(request, entry);
                 if (url == null) {
                     continue;
                 }
@@ -302,10 +302,10 @@ public class ImageOutputHandler extends OutputHandler {
                 if ( !entry.getResource().isImage()) {
                     continue;
                 }
-                String url = HtmlUtil.url(repository.URL_ENTRY_GET + "/"
+                String url = HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
                                           + entry.getName(), ARG_ID,
                                               entry.getId());
-                String thumburl = HtmlUtil.url(repository.URL_ENTRY_GET + "/"
+                String thumburl = HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
                                       + entry.getName(), ARG_ID,
                                           entry.getId(), ARG_IMAGEWIDTH,
                                           "" + 50);
@@ -323,7 +323,7 @@ public class ImageOutputHandler extends OutputHandler {
             }
         } else {
             for (Entry entry : entries) {
-                String url = getImageUrl(entry);
+                String url = getImageUrl(request, entry);
                 if (url == null) {
                     continue;
                 }
@@ -380,10 +380,10 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private String getImageUrl(Entry entry) {
+    private String getImageUrl(Request request, Entry entry) {
         if ( !entry.getResource().isImage()) {
             if (entry.hasAreaDefined()) {
-                return HtmlUtil.url(repository.URL_GETMAP, ARG_SOUTH,
+                return request.url(repository.URL_GETMAP, ARG_SOUTH,
                                     "" + entry.getSouth(), ARG_WEST,
                                     "" + entry.getWest(), ARG_NORTH,
                                     "" + entry.getNorth(), ARG_EAST,
@@ -392,7 +392,7 @@ public class ImageOutputHandler extends OutputHandler {
             return null;
         }
 
-        return HtmlUtil.url(repository.URL_ENTRY_GET + "/" + entry.getName(),
+        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/" + entry.getName(),
                             ARG_ID, entry.getId());
     }
 

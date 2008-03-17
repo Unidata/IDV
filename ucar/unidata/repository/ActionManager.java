@@ -136,7 +136,7 @@ public class ActionManager extends RepositoryManager {
             } else {
                 sb.append("<meta http-equiv=\"refresh\" content=\"2\">");
                 sb.append(getRepository().progress(msg("In progress")));
-                sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS,
+                sb.append(HtmlUtil.href(request.url(URL_STATUS,
                         ARG_ACTION_ID, id), msg("Reload")));
                 sb.append("<p>");
                 String msg = JobManager.getManager().getDialogLabel2(id);
@@ -147,7 +147,7 @@ public class ActionManager extends RepositoryManager {
                     sb.append(action.getMessage());
                 }
                 sb.append("<p>");
-                sb.append(HtmlUtil.form(URL_STATUS));
+                sb.append(request.form(URL_STATUS));
                 sb.append(HtmlUtil.submit(msg("Cancel Action"), ARG_CANCEL));
                 sb.append(HtmlUtil.hidden(ARG_ACTION_ID, id));
                 sb.append(HtmlUtil.formClose());
@@ -262,7 +262,7 @@ public class ActionManager extends RepositoryManager {
     protected Result doAction(Request request, final Action runnable,
                               String name, String continueHtml) {
         Object actionId = runAction(runnable, name, continueHtml);
-        return new Result(HtmlUtil.url(URL_STATUS, ARG_ACTION_ID,
+        return new Result(request.url(URL_STATUS, ARG_ACTION_ID,
                                        "" + actionId));
     }
 

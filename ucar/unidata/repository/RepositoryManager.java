@@ -189,7 +189,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    public String subHeaderLink(Object url, String label) {
+    public String subHeaderLink(String url, String label) {
         return HtmlUtil.href(url, label,
                              HtmlUtil.cssClass("pagesubheadinglink"));
     }
@@ -204,7 +204,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    public String subHeaderLink(Object url, String label, boolean toggle) {
+    public String subHeaderLink(String url, String label, boolean toggle) {
         //        if(true) return "x";
         String img = HtmlUtil.img(getRepository().fileUrl(toggle
                 ? ICON_MINUS

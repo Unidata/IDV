@@ -481,7 +481,7 @@ public class TypeHandler extends RepositoryManager {
         }
         links.add(
             new Link(
-                HtmlUtil.url(
+                     request.url(
                     getRepository().URL_COMMENTS_SHOW, ARG_ID,
                     entry.getId()), getRepository().fileUrl(ICON_COMMENTS),
                                     msg("Add/View Comments")));
@@ -489,7 +489,7 @@ public class TypeHandler extends RepositoryManager {
         if(!request.getUser().getAnonymous()) {
             links.add(
                       new Link(
-                               HtmlUtil.url(
+                               request.url(
                                             getRepository().URL_ENTRY_COPY, ARG_FROM,
                                             entry.getId()), getRepository().fileUrl(ICON_MOVE),
                                msg("Copy/Move Entry")));
@@ -498,8 +498,8 @@ public class TypeHandler extends RepositoryManager {
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(
                 new Link(
-                    HtmlUtil.url(
-                        getRepository().URL_ENTRY_FORM, ARG_ID,
+                         request.url(
+                                     getRepository().URL_ENTRY_FORM, ARG_ID,
                         entry.getId()), getRepository().fileUrl(ICON_EDIT),
                                         msg("Edit Entry")));
         }
@@ -554,8 +554,7 @@ public class TypeHandler extends RepositoryManager {
                             getRepository().fileUrl(ICON_FETCH),
                             "Download file" + size);
         } else {
-            return new Link(HtmlUtil
-                .url(getRepository().URL_ENTRY_GET + "/" + entry.getName(),
+            return new Link(HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/" + entry.getName(),
                      ARG_ID, entry.getId()), getRepository()
                          .fileUrl(ICON_FETCH), "Download file" + size);
         }
@@ -646,7 +645,7 @@ public class TypeHandler extends RepositoryManager {
                                              + entry.getEast()));
             } else if (entry.hasAreaDefined()) {
                 String img =
-                    HtmlUtil.img(HtmlUtil.url(getRepository().URL_GETMAP,
+                    HtmlUtil.img(request.url(getRepository().URL_GETMAP,
                         ARG_SOUTH, "" + entry.getSouth(), ARG_WEST,
                         "" + entry.getWest(), ARG_NORTH,
                         "" + entry.getNorth(), ARG_EAST,
@@ -661,8 +660,8 @@ public class TypeHandler extends RepositoryManager {
                         HtmlUtil.formEntryTop(
                             msgLabel("Image"),
                             HtmlUtil.img(
-                                HtmlUtil.url(
-                                    getRepository().URL_ENTRY_GET + "/"
+                                         HtmlUtil.url(
+                                                     request.url(getRepository().URL_ENTRY_GET) + "/"
                                     + entry.getName(), ARG_ID,
                                         entry.getId()), "")));
 
@@ -1230,7 +1229,7 @@ public class TypeHandler extends RepositoryManager {
             String areaWidget = HtmlUtil.makeLatLonBox(ARG_AREA, "", "", "",
                                     "");
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget) + "</table>";
-            //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(getRepository().URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
+            //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(request.url(getRepository().URL_GETMAP),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     areaWidget));
             advancedSB.append("\n");
@@ -1243,7 +1242,6 @@ public class TypeHandler extends RepositoryManager {
 
 
         formBuffer.append(getRepository().makeShowHideBlock(request, "search.basic",msg("Basic"),basicSB,true));
-        formBuffer.append(HtmlUtil.p());
         formBuffer.append(getRepository().makeShowHideBlock(request, "search.advanced",msg("Advanced"),advancedSB,false));
     }
 

@@ -134,15 +134,16 @@ text-decoration: none
    padding-bottom: 0px;
    padding-left: 5px;
    padding-top: 0px;
-   font-weight: bold;
+   xfont-weight: bold;
    vertical-align: bottom;
+   font-size: 12pt;
 }
 
 
 
 a.pagesubheadinglink {
    color:black;
-   font-weight: bold;
+   xfont-weight: bold;
    text-decoration: none;
 }
 

@@ -1,4 +1,5 @@
 <metadatahandlers>
+  <metadatahandler class="ucar.unidata.repository.AdminMetadataHandler" />
   <metadatahandler class="ucar.unidata.repository.EnumeratedMetadataHandler" 
                    name="Tag"
                    type="enum_tag"
