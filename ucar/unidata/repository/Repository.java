@@ -570,8 +570,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    protected String question(String h) {
-        return getMessage(h, "/question.png");
+    protected String question(String h,String buttons) {
+        return getMessage(h+"<hr>" + buttons, "/question.png");
     }
 
     /**
@@ -1518,10 +1518,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         msgSB.append(
             msg("Are you sure you want to delete all of the entries?"));
         msgSB.append(HtmlUtil.p());
-        msgSB.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
-                             HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
+        String buttons = buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+                                 HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
 
-        sb.append(question(msgSB.toString()));
+        sb.append(question(msgSB.toString(),buttons));
         sb.append(HtmlUtil.hidden(ARG_IDS, idBuffer.toString()));
         sb.append(HtmlUtil.formClose());
 
@@ -2635,7 +2635,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb = new StringBuffer();
         String hideImg = fileUrl(ICON_MINUS);
         String showImg = fileUrl(ICON_PLUS);
-        String link = "<a href=\"JavaScript: noop()\" class=\"pagesubheadinglink\" onclick=\"hideShow('" + id +"','" + id +"img','" +
+        String link = "<a href=\"JavaScript: noop()\" class=\"pagesubheadinglink\" onclick=\"toggleBlockVisibility('" + id +"','" + id +"img','" +
             hideImg +"','"+
             showImg +"')\">" +
             HtmlUtil.img(visible?hideImg:showImg,""," id='" + id +"img' ") +
@@ -3135,18 +3135,19 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(toEntry.getLabel());
             sb.append(HtmlUtil.br());
 
+            StringBuffer fb = new StringBuffer();
 
-            sb.append(request.form(URL_ENTRY_COPY));
-            sb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
-            sb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
-            sb.append(HtmlUtil.hidden(ARG_ACTION, action));
-            sb.append(HtmlUtil.hidden(ARG_ACTION, action));
+            fb.append(request.form(URL_ENTRY_COPY));
+            fb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
+            fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
+            fb.append(HtmlUtil.hidden(ARG_ACTION, action));
+            fb.append(HtmlUtil.hidden(ARG_ACTION, action));
             String okButton = HtmlUtil.submit(msg("OK"), ARG_MOVE_CONFIRM);
             String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             String buttons = buttons(okButton, cancelButton);
-            sb.append(buttons);
-            sb.append(HtmlUtil.formClose());
-            return new Result(msg("Move confirm"), new StringBuffer(question(sb.toString())));
+            fb.append(buttons);
+            fb.append(HtmlUtil.formClose());
+            return new Result(msg("Move confirm"), new StringBuffer(question(sb.toString(),fb.toString())));
         }
 
 
@@ -3945,7 +3946,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         StringBuffer inner = new StringBuffer();
-        inner.append(request.form(URL_ENTRY_DELETE, BLANK));
         if (entry.isGroup()) {
             inner.append(
                 msgLabel("Are you sure you want to delete the group"));
@@ -3959,12 +3959,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                 msgLabel("Are you sure you want to delete the entry"));
             inner.append(entry.getLabel());
         }
-        inner.append(HtmlUtil.p());
-        inner.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+
+        StringBuffer fb = new StringBuffer();
+        fb.append(request.form(URL_ENTRY_DELETE, BLANK));
+        fb.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
                              HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
-        inner.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-        inner.append(HtmlUtil.formClose());
-        sb.append(question(inner.toString()));
+        fb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        fb.append(HtmlUtil.formClose());
+        sb.append(question(inner.toString(),fb.toString()));
         return makeEntryEditResult(request, entry,
                                    msg("Entry delete confirm"), sb);
     }

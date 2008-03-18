@@ -760,11 +760,10 @@ public class UserManager extends RepositoryManager {
         if (request.defined(ARG_USER_DELETE)) {
             sb.append(
                 getRepository().question(
-                    msg("Are you sure you want to delete the user?")
-                    + HtmlUtil.p()
-                    + HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM)
-                    + HtmlUtil.space(2)
-                    + HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL)));
+                                         msg("Are you sure you want to delete the user?"),
+                                         getRepository().buttons(
+                                                                 HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM),
+                                                                 HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL))));
         } else {
             String buttons =
                 HtmlUtil.submit(msg("Change User"), ARG_USER_CHANGE)

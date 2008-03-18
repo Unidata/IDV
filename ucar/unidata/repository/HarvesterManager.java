@@ -302,11 +302,10 @@ public class HarvesterManager extends RepositoryManager {
         } else if (request.exists(ARG_DELETE)) {
             sb.append(
                 getRepository().question(
-                    msg("Are you sure you want to delete the harvester")
-                    + HtmlUtil.p()
-                    + HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM)
-                    + HtmlUtil.space(1)
-                    + HtmlUtil.submit(msg("Cancel"), ARG_CANCEL_DELETE)));
+                                         msg("Are you sure you want to delete the harvester"),
+                                         getRepository().buttons(
+                                                                 HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+                                                                 HtmlUtil.submit(msg("Cancel"), ARG_CANCEL_DELETE))));
         } else {
             if (request.exists(ARG_CHANGE)) {
                 harvester.applyEditForm(request);
