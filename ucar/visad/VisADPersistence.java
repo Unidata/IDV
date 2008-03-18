@@ -72,6 +72,9 @@ import java.util.List;
 
 public class VisADPersistence {
 
+    public static final String ATTR_AMOUNT = "amount";
+
+
     /** list of delegates */
     private static List delegates;
 
@@ -365,8 +368,48 @@ public class VisADPersistence {
         });
 
 
-        addDelegate(Unit.class, new XmlDelegateImpl() {
+        addDelegate(ScaledUnit.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
+                System.err.println("making scaled unit" + o.getClass().getName());
+                ScaledUnit    r             = (ScaledUnit) o;
+                Element objectElement = e.createObjectElement(o.getClass());
+                objectElement.setAttribute(ATTR_AMOUNT, r.getAmount()+"");
+                Element childElement = e.createElement(r.getUnit());
+                objectElement.appendChild(childElement);
+                System.err.println("making scaled unit done");
+                return objectElement;
+            }
+
+            public String toString() {
+                return "scaled unit delegate";
+            }
+            public Object createObject(XmlEncoder e, Element o) {
+                try {
+                    Object object = e.createObject(XmlUtil.getFirstChild(o));
+                    if(object instanceof String) {
+                        return createUnit(e,o);
+                    } else {
+                        Unit subUnit = (Unit) object;
+                        double amount = XmlUtil.getAttribute(o,ATTR_AMOUNT,(double)1.0);
+                        return ScaledUnit.create(amount, subUnit);
+                    } 
+                } catch (Exception exc) {
+                    System.err.println("Error creating unit:" + XmlUtil.toString(o));
+                    exc.printStackTrace();
+                    return null;
+                }}});
+
+
+
+
+        addDelegate(Unit.class, new XmlDelegateImpl() {
+            public String toString() {
+                return "unit delegate";
+            }
+            public Element createElement(XmlEncoder e, Object o) {
+                if(o instanceof ScaledUnit) {
+                    Misc.printStack("scaled unit");
+                }
                 Unit    r             = (Unit) o;
                 Element objectElement = e.createObjectElement(o.getClass());
                 String  unitString    = null;
@@ -385,33 +428,12 @@ public class VisADPersistence {
                 return objectElement;
             }
 
+
             public Object createObject(XmlEncoder e, Element o) {
-                String identifier =
-                    (String) e.createObject(XmlUtil.getFirstChild(o));
-                //                System.err.println ("identifier=" + identifier);
-                if (identifier == null) {
-                    return null;
-                }
                 try {
-                    if (identifier.equals("promiscuous")
-                            || identifier.equals(
-                                CommonUnit.promiscuous.toString())) {
-                        return CommonUnit.promiscuous;
-                    }
-                    if (identifier.equals("dimensionless")) {
-                        return CommonUnit.dimensionless;
-                    }
-                    //return  visad.data.units.Parser.instance().parse (identifier);
-                    String name = o.getAttribute("name");
-                    if ((name == null) || (name.length() == 0)) {
-                        name = identifier;
-                    }
-                    Unit theUnit = Util.parseUnit(identifier, name);
-                    //                    System.err.println ("Created unit" + theUnit + " id=" + theUnit.getIdentifier());
-                    return theUnit;
+                    return createUnit(e,o);
                 } catch (Exception exc) {
-                    System.err.println("Error creating unit:" + identifier
-                                       + " " + exc);
+                    System.err.println("Error creating unit "  + exc);
                     exc.printStackTrace();
                     return null;
                 }
@@ -717,7 +739,6 @@ public class VisADPersistence {
 
 
 
-
         addDelegate(FieldImpl.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 FieldImpl obj   = (FieldImpl) o;
@@ -730,6 +751,31 @@ public class VisADPersistence {
 
 
     }
+
+    public static Unit createUnit(XmlEncoder e, Element o) throws VisADException {
+        String identifier =
+            (String) e.createObject(XmlUtil.getFirstChild(o));
+        if (identifier == null) {
+            return null;
+        }
+        if (identifier.equals("promiscuous")
+            || identifier.equals(
+                                 CommonUnit.promiscuous.toString())) {
+            return CommonUnit.promiscuous;
+        }
+        if (identifier.equals("dimensionless")) {
+            return CommonUnit.dimensionless;
+        }
+        //return  visad.data.units.Parser.instance().parse (identifier);
+        String name = o.getAttribute("name");
+        if ((name == null) || (name.length() == 0)) {
+            name = identifier;
+        }
+        Unit theUnit = Util.parseUnit(identifier, name);
+        //                    System.err.println ("Created unit" + theUnit + " id=" + theUnit.getIdentifier());
+        return theUnit;
+    }
+
 
 
     /**
