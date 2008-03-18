@@ -328,9 +328,8 @@ public class OutputHandler extends RepositoryManager {
         String elementId =  entry.getId();
         sb.append(
             HtmlUtil.href(
-                          request.url(
-                                       getRepository().URL_ENTRY_SHOW, ARG_ID,
-                                       entry.getId()), linkText,
+                          request.entryUrl(
+                                       getRepository().URL_ENTRY_SHOW, entry), linkText,
                           " id=" + HtmlUtil.quote(elementId) +" " +
                           " onmouseover=" + HtmlUtil.quote("tooltip.show(event,'" + elementId +"');") + 
                           " onmouseout=" + HtmlUtil.quote("tooltip.hide(event,'" + elementId +"');")));

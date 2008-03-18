@@ -149,10 +149,17 @@ public class AdminMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String content = "";
         if(type.equals(TYPE_TEMPLATE)) {
+            String value = metadata.getAttr1();
+            if(!forEdit) {
+                value = getRepository().getResource(PROP_HTML_TEMPLATE);
+            }
+            value = value.replace("<","&lt;");
+            value = value.replace(">","&gt;");
+            value = value.replace("$","&#36;");
+            String textarea = HtmlUtil.textArea(arg1, value, 20, 80);
             content = HtmlUtil.row(HtmlUtil.colspan(submit,2)) +
                 HtmlUtil.formEntry(lbl,
-                                   HtmlUtil.hbox(HtmlUtil.textArea(arg1, metadata.getAttr1(),
-                                                                   20, 60), "Note: must contain macro ${content}"));
+                                   "Note: must contain macro ${content}" + "<br>" +textarea);
         }
         if ( !forEdit) {
             content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));

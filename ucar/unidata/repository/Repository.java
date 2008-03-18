@@ -1293,7 +1293,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         ApiMethod apiMethod =
-            new ApiMethod(handler, request,
+            new ApiMethod(this,handler, request,
                           XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME,
                               request), method, admin, canCache,
                                         XmlUtil.getAttribute(node,
@@ -1649,6 +1649,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         incoming = incoming.substring(urlBase.length());
         //        System.err.println(incoming);
 
+        
         List<Group> topGroups = getTopGroups(request);
         for(Group group: topGroups) {
             String name  = "/"+getPathFromEntry(group);
@@ -1857,8 +1858,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        if(template == null)
+        if(template == null) {
             template = getResource(PROP_HTML_TEMPLATE);
+        }
 
 
         String jsContent = HtmlUtil.div(""," id=\"tooltipdiv\" class=\"tooltip\" ") +
@@ -2904,8 +2906,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (apiMethod.getMustBeAdmin() && !isAdmin) {
                 continue;
             }
-            links.add(HtmlUtil.href(fileUrl(apiMethod.getRequest()),
-                                    msg(apiMethod.getName()), extra));
+            if(apiMethod == homeApi) {
+                links.add(HtmlUtil.href(fileUrl(apiMethod.getRequest()),
+                                        msg(apiMethod.getName()), extra));
+            } else {
+                links.add(HtmlUtil.href(request.url(apiMethod.getUrl()),
+                                        msg(apiMethod.getName()), extra));
+            }
         }
         return links;
     }
@@ -6011,9 +6018,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String getEntryUrl(Request request, Entry entry) {
-        return HtmlUtil.href(request.url(URL_ENTRY_SHOW, ARG_ID,
-                                          entry.getId()), entry.getLabel());
+        return HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, entry), entry.getLabel());
     }
+
 
     /**
      * _more_

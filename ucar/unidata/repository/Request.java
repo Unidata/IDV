@@ -128,6 +128,18 @@ public class Request implements Constants {
     }
 
 
+    public String entryUrl(RequestUrl theUrl, Entry entry) {
+        if(entry.getParentGroup()!=null && entry.getParentGroup().isTopGroup()) {
+            String collectionPath = repository.getPathFromEntry(entry);
+            
+            return HtmlUtil.url(theUrl.getUrl(collectionPath), ARG_ID, entry.getId());
+        }
+        if(entry.isTopGroup()) {
+            return HtmlUtil.url(theUrl.toString(), ARG_ID, entry.getId());
+        }
+        return url(theUrl,ARG_ID, entry.getId());
+    }
+
     public String url(RequestUrl theUrl) {
         if(collectionEntry!=null) {
             String collectionPath = repository.getPathFromEntry(collectionEntry);

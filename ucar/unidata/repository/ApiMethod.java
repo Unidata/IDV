@@ -96,6 +96,10 @@ public class ApiMethod {
     /** _more_ */
     private List actions;
 
+    private Repository repository;
+
+    private RequestUrl url;
+
     /**
      * _more_
      *
@@ -108,9 +112,10 @@ public class ApiMethod {
      * @param canCache _more_
      * @param isTopLevel _more_
      */
-    public ApiMethod(RequestHandler requestHandler, String request,
+    public ApiMethod(Repository repository, RequestHandler requestHandler, String request,
                      String name, Method method, boolean mustBeAdmin,
                      boolean canCache, boolean isTopLevel) {
+        this.repository = repository;
         this.requestHandler = requestHandler;
         this.request        = request;
         this.name           = name;
@@ -193,6 +198,12 @@ public class ApiMethod {
         return request;
     }
 
+    public RequestUrl getUrl() {
+        if(url == null) {
+            url =  new RequestUrl(repository, request);
+        }
+        return url;
+    }
 
     /**
      * Set the Method property.
