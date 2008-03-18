@@ -212,6 +212,8 @@ public class Request implements Constants {
         return (String) fileUploads.get(arg);
     }
 
+    public StringBuffer tmp = new StringBuffer();
+
     /**
      * _more_
      *
@@ -870,6 +872,8 @@ public class Request implements Constants {
         return type + "url args:" + getUrlArgs();  // + "\n\theader args:"               + httpHeaderArgs;
     }
 
+    private boolean sessionIdWasSet = false;
+
     /**
      * Set the SessionId property.
      *
@@ -877,7 +881,13 @@ public class Request implements Constants {
      */
     public void setSessionId(String value) {
         sessionId = value;
+        sessionIdWasSet = true;
     }
+
+    public boolean getSessionIdWasSet() {
+        return sessionIdWasSet;
+    }
+
 
     /**
      * Get the SessionId property.

@@ -71,6 +71,8 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
+    public static final String COOKIE_NAME = "repositorysession";
+
     /** _more_ */
     public static final String ROLE_ANY = "any";
 
@@ -224,6 +226,7 @@ public class UserManager extends RepositoryManager {
     protected void checkSession(Request request) throws Exception {
         User         user    = request.getUser();
         List<String> cookies = getCookies(request);
+
         for (String cookieValue : cookies) {
             request.setSessionId(cookieValue);
             if (user == null) {
@@ -307,7 +310,7 @@ public class UserManager extends RepositoryManager {
 
 
         if (request.getSessionId() == null) {
-            request.setSessionId(getSessionId());
+            //            request.setSessionId(getSessionId());
         }
 
 
@@ -347,6 +350,8 @@ public class UserManager extends RepositoryManager {
         if (cookie == null) {
             return cookies;
         }
+        request.tmp.append("cookie from header:" + cookie + "<p>");
+
         List toks = StringUtil.split(cookie, ";", true, true);
         for (int i = 0; i < toks.size(); i++) {
             String tok     = (String) toks.get(i);
@@ -356,13 +361,13 @@ public class UserManager extends RepositoryManager {
             }
             String cookieName  = (String) subtoks.get(0);
             String cookieValue = (String) subtoks.get(1);
-            if (cookieName.equals("repository-session")) {
+            if (cookieName.equals(COOKIE_NAME)) {
                 cookies.add(cookieValue);
             }
         }
+        request.tmp.append("cookies:" + cookies+"<p>");
         return cookies;
     }
-
 
 
 
@@ -371,7 +376,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    private String getSessionId() {
+    protected String getSessionId() {
         return getRepository().getGUID() + "_" + Math.random();
     }
 
@@ -403,6 +408,9 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void removeUserSession(Request request) throws Exception {
+        if(request.getSessionId()!=null) {
+            sessionMap.remove(request.getSessionId());
+        }
         List<String> cookies = getCookies(request);
         for (String cookieValue : cookies) {
             sessionMap.remove(cookieValue);
@@ -946,19 +954,7 @@ public class UserManager extends RepositoryManager {
         return result;
     }
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result adminUserList(Request request) throws Exception {
-
-
+    public StringBuffer getSessionList(Request request) throws Exception {
         List<Session> sessions    = getSessions();
         StringBuffer  sessionHtml = new StringBuffer(HtmlUtil.formTable());
         sessionHtml.append(msgHeader("Current Sessions"));
@@ -973,9 +969,27 @@ public class UserManager extends RepositoryManager {
                     HtmlUtil.cols(
                         session.user.getLabel(),
                         formatDate(request, session.createDate),
-                        formatDate(request, session.lastActivity))));
+                        formatDate(request, session.lastActivity),
+                                  session.id)));
         }
         sessionHtml.append(HtmlUtil.formTableClose());
+        return sessionHtml;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result adminUserList(Request request) throws Exception {
+
+
 
 
 
@@ -1033,7 +1047,7 @@ public class UserManager extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         sb.append("<table>");
-        sb.append(HtmlUtil.rowTop(HtmlUtil.cols(sessionHtml.toString(),
+        sb.append(HtmlUtil.rowTop(HtmlUtil.cols(getSessionList(request).toString(),
                 HtmlUtil.space(5), usersHtml.toString())));
         sb.append("</table>");
 
@@ -1355,7 +1369,7 @@ public class UserManager extends RepositoryManager {
                                        msg("Data Cart")));
         if (user.getAnonymous()) {
             String redirect =
-                XmlUtil.encodeBase64(request.getFullUrl().getBytes());
+                XmlUtil.encodeBase64(request.getUrl().getBytes());
             userLink = HtmlUtil.href(request.url(URL_USER_LOGIN,
                     ARG_REDIRECT, redirect), msg("Login"),
                                              " class=\"navlink\" ");
@@ -1472,6 +1486,7 @@ public class UserManager extends RepositoryManager {
     public Result processLogout(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         removeUserSession(request);
+        request.setSessionId(getSessionId());
         sb.append(getRepository().note(msg("You are logged out")));
         sb.append(makeLoginForm(request));
         Result result = new Result(msg("Logout"), sb);

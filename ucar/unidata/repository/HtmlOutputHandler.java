@@ -175,8 +175,11 @@ public class HtmlOutputHandler extends OutputHandler {
 
     public Result getMetadataXml(Request request, Entry entry) throws Exception {
         StringBuffer sb = new StringBuffer();
+        request.put(ARG_OUTPUT, OUTPUT_HTML);
+        String links = getRepository().getHeaderLinksForEntry(request, entry);
         boolean didOne = false;
         sb.append("<table>");
+        sb.append(HtmlUtil.row(HtmlUtil.colspan("<center>" + links +"</center>",2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent( entry,  request,
                                                                OutputHandler.OUTPUT_HTML, false));
         getMetadataHtml(request, entry, sb,false);

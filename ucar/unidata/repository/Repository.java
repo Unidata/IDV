@@ -102,6 +102,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+
     /** _more_ */
     public static final String GROUP_TOP = "Top";
 
@@ -1560,6 +1561,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         long   t1 = System.currentTimeMillis();
         Result result;
+
         if (debug) {
             debug("user:" + request.getUser() + " -- " + request.toString());
         }
@@ -1583,7 +1585,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else {
                 sb.append(error(inner.getMessage()));
                 String redirect =
-                    XmlUtil.encodeBase64(request.getFullUrl().getBytes());
+                    XmlUtil.encodeBase64(request.getUrl().getBytes());
                 sb.append(getUserManager().makeLoginForm(request,
                         HtmlUtil.hidden(ARG_REDIRECT, redirect)));
             }
@@ -1602,12 +1604,19 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
+        boolean okToAddCookie = false;
+
+
         if ((result != null) && (result.getInputStream() == null)
                 && result.isHtml() && result.getShouldDecorate()) {
             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
+            okToAddCookie = result.getResponseCode()==Result.RESPONSE_OK;
             decorateResult(request, result);
         }
 
+        if(result.getRedirectUrl()!=null) {
+            okToAddCookie = true;
+        }
 
         long t2 = System.currentTimeMillis();
         if ((result != null) && (t2 != t1)
@@ -1617,12 +1626,15 @@ public class Repository implements Constants, Tables, RequestHandler,
                                    + (t2 - t1));
             }
         }
-        if ((result != null) && (request.getSessionId() != null)) {
-            result.addCookie("repository-session", request.getSessionId()+"; path=" + getUrlBase() + "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
+        if (okToAddCookie && (request.getSessionIdWasSet() || request.getSessionId()==null)  && result != null) {
+            if (request.getSessionId() == null) {
+                request.setSessionId(getUserManager().getSessionId());
+            }
+            String sessionId = request.getSessionId();
+            //            result.addCookie("repositorysession", sessionId+"; path=" + getUrlBase() + "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
+            result.addCookie(UserManager.COOKIE_NAME, sessionId+"; path=" + getUrlBase());
         }
         return result;
-
-
     }
 
     protected ApiMethod findMethod(Request request) throws Exception {
@@ -1775,7 +1787,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-
         String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
         int length = getUrlBase().length();
         //        path = StringUtil.replace(path, getUrlBase(), BLANK);
@@ -1855,9 +1866,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             HtmlUtil.div(""," id=\"floatdiv\" class=\"floatdiv\" ");
 
 
-        String html = StringUtil.replace(template, "${content}",
-                                         new String(result.getContent())+ jsContent);
+        String content =new String(result.getContent());
 
+        String html = StringUtil.replace(template, "${content}",
+                                         content+ jsContent);
 
 
         String userLink = getUserManager().getUserLinks(request);

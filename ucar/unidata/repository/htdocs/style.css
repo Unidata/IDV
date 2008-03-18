@@ -43,12 +43,16 @@ a:hover {
 }
 
 A {
-text-decoration: none
+   text-decoration: none
 }
 
 
 
 
+.smallmessage {
+  font-size: 8pt;
+  font-style: italic;
+}
 
 .tooltip {
    border : 1px black solid;

@@ -332,8 +332,8 @@ public class OutputHandler extends RepositoryManager {
                                        getRepository().URL_ENTRY_SHOW, ARG_ID,
                                        entry.getId()), linkText,
                           " id=" + HtmlUtil.quote(elementId) +" " +
-                          " onmouseover=" + HtmlUtil.quote("tooltipShow(event,'" + elementId +"');") + 
-                          " onmouseout=" + HtmlUtil.quote("tooltipHide(event,'" + elementId +"');")));
+                          " onmouseover=" + HtmlUtil.quote("tooltip.show(event,'" + elementId +"');") + 
+                          " onmouseout=" + HtmlUtil.quote("tooltip.hide(event,'" + elementId +"');")));
         
         return HtmlUtil.span(sb.toString(), " id=" + HtmlUtil.quote("span_" + entry.getId()));
     }

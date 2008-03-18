@@ -219,6 +219,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+    public boolean xxcanHandle(String type) {
+        if(super.canHandle(type)) {
+            return true;
+        }
+        //For now
+        return super.canHandle("thredds."+type);
+    }
+
+
     /**
      * _more_
      *
