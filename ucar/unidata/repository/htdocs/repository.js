@@ -56,6 +56,7 @@ document.onmouseup   = mouseUp;
 
 var mouseIsDown = 0;
 var draggedEntry;
+var draggedEntryName;
 var mouseMoveCnt =0;
 
 function mouseDown(ev){
@@ -69,14 +70,23 @@ function mouseUp(ev){
     mouseIsDown = 0;
     draggedEntry   = null;
     setCursor('default')
+    var obj = new getObj('floatdiv');
+    if(obj) {
+        obj.style.visibility = "hidden";
+        obj.style.display = "none";
+    }
     return true;
 }
 
 function mouseMove(event) {
     if(draggedEntry && mouseIsDown) {
         mouseMoveCnt++;
-        if(mouseMoveCnt>5) {
-	        setCursor('move')
+        var obj = new getObj('floatdiv');
+        if(mouseMoveCnt==6) {
+           setCursor('move')
+        }
+        if(mouseMoveCnt>=6&& obj) {
+            moveFloatDiv(event.clientX,event.clientY);
         }
     }    
     return false;
@@ -84,6 +94,18 @@ function mouseMove(event) {
 }
 
 
+function moveFloatDiv(x,y) {
+        var obj = new getObj('floatdiv');
+        if(obj) {
+            if(obj.style.visibility!="visible") {
+                obj.style.visibility = "visible";
+                obj.style.display = "block";
+                obj.obj.innerHTML = draggedEntryName;
+            }
+            obj.style.top = y;
+            obj.style.left = x+10;
+        }
+}
 
 function mouseOverOnEntry(event, id) {
    if(id == draggedEntry) return;
@@ -119,8 +141,9 @@ function setCursor(c) {
 }
 
 
-function mouseDownOnEntry(event, id) {
+function mouseDownOnEntry(event, id, name) {
     draggedEntry = id;
+    draggedEntryName=name;
     mouseIsDown = 1;
     if(event.preventDefault) {
 	    event.preventDefault();
@@ -234,21 +257,6 @@ function hideShow(id,imgid,showimg,hideimg)
     } else {
 	  if(img) img.obj.src = hideimg;
     }
-}
-
-
-
-
-function folderClickHandler() {
- alert('callback ' + this.readyState +' ' + this.status);
- if(this.readyState == 4 && this.status == 200) {
-  if(this.responseXML != null && this.responseXML.getElementById('test').firstChild.data)
-    alert(this.responseXML.getElementById('test').firstChild.data);
-  else
-     alert("none");
- } else if (this.readyState == 4 && this.status != 200) {
-     alert("error");
- }
 }
 
 

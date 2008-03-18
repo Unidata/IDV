@@ -58,6 +58,13 @@ text-decoration: none
    z-index: 1;
 }
 
+.floatdiv {
+   position: absolute; 
+   visibility: hidden; 
+   z-index: 1;
+   color: gray;
+}
+
 .header {
    background-color:#006699;
 }
@@ -68,6 +75,7 @@ text-decoration: none
   font-weight: bold;
   color: #9C9C9C;
 }
+
 
 .breadcrumbs {
    text-decoration: none;

@@ -293,6 +293,7 @@ public class OutputHandler extends RepositoryManager {
 
 
 
+
     protected String getAjaxLink(Request request, Entry entry) {
         return getAjaxLink(request, entry, entry.getLabel(),true);
     }
@@ -310,7 +311,7 @@ public class OutputHandler extends RepositoryManager {
                 event += 
                     (entry.isGroup()?" onmouseover=" + HtmlUtil.quote("mouseOverOnEntry(event,'" + entry.getId() +"');"):"") + 
                     " onmouseout=" + HtmlUtil.quote("mouseOutOnEntry(event,'" + entry.getId() +"');") + 
-                    " onmousedown=" + HtmlUtil.quote("mouseDownOnEntry(event,'" + entry.getId() +"');") + 
+                    " onmousedown=" + HtmlUtil.quote("mouseDownOnEntry(event,'" + entry.getId() +"','" + entry.getLabel().replace("'","") +"');") + 
                     (entry.isGroup()?dropEvent:"");
             }
 

@@ -1847,9 +1847,18 @@ public class Repository implements Constants, Tables, RequestHandler,
             template = getResource(PROP_HTML_TEMPLATE);
 
 
+        String jsContent = HtmlUtil.div(""," id=\"tooltipdiv\" class=\"tooltip\" ") +
+            HtmlUtil.div(""," id=\"output\"") +
+            HtmlUtil.div(""," id=\"floatdiv\" class=\"floatdiv\" ");
+
+
         String html = StringUtil.replace(template, "${content}",
-                                         new String(result.getContent()));
+                                         new String(result.getContent())+ jsContent);
+
+
+
         String userLink = getUserManager().getUserLinks(request);
+
         html = StringUtil.replace(html, "${userlink}", userLink);
         html = StringUtil.replace(html, "${repository_name}",
                                   getProperty(PROP_REPOSITORY_NAME,
