@@ -23,7 +23,7 @@
 
 
 <nodetype    name="group" parent="Node" fillcolor="#cccccc">
-  <command label="View group" command="url(,${root}/group/show?group=%id%)"/>
+  <command label="View group" command="url(,${root}/entry/show?id=%id%)"/>
   <command label="Search group" command="url(,${root}/entry/searchform?group=%id%)"/>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>

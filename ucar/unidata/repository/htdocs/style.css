@@ -71,7 +71,7 @@ text-decoration: none
 
 
 .pageheading {
-  font-size: 14pt;
+  font-size: 12pt;
   font-weight: bold;
   color: #9C9C9C;
 }
@@ -244,23 +244,22 @@ a.navlink {
 
 
 
+.innernote {
+   padding-top:10px;
+}
 
 .note {
-   font-weight: bold;
-   margin:10px;
-   padding-top:5px;
-   padding-bottom:5px;
-   padding-left:5px;
-   padding-right:10px;
-   border : 1px black solid;
-   background-color : #FFFFCC;
+  margin:10px;
+  padding-bottom:5px;
+  padding-left:5px;
+  border : 1px black solid;
+  background-color : #FFFFCC;
 }
 
 
 
-
 .notetext {
-   font-weight: bold;
+   xfont-weight: bold;
 }
 
 

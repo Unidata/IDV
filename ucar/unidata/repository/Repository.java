@@ -535,7 +535,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String note(String h) {
-        return getMessage(h, "/information.png");
+        return getMessage(h, "/information.png",true);
     }
 
     /**
@@ -546,7 +546,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String progress(String h) {
-        return getMessage(h, "/progress.gif");
+        return getMessage(h, "/progress.gif",false);
     }
 
 
@@ -558,7 +558,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String warning(String h) {
-        return getMessage(h, "/warning.png");
+        return getMessage(h, "/warning.png",true);
     }
 
 
@@ -571,7 +571,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String question(String h,String buttons) {
-        return getMessage(h+"<hr>" + buttons, "/question.png");
+        return getMessage(h+"<hr>" + buttons, "/question.png",false);
     }
 
     /**
@@ -582,7 +582,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String error(String h) {
-        return getMessage(h, "/error.png");
+        return getMessage(h, "/error.png",true);
     }
 
     /**
@@ -593,12 +593,15 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    protected String getMessage(String h, String icon) {
-        h = "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
+    protected String getMessage(String h, String icon, boolean showClose) {
+        String close = "<a href=\"JavaScript: noop()\" onclick=\"hide('messageblock')\">" + 
+            HtmlUtil.img(fileUrl(ICON_CLOSE)) +"</a>";
+        if(!showClose) close = "&nbsp;";
+        h = "<div class=\"innernote\"><table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
             + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2)
             + "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
-            + "</span></td></tr></table>";
-        return "\n<table border=\"0\"><tr><td><div class=\"note\">" + h
+            + "</span></td></tr></table></div>";
+        return "\n<table border=\"0\" id=\"messageblock\"><tr><td><div class=\"note\"><table><tr valign=top><td>" + h + "</td><td>" +close +"</td></tr></table>" 
                + "</div></td></tr></table>\n";
     }
 
