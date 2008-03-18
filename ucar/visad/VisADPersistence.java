@@ -31,6 +31,7 @@ import ucar.unidata.data.point.PointOb;
 import ucar.unidata.geoloc.ProjectionRect;
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlDelegate;
 import ucar.unidata.xml.XmlDelegateImpl;
 import ucar.unidata.xml.XmlEncoder;
@@ -197,7 +198,7 @@ public class VisADPersistence {
                                          new Double(r.getValue()),
                                          r.getUnit(), r.getError());
                 List types = Misc.newList(RealType.class, Double.TYPE,
-                                          Unit.class, ErrorEstimate.class);
+                                          getUnitClass(r.getUnit()), ErrorEstimate.class);
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
@@ -214,12 +215,13 @@ public class VisADPersistence {
         addDelegate(ErrorEstimate.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 ErrorEstimate r = (ErrorEstimate) o;
+                Unit unit = r.getUnit();
                 List args = Misc.newList(new Double(r.getErrorValue()),
                                          new Double(r.getMean()),
                                          new Long(r.getNumberNotMissing()),
-                                         r.getUnit());
+                                         unit);
                 List types = Misc.newList(Double.TYPE, Double.TYPE,
-                                          Long.TYPE, Unit.class);
+                                          Long.TYPE, getUnitClass(r.getUnit()));
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
@@ -334,7 +336,7 @@ public class VisADPersistence {
                                          new Long(r.getNumberNotMissing()),
                                          r.getUnit());
                 List types = Misc.newList(Double.TYPE, Double.TYPE,
-                                          Long.TYPE, Unit.class);
+                                          Long.TYPE, getUnitClass(r.getUnit()));
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
@@ -370,46 +372,51 @@ public class VisADPersistence {
 
         addDelegate(ScaledUnit.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
-                System.err.println("making scaled unit" + o.getClass().getName());
                 ScaledUnit    r             = (ScaledUnit) o;
                 Element objectElement = e.createObjectElement(o.getClass());
                 objectElement.setAttribute(ATTR_AMOUNT, r.getAmount()+"");
                 Element childElement = e.createElement(r.getUnit());
                 objectElement.appendChild(childElement);
-                System.err.println("making scaled unit done");
                 return objectElement;
             }
 
-            public String toString() {
-                return "scaled unit delegate";
-            }
-            public Object createObject(XmlEncoder e, Element o) {
-                try {
-                    Object object = e.createObject(XmlUtil.getFirstChild(o));
-                    if(object instanceof String) {
-                        return createUnit(e,o);
-                    } else {
+                public Object createObject(XmlEncoder e, Element o) {
+                    try {
+                        Object object = e.createObject(XmlUtil.getFirstChild(o));
+                        if(object instanceof String) {
+                            //Handle old bundles that have a string "scaled unit"
+                            String s = (String) object;
+                            try {
+                                String[]toks = StringUtil.split(s," ",2);
+                                if(toks.length==1) {
+                                    return createUnit(e,o);
+                                }
+                                String identifier = toks[1];
+                                String name = o.getAttribute("name");
+                                if ((name == null) || (name.length() == 0)) {
+                                    name = identifier;
+                                }
+                                double amount = new Double(toks[0]).doubleValue();
+                                Unit theUnit = Util.parseUnit(identifier, name);
+                                return ScaledUnit.create(amount, theUnit);
+                            } catch (Exception exc) {
+
+                            } 
+                        }
                         Unit subUnit = (Unit) object;
                         double amount = XmlUtil.getAttribute(o,ATTR_AMOUNT,(double)1.0);
                         return ScaledUnit.create(amount, subUnit);
-                    } 
-                } catch (Exception exc) {
-                    System.err.println("Error creating unit:" + XmlUtil.toString(o));
-                    exc.printStackTrace();
-                    return null;
-                }}});
+                    } catch (Exception exc) {
+                        System.err.println("Error creating unit:" + XmlUtil.toString(o));
+                        exc.printStackTrace();
+                        return null;
+                    }}});
 
 
 
 
         addDelegate(Unit.class, new XmlDelegateImpl() {
-            public String toString() {
-                return "unit delegate";
-            }
             public Element createElement(XmlEncoder e, Object o) {
-                if(o instanceof ScaledUnit) {
-                    Misc.printStack("scaled unit");
-                }
                 Unit    r             = (Unit) o;
                 Element objectElement = e.createObjectElement(o.getClass());
                 String  unitString    = null;
@@ -750,6 +757,11 @@ public class VisADPersistence {
         });
 
 
+    }
+
+    public static Class getUnitClass(Unit unit) {
+        if(unit == null) return Unit.class;
+        return unit.getClass();
     }
 
     public static Unit createUnit(XmlEncoder e, Element o) throws VisADException {
