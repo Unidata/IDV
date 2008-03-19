@@ -445,6 +445,9 @@ public class DoradeAdapter implements RadarAdapter {
         //
         // create the FlatField
         //
+
+        RealTupleType rangeType = new RealTupleType(pType);
+
         FunctionType ftype = new FunctionType(radarDomain, pType);
         singleSweep = new FlatField(ftype, productDomain,
                                     (CoordinateSystem[]) null, (Set[]) null,
