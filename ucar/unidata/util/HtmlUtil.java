@@ -405,6 +405,10 @@ public class HtmlUtil {
         return "<tr valign=\"top\">" + row + "</tr>";
     }
 
+    public static String rowBottom(String row) {
+        return "<tr valign=\"bottom\">" + row + "</tr>";
+    }
+
 
     /**
      * _more_
