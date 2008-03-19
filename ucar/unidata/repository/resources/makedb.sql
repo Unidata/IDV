@@ -105,3 +105,6 @@ CREATE TABLE  harvesters (
        	      id varchar(200),
               class varchar(500),
               content varchar(10000));
+
+
+--CREATE TABLE stats ();

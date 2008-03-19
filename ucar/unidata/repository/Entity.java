@@ -205,10 +205,6 @@ public class Entity implements Cloneable {
         return parentGroup;
     }
 
-    public String getTopGroupId() {
-        if(parentGroup == null) return getId();
-        return parentGroup.getTopGroupId();
-    }
 
 
     /**

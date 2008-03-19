@@ -1650,7 +1650,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         //        System.err.println(incoming);
 
         
-        List<Group> topGroups = getTopGroups(request);
+        List<Group> topGroups = new ArrayList<Group>(getTopGroups(request));
+        topGroups.add(topGroup);
         for(Group group: topGroups) {
             String name  = "/"+getPathFromEntry(group);
             if(incoming.startsWith(name)) {
@@ -3139,8 +3140,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String       action = request.getString(ARG_ACTION, ACTION_COPY);
 
         if(request.exists(ARG_CANCEL)) {
-            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                                           fromEntry.getId()));
+            return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
 
 
@@ -3881,8 +3881,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             assocInsert.setString(col++, toEntry.getId());
             assocInsert.execute();
             assocInsert.close();
-            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                                           fromEntry.getId()));
+            return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
 
         StringBuffer sb = new StringBuffer();
@@ -3914,14 +3913,15 @@ public class Repository implements Constants, Tables, RequestHandler,
     private Result asynchDeleteEntries(Request request,
                                        final List<Entry> entries) {
         final Request        theRequest = request;
+        Entry group          = entries.get(0).getParentGroup();
         final String         groupId    = entries.get(0).getParentGroupId();
+
         ActionManager.Action action     = new ActionManager.Action() {
             public void run(Object actionId) throws Exception {
                 deleteEntries(theRequest, entries, actionId);
             }
         };
-        String href = HtmlUtil.href(request.url(URL_ENTRY_SHOW, ARG_ID,
-                          groupId), "Continue");
+        String href = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, group), "Continue");
         return getActionManager().doAction(request, action, "Deleting entry",
                                            "Continue: " + href);
     }
@@ -3946,8 +3946,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(request.url(URL_ENTRY_FORM, ARG_ID,
-                                           entry.getId()));
+            return new Result(request.entryUrl(URL_ENTRY_FORM,  entry));
         }
 
 
@@ -3959,8 +3958,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 return asynchDeleteEntries(request, entries);
             } else {
                 deleteEntries(request, entries, null);
-                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                        group.getId()));
+                return new Result(request.entryUrl(URL_ENTRY_SHOW, group));
             }
         }
 
@@ -4066,14 +4064,14 @@ public class Repository implements Constants, Tables, RequestHandler,
             newEntry    = false;
 
             if (entry.isTopGroup()) {
-                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                        entry.getId(), ARG_MESSAGE,
+                return new Result(request.entryUrl(URL_ENTRY_SHOW, 
+                        entry, ARG_MESSAGE,
                         "Cannot edit top-level group"));
             }
 
             if (request.exists(ARG_CANCEL)) {
-                return new Result(request.url(URL_ENTRY_FORM, ARG_ID,
-                        entry.getId()));
+                return new Result(request.entryUrl(URL_ENTRY_FORM, 
+                        entry));
             }
 
 
@@ -4082,14 +4080,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entries.add(entry);
                 deleteEntries(request, entries, null);
                 Group group = findGroup(entry.getParentGroupId());
-                return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                        group.getId(), ARG_MESSAGE, "Entry is deleted"));
+                return new Result(request.entryUrl(URL_ENTRY_SHOW, 
+                        group, ARG_MESSAGE, "Entry is deleted"));
             }
 
 
             if (request.exists(ARG_DELETE)) {
-                return new Result(request.url(URL_ENTRY_DELETE, ARG_ID,
-                        entry.getId()));
+                return new Result(request.entryUrl(URL_ENTRY_DELETE, 
+                        entry));
             }
         } else {
             typeHandler = getTypeHandler(request.getString(ARG_TYPE,
@@ -4172,8 +4170,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                                        new FileOutputStream(newFile),
                                        actionId, length) < 0) {
                         System.err.println("got cancel");
-                        return new Result(request.url(URL_ENTRY_SHOW,
-                                ARG_ID, parentGroup.getId()));
+                        return new Result(request.entryUrl(URL_ENTRY_SHOW,
+                                parentGroup));
                     }
                 }
 
@@ -4202,8 +4200,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
 
                 if (request.exists(ARG_CANCEL)) {
-                    return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                            parentGroup.getId()));
+                    return new Result(request.entryUrl(URL_ENTRY_SHOW, 
+                            parentGroup));
                 }
 
 
@@ -4366,13 +4364,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
-            return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
-                                           entry.getId()));
+            return new Result(request.entryUrl(URL_ENTRY_SHOW, 
+                                           entry));
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
             return new Result(
-                request.url(
-                    URL_ENTRY_SHOW, ARG_ID, entry.getParentGroupId(),
+                request.entryUrl(
+                    URL_ENTRY_SHOW, entry.getParentGroup(),
                     ARG_MESSAGE,
                     entries.size() + HtmlUtil.pad(msg("files uploaded"))));
         } else {
@@ -4677,16 +4675,16 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             length += name.length();
             titleList.add(0, name);
-            breadcrumbs.add(0, HtmlUtil.href(request.url(URL_ENTRY_SHOW,
-                    ARG_ID, parent.getId(), ARG_OUTPUT,
+            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+                    parent, ARG_OUTPUT,
                     output) + extraArgs, name));
             parent = findGroup(parent.getParentGroupId());
         }
         titleList.add(entry.getLabel());
         String nav;
         if (makeLinkForLastGroup) {
-            breadcrumbs.add(HtmlUtil.href(request.url(URL_ENTRY_SHOW,
-                    ARG_ID, entry.getId(), ARG_OUTPUT,
+            breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+                     entry, ARG_OUTPUT,
                     output), entry.getLabel()));
             nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
             //            if(breadcrumbs.size()>1) {
@@ -4757,12 +4755,12 @@ public class Repository implements Constants, Tables, RequestHandler,
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            breadcrumbs.add(0, HtmlUtil.href(request.url(URL_ENTRY_SHOW,
-                    ARG_ID, parent.getId()), name));
+            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+                    parent), name));
             parent = findGroup(parent.getParentGroupId());
         }
-        breadcrumbs.add(HtmlUtil.href(request.url(URL_ENTRY_SHOW, ARG_ID,
-                entry.getId()), entry.getLabel()));
+        breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, 
+                entry), entry.getLabel()));
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -6288,7 +6286,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         statement.setString(col++, entry.getName());
         statement.setString(col++, entry.getDescription());
         statement.setString(col++, entry.getParentGroupId());
-        statement.setString(col++, entry.getTopGroupId());
+        statement.setString(col++, entry.getCollectionGroupId());
         statement.setString(col++, entry.getUser().getId());
         if (entry.getResource() == null) {
             entry.setResource(new Resource());

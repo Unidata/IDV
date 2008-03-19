@@ -481,26 +481,26 @@ public class TypeHandler extends RepositoryManager {
         }
         links.add(
             new Link(
-                     request.url(
-                    getRepository().URL_COMMENTS_SHOW, ARG_ID,
-                    entry.getId()), getRepository().fileUrl(ICON_COMMENTS),
+                     request.entryUrl(
+                    getRepository().URL_COMMENTS_SHOW, 
+                    entry), getRepository().fileUrl(ICON_COMMENTS),
                                     msg("Add/View Comments")));
 
         if(!request.getUser().getAnonymous()) {
             links.add(
                       new Link(
-                               request.url(
-                                            getRepository().URL_ENTRY_COPY, ARG_FROM,
-                                            entry.getId()), getRepository().fileUrl(ICON_MOVE),
+                               request.entryUrl(
+                                            getRepository().URL_ENTRY_COPY, 
+                                            entry), getRepository().fileUrl(ICON_MOVE),
                                msg("Copy/Move Entry")));
         }
 
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(
                 new Link(
-                         request.url(
-                                     getRepository().URL_ENTRY_FORM, ARG_ID,
-                        entry.getId()), getRepository().fileUrl(ICON_EDIT),
+                         request.entryUrl(
+                                     getRepository().URL_ENTRY_FORM, 
+                                     entry), getRepository().fileUrl(ICON_EDIT),
                                         msg("Edit Entry")));
         }
 

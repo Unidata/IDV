@@ -351,16 +351,16 @@ public class OutputHandler extends RepositoryManager {
     public String getNextPrevLink(Request request, Entry entry,
                                   String output) {
         String nextLink = HtmlUtil.href(
-                                        request.url(
-                                  getRepository().URL_ENTRY_SHOW, ARG_ID,
-                                  entry.getId(), ARG_OUTPUT, output,
+                                        request.entryUrl(
+                                  getRepository().URL_ENTRY_SHOW, 
+                                  entry, ARG_OUTPUT, output,
                                   ARG_NEXT, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_RIGHT),
                                       msg("View Next Entry")));
         String prevLink = HtmlUtil.href(
-                                        request.url(
-                                  getRepository().URL_ENTRY_SHOW, ARG_ID,
-                                  entry.getId(), ARG_OUTPUT, output,
+                                        request.entryUrl(
+                                  getRepository().URL_ENTRY_SHOW, 
+                                  entry, ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_LEFT),
                                       msg("View Previous Entry")));
@@ -487,11 +487,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     protected String getEntryUrl(Request request, Entry entry) {
-        if(true)
-            return getAjaxLink(request,  entry, entry.getLabel(), false);
-        return HtmlUtil.href(request.url(getRepository().URL_ENTRY_SHOW,
-                                          ARG_ID,
-                                          entry.getId()), entry.getLabel());
+        return getAjaxLink(request,  entry, entry.getLabel(), false);
     }
 
     /**

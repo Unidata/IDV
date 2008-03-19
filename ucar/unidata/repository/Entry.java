@@ -246,6 +246,24 @@ public class Entry extends Entity {
         return isGroup() && (getParentGroupId() == null);
     }
 
+    public boolean isCollectionGroup() {
+        if(isGroup() && getParentGroup() != null) return getParentGroup().isTopGroup();
+        return false;
+    }
+
+    public String getCollectionGroupId() {
+        if(isCollectionGroup()) return getId();
+        if(getParentGroup() == null) return getId();
+        return getParentGroup().getCollectionGroupId();
+    }
+
+    public Group getCollectionGroup() {
+        if(isCollectionGroup()) return (Group)this;
+        if(getParentGroup() == null) return (Group)this;
+        return getParentGroup().getCollectionGroup();
+    }
+
+
     /**
      * _more_
      *

@@ -675,7 +675,7 @@ public class PatternHarvester extends Harvester {
         Group group = repository.findGroupFromName(baseGroupName + "/"
                           + groupName, getUser(), true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
-        entry.initEntry(name, desc, group, group.getTopGroupId(),getUser(),
+        entry.initEntry(name, desc, group, group.getCollectionGroupId(),getUser(),
                         new Resource(fileName, Resource.TYPE_FILE), "",
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), values);

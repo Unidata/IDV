@@ -298,9 +298,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @return _more_
      */
     protected String getEntryUrl(Request request,Entry entry) {
-        return HtmlUtil.href(request.url(getRepository().URL_ENTRY_SHOW,
-                                          ARG_ID,
-                                          entry.getId()), entry.getLabel());
+        return repository.getEntryUrl(request, entry);
     }
 
 

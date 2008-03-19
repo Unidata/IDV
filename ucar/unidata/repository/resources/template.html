@@ -1,18 +1,16 @@
 <html><head><title>${repository_name} - ${title}</title>
 <link rel="stylesheet" href="${root}/style.css" type="text/css">
 <script language="JavaScript1.2" src="${root}/repository.js"></script>
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Cache-Control" content="no-cache">
-<meta http-equiv="Expires" content="-1"></head>
+</head>
 <body>
-  <div class="header"><img src="${root}/header.jpg"  border="0" alt="Unidata Data Management System" title="Unidata Data Management System"></div>
-<table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td><div class="nav">${links}</div></td>
-<td align="right"><div class="nav">${userlink}&nbsp;</div></td></tr></table>${sublinks}<div class="content">${content}</div>
-
-
-<div class="footer">
-${footer}
-</div>
-
-
+<div class="header"><img src="${root}/header.jpg"  border="0" ></div>
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td><div class="nav">${links}</div></td>
+<td class="nav" align="right">${userlink}&nbsp;</td>
+</tr>
+</table>
+${sublinks}
+<div class="content">${content}</div>
+<div class="footer">${footer}</div>
 </body></html>

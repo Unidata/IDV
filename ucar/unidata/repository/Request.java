@@ -129,16 +129,29 @@ public class Request implements Constants {
 
 
     public String entryUrl(RequestUrl theUrl, Entry entry) {
-        if(entry.getParentGroup()!=null && entry.getParentGroup().isTopGroup()) {
-            String collectionPath = repository.getPathFromEntry(entry);
-            
-            return HtmlUtil.url(theUrl.getUrl(collectionPath), ARG_ID, entry.getId());
-        }
         if(entry.isTopGroup()) {
             return HtmlUtil.url(theUrl.toString(), ARG_ID, entry.getId());
         }
+        Group collectionGroup = entry.getCollectionGroup();
+        //This should always be true (?)
+        if(collectionGroup!=null) {
+            String collectionPath = repository.getPathFromEntry(collectionGroup);
+            return HtmlUtil.url(theUrl.getUrl(collectionPath), ARG_ID, entry.getId());
+        }
+
         return url(theUrl,ARG_ID, entry.getId());
     }
+
+    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1, String value1) {
+        return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1);
+    }
+
+    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1, String value1, String arg2, String value2) {
+        return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1,arg2,value2);
+    }
+
+
+
 
     public String url(RequestUrl theUrl) {
         if(collectionEntry!=null) {

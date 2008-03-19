@@ -34,7 +34,7 @@ function Util () {
         if (event.pageX) {
             return  event.pageX;
         }
-        return  e.clientX + document.body.scrollLeft
+        return  event.clientX + document.body.scrollLeft
         + document.documentElement.scrollLeft;
     }
 
@@ -42,7 +42,7 @@ function Util () {
         if (event.pageY) {
             return  event.pageY;
         }
-        return  e.clientY + document.body.scrollTop
+        return  event.clientY + document.body.scrollTop
         + document.documentElement.scrollTop;
 
     }
@@ -235,6 +235,7 @@ function Tooltip () {
 
     this.keyPressed = function (event) {
         if(!showing) return;
+
         c =util.getKeyChar(event);
         if(c == '\r' && pinned) {
             tooltip.unPin(event);
@@ -324,26 +325,26 @@ function Tooltip () {
 
 tooltip = new Tooltip();
 
-onkeypress = tooltip.keyPressed;
+document.onkeypress = tooltip.keyPressed;
 
 
-    function toggleEntryForm () {
-        var obj = util.getDomObject('entryform');
-        var img = util.getDomObject('entryformimg');
-        if(obj) {
-            if(toggleVisibilityOnObject(obj,'')) {
-                if(img) img.obj.src =  "${urlroot}/downarrow.gif";
-            } else {
-                if(img) img.obj.src =  "${urlroot}/rightarrow.gif";
-            }
-        }
-        var cnt = 0;
-        while(1) {
-            obj = util.getDomObject('entryform' + (cnt++));
-            if(!obj) break;
-            toggleVisibilityOnObject(obj,'');
+function toggleEntryForm () {
+    var obj = util.getDomObject('entryform');
+    var img = util.getDomObject('entryformimg');
+    if(obj) {
+        if(toggleVisibilityOnObject(obj,'')) {
+            if(img) img.obj.src =  "${urlroot}/downarrow.gif";
+        } else {
+            if(img) img.obj.src =  "${urlroot}/rightarrow.gif";
         }
     }
+    var cnt = 0;
+    while(1) {
+        obj = util.getDomObject('entryform' + (cnt++));
+        if(!obj) break;
+        toggleVisibilityOnObject(obj,'');
+    }
+}
 
 
 
