@@ -530,6 +530,9 @@ public class Request implements Constants {
 
 
 
+
+
+
     /**
      * _more_
      *
@@ -550,7 +553,7 @@ public class Request implements Constants {
                                         + " value:" + v + ":");
         }
         //TODO:Check the value
-        return v;
+        return repository.getDatabaseManager().escapeString(v);
     }
 
 

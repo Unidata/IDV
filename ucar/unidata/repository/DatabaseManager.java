@@ -429,6 +429,16 @@ public class DatabaseManager extends RepositoryManager {
         return sql;
     }
 
+    public String escapeString(String value) {
+        if (db.equals(DB_MYSQL)) {
+            value = value.replace("'","\\'");
+        } else {
+            value = value.replace("'","''");
+        }
+        return value;
+    }
+
+
     /**
      * _more_
      *
