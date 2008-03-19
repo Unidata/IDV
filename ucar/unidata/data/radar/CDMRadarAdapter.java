@@ -2719,8 +2719,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         try {
             u = Util.parseUnit(unitName);
         } catch (Exception pe) {
+            System.err.println("Warning: could not parse unit:" + unitName);
             u = null;
-            pe.printStackTrace();
+            //            pe.printStackTrace();
         }
 
         return u;
