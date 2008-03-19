@@ -2224,10 +2224,20 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
+     * @param request _more_
+     * @param entry _more_
+     *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    protected List<OutputHandler> getOutputHandlers() {
-        return outputHandlers;
+    public List getOutputTypesForEntry(Request request, Entry entry)
+            throws Exception {
+        List list = new ArrayList();
+        for (OutputHandler outputHandler : outputHandlers) {
+            outputHandler.getOutputTypesForEntry(request, entry, list);
+        }
+        return list;
     }
 
 
@@ -2256,21 +2266,16 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
-     * @param request _more_
-     * @param entry _more_
-     *
      * @return _more_
-     *
-     * @throws Exception _more_
      */
-    public List getOutputTypesForEntry(Request request, Entry entry)
-            throws Exception {
-        List list = new ArrayList();
-        for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getOutputTypesForEntry(request, entry, list);
-        }
-        return list;
+    protected List<OutputHandler> getOutputHandlers() {
+        return outputHandlers;
     }
+
+
+
+
+
 
 
     /**
@@ -2516,7 +2521,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected String getHeaderLinksForEntry(Request request, Entry entry)
+    protected List<Link> getEntryLinks(Request request, Entry entry)
             throws Exception {
         List<Link> links = new ArrayList<Link>();
         entry.getTypeHandler().getEntryLinks(request, entry, links);
@@ -2524,15 +2529,16 @@ public class Repository implements Constants, Tables, RequestHandler,
             outputHandler.getEntryLinks(request, entry, links);
         }
         OutputHandler outputHandler = getOutputHandler(request);
-        String nextPrev = HtmlUtil.space(1)
-                          + outputHandler.getNextPrevLink(request, entry,
-                              request.getOutput());
-
-        if (entry.isTopGroup()) {
-            nextPrev = "";
+        if (!entry.isTopGroup()) {
+            links.addAll(outputHandler.getNextPrevLinks(request, entry, request.getOutput()));
         }
-        return StringUtil.join(HtmlUtil.space(1), links) + nextPrev;
-        //        return StringUtil.join(HtmlUtil.space(1), links);
+        return links;
+    }
+
+
+    protected String getEntryLinksHtml(Request request, Entry entry)
+            throws Exception {
+        return StringUtil.join(HtmlUtil.space(1), getEntryLinks(request, entry));
     }
 
 
@@ -3393,21 +3399,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         getDatabaseManager().closeConnection();
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String makeGroupHeader(Request request, Group group)
-            throws Exception {
-        return HtmlUtil.bold(msg("Group:")) + HtmlUtil.space(1)
-               + getBreadCrumbs(request, group, true, BLANK)[1];
-    }
 
 
 
@@ -3457,7 +3448,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     public Result processEntryNew(Request request) throws Exception {
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
-        sb.append(makeGroupHeader(request, group));
+        sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
         sb.append(request.form(URL_ENTRY_FORM));
         sb.append(makeTypeSelect(request, false));
@@ -3506,7 +3497,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         if (entry == null) {
-            sb.append(makeGroupHeader(request, group));
+            sb.append(makeEntryHeader(request, group));
         } else {
             sb.append(makeEntryHeader(request, entry));
         }
@@ -4005,7 +3996,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String makeEntryHeader(Request request, Entry entry)
             throws Exception {
-        String crumbs = getBreadCrumbs(request, entry, true, BLANK)[1];
+        String crumbs = getBreadCrumbs(request, entry, false, BLANK)[1];
         return crumbs;
     }
 
@@ -4682,37 +4673,39 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         titleList.add(entry.getLabel());
         String nav;
+
+
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                     entry, ARG_OUTPUT,
-                    output), entry.getLabel()));
+                                                           entry, ARG_OUTPUT,
+                                                           output), entry.getLabel()));
             nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
-            //            if(breadcrumbs.size()>1) {
-            //            nav = HtmlUtil.div(HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")), HtmlUtil.cssClass("entryheader"));
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
-            //            }
         } else {
             nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
-            String links = getHeaderLinksForEntry(request, entry);
-            //            String   header = HtmlUtil.div(entry.getLabel() + 
-            //                                           HtmlUtil.space(1) +
-            //                                           links,
-            //                                           HtmlUtil.cssClass("entryheader"));
-            //                + HtmlUtil.div(entry.getLabel(), HtmlUtil.cssClass("entryname"))
-            String header =
-                "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr valign=\"bottom\"><td class=\"entryname\" >"
-                + entry.getLabel()
-                + "</td><td align=\"right\">" + links + "</tr></td></table>";
-
-            if (breadcrumbs.size() > 0) {
-                //                nav =  "<br>" + HtmlUtil.space(3);
+            List<Link> links = getEntryLinks(request, entry);
+            StringBuffer menu = new StringBuffer();
+            menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
+            for(Link link: links) {
+                menu.append(HtmlUtil.img(link.getIcon()));
+                menu.append(HtmlUtil.space(2));
+                menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(), HtmlUtil.cssClass("menulink")));            
+                menu.append(HtmlUtil.br());           
             }
-            nav = "\n"
-                  + HtmlUtil.div(
-                      HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))
-                      + "\n" + header, HtmlUtil.cssClass("entryheader"));
-            //            breadcrumbs.add(HtmlUtil.bold(entry.getLabel()) + HtmlUtil.space(1)
-            //                            + getHeaderLinksForEntry(request, entry));
+            menu.append("</div>");
+
+            String menuLink = HtmlUtil.space(1) + "<a href=\"javascript:noop()\" onclick=\"showMenu(event, 'menubutton', 'entrylinksmenu');\">" + HtmlUtil.img(fileUrl(ICON_TOOLS),msg("Show menu")," id=\"menubutton\" " ) +"</a>";
+            menuLink = "";
+            String linkHtml = getEntryLinksHtml(request, entry);
+            String header =
+                "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">" + HtmlUtil.rowBottom("<td class=\"entryname\" >"
+                                                                                                  + entry.getLabel() + menuLink
+                                                                                                  + "</td><td align=\"right\">" + linkHtml +"</td>") 
+                + "</table>";
+            nav =  HtmlUtil.div(
+                                HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))
+                                + header, HtmlUtil.cssClass("entryheader")) + menu;
+
         }
         String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
         return new String[] { title, nav };
@@ -6171,25 +6164,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     public String fileUrl(String f) {
         return urlBase + f;
     }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     *
-     * @return _more_
-     */
-    protected String getGraphLink(Request request, Group group) {
-        if ( !isAppletEnabled(request)) {
-            return BLANK;
-        }
-        return HtmlUtil
-            .href(request.url(URL_GRAPH_VIEW, ARG_ID, group.getFullName(),
-                     ARG_NODETYPE, NODETYPE_GROUP), HtmlUtil
-                         .img(fileUrl(ICON_GRAPH), "Show group in graph"));
-    }
-
 
 
     /**

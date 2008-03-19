@@ -427,7 +427,7 @@ public class HarvesterManager extends RepositoryManager {
         Group        group   = getRepository().findGroup(request);
         boolean      recurse = request.get(ARG_RECURSE, false);
         StringBuffer sb      = new StringBuffer();
-        sb.append(getRepository().makeGroupHeader(request, group));
+        sb.append(getRepository().makeEntryHeader(request, group));
         sb.append("<p>");
         String catalog = request.getString(ARG_CATALOG, "").trim();
         sb.append(request.form(URL_HARVESTERS_IMPORTCATALOG));

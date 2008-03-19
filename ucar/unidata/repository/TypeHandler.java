@@ -582,8 +582,8 @@ public class TypeHandler extends RepositoryManager {
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
-            String nextPrev = outputHandler.getNextPrevLink(request, entry,
-                                  output);
+            String nextPrev = StringUtil.join(HtmlUtil.space(1),outputHandler.getNextPrevLinks(request, entry,
+                                                                                               output));
             //            sb.append(HtmlUtil.formEntry("", nextPrev));
             //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), entry.getName()));

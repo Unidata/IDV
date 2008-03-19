@@ -348,23 +348,22 @@ public class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getNextPrevLink(Request request, Entry entry,
-                                  String output) {
-        String nextLink = HtmlUtil.href(
-                                        request.entryUrl(
-                                  getRepository().URL_ENTRY_SHOW, 
-                                  entry, ARG_OUTPUT, output,
-                                  ARG_NEXT, "true"), HtmlUtil.img(
-                                      getRepository().fileUrl(ICON_RIGHT),
-                                      msg("View Next Entry")));
-        String prevLink = HtmlUtil.href(
-                                        request.entryUrl(
-                                  getRepository().URL_ENTRY_SHOW, 
-                                  entry, ARG_OUTPUT, output,
-                                  ARG_PREVIOUS, "true"), HtmlUtil.img(
-                                      getRepository().fileUrl(ICON_LEFT),
-                                      msg("View Previous Entry")));
-        return prevLink + nextLink;
+    public List<Link> getNextPrevLinks(Request request, Entry entry,
+                                       String output) {
+        List<Link> links = new ArrayList<Link>();
+        links.add(new Link(request.entryUrl(
+                                            getRepository().URL_ENTRY_SHOW, 
+                                            entry, ARG_OUTPUT, output,
+                                            ARG_PREVIOUS, "true"), getRepository().fileUrl(ICON_LEFT),
+                           msg("View Previous Entry")));
+
+        links.add(new Link(
+                           request.entryUrl(
+                                            getRepository().URL_ENTRY_SHOW, 
+                                            entry, ARG_OUTPUT, output,
+                                            ARG_NEXT, "true"), getRepository().fileUrl(ICON_RIGHT), 
+                           msg("View Next Entry")));
+        return links;
     }
 
 

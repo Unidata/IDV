@@ -969,8 +969,7 @@ public class UserManager extends RepositoryManager {
                     HtmlUtil.cols(
                         session.user.getLabel(),
                         formatDate(request, session.createDate),
-                        formatDate(request, session.lastActivity),
-                                  session.id)));
+                        formatDate(request, session.lastActivity))));
         }
         sessionHtml.append(HtmlUtil.formTableClose());
         return sessionHtml;

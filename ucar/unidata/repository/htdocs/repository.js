@@ -54,6 +54,11 @@ function Util () {
 
 
 
+    this.setPosition = function(obj,x,y) {
+        obj.style.top = y;
+        obj.style.left = x;
+    }
+
     this.getLeft =  function(obj) {
         if(!obj) return 0;
         return obj.offsetLeft+this.getLeft(obj.offsetParent);
@@ -105,6 +110,7 @@ function print(s, clear) {
 
 
 
+var menuObject;
 document.onmousemove = mouseMove;
 document.onmousedown = mouseDown;
 document.onmouseup   = mouseUp;
@@ -114,7 +120,18 @@ var draggedEntry;
 var draggedEntryName;
 var mouseMoveCnt =0;
 
+function hideMenuObject() {
+    if(menuObject) {
+        hideObject(menuObject);
+        menuObject = null;
+    }
+}
+
+
 function mouseDown(event) {
+    if(menuObject) {
+        setTimeout("hideMenuObject()",2000);
+    }
     event = util.getEvent(event);
     mouseIsDown = 1;
     mouseMoveCnt =0;
@@ -290,6 +307,8 @@ function Tooltip () {
     }
 
     this.doShow = function(moveId,x,y,id) {
+
+        if(lastMove!=moveId) return;
         var link = util.getDomObject(id);
         if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
             x= util.getLeft(link.obj);
@@ -298,11 +317,10 @@ function Tooltip () {
             x+=20;
         }
 
-        if(lastMove!=moveId) return;
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
-        obj.style.top = y;
-        obj.style.left = x;
+        util.setPosition(obj, x,y);
+
 
         url = "${urlroot}/entry/show?id=" + id +"&output=metadataxml";
         var request = window.XMLHttpRequest ?
@@ -427,6 +445,33 @@ function toggleVisibility(id) {
 
 function hide(id) {
     hideObject(util.getDomObject(id));
+}
+
+
+function showMenu(event,srcId,id) {
+    var obj = util.getDomObject(id);
+    var srcObj = util.getDomObject(srcId);
+    if(!obj || !srcObj) return;
+    event = util.getEvent(event);
+    x = util.getEventX(event);
+    y = util.getEventY(event);
+    if(srcObj.obj.offsetLeft && srcObj.obj.offsetWidth) {
+        x= util.getLeft(srcObj.obj);
+        y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
+    } 
+
+    x+=2;
+    x+=3;
+
+    menuObject = obj;
+    showObject(obj);
+    
+    util.setPosition(obj, x,y);
+}
+
+
+function show(id) {
+    showObject(util.getDomObject(id));
 }
 
 function hideObject(obj) {

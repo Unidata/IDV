@@ -89,6 +89,8 @@ public interface Constants {
 
     public static final String ICON_DOWNARROW = "/downarrow.gif";
 
+    public static final String ICON_TOOLS = "/tools.gif";
+
     public static final String ICON_RIGHTARROW = "/rightarrow.gif";
 
     /** _more_ */
