@@ -130,7 +130,7 @@ function hideMenuObject() {
 
 function mouseDown(event) {
     if(menuObject) {
-        setTimeout("hideMenuObject()",2000);
+        setTimeout("hideMenuObject()",1000);
     }
     event = util.getEvent(event);
     mouseIsDown = 1;

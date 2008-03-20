@@ -4674,15 +4674,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         titleList.add(entry.getLabel());
         String nav;
 
+        String separator = HtmlUtil.span(HtmlUtil.pad("&gt;"),"class=separator");
 
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
                                                            entry, ARG_OUTPUT,
                                                            output), entry.getLabel()));
-            nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
+            nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
-            nav = StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
+            nav = StringUtil.join(separator, breadcrumbs);
             List<Link> links = getEntryLinks(request, entry);
             StringBuffer menu = new StringBuffer();
             menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
@@ -4694,8 +4695,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             menu.append("</div>");
 
-            String menuLink = HtmlUtil.space(1) + "<a href=\"javascript:noop()\" onclick=\"showMenu(event, 'menubutton', 'entrylinksmenu');\">" + HtmlUtil.img(fileUrl(ICON_TOOLS),msg("Show menu")," id=\"menubutton\" " ) +"</a>";
-            menuLink = "";
+            String menuLink = HtmlUtil.space(1) + "<a href=\"javascript:noop()\" onclick=\"showMenu(event, 'menubutton', 'entrylinksmenu');\">" + HtmlUtil.img(fileUrl(ICON_GRAYRECT),msg("Show menu")," id=\"menubutton\" " ) +"</a>";
+
             String linkHtml = getEntryLinksHtml(request, entry);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">" + HtmlUtil.rowBottom("<td class=\"entryname\" >"
