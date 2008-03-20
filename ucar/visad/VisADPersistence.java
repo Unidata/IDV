@@ -371,25 +371,26 @@ public class VisADPersistence {
 
 
         addDelegate(ScaledUnit.class, new XmlDelegateImpl() {
-            public Element createElement(XmlEncoder e, Object o) {
-                ScaledUnit    r             = (ScaledUnit) o;
-                Element objectElement = e.createObjectElement(o.getClass());
-                objectElement.setAttribute(ATTR_AMOUNT, r.getAmount()+"");
-                Element childElement = e.createElement(r.getUnit());
-                objectElement.appendChild(childElement);
-                return objectElement;
-            }
+                public Element createElement(XmlEncoder e, Object o) {
+                    ScaledUnit    r             = (ScaledUnit) o;
+                    Element objectElement = e.createObjectElement(o.getClass());
+                    objectElement.setAttribute(ATTR_AMOUNT, r.getAmount()+"");
+                    Element childElement = e.createElement(r.getUnit());
+                    objectElement.appendChild(childElement);
+                    return objectElement;
+                }
 
                 public Object createObject(XmlEncoder e, Element o) {
                     try {
                         Object object = e.createObject(XmlUtil.getFirstChild(o));
                         if(object instanceof String) {
-                            //Handle old bundles that have a string "scaled unit"
+                            //Handle old bundles that have a string "scale unit"
                             String s = (String) object;
                             try {
                                 String[]toks = StringUtil.split(s," ",2);
-                                if(toks.length==1) {
-                                    return createUnit(e,o);
+                                if(toks == null || toks.length==1) {
+                                    Unit unit = createUnit(e,o);
+                                    return unit;
                                 }
                                 String identifier = toks[1];
                                 String name = o.getAttribute("name");
@@ -400,7 +401,9 @@ public class VisADPersistence {
                                 Unit theUnit = Util.parseUnit(identifier, name);
                                 return ScaledUnit.create(amount, theUnit);
                             } catch (Exception exc) {
-
+                                System.err.println("error creating scaled unit:" + exc);
+                                Unit unit = createUnit(e,o);
+                                return unit;
                             } 
                         }
                         Unit subUnit = (Unit) object;
