@@ -24,9 +24,10 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.sql.Clause;
+
 
 import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.sql.Clause;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
@@ -252,22 +253,20 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected Result listAssociations(Request request) throws Exception {
 
-        StringBuffer sb          = new StringBuffer();
-        TypeHandler  typeHandler = repository.getTypeHandler(request);
-        String[] associations = getRepository().getAssociations(request);
+        StringBuffer  sb           = new StringBuffer();
+        TypeHandler   typeHandler  = repository.getTypeHandler(request);
+        String[]      associations = getRepository().getAssociations(request);
 
-        List<String>  names  = new ArrayList<String>();
-        List<Integer> counts = new ArrayList<Integer>();
+        List<String>  names        = new ArrayList<String>();
+        List<Integer> counts       = new ArrayList<Integer>();
         ResultSet     results;
         int           max = -1;
         int           min = -1;
         for (int i = 0; i < associations.length; i++) {
             String association = associations[i];
-            Statement stmt2 = typeHandler.select(
-                                  request, SqlUtil.count("*"),
-                                  Clause.eq(
-                                          COL_ASSOCIATIONS_NAME,
-                                          association),"");
+            Statement stmt2 = typeHandler.select(request, SqlUtil.count("*"),
+                                  Clause.eq(COL_ASSOCIATIONS_NAME,
+                                            association), "");
 
             ResultSet results2 = stmt2.getResultSet();
             if ( !results2.next()) {

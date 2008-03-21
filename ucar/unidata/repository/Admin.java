@@ -25,8 +25,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.Clause;
+
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -432,9 +433,11 @@ public class Admin extends RepositoryManager {
         sb.append(header("Repository Administration"));
         sb.append("<ul>\n");
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(request.url(URL_ADMIN_STARTSTOP), "Administer Database"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_STARTSTOP),
+                                "Administer Database"));
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES), "Show Tables"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES),
+                                "Show Tables"));
         sb.append("<li> ");
         sb.append(HtmlUtil.href(request.url(URL_ADMIN_STATS), "Statistics"));
         sb.append("<li> ");
@@ -570,7 +573,8 @@ public class Admin extends RepositoryManager {
         String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS, TABLE_METADATA };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
-                    + getRepository().getCount(tables[i].toLowerCase(), new Clause()), names[i])));
+                    + getRepository().getCount(tables[i].toLowerCase(),
+                        new Clause()), names[i])));
         }
 
 
@@ -581,18 +585,18 @@ public class Admin extends RepositoryManager {
         sb.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
-                    "" + getRepository().getCount(TABLE_ENTRIES,  new Clause()),
-                    msg("Total entries"))));
+                    "" + getRepository().getCount(
+                        TABLE_ENTRIES, new Clause()), msg("Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
             }
             int cnt = getRepository().getCount(TABLE_ENTRIES,
-                                               Clause.eq("type",typeHandler.getType()));
+                          Clause.eq("type", typeHandler.getType()));
 
             String url =
                 HtmlUtil.href(
-                              request.url(
+                    request.url(
                         getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
                         typeHandler.getType()), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
@@ -621,7 +625,8 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("SQL"));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES), msg("View Schema")));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES),
+                                msg("View Schema")));
         sb.append(HtmlUtil.p());
         sb.append(request.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit(msg("Execute")));
@@ -755,20 +760,18 @@ public class Admin extends RepositoryManager {
         cleanupStatus  = new StringBuffer();
         int myTimeStamp = ++cleanupTimeStamp;
         try {
-            Statement stmt = getDatabaseManager().select(
-                                                         SqlUtil.comma(
-                                                                       COL_ENTRIES_ID, COL_ENTRIES_RESOURCE,
-                                                                       COL_ENTRIES_TYPE), 
-                                                         TABLE_ENTRIES, Clause.eq(
-                                                                                   COL_ENTRIES_RESOURCE_TYPE,
-                                                                                   Resource.TYPE_FILE));
+            Statement stmt =
+                getDatabaseManager().select(SqlUtil.comma(COL_ENTRIES_ID,
+                    COL_ENTRIES_RESOURCE, COL_ENTRIES_TYPE), TABLE_ENTRIES,
+                        Clause.eq(COL_ENTRIES_RESOURCE_TYPE,
+                                  Resource.TYPE_FILE));
 
-            SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
-            ResultSet   results;
-            int         cnt       = 0;
-            int         deleteCnt = 0;
-            long        t1        = System.currentTimeMillis();
-            List<Entry> entries   = new ArrayList<Entry>();
+            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            ResultSet        results;
+            int              cnt       = 0;
+            int              deleteCnt = 0;
+            long             t1        = System.currentTimeMillis();
+            List<Entry>      entries   = new ArrayList<Entry>();
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     if ((cleanupTimeStamp != myTimeStamp)

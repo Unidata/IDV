@@ -54,7 +54,7 @@ public class Entry extends Entity {
     /** _more_ */
     private Resource resource;
 
-    /** _more_          */
+    /** _more_ */
     private String dataType;
 
     /** _more_ */
@@ -115,6 +115,7 @@ public class Entry extends Entity {
      * @param name _more_
      * @param description _more_
      * @param group _more_
+     * @param topGroupId _more_
      * @param user _more_
      * @param resource _more_
      * @param dataType _more_
@@ -124,10 +125,9 @@ public class Entry extends Entity {
      * @param values _more_
      */
     public void initEntry(String name, String description, Group group,
-                          String topGroupId,
-                          User user, Resource resource, String dataType,
-                          long createDate, long startDate, long endDate,
-                          Object[] values) {
+                          String topGroupId, User user, Resource resource,
+                          String dataType, long createDate, long startDate,
+                          long endDate, Object[] values) {
         super.init(name, description, group, user, createDate);
         //topGroup id is a noop
         this.resource = resource;
@@ -246,20 +246,45 @@ public class Entry extends Entity {
         return isGroup() && (getParentGroupId() == null);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isCollectionGroup() {
-        if(isGroup() && getParentGroup() != null) return getParentGroup().isTopGroup();
+        if (isGroup() && (getParentGroup() != null)) {
+            return getParentGroup().isTopGroup();
+        }
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getCollectionGroupId() {
-        if(isCollectionGroup()) return getId();
-        if(getParentGroup() == null) return getId();
+        if (isCollectionGroup()) {
+            return getId();
+        }
+        if (getParentGroup() == null) {
+            return getId();
+        }
         return getParentGroup().getCollectionGroupId();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Group getCollectionGroup() {
-        if(isCollectionGroup()) return (Group)this;
-        if(getParentGroup() == null) return (Group)this;
+        if (isCollectionGroup()) {
+            return (Group) this;
+        }
+        if (getParentGroup() == null) {
+            return (Group) this;
+        }
         return getParentGroup().getCollectionGroup();
     }
 
@@ -349,9 +374,16 @@ public class Entry extends Entity {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getLabel() {
         String label = super.getLabel();
-        if(label.length()>0) return label;
+        if (label.length() > 0) {
+            return label;
+        }
         return getTypeHandler().getLabel() + ": " + new Date(startDate);
     }
 

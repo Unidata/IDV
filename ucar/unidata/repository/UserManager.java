@@ -23,8 +23,10 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.Clause;
+
+
+import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 
@@ -64,7 +66,7 @@ import java.util.Properties;
 
 
 /**
-* Class TypeHandler _more_
+ * Class TypeHandler _more_
  *
  *
  * @author IDV Development Team
@@ -72,6 +74,7 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
+    /** _more_          */
     public static final String COOKIE_NAME = "repositorysession";
 
     /** _more_ */
@@ -128,7 +131,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_USER_DELETE = "user.delete";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_FROMLOGIN = "user.fromlogin";
 
 
@@ -366,7 +369,7 @@ public class UserManager extends RepositoryManager {
                 cookies.add(cookieValue);
             }
         }
-        request.tmp.append("cookies:" + cookies+"<p>");
+        request.tmp.append("cookies:" + cookies + "<p>");
         return cookies;
     }
 
@@ -409,7 +412,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void removeUserSession(Request request) throws Exception {
-        if(request.getSessionId()!=null) {
+        if (request.getSessionId() != null) {
             sessionMap.remove(request.getSessionId());
         }
         List<String> cookies = getCookies(request);
@@ -549,12 +552,9 @@ public class UserManager extends RepositoryManager {
             //            System.err.println ("got from user map:" + id +" " + user);
             return user;
         }
-        Statement stmt  = getDatabaseManager().select(
-                                                      COLUMNS_USERS,
-                                                      TABLE_USERS,
-                                                      Clause.eq(COL_USERS_ID,
-                                                                id));
-        ResultSet results =  stmt.getResultSet();
+        Statement stmt = getDatabaseManager().select(COLUMNS_USERS,
+                             TABLE_USERS, Clause.eq(COL_USERS_ID, id));
+        ResultSet results = stmt.getResultSet();
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
             if (userDefaultIfNotFound) {
@@ -638,8 +638,8 @@ public class UserManager extends RepositoryManager {
      */
     protected void deleteUser(User user) throws Exception {
         deleteRoles(user);
-        SqlUtil.delete(getConnection(),TABLE_USERS, Clause.eq(COL_USERS_ID,
-                                                              user.getId()));
+        SqlUtil.delete(getConnection(), TABLE_USERS,
+                       Clause.eq(COL_USERS_ID, user.getId()));
     }
 
     /**
@@ -650,9 +650,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteRoles(User user) throws Exception {
-        SqlUtil.delete(getConnection(),TABLE_USERROLES,
-                       Clause.eq(COL_USERROLES_USER_ID,
-                                 user.getId()));
+        SqlUtil.delete(getConnection(), TABLE_USERROLES,
+                       Clause.eq(COL_USERROLES_USER_ID, user.getId()));
     }
 
 
@@ -769,10 +768,10 @@ public class UserManager extends RepositoryManager {
         if (request.defined(ARG_USER_DELETE)) {
             sb.append(
                 getRepository().question(
-                                         msg("Are you sure you want to delete the user?"),
-                                         getRepository().buttons(
-                                                                 HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM),
-                                                                 HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL))));
+                    msg("Are you sure you want to delete the user?"),
+                    getRepository().buttons(
+                        HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM),
+                        HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL))));
         } else {
             String buttons =
                 HtmlUtil.submit(msg("Change User"), ARG_USER_CHANGE)
@@ -910,8 +909,8 @@ public class UserManager extends RepositoryManager {
                 makeOrUpdateUser(new User(id, name, email, "", "",
                                           hashPassword(password1), admin,
                                           ""), false);
-                String userEditLink = request.url(URL_USER_EDIT,
-                                          ARG_USER_ID, id);
+                String userEditLink = request.url(URL_USER_EDIT, ARG_USER_ID,
+                                          id);
                 return new Result(userEditLink);
             }
         }
@@ -955,6 +954,15 @@ public class UserManager extends RepositoryManager {
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public StringBuffer getSessionList(Request request) throws Exception {
         List<Session> sessions    = getSessions();
         StringBuffer  sessionHtml = new StringBuffer(HtmlUtil.formTable());
@@ -1002,14 +1010,14 @@ public class UserManager extends RepositoryManager {
         usersHtml.append(HtmlUtil.submit(msg("New User")));
         usersHtml.append("</form>");
 
-        Statement stmt = getDatabaseManager().select(
-                                                     COLUMNS_USERS, TABLE_USERS, new Clause(),
-                                                     " order by " + COL_USERS_ID);
+        Statement stmt = getDatabaseManager().select(COLUMNS_USERS,
+                             TABLE_USERS, new Clause(),
+                             " order by " + COL_USERS_ID);
 
-        SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
-        ResultSet  results;
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
 
-        List<User> users = new ArrayList();
+        List<User>       users = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 users.add(getUser(results));
@@ -1046,8 +1054,11 @@ public class UserManager extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         sb.append("<table>");
-        sb.append(HtmlUtil.rowTop(HtmlUtil.cols(getSessionList(request).toString(),
-                HtmlUtil.space(5), usersHtml.toString())));
+        sb.append(
+            HtmlUtil.rowTop(
+                HtmlUtil.cols(
+                    getSessionList(request).toString(), HtmlUtil.space(5),
+                    usersHtml.toString())));
         sb.append("</table>");
 
         Result result = new Result(msg("Users"), sb);
@@ -1078,11 +1089,9 @@ public class UserManager extends RepositoryManager {
                              results.getBoolean(col++),
                              results.getString(col++));
 
-        Statement    stmt  = 
-            getDatabaseManager().select(COL_USERROLES_ROLE,
-                                        TABLE_USERROLES,
-                                        Clause.eq(COL_USERROLES_USER_ID,
-                                                  user.getId()));
+        Statement stmt = getDatabaseManager().select(COL_USERROLES_ROLE,
+                             TABLE_USERROLES,
+                             Clause.eq(COL_USERROLES_USER_ID, user.getId()));
 
         String[]     array = SqlUtil.readString(stmt, 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
@@ -1374,14 +1383,13 @@ public class UserManager extends RepositoryManager {
                     ARG_REDIRECT, redirect), msg("Login"),
                                              " class=\"navlink\" ");
         } else {
-            userLink = HtmlUtil
-                .href(request.url(URL_USER_LOGOUT), msg(
-                    "Logout"), " class=\"navlink\" ") + HtmlUtil.space(1)
-                        + "|" + HtmlUtil.space(1)
-                        + HtmlUtil
-                            .href(request.url(URL_USER_SETTINGS), user
-                                .getLabel(), " class=\"navlink\" ") + HtmlUtil
-                                    .space(1);
+            userLink = HtmlUtil.href(
+                request.url(URL_USER_LOGOUT), msg("Logout"),
+                " class=\"navlink\" ") + HtmlUtil.space(1) + "|"
+                    + HtmlUtil.space(1)
+                    + HtmlUtil.href(
+                        request.url(URL_USER_SETTINGS), user.getLabel(),
+                            " class=\"navlink\" ") + HtmlUtil.space(1);
         }
         return cartEntry + HtmlUtil.space(2) + userLink;
     }
@@ -1433,15 +1441,11 @@ public class UserManager extends RepositoryManager {
             String password = request.getString(ARG_USER_PASSWORD1, "");
             password = hashPassword(password);
 
-            Statement    stmt  = 
-                getDatabaseManager().select(
-                                            COLUMNS_USERS, 
-                                            TABLE_USERS,
-                                            Clause.and(Clause.eq(
-                                                                 COL_USERS_ID,
-                                                                 name), Clause.eq(
-                                                                                  COL_USERS_PASSWORD,
-                                                                                  password)));
+            Statement stmt = getDatabaseManager().select(COLUMNS_USERS,
+                                 TABLE_USERS,
+                                 Clause.and(Clause.eq(COL_USERS_ID, name),
+                                            Clause.eq(COL_USERS_PASSWORD,
+                                                password)));
 
             ResultSet results = stmt.getResultSet();
             if (results.next()) {
@@ -1558,11 +1562,10 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<String> getRoles() throws Exception {
-        String[] roleArray =
-            SqlUtil.readString(
-                               getDatabaseManager().select(
-                                                           SqlUtil.distinct(COL_USERROLES_ROLE),
-                                                           TABLE_USERROLES, new Clause()), 1);
+        String[] roleArray = SqlUtil.readString(
+                                 getDatabaseManager().select(
+                                     SqlUtil.distinct(COL_USERROLES_ROLE),
+                                     TABLE_USERROLES, new Clause()), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
         roles.add(0, ROLE_ANY);
         return roles;
@@ -1596,8 +1599,8 @@ public class UserManager extends RepositoryManager {
                     getRepository().warning(msg("Incorrect passwords")));
             } else {
                 applyState(request, user, false);
-                return new Result(request.url(URL_USER_SETTINGS,
-                        ARG_MESSAGE, msg("User settings changed")));
+                return new Result(request.url(URL_USER_SETTINGS, ARG_MESSAGE,
+                        msg("User settings changed")));
             }
         }
 
@@ -1634,16 +1637,16 @@ public class UserManager extends RepositoryManager {
      */
     public static class Session {
 
-        /** _more_          */
+        /** _more_ */
         String id;
 
-        /** _more_          */
+        /** _more_ */
         User user;
 
-        /** _more_          */
+        /** _more_ */
         Date createDate;
 
-        /** _more_          */
+        /** _more_ */
         Date lastActivity;
 
         /**

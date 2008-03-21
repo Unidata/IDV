@@ -25,9 +25,10 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.sql.Clause;
+
 
 import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.sql.Clause;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -39,8 +40,9 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
-import java.sql.PreparedStatement;
 import java.lang.reflect.*;
+
+import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -63,6 +65,7 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
+    /** _more_          */
     public static final String ATTR_CLASS = "class";
 
     /** _more_ */
@@ -87,7 +90,7 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public GenericTypeHandler(Repository repository, Element entryNode)
             throws Exception {
-        super(repository,entryNode);
+        super(repository, entryNode);
         init(entryNode);
     }
 
@@ -157,14 +160,14 @@ public class GenericTypeHandler extends TypeHandler {
 
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
-            String className = XmlUtil.getAttribute(columnNode, ATTR_CLASS, Column.class.getName());
-            Class  c         = Misc.findClass(className);
+            String className = XmlUtil.getAttribute(columnNode, ATTR_CLASS,
+                                   Column.class.getName());
+            Class c = Misc.findClass(className);
             Constructor ctor = Misc.findConstructor(c,
-                                       new Class[] { getClass(),
-                                                     Element.class, Integer.TYPE});
-            Column column =  (Column) ctor.newInstance(new Object[] {
-                this, columnNode,
-                new Integer(colNames.size() - 1)});
+                                   new Class[] { getClass(),
+                    Element.class, Integer.TYPE });
+            Column column = (Column) ctor.newInstance(new Object[] { this,
+                    columnNode, new Integer(colNames.size() - 1) });
             columns.add(column);
             colNames.addAll(column.getColumnNames());
             column.createTable(statement);
@@ -318,12 +321,12 @@ public class GenericTypeHandler extends TypeHandler {
             return super.processList(request, what);
         }
 
-        String column = theColumn.getFullName();
-        String tag    = theColumn.getName();
-        String title  = theColumn.getDescription();
-        List<Clause>   where  = assembleWhereClause(request);
-        Statement statement = select(request,
-                                            SqlUtil.distinct(column), where,"");
+        String       column = theColumn.getFullName();
+        String       tag    = theColumn.getName();
+        String       title  = theColumn.getDescription();
+        List<Clause> where  = assembleWhereClause(request);
+        Statement statement = select(request, SqlUtil.distinct(column),
+                                     where, "");
 
         String[]     values = SqlUtil.readString(statement, 1);
         StringBuffer sb     = new StringBuffer();
@@ -434,9 +437,19 @@ public class GenericTypeHandler extends TypeHandler {
 
 
 
-    protected List<Clause> assembleWhereClause(Request request) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Clause> assembleWhereClause(Request request)
+            throws Exception {
         List<Clause> where        = super.assembleWhereClause(request);
-        int  originalSize = where.size();
+        int          originalSize = where.size();
         for (Column column : columns) {
             if ( !column.getCanSearch()) {
                 continue;
@@ -520,11 +533,9 @@ public class GenericTypeHandler extends TypeHandler {
         }
         Object[] values = new Object[colNames.size()];
 
-        Statement stmt = getDatabaseManager().select(
-                                                     SqlUtil.comma(colNames),
-                                                     getTableName(),
-                                                     Clause.eq(COL_ID,
-                                                               entry.getId()));
+        Statement stmt = getDatabaseManager().select(SqlUtil.comma(colNames),
+                             getTableName(),
+                             Clause.eq(COL_ID, entry.getId()));
         ResultSet results2 = stmt.getResultSet();
 
         if (results2.next()) {
@@ -573,19 +584,33 @@ public class GenericTypeHandler extends TypeHandler {
         return sb;
     }
 
-    protected String processDisplayTemplate(Request request, Entry entry, String html) 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param html _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected String processDisplayTemplate(Request request, Entry entry,
+                                            String html)
             throws Exception {
         html = super.processDisplayTemplate(request, entry, html);
-        Object[] values   = entry.getValues();
-        String       output = request.getOutput();
+        Object[] values = entry.getValues();
+        String   output = request.getOutput();
         if (values != null) {
-            int valueIdx=0;
+            int valueIdx = 0;
             for (Column column : columns) {
                 StringBuffer tmpSb = new StringBuffer();
                 valueIdx = column.formatValue(tmpSb, output, values,
-                                              valueIdx);
-                html = html.replace("${" + column.getName() +".content}", tmpSb.toString());
-                html = html.replace("${" + column.getName() +".label}", column.getLabel());
+                        valueIdx);
+                html = html.replace("${" + column.getName() + ".content}",
+                                    tmpSb.toString());
+                html = html.replace("${" + column.getName() + ".label}",
+                                    column.getLabel());
             }
         }
 
@@ -642,7 +667,7 @@ public class GenericTypeHandler extends TypeHandler {
         super.addToEntryForm(request, formBuffer, entry);
         Hashtable state = new Hashtable();
         for (Column column : columns) {
-            column.addToEntryForm(request, formBuffer, entry,state);
+            column.addToEntryForm(request, formBuffer, entry, state);
         }
 
     }
@@ -668,11 +693,12 @@ public class GenericTypeHandler extends TypeHandler {
             column.addToSearchForm(request, typeSB, where);
         }
 
-        if(typeSB.toString().length()>0) {
-            typeSB= new StringBuffer(HtmlUtil.formTable() + typeSB +
-                                     HtmlUtil.formTableClose());
+        if (typeSB.toString().length() > 0) {
+            typeSB = new StringBuffer(HtmlUtil.formTable() + typeSB
+                                      + HtmlUtil.formTableClose());
             formBuffer.append(HtmlUtil.p());
-            formBuffer.append(getRepository().makeShowHideBlock(request, getType(),msg(getLabel()),typeSB,true));
+            formBuffer.append(getRepository().makeShowHideBlock(request,
+                    getType(), msg(getLabel()), typeSB, true));
         }
 
 

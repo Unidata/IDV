@@ -25,13 +25,13 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.sql.Clause;
-
 
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
+import ucar.unidata.sql.Clause;
+
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -99,7 +99,7 @@ import javax.swing.*;
  */
 public class MetadataManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     private static final String SUFFIX_SELECT = ".select.";
 
 
@@ -154,12 +154,29 @@ public class MetadataManager extends RepositoryManager {
     MetadataHandler dfltMetadataHandler;
 
 
-    public Metadata findMetadata(Entry entry, Metadata.Type type, boolean checkInherited) throws Exception {
-        if(entry == null)return null;
-        for(Metadata metadata: getMetadata(entry)) {
-            if(metadata.getType().equals(type.getType())) return metadata;
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     * @param checkInherited _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Metadata findMetadata(Entry entry, Metadata.Type type,
+                                 boolean checkInherited)
+            throws Exception {
+        if (entry == null) {
+            return null;
         }
-        if(checkInherited) {
+        for (Metadata metadata : getMetadata(entry)) {
+            if (metadata.getType().equals(type.getType())) {
+                return metadata;
+            }
+        }
+        if (checkInherited) {
             return findMetadata(entry.getParentGroup(), type, checkInherited);
         }
         return null;
@@ -183,14 +200,12 @@ public class MetadataManager extends RepositoryManager {
         }
 
 
-        Statement stmt = getDatabaseManager().select(
-                                                     COLUMNS_METADATA,  
-                                                     TABLE_METADATA, 
-                                                     Clause.eq(COL_METADATA_ENTRY_ID, 
-                                                               entry.getId()), 
-                                                     " order by "   + COL_METADATA_TYPE);
-        SqlUtil.Iterator iter =    SqlUtil.getIterator(stmt);
-        ResultSet results;
+        Statement stmt = getDatabaseManager().select(COLUMNS_METADATA,
+                             TABLE_METADATA,
+                             Clause.eq(COL_METADATA_ENTRY_ID, entry.getId()),
+                             " order by " + COL_METADATA_TYPE);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
         metadataList = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -317,6 +332,8 @@ public class MetadataManager extends RepositoryManager {
      * @param request _more_
      * @param sb _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
     public StringBuffer addToSearchForm(Request request, StringBuffer sb)
@@ -350,8 +367,9 @@ public class MetadataManager extends RepositoryManager {
                     if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
                         continue;
                     }
-                    SqlUtil.delete(getConnection(),TABLE_METADATA,
-                                   Clause.eq(COL_METADATA_ID, request.getString(arg, BLANK)));
+                    SqlUtil.delete(getConnection(), TABLE_METADATA,
+                                   Clause.eq(COL_METADATA_ID,
+                                             request.getString(arg, BLANK)));
                 }
             } else {
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
@@ -360,14 +378,15 @@ public class MetadataManager extends RepositoryManager {
                 }
 
                 for (Metadata metadata : newMetadata) {
-                    SqlUtil.delete(getConnection(),TABLE_METADATA,
-                                   Clause.eq(COL_METADATA_ID, metadata.getId()));
+                    SqlUtil.delete(getConnection(), TABLE_METADATA,
+                                   Clause.eq(COL_METADATA_ID,
+                                             metadata.getId()));
                     insertMetadata(metadata);
                 }
             }
             entry.setMetadata(null);
             return new Result(request.url(URL_METADATA_FORM, ARG_ID,
-                                           entry.getId()));
+                                          entry.getId()));
         }
     }
 
@@ -445,33 +464,32 @@ public class MetadataManager extends RepositoryManager {
         sb.append(getRepository().makeEntryHeader(request, entry));
         sb.append(HtmlUtil.p());
         if ( !request.exists(ARG_TYPE)) {
-            List<String> groups = new ArrayList<String>();
-            Hashtable groupMap = new Hashtable();
+            List<String> groups   = new ArrayList<String>();
+            Hashtable    groupMap = new Hashtable();
 
             for (MetadataHandler handler : metadataHandlers) {
-                String name = handler.getHandlerGroupName();
+                String       name    = handler.getHandlerGroupName();
                 StringBuffer groupSB = null;
                 for (Metadata.Type type : handler.getTypes(request)) {
-                    if(groupSB == null) {
+                    if (groupSB == null) {
                         groupSB = (StringBuffer) groupMap.get(name);
-                        if(groupSB == null) {
+                        if (groupSB == null) {
                             groupMap.put(name, groupSB = new StringBuffer());
                             groups.add(name);
                         }
                     }
-                    groupSB.append(
-                        request.form(URL_METADATA_ADDFORM));
+                    groupSB.append(request.form(URL_METADATA_ADDFORM));
                     groupSB.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
                     groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
                     groupSB.append(HtmlUtil.submit(msg("Add")));
                     groupSB.append(HtmlUtil.space(1)
-                              + HtmlUtil.bold(type.getLabel()));
+                                   + HtmlUtil.bold(type.getLabel()));
                     groupSB.append(HtmlUtil.formClose());
                     groupSB.append(HtmlUtil.p());
                     groupSB.append(NEWLINE);
                 }
             }
-            for(String name: groups) {
+            for (String name : groups) {
                 sb.append(header(name));
                 sb.append("<ul>");
                 sb.append(groupMap.get(name));
@@ -523,7 +541,7 @@ public class MetadataManager extends RepositoryManager {
             }
             entry.setMetadata(null);
             return new Result(request.url(URL_METADATA_FORM, ARG_ID,
-                                           entry.getId()));
+                                          entry.getId()));
 
         }
     }
@@ -552,11 +570,10 @@ public class MetadataManager extends RepositoryManager {
 
         if (values == null) {
             Statement stmt = getDatabaseManager().select(
-                                                         SqlUtil.distinct(COL_METADATA_ATTR1),
-                                                         TABLE_METADATA,
-                                                         Clause.eq(
-                                                                   COL_METADATA_TYPE,
-                                                                   type.getType()));
+                                 SqlUtil.distinct(COL_METADATA_ATTR1),
+                                 TABLE_METADATA,
+                                 Clause.eq(
+                                     COL_METADATA_TYPE, type.getType()));
             values = SqlUtil.readString(stmt, 1);
             distinctMap.put(type.getType(), values);
         }

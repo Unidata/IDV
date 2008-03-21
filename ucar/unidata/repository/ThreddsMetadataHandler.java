@@ -78,8 +78,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         new Metadata.Type("thredds.creator", "Creator");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_LINK = new Metadata.Type("thredds.link",
-                                                      "Link");
+    public static final Metadata.Type TYPE_LINK =
+        new Metadata.Type("thredds.link", "Link");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DATAFORMAT =
@@ -122,8 +122,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         new Metadata.Type("thredds.documentation", "Documentation");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_ICON = new Metadata.Type("thredds.icon",
-                                                      "Icon");
+    public static final Metadata.Type TYPE_ICON =
+        new Metadata.Type("thredds.icon", "Icon");
 
 
     /**
@@ -154,12 +154,26 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     private String getTag(Metadata.Type type) {
-        int idx= type.getType().indexOf(".");
-        if(idx<0) return type.getType();
+        int idx = type.getType().indexOf(".");
+        if (idx < 0) {
+            return type.getType();
+        }
         return type.getType().substring(idx);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getHandlerGroupName() {
         return "Thredds";
     }
@@ -219,12 +233,19 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     public boolean xxcanHandle(String type) {
-        if(super.canHandle(type)) {
+        if (super.canHandle(type)) {
             return true;
         }
         //For now
-        return super.canHandle("thredds."+type);
+        return super.canHandle("thredds." + type);
     }
 
 
@@ -490,7 +511,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public boolean isTag(String tag, Metadata.Type type) {
-        return ("thredds."+tag).toLowerCase().equals(type.getType());
+        return ("thredds." + tag).toLowerCase().equals(type.getType());
     }
 
 

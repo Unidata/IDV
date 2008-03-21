@@ -96,14 +96,18 @@ public class ApiMethod {
     /** _more_ */
     private List actions;
 
+    /** _more_          */
     private Repository repository;
 
+    /** _more_          */
     private RequestUrl url;
 
     /**
      * _more_
      *
      *
+     *
+     * @param repository _more_
      * @param requestHandler _more_
      * @param request _more_
      * @param name _more_
@@ -112,10 +116,11 @@ public class ApiMethod {
      * @param canCache _more_
      * @param isTopLevel _more_
      */
-    public ApiMethod(Repository repository, RequestHandler requestHandler, String request,
-                     String name, Method method, boolean mustBeAdmin,
-                     boolean canCache, boolean isTopLevel) {
-        this.repository = repository;
+    public ApiMethod(Repository repository, RequestHandler requestHandler,
+                     String request, String name, Method method,
+                     boolean mustBeAdmin, boolean canCache,
+                     boolean isTopLevel) {
+        this.repository     = repository;
         this.requestHandler = requestHandler;
         this.request        = request;
         this.name           = name;
@@ -198,9 +203,14 @@ public class ApiMethod {
         return request;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public RequestUrl getUrl() {
-        if(url == null) {
-            url =  new RequestUrl(repository, request);
+        if (url == null) {
+            url = new RequestUrl(repository, request);
         }
         return url;
     }

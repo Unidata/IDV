@@ -146,10 +146,18 @@ public class DateGridOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getOutputTypesForEntry(Request request, Entry entry,
                                           List types)
-            throws Exception {
-    }
+            throws Exception {}
 
 
     /**
@@ -167,19 +175,19 @@ public class DateGridOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        String       output     = request.getOutput();
-        String       title      = group.getFullName();
-        StringBuffer sb         = new StringBuffer();
-        showNext(request, subGroups,  entries,   sb);
+        String       output = request.getOutput();
+        String       title  = group.getFullName();
+        StringBuffer sb     = new StringBuffer();
+        showNext(request, subGroups, entries, sb);
 
         entries.addAll(subGroups);
-        List types = new ArrayList();
-        List days = new ArrayList();
-        Hashtable dayMap = new Hashtable(); 
-        Hashtable typeMap = new Hashtable(); 
-        Hashtable contents = new Hashtable();
+        List             types    = new ArrayList();
+        List             days     = new ArrayList();
+        Hashtable        dayMap   = new Hashtable();
+        Hashtable        typeMap  = new Hashtable();
+        Hashtable        contents = new Hashtable();
 
-        SimpleDateFormat sdf = new SimpleDateFormat();
+        SimpleDateFormat sdf      = new SimpleDateFormat();
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         sdf.applyPattern("yyyy/MM/dd");
         SimpleDateFormat timeSdf = new SimpleDateFormat();
@@ -190,53 +198,60 @@ public class DateGridOutputHandler extends OutputHandler {
         monthSdf.applyPattern("MM");
         StringBuffer header = new StringBuffer();
         header.append(HtmlUtil.cols(HtmlUtil.bold(msg("Date"))));
-        for(Entry entry: entries) {
+        for (Entry entry : entries) {
             String type = entry.getTypeHandler().getType();
-            String day = sdf.format(new Date(entry.getStartDate()));
-            if(typeMap.get(type)==null) {
+            String day  = sdf.format(new Date(entry.getStartDate()));
+            if (typeMap.get(type) == null) {
                 types.add(entry.getTypeHandler());
-                typeMap.put(type,type);
-                header.append("<td>" + HtmlUtil.bold(entry.getTypeHandler().getLabel()) +"</td>");
+                typeMap.put(type, type);
+                header.append(
+                    "<td>" + HtmlUtil.bold(entry.getTypeHandler().getLabel())
+                    + "</td>");
             }
-            if(dayMap.get(day)==null) {
+            if (dayMap.get(day) == null) {
                 days.add(new Date(entry.getStartDate()));
                 dayMap.put(day, day);
             }
-            String time =  timeSdf.format(new Date(entry.getStartDate()));
-            String key = type +"_" + day;
+            String       time =
+                timeSdf.format(new Date(entry.getStartDate()));
+            String       key   = type + "_" + day;
             StringBuffer colSB = (StringBuffer) contents.get(key);
-            if(colSB == null) {
+            if (colSB == null) {
                 colSB = new StringBuffer();
                 contents.put(key, colSB);
             }
-            colSB.append(getAjaxLink(request, entry, time,false));
+            colSB.append(getAjaxLink(request, entry, time, false));
             colSB.append(HtmlUtil.br());
         }
 
-        sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\">");
+        sb.append(
+            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\">");
         days = Misc.sort(days);
         String currentMonth = "";
-        for(int dayIdx=0;dayIdx<days.size();dayIdx++) {
-            Date date = (Date) days.get(dayIdx);
+        for (int dayIdx = 0; dayIdx < days.size(); dayIdx++) {
+            Date   date  = (Date) days.get(dayIdx);
             String month = monthSdf.format(date);
             //Put the header in every month
-            if(!currentMonth.equals(month)) {
+            if ( !currentMonth.equals(month)) {
                 currentMonth = month;
-                sb.append(HtmlUtil.row(header.toString(), " style=\"background-color:lightblue;\""));
+                sb.append(
+                    HtmlUtil.row(
+                        header.toString(),
+                        " style=\"background-color:lightblue;\""));
             }
 
             String day = sdf.format(date);
             sb.append("<tr valign=\"top\">");
-            sb.append("<td width=\"5%\">" + day +"</td>");
-            for(int i=0;i<types.size();i++) {
-                TypeHandler typeHandler = (TypeHandler) types.get(i);
-                String type = typeHandler.getType();
-                String key = type +"_" + day;
-                StringBuffer cb = (StringBuffer) contents.get(key);
-                if(cb==null) {
-                    sb.append("<td>" + HtmlUtil.space(1) +"</td>");
+            sb.append("<td width=\"5%\">" + day + "</td>");
+            for (int i = 0; i < types.size(); i++) {
+                TypeHandler  typeHandler = (TypeHandler) types.get(i);
+                String       type        = typeHandler.getType();
+                String       key         = type + "_" + day;
+                StringBuffer cb          = (StringBuffer) contents.get(key);
+                if (cb == null) {
+                    sb.append("<td>" + HtmlUtil.space(1) + "</td>");
                 } else {
-                    sb.append("<td>" + cb +"</td>");
+                    sb.append("<td>" + cb + "</td>");
                 }
             }
             sb.append("</tr>");

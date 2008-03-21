@@ -97,8 +97,16 @@ public class RequestUrl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param collectionPath _more_
+     *
+     * @return _more_
+     */
     public String getUrl(String collectionPath) {
-        return repositorySource.getRepository().getUrlBase() + "/" +collectionPath + path;
+        return repositorySource.getRepository().getUrlBase() + "/"
+               + collectionPath + path;
     }
 
 

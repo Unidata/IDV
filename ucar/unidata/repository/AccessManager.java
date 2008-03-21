@@ -26,13 +26,13 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
-import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.sql.Clause;
-
-
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
+import ucar.unidata.sql.Clause;
+
+
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -341,8 +341,8 @@ public class AccessManager extends RepositoryManager {
     public List<Entry> filterEntries(Request request, List entries)
             throws Exception {
         List<Entry> filtered = new ArrayList();
-        for (int i=0;i<entries.size();i++) {
-            Entry entry =(Entry) entries.get(i);
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry = (Entry) entries.get(i);
             entry = filterEntry(request, entry);
             if (entry != null) {
                 filtered.add(entry);
@@ -426,8 +426,9 @@ public class AccessManager extends RepositoryManager {
                                      List<Permission> permissions)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            SqlUtil.delete(getConnection(),TABLE_PERMISSIONS,
-                           Clause.eq(COL_PERMISSIONS_ENTRY_ID, entry.getId()));
+            SqlUtil.delete(getConnection(), TABLE_PERMISSIONS,
+                           Clause.eq(COL_PERMISSIONS_ENTRY_ID,
+                                     entry.getId()));
 
             for (Permission permission : permissions) {
                 List roles = permission.getRoles();
@@ -459,17 +460,18 @@ public class AccessManager extends RepositoryManager {
             if (entry.getPermissions() != null) {
                 return entry.getPermissions();
             }
-            SqlUtil.Iterator iter =
-                SqlUtil.getIterator(getDatabaseManager().select(
-                                                                COLUMNS_PERMISSIONS,
-                                                                TABLE_PERMISSIONS,
-                                                                Clause.eq(COL_PERMISSIONS_ENTRY_ID,
-                                                                          entry.getId())));
+            SqlUtil.Iterator iter = SqlUtil.getIterator(
+                                        getDatabaseManager().select(
+                                            COLUMNS_PERMISSIONS,
+                                            TABLE_PERMISSIONS,
+                                            Clause.eq(
+                                                COL_PERMISSIONS_ENTRY_ID,
+                                                entry.getId())));
 
             List<Permission> permissions = new ArrayList();
 
-            ResultSet results;
-            Hashtable actions = new Hashtable();
+            ResultSet        results;
+            Hashtable        actions = new Hashtable();
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     String id     = results.getString(1);
@@ -610,8 +612,8 @@ public class AccessManager extends RepositoryManager {
 
 
             return new Result(request.url(URL_ACCESS_FORM, ARG_ID,
-                                           entry.getId(), ARG_MESSAGE,
-                                           message));
+                                          entry.getId(), ARG_MESSAGE,
+                                          message));
         }
     }
 

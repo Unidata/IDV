@@ -141,7 +141,7 @@ public class Entity implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         Entity that = (Entity) super.clone();
         //TODO: how do we handle associations
-        that.associations  = null;
+        that.associations = null;
         return that;
     }
 
@@ -249,15 +249,20 @@ public class Entity implements Cloneable {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getLabel() {
-        if(name!=null && name.trim().length()>0) {
+        if ((name != null) && (name.trim().length() > 0)) {
             return name;
         }
-        if(description!=null && description.trim().length()>0) {
+        if ((description != null) && (description.trim().length() > 0)) {
             return description;
         }
         return "";
-        
+
     }
 
     /**

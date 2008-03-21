@@ -25,12 +25,12 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.sql.SqlUtil;
-
 
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
+
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -252,6 +252,13 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getDatabaseManager();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Connection getConnection() throws Exception {
         return getDatabaseManager().getConnection(false);
     }

@@ -25,9 +25,10 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.sql.Clause;
+
 
 import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.sql.Clause;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 
@@ -79,7 +80,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_VALUE = "value";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DATATYPE = "datatype";
 
     /** _more_ */
@@ -132,9 +133,10 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private Hashtable properties = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private String defaultDataType;
 
+    /** _more_          */
     private String displayTemplatePath;
 
 
@@ -148,9 +150,16 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param entryNode _more_
+     */
     public TypeHandler(Repository repository, Element entryNode) {
         this(repository);
-        displayTemplatePath = XmlUtil.getAttribute(entryNode, "displaytemplate",(String)null);
+        displayTemplatePath = XmlUtil.getAttribute(entryNode,
+                "displaytemplate", (String) null);
     }
 
     /**
@@ -261,9 +270,19 @@ public class TypeHandler extends RepositoryManager {
         return getProperty("form.show." + arg, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getFormDefault(String arg, String dflt) {
         String prop = getProperty("form.default." + arg);
-        if(prop == null) return dflt;
+        if (prop == null) {
+            return dflt;
+        }
         return prop;
     }
 
@@ -369,18 +388,17 @@ public class TypeHandler extends RepositoryManager {
         int    col   = 3;
         String id    = results.getString(1);
         Entry  entry = createEntry(id);
-        entry.initEntry(results.getString(col++), results
-            .getString(col++), getRepository().findGroup(results.getString(col++)), 
-                        results.getString(col++), 
-                        getUserManager().findUser(results.getString(col++), true), new Resource(results
-                .getString(col++), results.getString(col++)), results
-                    .getString(col++), results
-                    .getTimestamp(col++, getRepository().calendar)
-                    .getTime(), results
-                    .getTimestamp(col++, getRepository().calendar)
-                    .getTime(), results
-                    .getTimestamp(col++, getRepository().calendar)
-                    .getTime(), null);
+        entry.initEntry(
+            results.getString(col++), results.getString(col++),
+            getRepository().findGroup(results.getString(col++)),
+            results.getString(col++),
+            getUserManager().findUser(results.getString(col++), true),
+            new Resource(results.getString(col++), results.getString(col++)),
+            results.getString(col++),
+            results.getTimestamp(col++, getRepository().calendar).getTime(),
+            results.getTimestamp(col++, getRepository().calendar).getTime(),
+            results.getTimestamp(col++, getRepository().calendar).getTime(),
+            null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
@@ -389,17 +407,32 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    protected String processDisplayTemplate(Request request, Entry entry, String html)             throws Exception {
-        html = html.replace("${" + ARG_NAME+"}", entry.getName());
-        html = html.replace("${" + ARG_LABEL+"}", entry.getLabel());
-        html = html.replace("${" + ARG_DESCRIPTION+"}", entry.getDescription());
-        html = html.replace("${" + ARG_CREATEDATE+"}",formatDate(request,
-                                                                 entry.getCreateDate()));
-        html = html.replace("${" + ARG_FROMDATE+"}",formatDate(request,
-                                                                 entry.getStartDate()));
-        html = html.replace("${" + ARG_TODATE+"}",formatDate(request,
-                                                                 entry.getEndDate()));
-        html = html.replace("${" + ARG_CREATOR+"}", entry.getUser().getLabel());
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param html _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected String processDisplayTemplate(Request request, Entry entry,
+                                            String html)
+            throws Exception {
+        html = html.replace("${" + ARG_NAME + "}", entry.getName());
+        html = html.replace("${" + ARG_LABEL + "}", entry.getLabel());
+        html = html.replace("${" + ARG_DESCRIPTION + "}",
+                            entry.getDescription());
+        html = html.replace("${" + ARG_CREATEDATE + "}",
+                            formatDate(request, entry.getCreateDate()));
+        html = html.replace("${" + ARG_FROMDATE + "}",
+                            formatDate(request, entry.getStartDate()));
+        html = html.replace("${" + ARG_TODATE + "}",
+                            formatDate(request, entry.getEndDate()));
+        html = html.replace("${" + ARG_CREATOR + "}",
+                            entry.getUser().getLabel());
 
         return html;
     }
@@ -423,9 +456,11 @@ public class TypeHandler extends RepositoryManager {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
-            if(displayTemplatePath!=null) {
-                String html = getRepository().getResource(displayTemplatePath);
-                return new StringBuffer(processDisplayTemplate(request, entry, html));
+            if (displayTemplatePath != null) {
+                String html =
+                    getRepository().getResource(displayTemplatePath);
+                return new StringBuffer(processDisplayTemplate(request,
+                        entry, html));
             }
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
@@ -482,27 +517,23 @@ public class TypeHandler extends RepositoryManager {
         }
         links.add(
             new Link(
-                     request.entryUrl(
-                    getRepository().URL_COMMENTS_SHOW, 
-                    entry), getRepository().fileUrl(ICON_COMMENTS),
-                                    msg("Add/View Comments")));
+                request.entryUrl(getRepository().URL_COMMENTS_SHOW, entry),
+                getRepository().fileUrl(ICON_COMMENTS),
+                msg("Add/View Comments")));
 
-        if(!request.getUser().getAnonymous()) {
+        if ( !request.getUser().getAnonymous()) {
             links.add(
-                      new Link(
-                               request.entryUrl(
-                                            getRepository().URL_ENTRY_COPY, 
-                                            entry), getRepository().fileUrl(ICON_MOVE),
-                               msg("Copy/Move Entry")));
+                new Link(
+                    request.entryUrl(getRepository().URL_ENTRY_COPY, entry),
+                    getRepository().fileUrl(ICON_MOVE),
+                    msg("Copy/Move Entry")));
         }
 
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(
                 new Link(
-                         request.entryUrl(
-                                     getRepository().URL_ENTRY_FORM, 
-                                     entry), getRepository().fileUrl(ICON_EDIT),
-                                        msg("Edit Entry")));
+                    request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
+                    getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
         }
 
     }
@@ -555,9 +586,11 @@ public class TypeHandler extends RepositoryManager {
                             getRepository().fileUrl(ICON_FETCH),
                             "Download file" + size);
         } else {
-            return new Link(HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/" + entry.getName(),
-                     ARG_ID, entry.getId()), getRepository()
-                         .fileUrl(ICON_FETCH), "Download file" + size);
+            return new Link(HtmlUtil
+                .url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                     + entry.getName(), ARG_ID, entry
+                         .getId()), getRepository()
+                             .fileUrl(ICON_FETCH), "Download file" + size);
         }
     }
 
@@ -583,8 +616,9 @@ public class TypeHandler extends RepositoryManager {
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
-            String nextPrev = StringUtil.join(HtmlUtil.space(1),outputHandler.getNextPrevLinks(request, entry,
-                                                                                               output));
+            String nextPrev = StringUtil.join(HtmlUtil.space(1),
+                                  outputHandler.getNextPrevLinks(request,
+                                      entry, output));
             //            sb.append(HtmlUtil.formEntry("", nextPrev));
             //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), entry.getName()));
@@ -647,10 +681,11 @@ public class TypeHandler extends RepositoryManager {
             } else if (entry.hasAreaDefined()) {
                 String img =
                     HtmlUtil.img(request.url(getRepository().URL_GETMAP,
-                        ARG_SOUTH, "" + entry.getSouth(), ARG_WEST,
-                        "" + entry.getWest(), ARG_NORTH,
-                        "" + entry.getNorth(), ARG_EAST,
-                        "" + entry.getEast()));
+                                             ARG_SOUTH,
+                                             "" + entry.getSouth(), ARG_WEST,
+                                             "" + entry.getWest(), ARG_NORTH,
+                                             "" + entry.getNorth(), ARG_EAST,
+                                             "" + entry.getEast()));
                 sb.append(HtmlUtil.formEntry(msgLabel("Area"), img));
             }
 
@@ -661,10 +696,11 @@ public class TypeHandler extends RepositoryManager {
                         HtmlUtil.formEntryTop(
                             msgLabel("Image"),
                             HtmlUtil.img(
-                                         HtmlUtil.url(
-                                                     request.url(getRepository().URL_ENTRY_GET) + "/"
-                                    + entry.getName(), ARG_ID,
-                                        entry.getId()), "")));
+                                HtmlUtil.url(
+                                    request.url(
+                                        getRepository().URL_ENTRY_GET) + "/"
+                                            + entry.getName(), ARG_ID,
+                                                entry.getId()), "")));
 
                 } else if (entry.getResource().isUrl()) {
                     sb.append(HtmlUtil.formEntryTop(msgLabel("Image"),
@@ -743,8 +779,20 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-    protected Statement select(Request request, String what,
-                               Clause clause, String extra)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param what _more_
+     * @param clause _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement select(Request request, String what, Clause clause,
+                               String extra)
             throws Exception {
         List<Clause> clauses = new ArrayList<Clause>();
         clauses.add(clause);
@@ -758,6 +806,7 @@ public class TypeHandler extends RepositoryManager {
      * @param request _more_
      * @param what _more_
      * @param whereList _more_
+     * @param clauses _more_
      * @param extra _more_
      *
      * @return _more_
@@ -772,8 +821,8 @@ public class TypeHandler extends RepositoryManager {
         String whatString  = cleanQueryString(what);
         String extraString = cleanQueryString(extra);
 
-        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA, TABLE_USERS,
-                                TABLE_ASSOCIATIONS };
+        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA,
+                                TABLE_USERS, TABLE_ASSOCIATIONS };
         //        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA,
         //                                TABLE_USERS, TABLE_ASSOCIATIONS };
         List    tables     = new ArrayList();
@@ -783,8 +832,8 @@ public class TypeHandler extends RepositoryManager {
         for (int i = 0; i < tableNames.length; i++) {
             String pattern = ".*[, =\\(]+" + tableNames[i] + "\\..*";
             //            System.out.println("pattern:" + pattern);
-            if (Clause.isColumnFromTable(clauses, tableNames[i]) ||
-                whatString.matches(pattern)  
+            if (Clause.isColumnFromTable(clauses, tableNames[i])
+                    || whatString.matches(pattern)
                     || (extraString.matches(pattern))) {
                 //                System.out.println("    ***** match");
                 tables.add(tableNames[i]);
@@ -808,7 +857,7 @@ public class TypeHandler extends RepositoryManager {
         while (true) {
             String subTable = TABLE_METADATA + "_" + metadataCnt;
             metadataCnt++;
-            if (!Clause.isColumnFromTable(clauses, subTable)) {
+            if ( !Clause.isColumnFromTable(clauses, subTable)) {
                 break;
             }
             tables.add(TABLE_METADATA + " " + subTable);
@@ -828,7 +877,7 @@ public class TypeHandler extends RepositoryManager {
                 }
 
 
-                if (!Clause.isColumn(clauses, COL_ENTRIES_TYPE)) {
+                if ( !Clause.isColumn(clauses, COL_ENTRIES_TYPE)) {
                     addOrClause(COL_ENTRIES_TYPE, typeString, clauses);
                 }
             }
@@ -838,12 +887,11 @@ public class TypeHandler extends RepositoryManager {
         //The join
         if (didEntries && didOther
                 && !TABLE_ENTRIES.equalsIgnoreCase(getTableName())) {
-            clauses.add(0, Clause.eq(COL_ENTRIES_ID,
-                                     getTableName() + ".id"));
+            clauses.add(0, Clause.eq(COL_ENTRIES_ID, getTableName() + ".id"));
         }
 
-        return SqlUtil.select(getConnection(), what, tables, Clause.and(clauses), 
-                              extra,
+        return SqlUtil.select(getConnection(), what, tables,
+                              Clause.and(clauses), extra,
                               getRepository().getMax(request));
     }
 
@@ -855,91 +903,87 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param request _more_
      * @param formBuffer _more_
+     * @param sb _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
-    public void addToEntryForm(Request request, StringBuffer sb,
-                               Entry entry)
-           throws Exception {
-            String size = HtmlUtil.SIZE_70;
-            if (okToShowInForm(ARG_NAME)) {
-                sb.append(HtmlUtil.formEntry("Name:",
-                                             HtmlUtil.input(ARG_NAME,
-                                                            ((entry != null)
-                                                             ? entry.getName()
-                                                             : getFormDefault(ARG_NAME,"")), size)));
-            } else {
-                String nameDefault = getFormDefault(ARG_NAME,null);
-                if(nameDefault!=null) {
-                    sb.append(HtmlUtil.hidden(ARG_NAME, nameDefault));
-                }
-            }
-            int rows = getProperty("form.rows.desc", 3);
-            if (okToShowInForm(ARG_DESCRIPTION)) {
-                sb.append(
-                          HtmlUtil.formEntryTop(
-                                                "Description:",
-                                                HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
-                                                                                    ? entry.getDescription()
-                                                                                    : BLANK), rows, 50)));
-            }
+    public void addToEntryForm(Request request, StringBuffer sb, Entry entry)
+            throws Exception {
 
-            if (okToShowInForm(ARG_RESOURCE)) {
-                if (entry == null) {
-                    sb.append(HtmlUtil.formEntry(msgLabel("File"),
-                            HtmlUtil.fileInput(ARG_FILE, size)
-                            + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
-                                false) + HtmlUtil.space(1)
-                                       + msg("Unzip archive")));
-                    String download =
-                        HtmlUtil.space(1)
-                        + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true",
-                                            false) + HtmlUtil.space(1)
-                                                + msg("Download");
-                    sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
-                            HtmlUtil.input(ARG_RESOURCE, BLANK, size)
-                            + download));
-                } else {
-                    sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                            entry.getResource().getPath()));
-                }
-                if ( !hasDefaultDataType()
-                        && okToShowInForm(ARG_DATATYPE)) {
-                    String selected = "";
-                    if (entry != null) {
-                        selected = entry.getDataType();
-                    }
-                    List   types  = getRepository().getDefaultDataTypes();
-                    String widget = ((types.size() > 1)
-                                     ? HtmlUtil.select(ARG_DATATYPE_SELECT,
-                                         types, selected) + HtmlUtil.space(1)
-                                             + msgLabel("Or")
-                                     : "") + HtmlUtil.input(ARG_DATATYPE);
-                    sb.append(HtmlUtil.formEntry(msgLabel("Data Type"),
-                            widget));
-                }
-
+        String size = HtmlUtil.SIZE_70;
+        if (okToShowInForm(ARG_NAME)) {
+            sb.append(HtmlUtil.formEntry("Name:",
+                                         HtmlUtil.input(ARG_NAME,
+                                             ((entry != null)
+                    ? entry.getName()
+                    : getFormDefault(ARG_NAME, "")), size)));
+        } else {
+            String nameDefault = getFormDefault(ARG_NAME, null);
+            if (nameDefault != null) {
+                sb.append(HtmlUtil.hidden(ARG_NAME, nameDefault));
             }
+        }
+        int rows = getProperty("form.rows.desc", 3);
+        if (okToShowInForm(ARG_DESCRIPTION)) {
+            sb.append(
+                HtmlUtil.formEntryTop(
+                    "Description:",
+                    HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
+                    ? entry.getDescription()
+                    : BLANK), rows, 50)));
+        }
 
-            String dateHelp = " (e.g., 2007-12-11 00:00:00)";
-            String fromDate = ((entry != null)
-                               ? formatDate(request,
-                                            new Date(entry.getStartDate()))
-                               : BLANK);
-            String toDate = ((entry != null)
-                             ? formatDate(request,
-                                          new Date(entry.getEndDate()))
-                             : BLANK);
-            if (okToShowInForm(ARG_DATE)) {
-                if (!okToShowInForm(ARG_TODATE)) {
+        if (okToShowInForm(ARG_RESOURCE)) {
+            if (entry == null) {
                 sb.append(
                     HtmlUtil.formEntry(
-                        "Date:",
-                        HtmlUtil.input(
-                            ARG_FROMDATE, fromDate,
-                            HtmlUtil.SIZE_30)));
-                } else {
+                        msgLabel("File"),
+                        HtmlUtil.fileInput(ARG_FILE, size)
+                        + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true", false)
+                        + HtmlUtil.space(1) + msg("Unzip archive")));
+                String download = HtmlUtil.space(1)
+                                  + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD,
+                                      "true", false) + HtmlUtil.space(1)
+                                          + msg("Download");
+                sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
+                                             HtmlUtil.input(ARG_RESOURCE,
+                                                 BLANK, size) + download));
+            } else {
+                sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                             entry.getResource().getPath()));
+            }
+            if ( !hasDefaultDataType() && okToShowInForm(ARG_DATATYPE)) {
+                String selected = "";
+                if (entry != null) {
+                    selected = entry.getDataType();
+                }
+                List   types  = getRepository().getDefaultDataTypes();
+                String widget = ((types.size() > 1)
+                                 ? HtmlUtil.select(ARG_DATATYPE_SELECT,
+                                     types, selected) + HtmlUtil.space(1)
+                                         + msgLabel("Or")
+                                 : "") + HtmlUtil.input(ARG_DATATYPE);
+                sb.append(HtmlUtil.formEntry(msgLabel("Data Type"), widget));
+            }
+
+        }
+
+        String dateHelp = " (e.g., 2007-12-11 00:00:00)";
+        String fromDate = ((entry != null)
+                           ? formatDate(request,
+                                        new Date(entry.getStartDate()))
+                           : BLANK);
+        String toDate = ((entry != null)
+                         ? formatDate(request, new Date(entry.getEndDate()))
+                         : BLANK);
+        if (okToShowInForm(ARG_DATE)) {
+            if ( !okToShowInForm(ARG_TODATE)) {
+                sb.append(HtmlUtil.formEntry("Date:",
+                                             HtmlUtil.input(ARG_FROMDATE,
+                                                 fromDate,
+                                                     HtmlUtil.SIZE_30)));
+            } else {
                 sb.append(
                     HtmlUtil.formEntry(
                         "Date Range:",
@@ -949,42 +993,44 @@ public class TypeHandler extends RepositoryManager {
                                 + HtmlUtil.input(
                                     ARG_TODATE, toDate,
                                     HtmlUtil.SIZE_30) + dateHelp));
-                }
-                if (entry == null) {
-                    List datePatterns = new ArrayList();
-
-                    datePatterns.add(new TwoFacedObject("", BLANK));
-                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
-                        datePatterns.add(DateUtil.DATE_FORMATS[i]);
-                    }
-
-                    if (okToShowInForm(ARG_RESOURCE)) {
-                        sb.append(HtmlUtil.formEntry("Date Pattern:",
-                                HtmlUtil.select(ARG_DATE_PATTERN,
-                                    datePatterns) + " (use file name)"));
-                    }
-
-                }
             }
+            if (entry == null) {
+                List datePatterns = new ArrayList();
 
+                datePatterns.add(new TwoFacedObject("", BLANK));
+                for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
+                    datePatterns.add(DateUtil.DATE_FORMATS[i]);
+                }
 
-            if (okToShowInForm(ARG_AREA)) {
-                sb.append(HtmlUtil.formEntry("Location:",
-                                             HtmlUtil.makeLatLonBox(ARG_AREA,
-                                                 ((entry != null)
-                                                     && entry.hasSouth())
-                        ? entry.getSouth()
-                        : Double.NaN, ((entry != null) && entry.hasNorth())
-                                      ? entry.getNorth()
-                                      : Double.NaN, ((entry != null)
-                                      && entry.hasEast())
-                        ? entry.getEast()
-                        : Double.NaN, ((entry != null) && entry.hasWest())
-                                      ? entry.getWest()
-                                      : Double.NaN)));
+                if (okToShowInForm(ARG_RESOURCE)) {
+                    sb.append(HtmlUtil.formEntry("Date Pattern:",
+                            HtmlUtil.select(ARG_DATE_PATTERN, datePatterns)
+                            + " (use file name)"));
+                }
+
             }
+        }
 
-}
+
+        if (okToShowInForm(ARG_AREA)) {
+            sb.append(HtmlUtil.formEntry("Location:",
+                                         HtmlUtil.makeLatLonBox(ARG_AREA,
+                                             ((entry != null)
+                                                 && entry.hasSouth())
+                                             ? entry.getSouth()
+                                             : Double.NaN, ((entry != null)
+                                             && entry.hasNorth())
+                    ? entry.getNorth()
+                    : Double.NaN, ((entry != null) && entry.hasEast())
+                                  ? entry.getEast()
+                                  : Double.NaN, ((entry != null)
+                                  && entry.hasWest())
+                    ? entry.getWest()
+                    : Double.NaN)));
+        }
+
+
+    }
 
 
 
@@ -1066,8 +1112,8 @@ public class TypeHandler extends RepositoryManager {
         maxDate = "";
 
 
-        StringBuffer basicSB  = new StringBuffer(HtmlUtil.formTable());
-        StringBuffer advancedSB  = new StringBuffer(HtmlUtil.formTable());
+        StringBuffer basicSB    = new StringBuffer(HtmlUtil.formTable());
+        StringBuffer advancedSB = new StringBuffer(HtmlUtil.formTable());
 
 
 
@@ -1100,7 +1146,7 @@ public class TypeHandler extends RepositoryManager {
                             1) + groupCbx));
         } else if (typeHandlers.size() == 1) {
             basicSB.append(HtmlUtil.hidden(ARG_TYPE,
-                    typeHandlers.get(0).getType()));
+                                           typeHandlers.get(0).getType()));
             basicSB.append(HtmlUtil.formEntry(msgLabel("Type"),
                     typeHandlers.get(0).getDescription()));
         }
@@ -1116,11 +1162,9 @@ public class TypeHandler extends RepositoryManager {
                                             + msg("Search metadata");
 
         String searchExact = " "
-                                + HtmlUtil.checkbox(ARG_EXACT,
-                                    "true",
-                                    request.get(ARG_EXACT,
-                                        false)) + " "
-                                            + msg("Match exactly");
+                             + HtmlUtil.checkbox(ARG_EXACT, "true",
+                                 request.get(ARG_EXACT, false)) + " "
+                                     + msg("Match exactly");
         if (name.trim().length() == 0) {
             basicSB.append(HtmlUtil.formEntry(msgLabel("Text"),
                     HtmlUtil.input(ARG_TEXT) + searchExact + searchMetaData));
@@ -1160,10 +1204,10 @@ public class TypeHandler extends RepositoryManager {
 
                 }
             } else {
-                Statement stmt = select(
-                                     request,
-                                     SqlUtil.distinct(
-                                         COL_ENTRIES_PARENT_GROUP_ID), where,"");
+                Statement stmt =
+                    select(request,
+                           SqlUtil.distinct(COL_ENTRIES_PARENT_GROUP_ID),
+                           where, "");
 
                 List<Group> groups =
                     getRepository().getGroups(SqlUtil.readString(stmt, 1));
@@ -1207,12 +1251,14 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
-        basicSB.append(HtmlUtil.formTableClose());        
-        advancedSB.append(HtmlUtil.formTableClose());        
+        basicSB.append(HtmlUtil.formTableClose());
+        advancedSB.append(HtmlUtil.formTableClose());
 
 
-        formBuffer.append(getRepository().makeShowHideBlock(request, "search.basic",msg("Basic"),basicSB,true));
-        formBuffer.append(getRepository().makeShowHideBlock(request, "search.advanced",msg("Advanced"),advancedSB,false));
+        formBuffer.append(getRepository().makeShowHideBlock(request,
+                "search.basic", msg("Basic"), basicSB, true));
+        formBuffer.append(getRepository().makeShowHideBlock(request,
+                "search.advanced", msg("Advanced"), advancedSB, false));
     }
 
 
@@ -1229,24 +1275,34 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-    protected List<Clause> assembleWhereClause(Request request) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Clause> assembleWhereClause(Request request)
+            throws Exception {
 
         List<Clause> where = new ArrayList<Clause>();
 
 
         if (request.defined(ARG_RESOURCE)) {
-            addOrClause(COL_ENTRIES_RESOURCE, request.getString(ARG_RESOURCE, ""),
-                        where);
+            addOrClause(COL_ENTRIES_RESOURCE,
+                        request.getString(ARG_RESOURCE, ""), where);
         }
 
         if (request.defined(ARG_DATATYPE)) {
-            addOrClause(COL_ENTRIES_DATATYPE, request.getString(ARG_DATATYPE, ""),
-                  where);
+            addOrClause(COL_ENTRIES_DATATYPE,
+                        request.getString(ARG_DATATYPE, ""), where);
         }
 
         if (request.defined(ARG_USER_ID)) {
-            addOrClause(COL_ENTRIES_USER_ID, request.getString(ARG_USER_ID, ""),
-                        where);
+            addOrClause(COL_ENTRIES_USER_ID,
+                        request.getString(ARG_USER_ID, ""), where);
         }
 
         if (request.defined(ARG_GROUP)) {
@@ -1280,10 +1336,9 @@ public class TypeHandler extends RepositoryManager {
                                      ? Clause.neq(
                                          COL_ENTRIES_PARENT_GROUP_ID,
                                          group.getId())
-                                     : Clause.eq(
-                                         COL_ENTRIES_PARENT_GROUP_ID,
-                                        group.getId()));
-                    where.add(Clause.or(sub,equals));
+                                     : Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                         group.getId()));
+                    where.add(Clause.or(sub, equals));
                 } else {
                     if (doNot) {
                         where.add(Clause.neq(COL_ENTRIES_PARENT_GROUP_ID,
@@ -1343,7 +1398,7 @@ public class TypeHandler extends RepositoryManager {
             if (includeNonGeo) {
                 areaExpr = Clause.or(areaExpr,
                                      Clause.eq(COL_ENTRIES_SOUTH,
-                                               new Double(Entry.NONGEO)));
+                                         new Double(Entry.NONGEO)));
             }
             where.add(areaExpr);
             //            System.err.println (areaExpr);
@@ -1457,11 +1512,11 @@ public class TypeHandler extends RepositoryManager {
 
         String name = (String) request.getString(ARG_TEXT, "").trim();
         if (name.length() > 0) {
-            if(!request.get(ARG_EXACT, false)) {
-                List tmp = StringUtil.split(name,",",true,true);
-                name = "%" + StringUtil.join("%,%", tmp) +"%";
+            if ( !request.get(ARG_EXACT, false)) {
+                List tmp = StringUtil.split(name, ",", true, true);
+                name = "%" + StringUtil.join("%,%", tmp) + "%";
             }
-            List<Clause> ors = new ArrayList<Clause>();
+            List<Clause> ors       = new ArrayList<Clause>();
             boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
             if (searchMetadata) {
                 List<Clause> metadataOrs = new ArrayList<Clause>();
@@ -1469,8 +1524,9 @@ public class TypeHandler extends RepositoryManager {
                 metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR2, name));
                 metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR3, name));
                 metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR4, name));
-                ors.add(Clause.and(Clause.or(metadataOrs), 
-                                      Clause.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID)));
+                ors.add(Clause.and(Clause.or(metadataOrs),
+                                   Clause.eq(COL_METADATA_ENTRY_ID,
+                                             COL_ENTRIES_ID)));
             } else {
                 ors.add(Clause.makeOrSplit(COL_ENTRIES_NAME, name));
                 ors.add(Clause.makeOrSplit(COL_ENTRIES_DESCRIPTION, name));
@@ -1607,7 +1663,17 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    protected boolean addOrClause(String column, String value, List<Clause> clauses) {
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param value _more_
+     * @param clauses _more_
+     *
+     * @return _more_
+     */
+    protected boolean addOrClause(String column, String value,
+                                  List<Clause> clauses) {
         if ((value != null) && (value.trim().length() > 0)
                 && !value.toLowerCase().equals("all")) {
             clauses.add(Clause.makeOrSplit(column, value));

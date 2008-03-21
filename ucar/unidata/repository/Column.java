@@ -111,8 +111,10 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_NAME = "name";
 
+    /** _more_          */
     private static final String ATTR_GROUP = "group";
 
+    /** _more_          */
     private static final String ATTR_OLDNAMES = "oldnames";
 
     /** _more_ */
@@ -164,8 +166,10 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String name;
 
+    /** _more_          */
     private String group;
 
+    /** _more_          */
     private List oldNames;
 
     /** _more_ */
@@ -228,10 +232,11 @@ public class Column implements Tables, Constants {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
-        group            = XmlUtil.getAttribute(element, ATTR_GROUP,(String)null);
-        oldNames         = StringUtil.split(XmlUtil.getAttribute(element, ATTR_OLDNAMES,""), ",",true, true);
-        suffix           = XmlUtil.getAttribute(element, ATTR_SUFFIX, "");
-        label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
+        group = XmlUtil.getAttribute(element, ATTR_GROUP, (String) null);
+        oldNames = StringUtil.split(XmlUtil.getAttribute(element,
+                ATTR_OLDNAMES, ""), ",", true, true);
+        suffix = XmlUtil.getAttribute(element, ATTR_SUFFIX, "");
+        label  = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
         propertiesFile = XmlUtil.getAttribute(element, ATTR_PROPERTIES,
@@ -438,8 +443,19 @@ public class Column implements Tables, Constants {
     }
 
 
-    private void defineColumn(Statement statement, String name, String type)  throws Exception {
-        String sql = "alter table " + getTableName() + " add column " +  name + " " + type;
+    /**
+     * _more_
+     *
+     * @param statement _more_
+     * @param name _more_
+     * @param type _more_
+     *
+     * @throws Exception _more_
+     */
+    private void defineColumn(Statement statement, String name, String type)
+            throws Exception {
+        String sql = "alter table " + getTableName() + " add column " + name
+                     + " " + type;
         SqlUtil.loadSql(sql, statement, true);
     }
 
@@ -447,28 +463,38 @@ public class Column implements Tables, Constants {
     /**
      * _more_
      *
+     *
+     * @param statement _more_
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public void createTable(Statement statement)  throws Exception {
-        
+    public void createTable(Statement statement) throws Exception {
+
 
         if (type.equals(TYPE_STRING)) {
-            defineColumn(statement, name,  "varchar(" + size + ") ");
+            defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_ENUMERATION)) {
-            defineColumn(statement, name,  "varchar(" + size + ") ");
+            defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_INT)) {
-            defineColumn(statement, name,  "int");
+            defineColumn(statement, name, "int");
         } else if (type.equals(TYPE_DOUBLE)) {
-            defineColumn(statement, name,  typeHandler.getRepository().getDatabaseManager()
-                         .convertType("double"));
+            defineColumn(
+                statement, name,
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
         } else if (type.equals(TYPE_BOOLEAN)) {
             //use int as boolean for database compatibility
-            defineColumn(statement, name,  "int");
+            defineColumn(statement, name, "int");
         } else if (type.equals(TYPE_LATLON)) {
-            defineColumn(statement, name+"_lat", typeHandler.getRepository().getDatabaseManager()
-                         .convertType("double")); 
-            defineColumn(statement, name+"_lon", typeHandler.getRepository().getDatabaseManager()
-                         .convertType("double")); 
+            defineColumn(
+                statement, name + "_lat",
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
+            defineColumn(
+                statement, name + "_lon",
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "double"));
 
         } else {
             throw new IllegalArgumentException("Unknown column type:" + type
@@ -476,17 +502,19 @@ public class Column implements Tables, Constants {
         }
 
 
-        for(int i=0;i<oldNames.size();i++) {
-            String sql = "update " + getTableName() + " set " + name + " = " + oldNames.get(i);
+        for (int i = 0; i < oldNames.size(); i++) {
+            String sql = "update " + getTableName() + " set " + name + " = "
+                         + oldNames.get(i);
             SqlUtil.loadSql(sql, statement, true);
-            sql = "alter table " + getTableName() + " drop " + oldNames.get(i);
+            sql = "alter table " + getTableName() + " drop "
+                  + oldNames.get(i);
             SqlUtil.loadSql(sql, statement, true);
         }
 
         if (isIndex) {
             SqlUtil.loadSql("CREATE INDEX " + getTableName() + "_INDEX_"
-                            + name + "  ON " + getTableName() + " ("
-                            + name + ")", statement, true);
+                            + name + "  ON " + getTableName() + " (" + name
+                            + ")", statement, true);
         }
 
     }
@@ -515,6 +543,11 @@ public class Column implements Tables, Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTableName() {
         return typeHandler.getTableName();
     }
@@ -522,6 +555,14 @@ public class Column implements Tables, Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param where _more_
+     *
+     * @throws Exception _more_
+     */
     protected void assembleWhereClause(Request request, List<Clause> where)
             throws Exception {
         String id = getFullName();
@@ -577,7 +618,7 @@ public class Column implements Tables, Constants {
             String value = request.getString(id, "");
             typeHandler.addOrClause(getFullName(),
                                     (String) request.getString(getFullName(),
-                                                               (String) null), where);
+                                        (String) null), where);
 
         }
 
@@ -624,18 +665,23 @@ public class Column implements Tables, Constants {
      * @param request _more_
      * @param formBuffer _more_
      * @param entry _more_
+     * @param state _more_
      *
      * @throws Exception _more_
      */
     public void addToEntryForm(Request request, StringBuffer formBuffer,
-                               Entry entry,Hashtable state)
+                               Entry entry, Hashtable state)
             throws Exception {
         String widget = getFormWidget(request, entry);
         //        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
         //                                             HtmlUtil.hbox(widget, suffix)));
-        if(group!=null && state.get(group)==null) {
-            formBuffer.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.div(group," class=\"formgroupheader\" "),2)));
-            state.put(group,group);
+        if ((group != null) && (state.get(group) == null)) {
+            formBuffer.append(
+                HtmlUtil.row(
+                    HtmlUtil.colspan(
+                        HtmlUtil.div(group, " class=\"formgroupheader\" "),
+                        2)));
+            state.put(group, group);
         }
 
         formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
@@ -644,8 +690,17 @@ public class Column implements Tables, Constants {
     }
 
 
-    public String getFormWidget(Request request, 
-                            Entry entry)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getFormWidget(Request request, Entry entry)
             throws Exception {
         String   widget = "";
         Object[] values = ((entry == null)
@@ -781,8 +836,8 @@ public class Column implements Tables, Constants {
         }
 
 
-        List<Clause>   tmp    = new ArrayList<Clause>(where);
-        String widget = "";
+        List<Clause> tmp    = new ArrayList<Clause>(where);
+        String       widget = "";
         if (type.equals(TYPE_LATLON)) {
             widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
         } else if (type.equals(TYPE_BOOLEAN)) {
@@ -802,7 +857,8 @@ public class Column implements Tables, Constants {
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 long t1 = System.currentTimeMillis();
                 Statement stmt = typeHandler.select(request,
-                                     SqlUtil.distinct(getFullName()), tmp,"");
+                                     SqlUtil.distinct(getFullName()), tmp,
+                                     "");
                 long     t2     = System.currentTimeMillis();
                 String[] values = SqlUtil.readString(stmt, 1);
                 long     t3     = System.currentTimeMillis();

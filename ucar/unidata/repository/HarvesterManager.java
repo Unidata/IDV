@@ -25,8 +25,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.Clause;
+
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -73,7 +74,7 @@ import java.util.Properties;
 public class HarvesterManager extends RepositoryManager {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_HARVESTER_ID = "harvester.id";
 
     /** _more_ */
@@ -85,12 +86,12 @@ public class HarvesterManager extends RepositoryManager {
                                                 "/harvesters/list",
                                                 "Harvesters");
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_HARVESTERS_NEW = new RequestUrl(this,
                                                "/harvesters/new");
 
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_HARVESTERS_EDIT = new RequestUrl(this,
                                                 "/harvesters/edit");
 
@@ -99,7 +100,7 @@ public class HarvesterManager extends RepositoryManager {
     /** _more_ */
     private List<Harvester> harvesters = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable harvesterMap = new Hashtable();
 
     /**
@@ -159,9 +160,10 @@ public class HarvesterManager extends RepositoryManager {
         harvesters = new ArrayList<Harvester>();
 
 
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().select(COLUMNS_HARVESTERS,
-                                                            TABLE_HARVESTERS, new Clause()));;
+        SqlUtil.Iterator iter = SqlUtil.getIterator(
+                                    getDatabaseManager().select(
+                                        COLUMNS_HARVESTERS, TABLE_HARVESTERS,
+                                        new Clause()));;
         ResultSet results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -297,21 +299,22 @@ public class HarvesterManager extends RepositoryManager {
         if (request.exists(ARG_DELETE_CONFIRM)) {
             harvesterMap.remove(harvester.getId());
             harvesters.remove(harvester);
-            SqlUtil.delete(getConnection(),TABLE_HARVESTERS,
+            SqlUtil.delete(getConnection(), TABLE_HARVESTERS,
                            Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
             return new Result(request.url(URL_HARVESTERS_LIST));
         } else if (request.exists(ARG_DELETE)) {
             sb.append(
                 getRepository().question(
-                                         msg("Are you sure you want to delete the harvester"),
-                                         getRepository().buttons(
-                                                                 HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
-                                                                 HtmlUtil.submit(msg("Cancel"), ARG_CANCEL_DELETE))));
+                    msg("Are you sure you want to delete the harvester"),
+                    getRepository().buttons(
+                        HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+                        HtmlUtil.submit(msg("Cancel"), ARG_CANCEL_DELETE))));
         } else {
             if (request.exists(ARG_CHANGE)) {
                 harvester.applyEditForm(request);
-                SqlUtil.delete(getConnection(),TABLE_HARVESTERS,
-                               Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
+                SqlUtil.delete(getConnection(), TABLE_HARVESTERS,
+                               Clause.eq(COL_HARVESTERS_ID,
+                                         harvester.getId()));
                 getDatabaseManager().executeInsert(INSERT_HARVESTERS,
                         new Object[] { harvester.getId(),
                                        harvester.getClass().getName(),

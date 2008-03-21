@@ -263,7 +263,7 @@ public class ActionManager extends RepositoryManager {
                               String name, String continueHtml) {
         Object actionId = runAction(runnable, name, continueHtml);
         return new Result(request.url(URL_STATUS, ARG_ACTION_ID,
-                                       "" + actionId));
+                                      "" + actionId));
     }
 
 

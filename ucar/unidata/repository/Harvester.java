@@ -125,7 +125,7 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private boolean active = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean activeOnStart = false;
 
     /** _more_ */
@@ -135,13 +135,13 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isEditable = false;
 
     /** _more_ */
     protected TypeHandler typeHandler;
 
-    /** _more_          */
+    /** _more_ */
     private String error;
 
 

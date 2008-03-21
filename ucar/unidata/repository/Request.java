@@ -109,6 +109,7 @@ public class Request implements Constants {
     /** _more_ */
     private String ip;
 
+    /** _more_          */
     private Entry collectionEntry;
 
     /**
@@ -128,66 +129,186 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String entryUrl(RequestUrl theUrl, Entry entry) {
-        if(entry.isTopGroup()) {
+        if (entry.isTopGroup()) {
             return HtmlUtil.url(theUrl.toString(), ARG_ID, entry.getId());
         }
         Group collectionGroup = entry.getCollectionGroup();
         //This should always be true (?)
-        if(collectionGroup!=null) {
-            String collectionPath = repository.getPathFromEntry(collectionGroup);
-            return HtmlUtil.url(theUrl.getUrl(collectionPath), ARG_ID, entry.getId());
+        if (collectionGroup != null) {
+            String collectionPath =
+                repository.getPathFromEntry(collectionGroup);
+            return HtmlUtil.url(theUrl.getUrl(collectionPath), ARG_ID,
+                                entry.getId());
         }
 
-        return url(theUrl,ARG_ID, entry.getId());
+        return url(theUrl, ARG_ID, entry.getId());
     }
 
-    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1, String value1) {
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
+     * @param arg1 _more_
+     * @param value1 _more_
+     *
+     * @return _more_
+     */
+    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
+                           String value1) {
         return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1);
     }
 
-    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1, String value1, String arg2, String value2) {
-        return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1,arg2,value2);
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
+     * @param arg1 _more_
+     * @param value1 _more_
+     * @param arg2 _more_
+     * @param value2 _more_
+     *
+     * @return _more_
+     */
+    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
+                           String value1, String arg2, String value2) {
+        return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1, arg2,
+                            value2);
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     *
+     * @return _more_
+     */
     public String url(RequestUrl theUrl) {
-        if(collectionEntry!=null) {
-            String collectionPath = repository.getPathFromEntry(collectionEntry);
+        if (collectionEntry != null) {
+            String collectionPath =
+                repository.getPathFromEntry(collectionEntry);
             return theUrl.getUrl(collectionPath);
         }
         return theUrl.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     *
+     * @return _more_
+     */
     public String form(RequestUrl theUrl) {
         return HtmlUtil.form(url(theUrl));
     }
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public String form(RequestUrl theUrl, String extra) {
         return HtmlUtil.form(url(theUrl), extra);
     }
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     *
+     * @return _more_
+     */
     public String uploadForm(RequestUrl theUrl) {
-        return HtmlUtil.uploadForm(url(theUrl),"");
+        return HtmlUtil.uploadForm(url(theUrl), "");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param arg1 _more_
+     * @param value1 _more_
+     *
+     * @return _more_
+     */
     public String url(RequestUrl theUrl, String arg1, String value1) {
         return HtmlUtil.url(url(theUrl), arg1, value1);
     }
 
-    public String url(RequestUrl theUrl, String arg1, String value1, String arg2, String value2) {
-        return HtmlUtil.url(url(theUrl), arg1, value1, arg2,value2);
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param arg1 _more_
+     * @param value1 _more_
+     * @param arg2 _more_
+     * @param value2 _more_
+     *
+     * @return _more_
+     */
+    public String url(RequestUrl theUrl, String arg1, String value1,
+                      String arg2, String value2) {
+        return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2);
     }
 
-    public String url(RequestUrl theUrl, String arg1, String value1, String arg2, String value2, String arg3, String value3) {
-        return HtmlUtil.url(url(theUrl), arg1, value1, arg2,value2,arg3, value3);
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param arg1 _more_
+     * @param value1 _more_
+     * @param arg2 _more_
+     * @param value2 _more_
+     * @param arg3 _more_
+     * @param value3 _more_
+     *
+     * @return _more_
+     */
+    public String url(RequestUrl theUrl, String arg1, String value1,
+                      String arg2, String value2, String arg3,
+                      String value3) {
+        return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
+                            value3);
     }
 
-    public String url(RequestUrl theUrl, String arg1, String value1, String arg2, String value2, String arg3, String value3, String arg4, String value4) {
-        return HtmlUtil.url(url(theUrl), arg1, value1, arg2,value2,arg3, value3, arg4, value4);
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param arg1 _more_
+     * @param value1 _more_
+     * @param arg2 _more_
+     * @param value2 _more_
+     * @param arg3 _more_
+     * @param value3 _more_
+     * @param arg4 _more_
+     * @param value4 _more_
+     *
+     * @return _more_
+     */
+    public String url(RequestUrl theUrl, String arg1, String value1,
+                      String arg2, String value2, String arg3, String value3,
+                      String arg4, String value4) {
+        return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
+                            value3, arg4, value4);
     }
 
 
@@ -237,6 +358,7 @@ public class Request implements Constants {
         return (String) fileUploads.get(arg);
     }
 
+    /** _more_          */
     public StringBuffer tmp = new StringBuffer();
 
     /**
@@ -901,6 +1023,7 @@ public class Request implements Constants {
         return type + "url args:" + getUrlArgs();  // + "\n\theader args:"               + httpHeaderArgs;
     }
 
+    /** _more_          */
     private boolean sessionIdWasSet = false;
 
     /**
@@ -909,10 +1032,15 @@ public class Request implements Constants {
      * @param value The new value for SessionId
      */
     public void setSessionId(String value) {
-        sessionId = value;
+        sessionId       = value;
         sessionIdWasSet = true;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getSessionIdWasSet() {
         return sessionIdWasSet;
     }
@@ -969,21 +1097,21 @@ public class Request implements Constants {
 
 
     /**
-       Set the CollectionEntry property.
-
-       @param value The new value for CollectionEntry
-    **/
-    public void setCollectionEntry (Entry value) {
-	collectionEntry = value;
+     *  Set the CollectionEntry property.
+     *
+     *  @param value The new value for CollectionEntry
+     */
+    public void setCollectionEntry(Entry value) {
+        collectionEntry = value;
     }
 
     /**
-       Get the CollectionEntry property.
-
-       @return The CollectionEntry
-    **/
-    public Entry getCollectionEntry () {
-	return collectionEntry;
+     *  Get the CollectionEntry property.
+     *
+     *  @return The CollectionEntry
+     */
+    public Entry getCollectionEntry() {
+        return collectionEntry;
     }
 
 

@@ -302,13 +302,13 @@ public class ImageOutputHandler extends OutputHandler {
                 if ( !entry.getResource().isImage()) {
                     continue;
                 }
-                String url = HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                          + entry.getName(), ARG_ID,
-                                              entry.getId());
-                String thumburl = HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                      + entry.getName(), ARG_ID,
-                                          entry.getId(), ARG_IMAGEWIDTH,
-                                          "" + 50);
+                String url =
+                    HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
+                                 + entry.getName(), ARG_ID, entry.getId());
+                String thumburl =
+                    HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
+                                 + entry.getName(), ARG_ID, entry.getId(),
+                                     ARG_IMAGEWIDTH, "" + 50);
                 String entryUrl = getEntryUrl(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
                 String title = entry.getTypeHandler().getEntryContent(entry,
@@ -376,6 +376,8 @@ public class ImageOutputHandler extends OutputHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
@@ -384,16 +386,16 @@ public class ImageOutputHandler extends OutputHandler {
         if ( !entry.getResource().isImage()) {
             if (entry.hasAreaDefined()) {
                 return request.url(repository.URL_GETMAP, ARG_SOUTH,
-                                    "" + entry.getSouth(), ARG_WEST,
-                                    "" + entry.getWest(), ARG_NORTH,
-                                    "" + entry.getNorth(), ARG_EAST,
-                                    "" + entry.getEast());
+                                   "" + entry.getSouth(), ARG_WEST,
+                                   "" + entry.getWest(), ARG_NORTH,
+                                   "" + entry.getNorth(), ARG_EAST,
+                                   "" + entry.getEast());
             }
             return null;
         }
 
-        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/" + entry.getName(),
-                            ARG_ID, entry.getId());
+        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
+                            + entry.getName(), ARG_ID, entry.getId());
     }
 
 }

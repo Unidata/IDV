@@ -92,7 +92,7 @@ public class GroupTypeHandler extends TypeHandler {
                                            Permission.ACTION_NEW)) {
             links.add(
                 new Link(
-                         request.url(
+                    request.url(
                         getRepository().URL_ENTRY_NEW, ARG_GROUP,
                         entry.getId()), getRepository().fileUrl(ICON_NEW),
                                         "New Entry or Group"));
@@ -100,7 +100,7 @@ public class GroupTypeHandler extends TypeHandler {
 
         links.add(
             new Link(
-                     request.url(
+                request.url(
                     getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
                     entry.getId()), getRepository().fileUrl(ICON_SEARCH),
                                     "Search in Group"));

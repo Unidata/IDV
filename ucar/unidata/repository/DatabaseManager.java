@@ -25,13 +25,13 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.sql.Clause;
-import ucar.unidata.sql.SqlUtil;
-
 
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
+
+import ucar.unidata.sql.Clause;
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -430,11 +430,18 @@ public class DatabaseManager extends RepositoryManager {
         return sql;
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public String escapeString(String value) {
         if (db.equals(DB_MYSQL)) {
-            value = value.replace("'","\\'");
+            value = value.replace("'", "\\'");
         } else {
-            value = value.replace("'","''");
+            value = value.replace("'", "''");
         }
         return value;
     }
@@ -498,26 +505,89 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-    public  Statement select(String what, String table, Clause clause,String extra) throws Exception {
-        return SqlUtil.select(getConnection(),what, Misc.newList(table), new Clause[]{clause},extra);
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param table _more_
+     * @param clause _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement select(String what, String table, Clause clause,
+                            String extra)
+            throws Exception {
+        return SqlUtil.select(getConnection(), what, Misc.newList(table),
+                              new Clause[] { clause }, extra);
     }
 
 
-    public  Statement select(String what, String table, Clause clause) throws Exception {
-        return select(what, Misc.newList(table), new Clause[]{clause});
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param table _more_
+     * @param clause _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement select(String what, String table, Clause clause)
+            throws Exception {
+        return select(what, Misc.newList(table), new Clause[] { clause });
     }
 
 
-    public  Statement select(String what, String table, Clause[]clauses) throws Exception {
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param table _more_
+     * @param clauses _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement select(String what, String table, Clause[] clauses)
+            throws Exception {
         return select(what, Misc.newList(table), clauses);
     }
 
 
-    public  Statement select(String what, String table, List<Clause>clauses) throws Exception {
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param table _more_
+     * @param clauses _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement select(String what, String table, List<Clause> clauses)
+            throws Exception {
         return select(what, Misc.newList(table), Clause.toArray(clauses));
     }
 
-    public  Statement select(String what, List tables, Clause[]clauses) throws Exception {
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param tables _more_
+     * @param clauses _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement select(String what, List tables, Clause[] clauses)
+            throws Exception {
         return SqlUtil.select(getConnection(), what, tables, clauses);
     }
 

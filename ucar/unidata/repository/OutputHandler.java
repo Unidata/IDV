@@ -120,7 +120,19 @@ public class OutputHandler extends RepositoryManager {
         this(repository);
     }
 
-    public void showNext(Request request, List<Group> subGroups, List<Entry> entries,  StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void showNext(Request request, List<Group> subGroups,
+                         List<Entry> entries, StringBuffer sb)
+            throws Exception {
         int cnt = subGroups.size() + entries.size();
         int max = request.get(ARG_MAX, Repository.MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
@@ -294,30 +306,65 @@ public class OutputHandler extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     protected String getAjaxLink(Request request, Entry entry) {
-        return getAjaxLink(request, entry, entry.getLabel(),true);
+        return getAjaxLink(request, entry, entry.getLabel(), true);
     }
 
-    protected String getAjaxLink(Request request, Entry entry, String linkText, boolean includeIcon) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param linkText _more_
+     * @param includeIcon _more_
+     *
+     * @return _more_
+     */
+    protected String getAjaxLink(Request request, Entry entry,
+                                 String linkText, boolean includeIcon) {
         StringBuffer sb = new StringBuffer();
-        if(includeIcon) {
+        if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
-            String icon = (entry.isGroup()?getRepository().fileUrl(ICON_FOLDER_CLOSED):getRepository().fileUrl(ICON_FILE));
-            String dropEvent =   HtmlUtil.onMouseUp("mouseUpOnEntry(event,'" + entry.getId()+"')");
-            String event = (entry.isGroup()?
-                            HtmlUtil.onMouseClick("folderClick('" + entry.getId() +"')") : "");
-            
-            if(okToMove) {
-                event += 
-                    (entry.isGroup()?HtmlUtil.onMouseOver("mouseOverOnEntry(event,'" + entry.getId() +"')"):"") + 
-                    HtmlUtil.onMouseOut("mouseOutOnEntry(event,'" + entry.getId() +"')") + 
-                    HtmlUtil.onMouseDown("mouseDownOnEntry(event,'" + entry.getId() +"','" + entry.getLabel().replace("'","") +"');") + 
-                    (entry.isGroup()?dropEvent:"");
+            String  icon     = (entry.isGroup()
+                                ? getRepository().fileUrl(ICON_FOLDER_CLOSED)
+                                : getRepository().fileUrl(ICON_FILE));
+            String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
+                                   + entry.getId() + "')");
+            String event = (entry.isGroup()
+                            ? HtmlUtil.onMouseClick("folderClick('"
+                                + entry.getId() + "')")
+                            : "");
+
+            if (okToMove) {
+                event += (entry.isGroup()
+                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,'"
+                          + entry.getId() + "')")
+                          : "") + HtmlUtil.onMouseOut(
+                              "mouseOutOnEntry(event,'" + entry.getId()
+                              + "')") + HtmlUtil.onMouseDown(
+                                  "mouseDownOnEntry(event,'" + entry.getId()
+                                  + "','" + entry.getLabel().replace("'", "")
+                                  + "');") + (entry.isGroup()
+                        ? dropEvent
+                        : "");
             }
 
 
-            String img = HtmlUtil.img(icon,(entry.isGroup()?"Click to open group; ":"") + (okToMove?"Drag to move":"") ," id=" + HtmlUtil.quote("img_" +entry.getId()) + event); 
-            if(entry.isGroup()) {
+            String img = HtmlUtil.img(icon, (entry.isGroup()
+                                             ? "Click to open group; "
+                                             : "") + (okToMove
+                    ? "Drag to move"
+                    : ""), " id=" + HtmlUtil.quote("img_" + entry.getId())
+                           + event);
+            if (entry.isGroup()) {
                 //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
                 sb.append(img);
             } else {
@@ -325,16 +372,20 @@ public class OutputHandler extends RepositoryManager {
             }
             sb.append(HtmlUtil.space(1));
         }
-        String elementId =  entry.getId();
+        String elementId = entry.getId();
         sb.append(
             HtmlUtil.href(
-                          request.entryUrl(
-                                       getRepository().URL_ENTRY_SHOW, entry), linkText,
-                          " id=" + HtmlUtil.quote(elementId) +" " +
-                          HtmlUtil.onMouseOver("tooltip.show(event,'" + elementId +"');") + 
-                          HtmlUtil.onMouseOut("tooltip.hide(event,'" + elementId +"');")));
-        
-        return HtmlUtil.span(sb.toString(), " id=" + HtmlUtil.quote("span_" + entry.getId()));
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
+                linkText,
+                " id=" + HtmlUtil.quote(elementId) + " "
+                + HtmlUtil.onMouseOver(
+                    "tooltip.show(event,'" + elementId
+                    + "');") + HtmlUtil.onMouseOut(
+                        "tooltip.hide(event,'" + elementId + "');")));
+
+        return HtmlUtil.span(sb.toString(),
+                             " id="
+                             + HtmlUtil.quote("span_" + entry.getId()));
     }
 
 
@@ -351,18 +402,19 @@ public class OutputHandler extends RepositoryManager {
     public List<Link> getNextPrevLinks(Request request, Entry entry,
                                        String output) {
         List<Link> links = new ArrayList<Link>();
-        links.add(new Link(request.entryUrl(
-                                            getRepository().URL_ENTRY_SHOW, 
-                                            entry, ARG_OUTPUT, output,
-                                            ARG_PREVIOUS, "true"), getRepository().fileUrl(ICON_LEFT),
-                           msg("View Previous Entry")));
+        links.add(
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    output, ARG_PREVIOUS, "true"), getRepository().fileUrl(
+                        ICON_LEFT), msg("View Previous Entry")));
 
-        links.add(new Link(
-                           request.entryUrl(
-                                            getRepository().URL_ENTRY_SHOW, 
-                                            entry, ARG_OUTPUT, output,
-                                            ARG_NEXT, "true"), getRepository().fileUrl(ICON_RIGHT), 
-                           msg("View Next Entry")));
+        links.add(
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    output, ARG_NEXT, "true"), getRepository().fileUrl(
+                        ICON_RIGHT), msg("View Next Entry")));
         return links;
     }
 
@@ -415,18 +467,20 @@ public class OutputHandler extends RepositoryManager {
      * @param dfltSelected _more_
      * @param showCrumbs _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
-    public String  getEntryHtml(StringBuffer sb, List<Entry> entries,
-                             Request request, boolean doForm,
-                             boolean dfltSelected, boolean showCrumbs)
+    public String getEntryHtml(StringBuffer sb, List<Entry> entries,
+                               Request request, boolean doForm,
+                               boolean dfltSelected, boolean showCrumbs)
             throws Exception {
 
         String link = "";
         if (doForm) {
             StringBuffer formSB = new StringBuffer();
             formSB.append(request.form(getRepository().URL_GETENTRIES,
-                                    "getentries"));
+                                       "getentries"));
             //            formSB.append(HtmlUtil.space(1));
             List outputList =
                 getRepository().getOutputTypesForEntries(request, entries);
@@ -437,21 +491,29 @@ public class OutputHandler extends RepositoryManager {
             formSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
             formSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
-            String arrowImg = HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),"Show/Hide Form"," id=\"entryformimg\" ");
-            link = HtmlUtil.space(2) + HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleEntryForm()"), arrowImg);
-            sb.append(HtmlUtil.span(formSB.toString()," id = \"entryform\" "));
-            sb.append("<ul class=\"folderblock\" style=\"list-style-image : url("
-                      + getRepository().fileUrl(ICON_BLANK) + ")\">");
+            String arrowImg =
+                HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),
+                             "Show/Hide Form", " id=\"entryformimg\" ");
+            link = HtmlUtil.space(2)
+                   + HtmlUtil.jsLink(
+                       HtmlUtil.onMouseClick("toggleEntryForm()"), arrowImg);
+            sb.append(HtmlUtil.span(formSB.toString(),
+                                    " id = \"entryform\" "));
+            sb.append(
+                "<ul class=\"folderblock\" style=\"list-style-image : url("
+                + getRepository().fileUrl(ICON_BLANK) + ")\">");
         }
         String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
-        int cnt = 0;
+        int    cnt = 0;
         for (Entry entry : entries) {
             sb.append("<li>");
             if (doForm) {
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                sb.append(HtmlUtil.span(
-                                        HtmlUtil.checkbox("entry_" + entry.getId(), "true",
-                                                          dfltSelected)," id=\"entryform" + (cnt++)+"\" "));
+                sb.append(
+                    HtmlUtil.span(
+                        HtmlUtil.checkbox(
+                            "entry_" + entry.getId(), "true",
+                            dfltSelected), " id=\"entryform" + (cnt++) + "\" "));
             }
 
             if (showCrumbs) {
@@ -462,15 +524,17 @@ public class OutputHandler extends RepositoryManager {
 
                 sb.append(crumbs);
             } else {
-                sb.append(getAjaxLink(request,  entry, entry.getLabel(), true));
-                          //                sb.append(getEntryUrl(request, entry));
+                sb.append(getAjaxLink(request, entry, entry.getLabel(),
+                                      true));
+                //                sb.append(getEntryUrl(request, entry));
             }
             //            sb.append(HtmlUtil.br());
         }
         if (doForm) {
             sb.append("</ul>");
             sb.append(HtmlUtil.formClose());
-            sb.append("\n<SCRIPT LANGUAGE=\"JavaScript\">toggleEntryForm();</script>\n"); 
+            sb.append(
+                "\n<SCRIPT LANGUAGE=\"JavaScript\">toggleEntryForm();</script>\n");
         }
         return link;
     }
@@ -481,12 +545,14 @@ public class OutputHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
      */
     protected String getEntryUrl(Request request, Entry entry) {
-        return getAjaxLink(request,  entry, entry.getLabel(), false);
+        return getAjaxLink(request, entry, entry.getLabel(), false);
     }
 
     /**

@@ -673,8 +673,8 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
-                request.url(repository.URL_ENTRY_SHOW, ARG_ID,
-                             group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
+                request.url(repository.URL_ENTRY_SHOW, ARG_ID, group.getId(),
+                            ARG_OUTPUT, OUTPUT_CATALOG);
 
             Element ref = XmlUtil.create(catalogInfo.doc, TAG_CATALOGREF,
                                          parent,
@@ -741,13 +741,13 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     private static class CatalogInfo {
 
-        /** _more_          */
+        /** _more_ */
         Document doc;
 
-        /** _more_          */
+        /** _more_ */
         Hashtable serviceMap;
 
-        /** _more_          */
+        /** _more_ */
         Element root;
 
         /**

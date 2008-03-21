@@ -245,7 +245,7 @@ public class Result {
      * @return _more_
      */
     public boolean isHtml() {
-        return mimeType!=null && mimeType.equals(TYPE_HTML);
+        return (mimeType != null) && mimeType.equals(TYPE_HTML);
     }
 
     /**

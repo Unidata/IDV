@@ -55,11 +55,12 @@ public class AdminMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static  Metadata.Type TYPE_TEMPLATE =  new Metadata.Type("admin.template",
-                                                                    "Page Template");
+    public static Metadata.Type TYPE_TEMPLATE =
+        new Metadata.Type("admin.template", "Page Template");
 
-    public static  Metadata.Type TYPE_CONTENTTEMPLATE =  new Metadata.Type("admin.contenttemplate",
-                                                                           "Content Template");
+    /** _more_          */
+    public static Metadata.Type TYPE_CONTENTTEMPLATE =
+        new Metadata.Type("admin.contenttemplate", "Content Template");
 
 
 
@@ -78,14 +79,29 @@ public class AdminMetadataHandler extends MetadataHandler {
     }
 
 
-    private List<Metadata.Type> dummyTypeList = new ArrayList<Metadata.Type>();
+    /** _more_          */
+    private List<Metadata.Type> dummyTypeList =
+        new ArrayList<Metadata.Type>();
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public List<Metadata.Type> getTypes(Request request) {
-        if(request.getUser().getAdmin()) 
+        if (request.getUser().getAdmin()) {
             return super.getTypes(request);
+        }
         return dummyTypeList;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getHandlerGroupName() {
         return "Admin";
     }
@@ -101,9 +117,9 @@ public class AdminMetadataHandler extends MetadataHandler {
      */
     public String[] getHtml(Metadata metadata) {
         Metadata.Type type = getType(metadata.getType());
-        String lbl= msgLabel(type.getLabel());
-        if(type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {
-            return new String[] { lbl, "Has template"};
+        String        lbl  = msgLabel(type.getLabel());
+        if (type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {
+            return new String[] { lbl, "Has template" };
         }
 
         String content = metadata.getAttr1();
@@ -146,20 +162,22 @@ public class AdminMetadataHandler extends MetadataHandler {
             cancel = "";
         }
 
-        String arg1 = ARG_ATTR1 + suffix;
+        String arg1    = ARG_ATTR1 + suffix;
         String content = "";
-        if(type.equals(TYPE_TEMPLATE)) {
+        if (type.equals(TYPE_TEMPLATE)) {
             String value = metadata.getAttr1();
-            if(!forEdit) {
+            if ( !forEdit) {
                 value = getRepository().getResource(PROP_HTML_TEMPLATE);
             }
-            value = value.replace("<","&lt;");
-            value = value.replace(">","&gt;");
-            value = value.replace("$","&#36;");
+            value = value.replace("<", "&lt;");
+            value = value.replace(">", "&gt;");
+            value = value.replace("$", "&#36;");
             String textarea = HtmlUtil.textArea(arg1, value, 20, 80);
-            content = HtmlUtil.row(HtmlUtil.colspan(submit,2)) +
-                HtmlUtil.formEntry(lbl,
-                                   "Note: must contain macro ${content}" + "<br>" +textarea);
+            content =
+                HtmlUtil.row(HtmlUtil.colspan(submit, 2))
+                + HtmlUtil.formEntry(lbl,
+                                     "Note: must contain macro ${content}"
+                                     + "<br>" + textarea);
         }
         if ( !forEdit) {
             content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));

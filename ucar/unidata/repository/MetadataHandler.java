@@ -97,6 +97,11 @@ public class MetadataHandler extends RepositoryManager {
         super(repository);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getHandlerGroupName() {
         return "Metadata";
     }
@@ -334,6 +339,8 @@ public class MetadataHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @return _more_
      */
     public List<Metadata.Type> getTypes(Request request) {

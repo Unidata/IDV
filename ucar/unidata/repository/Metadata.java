@@ -365,7 +365,7 @@ public class Metadata implements Constants, Tables {
         /** _more_ */
         String label;
 
-        /** _more_          */
+        /** _more_ */
         boolean isEnumerated = false;
 
         /**

@@ -61,11 +61,16 @@ import java.util.Properties;
  */
 public class ReportTypeHandler extends TypeHandler {
 
+    /** _more_          */
     public static final String COL_ID = "id";
+
+    /** _more_          */
     public static final String COL_CONTENT = "content";
 
+    /** _more_          */
     public static final String TAG_FIELD = "column";
 
+    /** _more_          */
     private String formTemplatePath;
 
 
@@ -125,8 +130,7 @@ public class ReportTypeHandler extends TypeHandler {
         List columnNodes = XmlUtil.findChildren(entryNode, TAG_FIELD);
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
-            Column  column = new Column(this, columnNode,
-                                        columns.size() - 1);
+            Column  column = new Column(this, columnNode, columns.size() - 1);
             columns.add(column);
         }
 
@@ -148,18 +152,29 @@ public class ReportTypeHandler extends TypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToEntryForm(Request request, StringBuffer formBuffer,
                                Entry entry)
             throws Exception {
         //        super.addToEntryForm(request, formBuffer, entry);
-        String html  = getRepository().getResource(formTemplatePath);
-        for(Column column: columns) {
+        String html = getRepository().getResource(formTemplatePath);
+        for (Column column : columns) {
             String widget = column.getFormWidget(request, entry);
-            html = html.replace("${" + column.getName() +".formwidget}", widget);
-            html = html.replace("${" + column.getName() +".label}", column.getLabel());
+            html = html.replace("${" + column.getName() + ".formwidget}",
+                                widget);
+            html = html.replace("${" + column.getName() + ".label}",
+                                column.getLabel());
         }
-        formBuffer.append(HtmlUtil.row(HtmlUtil.colspan(html,2)));
-        formBuffer.append(HtmlUtil.hidden(ARG_NAME,getLabel()));
+        formBuffer.append(HtmlUtil.row(HtmlUtil.colspan(html, 2)));
+        formBuffer.append(HtmlUtil.hidden(ARG_NAME, getLabel()));
     }
 
 

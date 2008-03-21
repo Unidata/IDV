@@ -83,19 +83,19 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAMETEMPLATE = "nametemplate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_GROUPTEMPLATE = "grouptemplate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TAGTEMPLATE = "tagtemplate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DESCTEMPLATE = "desctemplate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DATEFORMAT = "dateformat";
 
     /** _more_ */
@@ -106,7 +106,7 @@ public class PatternHarvester extends Harvester {
     public static final String ATTR_BASEGROUP = "basegroup";
 
 
-    /** _more_          */
+    /** _more_ */
     private String dateFormat = "yyyyMMdd_HHmm";
 
     /** _more_ */
@@ -675,7 +675,8 @@ public class PatternHarvester extends Harvester {
         Group group = repository.findGroupFromName(baseGroupName + "/"
                           + groupName, getUser(), true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
-        entry.initEntry(name, desc, group, group.getCollectionGroupId(),getUser(),
+        entry.initEntry(name, desc, group, group.getCollectionGroupId(),
+                        getUser(),
                         new Resource(fileName, Resource.TYPE_FILE), "",
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), values);
