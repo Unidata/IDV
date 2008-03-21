@@ -1194,7 +1194,38 @@ public class HtmlUtil {
 
 
 
+    public static String onMouseOver(String call) {
+        return " onmouseover=" + quote(call) +" ";
+    }
 
+
+    public static String onMouseOut(String call) {
+        return " onmouseout=" + quote(call) +" ";
+    }
+
+    public static String onMouseUp(String call) {
+        return " onmouseup=" + quote(call) +" ";
+    }
+
+    public static String onMouseDown(String call) {
+        return " onmousedown=" + quote(call) +" ";
+    }
+
+
+    public static String onMouseClick(String call) {
+        return " onclick=" + quote(call) +" ";
+    }
+
+
+
+    public static String jsLink(String events, String content) {
+        return jsLink(events, content, "");
+    }
+
+
+    public static String jsLink(String events, String content, String extra) {
+        return  "<a href=\"javascript:noop()\" " + events +" " + extra +">" + content +"</a>";
+    }
 
 }
 
