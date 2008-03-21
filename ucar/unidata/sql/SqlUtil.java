@@ -59,7 +59,7 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class SqlUtil {
-
+    public static boolean debug = false;
 
     /** A calendar to use */
     public static final GregorianCalendar calendar =
@@ -1379,21 +1379,75 @@ public class SqlUtil {
     }
 
 
-    public static Statement eval(Connection connection, String what, List tables, Clause[]clauses) throws Exception {
+    public static PreparedStatement getSelectStatement(Connection connection, String what, List tables, Clause clause, String extra) throws Exception {
         StringBuffer sb = new StringBuffer();
-        for(int i=0;i<clauses.length;i++) {
-            clauses[i].addClause(sb);
+        clause.addClause(sb);
+        String query = makeSelect(what, tables, sb.toString(),extra);
+        if(debug) {
+            System.err.println (query);
         }
-        String query = makeSelect(what, tables, sb.toString());
-        PreparedStatement stmt = connection.prepareStatement(query);
-        int  col = 1;
-        for(int i=0;i<clauses.length;i++) {
-            col = clauses[i].setValue(stmt,col);
+        return connection.prepareStatement(query);
+    }
+
+
+    public static Statement select(Connection connection, String what, List tables, Clause clause, String extra) throws Exception {
+        return select(connection, what, tables, clause, extra, -1);
+    }
+
+
+    public static Statement select(Connection connection, String what, List tables, Clause clause, String extra, int max) throws Exception {
+        PreparedStatement stmt = getSelectStatement(connection, what, tables, clause, extra);
+        if(max>0) {
+            stmt.setMaxRows(max);
         }
+        clause.setValue(stmt,1);
         stmt.execute();
         return stmt;
     }
 
+
+
+    public static PreparedStatement getDeleteStatement(Connection connection, String table, Clause clause) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        clause.addClause(sb);
+        String query = makeDelete(table, sb.toString());
+        return connection.prepareStatement(query);
+    }
+
+
+    public static void delete(Connection connection, String table, Clause clause) throws Exception {
+        PreparedStatement stmt = getDeleteStatement(connection, table, clause);
+        clause.setValue(stmt,1);
+        stmt.execute();
+        stmt.close();
+    }
+
+    public static Statement select(Connection connection, String what, List tables, Clause clause) throws Exception {
+        return select(connection, what, tables, clause,"");
+    }
+
+
+    public static Statement select(Connection connection, String what, List tables, Clause[]clauses) throws Exception {
+        return select(connection, what, tables, Clause.and(clauses));
+    }
+
+    public static Statement select(Connection connection, String what, List tables, Clause[]clauses, String extra) throws Exception {
+        return select(connection, what, tables, Clause.and(clauses),extra);
+    }
+
+
+
+    public static void update(Connection connection, String table, Clause clause) throws Exception {
+        /*
+        StringBuffer sb = new StringBuffer();
+        clause.addClause(sb);
+        String query = makeDelete(table, sb.toString());
+        return connection.prepareStatement(query);
+        PreparedStatement stmt = getDeleteStatement(connection, table, clause);
+        clause.setValue(stmt,1);
+        stmt.execute();
+        stmt.close();*/
+    }
 
 
 }
