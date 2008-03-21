@@ -25,7 +25,8 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 
 
 
@@ -3359,13 +3360,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             return getAccessManager().filterEntry(request, entry);
         }
 
-        String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
-                                          Misc.newList(TABLE_ENTRIES),
-                                          SqlUtil.eq(COL_ENTRIES_ID, "?"));
-        PreparedStatement entryStmt = getConnection().prepareStatement(query);
+        Statement entryStmt =    getDatabaseManager().eval(COLUMNS_ENTRIES, 
+                                                           TABLE_ENTRIES,
+                                                           new Clause[]{Clause.eq(COL_ENTRIES_ID, entryId)});
 
-        entryStmt.setString(1, entryId);
-        entryStmt.execute();
         ResultSet results = entryStmt.getResultSet();
         if ( !results.next()) {
             entryStmt.close();
@@ -4398,10 +4396,9 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     public List<Group> getTopGroups(Request request) throws Exception {
         if(topGroups!=null) return topGroups;
-        Statement statement = getDatabaseManager().execute(
-                                                           SqlUtil.makeSelect(COL_ENTRIES_ID, 
-                                                                              TABLE_ENTRIES,
-                                                                              SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID, SqlUtil.quote(topGroup.getId()))));
+        Statement statement = getDatabaseManager().eval(COL_ENTRIES_ID,
+                                                        TABLE_ENTRIES,
+                                                        new Clause[]{Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, topGroup.getId())});
         String[]  ids = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for(int i=0;i<ids.length;i++) {
@@ -5173,6 +5170,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
+
         String query = SqlUtil.makeSelect(
                            SqlUtil.comma(
                                COL_ENTRIES_ID, COL_ENTRIES_NAME,
@@ -5585,11 +5583,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected boolean tableContains(String id, String tableName,
                                     String column)
             throws Exception {
-        String query = SqlUtil.makeSelect(column, Misc.newList(tableName),
-                                          SqlUtil.eq(column,
-                                              SqlUtil.quote(id)));
-        ResultSet results =
-            getDatabaseManager().execute(query).getResultSet();
+        Statement statement = getDatabaseManager().eval(column, tableName,
+                                                        new Clause[]{Clause.eq(column, id)});
+
+        ResultSet results =statement.getResultSet();
         return results.next();
     }
 
@@ -5614,11 +5611,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (group != null) {
             return group;
         }
-        String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
-                                          Misc.newList(TABLE_ENTRIES),
-                                          SqlUtil.eq(COL_ENTRIES_ID,
-                                              SqlUtil.quote(id)));
-        Statement   statement = getDatabaseManager().execute(query);
+        Statement statement = getDatabaseManager().eval(COLUMNS_ENTRIES, TABLE_ENTRIES,
+                                                        new Clause[]{Clause.eq(COL_ENTRIES_ID, id)});
+
         List<Group> groups    = readGroups(statement);
         if (groups.size() > 0) {
             group = groups.get(0);
@@ -5716,6 +5711,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 where.add(COL_ENTRIES_PARENT_GROUP_ID + " is null");
             }
             where.add(SqlUtil.eq(COL_ENTRIES_NAME, SqlUtil.quote(lastName)));
+
 
 
             String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
@@ -6314,6 +6310,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                                    SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
                                        entry.getId() + "%"));
             Statement stmt = getDatabaseManager().execute(connection, query);
+
+
+
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
             while ((results = iter.next()) != null) {
@@ -6489,136 +6488,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     * @param connection _more_
-     * @param top _more_
-     *
-     * @throws Exception _more_
-     */
-    private void xxxdeleteEntriesInner(Request request, List<Entry> entries,
-                                       Connection connection, boolean top)
-            throws Exception {
-
-        if (top) {
-            System.err.println("before");
-            List<String[]> found = getDescendents(request, entries,
-                                       connection);
-            System.err.println("after " + found.size());
-        }
-
-
-        //Check for groups and recurse
-        List<Entry> children = new ArrayList();
-        for (Entry entry : entries) {
-            if ( !entry.isGroup()) {
-                continue;
-            }
-            Statement stmt;
-            String[] ids = SqlUtil.readString(
-                               stmt = getDatabaseManager().execute(
-                                   connection,
-                                   SqlUtil.makeSelect(
-                                       COL_ENTRIES_ID, TABLE_ENTRIES,
-                                       SqlUtil.eq(
-                                           COL_ENTRIES_PARENT_GROUP_ID,
-                                           SqlUtil.quote(entry.getId())))));
-            for (int i = 0; i < ids.length; i++) {
-                Entry childEntry = getEntry(ids[i], request, false, true);
-                if (childEntry != null) {
-                    if (childEntry.isGroup()) {
-                        List<Entry> tmp = new ArrayList<Entry>();
-                        tmp.add(childEntry);
-                        //                        deleteEntriesInner(request, tmp, connection,false);
-                    } else {
-                        children.add(childEntry);
-                    }
-                }
-            }
-        }
-        if (children.size() > 0) {
-            //            deleteEntriesInner(request, children, connection,false);
-        }
-
-
-        String query;
-
-
-        query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
-                                   SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID, "?"));
-
-        PreparedStatement permissionsStmt =
-            connection.prepareStatement(query);
-
-        query = SqlUtil.makeDelete(
-            TABLE_ASSOCIATIONS,
-            SqlUtil.makeOr(
-                Misc.newList(
-                    SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, "?"),
-                    SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, "?"))));
-        PreparedStatement assocStmt = connection.prepareStatement(query);
-
-        query = SqlUtil.makeDelete(TABLE_COMMENTS,
-                                   SqlUtil.eq(COL_COMMENTS_ENTRY_ID, "?"));
-        PreparedStatement commentsStmt = connection.prepareStatement(query);
-
-        query = SqlUtil.makeDelete(TABLE_METADATA,
-                                   SqlUtil.eq(COL_METADATA_ENTRY_ID, "?"));
-        PreparedStatement metadataStmt = connection.prepareStatement(query);
-
-
-        PreparedStatement entriesStmt =
-            connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
-                COL_ENTRIES_ID, "?"));
-
-        connection.setAutoCommit(false);
-        Statement statement = connection.createStatement();
-        for (Entry entry : entries) {
-            delCnt++;
-            if (delCnt % 100 == 0) {
-                System.err.println("Deleted:" + delCnt);
-            }
-            getStorageManager().removeFile(entry);
-
-            permissionsStmt.setString(1, entry.getId());
-            permissionsStmt.addBatch();
-
-            metadataStmt.setString(1, entry.getId());
-            metadataStmt.addBatch();
-
-            commentsStmt.setString(1, entry.getId());
-            commentsStmt.addBatch();
-
-            assocStmt.setString(1, entry.getId());
-            assocStmt.setString(2, entry.getId());
-            assocStmt.addBatch();
-
-            entriesStmt.setString(1, entry.getId());
-            entriesStmt.addBatch();
-
-            //TODO: Batch up the specific type deletes
-            entry.getTypeHandler().deleteEntry(request, statement, entry);
-        }
-        permissionsStmt.executeBatch();
-        metadataStmt.executeBatch();
-        commentsStmt.executeBatch();
-        assocStmt.executeBatch();
-        entriesStmt.executeBatch();
-        connection.commit();
-        connection.setAutoCommit(true);
-
-        permissionsStmt.close();
-        metadataStmt.close();
-        commentsStmt.close();
-        assocStmt.close();
-        entriesStmt.close();
-    }
 
 
 

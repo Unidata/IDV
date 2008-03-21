@@ -23,7 +23,7 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.sql.SqlUtil;
 
 
 /**

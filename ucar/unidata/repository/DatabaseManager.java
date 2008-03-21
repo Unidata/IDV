@@ -25,7 +25,8 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.sql.Clause;
+import ucar.unidata.sql.SqlUtil;
 
 
 
@@ -494,6 +495,15 @@ public class DatabaseManager extends RepositoryManager {
             return true;
         }
         return false;
+    }
+
+
+    public  Statement eval(String what, String table, Clause[]clauses) throws Exception {
+        return eval(what, Misc.newList(table), clauses);
+    }
+
+    public  Statement eval(String what, List tables, Clause[]clauses) throws Exception {
+        return SqlUtil.eval(getConnection(), what, tables, clauses);
     }
 
 

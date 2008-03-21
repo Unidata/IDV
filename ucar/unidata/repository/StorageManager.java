@@ -25,7 +25,7 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.sql.SqlUtil;
 
 
 

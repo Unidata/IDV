@@ -181,9 +181,17 @@ public class WmsSelection {
         } else {
             url = url + "&";
         }
+        double diff = Math.abs(boundsToUse.getMinLon() - boundsToUse.getMaxLon());
+        System.err.println ("diff:" + diff);
         String bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
                       + "," + boundsToUse.getMaxLon() + ","
                       + boundsToUse.getMaxLat();
+
+
+        /*        bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
+                      + "," + boundsToUse.getMaxLon() + ","
+                      + (boundsToUse.getMinLat()+diff);*/
+
 
         return url + "version=" + version + "&request=GetMap" +
         //          "&Exceptions=se_xml" + 

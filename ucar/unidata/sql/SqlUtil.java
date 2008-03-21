@@ -21,7 +21,7 @@
  */
 
 
-package ucar.unidata.data;
+package ucar.unidata.sql;
 
 
 import ucar.unidata.util.DateUtil;
@@ -33,11 +33,8 @@ import ucar.unidata.util.StringUtil;
 
 import java.io.File;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+
 
 
 import java.text.SimpleDateFormat;
@@ -1380,6 +1377,23 @@ public class SqlUtil {
         value = value.replace("'", "");
         return value;
     }
+
+
+    public static Statement eval(Connection connection, String what, List tables, Clause[]clauses) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<clauses.length;i++) {
+            clauses[i].addClause(sb);
+        }
+        String query = makeSelect(what, tables, sb.toString());
+        PreparedStatement stmt = connection.prepareStatement(query);
+        int  col = 1;
+        for(int i=0;i<clauses.length;i++) {
+            col = clauses[i].setValue(stmt,col);
+        }
+        stmt.execute();
+        return stmt;
+    }
+
 
 
 }
