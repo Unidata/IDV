@@ -283,12 +283,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @param request _more_
      * @param sb _more_
      * @param type _more_
-     * @param makeSelect _more_
+     * @param doSelect _more_
      *
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer sb,
-                                Metadata.Type type, boolean makeSelect)
+                                Metadata.Type type, boolean doSelect)
             throws Exception {
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + type,
                                   type.toString()));
@@ -297,7 +297,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                       + "inherited";
         inheritedCbx = "";
 
-        if (makeSelect) {
+        if (doSelect) {
             String[] values = getMetadataManager().getDistinctValues(request,
                                   this, type);
             if ((values == null) || (values.length == 0)) {

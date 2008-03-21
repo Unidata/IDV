@@ -27,6 +27,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -320,9 +321,9 @@ public class GenericTypeHandler extends TypeHandler {
         String column = theColumn.getFullName();
         String tag    = theColumn.getName();
         String title  = theColumn.getDescription();
-        List   where  = assembleWhereClause(request);
-        Statement statement = executeSelect(request,
-                                            SqlUtil.distinct(column), where);
+        List<Clause>   where  = assembleWhereClause(request);
+        Statement statement = select(request,
+                                            SqlUtil.distinct(column), where,"");
 
         String[]     values = SqlUtil.readString(statement, 1);
         StringBuffer sb     = new StringBuffer();
@@ -431,17 +432,10 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List assembleWhereClause(Request request) throws Exception {
-        List where        = super.assembleWhereClause(request);
+
+
+    protected List<Clause> assembleWhereClause(Request request) throws Exception {
+        List<Clause> where        = super.assembleWhereClause(request);
         int  originalSize = where.size();
         for (Column column : columns) {
             if ( !column.getCanSearch()) {
@@ -450,7 +444,7 @@ public class GenericTypeHandler extends TypeHandler {
             column.assembleWhereClause(request, where);
         }
         if ((originalSize != where.size()) && (originalSize > 0)) {
-            where.add(SqlUtil.eq(COL_ENTRIES_ID, getTableName() + ".id"));
+            where.add(Clause.eq(COL_ENTRIES_ID, getTableName() + ".id"));
         }
         return where;
     }
@@ -525,12 +519,14 @@ public class GenericTypeHandler extends TypeHandler {
             return entry;
         }
         Object[] values = new Object[colNames.size()];
-        String query = SqlUtil.makeSelect(SqlUtil.comma(colNames),
-                                          Misc.newList(getTableName()),
-                                          SqlUtil.eq(COL_ID,
-                                              SqlUtil.quote(entry.getId())));
-        ResultSet results2 =
-            getDatabaseManager().execute(query).getResultSet();
+
+        Statement stmt = getDatabaseManager().select(
+                                                     SqlUtil.comma(colNames),
+                                                     getTableName(),
+                                                     Clause.eq(COL_ID,
+                                                               entry.getId()));
+        ResultSet results2 = stmt.getResultSet();
+
         if (results2.next()) {
             int valueIdx = 0;
             for (Column column : columns) {
@@ -663,7 +659,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                List where, boolean advancedForm)
+                                List<Clause> where, boolean advancedForm)
             throws Exception {
         super.addToSearchForm(request, formBuffer, where, advancedForm);
 

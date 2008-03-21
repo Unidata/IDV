@@ -23,7 +23,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
+
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -519,15 +521,8 @@ public class Column implements Tables, Constants {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param where _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void assembleWhereClause(Request request, List where)
+
+    protected void assembleWhereClause(Request request, List<Clause> where)
             throws Exception {
         String id = getFullName();
         if (type.equals(TYPE_LATLON)) {
@@ -537,10 +532,10 @@ public class Column implements Tables, Constants {
             double lon2 = request.get(id + "_lon2", Double.NaN);
             if ((lat1 == lat1) && (lat2 == lat2) && (lon1 == lon1)
                     && (lon2 == lon2)) {
-                where.add(SqlUtil.ge(getFullName() + "_lat", lat1));
-                where.add(SqlUtil.le(getFullName() + "_lat", lat2));
-                where.add(SqlUtil.le(getFullName() + "_lon", lon1));
-                where.add(SqlUtil.ge(getFullName() + "_lon", lon2));
+                where.add(Clause.ge(getFullName() + "_lat", lat1));
+                where.add(Clause.le(getFullName() + "_lat", lat2));
+                where.add(Clause.le(getFullName() + "_lon", lon1));
+                where.add(Clause.ge(getFullName() + "_lon", lon2));
             }
         } else if (isNumeric()) {
             String expr = request.getCheckedString(id + "_expr", EXPR_EQUALS,
@@ -558,14 +553,14 @@ public class Column implements Tables, Constants {
             }
             if (from == from) {
                 if (expr.equals(EXPR_EQUALS)) {
-                    where.add(SqlUtil.eq(getFullName(), from));
+                    where.add(Clause.eq(getFullName(), from));
                 } else if (expr.equals(EXPR_LE)) {
-                    where.add(SqlUtil.le(getFullName(), from));
+                    where.add(Clause.le(getFullName(), from));
                 } else if (expr.equals(EXPR_GE)) {
-                    where.add(SqlUtil.ge(getFullName(), to));
+                    where.add(Clause.ge(getFullName(), to));
                 } else if (expr.equals(EXPR_BETWEEN)) {
-                    where.add(SqlUtil.ge(getFullName(), from));
-                    where.add(SqlUtil.le(getFullName(), to));
+                    where.add(Clause.ge(getFullName(), from));
+                    where.add(Clause.le(getFullName(), to));
                 } else if (expr.length() > 0) {
                     throw new IllegalArgumentException("Unknown expression:"
                             + expr);
@@ -574,17 +569,16 @@ public class Column implements Tables, Constants {
             }
         } else if (type.equals(TYPE_BOOLEAN)) {
             if (request.defined(id)) {
-                where.add(SqlUtil.eq(getFullName(), (request.get(id, true)
+                where.add(Clause.eq(getFullName(), (request.get(id, true)
                         ? 1
                         : 0)));
             }
         } else {
             String value = request.getString(id, "");
-            typeHandler.addOr(getFullName(),
-                              (String) request.getString(getFullName(),
-                                  (String) null), where,
-                                      !(type.equals(TYPE_INT)
-                                        || type.equals(TYPE_DOUBLE)));
+            typeHandler.addOrClause(getFullName(),
+                                    (String) request.getString(getFullName(),
+                                                               (String) null), where);
+
         }
 
     }
@@ -779,7 +773,7 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                List where)
+                                List<Clause> where)
             throws Exception {
 
         if ( !getCanSearch()) {
@@ -787,7 +781,7 @@ public class Column implements Tables, Constants {
         }
 
 
-        List   tmp    = new ArrayList(where);
+        List<Clause>   tmp    = new ArrayList<Clause>(where);
         String widget = "";
         if (type.equals(TYPE_LATLON)) {
             widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
@@ -807,8 +801,8 @@ public class Column implements Tables, Constants {
         } else {
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 long t1 = System.currentTimeMillis();
-                Statement stmt = typeHandler.executeSelect(request,
-                                     SqlUtil.distinct(getFullName()), tmp);
+                Statement stmt = typeHandler.select(request,
+                                     SqlUtil.distinct(getFullName()), tmp,"");
                 long     t2     = System.currentTimeMillis();
                 String[] values = SqlUtil.readString(stmt, 1);
                 long     t3     = System.currentTimeMillis();

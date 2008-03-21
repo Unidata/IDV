@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -157,10 +158,10 @@ public class HarvesterManager extends RepositoryManager {
 
         harvesters = new ArrayList<Harvester>();
 
-        String query = SqlUtil.makeSelect(COLUMNS_HARVESTERS,
-                                          Misc.newList(TABLE_HARVESTERS));
+
         SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
+            SqlUtil.getIterator(getDatabaseManager().select(COLUMNS_HARVESTERS,
+                                                            TABLE_HARVESTERS, new Clause()));;
         ResultSet results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -296,8 +297,8 @@ public class HarvesterManager extends RepositoryManager {
         if (request.exists(ARG_DELETE_CONFIRM)) {
             harvesterMap.remove(harvester.getId());
             harvesters.remove(harvester);
-            getDatabaseManager().executeDelete(TABLE_HARVESTERS,
-                    COL_HARVESTERS_ID, SqlUtil.quote(harvester.getId()));
+            SqlUtil.delete(getConnection(),TABLE_HARVESTERS,
+                           Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
             return new Result(request.url(URL_HARVESTERS_LIST));
         } else if (request.exists(ARG_DELETE)) {
             sb.append(
@@ -309,8 +310,8 @@ public class HarvesterManager extends RepositoryManager {
         } else {
             if (request.exists(ARG_CHANGE)) {
                 harvester.applyEditForm(request);
-                getDatabaseManager().executeDelete(TABLE_HARVESTERS,
-                        COL_HARVESTERS_ID, SqlUtil.quote(harvester.getId()));
+                SqlUtil.delete(getConnection(),TABLE_HARVESTERS,
+                               Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
                 getDatabaseManager().executeInsert(INSERT_HARVESTERS,
                         new Object[] { harvester.getId(),
                                        harvester.getClass().getName(),

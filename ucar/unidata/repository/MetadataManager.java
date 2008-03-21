@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 
 
 
@@ -182,15 +183,13 @@ public class MetadataManager extends RepositoryManager {
         }
 
 
-        String query = SqlUtil.makeSelect(
-                           COLUMNS_METADATA, Misc.newList(
-                               TABLE_METADATA), SqlUtil.eq(
-                               COL_METADATA_ENTRY_ID, SqlUtil.quote(
-                                   entry.getId())), " order by "
-                                       + COL_METADATA_TYPE);
-
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
+        Statement stmt = getDatabaseManager().select(
+                                                     COLUMNS_METADATA,  
+                                                     TABLE_METADATA, 
+                                                     Clause.eq(COL_METADATA_ENTRY_ID, 
+                                                               entry.getId()), 
+                                                     " order by "   + COL_METADATA_TYPE);
+        SqlUtil.Iterator iter =    SqlUtil.getIterator(stmt);
         ResultSet results;
         metadataList = new ArrayList();
         while ((results = iter.next()) != null) {
@@ -351,9 +350,8 @@ public class MetadataManager extends RepositoryManager {
                     if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
                         continue;
                     }
-                    String id = request.getString(arg, BLANK);
-                    getDatabaseManager().executeDelete(TABLE_METADATA,
-                            COL_METADATA_ID, SqlUtil.quote(id));
+                    SqlUtil.delete(getConnection(),TABLE_METADATA,
+                                   Clause.eq(COL_METADATA_ID, request.getString(arg, BLANK)));
                 }
             } else {
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
@@ -362,8 +360,8 @@ public class MetadataManager extends RepositoryManager {
                 }
 
                 for (Metadata metadata : newMetadata) {
-                    getDatabaseManager().executeDelete(TABLE_METADATA,
-                            COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
+                    SqlUtil.delete(getConnection(),TABLE_METADATA,
+                                   Clause.eq(COL_METADATA_ID, metadata.getId()));
                     insertMetadata(metadata);
                 }
             }
@@ -553,13 +551,12 @@ public class MetadataManager extends RepositoryManager {
         String[] values = (String[]) distinctMap.get(type.getType());
 
         if (values == null) {
-            Statement stmt = getDatabaseManager().execute(
-                                 SqlUtil.makeSelect(
-                                     SqlUtil.distinct(COL_METADATA_ATTR1),
-                                     TABLE_METADATA,
-                                     SqlUtil.eq(
-                                         COL_METADATA_TYPE,
-                                         SqlUtil.quote(type.getType()))));
+            Statement stmt = getDatabaseManager().select(
+                                                         SqlUtil.distinct(COL_METADATA_ATTR1),
+                                                         TABLE_METADATA,
+                                                         Clause.eq(
+                                                                   COL_METADATA_TYPE,
+                                                                   type.getType()));
             values = SqlUtil.readString(stmt, 1);
             distinctMap.put(type.getType(), values);
         }

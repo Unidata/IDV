@@ -553,7 +553,8 @@ public class Request implements Constants {
                                         + " value:" + v + ":");
         }
         //TODO:Check the value
-        return repository.getDatabaseManager().escapeString(v);
+        return v;
+        //        return repository.getDatabaseManager().escapeString(v);
     }
 
 

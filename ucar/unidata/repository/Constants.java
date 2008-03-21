@@ -91,6 +91,8 @@ public interface Constants {
 
     public static final String ICON_GRAYRECT = "/grayrect.gif";
 
+    public static final String ICON_GRAYRECTARROW = "/grayrectarrow.gif";
+
     public static final String ICON_TOOLS = "/tools.gif";
 
     public static final String ICON_RIGHTARROW = "/rightarrow.gif";

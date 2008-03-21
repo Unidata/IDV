@@ -252,6 +252,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getDatabaseManager();
     }
 
+    public Connection getConnection() throws Exception {
+        return getDatabaseManager().getConnection(false);
+    }
+
     /**
      * _more_
      *

@@ -25,6 +25,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
+import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -507,18 +508,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(msgHeader("Association Cloud"));
         }
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
-        List        where       = typeHandler.assembleWhereClause(request);
-        if (where.size() > 0) {
-            where.add(0, SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
-                                    COL_ENTRIES_ID));
-            where.add(0, SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID,
-                                    COL_ENTRIES_ID));
-        }
-
-
-        String[] associations =
-            SqlUtil.readString(typeHandler.executeSelect(request,
-                SqlUtil.distinct(COL_ASSOCIATIONS_NAME), where), 1);
+        String[] associations = getRepository().getAssociations(request);
 
 
         if (associations.length == 0) {
@@ -533,13 +523,12 @@ public class HtmlOutputHandler extends OutputHandler {
         int           min = -1;
         for (int i = 0; i < associations.length; i++) {
             String association = associations[i];
-            Statement stmt2 = typeHandler.executeSelect(
+            Statement stmt2 = typeHandler.select(
                                   request, SqlUtil.count("*"),
-                                  Misc.newList(
-                                      SqlUtil.eq(
+                                  Clause.eq(
                                           COL_ASSOCIATIONS_NAME,
-                                          SqlUtil.quote(association))));
-
+                                          association),"");
+            
             ResultSet results2 = stmt2.getResultSet();
             if ( !results2.next()) {
                 continue;

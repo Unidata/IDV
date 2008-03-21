@@ -596,8 +596,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String getMessage(String h, String icon, boolean showClose) {
-        String close = "<a href=\"JavaScript: noop()\" onclick=\"hide('messageblock')\">" + 
-            HtmlUtil.img(fileUrl(ICON_CLOSE)) +"</a>";
+        String close = HtmlUtil.jsLink(HtmlUtil.onMouseClick("hide('messageblock')"),  
+                                                             HtmlUtil.img(fileUrl(ICON_CLOSE)));
         if(!showClose) close = "&nbsp;";
         h = "<div class=\"innernote\"><table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
             + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2)
@@ -1083,8 +1083,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected void readGlobals() throws Exception {
         Statement statement =
-            getDatabaseManager().execute(SqlUtil.makeSelect("*",
-                Misc.newList(TABLE_GLOBALS)));
+            getDatabaseManager().select(COLUMNS_GLOBALS,
+                                        TABLE_GLOBALS, new Clause[]{});
         dbProperties = new Properties();
         ResultSet results = statement.getResultSet();
         while (results.next()) {
@@ -2141,11 +2141,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected void writeGlobal(String name, String value) throws Exception {
-        getDatabaseManager().executeDelete(TABLE_GLOBALS, COL_GLOBALS_NAME,
-                                           SqlUtil.quote(name));
+        SqlUtil.delete(getConnection(),TABLE_GLOBALS, Clause.eq(COL_GLOBALS_NAME,
+                                                                name));
         getDatabaseManager().executeInsert(INSERT_GLOBALS,
                                            new Object[] { name,
-                value });
+                                                          value });
         dbProperties.put(name, value);
         properties.put(name, value);
     }
@@ -2160,10 +2160,10 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public int getCount(String table, String where) throws Exception {
+    public int getCount(String table, Clause clause) throws Exception {
         Statement statement =
-            getDatabaseManager().execute(SqlUtil.makeSelect("count(*)",
-                Misc.newList(table), where));
+            getDatabaseManager().select("count(*)",
+                                        table, clause);
 
         ResultSet results = statement.getResultSet();
         if ( !results.next()) {
@@ -2447,13 +2447,17 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public List<Group> getGroups(List andList) throws Exception {
-        andList.add(SqlUtil.eq(COL_ENTRIES_TYPE,
-                               SqlUtil.quote(TypeHandler.TYPE_GROUP)));
-        String sql = SqlUtil.makeSelect(COL_ENTRIES_ID,
-                                        Misc.newList(TABLE_ENTRIES),
-                                        SqlUtil.makeAnd(andList));
-        Statement statement = getDatabaseManager().execute(sql);
+    public List<Group> getGroups(Clause clause) throws Exception {
+        
+        List<Clause> clauses = new ArrayList<Clause>();
+        if(clause!=null) {
+            clauses.add(clause);
+        }
+        clauses.add(Clause.eq(COL_ENTRIES_TYPE,
+                              TypeHandler.TYPE_GROUP));
+        Statement statement =    getDatabaseManager().select(COL_ENTRIES_ID, 
+                                                           TABLE_ENTRIES,
+                                                             clauses);
         return getGroups(SqlUtil.readString(statement, 1));
     }
 
@@ -2660,12 +2664,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb = new StringBuffer();
         String hideImg = fileUrl(ICON_MINUS);
         String showImg = fileUrl(ICON_PLUS);
-        String link = "<a href=\"JavaScript: noop()\" class=\"pagesubheadinglink\" onclick=\"toggleBlockVisibility('" + id +"','" + id +"img','" +
-            hideImg +"','"+
-            showImg +"')\">" +
-            HtmlUtil.img(visible?hideImg:showImg,""," id='" + id +"img' ") +
-            HtmlUtil.space(1) +
-            label +"</a>";
+        String link = HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('" + id +"','" + id +"img','" +
+                                                            hideImg +"','"+
+                                                            showImg +"')"), 
+                                                            HtmlUtil.img(visible?hideImg:showImg,""," id='" + id +"img' ") +
+                                                            HtmlUtil.space(1) +  label,
+                                                            "class=\"pagesubheadinglink\"");
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append("<div class=\"block\">");
@@ -2732,7 +2736,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append("<table width=\"90%\" border=0><tr><td>");
 
         Object oldValue = request.remove(ARG_RELATIVEDATE);
-        List   where    = typeHandler.assembleWhereClause(request);
+        List<Clause>   where    = typeHandler.assembleWhereClause(request);
         if (oldValue != null) {
             request.put(ARG_RELATIVEDATE, oldValue);
         }
@@ -3360,9 +3364,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             return getAccessManager().filterEntry(request, entry);
         }
 
-        Statement entryStmt =    getDatabaseManager().eval(COLUMNS_ENTRIES, 
+        Statement entryStmt =    getDatabaseManager().select(COLUMNS_ENTRIES, 
                                                            TABLE_ENTRIES,
-                                                           new Clause[]{Clause.eq(COL_ENTRIES_ID, entryId)});
+                                                           Clause.eq(COL_ENTRIES_ID, entryId));
 
         ResultSet results = entryStmt.getResultSet();
         if ( !results.next()) {
@@ -3755,9 +3759,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processCommentsEdit(Request request) throws Exception {
         Entry entry = getEntry(request);
-        getDatabaseManager().executeDelete(
-            TABLE_COMMENTS, COL_COMMENTS_ID,
-            SqlUtil.quote(request.getString(ARG_COMMENT_ID, BLANK)));
+        SqlUtil.delete(getConnection(),
+                       TABLE_COMMENTS, Clause.eq(COL_COMMENTS_ID,
+                                                 request.getUnsafeString(ARG_COMMENT_ID, BLANK)));
         entry.setComments(null);
         return new Result(request.url(URL_COMMENTS_SHOW, ARG_ID,
                                        entry.getId(), ARG_MESSAGE,
@@ -4396,9 +4400,9 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     public List<Group> getTopGroups(Request request) throws Exception {
         if(topGroups!=null) return topGroups;
-        Statement statement = getDatabaseManager().eval(COL_ENTRIES_ID,
+        Statement statement = getDatabaseManager().select(COL_ENTRIES_ID,
                                                         TABLE_ENTRIES,
-                                                        new Clause[]{Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, topGroup.getId())});
+                                                        Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, topGroup.getId()));
         String[]  ids = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for(int i=0;i<ids.length;i++) {
@@ -4459,7 +4463,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             boolean next = request.get(ARG_NEXT, false);
             List<String> ids = getEntryIdsInGroup(request,
                                    findGroup(entry.getParentGroupId()),
-                                   new ArrayList());
+                                   new ArrayList<Clause>());
             String nextId = null;
             for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
                 String id = ids.get(i);
@@ -4692,7 +4696,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             menu.append("</div>");
 
-            String menuLink = HtmlUtil.space(1) + "<a href=\"javascript:noop()\" onclick=\"showMenu(event, 'menubutton', 'entrylinksmenu');\">" + HtmlUtil.img(fileUrl(ICON_GRAYRECT),msg("Show menu")," id=\"menubutton\" " ) +"</a>";
+            String events = HtmlUtil.onMouseOver("setImage('menubutton','" + fileUrl(ICON_GRAYRECTARROW)+"')") +
+                HtmlUtil.onMouseOut("setImage('menubutton','" + fileUrl(ICON_GRAYRECT)+"')") +
+                HtmlUtil.onMouseClick("showMenu(event, 'menubutton', 'entrylinksmenu')");
+            String menuLink = HtmlUtil.space(1) + HtmlUtil.jsLink(events, HtmlUtil.img(fileUrl(ICON_GRAYRECT),msg("Show menu")," id=\"menubutton\" " ));
 
             String linkHtml = getEntryLinksHtml(request, entry);
             String header =
@@ -4779,7 +4786,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         OutputHandler outputHandler = getOutputHandler(request);
         TypeHandler   typeHandler   = getTypeHandler(request);
-        List          where         =
+        List<Clause>          where         =
             typeHandler.assembleWhereClause(request);
 
         List<String>  ids = getEntryIdsInGroup(request, group, where);
@@ -4817,14 +4824,14 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected List<String> getEntryIdsInGroup(Request request, Entry group,
-            List where)
+            List<Clause> where)
             throws Exception {
-        where = new ArrayList(where);
-        where.add(SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                             SqlUtil.quote(group.getId())));
+        where = new ArrayList<Clause>(where);
+        where.add(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                            group.getId()));
         TypeHandler typeHandler = getTypeHandler(request);
         int         skipCnt     = request.get(ARG_SKIP, 0);
-        Statement statement = typeHandler.executeSelect(request,
+        Statement statement = typeHandler.select(request,
                                   COL_ENTRIES_ID, where,
                                   getQueryOrderAndLimit(request, true));
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
@@ -4968,79 +4975,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         TypeHandler  typeHandler = getTypeHandler(request);
         StringBuffer sb          = new StringBuffer();
-        /*
-        if (type.equals(TYPE_TAG)) {
-            sb.append(XmlUtil.tag(TAG_NODE,
-                                  XmlUtil.attrs(ATTR_TYPE, TYPE_TAG, ATTR_ID,
-                                      originalId, ATTR_TITLE, originalId)));
-
-            String order = " DESC ";
-            if (request.get(ARG_ASCENDING, false)) {
-                order = " ASC ";
-            }
-
-            Statement stmt =
-                typeHandler.executeSelect(
-                    request,
-                    SqlUtil.comma(
-                        COL_ENTRIES_ID, COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
-                        COL_ENTRIES_PARENT_GROUP_ID,
-                        COL_ENTRIES_RESOURCE), Misc.newList(
-                            SqlUtil.eq(COL_TAGS_ENTRY_ID, COL_ENTRIES_ID),
-                            SqlUtil.eq(
-                                COL_TAGS_NAME,
-                                SqlUtil.quote(id))), " order by " + COL_ENTRIES_FROMDATE + order);
-
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-            ResultSet        results;
-            cnt       = 0;
-            actualCnt = 0;
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    cnt++;
-                    if (cnt <= skip) {
-                        continue;
-                    }
-                    actualCnt++;
-                    sb.append(getEntryNodeXml(request, results));
-                    sb.append(XmlUtil.tag(TAG_EDGE,
-                                          XmlUtil.attrs(ATTR_TYPE,
-                                              "taggedby", ATTR_FROM,
-                                                  originalId, ATTR_TO,
-                                                      results.getString(1))));
-
-                    if (actualCnt >= MAX_EDGES) {
-                        String skipId = "skip_" + type + "_"
-                                        + (actualCnt + skip) + "_" + id;
-                        sb.append(XmlUtil.tag(TAG_NODE,
-                                XmlUtil.attrs(ATTR_TYPE, "skip", ATTR_ID,
-                                    skipId, ATTR_TITLE, "...")));
-                        sb.append(XmlUtil.tag(TAG_EDGE,
-                                XmlUtil.attrs(ATTR_TYPE, "etc", ATTR_FROM,
-                                    originalId, ATTR_TO, skipId)));
-                        break;
-                    }
-                }
-            }
-            String xml = StringUtil.replace(graphXmlTemplate, "${content}",
-                                            sb.toString());
-            xml = StringUtil.replace(xml, "${root}", getUrlBase());
-            return new Result(BLANK, new StringBuffer(xml),
-                              getMimeTypeFromSuffix(".xml"));
-        }
-
-        */
         if ( !type.equals(TYPE_GROUP)) {
-            Statement stmt = typeHandler.executeSelect(
+            Statement stmt = typeHandler.select(
                                  request,
                                  SqlUtil.comma(
                                      COL_ENTRIES_ID, COL_ENTRIES_NAME,
                                      COL_ENTRIES_TYPE,
                                      COL_ENTRIES_PARENT_GROUP_ID,
-                                     COL_ENTRIES_RESOURCE), Misc.newList(
-                                         SqlUtil.eq(
-                                             COL_ENTRIES_ID,
-                                             SqlUtil.quote(id))));
+                                     COL_ENTRIES_RESOURCE), Clause.eq(
+                                                                      COL_ENTRIES_ID,
+                                                                      id),"");
 
             ResultSet results = stmt.getResultSet();
             if ( !results.next()) {
@@ -5115,8 +5059,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                     ATTR_TOOLTIP, group.getName(), ATTR_TITLE,
                     getGraphNodeTitle(group.getName()))));
         List<Group> subGroups =
-            getGroups(Misc.newList(SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                SqlUtil.quote(group.getId()))));
+            getGroups(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                group.getId()));
 
 
         Group parent = findGroup(group.getParentGroupId());
@@ -5171,16 +5115,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        String query = SqlUtil.makeSelect(
-                           SqlUtil.comma(
-                               COL_ENTRIES_ID, COL_ENTRIES_NAME,
-                               COL_ENTRIES_TYPE, COL_ENTRIES_PARENT_GROUP_ID,
-                               COL_ENTRIES_RESOURCE), Misc.newList(
-                                   TABLE_ENTRIES), SqlUtil.eq(
-                                   COL_ENTRIES_PARENT_GROUP_ID,
-                                   SqlUtil.quote(group.getId())));
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
+        Statement stmt = getDatabaseManager().select(
+                                                     SqlUtil.comma(
+                                                                   COL_ENTRIES_ID, COL_ENTRIES_NAME,
+                                                                   COL_ENTRIES_TYPE, COL_ENTRIES_PARENT_GROUP_ID,
+                                                                   COL_ENTRIES_RESOURCE),
+                                                     TABLE_ENTRIES, 
+                                                     Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                                               group.getId()));
+        SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
         ResultSet results;
         cnt       = 0;
         actualCnt = 0;
@@ -5305,9 +5248,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        List where = typeHandler.assembleWhereClause(request);
-        Statement stmt = typeHandler.executeSelect(request,
-                             SqlUtil.distinct(COL_ENTRIES_TYPE), where);
+        List<Clause> where = typeHandler.assembleWhereClause(request);
+        Statement stmt = typeHandler.select(request,
+                                            SqlUtil.distinct(COL_ENTRIES_TYPE), where, "");
         String[] types = SqlUtil.readString(stmt, 1);
         for (int i = 0; i < types.length; i++) {
             TypeHandler theTypeHandler = getTypeHandler(types[i]);
@@ -5333,10 +5276,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (dataTypeList != null) {
             return dataTypeList;
         }
-        Statement stmt = getDatabaseManager().execute(
-                             SqlUtil.makeSelect(
-                                 SqlUtil.distinct(COL_ENTRIES_DATATYPE),
-                                 TABLE_ENTRIES, ""));
+        Statement stmt = getDatabaseManager().select(
+                                                     SqlUtil.distinct(COL_ENTRIES_DATATYPE),
+                                                     TABLE_ENTRIES, new Clause[]{});
         String[]  types = SqlUtil.readString(stmt, 1);
         List      tmp   = new ArrayList();
         Hashtable seen  = new Hashtable();
@@ -5404,7 +5346,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *   Statement stmt;
      *   String[] tags =
      *       SqlUtil.readString(stmt =
-     *           typeHandler.executeSelect(request,
+     *           typeHandler.select(request,
      *                                     SqlUtil.distinct(COL_TAGS_NAME),
      *                                     where,
      *                                     " order by " + COL_TAGS_NAME), 1);
@@ -5418,7 +5360,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *   int           min = -1;
      *   for (int i = 0; i < tags.length; i++) {
      *       String tag = tags[i];
-     *       Statement stmt2 = typeHandler.executeSelect(request,
+     *       Statement stmt2 = typeHandler.select(request,
      *                             SqlUtil.count("*"),
      *                             Misc.newList(SqlUtil.eq(COL_TAGS_NAME,
      *                                 SqlUtil.quote(tag))));
@@ -5484,22 +5426,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List assembleWhereClause(Request request) throws Exception {
-        return getTypeHandler(request).assembleWhereClause(request);
-    }
-
-
-
-
 
     /**
      * _more_
@@ -5518,16 +5444,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             getAccessManager().initTopGroup(topGroup);
         }
-
-
-        /*
-        Statement statement =
-            getDatabaseManager().execute(SqlUtil.makeSelect(COLUMNS_ENTRIES,
-                Misc.newList(TABLE_ENTRIES),
-                SqlUtil.eq(COL_ENTRIES_TYPE,
-                           SqlUtil.quote(TypeHandler.TYPE_GROUP))));
-        readGroups(statement);
-        */
     }
 
 
@@ -5583,8 +5499,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected boolean tableContains(String id, String tableName,
                                     String column)
             throws Exception {
-        Statement statement = getDatabaseManager().eval(column, tableName,
-                                                        new Clause[]{Clause.eq(column, id)});
+        Statement statement = getDatabaseManager().select(column, tableName,
+                                                        Clause.eq(column, id));
 
         ResultSet results =statement.getResultSet();
         return results.next();
@@ -5611,8 +5527,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (group != null) {
             return group;
         }
-        Statement statement = getDatabaseManager().eval(COLUMNS_ENTRIES, TABLE_ENTRIES,
-                                                        new Clause[]{Clause.eq(COL_ENTRIES_ID, id)});
+        Statement statement = getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
+                                                        Clause.eq(COL_ENTRIES_ID, id));
 
         List<Group> groups    = readGroups(statement);
         if (groups.size() > 0) {
@@ -5701,23 +5617,17 @@ public class Repository implements Constants, Tables, RequestHandler,
                     return topGroup;
                 }
             }
-            List where = new ArrayList();
-            where.add(SqlUtil.eq(COL_ENTRIES_TYPE,
-                                 SqlUtil.quote(TypeHandler.TYPE_GROUP)));
+            List<Clause> clauses = new ArrayList<Clause>();
+            clauses.add(Clause.eq(COL_ENTRIES_TYPE,
+                                  TypeHandler.TYPE_GROUP));
             if (parent != null) {
-                where.add(SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                                     SqlUtil.quote(parent.getId())));
+                clauses.add(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                     parent.getId()));
             } else {
-                where.add(COL_ENTRIES_PARENT_GROUP_ID + " is null");
+                clauses.add(Clause.isNull(COL_ENTRIES_PARENT_GROUP_ID));
             }
-            where.add(SqlUtil.eq(COL_ENTRIES_NAME, SqlUtil.quote(lastName)));
-
-
-
-            String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
-                               Misc.newList(TABLE_ENTRIES),
-                               SqlUtil.makeAnd(where));
-            Statement   statement = getDatabaseManager().execute(query);
+            clauses.add(Clause.eq(COL_ENTRIES_NAME, lastName));
+            Statement   statement = getDatabaseManager().select(COLUMNS_ENTRIES,TABLE_ENTRIES, clauses);
             List<Group> groups    = readGroups(statement);
             if (groups.size() > 0) {
                 group = groups.get(0);
@@ -5751,12 +5661,13 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     private String getGroupId(Group parent) throws Exception {
         int    baseId = 0;
+        Clause idClause;
         String idWhere;
         if (parent == null) {
-            idWhere = COL_ENTRIES_PARENT_GROUP_ID + " IS NULL ";
+            idClause =  Clause.isNull(COL_ENTRIES_PARENT_GROUP_ID);
         } else {
-            idWhere = SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                                 SqlUtil.quote(parent.getId()));
+            idClause = Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                 parent.getId());
         }
         String newId = null;
         while (true) {
@@ -5765,13 +5676,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else {
                 newId = parent.getId() + Group.IDDELIMITER + baseId;
             }
-            String where = SqlUtil.makeAnd(Misc.newList(idWhere,
-                               SqlUtil.eq(COL_ENTRIES_ID,
-                                          SqlUtil.quote(newId))));
-            String query = SqlUtil.makeSelect(COL_ENTRIES_ID,
-                               Misc.newList(TABLE_ENTRIES), where);
-            ResultSet idResults =
-                getDatabaseManager().execute(query).getResultSet();
+
+            Statement stmt = getDatabaseManager().select(COL_ENTRIES_ID,
+                                                         TABLE_ENTRIES,
+                                                         new Clause[]{idClause,Clause.eq(COL_ENTRIES_ID, newId)});
+            ResultSet idResults =stmt.getResultSet();
 
             if ( !idResults.next()) {
                 break;
@@ -5839,13 +5748,13 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected List[] getEntries(Request request) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
-        List        where       = typeHandler.assembleWhereClause(request);
+        List<Clause>        where       = typeHandler.assembleWhereClause(request);
         int         skipCnt     = request.get(ARG_SKIP, 0);
-        Statement statement = typeHandler.executeSelect(request,
-                                  COLUMNS_ENTRIES, where,
-                                  getQueryOrderAndLimit(request, false));
+        Statement statement = typeHandler.select(request,
+                                                 COLUMNS_ENTRIES, where,
+                                                 getQueryOrderAndLimit(request, false));
 
-
+        SqlUtil.debug = false;
         List<Entry>      entries = new ArrayList<Entry>();
         List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
@@ -6023,18 +5932,17 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected List<Association> getAssociations(Request request,
             String entryId)
             throws Exception {
-        String query = SqlUtil.makeSelect(
-                           COLUMNS_ASSOCIATIONS,
-                           Misc.newList(TABLE_ASSOCIATIONS),
-                           SqlUtil.eq(
-                               COL_ASSOCIATIONS_FROM_ENTRY_ID,
-                               SqlUtil.quote(entryId)) + " OR "
-                                   + SqlUtil.eq(
-                                       COL_ASSOCIATIONS_TO_ENTRY_ID,
-                                       SqlUtil.quote(entryId)));
+        Statement stmt = getDatabaseManager().select(
+                                                     COLUMNS_ASSOCIATIONS,
+                                                     TABLE_ASSOCIATIONS,
+                                                     Clause.or(Clause.eq(
+                                                                         COL_ASSOCIATIONS_FROM_ENTRY_ID,
+                                                                         entryId),
+                                                               Clause.eq(
+                                                                         COL_ASSOCIATIONS_TO_ENTRY_ID,
+                                                                         entryId)));
         List<Association> associations = new ArrayList();
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
+        SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
         ResultSet results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -6044,6 +5952,23 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         return associations;
     }
+
+
+    public String[] getAssociations(Request request) throws Exception {
+        TypeHandler typeHandler = getRepository().getTypeHandler(request);
+        List<Clause>        where       = typeHandler.assembleWhereClause(request);
+        if (where.size() > 0) {
+            where.add(0, Clause.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
+                                    COL_ENTRIES_ID));
+            where.add(0, Clause.eq(COL_ASSOCIATIONS_TO_ENTRY_ID,
+                                    COL_ENTRIES_ID));
+        }
+
+        return
+            SqlUtil.readString(typeHandler.select(request,
+                SqlUtil.distinct(COL_ASSOCIATIONS_NAME), where,""), 1);
+    }
+
 
 
     /**
@@ -6061,15 +5986,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entry.getComments() != null) {
             return entry.getComments();
         }
-        String query = SqlUtil.makeSelect(
-                           COLUMNS_COMMENTS, Misc.newList(
-                               TABLE_COMMENTS), SqlUtil.eq(
-                               COL_COMMENTS_ENTRY_ID, SqlUtil.quote(
-                                   entry.getId())), " order by "
-                                       + COL_COMMENTS_DATE + " asc ");
+        Statement stmt = getDatabaseManager().select(
+                                                     COLUMNS_COMMENTS, 
+                                                     TABLE_COMMENTS, 
+                                                     Clause.eq(COL_COMMENTS_ENTRY_ID, 
+                                                               entry.getId()), " order by "
+                                                     + COL_COMMENTS_DATE + " asc ");
+        SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
         List<Comment> comments = new ArrayList();
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
         ResultSet results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -6236,8 +6160,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
-
     /**
      * _more_
      *
@@ -6303,15 +6225,14 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         List<String[]> children = new ArrayList();
         for (Entry entry : entries) {
-            String query = SqlUtil.makeSelect(SqlUtil.comma(new String[] {
-                               COL_ENTRIES_ID,
-                               COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
-                               COL_ENTRIES_RESOURCE_TYPE }), TABLE_ENTRIES,
-                                   SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
-                                       entry.getId() + "%"));
-            Statement stmt = getDatabaseManager().execute(connection, query);
-
-
+            Statement stmt = SqlUtil.select(connection, 
+                                            SqlUtil.comma(new String[] {
+                                                COL_ENTRIES_ID,
+                                                COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
+                                                COL_ENTRIES_RESOURCE_TYPE }),
+                                            Misc.newList(TABLE_ENTRIES),
+                                            Clause.like(COL_ENTRIES_PARENT_GROUP_ID,
+                                                        entry.getId() + "%"));
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
@@ -6804,16 +6725,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                 seenResources = new Hashtable();
             }
             PreparedStatement select =
-                getConnection().prepareStatement(
-                    query =
-                        SqlUtil.makeSelect(
-                            "count(" + COL_ENTRIES_ID + ")",
-                            Misc.newList(TABLE_ENTRIES),
-                            SqlUtil.makeAnd(
-                                Misc.newList(
-                                    SqlUtil.eq(COL_ENTRIES_RESOURCE, "?"),
-                                    SqlUtil.eq(
-                                        COL_ENTRIES_PARENT_GROUP_ID, "?")))));
+                SqlUtil.getSelectStatement(getConnection(), 
+                                           "count(" + COL_ENTRIES_ID + ")", Misc.newList(TABLE_ENTRIES), 
+                                           Clause.and(Clause.eq(COL_ENTRIES_RESOURCE, ""),
+                                                      Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, "?")), "");
             long t1 = System.currentTimeMillis();
             for (Entry entry : entries) {
                 String path = entry.getResource().getPath();

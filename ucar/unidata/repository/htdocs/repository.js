@@ -238,6 +238,13 @@ function mouseUpOnEntry(event, id) {
 
 
 
+function setImage(id,url) {
+    img = util.getDomObject(id);
+    if(img) {
+        img.obj.src  = url;
+    }
+}
+
 function Tooltip () {
     var lastMove = 0;
     var needsToClose = 1;

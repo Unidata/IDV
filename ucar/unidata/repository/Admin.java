@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -189,7 +190,7 @@ public class Admin extends RepositoryManager {
 
             int cnt = 0;
             if (tableName.toLowerCase().indexOf("_index_") < 0) {
-                cnt = getRepository().getCount(tableName, "");
+                cnt = getRepository().getCount(tableName, new Clause());
             }
             String tableVar  = null;
             String TABLENAME = tableName.toUpperCase();
@@ -569,8 +570,7 @@ public class Admin extends RepositoryManager {
         String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS, TABLE_METADATA };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
-                    + getRepository().getCount(tables[i].toLowerCase(),
-                        ""), names[i])));
+                    + getRepository().getCount(tables[i].toLowerCase(), new Clause()), names[i])));
         }
 
 
@@ -581,14 +581,14 @@ public class Admin extends RepositoryManager {
         sb.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
-                    "" + getRepository().getCount(TABLE_ENTRIES, ""),
+                    "" + getRepository().getCount(TABLE_ENTRIES,  new Clause()),
                     msg("Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
             }
             int cnt = getRepository().getCount(TABLE_ENTRIES,
-                          "type=" + SqlUtil.quote(typeHandler.getType()));
+                                               Clause.eq("type",typeHandler.getType()));
 
             String url =
                 HtmlUtil.href(
@@ -755,16 +755,15 @@ public class Admin extends RepositoryManager {
         cleanupStatus  = new StringBuffer();
         int myTimeStamp = ++cleanupTimeStamp;
         try {
-            String query = SqlUtil.makeSelect(
-                               SqlUtil.comma(
-                                   COL_ENTRIES_ID, COL_ENTRIES_RESOURCE,
-                                   COL_ENTRIES_TYPE), Misc.newList(
-                                       TABLE_ENTRIES), SqlUtil.eq(
-                                       COL_ENTRIES_RESOURCE_TYPE,
-                                       SqlUtil.quote(Resource.TYPE_FILE)));
+            Statement stmt = getDatabaseManager().select(
+                                                         SqlUtil.comma(
+                                                                       COL_ENTRIES_ID, COL_ENTRIES_RESOURCE,
+                                                                       COL_ENTRIES_TYPE), 
+                                                         TABLE_ENTRIES, Clause.eq(
+                                                                                   COL_ENTRIES_RESOURCE_TYPE,
+                                                                                   Resource.TYPE_FILE));
 
-            SqlUtil.Iterator iter =
-                SqlUtil.getIterator(getDatabaseManager().execute(query));
+            SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
             ResultSet   results;
             int         cnt       = 0;
             int         deleteCnt = 0;

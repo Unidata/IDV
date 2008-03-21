@@ -498,13 +498,30 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-    public  Statement eval(String what, String table, Clause[]clauses) throws Exception {
-        return eval(what, Misc.newList(table), clauses);
+    public  Statement select(String what, String table, Clause clause,String extra) throws Exception {
+        return SqlUtil.select(getConnection(),what, Misc.newList(table), new Clause[]{clause},extra);
     }
 
-    public  Statement eval(String what, List tables, Clause[]clauses) throws Exception {
-        return SqlUtil.eval(getConnection(), what, tables, clauses);
+
+    public  Statement select(String what, String table, Clause clause) throws Exception {
+        return select(what, Misc.newList(table), new Clause[]{clause});
     }
+
+
+    public  Statement select(String what, String table, Clause[]clauses) throws Exception {
+        return select(what, Misc.newList(table), clauses);
+    }
+
+
+    public  Statement select(String what, String table, List<Clause>clauses) throws Exception {
+        return select(what, Misc.newList(table), Clause.toArray(clauses));
+    }
+
+    public  Statement select(String what, List tables, Clause[]clauses) throws Exception {
+        return SqlUtil.select(getConnection(), what, tables, clauses);
+    }
+
+
 
 
 }

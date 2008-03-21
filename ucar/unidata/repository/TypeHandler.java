@@ -27,6 +27,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 
@@ -729,41 +730,6 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
-     * @param what _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Statement executeSelect(Request request, String what)
-            throws Exception {
-        return executeSelect(request, what, assembleWhereClause(request));
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param where _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Statement executeSelect(Request request, String what,
-                                      List where)
-            throws Exception {
-        return executeSelect(request, what, where, "");
-    }
-
-
-    /**
-     * _more_
-     *
      * @param s _more_
      *
      * @return _more_
@@ -773,6 +739,18 @@ public class TypeHandler extends RepositoryManager {
         s = StringUtil.stripAndReplace(s, "'", "'", "'dummy'");
         return s;
     }
+
+
+
+
+    protected Statement select(Request request, String what,
+                               Clause clause, String extra)
+            throws Exception {
+        List<Clause> clauses = new ArrayList<Clause>();
+        clauses.add(clause);
+        return select(request, what, clause, extra);
+    }
+
 
     /**
      * _more_
@@ -786,12 +764,11 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Statement executeSelect(Request request, String what,
-                                      List whereList, String extra)
+    protected Statement select(Request request, String what,
+                               List<Clause> clauses, String extra)
             throws Exception {
-        whereList = new ArrayList(whereList);
+        clauses = new ArrayList<Clause>(clauses);
         //We do the replace because (for some reason) any CRNW screws up the pattern matching
-        String whereString = cleanQueryString(SqlUtil.makeAnd(whereList));
         String whatString  = cleanQueryString(what);
         String extraString = cleanQueryString(extra);
 
@@ -803,13 +780,11 @@ public class TypeHandler extends RepositoryManager {
         boolean didEntries = false;
         boolean didOther   = false;
         boolean didMeta    = false;
-        //        System.err.println("what:" + whatString);
-        //        System.out.println("where:" + whereString);
-        //        System.out.println("extra:" + extraString);
         for (int i = 0; i < tableNames.length; i++) {
             String pattern = ".*[, =\\(]+" + tableNames[i] + "\\..*";
             //            System.out.println("pattern:" + pattern);
-            if (whatString.matches(pattern) || whereString.matches(pattern)
+            if (Clause.isColumnFromTable(clauses, tableNames[i]) ||
+                whatString.matches(pattern)  
                     || (extraString.matches(pattern))) {
                 //                System.out.println("    ***** match");
                 tables.add(tableNames[i]);
@@ -833,7 +808,7 @@ public class TypeHandler extends RepositoryManager {
         while (true) {
             String subTable = TABLE_METADATA + "_" + metadataCnt;
             metadataCnt++;
-            if (whereString.indexOf(subTable) < 0) {
+            if (!Clause.isColumnFromTable(clauses, subTable)) {
                 break;
             }
             tables.add(TABLE_METADATA + " " + subTable);
@@ -843,7 +818,6 @@ public class TypeHandler extends RepositoryManager {
 
         if (didEntries) {
             List typeList = request.get(ARG_TYPE, new ArrayList());
-
             typeList.remove(TYPE_ANY);
             if (typeList.size() > 0) {
                 String typeString;
@@ -853,8 +827,9 @@ public class TypeHandler extends RepositoryManager {
                     typeString = StringUtil.join(",", typeList);
                 }
 
-                if (whereList.toString().indexOf(COL_ENTRIES_TYPE) < 0) {
-                    addOr(COL_ENTRIES_TYPE, typeString, whereList, true);
+
+                if (!Clause.isColumn(clauses, COL_ENTRIES_TYPE)) {
+                    addOrClause(COL_ENTRIES_TYPE, typeString, clauses);
                 }
             }
         }
@@ -863,16 +838,13 @@ public class TypeHandler extends RepositoryManager {
         //The join
         if (didEntries && didOther
                 && !TABLE_ENTRIES.equalsIgnoreCase(getTableName())) {
-            whereList.add(0, SqlUtil.eq(COL_ENTRIES_ID,
-                                        getTableName() + ".id"));
+            clauses.add(0, Clause.eq(COL_ENTRIES_ID,
+                                     getTableName() + ".id"));
         }
 
-
-        String where = SqlUtil.makeAnd(whereList);
-        String sql   = SqlUtil.makeSelect(what, tables, where, extra);
-        //        System.err.println (sql);
-        return getDatabaseManager().execute(sql,
-                                            getRepository().getMax(request));
+        return SqlUtil.select(getConnection(), what, tables, Clause.and(clauses), 
+                              extra,
+                              getRepository().getMax(request));
     }
 
 
@@ -1028,10 +1000,8 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                List where, boolean advancedForm)
+                                List<Clause> where, boolean advancedForm)
             throws Exception {
-
-
 
         List dateSelect = new ArrayList();
         dateSelect.add(new TwoFacedObject(msg("All"), "none"));
@@ -1074,7 +1044,7 @@ public class TypeHandler extends RepositoryManager {
 
         /*
         if(minDate==null || maxDate == null) {
-            Statement stmt = executeSelect(request,
+            Statement stmt = select(request,
                                            SqlUtil.comma(
                                                          SqlUtil.min(COL_ENTRIES_FROMDATE),
                                                          SqlUtil.max(
@@ -1190,10 +1160,10 @@ public class TypeHandler extends RepositoryManager {
 
                 }
             } else {
-                Statement stmt = executeSelect(
+                Statement stmt = select(
                                      request,
                                      SqlUtil.distinct(
-                                         COL_ENTRIES_PARENT_GROUP_ID), where);
+                                         COL_ENTRIES_PARENT_GROUP_ID), where,"");
 
                 List<Group> groups =
                     getRepository().getGroups(SqlUtil.readString(stmt, 1));
@@ -1256,33 +1226,27 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List assembleWhereClause(Request request) throws Exception {
 
-        List where = new ArrayList();
+
+
+    protected List<Clause> assembleWhereClause(Request request) throws Exception {
+
+        List<Clause> where = new ArrayList<Clause>();
 
 
         if (request.defined(ARG_RESOURCE)) {
-            addOr(COL_ENTRIES_RESOURCE, request.getString(ARG_RESOURCE, ""),
-                  where, true);
+            addOrClause(COL_ENTRIES_RESOURCE, request.getString(ARG_RESOURCE, ""),
+                        where);
         }
 
         if (request.defined(ARG_DATATYPE)) {
-            addOr(COL_ENTRIES_DATATYPE, request.getString(ARG_DATATYPE, ""),
-                  where, true);
+            addOrClause(COL_ENTRIES_DATATYPE, request.getString(ARG_DATATYPE, ""),
+                  where);
         }
 
         if (request.defined(ARG_USER_ID)) {
-            addOr(COL_ENTRIES_USER_ID, request.getString(ARG_USER_ID, ""),
-                  where, true);
+            addOrClause(COL_ENTRIES_USER_ID, request.getString(ARG_USER_ID, ""),
+                        where);
         }
 
         if (request.defined(ARG_GROUP)) {
@@ -1293,9 +1257,8 @@ public class TypeHandler extends RepositoryManager {
                 groupName = groupName.substring(1);
             }
             if (groupName.endsWith("%")) {
-                //                where.add(SqlUtil.eq(COL_GROUPS_ID,ENTRIES_PARENT_GROUP_ID));
-                where.add(SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
-                                       groupName));
+                where.add(Clause.like(COL_ENTRIES_PARENT_GROUP_ID,
+                                      groupName));
             } else {
                 Group group = getRepository().findGroup(request);
                 if (group == null) {
@@ -1306,28 +1269,28 @@ public class TypeHandler extends RepositoryManager {
                     (String) request.getString(ARG_GROUP_CHILDREN,
                         (String) null);
                 if (Misc.equals(searchChildren, "true")) {
-                    String sub = (doNot
-                                  ? SqlUtil.notLike(
+                    Clause sub = (doNot
+                                  ? Clause.notLike(
                                       COL_ENTRIES_PARENT_GROUP_ID,
                                       group.getId() + Group.IDDELIMITER + "%")
-                                  : SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
+                                  : Clause.like(COL_ENTRIES_PARENT_GROUP_ID,
                                       group.getId() + Group.IDDELIMITER
                                       + "%"));
-                    String equals = (doNot
-                                     ? SqlUtil.neq(
+                    Clause equals = (doNot
+                                     ? Clause.neq(
                                          COL_ENTRIES_PARENT_GROUP_ID,
-                                         SqlUtil.quote(group.getId()))
-                                     : SqlUtil.eq(
+                                         group.getId())
+                                     : Clause.eq(
                                          COL_ENTRIES_PARENT_GROUP_ID,
-                                         SqlUtil.quote(group.getId())));
-                    where.add("(" + sub + " OR " + equals + ")");
+                                        group.getId()));
+                    where.add(Clause.or(sub,equals));
                 } else {
                     if (doNot) {
-                        where.add(SqlUtil.neq(COL_ENTRIES_PARENT_GROUP_ID,
-                                SqlUtil.quote(group.getId())));
+                        where.add(Clause.neq(COL_ENTRIES_PARENT_GROUP_ID,
+                                             group.getId()));
                     } else {
-                        where.add(SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                                             SqlUtil.quote(group.getId())));
+                        where.add(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                            group.getId()));
                     }
                 }
             }
@@ -1338,18 +1301,18 @@ public class TypeHandler extends RepositoryManager {
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
         if (dateRange[0] != null) {
-            where.add(SqlUtil.ge(COL_ENTRIES_FROMDATE, dateRange[0]));
+            where.add(Clause.ge(COL_ENTRIES_FROMDATE, dateRange[0]));
         }
 
 
         if (dateRange[1] != null) {
-            where.add(SqlUtil.le(COL_ENTRIES_TODATE, dateRange[1]));
+            where.add(Clause.le(COL_ENTRIES_TODATE, dateRange[1]));
         }
 
 
         Date createDate = request.get(ARG_CREATEDATE, (Date) null);
         if (createDate != null) {
-            where.add(SqlUtil.le(COL_ENTRIES_CREATEDATE, createDate));
+            where.add(Clause.le(COL_ENTRIES_CREATEDATE, createDate));
         }
 
 
@@ -1376,12 +1339,11 @@ public class TypeHandler extends RepositoryManager {
                                                0.0)));
         }
         if (areaExpressions.size() > 0) {
-            String areaExpr = SqlUtil.group(SqlUtil.makeAnd(areaExpressions));
+            Clause areaExpr = Clause.and(areaExpressions);
             if (includeNonGeo) {
-                areaExpr = SqlUtil.group(areaExpr + " OR "
-                                         + SqlUtil.eq(COL_ENTRIES_SOUTH,
-                                             Entry.NONGEO));
-
+                areaExpr = Clause.or(areaExpr,
+                                     Clause.eq(COL_ENTRIES_SOUTH,
+                                               new Double(Entry.NONGEO)));
             }
             where.add(areaExpr);
             //            System.err.println (areaExpr);
@@ -1447,16 +1409,6 @@ public class TypeHandler extends RepositoryManager {
                                             subTable + ".type",
                                             SqlUtil.quote(type))));
                 if (metadata.getInherited()) {
-                    String inheritedClausexxx =
-                        COL_ENTRIES_PARENT_GROUP_ID + " LIKE "
-                        + SqlUtil.group(
-                            SqlUtil.makeSelect(
-                                "metadata.entry_id ||'%'", TABLE_METADATA,
-                                "entries.parent_group_id LIKE "
-                                + "metadata.entry_id ||'%' AND "
-                                + "metadata.attr1="
-                                + SqlUtil.quote(metadata.getAttr1())));
-
                     String subselect =
                         SqlUtil.makeSelect(
                             "metadata.entry_id", TABLE_METADATA,
@@ -1498,7 +1450,7 @@ public class TypeHandler extends RepositoryManager {
         if (metadataAnds.size() > 0) {
             //        System.err.println ("metadata:" + metadataAnds);
             //            where.add(SqlUtil.group(SqlUtil.makeAnd(metadataAnds)));
-            where.add(SqlUtil.makeAnd(metadataAnds));
+            where.add(Clause.and(metadataAnds));
         }
 
 
@@ -1509,23 +1461,22 @@ public class TypeHandler extends RepositoryManager {
                 List tmp = StringUtil.split(name,",",true,true);
                 name = "%" + StringUtil.join("%,%", tmp) +"%";
             }
-            List ors = new ArrayList();
+            List<Clause> ors = new ArrayList<Clause>();
             boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
             if (searchMetadata) {
-                List metadataOrs = new ArrayList();
-                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR1, name, true));
-                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR2, name, true));
-                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR3, name, true));
-                metadataOrs.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR4, name, true));
-                String sql  =SqlUtil.makeAnd(SqlUtil.group(StringUtil.join(" OR ", metadataOrs)), 
-                                             SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
-                ors.add(SqlUtil.group(sql));
+                List<Clause> metadataOrs = new ArrayList<Clause>();
+                metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR1, name));
+                metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR2, name));
+                metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR3, name));
+                metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR4, name));
+                ors.add(Clause.and(Clause.or(metadataOrs), 
+                                      Clause.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID)));
             } else {
-                ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_NAME, name, true));
-                ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_DESCRIPTION, name, true));
+                ors.add(Clause.makeOrSplit(COL_ENTRIES_NAME, name));
+                ors.add(Clause.makeOrSplit(COL_ENTRIES_DESCRIPTION, name));
             }
 
-            where.add(SqlUtil.group(StringUtil.join(" OR ", ors)));
+            where.add(Clause.or(ors));
             //            where.add("(" + StringUtil.join(" OR ", ors) + ")");
             //            System.err.println("where:" + where);
         }
@@ -1650,6 +1601,16 @@ public class TypeHandler extends RepositoryManager {
                 && !value.toLowerCase().equals("all")) {
             list.add("(" + SqlUtil.makeOrSplit(column, value, quoteThem)
                      + ")");
+            return true;
+        }
+        return false;
+    }
+
+
+    protected boolean addOrClause(String column, String value, List<Clause> clauses) {
+        if ((value != null) && (value.trim().length() > 0)
+                && !value.toLowerCase().equals("all")) {
+            clauses.add(Clause.makeOrSplit(column, value));
             return true;
         }
         return false;

@@ -25,7 +25,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 
 
 
@@ -424,8 +426,8 @@ public class AccessManager extends RepositoryManager {
                                      List<Permission> permissions)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            getDatabaseManager().executeDelete(TABLE_PERMISSIONS,
-                    COL_PERMISSIONS_ENTRY_ID, SqlUtil.quote(entry.getId()));
+            SqlUtil.delete(getConnection(),TABLE_PERMISSIONS,
+                           Clause.eq(COL_PERMISSIONS_ENTRY_ID, entry.getId()));
 
             for (Permission permission : permissions) {
                 List roles = permission.getRoles();
@@ -457,14 +459,15 @@ public class AccessManager extends RepositoryManager {
             if (entry.getPermissions() != null) {
                 return entry.getPermissions();
             }
-            String query = SqlUtil.makeSelect(COLUMNS_PERMISSIONS,
-                               Misc.newList(TABLE_PERMISSIONS),
-                               SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID,
-                                          SqlUtil.quote(entry.getId())));
+            SqlUtil.Iterator iter =
+                SqlUtil.getIterator(getDatabaseManager().select(
+                                                                COLUMNS_PERMISSIONS,
+                                                                TABLE_PERMISSIONS,
+                                                                Clause.eq(COL_PERMISSIONS_ENTRY_ID,
+                                                                          entry.getId())));
 
             List<Permission> permissions = new ArrayList();
-            SqlUtil.Iterator iter =
-                SqlUtil.getIterator(getDatabaseManager().execute(query));
+
             ResultSet results;
             Hashtable actions = new Hashtable();
             while ((results = iter.next()) != null) {

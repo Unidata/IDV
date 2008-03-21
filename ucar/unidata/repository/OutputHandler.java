@@ -303,15 +303,15 @@ public class OutputHandler extends RepositoryManager {
         if(includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
             String icon = (entry.isGroup()?getRepository().fileUrl(ICON_FOLDER_CLOSED):getRepository().fileUrl(ICON_FILE));
-            String dropEvent =   " onmouseup=" + HtmlUtil.quote("mouseUpOnEntry(event,'" + entry.getId()+"');");
+            String dropEvent =   HtmlUtil.onMouseUp("mouseUpOnEntry(event,'" + entry.getId()+"')");
             String event = (entry.isGroup()?
-                            " onclick=" + HtmlUtil.quote("folderClick('" + entry.getId() +"')") : "");
+                            HtmlUtil.onMouseClick("folderClick('" + entry.getId() +"')") : "");
             
             if(okToMove) {
                 event += 
-                    (entry.isGroup()?" onmouseover=" + HtmlUtil.quote("mouseOverOnEntry(event,'" + entry.getId() +"');"):"") + 
-                    " onmouseout=" + HtmlUtil.quote("mouseOutOnEntry(event,'" + entry.getId() +"');") + 
-                    " onmousedown=" + HtmlUtil.quote("mouseDownOnEntry(event,'" + entry.getId() +"','" + entry.getLabel().replace("'","") +"');") + 
+                    (entry.isGroup()?HtmlUtil.onMouseOver("mouseOverOnEntry(event,'" + entry.getId() +"')"):"") + 
+                    HtmlUtil.onMouseOut("mouseOutOnEntry(event,'" + entry.getId() +"')") + 
+                    HtmlUtil.onMouseDown("mouseDownOnEntry(event,'" + entry.getId() +"','" + entry.getLabel().replace("'","") +"');") + 
                     (entry.isGroup()?dropEvent:"");
             }
 
@@ -331,8 +331,8 @@ public class OutputHandler extends RepositoryManager {
                           request.entryUrl(
                                        getRepository().URL_ENTRY_SHOW, entry), linkText,
                           " id=" + HtmlUtil.quote(elementId) +" " +
-                          " onmouseover=" + HtmlUtil.quote("tooltip.show(event,'" + elementId +"');") + 
-                          " onmouseout=" + HtmlUtil.quote("tooltip.hide(event,'" + elementId +"');")));
+                          HtmlUtil.onMouseOver("tooltip.show(event,'" + elementId +"');") + 
+                          HtmlUtil.onMouseOut("tooltip.hide(event,'" + elementId +"');")));
         
         return HtmlUtil.span(sb.toString(), " id=" + HtmlUtil.quote("span_" + entry.getId()));
     }
@@ -438,7 +438,7 @@ public class OutputHandler extends RepositoryManager {
             formSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
             String arrowImg = HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),"Show/Hide Form"," id=\"entryformimg\" ");
-            link = HtmlUtil.space(2) + "<a href=\"JavaScript: noop()\" onclick=\"toggleEntryForm()\">" + arrowImg +"</a>";
+            link = HtmlUtil.space(2) + HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleEntryForm()"), arrowImg);
             sb.append(HtmlUtil.span(formSB.toString()," id = \"entryform\" "));
             sb.append("<ul class=\"folderblock\" style=\"list-style-image : url("
                       + getRepository().fileUrl(ICON_BLANK) + ")\">");

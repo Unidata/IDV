@@ -24,6 +24,7 @@ package ucar.unidata.repository;
 
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.sql.Clause;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 
@@ -63,7 +64,7 @@ import java.util.Properties;
 
 
 /**
- * Class TypeHandler _more_
+* Class TypeHandler _more_
  *
  *
  * @author IDV Development Team
@@ -548,12 +549,12 @@ public class UserManager extends RepositoryManager {
             //            System.err.println ("got from user map:" + id +" " + user);
             return user;
         }
-        String query = SqlUtil.makeSelect(COLUMNS_USERS,
-                                          Misc.newList(TABLE_USERS),
-                                          SqlUtil.eq(COL_USERS_ID,
-                                              SqlUtil.quote(id)));
-        ResultSet results =
-            getDatabaseManager().execute(query).getResultSet();
+        Statement stmt  = getDatabaseManager().select(
+                                                      COLUMNS_USERS,
+                                                      TABLE_USERS,
+                                                      Clause.eq(COL_USERS_ID,
+                                                                id));
+        ResultSet results =  stmt.getResultSet();
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
             if (userDefaultIfNotFound) {
@@ -637,8 +638,8 @@ public class UserManager extends RepositoryManager {
      */
     protected void deleteUser(User user) throws Exception {
         deleteRoles(user);
-        getDatabaseManager().executeDelete(TABLE_USERS, COL_USERS_ID,
-                                           SqlUtil.quote(user.getId()));
+        SqlUtil.delete(getConnection(),TABLE_USERS, Clause.eq(COL_USERS_ID,
+                                                              user.getId()));
     }
 
     /**
@@ -649,9 +650,9 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteRoles(User user) throws Exception {
-        getDatabaseManager().executeDelete(TABLE_USERROLES,
-                                           COL_USERROLES_USER_ID,
-                                           SqlUtil.quote(user.getId()));
+        SqlUtil.delete(getConnection(),TABLE_USERROLES,
+                       Clause.eq(COL_USERROLES_USER_ID,
+                                 user.getId()));
     }
 
 
@@ -1001,12 +1002,11 @@ public class UserManager extends RepositoryManager {
         usersHtml.append(HtmlUtil.submit(msg("New User")));
         usersHtml.append("</form>");
 
-        String query =
-            SqlUtil.makeSelect(COLUMNS_USERS, Misc.newList(TABLE_USERS))
-            + " order by " + COL_USERS_ID;
+        Statement stmt = getDatabaseManager().select(
+                                                     COLUMNS_USERS, TABLE_USERS, new Clause(),
+                                                     " order by " + COL_USERS_ID);
 
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
+        SqlUtil.Iterator iter =  SqlUtil.getIterator(stmt);
         ResultSet  results;
 
         List<User> users = new ArrayList();
@@ -1078,11 +1078,12 @@ public class UserManager extends RepositoryManager {
                              results.getBoolean(col++),
                              results.getString(col++));
 
-        String query = SqlUtil.makeSelect(COL_USERROLES_ROLE,
-                                          Misc.newList(TABLE_USERROLES),
-                                          SqlUtil.eq(COL_USERROLES_USER_ID,
-                                              SqlUtil.quote(user.getId())));
-        Statement    stmt  = getDatabaseManager().execute(query);
+        Statement    stmt  = 
+            getDatabaseManager().select(COL_USERROLES_ROLE,
+                                        TABLE_USERROLES,
+                                        Clause.eq(COL_USERROLES_USER_ID,
+                                                  user.getId()));
+
         String[]     array = SqlUtil.readString(stmt, 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
         user.setRoles(roles);
@@ -1431,18 +1432,18 @@ public class UserManager extends RepositoryManager {
             String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD1, "");
             password = hashPassword(password);
-            String query = SqlUtil.makeSelect(
-                               COLUMNS_USERS, Misc.newList(TABLE_USERS),
-                               SqlUtil.makeAnd(
-                                   Misc.newList(
-                                       SqlUtil.eq(
-                                           COL_USERS_ID,
-                                           SqlUtil.quote(name)), SqlUtil.eq(
-                                               COL_USERS_PASSWORD,
-                                               SqlUtil.quote(password)))));
 
-            ResultSet results =
-                getDatabaseManager().execute(query).getResultSet();
+            Statement    stmt  = 
+                getDatabaseManager().select(
+                                            COLUMNS_USERS, 
+                                            TABLE_USERS,
+                                            Clause.and(Clause.eq(
+                                                                 COL_USERS_ID,
+                                                                 name), Clause.eq(
+                                                                                  COL_USERS_PASSWORD,
+                                                                                  password)));
+
+            ResultSet results = stmt.getResultSet();
             if (results.next()) {
                 user = getUser(results);
                 setUserSession(request, user);
@@ -1463,7 +1464,9 @@ public class UserManager extends RepositoryManager {
                     getRepository().warning(
                         msg("Incorrect user name or password")));
             }
+            stmt.close();
         }
+
 
         if (user == null) {
             sb.append(makeLoginForm(request));
@@ -1557,10 +1560,9 @@ public class UserManager extends RepositoryManager {
     public List<String> getRoles() throws Exception {
         String[] roleArray =
             SqlUtil.readString(
-                getDatabaseManager().execute(
-                    SqlUtil.makeSelect(
-                        SqlUtil.distinct(COL_USERROLES_ROLE),
-                        Misc.newList(TABLE_USERROLES))), 1);
+                               getDatabaseManager().select(
+                                                           SqlUtil.distinct(COL_USERROLES_ROLE),
+                                                           TABLE_USERROLES, new Clause()), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
         roles.add(0, ROLE_ANY);
         return roles;
