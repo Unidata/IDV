@@ -35,7 +35,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.sql.SqlUtil;
 
 
 import ucar.unidata.xml.XmlUtil;
