@@ -29,6 +29,8 @@ import ucar.nc2.*;
 
 import ucar.unidata.data.*;
 
+import ucar.unidata.sql.SqlUtil;
+
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.ui.SqlShell;
