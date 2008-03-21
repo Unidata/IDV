@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.sql;
 
 
@@ -59,6 +58,8 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class SqlUtil {
+
+    /** _more_          */
     public static boolean debug = false;
 
     /** A calendar to use */
@@ -704,6 +705,13 @@ public class SqlUtil {
         return " " + validName(name) + "=" + value + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static String isNull(String name) {
         return " " + validName(name) + " is NULL ";
     }
@@ -963,7 +971,7 @@ public class SqlUtil {
         for (String command : parseSql(sql)) {
             try {
                 command = command.trim();
-                if(command.length()>0) {
+                if (command.length() > 0) {
                     statement.execute(command);
                     //                    if(!ignoreErrors)
                     //                        System.err.println ("OK:" + command);
@@ -1004,7 +1012,7 @@ public class SqlUtil {
                 sb = new StringBuffer();
             }
         }
-        if(sb.toString().length()>0) {
+        if (sb.toString().length() > 0) {
             result.add(sb.toString());
         }
         return result;
@@ -1379,35 +1387,96 @@ public class SqlUtil {
     }
 
 
-    public static PreparedStatement getSelectStatement(Connection connection, String what, List tables, Clause clause, String extra) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static PreparedStatement getSelectStatement(Connection connection,
+            String what, List tables, Clause clause, String extra)
+            throws Exception {
         StringBuffer sb = new StringBuffer();
         clause.addClause(sb);
-        String query = makeSelect(what, tables, sb.toString(),extra);
-        if(debug) {
-            System.err.println (query);
+        String query = makeSelect(what, tables, sb.toString(), extra);
+        if (debug) {
+            System.err.println(query);
         }
         return connection.prepareStatement(query);
     }
 
 
-    public static Statement select(Connection connection, String what, List tables, Clause clause, String extra) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause clause, String extra)
+            throws Exception {
         return select(connection, what, tables, clause, extra, -1);
     }
 
 
-    public static Statement select(Connection connection, String what, List tables, Clause clause, String extra, int max) throws Exception {
-        PreparedStatement stmt = getSelectStatement(connection, what, tables, clause, extra);
-        if(max>0) {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param extra _more_
+     * @param max _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause clause, String extra,
+                                   int max)
+            throws Exception {
+        PreparedStatement stmt = getSelectStatement(connection, what, tables,
+                                     clause, extra);
+        if (max > 0) {
             stmt.setMaxRows(max);
         }
-        clause.setValue(stmt,1);
+        clause.setValue(stmt, 1);
         stmt.execute();
         return stmt;
     }
 
 
 
-    public static PreparedStatement getDeleteStatement(Connection connection, String table, Clause clause) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param table _more_
+     * @param clause _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static PreparedStatement getDeleteStatement(Connection connection,
+            String table, Clause clause)
+            throws Exception {
         StringBuffer sb = new StringBuffer();
         clause.addClause(sb);
         String query = makeDelete(table, sb.toString());
@@ -1415,29 +1484,96 @@ public class SqlUtil {
     }
 
 
-    public static void delete(Connection connection, String table, Clause clause) throws Exception {
-        PreparedStatement stmt = getDeleteStatement(connection, table, clause);
-        clause.setValue(stmt,1);
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param table _more_
+     * @param clause _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void delete(Connection connection, String table,
+                              Clause clause)
+            throws Exception {
+        PreparedStatement stmt = getDeleteStatement(connection, table,
+                                     clause);
+        clause.setValue(stmt, 1);
         stmt.execute();
         stmt.close();
     }
 
-    public static Statement select(Connection connection, String what, List tables, Clause clause) throws Exception {
-        return select(connection, what, tables, clause,"");
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause clause)
+            throws Exception {
+        return select(connection, what, tables, clause, "");
     }
 
 
-    public static Statement select(Connection connection, String what, List tables, Clause[]clauses) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clauses _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause[] clauses)
+            throws Exception {
         return select(connection, what, tables, Clause.and(clauses));
     }
 
-    public static Statement select(Connection connection, String what, List tables, Clause[]clauses, String extra) throws Exception {
-        return select(connection, what, tables, Clause.and(clauses),extra);
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param what _more_
+     * @param tables _more_
+     * @param clauses _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause[] clauses,
+                                   String extra)
+            throws Exception {
+        return select(connection, what, tables, Clause.and(clauses), extra);
     }
 
 
 
-    public static void update(Connection connection, String table, Clause clause) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param table _more_
+     * @param clause _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void update(Connection connection, String table,
+                              Clause clause)
+            throws Exception {
         /*
         StringBuffer sb = new StringBuffer();
         clause.addClause(sb);
