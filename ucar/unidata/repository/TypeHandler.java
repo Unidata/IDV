@@ -1442,27 +1442,27 @@ public class TypeHandler extends RepositoryManager {
             }
             values.add(metadata);
         }
-        List metadataAnds = new ArrayList();
-
-
+        List<Clause> metadataAnds = new ArrayList<Clause>();
         for (int typeIdx = 0; typeIdx < types.size(); typeIdx++) {
             String type        = (String) types.get(typeIdx);
             List   values      = (List) typeMap.get(type);
-            List   metadataOrs = new ArrayList();
+            List<Clause>   metadataOrs = new ArrayList<Clause>();
             String subTable    = TABLE_METADATA + "_" + typeIdx;
             for (int i = 0; i < values.size(); i++) {
                 Metadata metadata = (Metadata) values.get(i);
-                String clause =
-                    SqlUtil.makeAnd(
-                        Misc.newList(
-                            SqlUtil.eq(
-                                subTable + ".entry_id",
-                                COL_ENTRIES_ID), SqlUtil.eq(
-                                    subTable + ".attr1",
-                                    SqlUtil.quote(
-                                        metadata.getAttr1())), SqlUtil.eq(
-                                            subTable + ".type",
-                                            SqlUtil.quote(type))));
+                Clause clause =
+                    Clause.and(
+                               new Clause[]{
+                                   Clause.eq(
+                                             subTable + ".entry_id",
+                                             COL_ENTRIES_ID), 
+                                   Clause.eq(
+                                             subTable + ".attr1",
+                                             metadata.getAttr1()), 
+                                   Clause.eq(
+                                             subTable + ".type",
+                                             type)});
+                /***TODO
                 if (metadata.getInherited()) {
                     String subselect =
                         SqlUtil.makeSelect(
@@ -1491,20 +1491,17 @@ public class TypeHandler extends RepositoryManager {
                                 SqlUtil.group(clause),
                                 SqlUtil.group(inheritedClause))));
                     //                clause = SqlUtil.group(inheritedClause);
-                }
+                    }***/
                 //                System.err.println(clause);
-                metadataOrs.add(SqlUtil.group(clause));
+                metadataOrs.add(clause);
             }
             if (metadataOrs.size() > 0) {
                 //                metadataAnds.add(SqlUtil.group(SqlUtil.makeOr(metadataOrs)));
-                metadataAnds.add(SqlUtil.makeOr(metadataOrs));
+                metadataAnds.add(Clause.or(metadataOrs));
             }
         }
 
-        //        metadataAnds.add(inheritedQuery);
         if (metadataAnds.size() > 0) {
-            //        System.err.println ("metadata:" + metadataAnds);
-            //            where.add(SqlUtil.group(SqlUtil.makeAnd(metadataAnds)));
             where.add(Clause.and(metadataAnds));
         }
 
