@@ -221,8 +221,15 @@ public class HtmlUtil {
                + ">";
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     */
     public static String cssClass(String c) {
-        return " class=\"" + c +"\" ";
+        return " class=\"" + c + "\" ";
     }
 
     /**
@@ -390,8 +397,16 @@ public class HtmlUtil {
         return "<tr>" + row + "</tr>";
     }
 
+    /**
+     * _more_
+     *
+     * @param row _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String row(String row, String extra) {
-        return "<tr " + extra+">" + row + "</tr>";
+        return "<tr " + extra + ">" + row + "</tr>";
     }
 
     /**
@@ -405,6 +420,13 @@ public class HtmlUtil {
         return "<tr valign=\"top\">" + row + "</tr>";
     }
 
+    /**
+     * _more_
+     *
+     * @param row _more_
+     *
+     * @return _more_
+     */
     public static String rowBottom(String row) {
         return "<tr valign=\"bottom\">" + row + "</tr>";
     }
@@ -489,12 +511,14 @@ public class HtmlUtil {
      * @param s3 _more_
      * @param s4 _more_
      * @param s5 _more_
+     * @param s6 _more_
      *
      * @return _more_
      */
     public static String cols(String s1, String s2, String s3, String s4,
                               String s5, String s6) {
-        return cols(s1) + cols(s2) + cols(s3) + cols(s4) + cols(s5) + cols(s6);
+        return cols(s1) + cols(s2) + cols(s3) + cols(s4) + cols(s5)
+               + cols(s6);
     }
 
 
@@ -607,11 +631,20 @@ public class HtmlUtil {
         return checkbox(name, value, checked, "");
     }
 
-    public static String checkbox(String name, String value,
-                                  boolean checked, String extra) {
-        return "<input " +
-            extra +
-            attrs("type", "checkbox", "name", name, "value", value)
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param checked _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String checkbox(String name, String value, boolean checked,
+                                  String extra) {
+        return "<input " + extra
+               + attrs("type", "checkbox", "name", name, "value", value)
                + (checked
                   ? " checked "
                   : "") + ">";
@@ -636,7 +669,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String form(String  url, String extra) {
+    public static String form(String url, String extra) {
         return "<form action=\"" + url + "\"" + " " + extra + " >";
     }
 
@@ -851,7 +884,18 @@ public class HtmlUtil {
         return select(name, values, selected, Integer.MAX_VALUE);
     }
 
-    public static String select(String name, List values, String selected, String extra) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param values _more_
+     * @param selected _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String select(String name, List values, String selected,
+                                String extra) {
         return select(name, values, selected, extra, Integer.MAX_VALUE);
     }
 
@@ -884,14 +928,25 @@ public class HtmlUtil {
      */
     public static String select(String name, List values, String selected,
                                 int maxLength) {
-        return select(name, values, selected,"", maxLength);
+        return select(name, values, selected, "", maxLength);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param values _more_
+     * @param selected _more_
+     * @param extra _more_
+     * @param maxLength _more_
+     *
+     * @return _more_
+     */
     public static String select(String name, List values, String selected,
                                 String extra, int maxLength) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<select name=" + quote(name) +" " +  extra +">\n");
+        sb.append("<select name=" + quote(name) + " " + extra + ">\n");
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;
@@ -1194,37 +1249,90 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     *
+     * @return _more_
+     */
     public static String onMouseOver(String call) {
-        return " onmouseover=" + quote(call) +" ";
+        return " onmouseover=" + quote(call) + " ";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     *
+     * @return _more_
+     */
     public static String onMouseOut(String call) {
-        return " onmouseout=" + quote(call) +" ";
+        return " onmouseout=" + quote(call) + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     *
+     * @return _more_
+     */
     public static String onMouseUp(String call) {
-        return " onmouseup=" + quote(call) +" ";
+        return " onmouseup=" + quote(call) + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     *
+     * @return _more_
+     */
     public static String onMouseDown(String call) {
-        return " onmousedown=" + quote(call) +" ";
+        return " onmousedown=" + quote(call) + " ";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     *
+     * @return _more_
+     */
     public static String onMouseClick(String call) {
-        return " onclick=" + quote(call) +" ";
+        return " onclick=" + quote(call) + " ";
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param events _more_
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String jsLink(String events, String content) {
         return jsLink(events, content, "");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param events _more_
+     * @param content _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String jsLink(String events, String content, String extra) {
-        return  "<a href=\"javascript:noop()\" " + events +" " + extra +">" + content +"</a>";
+        return "<a href=\"javascript:noop()\" " + events + " " + extra + ">"
+               + content + "</a>";
     }
 
 }
