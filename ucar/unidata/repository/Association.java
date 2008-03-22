@@ -43,8 +43,14 @@ import java.util.List;
  */
 public class Association {
 
+    public static final String TYPE_ATTACHMENT = "attachment";
+
     /** _more_ */
     private String name;
+
+
+    /** _more_ */
+    private String type;
 
 
     /** _more_ */
@@ -61,8 +67,10 @@ public class Association {
      * @param fromId _more_
      * @param toId _more_
      */
-    public Association(String name, String fromId, String toId) {
+    public Association(String name, String type, String fromId, String toId) {
         this.name   = name;
+        if(type == null) type = "";
+        this.type = type;
         this.fromId = fromId;
         this.toId   = toId;
     }
@@ -124,6 +132,24 @@ public class Association {
     public String getToId() {
         return toId;
     }
+
+/**
+Set the Type property.
+
+@param value The new value for Type
+**/
+public void setType (String value) {
+	type = value;
+}
+
+/**
+Get the Type property.
+
+@return The Type
+**/
+public String getType () {
+	return type;
+}
 
 
 

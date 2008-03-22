@@ -84,9 +84,9 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links)
+                                 List<Link> links, boolean forMenu)
             throws Exception {
-        super.getEntryLinks(request, entry, links);
+        super.getEntryLinks(request, entry, links, forMenu);
         if (entry.getValues() == null) {
             return;
         }

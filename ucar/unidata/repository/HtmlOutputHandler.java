@@ -283,14 +283,12 @@ public class HtmlOutputHandler extends OutputHandler {
             if (association.getFromId().equals(entry.getId())) {
                 fromEntry = entry;
             } else {
-                fromEntry = getRepository().getEntry(association.getFromId(),
-                        request);
+                fromEntry = getRepository().getEntry(request,association.getFromId());
             }
             if (association.getToId().equals(entry.getId())) {
                 toEntry = entry;
             } else {
-                toEntry = getRepository().getEntry(association.getToId(),
-                        request);
+                toEntry = getRepository().getEntry(request,association.getToId());
             }
             if ((fromEntry == null) || (toEntry == null)) {
                 continue;

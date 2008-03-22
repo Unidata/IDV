@@ -4,6 +4,49 @@
 
 function Util () {
 
+    this.loadXML = function (url, callback,arg) {
+        var req = false;
+        if(window.XMLHttpRequest) {
+            try {
+                req = new XMLHttpRequest();
+            } catch(e) {
+                req = false;
+            }
+        } else if(window.ActiveXObject)  {
+            try {
+                req = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch(e) {
+                try {
+                    req = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch(e) {
+                    req = false;
+                }
+            }
+        }
+        if(req) {
+            req.onreadystatechange = function () { 
+                if (req.readyState == 4 && req.status == 200)   {
+                    callback(req,arg); 
+                }
+            };
+            req.open("GET", url, true);
+            req.send("");
+        }
+    }
+
+
+
+    this.setCursor = function(c) {
+        var cursor = document.cursor;
+        if(!cursor && document.getElementById) {
+            cursor =  document.getElementById('cursor');
+        }
+        if(!cursor) {
+            document.body.style.cursor = c;
+        }
+    }
+
+
     this.getDomObject = function(name) {
         obj = new DomObject(name);
         if(obj.obj) return obj;
@@ -22,6 +65,17 @@ function Util () {
         }
         return '';
     }
+
+
+    this.print = function (s, clear) {
+        var obj = util.getDomObject("output");
+        if(!obj) return;
+        if(clear) {
+            obj.obj.innerHTML  ="";
+        }
+        obj.obj.innerHTML  =obj.obj.innerHTML+"<br>" +s;
+    }
+
 
 
     this.getEvent = function (event) {
@@ -97,15 +151,6 @@ function noop() {
 
 
 
-function print(s, clear) {
-    var obj = util.getDomObject("output");
-    if(!obj) return;
-    if(clear) {
-        obj.obj.innerHTML  ="";
-    }
-    obj.obj.innerHTML  =obj.obj.innerHTML+"<br>" +s;
-}
-
 
 
 
@@ -144,7 +189,7 @@ function mouseUp(event) {
     event = util.getEvent(event);
     mouseIsDown = 0;
     draggedEntry   = null;
-    setCursor('default');
+    util.setCursor('default');
     var obj = util.getDomObject('floatdiv');
     if(obj) {
         hideObject(obj);
@@ -158,7 +203,7 @@ function mouseMove(event) {
         mouseMoveCnt++;
         var obj = util.getDomObject('floatdiv');
         if(mouseMoveCnt==6) {
-            setCursor('move');
+            util.setCursor('move');
         }
         if(mouseMoveCnt>=6&& obj) {
             moveFloatDiv(util.getEventX(event),util.getEventY(event));
@@ -327,23 +372,17 @@ function Tooltip () {
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
         util.setPosition(obj, x,y);
-
-
         url = "${urlroot}/entry/show?id=" + id +"&output=metadataxml";
-        var request = window.XMLHttpRequest ?
-        new XMLHttpRequest() : new ActiveXObject("MSXML2.XMLHTTP.3.0");
-        request.onreadystatechange = function()  {
-            if (request.readyState == 4 && request.status == 200)   {
-                var xmlDoc=request.responseXML.documentElement;
-                text = getChildText(xmlDoc);
-                obj.obj.innerHTML = "<div id=\"tooltipwrapper\" onmouseover=\"tooltip.divMouseOver();\"  onmouseout=\"tooltip.divMouseOut();\"><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.unPin();\" id=\"tooltipclose\" onmouseover=\"tooltip.divMouseOver();\" src=${urlroot}/blank.gif></td><td>" + text+"</table><div id=\"pindiv\" class=smallmessage>'p' to pin</div></div>";
-                //obj.obj.innerHTML = "<div id=\"tooltipwrapper\" onmouseover=\"tooltip.divMouseOver();\"  onmouseout=\"tooltip.divMouseOut();\">" + getChildText(xmlDoc)+"</div>";
-                showing = 1;
-                showObject(obj);
-            }
-        };
-        request.open("GET", url);
-        request.send(null);
+	util.loadXML( url, handleTooltip,obj);
+    }
+
+
+    function handleTooltip(request, obj) {
+        var xmlDoc=request.responseXML.documentElement;
+        text = getChildText(xmlDoc);
+        obj.obj.innerHTML = "<div id=\"tooltipwrapper\" onmouseover=\"tooltip.divMouseOver();\"  onmouseout=\"tooltip.divMouseOut();\"><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.unPin();\" id=\"tooltipclose\" onmouseover=\"tooltip.divMouseOver();\" src=${urlroot}/blank.gif></td><td>" + text+"</table><div id=\"pindiv\" class=smallmessage>'p' to pin</div></div>";
+        showing = 1;
+        showObject(obj);
     }
 
 }
@@ -386,6 +425,15 @@ function toggleBlockVisibility(id, imgid, showimg, hideimg) {
 
 
 
+function  handleFolderList(request, id) {
+    var block = util.getDomObject("block_" + id);
+    var img = util.getDomObject("img_" +id);
+    var xmlDoc=request.responseXML.documentElement;
+    block.obj.innerHTML = getChildText(xmlDoc);
+    if(img) img.obj.src = "${urlroot}/folderopen.gif";
+
+}
+
 function folderClick(id) {
     var block = util.getDomObject("block_" + id);
     if(!block) return;
@@ -395,17 +443,7 @@ function folderClick(id) {
         showObject(block);
         if(img) img.obj.src = "${urlroot}/progress.gif";
         url = "${urlroot}/entry/show?id=" + id +"&output=groupxml";
-        var request = window.XMLHttpRequest ?
-            new XMLHttpRequest() : new ActiveXObject("MSXML2.XMLHTTP.3.0");
-        request.onreadystatechange = function()  {
-            if (request.readyState == 4 && request.status == 200)   {
-                var xmlDoc=request.responseXML.documentElement;
-                block.obj.innerHTML = getChildText(xmlDoc);
-                if(img) img.obj.src = "${urlroot}/folderopen.gif";
-            }
-        }
-        request.open("GET", url);
-        request.send(null);
+	util.loadXML( url, handleFolderList,id);
     } else {
         if(img) img.obj.src = "${urlroot}/folderclosed.gif";
         block.obj.isOpen = 0;
@@ -416,16 +454,6 @@ function folderClick(id) {
 
 
 
-
-function setCursor(c) {
-    var cursor = document.cursor;
-    if(!cursor && document.getElementById) {
-        cursor =  document.getElementById('cursor');
-    }
-    if(!cursor) {
-        document.body.style.cursor = c;
-    }
-}
 
 
 

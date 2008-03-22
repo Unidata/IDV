@@ -435,7 +435,7 @@ public class HarvesterManager extends RepositoryManager {
         sb.append("<p>");
         String catalog = request.getString(ARG_CATALOG, "").trim();
         sb.append(request.form(URL_HARVESTERS_IMPORTCATALOG));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.submit(msgLabel("Import catalog")));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.input(ARG_CATALOG, catalog, " size=\"75\""));

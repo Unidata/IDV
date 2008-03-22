@@ -101,7 +101,6 @@ a.menulink {
 
 .header {
   font-family:  Helvetica, sans-serif;
-  background-image:url(${urlroot}/header.jpg);  
   background-repeat: no-repeat;
   background-color:#006699;
   font-size: 24pt;
@@ -147,6 +146,14 @@ a.menulink {
    border-bottom : 2px #aabbaa solid;
 }
 
+
+
+.entryname a:hover {
+	color:red;
+}
+.entryname a {
+   color: #9C9C9C;
+}
 
 .entryname {
    margin:0px;

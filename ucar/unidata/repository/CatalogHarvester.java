@@ -260,19 +260,22 @@ public class CatalogHarvester extends Harvester {
             typeHandler.initializeNewEntry(entry);
             if (entries.size() > 1000) {
                 Misc.gc();
-                System.err.println ("\nMemory:" +( Misc.usedMemory()/1000000) + " group:"+ getRepository().groupCache.size());
+                System.err.println ("\nMemory:" +( Misc.usedMemory()/1000000));
                 //                repository.processEntries(this, null, entries);
                 entries = new ArrayList<Entry>();
             }
             return;
         }
 
-        name = name.replace("/", "--");
+        name = name.replace(Group.IDDELIMITER, "--");
         name = name.replace("'", "");
-        String groupName = parent.getFullName() + "/" + name;
-        //        Group  group     = parent;
-        Group  group     = repository.findGroupFromName(groupName);
+        Group  group     = null;
+        Entry newGroup = repository.findEntryWithName(null,parent,name);
+        if(newGroup!=null && newGroup.isGroup()) {
+            group = (Group)newGroup;
+        }
         if (group == null) {
+            String groupName = parent.getFullName() + Group.IDDELIMITER + name;
             group = repository.findGroupFromName(groupName, user, true);
             /*
             List<Metadata> metadataList = new ArrayList<Metadata>();

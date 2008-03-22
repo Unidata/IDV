@@ -1238,8 +1238,7 @@ public class UserManager extends RepositoryManager {
         if (action.equals(ACTION_CLEAR)) {
             getCart(request).clear();
         } else if (action.equals(ACTION_ADD)) {
-            Entry entry = getRepository().getEntry(request.getId(""),
-                              request);
+            Entry entry = getRepository().getEntry(request,request.getId(""));
             if (entry == null) {
                 throw new IllegalArgumentException(
                     msgLabel("Could not find entry with id")
@@ -1277,8 +1276,7 @@ public class UserManager extends RepositoryManager {
             boolean haveFrom = request.defined(ARG_FROM);
             if (haveFrom) {
                 Entry fromEntry =
-                    getRepository().getEntry(request.getString(ARG_FROM, ""),
-                                             request);
+                    getRepository().getEntry(request,request.getString(ARG_FROM, ""));
                 sb.append(HtmlUtil.br());
                 sb.append(msgLabel("Pick an entry  to associate with")
                           + HtmlUtil.space(1) + fromEntry.getName());

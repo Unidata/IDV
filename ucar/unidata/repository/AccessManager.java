@@ -168,8 +168,8 @@ public class AccessManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_ID)) {
-            Entry entry = getRepository().getEntry(request.getString(ARG_ID,
-                              ""), request, false);
+            Entry entry = getRepository().getEntry(request, request.getString(ARG_ID,
+                              ""),  false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
                         + request.getString(ARG_ID, ""));
@@ -177,12 +177,10 @@ public class AccessManager extends RepositoryManager {
             return canDoAction(request, entry, action);
         }
 
-
-
         if (request.exists(ARG_IDS)) {
             for (String id : StringUtil.split(request.getString(ARG_IDS, ""),
                     ",", true, true)) {
-                Entry entry = getRepository().getEntry(id, request, false);
+                Entry entry = getRepository().getEntry(request, id, false);
                 if (entry == null) {
                     throw new IllegalArgumentException(
                         "Could not find entry:" + id);
@@ -252,7 +250,7 @@ public class AccessManager extends RepositoryManager {
                 }
                 break;
             }
-            entry = repository.getEntry(entry.getParentGroupId(), request);
+            entry = repository.getEntry(request, entry.getParentGroupId());
         }
 
         return false;
@@ -408,7 +406,7 @@ public class AccessManager extends RepositoryManager {
         }
         sb.append(HtmlUtil.rowTop(cols.toString()));
         listAccess(request,
-                   repository.getEntry(entry.getParentGroupId(), request),
+                   repository.getEntry(request, entry.getParentGroupId()),
                    sb);
     }
 

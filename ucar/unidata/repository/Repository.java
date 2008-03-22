@@ -537,7 +537,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String note(String h) {
-        return getMessage(h, "/information.png", true);
+        return getMessage(h, ICON_INFORMATION, true);
     }
 
     /**
@@ -548,7 +548,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String progress(String h) {
-        return getMessage(h, "/progress.gif", false);
+        return getMessage(h, ICON_PROGRESS, false);
     }
 
 
@@ -560,9 +560,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String warning(String h) {
-        return getMessage(h, "/warning.png", true);
+        return getMessage(h, ICON_WARNING, true);
     }
-
 
 
     /**
@@ -574,7 +573,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String question(String h, String buttons) {
-        return getMessage(h + "<hr>" + buttons, "/question.png", false);
+        return getMessage(h + "<p><hr>" + buttons, ICON_QUESTION, false);
     }
 
     /**
@@ -585,8 +584,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String error(String h) {
-        return getMessage(h, "/error.png", true);
+        return getMessage(h, ICON_ERROR, true);
     }
+
 
     /**
      * _more_
@@ -1103,6 +1103,15 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    protected void clearCache(Entry entry) {
+        entryCache.remove(entry.getId());
+        if(entry.isGroup()) {
+            Group group = (Group) entry;
+            groupCache.remove(group.getId());
+            groupCache.remove(group.getFullName());
+        }
+    }
+
 
     /**
      * _more_
@@ -1474,7 +1483,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<Entry> entries = new ArrayList<Entry>();
         for (String id : StringUtil.split(request.getString(ARG_IDS, ""),
                                           ",", true, true)) {
-            Entry entry = getRepository().getEntry(id, request, false);
+            Entry entry = getEntry(request, id, false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
                         + id);
@@ -1512,7 +1521,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             return new Result(request.url(URL_ENTRY_SHOW, ARG_ID, id));
         }
 
-
         if (request.exists(ARG_DELETE_CONFIRM)) {
             return asynchDeleteEntries(request, entries);
         }
@@ -1523,7 +1531,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                 "", new StringBuffer(warning(msg("No entries selected"))));
         }
 
-        sb.append(request.form(URL_ENTRY_DELETELIST));
         StringBuffer msgSB    = new StringBuffer();
         StringBuffer idBuffer = new StringBuffer();
         for (Entry entry : entries) {
@@ -1532,15 +1539,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         msgSB.append(
             msg("Are you sure you want to delete all of the entries?"));
-        msgSB.append(HtmlUtil.p());
-        String buttons =
-            buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
-                    HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
-
-        sb.append(question(msgSB.toString(), buttons));
-        sb.append(HtmlUtil.hidden(ARG_IDS, idBuffer.toString()));
-        sb.append(HtmlUtil.formClose());
-
+        sb.append(request.form(URL_ENTRY_DELETELIST));
+        String hidden = HtmlUtil.hidden(ARG_IDS, idBuffer.toString());
+        String form = makeOkCancelForm(request, URL_ENTRY_DELETELIST, ARG_DELETE_CONFIRM, hidden);
+        sb.append(question(msgSB.toString(), form));
         sb.append("<ul>");
         new OutputHandler(this).getEntryHtml(sb, entries, request, false,
                           false, true);
@@ -1549,6 +1551,18 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    public String makeOkCancelForm(Request request, RequestUrl url, String okArg, String extra) {
+        StringBuffer fb = new StringBuffer();
+        fb.append(request.form(URL_ENTRY_COPY));
+        fb.append(extra);
+        String okButton     = HtmlUtil.submit(msg("OK"),
+                                              okArg);
+        String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
+        String buttons      = buttons(okButton, cancelButton);
+        fb.append(buttons);
+        fb.append(HtmlUtil.formClose());
+        return fb.toString();
+    }
 
     /**
      * _more_
@@ -1910,6 +1924,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         String userLink = getUserManager().getUserLinks(request);
+
+        String headerImage = fileUrl("/header.jpg");
+        String headerTitle = getProperty(PROP_REPOSITORY_NAME,
+                                         "Repository");
+        html = StringUtil.replace(html, "${header.image}",headerImage);
+        html = StringUtil.replace(html, "${header.title}", headerTitle);
 
         html = StringUtil.replace(html, "${userlink}", userLink);
         html = StringUtil.replace(html, "${repository_name}",
@@ -2564,10 +2584,10 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected List<Link> getEntryLinks(Request request, Entry entry)
+    protected List<Link> getEntryLinks(Request request, Entry entry, boolean forMenu)
             throws Exception {
         List<Link> links = new ArrayList<Link>();
-        entry.getTypeHandler().getEntryLinks(request, entry, links);
+        entry.getTypeHandler().getEntryLinks(request, entry, links, forMenu);
         for (OutputHandler outputHandler : getOutputHandlers()) {
             outputHandler.getEntryLinks(request, entry, links);
         }
@@ -2593,7 +2613,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected String getEntryLinksHtml(Request request, Entry entry)
             throws Exception {
         return StringUtil.join(HtmlUtil.space(1),
-                               getEntryLinks(request, entry));
+                               getEntryLinks(request, entry,false));
     }
 
 
@@ -3157,12 +3177,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (fromId == null) {
             throw new IllegalArgumentException("No " + ARG_FROM + " given");
         }
-        Entry fromEntry = getEntry(fromId, request);
+        Entry fromEntry = getEntry(request,fromId);
         if (fromEntry == null) {
             throw new IllegalArgumentException("Could not find entry "
                     + fromId);
         }
 
+
+        if (request.exists(ARG_CANCEL)) {
+            return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
+        }
 
 
         if ( !request.exists(ARG_TO)) {
@@ -3206,7 +3230,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             throw new IllegalArgumentException("No " + ARG_TO + " given");
         }
 
-        Entry toEntry = getEntry(toId, request);
+        Entry toEntry = getEntry(request,toId);
         if (toEntry == null) {
             throw new IllegalArgumentException("Could not find entry "
                     + toId);
@@ -3229,6 +3253,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             throw new AccessException("Cannot copy to:" + toEntry.getLabel());
         }
 
+
         if ( !okToMove(fromEntry, toEntry)) {
             StringBuffer sb = new StringBuffer();
             sb.append(makeEntryHeader(request, fromEntry));
@@ -3237,11 +3262,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
+
         String action = request.getString(ARG_ACTION, ACTION_COPY);
 
-        if (request.exists(ARG_CANCEL)) {
-            return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
-        }
 
 
         if ( !request.exists(ARG_MOVE_CONFIRM)) {
@@ -3257,22 +3280,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(toEntry.getLabel());
             sb.append(HtmlUtil.br());
 
-            StringBuffer fb = new StringBuffer();
-
-            fb.append(request.form(URL_ENTRY_COPY));
-            fb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
-            fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
-            fb.append(HtmlUtil.hidden(ARG_ACTION, action));
-            fb.append(HtmlUtil.hidden(ARG_ACTION, action));
-            String okButton     = HtmlUtil.submit(msg("OK"),
-                                      ARG_MOVE_CONFIRM);
-            String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
-            String buttons      = buttons(okButton, cancelButton);
-            fb.append(buttons);
-            fb.append(HtmlUtil.formClose());
+            String hidden = HtmlUtil.hidden(ARG_FROM, fromEntry.getId()) +
+                HtmlUtil.hidden(ARG_TO, toEntry.getId())+
+                HtmlUtil.hidden(ARG_ACTION, action);
+            String form = makeOkCancelForm(request, URL_ENTRY_COPY, ARG_MOVE_CONFIRM, hidden);
             return new Result(msg("Move confirm"),
                               new StringBuffer(question(sb.toString(),
-                                  fb.toString())));
+                                                        form)));
         }
 
 
@@ -3282,13 +3296,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         try {
             if (action.equals(ACTION_MOVE)) {
                 fromEntry.setParentGroup(toGroup);
+
                 String oldId = fromEntry.getId();
                 String newId = oldId;
                 //TODO: critical section around new group id
                 if (fromEntry.isGroup()) {
                     newId = getGroupId(toGroup);
                     fromEntry.setId(newId);
-
                     String[] info = {
                         TABLE_ENTRIES, COL_ENTRIES_ID, TABLE_ENTRIES,
                         COL_ENTRIES_PARENT_GROUP_ID, TABLE_METADATA,
@@ -3299,6 +3313,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                         COL_PERMISSIONS_ENTRY_ID
                     };
 
+
                     for (int i = 0; i < info.length; i += 2) {
                         String sql = "UPDATE  " + info[i] + " SET "
                                      + SqlUtil.unDot(info[i + 1]) + " = "
@@ -3308,11 +3323,12 @@ public class Repository implements Constants, Tables, RequestHandler,
                         //                        System.err.println (sql);
                         statement.execute(sql);
                     }
+
+                    //TODO: we also cache the group full names
                     entryCache.remove(oldId);
                     entryCache.put(fromEntry.getId(), fromEntry);
                     groupCache.remove(fromEntry.getId());
                     groupCache.put(fromEntry.getId(), (Group) fromEntry);
-
                 }
 
                 //Change the parent
@@ -3324,11 +3340,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                              + SqlUtil.eq(COL_ENTRIES_ID,
                                           SqlUtil.quote(fromEntry.getId()));
                 statement.execute(sql);
+                connection.commit();
+                connection.setAutoCommit(true);
                 return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                         fromEntry.getId()));
             }
-            connection.commit();
-            connection.setAutoCommit(true);
         } finally {
             try {
                 connection.close();
@@ -3359,7 +3375,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entryId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
         }
-        Entry entry = getEntry(entryId, request);
+        Entry entry = getEntry(request,entryId);
         if (entry == null) {
             throw new IllegalArgumentException(
                 "Could not find entry with id:" + entryId);
@@ -3417,9 +3433,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(String entryId, Request request)
+    protected Entry getEntry(Request request, String entryId)
             throws Exception {
-        return getEntry(entryId, request, true);
+        return getEntry(request, entryId, true);
     }
 
     /**
@@ -3433,11 +3449,39 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(String entryId, Request request,
+    protected Entry getEntry(Request request, String entryId, 
                              boolean andFilter)
             throws Exception {
-        return getEntry(entryId, request, andFilter, false);
+        return getEntry(request, entryId, andFilter, false);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Entry getEntry(Request request) throws Exception {
+        Entry entry = getEntry(request, request.getString(ARG_ID, BLANK));
+        if (entry == null) {
+            Entry tmp = getEntry(request, request.getString(ARG_ID, BLANK), 
+                                 false);
+            if (tmp != null) {
+                throw new AccessException(
+                    "You do not have access to this entry");
+            }
+            throw new IllegalArgumentException("Could not find entry:"
+                    + request.getString(ARG_ID, BLANK));
+        }
+        return entry;
+    }
+
+
+
 
     /**
      * _more_
@@ -3451,7 +3495,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(String entryId, Request request,
+    protected Entry getEntry(Request request, String entryId, 
                              boolean andFilter, boolean abbreviated)
             throws Exception {
         if (entryId == null) {
@@ -3526,7 +3570,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(
                 request.form(
                     getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
-            sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
+            sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getId()));
             sb.append(HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
                       + HtmlUtil.space(1)
                       + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
@@ -3560,7 +3604,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(makeTypeSelect(request, false));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Create new entry"));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
         return new Result("New Form", sb, Result.TYPE_HTML);
@@ -3624,7 +3668,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(
                 HtmlUtil.formEntry(
                     BLANK, HtmlUtil.submit("Select Type to Add")));
-            sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+            sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         } else {
             TypeHandler typeHandler = ((entry == null)
                                        ? getTypeHandler(type)
@@ -3665,7 +3709,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
-                sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+                sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
             }
             //            sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
             typeHandler.addToEntryForm(request, sb, entry);
@@ -3679,31 +3723,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Entry getEntry(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, BLANK), request);
-        if (entry == null) {
-            Entry tmp = getEntry(request.getString(ARG_ID, BLANK), request,
-                                 false);
-            if (tmp != null) {
-                throw new AccessException(
-                    "You do not have access to this entry");
-            }
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, BLANK));
-        }
-        return entry;
-    }
 
 
 
@@ -3962,9 +3981,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processAssociationAdd(Request request) throws Exception {
-        Entry fromEntry = getEntry(request.getString(ARG_FROM, BLANK),
-                                   request);
-        Entry toEntry = getEntry(request.getString(ARG_TO, BLANK), request);
+        Entry fromEntry = getEntry(request, request.getString(ARG_FROM, BLANK));
+        Entry toEntry = getEntry(request,request.getString(ARG_TO, BLANK));
         if (fromEntry == null) {
             throw new IllegalArgumentException("Could not find entry:"
                     + request.getString(ARG_FROM, BLANK));
@@ -3979,6 +3997,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 getConnection().prepareStatement(INSERT_ASSOCIATIONS);
             int col = 1;
             assocInsert.setString(col++, name);
+            assocInsert.setString(col++, "");
             assocInsert.setString(col++, fromEntry.getId());
             assocInsert.setString(col++, toEntry.getId());
             assocInsert.execute();
@@ -4054,7 +4073,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
-            final List<Entry> entries = new ArrayList<Entry>();
+            List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
             Group group = findGroup(entry.getParentGroupId());
             if (entry.isGroup()) {
@@ -4064,7 +4083,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                 return new Result(request.entryUrl(URL_ENTRY_SHOW, group));
             }
         }
-
 
 
 
@@ -4085,7 +4103,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         StringBuffer fb = new StringBuffer();
         fb.append(request.form(URL_ENTRY_DELETE, BLANK));
-        fb.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+        fb.append(buttons(HtmlUtil.submit(msg("OK"), ARG_DELETE_CONFIRM),
                           HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
         fb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         fb.append(HtmlUtil.formClose());
@@ -4224,15 +4242,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (resourceName.length() == 0) {
                     resourceName = IOUtil.getFileTail(resource);
                 }
-                String groupName = request.getString(ARG_GROUP,
+
+                String groupId = request.getString(ARG_GROUP,
                                        (String) null);
-                if (groupName == null) {
+                if (groupId == null) {
                     throw new IllegalArgumentException(
                         "You must specify a parent group");
                 }
-                Group parentGroup = findGroupFromName(groupName,
-                                        request.getUser(), true);
-
+                Group parentGroup = findGroup(request);
                 if (filename != null) {
                     isFile       = true;
                     unzipArchive = request.get(ARG_FILE_UNZIP, false);
@@ -4341,23 +4358,21 @@ public class Repository implements Constants, Tables, RequestHandler,
                         //                            "You must specify a name");
                     }
 
+                    System.err.println("name:" + name +":" + parentGroup.getName());
                     if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
                         if (name.indexOf("/") >= 0) {
                             throw new IllegalArgumentException(
                                 "Cannot have a '/' in group name: '" + name
                                 + "'");
                         }
-
-                        String tmp = parentGroup.getFullName()
-                                     + Group.IDDELIMITER + name;
-                        Group existing = findGroupFromName(tmp);
-                        if (existing != null) {
+                        Entry existing = findEntryWithName(request, parentGroup, name);
+                        System.err.println("existing:" + existing);
+                        if (existing != null && existing.isGroup()) {
                             throw new IllegalArgumentException(
                                 "A group with the given name already exists");
 
                         }
                     }
-
 
                     Date[] theDateRange = { dateRange[0], dateRange[1] };
 
@@ -4423,16 +4438,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                         throw new IllegalArgumentException(
                             "Cannot have a '/' in group name:" + newName);
                     }
-                    String tmp =
-                        findGroup(entry.getParentGroupId()).getFullName()
-                        + Group.IDDELIMITER + newName;
-                    Group existing = findGroupFromName(tmp);
-                    if ((existing != null)
-                            && !existing.getId().equals(entry.getId())) {
+                    Entry existing = findEntryWithName(request, entry.getParentGroup(),newName);
+                    if (existing != null && existing.isGroup()
+                        && !existing.getId().equals(entry.getId())) {
                         throw new IllegalArgumentException(
                             "A group with the given name already exists");
-
-
                     }
                 }
 
@@ -4521,7 +4531,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String[]    ids    = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
-            Entry e = getEntry(ids[i], request);
+            Entry e = getEntry(request,ids[i]);
             if (e == null) {
                 continue;
             }
@@ -4566,8 +4576,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (request.defined(ARG_ID)) {
             entry = getEntry(request);
             if (entry == null) {
-                Entry tmp = getEntry(request.getString(ARG_ID, BLANK),
-                                     request, false);
+                Entry tmp = getEntry(request,request.getString(ARG_ID, BLANK),
+                                     false);
                 if (tmp != null) {
                     throw new IllegalArgumentException(
                         "You do not have access to this entry");
@@ -4657,7 +4667,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 continue;
             }
             id = id.substring(prefix.length());
-            Entry entry = getEntry(id, request);
+            Entry entry = getEntry(request,id);
             if (entry != null) {
                 entries.add(entry);
             }
@@ -4666,7 +4676,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (ids != null) {
             List<String> idList = StringUtil.split(ids, ",", true, true);
             for (String id : idList) {
-                Entry entry = getEntry(id, request);
+                Entry entry = getEntry(request,id);
                 if (entry != null) {
                     entries.add(entry);
                 }
@@ -4705,20 +4715,19 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Group findGroup(Request request) throws Exception {
         String groupNameOrId = (String) request.getString(ARG_GROUP,
-                                   (String) null);
+                                                          (String) null);
         if (groupNameOrId == null) {
             throw new IllegalArgumentException("No group specified");
         }
-        Group group = findGroupFromName(groupNameOrId);
-        if (group == null) {
-            group = findGroup(groupNameOrId);
+        Entry entry = getEntry(request, groupNameOrId,false);
+        if(entry!=null) {
+            if(!entry.isGroup()) {
+                throw new IllegalArgumentException("Not a group:" + groupNameOrId);
+            }
+            return (Group) entry;
         }
-
-        if (group == null) {
-            throw new IllegalArgumentException("Could not find group:"
-                    + groupNameOrId);
-        }
-        return group;
+        throw new IllegalArgumentException("Could not find group:"
+                                           + groupNameOrId);
     }
 
 
@@ -4814,14 +4823,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         String separator = HtmlUtil.span(HtmlUtil.pad("&gt;"),
                                          "class=separator");
 
+        String entryLink = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+                                                          entry, ARG_OUTPUT, output), entry.getLabel());
         if (makeLinkForLastGroup) {
-            breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                    entry, ARG_OUTPUT, output), entry.getLabel()));
+            breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-            List<Link>   links = getEntryLinks(request, entry);
+            List<Link>   links = getEntryLinks(request, entry,true);
             StringBuffer menu  = new StringBuffer();
             menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
             for (Link link : links) {
@@ -4851,7 +4861,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >"
-                                     + entry.getLabel() + menuLink
+                                     + entryLink + menuLink
                                      + "</td><td align=\"right\">" + linkHtml
                                      + "</td>") + "</table>";
             nav = HtmlUtil.div(
@@ -4940,7 +4950,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<Entry>   entries       = new ArrayList<Entry>();
         List<Group>   subGroups     = new ArrayList<Group>();
         for (String id : ids) {
-            Entry entry = getEntry(id, request);
+            Entry entry = getEntry(request,id);
             if (entry == null) {
                 continue;
             }
@@ -5143,10 +5153,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                 Entry   other  = null;
                 boolean isTail = true;
                 if (association.getFromId().equals(id)) {
-                    other  = getEntry(association.getToId(), request);
+                    other  = getEntry(request,association.getToId());
                     isTail = true;
                 } else {
-                    other  = getEntry(association.getFromId(), request);
+                    other  = getEntry(request,association.getFromId());
                     isTail = false;
                 }
 
@@ -5686,19 +5696,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Group findGroupFromName(String name) throws Exception {
-        return findGroupFromName(name, null, false);
-    }
-
 
     /**
      * _more_
@@ -5716,6 +5713,34 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         return findGroupFromName(name, user, createIfNeeded, false);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param user _more_
+     * @param createIfNeeded _more_
+     * @param isTop _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry findEntryWithName(Request request, Group parent, String name) 
+            throws Exception {
+        String groupName = parent.getFullName() + Group.IDDELIMITER + name;
+        Group group = groupCache.get(groupName);
+        if(group!=null) return group;
+        String[]ids = SqlUtil.readString(getDatabaseManager().select(COL_ENTRIES_ID,
+                                                                     TABLE_ENTRIES,
+                                                                     Clause.and(
+                                                                                Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, parent.getId()),
+                                                                                Clause.eq(COL_ENTRIES_NAME, name))));
+        if(ids.length==0) return null;
+        return getEntry(request, ids[0],false);
+    }
+
 
 
     /**
@@ -6095,7 +6120,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 associations.add(new Association(results.getString(1),
-                        results.getString(2), results.getString(3)));
+                                                 results.getString(2),
+                                                 results.getString(3), 
+                                                 results.getString(4)));
             }
         }
         return associations;
@@ -6438,6 +6465,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         clearCache();
     }
+
+    
+
 
     /** _more_ */
     int delCnt = 0;

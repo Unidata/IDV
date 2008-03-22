@@ -101,6 +101,14 @@ public interface Constants {
     /** _more_          */
     public static final String ICON_TOOLS = "/tools.gif";
 
+    public static final String ICON_ERROR = "/error.png";
+
+    public static final String ICON_QUESTION = "/question.png";
+
+    public static final String ICON_WARNING = "/warning.png";
+    public static final String ICON_PROGRESS = "/progress.gif";
+    public static final String ICON_INFORMATION= "/information.png";
+
     /** _more_          */
     public static final String ICON_RIGHTARROW = "/rightarrow.gif";
 

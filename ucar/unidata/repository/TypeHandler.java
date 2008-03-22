@@ -509,8 +509,26 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links)
+                                 List<Link> links, boolean forMenu)
             throws Exception {
+
+        if (getAccessManager().canEditEntry(request, entry)) {
+            links.add(
+                new Link(
+                    request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
+                    getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
+        }
+
+        if (forMenu && getAccessManager().canDoAction(request, entry,
+                                           Permission.ACTION_DELETE)) {
+            links.add(
+                new Link(
+                    request.entryUrl(getRepository().URL_ENTRY_DELETE, entry),
+                    getRepository().fileUrl(ICON_DELETE), msg("Delete Entry")));
+
+        }            
+
+
         Link downloadLink = getEntryDownloadLink(request, entry);
         if (downloadLink != null) {
             links.add(downloadLink);
@@ -524,17 +542,12 @@ public class TypeHandler extends RepositoryManager {
         if ( !request.getUser().getAnonymous()) {
             links.add(
                 new Link(
-                    request.entryUrl(getRepository().URL_ENTRY_COPY, entry),
+                    request.entryUrl(getRepository().URL_ENTRY_COPY, entry, ARG_FROM),
                     getRepository().fileUrl(ICON_MOVE),
                     msg("Copy/Move Entry")));
         }
 
-        if (getAccessManager().canEditEntry(request, entry)) {
-            links.add(
-                new Link(
-                    request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
-                    getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
-        }
+
 
     }
 
@@ -1216,7 +1229,7 @@ public class TypeHandler extends RepositoryManager {
                     groupList.add(ALL_OBJECT);
                     for (Group group : groups) {
                         groupList.add(
-                            new TwoFacedObject(group.getFullName()));
+                            new TwoFacedObject(group.getFullName(), group.getId()));
                     }
                     String groupSelect = HtmlUtil.select(ARG_GROUP,
                                              groupList, null, 100);
@@ -1224,7 +1237,7 @@ public class TypeHandler extends RepositoryManager {
                             groupSelect + searchChildren));
                 } else if (groups.size() == 1) {
                     advancedSB.append(HtmlUtil.hidden(ARG_GROUP,
-                            groups.get(0).getFullName()));
+                            groups.get(0).getId()));
                     advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             groups.get(0).getFullName() + searchChildren));
                 }
@@ -1304,20 +1317,20 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (request.defined(ARG_GROUP)) {
-            String groupName = (String) request.getString(ARG_GROUP,
+            String groupId = (String) request.getString(ARG_GROUP,
                                    "").trim();
-            boolean doNot = groupName.startsWith("!");
+            boolean doNot = groupId.startsWith("!");
             if (doNot) {
-                groupName = groupName.substring(1);
+                groupId = groupId.substring(1);
             }
-            if (groupName.endsWith("%")) {
+            if (groupId.endsWith("%")) {
                 where.add(Clause.like(COL_ENTRIES_PARENT_GROUP_ID,
-                                      groupName));
+                                      groupId));
             } else {
                 Group group = getRepository().findGroup(request);
                 if (group == null) {
                     throw new IllegalArgumentException(
-                        msgLabel("Could not find group") + groupName);
+                        msgLabel("Could not find group") + groupId);
                 }
                 String searchChildren =
                     (String) request.getString(ARG_GROUP_CHILDREN,
