@@ -97,8 +97,17 @@ a.menulink {
    color: gray;
 }
 
+
+
 .header {
-   background-color:#006699;
+  font-family:  Helvetica, sans-serif;
+  background-image:url(${urlroot}/header.jpg);  
+  background-repeat: no-repeat;
+  background-color:#006699;
+  font-size: 24pt;
+  font-weight: bold;
+  color: white;
+  padding-left:5px;
 }
 
 

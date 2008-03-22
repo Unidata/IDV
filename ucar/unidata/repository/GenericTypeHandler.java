@@ -479,8 +479,7 @@ public class GenericTypeHandler extends TypeHandler {
                 getTableName(), SqlUtil.comma(colNames),
                 SqlUtil.getQuestionMarks(colNames.size()));
         } else {
-
-            return SqlUtil.makeUpdate(getTableName(), COL_ID, colNames);
+            return SqlUtil.makeUpdate(getTableName(), COL_ID, Misc.listToStringArray(colNames));
         }
     }
 

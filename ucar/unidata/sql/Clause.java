@@ -240,6 +240,15 @@ public class Clause {
         return new Clause(column, EXPR_LE, value);
     }
 
+    public static Clause le(String column, double value) {
+        return le(column, new Double(value));
+    }
+
+
+    public static Clause ge(String column, double value) {
+        return le(column, new Double(value));
+    }
+
 
     /**
      * _more_
@@ -473,22 +482,7 @@ public class Clause {
         if (expr.equals(EXPR_ISNULL)) {
             return col;
         }
-        if (value instanceof String) {
-            if (SqlUtil.debug) {
-                System.err.println("Setting " + column + "=" + value);
-            }
-            stmt.setString(col, value.toString());
-        } else if (value instanceof Double) {
-            stmt.setDouble(col, ((Double) value).doubleValue());
-        } else if (value instanceof Integer) {
-            stmt.setInt(col, ((Integer) value).intValue());
-        } else if (value instanceof Date) {
-            Date dttm = (Date) value;
-            stmt.setTimestamp(col, new java.sql.Timestamp(dttm.getTime()),
-                              calendar);
-        } else {
-            throw new IllegalArgumentException("Unknown value:" + value);
-        }
+        SqlUtil.setValue(stmt, value, col);
         return col + 1;
     }
 

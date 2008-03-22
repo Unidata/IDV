@@ -584,21 +584,36 @@ public class SqlUtil {
      *
      * @return _more_
      */
-    public static String makeUpdate(String table, String colId, String id,
-                                    String[] names, String[] values) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("UPDATE  ");
-        sb.append(table);
-        sb.append(" SET ");
-        for (int i = 0; i < names.length; i++) {
-            if (i > 0) {
-                sb.append(",");
-            }
-            sb.append(" " + unDot(names[i]) + "=" + values[i] + " ");
+    public static  void update(Connection connection,
+                  String table, String colId, String id,
+                  String[] names, Object[] values) throws Exception {
+        String query = makeUpdate(table,  colId, names);
+        PreparedStatement stmt =  connection.prepareStatement(query);
+        for (int i = 0; i < values.length; i++) {
+            SqlUtil.setValue(stmt, values[i], i+1);
         }
-        sb.append(" WHERE ");
-        sb.append(colId + " = " + id);
-        return sb.toString();
+        stmt.setString(values.length+1, id);
+        stmt.execute();
+        stmt.close();
+    }
+
+
+
+    public static void setValue (PreparedStatement stmt, Object value, int col) throws Exception {
+        if (value instanceof String) {
+            stmt.setString(col, value.toString());
+        } else if (value instanceof Double) {
+            stmt.setDouble(col, ((Double) value).doubleValue());
+        } else if (value instanceof Integer) {
+            stmt.setInt(col, ((Integer) value).intValue());
+        } else if (value instanceof Date) {
+            Date dttm = (Date) value;
+            stmt.setTimestamp(col, new java.sql.Timestamp(dttm.getTime()),
+                              calendar);
+        } else {
+            throw new IllegalArgumentException("Unknown value:" + value);
+        }
+
     }
 
 
@@ -628,105 +643,7 @@ public class SqlUtil {
         return sb.toString();
     }
 
-    /**
-     * _more_
-     *
-     * @param table _more_
-     * @param colId _more_
-     * @param names _more_
-     *
-     * @return _more_
-     */
-    public static String makeUpdate(String table, String colId,
-                                    List<String> names) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("UPDATE  ");
-        sb.append(table);
-        sb.append(" SET ");
-        for (int i = 0; i < names.size(); i++) {
-            if (i > 0) {
-                sb.append(",");
-            }
-            sb.append(" " + unDot(names.get(i)) + "=?" + " ");
-        }
-        sb.append(" WHERE ");
-        sb.append(colId + " = ?");
-        return sb.toString();
-    }
 
-
-
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static String like(String name, String value) {
-        return " " + validName(name) + " LIKE " + quote(value) + " ";
-    }
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static String notLike(String name, String value) {
-        return " NOT " + validName(name) + " LIKE " + quote(value) + " ";
-    }
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static String neq(String name, String value) {
-        return " " + validName(name) + "<>" + value + " ";
-    }
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static String eq(String name, double value) {
-        return " " + validName(name) + "=" + value + " ";
-    }
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     *
-     * @return _more_
-     */
-    public static String isNull(String name) {
-        return " " + validName(name) + " is NULL ";
-    }
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
-    public static String eq(String name, int value) {
-        return " " + validName(name) + "=" + value + " ";
-    }
 
     /**
      * _more_
@@ -840,14 +757,7 @@ public class SqlUtil {
         return " " + validName(name) + "=" + quote(format(value)) + " ";
     }
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     *
-     * @return _more_
-     */
+
     public static String neq(String name, Date value) {
         return " " + validName(name) + "<>" + quote(format(value)) + " ";
     }
@@ -1576,13 +1486,11 @@ public class SqlUtil {
             throws Exception {
         /*
         StringBuffer sb = new StringBuffer();
-        clause.addClause(sb);
+       clause.addClause(sb);
         String query = makeDelete(table, sb.toString());
-        return connection.prepareStatement(query);
-        PreparedStatement stmt = getDeleteStatement(connection, table, clause);
-        clause.setValue(stmt,1);
-        stmt.execute();
-        stmt.close();*/
+        return connection.prepareStatement(query);*/
+
+
     }
 
 

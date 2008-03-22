@@ -531,7 +531,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                     XmlUtil.getAttribute(child,
                                         "xlink:title", url), url, "", "");
             } else {
-                String type = XmlUtil.getAttribute(child, "type");
+                String type = XmlUtil.getAttribute(child, "type","summary");
                 String text = XmlUtil.getChildText(child).trim();
                 return new Metadata(getRepository().getGUID(), "",
                                     TYPE_DOCUMENTATION, type, text, "", "");
@@ -562,7 +562,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 email = XmlUtil.getAttribute(contactNode, ATTR_EMAIL, "");
                 url   = XmlUtil.getAttribute(contactNode, ATTR_URL, "");
             }
-            return new Metadata(getRepository().getGUID(), "", getType(tag),
+            return new Metadata(getRepository().getGUID(), "", getType("thredds."+tag),
                                 name, vocabulary, email, url);
         } else if (isTag(tag, TYPE_KEYWORD)) {
             String text = XmlUtil.getChildText(child).trim();
@@ -578,10 +578,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                    || isTag(tag, TYPE_DATAFORMAT)) {
             String text = XmlUtil.getChildText(child).trim();
             text = text.replace("\n", "");
-            return new Metadata(getRepository().getGUID(), "", getType(tag),
+            return new Metadata(getRepository().getGUID(), "", getType("thredds."+tag),
                                 text, "", "", "");
         } else if (isTag(tag, TYPE_PROPERTY)) {
-            return new Metadata(getRepository().getGUID(), "", getType(tag),
+            return new Metadata(getRepository().getGUID(), "", getType("thredds."+tag),
                                 XmlUtil.getAttribute(child, ATTR_NAME),
                                 XmlUtil.getAttribute(child, ATTR_VALUE), "",
                                 "");

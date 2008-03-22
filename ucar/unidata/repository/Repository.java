@@ -1113,6 +1113,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         entryCache    = new Hashtable();
         groupCache    = new Hashtable();
         dataTypeList  = null;
+        topGroups = null;
     }
 
 
@@ -1826,7 +1827,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             checkFilePath(fullPath);
             try {
                 InputStream is = IOUtil.getInputStream(fullPath, getClass());
-                if (path.endsWith(".js")) {
+                if (path.endsWith(".js") || path.endsWith(".css")) {
                     String js = IOUtil.readContents(is);
                     js = js.replace("${urlroot}", getUrlBase());
                     is = new ByteArrayInputStream(js.getBytes());
@@ -4763,6 +4764,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                                    boolean makeLinkForLastGroup,
                                    String extraArgs, Group stopAt)
             throws Exception {
+        if(request == null) {
+            request = new  Request(this,"",new Hashtable());
+        }
+
         List breadcrumbs = new ArrayList();
         List titleList   = new ArrayList();
         if (entry == null) {
@@ -4792,8 +4797,15 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             length += name.length();
             titleList.add(0, name);
-            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                    parent, ARG_OUTPUT, output) + extraArgs, name));
+            String link;
+            if(request!=null) {
+                link = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+                                                      parent, ARG_OUTPUT, output)+extraArgs,name);
+            } else {
+                link = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW.toString(),
+                                                  ARG_OUTPUT, output)+extraArgs,name);
+            }
+            breadcrumbs.add(0, link);
             parent = findGroup(parent.getParentGroupId());
         }
         titleList.add(entry.getLabel());
@@ -5763,6 +5775,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
                                             clauses);
             List<Group> groups = readGroups(statement);
+            statement.close();
             if (groups.size() > 0) {
                 group = groups.get(0);
             } else {
@@ -6533,11 +6546,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entriesStmt.executeBatch();
             }
         }
+
         permissionsStmt.executeBatch();
         metadataStmt.executeBatch();
         commentsStmt.executeBatch();
         assocStmt.executeBatch();
         entriesStmt.executeBatch();
+
         connection.commit();
         connection.setAutoCommit(true);
 
@@ -6599,9 +6614,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entries.size() == 0) {
             return;
         }
-        //        if ( !isNew) {
-        clearCache();
-        //    }
+        if ( !isNew) {
+            clearCache();
+        }
 
         //We have our own connection
         Connection connection = getConnection(true);
@@ -6637,21 +6652,19 @@ public class Repository implements Constants, Tables, RequestHandler,
             clearCache();
         }
 
-        //        System.err.println("Inserting:" + entries.size() + " entries");
         long              t1             = System.currentTimeMillis();
         int               cnt            = 0;
         int               metadataCnt    = 0;
 
-        PreparedStatement entryStatement = connection.prepareStatement(isNew
+        PreparedStatement entryStmt = connection.prepareStatement(isNew
                 ? INSERT_ENTRIES
                 : UPDATE_ENTRIES);
 
+        PreparedStatement metadataStmt =
+            connection.prepareStatement(INSERT_METADATA);
+
 
         Hashtable typeStatements = new Hashtable();
-
-
-        PreparedStatement metadataInsert =
-            connection.prepareStatement(INSERT_METADATA);
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
@@ -6659,7 +6672,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             TypeHandler       typeHandler   = entry.getTypeHandler();
             String            sql           = typeHandler.getInsertSql(isNew);
             PreparedStatement typeStatement = null;
-
             if (sql != null) {
                 typeStatement = (PreparedStatement) typeStatements.get(sql);
                 if (typeStatement == null) {
@@ -6668,9 +6680,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
 
-            setStatement(entry, entryStatement, isNew);
+            setStatement(entry, entryStmt, isNew);
             batchCnt++;
-            entryStatement.addBatch();
+            entryStmt.addBatch();
 
             if (typeStatement != null) {
                 batchCnt++;
@@ -6684,26 +6696,25 @@ public class Repository implements Constants, Tables, RequestHandler,
                 for (Metadata metadata : metadataList) {
                     int col = 1;
                     metadataCnt++;
-                    metadataInsert.setString(col++, metadata.getId());
-                    metadataInsert.setString(col++, metadata.getEntryId());
-                    metadataInsert.setString(col++, metadata.getType());
-                    metadataInsert.setString(col++, metadata.getAttr1());
-                    metadataInsert.setString(col++, metadata.getAttr2());
-                    metadataInsert.setString(col++, metadata.getAttr3());
-                    metadataInsert.setString(col++, metadata.getAttr4());
-                    metadataInsert.addBatch();
+                    metadataStmt.setString(col++, metadata.getId());
+                    metadataStmt.setString(col++, metadata.getEntryId());
+                    metadataStmt.setString(col++, metadata.getType());
+                    metadataStmt.setString(col++, metadata.getAttr1());
+                    metadataStmt.setString(col++, metadata.getAttr2());
+                    metadataStmt.setString(col++, metadata.getAttr3());
+                    metadataStmt.setString(col++, metadata.getAttr4());
+                    metadataStmt.addBatch();
                     batchCnt++;
 
                 }
             }
 
-
             if (batchCnt > 1000) {
                 //                    if(isNew)
-                entryStatement.executeBatch();
-                //                    else                        entryStatement.executeUpdate();
+                entryStmt.executeBatch();
+                //                    else                        entryStmt.executeUpdate();
                 if (metadataCnt > 0) {
-                    metadataInsert.executeBatch();
+                    metadataStmt.executeBatch();
                 }
                 for (Enumeration keys = typeStatements.keys();
                         keys.hasMoreElements(); ) {
@@ -6718,22 +6729,18 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         if (batchCnt > 0) {
-            entryStatement.executeBatch();
-            metadataInsert.executeBatch();
-            entryStatement.close();
-            metadataInsert.close();
+            entryStmt.executeBatch();
+            metadataStmt.executeBatch();
             for (Enumeration keys = typeStatements.keys();
                     keys.hasMoreElements(); ) {
                 PreparedStatement typeStatement =
                     (PreparedStatement) typeStatements.get(
                         keys.nextElement());
                 typeStatement.executeBatch();
-                typeStatement.close();
             }
         }
         connection.commit();
         connection.setAutoCommit(true);
-
 
 
         long t2 = System.currentTimeMillis();
@@ -6749,7 +6756,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
-        entryStatement.close();
+
+        entryStmt.close();
+        metadataStmt.close();
         for (Enumeration keys =
                 typeStatements.keys(); keys.hasMoreElements(); ) {
             PreparedStatement typeStatement =
@@ -6862,7 +6871,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (entries.size() == 0) {
                 return needToAdd;
             }
-            if (seenResources.size() > 500000) {
+            if (seenResources.size() > 50000) {
                 seenResources = new Hashtable();
             }
             PreparedStatement select =

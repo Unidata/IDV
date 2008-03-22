@@ -644,7 +644,7 @@ public class Admin extends RepositoryManager {
 
         Statement statement = null;
         try {
-            statement = getDatabaseManager().execute(query);
+            statement = getDatabaseManager().execute(query,-1,0);
         } catch (Exception exc) {
             exc.printStackTrace();
             throw exc;

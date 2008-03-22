@@ -588,20 +588,21 @@ public class UserManager extends RepositoryManager {
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID,
-                               SqlUtil.quote(user.getId()), new String[] {
-                COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
-                COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN
-            }, new String[] {
-                SqlUtil.quote(user.getName()),
-                SqlUtil.quote(user.getPassword()),
-                SqlUtil.quote(user.getEmail()),
-                SqlUtil.quote(user.getQuestion()),
-                SqlUtil.quote(user.getAnswer()), (user.getAdmin()
-                        ? "1"
-                        : "0"), SqlUtil.quote(user.getLanguage())
-            });
-            getDatabaseManager().execute(query);
+            SqlUtil.update(getConnection(),
+                           TABLE_USERS, COL_USERS_ID,
+                           user.getId(), 
+                           new String[] {
+                               COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
+                               COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN
+                           }, new Object[] {
+                               user.getName(),
+                               user.getPassword(),
+                               user.getEmail(),
+                               user.getQuestion(),
+                               user.getAnswer(), 
+                               user.getAdmin()      ? new Integer(1)
+                               : new Integer(0), user.getLanguage()
+                           });
             return;
         }
 

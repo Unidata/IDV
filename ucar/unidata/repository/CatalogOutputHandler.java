@@ -301,7 +301,9 @@ public class CatalogOutputHandler extends OutputHandler {
                     String url = XmlUtil.getAttribute(child, "xlink:href");
                     Element root = XmlUtil.getRoot(url,
                                        CatalogOutputHandler.class);
-                    collectMetadata(repository, metadataList, root);
+                    if(root!=null) {
+                        collectMetadata(repository, metadataList, root);
+                    }
                 } else {
                     collectMetadata(repository, metadataList, child);
                 }

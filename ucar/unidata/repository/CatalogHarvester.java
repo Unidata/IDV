@@ -90,6 +90,8 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     int entryCnt = 0;
 
+    int groupCnt = 0;
+
     /** _more_ */
     User user;
 
@@ -126,8 +128,8 @@ public class CatalogHarvester extends Harvester {
      */
     protected void runInner() throws Exception {
         groups = new ArrayList();
-        importCatalog(topUrl, topGroup);
-        repository.processEntries(this, null, entries);
+        importCatalog(topUrl, topGroup,0);
+        //        repository.processEntries(this, null, entries);
         entries = new ArrayList<Entry>();
     }
 
@@ -142,11 +144,15 @@ public class CatalogHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    private boolean importCatalog(String url, Group parent) throws Exception {
+    private boolean importCatalog(String url, Group parent, int depth) throws Exception {
         if ( !getActive()) {
             return true;
         }
         if (seen.get(url) != null) {
+            return true;
+        }
+        if(depth>10) {
+            System.err.println("Catalogs go too deep:" + url);
             return true;
         }
         catalogCnt++;
@@ -159,14 +165,18 @@ public class CatalogHarvester extends Harvester {
         //        System.err.println(url);
         try {
             Element root = XmlUtil.getRoot(url, getClass());
-            Node child = XmlUtil.findChild(root,
-                                           CatalogOutputHandler.TAG_DATASET);
-            if (child != null) {
-                recurseCatalog((Element) child, parent, url, 0);
+            if(root==null) {
+                System.err.println("Could not load catalog:" + url);
+            } else {
+                Node child = XmlUtil.findChild(root,
+                                               CatalogOutputHandler.TAG_DATASET);
+                if (child != null) {
+                    recurseCatalog((Element) child, parent, url, 0, depth);
+                }
             }
             return true;
         } catch (Exception exc) {
-            System.err.println("exc:" + exc);
+            exc.printStackTrace();
             //            log("",exc);
             return false;
         }
@@ -183,16 +193,18 @@ public class CatalogHarvester extends Harvester {
      * @throws Exception _more_
      */
     private void recurseCatalog(Element node, Group parent,
-                                String catalogUrl, int depth)
+                                String catalogUrl, int xmlDepth, int recurseDepth)
             throws Exception {
+
+        if (xmlDepth > 1) {
+            return;
+        }
+
 
         if ( !getActive()) {
             return;
         }
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
-        if (depth > 1) {
-            return;
-        }
 
 
         NodeList elements = XmlUtil.getElements(node);
@@ -218,7 +230,7 @@ public class CatalogHarvester extends Harvester {
             }
         }
 
-        if ( !haveChildDatasets && (depth > 0) && (urlPath != null)) {
+        if ( !haveChildDatasets && (xmlDepth > 0) && (urlPath != null)) {
             Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
                                       false, null);
             if (serviceNode != null) {
@@ -247,7 +259,9 @@ public class CatalogHarvester extends Harvester {
             entries.add(entry);
             typeHandler.initializeNewEntry(entry);
             if (entries.size() > 1000) {
-                repository.processEntries(this, null, entries);
+                Misc.gc();
+                System.err.println ("\nMemory:" +( Misc.usedMemory()/1000000) + " group:"+ getRepository().groupCache.size());
+                //                repository.processEntries(this, null, entries);
                 entries = new ArrayList<Entry>();
             }
             return;
@@ -256,9 +270,11 @@ public class CatalogHarvester extends Harvester {
         name = name.replace("/", "--");
         name = name.replace("'", "");
         String groupName = parent.getFullName() + "/" + name;
+        //        Group  group     = parent;
         Group  group     = repository.findGroupFromName(groupName);
         if (group == null) {
             group = repository.findGroupFromName(groupName, user, true);
+            /*
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(repository, metadataList,
                     node);
@@ -267,6 +283,7 @@ public class CatalogHarvester extends Harvester {
                                           ThreddsMetadataHandler.TYPE_LINK,
                                           "Imported from catalog",
                                           catalogUrl, "", ""));
+
             for (Metadata metadata : metadataList) {
                 metadata.setEntryId(group.getId());
                 try {
@@ -280,16 +297,18 @@ public class CatalogHarvester extends Harvester {
                 } catch (Exception exc) {
                     repository.log("Bad metadata", exc);
                 }
-            }
+                }*/
             groups.add(repository.getBreadCrumbs(null, group, true, "",
                     topGroup)[1]);
+            groupCnt++;
+            if(groups.size()>100) groups = new ArrayList();
         }
 
 
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-                recurseCatalog(child, group, catalogUrl, depth + 1);
+                recurseCatalog(child, group, catalogUrl, xmlDepth + 1, recurseDepth);
             } else if (child.getTagName().equals(
                     CatalogOutputHandler.TAG_CATALOGREF)) {
                 if ( !recurse) {
@@ -305,7 +324,7 @@ public class CatalogHarvester extends Harvester {
                         url = IOUtil.getFileRoot(catalogUrl) + "/" + url;
                     }
                 }
-                if ( !importCatalog(url, group)) {
+                if ( !importCatalog(url, group, recurseDepth+1)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);
                     System.err.println("Base URL:"
@@ -330,7 +349,7 @@ public class CatalogHarvester extends Harvester {
         sb.append("Catalog: " + topUrl + "<br>");
         sb.append("Loaded " + catalogCnt + " catalogs<br>");
         sb.append("Created " + entryCnt + " entries<br>");
-        sb.append("Created " + groups.size() + " groups<ul>");
+        sb.append("Created " + groupCnt + " groups<ul>");
         for (int i = 0; i < groups.size(); i++) {
             String groupLine = (String) groups.get(i);
             sb.append("<li>");

@@ -848,7 +848,6 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (didMeta) {
-            //            whereList.add(SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
             tables.add(TABLE_METADATA);
             didEntries = true;
         }
@@ -861,7 +860,6 @@ public class TypeHandler extends RepositoryManager {
                 break;
             }
             tables.add(TABLE_METADATA + " " + subTable);
-            //            whereList.add(SqlUtil.eq(subTable+".entry_id", COL_ENTRIES_ID));
         }
 
 
@@ -1372,24 +1370,24 @@ public class TypeHandler extends RepositoryManager {
 
 
         boolean includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
-        List    areaExpressions = new ArrayList();
+        List<Clause>    areaExpressions = new ArrayList<Clause>();
         if (request.defined(ARG_AREA + "_south")) {
-            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_SOUTH,
-                                           request.get(ARG_AREA + "_south",
-                                               0.0)));
+            areaExpressions.add(Clause.ge(COL_ENTRIES_SOUTH,
+                                          request.get(ARG_AREA + "_south",
+                                                      0.0)));
         }
         if (request.defined(ARG_AREA + "_north")) {
-            areaExpressions.add(SqlUtil.le(COL_ENTRIES_NORTH,
+            areaExpressions.add(Clause.le(COL_ENTRIES_NORTH,
                                            request.get(ARG_AREA + "_north",
                                                0.0)));
         }
         if (request.defined(ARG_AREA + "_east")) {
-            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_EAST,
+            areaExpressions.add(Clause.ge(COL_ENTRIES_EAST,
                                            request.get(ARG_AREA + "_east",
                                                0.0)));
         }
         if (request.defined(ARG_AREA + "_west")) {
-            areaExpressions.add(SqlUtil.le(COL_ENTRIES_WEST,
+            areaExpressions.add(Clause.le(COL_ENTRIES_WEST,
                                            request.get(ARG_AREA + "_west",
                                                0.0)));
         }

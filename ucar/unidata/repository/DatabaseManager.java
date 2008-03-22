@@ -250,32 +250,6 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param sql _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Statement execute(String sql) throws Exception {
-        return execute(sql, -1);
-    }
-
-    /**
-     * _more_
-     *
-     * @param sql _more_
-     * @param max _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Statement execute(String sql, int max) throws Exception {
-        return execute(sql, max, 0);
-    }
 
     /**
      * _more_
@@ -293,22 +267,6 @@ public class DatabaseManager extends RepositoryManager {
         return execute(getConnection(), sql, max, timeout);
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param connection _more_
-     * @param sql _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Statement execute(Connection connection, String sql)
-            throws Exception {
-        return execute(connection, sql, 0, 0);
-    }
 
 
     /**
@@ -398,20 +356,6 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param table _more_
-     * @param column _more_
-     * @param value _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void executeDelete(String table, String column, String value)
-            throws Exception {
-        Statement stmt = execute(SqlUtil.makeDelete(table, column, value));
-        stmt.close();
-    }
 
 
     /**
