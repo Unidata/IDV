@@ -27,6 +27,9 @@ import org.w3c.dom.*;
 
 import ucar.unidata.sql.SqlUtil;
 
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataManager;
+import ucar.unidata.data.DataSourceDescriptor;
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
@@ -158,11 +161,39 @@ public class IdvOutputHandler extends OutputHandler {
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List types)
             throws Exception {
-
         List<Entry> theEntries = getRadarEntries(entries);
         if(theEntries.size()>0) {
-            types.add(new TwoFacedObject("Preview Image", OUTPUT_IDV));
+            types.add(new TwoFacedObject("Preview Radar", OUTPUT_IDV));
         }
+    }
+
+
+    private IntegratedDataViewer getIdv() throws Exception  {
+        if (idv == null) {
+            idv = new IntegratedDataViewer(false);
+        }
+        return idv;
+    }
+
+    protected void getOutputTypesForEntry(Request request, Entry entry,
+                                          List types)
+            throws Exception {
+
+        DataSourceDescriptor descriptor = getDescriptor(entry);
+        if(descriptor!=null) {
+            types.add(new TwoFacedObject("Preview " + descriptor.getLabel(), OUTPUT_IDV));
+            return;
+        }
+
+        /*
+        if(entry.getResource().getPath().endsWith(".shp")) {
+            types.add(new TwoFacedObject("Preview Shapefile", OUTPUT_IDV));
+            return;
+        }
+        */
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        getOutputTypesForEntries(request, entries, types);
     }
 
 
@@ -176,6 +207,20 @@ public class IdvOutputHandler extends OutputHandler {
         }
         return theEntries;
     }
+
+    private DataSourceDescriptor getDescriptor(Entry entry ) throws Exception {
+        String path = entry.getResource().getPath();
+        if(path.length()>0) {
+            List<DataSourceDescriptor> descriptors = getIdv().getDataManager().getDescriptors();
+            for(DataSourceDescriptor descriptor: descriptors) {
+                if(descriptor.getPatternFileFilter()!=null && descriptor.getPatternFileFilter().match(path)) {
+                    return descriptor;
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * _more_
@@ -191,25 +236,25 @@ public class IdvOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         
-        final List<Entry> theEntries = getRadarEntries(entries);
-        if(theEntries.size() == 0) {
-            return new Result(msg("Image Preview"),  new StringBuffer("No radar entries found"));
-        }
-
+        final List<Entry> radarEntries = getRadarEntries(entries);
         Entry theEntry = null;
         String id = group.getId();
         if (group.isDummy()) {
-            if(theEntries.size()==1) {
-                theEntry = theEntries.get(0);
-                id = theEntries.get(0).getId();
+            if(entries.size()==1) {
+                theEntry = entries.get(0);
+                id = entries.get(0).getId();
             } 
         }
 
-        if ( !request.exists("doimage")) {
-            StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
+
+
+
+        if (!request.exists("doimage")) {
+
             //TODO: the id is wrong if we are a search result
             String url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW
-                                      + "/preview.gif", ARG_ID,
+                                      + "/" + theEntry.getId() +"_preview.gif", ARG_ID,
                                       id, ARG_OUTPUT,
                                           OUTPUT_IDV, "doimage", "true");
 
@@ -221,6 +266,26 @@ public class IdvOutputHandler extends OutputHandler {
                 title = crumbs[0];
                 sb.append(crumbs[1]);
             }
+
+
+            DataSourceDescriptor descriptor = getDescriptor(theEntry);
+            if(descriptor!=null) {
+                DataSource dataSource = getIdv().makeOneDataSource(theEntry.getResource().getPath(),   descriptor.getId(), null);
+                if(dataSource!=null) {
+                    sb.append(dataSource.getFullDescription());
+                    Result result = new Result("Metadata - " + title, sb);
+                    result.putProperty(
+                                       PROP_NAVSUBLINKS,
+                                       getHeader(
+                                                 request, OUTPUT_IDV,
+                                                 getRepository().getOutputTypesForGroup(
+                                                                                        request, group, subGroups, entries)));
+                    return result;
+                }
+            }
+
+
+
 
             sb.append("&nbsp;<p>");
             sb.append(HtmlUtil.img(url));
@@ -238,28 +303,55 @@ public class IdvOutputHandler extends OutputHandler {
         File image = new File(IOUtil.joinDir(thumbDir,
                                              "preview_" + id.replace("/","_")
                                              + ".gif"));
-        if (image.exists()) {
+        if (image.exists() && false) {
             return new Result("preview.gif", new FileInputStream(image),
                               "image/gif");
         }
 
-
         StringBuffer isl = new StringBuffer();
+        
         isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
-        String datasource;
-        datasource = "FILE.RADAR";
+        String datasource="";
+        if(radarEntries.size()>0) {
+            datasource = "FILE.RADAR";
+        } else if(theEntry.getResource().getPath().endsWith(".shp")) {
+            datasource = "FILE.SHAPEFILE";
+        } else {
+            String path = theEntry.getResource().getPath();
+            if(path.length()>0) {
+                List<DataSourceDescriptor> descriptors = getIdv().getDataManager().getDescriptors();
+                for(DataSourceDescriptor descriptor: descriptors) {
+                    if(descriptor.getPatternFileFilter()!=null && descriptor.getPatternFileFilter().match(path)) {
+                        datasource =  descriptor.getId();
+                    }
+                }
+            }
+        }
         //        isl.append("<datasource type=\"" + datasource + "\" url=\""
         //                   + entry.getResource().getPath() + "\">\n");
         isl.append("<datasource type=\"" + datasource + "\" >\n");
         int cnt = 0;
-        for(Entry entry: theEntries) {
+        for(Entry entry: entries) {
             isl.append("<fileset file=\"" + entry.getResource().getPath() +"\"/>\n");
         }
-        isl.append(
-            "<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
-        isl.append("</datasource>\n");
-        //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
-        isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
+        //        System.err.println ("datasource:" + datasource);
+        if(datasource.equalsIgnoreCase("FILE.RADAR")) {
+            isl.append(
+                       "<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+            isl.append("</datasource>\n");
+            //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
+            isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
+        } else if(datasource.equalsIgnoreCase("FILE.SHAPEFILE")) {
+            isl.append(
+                       "<display type=\"shapefilecontrol\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+            isl.append("</datasource>\n");
+        } else if(datasource.equalsIgnoreCase("FILE.AREAFILE")) {
+            isl.append(
+                       "<display type=\"imagedisplay\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+            isl.append("</datasource>\n");
+        } else {
+            isl.append("</datasource>\n");
+        }
         isl.append("<pause/>\n");
         //        isl.append("<pause seconds=\"60\"/>\n");
 
@@ -283,9 +375,6 @@ public class IdvOutputHandler extends OutputHandler {
                 idv     = null;
                 callCnt = 0;
             }
-            if (idv == null) {
-                idv = new IntegratedDataViewer(false);
-            }
             /*
             Trace.addNot(".*Shadow.*");
             Trace.addNot(".*Azimuth.*");
@@ -295,9 +384,9 @@ public class IdvOutputHandler extends OutputHandler {
             Trace.addNot(".*MapProjection.*");
             Trace.startTrace();
             Trace.call1("Make image");*/
-            idv.getImageGenerator().processScriptFile("xml:" + isl);
+            getIdv().getImageGenerator().processScriptFile("xml:" + isl);
             //            Trace.call2("Make image");
-            idv.cleanup();
+            getIdv().cleanup();
             //            ucar.unidata.util.Trace.stopTrace();
         }
 
