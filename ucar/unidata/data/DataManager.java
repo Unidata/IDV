@@ -652,7 +652,9 @@ public class DataManager {
     }
 
 
-
+    public List<DataSourceDescriptor> getDescriptors() {
+        return descriptors;
+    }
 
 
 
@@ -1180,6 +1182,10 @@ public class DataManager {
     public DataSourceResults createDataSource(Object definingObject,
             String dataType, Hashtable properties) {
 
+        
+        if(dataType!=null && dataType.length()==0) {
+            dataType = null;
+        }
         if ((dataType == null) && (definingObject instanceof String)) {
             String file = (String) definingObject;
             if (file.startsWith("type:")) {
