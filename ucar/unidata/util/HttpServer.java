@@ -189,6 +189,8 @@ public class HttpServer {
                         continue;
                     }
                     Misc.run(request);
+                } catch (java.net.SocketException exc) {
+                    //noop
                 } catch (Exception exc) {
                     handleError("Error reading connection", exc);
                 }
@@ -284,6 +286,8 @@ public class HttpServer {
         public void run() {
             try {
                 processRequest();
+            } catch (java.net.SocketException se) {
+                //noop
             } catch (Exception e) {
                 server.handleError("exc:", e);
             }
