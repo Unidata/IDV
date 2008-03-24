@@ -86,6 +86,8 @@ public class HtmlOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_TIMELINE = "default.timeline";
 
+    public static final String OUTPUT_TIMELINE_DATA = "default.timelinedata";
+
 
     /** _more_ */
     public static final String OUTPUT_GRAPH = "default.graph";
@@ -123,6 +125,7 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)
+            || output.equals(OUTPUT_TIMELINE_DATA)
                || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD)
                || output.equals(OUTPUT_GROUPXML)
                || output.equals(OUTPUT_METADATAXML);
@@ -270,6 +273,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public void getAssociationBlock(Request request, Entry entry,
                                     StringBuffer sb)
             throws Exception {
+        boolean canEdit= getAccessManager().canDoAction(request, entry,
+                                                        Permission.ACTION_EDIT);
         List<Association> associations =
             getRepository().getAssociations(request, entry.getId());
         if (associations.size() == 0) {
@@ -293,7 +298,14 @@ public class HtmlOutputHandler extends OutputHandler {
             if ((fromEntry == null) || (toEntry == null)) {
                 continue;
             }
-            assocSB.append("<tr><td>");
+            assocSB.append("<tr>");
+            if(canEdit) {
+                assocSB.append(HtmlUtil.cols(HtmlUtil.href(
+                                                           request.url(getRepository().URL_ASSOCIATION_DELETE,
+                                                                       ARG_ASSOCIATION,
+                                                                       association.getId()),HtmlUtil.img(getRepository().fileUrl(ICON_DELETE),msg("Delete association")))));
+            }
+            assocSB.append("<td>");
             assocSB.append(((fromEntry == entry)
                             ? fromEntry.getLabel()
                             : getRepository().getEntryUrl(request,
@@ -680,7 +692,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (decorate) {
             detailsSB.append("</table>\n");
             sb.append(getRepository().makeShowHideBlock(request, "details",
-                    msg("Details"), detailsSB, false));
+                    msg("Information"), detailsSB, false));
         } else {
             //            System.err.println (detailsSB);
             sb.append(detailsSB);
@@ -849,8 +861,6 @@ public class HtmlOutputHandler extends OutputHandler {
         return result;
 
     }
-
-
 
 
 

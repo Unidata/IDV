@@ -200,6 +200,26 @@ public class AccessManager extends RepositoryManager {
             }
             return canDoAction(request, group, action);
         }
+
+        if(request.exists(ARG_ASSOCIATION)) {
+            Clause clause = Clause.eq(COL_ASSOCIATIONS_ID,
+                                      request.getString(ARG_ASSOCIATION, ""));
+            List<Association> associations =  getRepository().getAssociations(request, clause);
+            if(associations.size()==1) {
+                Entry fromEntry = getRepository().getEntry(request, associations.get(0).getFromId());
+                Entry toEntry = getRepository().getEntry(request, associations.get(0).getToId());
+                if (canDoAction(request, fromEntry, action)) {
+                    return true;
+                }
+                if (canDoAction(request, toEntry, action)) {
+                    return true;
+                }
+                return false;
+
+
+            }
+        }
+
         throw new IllegalArgumentException("Could not find entry or group");
         //        return false;
     }

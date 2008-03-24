@@ -45,6 +45,8 @@ public class Association {
 
     public static final String TYPE_ATTACHMENT = "attachment";
 
+    private String id;
+
     /** _more_ */
     private String name;
 
@@ -67,7 +69,8 @@ public class Association {
      * @param fromId _more_
      * @param toId _more_
      */
-    public Association(String name, String type, String fromId, String toId) {
+    public Association(String id, String name, String type, String fromId, String toId) {
+        this.id = id;
         this.name   = name;
         if(type == null) type = "";
         this.type = type;
@@ -76,6 +79,24 @@ public class Association {
     }
 
 
+
+/**
+Set the Id property.
+
+@param value The new value for Id
+**/
+public void setId (String value) {
+	id = value;
+}
+
+/**
+Get the Id property.
+
+@return The Id
+**/
+public String getId () {
+	return id;
+}
 
     /**
      * Set the Name property.

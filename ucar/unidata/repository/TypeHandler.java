@@ -517,6 +517,13 @@ public class TypeHandler extends RepositoryManager {
                 new Link(
                     request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
                     getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
+            if(forMenu) {
+                links.add(
+                          new Link(
+                                   request.entryUrl(getMetadataManager().URL_METADATA_FORM, entry),
+                                   getRepository().fileUrl(ICON_METADATA), msg("Edit Metadata")));
+                
+            }
         }
 
         if (forMenu && getAccessManager().canDoAction(request, entry,
@@ -640,7 +647,7 @@ public class TypeHandler extends RepositoryManager {
 
             String desc = entry.getDescription();
             if ((desc != null) && (desc.length() > 0)) {
-                sb.append(HtmlUtil.formEntry(msgLabel("Description"), desc));
+                sb.append(HtmlUtil.formEntry(msgLabel("Description"), getRepository().getEntryText(request, entry, desc)));
             }
             sb.append(HtmlUtil.formEntry(msgLabel("Created by"),
                                          entry.getUser().getLabel() + " @ "
@@ -809,7 +816,7 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
         List<Clause> clauses = new ArrayList<Clause>();
         clauses.add(clause);
-        return select(request, what, clause, extra);
+        return select(request, what, clauses, extra);
     }
 
 
@@ -1164,6 +1171,22 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+        List<Group> collectionGroups = getRepository().getTopGroups(request);
+        List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
+        collections.add(new TwoFacedObject("All",""));
+        for(Group group: collectionGroups) {
+            collections.add(
+                          new TwoFacedObject(group.getLabel(), group.getId()));
+            
+        }
+
+        Entry collection =  request.getCollectionEntry();
+        String collectionSelect = HtmlUtil.select(ARG_COLLECTION,
+                                                 collections, (collection!=null?collection.getId():null),100);
+        advancedSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
+                                          collectionSelect));
+
+
         String name = (String) request.getString(ARG_TEXT, "");
         String searchMetaData = " "
                                 + HtmlUtil.checkbox(ARG_SEARCHMETADATA,
@@ -1314,6 +1337,11 @@ public class TypeHandler extends RepositoryManager {
         if (request.defined(ARG_USER_ID)) {
             addOrClause(COL_ENTRIES_USER_ID,
                         request.getString(ARG_USER_ID, ""), where);
+        }
+
+        if (request.defined(ARG_COLLECTION)) {
+            addOrClause(COL_ENTRIES_TOP_GROUP_ID,
+                        request.getString(ARG_COLLECTION, ""), where);
         }
 
         if (request.defined(ARG_GROUP)) {

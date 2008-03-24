@@ -275,12 +275,10 @@ public class CatalogHarvester extends Harvester {
             group = (Group)newGroup;
         }
         if (group == null) {
-            String groupName = parent.getFullName() + Group.IDDELIMITER + name;
-            group = repository.findGroupFromName(groupName, user, true);
-            /*
+            group = repository.makeNewGroup(parent, name, user);
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(repository, metadataList,
-                    node);
+                                                 node);
             metadataList.add(new Metadata(repository.getGUID(),
                                           group.getId(),
                                           ThreddsMetadataHandler.TYPE_LINK,
@@ -293,14 +291,14 @@ public class CatalogHarvester extends Harvester {
                     if (metadata.getAttr1().length() > 10000) {
                         repository.log("Too long metadata:"
                                        + metadata.getAttr1().substring(0,
-                                           100) + "...");
+                                                                       100) + "...");
                         continue;
                     }
                     getMetadataManager().insertMetadata(metadata);
                 } catch (Exception exc) {
                     repository.log("Bad metadata", exc);
                 }
-                }*/
+            }
             groups.add(repository.getBreadCrumbs(null, group, true, "",
                     topGroup)[1]);
             groupCnt++;

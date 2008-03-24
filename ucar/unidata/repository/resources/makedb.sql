@@ -69,11 +69,13 @@ CREATE INDEX COMMENTS_INDEX_ENTRY_ID ON comments (ENTRY_ID);
 
 
 
-CREATE TABLE associations (name varchar(200),
-	                   type varchar(200),
+CREATE TABLE associations (id varchar(200),
+                           name varchar(200),
+		           type varchar(200),
 			   from_entry_id varchar(200),
 		           to_entry_id varchar(200));
 
+alter table associations add column id varchar(200);
 alter table associations add column type varchar(200);
 
 

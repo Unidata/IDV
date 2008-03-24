@@ -48,6 +48,7 @@
 
 
   <method request="/association/add"   method="processAssociationAdd"/>
+  <method request="/association/delete"   method="processAssociationDelete" actions="edit"/>
  
   <method request="/getentries"        method="processGetEntries" />
 

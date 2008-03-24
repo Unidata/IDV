@@ -143,6 +143,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
                                                 "/association/add");
 
+    public RequestUrl URL_ASSOCIATION_DELETE = new RequestUrl(this,
+                                                "/association/delete");
+
     /** _more_ */
     public RequestUrl URL_LIST_HOME = new RequestUrl(this, "/list/home");
 
@@ -1553,7 +1556,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     public String makeOkCancelForm(Request request, RequestUrl url, String okArg, String extra) {
         StringBuffer fb = new StringBuffer();
-        fb.append(request.form(URL_ENTRY_COPY));
+        fb.append(request.form(url));
         fb.append(extra);
         String okButton     = HtmlUtil.submit(msg("OK"),
                                               okArg);
@@ -1707,7 +1710,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 String path = tmp.getRequest();
                 if (path.endsWith("/*")) {
                     path = path.substring(0, path.length() - 2);
-                    if (incoming.startsWith(urlBase + path)) {
+                    if (incoming.startsWith(path)) {
                         apiMethod = tmp;
                         break;
                     }
@@ -3996,19 +3999,25 @@ public class Repository implements Constants, Tables, RequestHandler,
             PreparedStatement assocInsert =
                 getConnection().prepareStatement(INSERT_ASSOCIATIONS);
             int col = 1;
+            assocInsert.setString(col++, getGUID());
             assocInsert.setString(col++, name);
             assocInsert.setString(col++, "");
             assocInsert.setString(col++, fromEntry.getId());
             assocInsert.setString(col++, toEntry.getId());
             assocInsert.execute();
             assocInsert.close();
+            fromEntry.setAssociations(null);
+            toEntry.setAssociations(null);
+
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
 
         StringBuffer sb = new StringBuffer();
+        sb.append(header("Add assocation"));
         sb.append("Add association between " + fromEntry.getLabel());
         sb.append(" and  " + toEntry.getLabel());
         sb.append(request.form(URL_ASSOCIATION_ADD, BLANK));
+        sb.append(HtmlUtil.br());
         sb.append("Association Name: ");
         sb.append(HtmlUtil.input(ARG_NAME));
         sb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
@@ -4020,6 +4029,45 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new Result("Add Association", sb);
 
     }
+
+
+    public Result processAssociationDelete(Request request) throws Exception {
+        String associationId = request.getString(ARG_ASSOCIATION, "");
+        Clause clause = Clause.eq(COL_ASSOCIATIONS_ID,
+                                  associationId);
+        List<Association> associations =  getAssociations(request, clause);
+        if(associations.size()==0) {
+            return new Result(msg("Delete Associations"),
+                              new StringBuffer(error("Could not find assocation")));
+        }
+
+        Entry fromEntry = getEntry(request, associations.get(0).getFromId());
+        Entry toEntry = getEntry(request, associations.get(0).getToId());
+
+        if(request.exists(ARG_CANCEL)) {
+            return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
+        }
+
+
+        if(request.exists(ARG_DELETE_CONFIRM)) {
+            SqlUtil.delete(getConnection(), TABLE_ASSOCIATIONS,
+                           clause);
+            return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
+        }
+        StringBuffer sb = new StringBuffer();
+        String form = makeOkCancelForm(request, URL_ASSOCIATION_DELETE, ARG_DELETE_CONFIRM, 
+                                       HtmlUtil.hidden(ARG_ASSOCIATION, associationId));
+        sb.append(question(msg("Are you sure you want to delete the assocation?"),
+                           form));
+
+        sb.append(associations.get(0).getName());
+        sb.append(HtmlUtil.br());
+        sb.append(fromEntry.getLabel());
+        sb.append(HtmlUtil.pad(HtmlUtil.img(fileUrl(ICON_ARROW))));
+        sb.append(toEntry.getLabel());
+        return new Result(msg("Delete Associations"),
+                          sb);
+      }
 
 
 
@@ -5047,6 +5095,43 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    protected void getAssociationsGraph(Request request, String id, StringBuffer sb) throws Exception {
+        List<Association> associations = getAssociations(request, id);
+        for (Association association : associations) {
+            Entry   other  = null;
+            boolean isTail = true;
+            if (association.getFromId().equals(id)) {
+                other  = getEntry(request,association.getToId());
+                isTail = true;
+            } else {
+                other  = getEntry(request,association.getFromId());
+                isTail = false;
+            }
+
+            if (other != null) {
+                sb.append(
+                          XmlUtil.tag(
+                                      TAG_NODE,
+                                      XmlUtil.attrs(
+                                                    ATTR_TYPE,
+                                                    (other.isGroup()?NODETYPE_GROUP:
+                                                     other.getTypeHandler().getNodeType()),
+                                                    ATTR_ID, other.getId(), ATTR_TITLE,
+                                                    other.getName())));
+                sb.append(XmlUtil.tag(TAG_EDGE,
+                                      XmlUtil.attrs(ATTR_TYPE,
+                                                    "association", ATTR_FROM,
+                                                    (isTail
+                                                     ? id
+                                                     : other.getId()), ATTR_TO, (isTail
+                                                                                 ? other.getId()
+                                                                                 : id))));
+            }
+        }
+
+
+    }
+
 
     /**
      * _more_
@@ -5109,6 +5194,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         int     skip             = request.get(ARG_SKIP, 0);
         boolean haveSkip         = false;
+
         if (id.startsWith("skip_")) {
             haveSkip = true;
             //skip_tag_" +(cnt+skip)+"_"+id;
@@ -5145,41 +5231,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             if ( !results.next()) {
                 throw new IllegalArgumentException("Unknown entry id:" + id);
             }
-
             sb.append(getEntryNodeXml(request, results));
-
-            List<Association> associations = getAssociations(request, id);
-            for (Association association : associations) {
-                Entry   other  = null;
-                boolean isTail = true;
-                if (association.getFromId().equals(id)) {
-                    other  = getEntry(request,association.getToId());
-                    isTail = true;
-                } else {
-                    other  = getEntry(request,association.getFromId());
-                    isTail = false;
-                }
-
-                if (other != null) {
-                    sb.append(
-                        XmlUtil.tag(
-                            TAG_NODE,
-                            XmlUtil.attrs(
-                                ATTR_TYPE,
-                                other.getTypeHandler().getNodeType(),
-                                ATTR_ID, other.getId(), ATTR_TITLE,
-                                other.getName())));
-                    sb.append(XmlUtil.tag(TAG_EDGE,
-                                          XmlUtil.attrs(ATTR_TYPE,
-                                              "association", ATTR_FROM,
-                                                  (isTail
-                            ? id
-                            : other.getId()), ATTR_TO, (isTail
-                            ? other.getId()
-                            : id))));
-                }
-            }
-
+            getAssociationsGraph(request, id, sb);
 
             Group group = findGroup(results.getString(4));
             sb.append(XmlUtil.tag(TAG_NODE,
@@ -5198,6 +5251,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                             sb.toString());
 
             xml = StringUtil.replace(xml, "${root}", getUrlBase());
+            //            System.err.println(xml);
             return new Result(BLANK, new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
@@ -5213,6 +5267,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     ATTR_TYPE, NODETYPE_GROUP, ATTR_ID, group.getId(),
                     ATTR_TOOLTIP, group.getName(), ATTR_TITLE,
                     getGraphNodeTitle(group.getName()))));
+        getAssociationsGraph(request, id, sb);
         List<Group> subGroups =
             getGroups(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, group.getId()));
 
@@ -5310,12 +5365,27 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
         }
+
+
         String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                         sb.toString());
         xml = StringUtil.replace(xml, "${root}", getUrlBase());
+        //        System.err.println(xml);
         return new Result(BLANK, new StringBuffer(xml),
                           getMimeTypeFromSuffix(".xml"));
 
+    }
+
+
+    public String getEntryText(Request request, Entry entry, String s) throws Exception {
+        //<attachment name>
+        if(s.indexOf("<attachment")>=0) {
+            List<Association> associations = getAssociations(request, entry);
+            for(Association association: associations) {
+                if(!association.getFromId().equals(entry.getId())) continue;
+            }
+        }
+        return s;
     }
 
 
@@ -5807,20 +5877,31 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if ( !createIfNeeded) {
                     return null;
                 }
-                TypeHandler typeHandler =
-                    getTypeHandler(TypeHandler.TYPE_GROUP);
-                group = new Group(getGroupId(parent), typeHandler);
-                group.setName(lastName);
-                group.setParentGroup(parent);
-                group.setUser(user);
-                group.setDate(new Date().getTime());
-                addNewEntry(group);
+                return makeNewGroup(parent, lastName, user);
             }
             groupCache.put(group.getId(), group);
             groupCache.put(group.getFullName(), group);
             return group;
         }
     }
+
+
+    public Group makeNewGroup(Group parent, String name, User user) throws Exception {
+        synchronized (MUTEX_GROUP) {
+            TypeHandler typeHandler =
+                getTypeHandler(TypeHandler.TYPE_GROUP);
+            Group group = new Group(getGroupId(parent), typeHandler);
+            group.setName(name);
+            group.setParentGroup(parent);
+            group.setUser(user);
+            group.setDate(new Date().getTime());
+            addNewEntry(group);
+            groupCache.put(group.getId(), group);
+            groupCache.put(group.getFullName(), group);
+            return group;
+        }
+    }
+
 
     /**
      * _more_
@@ -6104,16 +6185,35 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected List<Association> getAssociations(Request request,
-            String entryId)
+                                                String entryId)
+        throws Exception {
+        return getAssociations(request, getEntry(request, entryId));
+    }
+
+    protected List<Association> getAssociations(Request request,
+                                                Entry entry) 
+        throws Exception {
+        if(entry.getAssociations()!=null) {
+            return entry.getAssociations();
+        }
+
+        entry.setAssociations(getAssociations(request, 
+                               Clause.or(
+                                         Clause.eq(
+                                                   COL_ASSOCIATIONS_FROM_ENTRY_ID,
+                                                   entry.getId()), Clause.eq(
+                                                                       COL_ASSOCIATIONS_TO_ENTRY_ID,
+                                                                       entry.getId()))));
+        return entry.getAssociations();
+    }
+
+
+    protected List<Association> getAssociations(Request request,
+                                                Clause clause)
             throws Exception {
         Statement stmt = getDatabaseManager().select(
                              COLUMNS_ASSOCIATIONS, TABLE_ASSOCIATIONS,
-                             Clause.or(
-                                 Clause.eq(
-                                     COL_ASSOCIATIONS_FROM_ENTRY_ID,
-                                     entryId), Clause.eq(
-                                         COL_ASSOCIATIONS_TO_ENTRY_ID,
-                                         entryId)));
+                             clause);
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
         ResultSet         results;
@@ -6122,11 +6222,15 @@ public class Repository implements Constants, Tables, RequestHandler,
                 associations.add(new Association(results.getString(1),
                                                  results.getString(2),
                                                  results.getString(3), 
-                                                 results.getString(4)));
+                                                 results.getString(4),
+                                                 results.getString(5)));
             }
         }
         return associations;
     }
+
+
+
 
 
     /**

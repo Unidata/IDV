@@ -166,7 +166,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         if (idx < 0) {
             return type.getType();
         }
-        return type.getType().substring(idx);
+        return type.getType().substring(idx+1);
     }
 
     /**
@@ -200,9 +200,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                           metadata.getAttr2(), "xlink:title",
                                           metadata.getAttr1() });
         } else if (type.equals(TYPE_DOCUMENTATION)) {
+            //            System.err.println ("tag:" +  getTag(TYPE_DOCUMENTATION));
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            metadata.getAttr2(), new String[] { ATTR_TYPE,
-                    metadata.getAttr1() });
+                                                               metadata.getAttr1() });
         } else if (type.equals(TYPE_PROPERTY)) {
             XmlUtil.create(doc, getTag(TYPE_PROPERTY), datasetNode,
                            new String[] { ATTR_NAME,

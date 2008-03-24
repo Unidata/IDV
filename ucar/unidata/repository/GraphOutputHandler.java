@@ -188,7 +188,10 @@ public class GraphOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         String graphAppletTemplate =
             getRepository().getResource(PROP_HTML_GRAPHAPPLET);
-        String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
+        String type = request.getString(ARG_NODETYPE, (String)null);
+        if(type == null) {
+            type = entry.isGroup()?NODETYPE_GROUP:NODETYPE_ENTRY;
+        }
         String html =
             StringUtil.replace(graphAppletTemplate, "${id}",
                                getRepository().encode(entry.getId()));

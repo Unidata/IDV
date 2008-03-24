@@ -80,6 +80,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CART = "/cart.gif";
 
+    public static final String ICON_METADATA = "/metadata.gif";
+
     /** _more_          */
     public static final String ICON_CLOSE = "/close.gif";
 
@@ -246,6 +248,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_TYPE = "type";
+
+    public static final String ARG_COLLECTION = "collection";
 
     /** _more_          */
     public static final String ARG_TEXT = "text";
