@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.gis;
 
 
@@ -181,8 +182,9 @@ public class WmsSelection {
         } else {
             url = url + "&";
         }
-        double diff = Math.abs(boundsToUse.getMinLon() - boundsToUse.getMaxLon());
-        System.err.println ("diff:" + diff);
+        double diff = Math.abs(boundsToUse.getMinLon()
+                               - boundsToUse.getMaxLon());
+        //System.err.println ("diff:" + diff);
         String bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
                       + "," + boundsToUse.getMaxLon() + ","
                       + boundsToUse.getMaxLat();

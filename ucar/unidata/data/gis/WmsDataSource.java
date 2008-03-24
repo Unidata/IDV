@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.gis;
 
 
@@ -287,11 +286,12 @@ public class WmsDataSource extends DataSourceImpl {
         imageWidth  = Math.min(Math.max(imageWidth, 50), 2056);
         imageHeight = Math.min(Math.max(imageHeight, 50), 2056);
 
-        imageWidth = 600;
+        imageWidth  = 600;
         imageHeight = 600;
 
 
-        double diff = Math.abs(boundsToUse.getMinLon() - boundsToUse.getMaxLon());
+        double diff = Math.abs(boundsToUse.getMinLon()
+                               - boundsToUse.getMaxLon());
         String url = wmsInfo.assembleRequest(boundsToUse,
                                              (int) (imageWidth / resolution),
                                              (int) (imageHeight
@@ -324,7 +324,7 @@ public class WmsDataSource extends DataSourceImpl {
                     long t1 = System.currentTimeMillis();
                     //                    System.err.println("getting image:" + url);
                     LogUtil.message("Reading WMS image: " + wmsInfo);
-                    System.err.println ("url:" + url);
+                    //System.err.println ("url:" + url);
 
                     InputStream is = IOUtil.getInputStream(url);
                     long        t2 = System.currentTimeMillis();
@@ -373,17 +373,17 @@ public class WmsDataSource extends DataSourceImpl {
             if (imageContent != null) {
                 String msg = new String(imageContent);
                 //  System.err.println ("msg:" + msg);
-/* Check to see if this is of the form:
+                /* Check to see if this is of the form:
 
-<?xml version='1.0' encoding="UTF-8" standalone="no" ?>
-<!DOCTYPE ServiceExceptionReport SYSTEM "http://www.digitalearth.gov/wmt/xml/exception_1_1_0.dtd ">
-<ServiceExceptionReport version="1.1.0">
- <ServiceException>
-   Service denied due to system overload. Please try again later.
- </ServiceException>
-</ServiceExceptionReport>
+                <?xml version='1.0' encoding="UTF-8" standalone="no" ?>
+                <!DOCTYPE ServiceExceptionReport SYSTEM "http://www.digitalearth.gov/wmt/xml/exception_1_1_0.dtd ">
+                <ServiceExceptionReport version="1.1.0">
+                 <ServiceException>
+                   Service denied due to system overload. Please try again later.
+                 </ServiceException>
+                </ServiceExceptionReport>
 
-*/
+                */
                 if (msg.indexOf("<ServiceExceptionReport") >= 0) {
                     try {
                         StringBuffer errors = new StringBuffer();
@@ -449,10 +449,10 @@ public class WmsDataSource extends DataSourceImpl {
         Linear2DSet domain = (Linear2DSet) xyData.getDomainSet();
         Linear2DSet imageDomain =
             new Linear2DSet(RealTupleType.SpatialEarth2DTuple,
-                                        boundsToUse.getMinLon(), boundsToUse.getMaxLon(),
-                                        domain.getX().getLength(),
-                                        boundsToUse.getMaxLat(), boundsToUse.getMinLat(),
-                                        domain.getY().getLength());
+                            boundsToUse.getMinLon(), boundsToUse.getMaxLon(),
+                            domain.getX().getLength(),
+                            boundsToUse.getMaxLat(), boundsToUse.getMinLat(),
+                            domain.getY().getLength());
 
         /*
         new Linear2DSet(RealTupleType.SpatialEarth2DTuple,
