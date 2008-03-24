@@ -321,6 +321,10 @@ public class Clause {
      * @return _more_
      */
     public boolean isColumnFromTable(String table) {
+        if(column == null) {
+            System.err.println ("column is null:" + Misc.toList(subClauses));
+            return false;
+        }
         return column.startsWith(table + ".");
     }
 
@@ -379,12 +383,14 @@ public class Clause {
             clauses.add(Clause.eq(column, value));
         }
 
-        if ((nots.size() > 0) && (notNots.size() > 0)) {
+        if ((notClauses.size() > 0) && (clauses.size() > 0)) {
             return Clause.and(Clause.and(toArray(notClauses)),
                               Clause.or(toArray(clauses)));
-        } else if (nots.size() > 0) {
+        } else if (notClauses.size() > 0) {
+            if(notClauses.size() ==1) return notClauses.get(0);
             return Clause.and(toArray(notClauses));
-        } else if (notNots.size() > 0) {
+        } else if (clauses.size() > 0) {
+            if(clauses.size() ==1) return clauses.get(0);
             return Clause.or(toArray(clauses));
         }
         return new Clause();
@@ -542,7 +548,14 @@ public class Clause {
         return value;
     }
 
-
+    public String toString() {
+        if(column!=null) {
+            return "column:" + column +" " + expr +" " + value;
+        } else if(subClauses!=null) {
+            return expr +" " +Misc.toList(subClauses);
+        }
+        return "clause:null";
+    }
 
 }
 
