@@ -121,10 +121,10 @@ public class DateGridOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
-            types.add(new TwoFacedObject("Date Grid", OUTPUT_GRID));
+            types.add(new OutputType("Date Grid", OUTPUT_GRID));
         }
     }
 
@@ -139,9 +139,9 @@ public class DateGridOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
-        types.add(new TwoFacedObject("Date Grid", OUTPUT_GRID));
+        types.add(new OutputType("Date Grid", OUTPUT_GRID));
     }
 
 
@@ -156,7 +156,7 @@ public class DateGridOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List types)
+                                          List<OutputType> types)
             throws Exception {}
 
 

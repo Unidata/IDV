@@ -43,7 +43,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.xml.XmlUtil;

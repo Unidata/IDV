@@ -905,7 +905,7 @@ public class TypeHandler extends RepositoryManager {
         //The join
         if (didEntries && didOther
                 && !TABLE_ENTRIES.equalsIgnoreCase(getTableName())) {
-            clauses.add(0, Clause.eq(COL_ENTRIES_ID, getTableName() + ".id"));
+            clauses.add(0, Clause.join(COL_ENTRIES_ID, getTableName() + ".id"));
         }
 
         return SqlUtil.select(getConnection(), what, tables,
@@ -1492,7 +1492,7 @@ public class TypeHandler extends RepositoryManager {
                 Clause clause =
                     Clause.and(
                                new Clause[]{
-                                   Clause.eq(
+                                   Clause.join(
                                              subTable + ".entry_id",
                                              COL_ENTRIES_ID), 
                                    Clause.eq(
@@ -1561,7 +1561,7 @@ public class TypeHandler extends RepositoryManager {
                 metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR3, name));
                 metadataOrs.add(Clause.makeOrSplit(COL_METADATA_ATTR4, name));
                 ors.add(Clause.and(Clause.or(metadataOrs),
-                                   Clause.eq(COL_METADATA_ENTRY_ID,
+                                   Clause.join(COL_METADATA_ENTRY_ID,
                                              COL_ENTRIES_ID)));
             } else {
                 ors.add(Clause.makeOrSplit(COL_ENTRIES_NAME, name));

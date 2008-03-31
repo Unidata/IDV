@@ -33,6 +33,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -76,52 +77,42 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class TestOutputHandler extends OutputHandler {
+public class OutputType extends TwoFacedObject {
+
+    private String suffix = "";
 
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param element _more_
-     * @throws Exception _more_
-     */
-    public TestOutputHandler(Repository repository, Element element)
-            throws Exception {
-        super(repository, element);
+    public OutputType(String name, String output,
+                      String suffix) {
+        super(name, output);
+        this.suffix = suffix;
     }
 
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals("testit");
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("testit", "testit"));
-        }
+    public OutputType(String name,String output) {
+        this(name, output,  "");
     }
 
 
+
+
+    
+/**
+Set the Suffix property.
+
+@param value The new value for Suffix
+**/
+public void setSuffix (String value) {
+	suffix = value;
+}
+
+/**
+Get the Suffix property.
+
+@return The Suffix
+**/
+public String getSuffix () {
+	return suffix;
+}
 
 
 }
-

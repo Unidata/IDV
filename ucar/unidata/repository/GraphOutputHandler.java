@@ -123,12 +123,12 @@ public class GraphOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List types)
+                                          List<OutputType> types)
             throws Exception {
         if ( !getRepository().isAppletEnabled(request)) {
             return;
         }
-        types.add(new TwoFacedObject("Graph", OUTPUT_GRAPH));
+        types.add(new OutputType("Graph", OUTPUT_GRAPH));
     }
 
     /**
@@ -144,7 +144,7 @@ public class GraphOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List types)
+                                          List<Entry> entries, List<OutputType> types)
             throws Exception {
         getOutputTypesForEntry(request, group, types);
     }

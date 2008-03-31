@@ -34,7 +34,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -130,12 +129,12 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
-            types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
-            types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
-            types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
+            types.add(new OutputType("Slideshow", OUTPUT_SLIDESHOW));
+            types.add(new OutputType("Gallery", OUTPUT_GALLERY));
+            types.add(new OutputType("Image Player", OUTPUT_PLAYER));
         }
     }
 
@@ -153,7 +152,7 @@ public class ImageOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List types)
+                                          List<Entry> entries, List<OutputType> types)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -173,7 +172,7 @@ public class ImageOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
         if (entries.size() > 0) {
             boolean ok = false;
@@ -188,9 +187,9 @@ public class ImageOutputHandler extends OutputHandler {
             }
         }
 
-        types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
-        types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
-        types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
+        types.add(new OutputType("Slideshow", OUTPUT_SLIDESHOW));
+        types.add(new OutputType("Gallery", OUTPUT_GALLERY));
+        types.add(new OutputType("Image Player", OUTPUT_PLAYER));
     }
 
 

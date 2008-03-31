@@ -36,7 +36,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -155,16 +154,16 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType>  types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
-            types.add(new TwoFacedObject("Entries XML", OUTPUT_XML));
+            types.add(new OutputType("Entries XML", OUTPUT_XML));
         } else if (what.equals(WHAT_TAG)) {
-            types.add(new TwoFacedObject("Tag XML", OUTPUT_XML));
+            types.add(new OutputType("Tag XML", OUTPUT_XML));
         } else if (what.equals(WHAT_TYPE)) {
-            types.add(new TwoFacedObject("Type XML", OUTPUT_XML));
+            types.add(new OutputType("Type XML", OUTPUT_XML));
         } else {
-            types.add(new TwoFacedObject("XML", OUTPUT_XML));
+            types.add(new OutputType("XML", OUTPUT_XML));
         }
     }
 
@@ -179,9 +178,9 @@ public class XmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
-        types.add(new TwoFacedObject("Entries XML", OUTPUT_XML));
+        types.add(new OutputType("Entries XML", OUTPUT_XML));
     }
 
 

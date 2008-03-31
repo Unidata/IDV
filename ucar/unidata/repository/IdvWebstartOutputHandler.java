@@ -26,6 +26,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -76,7 +77,12 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class TestOutputHandler extends OutputHandler {
+public class IdvWebstartOutputHandler extends OutputHandler {
+
+
+
+    /** _more_ */
+    public static final String OUTPUT_WEBSTART = "idv.webstart";
 
 
     /**
@@ -86,7 +92,7 @@ public class TestOutputHandler extends OutputHandler {
      * @param element _more_
      * @throws Exception _more_
      */
-    public TestOutputHandler(Repository repository, Element element)
+    public IdvWebstartOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
     }
@@ -100,26 +106,42 @@ public class TestOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canHandle(String output) {
-        return output.equals("testit");
+        return output.equals(OUTPUT_WEBSTART);
     }
+
+
+
+
 
     /**
      * _more_
      *
      * @param request _more_
-     * @param what _more_
+     * @param entry _more_
      * @param types _more_
-     *
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
+    protected void getOutputTypesForEntry(Request request, Entry entry,
+                                          List<OutputType> types)
             throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("testit", "testit"));
+        if(entry.getResource().getPath().endsWith(".xidv") ||
+           entry.getResource().getPath().endsWith(".zidv")) {
+            String suffix = "/"+entry.getId()+".jnlp";
+            types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
         }
     }
 
+
+
+    public Result outputEntry(Request request, Entry entry) throws Exception {
+        String jnlp = getRepository().getResource("/ucar/unidata/repository/resources/template.jnlp");
+        String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                                  + entry.getName(), ARG_ID, entry.getId());
+        jnlp = jnlp.replace("%URL%",url);
+        return new Result("",new StringBuffer(jnlp),"application/x-java-jnlp-file");
+        //        return new Result("",new StringBuffer(jnlp),"text/xml");
+    }
 
 
 

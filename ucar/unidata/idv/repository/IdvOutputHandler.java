@@ -151,7 +151,7 @@ public class IdvOutputHandler extends OutputHandler {
      */
     protected void xxxgetOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List types)
+                                          List<Entry> entries, List<OutputType> types)
 
             throws Exception {
         getOutputTypesForEntries(request, entries,types);
@@ -159,11 +159,11 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
         List<Entry> theEntries = getRadarEntries(entries);
         if(theEntries.size()>0) {
-            types.add(new TwoFacedObject("Preview Radar", OUTPUT_IDV));
+            types.add(new OutputType("Preview Radar", OUTPUT_IDV));
         }
     }
 
@@ -176,12 +176,12 @@ public class IdvOutputHandler extends OutputHandler {
     }
 
     protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List types)
+                                          List<OutputType> types)
             throws Exception {
 
         DataSourceDescriptor descriptor = getDescriptor(entry);
         if(descriptor!=null) {
-            types.add(new TwoFacedObject("Preview " + descriptor.getLabel(), OUTPUT_IDV));
+            types.add(new OutputType("Preview " + descriptor.getLabel(), OUTPUT_IDV));
             return;
         }
 

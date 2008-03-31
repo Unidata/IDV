@@ -33,7 +33,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -350,7 +349,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
             getOutputTypesForEntries(request, new ArrayList(), types);
@@ -370,9 +369,9 @@ public class CatalogOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
-        types.add(new TwoFacedObject("Thredds Catalog", OUTPUT_CATALOG));
+        types.add(new OutputType("Thredds Catalog", OUTPUT_CATALOG));
     }
 
 

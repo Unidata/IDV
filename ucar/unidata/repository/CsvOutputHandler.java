@@ -36,7 +36,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -125,16 +124,16 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
-            types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
+            types.add(new OutputType("CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TAG)) {
-            types.add(new TwoFacedObject("Tag CSV", OUTPUT_CSV));
+            types.add(new OutputType("Tag CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TYPE)) {
-            types.add(new TwoFacedObject("Type CSV", OUTPUT_CSV));
+            types.add(new OutputType("Type CSV", OUTPUT_CSV));
         } else {
-            types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
+            types.add(new OutputType("CSV", OUTPUT_CSV));
         }
     }
 
@@ -151,7 +150,7 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List types)
+                                          List<Entry> entries, List<OutputType> types)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -171,9 +170,9 @@ public class CsvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
-        types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
+        types.add(new OutputType("CSV", OUTPUT_CSV));
     }
 
 

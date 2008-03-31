@@ -35,7 +35,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -142,20 +141,20 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
-            types.add(new TwoFacedObject("Entry", OUTPUT_HTML));
+            types.add(new OutputType("Entry", OUTPUT_HTML));
             if (getRepository().isAppletEnabled(request)) {
-                types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
+                types.add(new OutputType("Timeline", OUTPUT_TIMELINE));
             }
         } else if (what.equals(WHAT_TAG)) {
-            types.add(new TwoFacedObject("Tag Html", OUTPUT_HTML));
-            types.add(new TwoFacedObject("Tag Cloud", OUTPUT_CLOUD));
+            types.add(new OutputType("Tag Html", OUTPUT_HTML));
+            types.add(new OutputType("Tag Cloud", OUTPUT_CLOUD));
         } else if (what.equals(WHAT_TYPE)) {
-            types.add(new TwoFacedObject("Type Html", OUTPUT_HTML));
+            types.add(new OutputType("Type Html", OUTPUT_HTML));
         } else {
-            types.add(new TwoFacedObject("Entry", OUTPUT_HTML));
+            types.add(new OutputType("Entry", OUTPUT_HTML));
         }
     }
 
@@ -170,11 +169,11 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
-        types.add(new TwoFacedObject("Entry", OUTPUT_HTML));
+        types.add(new OutputType("Entry", OUTPUT_HTML));
         if (entries.size() > 1) {
-            types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
+            types.add(new OutputType("Timeline", OUTPUT_TIMELINE));
         }
     }
 
@@ -276,7 +275,7 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean canEdit= getAccessManager().canDoAction(request, entry,
                                                         Permission.ACTION_EDIT);
         List<Association> associations =
-            getRepository().getAssociations(request, entry.getId());
+            getRepository().getAssociations(request, entry);
         if (associations.size() == 0) {
             return;
         }
@@ -405,12 +404,12 @@ public class HtmlOutputHandler extends OutputHandler {
     protected void appendListHeader(Request request, String output,
                                     String what, StringBuffer sb)
             throws Exception {
-        List<TwoFacedObject> outputTypes =
+        List<OutputType> outputTypes =
             getRepository().getOutputTypesFor(request, what);
         int cnt = 0;
         sb.append("<b>");
         String initialOutput = request.getOutput("");
-        for (TwoFacedObject tfo : outputTypes) {
+        for (OutputType tfo : outputTypes) {
             if (cnt++ > 0) {
                 sb.append("&nbsp;|&nbsp;");
             }

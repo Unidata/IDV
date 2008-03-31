@@ -1107,6 +1107,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     protected void clearCache(Entry entry) {
+        System.err.println ("Clear cache " + entry.getId());
         entryCache.remove(entry.getId());
         if(entry.isGroup()) {
             Group group = (Group) entry;
@@ -1120,6 +1121,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * _more_
      */
     protected void clearCache() {
+        System.err.println ("Clear full cache ");
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
         entryCache    = new Hashtable();
@@ -1441,10 +1443,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                 return output.equals(OUTPUT_DELETER);
             }
             protected void getOutputTypesForEntry(Request request,
-                    Entry entry, List types)
+                    Entry entry, List<OutputType> types)
                     throws Exception {}
             protected void getOutputTypesForEntries(Request request,
-                    List<Entry> entries, List types)
+                    List<Entry> entries, List<OutputType> types)
                     throws Exception {
                 for (Entry entry : entries) {
                     if ( !getAccessManager().canDoAction(request, entry,
@@ -1452,7 +1454,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                         return;
                     }
                 }
-                types.add(new TwoFacedObject("Delete", OUTPUT_DELETER));
+                types.add(new OutputType("Delete", OUTPUT_DELETER));
             }
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
@@ -2243,9 +2245,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public List getOutputTypesFor(Request request, String what)
+    public List<OutputType> getOutputTypesFor(Request request, String what)
             throws Exception {
-        List types = new ArrayList();
+        List<OutputType> types = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.getOutputTypesFor(request, what, types);
         }
@@ -2265,11 +2267,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public List getOutputTypesForGroup(Request request, Group group,
+    public List<OutputType> getOutputTypesForGroup(Request request, Group group,
                                        List<Group> subGroups,
                                        List<Entry> entries)
             throws Exception {
-        List types = new ArrayList();
+        List<OutputType> types = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.getOutputTypesForGroup(request, group, subGroups,
                     entries, types);
@@ -2290,7 +2292,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public List getOutputTypesForEntry(Request request, Entry entry)
             throws Exception {
-        List list = new ArrayList();
+        List<OutputType> list = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.getOutputTypesForEntry(request, entry, list);
         }
@@ -2309,9 +2311,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public List getOutputTypesForEntries(Request request, List<Entry> entries)
+    public List<OutputType> getOutputTypesForEntries(Request request, List<Entry> entries)
             throws Exception {
-        List list = new ArrayList();
+        List<OutputType> list = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.getOutputTypesForEntries(request, entries, list);
         }
@@ -2378,9 +2380,10 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    public Group getDummyGroup() {
+    public Group getDummyGroup() throws Exception {
         Group dummyGroup = new Group(groupTypeHandler, true);
         dummyGroup.setId(getGUID());
+        dummyGroup.setUser(getUserManager().getAnonymousUser());
         return dummyGroup;
     }
 
@@ -3515,6 +3518,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             return getAccessManager().filterEntry(request, entry);
         }
 
+        //        System.err.println ("Looking up entry:" + entryId);
+
         Statement entryStmt = getDatabaseManager().select(COLUMNS_ENTRIES,
                                   TABLE_ENTRIES,
                                   Clause.eq(COL_ENTRIES_ID, entryId));
@@ -3537,6 +3542,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (entryCache.size() > ENTRY_CACHE_LIMIT) {
                 entryCache = new Hashtable();
             }
+            //            System.err.println ("caching " + entryId);
             entryCache.put(entryId, entry);
         }
         return entry;
@@ -6020,10 +6026,15 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if ( !canDoSelectOffset && (skipCnt-- > 0)) {
                     continue;
                 }
-                //id,type,name,desc,group,user,file,createdata,fromdate,todate
-                TypeHandler localTypeHandler =
-                    getTypeHandler(results.getString(2));
-                Entry entry = localTypeHandler.getEntry(results);
+                String id = results.getString(1);
+                Entry entry = (Entry)entryCache.get(id);
+                if(entry == null) {
+                    //id,type,name,desc,group,user,file,createdata,fromdate,todate
+                    TypeHandler localTypeHandler =
+                        getTypeHandler(results.getString(2));
+                    entry = localTypeHandler.getEntry(results);
+                    entryCache.put(entry.getId(), entry);
+                }
                 if (seen.get(entry.getId()) != null) {
                     continue;
                 }
@@ -6187,14 +6198,22 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected List<Association> getAssociations(Request request,
                                                 String entryId)
         throws Exception {
-        return getAssociations(request, getEntry(request, entryId));
+        Entry entry = getEntry(request, entryId);
+        if(entry == null) {
+            System.err.println("Entry is null:" + entryId);
+        }
+        return getAssociations(request, entry);
     }
+
 
     protected List<Association> getAssociations(Request request,
                                                 Entry entry) 
         throws Exception {
         if(entry.getAssociations()!=null) {
             return entry.getAssociations();
+        }
+        if(entry.isDummy()) {
+            return new ArrayList<Association>();
         }
 
         entry.setAssociations(getAssociations(request, 
@@ -6272,6 +6291,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         if (entry.getComments() != null) {
             return entry.getComments();
+        }
+        if(entry.isDummy()) {
+            return new ArrayList<Comment>();
         }
         Statement stmt = getDatabaseManager().select(COLUMNS_COMMENTS,
                              TABLE_COMMENTS,

@@ -33,7 +33,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -86,12 +85,12 @@ public class RssOutputHandler extends OutputHandler {
     public static final String OUTPUT_RSS_SUMMARY = "rss.summary";
 
     /** _more_ */
-    private static final TwoFacedObject TFO_FULL =
-        new TwoFacedObject("Full RSS Feed", OUTPUT_RSS_FULL);
+    private static final OutputType TFO_FULL =
+        new OutputType("Full RSS Feed", OUTPUT_RSS_FULL);
 
     /** _more_ */
-    private static final TwoFacedObject TFO_SUMMARY =
-        new TwoFacedObject("RSS Feed", OUTPUT_RSS_SUMMARY);
+    private static final OutputType TFO_SUMMARY =
+        new OutputType("RSS Feed", OUTPUT_RSS_SUMMARY);
 
 
 
@@ -130,7 +129,7 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
             //types.add(TFO_FULL);
@@ -151,7 +150,7 @@ public class RssOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List types)
+                                          List<Entry> entries, List<OutputType> types)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -171,7 +170,7 @@ public class RssOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {
         //types.add(TFO_FULL);
         types.add(TFO_SUMMARY);

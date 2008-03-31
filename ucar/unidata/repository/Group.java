@@ -53,9 +53,6 @@ public class Group extends Entry {
     private List<Group> children = new ArrayList<Group>();
 
 
-    /** _more_ */
-    private boolean isDummy = false;
-
 
 
 
@@ -107,15 +104,6 @@ public class Group extends Entry {
             return getParentGroup().getFullName() + "/" + getName();
         }
         return getName();
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isDummy() {
-        return isDummy;
     }
 
 

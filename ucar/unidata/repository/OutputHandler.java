@@ -33,7 +33,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -192,7 +191,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesFor(Request request, String what, List types)
+    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {}
 
 
@@ -207,7 +206,7 @@ public class OutputHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List types)
+                                            List<Entry> entries, List<OutputType> types)
             throws Exception {}
 
 
@@ -222,7 +221,7 @@ public class OutputHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List types)
+                                          List<OutputType> types)
             throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
@@ -243,7 +242,7 @@ public class OutputHandler extends RepositoryManager {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List types)
+                                          List<Entry> entries, List<OutputType> types)
             throws Exception {
         getOutputTypesFor(request, WHAT_ENTRIES, types);
     }
@@ -482,7 +481,7 @@ public class OutputHandler extends RepositoryManager {
             formSB.append(request.form(getRepository().URL_GETENTRIES,
                                        "getentries"));
             //            formSB.append(HtmlUtil.space(1));
-            List outputList =
+            List<OutputType> outputList =
                 getRepository().getOutputTypesForEntries(request, entries);
             sb.append("\n");
             formSB.append(HtmlUtil.space(4));
@@ -587,21 +586,22 @@ public class OutputHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     protected List getHeader(Request request, String output,
-                             List<TwoFacedObject> outputTypes)
+                             List<OutputType> outputTypes)
             throws Exception {
         int    cnt           = 0;
         List   items         = new ArrayList();
         String initialOutput = request.getString(ARG_OUTPUT, "");
-        for (TwoFacedObject tfo : outputTypes) {
-            request.put(ARG_OUTPUT, (String) tfo.getId());
-            if (tfo.getId().equals(output)) {
-                items.add(msg(tfo.toString()));
+        for (OutputType outputType : outputTypes) {
+            request.put(ARG_OUTPUT, (String) outputType.getId());
+            if (outputType.getId().equals(output)) {
+                items.add(msg(outputType.toString()));
             } else {
+                String url = request.getRequestPath() + outputType.getSuffix() +"?"
+                    + request.getUrlArgs(ARG_MESSAGE);
                 items.add(
-                    HtmlUtil.href(
-                        request.getRequestPath() + "?"
-                        + request.getUrlArgs(ARG_MESSAGE), msg(
-                            tfo.toString()), " class=\"subnavlink\" "));
+                    HtmlUtil.href(url, 
+                                  msg(
+                                      outputType.toString()), " class=\"subnavlink\" "));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);

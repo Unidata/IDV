@@ -45,7 +45,6 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.xml.XmlUtil;
@@ -475,9 +474,20 @@ public class AccessManager extends RepositoryManager {
     protected List<Permission> getPermissions(Request request, Entry entry)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
+            if(false) {
+                List<Permission> tmp =  new ArrayList<Permission>();
+                tmp.add(new Permission(Permission.ACTION_VIEW,
+                                       getUserManager().ROLE_ANY));
+                return tmp;
+            }
+            if(entry.isGroup() && ((Group) entry).isDummy()) {
+                return  new ArrayList<Permission>();
+            }
             if (entry.getPermissions() != null) {
                 return entry.getPermissions();
             }
+            //            if(!entry.isGroup()) 
+            //                System.err.println ("getPermissions for entry:" + entry.getId());
             SqlUtil.Iterator iter = SqlUtil.getIterator(
                                         getDatabaseManager().select(
                                             COLUMNS_PERMISSIONS,
@@ -486,7 +496,7 @@ public class AccessManager extends RepositoryManager {
                                                 COL_PERMISSIONS_ENTRY_ID,
                                                 entry.getId())));
 
-            List<Permission> permissions = new ArrayList();
+            List<Permission> permissions = new ArrayList<Permission>();
 
             ResultSet        results;
             Hashtable        actions = new Hashtable();

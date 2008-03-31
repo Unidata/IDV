@@ -83,6 +83,11 @@ public class Entity implements Cloneable {
     /** _more_ */
     private long createDate;
 
+
+    /** _more_ */
+    boolean isDummy = false;
+
+
     /**
      * _more_
      */
@@ -427,13 +432,13 @@ public class Entity implements Cloneable {
      */
     public void setPermissions(List<Permission> value) {
         permissions = value;
+        permissionMap = new Hashtable();
         if (permissions != null) {
-            permissionMap = new Hashtable();
             for (Permission permission : permissions) {
                 permissionMap.put(permission.getAction(),
                                   permission.getRoles());
             }
-        }
+        } 
     }
 
     /**
@@ -481,6 +486,18 @@ public class Entity implements Cloneable {
     public String toString() {
         return name + " id:" + id;
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isDummy() {
+        return isDummy;
+    }
+
 
 
 

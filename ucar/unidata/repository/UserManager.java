@@ -1526,19 +1526,20 @@ public class UserManager extends RepositoryManager {
                 return output.equals(OUTPUT_CART);
             }
             protected void getOutputTypesFor(Request request, String what,
-                                             List types)
+                                             List<OutputType> types)
                     throws Exception {
                 //                    if (what.equals(WHAT_ENTRIES)) {
-                //                        types.add(new TwoFacedObject("Cart", OUTPUT_CART));
+                //                        types.add(new OutputType("Cart", OUTPUT_CART));
                 //                    }
             }
             protected void getOutputTypesForEntry(Request request,
-                    Entry entry, List types)
+                    Entry entry, List<OutputType> types)
                     throws Exception {}
+
             protected void getOutputTypesForEntries(Request request,
-                    List<Entry> entries, List types)
+                    List<Entry> entries, List<OutputType> types)
                     throws Exception {
-                types.add(new TwoFacedObject("Cart", OUTPUT_CART));
+                types.add(new OutputType("Cart", OUTPUT_CART));
             }
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
