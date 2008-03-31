@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.sql;
 
 
@@ -59,7 +60,7 @@ import java.util.regex.*;
  */
 public class SqlUtil {
 
-    /** _more_          */
+    /** _more_ */
     public static boolean debug = false;
 
     /** A calendar to use */
@@ -576,6 +577,8 @@ public class SqlUtil {
     /**
      * _more_
      *
+     *
+     * @param connection _more_
      * @param table _more_
      * @param colId _more_
      * @param id _more_
@@ -583,23 +586,36 @@ public class SqlUtil {
      * @param values _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public static  void update(Connection connection,
-                  String table, String colId, String id,
-                  String[] names, Object[] values) throws Exception {
-        String query = makeUpdate(table,  colId, names);
-        PreparedStatement stmt =  connection.prepareStatement(query);
+    public static void update(Connection connection, String table,
+                              String colId, String id, String[] names,
+                              Object[] values)
+            throws Exception {
+        String            query = makeUpdate(table, colId, names);
+        PreparedStatement stmt  = connection.prepareStatement(query);
         for (int i = 0; i < values.length; i++) {
-            SqlUtil.setValue(stmt, values[i], i+1);
+            SqlUtil.setValue(stmt, values[i], i + 1);
         }
-        stmt.setString(values.length+1, id);
+        stmt.setString(values.length + 1, id);
         stmt.execute();
         stmt.close();
     }
 
 
 
-    public static void setValue (PreparedStatement stmt, Object value, int col) throws Exception {
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param value _more_
+     * @param col _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void setValue(PreparedStatement stmt, Object value, int col)
+            throws Exception {
         if (value instanceof String) {
             stmt.setString(col, value.toString());
         } else if (value instanceof Double) {
@@ -758,6 +774,14 @@ public class SqlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String neq(String name, Date value) {
         return " " + validName(name) + "<>" + quote(format(value)) + " ";
     }
@@ -1319,6 +1343,7 @@ public class SqlUtil {
         if (debug) {
             System.err.println(query);
         }
+        //        System.err.println(query);
         return connection.prepareStatement(query);
     }
 
