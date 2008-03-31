@@ -1695,8 +1695,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         List<Group> topGroups = new ArrayList<Group>(getTopGroups(request));
         topGroups.add(topGroup);
+        //        System.err.println ("incoming:" + incoming);
         for (Group group : topGroups) {
             String name = "/" + getPathFromEntry(group);
+            //            System.err.println ("\t" + name);
             if (incoming.startsWith(name)) {
                 request.setCollectionEntry(group);
                 incoming = incoming.substring(name.length());
@@ -4412,7 +4414,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                         //                            "You must specify a name");
                     }
 
-                    System.err.println("name:" + name +":" + parentGroup.getName());
                     if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
                         if (name.indexOf("/") >= 0) {
                             throw new IllegalArgumentException(
@@ -4420,7 +4421,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 + "'");
                         }
                         Entry existing = findEntryWithName(request, parentGroup, name);
-                        System.err.println("existing:" + existing);
                         if (existing != null && existing.isGroup()) {
                             throw new IllegalArgumentException(
                                 "A group with the given name already exists");
@@ -6774,6 +6774,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             clearCache();
         }
 
+
         //We have our own connection
         Connection connection = getConnection(true);
         try {
@@ -6825,6 +6826,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         int batchCnt = 0;
         connection.setAutoCommit(false);
         for (Entry entry : entries) {
+            if(entry.isCollectionGroup()) {
+                topGroups = null;
+            }
             TypeHandler       typeHandler   = entry.getTypeHandler();
             String            sql           = typeHandler.getInsertSql(isNew);
             PreparedStatement typeStatement = null;

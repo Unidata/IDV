@@ -63,6 +63,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.*;
+import javax.servlet.http.*;
 
 
 
@@ -112,6 +113,12 @@ public class Request implements Constants {
     /** _more_          */
     private Entry collectionEntry;
 
+
+    private HttpServletRequest httpServletRequest;
+
+    private HttpServletResponse httpServletResponse;
+
+
     /**
      * _more_
      *
@@ -126,6 +133,16 @@ public class Request implements Constants {
         this.parameters         = parameters;
         this.originalParameters = new Hashtable();
         originalParameters.putAll(parameters);
+    }
+
+
+
+    public Request(Repository repository, String type, Hashtable parameters,
+                   HttpServletRequest httpServletRequest,
+                   HttpServletResponse httpServletResponse) {
+        this(repository, type, parameters);
+        this.httpServletRequest = httpServletRequest;
+        this.httpServletResponse = httpServletResponse;
     }
 
 
@@ -673,6 +690,15 @@ public class Request implements Constants {
         if (v == null) {
             return dflt;
         }
+        /*
+        for(int i=0;i<v.length();i++) {
+            String tmp = v.substring(0,i);
+            Matcher xx = pattern.matcher(tmp);
+            if ( !xx.find()) {
+                System.err.println("BAD:" + tmp);
+            }
+            }*/
+
         Matcher matcher = pattern.matcher(v);
         if ( !matcher.find()) {
             throw new BadInputException("Incorrect input for:" + key
@@ -1118,6 +1144,26 @@ public class Request implements Constants {
         return collectionEntry;
     }
 
+
+
+    /**
+       Get the HttpServletRequest property.
+
+       @return The HttpServletRequest
+    **/
+    public HttpServletRequest getHttpServletRequest () {
+	return httpServletRequest;
+    }
+
+
+    /**
+       Get the HttpServletResponse property.
+
+       @return The HttpServletResponse
+    **/
+    public HttpServletResponse getHttpServletResponse () {
+	return httpServletResponse;
+    }
 
 
 }

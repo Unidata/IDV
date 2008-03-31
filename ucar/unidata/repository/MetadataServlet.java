@@ -168,9 +168,10 @@ public class MetadataServlet extends HttpServlet {
             }
 
             // create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object
+
             Request repositoryRequest = new Request(repository,
-                                            request.getRequestURI(),
-                                            handler.formArgs);
+                                                    request.getRequestURI(),
+                                                    handler.formArgs, request, response);
             repositoryRequest.setIp(request.getRemoteAddr());
             repositoryRequest.setOutputStream(response.getOutputStream());
             repositoryRequest.setFileUploads(handler.fileUploads);
