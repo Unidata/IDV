@@ -1107,7 +1107,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     protected void clearCache(Entry entry) {
-        System.err.println ("Clear cache " + entry.getId());
+        //        System.err.println ("Clear cache " + entry.getId());
         entryCache.remove(entry.getId());
         if(entry.isGroup()) {
             Group group = (Group) entry;
@@ -1121,7 +1121,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * _more_
      */
     protected void clearCache() {
-        System.err.println ("Clear full cache ");
+        //        System.err.println ("Clear full cache ");
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
         entryCache    = new Hashtable();
@@ -1699,7 +1699,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         for (Group group : topGroups) {
             String name = "/" + getPathFromEntry(group);
             //            System.err.println ("\t" + name);
-            if (incoming.startsWith(name)) {
+            if (incoming.startsWith(name+"/")) {
                 request.setCollectionEntry(group);
                 incoming = incoming.substring(name.length());
                 break;
@@ -4090,6 +4090,12 @@ public class Repository implements Constants, Tables, RequestHandler,
     private Result asynchDeleteEntries(Request request,
                                        final List<Entry> entries) {
         final Request        theRequest = request;
+        Entry                entry = entries.get(0);
+        if(request.getCollectionEntry()!=null) {
+            if(Misc.equals(entry.getId(),request.getCollectionEntry().getId())) {
+                request.setCollectionEntry(null);
+            }
+        }
         Entry                group      = entries.get(0).getParentGroup();
         final String         groupId    = entries.get(0).getParentGroupId();
 
