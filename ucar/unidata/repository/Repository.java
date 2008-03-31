@@ -4591,7 +4591,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         String[]    ids    = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
-            Entry e = getEntry(request,ids[i]);
+            //Get the entry but don't check for access control
+            Entry e = getEntry(request,ids[i],false);
             if (e == null) {
                 continue;
             }
@@ -4601,8 +4602,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             Group g = (Group) e;
             groups.add(g);
         }
-        return topGroups = new ArrayList<Group>(
-            toGroupList(getAccessManager().filterEntries(request, groups)));
+        //For now don't check for access control
+        //        return topGroups = new ArrayList<Group>(
+        //            toGroupList(getAccessManager().filterEntries(request, groups)));
+        return topGroups = new ArrayList<Group>(groups);
     }
 
     /**
