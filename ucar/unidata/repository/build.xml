@@ -34,7 +34,8 @@
             nowarn="true"
             srcdir="${srcdir}"
         >
-        <include name="ucar/unidata/repository/**"/>
+        <include name="ucar/unidata/repository/*.java"/>
+        <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
         </javac>
     </target>
 
