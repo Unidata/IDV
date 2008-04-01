@@ -38,6 +38,9 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import java.io.*;
 
 import java.io.File;
@@ -83,7 +86,9 @@ public class DateGridOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_GRID = "dategrid.grid";
+    public static final String OUTPUT_GRID = "calendar.grid";
+
+    public static final String OUTPUT_CALENDAR = "calendar.calendar";
 
 
     /**
@@ -107,7 +112,7 @@ public class DateGridOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canHandle(String output) {
-        return output.equals(OUTPUT_GRID);
+        return output.equals(OUTPUT_GRID) || output.equals(OUTPUT_CALENDAR);
     }
 
 
@@ -124,6 +129,7 @@ public class DateGridOutputHandler extends OutputHandler {
     protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
+            types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
             types.add(new OutputType("Date Grid", OUTPUT_GRID));
         }
     }
@@ -141,6 +147,7 @@ public class DateGridOutputHandler extends OutputHandler {
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List<OutputType> types)
             throws Exception {
+        types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
         types.add(new OutputType("Date Grid", OUTPUT_GRID));
     }
 
@@ -176,11 +183,32 @@ public class DateGridOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         String       output = request.getOutput();
-        String       title  = group.getFullName();
         StringBuffer sb     = new StringBuffer();
         showNext(request, subGroups, entries, sb);
-
         entries.addAll(subGroups);
+        Result result;
+        if(output.equals(OUTPUT_GRID)) {
+            result = outputGrid(request, group, entries, sb);
+        } else {
+            result = outputCalendar(request, group, entries, sb);
+        }
+        result.putProperty(
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, output,
+                getRepository().getOutputTypesForGroup(
+                    request, group, subGroups, entries)));
+
+        return result;
+    }
+
+
+
+
+    private Result outputGrid(Request request, Group group,
+                              List<Entry> entries, StringBuffer sb)
+            throws Exception {
+        String       title  = group.getFullName();
         List             types    = new ArrayList();
         List             days     = new ArrayList();
         Hashtable        dayMap   = new Hashtable();
@@ -259,13 +287,70 @@ public class DateGridOutputHandler extends OutputHandler {
         sb.append("</table>");
 
         Result result = new Result(title, sb);
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, output,
-                getRepository().getOutputTypesForGroup(
-                    request, group, subGroups, entries)));
+        return result;
 
+    }
+
+
+
+    private Result outputCalendar(Request request, Group group,
+                                  List<Entry> entries, StringBuffer sb)
+            throws Exception {
+
+        GregorianCalendar cal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+
+        GregorianCalendar tmp =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        
+        int month = tmp.get(tmp.MONTH);
+        int today = tmp.get(cal.DAY_OF_MONTH);
+        int tmpDay = today;
+        while(month == tmp.get(tmp.MONTH)) {
+            tmpDay++;
+            tmp.set(cal.DAY_OF_MONTH,tmpDay);
+        }
+
+        tmp.set(cal.DAY_OF_MONTH,tmpDay-1);
+        int lastDay = tmpDay-1;
+
+        cal.clear(cal.DAY_OF_MONTH);
+        cal.set(cal.DAY_OF_MONTH,1);
+        System.err.println("dom: " +        cal.get(cal.DAY_OF_MONTH) +
+                           "  " + cal.get(cal.DAY_OF_WEEK));  
+        sb.append(
+            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
+
+        for (Entry entry : entries) {
+        }
+
+        String[]dayNames = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+        sb.append("<tr>");
+        for(int colIdx=0;colIdx<7;colIdx++) {
+            sb.append("<td width=\"14%\" class=\"calheader\">" + dayNames[colIdx] +"</td>");
+        }
+        sb.append("</tr>");
+        int dayCnt = 0;
+        int boxCnt = 0;
+        int startDow =  cal.get(cal.DAY_OF_WEEK);  
+        for(int rowIdx=0;rowIdx<6;rowIdx++) {
+            sb.append("<tr>");
+            for(int colIdx=0;colIdx<7;colIdx++) {
+                boxCnt++;
+                String content=HtmlUtil.space(1);
+                if(startDow<=boxCnt) {
+                    dayCnt++;
+                    if(dayCnt<=lastDay) {
+                        content = "<table border=0 cellspacing=\"0\" cellpadding=\"3\" width=100%><tr valign=top><td>&nbsp;</td><td align=right class=calday>" + dayCnt+"<br>&nbsp;</td></tr></table>";
+                    }
+                }
+                sb.append("<td class=\"calentry\">" + content +"</td>");
+            }
+        }
+
+        sb.append("</table>");
+
+        Result result = new Result(group.getFullName(), sb);
         return result;
 
     }

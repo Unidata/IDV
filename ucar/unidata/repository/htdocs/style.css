@@ -60,6 +60,8 @@ A {
   font-style: italic;
 }
 
+
+
 .tooltip {
    border : 1px black solid;
    background-color : #FFFFCC;
@@ -304,10 +306,21 @@ a.navlink {
   background-color : #FFFFCC;
 }
 
-
-
 .notetext {
-   xfont-weight: bold;
 }
 
 
+
+.calheader {
+   background-color : lightblue;
+   font-weight: bold;
+}
+
+.calday {
+   font-weight: bold;
+   font-size: 8pt;
+}
+
+.calentry {
+
+}
