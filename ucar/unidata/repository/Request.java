@@ -63,7 +63,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.*;
-//import javax.servlet.http.*;
+import javax.servlet.http.*;
 
 
 
@@ -114,8 +114,8 @@ public class Request implements Constants {
     private Entry collectionEntry;
 
 
-    //    private HttpServletRequest httpServletRequest;
-    //    private HttpServletResponse httpServletResponse;
+    private HttpServletRequest httpServletRequest;
+    private HttpServletResponse httpServletResponse;
 
 
     /**
@@ -136,14 +136,13 @@ public class Request implements Constants {
 
 
 
-    /*
     public Request(Repository repository, String type, Hashtable parameters,
                    HttpServletRequest httpServletRequest,
                    HttpServletResponse httpServletResponse) {
         this(repository, type, parameters);
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
-        }*/
+        }
 
 
     /**
@@ -1151,9 +1150,9 @@ public class Request implements Constants {
 
        @return The HttpServletRequest
     **/
-    /*    public HttpServletRequest getHttpServletRequest () {
+    public HttpServletRequest getHttpServletRequest () {
 	return httpServletRequest;
-        }*/
+    }
 
 
     /**
@@ -1161,9 +1160,9 @@ public class Request implements Constants {
 
        @return The HttpServletResponse
     **/
-    /*    public HttpServletResponse getHttpServletResponse () {
+    public HttpServletResponse getHttpServletResponse () {
 	return httpServletResponse;
-        }*/
+    }
 
 
 }

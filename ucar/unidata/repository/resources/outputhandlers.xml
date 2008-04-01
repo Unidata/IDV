@@ -12,5 +12,5 @@
   <outputhandler class="ucar.unidata.repository.GraphOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false"/>
 
-  <outputhandler class="ucar.unidata.repository.IdvWebstartOutputHandler" />
+  <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler" />
 </outputhandlers>
