@@ -58,6 +58,7 @@
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
             <include name="ucar/unidata/repository/resources/**/*.*"/>
+            <include name="ucar/unidata/repository/idv/template.jnlp"/>
             <include name="auxdata/maps/*"/>
         </jar>
     </target>
