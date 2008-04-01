@@ -10,7 +10,7 @@
 -->
   <outputhandler class="ucar.unidata.repository.ZipOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.GraphOutputHandler"/>
-  <outputhandler class="ucar.unidata.idv.repository.IdvOutputHandler" required="false"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false"/>
 
   <outputhandler class="ucar.unidata.repository.IdvWebstartOutputHandler" />
 </outputhandlers>

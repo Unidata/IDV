@@ -24,6 +24,8 @@
   </resources>
   <application-desc main-class="ucar.unidata.idv.DefaultIdv">
     <argument>-nodefault</argument>
+    <argument>-oneinstanceport</argument>
+    <argument>9876</argument>
     <argument>-bundle</argument>
     <argument>%URL%</argument>
   </application-desc>

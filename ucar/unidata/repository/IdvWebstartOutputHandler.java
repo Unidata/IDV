@@ -138,6 +138,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
         String jnlp = getRepository().getResource("/ucar/unidata/repository/resources/template.jnlp");
         String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
                                   + entry.getName(), ARG_ID, entry.getId());
+        url = getRepository().absoluteUrl(url);
         jnlp = jnlp.replace("%URL%",url);
         return new Result("",new StringBuffer(jnlp),"application/x-java-jnlp-file");
         //        return new Result("",new StringBuffer(jnlp),"text/xml");
