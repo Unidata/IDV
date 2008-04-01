@@ -128,7 +128,7 @@ public class GraphOutputHandler extends OutputHandler {
         if ( !getRepository().isAppletEnabled(request)) {
             return;
         }
-        types.add(new OutputType("Graph", OUTPUT_GRAPH));
+        //        types.add(new OutputType("Graph", OUTPUT_GRAPH));
     }
 
     /**
@@ -146,7 +146,7 @@ public class GraphOutputHandler extends OutputHandler {
                                           List<Group> subGroups,
                                           List<Entry> entries, List<OutputType> types)
             throws Exception {
-        getOutputTypesForEntry(request, group, types);
+        //        getOutputTypesForEntry(request, group, types);
     }
 
 
@@ -166,11 +166,12 @@ public class GraphOutputHandler extends OutputHandler {
             return;
         }
 
-        //        String url   = HtmlUtil.url(
-        //                                    getRepository().URL_ENTRY_SHOW, ARG_ID,
-        //                                    entry.getId(), ARG_OUTPUT, OUTPUT_GRAPH);
-        //        links.add(new Link(url,
-        //                           getRepository().fileUrl(ICON_GRAPH), "Show in graph"));
+        String url   = request.entryUrl(
+                                        getRepository().URL_ENTRY_SHOW, 
+                                        entry, 
+                                        ARG_OUTPUT, OUTPUT_GRAPH);
+        links.add(new Link(url,
+                           getRepository().fileUrl(ICON_GRAPH), "Show in graph"));
     }
 
 

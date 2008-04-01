@@ -119,23 +119,17 @@ public class RssOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links)
             throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            //types.add(TFO_FULL);
-            types.add(TFO_SUMMARY);
-        }
+        String url   = request.entryUrl(
+                                        getRepository().URL_ENTRY_SHOW, 
+                                        entry, 
+                                        ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
+        links.add(new Link(url,
+                           getRepository().fileUrl(ICON_RSS), "RSS Feed"));
     }
+
 
     /**
      * _more_
@@ -152,7 +146,7 @@ public class RssOutputHandler extends OutputHandler {
                                           List<Group> subGroups,
                                           List<Entry> entries, List<OutputType> types)
             throws Exception {
-        if (entries.size() == 0) {
+        if (entries.size() == 0&& subGroups.size()==0) {
             return;
         }
         getOutputTypesForEntries(request, entries, types);
@@ -209,6 +203,7 @@ public class RssOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
+        entries.addAll(subGroups);
         return outputEntries(request, entries);
     }
 
