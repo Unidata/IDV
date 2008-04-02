@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+  <display-name>Unidata Java Data Management System</display-name>
+  <description>
+    The Java Data Management System is an open data collection management framework that enables a data provider or a community of users to upload, organize, manage and share large data holdings. It is designed to run in a wide array of contexts, ranging from local desktop use to real time and case-study data archives. Its HTML interface provides end-user support for configuration, browsing, search, creation, update and management of the data repository. A Java library and web-service api supports integration with external data management systems (e.g., LDM), data provision services (e.g., ADDE, TDS) and end-user clients (e.g., IDV). The Java Data Management System incorporates a number of rich information management facilities, including an extensible metadata framework, grouping, tagging, annotations, and associations.  Based on an extensible Model-View-Control (MVC) framework, the data management system offers the ability to plug-in a variety of ways to access and deliver information - e.g., THREDDS catalogs, RSS feeds, and real-time event notification.
+  </description>
+
+  <context-param>
+    <param-name>args</param-name>
+    <param-value>-Djdms.db=derby,-admin,oxelson,freefall</param-value>
+    <description>
+      Database used by the repository.
+    </description>
+  </context-param>
+
+  <servlet>
+    <servlet-name>MetadataServlet</servlet-name>
+    <servlet-class>ucar.unidata.repository.MetadataServlet</servlet-class>
+  </servlet>
+
+   <!-- The mapping for the default servlet -->
+   <servlet-mapping>
+      <servlet-name>MetadataServlet</servlet-name>
+      <url-pattern>/*</url-pattern>
+   </servlet-mapping>
+
+</web-app>

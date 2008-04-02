@@ -593,7 +593,7 @@ public class UserManager extends RepositoryManager {
                            user.getId(), 
                            new String[] {
                                COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
-                               COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN
+                               COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN, COL_USERS_LANGUAGE
                            }, new Object[] {
                                user.getName(),
                                user.getPassword(),

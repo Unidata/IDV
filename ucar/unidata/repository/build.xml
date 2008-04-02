@@ -77,8 +77,8 @@
         </delete>
         <copy  file="${libsdir}/ramadda.jar" todir="${releasedir}"/>
         <copy  file="${libsdir}/ramaddalib.jar" todir="${releasedir}"/>
-        <copy  file="${ramaddadir}/ramadda.sh" todir="${releasedir}"/>
-        <copy  file="${ramaddadir}/ramaddamysql.sh" todir="${releasedir}"/>
+        <copy  file="${ramaddadir}/release/ramadda.sh" todir="${releasedir}"/>
+        <copy  file="${ramaddadir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${ramaddadir}/README" todir="${releasedir}"/>
         <delete file="${libsdir}/ramadda.tar"/>
         <tar 
