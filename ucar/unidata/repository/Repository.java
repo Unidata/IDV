@@ -1654,8 +1654,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         if ((result != null) && (t2 != t1)
                 && (true || request.get("debug", false))) {
             if ((t2 - t1) > 100) {
-                System.err.println("Time:" + request.getRequestPath() + " "
-                                   + (t2 - t1));
+                //                System.err.println("Time:" + request.getRequestPath() + " "
+                //                                   + (t2 - t1));
             }
         }
         if (okToAddCookie && (request
@@ -1691,7 +1691,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             return null;
         }
         incoming = incoming.substring(urlBase.length());
-        //        System.err.println(incoming);
+        if(incoming.length()==0) {
+            return homeApi;
+        }
 
 
         List<Group> topGroups = new ArrayList<Group>(getTopGroups(request));
@@ -4585,6 +4587,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (topGroups != null) {
             return topGroups;
         }
+        //        System.err.println("ramadda: getTopGroups " + topGroup);
+
         Statement statement = getDatabaseManager().select(COL_ENTRIES_ID,
                                   TABLE_ENTRIES,
                                   Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,

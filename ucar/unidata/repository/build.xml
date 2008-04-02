@@ -98,6 +98,10 @@
 
 
     <target name="war" depends="init">
+      <war webxml="${ramaddadir}/release/web.xml" destfile="${libsdir}/repository.war">
+          <lib file="${libsdir}/ramadda.jar"/>
+          <lib file="${libsdir}/ramaddalib.jar"/>
+      </war>
 
 
     </target>

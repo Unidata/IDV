@@ -171,6 +171,7 @@ public class MetadataServlet extends HttpServlet {
             Request repositoryRequest = new Request(repository,
                                                     request.getRequestURI(),
                                                     handler.formArgs, request, response);
+            //            System.err.println ("request:" +   request.getRequestURI());
             repositoryRequest.setIp(request.getRemoteAddr());
             repositoryRequest.setOutputStream(response.getOutputStream());
             repositoryRequest.setFileUploads(handler.fileUploads);
@@ -187,7 +188,8 @@ public class MetadataServlet extends HttpServlet {
         if (repositoryResult == null) {
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                "Unknown request:" + request.getRequestURI());
-        }
+            return;
+        } 
         if (repositoryResult.getNeedToWrite()) {
             List<String> args = repositoryResult.getHttpHeaderArgs();
             if (args != null) {
@@ -197,8 +199,6 @@ public class MetadataServlet extends HttpServlet {
                     response.setHeader(name, value);
                 }
             }
-
-
 
 
             if (repositoryResult.getRedirectUrl() != null) {

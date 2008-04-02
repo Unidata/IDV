@@ -316,8 +316,8 @@ public class DateGridOutputHandler extends OutputHandler {
 
         cal.clear(cal.DAY_OF_MONTH);
         cal.set(cal.DAY_OF_MONTH,1);
-        System.err.println("dom: " +        cal.get(cal.DAY_OF_MONTH) +
-                           "  " + cal.get(cal.DAY_OF_WEEK));  
+        //        System.err.println("dom: " +        cal.get(cal.DAY_OF_MONTH) +
+        //                           "  " + cal.get(cal.DAY_OF_WEEK));  
         sb.append(
             "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
 
