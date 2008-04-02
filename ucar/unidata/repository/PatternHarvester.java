@@ -152,9 +152,6 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     User user;
 
-    /** _more_ */
-    int rootStrLen;
-
 
     /** _more_ */
     private StringBuffer status = new StringBuffer();
@@ -222,7 +219,7 @@ public class PatternHarvester extends Harvester {
         descTemplate = XmlUtil.getAttribute(element, ATTR_DESCTEMPLATE, "");
         dateFormat = XmlUtil.getAttribute(element, ATTR_DATEFORMAT,
                                           dateFormat);
-        rootStrLen = rootDir.toString().length();
+
     }
 
     /**
@@ -302,9 +299,13 @@ public class PatternHarvester extends Harvester {
                       ? rootDir.toString()
                       : "";
         root = root.replace("\\", "/");
+        String extraLabel = "";
+        if(rootDir!=null && !rootDir.exists()) {
+            extraLabel = HtmlUtil.space(2) + HtmlUtil.bold("Directory does not exist");
+        }
         sb.append(HtmlUtil.formEntry(msgLabel("Look in directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
-                                         HtmlUtil.SIZE_60)));
+                                         HtmlUtil.SIZE_60)+extraLabel));
         sb.append(
             HtmlUtil.formEntry(
                 msgLabel("For files that match pattern"),
@@ -313,9 +314,11 @@ public class PatternHarvester extends Harvester {
         sb.append(HtmlUtil.formEntry(msgLabel("Name template"),
                                      HtmlUtil.input(ATTR_NAMETEMPLATE,
                                          nameTemplate, HtmlUtil.SIZE_60)));
-        sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
-                                     HtmlUtil.input(ATTR_BASEGROUP,
-                                         baseGroupName, HtmlUtil.SIZE_60)));
+        if(baseGroupName.length()>0) {
+            sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
+                                         HtmlUtil.input(ATTR_BASEGROUP,
+                                                        baseGroupName, HtmlUtil.SIZE_60)));
+        }
         sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,
                                          groupTemplate, HtmlUtil.SIZE_60)));
@@ -458,7 +461,9 @@ public class PatternHarvester extends Harvester {
         newEntryCnt = 0;
         status = new StringBuffer("Looking for initial directory listing");
         long tt1 = System.currentTimeMillis();
-        dirs = FileInfo.collectDirs(rootDir);
+        dirs = new ArrayList<FileInfo>();
+        dirs.add(new FileInfo(rootDir));
+        dirs.addAll(FileInfo.collectDirs(rootDir));
         long tt2 = System.currentTimeMillis();
         status = new StringBuffer("");
         //        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
@@ -520,6 +525,7 @@ public class PatternHarvester extends Harvester {
             File[] files = fileInfo.getFile().listFiles();
             if (files == null) {
                 continue;
+
             }
 
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
@@ -575,8 +581,6 @@ public class PatternHarvester extends Harvester {
      */
     private Entry processFile(File f) throws Exception {
 
-
-
         //check if its a hidden file
         if (f.getName().startsWith(".")) {
             return null;
@@ -587,6 +591,7 @@ public class PatternHarvester extends Harvester {
         fileName = fileName.replace("\\", "/");
 
         String dirPath = f.getParent().toString();
+        int rootStrLen = rootDir.toString().length();
         dirPath = dirPath.substring(rootStrLen);
         dirPath = SqlUtil.cleanUp(dirPath);
         dirPath = dirPath.replace("\\", "/");
@@ -642,8 +647,8 @@ public class PatternHarvester extends Harvester {
             toDate = createDate;
         }
 
-        List   dirToks  = StringUtil.split(dirPath, "/", true, true);
 
+        List   dirToks  = StringUtil.split(dirPath, "/", true, true);
         String dirGroup = StringUtil.join("/", dirToks);
 
 
@@ -672,8 +677,10 @@ public class PatternHarvester extends Harvester {
         desc = desc.replace("${name}", name);
 
 
-        Group group = repository.findGroupFromName(baseGroupName + "/"
-                          + groupName, getUser(), true);
+        if(baseGroupName!=null && baseGroupName.length()>0) {
+            groupName = baseGroupName + "/" + groupName;
+        }
+        Group group = repository.findGroupFromName(groupName, getUser(), true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
         entry.initEntry(name, desc, group, group.getCollectionGroupId(),
                         getUser(),

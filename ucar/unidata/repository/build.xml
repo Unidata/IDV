@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<project basedir="../../../" default="repositoryjar" name="Repository">
+<project basedir="../../../" default="ramaddajar" name="Ramadda">
 
 
     <target name="init">
+        <property  name="version" value="0.1"/>
         <property  name="build.sysclasspath" value="ignore"/>
         <property name="srcdir" value="${basedir}"/>
         <property name="compiledir" value="${srcdir}"/>
@@ -12,10 +13,11 @@
         <property name="jars_dest" value="${basedir}/lib"/>
         <property name="libsrc" value="${basedir}/libsrc"/>
         <property name="libsdir" value="${jars_dest}"/>
-        <property name="repositorydir" value="${srcdir}/ucar/unidata/repository" />
-        <property name="releasedir" value="${libsdir}/ramadda" />
+        <property name="ramaddadir" value="${srcdir}/ucar/unidata/repository" />
+        <property name="releasedir" value="${libsdir}/ramadda${version}" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/visad.jar;${libsdir}/external.jar"/>
+        <property name="xxxclasspath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/external.jar"/>
+        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/ramaddalib.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -24,8 +26,12 @@
         </delete>
     </target>
 
-    <target name="repository" depends="init,clean">
-    <echo message="classpath:${classpath}"/>
+
+    <target name="all" depends="lib,ramaddajar,release">
+    </target>
+
+
+    <target name="compile" depends="init,clean">
         <javac
             classpath="${classpath}"
             debug="true"
@@ -41,27 +47,25 @@
         </javac>
     </target>
 
-
-
-    <target name="repositoryjar" depends="repository">
+    <target name="ramaddajar" depends="compile">
         <jar 
             basedir="${srcdir}"
             compress="true"
             update="false"
-            jarfile="${jars_dest}/repository.jar">
+            jarfile="${jars_dest}/ramadda.jar">
            <manifest>
               <attribute name="Implementation-Title" value="Unidata's Ramada"/>
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="repositorylib.jar idv.jar auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar"/>
+              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar nc2.2.jar"/>
             </manifest> 
-
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
             <include name="ucar/unidata/repository/resources/**/*.*"/>
             <include name="ucar/unidata/repository/idv/template.jnlp"/>
             <include name="auxdata/maps/*"/>
+            <include name="auxdata/ui/icons/*"/>
         </jar>
     </target>
 
@@ -71,20 +75,16 @@
         <delete includeemptydirs="true">
             <fileset dir="${releasedir}" includes="**/*"/>
         </delete>
-        <copy  file="${libsdir}/local-visad.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/visad.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/external.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/repository.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/repositorylib.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/auxdata.jar" todir="${releasedir}"/>
-<!--        <copy  file="${libsrc}/.jar" todir="${releasedir}"/> -->
-        <copy  file="${repositorydir}/ramadda.sh" todir="${releasedir}"/>
-        <copy  file="${repositorydir}/README" todir="${releasedir}"/>
+        <copy  file="${libsdir}/ramadda.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/ramaddalib.jar" todir="${releasedir}"/>
+        <copy  file="${ramaddadir}/ramadda.sh" todir="${releasedir}"/>
+        <copy  file="${ramaddadir}/ramaddamysql.sh" todir="${releasedir}"/>
+        <copy  file="${ramaddadir}/README" todir="${releasedir}"/>
         <delete file="${libsdir}/ramadda.tar"/>
         <tar 
-            destfile="${libsdir}/ramadda.tar">
+            destfile="${libsdir}/ramadda.${version}.tar">
           <tarfileset dir="${releasedir}"
-              prefix="ramadda">
+              prefix="ramadda${version}">
               <include name="*"/>
          </tarfileset>
 
@@ -97,7 +97,13 @@
     </target>
 
 
-    <target name="lib" depends="repository">
+    <target name="war" depends="init">
+
+
+    </target>
+
+
+    <target name="lib" depends="init">
         <mkdir dir="${tmpjardir}"/>
         <delete includeemptydirs="true">
             <fileset dir="${tmpjardir}" includes="**/*"/>
@@ -105,6 +111,8 @@
         <unjar src="${jars_dest}/visad.jar" dest="${tmpjardir}"/>
         <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
+
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
@@ -112,11 +120,18 @@
         <jar 
             basedir="${tmpjardir}"
             compress="true"
-            jarfile="${libsdir}/repositorylib.jar">
+            jarfile="${libsdir}/ramaddalib.jar">
               <include name="**"/>
+
         </jar>
         <delete dir="${tmpjardir}"/>
     </target>
+
+
+
+
+
+
 
 
 </project>

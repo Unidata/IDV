@@ -1,17 +1,19 @@
-To run Ramadda run the ramadda.sh
+RAMADDA requires  Java 1.5 to run.
+
+To run RAMADDA run the ramadda.sh
 
 This just does:
    java -Xmx512m -jar repository.jar
 
 
-Ramadda creates a local storage directory in:
+RAMADDA creates a local storage directory in:
 <home dir>/.unidata/repository
 
 By default the server is on port 8080.  To change the port do:
     java -Xmx512m -jar repository.jar -port <some port>
 
 
-By default Ramadda uses a local Java Derby database. 
+By default RAMADDA uses a local Java Derby database. 
 To run with mysql you do:
      java -Xmx512m -jar repository.jar -Djdms.db=mysql
 
