@@ -12,6 +12,8 @@
         <property name="jars_dest" value="${basedir}/lib"/>
         <property name="libsrc" value="${basedir}/libsrc"/>
         <property name="libsdir" value="${jars_dest}"/>
+        <property name="repositorydir" value="${srcdir}/ucar/unidata/repository" />
+        <property name="releasedir" value="${libsdir}/ramadda" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
         <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/visad.jar;${libsdir}/external.jar"/>
     </target>
@@ -61,6 +63,37 @@
             <include name="ucar/unidata/repository/idv/template.jnlp"/>
             <include name="auxdata/maps/*"/>
         </jar>
+    </target>
+
+
+    <target name="release" depends="init">
+        <mkdir dir="${releasedir}"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${releasedir}" includes="**/*"/>
+        </delete>
+        <copy  file="${libsdir}/local-visad.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/visad.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/external.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/repository.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/repositorylib.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/auxdata.jar" todir="${releasedir}"/>
+<!--        <copy  file="${libsrc}/.jar" todir="${releasedir}"/> -->
+        <copy  file="${repositorydir}/ramadda.sh" todir="${releasedir}"/>
+        <copy  file="${repositorydir}/README" todir="${releasedir}"/>
+        <delete file="${libsdir}/ramadda.tar"/>
+        <tar 
+            destfile="${libsdir}/ramadda.tar">
+          <tarfileset dir="${releasedir}"
+              prefix="ramadda">
+              <include name="*"/>
+         </tarfileset>
+
+        </tar>
+<!--
+        <delete includeemptydirs="true">
+            <fileset dir="${releasedir}" includes="**/*"/>
+        </delete>
+-->
     </target>
 
 

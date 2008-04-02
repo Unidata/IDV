@@ -1,64 +1,31 @@
+To run Ramadda run the ramadda.sh
+
+This just does:
+   java -Xmx512m -jar repository.jar
 
 
---------------------------------------------------------------------------------
-Including geoloc package
-Since the repository does not include the nc2.2.jar we need to have the geoloc package imported into the
-idv tree. From idv/trunk/ucar do the following:
+Ramadda creates a local storage directory in:
+<home dir>/.unidata/repository
 
-svn propset svn:externals "geoloc svn://zero/common/java/trunk/src/main/java/ucar/unidata/geoloc" unidata
-
+By default the server is on port 8080.  To change the port do:
+    java -Xmx512m -jar repository.jar -port <some port>
 
 
---------------------------------------------------------------------------------
-Repository jar files
-The repository consists of 2 jar files:
-repositorylib.jar
-repository.jar
-The repositorylib.jar file contains all of the external libs that the repository uses.
-The repository.jar contains the code compiled within the ucar source tree.
-
-To build the repositorylib.jar file do:
-ant lib; 
-This will create  the jar in idv/trunk/lib
-
-To build repository.jar do:
-ant
-This creates the repository.jar file in  idv/trunk/lib
+By default Ramadda uses a local Java Derby database. 
+To run with mysql you do:
+     java -Xmx512m -jar repository.jar -Djdms.db=mysql
 
 
-To run the repository do:
-java -jar repository.jar 
-The default is to run the repository  with a local derby based.
+The mysql database and user/password is defined in the repository.properties 
+file. To change it make a repository.properties file with the following 
+3 lines and put it in <home dir>/.unidata/repository
 
+jdms.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull
+jdms.db.mysql.user=the database user
+jdms.db.mysql.password=the database password
 
-The first time you start the repository you should create an admin account. 
-You do this with the command line arguments:
-java -jar repository.jar -admin <user id> <password>
-
-
-
-
-To run the repository with a  mysql database:
-java -jar repository.jar -Djdms.db=mysql
-
-To run the repository with a  postgres database:
-java -jar repository.jar -Djdms.db=postgres
-
-
-
-If you have the repositorylib.jar file and the source tree  in your class path and want to run from the .class 
-files in your source tree just do:
-
-java    ucar.unidata.repository.RepositoryServer
-
-
-
-
-
---------------------------------------------------------------------------------
-Using the IdvOutputHandler
-There is an optional output handler that can generate preview images. To use this simply build the idv.jar and place it in the same directory as the repository.jar. You will also need from the lib directory:
-auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar
+Or alteratively set the properties on the command line:
+     java -Xmx512m -jar repository.jar -Djdms.db=mysql -Djdms.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull -Djdms.db.mysql.user=the database user -Djdms.db.mysql.password=the database password
 
 
 
