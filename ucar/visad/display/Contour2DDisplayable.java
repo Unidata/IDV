@@ -394,7 +394,7 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
-     * @deprecated Should use setData now
+     * @deprecated Should use loadData now
      */
     public void setGrid2D(FieldImpl field)
             throws RemoteException, VisADException {
@@ -402,7 +402,8 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
     }
 
     /**
-     * Set the data into the Displayable
+     * Set the appropriate ScalarMaps based on the data and then
+     * load the data into the DataReference.
      *
      * @param field a 2D VisAD Field representing the data
      *
