@@ -77,6 +77,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -2064,6 +2065,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     public String getProperty(String name) {
+        Map<String, String> env = System.getenv();
+        String prop = env.get(name);
+        if(prop!=null) return prop;
         return (String) properties.get(name);
     }
 
@@ -2077,6 +2081,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     public String getProperty(String name, String dflt) {
+        String prop = getProperty(name);
+        if(prop!=null) return prop;
         return Misc.getProperty(properties, name, dflt);
     }
 
@@ -2089,6 +2095,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     public boolean getProperty(String name, boolean dflt) {
+        String prop = getProperty(name);
+        if(prop!=null) return new Boolean(prop).booleanValue();
         return Misc.getProperty(properties, name, dflt);
     }
 

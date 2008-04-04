@@ -547,7 +547,7 @@ public interface Constants {
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
     /** _more_ */
-    public static final String PROP_REPOSITORY_HOME = "jdms.home";
+    public static final String PROP_REPOSITORY_HOME = "ramadda_home";
 
 
     /** _more_ */

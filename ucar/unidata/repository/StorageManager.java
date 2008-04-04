@@ -131,8 +131,9 @@ public class StorageManager extends RepositoryManager {
      *
      */
     protected void init() {
+
         repositoryDir = getRepository().getProperty(PROP_REPOSITORY_HOME,
-                (String) null);
+                                                    (String) null);
         if (repositoryDir == null) {
             repositoryDir =
                 IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),
