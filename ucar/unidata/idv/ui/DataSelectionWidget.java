@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -153,7 +154,7 @@ public class DataSelectionWidget {
     /** Current list of levels */
     private List levels;
 
-    /** _more_          */
+    /** _more_ */
     private boolean defaultLevelToFirst = true;
 
 
@@ -174,7 +175,7 @@ public class DataSelectionWidget {
     private String currentLbl;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<DataSelectionComponent> dataSelectionComponents;
 
     /**
@@ -333,17 +334,22 @@ public class DataSelectionWidget {
      *
      * @param dataSource  data source
      * @param dc  The data choice
+     *
+     * @return _more_
      */
-    protected void updateSelectionTab(DataSource dataSource, DataChoice dc) {
+    protected boolean updateSelectionTab(DataSource dataSource,
+                                         DataChoice dc) {
 
         //        System.err.println("update tab " + dataSource + " " + dc);
+        boolean newDataSource = false;
         if (lastDataSource != dataSource) {
             dataSourceChanged(dataSource);
+            newDataSource = true;
         }
         lastDataSource = dataSource;
 
         if (selectionTab == null) {
-            return;
+            return newDataSource;
         }
         int idx = selectionTab.getSelectedIndex();
         if (idx >= 0) {
@@ -369,12 +375,12 @@ public class DataSelectionWidget {
                 addSettingsComponent();
             }
             checkSelectionTab();
-            return;
+            return newDataSource;
         }
 
         if (dc == null) {
             checkSelectionTab();
-            return;
+            return newDataSource;
         }
 
 
@@ -501,7 +507,7 @@ public class DataSelectionWidget {
             }
         }
 
-
+        return newDataSource;
     }
 
 
@@ -724,6 +730,8 @@ public class DataSelectionWidget {
      * @param selected The selected times
      */
     public void setTimes(List all, List selected) {
+        //        Misc.printStack("DSW.setTimes  " + all,5,null);
+
         setTimes(timesList, allTimesButton, all, selected);
         if (all != null) {
             allDateTimes = new ArrayList(all);

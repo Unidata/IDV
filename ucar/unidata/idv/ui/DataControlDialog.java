@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -492,8 +493,11 @@ public class DataControlDialog implements ActionListener {
         dataChoice.getDataSources(sources);
         sources = Misc.makeUnique(sources);
 
+
+
         List selectedTimes = dataChoice.getSelectedDateTimes();
         //A hack -  data choices that have no times at all have a non-null but empty list of selected times.
+        List times = dataChoice.getAllDateTimes();
         if (false && (selectedTimes != null)) {
             List allTimes = dataChoice.getAllDateTimes();
             //Now, convert the (possible) indices to actual datetimes
@@ -501,16 +505,22 @@ public class DataControlDialog implements ActionListener {
                     allTimes);
             dataSelectionWidget.setTimes(selectedTimes, selectedTimes);
         } else {
-            dataSelectionWidget.setTimes(dataChoice.getAllDateTimes(),
-                                         selectedTimes);
+            dataSelectionWidget.setTimes(times, selectedTimes);
         }
+
 
         if (sources.size() == 1) {
             DataSource dataSource = (DataSource) sources.get(0);
-            dataSelectionWidget.updateSelectionTab(dataSource, dc);
+            //If the widget thinks this is a new data source then we need to reset the times list
+            if (dataSelectionWidget.updateSelectionTab(dataSource, dc)) {
+                dataSelectionWidget.setTimes(times, selectedTimes);
+            }
         } else {
             dataSelectionWidget.updateSelectionTab(null, dc);
         }
+
+
+
 
     }
 
