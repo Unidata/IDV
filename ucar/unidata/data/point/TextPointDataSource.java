@@ -1060,9 +1060,16 @@ public class TextPointDataSource extends PointDataSource {
             int lonIndex        = type.getIndex(RealType.Longitude);
             int altIndex        = type.getIndex(RealType.Altitude);
 
+            if(altIndex>=0) {
+                varNames.add("Altitude");
+            }
             int trackParamIndex = -1;
             if (trackParam != null) {
-                trackParamIndex = type.getIndex(trackParam);
+                if(trackParam.equals("Altitude")) {
+                    trackParamIndex = altIndex;
+                } else {
+                    trackParamIndex = type.getIndex(trackParam);
+                }
                 if (trackParamIndex == -1) {
                     throw new IllegalArgumentException(
                         "Can't find track param");
