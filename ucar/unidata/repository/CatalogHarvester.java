@@ -130,6 +130,9 @@ public class CatalogHarvester extends Harvester {
         groups = new ArrayList();
         importCatalog(topUrl, topGroup,0);
         //        repository.processEntries(this, null, entries);
+        if (entries.size() > 0) {
+            repository.processEntries(this, null, entries);
+        }
         entries = new ArrayList<Entry>();
     }
 
@@ -230,6 +233,7 @@ public class CatalogHarvester extends Harvester {
             }
         }
 
+
         if ( !haveChildDatasets && (xmlDepth > 0) && (urlPath != null)) {
             Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
                                       false, null);
@@ -258,10 +262,8 @@ public class CatalogHarvester extends Harvester {
                             createDate.getTime(), null);
             entries.add(entry);
             typeHandler.initializeNewEntry(entry);
-            if (entries.size() > 1000) {
-                Misc.gc();
-                System.err.println ("\nMemory:" +( Misc.usedMemory()/1000000));
-                //                repository.processEntries(this, null, entries);
+            if (entries.size() > 100) {
+                repository.processEntries(this, null, entries);
                 entries = new ArrayList<Entry>();
             }
             return;
