@@ -92,6 +92,8 @@ public class TextPointDataSource extends PointDataSource {
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
 
+    private Real      dfltReal;
+
     /** logging category */
     static LogUtil.LogCategory log_ =
         LogUtil.getLogInstance(TextPointDataSource.class.getName());
@@ -900,7 +902,13 @@ public class TextPointDataSource extends PointDataSource {
         float[] alts = new float[times.size()];
         //                float[]alts = (altIndex>=0?new float[times.size()]:null);
         Unit timeUnit    = ((DateTime) times.get(0)).getUnit();
-        Real paramSample = (Real) ((Data[]) tuples.get(0))[trackParamIndex];
+        
+        Real paramSample;
+        if(trackParamIndex>=0) {
+            paramSample = (Real) ((Data[]) tuples.get(0))[trackParamIndex];
+        } else {
+            paramSample =    getDefaultValue();
+        }
         RealType timeType =
             RealType.getRealType(DataUtil.cleanName("track_time" + "_"
                 + timeUnit), timeUnit);
@@ -911,7 +919,7 @@ public class TextPointDataSource extends PointDataSource {
         int        numObs       = times.size();
         for (int i = 0; i < numObs; i++) {
             DateTime dateTime = (DateTime) times.get(i);
-            Real     value = (Real) ((Data[]) tuples.get(i))[trackParamIndex];
+            Real     value = (trackParamIndex>=0?(Real) ((Data[]) tuples.get(i))[trackParamIndex]:getDefaultValue());
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getValue();
             Data[] tupleData = (Data[]) tuples.get(i);
@@ -953,6 +961,15 @@ public class TextPointDataSource extends PointDataSource {
         //        return timeTrack;
     }
 
+
+
+    private Real getDefaultValue() throws VisADException {
+        if(dfltReal == null) {
+            RealType  dfltRealType = RealType.getRealType("Default");
+            dfltReal      = new Real(dfltRealType,1);
+        }
+        return dfltReal;
+    }
 
 
     /**
@@ -1048,7 +1065,8 @@ public class TextPointDataSource extends PointDataSource {
             }
 
             Real      dfltAlt       = new Real(RealType.Altitude, 1);
-            Real      dfltReal      = new Real(1);
+            Real dfltReal = getDefaultValue();
+
 
             TupleType finalTT       = null;
             TupleType dataTupleType = null;
@@ -1067,12 +1085,14 @@ public class TextPointDataSource extends PointDataSource {
             if (trackParam != null) {
                 if(trackParam.equals("Altitude")) {
                     trackParamIndex = altIndex;
+                } else  if(trackParam.equals("Default")) {
                 } else {
+                    System.err.println ("track:" + trackParam + " " + type);
                     trackParamIndex = type.getIndex(trackParam);
-                }
-                if (trackParamIndex == -1) {
-                    throw new IllegalArgumentException(
-                        "Can't find track param");
+                    if (trackParamIndex == -1) {
+                        throw new IllegalArgumentException(
+                                                           "Can't find track param");
+                    }
                 }
             }
 
