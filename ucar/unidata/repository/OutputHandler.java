@@ -470,7 +470,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      * @throws Exception _more_
      */
-    public String getEntryHtml(StringBuffer sb, List<Entry> entries,
+    public String getEntryHtml(StringBuffer sb, List entries,
                                Request request, boolean doForm,
                                boolean dfltSelected, boolean showCrumbs)
             throws Exception {
@@ -504,7 +504,7 @@ public class OutputHandler extends RepositoryManager {
         }
         String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int    cnt = 0;
-        for (Entry entry : entries) {
+        for (Entry entry : (List<Entry>)entries) {
             sb.append("<li>");
             if (doForm) {
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));

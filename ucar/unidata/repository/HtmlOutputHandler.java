@@ -836,6 +836,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
                 //sb.append("</div>");
             }
+
+            //            entries.addAll(subGroups);
             if (entries.size() > 0) {
                 StringBuffer entriesSB = new StringBuffer();
                 if (showApplet) {

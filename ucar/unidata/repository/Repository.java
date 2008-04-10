@@ -1462,7 +1462,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                                       List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
+                System.err.println("groups:" + subGroups);
+
                 StringBuffer idBuffer = new StringBuffer();
+                entries.addAll(subGroups);
                 for (Entry entry : entries) {
                     idBuffer.append(",");
                     idBuffer.append(entry.getId());
@@ -4739,7 +4742,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     continue;
                 }
             }
-            if ( !id.startsWith(prefix)) {
+            if (!id.startsWith(prefix)) {
                 continue;
             }
             id = id.substring(prefix.length());

@@ -43,10 +43,10 @@
 		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
 		xrootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
-		filepattern="(station:[^/]+)/(product:[^/]+)/[^/]+_(fromDate:\d\d\d\d\d\d\d\d_\d\d\d\d)"
+		filepattern="(station:[^/]+)/(product:[^/]+)/[^/]+_(fromdate:\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"
 		grouptemplate = "${station}/${product}"
-		nametemplate="${station}-${product}-${fromDate}"
+		nametemplate="${station}-${product}-${fromdate}"
 		desctemplate= "${name} description"
                 monitor="true"
 		sleep="3"/>
@@ -60,7 +60,7 @@
 		filepattern="([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level2radar"
 		grouptemplate = "${station}"
-		nametemplate="${station}-${fromDate}"
+		nametemplate="${station}-${fromdate}"
 		desctemplate= "${name} description"
                 monitor="true"
 		sleep="3"/>
@@ -79,7 +79,7 @@
 		type="model"
                 dateformat="yyyyMMddHH"
 		grouptemplate = "${modelgroup}/${modelrun}"
-                nametemplate = "${modelgroup}-${modelrun}-${fromDate}"
+                nametemplate = "${modelgroup}-${modelrun}-${fromdate}"
 		desctemplate= "${name} description"
                 monitor="true"
 		sleep="3"/>
@@ -94,7 +94,7 @@
 		filepattern="([^/]+)/([^/]+)/([^/]+)/[^/]+(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="satellite"
 		grouptemplate = "${platform}/${resolution}/${product}"
-		nametemplate="${platform}-${resolution}-${product}-${fromDate}"
+		nametemplate="${platform}-${resolution}-${product}-${fromdate}"
 		desctemplate= "${name}"
                 monitor="true"
 		sleep="3"/>

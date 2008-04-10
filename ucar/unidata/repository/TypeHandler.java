@@ -873,6 +873,11 @@ public class TypeHandler extends RepositoryManager {
         }
 
         int metadataCnt = 0;
+
+
+
+
+
         while (true) {
             String subTable = TABLE_METADATA + "_" + metadataCnt;
             metadataCnt++;
@@ -908,6 +913,8 @@ public class TypeHandler extends RepositoryManager {
             clauses.add(0, Clause.join(COL_ENTRIES_ID, getTableName() + ".id"));
         }
 
+        //        System.err.println("tables:" + tables);
+        //        System.err.println("clauses:" + clauses);
         return SqlUtil.select(getConnection(), what, tables,
                               Clause.and(clauses), extra,
                               getRepository().getMax(request));
@@ -1663,7 +1670,7 @@ public class TypeHandler extends RepositoryManager {
      * @return _more_
      */
     public Object convert(String columnName, String value) {
-        return null;
+        return value;
     }
 
     /**

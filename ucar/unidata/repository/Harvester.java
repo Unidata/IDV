@@ -246,12 +246,13 @@ public class Harvester extends RepositoryManager {
                 msgLabel("Run"),
                 HtmlUtil.checkbox(ATTR_ACTIVE, "true", activeOnStart)
                 + HtmlUtil.space(1) + msg("Active on startup")
+                + HtmlUtil.space(3)
                 + HtmlUtil.checkbox(ATTR_MONITOR, "true", monitor)
                 + HtmlUtil.space(1) + msg("Monitor") + HtmlUtil.space(3)
                 + msgLabel("Sleep") + HtmlUtil.space(1)
                 + HtmlUtil.input(
                     ATTR_SLEEP, "" + sleepMinutes,
-                    HtmlUtil.SIZE_10) + HtmlUtil.space(1)
+                    HtmlUtil.SIZE_5) + HtmlUtil.space(1)
                                       + msg("(minutes)")));
 
     }

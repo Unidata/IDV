@@ -187,7 +187,7 @@ function loadImage(intImageIndex) {
 	if (arrImages.length == 1) {
 		document.getElementById("photoFrame").className = "photoFrame expanded";
 	}
-	document.getElementById("photo").src = "/resources/images/loadingImage.gif";
+	document.getElementById("photo").src = "${root}/loadingImage.gif";
 	document.getElementById("thumb" + lastActive).className = "thumbnail";
 	document.getElementById("photo").src = arrImages[intImageIndex];
 	document.getElementById("caption").innerHTML =  arrCaptions[intImageIndex];

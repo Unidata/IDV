@@ -274,8 +274,13 @@ public class StorageManager extends RepositoryManager {
      */
     public File moveToStorage(Request request, File original)
             throws Exception {
+        return moveToStorage(request, original,"");
+    }
+    
+    public File moveToStorage(Request request, File original, String prefix)
+            throws Exception {
         File newFile = new File(IOUtil.joinDir(getStorageDir(),
-                           original.getName()));
+                                               prefix+original.getName()));
         IOUtil.moveFile(original, newFile);
         return newFile;
     }
