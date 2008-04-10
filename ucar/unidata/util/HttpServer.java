@@ -585,12 +585,13 @@ public class HttpServer {
             }
             List argToks = StringUtil.split(args, "&", true, true);
             for (int i = 0; i < argToks.size(); i++) {
-                String[] toks = StringUtil.split(argToks.get(i).toString(),
-                                    "=", 2);
+                String tok = argToks.get(i).toString();
+                String[] toks = StringUtil.split(tok, "=", 2);
                 if ((toks == null) || (toks.length < 1)) {
                     continue;
                 }
-                addArg(ht,toks[0], decode(toks[1]));
+                //                System.err.println ("\t" + toks[1]);
+                addArg(ht,decode(toks[0]), decode(toks[1]));
             }
 
         }
