@@ -356,7 +356,14 @@ public class Clause {
      */
     public boolean isColumnFromTable(String table) {
         if (column == null) {
-            System.err.println("column is null:" + Misc.toList(subClauses));
+            if(subClauses!=null) {
+                for (int i = 0; i < subClauses.length; i++) {
+                    if(subClauses[i].isColumnFromTable(table)) {
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
         return column.startsWith(table + ".");
