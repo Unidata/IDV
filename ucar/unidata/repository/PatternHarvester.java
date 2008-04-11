@@ -214,6 +214,9 @@ public class PatternHarvester extends Harvester {
 
         this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
                 "");
+
+        filePattern = null;
+        sdf         = null;
         init();
         groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE,
                                              groupTemplate);
@@ -396,8 +399,6 @@ public class PatternHarvester extends Harvester {
      * _more_
      */
     private void init() {
-
-
         if ((filePattern == null) && (filePatternString != null)
                 && (filePatternString.length() > 0)) {
             String       tmp     = filePatternString;
@@ -420,6 +421,8 @@ public class PatternHarvester extends Harvester {
                 tmp = tmp.substring(idx2 + 1);
             }
             filePattern = Pattern.compile(pattern.toString());
+            //            System.err.println("pattern:" + this + "  " + filePatternString);
+            //            System.err.println("pattern names:" + patternNames);
         }
     }
 
@@ -635,7 +638,7 @@ public class PatternHarvester extends Harvester {
         fileName = fileName.replace("\\", "/");
         String dirPath = f.getParent().toString();
         int rootStrLen = rootDir.toString().length();
-        System.err.println("root:" + rootDir + " " + rootStrLen);
+        //        System.err.println("root:" + rootDir + " " + rootStrLen);
         dirPath = dirPath.substring(rootStrLen);
         dirPath = SqlUtil.cleanUp(dirPath);
         dirPath = dirPath.replace("\\", "/");
@@ -659,6 +662,7 @@ public class PatternHarvester extends Harvester {
         String    desc      = descTemplate;
 
 
+        //        System.err.println("pattern names:" + patternNames);
         for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {
             String dataName = patternNames.get(dataIdx);
             Object value    = matcher.group(dataIdx + 1);
