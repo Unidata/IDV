@@ -1245,6 +1245,7 @@ public class TypeHandler extends RepositoryManager {
 
                 }
             } else {
+                /****
                 Statement stmt =
                     select(request,
                            SqlUtil.distinct(COL_ENTRIES_PARENT_GROUP_ID),
@@ -1271,6 +1272,7 @@ public class TypeHandler extends RepositoryManager {
                     advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             groups.get(0).getFullName() + searchChildren));
                 }
+                ****/
             }
             advancedSB.append("\n");
         }

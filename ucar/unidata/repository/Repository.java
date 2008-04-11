@@ -6856,6 +6856,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             TypeHandler       typeHandler   = entry.getTypeHandler();
             String            sql           = typeHandler.getInsertSql(isNew);
+            //            System.err.println("sql:" + sql);
             PreparedStatement typeStatement = null;
             if (sql != null) {
                 typeStatement = (PreparedStatement) typeStatements.get(sql);

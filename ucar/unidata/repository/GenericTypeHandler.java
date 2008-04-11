@@ -203,12 +203,13 @@ public class GenericTypeHandler extends TypeHandler {
      * @return _more_
      */
     public Object[] makeValues(Hashtable map) {
-        Object[] values = new Object[colNames.size()];
+        Object[] values = new Object[columns.size()];
         //For now we just assume each column has a single value
         int idx = 0;
         for (Column column : columns) {
             Object data = map.get(column.getName());
             values[idx] = data;
+            idx++;
         }
         return values;
     }
@@ -241,7 +242,7 @@ public class GenericTypeHandler extends TypeHandler {
         if (colNames.size() <= 1) {
             return;
         }
-        Object[] values = new Object[colNames.size()];
+        Object[] values = new Object[columns.size()];
         for (Column column : columns) {
             column.setValue(request, values);
         }
@@ -457,7 +458,7 @@ public class GenericTypeHandler extends TypeHandler {
             column.assembleWhereClause(request, where);
         }
         if ((originalSize != where.size()) && (originalSize > 0)) {
-            where.add(Clause.eq(COL_ENTRIES_ID, getTableName() + ".id"));
+            where.add(Clause.join(COL_ENTRIES_ID, getTableName() + ".id"));
         }
         return where;
     }
@@ -530,7 +531,7 @@ public class GenericTypeHandler extends TypeHandler {
         if (colNames.size() == 0) {
             return entry;
         }
-        Object[] values = new Object[colNames.size()];
+        Object[] values = new Object[columns.size()];
 
         Statement stmt = getDatabaseManager().select(SqlUtil.comma(colNames),
                              getTableName(),
@@ -538,7 +539,8 @@ public class GenericTypeHandler extends TypeHandler {
         ResultSet results2 = stmt.getResultSet();
 
         if (results2.next()) {
-            int valueIdx = 0;
+            //We start at 2, skipping 1, because the first one is the id
+            int valueIdx = 2;
             for (Column column : columns) {
                 valueIdx = column.readValues(results2, values, valueIdx);
             }

@@ -604,6 +604,7 @@ public class PatternHarvester extends Harvester {
                     needToAdd = new ArrayList<Entry>();
                 }
 
+                //                if(true) break;
                 if ( !getActive()) {
                     return;
                 }
@@ -679,7 +680,12 @@ public class PatternHarvester extends Harvester {
                 map.put(dataName, value);
             }
         }
+        //        System.err.println("values:");
+        //        System.err.println("map:" + map);
         Object[] values     = typeHandler.makeValues(map);
+        //        for(int i=0;i<values.length;i++) {
+        //            System.err.println("   value[" + i +"] = " + values[i]);
+        //        }
 
         Date     createDate = new Date();
         if (fromDate == null) {

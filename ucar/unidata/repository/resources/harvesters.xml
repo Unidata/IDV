@@ -41,7 +41,7 @@
                 active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		xxrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
-		rootdir="/data/ldm/gempak/nexrad/NIDS"
+		rootdir="/data/ldm/gempak/nexrad/NIDS/FTG/N0R"
 		basegroup="IDD/NIDS"
 		filepattern="(station:[^/]+)/(product:[^/]+)/[^/]+_(fromdate:\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"

@@ -395,6 +395,7 @@ public class Column implements Tables, Constants {
             }
             stmtIdx += 2;
         } else {
+            //            System.err.println("\tset stmt:" + offset + " " + values[offset]);
             if (values[offset] != null) {
                 stmt.setString(stmtIdx, toString(values, offset));
             } else {
@@ -422,21 +423,21 @@ public class Column implements Tables, Constants {
     protected int readValues(ResultSet results, Object[] values, int valueIdx)
             throws Exception {
         if (type.equals(TYPE_INT)) {
-            values[valueIdx] = new Integer(results.getInt(valueIdx + 2));
+            values[offset] = new Integer(results.getInt(valueIdx));
             valueIdx++;
         } else if (type.equals(TYPE_DOUBLE)) {
-            values[valueIdx] = new Double(results.getDouble(valueIdx + 2));
+            values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
         } else if (type.equals(TYPE_BOOLEAN)) {
-            values[valueIdx] = new Boolean(results.getInt(valueIdx + 2) == 1);
+            values[offset] = new Boolean(results.getInt(valueIdx) == 1);
             valueIdx++;
         } else if (type.equals(TYPE_LATLON)) {
-            values[valueIdx] = new Double(results.getDouble(valueIdx + 2));
+            values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
-            values[valueIdx] = new Double(results.getDouble(valueIdx + 2));
+            values[offset+1] = new Double(results.getDouble(valueIdx));
             valueIdx++;
         } else {
-            values[valueIdx] = results.getString(valueIdx + 2);
+            values[offset] = results.getString(valueIdx);
             valueIdx++;
         }
         return valueIdx;
