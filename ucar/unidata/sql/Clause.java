@@ -534,6 +534,7 @@ public class Clause {
         if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_JOIN)) {
             return col;
         }
+        //        System.err.println("   value:"  + value + " " + col);
         SqlUtil.setValue(stmt, value, col);
         return col + 1;
     }
