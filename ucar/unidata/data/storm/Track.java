@@ -48,15 +48,15 @@ public class Track {
     private Way way;
 
     /** _more_          */
-    private List<EarthLocation[]> trackPoints;
+    private List<EarthLocation> trackPoints;
 
     /** _more_          */
-    private List trackTimes;
+    private List<Date> trackTimes;
 
     /** _more_          */
     private List attributes;
 
-    private Date trackStartTime;
+    //private Date trackStartTime;
 
     /**
      * _more_
@@ -67,18 +67,17 @@ public class Track {
      * @param times _more_
      * @param attrs _more_
      */
-    public Track(StormInfo stormInfo, Date sTime, Way way, List pts, List times,
+    public Track(StormInfo stormInfo, Way way, List pts, List times,
                  List attrs) {
 
         this.stormInfo   = stormInfo;
-        this.trackStartTime = sTime;
         this.way         = way;
         this.trackPoints = new ArrayList(pts);
         this.trackTimes  = new ArrayList(times);
         if (attrs != null) {
             this.attributes = new ArrayList(attrs);
         }
-        this.trackID = stormInfo.toString() + "_" + way;
+        this.trackID = stormInfo.toString() + "_" + way + "_" + getTrackStartTime().getTime();
     }
     /**
      * _more_
@@ -107,14 +106,7 @@ public class Track {
         return trackID;
     }
 
-    /**
-     * _more_
-     *
-     * @param time _more_
-     */
-    public void setTrackStartTime(Date time) {
-        this.trackStartTime = time;
-    }
+
 
     /**
      * _more_
@@ -122,7 +114,8 @@ public class Track {
      * @return _more_
      */
     public Date getTrackStartTime() {
-        return trackStartTime;
+
+        return trackTimes.size() > 0? trackTimes.get(0): null;
     }
     /**
      * _more_
@@ -138,7 +131,7 @@ public class Track {
      *
      * @return _more_
      */
-    public StormInfo getStormID() {
+    public StormInfo getStormInfo() {
         return stormInfo;
     }
 
@@ -165,8 +158,8 @@ public class Track {
      *
      * @param pts _more_
      */
-    public void setTrackPoints(List pts) {
-        this.trackPoints = new ArrayList(pts);
+    public void setTrackPoints(List<EarthLocation> pts) {
+        this.trackPoints = new ArrayList<EarthLocation>(pts);
     }
 
     /**
@@ -174,7 +167,7 @@ public class Track {
      *
      * @return _more_
      */
-    public List getTrackPoints() {
+    public List<EarthLocation> getTrackPoints() {
         return trackPoints;
     }
 
@@ -183,8 +176,8 @@ public class Track {
      *
      * @param pts _more_
      */
-    public void setTrackTimes(List pts) {
-        this.trackTimes = new ArrayList(pts);
+    public void setTrackTimes(List<Date> pts) {
+        this.trackTimes = new ArrayList<Date>(pts);
     }
 
     /**
@@ -229,7 +222,7 @@ public class Track {
             return false;
         }
         Track other = (Track) o;
-        return ((stormInfo == other.stormInfo) && (way == other.way) && (trackStartTime == other.trackStartTime));
+        return ((trackID.equals(other.trackID)) );
     }
 }
 

@@ -31,7 +31,7 @@ package ucar.unidata.data.storm;
  * To change this template use File | Settings | File Templates.
  */
 public class Way {
-
+    public static final Way OBSERVATION = new Way("obsr");
     /** _more_          */
     private String id;
 

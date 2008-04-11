@@ -42,7 +42,7 @@ public class TrackCollection {
     //private Track obsTrack;
 
     /** _more_          */
-    private HashMap wayToTracksHashMap;
+    private HashMap<Way,List> wayToTracksHashMap;
 
     /** _more_          */
     private List stormsTimeRanges;
@@ -51,7 +51,7 @@ public class TrackCollection {
      * _more_
      */
     public TrackCollection() {
-        wayToTracksHashMap     = new HashMap();
+        wayToTracksHashMap     = new HashMap<Way, List>();
         //forecastWayMapStartDates = new HashMap();
         //obsTrack           = null;
     }
@@ -62,9 +62,10 @@ public class TrackCollection {
      *
      * @param tracks _more_
      */
-    public void addTrackList(List tracks) {
-         Track track = (Track)tracks.get(0);
-         wayToTracksHashMap.put(track.getWay(), tracks);
+    public void addTrackList(List<Track> tracks) {
+         for(Track track: tracks) {
+             addTrack(track);
+         }
     }
 
    /**
@@ -73,7 +74,12 @@ public class TrackCollection {
      * @param track _more_
      */
     public void addTrack(Track track) {
-         wayToTracksHashMap.put(track.getWay(), track);
+       List list = wayToTracksHashMap.get(track.getWay());
+       if(list == null){
+          wayToTracksHashMap.put(track.getWay(), list = new ArrayList<Track>());
+
+       }
+       list.add(track);
     }
 
     /**
@@ -81,32 +87,17 @@ public class TrackCollection {
      *
      * @return _more_
      */
-    public List getTrackList(Way way) {
-        Object obj = wayToTracksHashMap.get(way);
-        if(obj instanceof List)
-            return (List)obj;
-        else
-            return null;
-    }
+    public List<Track> getTrackList(Way way) {
+        return (List<Track>)wayToTracksHashMap.get(way);
+     }
+
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public Track getTrack(Way way) {
-        Object obj = wayToTracksHashMap.get(way);
-        if(obj instanceof Track)
-            return (Track)obj;
-        else
-            return null;
-    }
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public HashMap getWayToTracksHashMap() {
+    public HashMap<Way,List> getWayToTracksHashMap() {
         return wayToTracksHashMap;
     }
 
@@ -147,7 +138,10 @@ public class TrackCollection {
      * @return _more_
      */
     public Track getObsTrack() {
-        return (Track)wayToTracksHashMap.get("obsr");
+        List tracks = getTrackList(Way.OBSERVATION);
+        if(tracks == null|| tracks.size()==0) return null;
+        return (Track) tracks.get(0);
+
     }
 
 }

@@ -285,8 +285,10 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
             }
 
         }
-
-        return  new Track( stormInfo, sTime, forecastWay, pts, times, null);
+       if(pts.size()>0)
+         return  new Track( stormInfo, forecastWay, pts, times, null);
+       else
+         return null;
 
     }
 
@@ -356,7 +358,7 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
         List whereList = new ArrayList();
 
         whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
-        whereList.add(SqlUtil.eq(fhourColumn, Integer.toString(0)));
+        whereList.add(SqlUtil.eq(fhourColumn,  "0"));
         whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(wy.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
@@ -402,9 +404,9 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
                 obsPts.add(elt);
             }
         }
-        Date dts = getStartTime(obsDts);
+        //Date dts = getStartTime(obsDts);
         Way obsWay = new Way("obsr");
-        return new Track(stormInfo, dts, obsWay, obsPts, obsDts, null);
+        return new Track(stormInfo, obsWay, obsPts, obsDts, null);
 
     }
 
@@ -666,7 +668,7 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
             Connection connection = getConnection();
             Statement  stmt       = connection.createStatement();
             //Drop the table  - ignore any errors
-            SqlUtil.loadSql("drop table " + tableName, stmt, false);
+            /* SqlUtil.loadSql("drop table " + tableName, stmt, false);
 
             //Load in the test data
             System.err.println("Creating test database");
@@ -679,7 +681,7 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
             SqlUtil.loadSql(initSql, stmt, false);
             connection.commit();
             connection.setAutoCommit(true);
-            System.err.println("OK");
+            System.err.println("OK");  */
         } catch (Exception exc) {
             exc.printStackTrace();
             return false;
