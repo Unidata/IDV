@@ -25,7 +25,7 @@ package ucar.unidata.data.storm;
 
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Misc;
@@ -170,16 +170,13 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
         while(itr.hasNext()) {
             Way forecastWay = (Way)itr.next();
             List forecastTracks = getForecastTracks(stormInfo, forecastWay);
-            trackCollection.addForecastWayMapTracks(forecastTracks);
-            List trackStartTimes = getForecastTrackStartDates(stormInfo, forecastWay);
-            trackCollection.addForecastWayMapStartDates(forecastWay, trackStartTimes);
+            if (forecastTracks.size() > 0)
+                trackCollection.addTrackList(forecastTracks);
+
         }
 
         Track obsTrack = getObservationTrack( stormInfo, (Way) forecastWays.get(0) );
-        trackCollection.addObsTrack(obsTrack);
-
-
-
+        trackCollection.addTrack(obsTrack);
 
     }
 
@@ -205,8 +202,11 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
         for(int i = 0; i< nstarts; i++) {
             Date dt = (Date)startDates.get(i);
             Track tk = getForecastTracks(stormInfo, dt, forecastWay );
-            if(tk != null)
-                tracks.add(tk);
+            if(tk != null) {
+                int pn = tk.getTrackPoints().size();
+                if( pn > 1)
+                    tracks.add(tk);
+            }
         }
         return tracks;
 
@@ -240,10 +240,10 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
         int dd = cal.get(Calendar.DAY_OF_MONTH);
         int hh = cal.get(Calendar.HOUR_OF_DAY);
 
-        whereList.add(SqlUtil.eq(yearColumn, yy));
-        whereList.add(SqlUtil.eq(monthColumn, mm));
-        whereList.add(SqlUtil.eq(dayColumn, dd));
-        whereList.add(SqlUtil.eq(hourColumn, hh));
+        whereList.add(SqlUtil.eq(yearColumn, Integer.toString(yy)));
+        whereList.add(SqlUtil.eq(monthColumn, Integer.toString(mm)));
+        whereList.add(SqlUtil.eq(dayColumn, Integer.toString(dd)));
+        whereList.add(SqlUtil.eq(hourColumn, Integer.toString(hh)));
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
         //        System.err.println (query);
         Statement        statement = evaluate(query);
@@ -304,7 +304,7 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
 
         List whereList = new ArrayList();
         whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
-        whereList.add(SqlUtil.eq(fhourColumn, 0));
+        whereList.add(SqlUtil.eq(fhourColumn, Integer.toString(0)));
         whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(way.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
@@ -356,7 +356,7 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
         List whereList = new ArrayList();
 
         whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
-        whereList.add(SqlUtil.eq(fhourColumn, 0));
+        whereList.add(SqlUtil.eq(fhourColumn, Integer.toString(0)));
         whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(wy.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
@@ -403,7 +403,8 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
             }
         }
         Date dts = getStartTime(obsDts);
-        return new Track(stormInfo, dts, null, obsPts, obsDts, null);
+        Way obsWay = new Way("obsr");
+        return new Track(stormInfo, dts, obsWay, obsPts, obsDts, null);
 
     }
 
@@ -474,7 +475,7 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
         List whereList = new ArrayList();
 
         whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(id)));
-        whereList.add(SqlUtil.eq(fhourColumn, 0));
+        whereList.add(SqlUtil.eq(fhourColumn, Integer.toString(0)));
 
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
@@ -701,8 +702,8 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
 
         String sd = sInfo.getStormID();
         TrackCollection cls = s.getTrackCollection(sInfo);
-        Map mp = cls.getForecastWayMapStartDates();
-        Map mp1 = cls.getForecastWayMapTracks();
+        Map mp = cls.getWayToStartDatesHashMap();
+        Map mp1 = cls.getWayToTracksHashMap();
         Track obsTrack = cls.getObsTrack();
 
         System.err.println("test:" );

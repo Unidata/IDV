@@ -23,9 +23,7 @@
 package ucar.unidata.data.storm;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 
 /**
@@ -38,13 +36,13 @@ import java.util.Iterator;
 public class TrackCollection {
 
     /** _more_          */
-    private HashMap forecastWayMapStartDates;
+    //private HashMap forecastWayMapStartDates;
 
     /** _more_          */
-    private Track obsTrack;
+    //private Track obsTrack;
 
     /** _more_          */
-    private HashMap forecastWayMapTracks;
+    private HashMap wayToTracksHashMap;
 
     /** _more_          */
     private List stormsTimeRanges;
@@ -53,9 +51,9 @@ public class TrackCollection {
      * _more_
      */
     public TrackCollection() {
-        forecastWayMapTracks     = new HashMap();
-        forecastWayMapStartDates = new HashMap();
-        obsTrack           = null;
+        wayToTracksHashMap     = new HashMap();
+        //forecastWayMapStartDates = new HashMap();
+        //obsTrack           = null;
     }
 
 
@@ -64,46 +62,84 @@ public class TrackCollection {
      *
      * @param tracks _more_
      */
-    public void addForecastWayMapTracks(List tracks) {
+    public void addTrackList(List tracks) {
          Track track = (Track)tracks.get(0);
-         forecastWayMapTracks.put(track.getWay(), tracks);        
+         wayToTracksHashMap.put(track.getWay(), tracks);
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public HashMap getForecastWayMapTracks() {
-        return forecastWayMapTracks;
-    }
-
-    /**
-     * _more_
-     *
-     * @param dTimes _more_
-     */
-    public void addForecastWayMapStartDates(Way way, List dTimes) {
-        forecastWayMapStartDates.put(way, dTimes);
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public HashMap getForecastWayMapStartDates() {
-        return forecastWayMapStartDates;
-    }
-
-    /**
+   /**
      * _more_
      *
      * @param track _more_
      */
-    public void addObsTrack(Track track) {
-        obsTrack = track;
+    public void addTrack(Track track) {
+         wayToTracksHashMap.put(track.getWay(), track);
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List getTrackList(Way way) {
+        Object obj = wayToTracksHashMap.get(way);
+        if(obj instanceof List)
+            return (List)obj;
+        else
+            return null;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Track getTrack(Way way) {
+        Object obj = wayToTracksHashMap.get(way);
+        if(obj instanceof Track)
+            return (Track)obj;
+        else
+            return null;
+    }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public HashMap getWayToTracksHashMap() {
+        return wayToTracksHashMap;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public HashMap getWayToStartDatesHashMap() {
+        HashMap wayToStartDatesHashMap = new HashMap();
+        int size = wayToTracksHashMap.size();
+        Set ways = wayToTracksHashMap.keySet();
+        Iterator itr = ways.iterator();
+        for(int i= 0; i< size; i++) {
+            Way way = (Way)itr.next();
+            List tracks = getTrackList(way);
+            List startTimes = new ArrayList();
+            if(tracks != null) {
+                Iterator its = tracks.iterator();
+                while(its.hasNext()) {
+                    Track track = (Track)its.next();
+                    Date st = track.getTrackStartTime();
+                    startTimes.add(st);
+                }
+                if(startTimes.size()>0)
+                    wayToStartDatesHashMap.put(way, startTimes);
+            }
+
+        }
+        return wayToStartDatesHashMap;
+    }
+
 
     /**
      * _more_
@@ -111,7 +147,7 @@ public class TrackCollection {
      * @return _more_
      */
     public Track getObsTrack() {
-        return obsTrack;
+        return (Track)wayToTracksHashMap.get("obsr");
     }
 
 }
