@@ -720,7 +720,7 @@ public class TypeHandler extends RepositoryManager {
                                     request.url(
                                         getRepository().URL_ENTRY_GET) + "/"
                                             + entry.getName(), ARG_ID,
-                                                entry.getId()), "")));
+                                                entry.getId()), "width=400")));
 
                 } else if (entry.getResource().isUrl()) {
                     sb.append(HtmlUtil.formEntryTop(msgLabel("Image"),

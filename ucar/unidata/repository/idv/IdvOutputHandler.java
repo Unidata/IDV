@@ -270,7 +270,7 @@ public class IdvOutputHandler extends OutputHandler {
 
 
             DataSourceDescriptor descriptor = getDescriptor(theEntry);
-            if(descriptor!=null) {
+            if(false && descriptor!=null) {
                 DataSource dataSource = getIdv().makeOneDataSource(theEntry.getResource().getPath(),   descriptor.getId(), null);
                 if(dataSource!=null) {
                     sb.append(dataSource.getFullDescription());
@@ -284,9 +284,6 @@ public class IdvOutputHandler extends OutputHandler {
                     return result;
                 }
             }
-
-
-
 
             sb.append("&nbsp;<p>");
             sb.append(HtmlUtil.img(url));
@@ -304,7 +301,7 @@ public class IdvOutputHandler extends OutputHandler {
         File image = new File(IOUtil.joinDir(thumbDir,
                                              "preview_" + id.replace("/","_")
                                              + ".gif"));
-        if (image.exists() && false) {
+        if (image.exists()) {
             return new Result("preview.gif", new FileInputStream(image),
                               "image/gif");
         }
