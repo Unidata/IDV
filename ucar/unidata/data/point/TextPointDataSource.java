@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -92,7 +93,8 @@ public class TextPointDataSource extends PointDataSource {
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
 
-    private Real      dfltReal;
+    /** _more_          */
+    private Real dfltReal;
 
     /** logging category */
     static LogUtil.LogCategory log_ =
@@ -901,13 +903,13 @@ public class TextPointDataSource extends PointDataSource {
         float[] lons = new float[times.size()];
         float[] alts = new float[times.size()];
         //                float[]alts = (altIndex>=0?new float[times.size()]:null);
-        Unit timeUnit    = ((DateTime) times.get(0)).getUnit();
-        
+        Unit timeUnit = ((DateTime) times.get(0)).getUnit();
+
         Real paramSample;
-        if(trackParamIndex>=0) {
+        if (trackParamIndex >= 0) {
             paramSample = (Real) ((Data[]) tuples.get(0))[trackParamIndex];
         } else {
-            paramSample =    getDefaultValue();
+            paramSample = getDefaultValue();
         }
         RealType timeType =
             RealType.getRealType(DataUtil.cleanName("track_time" + "_"
@@ -919,7 +921,10 @@ public class TextPointDataSource extends PointDataSource {
         int        numObs       = times.size();
         for (int i = 0; i < numObs; i++) {
             DateTime dateTime = (DateTime) times.get(i);
-            Real     value = (trackParamIndex>=0?(Real) ((Data[]) tuples.get(i))[trackParamIndex]:getDefaultValue());
+            Real     value    = ((trackParamIndex >= 0)
+                                 ? (Real) ((Data[]) tuples.get(
+                                     i))[trackParamIndex]
+                                 : getDefaultValue());
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getValue();
             Data[] tupleData = (Data[]) tuples.get(i);
@@ -963,10 +968,17 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     private Real getDefaultValue() throws VisADException {
-        if(dfltReal == null) {
-            RealType  dfltRealType = RealType.getRealType("Default");
-            dfltReal      = new Real(dfltRealType,1);
+        if (dfltReal == null) {
+            RealType dfltRealType = RealType.getRealType("Default");
+            dfltReal = new Real(dfltRealType, 1);
         }
         return dfltReal;
     }
@@ -1065,7 +1077,7 @@ public class TextPointDataSource extends PointDataSource {
             }
 
             Real      dfltAlt       = new Real(RealType.Altitude, 1);
-            Real dfltReal = getDefaultValue();
+            Real      dfltReal      = getDefaultValue();
 
 
             TupleType finalTT       = null;
@@ -1074,24 +1086,23 @@ public class TextPointDataSource extends PointDataSource {
 
 
             // Check for LAT/LON/ALT
-            int latIndex        = type.getIndex(RealType.Latitude);
-            int lonIndex        = type.getIndex(RealType.Longitude);
-            int altIndex        = type.getIndex(RealType.Altitude);
+            int latIndex = type.getIndex(RealType.Latitude);
+            int lonIndex = type.getIndex(RealType.Longitude);
+            int altIndex = type.getIndex(RealType.Altitude);
 
-            if(altIndex>=0) {
+            if (altIndex >= 0) {
                 varNames.add("Altitude");
             }
             int trackParamIndex = -1;
             if (trackParam != null) {
-                if(trackParam.equals("Altitude")) {
+                if (trackParam.equals("Altitude")) {
                     trackParamIndex = altIndex;
-                } else  if(trackParam.equals("Default")) {
-                } else {
-                    System.err.println ("track:" + trackParam + " " + type);
+                } else if (trackParam.equals("Default")) {}
+                else {
                     trackParamIndex = type.getIndex(trackParam);
                     if (trackParamIndex == -1) {
                         throw new IllegalArgumentException(
-                                                           "Can't find track param");
+                            "Can't find track param");
                     }
                 }
             }
@@ -1253,9 +1264,10 @@ public class TextPointDataSource extends PointDataSource {
                 }
 
 
-                if (i == 0)  {
-                    for(int otherIdx=0;otherIdx<others.length;otherIdx++) { 
-                        if(others[otherIdx] instanceof Real) {
+                if (i == 0) {
+                    for (int otherIdx = 0; otherIdx < others.length;
+                            otherIdx++) {
+                        if (others[otherIdx] instanceof Real) {
                             Real r = (Real) others[otherIdx];
                             varNames.add(((RealType) r.getType()).getName());
                         }
@@ -1315,21 +1327,23 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+
     /**
      * _more_
      */
     public void doMakeDataChoices() {
         super.doMakeDataChoices();
-        if (isTrajectoryEnabled()) {
+
+        try {
             if (getDataChoices().size() == 0) {
                 return;
             }
-            try {
-                DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
+            DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
+            //Sample the data to see if we need to show the metadata gui
+            Data sample = makeObs(dataChoice, null, null, null, true, true);
 
+            if (isTrajectoryEnabled()) {
 
-                Data sample = makeObs(dataChoice, null, null, null, true,
-                                      true);
                 //                System.err.println ("sample:" + sample);
 
                 List cats = DataCategory.parseCategories("Track" + ";trace",
@@ -1341,10 +1355,11 @@ public class TextPointDataSource extends PointDataSource {
                                             (Hashtable) null);
                     addDataChoice(choice);
                 }
-            } catch (Exception exc) {
-                logException("Creating track choices", exc);
             }
+        } catch (Exception exc) {
+            logException("Creating track choices", exc);
         }
+
     }
 
 
@@ -1540,28 +1555,28 @@ public class TextPointDataSource extends PointDataSource {
      */
     private static class ParamRow {
 
-        /** _more_          */
+        /** _more_ */
         JComboBox nameBox;
 
-        /** _more_          */
+        /** _more_ */
         JTextField extraFld;
 
-        /** _more_          */
+        /** _more_ */
         JTextField missingFld;
 
-        /** _more_          */
+        /** _more_ */
         JTextField unitFld;
 
-        /** _more_          */
+        /** _more_ */
         JButton popupBtn;
 
-        /** _more_          */
+        /** _more_ */
         JLabel sample;
 
-        /** _more_          */
+        /** _more_ */
         static Vector boxNames;
 
-        /** _more_          */
+        /** _more_ */
         static Vector unitNames;
 
         /**
