@@ -1,0 +1,712 @@
+/*
+ * $Id: IDV-Style.xjs,v 1.1 2006/05/03 21:43:47 dmurray Exp $
+ *
+ * Copyright 1997-2006 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+package ucar.unidata.data.storm;
+
+
+import ucar.unidata.data.BadDataException;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.SqlUtil;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.DateUtil;
+
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
+import visad.DateTime;
+import visad.Real;
+import visad.RealType;
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
+
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: yuanho
+ * Date: Apr 9, 2008
+ * Time: 4:58:27 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class STIStormDataSource extends DataSourceImpl implements StormDataSource {
+
+    // params for the table
+
+    /** _more_          */
+    private String tableName = "TYPHOON";
+
+    /** _more_          */
+    private String sIdColumn = "nno";
+
+    /** _more_          */
+    private String timeColumn = "time";
+
+    /** _more_          */
+    private String latitudeColumn = "lat";
+
+    /** _more_          */
+    private String longitudeColumn = "lon";
+
+    /** _more_          */
+    private String altitudeColumn = "altitude";
+
+    /** _more_          */
+    private String yearColumn = "yyyy";
+
+    /** _more_          */
+    private String monthColumn = "mm";
+
+    /** _more_          */
+    private String dayColumn = "day";
+
+    /** _more_          */
+    private String hourColumn = "hh";
+
+    /** _more_          */
+    private String fhourColumn = "fhour";
+
+    /** _more_          */
+    private String wayColumn = "way";
+
+    /** hard coded data base url for now */
+    private String dbUrl = "jdbc:derby:test;create=true";
+
+    /** the db connection */
+    private Connection connection;
+
+
+    /** _more_          */
+    private String fromDate = "-1 year";
+
+    /** _more_          */
+    private String toDate = "now";
+
+    /** the stormInfo and track */
+
+    private List  stormInfos;
+
+    /** _more_          */
+    private TrackCollection trackCollection;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+
+    public STIStormDataSource() throws Exception  {
+        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        if ( !initConnection()) {
+
+        }
+        initStormInfo();
+    }
+
+    public void initStormInfo() throws Exception {
+        if (stormInfos == null) {
+            stormInfos = getAllStormInfos();
+        }
+    }
+
+    public StormInfo [] getStormInfos() {
+        int size = stormInfos.size();
+        StormInfo [] sInfos = new StormInfo[size];
+
+        for(int i= 0; i< size; i++) {
+            sInfos[i] = (StormInfo)stormInfos.get(i);
+        }
+
+        return sInfos;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param stormInfo _more_
+     *
+     * @return _more_
+     */
+    public TrackCollection getTrackCollection(StormInfo stormInfo) throws Exception{
+        if (trackCollection == null) {
+            setTrackCollection(stormInfo);
+        }
+        return trackCollection;
+    }
+
+    /**
+     * _more_
+     *
+     * @param stormInfo _more_
+     */
+    public void setTrackCollection(StormInfo stormInfo) throws Exception {
+
+        trackCollection = new TrackCollection() ;
+        List forecastWays = getForecastWays(stormInfo) ;
+
+        Iterator itr = forecastWays.iterator();
+        while(itr.hasNext()) {
+            Way forecastWay = (Way)itr.next();
+            List forecastTracks = getForecastTracks(stormInfo, forecastWay);
+            trackCollection.addForecastWayMapTracks(forecastTracks);
+            List trackStartTimes = getForecastTrackStartDates(stormInfo, forecastWay);
+            trackCollection.addForecastWayMapStartDates(forecastWay, trackStartTimes);
+        }
+
+        Track obsTrack = getObservationTrack( stormInfo, (Way) forecastWays.get(0) );
+        trackCollection.addObsTrack(obsTrack);
+
+
+
+
+    }
+
+
+
+    public void setForecastTracks(Map fTrack ) {
+
+
+
+    }
+
+    /**
+     * _more_
+     *
+
+     * @throws Exception _more_
+     */
+    protected List getForecastTracks(StormInfo stormInfo, Way forecastWay ) throws Exception {
+
+        List tracks = new ArrayList();
+        List startDates = getForecastTrackStartDates(stormInfo, forecastWay);
+        int nstarts = startDates.size();
+        for(int i = 0; i< nstarts; i++) {
+            Date dt = (Date)startDates.get(i);
+            Track tk = getForecastTracks(stormInfo, dt, forecastWay );
+            if(tk != null)
+                tracks.add(tk);
+        }
+        return tracks;
+
+    }
+    /**
+     * _more_
+     *
+
+     * @throws Exception _more_
+     */
+    protected Track getForecastTracks(StormInfo stormInfo, Date sTime, Way forecastWay ) throws Exception {
+
+        String columns = sIdColumn + "," + yearColumn +"," + monthColumn +","
+                + dayColumn  + "," + hourColumn + "," + fhourColumn + "," + latitudeColumn
+                + "," + longitudeColumn + "," + wayColumn;
+
+
+        //SimpleDateFormat sdf = new SimpleDateFormat();
+        //sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        //sdf.applyPattern("yyyy-MM-dd HH:mm:ss");
+
+        List whereList = new ArrayList();
+        whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
+        whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(forecastWay.getId())));
+
+        //Date s = sdf.parse(sTime.toString());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sTime);
+        int yy = cal.get(Calendar.YEAR);
+        int mm = cal.get(Calendar.MONTH) + 1;
+        int dd = cal.get(Calendar.DAY_OF_MONTH);
+        int hh = cal.get(Calendar.HOUR_OF_DAY);
+
+        whereList.add(SqlUtil.eq(yearColumn, yy));
+        whereList.add(SqlUtil.eq(monthColumn, mm));
+        whereList.add(SqlUtil.eq(dayColumn, dd));
+        whereList.add(SqlUtil.eq(hourColumn, hh));
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet results;
+
+        //
+
+        List times = new ArrayList();
+        List pts = new ArrayList();
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                //                System.err.println ("row " + cnt);
+
+                int col = 1;
+                col++;   //sIdColumn
+                col++;   //int year = results.getInt(col++);
+                col++;   //int month = results.getInt(col++);
+                col++;   //int day = results.getInt(col++);
+                col++;   //int hour = results.getInt(col++);
+                int fhour = results.getInt(col++);
+
+
+                double latitude  = results.getDouble(col++);
+                double longitude = results.getDouble(col++);
+                double altitude  = 0.0;
+
+                EarthLocation elt =
+                    new EarthLocationLite(new Real(RealType.Latitude,
+                        latitude), new Real(RealType.Longitude, longitude),
+                                   new Real(RealType.Altitude, altitude));
+
+
+
+                times.add(fhour);
+                pts.add(elt);
+
+            }
+
+        }
+
+        return  new Track( stormInfo, sTime, forecastWay, pts, times, null);
+
+    }
+
+
+    /**
+     * _more_
+     *
+
+     * @throws Exception _more_
+     */
+    protected List getForecastTrackStartDates(StormInfo stormInfo, Way way) throws Exception {
+
+        String columns = sIdColumn + "," + yearColumn +"," + monthColumn +","
+                + dayColumn  + "," + hourColumn + "," + fhourColumn + "," + wayColumn;
+
+        List whereList = new ArrayList();
+        whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
+        whereList.add(SqlUtil.eq(fhourColumn, 0));
+        whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(way.getId())));
+
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet results;
+        List startDates = new ArrayList();
+
+        //
+        int cnt = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.applyPattern("yyyy/MM/dd HH");
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                //                System.err.println ("row " + cnt);
+                cnt++;
+                int col = 1;
+                col++;
+                int year = results.getInt(col++);
+                int month = results.getInt(col++);
+                int day = results.getInt(col++);
+                int hour = results.getInt(col++);
+
+                Date date = sdf.parse(year +"/"+ month +"/" + day + " " + hour);
+
+                //DateTime dttm          = new DateTime(date);
+
+                startDates.add(date);
+            }
+        }
+        return startDates;
+    }
+
+    /**
+     * _more_
+     *
+
+     * @throws Exception _more_
+     */
+    protected Track getObservationTrack( StormInfo stormInfo, Way wy ) throws Exception {
+
+        String columns = sIdColumn + "," + yearColumn +"," + monthColumn +","
+                + dayColumn  + "," + hourColumn + "," + fhourColumn + "," + latitudeColumn
+                + "," + longitudeColumn + "," + wayColumn;
+
+        List whereList = new ArrayList();
+
+        whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
+        whereList.add(SqlUtil.eq(fhourColumn, 0));
+        whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(wy.getId())));
+
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet results;
+
+        //
+        int cnt = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.applyPattern("yyyy/MM/dd HH");
+        List obsPts = new ArrayList();
+        List obsDts = new ArrayList();
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                //                System.err.println ("row " + cnt);
+                cnt++;
+                int col = 1;
+                col++;
+                int year = results.getInt(col++);
+                int month = results.getInt(col++);
+                int day = results.getInt(col++);
+                int hour = results.getInt(col++);
+                col++;      //fhour
+
+                double latitude  = results.getDouble(col++);
+                double longitude = results.getDouble(col++);
+                double altitude  = 0.0;
+
+                EarthLocation elt =
+                    new EarthLocationLite(new Real(RealType.Latitude,
+                        latitude), new Real(RealType.Longitude, longitude),
+                                   new Real(RealType.Altitude, altitude));
+
+
+                Date date = sdf.parse(year +"/"+ month +"/" + day + " " + hour);
+
+                //DateTime dttm          = new DateTime(date);
+                obsDts.add(date);
+                obsPts.add(elt);
+            }
+        }
+        Date dts = getStartTime(obsDts);
+        return new Track(stormInfo, dts, null, obsPts, obsDts, null);
+
+    }
+
+    
+    protected Date getStartTime(List times) {
+        int size = times.size();
+        Date dt = (Date)times.get(0);
+        int idx = 0;
+        long value = dt.getTime();
+        for(int i = 1; i< size; i++) {
+            dt = (Date)times.get(i);
+            long dtValue = dt.getTime();
+            if( dtValue < value ) {
+                value = dtValue;
+                idx = i;
+            }
+        }
+        return (Date)times.get(idx);
+    }
+
+    /**
+     * _more_
+     *
+
+     * @throws Exception _more_
+     */
+    protected List getAllStormInfos( ) throws Exception {
+
+        String columns =  "DISTINCT" + " " + sIdColumn ;
+
+        List whereList = new ArrayList();
+
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet results;
+
+        List stormInfos     = new ArrayList();
+
+        //TODO: How do we handle no data???
+        int cnt = 0;
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                //                System.err.println ("row " + cnt);
+                cnt++;
+                int col = 1;
+                String id = results.getString(col++);
+
+                Date startTime = getStormStartTime(id);
+
+                StormInfo sinfo = new StormInfo(id,startTime);
+                stormInfos.add(sinfo);
+
+            }
+        }
+
+        return stormInfos;
+
+    }
+
+    protected Date getStormStartTime(String id) throws Exception {
+
+        String columns = sIdColumn + "," + yearColumn +"," + monthColumn +","
+                + dayColumn  + "," + hourColumn + "," + fhourColumn ;
+
+        List whereList = new ArrayList();
+
+        whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(id)));
+        whereList.add(SqlUtil.eq(fhourColumn, 0));
+
+
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet results;
+
+        //
+        int cnt = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.applyPattern("yyyy/MM/dd HH");
+
+        List obsDts = new ArrayList();
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                //                System.err.println ("row " + cnt);
+                cnt++;
+                int col = 1;
+                col++;
+                int year = results.getInt(col++);
+                int month = results.getInt(col++);
+                int day = results.getInt(col++);
+                int hour = results.getInt(col++);
+                col++;      //fhour
+
+
+                Date date = sdf.parse(year +"/"+ month +"/" + day + " " + hour);
+
+                obsDts.add(date);
+
+            }
+        }
+
+        Date startTime = getStartTime(obsDts);
+
+        return startTime;
+
+    }
+    
+    /**
+     * _more_
+     *
+
+     * @throws Exception _more_
+     */
+    protected List getForecastWays(StormInfo stormInfo ) throws Exception {
+
+        String columns =  "DISTINCT" + " " + sIdColumn + "," + wayColumn;
+
+        List whereList = new ArrayList();
+        whereList.add(SqlUtil.eq(sIdColumn, SqlUtil.quote(stormInfo.getStormID())));
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet results;
+
+        List forecastWays     = new ArrayList();
+
+        //TODO: How do we handle no data???
+        int cnt = 0;
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                //                System.err.println ("row " + cnt);
+                cnt++;
+                int col = 1;
+                col++;
+                String id = results.getString(col++);
+                Way way = new Way(id);
+                forecastWays.add(way);
+
+            }
+        }
+
+        return forecastWays;
+
+    }
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     *
+     * @return _more_
+     *
+     * @throws SQLException _more_
+     */
+    private Statement evaluate(String sql) throws SQLException {
+        Statement stmt = getConnection().createStatement();
+        stmt.execute(sql);
+        return stmt;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Connection getConnection() {
+        if (connection != null) {
+            return connection;
+        }
+        //        String url = getFilePath();
+        //Just hard code the jdbc url
+        String url = dbUrl;
+        //We don't need to do this for derby.
+        if ((getUserName() == null) || (getUserName().trim().length() == 0)) {
+            if (url.indexOf("?") >= 0) {
+                int idx = url.indexOf("?");
+                List<String> args =
+                    (List<String>) StringUtil.split(url.substring(idx + 1),
+                        "&", true, true);
+                url = url.substring(0, idx);
+                for (String tok : args) {
+                    List<String> subtoks =
+                        (List<String>) StringUtil.split(tok, "=", true, true);
+                    if (subtoks.size() != 2) {
+                        continue;
+                    }
+                    String name  = subtoks.get(0);
+                    String value = subtoks.get(1);
+                    if (name.equals("user")) {
+                        setUserName(value);
+                    } else if (name.equals("password")) {
+                        setPassword(value);
+                    }
+                }
+            }
+        }
+
+        int cnt = 0;
+        while (true) {
+            String userName = getUserName();
+            String password = getPassword();
+            if (userName == null) {
+                userName = "";
+            }
+            if (password == null) {
+                password = "";
+            }
+            try {
+                connection = DriverManager.getConnection(url, userName,
+                        password);
+                return connection;
+            } catch (SQLException sqe) {
+                if ((sqe.toString()
+                        .indexOf("role \"" + userName
+                                 + "\" does not exist") >= 0) || (sqe
+                                     .toString()
+                                     .indexOf("user name specified") >= 0)) {
+                    String label;
+                    if (cnt == 0) {
+                        label =
+                            "<html>The database requires a login.<br>Please enter a user name and password:</html>";
+                    } else {
+                        label =
+                            "<html>Incorrect username/password. Please try again.</html>";
+                    }
+                    if ( !showPasswordDialog("Database Login", label)) {
+                        return null;
+                    }
+                    cnt++;
+                    continue;
+                }
+                throw new BadDataException("Unable to connect to database",
+                                           sqe);
+            }
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean initConnection() throws Exception {
+        if (getConnection() == null) {
+            return false;
+        }
+
+        try {
+            //Create the dummy database
+            Connection connection = getConnection();
+            Statement  stmt       = connection.createStatement();
+            //Drop the table  - ignore any errors
+            SqlUtil.loadSql("drop table " + tableName, stmt, false);
+
+            //Load in the test data
+            System.err.println("Creating test database");
+            String initSql = IOUtil.readContents(
+                                 "/ucar/unidata/data/sounding/typhoon.sql",
+                                 getClass());
+
+
+            connection.setAutoCommit(false);
+            SqlUtil.loadSql(initSql, stmt, false);
+            connection.commit();
+            connection.setAutoCommit(true);
+            System.err.println("OK");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) throws Exception {
+        String sid = "0622";
+        STIStormDataSource s = null;
+        try {
+            s = new STIStormDataSource();
+        } catch (Exception exc) {
+            System.err.println("err:" + exc);
+            exc.printStackTrace();
+        }
+
+        StormInfo [] sInfoList = s.getStormInfos();
+        StormInfo sInfo = sInfoList[0];
+
+        String sd = sInfo.getStormID();
+        TrackCollection cls = s.getTrackCollection(sInfo);
+        Map mp = cls.getForecastWayMapStartDates();
+        Map mp1 = cls.getForecastWayMapTracks();
+        Track obsTrack = cls.getObsTrack();
+
+        System.err.println("test:" );
+
+    }
+}
+
