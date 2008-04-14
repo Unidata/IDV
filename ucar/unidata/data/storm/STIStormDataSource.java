@@ -254,17 +254,19 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
 
         List times = new ArrayList();
         List pts = new ArrayList();
-
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        //sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.applyPattern("yyyy/MM/dd HH");
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 //                System.err.println ("row " + cnt);
 
                 int col = 1;
                 col++;   //sIdColumn
-                col++;   //int year = results.getInt(col++);
-                col++;   //int month = results.getInt(col++);
-                col++;   //int day = results.getInt(col++);
-                col++;   //int hour = results.getInt(col++);
+                int year = results.getInt(col++);
+                int month = results.getInt(col++);
+                int day = results.getInt(col++);
+                int hour = results.getInt(col++);
                 int fhour = results.getInt(col++);
 
 
@@ -276,10 +278,10 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
                                    new Real(RealType.Altitude, altitude));
+                int h = hour + fhour;
+                Date fdate = sdf.parse(year +"/"+ month +"/" + day + " " + h);
 
-
-
-                times.add(fhour);
+                times.add(fdate);
                 pts.add(elt);
 
             }
