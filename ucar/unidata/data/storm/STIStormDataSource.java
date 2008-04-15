@@ -25,22 +25,24 @@ package ucar.unidata.data.storm;
 
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.DateUtil;
+import ucar.visad.display.*;
 
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.rmi.RemoteException;
 
-import visad.DateTime;
-import visad.Real;
-import visad.RealType;
+import visad.*;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
+import visad.georef.EarthLocationTuple;
 
 
 /**
@@ -50,7 +52,7 @@ import visad.georef.EarthLocationLite;
  * Time: 4:58:27 PM
  * To change this template use File | Settings | File Templates.
  */
-public class STIStormDataSource extends DataSourceImpl implements StormDataSource {
+public class STIStormDataSource extends  StormDataSource {
 
     // params for the table
 
@@ -116,27 +118,31 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
      * @return _more_
      */
 
-    public STIStormDataSource() throws Exception  {
-        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+
+    public STIStormDataSource() throws Exception  {}
+
+     public STIStormDataSource(DataSourceDescriptor descriptor, String name,
+                          String description, Hashtable properties) throws Exception {
+         super(descriptor, name, description, properties);
+           Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
         if ( !initConnection()) {
 
         }
         initStormInfo();
-    }
+     }
 
+
+   
     public void initStormInfo() throws Exception {
         if (stormInfos == null) {
             stormInfos = getAllStormInfos();
         }
     }
 
-    public StormInfo [] getStormInfos() {
+    public List<StormInfo> getStormInfos() {
         int size = stormInfos.size();
-        StormInfo [] sInfos = new StormInfo[size];
-
-        for(int i= 0; i< size; i++) {
-            sInfos[i] = (StormInfo)stormInfos.get(i);
-        }
+        List<StormInfo>  sInfos = new ArrayList();
+        sInfos.addAll(stormInfos);
 
         return sInfos;
     }
@@ -701,8 +707,8 @@ public class STIStormDataSource extends DataSourceImpl implements StormDataSourc
             exc.printStackTrace();
         }
 
-        StormInfo [] sInfoList = s.getStormInfos();
-        StormInfo sInfo = sInfoList[0];
+        List sInfoList = s.getStormInfos();
+        StormInfo sInfo = (StormInfo)sInfoList.get(0);
 
         String sd = sInfo.getStormID();
         TrackCollection cls = s.getTrackCollection(sInfo);
