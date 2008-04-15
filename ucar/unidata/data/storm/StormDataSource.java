@@ -22,6 +22,12 @@
 
 package ucar.unidata.data.storm;
 
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataSourceDescriptor;
+
+import java.util.Hashtable;
+import java.util.List;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,14 +36,21 @@ package ucar.unidata.data.storm;
  * Time: 4:57:58 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface StormDataSource {
+public abstract class StormDataSource extends DataSourceImpl {
+
+     public StormDataSource() throws Exception  {}
+
+     public StormDataSource(DataSourceDescriptor descriptor, String name,
+                          String description, Hashtable properties) {
+         super(descriptor, name, description, properties);
+     }
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public StormInfo[] getStormInfos();
+    public abstract List<StormInfo> getStormInfos();
 
     /**
      * _more_
@@ -46,7 +59,7 @@ public interface StormDataSource {
      *
      * @return _more_
      */
-    public TrackCollection getTrackCollection(StormInfo stormInfo) throws Exception;
+    public abstract TrackCollection getTrackCollection(StormInfo stormInfo) throws Exception;
 
 
 
