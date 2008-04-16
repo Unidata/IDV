@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.visad;
 
 
@@ -88,8 +87,8 @@ public class GeoUtils {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public static EarthLocation toEarthLocation(
-            LatLonPoint llp) throws VisADException, RemoteException {
+    public static EarthLocation toEarthLocation(LatLonPoint llp)
+            throws VisADException, RemoteException {
         return new EarthLocationTuple(llp.getLatitude(), llp.getLongitude(),
                                       new Real(RealType.Altitude, 0.0));
     }
@@ -360,8 +359,8 @@ public class GeoUtils {
                 addresses.remove(address);
                 addresses.add(0, address);
                 addressMap.put(address, el.getLatLonPoint());
-                while(addresses.size()>20) {
-                    addresses.remove(addresses.size()-1);
+                while (addresses.size() > 20) {
+                    addresses.remove(addresses.size() - 1);
                 }
                 return el.getLatLonPoint();
             }
@@ -374,13 +373,25 @@ public class GeoUtils {
     }
 
 
+    /**
+     * Get saved addresses
+     *
+     * @return list of addresses
+     */
     public static List getSavedAddresses() {
         return addresses;
     }
 
 
+    /**
+     * set saved addresses
+     *
+     * @param add list of addresses
+     */
     public static void setSavedAddresses(List add) {
-        if(add==null) return;
+        if (add == null) {
+            return;
+        }
         addresses = new ArrayList(add);
     }
 
@@ -405,6 +416,89 @@ public class GeoUtils {
      */
     public static void main(String[] args) {
         System.err.println("lat/lon:" + getLocationOfAddress());
+    }
+
+    /**
+     * Normalize a longitude value to the range between -180 and 180.
+     *
+     * @param lonValue  longitude value to adjust (in degrees)
+     * @return adjusted value.
+     */
+    public static double normalizeLongitude(double lonValue) {
+        while ((lonValue < -180.) || (lonValue > 180.)) {
+            lonValue = Math.IEEEremainder(lonValue, 360.0);
+        }
+        return lonValue;
+    }
+
+    /**
+     * Normalize longitude values to the range between -180 and 180.
+     *
+     * @param lonValues  longitude values to adjust (in degrees)
+     * @return adjusted values.
+     */
+    public static double[] normalizeLongitude(double[] lonValues) {
+        for (int i = 0; i < lonValues.length; i++) {
+            lonValues[i] = normalizeLongitude(lonValues[i]);
+        }
+        return lonValues;
+    }
+
+
+    /**
+     * Normalize longitude values to the range between -180 and 180.
+     *
+     * @param lonValues  longitude values to adjust (in degrees)
+     *
+     * @return adjusted values.
+     */
+    public static float[] normalizeLongitude(float[] lonValues) {
+        for (int i = 0; i < lonValues.length; i++) {
+            lonValues[i] = (float) normalizeLongitude(lonValues[i]);
+        }
+        return lonValues;
+    }
+
+    /**
+     * Normalize a longitude value to the range between 0 and 360.
+     *
+     * @param lonValue  longitude value to adjust (in degrees)
+     * @return adjusted value.
+     */
+    public static double normalizeLongitude360(double lonValue) {
+        while ((lonValue < 0.) || (lonValue > 360.)) {
+            lonValue = 180. + Math.IEEEremainder(lonValue - 180., 360.0);
+        }
+        return lonValue;
+    }
+
+    /**
+     * Normalize longitude values to the range between 0 and 360.
+     *
+     * @param lonValues  longitude values to adjust (in degrees)
+     *
+     * @return adjusted values.
+     */
+    public static double[] normalizeLongitude360(double[] lonValues) {
+        for (int i = 0; i < lonValues.length; i++) {
+            lonValues[i] = normalizeLongitude(lonValues[i]);
+        }
+        return lonValues;
+    }
+
+
+    /**
+     * Normalize longitude values to the range between 0 and 360.
+     *
+     * @param lonValues  longitude values to adjust (in degrees)
+     *
+     * @return adjusted value.
+     */
+    public static float[] normalizeLongitude360(float[] lonValues) {
+        for (int i = 0; i < lonValues.length; i++) {
+            lonValues[i] = (float) normalizeLongitude360(lonValues[i]);
+        }
+        return lonValues;
     }
 
 }
