@@ -396,16 +396,6 @@ public class SymbolGlyph extends DrawingGlyph {
 
 
     /**
-     * Is glyph constrained to 2d
-     *
-     * @return Constrained to 2d
-     */
-    protected boolean constrainedTo2D() {
-        return true;
-    }
-
-
-    /**
      * Populate the xml node with attrs
      *
      * @param e Xml node
