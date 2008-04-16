@@ -1089,7 +1089,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             // to be equal to the range of the projection if the
             // X coordinate is approximately equal to Longitude.
             // For now, this is only LatLonProjections and TrivalMP's
-            double minLon    = -360.;
+            double minLon    = -360;
             double maxLon    = 360.;
             double centerLon = 0;
             MapProjection mp =
@@ -1118,7 +1118,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             /*
             System.out.println("DisplayProjectionLon"+myInstance+
               " has range of " + minLon + " to " + maxLon +
-              " with center at " + centerLon + ";use360 = " + use360);
+              " with center at " + centerLon + "; use360 = " + use360);
             */
 
             displayLatitudeType = new DisplayRealType("ProjectionLat"
@@ -1500,9 +1500,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             call1("toReference(d)", numpoints);
             double[][] t2 = new double[2][];
             t2[latIndex] = latlonalt[0];
+            t2[lonIndex] = latlonalt[1];
+            /*
             t2[lonIndex] = (use360)
                            ? GeoUtils.normalizeLongitude360(latlonalt[1])
                            : GeoUtils.normalizeLongitude(latlonalt[1]);
+            */
             t2           = mapProjection.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
@@ -1570,9 +1573,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             call1("toReference(f)", numpoints);
             float[][] t2 = new float[2][];
             t2[latIndex] = latlonalt[0];
+            t2[lonIndex] = latlonalt[1];
+            /*
             t2[lonIndex] = (use360)
                            ? GeoUtils.normalizeLongitude360(latlonalt[1])
                            : GeoUtils.normalizeLongitude(latlonalt[1]);
+            */
             t2           = mapProjection.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
@@ -1628,9 +1634,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     + "Can't do (x,y) to (lat,lon) transformation");
             }
             xyz[0] = t2[latIndex];
+            xyz[1] = t2[lonIndex];
+            /*
             xyz[1] = (use360)
                      ? GeoUtils.normalizeLongitude360(t2[lonIndex])
                      : GeoUtils.normalizeLongitude(t2[lonIndex]);
+            */
             call2("fromReference(d)", numpoints);
             return xyz;
         }
@@ -1666,9 +1675,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     + "Can't do (x,y) to (lat,lon) transformation");
             }
             xyz[0] = t2[latIndex];
+            xyz[1] = t2[lonIndex];
+            /*
             xyz[1] = (use360)
                      ? GeoUtils.normalizeLongitude360(t2[lonIndex])
                      : GeoUtils.normalizeLongitude(t2[lonIndex]);
+            */
             call2("fromReference(f)", numpoints);
             return xyz;
         }
