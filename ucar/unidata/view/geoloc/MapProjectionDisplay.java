@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -30,6 +31,8 @@ import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
+
+import ucar.visad.GeoUtils;
 
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.*;
@@ -215,6 +218,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * flag for forcing 2D
      */
     public static boolean force2D = false;
+
+    /** use 0-360 for longitude range */
+    private static boolean use360 = true;
 
     /**
      * Initializes an instance with the specified MapProjection
@@ -1105,10 +1111,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 maxLon    = minLon + r2d2.getWidth();
                 centerLon = minLon + r2d2.getWidth() / 2;
             }
+            if (((minLon > -180) && (minLon < 180))
+                    && ((maxLon > -180) && (maxLon < 180))) {
+                use360 = false;
+            }
             /*
             System.out.println("DisplayProjectionLon"+myInstance+
               " has range of " + minLon + " to " + maxLon +
-              " with center at " + centerLon);
+              " with center at " + centerLon + ";use360 = " + use360);
             */
 
             displayLatitudeType = new DisplayRealType("ProjectionLat"
@@ -1490,25 +1500,27 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             call1("toReference(d)", numpoints);
             double[][] t2 = new double[2][];
             t2[latIndex] = latlonalt[0];
-            t2[lonIndex] = latlonalt[1];
+            t2[lonIndex] = (use360)
+                           ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                           : GeoUtils.normalizeLongitude(latlonalt[1]);
             t2           = mapProjection.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
                     + "Can't do (lat,lon) to (x,y) transformation");
             }
-            double lat, lon;
+            double x, y;
             for (int i = 0; i < numpoints; i++) {
                 if (Double.isNaN(t2[xIndex][i])
                         || Double.isNaN(t2[yIndex][i])) {
-                    lat = Double.NaN;
-                    lon = Double.NaN;
+                    x = Double.NaN;
+                    y = Double.NaN;
                 } else {
-                    lat = (t2[xIndex][i] - offsetX) / scaleX;
-                    lon = (t2[yIndex][i] - offsetY) / scaleY;
+                    x = (t2[xIndex][i] - offsetX) / scaleX;
+                    y = (t2[yIndex][i] - offsetY) / scaleY;
                 }
-                latlonalt[0][i] = lat;
-                latlonalt[1][i] = lon;
+                latlonalt[0][i] = x;
+                latlonalt[1][i] = y;
             }
             call2("toReference(d)", numpoints);
             return latlonalt;
@@ -1558,25 +1570,27 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             call1("toReference(f)", numpoints);
             float[][] t2 = new float[2][];
             t2[latIndex] = latlonalt[0];
-            t2[lonIndex] = latlonalt[1];
+            t2[lonIndex] = (use360)
+                           ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                           : GeoUtils.normalizeLongitude(latlonalt[1]);
             t2           = mapProjection.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
                     + "Can't do (lat,lon) to (x,y) transformation");
             }
-            float lat, lon;
+            float x, y;
             for (int i = 0; i < numpoints; i++) {
                 if (Float.isNaN(t2[xIndex][i])
                         || Float.isNaN(t2[yIndex][i])) {
-                    lat = Float.NaN;
-                    lon = Float.NaN;
+                    x = Float.NaN;
+                    y = Float.NaN;
                 } else {
-                    lat = (float) ((t2[xIndex][i] - offsetX) / scaleX);
-                    lon = (float) ((t2[yIndex][i] - offsetY) / scaleY);
+                    x = (float) ((t2[xIndex][i] - offsetX) / scaleX);
+                    y = (float) ((t2[yIndex][i] - offsetY) / scaleY);
                 }
-                latlonalt[0][i] = lat;
-                latlonalt[1][i] = lon;
+                latlonalt[0][i] = x;
+                latlonalt[1][i] = y;
             }
             call2("toReference(f)", numpoints);
             return latlonalt;
@@ -1614,7 +1628,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     + "Can't do (x,y) to (lat,lon) transformation");
             }
             xyz[0] = t2[latIndex];
-            xyz[1] = t2[lonIndex];
+            xyz[1] = (use360)
+                     ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                     : GeoUtils.normalizeLongitude(t2[lonIndex]);
             call2("fromReference(d)", numpoints);
             return xyz;
         }
@@ -1650,7 +1666,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     + "Can't do (x,y) to (lat,lon) transformation");
             }
             xyz[0] = t2[latIndex];
-            xyz[1] = t2[lonIndex];
+            xyz[1] = (use360)
+                     ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                     : GeoUtils.normalizeLongitude(t2[lonIndex]);
             call2("fromReference(f)", numpoints);
             return xyz;
         }
