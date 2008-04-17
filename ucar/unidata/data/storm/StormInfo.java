@@ -63,7 +63,7 @@ public class StormInfo {
      *
      * @param id _more_
      */
-    public void setStormID(String id) {
+    public void setStormId(String id) {
         this.stormID = id;
     }
 
@@ -72,7 +72,7 @@ public class StormInfo {
      *
      * @return _more_
      */
-    public String getStormID() {
+    public String getStormId() {
         return stormID;
     }
 

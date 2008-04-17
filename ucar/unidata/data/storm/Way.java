@@ -37,7 +37,7 @@ public class Way {
     public static final Way OBSERVATION = new Way("obsr");
 
     /** _more_ */
-    private String id;
+    private String id="";
 
     /**
      * _more_
@@ -51,6 +51,10 @@ public class Way {
      */
     public Way(String id) {
         this.id = id;
+    }
+
+    public boolean isObserved() {
+        return this.equals(OBSERVATION);
     }
 
     /**
@@ -104,7 +108,8 @@ public class Way {
             return false;
         }
         Way other = (Way) o;
-        return (id == other.id);
+
+        return (this.id.equals(other.id));
     }
 
 

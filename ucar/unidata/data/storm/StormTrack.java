@@ -83,6 +83,12 @@ public class StormTrack {
                        + getTrackStartTime().getTime();
     }
 
+
+    public boolean isObserved() {
+        return way.isObserved();
+    }
+
+
     /**
      * _more_
      *
@@ -97,7 +103,7 @@ public class StormTrack {
      *
      * @param id _more_
      */
-    public void setTrackID(String id) {
+    public void setTrackId(String id) {
         this.trackID = id;
     }
 
@@ -106,7 +112,7 @@ public class StormTrack {
      *
      * @return _more_
      */
-    public String getTrackID() {
+    public String getTrackId() {
         return trackID;
     }
 
@@ -213,6 +219,12 @@ public class StormTrack {
     public List getTrackAttributes() {
         return attributes;
     }
+
+
+    public String toString() {
+        return trackID;
+    }
+
 
     /**
      * _more_

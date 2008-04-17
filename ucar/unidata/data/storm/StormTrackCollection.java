@@ -48,6 +48,8 @@ public class StormTrackCollection {
     /** _more_ */
     private List stormsTimeRanges;
 
+    List<StormTrack> tracks = new ArrayList<StormTrack>();
+
     /**
      * _more_
      */
@@ -82,6 +84,12 @@ public class StormTrackCollection {
 
         }
         list.add(track);
+        tracks.add(track);
+    }
+
+
+    public List<StormTrack> getTracks() {
+        return new ArrayList<StormTrack>(tracks);
     }
 
     /**
@@ -148,7 +156,6 @@ public class StormTrackCollection {
             return null;
         }
         return (StormTrack) tracks.get(0);
-
     }
 
 }

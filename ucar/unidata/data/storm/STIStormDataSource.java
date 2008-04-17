@@ -116,8 +116,9 @@ public class STIStormDataSource extends StormDataSource {
 
     private List stormInfos;
 
-    /** _more_ */
-    private StormTrackCollection trackCollection;
+
+
+
 
     /**
      * _more_
@@ -196,22 +197,7 @@ public class STIStormDataSource extends StormDataSource {
      */
     public StormTrackCollection getTrackCollection(StormInfo stormInfo)
             throws Exception {
-        if (trackCollection == null) {
-            setTrackCollection(stormInfo);
-        }
-        return trackCollection;
-    }
-
-    /**
-     * _more_
-     *
-     * @param stormInfo _more_
-     *
-     * @throws Exception _more_
-     */
-    public void setTrackCollection(StormInfo stormInfo) throws Exception {
-
-        trackCollection = new StormTrackCollection();
+        StormTrackCollection trackCollection =   new StormTrackCollection();
         List     forecastWays = getForecastWays(stormInfo);
 
         Iterator itr          = forecastWays.iterator();
@@ -228,6 +214,7 @@ public class STIStormDataSource extends StormDataSource {
                                              (Way) forecastWays.get(0));
         trackCollection.addTrack(obsTrack);
 
+        return trackCollection;
     }
 
 
@@ -298,7 +285,7 @@ public class STIStormDataSource extends StormDataSource {
 
         List whereList = new ArrayList();
         whereList.add(SqlUtil.eq(sIdColumn,
-                                 SqlUtil.quote(stormInfo.getStormID())));
+                                 SqlUtil.quote(stormInfo.getStormId())));
         whereList.add(SqlUtil.eq(wayColumn,
                                  SqlUtil.quote(forecastWay.getId())));
 
@@ -400,7 +387,7 @@ public class STIStormDataSource extends StormDataSource {
 
         List whereList = new ArrayList();
         whereList.add(SqlUtil.eq(sIdColumn,
-                                 SqlUtil.quote(stormInfo.getStormID())));
+                                 SqlUtil.quote(stormInfo.getStormId())));
         whereList.add(SqlUtil.eq(fhourColumn, Integer.toString(0)));
         whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(way.getId())));
 
@@ -462,7 +449,7 @@ public class STIStormDataSource extends StormDataSource {
         List whereList = new ArrayList();
 
         whereList.add(SqlUtil.eq(sIdColumn,
-                                 SqlUtil.quote(stormInfo.getStormID())));
+                                 SqlUtil.quote(stormInfo.getStormId())));
         whereList.add(SqlUtil.eq(fhourColumn, "0"));
         whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(wy.getId())));
 
@@ -665,7 +652,7 @@ public class STIStormDataSource extends StormDataSource {
 
         List   whereList = new ArrayList();
         whereList.add(SqlUtil.eq(sIdColumn,
-                                 SqlUtil.quote(stormInfo.getStormID())));
+                                 SqlUtil.quote(stormInfo.getStormId())));
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName),
                                           SqlUtil.makeAnd(whereList));
         //        System.err.println (query);
@@ -848,7 +835,7 @@ public class STIStormDataSource extends StormDataSource {
         List            sInfoList = s.getStormInfos();
         StormInfo       sInfo     = (StormInfo) sInfoList.get(0);
 
-        String          sd        = sInfo.getStormID();
+        String          sd        = sInfo.getStormId();
         StormTrackCollection cls       = s.getTrackCollection(sInfo);
         Map             mp        = cls.getWayToStartDatesHashMap();
         Map             mp1       = cls.getWayToTracksHashMap();
