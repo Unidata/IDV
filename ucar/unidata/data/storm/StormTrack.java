@@ -38,7 +38,7 @@ import java.util.List;
  * Time: 5:00:17 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Track {
+public class StormTrack {
 
     /** _more_ */
     private String trackID;
@@ -69,7 +69,7 @@ public class Track {
      * @param times _more_
      * @param attrs _more_
      */
-    public Track(StormInfo stormInfo, Way way, List pts, List times,
+    public StormTrack(StormInfo stormInfo, Way way, List pts, List times,
                  List attrs) {
 
         this.stormInfo   = stormInfo;
@@ -225,10 +225,10 @@ public class Track {
         if (o == null) {
             return false;
         }
-        if ( !(o instanceof Track)) {
+        if ( !(o instanceof StormTrack)) {
             return false;
         }
-        Track other = (Track) o;
+        StormTrack other = (StormTrack) o;
         return ((trackID.equals(other.trackID)));
     }
 }

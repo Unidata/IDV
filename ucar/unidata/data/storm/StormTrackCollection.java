@@ -34,13 +34,13 @@ import java.util.*;
  * Time: 5:00:40 PM
  * To change this template use File | Settings | File Templates.
  */
-public class TrackCollection {
+public class StormTrackCollection {
 
     /** _more_ */
     //private HashMap forecastWayMapStartDates;
 
     /** _more_ */
-    //private Track obsTrack;
+    //private StormTrack obsTrack;
 
     /** _more_ */
     private HashMap<Way, List> wayToTracksHashMap;
@@ -51,7 +51,7 @@ public class TrackCollection {
     /**
      * _more_
      */
-    public TrackCollection() {
+    public StormTrackCollection() {
         wayToTracksHashMap = new HashMap<Way, List>();
         //forecastWayMapStartDates = new HashMap();
         //obsTrack           = null;
@@ -63,8 +63,8 @@ public class TrackCollection {
      *
      * @param tracks _more_
      */
-    public void addTrackList(List<Track> tracks) {
-        for (Track track : tracks) {
+    public void addTrackList(List<StormTrack> tracks) {
+        for (StormTrack track : tracks) {
             addTrack(track);
         }
     }
@@ -74,11 +74,11 @@ public class TrackCollection {
      * 
      *  @param track _more_
      */
-    public void addTrack(Track track) {
+    public void addTrack(StormTrack track) {
         List list = wayToTracksHashMap.get(track.getWay());
         if (list == null) {
             wayToTracksHashMap.put(track.getWay(),
-                                   list = new ArrayList<Track>());
+                                   list = new ArrayList<StormTrack>());
 
         }
         list.add(track);
@@ -91,8 +91,8 @@ public class TrackCollection {
      * @param way _more_
      * @return _more_
      */
-    public List<Track> getTrackList(Way way) {
-        return (List<Track>) wayToTracksHashMap.get(way);
+    public List<StormTrack> getTrackList(Way way) {
+        return (List<StormTrack>) wayToTracksHashMap.get(way);
     }
 
 
@@ -123,7 +123,7 @@ public class TrackCollection {
             if (tracks != null) {
                 Iterator its = tracks.iterator();
                 while (its.hasNext()) {
-                    Track track = (Track) its.next();
+                    StormTrack track = (StormTrack) its.next();
                     Date  st    = track.getTrackStartTime();
                     startTimes.add(st);
                 }
@@ -142,12 +142,12 @@ public class TrackCollection {
      *
      * @return _more_
      */
-    public Track getObsTrack() {
+    public StormTrack getObsTrack() {
         List tracks = getTrackList(Way.OBSERVATION);
         if ((tracks == null) || (tracks.size() == 0)) {
             return null;
         }
-        return (Track) tracks.get(0);
+        return (StormTrack) tracks.get(0);
 
     }
 

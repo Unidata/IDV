@@ -117,7 +117,7 @@ public class STIStormDataSource extends StormDataSource {
     private List stormInfos;
 
     /** _more_ */
-    private TrackCollection trackCollection;
+    private StormTrackCollection trackCollection;
 
     /**
      * _more_
@@ -194,7 +194,7 @@ public class STIStormDataSource extends StormDataSource {
      *
      * @throws Exception _more_
      */
-    public TrackCollection getTrackCollection(StormInfo stormInfo)
+    public StormTrackCollection getTrackCollection(StormInfo stormInfo)
             throws Exception {
         if (trackCollection == null) {
             setTrackCollection(stormInfo);
@@ -211,7 +211,7 @@ public class STIStormDataSource extends StormDataSource {
      */
     public void setTrackCollection(StormInfo stormInfo) throws Exception {
 
-        trackCollection = new TrackCollection();
+        trackCollection = new StormTrackCollection();
         List     forecastWays = getForecastWays(stormInfo);
 
         Iterator itr          = forecastWays.iterator();
@@ -224,7 +224,7 @@ public class STIStormDataSource extends StormDataSource {
 
         }
 
-        Track obsTrack = getObservationTrack(stormInfo,
+        StormTrack obsTrack = getObservationTrack(stormInfo,
                                              (Way) forecastWays.get(0));
         trackCollection.addTrack(obsTrack);
 
@@ -258,7 +258,7 @@ public class STIStormDataSource extends StormDataSource {
         int  nstarts    = startDates.size();
         for (int i = 0; i < nstarts; i++) {
             Date  dt = (Date) startDates.get(i);
-            Track tk = getForecastTracks(stormInfo, dt, forecastWay);
+            StormTrack tk = getForecastTracks(stormInfo, dt, forecastWay);
             if (tk != null) {
                 int pn = tk.getTrackPoints().size();
                 if (pn > 1) {
@@ -282,7 +282,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected Track getForecastTracks(StormInfo stormInfo, Date sTime,
+    protected StormTrack getForecastTracks(StormInfo stormInfo, Date sTime,
                                       Way forecastWay)
             throws Exception {
 
@@ -360,7 +360,7 @@ public class STIStormDataSource extends StormDataSource {
 
         }
         if (pts.size() > 0) {
-            return new Track(stormInfo, forecastWay, pts, times, null);
+            return new StormTrack(stormInfo, forecastWay, pts, times, null);
         } else {
             return null;
         }
@@ -451,7 +451,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected Track getObservationTrack(StormInfo stormInfo, Way wy)
+    protected StormTrack getObservationTrack(StormInfo stormInfo, Way wy)
             throws Exception {
 
         String columns = sIdColumn + "," + yearColumn + "," + monthColumn
@@ -513,7 +513,7 @@ public class STIStormDataSource extends StormDataSource {
         }
         //Date dts = getStartTime(obsDts);
         Way obsWay = new Way("obsr");
-        return new Track(stormInfo, obsWay, obsPts, obsDts, null);
+        return new StormTrack(stormInfo, obsWay, obsPts, obsDts, null);
 
     }
 
@@ -849,10 +849,10 @@ public class STIStormDataSource extends StormDataSource {
         StormInfo       sInfo     = (StormInfo) sInfoList.get(0);
 
         String          sd        = sInfo.getStormID();
-        TrackCollection cls       = s.getTrackCollection(sInfo);
+        StormTrackCollection cls       = s.getTrackCollection(sInfo);
         Map             mp        = cls.getWayToStartDatesHashMap();
         Map             mp1       = cls.getWayToTracksHashMap();
-        Track           obsTrack  = cls.getObsTrack();
+        StormTrack           obsTrack  = cls.getObsTrack();
 
         System.err.println("test:");
 

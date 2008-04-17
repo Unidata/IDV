@@ -77,7 +77,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @throws Exception _more_
      */
-    public abstract TrackCollection getTrackCollection(StormInfo stormInfo)
+    public abstract StormTrackCollection getTrackCollection(StormInfo stormInfo)
      throws Exception;
 
 
