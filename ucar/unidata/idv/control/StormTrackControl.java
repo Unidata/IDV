@@ -21,20 +21,22 @@
  */
 
 
+
+
+
 package ucar.unidata.idv.control;
 
-import visad.georef.EarthLocation;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
 
-import ucar.unidata.data.DataUtil;
-
-import ucar.unidata.data.storm.*;
-
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+
+import ucar.unidata.data.DataUtil;
+
+import ucar.unidata.data.storm.*;
 
 
 
@@ -44,6 +46,8 @@ import ucar.unidata.ui.drawing.*;
 
 
 import ucar.unidata.ui.symbol.*;
+
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
@@ -54,10 +58,10 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.Util;
+
 
 import ucar.visad.display.*;
-
-import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.DisplayableDataRef;
@@ -67,11 +71,11 @@ import ucar.visad.display.SelectorPoint;
 import ucar.visad.display.StationModelDisplayable;
 import ucar.visad.display.TrackDisplayable;
 
-import ucar.unidata.util.ColorTable;
-
 
 
 import visad.*;
+
+import visad.georef.EarthLocation;
 
 import visad.georef.EarthLocationLite;
 
@@ -101,10 +105,10 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.table.*;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.*;
 
 
 
@@ -119,31 +123,44 @@ import javax.swing.event.ChangeListener;
 public class StormTrackControl extends DisplayControlImpl {
 
 
+    /** _more_ */
     private StormDataSource stormDataSource;
 
+    /** _more_ */
     private static final Data DUMMY_DATA = new Real(0);
 
 
 
+    /** _more_ */
     private StormInfo stormInfo;
 
 
+    /** _more_ */
     private TrackDisplayable obsTrackDisplay;
 
+    /** _more_ */
     private CompositeDisplayable trackHolder;
 
-    private  StormTrackCollection  trackCollection;
+    /** _more_ */
+    private List<Displayable> trackDisplays = new ArrayList<Displayable>();
 
+    /** _more_ */
+    private StormTrackCollection trackCollection;
+
+    /** _more_ */
     private List<StormTrack> tracks;
 
-    private  JTable trackTable;
+    /** _more_ */
+    private JTable trackTable;
 
+    /** _more_ */
     private AbstractTableModel trackModel;
 
     /**
      * Create a new Track Control; set the attribute flags
      */
     public StormTrackControl() {
+        setAttributeFlags(FLAG_COLORTABLE);
     }
 
 
@@ -169,22 +186,22 @@ public class StormTrackControl extends DisplayControlImpl {
         List dataSources = new ArrayList();
         dataChoice.getDataSources(dataSources);
 
-        if(dataSources.size()!=1) {
+        if (dataSources.size() != 1) {
             userMessage("Could not find Storm Data Source");
             return false;
         }
 
 
-        if(!(dataSources.get(0) instanceof StormDataSource)) {
+        if ( !(dataSources.get(0) instanceof StormDataSource)) {
             userMessage("Could not find Storm Data Source");
             return false;
         }
 
+        getColorTableWidget(getRangeForColorTable());
         stormDataSource = (StormDataSource) dataSources.get(0);
 
-
-
         obsTrackDisplay = new TrackDisplayable("track" + dataChoice);
+        obsTrackDisplay.setLineWidth(3);
         addDisplayable(obsTrackDisplay, getAttributeFlags());
 
         trackHolder = new CompositeDisplayable();
@@ -195,11 +212,14 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     */
     public void initDone() {
         super.initDone();
         try {
             handleNewStormInfo(stormInfo);
-        }catch(Exception exc) {
+        } catch (Exception exc) {
             logException("Setting new storm info", exc);
         }
     }
@@ -216,38 +236,38 @@ public class StormTrackControl extends DisplayControlImpl {
             throws VisADException, RemoteException {
 
         List<StormInfo> stormInfos = stormDataSource.getStormInfos();
-        List items = new ArrayList();
+        List            items      = new ArrayList();
         items.add("Select Storm to View");
         TwoFacedObject selected = null;
-        for(StormInfo stormInfo: stormInfos) {
-            TwoFacedObject tfo = new TwoFacedObject(stormInfo.getStormId() + " " + stormInfo.getStartTime(), 
-                                                    stormInfo);
+        for (StormInfo stormInfo : stormInfos) {
+            TwoFacedObject tfo = new TwoFacedObject(stormInfo.getStormId()
+                                     + " "
+                                     + stormInfo.getStartTime(), stormInfo);
 
             items.add(tfo);
-            if(this.stormInfo!=null && this.stormInfo.getStormId().equals(stormInfo.getStormId())) {
+            if ((this.stormInfo != null)
+                    && this.stormInfo.getStormId().equals(
+                        stormInfo.getStormId())) {
                 selected = tfo;
             }
         }
 
         final JComboBox box = new JComboBox();
         GuiUtils.setListData(box, items);
-        if(selected!=null) {
+        if (selected != null) {
             box.setSelectedItem(selected);
         }
 
         box.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                    try {
-                if(box.getSelectedIndex()==0) {
-                    handleNewStormInfo(null);
-                }  else {
-                    TwoFacedObject tfo = (TwoFacedObject) box.getSelectedItem();
-                        handleNewStormInfo((StormInfo)tfo.getId());
-                }
-                    }catch(Exception exc) {
-                        logException("Setting new storm info", exc);
-                    }
 
+                if (box.getSelectedIndex() == 0) {
+                    handleNewStormInfo(null);
+                } else {
+                    TwoFacedObject tfo =
+                        (TwoFacedObject) box.getSelectedItem();
+                    handleNewStormInfo((StormInfo) tfo.getId());
+                }
 
             }
         });
@@ -258,7 +278,9 @@ public class StormTrackControl extends DisplayControlImpl {
             }
 
             public int getRowCount() {
-                if(tracks==null) return 0;
+                if (tracks == null) {
+                    return 0;
+                }
                 return tracks.size();
             }
 
@@ -270,14 +292,20 @@ public class StormTrackControl extends DisplayControlImpl {
                                    int columnIndex) {}
 
             public Object getValueAt(int row, int column) {
-                if(tracks == null || row>= tracks.size()) return "";
+                if ((tracks == null) || (row >= tracks.size())) {
+                    return "";
+                }
                 StormTrack track = tracks.get(row);
-                if(column==0) return track.getWay();
-                return track.getTrackStartTime();                
+                if (column == 0) {
+                    return track.getWay();
+                }
+                return track.getTrackStartTime();
             }
 
             public String getColumnName(int column) {
-                if(column==0) return "Way";
+                if (column == 0) {
+                    return "Way";
+                }
                 return "Date";
             }
         };
@@ -295,17 +323,46 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box), scroller);             
-        return GuiUtils.top(GuiUtils.inset(contents,5));
+        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
+                                  scroller);
+        return GuiUtils.top(GuiUtils.inset(contents, 5));
     }
 
 
-    private void handleNewStormInfo(StormInfo newStormInfo) throws Exception {
+    /**
+     * _more_
+     *
+     * @param newStormInfo _more_
+     *
+     * @throws Exception _more_
+     */
+    private void handleNewStormInfo(final StormInfo newStormInfo) {
+        Misc.run(new Runnable() {
+            public void run() {
+                try {
+                    handleNewStormInfoInner(newStormInfo);
+                } catch (Exception exc) {
+                    logException("Setting new storm info", exc);
+                }
+
+            }
+        });
+    }
+
+    /**
+     * _more_
+     *
+     * @param newStormInfo _more_
+     *
+     * @throws Exception _more_
+     */
+    private void handleNewStormInfoInner(StormInfo newStormInfo)
+            throws Exception {
         stormInfo = newStormInfo;
-        //        trackHolder.clearDisplayables();
-        if(stormInfo == null) {
+        trackHolder.clearDisplayables();
+        if (stormInfo == null) {
             trackCollection = null;
-            tracks = null;
+            tracks          = null;
             obsTrackDisplay.setData(DUMMY_DATA);
             trackModel.fireTableStructureChanged();
             return;
@@ -317,71 +374,90 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
         trackCollection = stormDataSource.getTrackCollection(stormInfo);
-        tracks = trackCollection.getTracks();
+        tracks          = trackCollection.getTracks();
 
 
         StormTrack obsTrack = trackCollection.getObsTrack();
-        //        obsTrackDisplay.setTrack(makeField(obsTrack));
+        obsTrackDisplay.setTrack(makeField(obsTrack, false));
+
 
         ColorTable ct =
             getControlContext().getColorTableManager().getColorTable("Red");
 
-        float[][]colors =  getColorTableForDisplayable(ct);
+        float[][] colors = getColorTableForDisplayable(ct);
 
-        Way way = new Way("babj");
-        for(StormTrack track: tracks) {
-            if(track.isObserved()) {
+        Way       way    = new Way("babj");
+        for (StormTrack track : tracks) {
+            if (track.isObserved() || !track.getWay().equals(way)) {
                 continue;
             }
-            if(!track.getWay().equals(way)) {
-                continue;
-            }
-            TrackDisplayable trackDisplay = new TrackDisplayable("track " + track.getTrackId());
-            System.err.println ("got one:" + trackDisplay);
+            TrackDisplayable trackDisplay = new TrackDisplayable("track "
+                                                + track.getTrackId());
+
+            trackDisplay.setColorPalette(colors);
             trackHolder.addDisplayable(trackDisplay);
-            trackDisplay.setTrack(makeField(track));
-            //            addDisplayable(trackDisplay);
-            //            obsTrackDisplay.setTrack(makeField(track));
-            //            trackDisplay.setColorPalette(colors);
-            break;
+            trackDisplay.setTrack(makeField(track, true));
         }
-        trackHolder.clearDisplayables();
     }
 
 
-    private FieldImpl makeField(StormTrack track) throws Exception {
+    /**
+     * _more_
+     *
+     * @param track _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    int cnt = 0;
 
-        List times = track.getTrackTimes();
-        List<EarthLocation> locs = track.getTrackPoints();
+    /**
+     * _more_
+     *
+     * @param track _more_
+     * @param fixedValue _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private FieldImpl makeField(StormTrack track, boolean fixedValue)
+            throws Exception {
+
+        List                times    = track.getTrackTimes();
+        List<EarthLocation> locs     = track.getTrackPoints();
 
 
-        Unit timeUnit = CommonUnit.secondsSinceTheEpoch;
+        Unit                timeUnit = CommonUnit.secondsSinceTheEpoch;
 
-        RealType dfltRealType = RealType.getRealType("Default");
-        Real dfltReal = new Real(dfltRealType, 1);
+        RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
+        Real                dfltReal = new Real(dfltRealType, 1);
 
         RealType timeType =
-            RealType.getRealType(DataUtil.cleanName("track_time" + "_"
+            RealType.getRealType(DataUtil.cleanName("track_time" + cnt + "_"
                 + timeUnit), timeUnit);
-        RealTupleType rangeType = new RealTupleType(
-                                      ucar.visad.Util.getRealType(
-                                                                  dfltReal.getUnit()), timeType);
+        RealTupleType rangeType =
+            new RealTupleType(RealType.getRealType("trackrange_" + cnt,
+                dfltReal.getUnit()), timeType);
         double[][] newRangeVals = new double[2][times.size()];
         int        numObs       = times.size();
-        float[]lats =new float[numObs];
-        float[]lons =new float[numObs];
-        System.err.println("points:" + times + "\n" + locs);
+        float[]    lats         = new float[numObs];
+        float[]    lons         = new float[numObs];
+        //        System.err.println("points:" + times + "\n" + locs);
         for (int i = 0; i < numObs; i++) {
-            Date dateTime = (Date) times.get(i);
-            Real     value    = dfltReal;
-            EarthLocation el = locs.get(i);
+            Date          dateTime = (Date) times.get(i);
+            Real          value    = (fixedValue
+                                      ? dfltReal
+                                      : new Real(dfltRealType, i));
+            EarthLocation el       = locs.get(i);
             newRangeVals[0][i] = value.getValue();
-            newRangeVals[1][i] = dateTime.getTime()/1000;
-            lats[i] = (float) el.getLatitude().getValue();
-            lons[i] = (float) el.getLongitude().getValue();
+            newRangeVals[1][i] = dateTime.getTime() / 1000;
+            lats[i]            = (float) el.getLatitude().getValue();
+            lons[i]            = (float) el.getLongitude().getValue();
         }
         GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
-                                                               null);
+                                null);
         Set[] rangeSets = new Set[2];
         rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
         rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
@@ -391,8 +467,7 @@ public class StormTrackControl extends DisplayControlImpl {
         FlatField timeTrack = new FlatField(newType, llaSet,
                                             (CoordinateSystem) null,
                                             rangeSets,
-                                            new Unit[] {
-                                                dfltReal.getUnit(),
+                                            new Unit[] { dfltReal.getUnit(),
                 timeUnit });
         timeTrack.setSamples(newRangeVals, false);
 
@@ -400,21 +475,21 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
     /**
-       Set the StormInfo property.
-
-       @param value The new value for StormInfo
-    **/
-    public void setStormInfo (StormInfo value) {
-	stormInfo = value;
+     *  Set the StormInfo property.
+     *
+     *  @param value The new value for StormInfo
+     */
+    public void setStormInfo(StormInfo value) {
+        stormInfo = value;
     }
 
     /**
-       Get the StormInfo property.
-
-       @return The StormInfo
-    **/
-    public StormInfo getStormInfo () {
-	return stormInfo;
+     *  Get the StormInfo property.
+     *
+     *  @return The StormInfo
+     */
+    public StormInfo getStormInfo() {
+        return stormInfo;
     }
 
 
