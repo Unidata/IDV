@@ -241,6 +241,17 @@ example:
 
 
   <control
+     id="stormtrackcontrol"
+     categories="stormtrack"
+     class="ucar.unidata.idv.control.StormTrackControl"
+     description="Storm Track"
+     canstandalone="false"
+     label="Storm Track"
+     displaycategory="Trajectory"
+     properties="displayName=Storm Track Track Control;windowVisible=true;"/>
+
+
+  <control
      id="multidisplay.standalone"
      categories="none"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
