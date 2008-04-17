@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -35,23 +36,23 @@ import java.util.*;
  */
 public class TrackCollection {
 
-    /** _more_          */
+    /** _more_ */
     //private HashMap forecastWayMapStartDates;
 
-    /** _more_          */
+    /** _more_ */
     //private Track obsTrack;
 
-    /** _more_          */
-    private HashMap<Way,List> wayToTracksHashMap;
+    /** _more_ */
+    private HashMap<Way, List> wayToTracksHashMap;
 
-    /** _more_          */
+    /** _more_ */
     private List stormsTimeRanges;
 
     /**
      * _more_
      */
     public TrackCollection() {
-        wayToTracksHashMap     = new HashMap<Way, List>();
+        wayToTracksHashMap = new HashMap<Way, List>();
         //forecastWayMapStartDates = new HashMap();
         //obsTrack           = null;
     }
@@ -63,33 +64,36 @@ public class TrackCollection {
      * @param tracks _more_
      */
     public void addTrackList(List<Track> tracks) {
-         for(Track track: tracks) {
-             addTrack(track);
-         }
+        for (Track track : tracks) {
+            addTrack(track);
+        }
     }
 
-   /**
-     * _more_
-     *
-     * @param track _more_
+    /**
+     *  _more_
+     * 
+     *  @param track _more_
      */
     public void addTrack(Track track) {
-       List list = wayToTracksHashMap.get(track.getWay());
-       if(list == null){
-          wayToTracksHashMap.put(track.getWay(), list = new ArrayList<Track>());
+        List list = wayToTracksHashMap.get(track.getWay());
+        if (list == null) {
+            wayToTracksHashMap.put(track.getWay(),
+                                   list = new ArrayList<Track>());
 
-       }
-       list.add(track);
+        }
+        list.add(track);
     }
 
     /**
      * _more_
      *
+     *
+     * @param way _more_
      * @return _more_
      */
     public List<Track> getTrackList(Way way) {
-        return (List<Track>)wayToTracksHashMap.get(way);
-     }
+        return (List<Track>) wayToTracksHashMap.get(way);
+    }
 
 
     /**
@@ -97,7 +101,7 @@ public class TrackCollection {
      *
      * @return _more_
      */
-    public HashMap<Way,List> getWayToTracksHashMap() {
+    public HashMap<Way, List> getWayToTracksHashMap() {
         return wayToTracksHashMap;
     }
 
@@ -108,23 +112,24 @@ public class TrackCollection {
      * @return _more_
      */
     public HashMap getWayToStartDatesHashMap() {
-        HashMap wayToStartDatesHashMap = new HashMap();
-        int size = wayToTracksHashMap.size();
-        Set ways = wayToTracksHashMap.keySet();
-        Iterator itr = ways.iterator();
-        for(int i= 0; i< size; i++) {
-            Way way = (Way)itr.next();
-            List tracks = getTrackList(way);
+        HashMap  wayToStartDatesHashMap = new HashMap();
+        int      size                   = wayToTracksHashMap.size();
+        Set      ways                   = wayToTracksHashMap.keySet();
+        Iterator itr                    = ways.iterator();
+        for (int i = 0; i < size; i++) {
+            Way  way        = (Way) itr.next();
+            List tracks     = getTrackList(way);
             List startTimes = new ArrayList();
-            if(tracks != null) {
+            if (tracks != null) {
                 Iterator its = tracks.iterator();
-                while(its.hasNext()) {
-                    Track track = (Track)its.next();
-                    Date st = track.getTrackStartTime();
+                while (its.hasNext()) {
+                    Track track = (Track) its.next();
+                    Date  st    = track.getTrackStartTime();
                     startTimes.add(st);
                 }
-                if(startTimes.size()>0)
+                if (startTimes.size() > 0) {
                     wayToStartDatesHashMap.put(way, startTimes);
+                }
             }
 
         }
@@ -139,7 +144,9 @@ public class TrackCollection {
      */
     public Track getObsTrack() {
         List tracks = getTrackList(Way.OBSERVATION);
-        if(tracks == null|| tracks.size()==0) return null;
+        if ((tracks == null) || (tracks.size() == 0)) {
+            return null;
+        }
         return (Track) tracks.get(0);
 
     }

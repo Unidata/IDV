@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -35,10 +36,10 @@ import java.util.Date;
  */
 public class StormInfo {
 
-    /** _more_          */
+    /** _more_ */
     private String stormID;
 
-    /** _more_          */
+    /** _more_ */
     private Date startTime;
 
     /**
@@ -52,7 +53,7 @@ public class StormInfo {
      * @param id _more_
      * @param sTime _more_
      */
-    public StormInfo(String id,  Date sTime) {
+    public StormInfo(String id, Date sTime) {
         this.stormID   = id;
         this.startTime = sTime;
     }

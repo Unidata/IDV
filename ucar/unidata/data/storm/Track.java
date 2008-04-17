@@ -20,14 +20,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
 import visad.georef.EarthLocation;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,22 +40,22 @@ import java.util.Date;
  */
 public class Track {
 
-    /** _more_          */
+    /** _more_ */
     private String trackID;
 
-    /** _more_          */
+    /** _more_ */
     private StormInfo stormInfo;
 
-    /** _more_          */
+    /** _more_ */
     private Way way;
 
-    /** _more_          */
+    /** _more_ */
     private List<EarthLocation> trackPoints;
 
-    /** _more_          */
+    /** _more_ */
     private List<Date> trackTimes;
 
-    /** _more_          */
+    /** _more_ */
     private List attributes;
 
     //private Date trackStartTime;
@@ -77,8 +79,10 @@ public class Track {
         if (attrs != null) {
             this.attributes = new ArrayList(attrs);
         }
-        this.trackID = stormInfo.toString() + "_" + way + "_" + getTrackStartTime().getTime();
+        this.trackID = stormInfo.toString() + "_" + way + "_"
+                       + getTrackStartTime().getTime();
     }
+
     /**
      * _more_
      *
@@ -115,8 +119,11 @@ public class Track {
      */
     public Date getTrackStartTime() {
 
-        return trackTimes.size() > 0? trackTimes.get(0): null;
+        return (trackTimes.size() > 0)
+               ? trackTimes.get(0)
+               : null;
     }
+
     /**
      * _more_
      *
@@ -222,7 +229,7 @@ public class Track {
             return false;
         }
         Track other = (Track) o;
-        return ((trackID.equals(other.trackID)) );
+        return ((trackID.equals(other.trackID)));
     }
 }
 

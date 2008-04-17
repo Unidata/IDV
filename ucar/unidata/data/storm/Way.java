@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -31,8 +32,11 @@ package ucar.unidata.data.storm;
  * To change this template use File | Settings | File Templates.
  */
 public class Way {
-    public static final Way OBSERVATION = new Way("obsr");
+
     /** _more_          */
+    public static final Way OBSERVATION = new Way("obsr");
+
+    /** _more_ */
     private String id;
 
     /**
