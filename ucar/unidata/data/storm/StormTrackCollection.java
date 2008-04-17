@@ -49,6 +49,8 @@ public class StormTrackCollection {
     private List stormsTimeRanges;
 
     List<StormTrack> tracks = new ArrayList<StormTrack>();
+    
+    List<Way> ways = new ArrayList<Way>();
 
     /**
      * _more_
@@ -59,7 +61,32 @@ public class StormTrackCollection {
         //obsTrack           = null;
     }
 
+    /**
+     * _more_
+     *
+     */
+    public List<Way> getWayList( ) {
+        return ways;
+    }
+    /**
+     * _more_
+     *
+     * @param ways _more_
+     */
+    public void addWayList(List<Way> ways) {
+        for (Way way : ways) {
+            addWay(way);
+        }
+    }
 
+    /**
+     * _more_
+     *
+     * @param way _more_
+     */
+    public void addWay(Way way) {
+            ways.add(way);
+    }
     /**
      * _more_
      *
