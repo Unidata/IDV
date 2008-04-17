@@ -199,7 +199,7 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
         StormTrackCollection trackCollection =   new StormTrackCollection();
         List     forecastWays = getForecastWays(stormInfo);
-
+        trackCollection.addWayList(forecastWays);
         Iterator itr          = forecastWays.iterator();
         while (itr.hasNext()) {
             Way  forecastWay    = (Way) itr.next();
@@ -831,12 +831,13 @@ public class STIStormDataSource extends StormDataSource {
             System.err.println("err:" + exc);
             exc.printStackTrace();
         }
-
+        s.initAfter();
         List            sInfoList = s.getStormInfos();
         StormInfo       sInfo     = (StormInfo) sInfoList.get(0);
 
         String          sd        = sInfo.getStormId();
         StormTrackCollection cls       = s.getTrackCollection(sInfo);
+        List           ways        = cls.getWayList();
         Map             mp        = cls.getWayToStartDatesHashMap();
         Map             mp1       = cls.getWayToTracksHashMap();
         StormTrack           obsTrack  = cls.getObsTrack();
