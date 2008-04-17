@@ -243,8 +243,12 @@ public class CDMRadarAdapter implements RadarAdapter {
             stationName    = rds.getRadarName();
             isVolume       = rds.isVolume();
             dataFormatName = rds.getDataFormat();
-            vcp = rds.findGlobalAttributeIgnoreCase(
-                "VolumeCoveragePatternName").getStringValue();
+            Attribute vcpAttr = rds.findGlobalAttributeIgnoreCase(
+                "VolumeCoveragePatternName");
+            if(vcpAttr != null)
+                vcp = vcpAttr.getStringValue();
+            else
+                vcp = "unknown";
             Attribute attr = rds.findGlobalAttributeIgnoreCase("isRadial");
             if (attr != null) {
                 int isR = attr.getNumericValue().intValue();
