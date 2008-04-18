@@ -42,11 +42,14 @@ import ucar.unidata.data.storm.*;
 
 
 import ucar.unidata.idv.ControlContext;
-import ucar.unidata.ui.drawing.*;
+
+import ucar.unidata.ui.TreePanel;
 
 
-import ucar.unidata.ui.symbol.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 
@@ -156,6 +159,11 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private AbstractTableModel trackModel;
 
+
+    private TreePanel treePanel;
+
+
+
     /**
      * Create a new Track Control; set the attribute flags
      */
@@ -235,11 +243,24 @@ public class StormTrackControl extends DisplayControlImpl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
+        treePanel = new  TreePanel(true,100);
+
         List<StormInfo> stormInfos = stormDataSource.getStormInfos();
         List            items      = new ArrayList();
         items.add("Select Storm to View");
         TwoFacedObject selected = null;
+        //TODO: Sort the years so we  get the most recent year first
+        GregorianCalendar cal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         for (StormInfo stormInfo : stormInfos) {
+            cal.setTime(stormInfo.getStartTime());
+            int year = cal.get(Calendar.YEAR);
+            JComponent stormComp = new JPanel();
+            treePanel.addComponent(stormComp, ""+year,
+                                   stormInfo.getStormId(),null);
+
+
+            /*
             TwoFacedObject tfo = new TwoFacedObject(stormInfo.getStormId()
                                      + " "
                                      + stormInfo.getStartTime(), stormInfo);
@@ -249,9 +270,10 @@ public class StormTrackControl extends DisplayControlImpl {
                     && this.stormInfo.getStormId().equals(
                         stormInfo.getStormId())) {
                 selected = tfo;
-            }
+                }*/
         }
 
+        /*
         final JComboBox box = new JComboBox();
         GuiUtils.setListData(box, items);
         if (selected != null) {
@@ -270,7 +292,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 }
 
             }
-        });
+            });*/
 
         trackModel = new AbstractTableModel() {
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -322,10 +344,12 @@ public class StormTrackControl extends DisplayControlImpl {
         scroller.setMinimumSize(new Dimension(width, height));
 
 
+        JComponent contents = treePanel;
 
-        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
-                                  scroller);
-        return GuiUtils.top(GuiUtils.inset(contents, 5));
+
+        //        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
+        //                                  scroller);
+        return contents;
     }
 
 
