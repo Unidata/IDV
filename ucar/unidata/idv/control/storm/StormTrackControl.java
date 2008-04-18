@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: TrackControl.java,v 1.69 2007/08/21 11:32:08 jeffmc Exp $
  *
  * Copyright 1997-2004 Unidata Program Center/University Corporation for
@@ -19,7 +19,6 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 
 
@@ -124,7 +123,12 @@ import javax.swing.table.*;
 public class StormTrackControl extends DisplayControlImpl {
 
 
-    private Object MUTEX = new Object();
+    final ImageIcon ICON_ON = GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/dot.gif");
+    final ImageIcon ICON_OFF = GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/blank.gif");
+
+
+
+    private CompositeDisplayable placeHolder;
 
     /** _more_ */
     private StormDataSource stormDataSource;
@@ -134,8 +138,6 @@ public class StormTrackControl extends DisplayControlImpl {
 
     private Hashtable<StormInfo, StormDisplayState> stormDisplayStateMap  
         = new Hashtable<StormInfo, StormDisplayState>();
-
-
 
 
     /** _more_ */
@@ -172,6 +174,8 @@ public class StormTrackControl extends DisplayControlImpl {
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
 
+        placeHolder = new CompositeDisplayable("Place holder");
+        addDisplayable(placeHolder);
 
         List dataSources = new ArrayList();
         dataChoice.getDataSources(dataSources);
@@ -190,9 +194,6 @@ public class StormTrackControl extends DisplayControlImpl {
         getColorTableWidget(getRangeForColorTable());
         stormDataSource = (StormDataSource) dataSources.get(0);
 
-
-
-
         return true;
     }
 
@@ -206,6 +207,7 @@ public class StormTrackControl extends DisplayControlImpl {
         StormDisplayState stormDisplayState = stormDisplayStateMap.get(stormInfo);
         if(stormDisplayState == null) {
             stormDisplayState = new StormDisplayState(stormInfo);
+            stormDisplayState.setStormTrackControl(this);
             stormDisplayStateMap.put(stormInfo,stormDisplayState);
         }
         return stormDisplayState;
@@ -221,8 +223,9 @@ public class StormTrackControl extends DisplayControlImpl {
             for (Enumeration keys =stormDisplayStateMap.keys(); keys.hasMoreElements(); ) {
                 StormInfo key  = (StormInfo)keys.nextElement();
                 StormDisplayState stormDisplayState = stormDisplayStateMap.get(key);
+                stormDisplayState.setStormTrackControl(this);
                 if(stormDisplayState.getVisible()) {
-                    showStorm(stormDisplayState);
+                    stormDisplayState.showStorm();
                 }
             }
         } catch (Exception exc) {
@@ -250,38 +253,17 @@ public class StormTrackControl extends DisplayControlImpl {
         //TODO: Sort the years so we  get the most recent year first
         GregorianCalendar cal =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        final ImageIcon offIcon = GuiUtils.getImageIcon("/ucar/unidata/idv/control/images/Refresh16.gif");
-        final ImageIcon onIcon = GuiUtils.getImageIcon("/ucar/unidata/idv/control/images/Back16.gif");
+
         for (StormInfo stormInfo : stormInfos) {
             cal.setTime(stormInfo.getStartTime());
             int year = cal.get(Calendar.YEAR);
-            final StormDisplayState stormDisplayState = getStormDisplayState(stormInfo);
-            final JCheckBox showCbx  =new JCheckBox("Show",stormDisplayState.getVisible());
-            final StormInfo theStormInfo = stormInfo;
-            final JComponent stormComp = new JPanel(new BorderLayout());
-            showCbx.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        stormDisplayState.setVisible(showCbx.isSelected());
-                        showStorm(stormDisplayState);
-                        if(stormDisplayState.getVisible()) {
-                            treePanel.setIcon(stormComp, onIcon);
-                        } else {
-                            treePanel.setIcon(stormComp, offIcon);
-                        }
-                   }
-                });
+            StormDisplayState stormDisplayState = getStormDisplayState(stormInfo);
 
-            if(showCbx.isSelected()) {
-                treePanel.setIcon(stormComp, onIcon);
-            } else {
-                treePanel.setIcon(stormComp, offIcon);
-            }
-
-            stormComp.add(BorderLayout.CENTER, GuiUtils.topLeft(showCbx));
-            treePanel.addComponent(stormComp, ""+year,
-                                   stormInfo.getStormId(),offIcon);
+            treePanel.addComponent(stormDisplayState.getContents(), ""+year,
+                                   stormInfo.getStormId(),
+                                   stormDisplayState.getVisible()?
+                                   ICON_ON:ICON_OFF);
         }
-
 
         treePanel.setPreferredSize(new Dimension(300,400));
         JComponent contents = treePanel;
@@ -291,36 +273,11 @@ public class StormTrackControl extends DisplayControlImpl {
         return contents;
     }
 
-
-    private void showStorm(final StormDisplayState stormDisplayState) {
-        Misc.run(new Runnable() {
-            public void run() {
-                try {
-                    synchronized(MUTEX) {
-                        showStormInner(stormDisplayState);
-                    }
-                } catch (Exception exc) {
-                    logException("Showing storm", exc);
-                }
-
-            }
-        });
+    public void stormChanged(StormDisplayState stormDisplayState) {
+        treePanel.setIcon(stormDisplayState.getContents(),
+                          stormDisplayState.getVisible()?
+                          ICON_ON:ICON_OFF);
     }
-
-
-    /**
-     * _more_
-     *
-     * @param newStormInfo _more_
-     *
-     * @throws Exception _more_
-     */
-    private void showStormInner(StormDisplayState stormDisplayState)
-            throws Exception {
-        stormDisplayState.showStorm(this);
-    }
-
-
 
 
     /**

@@ -21,22 +21,11 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control.storm;
-
-
 import ucar.unidata.idv.control.DisplayControlImpl;
-
-
 import ucar.unidata.data.DataChoice;
-
-
 import ucar.unidata.data.DataUtil;
-
 import ucar.unidata.data.storm.*;
-
 
 import ucar.unidata.idv.ControlContext;
 
@@ -52,10 +41,7 @@ import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
@@ -64,8 +50,6 @@ import ucar.visad.Util;
 import ucar.visad.display.*;
 import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
-import ucar.visad.display.DisplayableDataRef;
-import ucar.visad.display.LineDrawing;
 import ucar.visad.display.SelectRangeDisplayable;
 import ucar.visad.display.SelectorPoint;
 import ucar.visad.display.StationModelDisplayable;
@@ -120,6 +104,7 @@ import javax.swing.table.*;
 
 public class StormDisplayState {
 
+    private Object MUTEX = new Object();
 
     /** _more_ */
     private static final Data DUMMY_DATA = new Real(0);
@@ -146,14 +131,14 @@ public class StormDisplayState {
     /** _more_ */
     private AbstractTableModel trackModel;
 
-
-
-
+    private StormTrackControl stormTrackControl;
 
     /** _more_ */
     private TrackDisplayable obsTrackDisplay;
 
+    private JComponent contents;
 
+    private JComponent centerContents;
 
     public StormDisplayState() {}
 
@@ -161,13 +146,85 @@ public class StormDisplayState {
         this.stormInfo = stormInfo;
     }
 
+    public JComponent getContents() {
+        if(contents == null) {
+            contents = doMakeContents();
+        }
+        return contents;
+    }
 
-    protected void showStorm(StormTrackControl stormTrackControl) throws Exception {
+    private JComponent doMakeContents() {
+        final JCheckBox showCbx  =new JCheckBox("Show",getVisible());
+        JLabel label = GuiUtils.cLabel(""+ stormInfo);
+        showCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    setVisible(showCbx.isSelected());
+                    showStorm();
+                }
+            });
+
+        JComponent top  =GuiUtils.leftCenter(showCbx, label);
+        centerContents = new JPanel(new BorderLayout());
+        JComponent contents = GuiUtils.topCenter(top, centerContents);
+        /*
+new BorderLayout()) {
+                boolean firstTime = true;
+                public void paint(Graphics g) {
+                    if(firstTime) {
+                        firstTime = false;
+                        initCenterContents();
+                        repaint();
+                        return;
+                    }
+                    super.paint(g);
+                }
+                };*/
+
+
+        return contents;
+    }
+
+
+    private void initCenterContents() {
+        centerContents.add(BorderLayout.CENTER, new JLabel("initialized"));
+        centerContents.repaint();
+    }
+
+    protected void setStormTrackControl (StormTrackControl stormTrackControl) {
+        this.stormTrackControl = stormTrackControl;
+    }
+
+    protected void showStorm() {
+        Misc.run(new Runnable() {
+            public void run() {
+                try {
+                    synchronized(MUTEX) {
+                        stormTrackControl.stormChanged(StormDisplayState.this);
+                        showStormInner();
+                    }
+                } catch (Exception exc) {
+                    stormTrackControl.logException("Showing storm", exc);
+                }
+
+            }
+        });
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param newStormInfo _more_
+     *
+     * @throws Exception _more_
+     */
+    private void showStormInner()
+            throws Exception {
         if(trackCollection==null) {
             trackCollection = stormTrackControl.getStormDataSource().getTrackCollection(stormInfo);
             tracks          = trackCollection.getTracks();
+            initCenterContents();
         }
-
 
         if(trackHolder==null) {
             trackHolder = new CompositeDisplayable();
