@@ -431,7 +431,7 @@ new BorderLayout()) {
             throws Exception {
 
         List                times    = track.getTrackTimes();
-        List<EarthLocation> locs     = track.getTrackPoints();
+        List<StormTrackPoint> locs     = track.getTrackPoints();
 
 
         Unit                timeUnit = CommonUnit.secondsSinceTheEpoch;
@@ -455,7 +455,7 @@ new BorderLayout()) {
             Real          value    = (fixedValue
                                       ? dfltReal
                                       : new Real(dfltRealType, i));
-            EarthLocation el       = locs.get(i);
+            EarthLocation el       = locs.get(i).getTrackPointLocation();
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getTime() / 1000;
             lats[i]            = (float) el.getLatitude().getValue();
