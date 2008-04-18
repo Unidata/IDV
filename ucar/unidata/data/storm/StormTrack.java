@@ -84,8 +84,8 @@ public class StormTrack {
     }
 
 
-    public boolean isObserved() {
-        return way.isObserved();
+    public boolean isObservation() {
+        return way.isObservation();
     }
 
 

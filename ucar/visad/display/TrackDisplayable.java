@@ -118,7 +118,7 @@ public class TrackDisplayable extends RGBDisplayable {
     public void setLineWidth(float lineWidth)
             throws VisADException, RemoteException {
 
-        float oldValue;
+       float oldValue;
 
         synchronized (this) {
             oldValue = myLineWidth;

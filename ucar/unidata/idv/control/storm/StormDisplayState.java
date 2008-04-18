@@ -21,22 +21,21 @@
  */
 
 
+
 package ucar.unidata.idv.control.storm;
-import ucar.unidata.idv.control.DisplayControlImpl;
+
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.storm.*;
 
 import ucar.unidata.idv.ControlContext;
+import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.ui.TreePanel;
-
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import ucar.unidata.util.ColorTable;
 
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
@@ -84,7 +83,11 @@ import java.util.ArrayList;
 
 
 import java.util.Arrays;
+
+
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -104,6 +107,7 @@ import javax.swing.table.*;
 
 public class StormDisplayState {
 
+    /** _more_          */
     private Object MUTEX = new Object();
 
     /** _more_ */
@@ -111,13 +115,26 @@ public class StormDisplayState {
 
 
     /** _more_ */
-    private CompositeDisplayable trackHolder;
+    private CompositeDisplayable forecastHolder;
 
 
+    /** _more_          */
     private StormInfo stormInfo;
 
-    private boolean visible = false;
+    /** _more_          */
+    private boolean obsVisible = true;
+
+
+    /** _more_          */
+    private boolean forecastVisible = false;
+
+    /** _more_          */
     private boolean changed = false;
+
+
+    /** _more_          */
+    private boolean active = false;
+
 
     /** _more_ */
     private StormTrackCollection trackCollection;
@@ -131,41 +148,72 @@ public class StormDisplayState {
     /** _more_ */
     private AbstractTableModel trackModel;
 
+    /** _more_          */
     private StormTrackControl stormTrackControl;
 
     /** _more_ */
     private TrackDisplayable obsTrackDisplay;
 
+    /** _more_          */
     private JComponent contents;
 
-    private JComponent centerContents;
 
+    private Hashtable<Way,WayDisplayState> wayDisplayStateMap = new Hashtable<Way,WayDisplayState>();
+
+
+
+    /**
+     * _more_
+     */
     public StormDisplayState() {}
 
+    /**
+     * _more_
+     *
+     * @param stormInfo _more_
+     */
     public StormDisplayState(StormInfo stormInfo) {
         this.stormInfo = stormInfo;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent getContents() {
-        if(contents == null) {
+        if (contents == null) {
             contents = doMakeContents();
         }
         return contents;
     }
 
-    private JComponent doMakeContents() {
-        final JCheckBox showCbx  =new JCheckBox("Show",getVisible());
-        JLabel label = GuiUtils.cLabel(""+ stormInfo);
-        showCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    setVisible(showCbx.isSelected());
-                    showStorm();
-                }
-            });
+    private WayDisplayState getWayDisplayState(Way way) {
+        WayDisplayState wayState = wayDisplayStateMap.get(way);
+        if(wayState == null) {
+            wayDisplayStateMap.put(way,wayState = new WayDisplayState(way));
+        }
+        return wayState;
+    }
 
-        JComponent top  =GuiUtils.leftCenter(showCbx, label);
-        centerContents = new JPanel(new BorderLayout());
-        JComponent contents = GuiUtils.topCenter(top, centerContents);
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private JComponent doMakeContents() {
+        JButton loadBtn = new JButton("Load Tracks:");
+        JLabel  label   = GuiUtils.cLabel("  " + stormInfo);
+        loadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                active = true;
+                showStorm();
+            }
+        });
+
+        JComponent top      = GuiUtils.hbox(loadBtn, label);
+        JComponent contents = GuiUtils.top(GuiUtils.inset(top, 5));
         /*
 new BorderLayout()) {
                 boolean firstTime = true;
@@ -180,26 +228,108 @@ new BorderLayout()) {
                 }
                 };*/
 
-
         return contents;
     }
 
 
-    private void initCenterContents() {
-        centerContents.add(BorderLayout.CENTER, new JLabel("initialized"));
-        centerContents.repaint();
+    /**
+     * _more_
+     */
+    public void initDone() {
+        if (getActive()) {
+            showStorm();
+        }
+
     }
 
-    protected void setStormTrackControl (StormTrackControl stormTrackControl) {
+
+
+    /**
+     * _more_
+     */
+    private void initCenterContents() {
+        contents.removeAll();
+        final JCheckBox showObsCbx = new JCheckBox("Show Observation Track",
+                                         getObsVisible());
+        JLabel label = GuiUtils.lLabel("<html><h3>Storm: " + stormInfo
+                                       + "</h3></html>");
+        showObsCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                setObsVisible(showObsCbx.isSelected());
+                showStorm();
+            }
+        });
+
+        final JCheckBox showForecastCbx =
+            new JCheckBox("Show Forecast Tracks", getForecastVisible());
+        showForecastCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                setForecastVisible(showForecastCbx.isSelected());
+                showStorm();
+            }
+        });
+
+        JComponent top     = GuiUtils.vbox(label, showObsCbx,
+                                           showForecastCbx);
+
+        List<Way>  ways    = trackCollection.getWayList();
+        List       wayCbxs = new ArrayList();
+        wayCbxs.add(new JLabel("Ways: "));
+        for (Way way : ways) {
+            if (way.isObservation()) {
+                continue;
+            }
+            final WayDisplayState wayDisplayState = getWayDisplayState(way);
+            final JCheckBox wayCbx = new JCheckBox(way.toString(), wayDisplayState.getVisible());
+            wayCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        wayDisplayState.setVisible(wayCbx.isSelected());
+                    } catch(Exception exc) {
+                        stormTrackControl.logException("Toggling way visibility", exc);
+                    }
+                }
+            });
+            wayCbxs.add(wayCbx);
+        }
+        JComponent wayComp = GuiUtils.hbox(wayCbxs);
+        JComponent inner = GuiUtils.topCenter(top,
+                               GuiUtils.inset(GuiUtils.top(wayComp), 5));
+
+        contents.add(BorderLayout.CENTER, GuiUtils.inset(inner, 5));
+        contents.repaint();
+    }
+
+    /**
+     * _more_
+     *
+     * @param way _more_
+     *
+     * @return _more_
+     */
+    protected boolean canShowWay(Way way) {
+        return getWayDisplayState(way).getVisible();
+    }
+
+    /**
+     * _more_
+     *
+     * @param stormTrackControl _more_
+     */
+    protected void setStormTrackControl(StormTrackControl stormTrackControl) {
         this.stormTrackControl = stormTrackControl;
     }
 
+    /**
+     * _more_
+     */
     protected void showStorm() {
         Misc.run(new Runnable() {
             public void run() {
                 try {
-                    synchronized(MUTEX) {
-                        stormTrackControl.stormChanged(StormDisplayState.this);
+                    synchronized (MUTEX) {
+                        stormTrackControl.stormChanged(
+                            StormDisplayState.this);
                         showStormInner();
                     }
                 } catch (Exception exc) {
@@ -214,67 +344,77 @@ new BorderLayout()) {
     /**
      * _more_
      *
-     * @param newStormInfo _more_
      *
      * @throws Exception _more_
      */
-    private void showStormInner()
-            throws Exception {
-        if(trackCollection==null) {
-            trackCollection = stormTrackControl.getStormDataSource().getTrackCollection(stormInfo);
-            tracks          = trackCollection.getTracks();
+    private void showStormInner() throws Exception {
+        if (trackCollection == null) {
+            contents.removeAll();
+            contents.add(
+                GuiUtils.top(
+                    GuiUtils.inset(new JLabel("Loading Tracks..."), 5)));
+            contents.repaint();
+            trackCollection =
+                stormTrackControl.getStormDataSource().getTrackCollection(
+                    stormInfo);
+            tracks = trackCollection.getTracks();
             initCenterContents();
         }
 
-        if(trackHolder==null) {
-            trackHolder = new CompositeDisplayable();
-            stormTrackControl.addDisplayable(trackHolder);
-        }
 
-        trackHolder.clearDisplayables();
-        if(obsTrackDisplay==null) {
-            obsTrackDisplay = new TrackDisplayable("track_" + stormInfo.getStormId());
+        //Make the displayables if needed
+        if (obsTrackDisplay == null) {
+
+            obsTrackDisplay = new TrackDisplayable("track_"
+                    + stormInfo.getStormId());
             obsTrackDisplay.setLineWidth(3);
             stormTrackControl.addDisplayable(obsTrackDisplay);
+            StormTrack obsTrack = trackCollection.getObsTrack();
+            obsTrackDisplay.setTrack(makeField(obsTrack, false));
         }
 
-        if (!getVisible()) {
-            obsTrackDisplay.setData(DUMMY_DATA);
-            if(trackModel!=null)
-                trackModel.fireTableStructureChanged();
+
+        obsTrackDisplay.setVisible(getObsVisible());
+
+
+        if ( !getForecastVisible()) {
+            if (forecastHolder != null) {
+                forecastHolder.setVisible(false);
+            }
             return;
         }
 
+        if (forecastHolder == null) {
+            forecastHolder = new CompositeDisplayable();
+            stormTrackControl.addDisplayable(forecastHolder);
+            ColorTable ct =
+                stormTrackControl.getControlContext().getColorTableManager()
+                    .getColorTable("Red");
 
+            float[][] colors =
+                stormTrackControl.getColorTableForDisplayable(ct);
+            for (StormTrack track : tracks) {
+                if (track.isObservation()) {
+                    continue;
+                }
+                WayDisplayState wayDisplayState = getWayDisplayState(track.getWay());
+                TrackDisplayable trackDisplay = new TrackDisplayable("track "
+                                                    + track.getTrackId());
 
-        if(trackModel!=null)
-            trackModel.fireTableStructureChanged();
-
-
-        StormTrack obsTrack = trackCollection.getObsTrack();
-        obsTrackDisplay.setTrack(makeField(obsTrack, false));
-
-
-        ColorTable ct =
-            stormTrackControl.getControlContext().getColorTableManager().getColorTable("Red");
-
-        float[][] colors = stormTrackControl.getColorTableForDisplayable(ct);
-
-        Way       way    = new Way("babj");
-        for (StormTrack track : tracks) {
-            if (track.isObserved() || !track.getWay().equals(way)) {
-                continue;
+                wayDisplayState.addDisplayable(trackDisplay);
+                if(!wayDisplayState.getVisible()) {
+                    trackDisplay.setVisible(false);
+                }
+                forecastHolder.addDisplayable(trackDisplay);
+                trackDisplay.setTrack(makeField(track, true));
             }
-            TrackDisplayable trackDisplay = new TrackDisplayable("track "
-                                                + track.getTrackId());
-
-            trackDisplay.setColorPalette(colors);
-            trackHolder.addDisplayable(trackDisplay);
-            trackDisplay.setTrack(makeField(track, true));
         }
+
+        forecastHolder.setVisible(true);
     }
 
 
+    /** _more_          */
     int cnt = 0;
 
     /**
@@ -320,6 +460,7 @@ new BorderLayout()) {
             newRangeVals[1][i] = dateTime.getTime() / 1000;
             lats[i]            = (float) el.getLatitude().getValue();
             lons[i]            = (float) el.getLongitude().getValue();
+            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
         }
         GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
                                 null);
@@ -341,6 +482,9 @@ new BorderLayout()) {
 
 
 
+    /**
+     * _more_
+     */
     public void doit() {
         trackModel = new AbstractTableModel() {
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -415,40 +559,98 @@ new BorderLayout()) {
 
 
     /**
-       Set the Visible property.
-
-       @param value The new value for Visible
-    **/
-    public void setVisible (boolean value) {
-	visible = value;
+     *  Set the ObsVisible property.
+     *
+     *  @param value The new value for ObsVisible
+     */
+    public void setObsVisible(boolean value) {
+        obsVisible = value;
     }
 
     /**
-       Get the Visible property.
+     *  Get the ObsVisible property.
+     *
+     *  @return The ObsVisible
+     */
+    public boolean getObsVisible() {
+        return obsVisible;
+    }
 
-       @return The Visible
-    **/
-    public boolean getVisible () {
-	return visible;
+
+
+    /**
+     *  Set the ForecastVisible property.
+     *
+     *  @param value The new value for ForecastVisible
+     */
+    public void setForecastVisible(boolean value) {
+        forecastVisible = value;
     }
 
     /**
-       Set the Changed property.
-
-       @param value The new value for Changed
-    **/
-    public void setChanged (boolean value) {
-	changed = value;
+     *  Get the ObsVisible property.
+     *
+     *  @return The ForecastVisible
+     */
+    public boolean getForecastVisible() {
+        return forecastVisible;
     }
 
     /**
-       Get the Changed property.
-
-       @return The Changed
-    **/
-    public boolean getChanged () {
-	return changed;
+     *  Set the Changed property.
+     *
+     *  @param value The new value for Changed
+     */
+    public void setChanged(boolean value) {
+        changed = value;
     }
+
+    /**
+     *  Get the Changed property.
+     *
+     *  @return The Changed
+     */
+    public boolean getChanged() {
+        return changed;
+    }
+
+    /**
+     * Set the Active property.
+     *
+     * @param value The new value for Active
+     */
+    public void setActive(boolean value) {
+        active = value;
+    }
+
+    /**
+     * Get the Active property.
+     *
+     * @return The Active
+     */
+    public boolean getActive() {
+        return active;
+    }
+
+
+    /**
+       Set the WayDisplayStateMap property.
+
+       @param value The new value for WayDisplayStateMap
+    **/
+    public void setWayDisplayStateMap (Hashtable<Way,WayDisplayState> value) {
+	wayDisplayStateMap = value;
+    }
+
+    /**
+       Get the WayDisplayStateMap property.
+
+       @return The WayDisplayStateMap
+    **/
+    public Hashtable<Way,WayDisplayState> getWayDisplayStateMap () {
+	return wayDisplayStateMap;
+    }
+
 
 
 

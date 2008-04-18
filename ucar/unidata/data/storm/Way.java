@@ -34,7 +34,7 @@ package ucar.unidata.data.storm;
 public class Way {
 
     /** _more_          */
-    public static final Way OBSERVATION = new Way("obsr");
+    public static final Way OBSERVATION = new Way("Observation");
 
     /** _more_ */
     private String id="";
@@ -53,7 +53,7 @@ public class Way {
         this.id = id;
     }
 
-    public boolean isObserved() {
+    public boolean isObservation() {
         return this.equals(OBSERVATION);
     }
 

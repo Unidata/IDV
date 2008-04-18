@@ -491,8 +491,7 @@ public class STIStormDataSource extends StormDataSource {
             }
         }
         //Date dts = getStartTime(obsDts);
-        Way obsWay = new Way("obsr");
-        return new StormTrack(stormInfo, obsWay, obsPts, obsDts, null);
+        return new StormTrack(stormInfo, Way.OBSERVATION, obsPts, obsDts, null);
 
     }
 
