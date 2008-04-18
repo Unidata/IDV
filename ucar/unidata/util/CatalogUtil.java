@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.util;
 
 
@@ -350,13 +348,36 @@ public class CatalogUtil {
                                         TAG_SERVICE);
         for (int i = 0; i < childrenServiceNodes.size(); i++) {
             Element serviceNode = (Element) childrenServiceNodes.get(i);
-            if ( !Misc.equals(XmlUtil.getAttribute(serviceNode, ATTR_NAME,
-                    NULL_STRING), serviceName)) {
-                continue;
-            }
-
+            String name = XmlUtil.getAttribute(serviceNode, ATTR_NAME,
+                              NULL_STRING);
             String serviceType = XmlUtil.getAttribute(serviceNode,
                                      ATTR_SERVICETYPE, NULL_STRING);
+            if ( !Misc.equals(name, serviceName)) {
+                // check if it's a compound service and ours is inside.
+                if (Misc.equals(serviceType, SERVICE_COMPOUND)) {
+                    List children = XmlUtil.findChildren(serviceNode,
+                                        TAG_SERVICE);
+                    boolean foundOne = false;
+                    for (int childIdx = 0; childIdx < children.size();
+                            childIdx++) {
+                        Element childServiceNode =
+                            (Element) children.get(childIdx);
+                        String childServiceName =
+                            XmlUtil.getAttribute(childServiceNode, ATTR_NAME,
+                                NULL_STRING);
+                        if (Misc.equals(childServiceName, serviceName)) {
+                            foundOne = true;
+                            break;
+                        }
+                    }
+                    if ( !foundOne) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
             if (Misc.equals(serviceType, SERVICE_COMPOUND)) {
                 List children = XmlUtil.findChildren(serviceNode,
                                     TAG_SERVICE);
@@ -376,9 +397,9 @@ public class CatalogUtil {
     }
 
     /**
-     * _more_
+     * Log the error
      *
-     * @param msg _more_
+     * @param msg  the error message
      */
     public static void errorMessage(String msg) {
         LogUtil.userErrorMessage(msg);
