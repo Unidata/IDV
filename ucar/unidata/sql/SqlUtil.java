@@ -912,9 +912,9 @@ public class SqlUtil {
                 }
             } catch (Exception exc) {
                 if ( !ignoreErrors) {
-                    System.err.println("Bad sql:" + command);
-                    System.err.println("" + exc);
-                    //                    throw exc;
+                    //                    System.err.println("Bad sql:" + command);
+                    //                    System.err.println("" + exc);
+                    throw exc;
                 }
             }
         }

@@ -44,6 +44,7 @@ import visad.georef.EarthLocationTuple;
 
 import java.rmi.RemoteException;
 
+import java.io.*;
 import java.sql.*;
 
 import java.text.SimpleDateFormat;
@@ -114,7 +115,7 @@ public class STIStormDataSource extends StormDataSource {
 
     /** the stormInfo and track */
 
-    private List stormInfos;
+    private List<StormInfo> stormInfos;
 
 
 
@@ -153,24 +154,24 @@ public class STIStormDataSource extends StormDataSource {
 
     protected void initAfter() {
         try {
+            File userDir = 
+                getDataContext().getIdv().getObjectStore().getUserDirectory();
+            String derbyDir = IOUtil.joinDir(userDir,"derbydb");
+            IOUtil.makeDirRecursive(new File(derbyDir));
+            System.setProperty("derby.system.home", derbyDir);
+
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-            if ( !initConnection()) {}
-            initStormInfo();
+            if ( !initConnection()) {
+                setInError(true,true, "Unable to initialize database connection");
+            } else {
+                stormInfos = getAllStormInfos();
+            }
         } catch(Exception exc) {
             logException("Error initializing STI database",exc);
         }
     }
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void initStormInfo() throws Exception {
-        if (stormInfos == null) {
-            stormInfos = getAllStormInfos();
-        }
-    }
+
 
     /**
      * _more_
@@ -178,10 +179,8 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     public List<StormInfo> getStormInfos() {
-        int             size   = stormInfos.size();
         List<StormInfo> sInfos = new ArrayList();
         sInfos.addAll(stormInfos);
-
         return sInfos;
     }
 
@@ -218,14 +217,6 @@ public class STIStormDataSource extends StormDataSource {
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param fTrack _more_
-     */
-    public void setForecastTracks(Map fTrack) {}
-
     /**
      * _more_
      *
@@ -237,10 +228,10 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected List getForecastTracks(StormInfo stormInfo, Way forecastWay)
+    private List<StormTrack> getForecastTracks(StormInfo stormInfo, Way forecastWay)
             throws Exception {
 
-        List tracks     = new ArrayList();
+        List<StormTrack> tracks     = new ArrayList<StormTrack>();
         List startDates = getForecastTrackStartDates(stormInfo, forecastWay);
         int  nstarts    = startDates.size();
         for (int i = 0; i < nstarts; i++) {
@@ -248,6 +239,7 @@ public class STIStormDataSource extends StormDataSource {
             StormTrack tk = getForecastTracks(stormInfo, dt, forecastWay);
             if (tk != null) {
                 int pn = tk.getTrackPoints().size();
+                //Why > 1???
                 if (pn > 1) {
                     tracks.add(tk);
                 }
@@ -269,7 +261,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected StormTrack getForecastTracks(StormInfo stormInfo, Date sTime,
+    private StormTrack getForecastTracks(StormInfo stormInfo, Date sTime,
                                       Way forecastWay)
             throws Exception {
 
@@ -536,7 +528,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected List getAllStormInfos() throws Exception {
+    private List<StormInfo> getAllStormInfos() throws Exception {
 
         String columns   = "DISTINCT" + " " + sIdColumn;
 
@@ -549,7 +541,7 @@ public class STIStormDataSource extends StormDataSource {
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
 
-        List             stormInfos = new ArrayList();
+        List<StormInfo>     stormInfos = new ArrayList<StormInfo>();
 
         //TODO: How do we handle no data???
         int cnt = 0;
@@ -787,27 +779,28 @@ public class STIStormDataSource extends StormDataSource {
         }
 
         try {
-            //Create the dummy database
-            /*
 
+            //Create the dummy database
             Connection connection = getConnection();
             Statement  stmt       = connection.createStatement();
             //Drop the table  - ignore any errors
-            SqlUtil.loadSql("drop table " + tableName, stmt, false);
+            //          SqlUtil.loadSql("drop table " + tableName, stmt, false);
 
             //Load in the test data
-            System.err.println("Creating test database");
-            String initSql = IOUtil.readContents(
-                                 "/ucar/unidata/data/sounding/typhoon.sql",
-                                 getClass());
+            try {
+                stmt.execute("select count(*) from typhoon");
+            } catch(Exception exc) {
+                System.err.println ("exc;" + exc);
+                System.err.println("Creating test database");
+                String initSql = IOUtil.readContents(
+                                                     "/ucar/unidata/data/storm/testdb.sql",
+                                                     getClass());
 
-
-            connection.setAutoCommit(false);
-            SqlUtil.loadSql(initSql, stmt, false);
-            connection.commit();
-            connection.setAutoCommit(true);
-            System.err.println("OK");
-            */
+                connection.setAutoCommit(false);
+                SqlUtil.loadSql(initSql, stmt, false);
+                connection.commit();
+                connection.setAutoCommit(true);
+            }
         } catch (Exception exc) {
             exc.printStackTrace();
             return false;

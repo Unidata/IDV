@@ -118,7 +118,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     private static class MyTreeNode extends DefaultMutableTreeNode {
 
         /** icon */
-        ImageIcon icon;
+        public ImageIcon icon;
 
         /**
          * ctor
@@ -253,6 +253,16 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
                 }
             }
             panel.show(emptyPanel);
+        }
+    }
+
+
+    public void setIcon(Component comp,ImageIcon icon) {
+        MyTreeNode node =
+            (MyTreeNode) compToNode.get(comp);
+        if(node!=null) {
+            node.icon = icon;
+            tree.repaint();
         }
     }
 

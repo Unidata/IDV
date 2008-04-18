@@ -100,7 +100,7 @@ public class StormInfo {
      * @return _more_
      */
     public String toString() {
-        return stormID + "_" + startTime.toString();
+        return stormID + " " + startTime.toString();
     }
 
     /**
@@ -109,7 +109,7 @@ public class StormInfo {
      * @return _more_
      */
     public int hashCode() {
-        return toString().hashCode();
+        return stormID.hashCode();
     }
 
     /**
@@ -127,7 +127,7 @@ public class StormInfo {
             return false;
         }
         StormInfo other = (StormInfo) o;
-        return ((stormID == other.stormID) && (startTime == other.startTime));
+        return (this.stormID.equals(other.stormID));
     }
 
 
