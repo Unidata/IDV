@@ -154,7 +154,7 @@ public class STIStormDataSource extends StormDataSource {
 
     protected void initAfter() {
         try {
-            File userDir = 
+            File userDir =
                 getDataContext().getIdv().getObjectStore().getUserDirectory();
             String derbyDir = IOUtil.joinDir(userDir,"derbydb");
             IOUtil.makeDirRecursive(new File(derbyDir));
@@ -198,7 +198,7 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
         StormTrackCollection trackCollection =   new StormTrackCollection();
         List     forecastWays = getForecastWays(stormInfo);
-        trackCollection.addWayList(forecastWays);
+
         Iterator itr          = forecastWays.iterator();
         while (itr.hasNext()) {
             Way  forecastWay    = (Way) itr.next();
