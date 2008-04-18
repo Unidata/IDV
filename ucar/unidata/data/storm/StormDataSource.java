@@ -80,6 +80,12 @@ public abstract class StormDataSource extends DataSourceImpl {
     public abstract StormTrackCollection getTrackCollection(StormInfo stormInfo)
      throws Exception;
 
+    /**
+         * _more_
+         *
+         * @return _more_
+         */
+    public abstract StormInfo getStormInfo(String stormId);
 
 
 }

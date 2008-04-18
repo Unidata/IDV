@@ -41,7 +41,7 @@ import java.util.List;
 public class StormTrack {
 
     /** _more_ */
-    private String trackID;
+    private String trackId;
 
     /** _more_ */
     private StormInfo stormInfo;
@@ -50,13 +50,9 @@ public class StormTrack {
     private Way way;
 
     /** _more_ */
-    private List<EarthLocation> trackPoints;
+    private List<StormTrackPoint> trackPoints;
 
-    /** _more_ */
-    private List<Date> trackTimes;
 
-    /** _more_ */
-    private List attributes;
 
     //private Date trackStartTime;
 
@@ -66,21 +62,16 @@ public class StormTrack {
      * @param stormInfo _more_
      * @param way _more_
      * @param pts _more_
-     * @param times _more_
-     * @param attrs _more_
      */
-    public StormTrack(StormInfo stormInfo, Way way, List pts, List times,
-                 List attrs) {
+    public StormTrack(StormInfo stormInfo, Way way, List<StormTrackPoint> pts) {
 
         this.stormInfo   = stormInfo;
         this.way         = way;
         this.trackPoints = new ArrayList(pts);
-        this.trackTimes  = new ArrayList(times);
-        if (attrs != null) {
-            this.attributes = new ArrayList(attrs);
-        }
-        this.trackID = stormInfo.toString() + "_" + way + "_"
-                       + getTrackStartTime().getTime();
+        StormTrackPoint firstPoint = (StormTrackPoint)pts.get(0);
+        Date trackStartTime = firstPoint.getTrackPointTime();
+        this.trackId = stormInfo.toString() + "_" + way + "_"
+                       + trackStartTime.getTime();
     }
 
 
@@ -95,7 +86,7 @@ public class StormTrack {
      * @return _more_
      */
     public int hashCode() {
-        return trackID.hashCode();
+        return trackId.hashCode();
     }
 
     /**
@@ -104,7 +95,7 @@ public class StormTrack {
      * @param id _more_
      */
     public void setTrackId(String id) {
-        this.trackID = id;
+        this.trackId = id;
     }
 
     /**
@@ -113,7 +104,7 @@ public class StormTrack {
      * @return _more_
      */
     public String getTrackId() {
-        return trackID;
+        return trackId;
     }
 
 
@@ -124,10 +115,9 @@ public class StormTrack {
      * @return _more_
      */
     public Date getTrackStartTime() {
+        StormTrackPoint firstPoint = trackPoints.get(0);
+        return firstPoint.getTrackPointTime();
 
-        return (trackTimes.size() > 0)
-               ? trackTimes.get(0)
-               : null;
     }
 
     /**
@@ -171,8 +161,8 @@ public class StormTrack {
      *
      * @param pts _more_
      */
-    public void setTrackPoints(List<EarthLocation> pts) {
-        this.trackPoints = new ArrayList<EarthLocation>(pts);
+    public void setTrackPoints(List<StormTrackPoint> pts) {
+        this.trackPoints = new ArrayList<StormTrackPoint>(pts);
     }
 
     /**
@@ -180,17 +170,8 @@ public class StormTrack {
      *
      * @return _more_
      */
-    public List<EarthLocation> getTrackPoints() {
+    public List<StormTrackPoint> getTrackPoints() {
         return trackPoints;
-    }
-
-    /**
-     * _more_
-     *
-     * @param pts _more_
-     */
-    public void setTrackTimes(List<Date> pts) {
-        this.trackTimes = new ArrayList<Date>(pts);
     }
 
     /**
@@ -199,30 +180,16 @@ public class StormTrack {
      * @return _more_
      */
     public List getTrackTimes() {
+        List<Date> trackTimes = new ArrayList();
+        for(StormTrackPoint stp: trackPoints){
+            trackTimes.add(stp.getTrackPointTime());
+        }
         return trackTimes;
-    }
-
-    /**
-     * _more_
-     *
-     * @param attrs _more_
-     */
-    public void setTrackAttributes(List attrs) {
-        this.attributes = new ArrayList(attrs);
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List getTrackAttributes() {
-        return attributes;
     }
 
 
     public String toString() {
-        return trackID;
+        return trackId;
     }
 
 
@@ -241,7 +208,7 @@ public class StormTrack {
             return false;
         }
         StormTrack other = (StormTrack) o;
-        return ((trackID.equals(other.trackID)));
+        return ((trackId.equals(other.trackId)));
     }
 }
 

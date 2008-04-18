@@ -35,7 +35,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.display.*;
-
+import ucar.nc2.Attribute;
 import visad.*;
 
 import visad.georef.EarthLocation;
@@ -99,6 +99,28 @@ public class STIStormDataSource extends StormDataSource {
 
     /** _more_ */
     private String wayColumn = "way";
+
+    /** _more_ */
+    private String pressureColumn = "pressure";
+
+    /** _more_ */
+    private String windSpdColumn = "wind";
+
+    /** _more_ */
+    private String radiusMGColumn = "xx1";
+
+    /** _more_ */
+    private String radiusWGColumn = "xx2";
+
+    /** _more_ */
+    private String moveDirColumn = "xx3";
+
+    /** _more_ */
+    private String moveSpdColumn = "xx4";
+
+
+
+
 
     /** hard coded data base url for now */
     private String dbUrl = "jdbc:derby:test;create=true";
@@ -184,7 +206,13 @@ public class STIStormDataSource extends StormDataSource {
         return sInfos;
     }
 
-
+    public StormInfo getStormInfo(String stormId){
+        for(StormInfo sInfo: stormInfos) {
+            if(sInfo.getStormId().equals(stormId))
+                return sInfo;
+        }
+        return null;
+    }
     /**
      * _more_
      *
@@ -261,6 +289,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
+
     private StormTrack getForecastTracks(StormInfo stormInfo, Date sTime,
                                       Way forecastWay)
             throws Exception {
@@ -268,7 +297,10 @@ public class STIStormDataSource extends StormDataSource {
         String columns = sIdColumn + "," + yearColumn + "," + monthColumn
                          + "," + dayColumn + "," + hourColumn + ","
                          + fhourColumn + "," + latitudeColumn + ","
-                         + longitudeColumn + "," + wayColumn;
+                         + longitudeColumn + "," + windSpdColumn + ","
+                         + pressureColumn+ "," + radiusMGColumn + ","
+                         + radiusWGColumn + "," + moveDirColumn + ","
+                         + moveSpdColumn + "," + wayColumn;
 
 
         //SimpleDateFormat sdf = new SimpleDateFormat();
@@ -302,15 +334,15 @@ public class STIStormDataSource extends StormDataSource {
 
         //
 
-        List             times = new ArrayList();
-        List             pts   = new ArrayList();
+        List<StormTrackPoint>    pts   = new ArrayList();
+        List<Attribute>          attrs;
         SimpleDateFormat sdf   = new SimpleDateFormat();
         //sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         sdf.applyPattern("yyyy/MM/dd HH");
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 //                System.err.println ("row " + cnt);
-
+                attrs = new ArrayList();
                 int col = 1;
                 col++;  //sIdColumn
                 int    year      = results.getInt(col++);
@@ -323,6 +355,18 @@ public class STIStormDataSource extends StormDataSource {
                 double latitude  = results.getDouble(col++);
                 double longitude = results.getDouble(col++);
                 double altitude  = 0.0;
+                double windSpd  = results.getDouble(col++);
+                attrs.add( new Attribute("MaxWindSpeed", windSpd));
+                double pressure = results.getDouble(col++);
+                attrs.add( new Attribute("MinPressure", pressure));
+                double radiusMG = results.getDouble(col++);
+                attrs.add( new Attribute("RadiusModerateGale", radiusMG));
+                double radiusWG = results.getDouble(col++);
+                attrs.add( new Attribute("RadiusWholeGale", radiusWG));
+                double moveDir = results.getDouble(col++);
+                attrs.add( new Attribute("MoveDirection", moveDir));
+                double moveSpd = results.getDouble(col++);
+                attrs.add( new Attribute("MoveSpeed", moveSpd));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -332,14 +376,14 @@ public class STIStormDataSource extends StormDataSource {
                 Date fdate = sdf.parse(year + "/" + month + "/" + day + " "
                                        + h);
 
-                times.add(fdate);
-                pts.add(elt);
+                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, fdate, attrs);
+                pts.add(stp);
 
             }
 
         }
         if (pts.size() > 0) {
-            return new StormTrack(stormInfo, forecastWay, pts, times, null);
+            return new StormTrack(stormInfo, forecastWay, pts);
         } else {
             return null;
         }
@@ -436,7 +480,10 @@ public class STIStormDataSource extends StormDataSource {
         String columns = sIdColumn + "," + yearColumn + "," + monthColumn
                          + "," + dayColumn + "," + hourColumn + ","
                          + fhourColumn + "," + latitudeColumn + ","
-                         + longitudeColumn + "," + wayColumn;
+                         + longitudeColumn + "," + windSpdColumn + ","
+                         + pressureColumn+ "," + radiusMGColumn + ","
+                         + radiusWGColumn + "," + moveDirColumn + ","
+                         + moveSpdColumn + "," + wayColumn;
 
         List whereList = new ArrayList();
 
@@ -453,16 +500,19 @@ public class STIStormDataSource extends StormDataSource {
         ResultSet        results;
 
         //
+
         int              cnt = 0;
         SimpleDateFormat sdf = new SimpleDateFormat();
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         sdf.applyPattern("yyyy/MM/dd HH");
-        List obsPts = new ArrayList();
-        List obsDts = new ArrayList();
+        List<StormTrackPoint> obsPts = new ArrayList();
+
 
         while ((results = iter.next()) != null) {
+
             while (results.next()) {
                 //                System.err.println ("row " + cnt);
+                List<Attribute> attrs = new ArrayList();
                 cnt++;
                 int col = 1;
                 col++;
@@ -475,6 +525,18 @@ public class STIStormDataSource extends StormDataSource {
                 double latitude  = results.getDouble(col++);
                 double longitude = results.getDouble(col++);
                 double altitude  = 0.0;
+                double windSpd  = results.getDouble(col++);
+                attrs.add( new Attribute("MaxWindSpeed", windSpd));
+                double pressure = results.getDouble(col++);
+                attrs.add( new Attribute("MinPressure", pressure));
+                double radiusMG = results.getDouble(col++);
+                attrs.add( new Attribute("RadiusModerateGale", radiusMG));
+                double radiusWG = results.getDouble(col++);
+                attrs.add( new Attribute("RadiusWholeGale", radiusWG));
+                double moveDir = results.getDouble(col++);
+                attrs.add( new Attribute("MoveDirection", moveDir));
+                double moveSpd = results.getDouble(col++);
+                attrs.add( new Attribute("MoveSpeed", moveSpd));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -484,14 +546,16 @@ public class STIStormDataSource extends StormDataSource {
 
                 Date date = sdf.parse(year + "/" + month + "/" + day + " "
                                       + hour);
-
+                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, attrs);
                 //DateTime dttm          = new DateTime(date);
-                obsDts.add(date);
-                obsPts.add(elt);
+
+                obsPts.add(stp);
+
             }
         }
         //Date dts = getStartTime(obsDts);
-        return new StormTrack(stormInfo, Way.OBSERVATION, obsPts, obsDts, null);
+
+        return new StormTrack(stormInfo, Way.OBSERVATION, obsPts);
 
     }
 
@@ -815,7 +879,7 @@ public class STIStormDataSource extends StormDataSource {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        String             sid = "0622";
+        String             sid = "0623";
         STIStormDataSource s   = null;
         try {
             s = new STIStormDataSource();
@@ -826,14 +890,15 @@ public class STIStormDataSource extends StormDataSource {
         s.initAfter();
         List            sInfoList = s.getStormInfos();
         StormInfo       sInfo     = (StormInfo) sInfoList.get(0);
-
+                        sInfo = s.getStormInfo(sid);
         String          sd        = sInfo.getStormId();
         StormTrackCollection cls       = s.getTrackCollection(sInfo);
         List           ways        = cls.getWayList();
         Map             mp        = cls.getWayToStartDatesHashMap();
         Map             mp1       = cls.getWayToTracksHashMap();
-        StormTrack           obsTrack  = cls.getObsTrack();
-
+        StormTrack      obsTrack  = cls.getObsTrack();
+        List            trackPointList = obsTrack.getTrackPoints();
+        List            trackPointTime = obsTrack.getTrackTimes();
         System.err.println("test:");
 
     }
