@@ -882,6 +882,7 @@ public class CompositeDisplayable extends Displayable {
                 continue;
             }
 
+            if(!displayable.getUseTimesInAnimation()) continue;
             Set set = displayable.getAnimationSet(aniType);
             if (set != null) {
                 aniSet = (aniSet == null)
