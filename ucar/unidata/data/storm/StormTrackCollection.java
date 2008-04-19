@@ -23,8 +23,12 @@
 
 package ucar.unidata.data.storm;
 
-
-import java.util.*;
+import visad.*;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -143,7 +147,7 @@ public class StormTrackCollection {
                 Iterator its = tracks.iterator();
                 while (its.hasNext()) {
                     StormTrack track = (StormTrack) its.next();
-                    Date  st    = track.getTrackStartTime();
+                    DateTime  st    = track.getTrackStartTime();
                     startTimes.add(st);
                 }
                 if (startTimes.size() > 0) {

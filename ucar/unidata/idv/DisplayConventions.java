@@ -85,10 +85,10 @@ public class DisplayConventions extends IdvManager {
     private DecimalFormat angleFormat = new DecimalFormat(DEFAULT_FORMAT);
 
     /** We keep this around so we can cycle through the colors */
-    private int nextColor = 0;
+    private static int nextColor = 0;
 
     /** The array of colors we cycle through */
-    private Color[] colors = {
+    private static Color[] colors = {
         Color.red, Color.cyan, Color.magenta, Color.green, Color.orange,
         Color.yellow
     };
@@ -642,7 +642,7 @@ public class DisplayConventions extends IdvManager {
      *
      * @return The next color in the list
      */
-    public Color getColor() {
+    public static Color getColor() {
         if (nextColor >= colors.length) {
             nextColor = 0;
         }

@@ -1393,12 +1393,18 @@ public class ColorTableDefaults {
      * @return the color table this color
      */
     public static final float[][] allOneColor(Color color) {
+        return allOneColor(color, false);
+    }
+
+    public static final float[][] allOneColor(Color color, boolean addAlpha) {
         int       len   = 5;
-        float[][] table = new float[3][len];
+        float[][] table = new float[(addAlpha?4:3)][len];
         for (int m = 0; m < len; m++) {
             table[0][m] = color.getRed() / 255.f;    // Red amount  
             table[1][m] = color.getGreen() / 255.f;  // Green
             table[2][m] = color.getBlue() / 255.f;   // Blue  
+            if(addAlpha) 
+                table[3][m] = 1.0f;
         }
         return table;
     }

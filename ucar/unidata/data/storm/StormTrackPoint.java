@@ -1,9 +1,9 @@
 package ucar.unidata.data.storm;
 
+import visad.*;
 import visad.georef.EarthLocation;
 
 import java.util.List;
-import java.util.Date;
 import java.util.ArrayList;
 
 /**
@@ -21,27 +21,27 @@ public class StormTrackPoint {
     private StormInfo stormInfo;
 
     /** _more_ */
-    private EarthLocation trackPintLocation;
+    private EarthLocation trackPointLocation;
 
     /** _more_ */
-    private Date trackPointTime;
+    private DateTime trackPointTime;
 
     /** _more_ */
     private List attributes;
 
 
 
-    public StormTrackPoint(StormInfo stormInfo, EarthLocation  pointLocation, Date time,
+    public StormTrackPoint(StormInfo stormInfo, EarthLocation  pointLocation, DateTime time,
                  List attrs) {
 
         this.stormInfo   = stormInfo;
 
-        this.trackPintLocation = pointLocation;
+        this.trackPointLocation = pointLocation;
         this.trackPointTime  = time;
         this.attributes = new ArrayList(attrs);
 
         this.trackPointId = stormInfo.toString() + "_" + pointLocation.toString() + "_"
-                       + time.getTime();
+                       + time.getValue();
     }
 
     /**
@@ -94,7 +94,7 @@ public class StormTrackPoint {
     }
 
 
-    public void setTrackPointTime(Date time) {
+    public void setTrackPointTime(DateTime time) {
         this.trackPointTime = time;
     }
 
@@ -103,7 +103,7 @@ public class StormTrackPoint {
      *
      * @return _more_
      */
-    public Date getTrackPointTime() {
+    public DateTime getTrackPointTime() {
 
         return  trackPointTime;
     }
@@ -114,7 +114,7 @@ public class StormTrackPoint {
      * @param point _more_
      */
     public void setTrackPointLocation( EarthLocation point) {
-        this.trackPintLocation = point;
+        this.trackPointLocation = point;
     }
 
     /**
@@ -123,7 +123,7 @@ public class StormTrackPoint {
      * @return _more_
      */
     public EarthLocation getTrackPointLocation() {
-        return trackPintLocation;
+        return trackPointLocation;
     }
 
 
@@ -147,8 +147,11 @@ public class StormTrackPoint {
 
 
     public String toString() {
-        return trackPointId;
+        return trackPointLocation+"";
+        //trackPointId;
+
     }
+
 
 
     /**

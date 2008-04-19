@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -31,10 +30,11 @@ import ucar.unidata.data.storm.*;
 
 import ucar.visad.display.*;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
-
+import visad.*;
 
 
 /**
@@ -54,9 +54,19 @@ public class WayDisplayState {
     /** _more_          */
     List<Displayable> displayables = new ArrayList<Displayable>();
 
+
+
+    private List<StormTrack> tracks = new ArrayList<StormTrack>();
+    private List<FieldImpl> fields = new ArrayList<FieldImpl>();
+    private List<DateTime> times = new ArrayList<DateTime>();
+
+    private Color color;
+
     public WayDisplayState() {
     }
 
+
+    
 
     /**
      * _more_
@@ -67,6 +77,23 @@ public class WayDisplayState {
         this.way = way;
     }
 
+    public void addTrack(StormTrack track, FieldImpl field) {
+        tracks.add(track);
+        times.add(track.getTrackStartTime());
+        fields.add(field);
+    }
+
+
+    public List getFields() {
+        return fields;
+    }
+    public List<StormTrack> getTracks() {
+        return tracks;
+    }
+
+    public List<DateTime> getTimes() {
+        return times;
+    }
 
     /**
      * _more_
@@ -117,6 +144,24 @@ public class WayDisplayState {
     public boolean getVisible() {
         return visible;
     }
+
+/**
+Set the Color property.
+
+@param value The new value for Color
+**/
+public void setColor (Color value) {
+	color = value;
+}
+
+/**
+Get the Color property.
+
+@return The Color
+**/
+public Color getColor () {
+	return color;
+}
 
 
 

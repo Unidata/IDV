@@ -161,8 +161,7 @@ public class TrackControl extends GridDisplayControl {
     /** selector point */
     private StationModelDisplayable indicator = null;
 
-    /** time holder */
-    private DisplayableData timesHolder = null;
+
 
     /** text field for marker text */
     private JTextField markerTextField;

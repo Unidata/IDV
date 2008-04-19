@@ -64,6 +64,8 @@ public class STIStormDataSource extends StormDataSource {
 
     // params for the table
 
+    GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+
     /** _more_ */
     private String tableName = "TYPHOON";
 
@@ -225,16 +227,13 @@ public class STIStormDataSource extends StormDataSource {
     public StormTrackCollection getTrackCollection(StormInfo stormInfo)
             throws Exception {
         StormTrackCollection trackCollection =   new StormTrackCollection();
-        List     forecastWays = getForecastWays(stormInfo);
-
-        Iterator itr          = forecastWays.iterator();
-        while (itr.hasNext()) {
-            Way  forecastWay    = (Way) itr.next();
+        List<Way>    forecastWays = getForecastWays(stormInfo);
+        for(Way forecastWay: forecastWays) {
+            //            if(!forecastWay.getId().equals("SHTM")) continue;
             List forecastTracks = getForecastTracks(stormInfo, forecastWay);
             if (forecastTracks.size() > 0) {
                 trackCollection.addTrackList(forecastTracks);
             }
-
         }
 
         StormTrack obsTrack = getObservationTrack(stormInfo,
@@ -263,7 +262,7 @@ public class STIStormDataSource extends StormDataSource {
         List startDates = getForecastTrackStartDates(stormInfo, forecastWay);
         int  nstarts    = startDates.size();
         for (int i = 0; i < nstarts; i++) {
-            Date  dt = (Date) startDates.get(i);
+            DateTime  dt = (DateTime) startDates.get(i);
             StormTrack tk = getForecastTracks(stormInfo, dt, forecastWay);
             if (tk != null) {
                 int pn = tk.getTrackPoints().size();
@@ -290,17 +289,17 @@ public class STIStormDataSource extends StormDataSource {
      * @throws Exception _more_
      */
 
-    private StormTrack getForecastTracks(StormInfo stormInfo, Date sTime,
+    private StormTrack getForecastTracks(StormInfo stormInfo, DateTime sTime,
                                       Way forecastWay)
             throws Exception {
 
-        String columns = sIdColumn + "," + yearColumn + "," + monthColumn
-                         + "," + dayColumn + "," + hourColumn + ","
-                         + fhourColumn + "," + latitudeColumn + ","
-                         + longitudeColumn + "," + windSpdColumn + ","
-                         + pressureColumn+ "," + radiusMGColumn + ","
-                         + radiusWGColumn + "," + moveDirColumn + ","
-                         + moveSpdColumn + "," + wayColumn;
+        String columns = SqlUtil.comma(new String[]{yearColumn, monthColumn,
+                                                    dayColumn, hourColumn, fhourColumn,
+                                                    latitudeColumn, longitudeColumn, 
+                                                    windSpdColumn,
+                                                    pressureColumn, radiusMGColumn,
+                                                    radiusWGColumn, moveDirColumn,
+                                                    moveSpdColumn});
 
 
         //SimpleDateFormat sdf = new SimpleDateFormat();
@@ -314,8 +313,7 @@ public class STIStormDataSource extends StormDataSource {
                                  SqlUtil.quote(forecastWay.getId())));
 
         //Date s = sdf.parse(sTime.toString());
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(sTime);
+        cal.setTime(new Date((long)(sTime.getValue(CommonUnit.secondsSinceTheEpoch)*1000)));
         int yy = cal.get(Calendar.YEAR);
         int mm = cal.get(Calendar.MONTH) + 1;
         int dd = cal.get(Calendar.DAY_OF_MONTH);
@@ -332,29 +330,25 @@ public class STIStormDataSource extends StormDataSource {
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
 
-        //
-
         List<StormTrackPoint>    pts   = new ArrayList();
         List<Attribute>          attrs;
         SimpleDateFormat sdf   = new SimpleDateFormat();
         //sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         sdf.applyPattern("yyyy/MM/dd HH");
+        Real altReal = new Real(RealType.Altitude, 0);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 //                System.err.println ("row " + cnt);
                 attrs = new ArrayList();
                 int col = 1;
-                col++;  //sIdColumn
                 int    year      = results.getInt(col++);
                 int    month     = results.getInt(col++);
                 int    day       = results.getInt(col++);
                 int    hour      = results.getInt(col++);
                 int    fhour     = results.getInt(col++);
 
-
                 double latitude  = results.getDouble(col++);
                 double longitude = results.getDouble(col++);
-                double altitude  = 0.0;
                 double windSpd  = results.getDouble(col++);
                 attrs.add( new Attribute("MaxWindSpeed", windSpd));
                 double pressure = results.getDouble(col++);
@@ -371,17 +365,19 @@ public class STIStormDataSource extends StormDataSource {
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
-                                   new Real(RealType.Altitude, altitude));
+                                          altReal);
                 int h = hour + fhour;
                 Date fdate = sdf.parse(year + "/" + month + "/" + day + " "
                                        + h);
 
-                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, fdate, attrs);
+                DateTime dttm = new DateTime(fdate);
+                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, dttm, attrs);
                 pts.add(stp);
 
             }
 
         }
+
         if (pts.size() > 0) {
             return new StormTrack(stormInfo, forecastWay, pts);
         } else {
@@ -417,9 +413,8 @@ public class STIStormDataSource extends StormDataSource {
     protected List getForecastTrackStartDates(StormInfo stormInfo, Way way)
             throws Exception {
 
-        String columns = sIdColumn + "," + yearColumn + "," + monthColumn
-                         + "," + dayColumn + "," + hourColumn + ","
-                         + fhourColumn + "," + wayColumn;
+        String columns = SqlUtil.comma(new String[]{yearColumn,  monthColumn,  
+                                                    dayColumn,  hourColumn});
 
         List whereList = new ArrayList();
         whereList.add(SqlUtil.eq(sIdColumn,
@@ -435,29 +430,23 @@ public class STIStormDataSource extends StormDataSource {
         ResultSet        results;
         List             startDates = new ArrayList();
 
-        //
-        int              cnt = 0;
+
         SimpleDateFormat sdf = new SimpleDateFormat();
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         sdf.applyPattern("yyyy/MM/dd HH");
 
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                //                System.err.println ("row " + cnt);
-                cnt++;
                 int col = 1;
-                col++;
                 int year  = results.getInt(col++);
                 int month = results.getInt(col++);
                 int day   = results.getInt(col++);
                 int hour  = results.getInt(col++);
-
+                
                 Date date = sdf.parse(year + "/" + month + "/" + day + " "
                                       + hour);
-
-                //DateTime dttm          = new DateTime(date);
-
-                startDates.add(date);
+                DateTime dttm          = new DateTime(date);
+                startDates.add(dttm);
             }
         }
         return startDates;
@@ -476,24 +465,24 @@ public class STIStormDataSource extends StormDataSource {
      */
     protected StormTrack getObservationTrack(StormInfo stormInfo, Way wy)
             throws Exception {
-
-        String columns = sIdColumn + "," + yearColumn + "," + monthColumn
-                         + "," + dayColumn + "," + hourColumn + ","
-                         + fhourColumn + "," + latitudeColumn + ","
-                         + longitudeColumn + "," + windSpdColumn + ","
-                         + pressureColumn+ "," + radiusMGColumn + ","
-                         + radiusWGColumn + "," + moveDirColumn + ","
-                         + moveSpdColumn + "," + wayColumn;
+        String columns = SqlUtil.comma(new String[]{yearColumn, monthColumn,
+                                                    dayColumn, hourColumn, 
+                                                    latitudeColumn,  longitudeColumn, 
+                                                    windSpdColumn, 
+                                                    pressureColumn , radiusMGColumn, 
+                                                    radiusWGColumn, moveDirColumn, 
+                                                    moveSpdColumn,  wayColumn});
 
         List whereList = new ArrayList();
 
         whereList.add(SqlUtil.eq(sIdColumn,
                                  SqlUtil.quote(stormInfo.getStormId())));
         whereList.add(SqlUtil.eq(fhourColumn, "0"));
-        whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(wy.getId())));
+        //        whereList.add(SqlUtil.eq(wayColumn, SqlUtil.quote(wy.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(tableName),
-                                          SqlUtil.makeAnd(whereList));
+                                         SqlUtil.makeAnd(whereList));
+        query = query + " order by  " + SqlUtil.comma(new String[]{yearColumn, monthColumn,dayColumn,hourColumn});
         //        System.err.println (query);
         Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
@@ -507,7 +496,9 @@ public class STIStormDataSource extends StormDataSource {
         sdf.applyPattern("yyyy/MM/dd HH");
         List<StormTrackPoint> obsPts = new ArrayList();
 
+        Hashtable seenDate = new Hashtable();
 
+        Real altReal = new Real(RealType.Altitude, 0);
         while ((results = iter.next()) != null) {
 
             while (results.next()) {
@@ -515,16 +506,12 @@ public class STIStormDataSource extends StormDataSource {
                 List<Attribute> attrs = new ArrayList();
                 cnt++;
                 int col = 1;
-                col++;
                 int year  = results.getInt(col++);
                 int month = results.getInt(col++);
                 int day   = results.getInt(col++);
                 int hour  = results.getInt(col++);
-                col++;  //fhour
-
                 double latitude  = results.getDouble(col++);
                 double longitude = results.getDouble(col++);
-                double altitude  = 0.0;
                 double windSpd  = results.getDouble(col++);
                 attrs.add( new Attribute("MaxWindSpeed", windSpd));
                 double pressure = results.getDouble(col++);
@@ -541,16 +528,15 @@ public class STIStormDataSource extends StormDataSource {
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
-                                   new Real(RealType.Altitude, altitude));
-
+                                          altReal);
 
                 Date date = sdf.parse(year + "/" + month + "/" + day + " "
                                       + hour);
-                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, attrs);
-                //DateTime dttm          = new DateTime(date);
-
+                if(seenDate.get(date)!=null) continue;
+                seenDate.put(date,date);
+                DateTime dttm          = new DateTime(date);
+                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, dttm, attrs);
                 obsPts.add(stp);
-
             }
         }
         //Date dts = getStartTime(obsDts);
@@ -701,9 +687,9 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected List getForecastWays(StormInfo stormInfo) throws Exception {
+    protected List<Way> getForecastWays(StormInfo stormInfo) throws Exception {
 
-        String columns   = "DISTINCT" + " " + sIdColumn + "," + wayColumn;
+        String columns   = SqlUtil.distinct(wayColumn);
 
         List   whereList = new ArrayList();
         whereList.add(SqlUtil.eq(sIdColumn,
@@ -715,7 +701,7 @@ public class STIStormDataSource extends StormDataSource {
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
 
-        List             forecastWays = new ArrayList();
+        List<Way>     forecastWays = new ArrayList<Way>();
 
         //TODO: How do we handle no data???
         int cnt = 0;
@@ -724,15 +710,13 @@ public class STIStormDataSource extends StormDataSource {
             while (results.next()) {
                 //                System.err.println ("row " + cnt);
                 cnt++;
-                int col = 1;
-                col++;
-                String id  = results.getString(col++);
+                String id  = results.getString(1);
                 Way    way = new Way(id);
                 forecastWays.add(way);
-
             }
         }
 
+        System.err.println ("ways:" + forecastWays);
         return forecastWays;
 
     }

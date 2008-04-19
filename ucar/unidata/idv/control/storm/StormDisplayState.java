@@ -25,11 +25,13 @@
 package ucar.unidata.idv.control.storm;
 
 
+import  ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.storm.*;
 
 import ucar.unidata.idv.ControlContext;
+import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.ui.TreePanel;
@@ -154,10 +156,15 @@ public class StormDisplayState {
     /** _more_ */
     private TrackDisplayable obsTrackDisplay;
 
+
+    /** time holder */
+    private DisplayableData timesHolder = null;
+
     /** _more_          */
     private JComponent contents;
 
 
+    
     private Hashtable<Way,WayDisplayState> wayDisplayStateMap = new Hashtable<Way,WayDisplayState>();
 
 
@@ -188,10 +195,17 @@ public class StormDisplayState {
         return contents;
     }
 
+    private List<WayDisplayState> getWayDisplayStates() {
+        return  (List<WayDisplayState>)Misc.toList(wayDisplayStateMap.elements());
+    }
+
     private WayDisplayState getWayDisplayState(Way way) {
         WayDisplayState wayState = wayDisplayStateMap.get(way);
         if(wayState == null) {
             wayDisplayStateMap.put(way,wayState = new WayDisplayState(way));
+        }
+        if(wayState.getColor() == null) {
+            wayState.setColor(DisplayConventions.getColor());
         }
         return wayState;
     }
@@ -290,9 +304,11 @@ new BorderLayout()) {
                     }
                 }
             });
-            wayCbxs.add(wayCbx);
+            JComponent swatch  =GuiUtils.filler(10,10);
+            swatch.setBackground(wayDisplayState.getColor());
+            wayCbxs.add(GuiUtils.left(GuiUtils.hbox(GuiUtils.wrap(swatch),wayCbx)));
         }
-        JComponent wayComp = GuiUtils.hbox(wayCbxs);
+        JComponent wayComp = GuiUtils.vbox(wayCbxs);
         JComponent inner = GuiUtils.topCenter(top,
                                GuiUtils.inset(GuiUtils.top(wayComp), 5));
 
@@ -364,13 +380,18 @@ new BorderLayout()) {
 
         //Make the displayables if needed
         if (obsTrackDisplay == null) {
-
             obsTrackDisplay = new TrackDisplayable("track_"
                     + stormInfo.getStormId());
             obsTrackDisplay.setLineWidth(3);
             stormTrackControl.addDisplayable(obsTrackDisplay);
             StormTrack obsTrack = trackCollection.getObsTrack();
             obsTrackDisplay.setTrack(makeField(obsTrack, false));
+            timesHolder = new LineDrawing("track_time" +  stormInfo.getStormId());
+            timesHolder.setManipulable(false);
+            timesHolder.setVisible(false);
+            List times    = obsTrack.getTrackTimes();
+            timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
+            stormTrackControl.addDisplayable(timesHolder);
         }
 
 
@@ -387,30 +408,58 @@ new BorderLayout()) {
         if (forecastHolder == null) {
             forecastHolder = new CompositeDisplayable();
             stormTrackControl.addDisplayable(forecastHolder);
-            ColorTable ct =
-                stormTrackControl.getControlContext().getColorTableManager()
-                    .getColorTable("Red");
+            //            ColorTable ct =
+            //                stormTrackControl.getControlContext().getColorTableManager()
+            //                .getColorTable("Red");
 
-            float[][] colors =
-                stormTrackControl.getColorTableForDisplayable(ct);
+
+
+
+            forecastHolder.setVisible(true);
             for (StormTrack track : tracks) {
                 if (track.isObservation()) {
                     continue;
                 }
+                //                if (!(track.getWay().getId().equals("SHTM") ||
+                //                      track.getWay().getId().equals("jawt"))) 
+                //continue;
                 WayDisplayState wayDisplayState = getWayDisplayState(track.getWay());
-                TrackDisplayable trackDisplay = new TrackDisplayable("track "
-                                                    + track.getTrackId());
+                FieldImpl field = makeField(track, true);
+                wayDisplayState.addTrack(track,  field);
 
+                //                TrackDisplayable trackDisplay = new TrackDisplayable("track ");
+                //                trackDisplay.setTrack(field);
+                //                forecastHolder.addDisplayable(trackDisplay);
+            }
+
+            List<WayDisplayState> wayDisplayStates  = getWayDisplayStates();
+            for(WayDisplayState wayDisplayState: wayDisplayStates) {
+                List fields = wayDisplayState.getFields();
+                //                if (!(wayDisplayState.getWay().getId().equals("SHTM"))) continue;
+                //                System.err.println (wayDisplayState.getWay() +" fields=" +fields.size());
+                if(fields.size() == 0) continue;
+                TrackDisplayable trackDisplay = new TrackDisplayable("track ");
+                trackDisplay.setColorPalette(getColor(wayDisplayState.getColor()));
+                trackDisplay.setUseTimesInAnimation(false);
                 wayDisplayState.addDisplayable(trackDisplay);
                 if(!wayDisplayState.getVisible()) {
                     trackDisplay.setVisible(false);
                 }
                 forecastHolder.addDisplayable(trackDisplay);
-                trackDisplay.setTrack(makeField(track, true));
+                FieldImpl timeField = ucar.visad.Util.makeTimeField(fields,wayDisplayState.getTimes());
+                trackDisplay.setTrack(timeField);
             }
         }
 
-        forecastHolder.setVisible(true);
+    }
+
+
+        //        ucar.visad.Util.makeTimeField(List<Data> ranges, List times)
+
+
+    private float[][]getColor(Color c) {
+        if(c==null) c = Color.red;
+        return ColorTableDefaults.allOneColor(c,true);
     }
 
 
@@ -432,9 +481,11 @@ new BorderLayout()) {
 
         List                times    = track.getTrackTimes();
         List<StormTrackPoint> locs     = track.getTrackPoints();
+        int        numPoints       = times.size();
+        //        System.err.println ("times:" + times);
+        //        System.err.println ("locs:" + locs);
 
-
-        Unit                timeUnit = CommonUnit.secondsSinceTheEpoch;
+        Unit                timeUnit = ((DateTime)times.get(0)).getUnit();
 
         RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
         Real                dfltReal = new Real(dfltRealType, 1);
@@ -445,22 +496,21 @@ new BorderLayout()) {
         RealTupleType rangeType =
             new RealTupleType(RealType.getRealType("trackrange_" + cnt,
                 dfltReal.getUnit()), timeType);
-        double[][] newRangeVals = new double[2][times.size()];
-        int        numObs       = times.size();
-        float[]    lats         = new float[numObs];
-        float[]    lons         = new float[numObs];
+        double[][] newRangeVals = new double[2][numPoints];
+        float[]    lats         = new float[numPoints];
+        float[]    lons         = new float[numPoints];
         //        System.err.println("points:" + times + "\n" + locs);
-        for (int i = 0; i < numObs; i++) {
-            Date          dateTime = (Date) times.get(i);
+        for (int i = 0; i < numPoints; i++) {
+            DateTime      dateTime = (DateTime) times.get(i);
             Real          value    = (fixedValue
                                       ? dfltReal
                                       : new Real(dfltRealType, i));
             EarthLocation el       = locs.get(i).getTrackPointLocation();
             newRangeVals[0][i] = value.getValue();
-            newRangeVals[1][i] = dateTime.getTime() / 1000;
+            newRangeVals[1][i] = dateTime.getValue();
             lats[i]            = (float) el.getLatitude().getValue();
             lons[i]            = (float) el.getLongitude().getValue();
-            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
+            //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
         }
         GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
                                 null);
@@ -476,7 +526,6 @@ new BorderLayout()) {
                                             new Unit[] { dfltReal.getUnit(),
                 timeUnit });
         timeTrack.setSamples(newRangeVals, false);
-
         return timeTrack;
     }
 

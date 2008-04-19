@@ -24,10 +24,10 @@
 package ucar.unidata.data.storm;
 
 
+import visad.*;
 import visad.georef.EarthLocation;
-
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
 
 
@@ -52,9 +52,9 @@ public class StormTrack {
     /** _more_ */
     private List<StormTrackPoint> trackPoints;
 
-
-
     //private Date trackStartTime;
+
+
 
     /**
      * _more_
@@ -69,9 +69,9 @@ public class StormTrack {
         this.way         = way;
         this.trackPoints = new ArrayList(pts);
         StormTrackPoint firstPoint = (StormTrackPoint)pts.get(0);
-        Date trackStartTime = firstPoint.getTrackPointTime();
+        DateTime trackStartTime = firstPoint.getTrackPointTime();
         this.trackId = stormInfo.toString() + "_" + way + "_"
-                       + trackStartTime.getTime();
+                       + trackStartTime.getValue();
     }
 
 
@@ -114,7 +114,7 @@ public class StormTrack {
      *
      * @return _more_
      */
-    public Date getTrackStartTime() {
+    public DateTime getTrackStartTime() {
         StormTrackPoint firstPoint = trackPoints.get(0);
         return firstPoint.getTrackPointTime();
 
@@ -179,8 +179,8 @@ public class StormTrack {
      *
      * @return _more_
      */
-    public List getTrackTimes() {
-        List<Date> trackTimes = new ArrayList();
+    public List<DateTime> getTrackTimes() {
+        List<DateTime> trackTimes = new ArrayList();
         for(StormTrackPoint stp: trackPoints){
             trackTimes.add(stp.getTrackPointTime());
         }
