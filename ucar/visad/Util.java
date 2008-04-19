@@ -2919,6 +2919,32 @@ public final class Util {
 
 
 
+    public static FieldImpl makeTimeField(List ranges, List times)
+            throws VisADException, RemoteException {
+        FieldImpl fi      = null;
+        Set       timeSet = makeTimeSet(times);
+        for (int i = 0; i < times.size(); i++) {
+            Data range = (Data)ranges.get(i);
+            if (fi == null) {
+                DateTime dttm;
+                Object obj = times.get(i);
+                if(obj instanceof DateTime) {
+                    dttm = (DateTime)  obj;
+                } else if(obj instanceof Date) {
+                    dttm = new DateTime((Date)obj);
+                } else {
+                    throw new IllegalArgumentException("Unknown date type:" + obj);
+                }
+                fi = new FieldImpl(new FunctionType(dttm.getType(),
+                        range.getType()), timeSet);
+            }
+            fi.setSample(i, range, false, false);
+        }
+        return fi;
+    }
+
+
+
 
 
     /**
