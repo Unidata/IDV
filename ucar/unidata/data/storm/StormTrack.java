@@ -23,6 +23,8 @@
 
 package ucar.unidata.data.storm;
 
+import ucar.unidata.data.*;
+
 
 import visad.*;
 import visad.georef.EarthLocation;
@@ -49,11 +51,24 @@ public class StormTrack {
     /** _more_ */
     private Way way;
 
+
+    private NamedArray lats;
+    private NamedArray lons;
+    private List<DateTime> times;
+
     /** _more_ */
     private List<StormTrackPoint> trackPoints;
 
     //private Date trackStartTime;
 
+
+    public StormTrack(StormInfo stormInfo, Way way, NamedArray lats, NamedArray lons, List<DateTime> times) {
+        this.stormInfo   = stormInfo;
+        this.way         = way;
+        this.lats = lats;
+        this.lons = lons;
+        this.times = times;
+    }
 
 
     /**
@@ -210,5 +225,64 @@ public class StormTrack {
         StormTrack other = (StormTrack) o;
         return ((trackId.equals(other.trackId)));
     }
+
+
+
+/**
+Set the Lats property.
+
+@param value The new value for Lats
+**/
+public void setLats (NamedArray value) {
+	lats = value;
+}
+
+/**
+Get the Lats property.
+
+@return The Lats
+**/
+public NamedArray getLats () {
+	return lats;
+}
+
+/**
+Set the Lons property.
+
+@param value The new value for Lons
+**/
+public void setLons (NamedArray value) {
+	lons = value;
+}
+
+/**
+Get the Lons property.
+
+@return The Lons
+**/
+public NamedArray getLons () {
+	return lons;
+}
+
+/**
+Set the Times property.
+
+@param value The new value for Times
+**/
+public void setTimes (List<DateTime> value) {
+	times = value;
+}
+
+/**
+Get the Times property.
+
+@return The Times
+**/
+public List<DateTime> getTimes () {
+	return times;
+}
+
+
+
 }
 

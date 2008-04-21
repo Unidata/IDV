@@ -23,8 +23,8 @@
 
 package ucar.unidata.data.storm;
 
+import visad.*;
 
-import java.util.Date;
 
 
 /**
@@ -40,7 +40,7 @@ public class StormInfo {
     private String stormID;
 
     /** _more_ */
-    private Date startTime;
+    private DateTime startTime;
 
     /**
      * _more_
@@ -53,7 +53,7 @@ public class StormInfo {
      * @param id _more_
      * @param sTime _more_
      */
-    public StormInfo(String id, Date sTime) {
+    public StormInfo(String id, DateTime sTime) {
         this.stormID   = id;
         this.startTime = sTime;
     }
@@ -81,7 +81,7 @@ public class StormInfo {
      *
      * @param dt _more_
      */
-    public void setStartTime(Date dt) {
+    public void setStartTime(DateTime dt) {
         this.startTime = dt;
     }
 
@@ -90,7 +90,7 @@ public class StormInfo {
      *
      * @return _more_
      */
-    public Date getStartTime() {
+    public DateTime getStartTime() {
         return startTime;
     }
 
