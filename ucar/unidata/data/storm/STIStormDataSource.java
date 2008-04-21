@@ -333,7 +333,9 @@ public class STIStormDataSource extends StormDataSource {
                 int    fhour     = results.getInt(col++);
 
                 double latitude  = results.getDouble(col++);
+                if (latitude == 9999 || latitude == 999) latitude = Float.NaN;
                 double longitude = results.getDouble(col++);
+                if(longitude == 9999 || longitude == 999) longitude = Float.NaN;
                 double windSpd  = results.getDouble(col++);
                 attrs.add( new Attribute("MaxWindSpeed", windSpd));
                 double pressure = results.getDouble(col++);
