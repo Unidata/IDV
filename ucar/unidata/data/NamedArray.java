@@ -45,7 +45,59 @@ public class NamedArray {
         this.values = values;
     }
 
+    /**
+       Set the Name property.
 
+       @param value The new value for Name
+    **/
+    public void setName (String value) {
+	name = value;
+    }
+
+    /**
+       Get the Name property.
+
+       @return The Name
+    **/
+    public String getName () {
+	return name;
+    }
+
+    /**
+       Set the Unit property.
+
+       @param value The new value for Unit
+    **/
+    public void setUnit (Unit value) {
+	unit = value;
+    }
+
+    /**
+       Get the Unit property.
+
+       @return The Unit
+    **/
+    public Unit getUnit () {
+	return unit;
+    }
+
+    /**
+       Set the Values property.
+
+       @param value The new value for Values
+    **/
+    public void setValues (float[] value) {
+	values = value;
+    }
+
+    /**
+       Get the Values property.
+
+       @return The Values
+    **/
+    public float[] getValues () {
+	return values;
+    }
 
 
 
