@@ -276,7 +276,7 @@ public class StormTrackControl extends DisplayControlImpl {
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
         for (StormInfo stormInfo : stormInfos) {
-            cal.setTime(stormInfo.getStartTime());
+            cal.setTime(ucar.visad.Util.makeDate(stormInfo.getStartTime()));
             int year = cal.get(Calendar.YEAR);
             StormDisplayState stormDisplayState =
                 getStormDisplayState(stormInfo);

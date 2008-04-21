@@ -450,7 +450,6 @@ new BorderLayout()) {
                 trackDisplay.setTrack(timeField);
             }
         }
-
     }
 
 
