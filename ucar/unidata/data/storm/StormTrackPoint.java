@@ -30,19 +30,45 @@ public class StormTrackPoint {
     private List attributes;
 
 
+    private int forecastHour = 0;
+
 
     public StormTrackPoint(StormInfo stormInfo, EarthLocation  pointLocation, DateTime time,
+                           int forecastHour,
                  List attrs) {
 
         this.stormInfo   = stormInfo;
 
         this.trackPointLocation = pointLocation;
         this.trackPointTime  = time;
+        this.forecastHour = forecastHour;
         this.attributes = new ArrayList(attrs);
 
         this.trackPointId = stormInfo.toString() + "_" + pointLocation.toString() + "_"
                        + time.getValue();
     }
+
+    /**
+       Set the ForecastHour property.
+
+       @param value The new value for ForecastHour
+    **/
+    public void setForecastHour (int value) {
+	forecastHour = value;
+    }
+
+    /**
+       Get the ForecastHour property.
+
+       @return The ForecastHour
+    **/
+    public int getForecastHour () {
+	return forecastHour;
+    }
+
+
+
+
 
     /**
      * _more_

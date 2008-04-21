@@ -354,7 +354,7 @@ public class STIStormDataSource extends StormDataSource {
                         latitude), new Real(RealType.Longitude, longitude),
                                           altReal);
                 DateTime dttm = getDateTime(year, month, day, hour+fhour);
-                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, dttm, attrs);
+                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, dttm, fhour, attrs);
                 pts.add(stp);
             }
         }
@@ -596,7 +596,7 @@ public class STIStormDataSource extends StormDataSource {
                 }
                 //                                seenDate.put(date,date);
                 seenDate.put(date,key);
-                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, attrs);
+                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, 0,attrs);
                 obsPts.add(stp);
             }
         }
