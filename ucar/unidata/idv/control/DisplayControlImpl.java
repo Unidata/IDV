@@ -6004,7 +6004,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    Problem in VisAD
      */
-    protected void removeDisplayable(Displayable displayable)
+    public void removeDisplayable(Displayable displayable)
             throws RemoteException, VisADException {
         DisplayInfo info = findDisplayInfo(displayable);
         if (info != null) {

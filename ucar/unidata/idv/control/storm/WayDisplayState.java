@@ -29,10 +29,16 @@ import ucar.unidata.data.storm.*;
 
 
 import ucar.visad.display.*;
+import ucar.unidata.util.LogUtil;
 
 import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 import visad.*;
 
@@ -45,6 +51,11 @@ import visad.*;
 
 public class WayDisplayState {
 
+    private StormDisplayState stormDisplayState;
+
+    private JCheckBox visibilityCbx;
+
+
     /** _more_          */
     private Way way;
 
@@ -53,9 +64,6 @@ public class WayDisplayState {
 
     /** _more_          */
     List<Displayable> displayables = new ArrayList<Displayable>();
-
-
-
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
     private List<FieldImpl> fields = new ArrayList<FieldImpl>();
     private List<DateTime> times = new ArrayList<DateTime>();
@@ -66,16 +74,45 @@ public class WayDisplayState {
     }
 
 
-    
 
     /**
      * _more_
      *
      * @param way _more_
      */
-    public WayDisplayState(Way way) {
+    public WayDisplayState(StormDisplayState stormDisplayState, Way way) {
+        this.stormDisplayState = stormDisplayState;
         this.way = way;
     }
+
+    public void deactivate() {
+        displayables = new ArrayList<Displayable>();
+        tracks = new ArrayList<StormTrack>();
+        fields = new ArrayList<FieldImpl>();
+        times = new ArrayList<DateTime>();
+    }
+    
+
+
+
+    public JCheckBox getVisiblityCheckBox() {
+        if(visibilityCbx==null) {
+            visibilityCbx = new JCheckBox((way.isObservation()?"Show Observation Track":way.toString()), getVisible());
+            visibilityCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        setVisible(visibilityCbx.isSelected());
+                    } catch(Exception exc) {
+                        LogUtil.logException("Toggling way visibility", exc);
+                    }
+                }
+            });
+
+
+        }
+        return visibilityCbx;
+    }
+
 
     public void addTrack(StormTrack track, FieldImpl field) {
         tracks.add(track);
@@ -100,8 +137,13 @@ public class WayDisplayState {
      *
      * @param displayable _more_
      */
-    public void addDisplayable(Displayable displayable) {
+    public void addDisplayable(Displayable displayable) throws Exception {
         displayables.add(displayable);
+        if(way.isObservation()) {
+            displayable.setVisible(getVisible());
+        } else {
+            displayable.setVisible(getVisible() && stormDisplayState.getForecastVisible());
+        }
     }
 
 
@@ -124,6 +166,7 @@ public class WayDisplayState {
         return way;
     }
 
+
     /**
      * Set the Visible property.
      *
@@ -132,7 +175,11 @@ public class WayDisplayState {
     public void setVisible(boolean value) throws Exception {
         this.visible = value;
         for(Displayable displayable: displayables) {
-            displayable.setVisible(visible);
+            if(way.isObservation()) {
+                displayable.setVisible(getVisible());
+            } else {
+                displayable.setVisible(getVisible() && stormDisplayState.getForecastVisible());
+            }
         }
     }
 
@@ -161,6 +208,25 @@ Get the Color property.
 **/
 public Color getColor () {
 	return color;
+}
+
+
+/**
+Set the StormDisplayState property.
+
+@param value The new value for StormDisplayState
+**/
+public void setStormDisplayState (StormDisplayState value) {
+	stormDisplayState = value;
+}
+
+/**
+Get the StormDisplayState property.
+
+@return The StormDisplayState
+**/
+public StormDisplayState getStormDisplayState () {
+	return stormDisplayState;
 }
 
 
