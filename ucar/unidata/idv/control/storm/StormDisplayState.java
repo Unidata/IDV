@@ -25,6 +25,14 @@
 package ucar.unidata.idv.control.storm;
 
 
+import ucar.unidata.ui.drawing.*;
+import ucar.unidata.ui.symbol.*;
+
+import ucar.visad.*;
+import ucar.visad.display.*;
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObFactory;
+
 import  ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
@@ -157,9 +165,6 @@ public class StormDisplayState {
 
 
     private WayDisplayState obsDisplayState;            
-
-
-
 
 
     /** time holder */
@@ -406,6 +411,24 @@ public class StormDisplayState {
             List times    = obsTrack.getTrackTimes();
             timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
             holder.addDisplayable(timesHolder);
+
+
+            StationModelDisplayable dots  = new StationModelDisplayable("dots");
+            obsDisplayState.addDisplayable(dots);
+            StationModel model = new StationModel("TrackLocation");
+            ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
+            shapeSymbol.setShape(ucar.visad.ShapeUtility.FILLED_CIRCLE);
+            shapeSymbol.setScale(0.8f);
+            shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
+            shapeSymbol.setRectPoint(Glyph.PT_MM);
+            model.addSymbol(shapeSymbol);
+
+            dots.setScale(1.0f);
+            holder.addDisplayable(dots);
+            dots.setStationModel(model);
+            dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
+                                                                           -1,-1));
+
         }
 
 
@@ -431,10 +454,15 @@ public class StormDisplayState {
             }
 
             for(WayDisplayState wayDisplayState: wayDisplayStates) {
+                if (wayDisplayState.getWay().isObservation()) {
+                    continue;
+                }
+
                 List fields = wayDisplayState.getFields();
                 //                if (!(wayDisplayState.getWay().getId().equals("SHTM"))) continue;
                 //                System.err.println (wayDisplayState.getWay() +" fields=" +fields.size());
                 if(fields.size() == 0) continue;
+
                 TrackDisplayable trackDisplay = new TrackDisplayable("track ");
                 trackDisplay.setColorPalette(getColor(wayDisplayState.getColor())); 
                 trackDisplay.setUseTimesInAnimation(false);
@@ -442,6 +470,28 @@ public class StormDisplayState {
                 if(!wayDisplayState.getVisible()) {
                     trackDisplay.setVisible(false);
                 }
+
+                StationModelDisplayable dots  = new StationModelDisplayable("dots");
+                wayDisplayState.addDisplayable(dots);
+                StationModel model = new StationModel("TrackLocation");
+                TextSymbol textSymbol = new TextSymbol("label","the label");
+                textSymbol.setScale(1.5f);
+                textSymbol.setRectPoint(Glyph.PT_UL);
+                textSymbol.bounds = new java.awt.Rectangle(10,0,21,15);
+                model.addSymbol(textSymbol);
+
+                ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
+                shapeSymbol.setScale(0.5f);
+                shapeSymbol.setShape(ucar.visad.ShapeUtility.CIRCLE);
+                shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
+                shapeSymbol.setRectPoint(Glyph.PT_MM);
+                model.addSymbol(shapeSymbol);
+                forecastHolder.addDisplayable(dots);
+                dots.setScale(1.0f);
+                dots.setStationModel(model);
+                dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( wayDisplayState.getPointObs(),
+                                                                               -1,-1));
+
                 forecastHolder.addDisplayable(trackDisplay);
                 FieldImpl timeField = ucar.visad.Util.makeTimeField(fields,wayDisplayState.getTimes());
                 trackDisplay.setTrack(timeField);

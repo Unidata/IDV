@@ -27,6 +27,8 @@ package ucar.unidata.idv.control.storm;
 import ucar.unidata.data.storm.*;
 
 
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObFactory;
 
 import ucar.visad.display.*;
 import ucar.unidata.util.LogUtil;
@@ -67,11 +69,15 @@ public class WayDisplayState {
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
     private List<FieldImpl> fields = new ArrayList<FieldImpl>();
     private List<DateTime> times = new ArrayList<DateTime>();
+    private List<PointOb> pointObs = new ArrayList<PointOb>();
 
     private Color color;
 
     public WayDisplayState() {
     }
+
+
+
 
 
 
@@ -90,8 +96,10 @@ public class WayDisplayState {
         tracks = new ArrayList<StormTrack>();
         fields = new ArrayList<FieldImpl>();
         times = new ArrayList<DateTime>();
+        pointObs = new ArrayList<PointOb>();
     }
     
+
 
 
 
@@ -114,10 +122,42 @@ public class WayDisplayState {
     }
 
 
-    public void addTrack(StormTrack track, FieldImpl field) {
+    public List<PointOb> getPointObs() {
+        return pointObs;
+    }
+
+    private static TextType textType;
+    public void addTrack(StormTrack track, FieldImpl field) throws Exception {
         tracks.add(track);
         times.add(track.getTrackStartTime());
         fields.add(field);
+
+        boolean isObservation = way.isObservation();
+        DateTime startTime = track.getTrackStartTime();
+        List<StormTrackPoint> locs     = track.getTrackPoints();
+        //        return makePointOb(el,dt, new RealTuple(new Real[] { new Real(0) }));
+        if(textType == null) {
+            textType = new TextType("label");
+        }
+
+        for(int i=0;i<locs.size();i++) {
+            StormTrackPoint stp = locs.get(i);
+            DateTime time  =startTime;
+            String label = "";
+            if(isObservation) {
+                time = stp.getTrackPointTime();
+            } else {
+                if(i==0) {
+                    label = way +": "+track.getTrackStartTime();
+                }  else {
+                    label = ""+stp.getForecastHour()+"H";
+                }
+            }
+            Tuple tuple = new Tuple(new Data[]{new visad.Text(textType,label)});
+            pointObs.add(PointObFactory.makePointOb(stp.getTrackPointLocation(), time,tuple));
+        }
+
+
     }
 
 

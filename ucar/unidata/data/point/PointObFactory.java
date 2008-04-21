@@ -1041,11 +1041,16 @@ public class PointObFactory {
      */
     public static PointOb makePointOb(EarthLocation el, DateTime dt)
             throws VisADException, RemoteException {
+        return makePointOb(el,dt, new RealTuple(new Real[] { new Real(0) }));
+    }
+
+
+    public static PointOb makePointOb(EarthLocation el, DateTime dt, Tuple tuple)
+            throws VisADException, RemoteException {
         if (dt == null) {
             dt = new DateTime(Double.NaN);
         }
-        return new PointObTuple(el, dt,
-                                new RealTuple(new Real[] { new Real(0) }));
+        return new PointObTuple(el, dt,tuple);
     }
 
     /**
