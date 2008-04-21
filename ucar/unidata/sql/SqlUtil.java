@@ -1029,6 +1029,57 @@ public class SqlUtil {
     }
 
 
+
+    public static List<float[]> readFloats(Statement stmt, float missing)
+            throws Exception {
+        List<float[]> arrays = new ArrayList<float[]>();
+        int numCols =  -1;
+        int       cnt     = 0;
+        ResultSet results;
+        Iterator  iter = getIterator(stmt);
+        while ((results = iter.next()) != null) {
+            if(numCols == -1) {
+                ResultSetMetaData rsmd = results.getMetaData();
+                numCols = rsmd.getColumnCount();
+                for(int column=0;column<numCols;column++) {
+                    arrays.add(new float[1000]);
+                }
+            }
+            while (results.next()) {
+                for(int column=0;column<numCols;column++) {
+                    float[]current = arrays.get(column);
+                    float value = results.getFloat(column+1);
+                    if (value == missing) {
+                        value = Float.NaN;
+                    }
+                    current[cnt] = value;
+                    if (cnt+1 >= current.length) {
+                        float[] tmp = current;
+                        current = new float[current.length *2];
+                        System.arraycopy(tmp, 0, current, 0, tmp.length);
+                        arrays.set(column, current);
+                    }
+                }
+                cnt++;
+            }
+        }
+
+
+        if (debug) {
+            //            System.err.println ("arrays: " + arrays.size() + " cnt=" + cnt);
+        }
+        for(int column=0;column<numCols;column++) {
+            float[]current = arrays.get(column);
+            float[] actual = new float[cnt];
+            System.arraycopy(current, 0, actual, 0, cnt);
+            arrays.set(column, actual);
+        }
+        return arrays;
+    }
+
+
+
+
     /**
      * _more_
      *
