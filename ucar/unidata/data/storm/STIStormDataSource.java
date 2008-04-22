@@ -236,8 +236,8 @@ public class STIStormDataSource extends StormDataSource {
                 trackCollection.addTrackList(forecastTracks);
             }
         }
-        StormTrack obsTrack = getObservationTrack(stormInfo,
-                                                  (Way) forecastWays.get(0));
+        StormTrack obsTrack = getObservationTrack(stormInfo);
+         //                                         (Way) forecastWays.get(0));
         long t2   = System.currentTimeMillis();
         System.err.println ("time:" + (t2-t1));
         trackCollection.addTrack(obsTrack);
@@ -525,12 +525,45 @@ public class STIStormDataSource extends StormDataSource {
      *
      *
      * @param stormInfo _more_
+     *
+     * @return _more_
+     * @throws Exception _more_
+     */
+    protected StormTrack getObservationTrack(StormInfo stormInfo)
+            throws Exception {
+        List obsPts = null;
+        Way babjWay = new Way("babj");
+        //first get the obs from BABJ
+        List<StormTrackPoint> obsBABJ = getObservationTrack(stormInfo, babjWay);
+
+        DateTime timeMin = obsBABJ.get(0).getTrackPointTime();
+        DateTime timeMax = obsBABJ.get(obsBABJ.size()-1).getTrackPointTime();
+
+        // get list of ways
+        List<Way>  ways = getForecastWays(stormInfo);
+
+        for(Way way: ways ){
+              if(! way.equals(babjWay)){
+                  obsBABJ = getObservationTrack(stormInfo, way, timeMin, timeMax, obsBABJ);
+                  timeMin = obsBABJ.get(0).getTrackPointTime();
+                  timeMax = obsBABJ.get(obsBABJ.size()-1).getTrackPointTime();
+              }
+        }
+
+        return new StormTrack(stormInfo, Way.OBSERVATION, obsBABJ);
+    }
+    /**
+     * _more_
+     *
+     *
+     *
+     * @param stormInfo _more_
      * @param wy _more_
      *
      * @return _more_
      * @throws Exception _more_
      */
-    protected StormTrack getObservationTrack(StormInfo stormInfo, Way wy)
+    protected List<StormTrackPoint> getObservationTrack(StormInfo stormInfo, Way wy)
             throws Exception {
         String columns = SqlUtil.comma(new String[]{COL_YEAR, COL_MONTH,
                                                     COL_DAY, COL_HOUR, 
@@ -545,7 +578,7 @@ public class STIStormDataSource extends StormDataSource {
         whereList.add(SqlUtil.eq(COL_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
         whereList.add(SqlUtil.eq(COL_FHOUR, ZEROHOUR));
-        //        whereList.add(SqlUtil.eq(COL_WAY, SqlUtil.quote(wy.getId())));
+        whereList.add(SqlUtil.eq(COL_WAY, SqlUtil.quote(wy.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                          SqlUtil.makeAnd(whereList));
@@ -556,7 +589,7 @@ public class STIStormDataSource extends StormDataSource {
         ResultSet        results;
 
         List<StormTrackPoint> obsPts = new ArrayList();
-        Hashtable seenDate = new Hashtable();
+        //Hashtable seenDate = new Hashtable();
         Real altReal = new Real(RealType.Altitude, 0);
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -588,21 +621,107 @@ public class STIStormDataSource extends StormDataSource {
 
                 DateTime date = getDateTime(year, month, day, hour);
                 String key = "" + latitude + " " + longitude;
-                if(seenDate.get(date)!=null) {
-                    if(!seenDate.get(date).equals(key)) {
+               // if(seenDate.get(date)!=null) {
+               //     if(!seenDate.get(date).equals(key)) {
                         //                        System.err.println ("seen: " + date + " " + seenDate.get(date) + " != " + key);
-                    }
-                    continue;
-                }
+                //    }
+                //    continue;
+               // }
                 //                                seenDate.put(date,date);
-                seenDate.put(date,key);
+               // seenDate.put(date,key);
                 StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, 0,attrs);
                 obsPts.add(stp);
             }
         }
-        return new StormTrack(stormInfo, Way.OBSERVATION, obsPts);
+
+        return  obsPts;
     }
 
+    protected List<StormTrackPoint> getObservationTrack(StormInfo stormInfo, Way wy, DateTime before, DateTime after, List pts)
+            throws Exception {
+        String columns = SqlUtil.comma(new String[]{COL_YEAR, COL_MONTH,
+                                                    COL_DAY, COL_HOUR,
+                                                    COL_LATITUDE,  COL_LONGITUDE,
+                                                    COL_WINDSPEED,
+                                                    COL_PRESSURE , COL_RADIUSMG,
+                                                    COL_RADIUSWG, COL_MOVEDIR,
+                                                    COL_MOVESPEED,  COL_WAY});
+
+        List whereList = new ArrayList();
+
+        whereList.add(SqlUtil.eq(COL_STORMID,
+                                 SqlUtil.quote(stormInfo.getStormId())));
+        whereList.add(SqlUtil.eq(COL_FHOUR, ZEROHOUR));
+        whereList.add(SqlUtil.eq(COL_WAY, SqlUtil.quote(wy.getId())));
+
+        String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
+                                         SqlUtil.makeAnd(whereList));
+        query = query + " order by  " + SqlUtil.comma(new String[]{COL_YEAR, COL_MONTH,COL_DAY,COL_HOUR});
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet        results;
+
+        List<StormTrackPoint> obsPts = new ArrayList();
+        List<StormTrackPoint> obsPts1 = new ArrayList();
+        List<StormTrackPoint> obsPts2 = new ArrayList();
+        Real altReal = new Real(RealType.Altitude, 0);
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                List<Attribute> attrs = new ArrayList();
+                int col = 1;
+                int year  = results.getInt(col++);
+                int month = results.getInt(col++);
+                int day   = results.getInt(col++);
+                int hour  = results.getInt(col++);
+                double latitude  = results.getDouble(col++);
+                double longitude = results.getDouble(col++);
+                double windSpd  = results.getDouble(col++);
+                attrs.add( new Attribute("MaxWindSpeed", windSpd));
+                double pressure = results.getDouble(col++);
+                attrs.add( new Attribute("MinPressure", pressure));
+                double radiusMG = results.getDouble(col++);
+                attrs.add( new Attribute("RadiusModerateGale", radiusMG));
+                double radiusWG = results.getDouble(col++);
+                attrs.add( new Attribute("RadiusWholeGale", radiusWG));
+                double moveDir = results.getDouble(col++);
+                attrs.add( new Attribute("MoveDirection", moveDir));
+                double moveSpd = results.getDouble(col++);
+                attrs.add( new Attribute("MoveSpeed", moveSpd));
+
+                EarthLocation elt =
+                    new EarthLocationLite(new Real(RealType.Latitude,
+                        latitude), new Real(RealType.Longitude, longitude),
+                                          altReal);
+
+                DateTime date = getDateTime(year, month, day, hour);
+
+                if(date.getValue() < before.getValue()) {
+                    StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, 0,attrs);
+                    obsPts1.add(stp);
+                }
+
+                if(date.getValue() > after.getValue()) {
+                    StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, date, 0,attrs);
+                    obsPts2.add(stp);
+                }
+
+
+            }
+        }
+
+        if(obsPts1.size()>0) {
+            obsPts.addAll(obsPts1);
+        }
+
+        obsPts.addAll(pts);
+
+        if(obsPts2.size()>0) {
+            obsPts.addAll(obsPts2);
+        }
+
+        return  obsPts;
+    }
 
     /**
      * _more_
@@ -903,12 +1022,14 @@ public class STIStormDataSource extends StormDataSource {
                         sInfo = s.getStormInfo(sid);
         String          sd        = sInfo.getStormId();
         StormTrackCollection cls       = s.getTrackCollection(sInfo);
-        List           ways        = cls.getWayList();
-        Map             mp        = cls.getWayToStartDatesHashMap();
-        Map             mp1       = cls.getWayToTracksHashMap();
         StormTrack      obsTrack  = cls.getObsTrack();
         List            trackPointList = obsTrack.getTrackPoints();
         List            trackPointTime = obsTrack.getTrackTimes();
+        List           ways        = cls.getWayList();
+        Map             mp        = cls.getWayToStartDatesHashMap();
+        Map             mp1       = cls.getWayToTracksHashMap();
+
+
         System.err.println("test:");
 
     }
