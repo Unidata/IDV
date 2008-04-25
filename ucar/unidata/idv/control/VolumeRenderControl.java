@@ -168,6 +168,9 @@ public class VolumeRenderControl extends GridDisplayControl {
     private void loadVolumeData() throws VisADException, RemoteException {
         Trace.call1("VRC.loadVolumeData");
         FieldImpl grid    = getGridDataInstance().getGrid();
+        // make sure the projection is correct before we start 
+        // transforming the data
+        setProjectionInView(true);
         FieldImpl newGrid = grid;
         CoordinateSystem cs =
             getNavigatedDisplay().getDisplayCoordinateSystem();
@@ -257,7 +260,7 @@ public class VolumeRenderControl extends GridDisplayControl {
             GriddedSet.create(RealTupleType.SpatialCartesian3DTuple, newVals,
                               domainSet.getLengths(),
                               (CoordinateSystem) null, (Unit[]) null,
-                              (ErrorEstimate[]) null, false, false);
+                              (ErrorEstimate[]) null, false, true);
         Trace.call1("VRC.setSpatialDomain");
         FieldImpl newGrid = GridUtil.setSpatialDomain(grid, xyzSet);  //, true);
         Trace.call2("VRC.setSpatialDomain");
@@ -269,6 +272,7 @@ public class VolumeRenderControl extends GridDisplayControl {
             new Linear3DSet(RealTupleType.SpatialCartesian3DTuple, lows[0],
                             highs[0], lengths[0], lows[1], highs[1],
                             lengths[1], lows[2], highs[2], lengths[2]);
+        // System.out.println(volumeXYZ);
         Trace.call1("VRC.resampleGrid");
         newGrid = GridUtil.resampleGrid(newGrid, volumeXYZ);
         Trace.call2("VRC.resampleGrid");
