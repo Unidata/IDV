@@ -24,93 +24,30 @@
 
 
 
+
+
 package ucar.unidata.idv.control.storm;
 
 
 import ucar.unidata.data.DataChoice;
-
-
-import ucar.unidata.data.DataUtil;
-
 import ucar.unidata.data.storm.*;
-
-
-import ucar.unidata.idv.ControlContext;
-
-
 import ucar.unidata.idv.control.DisplayControlImpl;
-
 import ucar.unidata.ui.TreePanel;
-import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-
-import ucar.visad.Util;
-
-
-import ucar.visad.display.*;
-import ucar.visad.display.Animation;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.DisplayableDataRef;
-import ucar.visad.display.LineDrawing;
-import ucar.visad.display.SelectRangeDisplayable;
-import ucar.visad.display.SelectorPoint;
-import ucar.visad.display.StationModelDisplayable;
-import ucar.visad.display.TrackDisplayable;
-
-
-
-import visad.*;
-
+import ucar.visad.display.CompositeDisplayable;
+import visad.Real;
+import visad.Unit;
+import visad.VisADException;
 import visad.georef.EarthLocation;
 
-import visad.georef.EarthLocationLite;
-
-import visad.georef.EarthLocationTuple;
-import visad.georef.LatLonPoint;
-import visad.georef.LatLonTuple;
-
-import visad.util.DataUtility;
-
-import java.awt.*;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.*;
-
-import java.beans.*;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-
-
-import java.util.Arrays;
-
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-
 import javax.swing.*;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.*;
-
+import java.awt.*;
+import java.rmi.RemoteException;
+import java.util.*;
+import java.util.List;
 
 
 /**
@@ -124,37 +61,34 @@ import javax.swing.table.*;
 public class StormTrackControl extends DisplayControlImpl {
 
 
-    /** _more_          */
+    /** _more_ */
     final ImageIcon ICON_ON =
         GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/dot.gif");
 
-    /** _more_          */
+    /** _more_ */
     final ImageIcon ICON_OFF =
         GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/blank.gif");
 
 
 
-    /** _more_          */
+    /** _more_ */
     private CompositeDisplayable placeHolder;
 
     /** _more_ */
     private StormDataSource stormDataSource;
 
 
+    /** Holds the EarthLocation of the last point clicked */
+    private EarthLocation lastEarthLocation = null;
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<StormInfo, StormDisplayState> stormDisplayStateMap =
         new Hashtable<StormInfo, StormDisplayState>();
 
 
     /** _more_ */
-    private List<Displayable> trackDisplays = new ArrayList<Displayable>();
-
-
-    /** _more_          */
     private TreePanel treePanel;
-
 
 
     /**
@@ -180,8 +114,8 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public boolean init(DataChoice dataChoice)
-            throws VisADException, RemoteException {
+    public boolean init(DataChoice dataChoice) throws VisADException,
+            RemoteException {
 
         placeHolder = new CompositeDisplayable("Place holder");
         addDisplayable(placeHolder);
@@ -263,8 +197,8 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws RemoteException On Badness
      * @throws VisADException On Badness
      */
-    protected Container doMakeContents()
-            throws VisADException, RemoteException {
+    protected Container doMakeContents() throws VisADException,
+            RemoteException {
 
         treePanel = new TreePanel(true, 100);
 
@@ -346,6 +280,134 @@ public class StormTrackControl extends DisplayControlImpl {
         return stormDisplayStates;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep) throws Exception {
+
+        StormTrackPoint ob             = null;
+
+        List            result         = new ArrayList();
+        List            theStormStates = getStormDisplayStates();
+        if (theStormStates != null) {
+            ob = findClosestOb(el, theStormStates);
+        }
+
+        // System.err.println("R = "+ r);
+
+        if (ob != null) {
+            result.add("<tr><td>" + getMenuLabel() + ":</td></tr> "
+                       + formatStormTrackPoint(ob));
+            // +  "</tr>");
+        }
+        return result;
+    }
+
+    /**
+     * _more_
+     *
+     * @param stp _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected String formatStormTrackPoint(
+            StormTrackPoint stp) throws VisADException, RemoteException {
+        Unit   displayUnit = getDisplayUnit();
+        double value;
+
+        String result;
+        if (stp == null) {
+            result = "";
+        } else {
+            result = "<tr><td>" + "Storm ID: "
+                     + stp.getStormInfo().getStormId() + "</td></tr>";
+            result = "<tr><td>" + result + "Track Point Time: "
+                     + stp.getTrackPointTime() + "</td></tr>";
+            result = "<tr><td>" + result + "Max Wind Speed: "
+                     + stp.getAttribute("MaxWindSpeed") + "</td></tr>";
+            result = "<tr><td>" + result + "Min Pressure: "
+                     + stp.getAttribute("MinPressure") + "</td></tr>";
+
+            int length = result.length();
+            result = StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
+        }
+
+        return result;
+    }
+
+
+    /**
+     * Find the closest ob in the field to the particular EarthLocation
+     *
+     * @param el  the EarthLocation
+     * @param theStates _more_
+     *
+     * @return the closest ob (may be null);
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    protected StormTrackPoint findClosestOb(
+            EarthLocation el,
+            List<StormDisplayState> theStates) throws VisADException,
+                RemoteException {
+
+        if ((el == null) || (theStates == null)) {
+            return null;
+        }
+
+        int             numStates   = theStates.size();
+        StormTrackPoint closestOb   = null;
+
+
+        int[]           clickPt     = boxToScreen(earthToBox(el));
+        double          minDistance = 20;
+        //        System.err.println ("click:" + clickPt[0]+"/"+clickPt[1] + " " +minDistance);
+
+        for (int i = 0; i < numStates; i++) {
+            StormDisplayState sds   = theStates.get(i);
+            StormInfo         sinfo = sds.getStormInfo();
+            Hashtable<Way, WayDisplayState> wdMap =
+                sds.getWayDisplayStateMap();
+            // Way obsWay = new Way(Way.OBSERVATION);
+
+            WayDisplayState       obsWDS   = wdMap.get(Way.OBSERVATION);
+
+            List<StormTrack>      tracks   = obsWDS.getTracks();
+            StormTrack            obsTrack = tracks.get(0);
+
+            List<StormTrackPoint> stpList  = obsTrack.getTrackPoints();
+            int                   size     = stpList.size();
+            for (int j = 0; j < size; j++) {
+                StormTrackPoint stp      = stpList.get(j);
+                EarthLocation   stpLoc   = stp.getTrackPointLocation();
+                int[]           obScreen = boxToScreen(earthToBox(stpLoc));
+                double distance = GuiUtils.distance(obScreen, clickPt);
+                if (distance < minDistance) {
+                    closestOb   = stp;
+                    minDistance = distance;
+                }
+            }
+
+            //            System.err.println ("\t" + obScreen[0]+"/"+obScreen[1] + " d:" + distance);
+
+        }
+        return closestOb;
+    }
 
 
 }
