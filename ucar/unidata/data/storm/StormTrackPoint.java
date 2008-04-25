@@ -1,5 +1,6 @@
 package ucar.unidata.data.storm;
 
+import ucar.nc2.Attribute;
 import visad.*;
 import visad.georef.EarthLocation;
 
@@ -27,7 +28,7 @@ public class StormTrackPoint {
     private DateTime trackPointTime;
 
     /** _more_ */
-    private List attributes;
+    private List<Attribute> attributes;
 
 
     private int forecastHour = 0;
@@ -158,8 +159,8 @@ public class StormTrackPoint {
      *
      * @param attrs _more_
      */
-    public void setTrackAttributes(List attrs) {
-        this.attributes = new ArrayList(attrs);
+    public void setTrackAttributes(List<Attribute> attrs) {
+        this.attributes = new ArrayList<Attribute>(attrs);
     }
 
     /**
@@ -167,7 +168,7 @@ public class StormTrackPoint {
      *
      * @return _more_
      */
-    public List getTrackAttributes() {
+    public List<Attribute> getTrackAttributes() {
         return attributes;
     }
 
@@ -178,7 +179,21 @@ public class StormTrackPoint {
 
     }
 
-
+    /**
+     * _more_
+     *
+     * @param attrName _more_
+     *
+     * @return _more_
+     */
+    public String getAttribute(String attrName) {
+        for (Attribute attr : attributes) {
+            if (attr.getName().equalsIgnoreCase(attrName)) {
+                return attr.getNumericValue().toString();
+            }
+        }
+        return "";
+    }
 
     /**
      * _more_
