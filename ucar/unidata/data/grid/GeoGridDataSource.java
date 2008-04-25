@@ -933,8 +933,11 @@ public class GeoGridDataSource extends GridDataSource {
             for (int i = 0; i < sources.size(); i++) {
                 String s = sources.get(i).toString();
                 try {
-                    sb.append("<netcdf location=\""
-                              + IOUtil.getURL(s, getClass()) + "\" />\n");
+                    sb.append("<netcdf location=\"");
+                    sb.append(IOUtil.getURL(s, getClass()));
+                    sb.append("\"");
+                    sb.append(" enhance=\"true\"");
+                    sb.append(" />\n");
                 } catch (IOException ioe) {
                     setInError(true);
                     throw new WrapperException(
