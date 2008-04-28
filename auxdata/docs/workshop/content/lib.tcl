@@ -8,7 +8,7 @@ gen::setIndexFile   main.index
 
 ##Where is the userguide located at
 ##TODO: Set this to point to the right place
-set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/release/nightly
+set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/
 set ::userguideRoot $::workshopDocroot/docs/userguide
 
 ##The page title
@@ -24,7 +24,7 @@ set ::idvInstall /home/idv
 gen::defineMacro {<%workshop.datadir%>} {/data/idv}
 
 ##We use this for referencing download file names
-gen::defineMacro {<%idv.version%>} {2.4}
+gen::defineMacro {<%idv.version%>} {2.5}
 
 ##The installed directory of the source
 gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
@@ -92,13 +92,13 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::setIndexFile   regional.index
         set ::workshopTitle {Regional Unidata IDV Workshop}
         gen::define flag_regionalworkshop 
-        gen::defineMacro {<%idv.version%>} {2.4}
+        gen::defineMacro {<%idv.version%>} {2.5}
         set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
-        set ::workshopHome /home/idvclassNN
-        gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
+        set ::workshopHome {c:\\\\data\\\\idv}
+        gen::defineMacro {<%workshop.installdir%>} "$::workshopHome"
         gen::defineMacro {<%workshop.homedir%>} $::workshopHome
-        gen::defineMacro {<%workshop.idvinstall%>} /usr/local
-        gen::defineMacro {<%workshop.datadir%>} {/archive/workshops/unidata/idv}
+        gen::defineMacro {<%workshop.idvinstall%>} {c:\\\\Program Files\\\\}
+        gen::defineMacro {<%workshop.datadir%>} $::workshopHome
         gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
         gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"

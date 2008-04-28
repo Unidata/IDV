@@ -1,22 +1,19 @@
 
 #index.html
-title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an abbreviated version of the IDV training workshop intended to give users an overview of IDV capabilities and functionality.
+title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:This is an abbreviated version of the IDV training workshop intended to give users an overview of IDV capabilities and functionality.
 
 >installandstart/Start.html
 >>installandstart/FirstStart.html
 >>installandstart/basics/index.html
 >>>installandstart/basics/GettingStarted.html
 >>>installandstart/basics/Navigation.html
->>>datadisplays/selection/FieldSelector.html
->>>datadisplays/selection/DisplayControl.html
->>>datadisplays/selection/Legends.html
 >>>datadisplays/selection/TimeAnimation.html
 >>>installandstart/basics/MainMenu.html
 >>>installandstart/basics/ViewManagerMenus.html
 >>>installandstart/basics/BackgroundMaps.html
 +>>>resources/ProjectionManager.html
 >>>resources/Preferences.html
->>>installandstart/basics/Exiting.html
++>>>installandstart/basics/Exiting.html
 +>>>installandstart/WebStart.html
 
 |installandstart/basics/MouseAndKeyboard.html
@@ -28,14 +25,17 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 
 #>datadisplays/index.html
 #>>datadisplays/selection/index.html
-#>>>datadisplays/selection/DataSourceChooser.html
 
 
 >datadisplays/index.html
 >>datadisplays/selection/index.html
+>>datadisplays/selection/DataSourceChooser.html
 >>datadisplays/grid/index.html
 >>>datadisplays/grid/LoadingGrids.html
+>>>datadisplays/selection/FieldSelector.html
 >>>datadisplays/grid/PlanViews.html
+>>>datadisplays/selection/DisplayControl.html
+>>>datadisplays/selection/Legends.html
 >>>datadisplays/grid/Isosurfaces.html
 >>>datadisplays/grid/CrossSections.html
 >>>datadisplays/grid/Probes.html
