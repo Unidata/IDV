@@ -67,6 +67,7 @@ import ucar.visad.display.TrackDisplayable;
 
 
 import visad.*;
+import visad.bom.Radar2DCoordinateSystem;
 
 import visad.georef.EarthLocation;
 
@@ -288,7 +289,7 @@ public class StormDisplayState {
         JButton unloadBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif",this,"deactivate");
         unloadBtn.setToolTipText("Remove this storm");
 
-        JComponent label = GuiUtils.inset(GuiUtils.hbox(unloadBtn, GuiUtils.lLabel("Storm: " + stormInfo)), new Insets(0,0,5,0));
+        JComponent label = GuiUtils.inset(GuiUtils.hbox(unloadBtn, GuiUtils.lLabel("Unload Storm: " + stormInfo)), new Insets(0,0,5,0));
 
         final JCheckBox showForecastCbx =
             new JCheckBox("Show Forecast Tracks", getForecastVisible());
@@ -395,10 +396,15 @@ public class StormDisplayState {
             TrackDisplayable trackDisplay = new TrackDisplayable("track_"
                                                                  + stormInfo.getStormId());
             obsDisplayState.addDisplayable(trackDisplay);
+
             trackDisplay.setLineWidth(3);
             trackDisplay.setTrack(field);
-
             holder.addDisplayable(trackDisplay);
+
+            RingSet [] rings = makeRingField(obsTrack, obsDisplayState, holder);
+
+
+
 
             indicator = new StationModelDisplayable("indicator");
             indicator.setShouldUseAltitude(false);
@@ -427,7 +433,7 @@ public class StormDisplayState {
             holder.addDisplayable(dots);
             dots.setStationModel(model);
             dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
-                                                                           -1,-1));
+                                                                           24*60,-1));
 
         }
 
@@ -576,6 +582,78 @@ public class StormDisplayState {
         return timeTrack;
     }
 
+      /** Type for Range */
+    private final RealType rangeType = RealType.getRealType("Range",
+                                           CommonUnit.meter);
+
+    /** Type for Azimuth */
+    private final RealType azimuthType = RealType.getRealType("Azimuth",
+                                             CommonUnit.degree);
+    /**
+     * _more_
+     *
+     * @param track _more_
+
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private RingSet [] makeRingField(StormTrack track, WayDisplayState wState, CompositeDisplayable holder)
+            throws Exception {
+
+
+        List<StormTrackPoint> locs     = track.getTrackPoints();
+        int        numPoints       = locs.size();
+
+        RingSet [] rings =   new RingSet[numPoints];
+
+        double[][] newRangeVals = new double[2][numPoints];
+        float[]    lats         = new float[numPoints];
+        float[]    lons         = new float[numPoints];
+        //        System.err.println("points:" + times + "\n" + locs);
+        for (int i = 0; i < numPoints; i++) {
+
+            EarthLocation el       = locs.get(i).getTrackPointLocation();
+
+            lats[i]            = (float) el.getLatitude().getValue();
+            lons[i]            = (float) el.getLongitude().getValue();
+            StormTrackPoint stp = locs.get(i);
+            String rds = stp.getAttribute("RadiusModerateGale");
+            if(!rds.startsWith("999")){
+                float r = Float.valueOf(rds);
+                rings[i] = makeRealTupleType( lats[i], lons[i], r);
+                 wState.addDisplayable(rings[i]);
+                holder.addDisplayable(rings[i]);
+            }
+            //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
+        }
+
+
+        return rings;
+    }
+
+    private RingSet makeRealTupleType(double lat, double lon, double r)
+            throws VisADException, RemoteException {
+        Radar2DCoordinateSystem r2Dcs =
+            new Radar2DCoordinateSystem((float) lat, (float) lon);
+        RealTupleType rtt =  new RealTupleType(rangeType, azimuthType, r2Dcs, null);
+        Color ringColor = Color.gray;
+
+        RingSet  rss = new RingSet("range rings", rtt, ringColor);
+        // set initial spacing etc.
+        rss.setRingValues(
+            new Real(rangeType, r, CommonUnit.meter.scale(1000)),
+            new Real(rangeType, r, CommonUnit.meter.scale(1000)));
+        rss.setVisible(true);
+        /** width for range rings */
+        float radialWidth = 1.f;
+
+        rss.setLineWidth(radialWidth);
+
+        return rss;
+
+    }
 
 
     /**
