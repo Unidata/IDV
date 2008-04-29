@@ -205,16 +205,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
         //Get the storm infos and sort them
         List<StormInfo> stormInfos = (List<StormInfo>)Misc.sort(stormDataSource.getStormInfos());
-        
-        List            items      = new ArrayList();
-        items.add("Select Storm to View");
-        TwoFacedObject selected = null;
-        //TODO: Sort the years so we  get the most recent year first
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-
         Hashtable years = new Hashtable();
         JComponent firstComponent = null;
-        //Go in reverese order so we get the latest first
+        JComponent firstSelectedComponent = null;
+        //Go in reverse order so we get the latest first
         for (int i=stormInfos.size()-1;i>=0;i--) {
             StormInfo stormInfo = stormInfos.get(i);
             cal.setTime(ucar.visad.Util.makeDate(stormInfo.getStartTime()));
@@ -234,13 +229,20 @@ public class StormTrackControl extends DisplayControlImpl {
                                    stormDisplayState.getActive()
                                    ? ICON_ON
                                    : ICON_OFF);
+
+            if(stormDisplayState.getActive() && firstSelectedComponent == null) {
+                firstSelectedComponent = panelContents;
+            }
             if(firstComponent==null) {
                 firstComponent = panelContents;
             }
-
         }
-        if(firstComponent!=null) {
-            treePanel.showPath(firstComponent);
+
+        //Show the first selected component or the first component
+        if(firstSelectedComponent!=null) {
+            treePanel.show(firstSelectedComponent);
+        } else if(firstComponent!=null) {
+            treePanel.show(firstComponent);
         }
 
         treePanel.setPreferredSize(new Dimension(300, 400));
