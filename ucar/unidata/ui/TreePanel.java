@@ -345,6 +345,11 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     }
 
 
+    public void show(Component component) {
+        panel.show(component);
+    }
+
+
     /**
      * Show the tree node that corresponds to the component
      *
