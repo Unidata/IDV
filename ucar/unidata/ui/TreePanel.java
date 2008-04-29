@@ -350,7 +350,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
      *
      * @param component comp
      */
-    private void showPath(Component component) {
+    public void showPath(Component component) {
         if (component != null) {
             DefaultMutableTreeNode node =
                 (DefaultMutableTreeNode) compToNode.get(component);

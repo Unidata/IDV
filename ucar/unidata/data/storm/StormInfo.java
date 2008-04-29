@@ -34,7 +34,7 @@ import visad.*;
  * Time: 4:57:21 PM
  * To change this template use File | Settings | File Templates.
  */
-public class StormInfo {
+public class StormInfo implements Comparable {
 
     /** _more_ */
     private String stormID;
@@ -57,6 +57,23 @@ public class StormInfo {
         this.stormID   = id;
         this.startTime = sTime;
     }
+
+
+    /**
+     * Compare this object to another.
+     * @param o object in question.
+     * @return spec from Comparable interface.
+     */
+    public int compareTo(Object o) {
+        if (o instanceof StormInfo) {
+            StormInfo that = (StormInfo) o;
+            if(startTime.getValue()<that.startTime.getValue()) return -1;
+            if(startTime.getValue()>that.startTime.getValue()) return 1;
+            return 0;
+        }
+        return toString().compareTo(o.toString());
+    }
+
 
     /**
      * _more_

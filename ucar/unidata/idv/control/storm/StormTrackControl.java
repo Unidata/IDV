@@ -35,6 +35,7 @@ import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.visad.display.CompositeDisplayable;
@@ -202,24 +203,44 @@ public class StormTrackControl extends DisplayControlImpl {
 
         treePanel = new TreePanel(true, 100);
 
-        List<StormInfo> stormInfos = stormDataSource.getStormInfos();
+        //Get the storm infos and sort them
+        List<StormInfo> stormInfos = (List<StormInfo>)Misc.sort(stormDataSource.getStormInfos());
+        
         List            items      = new ArrayList();
         items.add("Select Storm to View");
         TwoFacedObject selected = null;
         //TODO: Sort the years so we  get the most recent year first
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
-        for (StormInfo stormInfo : stormInfos) {
+        Hashtable years = new Hashtable();
+        JComponent firstComponent = null;
+        //Go in reverese order so we get the latest first
+        for (int i=stormInfos.size()-1;i>=0;i--) {
+            StormInfo stormInfo = stormInfos.get(i);
             cal.setTime(ucar.visad.Util.makeDate(stormInfo.getStartTime()));
             int year = cal.get(Calendar.YEAR);
             StormDisplayState stormDisplayState =
                 getStormDisplayState(stormInfo);
 
-            treePanel.addComponent(stormDisplayState.getContents(),
-                                   "" + year, stormInfo.getStormId(),
+            String category = ""+year;
+            if(years.get(category)==null) {
+                years.put(category, category);
+                JComponent categoryComponent = new JLabel("Allow user to view all observed tracks for a given year");
+                treePanel.addCategoryComponent(category, categoryComponent);
+            }
+            JComponent panelContents = stormDisplayState.getContents();
+            treePanel.addComponent(panelContents,
+                                   category, stormInfo.getStormId(),
                                    stormDisplayState.getActive()
                                    ? ICON_ON
                                    : ICON_OFF);
+            if(firstComponent==null) {
+                firstComponent = panelContents;
+            }
+
+        }
+        if(firstComponent!=null) {
+            treePanel.showPath(firstComponent);
         }
 
         treePanel.setPreferredSize(new Dimension(300, 400));
