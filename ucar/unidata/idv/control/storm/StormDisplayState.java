@@ -141,6 +141,9 @@ public class StormDisplayState {
     /** _more_          */
     private boolean forecastVisible = false;
 
+
+    private boolean forecastRingsVisible = false;
+
     /** _more_          */
     private boolean changed = false;
 
@@ -315,9 +318,17 @@ public class StormDisplayState {
                 showStorm();
             }
         });
-
-        JComponent top     = GuiUtils.vbox(label, getWayDisplayState(Way.OBSERVATION).getVisiblityCheckBox(),
-                                           showForecastCbx);
+        final JCheckBox showForecastRingsCbx =
+            new JCheckBox("Show Forecast Rings", getForecastVisible());
+        showForecastRingsCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                setForecastRingsVisible(showForecastRingsCbx.isSelected());
+                showStorm();
+            }
+        });
+        JComponent top     = GuiUtils.vbox(label, GuiUtils.hbox(getWayDisplayState(Way.OBSERVATION).getVisiblityCheckBox(),
+                                           getWayDisplayState(Way.OBSERVATION).getRingsVisiblityCheckBox()),
+                                           showForecastCbx );
 
         List<Way>  ways    = trackCollection.getWayList();
         List       wayCbxs = new ArrayList();
@@ -417,7 +428,7 @@ public class StormDisplayState {
             trackDisplay.setTrack(field);
             holder.addDisplayable(trackDisplay);
 
-            RingSet [] rings = makeRingField(obsTrack, obsDisplayState, holder);
+            makeRingField(obsTrack, obsDisplayState, holder);
 
 
 
@@ -473,6 +484,8 @@ public class StormDisplayState {
                 WayDisplayState wayDisplayState = getWayDisplayState(track.getWay());
                 FieldImpl field = makeField(track, true);
                 wayDisplayState.addTrack(track,  field);
+
+                //makeRingField(track, wayDisplayState, forecastHolder);
             }
 
             for(WayDisplayState wayDisplayState: wayDisplayStates) {
@@ -568,12 +581,16 @@ public class StormDisplayState {
         double[][] newRangeVals = new double[2][numPoints];
         float[]    lats         = new float[numPoints];
         float[]    lons         = new float[numPoints];
+        float[]    attrValue = null;
+        if(!fixedValue) {
+           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
+        }
         //        System.err.println("points:" + times + "\n" + locs);
         for (int i = 0; i < numPoints; i++) {
             DateTime      dateTime = (DateTime) times.get(i);
             Real          value    = (fixedValue
                                       ? dfltReal
-                                      : new Real(dfltRealType, i));
+                                      : new Real(dfltRealType, attrValue[i]));
             EarthLocation el       = locs.get(i).getTrackPointLocation();
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getValue();
@@ -639,8 +656,8 @@ public class StormDisplayState {
             if(!rds.startsWith("999")){
                 float r = Float.valueOf(rds);
                 rings[i] = makeRealTupleType( lats[i], lons[i], r);
-                 wState.addDisplayable(rings[i]);
-                holder.addDisplayable(rings[i]);
+                 wState.addRingsDisplayable(rings[i]);
+                 holder.addDisplayable(rings[i]);
             }
             //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
         }
@@ -758,6 +775,10 @@ public class StormDisplayState {
         forecastVisible = value;
     }
 
+
+    public void setForecastRingsVisible(boolean value) {
+        forecastRingsVisible = value;
+    }
     /**
      *  Get the ObsVisible property.
      *
@@ -765,6 +786,10 @@ public class StormDisplayState {
      */
     public boolean getForecastVisible() {
         return forecastVisible;
+    }
+
+    public boolean getForecastRingsVisible() {
+        return forecastRingsVisible;
     }
 
     /**
