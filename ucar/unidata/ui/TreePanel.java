@@ -71,6 +71,8 @@ import javax.swing.tree.*;
 
 public class TreePanel extends JPanel implements TreeSelectionListener {
 
+    public static final String CATEGORY_DELIMITER = ">";
+
     /** the tree */
     private JTree tree;
 
@@ -283,12 +285,12 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         if (category == null) {
             root.add(panelNode);
         } else {
-            List toks = StringUtil.split(category, ">", true, true);
+            List toks = StringUtil.split(category, CATEGORY_DELIMITER, true, true);
             String                 catSoFar = "";
             DefaultMutableTreeNode catNode  = root;
             for (int i = 0; i < toks.size(); i++) {
                 String cat = (String) toks.get(i);
-                catSoFar = catSoFar + ">" + cat;
+                catSoFar = catSoFar + CATEGORY_DELIMITER + cat;
                 DefaultMutableTreeNode node =
                     (DefaultMutableTreeNode) catToNode.get(catSoFar);
                 if (node == null) {
@@ -320,7 +322,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
      * @param comp _more_
      */
     public void addCategoryComponent(String cat, JComponent comp) {
-        catComponents.put(">" + cat, comp);
+        catComponents.put(CATEGORY_DELIMITER + cat, comp);
     }
 
 
