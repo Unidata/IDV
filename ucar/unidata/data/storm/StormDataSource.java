@@ -24,9 +24,8 @@
 package ucar.unidata.data.storm;
 
 
-import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.*;
 
-import ucar.unidata.data.DataSourceImpl;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -67,6 +66,22 @@ public abstract class StormDataSource extends DataSourceImpl {
      * @return _more_
      */
     public abstract List<StormInfo> getStormInfos();
+
+
+    /**
+     * _more_
+     */
+    protected void doMakeDataChoices() {
+        List cats = DataCategory.parseCategories("stormtrack", false);
+        DataChoice choice = new DirectDataChoice(this, "stormtrack",
+                                "Storm Track", "Storm Track", cats,
+                                (Hashtable) null);
+        addDataChoice(choice);
+
+    }
+
+
+
 
     /**
      * _more_

@@ -225,7 +225,7 @@ public class StormTrackControl extends DisplayControlImpl {
             }
             JComponent panelContents = stormDisplayState.getContents();
             treePanel.addComponent(panelContents,
-                                   category, stormInfo.getStormId(),
+                                   category, stormInfo.toString(),
                                    stormDisplayState.getActive()
                                    ? ICON_ON
                                    : ICON_OFF);
@@ -356,8 +356,8 @@ public class StormTrackControl extends DisplayControlImpl {
         if (stp == null) {
             result = "";
         } else {
-            result = "<tr><td>" + "Storm ID: "
-                     + stp.getStormInfo().getStormId() + "</td></tr>";
+            result = "<tr><td>" + "Storm: "
+                     + stp.getStormInfo().toString() + "</td></tr>";
             result = "<tr><td>" + result + "Track Point Time: "
                      + stp.getTrackPointTime() + "</td></tr>";
             result = "<tr><td>" + result + "Max Wind Speed: "

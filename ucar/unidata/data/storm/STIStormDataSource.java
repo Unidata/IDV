@@ -986,19 +986,6 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
-    /**
-     * _more_
-     */
-    protected void doMakeDataChoices() {
-        List cats = DataCategory.parseCategories("stormtrack", false);
-        DataChoice choice = new DirectDataChoice(this, "stormtrack",
-                                "Storm Track", "Storm Track", cats,
-                                (Hashtable) null);
-        addDataChoice(choice);
-
-    }
-
-
 
     /**
      * _more_

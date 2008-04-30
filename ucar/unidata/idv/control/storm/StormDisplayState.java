@@ -265,7 +265,23 @@ public class StormDisplayState {
         JComponent top      = GuiUtils.hbox(loadBtn, label);
         originalContents = GuiUtils.inset(top, 5);
         JComponent contents = GuiUtils.top(originalContents);
+        contents = new JPanel(new BorderLayout()) {
+                public String toString() { return "storm:" + xxx();}
+                public boolean equals(Object o) {
+                    boolean result = super.equals(o);
+                    if(result) {
+                        //                        System.err.println (this + " == " + o);
+                    }
+                    return result;
+                }
+            };
+
+        contents.add(BorderLayout.NORTH, originalContents);
         return contents;
+    }
+
+    public String xxx() {
+        return stormInfo.toString();
     }
 
 

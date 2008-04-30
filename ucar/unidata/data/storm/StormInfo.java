@@ -39,6 +39,9 @@ public class StormInfo implements Comparable {
     /** _more_ */
     private String stormID;
 
+    private String name;
+
+
     /** _more_ */
     private DateTime startTime;
 
@@ -54,7 +57,12 @@ public class StormInfo implements Comparable {
      * @param sTime _more_
      */
     public StormInfo(String id, DateTime sTime) {
+        this(id,id,sTime);
+    }
+
+    public StormInfo(String id, String name, DateTime sTime) {
         this.stormID   = id;
+        this.name = name;
         this.startTime = sTime;
     }
 
@@ -111,13 +119,15 @@ public class StormInfo implements Comparable {
         return startTime;
     }
 
+
     /**
      * _more_
      *
      * @return _more_
      */
     public String toString() {
-        return stormID + " " + startTime.toString();
+        if(name !=null) return name;
+        return stormID;
     }
 
     /**
@@ -146,6 +156,24 @@ public class StormInfo implements Comparable {
         StormInfo other = (StormInfo) o;
         return (this.stormID.equals(other.stormID));
     }
+
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
 
 
 

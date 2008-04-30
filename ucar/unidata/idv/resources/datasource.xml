@@ -62,6 +62,12 @@
      factory="ucar.unidata.data.storm.STIStormDataSource"
      label="STI Storm Data"/>
 
+  <datasource
+     id="STORM.ATCF"
+     fileselection="true"
+     factory="ucar.unidata.data.storm.AtcfStormDataSource"
+     label="Atcf Storm Data"/>
+
 
   <datasource
      id="DB.TRAJECTORY"
