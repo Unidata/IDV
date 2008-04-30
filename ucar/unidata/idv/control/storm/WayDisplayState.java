@@ -57,15 +57,18 @@ public class WayDisplayState {
 
     private JCheckBox visibilityCbx;
 
-
+    private JCheckBox visibilityRingsCbx;
     /** _more_          */
     private Way way;
 
     /** _more_          */
     private boolean visible = true;
+/** _more_          */
+    private boolean ringsVisible = true;
 
     /** _more_          */
     List<Displayable> displayables = new ArrayList<Displayable>();
+    List<Displayable> ringsDisplayables = new ArrayList<Displayable>();
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
     private List<FieldImpl> fields = new ArrayList<FieldImpl>();
     private List<DateTime> times = new ArrayList<DateTime>();
@@ -93,6 +96,7 @@ public class WayDisplayState {
 
     public void deactivate() {
         displayables = new ArrayList<Displayable>();
+        ringsDisplayables = new ArrayList<Displayable>();
         tracks = new ArrayList<StormTrack>();
         fields = new ArrayList<FieldImpl>();
         times = new ArrayList<DateTime>();
@@ -121,7 +125,23 @@ public class WayDisplayState {
         return visibilityCbx;
     }
 
+    public JCheckBox getRingsVisiblityCheckBox() {
+        if(visibilityRingsCbx==null) {
+            visibilityRingsCbx = new JCheckBox((way.isObservation()?"Show Observation Rings":way.toString()), getRingsVisible());
+            visibilityRingsCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        setRingsVisible(visibilityRingsCbx.isSelected());
+                    } catch(Exception exc) {
+                        LogUtil.logException("Toggling way visibility", exc);
+                    }
+                }
+            });
 
+
+        }
+        return visibilityRingsCbx;
+    }
     public List<PointOb> getPointObs() {
         return pointObs;
     }
@@ -187,6 +207,16 @@ public class WayDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param displayable _more_
+     */
+    public void addRingsDisplayable(Displayable displayable) throws Exception {
+        ringsDisplayables.add(displayable);
+        setRingVisibility(displayable);
+     }
+
 
     /**
      * Set the Way property.
@@ -221,7 +251,30 @@ public class WayDisplayState {
                 displayable.setVisible(getVisible() && stormDisplayState.getForecastVisible());
             }
         }
+        setRingsVisible(ringsVisible);
     }
+
+        /**
+     * Set the Visible property.
+     *
+     * @param value The new value for Visible
+     */
+    public void setRingsVisible(boolean value) throws Exception {
+        this.ringsVisible = value;
+        for(Displayable displayable: ringsDisplayables) {
+              setRingVisibility(displayable);
+         }
+    }
+
+      private void setRingVisibility(Displayable ringDisplayable) throws Exception {
+            if(way.isObservation()) {
+                ringDisplayable.setVisible(getVisible() && getRingsVisible());
+            } else {
+                ringDisplayable.setVisible(getVisible() && getRingsVisible() && stormDisplayState.getForecastVisible());
+            }
+        }
+
+
 
     /**
      * Get the Visible property.
@@ -230,6 +283,14 @@ public class WayDisplayState {
      */
     public boolean getVisible() {
         return visible;
+    }
+    /**
+     * Get the Visible property.
+     *
+     * @return The Visible
+     */
+    public boolean getRingsVisible() {
+        return ringsVisible;
     }
 
 /**
