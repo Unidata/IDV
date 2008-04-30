@@ -79,7 +79,6 @@ public class StormTrack {
      * @param pts _more_
      */
     public StormTrack(StormInfo stormInfo, Way way, List<StormTrackPoint> pts) {
-
         this.stormInfo   = stormInfo;
         this.way         = way;
         this.trackPoints = new ArrayList(pts);
@@ -89,6 +88,24 @@ public class StormTrack {
                        + trackStartTime.getValue();
     }
 
+
+
+
+    public StormTrack(StormInfo stormInfo, Way way, DateTime startTime) {
+        this.stormInfo   = stormInfo;
+        this.way         = way;
+        this.trackPoints = new ArrayList();
+        this.trackId = stormInfo.toString() + "_" + way + "_"
+                       + startTime.getValue();
+    }
+
+
+
+
+
+    public void addPoint(StormTrackPoint point) {
+        trackPoints.add(point);
+    }
 
     public boolean isObservation() {
         return way.isObservation();
@@ -212,6 +229,7 @@ public class StormTrack {
         float [] trackAttributes = new float[size];
         for(int i = 0; i< size; i++){
             String str = trackPoints.get(i).getAttribute(attrName);
+            if(str == null || str.length()==0) return null;
             if(str.startsWith("9999"))
                  trackAttributes[i] = Float.NaN;
             else

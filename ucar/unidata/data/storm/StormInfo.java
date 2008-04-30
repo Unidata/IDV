@@ -42,6 +42,11 @@ public class StormInfo implements Comparable {
     private String name;
 
 
+    private String basin;
+
+    private String number;
+
+
     /** _more_ */
     private DateTime startTime;
 
@@ -61,9 +66,15 @@ public class StormInfo implements Comparable {
     }
 
     public StormInfo(String id, String name, DateTime sTime) {
+        this(id,name,null,null,sTime);
+    }
+
+    public StormInfo(String id, String name, String basin, String number, DateTime sTime) {
         this.stormID   = id;
         this.name = name;
+        this.basin = basin;
         this.startTime = sTime;
+        this.number = number;
     }
 
 
@@ -175,6 +186,43 @@ public String getName () {
 	return name;
 }
 
+
+/**
+Set the Basin property.
+
+@param value The new value for Basin
+**/
+public void setBasin (String value) {
+	basin = value;
+}
+
+/**
+Get the Basin property.
+
+@return The Basin
+**/
+public String getBasin () {
+	return basin;
+}
+
+
+/**
+Set the Number property.
+
+@param value The new value for Number
+**/
+public void setNumber (String value) {
+	number = value;
+}
+
+/**
+Get the Number property.
+
+@return The Number
+**/
+public String getNumber () {
+	return number;
+}
 
 
 }

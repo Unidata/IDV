@@ -5,7 +5,7 @@ CREATE TABLE  typhoon (
   nno varchar(11),
   shuoming varchar(120),
   yyyy int,
-  mm int,
+  mon int,
   day int,
   hh int,
   fhour int,
