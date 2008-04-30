@@ -202,6 +202,23 @@ public class StormTrack {
         return trackTimes;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public float [] getTrackAttributeValues(String attrName) {
+        int size = trackPoints.size();
+        float [] trackAttributes = new float[size];
+        for(int i = 0; i< size; i++){
+            String str = trackPoints.get(i).getAttribute(attrName);
+            if(str.startsWith("9999"))
+                 trackAttributes[i] = Float.NaN;
+            else
+                trackAttributes[i] = Float.valueOf(str);
+        }
+        return trackAttributes;
+    }
 
     public String toString() {
         return trackId;
