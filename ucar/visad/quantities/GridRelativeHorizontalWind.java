@@ -311,14 +311,22 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
             }
         }
 
+        // account for null units, assume m/sec
+        Unit[] rangeUnits = innerField.getDefaultRangeUnits();
+        if ((rangeUnits == null) || (rangeUnits[0] == null)
+                || rangeUnits[0].isDimensionless()) {
+            rangeUnits =
+                CartesianHorizontalWind.getEarthVectorType()
+                    .getDefaultUnits();
+        }
+
 
         FlatField uvField =
             new FlatField(
                 new FunctionType(
                     ((SetType) innerDom.getType()).getDomain(),
                     CartesianHorizontalWind.getEarthVectorType()), innerDom,
-                        (CoordinateSystem) null, (Set[]) null,
-                        innerField.getDefaultRangeUnits());
+                        (CoordinateSystem) null, (Set[]) null, rangeUnits);
 
 
 
