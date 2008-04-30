@@ -417,50 +417,50 @@ public class StormDisplayState {
 
         if (obsDisplayState.getTracks().size()==0) {
             StormTrack obsTrack = trackCollection.getObsTrack();
-            FieldImpl field = makeField(obsTrack, false);
-            obsDisplayState.addTrack(obsTrack,  field);
+            if(obsTrack!=null) {
+                FieldImpl field = makeField(obsTrack, false);
+                obsDisplayState.addTrack(obsTrack,  field);
 
-            TrackDisplayable trackDisplay = new TrackDisplayable("track_"
-                                                                 + stormInfo.getStormId());
-            obsDisplayState.addDisplayable(trackDisplay);
+                TrackDisplayable trackDisplay = new TrackDisplayable("track_"
+                                                                     + stormInfo.getStormId());
+                obsDisplayState.addDisplayable(trackDisplay);
 
-            trackDisplay.setLineWidth(3);
-            trackDisplay.setTrack(field);
-            holder.addDisplayable(trackDisplay);
+                trackDisplay.setLineWidth(3);
+                trackDisplay.setTrack(field);
+                holder.addDisplayable(trackDisplay);
 
-            makeRingField(obsTrack, obsDisplayState, holder);
+                makeRingField(obsTrack, obsDisplayState, holder);
 
-
-
-
-            indicator = new StationModelDisplayable("indicator");
-            indicator.setShouldUseAltitude(false);
-            holder.addDisplayable(indicator);
+                indicator = new StationModelDisplayable("indicator");
+                indicator.setShouldUseAltitude(false);
+                holder.addDisplayable(indicator);
 
 
-            timesHolder = new LineDrawing("track_time" +  stormInfo.getStormId());
-            timesHolder.setManipulable(false);
-            timesHolder.setVisible(false);
-            List times    = obsTrack.getTrackTimes();
-            timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
-            holder.addDisplayable(timesHolder);
+                timesHolder = new LineDrawing("track_time" +  stormInfo.getStormId());
+                timesHolder.setManipulable(false);
+                timesHolder.setVisible(false);
+                List times    = obsTrack.getTrackTimes();
+                timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
+                holder.addDisplayable(timesHolder);
 
 
-            StationModelDisplayable dots  = new StationModelDisplayable("dots");
-            obsDisplayState.addDisplayable(dots);
-            StationModel model = new StationModel("TrackLocation");
-            ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
-            shapeSymbol.setShape(ucar.visad.ShapeUtility.FILLED_CIRCLE);
-            shapeSymbol.setScale(0.8f);
-            shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
-            shapeSymbol.setRectPoint(Glyph.PT_MM);
-            model.addSymbol(shapeSymbol);
+                StationModelDisplayable dots  = new StationModelDisplayable("dots");
+                obsDisplayState.addDisplayable(dots);
+                StationModel model = new StationModel("TrackLocation");
+                ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
+                shapeSymbol.setShape(ucar.visad.ShapeUtility.FILLED_CIRCLE);
+                shapeSymbol.setScale(0.8f);
+                shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
+                shapeSymbol.setRectPoint(Glyph.PT_MM);
+                model.addSymbol(shapeSymbol);
 
-            dots.setScale(1.0f);
-            holder.addDisplayable(dots);
-            dots.setStationModel(model);
-            dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
-                                                                           24*60,-1));
+                dots.setScale(1.0f);
+                holder.addDisplayable(dots);
+                dots.setStationModel(model);
+                dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
+                                                                               24*60,-1));
+
+            }
 
         }
 
@@ -506,6 +506,7 @@ public class StormDisplayState {
                     trackDisplay.setVisible(false);
                 }
 
+                /*
                 StationModelDisplayable dots  = new StationModelDisplayable("dots");
                 wayDisplayState.addDisplayable(dots);
                 StationModel model = new StationModel("TrackLocation");
@@ -527,6 +528,7 @@ public class StormDisplayState {
                 dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( wayDisplayState.getPointObs(),
                                                                                -1,-1));
 
+                */
                 forecastHolder.addDisplayable(trackDisplay);
                 FieldImpl timeField = ucar.visad.Util.makeTimeField(fields,wayDisplayState.getTimes());
                 trackDisplay.setTrack(timeField);
@@ -582,15 +584,16 @@ public class StormDisplayState {
         float[]    lats         = new float[numPoints];
         float[]    lons         = new float[numPoints];
         float[]    attrValue = null;
-        if(!fixedValue) {
-           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
-        }
+        //        if(!fixedValue) {
+            //           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
+            attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_CATEGORY);
+            //        }
         //        System.err.println("points:" + times + "\n" + locs);
         for (int i = 0; i < numPoints; i++) {
             DateTime      dateTime = (DateTime) times.get(i);
             Real          value    = (fixedValue
                                       ? dfltReal
-                                      : new Real(dfltRealType, attrValue[i]));
+                                      : new Real(dfltRealType, (attrValue!=null?attrValue[i]:0.0)));
             EarthLocation el       = locs.get(i).getTrackPointLocation();
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getValue();
@@ -653,6 +656,7 @@ public class StormDisplayState {
             lons[i]            = (float) el.getLongitude().getValue();
             StormTrackPoint stp = locs.get(i);
             String rds = stp.getAttribute("RadiusModerateGale");
+            if(rds==null || rds.length()==0) continue;
             if(!rds.startsWith("999")){
                 float r = Float.valueOf(rds);
                 rings[i] = makeRealTupleType( lats[i], lons[i], r);

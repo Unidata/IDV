@@ -224,6 +224,9 @@ public class StormTrackControl extends DisplayControlImpl {
                 treePanel.addCategoryComponent(category, categoryComponent);
             }
             JComponent panelContents = stormDisplayState.getContents();
+            if(stormInfo.getBasin()!=null) {
+                category = category +TreePanel.CATEGORY_DELIMITER + "Basin:" + stormInfo.getBasin();
+            }
             treePanel.addComponent(panelContents,
                                    category, stormInfo.toString(),
                                    stormDisplayState.getActive()
