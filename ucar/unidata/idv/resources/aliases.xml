@@ -84,7 +84,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="UREL"
      label="Grid Relative U component of wind"
-     aliases="GridRelative_u,GridRelative_u_fhg,U10,UREL_PRES,VREL_HGHT"/>
+     aliases="GridRelative_u,GridRelative_u_fhg,U10,UREL_PRES,UREL_HGHT"/>
   <alias
      name="VREL"
      label="Grid Relative V component of wind"
