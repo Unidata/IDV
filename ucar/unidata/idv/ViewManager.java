@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv;
 
 
@@ -630,7 +627,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Keeps track of when we update display list when the component resizes_ */
     private int componentResizeCnt = 0;
 
-    /** _more_ */
+    /** are we dirty ;-) */
     private boolean dirty = false;
 
 
@@ -821,7 +818,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     *Handle the drop action
+     * Handle the drop action
      *
      * @param object object being dropped
      */
@@ -935,7 +932,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         //        centerPanelWrapper = new JPanel(new BorderLayout());
-        centerPanelWrapper = GuiUtils.center(mainSplitPane);
+        centerPanelWrapper = (showControlLegend)
+                             ? GuiUtils.center(mainSplitPane)
+                             : GuiUtils.center(centerPanel);
         fullContents       = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
         fullContents.setBorder(getContentsBorder());
 
@@ -3542,10 +3541,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Update display if needed
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException 
+     * @throws VisADException 
      */
     public void updateDisplayIfNeeded()
             throws VisADException, RemoteException {
@@ -3754,7 +3753,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Set the ExternalAnimation property.
      *
      * @param value The new value for ExternalAnimation
-     * @param widget _more_
+     * @param widget the animation widget to update
      */
     public void setExternalAnimation(Animation value,
                                      AnimationWidget widget) {
@@ -4274,9 +4273,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Is this an interactive session
      *
-     * @return _more_
+     * @return true if interactive
      */
     public boolean isInteractive() {
         return getIdv().getInteractiveMode();
@@ -4553,23 +4552,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void actionPerformed(ActionEvent event) {}
 
 
-    /** _more_ */
+    /** image panel */
     private ImagePanel imagePanel;
 
-    /** _more_ */
+    /** flag for using the image panel */
     boolean usingImagePanel = false;
 
     /**
-     * _more_
+     * Make frames
      */
     public void makeFrames() {
         ImageSequenceGrabber isg = new ImageSequenceGrabber(this, null, true);
     }
 
     /**
-     * _more_
+     * Do we use the display
      *
-     * @return _more_
+     * @return true if we do
      */
     public boolean useDisplay() {
         if ( !usingImagePanel) {
@@ -4585,7 +4584,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Use the images
      */
     public void useImages() {
         if (usingImagePanel) {
@@ -4602,10 +4601,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Use the images
      *
-     * @param images _more_
-     * @param andShow _more_
+     * @param images list of images
+     * @param andShow true to show
      */
     public void useImages(List images, boolean andShow) {
         if (imagePanel == null) {
@@ -4925,11 +4924,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
                     try {
                         image =
-                            robot.createScreenCapture(new Rectangle(loc.x, loc.y,
-                                                                    dim.width, dim.height));
-                    } catch(Exception exc) {
-                        logException("Error capturing image for component:" + whichComponent +" location:" + loc.x +"x" + loc.y +" dimension:" + dim.width +"x" + dim.height,  
-                                     exc);
+                            robot.createScreenCapture(new Rectangle(loc.x,
+                                loc.y, dim.width, dim.height));
+                    } catch (Exception exc) {
+                        logException("Error capturing image for component:"
+                                     + whichComponent + " location:" + loc.x
+                                     + "x" + loc.y + " dimension:"
+                                     + dim.width + "x" + dim.height, exc);
                         return;
                     }
 
