@@ -2433,6 +2433,12 @@ public final class Util {
      */
     public static RealType makeRealType(String name, Unit unit)
             throws VisADException {
+        return makeRealType(name, null, unit);
+    }
+
+
+    public static RealType makeRealType(String name, String alias, Unit unit)
+        throws VisADException {
         RealType type    = null;
         String   newname = cleanName(name) + "[unit:" + ((unit == null)
                 ? "null"
@@ -2446,6 +2452,9 @@ public final class Util {
             throw new VisADException(
                 "couldn't create RealType with units compatible to "
                 + unit.toString());
+        }
+        if(alias!=null) {
+            type.alias(alias);
         }
         return type;
     }
