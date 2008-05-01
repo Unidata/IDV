@@ -551,7 +551,7 @@ public class StormDisplayState {
                 holder.addDisplayable(trackDisplay);
 
                 makeRingField(obsTrack, obsDisplayState, holder,
-                              StormDataSource.ATTR_MODERATEGALE);
+                              null);
 
                 indicator = new StationModelDisplayable("indicator");
                 indicator.setShouldUseAltitude(false);
@@ -673,7 +673,7 @@ public class StormDisplayState {
                     for (StormTrack strack : tracks) {
                         makeRingField(strack, wayDisplayState,
                                       forecastHolder,
-                                      StormDataSource.ATTR_PROBABILITYRADIUS);
+                                      null);
                     }
                 }
             }
@@ -778,9 +778,7 @@ public class StormDisplayState {
         return timeTrack;
     }
 
-    /** Type for Range */
-    private final RealType rangeType = RealType.getRealType("Range",
-                                           CommonUnit.meter);
+
 
     /** Type for Azimuth */
     private final RealType azimuthType = RealType.getRealType("Azimuth",
@@ -801,8 +799,10 @@ public class StormDisplayState {
      */
     private RingSet[] makeRingField(StormTrack track, WayDisplayState wState,
                                     CompositeDisplayable holder,
-                                    String attrName)
+                                    RealType type)
             throws Exception {
+        //TODO: Use the param type
+        type = STIStormDataSource.TYPE_RADIUSMODERATEGALE;
         List<EarthLocation> locations    = track.getLocations();
         int                 numPoints    = locations.size();
         RingSet[]           rings        = new RingSet[numPoints];
@@ -810,7 +810,7 @@ public class StormDisplayState {
         float[]             lats         = new float[numPoints];
         float[]             lons         = new float[numPoints];
         //TODO: Use a real type
-        Real[] values = track.getTrackAttributeValues(null);
+        Real[] values = track.getTrackAttributeValues(type);
         if (values == null) {
             return null;
         }
@@ -820,7 +820,7 @@ public class StormDisplayState {
             lons[i] = (float) el.getLongitude().getValue();
             if ((values[i] != null) && !values[i].isMissing()) {
                 rings[i] = makeRealTupleType(lats[i], lons[i],
-                                             values[i].getValue());
+                                             values[i]);
                 wState.addRingsDisplayable(rings[i]);
                 holder.addDisplayable(rings[i]);
             }
@@ -840,19 +840,20 @@ public class StormDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    private RingSet makeRealTupleType(double lat, double lon, double r)
+    private RingSet makeRealTupleType(double lat, double lon, Real r)
             throws VisADException, RemoteException {
         Radar2DCoordinateSystem r2Dcs =
             new Radar2DCoordinateSystem((float) lat, (float) lon);
-        RealTupleType rtt = new RealTupleType(rangeType, azimuthType, r2Dcs,
+        RealTupleType rtt = new RealTupleType((RealType)r.getType(), azimuthType, r2Dcs,
                                 null);
         Color   ringColor = Color.gray;
 
         RingSet rss       = new RingSet("range rings", rtt, ringColor);
         // set initial spacing etc.
-        rss.setRingValues(
-            new Real(rangeType, r, CommonUnit.meter.scale(1000)),
-            new Real(rangeType, r, CommonUnit.meter.scale(1000)));
+        rss.setRingValues(r,r);
+        //        rss.setRingValues(
+        //            new Real(rangeType, r, CommonUnit.meter.scale(1000)),
+        //            new Real(rangeType, r, CommonUnit.meter.scale(1000)));
         rss.setVisible(true);
 
         /** width for range rings */

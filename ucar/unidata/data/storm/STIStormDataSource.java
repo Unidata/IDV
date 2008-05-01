@@ -75,7 +75,11 @@ public class STIStormDataSource extends StormDataSource {
 
     /** _more_          */
     private static final String DEFAULT_URL =
-        "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=yuanho&password=password";
+        "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=jeff&password=mypassword";
+
+
+    //    private static final String DEFAULT_URL =
+    //        "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=yuanho&password=password";
 
     /** _more_          */
     private static final String COL_YEAR = "year";
@@ -98,25 +102,25 @@ public class STIStormDataSource extends StormDataSource {
 
 
     /** _more_          */
-    private static RealType TYPE_MAXWINDSPEED;
+    public static RealType TYPE_MAXWINDSPEED;
 
     /** _more_          */
-    private static RealType TYPE_MINPRESSURE;
+    public static RealType TYPE_MINPRESSURE;
 
     /** _more_          */
-    private static RealType TYPE_RADIUSMODERATEGALE;
+    public static RealType TYPE_RADIUSMODERATEGALE;
 
     /** _more_          */
-    private static RealType TYPE_RADIUSWHOLEGALE;
+    public static RealType TYPE_RADIUSWHOLEGALE;
 
     /** _more_          */
-    private static RealType TYPE_PROBABILITYRADIUS;
+    public static RealType TYPE_PROBABILITYRADIUS;
 
     /** _more_          */
-    private static RealType TYPE_MOVEDIRECTION;
+    public static RealType TYPE_MOVEDIRECTION;
 
     /** _more_          */
-    private static RealType TYPE_MOVESPEED;
+    public static RealType TYPE_MOVESPEED;
 
 
 

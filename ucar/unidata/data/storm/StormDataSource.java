@@ -115,26 +115,6 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_          */
     public static final String ATTR_CATEGORY = "attr.category";
 
-    /** _more_          */
-    public static final String ATTR_WINDSPEED = "MaxWindSpeed";
-
-    /** _more_          */
-    public static final String ATTR_PRESSURE = "MinPressure";
-
-    /** _more_          */
-    public static final String ATTR_MODERATEGALE = "RadiusModerateGale";
-
-    /** _more_          */
-    public static final String ATTR_WHOLEGALE = "RadiusWholeGale";
-
-    /** _more_          */
-    public static final String ATTR_MOVEDIR = "MoveDirection";
-
-    /** _more_          */
-    public static final String ATTR_MOVESPEED = "MoveSpeed";
-
-    /** _more_          */
-    public static final String ATTR_PROBABILITYRADIUS = "ProbabilityRadius";
 
     /**
      * _more_

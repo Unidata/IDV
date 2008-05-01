@@ -294,6 +294,7 @@ public class StormTrack {
      * @return _more_
      */
     public Real[] getTrackAttributeValues(RealType type) {
+        if(type == null) return null;
         int    size            = trackPoints.size();
         Real[] trackAttributes = new Real[size];
         for (int i = 0; i < size; i++) {
