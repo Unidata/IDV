@@ -72,16 +72,21 @@ import java.util.Map;
 public class STIStormDataSource extends StormDataSource {
 
 
-    /* Use this for mysql:
-       private static final String DEFAULT_URL =  "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=jeff&password=mypassword";
+    /* Use this for mysql:     */
+       private static final String DEFAULT_URL =  "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=yuanho&password=password";
        private static final String COL_YEAR = "year";
        private static final String COL_HOUR = "hour";
-    */
+    /**/
 
     //Use this for java derby:
+    /*
+
     private static final String DEFAULT_URL = "jdbc:derby:test;create=true";
     private static final String COL_HOUR = "hh";
     private static final String COL_YEAR = "yyyy";
+
+    */
+
 
 
 
@@ -270,8 +275,15 @@ public class STIStormDataSource extends StormDataSource {
         long                 t1              = System.currentTimeMillis();
         StormTrackCollection trackCollection = new StormTrackCollection();
         List<Way>            forecastWays    = getForecastWays(stormInfo);
+        List rings = new ArrayList();
+        double r = 50;
+        for(int i=0; i< 10; i++){
+            rings.add(r);
+            r = r + 50;
+        }
         for (Way forecastWay : forecastWays) {
             //            if(!forecastWay.getId().equals("SHTM")) continue;
+            forecastWay.setProbabilityRIngs(rings);
             List forecastTracks = getForecastTracks(stormInfo, forecastWay);
             if (forecastTracks.size() > 0) {
                 trackCollection.addTrackList(forecastTracks);
@@ -358,7 +370,7 @@ public class STIStormDataSource extends StormDataSource {
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
         ResultSet             results;
-
+        double radius = 50;
         List<StormTrackPoint> pts = new ArrayList();
         List<Attribute>       attrs;
         Real                  altReal = new Real(RealType.Altitude, 0);
@@ -382,17 +394,19 @@ public class STIStormDataSource extends StormDataSource {
                     longitude = Float.NaN;
                 }
                 double windSpd = results.getDouble(col++);
-                attrs.add(new Attribute("MaxWindSpeed", windSpd));
+                attrs.add(new Attribute(ATTR_WINDSPEED, windSpd));
                 double pressure = results.getDouble(col++);
-                attrs.add(new Attribute("MinPressure", pressure));
+                attrs.add(new Attribute(ATTR_PRESSURE, pressure));
                 double radiusMG = results.getDouble(col++);
-                attrs.add(new Attribute("RadiusModerateGale", radiusMG));
+                attrs.add(new Attribute(ATTR_MODERATEGALE, radiusMG));
                 double radiusWG = results.getDouble(col++);
-                attrs.add(new Attribute("RadiusWholeGale", radiusWG));
+                attrs.add(new Attribute(ATTR_WHOLEGALE, radiusWG));
                 double moveDir = results.getDouble(col++);
-                attrs.add(new Attribute("MoveDirection", moveDir));
+                attrs.add(new Attribute(ATTR_MOVEDIR, moveDir));
                 double moveSpd = results.getDouble(col++);
-                attrs.add(new Attribute("MoveSpeed", moveSpd));
+                attrs.add(new Attribute(ATTR_MOVESPEED, moveSpd));
+                attrs.add(new Attribute(ATTR_PROBABILITYRADIUS, radius));
+                radius = radius + 50;
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -686,17 +700,17 @@ public class STIStormDataSource extends StormDataSource {
                 double          latitude  = results.getDouble(col++);
                 double          longitude = results.getDouble(col++);
                 double          windSpd   = results.getDouble(col++);
-                attrs.add(new Attribute("MaxWindSpeed", windSpd));
+                attrs.add(new Attribute(ATTR_WINDSPEED, windSpd));
                 double pressure = results.getDouble(col++);
-                attrs.add(new Attribute("MinPressure", pressure));
+                attrs.add(new Attribute(ATTR_PRESSURE, pressure));
                 double radiusMG = results.getDouble(col++);
-                attrs.add(new Attribute("RadiusModerateGale", radiusMG));
+                attrs.add(new Attribute(ATTR_MODERATEGALE, radiusMG));
                 double radiusWG = results.getDouble(col++);
-                attrs.add(new Attribute("RadiusWholeGale", radiusWG));
+                attrs.add(new Attribute(ATTR_WHOLEGALE, radiusWG));
                 double moveDir = results.getDouble(col++);
-                attrs.add(new Attribute("MoveDirection", moveDir));
+                attrs.add(new Attribute(ATTR_MOVEDIR, moveDir));
                 double moveSpd = results.getDouble(col++);
-                attrs.add(new Attribute("MoveSpeed", moveSpd));
+                attrs.add(new Attribute(ATTR_MOVESPEED, moveSpd));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -764,6 +778,7 @@ public class STIStormDataSource extends StormDataSource {
         List<StormTrackPoint> obsPts1 = new ArrayList();
         List<StormTrackPoint> obsPts2 = new ArrayList();
         Real                  altReal = new Real(RealType.Altitude, 0);
+
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 List<Attribute> attrs     = new ArrayList();
@@ -775,17 +790,17 @@ public class STIStormDataSource extends StormDataSource {
                 double          latitude  = results.getDouble(col++);
                 double          longitude = results.getDouble(col++);
                 double          windSpd   = results.getDouble(col++);
-                attrs.add(new Attribute("MaxWindSpeed", windSpd));
+                attrs.add(new Attribute(ATTR_WINDSPEED, windSpd));
                 double pressure = results.getDouble(col++);
-                attrs.add(new Attribute("MinPressure", pressure));
+                attrs.add(new Attribute(ATTR_PRESSURE, pressure));
                 double radiusMG = results.getDouble(col++);
-                attrs.add(new Attribute("RadiusModerateGale", radiusMG));
+                attrs.add(new Attribute(ATTR_MODERATEGALE, radiusMG));
                 double radiusWG = results.getDouble(col++);
-                attrs.add(new Attribute("RadiusWholeGale", radiusWG));
+                attrs.add(new Attribute(ATTR_WHOLEGALE, radiusWG));
                 double moveDir = results.getDouble(col++);
-                attrs.add(new Attribute("MoveDirection", moveDir));
+                attrs.add(new Attribute(ATTR_MOVEDIR, moveDir));
                 double moveSpd = results.getDouble(col++);
-                attrs.add(new Attribute("MoveSpeed", moveSpd));
+                attrs.add(new Attribute(ATTR_MOVESPEED, moveSpd));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
