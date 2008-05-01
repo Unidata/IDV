@@ -34,10 +34,12 @@ package ucar.unidata.data.storm;
 public class Way {
 
     /** _more_          */
-    public static final Way OBSERVATION = new Way("Observation");
+    public static final Way OBSERVATION = new Way("Observation", "Observation");
 
     /** _more_ */
-    private String id="";
+    private String id;
+
+    private String name;
 
     /**
      * _more_
@@ -50,12 +52,18 @@ public class Way {
      * @param id _more_
      */
     public Way(String id) {
+        this(id,id);
+    }
+
+    public Way(String id, String name) {
         this.id = id;
+        this.name = name;
     }
 
     public boolean isObservation() {
         return this.equals(OBSERVATION);
     }
+
 
     /**
      * _more_
@@ -81,7 +89,7 @@ public class Way {
      * @return _more_
      */
     public String toString() {
-        return id;
+        return name;
     }
 
     /**
@@ -111,6 +119,25 @@ public class Way {
 
         return (this.id.equals(other.id));
     }
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
+
+
 
 
 }

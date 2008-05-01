@@ -32,6 +32,7 @@ import ucar.unidata.data.point.PointObFactory;
 
 import ucar.visad.display.*;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.GuiUtils;
 
 import java.awt.Color;
 import java.util.List;
@@ -57,14 +58,15 @@ public class WayDisplayState {
 
     private JCheckBox visibilityCbx;
 
-    private JCheckBox visibilityRingsCbx;
+    private JCheckBox ringsCbx;
     /** _more_          */
     private Way way;
 
     /** _more_          */
     private boolean visible = true;
-/** _more_          */
-    private boolean ringsVisible = true;
+
+    /** _more_          */
+    private boolean ringsVisible = false;
 
     /** _more_          */
     List<Displayable> displayables = new ArrayList<Displayable>();
@@ -104,12 +106,10 @@ public class WayDisplayState {
     }
     
 
-
-
-
     public JCheckBox getVisiblityCheckBox() {
         if(visibilityCbx==null) {
-            visibilityCbx = new JCheckBox((way.isObservation()?"Show Observation Track":way.toString()), getVisible());
+            visibilityCbx = new JCheckBox("Visible", getVisible());
+            visibilityCbx.setToolTipText("Show/Hide Track");
             visibilityCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
@@ -126,22 +126,25 @@ public class WayDisplayState {
     }
 
     public JCheckBox getRingsVisiblityCheckBox() {
-        if(visibilityRingsCbx==null) {
-            visibilityRingsCbx = new JCheckBox((way.isObservation()?"Show Observation Rings":way.toString()), getRingsVisible());
-            visibilityRingsCbx.addActionListener(new ActionListener() {
+        if(ringsCbx==null) {
+            //            ringsCbx = new JCheckBox("Rings",GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/Rings16.gif"), getRingsVisible());
+            ringsCbx = new JCheckBox("Rings", getRingsVisible());
+            ringsCbx.setToolTipText("Show Rings");
+            ringsCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
-                        setRingsVisible(visibilityRingsCbx.isSelected());
+                        setRingsVisible(ringsCbx.isSelected());
                     } catch(Exception exc) {
                         LogUtil.logException("Toggling way visibility", exc);
                     }
                 }
             });
 
-
         }
-        return visibilityRingsCbx;
+        return ringsCbx;
     }
+
+
     public List<PointOb> getPointObs() {
         return pointObs;
     }

@@ -20,12 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -35,6 +29,7 @@ import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -77,6 +72,9 @@ public class StormTrackControl extends DisplayControlImpl {
 
     /** _more_ */
     private StormDataSource stormDataSource;
+
+
+    private List<StormInfo> stormInfos;
 
 
     /** Holds the EarthLocation of the last point clicked */
@@ -152,6 +150,72 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    public void viewStorm(StormDisplayState  stormDisplayState) {
+        treePanel.show(stormDisplayState.getContents());
+    }
+
+    public void unloadAllTracks() {
+        for (int i=stormInfos.size()-1;i>=0;i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            StormDisplayState  stormDisplayState=
+                getStormDisplayState(stormInfo);
+            if(stormDisplayState.getActive()) {
+                stormDisplayState.deactivate();
+            }
+        }
+    }
+
+    protected void getEditMenuItems(List items, boolean forMenuBar) {
+        try {
+        List subMenus = new ArrayList();
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        Hashtable menus = new Hashtable();
+        List activeItems = new ArrayList();
+        for (int i=stormInfos.size()-1;i>=0;i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            cal.setTime(ucar.visad.Util.makeDate(stormInfo.getStartTime()));
+            int year = cal.get(Calendar.YEAR);
+            JMenu yearMenu = (JMenu) menus.get(""+year);
+            if(yearMenu ==null) {
+                yearMenu =new JMenu(""+year);
+                menus.put(""+year,yearMenu);
+                subMenus.add(yearMenu);
+            }
+            StormDisplayState  stormDisplayState=
+                getStormDisplayState(stormInfo);
+            if(stormDisplayState.getActive()) {
+                activeItems.add(MenuUtil.makeMenuItem(stormInfo.toString(), this, "viewStorm", stormDisplayState));
+            }
+            if(stormInfo.getBasin()!=null) {
+                JMenu basinMenu = (JMenu) menus.get(year+"Basin:" + stormInfo.getBasin());
+                if(basinMenu == null) {
+                    basinMenu  = new JMenu("Basin:" + stormInfo.getBasin());
+                    menus.put(year+"Basin:" + stormInfo.getBasin(),basinMenu);                    
+                    yearMenu.add(basinMenu);
+                }
+                yearMenu = basinMenu;
+            }
+            yearMenu.add(GuiUtils.makeMenuItem(stormInfo.toString(), this, "viewStorm", stormDisplayState));
+        }
+
+        JMenu trackMenu =   GuiUtils.makeMenu(
+                              "Storm Tracks",subMenus);
+        GuiUtils.limitMenuSize(trackMenu, "Tracks:", 30);
+        if(activeItems.size()>0) {
+            activeItems.add(0,GuiUtils.MENU_SEPARATOR);
+            activeItems.add(0,GuiUtils.makeMenuItem("Unload all tracks", this, "unloadAllTracks",null));
+            trackMenu.insert(GuiUtils.makeMenu("Active Tracks", activeItems),0);
+        }
+
+
+        items.add(trackMenu);
+        super.getEditMenuItems(items, forMenuBar);
+        } catch (Exception exc) {
+            logException("Making track menu", exc);
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -201,10 +265,10 @@ public class StormTrackControl extends DisplayControlImpl {
     protected Container doMakeContents() throws VisADException,
             RemoteException {
 
-        treePanel = new TreePanel(true, 100);
+        treePanel = new TreePanel(true, 150);
 
         //Get the storm infos and sort them
-        List<StormInfo> stormInfos = (List<StormInfo>)Misc.sort(stormDataSource.getStormInfos());
+        stormInfos = (List<StormInfo>)Misc.sort(stormDataSource.getStormInfos());
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         Hashtable years = new Hashtable();
         JComponent firstComponent = null;

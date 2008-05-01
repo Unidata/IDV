@@ -156,7 +156,7 @@ public class StormDisplayState {
     private StormTrackCollection trackCollection;
 
     /** _more_ */
-    private List<StormTrack> tracks;
+    //    private List<StormTrack> tracks;
 
     /** _more_ */
     private JTable trackTable;
@@ -257,7 +257,7 @@ public class StormDisplayState {
      */
     private JComponent doMakeContents() {
         JButton loadBtn = new JButton("Load Tracks:");
-        JLabel  label   = GuiUtils.cLabel("  " + stormInfo);
+        JLabel  topLabel   = GuiUtils.cLabel("  " + stormInfo);
         loadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 active = true;
@@ -265,7 +265,7 @@ public class StormDisplayState {
             }
         });
 
-        JComponent top      = GuiUtils.hbox(loadBtn, label);
+        JComponent top      = GuiUtils.hbox(loadBtn, topLabel);
         originalContents = GuiUtils.inset(top, 5);
         JComponent contents = GuiUtils.top(originalContents);
         contents = new JPanel(new BorderLayout()) {
@@ -308,10 +308,11 @@ public class StormDisplayState {
         JButton unloadBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif",this,"deactivate");
         unloadBtn.setToolTipText("Remove this storm");
 
-        JComponent label = GuiUtils.inset(GuiUtils.hbox(unloadBtn, GuiUtils.lLabel("Unload Storm: " + stormInfo)), new Insets(0,0,5,0));
+        JComponent top = GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel("Storm: " + stormInfo),unloadBtn), new Insets(0,0,5,0));
 
         final JCheckBox showForecastCbx =
-            new JCheckBox("Show Forecast Tracks", getForecastVisible());
+            new JCheckBox("Visible",getForecastVisible());
+        showForecastCbx.setToolTipText("Show Forecast Tracks");
         showForecastCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 setForecastVisible(showForecastCbx.isSelected());
@@ -326,28 +327,66 @@ public class StormDisplayState {
                 showStorm();
             }
         });
-        JComponent top     = GuiUtils.vbox(label, GuiUtils.hbox(getWayDisplayState(Way.OBSERVATION).getVisiblityCheckBox(),
-                                           getWayDisplayState(Way.OBSERVATION).getRingsVisiblityCheckBox()),
-                                           showForecastCbx );
 
+
+
+
+        List components = new ArrayList();
         List<Way>  ways    = trackCollection.getWayList();
-        List       wayCbxs = new ArrayList();
-        wayCbxs.add(new JLabel("Ways: "));
+        boolean haveDoneForecast = false;
         for (Way way : ways) {
-            if (way.isObservation()) {
-                continue;
-            }
             WayDisplayState wayDisplayState = getWayDisplayState(way);
             JComponent swatch  =GuiUtils.filler(10,10);
             swatch.setBackground(wayDisplayState.getColor());
-            wayCbxs.add(GuiUtils.left(GuiUtils.hbox(GuiUtils.wrap(swatch),wayDisplayState.getVisiblityCheckBox())));
+            JLabel wayLabel = new JLabel(way.toString());
+            JComponent buttons = GuiUtils.hbox(
+                                              wayDisplayState.getVisiblityCheckBox(),
+                                              wayDisplayState.getRingsVisiblityCheckBox());
+            buttons = GuiUtils.left(buttons);
+            if (way.isObservation()) {
+                components.add(0, wayLabel);
+                components.add(1,buttons);
+                components.add(2,GuiUtils.left(GuiUtils.wrap(swatch)));
+
+            } else {
+                if(!haveDoneForecast) {
+                    haveDoneForecast = true;
+                    //                    components.add(GuiUtils.hbox(showForecastCbx,new JLabel("Forecasts")));
+                    components.add(GuiUtils.filler(2,5));
+                    components.add(GuiUtils.filler(2,5));
+                    components.add(GuiUtils.filler(2,5));
+
+                    components.add(GuiUtils.lLabel("Forecasts:"));
+                    components.add(GuiUtils.left(showForecastCbx));
+                    components.add(GuiUtils.filler());
+                }
+                components.add(wayLabel);
+                components.add(buttons);
+                components.add(GuiUtils.left(GuiUtils.wrap(swatch)));
+            }
         }
-        JComponent wayComp = GuiUtils.vbox(wayCbxs);
+
+        GuiUtils.tmpInsets = new Insets(2,2,0,2);
+        JComponent wayComp = GuiUtils.top(GuiUtils.doLayout(components,3,GuiUtils.WT_NNY,GuiUtils.WT_N));
+        //Put the list of ways into a scroller if there are lots of them
+        if(ways.size()>10) {
+        int width  = 300;
+        int height = 400;
+        JScrollPane scroller = GuiUtils.makeScrollPane(wayComp, width,
+                                   height);
+        scroller.setBorder(BorderFactory.createLoweredBevelBorder());
+        scroller.setPreferredSize(new Dimension(width, height));
+        scroller.setMinimumSize(new Dimension(width, height));
+        wayComp = scroller;
+        }
+
         JComponent inner = GuiUtils.topCenter(top,
-                                              GuiUtils.inset(GuiUtils.top(wayComp), new Insets(0,5,0,0)));
+                                              GuiUtils.inset(wayComp, new Insets(0,5,0,0)));
 
         contents.add(BorderLayout.CENTER, GuiUtils.inset(inner, 5));
-        contents.repaint(1);
+        contents.invalidate();
+        contents.validate();
+        contents.repaint();
     }
 
     /**
@@ -403,11 +442,13 @@ public class StormDisplayState {
             contents.add(
                 GuiUtils.top(
                     GuiUtils.inset(new JLabel("Loading Tracks..."), 5)));
-            contents.repaint(1);
+            contents.invalidate();
+            contents.validate();
+            contents.repaint();
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
                     stormInfo);
-            tracks = trackCollection.getTracks();
+            //            tracks = trackCollection.getTracks();
             initCenterContents();
             holder = new CompositeDisplayable();
             stormTrackControl.addDisplayable(holder);
@@ -461,14 +502,19 @@ public class StormDisplayState {
                 dots.setScale(1.0f);
                 holder.addDisplayable(dots);
                 dots.setStationModel(model);
+                //                dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
+                //                                                                               24*60,-1));
                 dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
-                                                                               24*60,-1));
+                                                                               -1,-1));
 
             }
 
         }
 
+        
 
+        //Don't load them until we need to
+        if(getForecastVisible() || forecastHolder !=null) {
         List<WayDisplayState> wayDisplayStates  = getWayDisplayStates();
         if (forecastHolder != null) {
             forecastHolder.setVisible(getForecastVisible());
@@ -479,7 +525,7 @@ public class StormDisplayState {
             forecastHolder = new CompositeDisplayable();
             holder.addDisplayable(forecastHolder);
             forecastHolder.setVisible(true);
-            for (StormTrack track : tracks) {
+            for (StormTrack track : trackCollection.getTracks()) {
                 if (track.isObservation()) {
                     continue;
                 }
@@ -537,6 +583,7 @@ public class StormDisplayState {
                 FieldImpl timeField = ucar.visad.Util.makeTimeField(fields,wayDisplayState.getTimes());
                 trackDisplay.setTrack(timeField);
             }
+        }
         }
 
         if(wasActive)  displayMaster.setActive(true);
@@ -716,10 +763,10 @@ public class StormDisplayState {
             }
 
             public int getRowCount() {
-                if (tracks == null) {
+                if (trackCollection == null) {
                     return 0;
                 }
-                return tracks.size();
+                return trackCollection.getTracks().size();
             }
 
             public int getColumnCount() {
@@ -730,10 +777,11 @@ public class StormDisplayState {
                                    int columnIndex) {}
 
             public Object getValueAt(int row, int column) {
-                if ((tracks == null) || (row >= tracks.size())) {
+                
+                if ((trackCollection == null) || (row >= trackCollection.getTracks().size())) {
                     return "";
                 }
-                StormTrack track = tracks.get(row);
+                StormTrack track = trackCollection.getTracks().get(row);
                 if (column == 0) {
                     return track.getWay();
                 }
