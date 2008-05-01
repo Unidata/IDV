@@ -224,15 +224,15 @@ public class STIStormDataSource extends StormDataSource {
             TYPE_RADIUSMODERATEGALE =
                 ucar.visad.Util.makeRealType("radiusmoderategale",
                                              "Moderate_Gale_Radius",
-                                             Util.parseUnit("m"));
+                                             Util.parseUnit("km"));
             TYPE_PROBABILITYRADIUS =
                 ucar.visad.Util.makeRealType("probabilityradius",
                                              "Probability_Radius",
-                                             Util.parseUnit("m"));
+                                             Util.parseUnit("km"));
             TYPE_RADIUSWHOLEGALE =
                 ucar.visad.Util.makeRealType("radiuswholegale",
                                              "Whole_Gale_Radius",
-                                             Util.parseUnit("m"));
+                                             Util.parseUnit("km"));
             TYPE_MOVEDIRECTION =
                 ucar.visad.Util.makeRealType("movedirection",
                                              "Storm_Direction",
