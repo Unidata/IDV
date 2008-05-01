@@ -16,17 +16,26 @@ the <code class="filename">runIDV</code> script. </div>
 
   <li>Open a terminal window (if you do not have one open already)
       and change to the directory where the IDV was installed.
-      (e.g., <code class="filename"><%workshop.idvinstall%>/IDV_<%idv.version%></code>)
+      (e.g., <code class="filename"><%workshop.idvinstall%>IDV_<%idv.version%></code>)
     <p><ul>
-      <code class="command">cd&nbsp;&nbsp;<%workshop.idvinstall%>/IDV_<%idv.version%></code>
+      <code class="command">cd&nbsp;&nbsp;<%workshop.idvinstall%>IDV_<%idv.version%></code>
     </ul></p>
   </li>
 
   <li>Print out the <code class="filename">runIDV</code> script. 
-    <p><ul>
+    <p>
+    <i>On Unix/Mac:</i>
+    <ul>
       <code class="command">cat&nbsp;&nbsp;runIDV</code>
     </ul></p>
+    <p>
+    <i>On Windows:</i>
+    <ul>
+      <code class="command">type&nbsp;&nbsp;runIDV.bat</code>
+    </ul></p>
     <p>You should see a printout that starts like this:
+    <p>
+    <i>On Unix:</i>
     <pre>
 #!/bin/sh
 
@@ -34,6 +43,11 @@ dirname=`dirname $0`
 command="java -Xmx512m -Didv.enableStereo=false -jar idv.jar $*"
     </pre>
 and then some code to find the version of java to use.
+    <p>
+    <i>On Windows:</i>
+    <pre>
+jre\\\bin\\\java -Xmx512m -Didv.enableStereo=false -jar idv.jar %*
+    </pre>
 
     <p>The script sets up the environment for the IDV to run.  
 

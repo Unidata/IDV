@@ -18,7 +18,7 @@ set ::workshopTitle {Unidata IDV Workshop}
 set ::workshopHome /home/idv
 
 ##The installation directory of the  IDV
-set ::idvInstall /home/idv
+set ::idvInstall /home/idv/
 
 ##Where on the filesystem do we find the data files.
 gen::defineMacro {<%workshop.datadir%>} {/data/idv}
@@ -98,7 +98,7 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::defineMacro {<%workshop.installdir%>} "$::workshopHome"
         gen::defineMacro {<%workshop.homedir%>} $::workshopHome
         gen::defineMacro {<%workshop.idvinstall%>} {c:\\\\Program Files\\\\}
-        gen::defineMacro {<%workshop.datadir%>} $::workshopHome
+        gen::defineMacro {<%workshop.datadir%>} {c:\\\\workshopdata}
         gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
         gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"

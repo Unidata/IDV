@@ -9,12 +9,12 @@ index.html
 >>installandstart/Download.html
 >>installandstart/Installer.html
 
-
 >installandstart/Start.html
 >>installandstart/FirstStart.html
 >>installandstart/basics/index.html
 >>>installandstart/basics/GettingStarted.html
 >>>installandstart/basics/Navigation.html
+>>>datadisplays/selection/TimeAnimation.html
 >>>installandstart/basics/MainMenu.html
 >>>installandstart/basics/ViewManagerMenus.html
 >>>installandstart/basics/BackgroundMaps.html
@@ -27,23 +27,20 @@ index.html
 |installandstart/basics/MapSelector.html
 |installandstart/basics/ShortStart.html
 |installandstart/LocalData.html
+|datadisplays/selection/TimeAnimationWidget.html
 
 
 >datadisplays/index.html
 >>datadisplays/selection/index.html
->>>datadisplays/selection/DataSourceChooser.html
->>>datadisplays/selection/FieldSelector.html
->>>datadisplays/selection/DisplayControl.html
->>>datadisplays/selection/Legends.html
->>>datadisplays/selection/TimeAnimation.html
-|datadisplays/selection/TimeAnimationWidget.html
-
-
+>>datadisplays/selection/DataSourceChooser.html
 >>datadisplays/grid/index.html
 >>>datadisplays/grid/LoadingGrids.html
+>>>datadisplays/selection/FieldSelector.html
+>>>datadisplays/selection/DisplayControl.html
 >>>datadisplays/grid/PlanViews.html
 >>>datadisplays/grid/Isosurfaces.html
 >>>datadisplays/grid/CrossSections.html
+>>>datadisplays/selection/Legends.html
 >>>datadisplays/grid/Probes.html
 >>>datadisplays/grid/Probes2.html
 >>>datadisplays/grid/VectorDisplays.html

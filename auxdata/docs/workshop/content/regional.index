@@ -13,8 +13,8 @@ title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:T
 >>>installandstart/basics/BackgroundMaps.html
 +>>>resources/ProjectionManager.html
 >>>resources/Preferences.html
-+>>>installandstart/basics/Exiting.html
-+>>>installandstart/WebStart.html
+#>>>installandstart/basics/Exiting.html
+#>>>installandstart/WebStart.html
 
 |installandstart/basics/MouseAndKeyboard.html
 |installandstart/basics/MapSelector.html
@@ -22,22 +22,17 @@ title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:T
 |installandstart/LocalData.html
 |datadisplays/selection/TimeAnimationWidget.html
 
-
-#>datadisplays/index.html
-#>>datadisplays/selection/index.html
-
-
 >datadisplays/index.html
 >>datadisplays/selection/index.html
 >>datadisplays/selection/DataSourceChooser.html
 >>datadisplays/grid/index.html
 >>>datadisplays/grid/LoadingGrids.html
 >>>datadisplays/selection/FieldSelector.html
->>>datadisplays/grid/PlanViews.html
 >>>datadisplays/selection/DisplayControl.html
->>>datadisplays/selection/Legends.html
+>>>datadisplays/grid/PlanViews.html
 >>>datadisplays/grid/Isosurfaces.html
 >>>datadisplays/grid/CrossSections.html
++>>>datadisplays/selection/Legends.html
 >>>datadisplays/grid/Probes.html
 +>>>datadisplays/grid/Probes2.html
 >>>datadisplays/grid/VectorDisplays.html
