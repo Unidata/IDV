@@ -239,15 +239,37 @@ public class StormTrack {
         float [] trackAttributes = new float[size];
         for(int i = 0; i< size; i++){
             String str = trackPoints.get(i).getAttribute(attrName);
-            if(str == null || str.length()==0) return null;
             if(str.startsWith("9999"))
                  trackAttributes[i] = Float.NaN;
             else
                 trackAttributes[i] = Float.valueOf(str);
         }
+        for(int i = 0; i< size; i++){
+            if( trackAttributes[i] == Float.NaN ) {
+                 trackAttributes[i] =  findClosestAttr(trackAttributes, i) ;
+            }
+        }
+
         return trackAttributes;
     }
 
+    public float findClosestAttr(float [] trackAttributes, int i) {
+        int up = i;
+        int down = i;
+        int size = trackAttributes.length;
+        float value = Float.NaN;
+        while(Float.isNaN(value)) {
+            up++;
+            down--;
+            if(up > 0 && up < size)
+               value = trackAttributes[up];
+            if(down > 0 && down < size)
+               value = trackAttributes[down];
+        }
+
+        return value;
+
+    }
     public String toString() {
         return trackId;
     }
