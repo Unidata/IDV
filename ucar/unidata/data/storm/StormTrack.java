@@ -20,14 +20,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.storm;
+
 
 import ucar.unidata.data.*;
 
 
 import visad.*;
+
 import visad.georef.EarthLocation;
+
 import java.util.ArrayList;
 
 import java.util.List;
@@ -52,8 +54,13 @@ public class StormTrack {
     private Way way;
 
 
+    /** _more_          */
     private NamedArray lats;
+
+    /** _more_          */
     private NamedArray lons;
+
+    /** _more_          */
     private List<DateTime> times;
 
     /** _more_ */
@@ -62,12 +69,22 @@ public class StormTrack {
     //private Date trackStartTime;
 
 
-    public StormTrack(StormInfo stormInfo, Way way, NamedArray lats, NamedArray lons, List<DateTime> times) {
-        this.stormInfo   = stormInfo;
-        this.way         = way;
-        this.lats = lats;
-        this.lons = lons;
-        this.times = times;
+    /**
+     * _more_
+     *
+     * @param stormInfo _more_
+     * @param way _more_
+     * @param lats _more_
+     * @param lons _more_
+     * @param times _more_
+     */
+    public StormTrack(StormInfo stormInfo, Way way, NamedArray lats,
+                      NamedArray lons, List<DateTime> times) {
+        this.stormInfo = stormInfo;
+        this.way       = way;
+        this.lats      = lats;
+        this.lons      = lons;
+        this.times     = times;
     }
 
 
@@ -78,12 +95,13 @@ public class StormTrack {
      * @param way _more_
      * @param pts _more_
      */
-    public StormTrack(StormInfo stormInfo, Way way, List<StormTrackPoint> pts) {
+    public StormTrack(StormInfo stormInfo, Way way,
+                      List<StormTrackPoint> pts) {
         this.stormInfo   = stormInfo;
         this.way         = way;
-        this.trackPoints = new ArrayList(pts);
-        StormTrackPoint firstPoint = (StormTrackPoint)pts.get(0);
-        DateTime trackStartTime = firstPoint.getTrackPointTime();
+        this.trackPoints = new ArrayList<StormTrackPoint>(pts);
+        StormTrackPoint firstPoint     = (StormTrackPoint) pts.get(0);
+        DateTime        trackStartTime = firstPoint.getTrackPointTime();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + trackStartTime.getValue();
     }
@@ -91,6 +109,13 @@ public class StormTrack {
 
 
 
+    /**
+     * _more_
+     *
+     * @param stormInfo _more_
+     * @param way _more_
+     * @param startTime _more_
+     */
     public StormTrack(StormInfo stormInfo, Way way, DateTime startTime) {
         this.stormInfo   = stormInfo;
         this.way         = way;
@@ -103,10 +128,20 @@ public class StormTrack {
 
 
 
+    /**
+     * _more_
+     *
+     * @param point _more_
+     */
     public void addPoint(StormTrackPoint point) {
         trackPoints.add(point);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isObservation() {
         return way.isObservation();
     }
@@ -213,16 +248,38 @@ public class StormTrack {
      */
     public List<DateTime> getTrackTimes() {
         List<DateTime> trackTimes = new ArrayList();
-        for(StormTrackPoint stp: trackPoints){
+        for (StormTrackPoint stp : trackPoints) {
             trackTimes.add(stp.getTrackPointTime());
         }
         return trackTimes;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<RealType> getTypes() {
+        List<RealType> types = new ArrayList<RealType>();
+        if (trackPoints.size() > 0) {
+            List<Real> reals = trackPoints.get(0).getTrackAttributes();
+            for (Real r : reals) {
+                types.add((RealType) r.getType());
+            }
+
+        }
+        return types;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<EarthLocation> getLocations() {
         List<EarthLocation> locs = new ArrayList();
-        for(StormTrackPoint stp: trackPoints){
+        for (StormTrackPoint stp : trackPoints) {
             locs.add(stp.getTrackPointLocation());
         }
         return locs;
@@ -232,44 +289,60 @@ public class StormTrack {
     /**
      * _more_
      *
+     *
+     * @param type _more_
      * @return _more_
      */
-    public float [] getTrackAttributeValues(String attrName) {
-        int size = trackPoints.size();
-        float [] trackAttributes = new float[size];
-        for(int i = 0; i< size; i++){
-            String str = trackPoints.get(i).getAttribute(attrName);
-            if(str.startsWith("9999"))
-                 trackAttributes[i] = Float.NaN;
-            else
-                trackAttributes[i] = Float.valueOf(str);
-        }
-        for(int i = 0; i< size; i++){
-            if( trackAttributes[i] == Float.NaN ) {
-                 trackAttributes[i] =  findClosestAttr(trackAttributes, i) ;
+    public Real[] getTrackAttributeValues(RealType type) {
+        int    size            = trackPoints.size();
+        Real[] trackAttributes = new Real[size];
+        for (int i = 0; i < size; i++) {
+            Real value = trackPoints.get(i).getAttribute(type);
+            if (value == null) {
+                if (i == 0) {
+                    return null;
+                }
+                trackAttributes[i] = null;
+            } else {
+                trackAttributes[i] = value;
             }
         }
-
         return trackAttributes;
     }
 
-    public float findClosestAttr(float [] trackAttributes, int i) {
-        int up = i;
-        int down = i;
-        int size = trackAttributes.length;
+    /**
+     * _more_
+     *
+     * @param trackAttributes _more_
+     * @param i _more_
+     *
+     * @return _more_
+     */
+    public float findClosestAttr(float[] trackAttributes, int i) {
+        int   up    = i;
+        int   down  = i;
+        int   size  = trackAttributes.length;
         float value = Float.NaN;
-        while(Float.isNaN(value)) {
+        while (Float.isNaN(value)) {
             up++;
             down--;
-            if(up > 0 && up < size)
-               value = trackAttributes[up];
-            if(down > 0 && down < size)
-               value = trackAttributes[down];
+            if ((up > 0) && (up < size)) {
+                value = trackAttributes[up];
+            }
+            if ((down > 0) && (down < size)) {
+                value = trackAttributes[down];
+            }
         }
 
         return value;
 
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return trackId;
     }
@@ -295,59 +368,59 @@ public class StormTrack {
 
 
 
-/**
-Set the Lats property.
+    /**
+     * Set the Lats property.
+     *
+     * @param value The new value for Lats
+     */
+    public void setLats(NamedArray value) {
+        lats = value;
+    }
 
-@param value The new value for Lats
-**/
-public void setLats (NamedArray value) {
-	lats = value;
-}
+    /**
+     * Get the Lats property.
+     *
+     * @return The Lats
+     */
+    public NamedArray getLats() {
+        return lats;
+    }
 
-/**
-Get the Lats property.
+    /**
+     * Set the Lons property.
+     *
+     * @param value The new value for Lons
+     */
+    public void setLons(NamedArray value) {
+        lons = value;
+    }
 
-@return The Lats
-**/
-public NamedArray getLats () {
-	return lats;
-}
+    /**
+     * Get the Lons property.
+     *
+     * @return The Lons
+     */
+    public NamedArray getLons() {
+        return lons;
+    }
 
-/**
-Set the Lons property.
+    /**
+     * Set the Times property.
+     *
+     * @param value The new value for Times
+     */
+    public void setTimes(List<DateTime> value) {
+        times = value;
+    }
 
-@param value The new value for Lons
-**/
-public void setLons (NamedArray value) {
-	lons = value;
-}
-
-/**
-Get the Lons property.
-
-@return The Lons
-**/
-public NamedArray getLons () {
-	return lons;
-}
-
-/**
-Set the Times property.
-
-@param value The new value for Times
-**/
-public void setTimes (List<DateTime> value) {
-	times = value;
-}
-
-/**
-Get the Times property.
-
-@return The Times
-**/
-public List<DateTime> getTimes () {
-	return times;
-}
+    /**
+     * Get the Times property.
+     *
+     * @return The Times
+     */
+    public List<DateTime> getTimes() {
+        return times;
+    }
 
 
 

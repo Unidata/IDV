@@ -20,30 +20,31 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.storm;
-
-
-import ucar.unidata.data.storm.*;
 
 
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 
-import ucar.visad.display.*;
-import ucar.unidata.util.LogUtil;
+
+import ucar.unidata.data.storm.*;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
 
-import java.awt.Color;
-import java.util.List;
-import java.util.ArrayList;
-
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import ucar.visad.display.*;
 
 import visad.*;
+
+import java.awt.*;
+
+import java.awt.Color;
+import java.awt.event.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -54,32 +55,49 @@ import visad.*;
 
 public class WayDisplayState {
 
+    /** _more_          */
     private StormDisplayState stormDisplayState;
 
+    /** _more_          */
     private JCheckBox visibilityCbx;
 
-    private JCheckBox ringsCbx;
     /** _more_          */
+    private JCheckBox ringsCbx;
+
+    /** _more_ */
     private Way way;
 
-    /** _more_          */
+    /** _more_ */
     private boolean visible = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean ringsVisible = false;
 
-    /** _more_          */
+    /** _more_ */
     List<Displayable> displayables = new ArrayList<Displayable>();
+
+    /** _more_          */
     List<Displayable> ringsDisplayables = new ArrayList<Displayable>();
+
+    /** _more_          */
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
+
+    /** _more_          */
     private List<FieldImpl> fields = new ArrayList<FieldImpl>();
+
+    /** _more_          */
     private List<DateTime> times = new ArrayList<DateTime>();
+
+    /** _more_          */
     private List<PointOb> pointObs = new ArrayList<PointOb>();
 
+    /** _more_          */
     private Color color;
 
-    public WayDisplayState() {
-    }
+    /**
+     * _more_
+     */
+    public WayDisplayState() {}
 
 
 
@@ -89,32 +107,42 @@ public class WayDisplayState {
     /**
      * _more_
      *
+     *
+     * @param stormDisplayState _more_
      * @param way _more_
      */
     public WayDisplayState(StormDisplayState stormDisplayState, Way way) {
         this.stormDisplayState = stormDisplayState;
-        this.way = way;
+        this.way               = way;
     }
 
+    /**
+     * _more_
+     */
     public void deactivate() {
-        displayables = new ArrayList<Displayable>();
+        displayables      = new ArrayList<Displayable>();
         ringsDisplayables = new ArrayList<Displayable>();
-        tracks = new ArrayList<StormTrack>();
-        fields = new ArrayList<FieldImpl>();
-        times = new ArrayList<DateTime>();
-        pointObs = new ArrayList<PointOb>();
+        tracks            = new ArrayList<StormTrack>();
+        fields            = new ArrayList<FieldImpl>();
+        times             = new ArrayList<DateTime>();
+        pointObs          = new ArrayList<PointOb>();
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JCheckBox getVisiblityCheckBox() {
-        if(visibilityCbx==null) {
+        if (visibilityCbx == null) {
             visibilityCbx = new JCheckBox("Visible", getVisible());
             visibilityCbx.setToolTipText("Show/Hide Track");
             visibilityCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
                         setVisible(visibilityCbx.isSelected());
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         LogUtil.logException("Toggling way visibility", exc);
                     }
                 }
@@ -125,8 +153,13 @@ public class WayDisplayState {
         return visibilityCbx;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JCheckBox getRingsVisiblityCheckBox() {
-        if(ringsCbx==null) {
+        if (ringsCbx == null) {
             //            ringsCbx = new JCheckBox("Rings",GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/Rings16.gif"), getRingsVisible());
             ringsCbx = new JCheckBox("Rings", getRingsVisible());
             ringsCbx.setToolTipText("Show Rings");
@@ -134,7 +167,7 @@ public class WayDisplayState {
                 public void actionPerformed(ActionEvent ae) {
                     try {
                         setRingsVisible(ringsCbx.isSelected());
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         LogUtil.logException("Toggling way visibility", exc);
                     }
                 }
@@ -145,52 +178,86 @@ public class WayDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<PointOb> getPointObs() {
         return pointObs;
     }
 
+    /** _more_          */
     private static TextType textType;
+
+    /**
+     * _more_
+     *
+     * @param track _more_
+     * @param field _more_
+     *
+     * @throws Exception _more_
+     */
     public void addTrack(StormTrack track, FieldImpl field) throws Exception {
         tracks.add(track);
         times.add(track.getTrackStartTime());
         fields.add(field);
 
-        boolean isObservation = way.isObservation();
-        DateTime startTime = track.getTrackStartTime();
-        List<StormTrackPoint> locs     = track.getTrackPoints();
+        boolean               isObservation = way.isObservation();
+        DateTime              startTime     = track.getTrackStartTime();
+        List<StormTrackPoint> locs          = track.getTrackPoints();
         //        return makePointOb(el,dt, new RealTuple(new Real[] { new Real(0) }));
-        if(textType == null) {
+        if (textType == null) {
             textType = new TextType("label");
         }
 
-        for(int i=0;i<locs.size();i++) {
-            StormTrackPoint stp = locs.get(i);
-            DateTime time  =startTime;
-            String label = "";
-            if(isObservation) {
+        for (int i = 0; i < locs.size(); i++) {
+            StormTrackPoint stp   = locs.get(i);
+            DateTime        time  = startTime;
+            String          label = "";
+            if (isObservation) {
                 time = stp.getTrackPointTime();
             } else {
-                if(i==0) {
-                    label = way +": "+track.getTrackStartTime();
-                }  else {
-                    label = ""+stp.getForecastHour()+"H";
+                if (i == 0) {
+                    label = way + ": " + track.getTrackStartTime();
+                } else {
+                    label = "" + stp.getForecastHour() + "H";
                 }
             }
-            Tuple tuple = new Tuple(new Data[]{new visad.Text(textType,label)});
-            pointObs.add(PointObFactory.makePointOb(stp.getTrackPointLocation(), time,tuple));
+            Tuple tuple = new Tuple(new Data[] {
+                              new visad.Text(textType, label) });
+            pointObs.add(
+                PointObFactory.makePointOb(
+                    stp.getTrackPointLocation(), time, tuple));
         }
 
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getFields() {
         return fields;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<StormTrack> getTracks() {
         return tracks;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<DateTime> getTimes() {
         return times;
     }
@@ -199,13 +266,16 @@ public class WayDisplayState {
      * _more_
      *
      * @param displayable _more_
+     *
+     * @throws Exception _more_
      */
     public void addDisplayable(Displayable displayable) throws Exception {
         displayables.add(displayable);
-        if(way.isObservation()) {
+        if (way.isObservation()) {
             displayable.setVisible(getVisible());
         } else {
-            displayable.setVisible(getVisible() && stormDisplayState.getForecastVisible());
+            displayable.setVisible(getVisible()
+                                   && stormDisplayState.getForecastVisible());
         }
     }
 
@@ -214,11 +284,14 @@ public class WayDisplayState {
      * _more_
      *
      * @param displayable _more_
+     *
+     * @throws Exception _more_
      */
-    public void addRingsDisplayable(Displayable displayable) throws Exception {
+    public void addRingsDisplayable(Displayable displayable)
+            throws Exception {
         ringsDisplayables.add(displayable);
         setRingVisibility(displayable);
-     }
+    }
 
 
     /**
@@ -244,38 +317,53 @@ public class WayDisplayState {
      * Set the Visible property.
      *
      * @param value The new value for Visible
+     *
+     * @throws Exception _more_
      */
     public void setVisible(boolean value) throws Exception {
         this.visible = value;
-        for(Displayable displayable: displayables) {
-            if(way.isObservation()) {
+        for (Displayable displayable : displayables) {
+            if (way.isObservation()) {
                 displayable.setVisible(getVisible());
             } else {
-                displayable.setVisible(getVisible() && stormDisplayState.getForecastVisible());
+                displayable.setVisible(
+                    getVisible() && stormDisplayState.getForecastVisible());
             }
         }
         setRingsVisible(ringsVisible);
     }
 
-        /**
+    /**
      * Set the Visible property.
      *
      * @param value The new value for Visible
+     *
+     * @throws Exception _more_
      */
     public void setRingsVisible(boolean value) throws Exception {
         this.ringsVisible = value;
-        for(Displayable displayable: ringsDisplayables) {
-              setRingVisibility(displayable);
-         }
+        for (Displayable displayable : ringsDisplayables) {
+            setRingVisibility(displayable);
+        }
     }
 
-      private void setRingVisibility(Displayable ringDisplayable) throws Exception {
-            if(way.isObservation()) {
-                ringDisplayable.setVisible(getVisible() && getRingsVisible());
-            } else {
-                ringDisplayable.setVisible(getVisible() && getRingsVisible() && stormDisplayState.getForecastVisible());
-            }
+    /**
+     * _more_
+     *
+     * @param ringDisplayable _more_
+     *
+     * @throws Exception _more_
+     */
+    private void setRingVisibility(Displayable ringDisplayable)
+            throws Exception {
+        if (way.isObservation()) {
+            ringDisplayable.setVisible(getVisible() && getRingsVisible());
+        } else {
+            ringDisplayable.setVisible(
+                getVisible() && getRingsVisible()
+                && stormDisplayState.getForecastVisible());
         }
+    }
 
 
 
@@ -287,6 +375,7 @@ public class WayDisplayState {
     public boolean getVisible() {
         return visible;
     }
+
     /**
      * Get the Visible property.
      *
@@ -296,42 +385,42 @@ public class WayDisplayState {
         return ringsVisible;
     }
 
-/**
-Set the Color property.
+    /**
+     * Set the Color property.
+     *
+     * @param value The new value for Color
+     */
+    public void setColor(Color value) {
+        color = value;
+    }
 
-@param value The new value for Color
-**/
-public void setColor (Color value) {
-	color = value;
-}
-
-/**
-Get the Color property.
-
-@return The Color
-**/
-public Color getColor () {
-	return color;
-}
+    /**
+     * Get the Color property.
+     *
+     * @return The Color
+     */
+    public Color getColor() {
+        return color;
+    }
 
 
-/**
-Set the StormDisplayState property.
+    /**
+     * Set the StormDisplayState property.
+     *
+     * @param value The new value for StormDisplayState
+     */
+    public void setStormDisplayState(StormDisplayState value) {
+        stormDisplayState = value;
+    }
 
-@param value The new value for StormDisplayState
-**/
-public void setStormDisplayState (StormDisplayState value) {
-	stormDisplayState = value;
-}
-
-/**
-Get the StormDisplayState property.
-
-@return The StormDisplayState
-**/
-public StormDisplayState getStormDisplayState () {
-	return stormDisplayState;
-}
+    /**
+     * Get the StormDisplayState property.
+     *
+     * @return The StormDisplayState
+     */
+    public StormDisplayState getStormDisplayState() {
+        return stormDisplayState;
+    }
 
 
 

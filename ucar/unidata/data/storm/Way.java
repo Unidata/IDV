@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.storm;
 
 
@@ -33,12 +32,14 @@ package ucar.unidata.data.storm;
  */
 public class Way {
 
-    /** _more_          */
-    public static final Way OBSERVATION = new Way("Observation", "Observation");
+    /** _more_ */
+    public static final Way OBSERVATION = new Way("Observation",
+                                              "Observation");
 
     /** _more_ */
     private String id;
 
+    /** _more_          */
     private String name;
 
     /**
@@ -52,14 +53,25 @@ public class Way {
      * @param id _more_
      */
     public Way(String id) {
-        this(id,id);
+        this(id, id);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param name _more_
+     */
     public Way(String id, String name) {
-        this.id = id;
+        this.id   = id;
         this.name = name;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isObservation() {
         return this.equals(OBSERVATION);
     }
@@ -119,23 +131,24 @@ public class Way {
 
         return (this.id.equals(other.id));
     }
-/**
-Set the Name property.
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
 
 

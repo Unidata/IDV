@@ -20,15 +20,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.storm;
 
+
 import visad.*;
-import java.util.Set;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -52,6 +53,7 @@ public class StormTrackCollection {
     /** _more_ */
     private List stormsTimeRanges;
 
+    /** _more_          */
     List<StormTrack> tracks = new ArrayList<StormTrack>();
 
 
@@ -67,9 +69,11 @@ public class StormTrackCollection {
     /**
      * _more_
      *
+     *
+     * @return _more_
      */
-    public List<Way> getWayList( ) {
-        Set ss = wayToTracksHashMap.keySet();
+    public List<Way> getWayList() {
+        Set       ss   = wayToTracksHashMap.keySet();
         ArrayList ways = new ArrayList();
         ways.addAll(ss);
         return ways;
@@ -88,7 +92,7 @@ public class StormTrackCollection {
 
     /**
      *  _more_
-     * 
+     *
      *  @param track _more_
      */
     public void addTrack(StormTrack track) {
@@ -103,6 +107,11 @@ public class StormTrackCollection {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<StormTrack> getTracks() {
         return new ArrayList<StormTrack>(tracks);
     }
@@ -147,7 +156,7 @@ public class StormTrackCollection {
                 Iterator its = tracks.iterator();
                 while (its.hasNext()) {
                     StormTrack track = (StormTrack) its.next();
-                    DateTime  st    = track.getTrackStartTime();
+                    DateTime   st    = track.getTrackStartTime();
                     startTimes.add(st);
                 }
                 if (startTimes.size() > 0) {

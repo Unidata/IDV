@@ -20,8 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.storm;
+
 
 import visad.*;
 
@@ -39,11 +39,14 @@ public class StormInfo implements Comparable {
     /** _more_ */
     private String stormID;
 
+    /** _more_          */
     private String name;
 
 
+    /** _more_          */
     private String basin;
 
+    /** _more_          */
     private String number;
 
 
@@ -62,19 +65,36 @@ public class StormInfo implements Comparable {
      * @param sTime _more_
      */
     public StormInfo(String id, DateTime sTime) {
-        this(id,id,sTime);
+        this(id, id, sTime);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param name _more_
+     * @param sTime _more_
+     */
     public StormInfo(String id, String name, DateTime sTime) {
-        this(id,name,null,null,sTime);
+        this(id, name, null, null, sTime);
     }
 
-    public StormInfo(String id, String name, String basin, String number, DateTime sTime) {
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param name _more_
+     * @param basin _more_
+     * @param number _more_
+     * @param sTime _more_
+     */
+    public StormInfo(String id, String name, String basin, String number,
+                     DateTime sTime) {
         this.stormID   = id;
-        this.name = name;
-        this.basin = basin;
+        this.name      = name;
+        this.basin     = basin;
         this.startTime = sTime;
-        this.number = number;
+        this.number    = number;
     }
 
 
@@ -86,8 +106,12 @@ public class StormInfo implements Comparable {
     public int compareTo(Object o) {
         if (o instanceof StormInfo) {
             StormInfo that = (StormInfo) o;
-            if(startTime.getValue()<that.startTime.getValue()) return -1;
-            if(startTime.getValue()>that.startTime.getValue()) return 1;
+            if (startTime.getValue() < that.startTime.getValue()) {
+                return -1;
+            }
+            if (startTime.getValue() > that.startTime.getValue()) {
+                return 1;
+            }
             return 0;
         }
         return toString().compareTo(o.toString());
@@ -137,7 +161,9 @@ public class StormInfo implements Comparable {
      * @return _more_
      */
     public String toString() {
-        if(name !=null) return name;
+        if (name != null) {
+            return name;
+        }
         return stormID;
     }
 
@@ -168,61 +194,61 @@ public class StormInfo implements Comparable {
         return (this.stormID.equals(other.stormID));
     }
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
-
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
-
-
-/**
-Set the Basin property.
-
-@param value The new value for Basin
-**/
-public void setBasin (String value) {
-	basin = value;
-}
-
-/**
-Get the Basin property.
-
-@return The Basin
-**/
-public String getBasin () {
-	return basin;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
 
-/**
-Set the Number property.
+    /**
+     * Set the Basin property.
+     *
+     * @param value The new value for Basin
+     */
+    public void setBasin(String value) {
+        basin = value;
+    }
 
-@param value The new value for Number
-**/
-public void setNumber (String value) {
-	number = value;
-}
+    /**
+     * Get the Basin property.
+     *
+     * @return The Basin
+     */
+    public String getBasin() {
+        return basin;
+    }
 
-/**
-Get the Number property.
 
-@return The Number
-**/
-public String getNumber () {
-	return number;
-}
+    /**
+     * Set the Number property.
+     *
+     * @param value The new value for Number
+     */
+    public void setNumber(String value) {
+        number = value;
+    }
+
+    /**
+     * Get the Number property.
+     *
+     * @return The Number
+     */
+    public String getNumber() {
+        return number;
+    }
 
 
 }
