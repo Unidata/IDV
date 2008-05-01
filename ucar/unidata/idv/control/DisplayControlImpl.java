@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -186,6 +185,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** Should we use the times in this display control as part of the animation set */
     private boolean useTimesInAnimation = true;
 
+    /** _more_          */
     private boolean doCursorReadout = true;
 
     /** Are we expanded in the main tabs */
@@ -899,7 +899,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-                
+
 
 
         if (haveInitialized) {
@@ -967,7 +967,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if ( !init(myDataChoices)) {
             displayControlFailed();
-            if(getProperty("control.ignoreerrors",false)) {
+            if (getProperty("control.ignoreerrors", false)) {
                 controlContext.addDisplayControl(this);
             }
             return;
@@ -984,7 +984,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-        if(getIdv().getInteractiveMode()) {
+        if (getIdv().getInteractiveMode()) {
             Trace.call1("DisplayControlImpl.init doMakeWindow");
             //Now create the gui
             doMakeWindow();
@@ -3408,7 +3408,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public DisplayableData getDisplayListDisplayable(ViewManager view) {
         DisplayableData displayListDisplayable = null;
-        if (displayListTable == null) return null;  // in process of removing ?
+        if (displayListTable == null) {
+            return null;  // in process of removing ?
+        }
         try {
             displayListDisplayable =
                 (DisplayableData) displayListTable.get(view);
@@ -4812,8 +4814,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             JMenuItem btn = new JMenuItem(labels.get(i).toString());
             btn.addActionListener(new ObjectListener(names.get(i)) {
                 public void actionPerformed(ActionEvent ae) {
-                    String text  = field.getText();
-                    int    caret = field.getCaretPosition();
+                    String text        = field.getText();
+                    int    caret       = field.getCaretPosition();
+                    int    selectStart = field.getSelectionStart();
+                    int    selectEnd   = field.getSelectionEnd();
+                    // System.out.println("Select start = " + selectStart + "; end = " + selectEnd);
+                    if (selectStart == selectEnd) {  // no selected text
+                    } else {
+                        text = text.substring(0, selectStart)
+                               + text.substring(selectEnd);
+                        caret = Math.max(0, (caret
+                                             - (selectEnd - selectStart)));
+                    }
                     if (caret >= text.length()) {
                         field.setText(text + theObject);
                     } else {
@@ -4964,7 +4976,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void showProperties() {
         JTabbedPane jtp = new JTabbedPane();
         addPropertiesComponents(jtp);
-        final JDialog propertiesDialog = GuiUtils.createDialog("Properties -- " + getTitle(), true);
+        final JDialog propertiesDialog =
+            GuiUtils.createDialog("Properties -- " + getTitle(), true);
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String cmd = event.getActionCommand();
@@ -4980,9 +4993,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         };
-        Window f = GuiUtils.getWindow(contents);
+        Window     f       = GuiUtils.getWindow(contents);
         JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
-        JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp, buttons), 5);
+        JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
+                                      buttons), 5);
         propertiesDialog.getContentPane().add(propContents);
         propertiesDialog.pack();
         if (f != null) {
@@ -5039,7 +5053,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         extraLabelTemplateFld = new JTextArea(extraLabelTemplate, 3, 25);
         extraLabelTemplateFld.setToolTipText("Enter extra legend labels");
-        popupBtn = makeMacroPopup(extraLabelTemplateFld, null,
+        popupBtn = makeMacroPopup(extraLabelTemplateFld,
+                                  PREF_EXTRALABEL_TEMPLATE,
                                   "extraLabelTemplate");
 
 
@@ -5200,7 +5215,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         dsd.addPropertyValue(new Boolean(getUseTimesInAnimation()),
                              "useTimesInAnimation", "Use Times In Animation",
                              SETTINGS_GROUP_FLAGS);
-       
+
         dsd.addPropertyValue(new Boolean(getDoCursorReadout()),
                              "doCursorReadout", "Include in cursor readout",
                              SETTINGS_GROUP_FLAGS);
@@ -5225,8 +5240,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param obj  list of objects defining the label
      */
     public void setLabelAsPreference(Object[] obj) {
-        JTextField field = (JTextField) obj[0];
-        String     pref  = (String) obj[1];
+        JTextComponent field = (JTextComponent) obj[0];
+        String         pref  = (String) obj[1];
         getStore().put(pref, field.getText().trim());
         getStore().save();
     }
@@ -5312,9 +5327,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         comps.add(cbx);
 
-        methodNameToSettingsMap.put("setDoCursorReadout",
-                                    cbx = new JCheckBox(
-                                                        "Include in cursor readout", getDoCursorReadout()));
+        methodNameToSettingsMap.put("setDoCursorReadout", cbx =
+            new JCheckBox("Include in cursor readout", getDoCursorReadout()));
         comps.add(cbx);
 
         methodNameToSettingsMap.put("setShowNoteText",
@@ -6302,11 +6316,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws Exception _more_
      */
     public final List getCursorReadout(EarthLocation el, Real animationValue,
-                                 int animationStep)
-        throws Exception {
-        if(!getDoCursorReadout()) return null;
+                                       int animationStep)
+            throws Exception {
+        if ( !getDoCursorReadout()) {
+            return null;
+        }
         try {
-            List l =getCursorReadoutInner(el, animationValue, animationStep);
+            List l = getCursorReadoutInner(el, animationValue, animationStep);
             return l;
         } catch (Exception exc) {
             LogUtil.consoleMessage("Error getting cursor readout");
@@ -6316,34 +6332,56 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return null;
     }
 
-    protected List getCursorReadoutInner(EarthLocation el, Real animationValue,
-                                 int animationStep)
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep)
             throws Exception {
         return null;
     }
 
 
 
-    protected String formatForCursorReadout(Real r) 
-        throws VisADException, RemoteException {
-        Unit displayUnit = getDisplayUnit();
+    /**
+     * _more_
+     *
+     * @param r _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected String formatForCursorReadout(Real r)
+            throws VisADException, RemoteException {
+        Unit   displayUnit = getDisplayUnit();
         double value;
-        Unit unit;
-        String result; 
-        if(r.isMissing()) {
+        Unit   unit;
+        String result;
+        if (r.isMissing()) {
             result = "missing";
         } else {
-            if(displayUnit!=null) {
+            if (displayUnit != null) {
                 value = r.getValue(displayUnit);
-                unit = displayUnit;
+                unit  = displayUnit;
             } else {
                 value = r.getValue();
-                unit = r.getUnit();
+                unit  = r.getUnit();
             }
-            result  = Misc.format(value);
-            result= result + "[" + unit+"]";
-            int length  = result.length();
-            result = StringUtil.padLeft(result, 5*(20-length),"&nbsp;");
+            result = Misc.format(value);
+            result = result + "[" + unit + "]";
+            int length = result.length();
+            result = StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
         }
 
         return result;
@@ -7920,6 +7958,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public void debug(String msg) {
         //        if(displayId.startsWith("plan")) {
         //            System.out.println(new java.util.Date() + ": " + msg);
@@ -8418,7 +8461,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void displayControlFailed() {
         try {
-            if(!getProperty("control.ignoreerrors",false)) {
+            if ( !getProperty("control.ignoreerrors", false)) {
                 doRemove();
             }
         } catch (Exception exc) {}
@@ -10491,6 +10534,21 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The ExtraLabelTemplate
      */
     public String getExtraLabelTemplate() {
+        if ((extraLabelTemplate == null) || extraLabelTemplate.equals("")) {
+            boolean haveData = (getShortParamName() != null);
+            extraLabelTemplate = getStore().get(PREF_EXTRALABEL_TEMPLATE
+                    + "." + displayId, (String) null);
+            if (extraLabelTemplate == null) {
+                String pref = PREF_EXTRALABEL_TEMPLATE + (haveData
+                        ? ".data"
+                        : ".nodata");
+                extraLabelTemplate = getStore().get(pref, (String) null);
+            }
+        }
+        if (extraLabelTemplate == null) {
+            extraLabelTemplate = "";
+        }
+
         return extraLabelTemplate;
     }
 
@@ -10552,8 +10610,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (d == null) {
                 return;
             }
-            if(Util.exportAsNetcdf(getDisplayedData())) {
-                userMessage("<html>The displayed data has been exported.<p>Note: this facility is experimental. The exported NetCDF file is not CF compliant and cannot be used within the IDV</html>");
+            if (Util.exportAsNetcdf(getDisplayedData())) {
+                userMessage(
+                    "<html>The displayed data has been exported.<p>Note: this facility is experimental. The exported NetCDF file is not CF compliant and cannot be used within the IDV</html>");
             }
         } catch (Exception e) {
             logException("Unable to export the data", e);
@@ -10678,23 +10737,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean showColorControlWidget() {
         return false;
     }
-/**
-Set the DoCursorReadout property.
 
-@param value The new value for DoCursorReadout
-**/
-public void setDoCursorReadout (boolean value) {
+    /**
+     * Set the DoCursorReadout property.
+     *
+     * @param value The new value for DoCursorReadout
+     */
+    public void setDoCursorReadout(boolean value) {
         doCursorReadout = value;
-}
+    }
 
-/**
-Get the DoCursorReadout property.
-
-@return The DoCursorReadout
-**/
-public boolean getDoCursorReadout () {
+    /**
+     * Get the DoCursorReadout property.
+     *
+     * @return The DoCursorReadout
+     */
+    public boolean getDoCursorReadout() {
         return doCursorReadout;
-}
+    }
 
 
 

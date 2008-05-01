@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -42,11 +41,11 @@ import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 
-import ucar.unidata.idv.ui.IdvUIManager;
-
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.ViewContext;
+
+import ucar.unidata.idv.ui.IdvUIManager;
 
 
 import ucar.unidata.metdata.NamedStationImpl;
@@ -139,14 +138,14 @@ public abstract class DisplayControlBase extends SharableImpl {
 
 
     /** The icon used to show locked legend components */
-    protected static ImageIcon ICON_LOCK  = IdvUIManager.ICON_LOCK;
+    protected static ImageIcon ICON_LOCK = IdvUIManager.ICON_LOCK;
 
     /** The icon used to show unlocked legend components */
-    protected static ImageIcon ICON_UNLOCK = IdvUIManager.ICON_UNLOCK; 
+    protected static ImageIcon ICON_UNLOCK = IdvUIManager.ICON_UNLOCK;
 
 
     /** Icon used to remove displays */
-    public static ImageIcon ICON_REMOVE  = IdvUIManager.ICON_REMOVE;
+    public static ImageIcon ICON_REMOVE = IdvUIManager.ICON_REMOVE;
 
 
 
@@ -157,6 +156,10 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** The preference id for the default label template for displays */
     public static final String PREF_LEGENDLABEL_TEMPLATE =
         "idv.legendlabel.template";
+
+    /** The preference id for the default extra label template for displays */
+    public static final String PREF_EXTRALABEL_TEMPLATE =
+        "idv.extralabel.template";
 
     /** The preference id for the default label template for displays */
     public static final String PREF_DISPLAYLIST_TEMPLATE =
