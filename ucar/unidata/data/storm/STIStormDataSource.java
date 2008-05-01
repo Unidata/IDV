@@ -72,7 +72,6 @@ import java.util.Map;
 public class STIStormDataSource extends StormDataSource {
 
 
-
     /* Use this for mysql:
        private static final String DEFAULT_URL =  "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=jeff&password=mypassword";
        private static final String COL_YEAR = "year";

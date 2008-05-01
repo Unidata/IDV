@@ -413,8 +413,12 @@ public class StormDisplayState {
             stormTrackControl.addDisplayable(holder);
         }
 
+        DisplayMaster displayMaster = stormTrackControl.getDisplayMaster(holder);
+        boolean wasActive = displayMaster.ensureInactive();
+
         obsDisplayState = getWayDisplayState(Way.OBSERVATION);
 
+        long t1 = System.currentTimeMillis();
         if (obsDisplayState.getTracks().size()==0) {
             StormTrack obsTrack = trackCollection.getObsTrack();
             if(obsTrack!=null) {
@@ -534,6 +538,12 @@ public class StormDisplayState {
                 trackDisplay.setTrack(timeField);
             }
         }
+
+        if(wasActive)  displayMaster.setActive(true);
+        long t2 = System.currentTimeMillis();
+        System.err.println ("time:" + (t2-t1));
+
+
     }
 
 
@@ -563,6 +573,8 @@ public class StormDisplayState {
     private FieldImpl makeField(StormTrack track, boolean fixedValue)
             throws Exception {
 
+
+
         List                times    = track.getTrackTimes();
         List<StormTrackPoint> locs     = track.getTrackPoints();
         int        numPoints       = times.size();
@@ -585,9 +597,10 @@ public class StormDisplayState {
         float[]    lons         = new float[numPoints];
         float[]    attrValue = null;
         //        if(!fixedValue) {
-            //           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
-            attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_CATEGORY);
-            //        }
+        //           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
+        attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_CATEGORY);
+        //        }
+        //            System.err.println("got category:" + (attrValue!=null));
         //        System.err.println("points:" + times + "\n" + locs);
         for (int i = 0; i < numPoints; i++) {
             DateTime      dateTime = (DateTime) times.get(i);
