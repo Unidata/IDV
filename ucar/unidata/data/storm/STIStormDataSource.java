@@ -283,7 +283,6 @@ public class STIStormDataSource extends StormDataSource {
         }
         for (Way forecastWay : forecastWays) {
             //            if(!forecastWay.getId().equals("SHTM")) continue;
-            forecastWay.setProbabilityRIngs(rings);
             List forecastTracks = getForecastTracks(stormInfo, forecastWay);
             if (forecastTracks.size() > 0) {
                 trackCollection.addTrackList(forecastTracks);
