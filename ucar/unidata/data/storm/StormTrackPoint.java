@@ -15,11 +15,6 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class StormTrackPoint {
-        /** _more_ */
-    private String trackPointId;
-
-    /** _more_ */
-    private StormInfo stormInfo;
 
     /** _more_ */
     private EarthLocation trackPointLocation;
@@ -34,19 +29,13 @@ public class StormTrackPoint {
     private int forecastHour = 0;
 
 
-    public StormTrackPoint(StormInfo stormInfo, EarthLocation  pointLocation, DateTime time,
+    public StormTrackPoint(EarthLocation  pointLocation, DateTime time,
                            int forecastHour,
-                 List attrs) {
-
-        this.stormInfo   = stormInfo;
-
+                           List attrs) {
         this.trackPointLocation = pointLocation;
         this.trackPointTime  = time;
         this.forecastHour = forecastHour;
         this.attributes = new ArrayList(attrs);
-
-        this.trackPointId = stormInfo.toString() + "_" + pointLocation.toString() + "_"
-                       + time.getValue();
     }
 
     /**
@@ -65,59 +54,6 @@ public class StormTrackPoint {
     **/
     public int getForecastHour () {
 	return forecastHour;
-    }
-
-
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int hashCode() {
-        return trackPointId.hashCode();
-    }
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     */
-    public void setTrackId(String id) {
-        this.trackPointId = id;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getTrackId() {
-        return trackPointId;
-    }
-
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param stormInfo _more_
-     */
-    public void setStormInfo(StormInfo stormInfo) {
-        this.stormInfo = stormInfo;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public StormInfo getStormInfo() {
-        return stormInfo;
     }
 
 
@@ -175,8 +111,6 @@ public class StormTrackPoint {
 
     public String toString() {
         return trackPointLocation+"";
-        //trackPointId;
-
     }
 
     /**
@@ -202,6 +136,7 @@ public class StormTrackPoint {
      *
      * @return _more_
      */
+    /*
     public boolean equals(Object o) {
         if (o == null) {
             return false;
@@ -211,5 +146,5 @@ public class StormTrackPoint {
         }
         StormTrackPoint other = (StormTrackPoint) o;
         return ((trackPointId.equals(other.trackPointId)));
-    }
+        }*/
 }

@@ -219,6 +219,16 @@ public class StormTrack {
         return trackTimes;
     }
 
+
+    public List<EarthLocation> getLocations() {
+        List<EarthLocation> locs = new ArrayList();
+        for(StormTrackPoint stp: trackPoints){
+            locs.add(stp.getTrackPointLocation());
+        }
+        return locs;
+    }
+
+
     /**
      * _more_
      *

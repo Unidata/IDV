@@ -84,6 +84,17 @@ public class STIStormDataSource extends StormDataSource {
     private static final String COL_YEAR = "yyyy";
 
 
+
+
+    private static RealType TYPE_MAXWINDSPEED;
+    private static RealType TYPE_MINPRESSURE;
+    private static RealType TYPE_RADIUSMODERATEGALE;
+    private static RealType TYPE_RADIUSWHOLEGALE;
+    private static RealType TYPE_MOVEDIRECTION;
+    private static RealType TYPE_MOVESPEED;
+
+
+
     /** _more_          */
     private static float MISSING = 9999.0f;
 
@@ -172,6 +183,17 @@ public class STIStormDataSource extends StormDataSource {
 
     public STIStormDataSource() throws Exception {}
 
+
+    private void initTypes() throws VisADException {
+        if(TYPE_MAXWINDSPEED==null) {
+            TYPE_MAXWINDSPEED = ucar.visad.Util.makeRealType("MAXWINDSPEED",null);
+            TYPE_MINPRESSURE = ucar.visad.Util.makeRealType("MINPRESSURE",null);
+            TYPE_RADIUSMODERATEGALE = ucar.visad.Util.makeRealType("RADIUSMODERATEGALE",null);
+            TYPE_RADIUSWHOLEGALE = ucar.visad.Util.makeRealType("RADIUSWHOLEGALE",null);
+            TYPE_MOVEDIRECTION = ucar.visad.Util.makeRealType("MOVEDIRECTION",null);
+            TYPE_MOVESPEED = ucar.visad.Util.makeRealType("MOVESPEED",null);
+        }
+    }
 
 
 
@@ -377,8 +399,8 @@ public class STIStormDataSource extends StormDataSource {
                         latitude), new Real(RealType.Longitude, longitude),
                                    altReal);
                 DateTime dttm = getDateTime(year, month, day, hour + fhour);
-                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt,
-                                          dttm, fhour, attrs);
+                StormTrackPoint stp = new StormTrackPoint(elt,
+                                                          dttm, fhour, attrs);
                 pts.add(stp);
             }
         }
@@ -691,8 +713,8 @@ public class STIStormDataSource extends StormDataSource {
                 // }
                 //                                seenDate.put(date,date);
                 // seenDate.put(date,key);
-                StormTrackPoint stp = new StormTrackPoint(stormInfo, elt,
-                                          date, 0, attrs);
+                StormTrackPoint stp = new StormTrackPoint(elt,
+                                                          date, 0, attrs);
                 obsPts.add(stp);
             }
         }
@@ -773,14 +795,14 @@ public class STIStormDataSource extends StormDataSource {
                 DateTime date = getDateTime(year, month, day, hour);
 
                 if (date.getValue() < before.getValue()) {
-                    StormTrackPoint stp = new StormTrackPoint(stormInfo, elt,
-                                              date, 0, attrs);
+                    StormTrackPoint stp = new StormTrackPoint(elt,
+                                                              date, 0, attrs);
                     obsPts1.add(stp);
                 }
 
                 if (date.getValue() > after.getValue()) {
-                    StormTrackPoint stp = new StormTrackPoint(stormInfo, elt,
-                                              date, 0, attrs);
+                    StormTrackPoint stp = new StormTrackPoint(elt,
+                                                              date, 0, attrs);
                     obsPts2.add(stp);
                 }
 

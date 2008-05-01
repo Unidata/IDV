@@ -237,7 +237,7 @@ public class AtcfStormDataSource extends StormDataSource {
             
             List attrs = new ArrayList();
             attrs.add( new Attribute(ATTR_CATEGORY, category));
-            StormTrackPoint stp = new StormTrackPoint(stormInfo, elt, new DateTime(dttm),
+            StormTrackPoint stp = new StormTrackPoint(elt, new DateTime(dttm),
                                                       forecastHour,
                                                       attrs);
 
