@@ -472,7 +472,7 @@ public class StormDisplayState {
                 trackDisplay.setTrack(field);
                 holder.addDisplayable(trackDisplay);
 
-                makeRingField(obsTrack, obsDisplayState, holder);
+                makeRingField(obsTrack, obsDisplayState, holder, StormDataSource.ATTR_MODERATEGALE);
 
                 indicator = new StationModelDisplayable("indicator");
                 indicator.setShouldUseAltitude(false);
@@ -509,7 +509,7 @@ public class StormDisplayState {
 
         }
 
-        
+
 
         //Don't load them until we need to
         if(getForecastVisible() || forecastHolder !=null) {
@@ -533,7 +533,7 @@ public class StormDisplayState {
                 FieldImpl field = makeField(track, true);
                 wayDisplayState.addTrack(track,  field);
 
-                //makeRingField(track, wayDisplayState, forecastHolder);
+
             }
 
             for(WayDisplayState wayDisplayState: wayDisplayStates) {
@@ -547,7 +547,7 @@ public class StormDisplayState {
                 if(fields.size() == 0) continue;
 
                 TrackDisplayable trackDisplay = new TrackDisplayable("track ");
-                trackDisplay.setColorPalette(getColor(wayDisplayState.getColor())); 
+                trackDisplay.setColorPalette(getColor(wayDisplayState.getColor()));
                 trackDisplay.setUseTimesInAnimation(false);
                 wayDisplayState.addDisplayable(trackDisplay);
                 if(!wayDisplayState.getVisible()) {
@@ -580,6 +580,10 @@ public class StormDisplayState {
                 forecastHolder.addDisplayable(trackDisplay);
                 FieldImpl timeField = ucar.visad.Util.makeTimeField(fields,wayDisplayState.getTimes());
                 trackDisplay.setTrack(timeField);
+                List<StormTrack>  tracks = wayDisplayState.getTracks() ;
+                for(StormTrack strack: tracks){
+                      makeRingField(strack, wayDisplayState, forecastHolder,StormDataSource.ATTR_PROBABILITYRADIUS);
+                }
             }
         }
         }
@@ -636,7 +640,13 @@ public class StormDisplayState {
         double[][] newRangeVals = new double[2][numPoints];
         float[]    lats         = new float[numPoints];
         float[]    lons         = new float[numPoints];
-        float[]    attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_CATEGORY);
+        float[]    attrValue = null;
+        //        if(!fixedValue) {
+        //           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
+        attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_WINDSPEED);
+        //        }
+        //            System.err.println("got category:" + (attrValue!=null));
+        //        System.err.println("points:" + times + "\n" + locs);
         for (int i = 0; i < numPoints; i++) {
             DateTime      dateTime = (DateTime) times.get(i);
             Real          value    = (fixedValue
@@ -683,7 +693,8 @@ public class StormDisplayState {
      *
      * @throws Exception _more_
      */
-    private RingSet [] makeRingField(StormTrack track, WayDisplayState wState, CompositeDisplayable holder)
+    private RingSet [] makeRingField(StormTrack track, WayDisplayState wState, CompositeDisplayable holder,
+                                        String attrName)
             throws Exception {
         List<EarthLocation> locations     = track.getLocations();
         int        numPoints       = locations.size();
@@ -691,7 +702,7 @@ public class StormDisplayState {
         double[][] newRangeVals = new double[2][numPoints];
         float[]    lats         = new float[numPoints];
         float[]    lons         = new float[numPoints];
-        float[]    values = track.getTrackAttributeValues("RadiusModerateGale");
+        float[]    values = track.getTrackAttributeValues(attrName);
         for (int i = 0; i < numPoints; i++) {
             EarthLocation el       = locations.get(i);
             lats[i]            = (float) el.getLatitude().getValue();
@@ -752,7 +763,7 @@ public class StormDisplayState {
                                    int columnIndex) {}
 
             public Object getValueAt(int row, int column) {
-                
+
                 if ((trackCollection == null) || (row >= trackCollection.getTracks().size())) {
                     return "";
                 }

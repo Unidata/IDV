@@ -104,7 +104,7 @@ public class WayDisplayState {
         times = new ArrayList<DateTime>();
         pointObs = new ArrayList<PointOb>();
     }
-    
+
 
     public JCheckBox getVisiblityCheckBox() {
         if(visibilityCbx==null) {

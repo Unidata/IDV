@@ -424,7 +424,7 @@ public class StormTrackControl extends DisplayControlImpl {
             result = "";
         } else {
             result = "<tr><td>" + "Storm: "
-                     + stp.getStormInfo().toString() + "</td></tr>";
+                     + stp.toString() + "</td></tr>";
             result = result + "<tr><td>" + "Track Point Time: "
                      + stp.getTrackPointTime() + "</td></tr>";
             result = result + "<tr><td>"  + "Max Wind Speed: "
