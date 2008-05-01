@@ -329,8 +329,6 @@ public class StormDisplayState {
         });
 
 
-
-
         List components = new ArrayList();
         List<Way>  ways    = trackCollection.getWayList();
         boolean haveDoneForecast = false;
@@ -621,13 +619,9 @@ public class StormDisplayState {
             throws Exception {
 
 
-
-        List                times    = track.getTrackTimes();
-        List<StormTrackPoint> locs     = track.getTrackPoints();
+        List<DateTime>       times    = track.getTrackTimes();
+        List<EarthLocation> locations     = track.getLocations();
         int        numPoints       = times.size();
-        //        System.err.println ("times:" + times);
-        //        System.err.println ("locs:" + locs);
-
         Unit                timeUnit = ((DateTime)times.get(0)).getUnit();
 
         RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
@@ -642,19 +636,13 @@ public class StormDisplayState {
         double[][] newRangeVals = new double[2][numPoints];
         float[]    lats         = new float[numPoints];
         float[]    lons         = new float[numPoints];
-        float[]    attrValue = null;
-        //        if(!fixedValue) {
-        //           attrValue = track.getTrackAttributeValues("MaxWindSpeed");
-        attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_CATEGORY);
-        //        }
-        //            System.err.println("got category:" + (attrValue!=null));
-        //        System.err.println("points:" + times + "\n" + locs);
+        float[]    attrValue = track.getTrackAttributeValues(StormDataSource.ATTR_CATEGORY);
         for (int i = 0; i < numPoints; i++) {
             DateTime      dateTime = (DateTime) times.get(i);
             Real          value    = (fixedValue
                                       ? dfltReal
                                       : new Real(dfltRealType, (attrValue!=null?attrValue[i]:0.0)));
-            EarthLocation el       = locs.get(i).getTrackPointLocation();
+            EarthLocation el       = locations.get(i);
             newRangeVals[0][i] = value.getValue();
             newRangeVals[1][i] = dateTime.getValue();
             lats[i]            = (float) el.getLatitude().getValue();
@@ -697,36 +685,23 @@ public class StormDisplayState {
      */
     private RingSet [] makeRingField(StormTrack track, WayDisplayState wState, CompositeDisplayable holder)
             throws Exception {
-
-
-        List<StormTrackPoint> locs     = track.getTrackPoints();
-        int        numPoints       = locs.size();
-
+        List<EarthLocation> locations     = track.getLocations();
+        int        numPoints       = locations.size();
         RingSet [] rings =   new RingSet[numPoints];
-
         double[][] newRangeVals = new double[2][numPoints];
         float[]    lats         = new float[numPoints];
         float[]    lons         = new float[numPoints];
-        //        System.err.println("points:" + times + "\n" + locs);
+        float[]    values = track.getTrackAttributeValues("RadiusModerateGale");
         for (int i = 0; i < numPoints; i++) {
-
-            EarthLocation el       = locs.get(i).getTrackPointLocation();
-
+            EarthLocation el       = locations.get(i);
             lats[i]            = (float) el.getLatitude().getValue();
             lons[i]            = (float) el.getLongitude().getValue();
-            StormTrackPoint stp = locs.get(i);
-            String rds = stp.getAttribute("RadiusModerateGale");
-            if(rds==null || rds.length()==0) continue;
-            if(!rds.startsWith("999")){
-                float r = Float.valueOf(rds);
-                rings[i] = makeRealTupleType( lats[i], lons[i], r);
-                 wState.addRingsDisplayable(rings[i]);
-                 holder.addDisplayable(rings[i]);
+            if(values[i]==values[i]) {
+                rings[i] = makeRealTupleType( lats[i], lons[i], values[i]);
+                wState.addRingsDisplayable(rings[i]);
+                holder.addDisplayable(rings[i]);
             }
-            //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
         }
-
-
         return rings;
     }
 
