@@ -34,7 +34,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.visad.display.CompositeDisplayable;
+import ucar.visad.display.*;
 
 import visad.*;
 
@@ -103,6 +103,11 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+
+
+    public DisplayMaster getDisplayMaster() {
+        return getDisplayMaster(placeHolder);
+    }
 
 
 
@@ -252,13 +257,17 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @return _more_
      */
-    private StormDisplayState getStormDisplayState(StormInfo stormInfo) {
+    private StormDisplayState getStormDisplayState(StormInfo stormInfo)  {
         StormDisplayState stormDisplayState =
             stormDisplayStateMap.get(stormInfo);
         if (stormDisplayState == null) {
-            stormDisplayState = new StormDisplayState(stormInfo);
-            stormDisplayState.setStormTrackControl(this);
-            stormDisplayStateMap.put(stormInfo, stormDisplayState);
+            try {
+                stormDisplayState = new StormDisplayState(stormInfo);
+                stormDisplayState.setStormTrackControl(this);
+                stormDisplayStateMap.put(stormInfo, stormDisplayState);
+            } catch(Exception exc) {
+                logException("Creating storm display", exc);
+            }
         }
         return stormDisplayState;
     }

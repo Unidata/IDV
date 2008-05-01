@@ -5278,13 +5278,14 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param comp The component
      */
-    public static void italicizeFont(Component comp) {
+    public static Component italicizeFont(Component comp) {
         if (comp != null) {
             Font f = comp.getFont();
             if (f != null) {
                 comp.setFont(f.deriveFont(Font.ITALIC));
             }
         }
+        return comp;
     }
 
 

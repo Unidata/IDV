@@ -23,7 +23,7 @@
 package ucar.unidata.data.storm;
 
 
-import ucar.nc2.Attribute;
+
 
 import visad.*;
 
@@ -69,7 +69,7 @@ public class StormTrackPoint {
         this.trackPointLocation = pointLocation;
         this.trackPointTime     = time;
         this.forecastHour       = forecastHour;
-        this.attributes         = new ArrayList<Real>(attrs);
+        this.attributes         = attrs;
     }
 
     /**
@@ -107,7 +107,6 @@ public class StormTrackPoint {
      * @return _more_
      */
     public DateTime getTrackPointTime() {
-
         return trackPointTime;
     }
 

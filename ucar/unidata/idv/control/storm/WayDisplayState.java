@@ -61,23 +61,17 @@ public class WayDisplayState {
     /** _more_          */
     private JCheckBox visibilityCbx;
 
-    /** _more_          */
-    private JCheckBox ringsCbx;
-
     /** _more_ */
     private Way way;
 
     /** _more_ */
     private boolean visible = true;
 
-    /** _more_ */
-    private boolean ringsVisible = false;
+    private boolean ringsVisible = true;
+
 
     /** _more_ */
     List<Displayable> displayables = new ArrayList<Displayable>();
-
-    /** _more_          */
-    List<Displayable> ringsDisplayables = new ArrayList<Displayable>();
 
     /** _more_          */
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
@@ -94,10 +88,32 @@ public class WayDisplayState {
     /** _more_          */
     private Color color;
 
+
+    private CompositeDisplayable ringsHolder;
+
+
     /**
      * _more_
      */
     public WayDisplayState() {}
+
+
+    private RealType ringsType;
+
+    protected void setRings(RealType ringsType, List<RingSet> rings) throws Exception {
+        this.ringsType= ringsType;
+        if(ringsHolder==null) {
+            ringsHolder  = new CompositeDisplayable("rings holder");
+            stormDisplayState.addDisplayable(ringsHolder);
+        }
+        ringsHolder.clearDisplayables();
+        if(rings!=null) {
+            for(RingSet ring: rings) {
+                ringsHolder.addDisplayable(ring);
+            }
+        }
+        setRingsVisible(getRingsVisible());
+    }
 
 
 
@@ -119,9 +135,9 @@ public class WayDisplayState {
     /**
      * _more_
      */
-    public void deactivate() {
+    public void deactivate()  {
         displayables      = new ArrayList<Displayable>();
-        ringsDisplayables = new ArrayList<Displayable>();
+        ringsHolder = null;
         tracks            = new ArrayList<StormTrack>();
         fields            = new ArrayList<FieldImpl>();
         times             = new ArrayList<DateTime>();
@@ -136,7 +152,7 @@ public class WayDisplayState {
      */
     public JCheckBox getVisiblityCheckBox() {
         if (visibilityCbx == null) {
-            visibilityCbx = new JCheckBox("Visible", getVisible());
+            visibilityCbx = new JCheckBox("", getVisible());
             visibilityCbx.setToolTipText("Show/Hide Track");
             visibilityCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -151,30 +167,6 @@ public class WayDisplayState {
 
         }
         return visibilityCbx;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public JCheckBox getRingsVisiblityCheckBox() {
-        if (ringsCbx == null) {
-            //            ringsCbx = new JCheckBox("Rings",GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/Rings16.gif"), getRingsVisible());
-            ringsCbx = new JCheckBox("Rings", getRingsVisible());
-            ringsCbx.setToolTipText("Show Rings");
-            ringsCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        setRingsVisible(ringsCbx.isSelected());
-                    } catch (Exception exc) {
-                        LogUtil.logException("Toggling way visibility", exc);
-                    }
-                }
-            });
-
-        }
-        return ringsCbx;
     }
 
 
@@ -280,19 +272,6 @@ public class WayDisplayState {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param displayable _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addRingsDisplayable(Displayable displayable)
-            throws Exception {
-        ringsDisplayables.add(displayable);
-        setRingVisibility(displayable);
-    }
-
 
     /**
      * Set the Way property.
@@ -342,8 +321,8 @@ public class WayDisplayState {
      */
     public void setRingsVisible(boolean value) throws Exception {
         this.ringsVisible = value;
-        for (Displayable displayable : ringsDisplayables) {
-            setRingVisibility(displayable);
+        if(ringsHolder!=null) {
+            ringsHolder.setVisible(ringsVisible);
         }
     }
 

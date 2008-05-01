@@ -51,6 +51,7 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.*;
+import ucar.visad.display.*;
 
 import ucar.visad.Util;
 import ucar.visad.display.*;
@@ -142,12 +143,8 @@ public class StormDisplayState {
     private StormInfo stormInfo;
 
 
-    /** _more_ */
-    private boolean forecastVisible = false;
+    private WayDisplayState forecastState;
 
-
-    /** _more_          */
-    private boolean forecastRingsVisible = false;
 
     /** _more_ */
     private boolean changed = false;
@@ -160,8 +157,6 @@ public class StormDisplayState {
     /** _more_ */
     private StormTrackCollection trackCollection;
 
-    /** _more_          */
-    private List<RealType> attributeTypes;
 
     /** _more_ */
     //    private List<StormTrack> tracks;
@@ -202,14 +197,18 @@ public class StormDisplayState {
      */
     public StormDisplayState() {}
 
+
     /**
      * _more_
      *
      * @param stormInfo _more_
      */
-    public StormDisplayState(StormInfo stormInfo) {
+    public StormDisplayState(StormInfo stormInfo) throws Exception {
         this.stormInfo = stormInfo;
+        forecastState = new  WayDisplayState(this, new Way("forecaststate"));
+        forecastState.setVisible(false);
     }
+
 
     /**
      * _more_
@@ -259,7 +258,6 @@ public class StormDisplayState {
     public void deactivate() {
         try {
             trackCollection = null;
-            attributeTypes  = null;
             active          = false;
             stormTrackControl.removeDisplayable(holder);
             holder         = null;
@@ -336,6 +334,13 @@ public class StormDisplayState {
 
 
 
+    protected void wayStateChanged(WayDisplayState wayDisplayState) {
+    }
+
+
+    public boolean getForecastVisible() {
+        return forecastState.getVisible();
+    }
     /**
      * _more_
      */
@@ -351,30 +356,31 @@ public class StormDisplayState {
             GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel("Storm: "
                 + stormInfo), unloadBtn), new Insets(0, 0, 5, 0));
 
-        final JCheckBox showForecastCbx = new JCheckBox("Visible",
-                                              getForecastVisible());
-        showForecastCbx.setToolTipText("Show Forecast Tracks");
-        showForecastCbx.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                setForecastVisible(showForecastCbx.isSelected());
-                showStorm();
-            }
-        });
-        final JCheckBox showForecastRingsCbx =
-            new JCheckBox("Show Forecast Rings", getForecastVisible());
-        showForecastRingsCbx.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                setForecastRingsVisible(showForecastRingsCbx.isSelected());
-                showStorm();
-            }
-        });
+        JCheckBox showForecastCbx = forecastState.getVisiblityCheckBox();
+        //        setForecastVisible(showForecastCbx.isSelected());
+        //        showStorm();
 
-
+        List<RealType> attributeTypes = null;
+        if (trackCollection.getTracks().size() > 0) {
+            attributeTypes =
+                trackCollection.getTracks().get(0).getTypes();
+        }
+        Vector radiusAttrNames = null;
         Vector attrNames = null;
         if ((attributeTypes != null) && (attributeTypes.size() > 0)) {
+          
+
             attrNames = new Vector();
             attrNames.add(new TwoFacedObject("Fixed", null));
             for (RealType type : attributeTypes) {
+                if(Unit.canConvert(type.getDefaultUnit(), CommonUnit.meter)) {
+                    if(radiusAttrNames == null) {
+                        radiusAttrNames = new Vector();
+                        radiusAttrNames.add(new TwoFacedObject("None", null));
+                    }
+                    radiusAttrNames.add(new TwoFacedObject(type.getName().replace("_",
+                        " "), type));
+                }
                 attrNames.add(new TwoFacedObject(type.getName().replace("_",
                         " "), type));
             }
@@ -385,17 +391,24 @@ public class StormDisplayState {
         List      components       = new ArrayList();
         List<Way> ways             = trackCollection.getWayList();
         boolean   haveDoneForecast = false;
+        components.add(GuiUtils.italicizeFont(new JLabel("Track Type")));
+        components.add(GuiUtils.italicizeFont(new JLabel("Visible")));
+        
+        components.add(GuiUtils.italicizeFont(new JLabel((radiusAttrNames!=null?"Rings":""))));
+        components.add(GuiUtils.italicizeFont(new JLabel("Color")));
+        components.add(GuiUtils.italicizeFont(new JLabel("Color Param")));
+
         for (Way way : ways) {
             WayDisplayState wayDisplayState = getWayDisplayState(way);
             JComponent      swatch          = GuiUtils.filler(10, 10);
             swatch.setBackground(wayDisplayState.getColor());
             JLabel wayLabel = new JLabel(way.toString());
-            JComponent buttons =
-                GuiUtils.hbox(wayDisplayState.getVisiblityCheckBox(),
-                              wayDisplayState.getRingsVisiblityCheckBox());
-            buttons = GuiUtils.left(buttons);
+
             JComboBox paramBox = ((attrNames != null)
                                   ? new JComboBox(attrNames)
+                                  : null);
+            JComboBox radiusBox = ((radiusAttrNames != null)
+                                  ? new JComboBox(radiusAttrNames)
                                   : null);
             Component paramComp;
             if (paramBox != null) {
@@ -404,16 +417,26 @@ public class StormDisplayState {
                 paramComp = GuiUtils.filler();
             }
 
+            Component radiusComp;
+            if (radiusBox != null) {
+                radiusComp = radiusBox;
+            } else {
+                radiusComp = GuiUtils.filler();
+            }
+
 
             if (way.isObservation()) {
-                components.add(0, wayLabel);
-                components.add(1, buttons);
-                components.add(2, GuiUtils.left(GuiUtils.wrap(swatch)));
-                components.add(3, paramComp);
+                components.add(0+5, wayLabel);
+                components.add(1+5, GuiUtils.left(wayDisplayState.getVisiblityCheckBox()));
+                components.add(2+5, radiusComp);
+                //                components.add(2+5, GuiUtils.left(wayDisplayState.getRingsVisiblityCheckBox()));
+                components.add(3+5, GuiUtils.left(GuiUtils.wrap(swatch)));
+                components.add(4+5, paramComp);
             } else {
                 if ( !haveDoneForecast) {
                     haveDoneForecast = true;
                     //                    components.add(GuiUtils.hbox(showForecastCbx,new JLabel("Forecasts")));
+                    components.add(GuiUtils.filler(2, 5));
                     components.add(GuiUtils.filler(2, 5));
                     components.add(GuiUtils.filler(2, 5));
                     components.add(GuiUtils.filler(2, 5));
@@ -423,9 +446,12 @@ public class StormDisplayState {
                     components.add(GuiUtils.left(showForecastCbx));
                     components.add(GuiUtils.filler());
                     components.add(GuiUtils.filler());
+                    components.add(GuiUtils.filler());
                 }
                 components.add(wayLabel);
-                components.add(buttons);
+                components.add(GuiUtils.left(wayDisplayState.getVisiblityCheckBox()));
+                components.add(radiusComp);
+                //                components.add(GuiUtils.left(wayDisplayState.getRingsVisiblityCheckBox()));
                 components.add(GuiUtils.left(GuiUtils.wrap(swatch)));
                 components.add(paramComp);
             }
@@ -433,7 +459,7 @@ public class StormDisplayState {
 
         GuiUtils.tmpInsets = new Insets(2, 2, 0, 2);
         JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(components,
-                                 4, GuiUtils.WT_NNN, GuiUtils.WT_N));
+                                                                5, GuiUtils.WT_NNN, GuiUtils.WT_N));
         //Put the list of ways into a scroller if there are lots of them
         if (ways.size() > 10) {
             int width  = 300;
@@ -483,6 +509,9 @@ public class StormDisplayState {
     protected void showStorm() {
         Misc.run(new Runnable() {
             public void run() {
+                DisplayMaster displayMaster =
+                    stormTrackControl.getDisplayMaster();
+                boolean wasActive = displayMaster.ensureInactive();
                 try {
                     synchronized (MUTEX) {
                         showStormInner();
@@ -491,10 +520,21 @@ public class StormDisplayState {
                     }
                 } catch (Exception exc) {
                     stormTrackControl.logException("Showing storm", exc);
+                } finally {
+                    if (wasActive) {
+                        try {
+                            displayMaster.setActive(true);
+                        } catch (Exception exc) { }
+                    }
                 }
 
             }
         });
+    }
+
+
+    protected void addDisplayable(Displayable displayable) throws VisADException, RemoteException {
+        holder.addDisplayable(displayable);
     }
 
 
@@ -505,7 +545,7 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     private void showStormInner() throws Exception {
-
+        //Read the tracks if we haven't
         if (trackCollection == null) {
             contents.removeAll();
             contents.add(
@@ -517,23 +557,12 @@ public class StormDisplayState {
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
                     stormInfo);
-            if (trackCollection.getTracks().size() > 0) {
-                attributeTypes =
-                    trackCollection.getTracks().get(0).getTypes();
-            }
-            //            tracks = trackCollection.getTracks();
             initCenterContents();
-            holder = new CompositeDisplayable();
-            stormTrackControl.addDisplayable(holder);
+            stormTrackControl.addDisplayable(holder = new CompositeDisplayable());
         }
 
-        DisplayMaster displayMaster =
-            stormTrackControl.getDisplayMaster(holder);
-        boolean wasActive = displayMaster.ensureInactive();
 
         obsDisplayState = getWayDisplayState(Way.OBSERVATION);
-
-
 
         long t1 = System.currentTimeMillis();
         if (obsDisplayState.getTracks().size() == 0) {
@@ -679,9 +708,7 @@ public class StormDisplayState {
             }
         }
 
-        if (wasActive) {
-            displayMaster.setActive(true);
-        }
+
         long t2 = System.currentTimeMillis();
         System.err.println("time:" + (t2 - t1));
 
@@ -797,7 +824,7 @@ public class StormDisplayState {
      *
      * @throws Exception _more_
      */
-    private RingSet[] makeRingField(StormTrack track, WayDisplayState wState,
+    private void makeRingField(StormTrack track, WayDisplayState wState,
                                     CompositeDisplayable holder,
                                     RealType type)
             throws Exception {
@@ -805,34 +832,30 @@ public class StormDisplayState {
         type = STIStormDataSource.TYPE_RADIUSMODERATEGALE;
         List<EarthLocation> locations    = track.getLocations();
         int                 numPoints    = locations.size();
-        RingSet[]           rings        = new RingSet[numPoints];
+        List<RingSet>           rings     = new ArrayList<RingSet>();
         double[][]          newRangeVals = new double[2][numPoints];
         float[]             lats         = new float[numPoints];
         float[]             lons         = new float[numPoints];
         //TODO: Use a real type
         Real[] values = track.getTrackAttributeValues(type);
         if (values == null) {
-            return null;
+            wState.setRings(null,null);
+            return;
         }
         for (int i = 0; i < numPoints; i++) {
-            EarthLocation el = locations.get(i);
-            lats[i] = (float) el.getLatitude().getValue();
-            lons[i] = (float) el.getLongitude().getValue();
             if ((values[i] != null) && !values[i].isMissing()) {
-                rings[i] = makeRealTupleType(lats[i], lons[i],
-                                             values[i]);
-                wState.addRingsDisplayable(rings[i]);
-                holder.addDisplayable(rings[i]);
+                rings.add(makeRingSet(locations.get(i),
+                                      values[i]));
             }
         }
-        return rings;
+        wState.setRings(type, rings);
     }
+
 
     /**
      * _more_
      *
-     * @param lat _more_
-     * @param lon _more_
+
      * @param r _more_
      *
      * @return _more_
@@ -840,8 +863,10 @@ public class StormDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    private RingSet makeRealTupleType(double lat, double lon, Real r)
+    private RingSet makeRingSet(EarthLocation el, Real r)
             throws VisADException, RemoteException {
+        double lat =  el.getLatitude().getValue();
+        double lon =  el.getLongitude().getValue();
         Radar2DCoordinateSystem r2Dcs =
             new Radar2DCoordinateSystem((float) lat, (float) lon);
         RealTupleType rtt = new RealTupleType((RealType)r.getType(), azimuthType, r2Dcs,
@@ -943,45 +968,6 @@ public class StormDisplayState {
     }
 
 
-
-
-    /**
-     *  Set the ForecastVisible property.
-     *
-     *  @param value The new value for ForecastVisible
-     */
-    public void setForecastVisible(boolean value) {
-        forecastVisible = value;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param value _more_
-     */
-    public void setForecastRingsVisible(boolean value) {
-        forecastRingsVisible = value;
-    }
-
-    /**
-     *  Get the ObsVisible property.
-     *
-     *  @return The ForecastVisible
-     */
-    public boolean getForecastVisible() {
-        return forecastVisible;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean getForecastRingsVisible() {
-        return forecastRingsVisible;
-    }
-
     /**
      *  Set the Changed property.
      *
@@ -1036,6 +1022,27 @@ public class StormDisplayState {
     public Hashtable<Way, WayDisplayState> getWayDisplayStateMap() {
         return wayDisplayStateMap;
     }
+
+
+    /**
+       Set the ForecastState property.
+
+       @param value The new value for ForecastState
+    **/
+    public void setForecastState (WayDisplayState value) {
+	forecastState = value;
+    }
+
+    /**
+       Get the ForecastState property.
+
+       @return The ForecastState
+    **/
+    public WayDisplayState getForecastState () {
+	return forecastState;
+    }
+
+
 
 
 

@@ -127,7 +127,6 @@ public class StormTrack {
 
 
 
-
     /**
      * _more_
      *
@@ -262,8 +261,10 @@ public class StormTrack {
      */
     public List<RealType> getTypes() {
         List<RealType> types = new ArrayList<RealType>();
+        System.err.println ("trackPoints:" + trackPoints.size());
         if (trackPoints.size() > 0) {
             List<Real> reals = trackPoints.get(0).getTrackAttributes();
+            System.err.println ("reals:" + reals);
             for (Real r : reals) {
                 types.add((RealType) r.getType());
             }

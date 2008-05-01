@@ -218,7 +218,8 @@ public class STIStormDataSource extends StormDataSource {
      *
      * @throws VisADException _more_
      */
-    private void initTypes() throws VisADException {
+    protected void initTypes() throws VisADException {
+        super.initTypes();
         if (TYPE_MAXWINDSPEED == null) {
             //TODO: Make sure these are the right units
             TYPE_MAXWINDSPEED = ucar.visad.Util.makeRealType("maxwindspeed",

@@ -125,7 +125,7 @@ public class AtcfStormDataSource extends StormDataSource {
             String           stormTable = new String(bytes);
             List lines = StringUtil.split(stormTable, "\n", true, true);
 
-            SimpleDateFormat fmt        = new SimpleDateFormat("yyyymmddHH");
+            SimpleDateFormat fmt        = new SimpleDateFormat("yyyyMMddHH");
             for (int i = 0; i < lines.size(); i++) {
                 String line   = (String) lines.get(i);
                 List   toks   = StringUtil.split(line, ",", true);
@@ -195,7 +195,7 @@ public class AtcfStormDataSource extends StormDataSource {
         String           trackData = new String(bytes);
         List             lines = StringUtil.split(trackData, "\n", true,
                                      true);
-        SimpleDateFormat fmt       = new SimpleDateFormat("yyyymmddHH");
+        SimpleDateFormat fmt       = new SimpleDateFormat("yyyyMMddHH");
         Hashtable        trackMap  = new Hashtable();
         Real             altReal   = new Real(RealType.Altitude, 0);
         System.err.println("obs:" + lines.size());
@@ -206,6 +206,8 @@ public class AtcfStormDataSource extends StormDataSource {
         okWays.put("ETA", "");
         okWays.put("NGX", "");
         okWays.put("BAMS", "");
+        Hashtable seenDate = new Hashtable();
+        initTypes();
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
             List   toks = StringUtil.split(line, ",", true);
@@ -220,11 +222,21 @@ public class AtcfStormDataSource extends StormDataSource {
             boolean isBest    = wayString.equals(WAY_BEST);
             boolean isWarning = wayString.equals(WAY_WRNG);
             boolean isCarq    = wayString.equals(WAY_CARQ);
-            Date    dttm      = fmt.parse(dateString);
+            //            if(isBest) {
+            //                System.err.println("line:" + line);
+            //            }
+
             int forecastHour  = new Integer((String) toks.get(5)).intValue();
             if (isWarning || isCarq) {
                 forecastHour = -forecastHour;
             }
+
+            //Check for unique dates for this way
+            String dttmkey = wayString +"_"+ dateString+"_" + forecastHour;
+            if(seenDate.get(dttmkey)!=null) continue;
+            seenDate.put(dttmkey,dttmkey);
+
+            Date    dttm      = fmt.parse(dateString);
             convertCal.setTime(dttm);
             String key;
             if (isBest) {
@@ -244,13 +256,10 @@ public class AtcfStormDataSource extends StormDataSource {
             }
             String latString = (String) toks.get(6);
             String lonString = (String) toks.get(7);
-            //            System.err.println ("before:" + latString);
             latString = latString.substring(0, 2) + "."
                         + latString.substring(2);
             lonString = lonString.substring(0, 2) + "."
                         + lonString.substring(2);
-            //            System.err.println (latString);
-            //            if(true) break;
             double latitude  = Misc.decodeLatLon(latString);
             double longitude = Misc.decodeLatLon(lonString);
             EarthLocation elt =
@@ -258,14 +267,13 @@ public class AtcfStormDataSource extends StormDataSource {
                                       new Real(RealType.Longitude,
                                           longitude), altReal);
 
-            List<Real> attrs = new ArrayList<Real>();
-            //            attrs.add( new Attribute(ATTR_CATEGORY, category));
+            List<Real> attributes = new ArrayList<Real>();
+            attributes.add(new Real(TYPE_STORMCATEGORY, (double)category));
             StormTrackPoint stp = new StormTrackPoint(elt,
-                                      new DateTime(dttm), forecastHour,
-                                      attrs);
+                                                      new DateTime(dttm), forecastHour,
+                                                      attributes);
 
             track.addPoint(stp);
-
         }
     }
 

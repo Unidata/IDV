@@ -116,6 +116,10 @@ public abstract class StormDataSource extends DataSourceImpl {
     public static final String ATTR_CATEGORY = "attr.category";
 
 
+    /** _more_          */
+    public static RealType TYPE_STORMCATEGORY;
+
+
     /**
      * _more_
      *
@@ -135,6 +139,15 @@ public abstract class StormDataSource extends DataSourceImpl {
                            String description, Hashtable properties) {
         super(descriptor, name, description, properties);
     }
+
+
+    protected void initTypes() throws VisADException {
+        if(TYPE_STORMCATEGORY == null) {
+            TYPE_STORMCATEGORY = ucar.visad.Util.makeRealType("stormcategory",
+                                                              "Storm_Category", null);
+        }
+    }
+
 
     /**
      * _more_
