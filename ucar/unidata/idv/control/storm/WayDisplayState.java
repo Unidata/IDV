@@ -330,7 +330,7 @@ public class WayDisplayState {
                     getVisible() && stormDisplayState.getForecastVisible());
             }
         }
-        setRingsVisible(ringsVisible);
+        //setRingsVisible(ringsVisible);
     }
 
     /**
