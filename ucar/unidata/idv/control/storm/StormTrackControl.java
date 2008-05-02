@@ -71,6 +71,9 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    private Hashtable okWays = new Hashtable();
+
+
     /** _more_ */
     private CompositeDisplayable placeHolder;
 
@@ -109,6 +112,50 @@ public class StormTrackControl extends DisplayControlImpl {
         return getDisplayMaster(placeHolder);
     }
 
+
+
+    protected boolean okToShowWay(Way way) {
+        if(okWays.size()>0 && okWays.get(way.getId())==null) return false;
+        return true;
+    }
+
+
+    public void subsetWays() {
+        StormDisplayState current = getCurrentStormDisplayState();
+        if(current == null) return;
+        current.onlyShowSelectedWays();
+    }
+
+    public StormDisplayState getCurrentStormDisplayState() {
+        Component comp = treePanel.getVisibleComponent();
+        if(comp == null) return null;
+        for (int i = stormInfos.size() - 1; i >= 0; i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            StormDisplayState stormDisplayState =
+                getStormDisplayState(stormInfo);
+            if(stormDisplayState.getContents() == comp) return stormDisplayState;
+        }
+        return null;
+    }
+
+    public void showAllWays() {
+        List<Way> ways = new ArrayList<Way>();
+        onlyShowTheseWays(ways);
+    }
+
+
+    protected void onlyShowTheseWays(List<Way> ways) {
+        okWays = new Hashtable();
+        for(Way way: ways) {
+            okWays.put(way.getId(), new Boolean(true));
+        }
+        for (int i = stormInfos.size() - 1; i >= 0; i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            StormDisplayState stormDisplayState =
+                getStormDisplayState(stormInfo);
+            stormDisplayState.reload();
+        }
+    }
 
 
     /**
@@ -183,13 +230,15 @@ public class StormTrackControl extends DisplayControlImpl {
         }
     }
 
+
+
     /**
      * _more_
      *
      * @param items _more_
      * @param forMenuBar _more_
      */
-    protected void getEditMenuItems(List items, boolean forMenuBar) {
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
         try {
             List subMenus = new ArrayList();
             GregorianCalendar cal =
@@ -233,6 +282,9 @@ public class StormTrackControl extends DisplayControlImpl {
 
             JMenu trackMenu = GuiUtils.makeMenu("Storm Tracks", subMenus);
             GuiUtils.limitMenuSize(trackMenu, "Tracks:", 30);
+
+
+
             if (activeItems.size() > 0) {
                 activeItems.add(0, GuiUtils.MENU_SEPARATOR);
                 activeItems.add(0, GuiUtils.makeMenuItem("Unload all tracks",
@@ -242,11 +294,26 @@ public class StormTrackControl extends DisplayControlImpl {
             }
 
 
+            if(okWays.size()>0) {
+                items.add(GuiUtils.makeMenuItem("Show All " + getWaysName(),this, "showAllWays"));
+            }
+            StormDisplayState current = getCurrentStormDisplayState();
+            if(current != null && current.getActive()) {
+                items.add(GuiUtils.makeMenuItem("Only Show Selected " +getWaysName(),this, "subsetWays"));
+            }
             items.add(trackMenu);
-            super.getEditMenuItems(items, forMenuBar);
+            super.getViewMenuItems(items, forMenuBar);
         } catch (Exception exc) {
             logException("Making track menu", exc);
         }
+    }
+
+    public String getWayName() {
+        return "Way";
+    }
+
+    public String getWaysName() {
+        return "Ways";
     }
 
 
@@ -544,6 +611,25 @@ public class StormTrackControl extends DisplayControlImpl {
         }
         return closestOb;
     }
+
+    /**
+Set the OkWays property.
+
+@param value The new value for OkWays
+**/
+public void setOkWays (Hashtable value) {
+	okWays = value;
+}
+
+/**
+Get the OkWays property.
+
+@return The OkWays
+**/
+public Hashtable getOkWays () {
+	return okWays;
+}
+
 
 
 }

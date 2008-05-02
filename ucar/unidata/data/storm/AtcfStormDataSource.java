@@ -199,13 +199,13 @@ public class AtcfStormDataSource extends StormDataSource {
         Hashtable        trackMap  = new Hashtable();
         Real             altReal   = new Real(RealType.Altitude, 0);
         System.err.println("obs:" + lines.size());
-        Hashtable okWays = new Hashtable();
+        /*        Hashtable okWays = new Hashtable();
         okWays.put(WAY_CARQ, "");
         okWays.put(WAY_WRNG, "");
         okWays.put(WAY_BEST, "");
         okWays.put("ETA", "");
         okWays.put("NGX", "");
-        okWays.put("BAMS", "");
+        okWays.put("BAMS", "");*/
         Hashtable seenDate = new Hashtable();
         initTypes();
         for (int i = 0; i < lines.size(); i++) {
@@ -216,9 +216,9 @@ public class AtcfStormDataSource extends StormDataSource {
             int    category   = getCategory((String) toks.get(9));
             String dateString = (String) toks.get(2);
             String wayString  = (String) toks.get(4);
-            if (okWays.get(wayString) == null) {
-                continue;
-            }
+            //            if (okWays.get(wayString) == null) {
+            //                continue;
+            //            }
             boolean isBest    = wayString.equals(WAY_BEST);
             boolean isWarning = wayString.equals(WAY_WRNG);
             boolean isCarq    = wayString.equals(WAY_CARQ);
@@ -343,18 +343,33 @@ public class AtcfStormDataSource extends StormDataSource {
         if (new File(file).exists()) {
             return IOUtil.readBytes(IOUtil.getInputStream(file, getClass()));
         }
-        URL       url = new URL(file);
-        FTPClient ftp = new FTPClient();
-        ftp.connect(url.getHost());
-        ftp.login("anonymous", "password");
-        ftp.setFileType(FTP.IMAGE_FILE_TYPE);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ftp.enterLocalPassiveMode();
-        if ( !ftp.retrieveFile(url.getPath(), bos)) {
-            return null;
-            //            throw new FileNotFoundException("Could not read file: " + file);
+        if(!file.startsWith("ftp:")) {
+            throw new FileNotFoundException("Could not read file: " + file);
         }
-        return bos.toByteArray();
+        
+        URL       url = new URL(file);
+        //Try to read up to 5 times
+        Exception lastException=null;
+        for(int i=0;i<5;i++) {
+            FTPClient ftp = new FTPClient();
+            try {
+                ftp.connect(url.getHost());
+                ftp.login("anonymous", "password");
+                ftp.setFileType(FTP.IMAGE_FILE_TYPE);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ftp.enterLocalPassiveMode();
+                if (ftp.retrieveFile(url.getPath(), bos)) {
+                    return bos.toByteArray();
+                }
+            } catch(Exception exc) {
+                lastException = exc;
+            }
+            //Wait a bit
+            Misc.sleep(100);
+        }
+        if(lastException!=null) throw lastException;
+        //            throw new FileNotFoundException("Could not read file: " + file);
+        return null;
     }
 
 

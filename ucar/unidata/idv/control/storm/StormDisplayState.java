@@ -121,15 +121,40 @@ import javax.swing.table.*;
 
 public class StormDisplayState {
 
+    /** The array of colors we cycle through */
+    private static Color[] colors = {
+        Color.RED, Color.PINK, Color.MAGENTA, Color.ORANGE, Color.YELLOW,   Color.GREEN, Color.BLUE, Color.CYAN, 
+        Color.BLACK,
+        Color.DARK_GRAY,
+        Color.GRAY,
+        Color.LIGHT_GRAY
+    };
+
+    private static int nextColor = 0;
+
+
+    /**
+     * Cycle through the color list.
+     *
+     * @return The next color in the list
+     */
+    private static Color getNextColor() {
+        if (nextColor >= colors.length) {
+            nextColor = 0;
+        }
+        return colors[nextColor++];
+    }
+
+
+
+
+
     /** _more_ */
     private Object MUTEX = new Object();
 
     /** _more_ */
     private static final Data DUMMY_DATA = new Real(0);
 
-
-    /** _more_ */
-    private CompositeDisplayable forecastHolder;
 
 
     /** _more_          */
@@ -145,6 +170,7 @@ public class StormDisplayState {
 
     private WayDisplayState forecastState;
 
+    private boolean haveLoadedForecasts = false;
 
     /** _more_ */
     private boolean changed = false;
@@ -244,11 +270,31 @@ public class StormDisplayState {
         if (wayState == null) {
             wayDisplayStateMap.put(way,
                                    wayState = new WayDisplayState(this, way));
-        }
-        if (wayState.getColor() == null) {
-            wayState.setColor(DisplayConventions.getColor());
+            //        "idv.stormtrackcontrol.way.color"
+            if (wayState.getColor() == null) {
+                wayState.setColor(getNextColor());
+            }
         }
         return wayState;
+    }
+
+
+
+    public void onlyShowSelectedWays() {
+        List<Way> ways = new ArrayList<Way>();
+        List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
+        for (WayDisplayState wayDisplayState : wayDisplayStates) {
+            if(wayDisplayState.getVisible()) ways.add(wayDisplayState.getWay());
+        }
+        stormTrackControl.onlyShowTheseWays(ways);
+    }
+
+
+    protected void reload() {
+        if(!active) return;
+        deactivate();
+        active = true;
+        showStorm();
     }
 
 
@@ -261,7 +307,6 @@ public class StormDisplayState {
             active          = false;
             stormTrackControl.removeDisplayable(holder);
             holder         = null;
-            forecastHolder = null;
             contents.removeAll();
             contents.add(BorderLayout.NORTH, originalContents);
             List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
@@ -334,8 +379,8 @@ public class StormDisplayState {
 
 
 
-    protected void wayStateChanged(WayDisplayState wayDisplayState) {
-    }
+
+
 
 
     public boolean getForecastVisible() {
@@ -356,9 +401,7 @@ public class StormDisplayState {
             GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel("Storm: "
                 + stormInfo), unloadBtn), new Insets(0, 0, 5, 0));
 
-        JCheckBox showForecastCbx = forecastState.getVisiblityCheckBox();
-        //        setForecastVisible(showForecastCbx.isSelected());
-        //        showStorm();
+        
 
         List<RealType> attributeTypes = null;
         if (trackCollection.getTracks().size() > 0) {
@@ -368,8 +411,6 @@ public class StormDisplayState {
         Vector radiusAttrNames = null;
         Vector attrNames = null;
         if ((attributeTypes != null) && (attributeTypes.size() > 0)) {
-          
-
             attrNames = new Vector();
             attrNames.add(new TwoFacedObject("Fixed", null));
             for (RealType type : attributeTypes) {
@@ -400,6 +441,7 @@ public class StormDisplayState {
 
         for (Way way : ways) {
             WayDisplayState wayDisplayState = getWayDisplayState(way);
+            if(!stormTrackControl.okToShowWay(wayDisplayState.getWay())) continue;
             JComponent      swatch          = GuiUtils.filler(10, 10);
             swatch.setBackground(wayDisplayState.getColor());
             JLabel wayLabel = new JLabel(way.toString());
@@ -435,7 +477,6 @@ public class StormDisplayState {
             } else {
                 if ( !haveDoneForecast) {
                     haveDoneForecast = true;
-                    //                    components.add(GuiUtils.hbox(showForecastCbx,new JLabel("Forecasts")));
                     components.add(GuiUtils.filler(2, 5));
                     components.add(GuiUtils.filler(2, 5));
                     components.add(GuiUtils.filler(2, 5));
@@ -443,7 +484,7 @@ public class StormDisplayState {
                     components.add(GuiUtils.filler(2, 5));
 
                     components.add(GuiUtils.lLabel("Forecasts:"));
-                    components.add(GuiUtils.left(showForecastCbx));
+                    components.add(GuiUtils.left(forecastState.getVisiblityCheckBox()));
                     components.add(GuiUtils.filler());
                     components.add(GuiUtils.filler());
                     components.add(GuiUtils.filler());
@@ -571,16 +612,8 @@ public class StormDisplayState {
                 FieldImpl field = makeField(obsTrack, null);
                 obsDisplayState.addTrack(obsTrack, field);
 
-                TrackDisplayable trackDisplay = new TrackDisplayable("track_"
-                                                    + stormInfo.getStormId());
-                obsDisplayState.addDisplayable(trackDisplay);
-
-                trackDisplay.setLineWidth(3);
-                trackDisplay.setTrack(field);
-                holder.addDisplayable(trackDisplay);
-
-                makeRingField(obsTrack, obsDisplayState, holder,
-                              null);
+                obsDisplayState.getTrackDisplay().setTrack(field);
+                makeRingField(obsTrack, obsDisplayState, null);
 
                 indicator = new StationModelDisplayable("indicator");
                 indicator.setShouldUseAltitude(false);
@@ -595,10 +628,79 @@ public class StormDisplayState {
                 timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
                 holder.addDisplayable(timesHolder);
 
-
                 StationModelDisplayable dots =
                     new StationModelDisplayable("dots");
                 obsDisplayState.addDisplayable(dots);
+                dots.setScale(1.0f);
+                holder.addDisplayable(dots);
+                dots.setStationModel(getObservationStationModel());
+                //                dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
+                //                                                                               24*60,-1));
+                dots.setStationData(
+                    PointObFactory.makeTimeSequenceOfPointObs(
+                        obsDisplayState.getPointObs(), -1, -1));
+            }
+        }
+
+
+        //Don't load them until we need to
+        if (getForecastVisible() && !haveLoadedForecasts) {
+            haveLoadedForecasts = true;
+            List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
+            for (StormTrack track : trackCollection.getTracks()) {
+                if (track.isObservation()) {
+                    continue;
+                }
+                if(!stormTrackControl.okToShowWay(track.getWay())) continue;
+                WayDisplayState wayDisplayState =
+                    getWayDisplayState(track.getWay());
+                FieldImpl field = makeField(track, null);
+                wayDisplayState.addTrack(track, field);
+            }
+
+            for (WayDisplayState wayDisplayState : wayDisplayStates) {
+                if (wayDisplayState.getWay().isObservation()) {
+                    continue;
+                }
+                List fields = wayDisplayState.getFields();
+                if (fields.size() == 0) {
+                    continue;
+                }
+
+                FieldImpl timeField =
+                    ucar.visad.Util.makeTimeField(fields,
+                                                  wayDisplayState.getTimes());
+                wayDisplayState.getTrackDisplay().setTrack(timeField);
+                List<StormTrack> tracks = wayDisplayState.getTracks();
+                for (StormTrack strack : tracks) {
+                    makeRingField(strack, wayDisplayState,
+                                  null);
+                }
+            }
+        }
+
+        checkVisibility();
+        long t2 = System.currentTimeMillis();
+        System.err.println("time:" + (t2 - t1));
+    }
+
+
+    protected void wayVisibilityChanged(WayDisplayState wayDisplayState) {
+        if(forecastState == wayDisplayState) {
+            showStorm();
+        }
+    }
+
+
+    private void checkVisibility()  throws Exception {
+        List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
+        for (WayDisplayState wayDisplayState : wayDisplayStates) {
+            wayDisplayState.checkVisibility();
+        }
+    }
+
+
+    private StationModel getObservationStationModel() {
                 StationModel model       = new StationModel("TrackLocation");
                 ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
                 shapeSymbol.setShape(ucar.visad.ShapeUtility.FILLED_CIRCLE);
@@ -607,68 +709,10 @@ public class StormDisplayState {
                 shapeSymbol.setRectPoint(Glyph.PT_MM);
                 model.addSymbol(shapeSymbol);
 
-                dots.setScale(1.0f);
-                holder.addDisplayable(dots);
-                dots.setStationModel(model);
-                //                dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( obsDisplayState.getPointObs(),
-                //                                                                               24*60,-1));
-                dots.setStationData(
-                    PointObFactory.makeTimeSequenceOfPointObs(
-                        obsDisplayState.getPointObs(), -1, -1));
+                return model;
+    }
 
-            }
-
-        }
-
-
-
-        //Don't load them until we need to
-        if (getForecastVisible() || (forecastHolder != null)) {
-            List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
-            if (forecastHolder != null) {
-                forecastHolder.setVisible(getForecastVisible());
-                for (WayDisplayState wayDisplayState : wayDisplayStates) {
-                    wayDisplayState.setVisible(wayDisplayState.getVisible());
-                }
-            } else {
-                forecastHolder = new CompositeDisplayable();
-                holder.addDisplayable(forecastHolder);
-                forecastHolder.setVisible(true);
-                for (StormTrack track : trackCollection.getTracks()) {
-                    if (track.isObservation()) {
-                        continue;
-                    }
-                    //                if (!(track.getWay().getId().equals("SHTM") ||
-                    //                      track.getWay().getId().equals("jawt"))) continue;
-                    WayDisplayState wayDisplayState =
-                        getWayDisplayState(track.getWay());
-                    FieldImpl field = makeField(track, null);
-                    wayDisplayState.addTrack(track, field);
-
-
-                }
-
-                for (WayDisplayState wayDisplayState : wayDisplayStates) {
-                    if (wayDisplayState.getWay().isObservation()) {
-                        continue;
-                    }
-
-                    List fields = wayDisplayState.getFields();
-                    //                if (!(wayDisplayState.getWay().getId().equals("SHTM"))) continue;
-                    //                System.err.println (wayDisplayState.getWay() +" fields=" +fields.size());
-                    if (fields.size() == 0) {
-                        continue;
-                    }
-
-                    TrackDisplayable trackDisplay =
-                        new TrackDisplayable("track ");
-                    trackDisplay.setColorPalette(
-                        getColor(wayDisplayState.getColor()));
-                    trackDisplay.setUseTimesInAnimation(false);
-                    wayDisplayState.addDisplayable(trackDisplay);
-                    if ( !wayDisplayState.getVisible()) {
-                        trackDisplay.setVisible(false);
-                    }
+    private StationModel getForecastStationModel() {
 
                     /*
                     StationModelDisplayable dots  = new StationModelDisplayable("dots");
@@ -693,28 +737,9 @@ public class StormDisplayState {
                                                                                    -1,-1));
 
                     */
-                    forecastHolder.addDisplayable(trackDisplay);
-                    FieldImpl timeField =
-                        ucar.visad.Util.makeTimeField(fields,
-                            wayDisplayState.getTimes());
-                    trackDisplay.setTrack(timeField);
-                    List<StormTrack> tracks = wayDisplayState.getTracks();
-                    for (StormTrack strack : tracks) {
-                        makeRingField(strack, wayDisplayState,
-                                      forecastHolder,
-                                      null);
-                    }
-                }
-            }
-        }
-
-
-        long t2 = System.currentTimeMillis();
-        System.err.println("time:" + (t2 - t1));
-
-
-
+        return null;
     }
+
 
 
 
@@ -728,7 +753,7 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    private float[][] getColor(Color c) {
+    public static  float[][] getColor(Color c) {
         if (c == null) {
             c = Color.red;
         }
@@ -751,7 +776,6 @@ public class StormDisplayState {
      */
     private FieldImpl makeField(StormTrack track, RealType type)
             throws Exception {
-
 
         List<DateTime>      times     = track.getTrackTimes();
         List<EarthLocation> locations = track.getLocations();
@@ -816,7 +840,6 @@ public class StormDisplayState {
      *
      * @param track _more_
      * @param wState _more_
-     * @param holder _more_
      * @param attrName _more_
      *
      *
@@ -825,7 +848,6 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     private void makeRingField(StormTrack track, WayDisplayState wState,
-                                    CompositeDisplayable holder,
                                     RealType type)
             throws Exception {
         //TODO: Use the param type
@@ -929,7 +951,7 @@ public class StormDisplayState {
 
             public String getColumnName(int column) {
                 if (column == 0) {
-                    return "Way";
+                    return stormTrackControl.getWayName();
                 }
                 return "Date";
             }

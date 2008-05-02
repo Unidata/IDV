@@ -33,6 +33,7 @@ import ucar.unidata.util.LogUtil;
 
 import ucar.visad.display.*;
 
+import java.rmi.RemoteException;
 import visad.*;
 
 import java.awt.*;
@@ -41,6 +42,7 @@ import java.awt.Color;
 import java.awt.event.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.*;
@@ -69,10 +71,6 @@ public class WayDisplayState {
 
     private boolean ringsVisible = true;
 
-
-    /** _more_ */
-    List<Displayable> displayables = new ArrayList<Displayable>();
-
     /** _more_          */
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
 
@@ -89,8 +87,11 @@ public class WayDisplayState {
     private Color color;
 
 
+    private CompositeDisplayable holder;
+
     private CompositeDisplayable ringsHolder;
 
+    private  TrackDisplayable trackDisplay;
 
     /**
      * _more_
@@ -100,11 +101,20 @@ public class WayDisplayState {
 
     private RealType ringsType;
 
-    protected void setRings(RealType ringsType, List<RingSet> rings) throws Exception {
+    protected CompositeDisplayable getHolder() throws VisADException, RemoteException {
+        if(holder == null) {
+            holder  = new CompositeDisplayable("way  holder");
+            stormDisplayState.addDisplayable(holder);
+        }
+        return holder;
+    }
+
+
+    protected void setRings(RealType ringsType, List<RingSet> rings) throws VisADException, RemoteException {
         this.ringsType= ringsType;
         if(ringsHolder==null) {
             ringsHolder  = new CompositeDisplayable("rings holder");
-            stormDisplayState.addDisplayable(ringsHolder);
+            addDisplayable(ringsHolder);
         }
         ringsHolder.clearDisplayables();
         if(rings!=null) {
@@ -115,8 +125,22 @@ public class WayDisplayState {
         setRingsVisible(getRingsVisible());
     }
 
-
-
+    
+    public TrackDisplayable getTrackDisplay() throws VisADException, RemoteException {
+        if(trackDisplay ==null) {
+            trackDisplay = new TrackDisplayable("track_"
+                                                + stormDisplayState.getStormInfo().getStormId());
+            if(way.isObservation()) {
+                trackDisplay.setLineWidth(3);
+            } else {
+                trackDisplay.setUseTimesInAnimation(false);
+            }
+            trackDisplay.setColorPalette(
+                                         stormDisplayState.getColor(getColor()));
+            addDisplayable(trackDisplay);
+        }
+        return trackDisplay;
+    }
 
 
 
@@ -135,8 +159,13 @@ public class WayDisplayState {
     /**
      * _more_
      */
-    public void deactivate()  {
-        displayables      = new ArrayList<Displayable>();
+    public void deactivate()  throws VisADException , RemoteException{
+        ringsHolder = null;
+        if(holder!=null) {
+            
+        }
+        trackDisplay = null;
+        holder = null;
         ringsHolder = null;
         tracks            = new ArrayList<StormTrack>();
         fields            = new ArrayList<FieldImpl>();
@@ -158,6 +187,7 @@ public class WayDisplayState {
                 public void actionPerformed(ActionEvent ae) {
                     try {
                         setVisible(visibilityCbx.isSelected());
+                        stormDisplayState.wayVisibilityChanged(WayDisplayState.this);
                     } catch (Exception exc) {
                         LogUtil.logException("Toggling way visibility", exc);
                     }
@@ -261,8 +291,9 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public void addDisplayable(Displayable displayable) throws Exception {
-        displayables.add(displayable);
+    public void addDisplayable(Displayable displayable) throws VisADException, RemoteException  {
+
+        getHolder().addDisplayable(displayable);
         if (way.isObservation()) {
             displayable.setVisible(getVisible());
         } else {
@@ -273,24 +304,22 @@ public class WayDisplayState {
 
 
 
-    /**
-     * Set the Way property.
-     *
-     * @param value The new value for Way
-     */
-    public void setWay(Way value) {
-        way = value;
-    }
 
-    /**
-     * Get the Way property.
-     *
-     * @return The Way
-     */
-    public Way getWay() {
-        return way;
-    }
+    public void checkVisibility()  throws Exception {
+        if(holder!=null) {
+            for (Iterator iter = holder.iterator(); iter.hasNext(); ) {
+                Displayable displayable = (Displayable) iter.next();
+                if (way.isObservation()) {
+                    displayable.setVisible(getVisible());
+                } else {
+                    displayable.setVisible(
+                                           getVisible() && stormDisplayState.getForecastVisible());
+                }
+            }
+            //setRingsVisible(ringsVisible);
+        }
 
+    }
 
     /**
      * Set the Visible property.
@@ -301,15 +330,7 @@ public class WayDisplayState {
      */
     public void setVisible(boolean value) throws Exception {
         this.visible = value;
-        for (Displayable displayable : displayables) {
-            if (way.isObservation()) {
-                displayable.setVisible(getVisible());
-            } else {
-                displayable.setVisible(
-                    getVisible() && stormDisplayState.getForecastVisible());
-            }
-        }
-        //setRingsVisible(ringsVisible);
+        checkVisibility();
     }
 
     /**
@@ -319,7 +340,7 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public void setRingsVisible(boolean value) throws Exception {
+    public void setRingsVisible(boolean value) throws VisADException, RemoteException {
         this.ringsVisible = value;
         if(ringsHolder!=null) {
             ringsHolder.setVisible(ringsVisible);
@@ -400,6 +421,27 @@ public class WayDisplayState {
     public StormDisplayState getStormDisplayState() {
         return stormDisplayState;
     }
+
+
+
+    /**
+     * Set the Way property.
+     *
+     * @param value The new value for Way
+     */
+    public void setWay(Way value) {
+        way = value;
+    }
+
+    /**
+     * Get the Way property.
+     *
+     * @return The Way
+     */
+    public Way getWay() {
+        return way;
+    }
+
 
 
 

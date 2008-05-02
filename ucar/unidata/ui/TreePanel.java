@@ -216,6 +216,10 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     }
 
 
+    public Component getVisibleComponent() {
+        return panel.getVisibleComponent();
+    }
+
     /**
      * Handle tree selection changed
      *
