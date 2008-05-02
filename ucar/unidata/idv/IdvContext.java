@@ -51,5 +51,10 @@ public interface IdvContext {
      * @return The property as a String or the dflt value if not found
      */
     public String getProperty(String name, String dflt);
+
+
+    public java.awt.Color getColorProperty(String name, java.awt.Color dflt);
+
+
 }
 

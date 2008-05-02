@@ -37,7 +37,7 @@ import ucar.unidata.idv.publish.PublishManager;
 import ucar.unidata.idv.test.TestManager;
 
 import ucar.unidata.idv.ui.AliasEditor;
-
+import java.awt.Color;
 
 
 
@@ -1097,6 +1097,18 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
      */
     public String getProperty(String name, String dflt) {
         return getStateManager().getProperty(name, dflt);
+    }
+
+    /**
+     *  Utility method to retrieve a String property from the idv properties.
+     *  If the property does not exists return the given default value.
+     *
+     * @param name The name of the property
+     * @param dflt The default value if the property is not found
+     * @return The given property or the dflt value
+     */
+    public Color getColorProperty(String name, Color dflt) {
+        return getStateManager().getColorProperty(name, dflt);
     }
 
 

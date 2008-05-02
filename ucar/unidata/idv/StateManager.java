@@ -38,6 +38,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
@@ -45,6 +46,7 @@ import ucar.unidata.util.Trace;
 
 import ucar.unidata.xml.*;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
 import java.io.File;
@@ -621,6 +623,21 @@ public class StateManager extends IdvManager {
         }
         return dflt;
     }
+
+
+
+    /**
+     *  Utility method to retrieve a String property from the idv properties.
+     *  If the property does not exists return the given default value.
+     *
+     * @param name Property name
+     * @param dflt The default value to return if name is not found
+     * @return The property value or dflt if not found
+     */
+    public Color getColorProperty(String name, Color dflt) {
+        return GuiUtils.decodeColor((String) getProperty(name),dflt);
+    }
+
 
 
     /**
