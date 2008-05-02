@@ -29,9 +29,13 @@ import ucar.unidata.data.point.PointObFactory;
 
 import ucar.unidata.data.storm.*;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.LogUtil;
 
 import ucar.visad.display.*;
+
+import ucar.unidata.util.ColorTable;
+import ucar.unidata.ui.colortable.ColorTableManager;
 
 import java.rmi.RemoteException;
 import visad.*;
@@ -44,9 +48,12 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
+
+import ucar.unidata.ui.colortable.ColorTableDefaults;
 
 
 /**
@@ -56,6 +63,7 @@ import javax.swing.event.*;
  */
 
 public class WayDisplayState {
+
 
     /** _more_          */
     private StormDisplayState stormDisplayState;
@@ -87,11 +95,19 @@ public class WayDisplayState {
     private Color color;
 
 
+    private JComboBox paramBox;
+
+    private GuiUtils.ColorSwatch colorSwatch;
+
     private CompositeDisplayable holder;
 
     private CompositeDisplayable ringsHolder;
 
     private  TrackDisplayable trackDisplay;
+
+    private String colorTable="Bright38";
+
+
 
     /**
      * _more_
@@ -126,7 +142,7 @@ public class WayDisplayState {
     }
 
     
-    public TrackDisplayable getTrackDisplay() throws VisADException, RemoteException {
+    public TrackDisplayable getTrackDisplay() throws Exception {
         if(trackDisplay ==null) {
             trackDisplay = new TrackDisplayable("track_"
                                                 + stormDisplayState.getStormInfo().getStormId());
@@ -135,12 +151,12 @@ public class WayDisplayState {
             } else {
                 trackDisplay.setUseTimesInAnimation(false);
             }
-            trackDisplay.setColorPalette(
-                                         stormDisplayState.getColor(getColor()));
+            setTrackColor();
             addDisplayable(trackDisplay);
         }
         return trackDisplay;
     }
+
 
 
 
@@ -155,6 +171,113 @@ public class WayDisplayState {
         this.stormDisplayState = stormDisplayState;
         this.way               = way;
     }
+
+
+    protected JComponent getColorSwatch() {
+        if(colorSwatch == null) {
+            colorSwatch = new GuiUtils.ColorSwatch(getColor(), "Set track color") {
+                    public void setBackground(Color newColor) {
+                        super.setBackground(newColor);
+                        WayDisplayState.this.color = newColor;
+                        if(trackDisplay!=null) {
+                            try {
+                                setTrackColor();
+                            } catch (Exception exc) {
+                                LogUtil.logException("Setting color", exc);
+                            }
+                        }
+                    }
+                };
+            colorSwatch.setMinimumSize(new Dimension(15, 15));
+            colorSwatch.setPreferredSize(new Dimension(15, 15));
+        }
+        return colorSwatch;
+    }
+
+    public  float[][] getColorPalette() {
+        RealType type = getParamType();
+        if(type!=null && colorTable!=null) {
+            ColorTable ct =
+                stormDisplayState.getStormTrackControl().getControlContext().getColorTableManager().getColorTable(
+                                                                                                                  colorTable);
+            if(ct!=null) {
+                return stormDisplayState.getStormTrackControl().getColorTableForDisplayable(ct);
+            }
+        }
+
+        return getColorPalette(getColor());
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     */
+    public static  float[][] getColorPalette(Color c) {
+        if (c == null) {
+            c = Color.red;
+        }
+        return ColorTableDefaults.allOneColor(c, true);
+    }
+
+    protected Component getParamComponent(Vector attrNames) {
+        if(attrNames==null || attrNames.size()==0) return GuiUtils.filler();
+        if(paramBox == null) {
+            paramBox =  new JComboBox(attrNames);
+            paramBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        try {
+                            makeField();
+                            setTrackColor();
+                            stormDisplayState.wayParamChanged(WayDisplayState.this);
+                        } catch (Exception exc) {
+                            LogUtil.logException("Making new field", exc);
+                        }
+                    }
+                });
+        }
+        return paramBox;
+    }
+
+
+    private void setTrackColor() throws Exception {
+        if(trackDisplay!=null) {
+            trackDisplay.setColorPalette(getColorPalette());
+        }
+    }
+
+    public boolean usingDefaultParam() {
+        if(paramBox == null) return false;
+        TwoFacedObject tfo = (TwoFacedObject) paramBox.getSelectedItem();
+        Object id = tfo.getId();
+        if(id == null) return false;
+        if(id instanceof RealType) {
+            return false;
+        }
+        return id.toString().equals("default");
+    }
+
+    //    protected ColorTable getParamColorTable() {
+    //    }
+
+    protected RealType getParamType() {
+        if(paramBox == null) return null;
+        TwoFacedObject tfo = (TwoFacedObject) paramBox.getSelectedItem();
+        Object id = tfo.getId();
+        if(id == null) return null;
+        if(id instanceof RealType) {
+            return (RealType) id;
+        }
+        if(id.toString().equals("default")) {
+            return stormDisplayState.getForecastParamType();
+        }
+        return null;
+    }
+
 
     /**
      * _more_
@@ -220,6 +343,33 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
+    public void addTrack(StormTrack track) throws Exception {
+        tracks.add(track);
+    }
+
+
+    protected void makeField() throws Exception  {
+        List<FieldImpl> fields = new ArrayList<FieldImpl>();
+        List<DateTime> times = new ArrayList<DateTime>();
+        
+        RealType type = getParamType();
+        for(StormTrack track: tracks) {
+            FieldImpl field = stormDisplayState.makeField(track, type);
+            fields.add(field);
+            times.add(track.getTrackStartTime());
+        }
+
+        if (fields.size() == 0) {
+            return;
+        }
+
+        FieldImpl timeField =
+            ucar.visad.Util.makeTimeField(fields,
+                                          times);
+        getTrackDisplay().setTrack(timeField);
+    }
+
+
     public void addTrack(StormTrack track, FieldImpl field) throws Exception {
         tracks.add(track);
         times.add(track.getTrackStartTime());
@@ -442,6 +592,24 @@ public class WayDisplayState {
         return way;
     }
 
+
+/**
+Set the ColorTable property.
+
+@param value The new value for ColorTable
+**/
+public void setColorTable (String value) {
+	colorTable = value;
+}
+
+/**
+Get the ColorTable property.
+
+@return The ColorTable
+**/
+public String getColorTable () {
+	return colorTable;
+}
 
 
 
