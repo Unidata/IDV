@@ -250,6 +250,7 @@ public class TwoFacedObject implements Comparable {
 
 
     public static String findLabel(Object id, List l) {
+        if(id == null) return null;
         for (int i = 0; i < l.size(); i++) {
             TwoFacedObject tfo = (TwoFacedObject) l.get(i);
             if (Misc.equals(id, tfo.getId())) {
