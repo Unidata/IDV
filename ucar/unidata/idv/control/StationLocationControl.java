@@ -1550,9 +1550,11 @@ public class StationLocationControl extends StationModelControl {
                 int index = column - 1;
                 if ((index >= 0) && (index < attributes.size())) {
                     Object key = attributes.get(index);
-                    String s =(String) station.getProperties().get(key);
-                    s =  StringUtil.stripTags(s);
-                    return s;
+                    Object o = station.getProperties().get(key);
+                    if(o!=null) {
+                        o =  StringUtil.stripTags(o.toString());
+                    }
+                    return o;
                 }
             }
             return "";
