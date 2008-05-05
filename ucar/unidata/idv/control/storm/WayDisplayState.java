@@ -39,6 +39,8 @@ import ucar.unidata.ui.colortable.ColorTableManager;
 
 import java.rmi.RemoteException;
 import visad.*;
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
 
 import java.awt.*;
 
@@ -54,6 +56,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ucar.unidata.ui.colortable.ColorTableDefaults;
+import ucar.unidata.geoloc.projection.FlatEarth;
+import ucar.unidata.geoloc.ProjectionPointImpl;
 
 
 /**
@@ -141,7 +145,7 @@ public class WayDisplayState {
         setRingsVisible(getRingsVisible());
     }
 
-    
+
     public TrackDisplayable getTrackDisplay() throws Exception {
         if(trackDisplay ==null) {
             trackDisplay = new TrackDisplayable("track_"
@@ -285,7 +289,7 @@ public class WayDisplayState {
     public void deactivate()  throws VisADException , RemoteException{
         ringsHolder = null;
         if(holder!=null) {
-            
+
         }
         trackDisplay = null;
         holder = null;
@@ -339,7 +343,6 @@ public class WayDisplayState {
      * _more_
      *
      * @param track _more_
-     * @param field _more_
      *
      * @throws Exception _more_
      */
@@ -351,7 +354,7 @@ public class WayDisplayState {
     protected void makeField() throws Exception  {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime> times = new ArrayList<DateTime>();
-        
+
         RealType type = getParamType();
         for(StormTrack track: tracks) {
             FieldImpl field = stormDisplayState.makeField(track, type);
@@ -611,7 +614,168 @@ public String getColorTable () {
 	return colorTable;
 }
 
+    /**
+     * _more_
+     *
+     * @param track _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public StormTrack makeCornTrack(StormTrack track) throws VisADException {
+        List<StormTrackPoint> stps          = track.getTrackPoints();
+        int                   size          = stps.size();
+        int                   numberOfPoint = size * 2 + 11;
+        StormTrackPoint[]     cornPoints = new StormTrackPoint[numberOfPoint];
 
+        StormTrackPoint       stp1          = stps.get(0);
+        cornPoints[0]                 = stp1;  // first point  & last point
+        cornPoints[numberOfPoint - 1] = stp1;
+
+        StormTrackPoint stp2;
+        StormTrackPoint stp;
+
+        // circle  1 to n
+
+        for (int i = 1; i < size; i++) {
+            stp2 = stps.get(i);
+            //right point
+            stp           = getPointToCircleTangencyPoint(stp1, stp2, true);
+            cornPoints[i] = stp;
+            //left point
+            stp = getPointToCircleTangencyPoint(stp1, stp2, false);
+            cornPoints[numberOfPoint - i - 1] = stp;
+            stp1                              = stp2;
+        }
+
+        // end point half circle take 11 points
+        StormTrackPoint last   = stps.get(size - 1);
+        EarthLocation lastEl = last.getTrackPointLocation();
+        EarthLocation   endEl = cornPoints[size - 1].getTrackPointLocation();
+        double          ang    = getCircleAngleRange(lastEl, endEl);
+
+        Real r = last.getAttribute(STIStormDataSource.TYPE_PROBABILITYRADIUS);
+        StormTrackPoint[] halfCircle = getHalfCircleTrackPoint(lastEl, ang,
+                                           r.getValue());
+
+        for (int i = 0; i < 11; i++) {
+            cornPoints[size + i] = halfCircle[i];
+        }
+
+        List cornList = new ArrayList<StormTrackPoint>();
+        for (int i = 0; i < numberOfPoint; i++) {
+            cornList.add(cornPoints[i]);
+        }
+
+        return new StormTrack(track.getStormInfo(), new Way("CORN"),
+                              cornList);
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param sp1 _more_
+     * @param sp2 _more_
+     * @param right _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public StormTrackPoint getPointToCircleTangencyPoint(StormTrackPoint sp1,
+            StormTrackPoint sp2, boolean right) throws VisADException {
+
+        int           sign = 1;
+        EarthLocation el1  = sp1.getTrackPointLocation();
+        EarthLocation el2  = sp2.getTrackPointLocation();
+
+        Real rl = sp2.getAttribute(STIStormDataSource.TYPE_PROBABILITYRADIUS);
+
+        double        r    = rl.getValue();
+        FlatEarth e    = new FlatEarth();
+        ProjectionPointImpl p1 = e.latLonToProj(el1.getLatitude().getValue(),
+                                     el1.getLongitude().getValue());
+        ProjectionPointImpl p2 = e.latLonToProj(el2.getLatitude().getValue(),
+                                     el2.getLongitude().getValue());
+        double dist = p1.distance(p2);
+
+        if ( !right) {
+            sign = -1;
+        }
+        double x = p2.getX() + sign * r * (p2.getY() - p1.getY()) / dist;
+        double y = p2.getY() + sign * r * (p1.getX() - p2.getX()) / dist;
+
+        //ProjectionPointImpl p = new ProjectionPointImpl(x,y);
+        e.setOriginLat(x);
+        e.setOriginLon(y);
+        EarthLocation el = new EarthLocationLite(e.getOriginLat(),
+                               e.getOriginLon(), 0);
+        StormTrackPoint sp = new StormTrackPoint(el, null, 0, null);
+        return sp;
+    }
+
+    /**
+     * _more_
+     *
+     * @param c _more_
+     * @param d _more_
+     *
+     * @return _more_
+     */
+    public double getCircleAngleRange(EarthLocation c, EarthLocation d) {
+
+        FlatEarth e = new FlatEarth();
+        ProjectionPointImpl p1 = e.latLonToProj(c.getLatitude().getValue(),
+                                     c.getLongitude().getValue());
+        ProjectionPointImpl p2 = e.latLonToProj(d.getLatitude().getValue(),
+                                     d.getLongitude().getValue());
+
+        double dx = p2.getX() - p1.getX();
+        double dy = p2.getY() - p1.getY();
+
+        double a  = Math.atan2(dy, dx);
+
+        return a;
+    }
+
+    /**
+     * _more_
+     *
+     * @param c _more_
+     * @param angle _more_
+     * @param r _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public StormTrackPoint[] getHalfCircleTrackPoint(EarthLocation c,
+            double angle, double r) throws VisADException {
+        // return 10 track point
+        int               size  = 11;
+
+        StormTrackPoint[] track = new StormTrackPoint[size];
+        FlatEarth         e     = new FlatEarth();
+        ProjectionPointImpl p0 = e.latLonToProj(c.getLatitude().getValue(),
+                                     c.getLongitude().getValue());
+
+        for (int i = 0; i < size; i++) {
+            double af = angle + 15 * Math.PI / 180.0;
+            double x  = p0.getX() + r * Math.cos(af);
+            double y  = p0.getY() + r * Math.sin(af);
+            e.setOriginLat(x);
+            e.setOriginLon(y);
+            EarthLocation el = new EarthLocationLite(e.getOriginLat(),
+                                   e.getOriginLon(), 0);
+            StormTrackPoint sp = new StormTrackPoint(el, null, 0, null);
+
+            track[i] = sp;
+        }
+
+        return track;
+    }
 
 }
 
