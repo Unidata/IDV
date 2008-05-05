@@ -1392,12 +1392,15 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
         GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
                                      givenDataSelection, requestProperties,
                                      fromLevelIndex, toLevelIndex);
+        if(adapter == null) {
+            throw new BadDataException("Could not find field:" + dataChoice.getStringId());
+        }
         Trace.call2("GeoGridDataSource.make GeoGridAdapter");
-
 
         Trace.call1("GeoGridDataSource.make times");
         List times = getTimesFromDataSelection(givenDataSelection,
