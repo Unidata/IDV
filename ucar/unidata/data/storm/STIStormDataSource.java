@@ -322,12 +322,8 @@ public class STIStormDataSource extends StormDataSource {
         long                 t1              = System.currentTimeMillis();
         StormTrackCollection trackCollection = new StormTrackCollection();
         List<Way>            forecastWays    = getForecastWays(stormInfo);
-        List                 rings           = new ArrayList();
-        double               r               = 50;
-        for (int i = 0; i < 10; i++) {
-            rings.add(r);
-            r = r + 50;
-        }
+
+
         for (Way forecastWay : forecastWays) {
             List forecastTracks = getForecastTracks(stormInfo, forecastWay);
             if (forecastTracks.size() > 0) {
@@ -415,7 +411,7 @@ public class STIStormDataSource extends StormDataSource {
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
         ResultSet             results;
-        double                radius = 50;
+        double                radius = 0;
         List<StormTrackPoint> pts    = new ArrayList();
 
         initTypes();
@@ -462,7 +458,8 @@ public class STIStormDataSource extends StormDataSource {
                 DateTime dttm = getDateTime(year, month, day, hour + fhour);
                 StormTrackPoint stp = new StormTrackPoint(elt, dttm, fhour,
                                           attrs);
-                pts.add(stp);
+                if(!elt.isMissing())
+                    pts.add(stp);
             }
         }
 
