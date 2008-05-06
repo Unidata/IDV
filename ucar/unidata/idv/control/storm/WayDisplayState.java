@@ -58,6 +58,9 @@ import javax.swing.event.*;
 import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.geoloc.projection.FlatEarth;
 import ucar.unidata.geoloc.ProjectionPointImpl;
+import ucar.unidata.geoloc.ProjectionPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonPoint;
 
 
 /**
@@ -357,8 +360,13 @@ public class WayDisplayState {
 
         RealType type = getParamType();
         for(StormTrack track: tracks) {
+            StormTrack cornTrack = makeCornTrack(track);
             FieldImpl field = stormDisplayState.makeField(track, type);
-            fields.add(field);
+          //  fields.add(field);
+            FieldImpl cfield = stormDisplayState.makeField(cornTrack, type);
+            fields.add(cfield);
+
+          //  times.add(track.getTrackStartTime());
             times.add(track.getTrackStartTime());
         }
 
@@ -657,7 +665,7 @@ public String getColorTable () {
 
         Real r = last.getAttribute(STIStormDataSource.TYPE_PROBABILITYRADIUS);
         StormTrackPoint[] halfCircle = getHalfCircleTrackPoint(lastEl, ang,
-                                           r.getValue());
+                                           r.getValue(), last.getTrackPointTime());
 
         for (int i = 0; i < 11; i++) {
             cornPoints[size + i] = halfCircle[i];
@@ -694,10 +702,11 @@ public String getColorTable () {
         Real rl = sp2.getAttribute(STIStormDataSource.TYPE_PROBABILITYRADIUS);
 
         double        r    = rl.getValue();
-        FlatEarth e    = new FlatEarth();
-        ProjectionPointImpl p1 = e.latLonToProj(el1.getLatitude().getValue(),
+        FlatEarth e1    = new FlatEarth();
+        FlatEarth e2   = new FlatEarth();
+        ProjectionPointImpl p1 = e1.latLonToProj(el1.getLatitude().getValue(),
                                      el1.getLongitude().getValue());
-        ProjectionPointImpl p2 = e.latLonToProj(el2.getLatitude().getValue(),
+        ProjectionPointImpl p2 = e2.latLonToProj(el2.getLatitude().getValue(),
                                      el2.getLongitude().getValue());
         double dist = p1.distance(p2);
 
@@ -707,12 +716,15 @@ public String getColorTable () {
         double x = p2.getX() + sign * r * (p2.getY() - p1.getY()) / dist;
         double y = p2.getY() + sign * r * (p1.getX() - p2.getX()) / dist;
 
-        //ProjectionPointImpl p = new ProjectionPointImpl(x,y);
-        e.setOriginLat(x);
-        e.setOriginLon(y);
-        EarthLocation el = new EarthLocationLite(e.getOriginLat(),
-                               e.getOriginLon(), 0);
-        StormTrackPoint sp = new StormTrackPoint(el, null, 0, null);
+
+        ProjectionPoint pp = new ProjectionPointImpl(x,y);
+        LatLonPointImpl lp = new LatLonPointImpl();
+        FlatEarth e3   = new FlatEarth();
+        LatLonPoint lp11 = e3.projToLatLon(pp, lp);
+
+        EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
+                               lp11.getLongitude(), 0);
+        StormTrackPoint sp = new StormTrackPoint(el, sp1.getTrackPointTime(), 0, null);
         return sp;
     }
 
@@ -726,10 +738,11 @@ public String getColorTable () {
      */
     public double getCircleAngleRange(EarthLocation c, EarthLocation d) {
 
-        FlatEarth e = new FlatEarth();
-        ProjectionPointImpl p1 = e.latLonToProj(c.getLatitude().getValue(),
+        FlatEarth e1 = new FlatEarth();
+        ProjectionPointImpl p1 = e1.latLonToProj(c.getLatitude().getValue(),
                                      c.getLongitude().getValue());
-        ProjectionPointImpl p2 = e.latLonToProj(d.getLatitude().getValue(),
+        FlatEarth e2 = new FlatEarth();
+        ProjectionPointImpl p2 = e2.latLonToProj(d.getLatitude().getValue(),
                                      d.getLongitude().getValue());
 
         double dx = p2.getX() - p1.getX();
@@ -752,7 +765,7 @@ public String getColorTable () {
      * @throws VisADException _more_
      */
     public StormTrackPoint[] getHalfCircleTrackPoint(EarthLocation c,
-            double angle, double r) throws VisADException {
+            double angle, double r, DateTime dt) throws VisADException {
         // return 10 track point
         int               size  = 11;
 
@@ -762,14 +775,17 @@ public String getColorTable () {
                                      c.getLongitude().getValue());
 
         for (int i = 0; i < size; i++) {
-            double af = angle + 15 * Math.PI / 180.0;
+            double af = angle + i * 15 * Math.PI / 180.0;
             double x  = p0.getX() + r * Math.cos(af);
             double y  = p0.getY() + r * Math.sin(af);
-            e.setOriginLat(x);
-            e.setOriginLon(y);
-            EarthLocation el = new EarthLocationLite(e.getOriginLat(),
-                                   e.getOriginLon(), 0);
-            StormTrackPoint sp = new StormTrackPoint(el, null, 0, null);
+
+            ProjectionPoint pp = new ProjectionPointImpl(x,y);
+            LatLonPointImpl lp = new LatLonPointImpl();
+            FlatEarth e3   = new FlatEarth();
+            LatLonPoint lp11 = e3.projToLatLon(pp, lp);
+            EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
+                                   lp11.getLongitude(), 0);
+            StormTrackPoint sp = new StormTrackPoint(el,dt , 0, null);
 
             track[i] = sp;
         }
