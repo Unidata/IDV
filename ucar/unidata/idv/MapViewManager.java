@@ -1,7 +1,7 @@
 /*
  * $Id: MapViewManager.java,v 1.382 2007/08/16 14:05:04 jeffmc Exp $
  *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2008 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -19,7 +19,6 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 
 
@@ -1222,6 +1221,28 @@ public class MapViewManager extends NavigatedViewManager {
                                  boolean fromWidget, String name,
                                  boolean checkDefault,
                                  boolean addToCommandHistory) {
+        setMapProjection(projection, fromWidget, name, checkDefault,
+                         addToCommandHistory, false);
+    }
+
+
+    /**
+     * Set map projection in the main display.
+     *
+     * @param projection a Projection
+     * @param fromWidget  true if this was from a widget (ie. widget or
+     *                    menu item)
+     * @param name        name to put in the history list (may be null)
+     * @param checkDefault  if true, check to see if we
+     *                    should call getUseProjectionFromData()
+     * @param addToCommandHistory Add this projection to the command history
+     * @param maintainViewpoint  maintain the viewpoint
+     */
+    public void setMapProjection(MapProjection projection,
+                                 boolean fromWidget, String name,
+                                 boolean checkDefault,
+                                 boolean addToCommandHistory,
+                                 boolean maintainViewpoint) {
 
 
         IdvUIManager.startTime = System.currentTimeMillis();
@@ -1262,9 +1283,13 @@ public class MapViewManager extends NavigatedViewManager {
                     doShare(SHARE_PROJECTION, projection);
                 }
                 try {
+                    double[] matrix = getDisplayMatrix();
                     getMapDisplay().setMapProjection(mainProjection);
                     if (getAspectRatio() != null) {
                         getMapDisplay().setDisplayAspect(getAspectRatio());
+                    }
+                    if (maintainViewpoint) {
+                        setDisplayMatrix(matrix);
                     }
 
                 } catch (Exception e) {
