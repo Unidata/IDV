@@ -94,7 +94,7 @@ public class STIStormDataSource extends StormDataSource {
 
     private String getColHour() {
         if(useDerby()) return COL_DERBY_HOUR;
-        return getColHour();
+        return COL_HOUR;
     }
 
     private String getColYear() {
