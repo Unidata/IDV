@@ -89,7 +89,7 @@ public class STIStormDataSource extends StormDataSource {
 
 
     private boolean useDerby() {
-        return true;
+        return false;
     }
 
     private String getColHour() {
