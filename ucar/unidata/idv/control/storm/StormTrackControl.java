@@ -27,6 +27,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.storm.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
+import ucar.unidata.ui.TwoListPanel;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.MenuUtil;
@@ -71,7 +72,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-    private Hashtable okWays = new Hashtable();
+    private Hashtable<String,Boolean> okWays = new Hashtable<String,Boolean>();
 
 
     /** _more_ */
@@ -115,8 +116,38 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
     protected boolean okToShowWay(Way way) {
+        if(way.isObservation()) return true;
         if(okWays.size()>0 && okWays.get(way.getId())==null) return false;
         return true;
+    }
+
+
+    public void showWaySelectDialog() {
+        List checkBoxes = new ArrayList();
+        List useWays = new ArrayList();
+        List allWays  = new ArrayList();
+        StormDisplayState current = getCurrentStormDisplayState();
+        List<WayDisplayState> wayDisplayStates = current.getWayDisplayStates();
+        for (WayDisplayState wayDisplayState : wayDisplayStates) {
+            Way way =wayDisplayState.getWay();
+            if(way.isObservation()) continue;
+            if(okToShowWay(way)) {
+                useWays.add(way);            
+            } 
+            allWays.add(way);            
+        }
+        useWays = Misc.sort(useWays);
+        allWays = Misc.sort(allWays);
+        TwoListPanel tlp = new TwoListPanel(allWays, "Don't Use", useWays,
+                                            "Use", null,false);
+        if(!GuiUtils.showOkCancelDialog(null,getWayName()+" Selection", tlp, null)) return;
+        List only = tlp.getCurrentEntries();
+        if(only.size() == allWays.size()) {
+            onlyShowTheseWays(new ArrayList<Way>());
+        } else {
+            onlyShowTheseWays((List<Way>)only);
+        }
+        
     }
 
 
@@ -293,13 +324,9 @@ public class StormTrackControl extends DisplayControlImpl {
                         activeItems), 0);
             }
 
-
-            if(okWays.size()>0) {
-                items.add(GuiUtils.makeMenuItem("Show All " + getWaysName(),this, "showAllWays"));
-            }
             StormDisplayState current = getCurrentStormDisplayState();
             if(current != null && current.getActive()) {
-                items.add(GuiUtils.makeMenuItem("Only Show Selected " +getWaysName(),this, "subsetWays"));
+                items.add(GuiUtils.makeMenuItem("Select " + getWaysName() + " To Use",this, "showWaySelectDialog"));
             }
             items.add(trackMenu);
             super.getViewMenuItems(items, forMenuBar);
@@ -617,7 +644,7 @@ Set the OkWays property.
 
 @param value The new value for OkWays
 **/
-public void setOkWays (Hashtable value) {
+public void setOkWays (Hashtable<String,Boolean> value) {
 	okWays = value;
 }
 
@@ -626,7 +653,7 @@ Get the OkWays property.
 
 @return The OkWays
 **/
-public Hashtable getOkWays () {
+public Hashtable<String,Boolean> getOkWays () {
 	return okWays;
 }
 

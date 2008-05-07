@@ -251,7 +251,7 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    private List<WayDisplayState> getWayDisplayStates() {
+    protected List<WayDisplayState> getWayDisplayStates() {
         return (List<WayDisplayState>) Misc.toList(
             wayDisplayStateMap.elements());
     }
@@ -275,7 +275,6 @@ public class StormDisplayState {
         }
         return wayState;
     }
-
 
 
     public void onlyShowSelectedWays() {
@@ -422,14 +421,15 @@ public class StormDisplayState {
 
 
         List      components       = new ArrayList();
-        List<Way> ways             = trackCollection.getWayList();
+        //Sort them by name
+        List<Way> ways             = Misc.sort(trackCollection.getWayList());
         boolean   haveDoneForecast = false;
-        components.add(GuiUtils.italicizeFont(new JLabel("Track Type")));
-        components.add(GuiUtils.italicizeFont(new JLabel("Visible")));
-        
-        components.add(GuiUtils.italicizeFont(new JLabel((radiusAttrNames!=null?"Rings":""))));
-        components.add(GuiUtils.italicizeFont(new JLabel("Color")));
-        components.add(GuiUtils.italicizeFont(new JLabel("Color Param")));
+        //        components.add(GuiUtils.italicizeFont(new JLabel("<html><u>Track Type</u></html>")));
+        components.add(new JLabel("<html><u><i>Track Type</i></u></html>"));
+        components.add(new JLabel("<html><u><i>Visible</i></u></html>"));
+        components.add(GuiUtils.italicizeFont(new JLabel((radiusAttrNames!=null?"<html><u><i>Rings</i></u></html>":""))));
+        components.add(new JLabel("<html><u><i>Color</i></u></html>"));
+        components.add(new JLabel("<html><u><i>Color Field</i></u></html>"));
 
         attrNames.add(0,new TwoFacedObject("Fixed", null));
         for (Way way : ways) {
@@ -451,6 +451,7 @@ public class StormDisplayState {
             Vector tmpAttrNames = new Vector(attrNames);
             tmpAttrNames.add(1,new TwoFacedObject("Default", "default"));
 
+            
 
             if (way.isObservation()) {
                 components.add(0+5, wayLabel);
@@ -593,7 +594,7 @@ public class StormDisplayState {
             contents.repaint();
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
-                    stormInfo);
+                    stormInfo, stormTrackControl.getOkWays());
             initCenterContents();
             stormTrackControl.addDisplayable(holder = new CompositeDisplayable());
             //Add the tracks
