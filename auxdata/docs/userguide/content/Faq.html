@@ -266,6 +266,23 @@ of bytes, the trailing <b>m</b> is a multiplier (m=mega). Do not use
 the maximum amount of memory on your machine as some is needed for      
 the operating system itself. If the system has to use swap memory,      
 performance will degrade as well.                                       
+<p>
+
+On a Mac, the procedure is a little more complicated because the
+launcher does not use the runIDV script. In order to increase the
+memory to say 1024 mb, you need to edit the Info.plist file in the IDV
+application contents. To do this first go into the IDV folder in the
+Applications folder and holding the Control button on the keyboard and
+click on "IDV". For a 3-button mouse just right click. This will give
+the Contents of the file in a new window. Then click on Contents folder.
+You can edit the Info.plist file by dragging it into a text editor or
+into a terminal window (type vi first). After the line VMOptions is the
+memory setting "-Xmx512m". Change this to -Xmx1024m and save the file.
+You can now launch the IDV by double clicking on the IDV application.
+You should see 1024 MB as the allocated memory at the bottom of the IDV
+window.
+<p>
+
 </faqitem>
 
 <faqitem q="How can I change the size of the IDV window?" id="windowsize">
