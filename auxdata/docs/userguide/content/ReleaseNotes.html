@@ -11,117 +11,39 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.3 release.
+The items below reflect changes since the 2.4 release.
 
 <faq qlabel=" " alabel=" ">
 
-<faqitem cat="Display Changes"></faqitem>
+<faqitem cat="System Changes"></faqitem>
 
-<faqitem q="Display Settings" id="displaysetting">
-Users can save properties of display controls in favorite
-display settings.  These can be used when displays are
-created or shared between controls.  See the section
-on <a href="tools/DisplaySettings.html">Display Settings</a>
-in the User's Guide.
+<faqitem q="What's new?" id="whatsnew">
+This is mainly a maintenance release with some bug fixes
+and performance improvements.
 </faqitem>
 
-<faqitem q="Set vertical range in cross sections" id="xsvertical">
-Users can now set the vertical scale range in the Cross Section
-and Data Transect Display controls.
-</faqitem>
+<faqitem q="What's next?" id="whatsnext">
+The next release after <%idv.version%> will involve several 
+changes to the underlying infrastructure:
 
-<faqitem q="Point data accumulation" id="pointacc">
-Users can  show the aggregation of point observations through
-time.  This is useful for showing how many observations accumulate
-through time (e.g. earthquake epicenters, lightning plots) in a 
-given area.  For more information, see the 
-<a href="controls/StationModelControl.html">Point Data Plot</a>
-control documentation.
-</faqitem>
+<ul>
+<li>Use of the Java-netCDF 4.0 library. This will provide
+limited support for HDF-4 and HDF-5 files.</li>
 
-<faqitem q="Move a display to another view" id="dnd">
-Users can now move a display from one view to another of the
-same type using drag and drop.  Click on the drag and drop icon
-<img src="controls/images/dnd.gif"> in the legend and drag
-it over to the new view.  The display will be removed from the
-original view and placed in the new view.  At present, only a
-move is allowed, not a copy.  For more information, see the
-<a href="controls/index.html">Display Control</a> section of 
-the IDV User's Guide.
+<li>Use of Java 6 (JDK 1.6) in the installers and Web Start.</li>
+</ul>
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
-
-<faqitem q="New diagnostic functions" id="griddiag">
-The Jython library has been enhanced with many new 
-functions.  Most of the GEMPAK grid diagnostics have been
-implemented.  For a complete list, see
-<a href="tools/JythonLib.html">Jython Library Functions</a>.
-</faqitem>
-
-<faqitem q="GEMPAK grid reading" id="gemgrids">
-The IDV can now read in GEMPAK grid files from local disk
-and from a THREDDS Data Server (TDS). Only grids with 
-no packing, Grib 1 or Grib 2 packing are supported at this
-point.
-</faqitem>
-
-<faqitem q="Saving grids locally" id="localgrid">
-You can now save remote grids to your local system and/or
-use the IDV to subset these remote grids.  When you load in
-a gridded dataset, you can use the [ug::menu {Write Grid}]
-menu from the Data Source properties menu to save the grid.
-The data will be saved in a netCDF file using the CF 1.0
-convention.  This same mechanism can be used to subset a
-local grid and/or convert from the native format to netCDF.
-</faqitem>
-
-<faqitem q="Text Point Data" id="csv">
-Several improvements have been made to the Text Point Data Source.
-Point data stored in comma-separated value (CSV) text files
-or Excel spreadsheets can be read into the IDV.  The data source
-has an metadata GUI which can be used to specify the parameters,
-the units and the structure of the file.  For more information, 
-see the <a href="data/TextPointData.html">Text Point Data File</a> 
-page in the User's Guide.
-</faqitem>
-
-<faqitem q="Field Mask" id="fieldmask">
-There is a new Field Mask option which allows you to define
-a mask for a dataset such that only certain fields are shown
-in the field selector.  The field mask can be used for a particular
-dataset, or can be applied to similiar datasets.  Access this
-feature through the Data Source properties menu using the
-[ug::menu {Write Field Mask Plugin}] option. 
-</faqitem>
-
-<faqitem cat="Other Changes"></faqitem>
-
-<faqitem q="Jython Shell" id="jshell">
-A new interactive <a href="tools/JythonShell.html">Jython Shell</a>
-can be accessed under the [ht::menu Edit Formulas {Jython Shell}]
-menu.  This shell allows you to interactively write new procedures,
-load in data and create displays.
-</faqitem>
-
-<faqitem q="Jython Library GUI" id="jgui">
-The Jython library GUI has been updated to use a tree view instead
-of tabs to access the various libraries.  It now has a search function
-and facilities for automatically creating formulas from your
-Jython methods.  For more information, see the
-<a href="tools/Jython.html">Jython Library</a> documentation.
+<faqitem q="Remote Level II Radar access" id="remotelevel2">
+There is a new chooser under the Radar tab of the Data Chooser
+window that allows you to access radar volume data (Level II)
+from a THREDDS Data Server (TDS).
 </faqitem>
 
 <faqitem cat="Bug Fixes"></faqitem>
 
-<faqitem q="Reported problems fixed in this release:" id="known_bugs">
-<ul>
-<li>Scale factor from StationModelControl is not applied when zooming</li>
-<li>Derivatives for lat/lon grids doesn't work</li>
-<li>Various and sundry bugs were fixed in this release</li>.
-</ul>
-<p>
-
+<faqitem q="Known Problems" id="knownproblems">
 For a list of outstanding known problems, see the 
 <a href="Bugs.html">Known Problems</a> page.
 </faqitem>
