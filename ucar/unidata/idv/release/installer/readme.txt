@@ -1,6 +1,6 @@
 IDV Copyright:
 
-Copyright 1997-2007 Unidata Program Center/University Corporation
+Copyright 1997-2008 Unidata Program Center/University Corporation
 for Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
 support-idv@unidata.ucar.edu.
 
@@ -22,6 +22,8 @@ Other Copyrights/Licenses:
 
 This product includes software developed by:
 
+    * The University Corporation for Atmospherice Research (netCDF-Java)
+         (http://www.unidata.ucar.edu/software/netcdf-java)
     * The University of Wisconsin-Madison 
          (VisAD) (http://www.ssec.wisc.edu/~billh/visad.html).
     * The Apache Software Foundation (http://www.apache.org/).
@@ -29,6 +31,12 @@ This product includes software developed by:
     * The JDOM project (http://www.jdom.org)
     * The ImageJ project (http://rsb.info.nih.gov/ij/) 
     * The JJ2000 project (http://jpeg2000.epfl.ch/)
+    * The JFreeChart project (http://www.jfree.org/jfreechart/index.php)
+    * The JCommon project (http://www.jfree.org/jcommon/)
+    * The L2FProd.com Common Components 6.9.1 (http://common.L2FProd.com)
+    * The jnumeric package (http://jnumerical.sourceforge.net/)
+    * JAMA: The Java Matrix Package (http://math.nist.gov/javanumerics/jama/)
+    * JTEM: Java tools for experimental mathematics (http://www-sfb288.math.tu-berlin.de/~jtem/numericalMethods/index.html)
 
 Please read the different LICENSE files present in the root directory
 of the IDV distribution for restrictions on those packages.
