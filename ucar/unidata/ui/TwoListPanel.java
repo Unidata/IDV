@@ -92,22 +92,31 @@ public class TwoListPanel extends JPanel implements ActionListener {
     /** _more_ */
     private List originalToEntries;
 
+    private boolean showUpDownButtons = true;
 
     /**
      * _more_
      *
-     * @param fromEntries _more_
+     * @param fromEntries All available entries
      * @param fromLabel _more_
-     * @param toEntries _more_
+     * @param toEntries Currently use entries
      * @param toLabel _more_
      * @param extraButtons _more_
      */
     public TwoListPanel(List fromEntries, String fromLabel, List toEntries,
                         String toLabel, JComponent extraButtons) {
+        this(fromEntries, fromLabel, toEntries, toLabel, extraButtons, true);
+    }
+
+    public TwoListPanel(List fromEntries, String fromLabel, List toEntries,
+                        String toLabel, JComponent extraButtons,boolean showUpDownButtons) {
+
+
         this.fromEntries         = new Vector(fromEntries);
         this.toEntries           = new Vector(toEntries);
         this.originalFromEntries = new ArrayList(fromEntries);
         this.originalToEntries   = new ArrayList(toEntries);
+        this.showUpDownButtons = showUpDownButtons;
         init(fromLabel, toLabel, extraButtons);
     }
 
@@ -485,8 +494,8 @@ public class TwoListPanel extends JPanel implements ActionListener {
                                middlePanel,
                                GuiUtils.topCenter(GuiUtils.cLabel(toLabel),
                                    toSp),
-                               GuiUtils.top(GuiUtils.vbox(upButton,
-                                   downButton)) }, 4, GuiUtils.WT_YNYN,
+                               GuiUtils.top(showUpDownButtons?GuiUtils.vbox(upButton,
+                                   downButton):new JPanel()) }, 4, GuiUtils.WT_YNYN,
                                        GuiUtils.WT_Y);
         mainPanel = GuiUtils.inset(mainPanel, 5);
 
