@@ -49,6 +49,7 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Calendar;
 
 import java.util.Date;
@@ -171,7 +172,7 @@ public class AtcfStormDataSource extends StormDataSource {
      * @throws Exception _more_
      */
     private void readTracks(StormInfo stormInfo, StormTrackCollection tracks,
-                            String trackFile)
+                            String trackFile, Hashtable<String,Boolean> waysToUse)
             throws Exception {
         long   t1    = System.currentTimeMillis();
         byte[] bytes = readFile(trackFile);
@@ -208,6 +209,7 @@ public class AtcfStormDataSource extends StormDataSource {
         okWays.put("BAMS", "");*/
         Hashtable seenDate = new Hashtable();
         initTypes();
+        int xcnt=0;
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
             List   toks = StringUtil.split(line, ",", true);
@@ -222,9 +224,6 @@ public class AtcfStormDataSource extends StormDataSource {
             boolean isBest    = wayString.equals(WAY_BEST);
             boolean isWarning = wayString.equals(WAY_WRNG);
             boolean isCarq    = wayString.equals(WAY_CARQ);
-            //            if(isBest) {
-            //                System.err.println("line:" + line);
-            //            }
 
             int forecastHour  = new Integer((String) toks.get(5)).intValue();
             if (isWarning || isCarq) {
@@ -239,6 +238,11 @@ public class AtcfStormDataSource extends StormDataSource {
             Date    dttm      = fmt.parse(dateString);
             convertCal.setTime(dttm);
             String key;
+            Way way = new Way(wayString);
+            if(!isBest && waysToUse !=null && waysToUse.size()>0 && waysToUse.get(wayString) == null) {
+                continue;
+            }
+
             if (isBest) {
                 key = wayString;
             } else {
@@ -247,9 +251,9 @@ public class AtcfStormDataSource extends StormDataSource {
             }
             StormTrack track = (StormTrack) trackMap.get(key);
             if (track == null) {
-                Way way = (isBest
-                           ? Way.OBSERVATION
-                           : new Way(wayString));
+                way = (isBest
+                       ? Way.OBSERVATION
+                       : way);
                 track = new StormTrack(stormInfo, way, new DateTime(dttm));
                 trackMap.put(key, track);
                 tracks.addTrack(track);
@@ -287,7 +291,7 @@ public class AtcfStormDataSource extends StormDataSource {
      *
      * @throws Exception _more_
      */
-    public StormTrackCollection getTrackCollection(StormInfo stormInfo)
+    public StormTrackCollection getTrackCollection(StormInfo stormInfo, Hashtable<String,Boolean> waysToUse)
             throws Exception {
         long                 t1     = System.currentTimeMillis();
         StormTrackCollection tracks = new StormTrackCollection();
@@ -296,12 +300,12 @@ public class AtcfStormDataSource extends StormDataSource {
                            + "/" + "a" + stormInfo.getBasin().toLowerCase()
                            + stormInfo.getNumber()
                            + getYear(stormInfo.getStartTime()) + ".dat.gz";
-        readTracks(stormInfo, tracks, trackFile);
+        readTracks(stormInfo, tracks, trackFile, waysToUse);
         trackFile = path + "/" + getYear(stormInfo.getStartTime()) + "/"
                     + "b" + stormInfo.getBasin().toLowerCase()
                     + stormInfo.getNumber()
                     + getYear(stormInfo.getStartTime()) + ".dat.gz";
-        readTracks(stormInfo, tracks, trackFile);
+        readTracks(stormInfo, tracks, trackFile, null);
         long t2 = System.currentTimeMillis();
         System.err.println("time: " + (t2 - t1));
 

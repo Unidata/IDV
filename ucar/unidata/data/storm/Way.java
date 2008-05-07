@@ -30,7 +30,7 @@ package ucar.unidata.data.storm;
  * Time: 4:57:38 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Way {
+public class Way implements Comparable {
 
     /** _more_ */
     public static final Way OBSERVATION = new Way("Observation",
@@ -150,7 +150,13 @@ public class Way {
         return name;
     }
 
-
+    public int compareTo(Object o) {
+        if (o instanceof Way) {
+            Way that = (Way) o;
+            return this.name.compareTo(that.name);
+        }
+        return toString().compareTo(o.toString());
+    }
 
 
 }

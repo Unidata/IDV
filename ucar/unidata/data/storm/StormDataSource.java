@@ -200,7 +200,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      * @throws Exception _more_
      */
     public abstract StormTrackCollection getTrackCollection(
-            StormInfo stormInfo)
+            StormInfo stormInfo, Hashtable<String,Boolean> waysToUse)
      throws Exception;
 
 
