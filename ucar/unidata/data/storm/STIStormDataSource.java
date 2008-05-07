@@ -418,6 +418,8 @@ public class STIStormDataSource extends StormDataSource {
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
+         query = query + " order by  " + SqlUtil.comma(new String[] { getColYear(),
+                COL_MONTH, COL_DAY, getColHour(), COL_FHOUR});
         //        System.err.println (query);
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
@@ -458,10 +460,10 @@ public class STIStormDataSource extends StormDataSource {
                 attrs.add(new Real(TYPE_MOVEDIRECTION, moveDir));
                 double moveSpd = results.getDouble(col++);
                 attrs.add(new Real(TYPE_MOVESPEED, moveSpd));
-
+                  radius = fhour * 50.0f /24.0f;
                 attrs.add(new Real(TYPE_PROBABILITYRADIUS, radius));
-                radius = radius + 50;
 
+                  System.err.println("setting radius =" + radius + "  forecast hour = " + fhour + " way=" + forecastWay);
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
@@ -650,6 +652,8 @@ public class STIStormDataSource extends StormDataSource {
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
+        query = query + " order by  " + SqlUtil.comma(new String[] { getColYear(),
+                COL_MONTH, COL_DAY, getColHour() });
         //        System.err.println (query);
         Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
@@ -755,16 +759,34 @@ public class STIStormDataSource extends StormDataSource {
                 double     latitude  = results.getDouble(col++);
                 double     longitude = results.getDouble(col++);
                 double     windSpd   = results.getDouble(col++);
+                if ((windSpd == 9999) || (windSpd == 999)) {
+                    windSpd = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MAXWINDSPEED, windSpd));
                 double pressure = results.getDouble(col++);
+                if ((pressure == 9999) || (pressure == 999)) {
+                    pressure = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MINPRESSURE, pressure));
                 double radiusMG = results.getDouble(col++);
+                if ((radiusMG == 9999) || (radiusMG == 999)) {
+                    radiusMG = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_RADIUSMODERATEGALE, radiusMG));
                 double radiusWG = results.getDouble(col++);
+                if ((radiusWG == 9999) || (radiusWG == 999)) {
+                    radiusWG = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_RADIUSWHOLEGALE, radiusWG));
                 double moveDir = results.getDouble(col++);
+                if ((moveDir == 9999) || (moveDir == 999)) {
+                    moveDir = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MOVEDIRECTION, moveDir));
                 double moveSpd = results.getDouble(col++);
+                if ((moveSpd == 9999) || (moveSpd == 999)) {
+                    moveSpd = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MOVESPEED, moveSpd));
 
 
@@ -846,16 +868,34 @@ public class STIStormDataSource extends StormDataSource {
                 double     latitude  = results.getDouble(col++);
                 double     longitude = results.getDouble(col++);
                 double     windSpd   = results.getDouble(col++);
+                if ((windSpd == 9999) || (windSpd == 999)) {
+                    windSpd = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MAXWINDSPEED, windSpd));
                 double pressure = results.getDouble(col++);
+                if ((pressure == 9999) || (pressure == 999)) {
+                    pressure = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MINPRESSURE, pressure));
                 double radiusMG = results.getDouble(col++);
+                if ((radiusMG == 9999) || (radiusMG == 999)) {
+                    radiusMG = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_RADIUSMODERATEGALE, radiusMG));
                 double radiusWG = results.getDouble(col++);
+                if ((radiusWG == 9999) || (radiusWG == 999)) {
+                    radiusWG = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_RADIUSWHOLEGALE, radiusWG));
                 double moveDir = results.getDouble(col++);
+                if ((moveDir == 9999) || (moveDir == 999)) {
+                    moveDir = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MOVEDIRECTION, moveDir));
                 double moveSpd = results.getDouble(col++);
+                if ((moveSpd == 9999) || (moveSpd == 999)) {
+                    moveSpd = Float.NaN;
+                }
                 attrs.add(new Real(TYPE_MOVESPEED, moveSpd));
 
 
