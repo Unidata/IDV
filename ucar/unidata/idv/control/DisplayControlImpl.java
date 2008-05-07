@@ -185,7 +185,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** Should we use the times in this display control as part of the animation set */
     private boolean useTimesInAnimation = true;
 
-    /** _more_          */
+    /** should we do the cursor readout */
     private boolean doCursorReadout = true;
 
     /** Are we expanded in the main tabs */
@@ -5878,6 +5878,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *                           preference to reset data is used or not
      */
     protected void setProjectionInView(boolean useViewPreference) {
+        setProjectionInView(useViewPreference, false);
+    }
+
+    /**
+     * Set the projection in the map view manager.
+     *
+     * @param useViewPreference  if true, will let the view decide if
+     *                           preference to reset data is used or not
+     * @param maintainViewpoint  keep the same viewpoint
+     */
+    protected void setProjectionInView(boolean useViewPreference,
+                                       boolean maintainViewpoint) {
         MapViewManager mvm = getMapViewManager();
         if (mvm == null) {
             return;
@@ -5891,7 +5903,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         mvm.setMapProjection(
             mp, true,
             getDisplayConventions().getMapProjectionLabel(mp, this),
-            useViewPreference);
+            useViewPreference, true, maintainViewpoint);
     }
 
     /**
@@ -6305,15 +6317,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Get the list of items for the cursor readout
      *
-     * @param el _more_
-     * @param animationValue _more_
-     * @param animationStep _more_
+     * @param el   location of cursor
+     * @param animationValue  animation value
+     * @param animationStep  animation step
      *
-     * @return _more_
+     * @return list of strings for readout
      *
-     * @throws Exception _more_
+     * @throws Exception  problem getting at the data
      */
     public final List getCursorReadout(EarthLocation el, Real animationValue,
                                        int animationStep)
@@ -6333,15 +6345,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Get the list of items, subclasses should override
      *
-     * @param el _more_
-     * @param animationValue _more_
-     * @param animationStep _more_
+     * @param el   location of cursor
+     * @param animationValue  animation value
+     * @param animationStep  animation step
      *
-     * @return _more_
+     * @return list of strings for readout
      *
-     * @throws Exception _more_
+     * @throws Exception  problem getting at the data
      */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
@@ -6353,14 +6365,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Format a real for the cursor readout
      *
-     * @param r _more_
+     * @param r  the real
      *
-     * @return _more_
+     * @return  the formatted string
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException  VisAD error
      */
     protected String formatForCursorReadout(Real r)
             throws VisADException, RemoteException {
@@ -7959,9 +7971,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Debug
      *
-     * @param msg _more_
+     * @param msg the message
      */
     public void debug(String msg) {
         //        if(displayId.startsWith("plan")) {

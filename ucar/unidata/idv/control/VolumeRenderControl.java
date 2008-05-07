@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2005 Unidata Program Center/University Corporation for
+ * Copyright 1997-2008 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -17,7 +17,8 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-// $Id: VolumeRenderControl.java,v 1.11 2006/12/01 20:16:39 jeffmc Exp $
+
+
 
 package ucar.unidata.idv.control;
 
@@ -167,10 +168,10 @@ public class VolumeRenderControl extends GridDisplayControl {
      */
     private void loadVolumeData() throws VisADException, RemoteException {
         Trace.call1("VRC.loadVolumeData");
-        FieldImpl grid    = getGridDataInstance().getGrid();
+        FieldImpl grid = getGridDataInstance().getGrid();
         // make sure the projection is correct before we start 
         // transforming the data
-        setProjectionInView(true);
+        setProjectionInView(true, true);
         FieldImpl newGrid = grid;
         CoordinateSystem cs =
             getNavigatedDisplay().getDisplayCoordinateSystem();
