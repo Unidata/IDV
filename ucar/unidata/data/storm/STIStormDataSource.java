@@ -389,6 +389,29 @@ public class STIStormDataSource extends StormDataSource {
 
     }
 
+
+    /**
+     * If d is a missing value return  NaN. Else return d
+     * @param d The value
+     * @param Nan if d is missing else d
+     */
+
+    public double getValue(double d) {
+        if (d == 9999 || d == 999) {        
+            return Double.NaN;
+        }
+        return d;
+    }
+
+
+    public double getLatLonValue(double d) {
+        if (d == 9999 || d == 999) {
+            return Double.NaN;
+        }
+        return d;
+    }
+
+
     /**
      * _more_
      *
@@ -444,30 +467,17 @@ public class STIStormDataSource extends StormDataSource {
                 int        hour     = results.getInt(col++);
                 int        fhour    = results.getInt(col++);
 
-                double     latitude = results.getDouble(col++);
-                if ((latitude == 9999) || (latitude == 999)) {
-                    latitude = Float.NaN;
-                }
-                double longitude = results.getDouble(col++);
-                if ((longitude == 9999) || (longitude == 999)) {
-                    longitude = Float.NaN;
-                }
-                double windSpd = results.getDouble(col++);
-                attrs.add(new Real(TYPE_MAXWINDSPEED, windSpd));
-                double pressure = results.getDouble(col++);
-                attrs.add(new Real(TYPE_MINPRESSURE, pressure));
-                double radiusMG = results.getDouble(col++);
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, radiusMG));
-                double radiusWG = results.getDouble(col++);
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, radiusWG));
-                double moveDir = results.getDouble(col++);
-                attrs.add(new Real(TYPE_MOVEDIRECTION, moveDir));
-                double moveSpd = results.getDouble(col++);
-                attrs.add(new Real(TYPE_MOVESPEED, moveSpd));
-                  radius = fhour * 50.0f /24.0f;
+                double latitude = getLatLonValue(results.getDouble(col++));
+                double longitude = getLatLonValue(results.getDouble(col++));
+                attrs.add(new Real(TYPE_MAXWINDSPEED, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MINPRESSURE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVEDIRECTION, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVESPEED, getValue(results.getDouble(col++))));
+                radius = fhour * 50.0f /24.0f;
                 attrs.add(new Real(TYPE_PROBABILITYRADIUS, radius));
-
-                  System.err.println("setting radius =" + radius + "  forecast hour = " + fhour + " way=" + forecastWay);
+                //                System.err.println("setting radius =" + radius + "  forecast hour = " + fhour + " way=" + forecastWay);
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
@@ -760,39 +770,14 @@ public class STIStormDataSource extends StormDataSource {
                 int        month     = results.getInt(col++);
                 int        day       = results.getInt(col++);
                 int        hour      = results.getInt(col++);
-                double     latitude  = results.getDouble(col++);
-                double     longitude = results.getDouble(col++);
-                double     windSpd   = results.getDouble(col++);
-                if ((windSpd == 9999) || (windSpd == 999)) {
-                    windSpd = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MAXWINDSPEED, windSpd));
-                double pressure = results.getDouble(col++);
-                if ((pressure == 9999) || (pressure == 999)) {
-                    pressure = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MINPRESSURE, pressure));
-                double radiusMG = results.getDouble(col++);
-                if ((radiusMG == 9999) || (radiusMG == 999)) {
-                    radiusMG = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, radiusMG));
-                double radiusWG = results.getDouble(col++);
-                if ((radiusWG == 9999) || (radiusWG == 999)) {
-                    radiusWG = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, radiusWG));
-                double moveDir = results.getDouble(col++);
-                if ((moveDir == 9999) || (moveDir == 999)) {
-                    moveDir = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MOVEDIRECTION, moveDir));
-                double moveSpd = results.getDouble(col++);
-                if ((moveSpd == 9999) || (moveSpd == 999)) {
-                    moveSpd = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MOVESPEED, moveSpd));
-
+                double     latitude  = getLatLonValue(results.getDouble(col++));
+                double     longitude = getLatLonValue(results.getDouble(col++));
+                attrs.add(new Real(TYPE_MAXWINDSPEED, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MINPRESSURE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVEDIRECTION, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVESPEED, getValue(results.getDouble(col++))));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -869,38 +854,14 @@ public class STIStormDataSource extends StormDataSource {
                 int        month     = results.getInt(col++);
                 int        day       = results.getInt(col++);
                 int        hour      = results.getInt(col++);
-                double     latitude  = results.getDouble(col++);
-                double     longitude = results.getDouble(col++);
-                double     windSpd   = results.getDouble(col++);
-                if ((windSpd == 9999) || (windSpd == 999)) {
-                    windSpd = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MAXWINDSPEED, windSpd));
-                double pressure = results.getDouble(col++);
-                if ((pressure == 9999) || (pressure == 999)) {
-                    pressure = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MINPRESSURE, pressure));
-                double radiusMG = results.getDouble(col++);
-                if ((radiusMG == 9999) || (radiusMG == 999)) {
-                    radiusMG = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, radiusMG));
-                double radiusWG = results.getDouble(col++);
-                if ((radiusWG == 9999) || (radiusWG == 999)) {
-                    radiusWG = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, radiusWG));
-                double moveDir = results.getDouble(col++);
-                if ((moveDir == 9999) || (moveDir == 999)) {
-                    moveDir = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MOVEDIRECTION, moveDir));
-                double moveSpd = results.getDouble(col++);
-                if ((moveSpd == 9999) || (moveSpd == 999)) {
-                    moveSpd = Float.NaN;
-                }
-                attrs.add(new Real(TYPE_MOVESPEED, moveSpd));
+                double     latitude  = getLatLonValue(results.getDouble(col++));
+                double     longitude = getLatLonValue(results.getDouble(col++));
+                attrs.add(new Real(TYPE_MAXWINDSPEED, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MINPRESSURE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVEDIRECTION, getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVESPEED, getValue(results.getDouble(col++))));
 
 
                 EarthLocation elt =
