@@ -343,6 +343,10 @@ public class STIStormDataSource extends StormDataSource {
         }
         StormTrack obsTrack = getObservationTrack(stormInfo);
         //                                         (Way) forecastWays.get(0));
+        List<StormTrack> tracks = trackCollection.getTracks();
+        for(StormTrack stk: tracks){
+            setStormTrackForecastError(obsTrack, stk);
+        }
         long t2 = System.currentTimeMillis();
         System.err.println("time:" + (t2 - t1));
         trackCollection.addTrack(obsTrack);
