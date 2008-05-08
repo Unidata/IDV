@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -948,10 +949,17 @@ public abstract class ChartManager implements ImageObserver {
         //Only create a new chart if we don't have any
         ChartHolder chartHolder = findChartHolder(null);
         if (chartHolder == null) {
-            getChartHolder(getDefaultChartName());
+            makeInitialChart();
         }
         initCharts();
         updateContents(true);
+    }
+
+    /**
+     * _more_
+     */
+    protected void makeInitialChart() {
+        getChartHolder(getDefaultChartName());
     }
 
     /**

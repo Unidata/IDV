@@ -20,7 +20,11 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.chart;
+
+
+import org.itc.idv.math.SunriseSunsetCollector;
 
 
 import org.jfree.chart.*;
@@ -42,19 +46,19 @@ import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.*;
 import ucar.unidata.data.storm.*;
 
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
+
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.IdvPreferenceManager;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.ProbeRowInfo;
 import ucar.unidata.idv.control.chart.LineState;
+import ucar.unidata.idv.ui.IdvTimeline;
 
 
 import ucar.unidata.ui.symbol.*;
-import ucar.unidata.idv.ui.IdvTimeline;
-
-import ucar.unidata.geoloc.LatLonPoint;
-import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -85,7 +89,6 @@ import java.util.TimeZone;
 
 import javax.swing.*;
 
-import org.itc.idv.math.SunriseSunsetCollector;
 
 /**
  * A time series chart
@@ -108,9 +111,16 @@ public class TimeSeriesChart extends XYChartManager {
     /** format */
     NumberFormat numberFormat;
 
+    /** _more_          */
     private List sunriseDates;
+
+    /** _more_          */
     private LatLonPoint sunriseLocation;
+
+    /** _more_          */
     private Date lastStartDate;
+
+    /** _more_          */
     private Date lastEndDate;
 
     /**
@@ -161,15 +171,15 @@ public class TimeSeriesChart extends XYChartManager {
         sdf.setTimeZone(timeZone);
         timeAxis.setDateFormatOverride(sdf);
 
-        final XYPlot[] xyPlotHolder = {null};
+        final XYPlot[] xyPlotHolder = { null };
 
         xyPlotHolder[0] = new MyXYPlot(new TimeSeriesCollection(), timeAxis,
-                                     valueAxis, null) {
-                public void drawBackground(Graphics2D g2, Rectangle2D area) {
-                    super.drawBackground(g2, area);
-                    drawSunriseSunset(g2, xyPlotHolder[0], area);
-                }
-            };
+                                       valueAxis, null) {
+            public void drawBackground(Graphics2D g2, Rectangle2D area) {
+                super.drawBackground(g2, area);
+                drawSunriseSunset(g2, xyPlotHolder[0], area);
+            }
+        };
 
         if (animationTimeAnnotation != null) {
             xyPlotHolder[0].addAnnotation(animationTimeAnnotation);
@@ -250,9 +260,12 @@ public class TimeSeriesChart extends XYChartManager {
         dataset.setDomainIsPointsInTime(true);
         dataset.addSeries(series);
 
-        String     axisLabel = name + ((unit != null)
-                                       ? " [" + unit + "]"
-                                       : "");
+        String axisLabel = lineState.getAxisLabel();
+        if (axisLabel == null) {
+            axisLabel = name + ((unit != null)
+                                ? " [" + unit + "]"
+                                : "");
+        }
         NumberAxis rangeAxis;
 
         if (lineState.getUseLogarithmicRange() && false) {
@@ -376,13 +389,16 @@ public class TimeSeriesChart extends XYChartManager {
             throws VisADException, RemoteException {
         clearLineStates();
         updatePending = false;
-        List<ProbeRowInfo> rowInfos = (currentProbeData==null?null:new ArrayList<ProbeRowInfo>(currentProbeData));
+        List<ProbeRowInfo> rowInfos = ((currentProbeData == null)
+                                       ? null
+                                       : new ArrayList<ProbeRowInfo>(
+                                           currentProbeData));
         try {
             initCharts();
             if ((rowInfos != null) && (rowInfos.size() > 0)) {
                 for (int paramIdx = 0; paramIdx < rowInfos.size();
                         paramIdx++) {
-                    ProbeRowInfo info = rowInfos.get(paramIdx);
+                    ProbeRowInfo info      = rowInfos.get(paramIdx);
                     LineState    lineState = info.getLineState();
                     addLineState(lineState);
                     FieldImpl field = info.getPointSample();
@@ -404,15 +420,17 @@ public class TimeSeriesChart extends XYChartManager {
                     TimeSeries series = new TimeSeries(lineState.getName(),
                                             Millisecond.class);
 
-                    Set        timeSet    = field.getDomainSet();
-                    Unit[]     timeUnits  = timeSet.getSetUnits();
-                    double[][] times      = timeSet.getDoubles();
-                    double[][] values     = field.getValues(false);
-                    if(values == null) continue;
-                    double[]   valueArray = values[0];
+                    Set        timeSet   = field.getDomainSet();
+                    Unit[]     timeUnits = timeSet.getSetUnits();
+                    double[][] times     = timeSet.getDoubles();
+                    double[][] values    = field.getValues(false);
+                    if (values == null) {
+                        continue;
+                    }
+                    double[] valueArray = values[0];
                     Unit rawUnit =
                         ucar.visad.Util.getDefaultRangeUnits(field)[0];
-                    if (lineState.unit != null && rawUnit !=null) {
+                    if ((lineState.unit != null) && (rawUnit != null)) {
                         valueArray = lineState.unit.toThis(valueArray,
                                 rawUnit);
                     }
@@ -425,7 +443,7 @@ public class TimeSeriesChart extends XYChartManager {
                             continue;
                         }
                         Date date = Util.makeDate(new DateTime(times[0][i],
-                                                               timeUnits[0]));
+                                        timeUnits[0]));
                         if ((i == 0) || (valueArray[i] > max)) {
                             max = valueArray[i];
                         }
@@ -469,7 +487,8 @@ public class TimeSeriesChart extends XYChartManager {
                 if ((obs != null) && (obs.size() > 0)) {
                     List goodVars = new ArrayList();
                     for (int varIdx = 0; varIdx < plotVars.size(); varIdx++) {
-                        PointParam plotVar = (PointParam)plotVars.get(varIdx);
+                        PointParam plotVar =
+                            (PointParam) plotVars.get(varIdx);
                         LineState lineState = plotVar.getLineState();
                         addLineState(lineState);
                         String     var       = lineState.getName();
@@ -660,10 +679,12 @@ public class TimeSeriesChart extends XYChartManager {
      * @param obs obs
      * @param plotVars the vars to plot
      *
+     * @param lines _more_
+     *
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void setTracks(List<LineState> lines) 
+    public void setTracks(List<LineState> lines)
             throws VisADException, RemoteException {
         try {
             synchronized (MUTEX) {
@@ -671,25 +692,27 @@ public class TimeSeriesChart extends XYChartManager {
                 clearLineStates();
                 settingData = true;
                 initCharts();
-                for(LineState lineState: lines) {
+                for (LineState lineState : lines) {
                     if ( !lineState.getVisible()) {
                         continue;
                     }
                     addLineState(lineState);
-                    TimeSeries series   =  new TimeSeries(lineState.getName(),
-                                                          Millisecond.class);
-                    List<DateTime> dates = lineState.getTimes();
-                    List<Real> values = lineState.getValues();
-                    if(dates == null || values == null) continue;
-                    for(int pointIdx=0;pointIdx<dates.size();pointIdx++) {
-                        Date dttm = Util.makeDate(dates.get(pointIdx));
+                    TimeSeries series = new TimeSeries(lineState.getName(),
+                                            Millisecond.class);
+                    List<DateTime> dates  = lineState.getTimes();
+                    List<Real>     values = lineState.getValues();
+                    if ((dates == null) || (values == null)) {
+                        continue;
+                    }
+                    for (int pointIdx = 0; pointIdx < dates.size();
+                            pointIdx++) {
+                        Date   dttm  = Util.makeDate(dates.get(pointIdx));
                         double value = values.get(pointIdx).getValue();
-                        series.addOrUpdate(new Millisecond(dttm),
-                                           value);
+                        series.addOrUpdate(new Millisecond(dttm), value);
                     }
                     XYItemRenderer renderer = null;
-                    Axis axis = addSeries(series, lineState,
-                                          paramIdx, renderer, true);
+                    Axis axis = addSeries(series, lineState, paramIdx,
+                                          renderer, true);
                     paramIdx++;
                 }
             }
@@ -733,38 +756,54 @@ public class TimeSeriesChart extends XYChartManager {
     }
 
 
-     
+
+    /**
+     * _more_
+     *
+     * @param llp _more_
+     */
     public void setLocation(LatLonPoint llp) {
         sunriseLocation = llp;
-        sunriseDates = null;
+        sunriseDates    = null;
         getContents().repaint();
     }
 
 
-    private void drawSunriseSunset(Graphics2D g2, XYPlot plot, Rectangle2D dataArea) {
-        if(sunriseLocation == null) return;
-        DateAxis domainAxis = (DateAxis)plot.getDomainAxis();
-        Date startDate = ((DateAxis)domainAxis).getMinimumDate();
-        Date endDate = ((DateAxis)domainAxis).getMaximumDate();
-        if(sunriseDates == null || !Misc.equals(startDate, lastStartDate) ||
-           !Misc.equals(endDate, lastEndDate)) {
+    /**
+     * _more_
+     *
+     * @param g2 _more_
+     * @param plot _more_
+     * @param dataArea _more_
+     */
+    private void drawSunriseSunset(Graphics2D g2, XYPlot plot,
+                                   Rectangle2D dataArea) {
+        if (sunriseLocation == null) {
+            return;
+        }
+        DateAxis domainAxis = (DateAxis) plot.getDomainAxis();
+        Date     startDate  = ((DateAxis) domainAxis).getMinimumDate();
+        Date     endDate    = ((DateAxis) domainAxis).getMaximumDate();
+        if ((sunriseDates == null) || !Misc.equals(startDate, lastStartDate)
+                || !Misc.equals(endDate, lastEndDate)) {
             lastStartDate = startDate;
-            lastEndDate = endDate;
-            sunriseDates = IdvTimeline.makeSunriseDates(sunriseLocation, startDate, endDate);
+            lastEndDate   = endDate;
+            sunriseDates = IdvTimeline.makeSunriseDates(sunriseLocation,
+                    startDate, endDate);
         }
         int top    = (int) (dataArea.getY());
         int bottom = (int) (dataArea.getY() + dataArea.getHeight());
-        int height = bottom-top;
+        int height = bottom - top;
         g2.setColor(Color.yellow);
-        Shape     originalClip      = g2.getClip();
+        Shape originalClip = g2.getClip();
         g2.clip(dataArea);
         for (int i = 0; i < sunriseDates.size(); i += 2) {
             Date d1 = (Date) sunriseDates.get(i + 1);
             Date d2 = (Date) sunriseDates.get(i);
-            int x1 = (int) domainAxis.valueToJava2D(d1.getTime(),
-                        dataArea, RectangleEdge.BOTTOM);
-            int x2 = (int) domainAxis.valueToJava2D(d2.getTime(),
-                        dataArea, RectangleEdge.BOTTOM);
+            int x1 = (int) domainAxis.valueToJava2D(d1.getTime(), dataArea,
+                         RectangleEdge.BOTTOM);
+            int x2 = (int) domainAxis.valueToJava2D(d2.getTime(), dataArea,
+                         RectangleEdge.BOTTOM);
             g2.fillRect(x1, top, (x2 - x1), height);
         }
         g2.setClip(originalClip);

@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -29,9 +30,10 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
-import visad.Unit;
 import visad.DateTime;
 import visad.Real;
+
+import visad.Unit;
 
 
 import java.awt.*;
@@ -295,6 +297,9 @@ public class LineState {
     /** my name */
     private String name;
 
+    /** _more_          */
+    private String axisLabel;
+
     /** index */
     protected int index;
 
@@ -415,19 +420,38 @@ public class LineState {
     }
 
 
+    /** _more_          */
     private List<DateTime> times;
+
+    /** _more_          */
     private List<Real> values;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<DateTime> getTimes() {
         return times;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Real> getValues() {
         return values;
     }
 
+    /**
+     * _more_
+     *
+     * @param times _more_
+     * @param values _more_
+     */
     public void setTrack(List<DateTime> times, List<Real> values) {
-        this.times = times;
+        this.times  = times;
         this.values = values;
     }
 
@@ -1052,6 +1076,25 @@ public class LineState {
     public boolean getValid() {
         return valid;
     }
+
+    /**
+     *  Set the AxisLabel property.
+     *
+     *  @param value The new value for AxisLabel
+     */
+    public void setAxisLabel(String value) {
+        axisLabel = value;
+    }
+
+    /**
+     *  Get the AxisLabel property.
+     *
+     *  @return The AxisLabel
+     */
+    public String getAxisLabel() {
+        return axisLabel;
+    }
+
 
 
 }
