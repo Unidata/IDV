@@ -157,7 +157,7 @@ public class StormTrackPoint {
     /**
      * _more_
      *
-     * @param attrName _more_
+     * @param type _more_
      *
      * @param type _more_
      *
@@ -172,6 +172,22 @@ public class StormTrackPoint {
         return null;
     }
 
+   /**
+     * _more_
+     *
+     * @param attr _more_
+     *
+     *
+     * @return _more_
+     */
+    public void addAttribute(Real attr) {
+       if(attributes == null) {
+            attributes = new ArrayList<Real>();
+       }
+
+       attributes.add(attr);
+
+    }
 
     /**
      * _more_
