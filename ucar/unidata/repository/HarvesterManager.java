@@ -194,11 +194,16 @@ public class HarvesterManager extends RepositoryManager {
                 if (root == null) {
                     continue;
                 }
-                List<Harvester> newHarvesters =
-                    Harvester.createHarvesters(getRepository(), root);
-                harvesters.addAll(newHarvesters);
-                for (Harvester harvester : newHarvesters) {
-                    harvesterMap.put(harvester.getId(), harvester);
+                try {
+                    List<Harvester> newHarvesters =
+                        Harvester.createHarvesters(getRepository(), root);
+                    harvesters.addAll(newHarvesters);
+                    for (Harvester harvester : newHarvesters) {
+                        harvesterMap.put(harvester.getId(), harvester);
+                    }
+                } catch (Exception exc) {
+                    System.err.println("Error loading harvester file:" + file);
+                    System.err.println(exc);
                 }
             }
         } catch (Exception exc) {
