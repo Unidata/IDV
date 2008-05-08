@@ -26,17 +26,15 @@ package ucar.unidata.data.storm;
 import ucar.unidata.data.*;
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.geoloc.projection.FlatEarth;
+import ucar.unidata.geoloc.ProjectionPointImpl;
+import ucar.visad.Util;
 
 import visad.*;
+import visad.georef.EarthLocation;
 
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -97,6 +95,10 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_          */
     public static final int CATEGORY_XX = 15;  // - unknown.
 
+    /** _more_          */
+    public static RealType TYPE_DISTANCEERROR;
+
+
 
     /** _more_          */
     public static final int[] CATEGORY_VALUES = {
@@ -145,6 +147,11 @@ public abstract class StormDataSource extends DataSourceImpl {
         if(TYPE_STORMCATEGORY == null) {
             TYPE_STORMCATEGORY = ucar.visad.Util.makeRealType("stormcategory",
                                                               "Storm_Category", null);
+        }
+        if(TYPE_DISTANCEERROR == null) {
+              TYPE_DISTANCEERROR =  ucar.visad.Util.makeRealType("forcast location error",
+                                             "distance_error",
+                                             Util.parseUnit("km"));
         }
     }
 
@@ -237,5 +244,52 @@ public abstract class StormDataSource extends DataSourceImpl {
         return cal.get(Calendar.YEAR);
     }
 
+    public static void setStormTrackForecastError(StormTrack obsTrack , StormTrack fctTrack)throws VisADException {
+        List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
+        List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();
+
+        for(StormTrackPoint stp: fctTrackPoints){
+            DateTime dt = stp.getTrackPointTime();
+            StormTrackPoint stpObs =  getClosestPoint(obsTrackPoints, dt);
+            double der = getDistance(stpObs, stp);
+            stp.addAttribute(new Real(TYPE_DISTANCEERROR, der));
+        }
+       
+    }
+    
+    public static StormTrackPoint getClosestPoint(List<StormTrackPoint> aList, DateTime dt){
+
+        StormTrackPoint stp = aList.get(0);
+        int numPoints = aList.size();
+        double pValue = dt.getValue();
+        double minDiff = 2000000;
+
+        for(int i = 0; i < numPoints; i++){
+            StormTrackPoint stp1 = aList.get(i);
+            double p1Value = stp1.getTrackPointTime().getValue();
+            double diff = Math.abs(p1Value-pValue);
+            if(diff < minDiff){
+                stp = stp1;
+                minDiff = diff;
+            }
+
+        }
+        return stp;
+    }
+
+    public static double getDistance(StormTrackPoint p1, StormTrackPoint p2){
+
+        FlatEarth e1    = new FlatEarth();
+        FlatEarth e2   = new FlatEarth();
+
+        EarthLocation el1 = p1.getTrackPointLocation();
+        EarthLocation el2 = p2.getTrackPointLocation();
+        ProjectionPointImpl pp1 = e1.latLonToProj(el1.getLatitude().getValue(),
+                                     el1.getLongitude().getValue());
+        ProjectionPointImpl pp2 = e2.latLonToProj(el2.getLatitude().getValue(),
+                                     el2.getLongitude().getValue());
+        return pp1.distance(pp2);
+
+    }
 }
 
