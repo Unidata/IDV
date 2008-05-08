@@ -30,6 +30,8 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
 import visad.Unit;
+import visad.DateTime;
+import visad.Real;
 
 
 import java.awt.*;
@@ -410,6 +412,23 @@ public class LineState {
         dialog.getContentPane().add(contents);
         GuiUtils.showInCenter(dialog);
         return ok[0];
+    }
+
+
+    private List<DateTime> times;
+    private List<Real> values;
+
+    public List<DateTime> getTimes() {
+        return times;
+    }
+
+    public List<Real> getValues() {
+        return values;
+    }
+
+    public void setTrack(List<DateTime> times, List<Real> values) {
+        this.times = times;
+        this.values = values;
     }
 
 

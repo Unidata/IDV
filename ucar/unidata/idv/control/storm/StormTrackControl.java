@@ -95,6 +95,8 @@ public class StormTrackControl extends DisplayControlImpl {
         new Hashtable<StormInfo, StormDisplayState>();
 
 
+    private List<StormDisplayState> activeStorms;
+
     /** _more_ */
     private TreePanel treePanel;
 
@@ -344,6 +346,21 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    private List<StormDisplayState> getActiveStorms() {
+        if(activeStorms == null) {
+            List<StormDisplayState> tmpList =  new ArrayList<StormDisplayState>();
+            List<StormDisplayState> stormDisplayStates = getStormDisplayStates();
+            for(StormDisplayState stormDisplayState: stormDisplayStates) {
+                if(stormDisplayState.getActive()) 
+                    tmpList.add(stormDisplayState);
+            }
+            activeStorms=tmpList;
+        }
+        return activeStorms;
+    }
+
+
+
     /**
      * _more_
      *
@@ -449,11 +466,12 @@ public class StormTrackControl extends DisplayControlImpl {
             treePanel.show(firstComponent);
         }
 
-        treePanel.setPreferredSize(new Dimension(300, 400));
+        treePanel.setPreferredSize(new Dimension(500, 400));
         JComponent contents = treePanel;
 
         //        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
         //                                  scroller);
+        contents.setPreferredSize(new Dimension(500,400));
         return contents;
     }
 
@@ -463,6 +481,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param stormDisplayState _more_
      */
     public void stormChanged(StormDisplayState stormDisplayState) {
+        activeStorms = null;
         treePanel.setIcon(stormDisplayState.getContents(),
                           stormDisplayState.getActive()
                           ? ICON_ON
@@ -483,6 +502,26 @@ public class StormTrackControl extends DisplayControlImpl {
             }
         }
     }
+
+
+    /**
+     * Respond to a timeChange event
+     *
+     * @param time new time
+     */
+    protected void timeChanged(Real time) {
+        try {
+            List<StormDisplayState> active = getActiveStorms();
+            for(StormDisplayState stormDisplayState: active) {
+                stormDisplayState.timeChanged(time);
+            }
+        } catch (Exception exc) {
+            logException("changePosition", exc);
+        }
+        super.timeChanged(time);
+    }
+
+
 
 
     /**

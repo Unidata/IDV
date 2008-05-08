@@ -40,6 +40,7 @@ import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.data.point.*;
+import ucar.unidata.data.storm.*;
 
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.IdvPreferenceManager;
@@ -446,6 +447,7 @@ public class TimeSeriesChart extends XYChartManager {
     }
 
 
+
     /**
      * set chart from point data
      *
@@ -650,6 +652,56 @@ public class TimeSeriesChart extends XYChartManager {
         }
 
     }
+
+
+    /**
+     * set chart from track data
+     *
+     * @param obs obs
+     * @param plotVars the vars to plot
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public void setTracks(List<LineState> lines) 
+            throws VisADException, RemoteException {
+        try {
+            synchronized (MUTEX) {
+                int paramIdx = 0;
+                clearLineStates();
+                settingData = true;
+                initCharts();
+                for(LineState lineState: lines) {
+                    if ( !lineState.getVisible()) {
+                        continue;
+                    }
+                    addLineState(lineState);
+                    TimeSeries series   =  new TimeSeries(lineState.getName(),
+                                                          Millisecond.class);
+                    List<DateTime> dates = lineState.getTimes();
+                    List<Real> values = lineState.getValues();
+                    if(dates == null || values == null) continue;
+                    for(int pointIdx=0;pointIdx<dates.size();pointIdx++) {
+                        Date dttm = Util.makeDate(dates.get(pointIdx));
+                        double value = values.get(pointIdx).getValue();
+                        series.addOrUpdate(new Millisecond(dttm),
+                                           value);
+                    }
+                    XYItemRenderer renderer = null;
+                    Axis axis = addSeries(series, lineState,
+                                          paramIdx, renderer, true);
+                    paramIdx++;
+                }
+            }
+            updateContents();
+        } finally {
+            doneLoadingData();
+        }
+
+    }
+
+
+
 
     /**
      *  Set the ShowAnimationTime property.

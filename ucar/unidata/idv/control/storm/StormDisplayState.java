@@ -29,11 +29,12 @@ import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.storm.*;
 
+import ucar.unidata.idv.control.chart.*;
+
+
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
-
-import ucar.unidata.ui.TreePanel;
 
 
 
@@ -128,22 +129,13 @@ public class StormDisplayState {
         Color.LIGHT_GRAY
     };
 
-    private static int nextColor = 0;
+    private static int[] nextColor = {0};
 
+    private static int[] nextChartColor = {0};
 
-    /**
-     * Cycle through the color list.
-     *
-     * @return The next color in the list
-     */
-    private static Color getNextColor() {
-        if (nextColor >= colors.length) {
-            nextColor = 0;
-        }
-        return colors[nextColor++];
-    }
+    private TimeSeriesChart timeSeries;
 
-
+    private JPanel chartLeft;
 
 
 
@@ -202,6 +194,8 @@ public class StormDisplayState {
 
     /** _more_ */
     private JComponent contents;
+
+    private JTabbedPane tabbedPane;
 
     /** _more_          */
     private JComponent originalContents;
@@ -270,7 +264,7 @@ public class StormDisplayState {
                                    wayState = new WayDisplayState(this, way));
             //        "idv.stormtrackcontrol.way.color"
             if (wayState.getColor() == null) {
-                wayState.setColor(getNextColor());
+                wayState.setColor(getNextColor(nextColor));
             }
         }
         return wayState;
@@ -337,20 +331,9 @@ public class StormDisplayState {
         JComponent top = GuiUtils.hbox(loadBtn, topLabel);
         originalContents = GuiUtils.inset(top, 5);
         JComponent contents = GuiUtils.top(originalContents);
-        contents = new JPanel(new BorderLayout()) {
-            public String toString() {
-                return "storm:" + xxx();
-            }
-            public boolean equals(Object o) {
-                boolean result = super.equals(o);
-                if (result) {
-                    //                        System.err.println (this + " == " + o);
-                }
-                return result;
-            }
-        };
-
+        contents = new JPanel(new BorderLayout());
         contents.add(BorderLayout.NORTH, originalContents);
+
         return contents;
     }
 
@@ -391,7 +374,7 @@ public class StormDisplayState {
 
         JComponent top =
             GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel("Storm: "
-                + stormInfo), unloadBtn), new Insets(0, 0, 5, 0));
+                + stormInfo), unloadBtn), new Insets(0, 0, 0, 0));
 
         
 
@@ -499,15 +482,43 @@ public class StormDisplayState {
             wayComp = scroller;
         }
 
-        JComponent inner = GuiUtils.topCenter(top,
-                               GuiUtils.inset(wayComp,
-                                   new Insets(0, 5, 0, 0)));
+        wayComp =  GuiUtils.inset(wayComp,
+                                  new Insets(0, 5, 0, 0));
+        chartLeft  = new JPanel(new BorderLayout());
+        JComponent chartComp = GuiUtils.leftCenter(chartLeft,getChart().getContents());
+       
 
-        contents.add(BorderLayout.CENTER, GuiUtils.inset(inner, 5));
+        tabbedPane =GuiUtils.getNestedTabbedPane();
+        tabbedPane.addTab("Settings", wayComp);
+        tabbedPane.addTab("Chart", chartComp);
+        JComponent inner = GuiUtils.topCenter(top,tabbedPane);
+        inner = GuiUtils.inset(inner, 5);
+
+        contents.add(BorderLayout.CENTER, inner);
         contents.invalidate();
         contents.validate();
         contents.repaint();
 
+    }
+
+
+
+    /**
+     * Get the chart
+     *
+     * @return The chart_
+     */
+    public TimeSeriesChart getChart() {
+        if (timeSeries == null) {
+            timeSeries = new TimeSeriesChart(stormTrackControl, "Track Charts");
+            timeSeries.showAnimationTime(true);
+        }
+        return timeSeries;
+    }
+
+
+    protected void timeChanged(Real time) {
+        getChart().timeChanged();
     }
 
 
@@ -574,6 +585,11 @@ public class StormDisplayState {
         return stormTrackControl;
     }
 
+    protected boolean showChart(RealType realType) {
+        return true;
+    }
+
+
 
     /**
      * _more_
@@ -607,6 +623,32 @@ public class StormDisplayState {
 
             StormTrack obsTrack = trackCollection.getObsTrack();
             if (obsTrack != null) {
+                List<LineState> lines = new ArrayList<LineState>();
+                List<DateTime>      times     = obsTrack.getTrackTimes();
+                List<EarthLocation> locations = obsTrack.getLocations();
+                List<RealType> types = obsTrack.getTypes();
+                List<StormTrackPoint> trackPoints = obsTrack.getTrackPoints();
+                List typeCbxs = new ArrayList();
+                for(RealType type: types) {
+                    if(type.equals(StormDataSource.TYPE_STORMCATEGORY)) continue;
+                    List<Real> values = new  ArrayList<Real>();
+                    for(int pointIdx=0;pointIdx<times.size();pointIdx++) {
+                        Real value = trackPoints.get(pointIdx).getAttribute(type);
+                        //TODO: ever get null here?
+                        values.add(value);
+                    }
+                    String label = obsTrack.getWay() +":" + type.toString().replace("_"," ");
+                    LineState lineState = new LineState();
+                    lineState.setColor(getWayDisplayState(obsTrack.getWay()).getColor());
+                    lineState.setName(label);
+                    lineState.setTrack(times, values);
+                    lines.add(lineState);
+                    typeCbxs.add(new JCheckBox(type.toString().replace("_"," "),true));
+                }
+                chartLeft.add(BorderLayout.NORTH,GuiUtils.vbox(typeCbxs));
+                getChart().setTracks(lines);
+
+
                 FieldImpl field = makeField(obsTrack, null);
                 obsDisplayState.addTrack(obsTrack, field);
 
@@ -618,7 +660,6 @@ public class StormDisplayState {
                         + stormInfo.getStormId());
                 timesHolder.setManipulable(false);
                 timesHolder.setVisible(false);
-                List times = obsTrack.getTrackTimes();
                 timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
                 holder.addDisplayable(timesHolder);
 
@@ -1041,6 +1082,19 @@ public class StormDisplayState {
     }
 
 
+
+
+    /**
+     * Cycle through the color list.
+     *
+     * @return The next color in the list
+     */
+    private static Color getNextColor(int[]nextColor) {
+        if (nextColor[0] >= colors.length) {
+            nextColor[0] = 0;
+        }
+        return colors[nextColor[0]++];
+    }
 
 
 
