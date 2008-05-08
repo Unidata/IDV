@@ -32,6 +32,7 @@ import ucar.visad.Util;
 
 import visad.*;
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
 
 
 import java.util.*;
@@ -259,22 +260,55 @@ public abstract class StormDataSource extends DataSourceImpl {
     
     public static StormTrackPoint getClosestPoint(List<StormTrackPoint> aList, DateTime dt){
 
-        StormTrackPoint stp = aList.get(0);
+
         int numPoints = aList.size();
+        StormTrackPoint stp1 = aList.get(0);
+        StormTrackPoint stp2 = aList.get(numPoints-1);
+
         double pValue = dt.getValue();
-        double minDiff = 2000000;
+        double minDiffLeft = 200000;
+        double minDiffRight = 200000;
 
         for(int i = 0; i < numPoints; i++){
-            StormTrackPoint stp1 = aList.get(i);
-            double p1Value = stp1.getTrackPointTime().getValue();
-            double diff = Math.abs(p1Value-pValue);
-            if(diff < minDiff){
-                stp = stp1;
-                minDiff = diff;
+            StormTrackPoint stp11 = aList.get(i);
+            StormTrackPoint stp21 = aList.get(numPoints -i -1);
+
+            double p1Value = stp11.getTrackPointTime().getValue();
+            double p2Value = stp21.getTrackPointTime().getValue();
+            double diff1 = Math.abs(p1Value-pValue);
+            double diff2 = Math.abs(p2Value-pValue);
+
+            if(pValue >= p1Value && diff1 < minDiffRight) {
+                if(pValue == p1Value) return stp11;
+                stp1 = stp11;
+                minDiffRight = diff1;
+
+            }
+
+            if(pValue <= p2Value && diff2 < minDiffLeft) {
+                if(pValue == p2Value) return stp21;
+                stp2 = stp21;
+                minDiffLeft = diff2;
             }
 
         }
-        return stp;
+
+        double diff = minDiffLeft + minDiffRight;
+        EarthLocation el1 = stp1.getTrackPointLocation();
+        EarthLocation el2 = stp1.getTrackPointLocation();
+
+        double lat = ( (diff - minDiffLeft )*el1.getLatitude().getValue()
+                    +  (diff - minDiffRight )*el2.getLatitude().getValue() )/diff;
+        double lon = ( (diff - minDiffLeft )*el1.getLongitude().getValue()
+                     + (diff - minDiffRight )*el2.getLongitude().getValue() )/diff;
+
+        EarthLocation el = new EarthLocationLite(new Real(RealType.Latitude,
+                        lat), new Real(RealType.Longitude, lon),
+                                   null);
+
+        return  new StormTrackPoint(el, dt , 0, null);
+
+
     }
 
     public static double getDistance(StormTrackPoint p1, StormTrackPoint p2){
