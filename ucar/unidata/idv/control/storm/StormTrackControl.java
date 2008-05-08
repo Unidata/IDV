@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -72,7 +74,9 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-    private Hashtable<String,Boolean> okWays = new Hashtable<String,Boolean>();
+    /** _more_ */
+    private Hashtable<String, Boolean> okWays = new Hashtable<String,
+                                                    Boolean>();
 
 
     /** _more_ */
@@ -82,7 +86,7 @@ public class StormTrackControl extends DisplayControlImpl {
     private StormDataSource stormDataSource;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<StormInfo> stormInfos;
 
 
@@ -95,6 +99,7 @@ public class StormTrackControl extends DisplayControlImpl {
         new Hashtable<StormInfo, StormDisplayState>();
 
 
+    /** _more_ */
     private List<StormDisplayState> activeStorms;
 
     /** _more_ */
@@ -111,75 +116,123 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public DisplayMaster getDisplayMaster() {
         return getDisplayMaster(placeHolder);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param way _more_
+     *
+     * @return _more_
+     */
     protected boolean okToShowWay(Way way) {
-        if(way.isObservation()) return true;
-        if(okWays.size()>0 && okWays.get(way.getId())==null) return false;
+        if (way.isObservation()) {
+            return true;
+        }
+        if ((okWays.size() > 0) && (okWays.get(way.getId()) == null)) {
+            return false;
+        }
         return true;
     }
 
 
+    /**
+     * _more_
+     */
     public void showWaySelectDialog() {
-        List checkBoxes = new ArrayList();
-        List useWays = new ArrayList();
-        List allWays  = new ArrayList();
-        StormDisplayState current = getCurrentStormDisplayState();
-        List<WayDisplayState> wayDisplayStates = current.getWayDisplayStates();
+        List                  checkBoxes       = new ArrayList();
+        List                  useWays          = new ArrayList();
+        List                  allWays          = new ArrayList();
+        StormDisplayState     current          =
+            getCurrentStormDisplayState();
+        List<WayDisplayState> wayDisplayStates =
+            current.getWayDisplayStates();
         for (WayDisplayState wayDisplayState : wayDisplayStates) {
-            Way way =wayDisplayState.getWay();
-            if(way.isObservation()) continue;
-            if(okToShowWay(way)) {
-                useWays.add(way);            
-            } 
-            allWays.add(way);            
+            Way way = wayDisplayState.getWay();
+            if (way.isObservation()) {
+                continue;
+            }
+            if (okToShowWay(way)) {
+                useWays.add(way);
+            }
+            allWays.add(way);
         }
         useWays = Misc.sort(useWays);
         allWays = Misc.sort(allWays);
         TwoListPanel tlp = new TwoListPanel(allWays, "Don't Use", useWays,
-                                            "Use", null,false);
-        if(!GuiUtils.showOkCancelDialog(null,getWayName()+" Selection", tlp, null)) return;
+                                            "Use", null, false);
+        if ( !GuiUtils.showOkCancelDialog(null, getWayName() + " Selection",
+                                          tlp, null)) {
+            return;
+        }
         List only = tlp.getCurrentEntries();
-        if(only.size() == allWays.size()) {
+        if (only.size() == allWays.size()) {
             onlyShowTheseWays(new ArrayList<Way>());
         } else {
-            onlyShowTheseWays((List<Way>)only);
+            onlyShowTheseWays((List<Way>) only);
         }
-        
+
     }
 
 
+    /**
+     * _more_
+     */
     public void subsetWays() {
         StormDisplayState current = getCurrentStormDisplayState();
-        if(current == null) return;
+        if (current == null) {
+            return;
+        }
         current.onlyShowSelectedWays();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public StormDisplayState getCurrentStormDisplayState() {
         Component comp = treePanel.getVisibleComponent();
-        if(comp == null) return null;
+        if (comp == null) {
+            return null;
+        }
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             StormInfo stormInfo = stormInfos.get(i);
             StormDisplayState stormDisplayState =
                 getStormDisplayState(stormInfo);
-            if(stormDisplayState.getContents() == comp) return stormDisplayState;
+            if (stormDisplayState.getContents() == comp) {
+                return stormDisplayState;
+            }
         }
         return null;
     }
 
+    /**
+     * _more_
+     */
     public void showAllWays() {
         List<Way> ways = new ArrayList<Way>();
         onlyShowTheseWays(ways);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param ways _more_
+     */
     protected void onlyShowTheseWays(List<Way> ways) {
         okWays = new Hashtable();
-        for(Way way: ways) {
+        for (Way way : ways) {
             okWays.put(way.getId(), new Boolean(true));
         }
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
@@ -327,8 +380,9 @@ public class StormTrackControl extends DisplayControlImpl {
             }
 
             StormDisplayState current = getCurrentStormDisplayState();
-            if(current != null && current.getActive()) {
-                items.add(GuiUtils.makeMenuItem("Select " + getWaysName() + " To Use",this, "showWaySelectDialog"));
+            if ((current != null) && current.getActive()) {
+                items.add(GuiUtils.makeMenuItem("Select " + getWaysName()
+                        + " To Use", this, "showWaySelectDialog"));
             }
             items.add(trackMenu);
             super.getViewMenuItems(items, forMenuBar);
@@ -337,24 +391,42 @@ public class StormTrackControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getWayName() {
         return "Way";
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getWaysName() {
         return "Ways";
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private List<StormDisplayState> getActiveStorms() {
-        if(activeStorms == null) {
-            List<StormDisplayState> tmpList =  new ArrayList<StormDisplayState>();
-            List<StormDisplayState> stormDisplayStates = getStormDisplayStates();
-            for(StormDisplayState stormDisplayState: stormDisplayStates) {
-                if(stormDisplayState.getActive()) 
+        if (activeStorms == null) {
+            List<StormDisplayState> tmpList =
+                new ArrayList<StormDisplayState>();
+            List<StormDisplayState> stormDisplayStates =
+                getStormDisplayStates();
+            for (StormDisplayState stormDisplayState : stormDisplayStates) {
+                if (stormDisplayState.getActive()) {
                     tmpList.add(stormDisplayState);
+                }
             }
-            activeStorms=tmpList;
+            activeStorms = tmpList;
         }
         return activeStorms;
     }
@@ -368,7 +440,7 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @return _more_
      */
-    private StormDisplayState getStormDisplayState(StormInfo stormInfo)  {
+    private StormDisplayState getStormDisplayState(StormInfo stormInfo) {
         StormDisplayState stormDisplayState =
             stormDisplayStateMap.get(stormInfo);
         if (stormDisplayState == null) {
@@ -376,7 +448,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 stormDisplayState = new StormDisplayState(stormInfo);
                 stormDisplayState.setStormTrackControl(this);
                 stormDisplayStateMap.put(stormInfo, stormDisplayState);
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 logException("Creating storm display", exc);
             }
         }
@@ -471,7 +543,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
         //        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
         //                                  scroller);
-        contents.setPreferredSize(new Dimension(500,400));
+        contents.setPreferredSize(new Dimension(500, 400));
         return contents;
     }
 
@@ -512,7 +584,7 @@ public class StormTrackControl extends DisplayControlImpl {
     protected void timeChanged(Real time) {
         try {
             List<StormDisplayState> active = getActiveStorms();
-            for(StormDisplayState stormDisplayState: active) {
+            for (StormDisplayState stormDisplayState : active) {
                 stormDisplayState.timeChanged(time);
             }
         } catch (Exception exc) {
@@ -679,22 +751,22 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
     /**
-Set the OkWays property.
+     * Set the OkWays property.
+     *
+     * @param value The new value for OkWays
+     */
+    public void setOkWays(Hashtable<String, Boolean> value) {
+        okWays = value;
+    }
 
-@param value The new value for OkWays
-**/
-public void setOkWays (Hashtable<String,Boolean> value) {
-	okWays = value;
-}
-
-/**
-Get the OkWays property.
-
-@return The OkWays
-**/
-public Hashtable<String,Boolean> getOkWays () {
-	return okWays;
-}
+    /**
+     * Get the OkWays property.
+     *
+     * @return The OkWays
+     */
+    public Hashtable<String, Boolean> getOkWays() {
+        return okWays;
+    }
 
 
 
