@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -39,7 +40,7 @@ public class Way implements Comparable {
     /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
     /**
@@ -150,6 +151,13 @@ public class Way implements Comparable {
         return name;
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public int compareTo(Object o) {
         if (o instanceof Way) {
             Way that = (Way) o;

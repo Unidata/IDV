@@ -20,17 +20,20 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.geoloc.ProjectionPointImpl;
+import ucar.unidata.geoloc.projection.FlatEarth;
 
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.geoloc.projection.FlatEarth;
-import ucar.unidata.geoloc.ProjectionPointImpl;
+
 import ucar.visad.Util;
 
 import visad.*;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
@@ -48,60 +51,60 @@ import java.util.*;
 public abstract class StormDataSource extends DataSourceImpl {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_DB = 0;  // - disturbance,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_TD = 1;  // - tropical depression,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_TS = 2;  // - tropical storm,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_TY = 3;  // - typhoon,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_ST = 4;  // - super typhoon,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_TC = 5;  // - tropical cyclone,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_HU = 6;  // - hurricane,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_SD = 7;  // - subtropical depression,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_SS = 8;  // - subtropical storm,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_EX = 9;  // - extratropical systems,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_IN = 10;  // - inland,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_DS = 11;  // - dissipating,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_LO = 12;  // - low,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_WV = 13;  // - tropical wave,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_ET = 14;  // - extrapolated,
 
-    /** _more_          */
+    /** _more_ */
     public static final int CATEGORY_XX = 15;  // - unknown.
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_DISTANCEERROR;
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int[] CATEGORY_VALUES = {
         CATEGORY_DB, CATEGORY_TD, CATEGORY_TS, CATEGORY_TY, CATEGORY_ST,
         CATEGORY_TC, CATEGORY_HU, CATEGORY_SD, CATEGORY_SS, CATEGORY_EX,
@@ -109,17 +112,17 @@ public abstract class StormDataSource extends DataSourceImpl {
         CATEGORY_XX
     };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] CATEGORY_NAMES = {
         "DB", "TD", "TS", "TY", "ST", "TC", "HU", "SD", "SS", "EX", "IN",
         "DS", "LO", "WV", "ET", "XX"
     };
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CATEGORY = "attr.category";
 
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_STORMCATEGORY;
 
 
@@ -144,15 +147,40 @@ public abstract class StormDataSource extends DataSourceImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param alias _more_
+     * @param unit _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    protected RealType makeRealType(String id, String alias, Unit unit)
+            throws VisADException {
+        alias = alias + "[unit:" + ((unit == null)
+                                    ? "null"
+                                    : Util.cleanName(unit.toString())) + "]";
+        return ucar.visad.Util.makeRealType(id, alias, unit);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @throws VisADException _more_
+     */
     protected void initTypes() throws VisADException {
-        if(TYPE_STORMCATEGORY == null) {
-            TYPE_STORMCATEGORY = ucar.visad.Util.makeRealType("stormcategory",
-                                                              "Storm_Category", null);
+        if (TYPE_STORMCATEGORY == null) {
+            TYPE_STORMCATEGORY = Util.makeRealType("stormcategory",
+                    "Storm_Category", null);
         }
-        if(TYPE_DISTANCEERROR == null) {
-              TYPE_DISTANCEERROR =  ucar.visad.Util.makeRealType("forcast location error",
-                                             "distance_error",
-                                             Util.parseUnit("km"));
+        if (TYPE_DISTANCEERROR == null) {
+            TYPE_DISTANCEERROR = Util.makeRealType("forecastlocationerror",
+                    "Distance_Error", Util.parseUnit("km"));
         }
     }
 
@@ -202,13 +230,14 @@ public abstract class StormDataSource extends DataSourceImpl {
      * _more_
      *
      * @param stormInfo _more_
+     * @param waysToUse _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public abstract StormTrackCollection getTrackCollection(
-            StormInfo stormInfo, Hashtable<String,Boolean> waysToUse)
+            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse)
      throws Exception;
 
 
@@ -245,83 +274,117 @@ public abstract class StormDataSource extends DataSourceImpl {
         return cal.get(Calendar.YEAR);
     }
 
-    public static void setStormTrackForecastError(StormTrack obsTrack , StormTrack fctTrack)throws VisADException {
+    /**
+     * _more_
+     *
+     * @param obsTrack _more_
+     * @param fctTrack _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static void setStormTrackForecastError(StormTrack obsTrack,
+            StormTrack fctTrack)
+            throws VisADException {
         List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
         List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();
 
-        for(StormTrackPoint stp: fctTrackPoints){
-            DateTime dt = stp.getTrackPointTime();
-            StormTrackPoint stpObs =  getClosestPoint(obsTrackPoints, dt);
-            double der = getDistance(stpObs, stp);
+        for (StormTrackPoint stp : fctTrackPoints) {
+            DateTime        dt     = stp.getTrackPointTime();
+            StormTrackPoint stpObs = getClosestPoint(obsTrackPoints, dt);
+            double          der    = getDistance(stpObs, stp);
             stp.addAttribute(new Real(TYPE_DISTANCEERROR, der));
         }
-       
+
     }
-    
-    public static StormTrackPoint getClosestPoint(List<StormTrackPoint> aList, DateTime dt){
+
+    /**
+     * _more_
+     *
+     * @param aList _more_
+     * @param dt _more_
+     *
+     * @return _more_
+     */
+    public static StormTrackPoint getClosestPoint(
+            List<StormTrackPoint> aList, DateTime dt) {
 
 
-        int numPoints = aList.size();
-        StormTrackPoint stp1 = aList.get(0);
-        StormTrackPoint stp2 = aList.get(numPoints-1);
+        int             numPoints    = aList.size();
+        StormTrackPoint stp1         = aList.get(0);
+        StormTrackPoint stp2         = aList.get(numPoints - 1);
 
-        double pValue = dt.getValue();
-        double minDiffLeft = 200000;
-        double minDiffRight = 200000;
+        double          pValue       = dt.getValue();
+        double          minDiffLeft  = 200000;
+        double          minDiffRight = 200000;
 
-        for(int i = 0; i < numPoints; i++){
-            StormTrackPoint stp11 = aList.get(i);
-            StormTrackPoint stp21 = aList.get(numPoints -i -1);
+        for (int i = 0; i < numPoints; i++) {
+            StormTrackPoint stp11   = aList.get(i);
+            StormTrackPoint stp21   = aList.get(numPoints - i - 1);
 
-            double p1Value = stp11.getTrackPointTime().getValue();
-            double p2Value = stp21.getTrackPointTime().getValue();
-            double diff1 = Math.abs(p1Value-pValue);
-            double diff2 = Math.abs(p2Value-pValue);
+            double          p1Value = stp11.getTrackPointTime().getValue();
+            double          p2Value = stp21.getTrackPointTime().getValue();
+            double          diff1   = Math.abs(p1Value - pValue);
+            double          diff2   = Math.abs(p2Value - pValue);
 
-            if(pValue >= p1Value && diff1 < minDiffRight) {
-                if(pValue == p1Value) return stp11;
-                stp1 = stp11;
+            if ((pValue >= p1Value) && (diff1 < minDiffRight)) {
+                if (pValue == p1Value) {
+                    return stp11;
+                }
+                stp1         = stp11;
                 minDiffRight = diff1;
 
             }
 
-            if(pValue <= p2Value && diff2 < minDiffLeft) {
-                if(pValue == p2Value) return stp21;
-                stp2 = stp21;
+            if ((pValue <= p2Value) && (diff2 < minDiffLeft)) {
+                if (pValue == p2Value) {
+                    return stp21;
+                }
+                stp2        = stp21;
                 minDiffLeft = diff2;
             }
 
         }
 
-        double diff = minDiffLeft + minDiffRight;
-        EarthLocation el1 = stp1.getTrackPointLocation();
-        EarthLocation el2 = stp1.getTrackPointLocation();
+        double        diff = minDiffLeft + minDiffRight;
+        EarthLocation el1  = stp1.getTrackPointLocation();
+        EarthLocation el2  = stp1.getTrackPointLocation();
 
-        double lat = ( (diff - minDiffLeft )*el1.getLatitude().getValue()
-                    +  (diff - minDiffRight )*el2.getLatitude().getValue() )/diff;
-        double lon = ( (diff - minDiffLeft )*el1.getLongitude().getValue()
-                     + (diff - minDiffRight )*el2.getLongitude().getValue() )/diff;
+        double lat = ((diff - minDiffLeft) * el1.getLatitude().getValue()
+                      + (diff - minDiffRight)
+                        * el2.getLatitude().getValue()) / diff;
+        double lon = ((diff - minDiffLeft) * el1.getLongitude().getValue()
+                      + (diff - minDiffRight)
+                        * el2.getLongitude().getValue()) / diff;
 
         EarthLocation el = new EarthLocationLite(new Real(RealType.Latitude,
-                        lat), new Real(RealType.Longitude, lon),
-                                   null);
+                               lat), new Real(RealType.Longitude, lon), null);
 
-        return  new StormTrackPoint(el, dt , 0, null);
+        return new StormTrackPoint(el, dt, 0, null);
 
 
     }
 
-    public static double getDistance(StormTrackPoint p1, StormTrackPoint p2){
+    /**
+     * _more_
+     *
+     * @param p1 _more_
+     * @param p2 _more_
+     *
+     * @return _more_
+     */
+    public static double getDistance(StormTrackPoint p1, StormTrackPoint p2) {
 
-        FlatEarth e1    = new FlatEarth();
-        FlatEarth e2   = new FlatEarth();
+        FlatEarth     e1  = new FlatEarth();
+        FlatEarth     e2  = new FlatEarth();
 
         EarthLocation el1 = p1.getTrackPointLocation();
         EarthLocation el2 = p2.getTrackPointLocation();
-        ProjectionPointImpl pp1 = e1.latLonToProj(el1.getLatitude().getValue(),
-                                     el1.getLongitude().getValue());
-        ProjectionPointImpl pp2 = e2.latLonToProj(el2.getLatitude().getValue(),
-                                     el2.getLongitude().getValue());
+        ProjectionPointImpl pp1 =
+            e1.latLonToProj(el1.getLatitude().getValue(),
+                            el1.getLongitude().getValue());
+        ProjectionPointImpl pp2 =
+            e2.latLonToProj(el2.getLatitude().getValue(),
+                            el2.getLongitude().getValue());
         return pp1.distance(pp2);
 
     }

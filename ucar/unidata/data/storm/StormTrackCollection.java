@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -53,7 +54,7 @@ public class StormTrackCollection {
     /** _more_ */
     private List stormsTimeRanges;
 
-    /** _more_          */
+    /** _more_ */
     List<StormTrack> tracks = new ArrayList<StormTrack>();
 
 

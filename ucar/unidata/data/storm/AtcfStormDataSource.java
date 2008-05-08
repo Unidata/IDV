@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -49,10 +50,10 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Calendar;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 
 import java.util.Hashtable;
@@ -68,13 +69,13 @@ import java.util.zip.GZIPInputStream;
  */
 public class AtcfStormDataSource extends StormDataSource {
 
-    /** _more_          */
+    /** _more_ */
     private static final String WAY_BEST = "BEST";
 
-    /** _more_          */
+    /** _more_ */
     private static final String WAY_CARQ = "CARQ";
 
-    /** _more_          */
+    /** _more_ */
     private static final String WAY_WRNG = "WRNG";
 
 
@@ -168,12 +169,15 @@ public class AtcfStormDataSource extends StormDataSource {
      * @param stormInfo _more_
      * @param tracks _more_
      * @param trackFile _more_
+     * @param waysToUse _more_
      *
      * @throws Exception _more_
      */
     private void readTracks(StormInfo stormInfo, StormTrackCollection tracks,
-                            String trackFile, Hashtable<String,Boolean> waysToUse)
+                            String trackFile,
+                            Hashtable<String, Boolean> waysToUse)
             throws Exception {
+
         long   t1    = System.currentTimeMillis();
         byte[] bytes = readFile(trackFile);
         long   t2    = System.currentTimeMillis();
@@ -209,7 +213,7 @@ public class AtcfStormDataSource extends StormDataSource {
         okWays.put("BAMS", "");*/
         Hashtable seenDate = new Hashtable();
         initTypes();
-        int xcnt=0;
+        int xcnt = 0;
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
             List   toks = StringUtil.split(line, ",", true);
@@ -231,15 +235,19 @@ public class AtcfStormDataSource extends StormDataSource {
             }
 
             //Check for unique dates for this way
-            String dttmkey = wayString +"_"+ dateString+"_" + forecastHour;
-            if(seenDate.get(dttmkey)!=null) continue;
-            seenDate.put(dttmkey,dttmkey);
+            String dttmkey = wayString + "_" + dateString + "_"
+                             + forecastHour;
+            if (seenDate.get(dttmkey) != null) {
+                continue;
+            }
+            seenDate.put(dttmkey, dttmkey);
 
-            Date    dttm      = fmt.parse(dateString);
+            Date dttm = fmt.parse(dateString);
             convertCal.setTime(dttm);
             String key;
-            Way way = new Way(wayString);
-            if(!isBest && waysToUse !=null && waysToUse.size()>0 && waysToUse.get(wayString) == null) {
+            Way    way = new Way(wayString);
+            if ( !isBest && (waysToUse != null) && (waysToUse.size() > 0)
+                    && (waysToUse.get(wayString) == null)) {
                 continue;
             }
 
@@ -251,9 +259,9 @@ public class AtcfStormDataSource extends StormDataSource {
             }
             StormTrack track = (StormTrack) trackMap.get(key);
             if (track == null) {
-                way = (isBest
-                       ? Way.OBSERVATION
-                       : way);
+                way   = (isBest
+                         ? Way.OBSERVATION
+                         : way);
                 track = new StormTrack(stormInfo, way, new DateTime(dttm));
                 trackMap.put(key, track);
                 tracks.addTrack(track);
@@ -272,13 +280,14 @@ public class AtcfStormDataSource extends StormDataSource {
                                           longitude), altReal);
 
             List<Real> attributes = new ArrayList<Real>();
-            attributes.add(new Real(TYPE_STORMCATEGORY, (double)category));
+            attributes.add(new Real(TYPE_STORMCATEGORY, (double) category));
             StormTrackPoint stp = new StormTrackPoint(elt,
-                                                      new DateTime(dttm), forecastHour,
-                                                      attributes);
+                                      new DateTime(dttm), forecastHour,
+                                      attributes);
 
             track.addPoint(stp);
         }
+
     }
 
 
@@ -286,12 +295,14 @@ public class AtcfStormDataSource extends StormDataSource {
      * _more_
      *
      * @param stormInfo _more_
+     * @param waysToUse _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public StormTrackCollection getTrackCollection(StormInfo stormInfo, Hashtable<String,Boolean> waysToUse)
+    public StormTrackCollection getTrackCollection(StormInfo stormInfo,
+            Hashtable<String, Boolean> waysToUse)
             throws Exception {
         long                 t1     = System.currentTimeMillis();
         StormTrackCollection tracks = new StormTrackCollection();
@@ -347,14 +358,14 @@ public class AtcfStormDataSource extends StormDataSource {
         if (new File(file).exists()) {
             return IOUtil.readBytes(IOUtil.getInputStream(file, getClass()));
         }
-        if(!file.startsWith("ftp:")) {
+        if ( !file.startsWith("ftp:")) {
             throw new FileNotFoundException("Could not read file: " + file);
         }
-        
-        URL       url = new URL(file);
+
+        URL url = new URL(file);
         //Try to read up to 5 times
-        Exception lastException=null;
-        for(int i=0;i<5;i++) {
+        Exception lastException = null;
+        for (int i = 0; i < 5; i++) {
             FTPClient ftp = new FTPClient();
             try {
                 ftp.connect(url.getHost());
@@ -365,13 +376,15 @@ public class AtcfStormDataSource extends StormDataSource {
                 if (ftp.retrieveFile(url.getPath(), bos)) {
                     return bos.toByteArray();
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 lastException = exc;
             }
             //Wait a bit
             Misc.sleep(100);
         }
-        if(lastException!=null) throw lastException;
+        if (lastException != null) {
+            throw lastException;
+        }
         //            throw new FileNotFoundException("Could not read file: " + file);
         return null;
     }

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -73,7 +74,7 @@ public class STIStormDataSource extends StormDataSource {
 
     /* Use this for mysql:     */
 
-    /** _more_          */
+    /** _more_ */
     private static final String DEFAULT_URL =
         "jdbc:mysql://localhost:3306/typhoon?zeroDateTimeBehavior=convertToNull&user=jeff&password=mypassword";
 
@@ -83,45 +84,70 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
-    private static final String DEFAULT_DERBY_URL = "jdbc:derby:test;create=true";
+    /** _more_          */
+    private static final String DEFAULT_DERBY_URL =
+        "jdbc:derby:test;create=true";
+
+    /** _more_          */
     private static final String COL_DERBY_HOUR = "hh";
+
+    /** _more_          */
     private static final String COL_DERBY_YEAR = "yyyy";
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private boolean useDerby() {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private String getColHour() {
-        if(useDerby()) return COL_DERBY_HOUR;
+        if (useDerby()) {
+            return COL_DERBY_HOUR;
+        }
         return COL_HOUR;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private String getColYear() {
-        if(useDerby()) return COL_DERBY_YEAR;
+        if (useDerby()) {
+            return COL_DERBY_YEAR;
+        }
         return COL_YEAR;
     }
 
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_MAXWINDSPEED;
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_MINPRESSURE;
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_RADIUSMODERATEGALE;
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_RADIUSWHOLEGALE;
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_PROBABILITYRADIUS;
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_MOVEDIRECTION;
 
-    /** _more_          */
+    /** _more_ */
     public static RealType TYPE_MOVESPEED;
 
 
@@ -135,10 +161,10 @@ public class STIStormDataSource extends StormDataSource {
     /** _more_ */
     private static final String TABLE_TRACK = "typhoon";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_YEAR = "year";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_HOUR = "hour";
     /**/
 
@@ -223,6 +249,8 @@ public class STIStormDataSource extends StormDataSource {
     public STIStormDataSource() throws Exception {}
 
 
+
+
     /**
      * _more_
      *
@@ -232,28 +260,20 @@ public class STIStormDataSource extends StormDataSource {
         super.initTypes();
         if (TYPE_MAXWINDSPEED == null) {
             //TODO: Make sure these are the right units
-            TYPE_MAXWINDSPEED = ucar.visad.Util.makeRealType("maxwindspeed",
-                    "Max_Windspeed", Util.parseUnit("m/s"));
-            TYPE_MINPRESSURE = ucar.visad.Util.makeRealType("minpressure",
-                    "Min_Pressure", Util.parseUnit("mb"));
-            TYPE_RADIUSMODERATEGALE =
-                ucar.visad.Util.makeRealType("radiusmoderategale",
-                                             "Moderate_Gale_Radius",
-                                             Util.parseUnit("km"));
-            TYPE_PROBABILITYRADIUS =
-                ucar.visad.Util.makeRealType("probabilityradius",
-                                             "Probability_Radius",
-                                             Util.parseUnit("km"));
-            TYPE_RADIUSWHOLEGALE =
-                ucar.visad.Util.makeRealType("radiuswholegale",
-                                             "Whole_Gale_Radius",
-                                             Util.parseUnit("km"));
-            TYPE_MOVEDIRECTION =
-                ucar.visad.Util.makeRealType("movedirection",
-                                             "Storm_Direction",
-                                             CommonUnit.degree);
-            TYPE_MOVESPEED = ucar.visad.Util.makeRealType("movespeed",
-                    "Storm_Speed", Util.parseUnit("m/s"));
+            TYPE_MAXWINDSPEED = makeRealType("maxwindspeed", "Max_Windspeed",
+                                             Util.parseUnit("m/s"));
+            TYPE_MINPRESSURE = makeRealType("minpressure", "Min_Pressure",
+                                            Util.parseUnit("mb"));
+            TYPE_RADIUSMODERATEGALE = makeRealType("radiusmoderategale",
+                    "Moderate_Gale_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITYRADIUS = makeRealType("probabilityradius",
+                    "Probability_Radius", Util.parseUnit("km"));
+            TYPE_RADIUSWHOLEGALE = makeRealType("radiuswholegale",
+                    "Whole_Gale_Radius", Util.parseUnit("km"));
+            TYPE_MOVEDIRECTION = makeRealType("movedirection",
+                    "Storm_Direction", CommonUnit.degree);
+            TYPE_MOVESPEED = makeRealType("movespeed", "Storm_Speed",
+                                          Util.parseUnit("m/s"));
         }
     }
 
@@ -274,7 +294,9 @@ public class STIStormDataSource extends StormDataSource {
         super(descriptor, "STI Storm Data", "STI Storm Data", properties);
         if ((url == null) || url.trim().equalsIgnoreCase("default")
                 || (url.trim().length() == 0)) {
-            url = (useDerby()?DEFAULT_DERBY_URL:DEFAULT_URL);
+            url = (useDerby()
+                   ? DEFAULT_DERBY_URL
+                   : DEFAULT_URL);
         }
         dbUrl = url;
     }
@@ -322,12 +344,14 @@ public class STIStormDataSource extends StormDataSource {
      * _more_
      *
      * @param stormInfo _more_
+     * @param waysToUse _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public StormTrackCollection getTrackCollection(StormInfo stormInfo,  Hashtable<String,Boolean> waysToUse)
+    public StormTrackCollection getTrackCollection(StormInfo stormInfo,
+            Hashtable<String, Boolean> waysToUse)
             throws Exception {
         long                 t1              = System.currentTimeMillis();
         StormTrackCollection trackCollection = new StormTrackCollection();
@@ -335,7 +359,10 @@ public class STIStormDataSource extends StormDataSource {
 
 
         for (Way forecastWay : forecastWays) {
-            if(waysToUse!=null &&  waysToUse.size()>0 &&  waysToUse.get(forecastWay.getId())==null) continue;
+            if ((waysToUse != null) && (waysToUse.size() > 0)
+                    && (waysToUse.get(forecastWay.getId()) == null)) {
+                continue;
+            }
             List forecastTracks = getForecastTracks(stormInfo, forecastWay);
             if (forecastTracks.size() > 0) {
                 trackCollection.addTrackList(forecastTracks);
@@ -344,7 +371,7 @@ public class STIStormDataSource extends StormDataSource {
         StormTrack obsTrack = getObservationTrack(stormInfo);
         //                                         (Way) forecastWays.get(0));
         List<StormTrack> tracks = trackCollection.getTracks();
-        for(StormTrack stk: tracks){
+        for (StormTrack stk : tracks) {
             setStormTrackForecastError(obsTrack, stk);
         }
         long t2 = System.currentTimeMillis();
@@ -394,18 +421,27 @@ public class STIStormDataSource extends StormDataSource {
      * If d is a missing value return  NaN. Else return d
      * @param d The value
      * @param Nan if d is missing else d
+     *
+     * @return _more_
      */
 
     public double getValue(double d) {
-        if (d == 9999 || d == 999) {        
+        if ((d == 9999) || (d == 999)) {
             return Double.NaN;
         }
         return d;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     *
+     * @return _more_
+     */
     public double getLatLonValue(double d) {
-        if (d == 9999 || d == 999) {
+        if ((d == 9999) || (d == 999)) {
             return Double.NaN;
         }
         return d;
@@ -429,9 +465,9 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
         //        if(true) return getForecastTrackX(stormInfo, sTime, forecastWay);
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_FHOUR, COL_LATITUDE,
-            COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE, COL_RADIUSMG,
-            COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED
+            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_FHOUR,
+            COL_LATITUDE, COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE,
+            COL_RADIUSMG, COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED
         });
 
 
@@ -445,8 +481,9 @@ public class STIStormDataSource extends StormDataSource {
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
-         query = query + " order by  " + SqlUtil.comma(new String[] { getColYear(),
-                COL_MONTH, COL_DAY, getColHour(), COL_FHOUR});
+        query = query + " order by  "
+                + SqlUtil.comma(new String[] { getColYear(),
+                COL_MONTH, COL_DAY, getColHour(), COL_FHOUR });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
@@ -467,15 +504,23 @@ public class STIStormDataSource extends StormDataSource {
                 int        hour     = results.getInt(col++);
                 int        fhour    = results.getInt(col++);
 
-                double latitude = getLatLonValue(results.getDouble(col++));
-                double longitude = getLatLonValue(results.getDouble(col++));
-                attrs.add(new Real(TYPE_MAXWINDSPEED, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MINPRESSURE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVEDIRECTION, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVESPEED, getValue(results.getDouble(col++))));
-                radius = fhour * 50.0f /24.0f;
+                double     latitude =
+                    getLatLonValue(results.getDouble(col++));
+                double longitude    =
+                    getLatLonValue(results.getDouble(col++));
+                attrs.add(new Real(TYPE_MAXWINDSPEED,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MINPRESSURE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSMODERATEGALE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSWHOLEGALE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVEDIRECTION,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVESPEED,
+                                   getValue(results.getDouble(col++))));
+                radius = fhour * 50.0f / 24.0f;
                 attrs.add(new Real(TYPE_PROBABILITYRADIUS, radius));
                 //                System.err.println("setting radius =" + radius + "  forecast hour = " + fhour + " way=" + forecastWay);
                 EarthLocation elt =
@@ -485,8 +530,9 @@ public class STIStormDataSource extends StormDataSource {
                 DateTime dttm = getDateTime(year, month, day, hour + fhour);
                 StormTrackPoint stp = new StormTrackPoint(elt, dttm, fhour,
                                           attrs);
-                if(!elt.isMissing())
+                if ( !elt.isMissing()) {
                     pts.add(stp);
+                }
             }
         }
 
@@ -543,9 +589,9 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
 
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_FHOUR, COL_LATITUDE,
-            COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE, COL_RADIUSMG,
-            COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED
+            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_FHOUR,
+            COL_LATITUDE, COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE,
+            COL_RADIUSMG, COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED
         });
 
 
@@ -666,7 +712,8 @@ public class STIStormDataSource extends StormDataSource {
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
-        query = query + " order by  " + SqlUtil.comma(new String[] { getColYear(),
+        query = query + " order by  "
+                + SqlUtil.comma(new String[] { getColYear(),
                 COL_MONTH, COL_DAY, getColHour() });
         //        System.err.println (query);
         Statement        statement = evaluate(query);
@@ -752,7 +799,8 @@ public class STIStormDataSource extends StormDataSource {
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
-        query = query + " order by  " + SqlUtil.comma(new String[] { getColYear(),
+        query = query + " order by  "
+                + SqlUtil.comma(new String[] { getColYear(),
                 COL_MONTH, COL_DAY, getColHour() });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
@@ -764,20 +812,28 @@ public class STIStormDataSource extends StormDataSource {
         Real altReal = new Real(RealType.Altitude, 0);
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                List<Real> attrs     = new ArrayList();
-                int        col       = 1;
-                int        year      = results.getInt(col++);
-                int        month     = results.getInt(col++);
-                int        day       = results.getInt(col++);
-                int        hour      = results.getInt(col++);
-                double     latitude  = getLatLonValue(results.getDouble(col++));
-                double     longitude = getLatLonValue(results.getDouble(col++));
-                attrs.add(new Real(TYPE_MAXWINDSPEED, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MINPRESSURE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVEDIRECTION, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVESPEED, getValue(results.getDouble(col++))));
+                List<Real> attrs    = new ArrayList();
+                int        col      = 1;
+                int        year     = results.getInt(col++);
+                int        month    = results.getInt(col++);
+                int        day      = results.getInt(col++);
+                int        hour     = results.getInt(col++);
+                double     latitude =
+                    getLatLonValue(results.getDouble(col++));
+                double longitude    =
+                    getLatLonValue(results.getDouble(col++));
+                attrs.add(new Real(TYPE_MAXWINDSPEED,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MINPRESSURE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSMODERATEGALE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSWHOLEGALE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVEDIRECTION,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVESPEED,
+                                   getValue(results.getDouble(col++))));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -834,7 +890,8 @@ public class STIStormDataSource extends StormDataSource {
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
-        query = query + " order by  " + SqlUtil.comma(new String[] { getColYear(),
+        query = query + " order by  "
+                + SqlUtil.comma(new String[] { getColYear(),
                 COL_MONTH, COL_DAY, getColHour() });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
@@ -848,20 +905,28 @@ public class STIStormDataSource extends StormDataSource {
 
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                List<Real> attrs     = new ArrayList();
-                int        col       = 1;
-                int        year      = results.getInt(col++);
-                int        month     = results.getInt(col++);
-                int        day       = results.getInt(col++);
-                int        hour      = results.getInt(col++);
-                double     latitude  = getLatLonValue(results.getDouble(col++));
-                double     longitude = getLatLonValue(results.getDouble(col++));
-                attrs.add(new Real(TYPE_MAXWINDSPEED, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MINPRESSURE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVEDIRECTION, getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVESPEED, getValue(results.getDouble(col++))));
+                List<Real> attrs    = new ArrayList();
+                int        col      = 1;
+                int        year     = results.getInt(col++);
+                int        month    = results.getInt(col++);
+                int        day      = results.getInt(col++);
+                int        hour     = results.getInt(col++);
+                double     latitude =
+                    getLatLonValue(results.getDouble(col++));
+                double longitude    =
+                    getLatLonValue(results.getDouble(col++));
+                attrs.add(new Real(TYPE_MAXWINDSPEED,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MINPRESSURE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSMODERATEGALE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_RADIUSWHOLEGALE,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVEDIRECTION,
+                                   getValue(results.getDouble(col++))));
+                attrs.add(new Real(TYPE_MOVESPEED,
+                                   getValue(results.getDouble(col++))));
 
 
                 EarthLocation elt =
@@ -1193,7 +1258,7 @@ public class STIStormDataSource extends StormDataSource {
         StormInfo sInfo     = (StormInfo) sInfoList.get(0);
         sInfo = s.getStormInfo(sid);
         String               sd             = sInfo.getStormId();
-        StormTrackCollection cls            = s.getTrackCollection(sInfo,null);
+        StormTrackCollection cls = s.getTrackCollection(sInfo, null);
         StormTrack           obsTrack       = cls.getObsTrack();
         List                 trackPointList = obsTrack.getTrackPoints();
         List                 trackPointTime = obsTrack.getTrackTimes();

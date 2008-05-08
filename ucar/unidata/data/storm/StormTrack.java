@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -54,13 +55,13 @@ public class StormTrack {
     private Way way;
 
 
-    /** _more_          */
+    /** _more_ */
     private NamedArray lats;
 
-    /** _more_          */
+    /** _more_ */
     private NamedArray lons;
 
-    /** _more_          */
+    /** _more_ */
     private List<DateTime> times;
 
     /** _more_ */
@@ -261,10 +262,10 @@ public class StormTrack {
      */
     public List<RealType> getTypes() {
         List<RealType> types = new ArrayList<RealType>();
-        System.err.println ("trackPoints:" + trackPoints.size());
+        System.err.println("trackPoints:" + trackPoints.size());
         if (trackPoints.size() > 0) {
             List<Real> reals = trackPoints.get(0).getTrackAttributes();
-            System.err.println ("reals:" + reals);
+            System.err.println("reals:" + reals);
             for (Real r : reals) {
                 types.add((RealType) r.getType());
             }
@@ -295,7 +296,9 @@ public class StormTrack {
      * @return _more_
      */
     public Real[] getTrackAttributeValues(RealType type) {
-        if(type == null) return null;
+        if (type == null) {
+            return null;
+        }
         int    size            = trackPoints.size();
         Real[] trackAttributes = new Real[size];
         for (int i = 0; i < size; i++) {
