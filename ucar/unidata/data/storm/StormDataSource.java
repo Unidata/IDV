@@ -38,6 +38,8 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
 
+import java.rmi.RemoteException;
+
 import java.util.*;
 
 
@@ -274,6 +276,7 @@ public abstract class StormDataSource extends DataSourceImpl {
         return cal.get(Calendar.YEAR);
     }
 
+
     /**
      * _more_
      *
@@ -295,6 +298,32 @@ public abstract class StormDataSource extends DataSourceImpl {
             stp.addAttribute(new Real(TYPE_DISTANCEERROR, der));
         }
 
+    }
+
+
+    public static StormTrack difference(StormTrack obsTrack,
+                                        StormTrack fctTrack, RealType type)
+        throws VisADException, RemoteException {
+        List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
+        List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();
+        List<StormTrackPoint> diffPoints = new ArrayList<StormTrackPoint>();
+
+        for (StormTrackPoint forecastPoint : fctTrackPoints) {
+            DateTime        dt     = forecastPoint.getTrackPointTime();
+            StormTrackPoint closestObs = getClosestPoint(obsTrackPoints, dt);
+            if(closestObs==null) continue;
+            Real r1 = closestObs.getAttribute(type);
+            if(r1 == null) continue;
+            Real r2 = forecastPoint.getAttribute(type);
+            if(r2 == null) continue;
+            Real r3 = (Real) r1.__sub__(r2);
+            StormTrackPoint newStormTrackPoint = new  StormTrackPoint(forecastPoint.getTrackPointLocation(), dt,forecastPoint.getForecastHour(), new ArrayList<Real>());
+            newStormTrackPoint.addAttribute(r3);
+            diffPoints.add(newStormTrackPoint);
+        }
+        if(diffPoints.size()==0) return null;
+        return new StormTrack(fctTrack.getStormInfo(),fctTrack.getWay(),
+                              diffPoints);
     }
 
     /**

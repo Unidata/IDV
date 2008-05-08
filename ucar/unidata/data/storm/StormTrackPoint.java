@@ -165,6 +165,7 @@ public class StormTrackPoint {
      * @return _more_
      */
     public Real getAttribute(RealType type) {
+        if(attributes==null) return null;
         for (Real attr : attributes) {
             if (attr.getType().equals(type)) {
                 return attr;

@@ -154,6 +154,9 @@ public class StormDisplayState {
     /** _more_ */
     private List<Way> chartWays = new ArrayList();
 
+    private boolean chartDifference = false;
+
+
     /** _more_ */
     private JComboBox chartTimeBox;
 
@@ -811,6 +814,14 @@ public class StormDisplayState {
         }
         madeChart = true;
         List<DateTime> forecastTimes = findChartForecastTimes();
+        final JCheckBox chartDiffCbx = new JCheckBox("Difference", chartDifference);
+        chartDiffCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                chartDifference = chartDiffCbx.isSelected();
+                updateChart();
+            }
+            });
+
         chartTimeBox = new JComboBox(new Vector(forecastTimes));
         chartTimeBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -856,6 +867,7 @@ public class StormDisplayState {
 
         List cbxs = new ArrayList();
         cbxs.add(GuiUtils.label("Time: ", chartTimeBox));
+        cbxs.add(chartDiffCbx);
         cbxs.add(GuiUtils.filler(5, 10));
         List<Way> ways = Misc.sort(trackCollection.getWayList());
         cbxs.add(new JLabel(stormTrackControl.getWaysName() + ":"));
@@ -1062,10 +1074,24 @@ public class StormDisplayState {
                 }
             }
             List<LineState> lines = new ArrayList<LineState>();
+            StormTrack obsTrack = trackCollection.getObsTrack();
             for (RealType type : chartParams) {
                 List<LineState> linesForType = new ArrayList<LineState>();
                 for (StormTrack track : tracksToUse) {
-                    LineState lineState = makeLine(track, type);
+                    LineState lineState=null;
+                    if(chartDifference && track.getWay().isObservation()) continue;
+
+
+                    if(track.getWay().isObservation()|| !chartDifference) {
+                        lineState= makeLine(track, type);
+                    } else {
+                        //TODO: make difference from observed
+                        track = StormDataSource.difference(obsTrack,
+                                                           track, type);
+                        if(track !=null) {
+                            lineState= makeLine(track, type);
+                        }
+                    }
                     if (lineState == null) {
                         continue;
                     }
@@ -1238,7 +1264,6 @@ public class StormDisplayState {
         RealType timeType =
             RealType.getRealType(DataUtil.cleanName("track_time" + cnt + "_"
                 + timeUnit), timeUnit);
-        System.err.println("Using type: " + type);
         RealTupleType rangeType    = null;
         double[][]    newRangeVals = new double[2][numPoints];
         float[]       alts         = new float[numPoints];
@@ -1586,6 +1611,24 @@ public class StormDisplayState {
     public DateTime getChartForecastTime() {
         return chartForecastTime;
     }
+
+/**
+Set the ChartDifference property.
+
+@param value The new value for ChartDifference
+**/
+public void setChartDifference (boolean value) {
+	chartDifference = value;
+}
+
+/**
+Get the ChartDifference property.
+
+@return The ChartDifference
+**/
+public boolean getChartDifference () {
+	return chartDifference;
+}
 
 
 
