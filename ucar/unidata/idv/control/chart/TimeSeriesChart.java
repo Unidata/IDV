@@ -151,6 +151,15 @@ public class TimeSeriesChart extends XYChartManager {
         super(control, chartName);
     }
 
+    private String dateFormat;
+    public void setDateFormat(String format) {
+        dateFormat = format;
+    }
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+
 
 
     /**
@@ -163,12 +172,136 @@ public class TimeSeriesChart extends XYChartManager {
             control.getControlContext().getIdv().getPreferenceManager();
         TimeZone   timeZone  = pref.getDefaultTimeZone();
         NumberAxis valueAxis = new FixedWidthNumberAxis("");
-        DateAxis timeAxis = new DateAxis("Time (" + timeZone.getID() + ")",
-                                         timeZone);
-
-        SimpleDateFormat sdf =
-            new SimpleDateFormat(pref.getDefaultDateFormat());
+        final SimpleDateFormat sdf =
+            new SimpleDateFormat((dateFormat!=null?dateFormat:pref.getDefaultDateFormat()));
         sdf.setTimeZone(timeZone);
+        DateAxis timeAxis = new DateAxis("Time (" + timeZone.getID() + ")",
+                                         timeZone) {
+
+    protected List xxxxxrefreshTicksHorizontal(Graphics2D g2,
+                                          Rectangle2D dataArea,
+                                          RectangleEdge edge) {
+
+        List ticks = super.refreshTicksHorizontal(g2,
+                                                  dataArea,
+                                                  edge);
+        
+        List result = new java.util.ArrayList();
+
+        Font tickLabelFont = getTickLabelFont();
+        g2.setFont(tickLabelFont);
+
+        if (isAutoTickUnitSelection()) {
+            selectAutoTickUnit(g2, dataArea, edge);
+        }
+
+        DateTickUnit unit = getTickUnit();
+        Date tickDate = calculateLowestVisibleTickValue(unit);
+        Date upperDate = getMaximumDate();
+
+        Date firstDate = null;
+        while (tickDate.before(upperDate)) {
+
+            if (!isHiddenValue(tickDate.getTime())) {
+                // work out the value, label and position
+                String tickLabel;
+                DateFormat formatter = getDateFormatOverride();
+                if(firstDate==null) {
+                    if (formatter != null) {
+                        tickLabel = formatter.format(tickDate);
+                    }  else {
+                        tickLabel = getTickUnit().dateToString(tickDate);
+                    }
+                    firstDate = tickDate;
+                } else {
+                    double msdiff = tickDate.getTime()-firstDate.getTime();
+                    int hours = (int)(msdiff/1000/60/60);
+                    tickLabel = hours+"H";
+                }
+                //                tickLabel = tickLabel;
+                TextAnchor anchor = null;
+                TextAnchor rotationAnchor = null;
+                double angle = 0.0;
+                if (isVerticalTickLabels()) {
+                    anchor = TextAnchor.CENTER_RIGHT;
+                    rotationAnchor = TextAnchor.CENTER_RIGHT;
+                    if (edge == RectangleEdge.TOP) {
+                        angle = Math.PI / 2.0;
+                    }
+                    else {
+                        angle = -Math.PI / 2.0;
+                    }
+                }
+                else {
+                    if (edge == RectangleEdge.TOP) {
+                        anchor = TextAnchor.BOTTOM_CENTER;
+                        rotationAnchor = TextAnchor.BOTTOM_CENTER;
+                    }
+                    else {
+                        anchor = TextAnchor.TOP_CENTER;
+                        rotationAnchor = TextAnchor.TOP_CENTER;
+                    }
+                }
+
+                Tick tick = new DateTick(tickDate, tickLabel, anchor, 
+                        rotationAnchor, angle);
+                result.add(tick);
+                tickDate = unit.addToDate(tickDate, getTimeZone());
+            }
+            else {
+                tickDate = unit.rollDate(tickDate, getTimeZone());
+                continue;
+            }
+
+            // could add a flag to make the following correction optional...
+            switch (unit.getUnit()) {
+
+                case (DateTickUnit.MILLISECOND) :
+                case (DateTickUnit.SECOND) :
+                case (DateTickUnit.MINUTE) :
+                case (DateTickUnit.HOUR) :
+                case (DateTickUnit.DAY) :
+                    break;
+                case (DateTickUnit.MONTH) :
+                    tickDate = calculateDateForPositionX(new Month(tickDate,
+                            getTimeZone()), getTickMarkPosition());
+                    break;
+                case(DateTickUnit.YEAR) :
+                    tickDate = calculateDateForPositionX(new Year(tickDate, 
+                                                                 getTimeZone()), getTickMarkPosition());
+                    break;
+
+                default: break;
+
+            }
+
+        }
+        return result;
+
+    }
+
+    private Date calculateDateForPositionX(RegularTimePeriod period, 
+                                          DateTickMarkPosition position) {
+        
+        if (position == null) {
+            throw new IllegalArgumentException("Null 'position' argument.");   
+        }
+        Date result = null;
+        if (position == DateTickMarkPosition.START) {
+            result = new Date(period.getFirstMillisecond());
+        }
+        else if (position == DateTickMarkPosition.MIDDLE) {
+            result = new Date(period.getMiddleMillisecond());
+        }
+        else if (position == DateTickMarkPosition.END) {
+            result = new Date(period.getLastMillisecond());
+        }
+        return result;
+
+    }
+
+
+            };
         timeAxis.setDateFormatOverride(sdf);
 
         final XYPlot[] xyPlotHolder = { null };

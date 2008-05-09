@@ -141,6 +141,8 @@ public class StormDisplayState {
     /** _more_ */
     private JPanel chartLeft;
 
+    private JPanel chartTop;
+
 
     /** _more_ */
     private boolean madeChart = false;
@@ -547,9 +549,10 @@ public class StormDisplayState {
         }
 
         wayComp   = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
+        chartTop = new JPanel(new BorderLayout());
         chartLeft = new JPanel(new BorderLayout());
         JComponent chartComp = GuiUtils.leftCenter(chartLeft,
-                                   getChart().getContents());
+                                                   GuiUtils.topCenter(chartTop,getChart().getContents()));
 
         tabbedPane = GuiUtils.getNestedTabbedPane();
         tabbedPane.addTab("Tracks", wayComp);
@@ -579,6 +582,7 @@ public class StormDisplayState {
                 protected void makeInitialChart() {}
             };
             timeSeries.showAnimationTime(true);
+            timeSeries.setDateFormat("MM/dd HH:mm z");
         }
         return timeSeries;
     }
@@ -814,7 +818,7 @@ public class StormDisplayState {
         }
         madeChart = true;
         List<DateTime> forecastTimes = findChartForecastTimes();
-        final JCheckBox chartDiffCbx = new JCheckBox("Difference", chartDifference);
+        final JCheckBox chartDiffCbx = new JCheckBox("Use Difference", chartDifference);
         chartDiffCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 chartDifference = chartDiffCbx.isSelected();
@@ -865,12 +869,13 @@ public class StormDisplayState {
             }
         }
 
+        Insets inset = new Insets(2,7,0,0);
         List cbxs = new ArrayList();
-        cbxs.add(GuiUtils.label("Time: ", chartTimeBox));
+        cbxs.add(GuiUtils.lLabel("Time:"));
+        cbxs.add(GuiUtils.inset(chartTimeBox,inset));
         cbxs.add(chartDiffCbx);
-        cbxs.add(GuiUtils.filler(5, 10));
         List<Way> ways = Misc.sort(trackCollection.getWayList());
-        cbxs.add(new JLabel(stormTrackControl.getWaysName() + ":"));
+        List wayComps = new ArrayList();
         for (Way way : ways) {
             final Way theWay = way;
             if (way.isObservation() && !chartWays.contains(way)) {
@@ -887,11 +892,23 @@ public class StormDisplayState {
                     }
                 }
             });
-            cbxs.add(cbx);
+            if (way.isObservation()) {
+                wayComps.add(cbx);
+            } else {
+                wayComps.add(0,cbx);
+            }
         }
 
-        cbxs.add(new JLabel(" "));
-        cbxs.add(new JLabel("Parameters:"));
+        cbxs.add(GuiUtils.filler(5, 10));
+        cbxs.add(new JLabel(stormTrackControl.getWaysName() + ":"));
+        JComponent chartWayComp = GuiUtils.vbox(wayComps);
+        if(wayComps.size()>6) {
+            chartWayComp =  makeScroller(chartWayComp, 50,100);
+        }
+        cbxs.add(GuiUtils.inset(chartWayComp,inset));
+
+
+        List paramComps = new ArrayList();
         for (RealType type : types) {
             final RealType  theRealType   = type;
             boolean         useChartParam = chartParams.contains(theRealType);
@@ -906,14 +923,38 @@ public class StormDisplayState {
                     }
                 }
             });
-            cbxs.add(cbx);
+            paramComps.add(cbx);
         }
+        cbxs.add(GuiUtils.filler(5, 10));
+        cbxs.add(new JLabel("Parameters:"));
+        JComponent paramComp = GuiUtils.vbox(paramComps);
+        if(paramComps.size()>6) {
+            paramComp =  makeScroller(paramComp, 50,100);
+        }
+        cbxs.add(GuiUtils.inset(paramComp,inset));
+
+        //        JComponent top = GuiUtils.left(GuiUtils.hbox(
+        //                                                     GuiUtils.label("Forecast Time: ", chartTimeBox),
+        //                                                     chartDiffCbx));
+        //        top = GuiUtils.inset(top,5);
+        //        chartTop.add(BorderLayout.NORTH, top);
+
         chartLeft.add(BorderLayout.NORTH,
                       GuiUtils.inset(GuiUtils.vbox(cbxs), 5));
         chartLeft.invalidate();
         chartLeft.validate();
         chartLeft.repaint();
     }
+
+    JScrollPane makeScroller(JComponent comp, int width, int height) {
+        JScrollPane scroller = GuiUtils.makeScrollPane(comp, width,
+                                                       height);
+        scroller.setBorder(BorderFactory.createLoweredBevelBorder());
+        scroller.setPreferredSize(new Dimension(width, height));
+        scroller.setMinimumSize(new Dimension(width, height));
+        return scroller;
+    }
+
 
     /**
      * _more_
@@ -1079,23 +1120,20 @@ public class StormDisplayState {
                 List<LineState> linesForType = new ArrayList<LineState>();
                 for (StormTrack track : tracksToUse) {
                     LineState lineState=null;
-                    if(chartDifference && track.getWay().isObservation()) continue;
-
-
-                    if(track.getWay().isObservation()|| !chartDifference) {
-                        lineState= makeLine(track, type);
-                    } else {
-                        //TODO: make difference from observed
+                    if(chartDifference && canDoDifference(type)) {
+                        if(track.getWay().isObservation()) continue;
                         track = StormDataSource.difference(obsTrack,
                                                            track, type);
                         if(track !=null) {
                             lineState= makeLine(track, type);
                         }
+                    } else {
+                        lineState= makeLine(track, type);
                     }
                     if (lineState == null) {
                         continue;
                     }
-                    //Check for nans
+                    //Only add it if there are values
                     if (lineState.getRange().getMin()
                             == lineState.getRange().getMin()) {
                         linesForType.add(lineState);
@@ -1118,17 +1156,16 @@ public class StormDisplayState {
                 }
                 lines.addAll(linesForType);
             }
-
-
-
-
-
-
-
             getChart().setTracks(lines);
         } catch (Exception exc) {
             stormTrackControl.logException("Updating chart", exc);
         }
+    }
+
+
+    private boolean canDoDifference(RealType type) {
+        if(type.equals(StormDataSource.TYPE_DISTANCEERROR)) return false;
+        return true;
     }
 
 
