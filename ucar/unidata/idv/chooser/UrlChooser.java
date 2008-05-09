@@ -228,19 +228,19 @@ public class UrlChooser extends IdvChooser implements ActionListener {
     private void loadURLInner() {
 
         String url = "";
+        String    dataSourceId = getDataSourceId();
         if (showBox) {
             Object selectedItem = box.getSelectedItem();
             if (selectedItem != null) {
                 url = selectedItem.toString().trim();
             }
-            if (url.length() == 0) {
+            if (url.length() == 0 && dataSourceId == null) {
                 userMessage("Please specify a url");
                 return;
             }
         }
 
         Hashtable properties   = new Hashtable();
-        String    dataSourceId = getDataSourceId();
         if (dataSourceId != null) {
             properties.put(DataManager.DATATYPE_ID, dataSourceId);
         }
