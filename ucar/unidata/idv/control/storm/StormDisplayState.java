@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -136,7 +137,7 @@ public class StormDisplayState {
     /** _more_ */
     private static int[] nextColor = { 0 };
 
-    /** _more_          */
+    /** _more_ */
     private List<StormTrackChart> charts = new ArrayList<StormTrackChart>();
 
 
@@ -563,7 +564,9 @@ public class StormDisplayState {
         tabbedPane.addTab("Tracks", wayComp);
 
         if (charts.size() == 0) {
-            charts.add(new StormTrackChart(this, "Storm Chart"));
+            charts.add(
+                new StormTrackChart(
+                    this, "Storm Chart", StormTrackChart.MODE_FORECASTTIME));
         }
         for (StormTrackChart stormTrackChart : charts) {
             tabbedPane.addTab(stormTrackChart.getName(),
@@ -1045,32 +1048,51 @@ public class StormDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param stormTrackChart _more_
+     */
     protected void removeChart(StormTrackChart stormTrackChart) {
         charts.remove(stormTrackChart);
         tabbedPane.remove(stormTrackChart.getContents());
     }
 
+
+    /**
+     * _more_
+     */
     public void addForecastTimeChart() {
-        String chartName = GuiUtils.getInput("Please enter a chart name","Chart Name: ", "Storm Chart");
-        if(chartName == null) return;
-        StormTrackChart stormTrackChart = new  StormTrackChart(this, chartName);
-        charts.add(stormTrackChart);
-        tabbedPane.addTab(stormTrackChart.getName(),
-                          stormTrackChart.getContents());
-        stormTrackChart.updateChart();
-
+        addForecastChart(StormTrackChart.MODE_FORECASTTIME);
     }
 
+    /**
+     * _more_
+     */
     public void addForecastHourChart() {
-        String chartName = GuiUtils.getInput("Please enter a chart name","Chart Name: ", "Storm Chart");
-        if(chartName == null) return;
-        StormTrackChart stormTrackChart = new  StormTrackChart(this, chartName);
+        addForecastChart(StormTrackChart.MODE_FORECASTHOUR);
+    }
+
+    /**
+     * _more_
+     *
+     * @param mode _more_
+     */
+    public void addForecastChart(int mode) {
+        String chartName = GuiUtils.getInput("Please enter a chart name",
+                                             "Chart Name: ", "Storm Chart");
+        if (chartName == null) {
+            return;
+        }
+        StormTrackChart stormTrackChart = new StormTrackChart(this,
+                                              chartName, mode);
         charts.add(stormTrackChart);
         tabbedPane.addTab(stormTrackChart.getName(),
                           stormTrackChart.getContents());
         stormTrackChart.updateChart();
 
     }
+
 
     /**
      * _more_

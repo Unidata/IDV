@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -128,7 +129,16 @@ import javax.swing.table.*;
 public class StormTrackChart {
 
     /** _more_          */
+    public static final int MODE_FORECASTTIME = 0;
+
+    /** _more_          */
+    public static final int MODE_FORECASTHOUR = 1;
+
+    /** _more_ */
     private StormDisplayState stormDisplayState;
+
+    /** _more_          */
+    private int mode;
 
     /** _more_ */
     private TimeSeriesChart timeSeries;
@@ -136,14 +146,16 @@ public class StormTrackChart {
     /** _more_ */
     private JPanel chartLeft;
 
-    /** _more_          */
+    /** _more_ */
     private JPanel chartTop;
 
     /** _more_ */
     private boolean madeChart = false;
 
     /** _more_ */
-    private DateTime chartForecastTime;
+    private DateTime forecastTime;
+
+    private int forecastHour=0;
 
     /** _more_ */
     private List<RealType> chartParams = new ArrayList();
@@ -151,7 +163,7 @@ public class StormTrackChart {
     /** _more_ */
     private List<Way> chartWays = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private boolean chartDifference = false;
 
 
@@ -162,11 +174,11 @@ public class StormTrackChart {
     private boolean ignoreChartTimeChanges = false;
 
 
-    /** _more_          */
+    /** _more_ */
     private JComponent contents;
 
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
     /**
@@ -186,10 +198,27 @@ public class StormTrackChart {
      * @throws Exception _more_
      */
     public StormTrackChart(StormDisplayState stormDisplayState, String name) {
-        this.stormDisplayState = stormDisplayState;
-        this.name = name;
+        this(stormDisplayState, name, MODE_FORECASTTIME);
     }
 
+    /**
+     * _more_
+     *
+     * @param stormDisplayState _more_
+     * @param name _more_
+     * @param mode _more_
+     */
+    public StormTrackChart(StormDisplayState stormDisplayState, String name,
+                           int mode) {
+        this.stormDisplayState = stormDisplayState;
+        this.name              = name;
+        this.mode              = mode;
+    }
+
+
+    protected boolean isHourly() {
+        return mode == MODE_FORECASTHOUR;
+    }
 
     /**
      * _more_
@@ -284,7 +313,7 @@ public class StormTrackChart {
      *
      * @return _more_
      */
-    private List<DateTime> findChartForecastTimes() {
+    private List<DateTime> findForecastTimes() {
         List<DateTime> forecastTimes    = new ArrayList<DateTime>();
         Hashtable      seenForecastTime = new Hashtable();
         for (StormTrack track : stormDisplayState.getTrackCollection()
@@ -307,6 +336,34 @@ public class StormTrackChart {
 
     /**
      * _more_
+     *
+     * @return _more_
+     */
+    private List<Integer> findForecastHours() {
+        List<Integer> forecastHours    = new ArrayList<Integer>();
+        Hashtable      seenForecastHour = new Hashtable();
+        Hashtable seen = new Hashtable();
+        for (StormTrack track : stormDisplayState.getTrackCollection().getTracks()) {
+            if (track.getWay().isObservation()) {
+                continue;
+            }
+            if (!chartWays.contains(track.getWay())) {
+                continue;
+            }
+            for(StormTrackPoint stormTrackPoint: track.getTrackPoints()) {
+                Integer forecastHour = new Integer(stormTrackPoint.getForecastHour());
+                if (seenForecastHour.get(forecastHour) == null) {
+                    seenForecastHour.put(forecastHour, forecastHour);
+                    forecastHours.add(forecastHour);
+                }
+            }
+        }
+        return (List<Integer>) Misc.sort(forecastHours);
+    }
+
+
+    /**
+     * _more_
      */
     protected void createChart() {
 
@@ -314,7 +371,7 @@ public class StormTrackChart {
             return;
         }
         madeChart = true;
-        List<DateTime> forecastTimes = findChartForecastTimes();
+        List<DateTime> forecastTimes = findForecastTimes();
         final JCheckBox chartDiffCbx = new JCheckBox("Use Difference",
                                            chartDifference);
         chartDiffCbx.addActionListener(new ActionListener() {
@@ -324,16 +381,24 @@ public class StormTrackChart {
             }
         });
 
-        chartTimeBox = new JComboBox(new Vector(forecastTimes));
+        chartTimeBox = new JComboBox();
         chartTimeBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (ignoreChartTimeChanges) {
                     return;
                 }
-                DateTime dateTime = (DateTime) chartTimeBox.getSelectedItem();
-                if ( !Misc.equals(dateTime, chartForecastTime)) {
-                    chartForecastTime = dateTime;
-                    updateChart();
+                if(isHourly()) {
+                    int hour  =  (Integer) ((TwoFacedObject)chartTimeBox.getSelectedItem()).getId();
+                    if (forecastHour!=hour) {
+                        forecastHour = hour;
+                        updateChart();
+                    }
+                } else {
+                    DateTime dateTime = (DateTime) chartTimeBox.getSelectedItem();
+                    if ( !Misc.equals(dateTime, forecastTime)) {
+                        forecastTime = dateTime;
+                        updateChart();
+                    }
                 }
             }
         });
@@ -346,7 +411,9 @@ public class StormTrackChart {
         List<RealType> types = new ArrayList<RealType>();
         for (StormTrack track : stormDisplayState.getTrackCollection()
                 .getTracks()) {
-            if(track == null) continue;
+            if (track == null) {
+                continue;
+            }
             if ( !track.isObservation()) {
                 types = track.getTypes();
                 break;
@@ -366,7 +433,7 @@ public class StormTrackChart {
 
         Insets inset      = new Insets(2, 7, 0, 0);
         List   chartComps = new ArrayList();
-        chartComps.add(GuiUtils.lLabel("Time:"));
+        chartComps.add(GuiUtils.lLabel((isHourly()?"Forecast Hour:":"Forecast Time:")));
         chartComps.add(GuiUtils.inset(chartTimeBox, inset));
         List<Way> ways =
             Misc.sort(stormDisplayState.getTrackCollection().getWayList());
@@ -433,11 +500,12 @@ public class StormTrackChart {
         chartComps.add(GuiUtils.inset(paramComp, inset));
         chartComps.add(chartDiffCbx);
 
-        JButton removeBtn = GuiUtils.makeButton("Remove Chart", this, "removeChart");
+        JButton removeBtn = GuiUtils.makeButton("Remove Chart", this,
+                                "removeChart");
         chartComps.add(GuiUtils.filler(5, 10));
         chartComps.add(removeBtn);
 
-        
+
 
         //        JComponent top = GuiUtils.left(GuiUtils.hbox(
         //                                                     GuiUtils.label("Forecast Time: ", chartTimeBox),
@@ -453,8 +521,12 @@ public class StormTrackChart {
 
     }
 
+    /**
+     * _more_
+     */
     public void removeChart() {
-        if(GuiUtils.askOkCancel("Remove Chart", "Do you want to remove this chart?")) {
+        if (GuiUtils.askOkCancel("Remove Chart",
+                                 "Do you want to remove this chart?")) {
             stormDisplayState.removeChart(this);
 
         }
@@ -607,24 +679,32 @@ public class StormTrackChart {
      */
     protected void updateChart() {
         try {
-            if(!madeChart) {
+            if ( !madeChart) {
                 createChart();
             }
-            List<DateTime> forecastTimes = findChartForecastTimes();
-
-            if (forecastTimes.size() > 0) {
-                if ((chartForecastTime == null)
-                        || !forecastTimes.contains(chartForecastTime)) {
-                    chartForecastTime = forecastTimes.get(0);
-                }
-            }
-
 
             ignoreChartTimeChanges = true;
-            GuiUtils.setListData(chartTimeBox, forecastTimes);
-            chartTimeBox.setSelectedItem(chartForecastTime);
-            chartTimeBox.repaint();
+            if(isHourly()) {
+                List<Integer>  forecastHours = findForecastHours();
+                List tfos = new ArrayList();
+                for(Integer i:forecastHours) {
+                    tfos.add(new TwoFacedObject(i+"H", i));
+                }
+                GuiUtils.setListData(chartTimeBox,tfos);
+                chartTimeBox.setSelectedItem(TwoFacedObject.findId(new Integer(forecastHour), tfos));
+            } else {
+                List<DateTime> forecastTimes = findForecastTimes();
+                if (forecastTimes.size() > 0) {
+                    if ((forecastTime == null)
+                        || !forecastTimes.contains(forecastTime)) {
+                        forecastTime = forecastTimes.get(0);
+                    }
+                }
+                GuiUtils.setListData(chartTimeBox, forecastTimes);
+                chartTimeBox.setSelectedItem(forecastTime);
+            }
             ignoreChartTimeChanges = false;
+            chartTimeBox.repaint();
             Hashtable useWay = new Hashtable();
             for (Way way : chartWays) {
                 useWay.put(way, way);
@@ -635,7 +715,7 @@ public class StormTrackChart {
                     .getTracks()) {
                 if (useWay.get(track.getWay()) != null) {
                     if (track.getWay().isObservation()
-                            || Misc.equals(chartForecastTime,
+                            || Misc.equals(forecastTime,
                                            track.getTrackStartTime())) {
                         tracksToUse.add(track);
                     }
@@ -755,8 +835,8 @@ public class StormTrackChart {
      *
      *  @param value The new value for ChartForecastTime
      */
-    public void setChartForecastTime(DateTime value) {
-        chartForecastTime = value;
+    public void setForecastTime(DateTime value) {
+        forecastTime = value;
     }
 
     /**
@@ -764,8 +844,8 @@ public class StormTrackChart {
      *
      *  @return The ChartForecastTime
      */
-    public DateTime getChartForecastTime() {
-        return chartForecastTime;
+    public DateTime getForecastTime() {
+        return forecastTime;
     }
 
     /**
@@ -807,22 +887,62 @@ public class StormTrackChart {
 
 
     /**
-       Set the StormDisplayState property.
-
-       @param value The new value for StormDisplayState
-    **/
-    public void setStormDisplayState (StormDisplayState value) {
-	stormDisplayState = value;
+     *  Set the StormDisplayState property.
+     *
+     *  @param value The new value for StormDisplayState
+     */
+    public void setStormDisplayState(StormDisplayState value) {
+        stormDisplayState = value;
     }
 
     /**
-       Get the StormDisplayState property.
-
-       @return The StormDisplayState
-    **/
-    public StormDisplayState getStormDisplayState () {
-	return stormDisplayState;
+     *  Get the StormDisplayState property.
+     *
+     *  @return The StormDisplayState
+     */
+    public StormDisplayState getStormDisplayState() {
+        return stormDisplayState;
     }
+
+    /**
+     * Set the Mode property.
+     *
+     * @param value The new value for Mode
+     */
+    public void setMode(int value) {
+        mode = value;
+    }
+
+    /**
+     * Get the Mode property.
+     *
+     * @return The Mode
+     */
+    public int getMode() {
+        return mode;
+    }
+
+
+/**
+Set the ForecastHour property.
+
+@param value The new value for ForecastHour
+**/
+public void setForecastHour (int value) {
+	forecastHour = value;
+}
+
+/**
+Get the ForecastHour property.
+
+@return The ForecastHour
+**/
+public int getForecastHour () {
+	return forecastHour;
+}
+
+
+
 
 
 }
