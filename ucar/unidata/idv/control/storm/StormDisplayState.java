@@ -1045,8 +1045,26 @@ public class StormDisplayState {
     }
 
 
-    public void addChart() {
-        StormTrackChart stormTrackChart = new  StormTrackChart(this, "Storm Chart");
+    protected void removeChart(StormTrackChart stormTrackChart) {
+        charts.remove(stormTrackChart);
+        tabbedPane.remove(stormTrackChart.getContents());
+    }
+
+    public void addForecastTimeChart() {
+        String chartName = GuiUtils.getInput("Please enter a chart name","Chart Name: ", "Storm Chart");
+        if(chartName == null) return;
+        StormTrackChart stormTrackChart = new  StormTrackChart(this, chartName);
+        charts.add(stormTrackChart);
+        tabbedPane.addTab(stormTrackChart.getName(),
+                          stormTrackChart.getContents());
+        stormTrackChart.updateChart();
+
+    }
+
+    public void addForecastHourChart() {
+        String chartName = GuiUtils.getInput("Please enter a chart name","Chart Name: ", "Storm Chart");
+        if(chartName == null) return;
+        StormTrackChart stormTrackChart = new  StormTrackChart(this, chartName);
         charts.add(stormTrackChart);
         tabbedPane.addTab(stormTrackChart.getName(),
                           stormTrackChart.getContents());

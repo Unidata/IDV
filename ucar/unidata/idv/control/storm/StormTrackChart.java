@@ -432,6 +432,12 @@ public class StormTrackChart {
         chartComps.add(GuiUtils.inset(paramComp, inset));
         chartComps.add(chartDiffCbx);
 
+        JButton removeBtn = GuiUtils.makeButton("Remove Chart", this, "removeChart");
+        chartComps.add(GuiUtils.filler(5, 10));
+        chartComps.add(removeBtn);
+
+        
+
         //        JComponent top = GuiUtils.left(GuiUtils.hbox(
         //                                                     GuiUtils.label("Forecast Time: ", chartTimeBox),
         //                                                     chartDiffCbx));
@@ -443,6 +449,14 @@ public class StormTrackChart {
         chartLeft.invalidate();
         chartLeft.validate();
         chartLeft.repaint();
+
+    }
+
+    public void removeChart() {
+        if(GuiUtils.askOkCancel("Remove Chart", "Do you want to remove this chart?")) {
+            stormDisplayState.removeChart(this);
+
+        }
 
     }
 

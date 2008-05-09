@@ -331,7 +331,8 @@ public class StormTrackControl extends DisplayControlImpl {
         StormDisplayState     current          =
             getCurrentStormDisplayState();
         if(current!=null && current.getActive()) {
-            items.add(GuiUtils.makeMenuItem("Add Chart", current, "addChart"));
+            items.add(GuiUtils.makeMenuItem("Add Forecast Time Chart", current, "addForecastTimeChart"));
+            items.add(GuiUtils.makeMenuItem("Add Forecast Hour Chart", current, "addForecastHourChart"));
         }
 
         super.getEditMenuItems(items,  forMenuBar);
