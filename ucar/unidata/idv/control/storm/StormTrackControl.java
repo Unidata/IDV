@@ -160,20 +160,19 @@ public class StormTrackControl extends DisplayControlImpl {
     public void showWaySelectDialog() {
         List                  checkBoxes       = new ArrayList();
         List                  useWays          = new ArrayList();
-        List                  allWays          = new ArrayList();
+        List                  allWays          = new ArrayList<Way>();
         StormDisplayState     current          =
             getCurrentStormDisplayState();
         List<WayDisplayState> wayDisplayStates =
             current.getWayDisplayStates();
-        for (WayDisplayState wayDisplayState : wayDisplayStates) {
-            Way way = wayDisplayState.getWay();
+        for (Way way: stormDataSource.getWays()) {
             if (way.isObservation()) {
                 continue;
             }
+            allWays.add(way);
             if (okToShowWay(way)) {
                 useWays.add(way);
             }
-            allWays.add(way);
         }
         useWays = Misc.sort(useWays);
         allWays = Misc.sort(allWays);

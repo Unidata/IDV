@@ -243,6 +243,24 @@ public abstract class StormDataSource extends DataSourceImpl {
      throws Exception;
 
 
+
+
+    private Hashtable seenWays = new Hashtable();
+    private List<Way> ways = new ArrayList();
+
+    protected Way addWay(Way way) {
+        if(seenWays.get(way) ==null) {
+            seenWays.put(way,way);
+            ways.add(way);
+        }
+        return way;
+    }
+
+
+    public List<Way> getWays() {
+        return new ArrayList<Way>(ways);
+    }
+
     /**
      * _more_
      *

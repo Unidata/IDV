@@ -346,6 +346,7 @@ public class StormTrackChart {
         List<RealType> types = new ArrayList<RealType>();
         for (StormTrack track : stormDisplayState.getTrackCollection()
                 .getTracks()) {
+            if(track == null) continue;
             if ( !track.isObservation()) {
                 types = track.getTypes();
                 break;
@@ -802,6 +803,25 @@ public class StormTrackChart {
      */
     public String getName() {
         return name;
+    }
+
+
+    /**
+       Set the StormDisplayState property.
+
+       @param value The new value for StormDisplayState
+    **/
+    public void setStormDisplayState (StormDisplayState value) {
+	stormDisplayState = value;
+    }
+
+    /**
+       Get the StormDisplayState property.
+
+       @return The StormDisplayState
+    **/
+    public StormDisplayState getStormDisplayState () {
+	return stormDisplayState;
     }
 
 

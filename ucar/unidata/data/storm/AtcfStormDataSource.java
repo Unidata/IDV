@@ -262,7 +262,7 @@ public class AtcfStormDataSource extends StormDataSource {
                 way   = (isBest
                          ? Way.OBSERVATION
                          : way);
-                track = new StormTrack(stormInfo, way, new DateTime(dttm));
+                track = new StormTrack(stormInfo, addWay(way), new DateTime(dttm));
                 trackMap.put(key, track);
                 tracks.addTrack(track);
             }
