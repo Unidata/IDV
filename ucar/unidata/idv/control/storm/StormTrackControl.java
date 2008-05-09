@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -37,8 +38,9 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.visad.display.*;
 import ucar.visad.Util;
+
+import ucar.visad.display.*;
 
 import visad.*;
 
@@ -80,7 +82,10 @@ public class StormTrackControl extends DisplayControlImpl {
                                                     Boolean>();
 
 
+    /** _more_          */
     private String startTime;
+
+    /** _more_          */
     private String endTime;
 
     /** _more_ */
@@ -322,6 +327,16 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    protected void getEditMenuItems(List items, boolean forMenuBar) {
+        StormDisplayState     current          =
+            getCurrentStormDisplayState();
+        if(current!=null && current.getActive()) {
+            items.add(GuiUtils.makeMenuItem("Add Chart", current, "addChart"));
+        }
+
+        super.getEditMenuItems(items,  forMenuBar);
+    }
+
 
     /**
      * _more_
@@ -551,24 +566,27 @@ public class StormTrackControl extends DisplayControlImpl {
         contents.setPreferredSize(new Dimension(500, 400));
 
 
-        if(startTime!=null && endTime!=null) {
+        if ((startTime != null) && (endTime != null)) {
             try {
 
-                Date[]range = DateUtil.getDateRange(startTime, endTime, new Date());
+                Date[] range = DateUtil.getDateRange(startTime, endTime,
+                                   new Date());
                 double fromDate = range[0].getTime();
-                double toDate = range[1].getTime();
-                for(StormInfo stormInfo: stormInfos) {
-                    double date = Util.makeDate(stormInfo.getStartTime()).getTime();
+                double toDate   = range[1].getTime();
+                for (StormInfo stormInfo : stormInfos) {
+                    double date =
+                        Util.makeDate(stormInfo.getStartTime()).getTime();
                     StormDisplayState stormDisplayState =
                         getStormDisplayState(stormInfo);
-                    if(date>=fromDate && date<=toDate) {
+                    if ((date >= fromDate) && (date <= toDate)) {
                         stormDisplayState.loadStorm();
-                    } else if(stormDisplayState.getActive()) {
+                    } else if (stormDisplayState.getActive()) {
                         stormDisplayState.deactivate();
                     }
                 }
-            } catch(java.text.ParseException pe) {
-                logException("Error parsing start/end dates:" + startTime +" " + endTime, pe);
+            } catch (java.text.ParseException pe) {
+                logException("Error parsing start/end dates:" + startTime
+                             + " " + endTime, pe);
             }
         }
 
@@ -802,41 +820,41 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-/**
-Set the StartTime property.
+    /**
+     * Set the StartTime property.
+     *
+     * @param value The new value for StartTime
+     */
+    public void setStartTime(String value) {
+        startTime = value;
+    }
 
-@param value The new value for StartTime
-**/
-public void setStartTime (String value) {
-	startTime = value;
-}
+    /**
+     * Get the StartTime property.
+     *
+     * @return The StartTime
+     */
+    public String getStartTime() {
+        return startTime;
+    }
 
-/**
-Get the StartTime property.
+    /**
+     * Set the EndTime property.
+     *
+     * @param value The new value for EndTime
+     */
+    public void setEndTime(String value) {
+        endTime = value;
+    }
 
-@return The StartTime
-**/
-public String getStartTime () {
-	return startTime;
-}
-
-/**
-Set the EndTime property.
-
-@param value The new value for EndTime
-**/
-public void setEndTime (String value) {
-	endTime = value;
-}
-
-/**
-Get the EndTime property.
-
-@return The EndTime
-**/
-public String getEndTime () {
-	return endTime;
-}
+    /**
+     * Get the EndTime property.
+     *
+     * @return The EndTime
+     */
+    public String getEndTime() {
+        return endTime;
+    }
 
 
 
