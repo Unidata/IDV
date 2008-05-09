@@ -74,7 +74,7 @@ public class RequestUrl {
      * @return _more_
      */
     public String getFullUrl(String suffix) {
-        return repositorySource.getRepository().absoluteUrl(path) + suffix;
+        return repositorySource.getRepository().absoluteUrl(repositorySource.getRepository().getUrlBase()+path) +  suffix;
     }
 
 
@@ -84,7 +84,7 @@ public class RequestUrl {
      * @return _more_
      */
     public String getFullUrl() {
-        return repositorySource.getRepository().absoluteUrl(path);
+        return repositorySource.getRepository().absoluteUrl(repositorySource.getRepository().getUrlBase() + path);
     }
 
     /**

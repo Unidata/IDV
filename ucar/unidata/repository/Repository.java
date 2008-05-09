@@ -6381,7 +6381,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     public String absoluteUrl(String url) {
-        return "http://" + hostname + ":" + port + getUrlBase() +"" +url;
+        return "http://" + hostname + ":" + port + url;
     }
 
 
