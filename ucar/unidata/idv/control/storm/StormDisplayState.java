@@ -358,6 +358,13 @@ public class StormDisplayState {
         }
     }
 
+    public void loadStorm() {
+        if(active) return;
+        active = true;
+        showStorm();
+    }
+
+
 
     /**
      * _more_
@@ -369,8 +376,7 @@ public class StormDisplayState {
         JLabel  topLabel = GuiUtils.cLabel("  " + stormInfo);
         loadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                active = true;
-                showStorm();
+                loadStorm();
             }
         });
 
@@ -430,9 +436,18 @@ public class StormDisplayState {
 
 
 
-        List<RealType> attributeTypes = null;
-        if (trackCollection.getTracks().size() > 0) {
-            attributeTypes = trackCollection.getTracks().get(0).getTypes();
+        List<RealType> attributeTypes = new ArrayList<RealType>();
+        Hashtable seenTypes = new Hashtable();
+        Hashtable seenWays = new Hashtable();
+        for (StormTrack track : trackCollection.getTracks()) {
+            if(seenWays.get(track.getWay())!=null) continue;
+            seenWays.put(track.getWay(),track.getWay());
+            List<RealType> types = track.getTypes();
+            for(RealType realType: types) {
+                if(seenTypes.get(realType)!=null) continue;
+                seenTypes.put(realType,realType);
+                attributeTypes.add(realType);
+            }
         }
         Vector radiusAttrNames = null;
         Vector attrNames       = null;
@@ -840,12 +855,6 @@ public class StormDisplayState {
             }
         });
 
-        if (forecastTimes.size() > 0) {
-            if ((chartForecastTime == null)
-                    || !forecastTimes.contains(chartForecastTime)) {
-                chartForecastTime = forecastTimes.get(0);
-            }
-        }
 
 
 
@@ -870,10 +879,9 @@ public class StormDisplayState {
         }
 
         Insets inset = new Insets(2,7,0,0);
-        List cbxs = new ArrayList();
-        cbxs.add(GuiUtils.lLabel("Time:"));
-        cbxs.add(GuiUtils.inset(chartTimeBox,inset));
-        cbxs.add(chartDiffCbx);
+        List chartComps = new ArrayList();
+        chartComps.add(GuiUtils.lLabel("Time:"));
+        chartComps.add(GuiUtils.inset(chartTimeBox,inset));
         List<Way> ways = Misc.sort(trackCollection.getWayList());
         List wayComps = new ArrayList();
         for (Way way : ways) {
@@ -892,20 +900,20 @@ public class StormDisplayState {
                     }
                 }
             });
-            if (way.isObservation()) {
+            if (!way.isObservation()) {
                 wayComps.add(cbx);
             } else {
                 wayComps.add(0,cbx);
             }
         }
 
-        cbxs.add(GuiUtils.filler(5, 10));
-        cbxs.add(new JLabel(stormTrackControl.getWaysName() + ":"));
+        chartComps.add(GuiUtils.filler(5, 10));
+        chartComps.add(new JLabel(stormTrackControl.getWaysName() + ":"));
         JComponent chartWayComp = GuiUtils.vbox(wayComps);
         if(wayComps.size()>6) {
-            chartWayComp =  makeScroller(chartWayComp, 50,100);
+            chartWayComp =  makeScroller(chartWayComp, 75,150);
         }
-        cbxs.add(GuiUtils.inset(chartWayComp,inset));
+        chartComps.add(GuiUtils.inset(chartWayComp,inset));
 
 
         List paramComps = new ArrayList();
@@ -925,13 +933,14 @@ public class StormDisplayState {
             });
             paramComps.add(cbx);
         }
-        cbxs.add(GuiUtils.filler(5, 10));
-        cbxs.add(new JLabel("Parameters:"));
+        chartComps.add(GuiUtils.filler(5, 10));
+        chartComps.add(new JLabel("Parameters:"));
         JComponent paramComp = GuiUtils.vbox(paramComps);
         if(paramComps.size()>6) {
-            paramComp =  makeScroller(paramComp, 50,100);
+            paramComp =  makeScroller(paramComp, 75,150);
         }
-        cbxs.add(GuiUtils.inset(paramComp,inset));
+        chartComps.add(GuiUtils.inset(paramComp,inset));
+        chartComps.add(chartDiffCbx);
 
         //        JComponent top = GuiUtils.left(GuiUtils.hbox(
         //                                                     GuiUtils.label("Forecast Time: ", chartTimeBox),
@@ -940,7 +949,7 @@ public class StormDisplayState {
         //        chartTop.add(BorderLayout.NORTH, top);
 
         chartLeft.add(BorderLayout.NORTH,
-                      GuiUtils.inset(GuiUtils.vbox(cbxs), 5));
+                      GuiUtils.inset(GuiUtils.vbox(chartComps), 5));
         chartLeft.invalidate();
         chartLeft.validate();
         chartLeft.repaint();
@@ -1095,9 +1104,19 @@ public class StormDisplayState {
     private void updateChart() {
         try {
             List<DateTime> forecastTimes = findChartForecastTimes();
+
+            if (forecastTimes.size() > 0) {
+                if ((chartForecastTime == null)
+                    || !forecastTimes.contains(chartForecastTime)) {
+                    chartForecastTime = forecastTimes.get(0);
+                }
+            }
+
+
             ignoreChartTimeChanges = true;
             GuiUtils.setListData(chartTimeBox, forecastTimes);
             chartTimeBox.setSelectedItem(chartForecastTime);
+            chartTimeBox.repaint();
             ignoreChartTimeChanges = false;
             Hashtable useWay = new Hashtable();
             for (Way way : chartWays) {

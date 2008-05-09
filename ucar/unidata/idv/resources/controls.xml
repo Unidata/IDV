@@ -250,6 +250,16 @@ example:
      displaycategory="Trajectory"
      properties="displayName=Storm Track Track Control;windowVisible=true;"/>
 
+  <control
+     id="stormtrackcontrollatest"
+     categories="stormtrack"
+     class="ucar.unidata.idv.control.storm.StormTrackControl"
+     description="Latest Storm Track"
+     canstandalone="false"
+     label="Latest Storm Track"
+     displaycategory="Trajectory"
+     properties="startTime=-1 month;endTime=now;displayName=Storm Track Track Control;windowVisible=true;"/>
+
 
   <control
      id="multidisplay.standalone"

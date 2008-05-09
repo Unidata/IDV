@@ -38,6 +38,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.display.*;
+import ucar.visad.Util;
 
 import visad.*;
 
@@ -78,6 +79,9 @@ public class StormTrackControl extends DisplayControlImpl {
     private Hashtable<String, Boolean> okWays = new Hashtable<String,
                                                     Boolean>();
 
+
+    private String startTime;
+    private String endTime;
 
     /** _more_ */
     private CompositeDisplayable placeHolder;
@@ -278,6 +282,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
         getColorTableWidget(getRangeForColorTable());
         stormDataSource = (StormDataSource) dataSources.get(0);
+
 
         return true;
     }
@@ -544,6 +549,31 @@ public class StormTrackControl extends DisplayControlImpl {
         //        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
         //                                  scroller);
         contents.setPreferredSize(new Dimension(500, 400));
+
+
+        if(startTime!=null && endTime!=null) {
+            try {
+
+                Date[]range = DateUtil.getDateRange(startTime, endTime, new Date());
+                double fromDate = range[0].getTime();
+                double toDate = range[1].getTime();
+                for(StormInfo stormInfo: stormInfos) {
+                    double date = Util.makeDate(stormInfo.getStartTime()).getTime();
+                    StormDisplayState stormDisplayState =
+                        getStormDisplayState(stormInfo);
+                    if(date>=fromDate && date<=toDate) {
+                        stormDisplayState.loadStorm();
+                    } else if(stormDisplayState.getActive()) {
+                        stormDisplayState.deactivate();
+                    }
+                }
+            } catch(java.text.ParseException pe) {
+                logException("Error parsing start/end dates:" + startTime +" " + endTime, pe);
+            }
+        }
+
+
+
         return contents;
     }
 
@@ -767,6 +797,47 @@ public class StormTrackControl extends DisplayControlImpl {
     public Hashtable<String, Boolean> getOkWays() {
         return okWays;
     }
+
+
+
+
+
+/**
+Set the StartTime property.
+
+@param value The new value for StartTime
+**/
+public void setStartTime (String value) {
+	startTime = value;
+}
+
+/**
+Get the StartTime property.
+
+@return The StartTime
+**/
+public String getStartTime () {
+	return startTime;
+}
+
+/**
+Set the EndTime property.
+
+@param value The new value for EndTime
+**/
+public void setEndTime (String value) {
+	endTime = value;
+}
+
+/**
+Get the EndTime property.
+
+@return The EndTime
+**/
+public String getEndTime () {
+	return endTime;
+}
+
 
 
 
