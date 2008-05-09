@@ -85,7 +85,9 @@ line using: and -Dbasedir=/some/other/dir
         <property name="installer_src_dir" value="${release_src_dir}/installer" />
 
         <property name="sign_keystore" value="/upc/share/idv/.keystore"/>
-        <property name="sign_password" value="poohbear"/>
+        <property name="keypassfile" value="/upc/share/idv/.keypass"/>
+        <property file="${keypassfile}"/>
+        <available file="${keypassfile}" property="sign_password" value="${key.password}"/>
 
         <taskdef name="install4j"
                classname="com.install4j.Install4JTask"
