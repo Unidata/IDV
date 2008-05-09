@@ -101,7 +101,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        return false;
+        return true;
     }
 
     /**

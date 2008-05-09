@@ -89,19 +89,11 @@ import java.util.zip.ZipInputStream;
  * @author IDV Development Team
  * @version $Revision: 1.12 $
  */
-public class KmlGroundOverlay extends KmlInfo {
+public class KmlGroundOverlay extends KmlImageElement {
 
-    /** xml tags */
-    public static final String TAG_ICON = "Icon";
 
     /** xml tags */
     public static final String TAG_VIEWBOUNDSCALE = "viewBoundScale";
-
-    /** xml tags */
-    public static final String TAG_NAME = "name";
-
-    /** xml tags */
-    public static final String TAG_HREF = "href";
 
     /** xml tags */
     public static final String TAG_LATLONBOX = "LatLonBox";
@@ -120,15 +112,6 @@ public class KmlGroundOverlay extends KmlInfo {
 
     /** xml tags */
     public static final String TAG_ROTATION = "rotation";
-
-    /** url of the kml doc */
-    private String baseUrl;
-
-    /** name */
-    private String name;
-
-    /** url */
-    private String href;
 
     /** scale */
     private double viewBoundScale = 1.0;
@@ -164,41 +147,30 @@ public class KmlGroundOverlay extends KmlInfo {
      */
     public KmlGroundOverlay(Element node, String displayCategory,
                             String baseUrl) {
-        super(node, displayCategory, "RGBIMAGE");
-        this.baseUrl = baseUrl;
-        //      System.out.println ("node:" + XmlUtil.toString(node));
+        super(node, displayCategory, baseUrl);
 
         Element iconNode = XmlUtil.findChild(node, TAG_ICON);
-        href = XmlUtil.getChildText(XmlUtil.findChild(iconNode, TAG_HREF));
         Element tmpNode = XmlUtil.findChild(iconNode, TAG_VIEWBOUNDSCALE);
         if (tmpNode != null) {
             viewBoundScale =
                 new Double(XmlUtil.getChildText(tmpNode)).doubleValue();
         }
+
+
+
         Element latLonNode = XmlUtil.findChild(node, TAG_LATLONBOX);
         north = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                TAG_NORTH))).doubleValue();
-        south = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                TAG_SOUTH))).doubleValue();
-        east = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                TAG_EAST))).doubleValue();
-        west = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                TAG_WEST))).doubleValue();
+                                                                      TAG_NORTH))).doubleValue();
+            south = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                      TAG_SOUTH))).doubleValue();
+            east = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                     TAG_EAST))).doubleValue();
+            west = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                     TAG_WEST))).doubleValue();
     }
 
 
 
-    /**
-     * Find the href element
-     *
-     * @param node node
-     *
-     * @return href
-     */
-    public static String getHref(Element node) {
-        Element iconNode = XmlUtil.findChild(node, TAG_ICON);
-        return XmlUtil.getChildText(XmlUtil.findChild(iconNode, TAG_HREF));
-    }
 
     /**
      * get the image data
@@ -213,7 +185,7 @@ public class KmlGroundOverlay extends KmlInfo {
      */
     public Data getData(KmlDataSource dataSource, Object loadId)
             throws VisADException, RemoteException {
-        Image image = dataSource.readImage(getHref(), baseUrl);
+        Image image = getImage(dataSource);
         if (image == null) {
             return null;
         }
@@ -242,25 +214,6 @@ public class KmlGroundOverlay extends KmlInfo {
 
     }
 
-
-
-    /**
-     * Set the Href property.
-     *
-     * @param value The new value for Href
-     */
-    public void setHref(String value) {
-        href = value;
-    }
-
-    /**
-     * Get the Href property.
-     *
-     * @return The Href
-     */
-    public String getHref() {
-        return href;
-    }
 
     /**
      * Set the ViewBoundScale property.
@@ -369,24 +322,6 @@ public class KmlGroundOverlay extends KmlInfo {
     public double getWest() {
         return west;
     }
-
-/**
-Set the BaseUrl property.
-
-@param value The new value for BaseUrl
-**/
-public void setBaseUrl (String value) {
-	baseUrl = value;
-}
-
-/**
-Get the BaseUrl property.
-
-@return The BaseUrl
-**/
-public String getBaseUrl () {
-	return baseUrl;
-}
 
 
 

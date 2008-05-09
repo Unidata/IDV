@@ -73,6 +73,8 @@ public class KmlId {
     /** Node type */
     public static final String NODE_GROUNDOVERLAY = "GroundOverlay";
 
+    public static final String NODE_PHOTOOVERLAY = "PhotoOverlay";
+
     /** Node type */
     public static final String NODE_PLACEMARKS = "Placemarks";
 
@@ -150,6 +152,16 @@ public class KmlId {
      */
     public boolean isGroundOverlay() {
         return type.equals(NODE_GROUNDOVERLAY);
+    }
+
+
+    /**
+     * Am I a photo overlay
+     *
+     * @return is photo overlay
+     */
+    public boolean isPhotoOverlay() {
+        return type.equals(NODE_PHOTOOVERLAY);
     }
 
     /**

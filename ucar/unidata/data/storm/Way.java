@@ -161,7 +161,7 @@ public class Way implements Comparable {
     public int compareTo(Object o) {
         if (o instanceof Way) {
             Way that = (Way) o;
-            return this.name.compareTo(that.name);
+            return this.name.toLowerCase().compareTo(that.name.toLowerCase());
         }
         return toString().compareTo(o.toString());
     }

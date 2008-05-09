@@ -309,22 +309,63 @@ public abstract class StormDataSource extends DataSourceImpl {
         List<StormTrackPoint> diffPoints = new ArrayList<StormTrackPoint>();
 
         for (StormTrackPoint forecastPoint : fctTrackPoints) {
-            DateTime        dt     = forecastPoint.getTrackPointTime();
-            StormTrackPoint closestObs = getClosestPoint(obsTrackPoints, dt);
-            if(closestObs==null) continue;
-            Real r1 = closestObs.getAttribute(type);
-            if(r1 == null) continue;
-            Real r2 = forecastPoint.getAttribute(type);
-            if(r2 == null) continue;
-            Real r3 = (Real) r1.__sub__(r2);
-            StormTrackPoint newStormTrackPoint = new  StormTrackPoint(forecastPoint.getTrackPointLocation(), dt,forecastPoint.getForecastHour(), new ArrayList<Real>());
-            newStormTrackPoint.addAttribute(r3);
+            Real forecastValue = forecastPoint.getAttribute(type);
+            if(forecastValue == null) continue;
+            DateTime        forecastDttm     = forecastPoint.getTrackPointTime();
+            StormTrackPoint[] range = getClosestPointRange(obsTrackPoints, forecastDttm);
+            if(range == null) continue;
+            Real obsValue=null;
+            if(range.length==1) {
+                //exact match:
+                obsValue  = range[0].getAttribute(type);
+            } else {
+                //Interpolate between the two points
+                Real v1 = range[0].getAttribute(type);
+                Real v2 = range[1].getAttribute(type);
+                if(v1 == null || v2 == null) continue;
+                DateTime t1 = range[0].getTrackPointTime();            
+                DateTime t2 = range[1].getTrackPointTime();            
+                double percent = forecastDttm.getValue()-t1.getValue()/(t2.getValue()-t1.getValue());
+
+                double interpolatedValue  = v2.getValue() + percent*(v2.getValue()-v1.getValue());
+                obsValue =v1.cloneButValue(interpolatedValue);
+                System.err.println ("interp %:" + percent +  " v:" + obsValue + " v1:" + v1 + " v2:" + v2 + "\n\tt1:" + t1 + " t2:" + t2);
+            }
+
+            if(obsValue == null) continue;
+
+            Real difference = (Real) forecastValue.__sub__(obsValue);
+            StormTrackPoint newStormTrackPoint = new  StormTrackPoint(forecastPoint.getTrackPointLocation(), forecastDttm,forecastPoint.getForecastHour(), new ArrayList<Real>());
+            newStormTrackPoint.addAttribute(difference);
             diffPoints.add(newStormTrackPoint);
         }
         if(diffPoints.size()==0) return null;
         return new StormTrack(fctTrack.getStormInfo(),fctTrack.getWay(),
                               diffPoints);
     }
+
+    public static StormTrackPoint[] getClosestPointRange(
+            List<StormTrackPoint> aList, DateTime dt) {
+        double          timeToLookFor    = dt.getValue();
+        int             numPoints    = aList.size();
+        double lastTime = -1;
+
+        for (int i = 0; i < numPoints; i++) {
+            StormTrackPoint stp   = aList.get(i);
+            double          currentTime = stp.getTrackPointTime().getValue();
+            if(timeToLookFor==currentTime) {
+                return new StormTrackPoint[]{stp};
+            }
+            if(timeToLookFor<currentTime) {
+                if(i==0) return null;
+                if(timeToLookFor>lastTime)
+                    return new StormTrackPoint[]{aList.get(i-1), stp};
+            }
+            lastTime = currentTime;
+        }
+        return null;
+    }
+
 
     /**
      * _more_

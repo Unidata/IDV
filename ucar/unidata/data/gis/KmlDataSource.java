@@ -110,6 +110,8 @@ public class KmlDataSource extends FilesDataSource {
     /** kml tag id */
     public static final String TAG_GROUNDOVERLAY = "GroundOverlay";
 
+    public static final String TAG_PHOTOOVERLAY = "PhotoOverlay";
+
     /** xml tag */
     public static final String TAG_URL = "Url";
 
@@ -809,7 +811,7 @@ public class KmlDataSource extends FilesDataSource {
                         id, dataChoiceName, dataChoiceName, categories,
                         props));
             }
-        } else if (tagName.equals(TAG_GROUNDOVERLAY)) {
+        } else if (tagName.equals(TAG_GROUNDOVERLAY) || tagName.equals(TAG_PHOTOOVERLAY)) {
             //            System.err.println ("got ground overlay:" + XmlUtil.toString(node));
             String name = XmlUtil.getChildText(XmlUtil.findChild(node,
                               TAG_NAME));
@@ -820,7 +822,8 @@ public class KmlDataSource extends FilesDataSource {
             String displayCategory = StringUtil.join("-",
                                          currentDisplayCategories);
             String href = KmlGroundOverlay.getHref(node);
-            KmlId id = new KmlId(KmlId.NODE_GROUNDOVERLAY, name,
+            KmlId id = new KmlId(tagName.equals(TAG_GROUNDOVERLAY)?KmlId.NODE_GROUNDOVERLAY:
+                                 KmlId.NODE_PHOTOOVERLAY, name,
                                  displayCategory, baseUrl, href);
             int ucnt = 0;
             while (idToNode.get(id) != null) {
@@ -898,6 +901,9 @@ public class KmlDataSource extends FilesDataSource {
                 kmlInfo = new KmlPoints((List) node, "");
             } else if (id.isGroundOverlay()) {
                 kmlInfo = new KmlGroundOverlay((Element) node, "",
+                        id.getDocUrl());
+            } else if (id.isPhotoOverlay()) {
+                kmlInfo = new KmlPhotoOverlay((Element) node, "",
                         id.getDocUrl());
             } else if (id.isShapes()) {
                 kmlInfo = new KmlPolygons((Element) node, "");
