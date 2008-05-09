@@ -450,7 +450,7 @@ public class WayDisplayState {
 
         RealType        type   = getParamType();
         for (StormTrack track : tracks) {
-            StormTrack cornTrack = makeCornTrack(track);
+            StormTrack cornTrack = makeCornTrack(track, STIStormDataSource.TYPE_PROBABILITY10RADIUS);
             FieldImpl  field     = stormDisplayState.makeField(track, type);
             //  fields.add(field);
             FieldImpl cfield = stormDisplayState.makeField(cornTrack, type);
@@ -729,6 +729,20 @@ public class WayDisplayState {
         return colorTable;
     }
 
+    private List<StormTrackPoint> getRealTrackPoints(StormTrack track, RealType type){
+        List<StormTrackPoint> newStps = new ArrayList();
+        List<StormTrackPoint> stps = track.getTrackPoints();
+
+        newStps.add(stps.get(0));
+        Iterator<StormTrackPoint> it = stps.iterator();
+
+        while(it.hasNext()) {
+            StormTrackPoint stp = it.next();
+            if(stp.getAttribute(type) != null)
+                  newStps.add(stp);
+        }
+        return newStps;
+    }
     /**
      * _more_
      *
@@ -738,8 +752,8 @@ public class WayDisplayState {
      *
      * @throws VisADException _more_
      */
-    public StormTrack makeCornTrack(StormTrack track) throws VisADException {
-        List<StormTrackPoint> stps          = track.getTrackPoints();
+    public StormTrack makeCornTrack(StormTrack track, RealType type) throws VisADException {
+        List<StormTrackPoint> stps          = getRealTrackPoints(track, type);
         int                   size          = stps.size();
         int                   numberOfPoint = size * 2 + 11;
         StormTrackPoint[]     cornPoints = new StormTrackPoint[numberOfPoint];
@@ -756,10 +770,10 @@ public class WayDisplayState {
         for (int i = 1; i < size; i++) {
             stp2 = stps.get(i);
             //right point
-            stp           = getPointToCircleTangencyPoint(stp1, stp2, true);
+            stp           = getPointToCircleTangencyPoint(stp1, stp2, type, true);
             cornPoints[i] = stp;
             //left point
-            stp = getPointToCircleTangencyPoint(stp1, stp2, false);
+            stp = getPointToCircleTangencyPoint(stp1, stp2, type, false);
             cornPoints[numberOfPoint - i - 1] = stp;
             stp1                              = stp2;
         }
@@ -770,7 +784,7 @@ public class WayDisplayState {
         EarthLocation   endEl = cornPoints[size - 1].getTrackPointLocation();
         double          ang    = getCircleAngleRange(lastEl, endEl);
 
-        Real r = last.getAttribute(STIStormDataSource.TYPE_PROBABILITYRADIUS);
+        Real r = last.getAttribute(type);
         StormTrackPoint[] halfCircle = getHalfCircleTrackPoint(lastEl, ang,
                                            r.getValue(),
                                            last.getTrackPointTime());
@@ -801,14 +815,14 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint getPointToCircleTangencyPoint(StormTrackPoint sp1,
-            StormTrackPoint sp2, boolean right)
+            StormTrackPoint sp2, RealType type, boolean right)
             throws VisADException {
 
         int           sign = 1;
         EarthLocation el1  = sp1.getTrackPointLocation();
         EarthLocation el2  = sp2.getTrackPointLocation();
 
-        Real rl = sp2.getAttribute(STIStormDataSource.TYPE_PROBABILITYRADIUS);
+        Real rl = sp2.getAttribute(type);
 
         double        r    = rl.getValue();
         FlatEarth     e1   = new FlatEarth();
