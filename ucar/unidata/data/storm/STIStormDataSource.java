@@ -113,7 +113,7 @@ public class STIStormDataSource extends StormDataSource {
         if (useDerby()) {
             return COL_DERBY_HOUR;
         }
-        return COL_HOUR;
+        return COL_TYPHOON_HOUR;
     }
 
     /**
@@ -125,7 +125,7 @@ public class STIStormDataSource extends StormDataSource {
         if (useDerby()) {
             return COL_DERBY_YEAR;
         }
-        return COL_YEAR;
+        return COL_TYPHOON_YEAR;
     }
 
 
@@ -161,58 +161,80 @@ public class STIStormDataSource extends StormDataSource {
     /** _more_ */
     private static final String TABLE_TRACK = "typhoon";
 
-    /** _more_ */
-    private static final String COL_YEAR = "year";
+
 
     /** _more_ */
-    private static final String COL_HOUR = "hour";
+    private static final String COL_TYPHOON_YEAR = "year";
+
+    /** _more_ */
+    private static final String COL_TYPHOON_HOUR = "hour";
     /**/
 
 
     /** _more_ */
-    private static final String COL_STORMID = "nno";
+    private static final String COL_TYPHOON_STORMID = "nno";
 
     /** _more_ */
-    private static final String COL_TIME = "time";
+    private static final String COL_TYPHOON_TIME = "time";
 
     /** _more_ */
-    private static final String COL_LATITUDE = "lat";
+    private static final String COL_TYPHOON_LATITUDE = "lat";
 
     /** _more_ */
-    private static final String COL_LONGITUDE = "lon";
-
-
-
-    /** _more_ */
-    private static final String COL_MONTH = "mon";
-
-    /** _more_ */
-    private static final String COL_DAY = "day";
+    private static final String COL_TYPHOON_LONGITUDE = "lon";
 
 
     /** _more_ */
-    private static final String COL_FHOUR = "fhour";
+    private static final String COL_TYPHOON_MONTH = "mon";
 
     /** _more_ */
-    private static final String COL_WAY = "way";
+    private static final String COL_TYPHOON_DAY = "day";
+
 
     /** _more_ */
-    private static final String COL_PRESSURE = "pressure";
+    private static final String COL_TYPHOON_FHOUR = "fhour";
 
     /** _more_ */
-    private static final String COL_WINDSPEED = "wind";
+    private static final String COL_TYPHOON_WAY = "way";
 
     /** _more_ */
-    private static final String COL_RADIUSMG = "xx1";
+    private static final String COL_TYPHOON_PRESSURE = "pressure";
 
     /** _more_ */
-    private static final String COL_RADIUSWG = "xx2";
+    private static final String COL_TYPHOON_WINDSPEED = "wind";
 
     /** _more_ */
-    private static final String COL_MOVEDIR = "xx3";
+    private static final String COL_TYPHOON_RADIUSMG = "xx1";
 
     /** _more_ */
-    private static final String COL_MOVESPEED = "xx4";
+    private static final String COL_TYPHOON_RADIUSWG = "xx2";
+
+    /** _more_ */
+    private static final String COL_TYPHOON_MOVEDIR = "xx3";
+
+    /** _more_ */
+    private static final String COL_TYPHOON_MOVESPEED = "xx4";
+
+
+
+    private static final String TABLE_PROBILITY = "probility";
+
+
+
+    private static final String COL_PROBILITY_WAYNAME="wayname";
+    private static final String COL_PROBILITY_FHOUR="fhour";
+    private static final String COL_PROBILITY_P10="p10";
+    private static final String COL_PROBILITY_P20="p20";
+    private static final String COL_PROBILITY_P30="p30";
+    private static final String COL_PROBILITY_P40="p40";
+    private static final String COL_PROBILITY_P50="p50";
+    private static final String COL_PROBILITY_P60="p60";
+    private static final String COL_PROBILITY_P70="p70";
+    private static final String COL_PROBILITY_P80="p80";
+    private static final String COL_PROBILITY_P90="p90";
+    private static final String COL_PROBILITY_P100="p100";
+    private static final String COL_PROBILITY_ERROR="error";
+    private static final String COL_PROBILITY_REMARK="remark";
 
 
     /** _more_ */
@@ -465,16 +487,16 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
         //        if(true) return getForecastTrackX(stormInfo, sTime, forecastWay);
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_FHOUR,
-            COL_LATITUDE, COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE,
-            COL_RADIUSMG, COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_FHOUR,
+            COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE,
+            COL_TYPHOON_RADIUSMG, COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED
         });
 
 
         List whereList = new ArrayList();
-        whereList.add(SqlUtil.eq(COL_STORMID,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
-        whereList.add(SqlUtil.eq(COL_WAY,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY,
                                  SqlUtil.quote(forecastWay.getId())));
 
         addDateSelection(sTime, whereList);
@@ -483,7 +505,7 @@ public class STIStormDataSource extends StormDataSource {
                                           SqlUtil.makeAnd(whereList));
         query = query + " order by  "
                 + SqlUtil.comma(new String[] { getColYear(),
-                COL_MONTH, COL_DAY, getColHour(), COL_FHOUR });
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_FHOUR });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
@@ -568,8 +590,8 @@ public class STIStormDataSource extends StormDataSource {
         int dd = cal.get(Calendar.DAY_OF_MONTH);
         int hh = cal.get(Calendar.HOUR_OF_DAY);
         whereList.add(SqlUtil.eq(getColYear(), Integer.toString(yy)));
-        whereList.add(SqlUtil.eq(COL_MONTH, Integer.toString(mm)));
-        whereList.add(SqlUtil.eq(COL_DAY, Integer.toString(dd)));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_MONTH, Integer.toString(mm)));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_DAY, Integer.toString(dd)));
         whereList.add(SqlUtil.eq(getColHour(), Integer.toString(hh)));
     }
 
@@ -589,17 +611,17 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
 
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_FHOUR,
-            COL_LATITUDE, COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE,
-            COL_RADIUSMG, COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_FHOUR,
+            COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE,
+            COL_TYPHOON_RADIUSMG, COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED
         });
 
 
 
         List whereList = new ArrayList();
-        whereList.add(SqlUtil.eq(COL_STORMID,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
-        whereList.add(SqlUtil.eq(COL_WAY,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY,
                                  SqlUtil.quote(forecastWay.getId())));
 
 
@@ -701,20 +723,20 @@ public class STIStormDataSource extends StormDataSource {
             Way way)
             throws Exception {
 
-        String columns = SqlUtil.comma(new String[] { getColYear(), COL_MONTH,
-                COL_DAY, getColHour() });
+        String columns = SqlUtil.comma(new String[] { getColYear(), COL_TYPHOON_MONTH,
+                COL_TYPHOON_DAY, getColHour() });
 
         List whereList = new ArrayList();
-        whereList.add(SqlUtil.eq(COL_STORMID,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
-        whereList.add(SqlUtil.eq(COL_FHOUR, ZEROHOUR));
-        whereList.add(SqlUtil.eq(COL_WAY, SqlUtil.quote(way.getId())));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_FHOUR, ZEROHOUR));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY, SqlUtil.quote(way.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
         query = query + " order by  "
                 + SqlUtil.comma(new String[] { getColYear(),
-                COL_MONTH, COL_DAY, getColHour() });
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour() });
         //        System.err.println (query);
         Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
@@ -785,23 +807,23 @@ public class STIStormDataSource extends StormDataSource {
             Way wy)
             throws Exception {
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_LATITUDE,
-            COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE, COL_RADIUSMG,
-            COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED, COL_WAY
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_LATITUDE,
+            COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
+            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED, COL_TYPHOON_WAY
         });
 
         List whereList = new ArrayList();
 
-        whereList.add(SqlUtil.eq(COL_STORMID,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
-        whereList.add(SqlUtil.eq(COL_FHOUR, ZEROHOUR));
-        whereList.add(SqlUtil.eq(COL_WAY, SqlUtil.quote(wy.getId())));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_FHOUR, ZEROHOUR));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY, SqlUtil.quote(wy.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
         query = query + " order by  "
                 + SqlUtil.comma(new String[] { getColYear(),
-                COL_MONTH, COL_DAY, getColHour() });
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour() });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
@@ -876,23 +898,23 @@ public class STIStormDataSource extends StormDataSource {
             Way wy, DateTime before, DateTime after, List pts)
             throws Exception {
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_MONTH, COL_DAY, getColHour(), COL_LATITUDE,
-            COL_LONGITUDE, COL_WINDSPEED, COL_PRESSURE, COL_RADIUSMG,
-            COL_RADIUSWG, COL_MOVEDIR, COL_MOVESPEED, COL_WAY
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_LATITUDE,
+            COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
+            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED, COL_TYPHOON_WAY
         });
 
         List whereList = new ArrayList();
 
-        whereList.add(SqlUtil.eq(COL_STORMID,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
-        whereList.add(SqlUtil.eq(COL_FHOUR, ZEROHOUR));
-        whereList.add(SqlUtil.eq(COL_WAY, SqlUtil.quote(wy.getId())));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_FHOUR, ZEROHOUR));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY, SqlUtil.quote(wy.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
         query = query + " order by  "
                 + SqlUtil.comma(new String[] { getColYear(),
-                COL_MONTH, COL_DAY, getColHour() });
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour() });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
@@ -997,7 +1019,7 @@ public class STIStormDataSource extends StormDataSource {
      * @throws Exception _more_
      */
     private List<StormInfo> getAllStormInfos() throws Exception {
-        String columns = SqlUtil.distinct(COL_STORMID);
+        String columns = SqlUtil.distinct(COL_TYPHOON_STORMID);
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK));
         //        System.err.println (query);
         System.err.println(query);
@@ -1026,12 +1048,12 @@ public class STIStormDataSource extends StormDataSource {
      * @throws Exception _more_
      */
     protected DateTime getStormStartTime(String id) throws Exception {
-        String columns = SqlUtil.comma(new String[] { getColYear(), COL_MONTH,
-                COL_DAY, getColHour() });
+        String columns = SqlUtil.comma(new String[] { getColYear(), COL_TYPHOON_MONTH,
+                COL_TYPHOON_DAY, getColHour() });
 
         List whereList = new ArrayList();
-        whereList.add(SqlUtil.eq(COL_STORMID, SqlUtil.quote(id)));
-        whereList.add(SqlUtil.eq(COL_FHOUR, ZEROHOUR));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID, SqlUtil.quote(id)));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_FHOUR, ZEROHOUR));
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
         query = query + " order by  " + columns;
@@ -1067,10 +1089,10 @@ public class STIStormDataSource extends StormDataSource {
     protected List<Way> getForecastWays(StormInfo stormInfo)
             throws Exception {
 
-        String columns   = SqlUtil.distinct(COL_WAY);
+        String columns   = SqlUtil.distinct(COL_TYPHOON_WAY);
 
         List   whereList = new ArrayList();
-        whereList.add(SqlUtil.eq(COL_STORMID,
+        whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
@@ -1213,7 +1235,7 @@ public class STIStormDataSource extends StormDataSource {
             //Load in the test data
             try {
                 stmt.execute("select count(*) from typhoon");
-                System.err.println("OK");
+                System.err.println("Derby DB OK");
             } catch (Exception exc) {
                 System.err.println("exc;" + exc);
                 System.err.println("Creating test database");
