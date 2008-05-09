@@ -612,7 +612,7 @@ public class STIStormDataSource extends StormDataSource {
                                + " from query:" + SqlUtil.makeAnd(whereList));
         }
         if (pts.size() > 0) {
-            return new StormTrack(stormInfo, addWay(forecastWay), pts);
+            return new StormTrack(stormInfo, forecastWay, pts);
         } else {
             return null;
         }
@@ -734,7 +734,7 @@ public class STIStormDataSource extends StormDataSource {
 
 
         return new StormTrack(
-                              stormInfo, addWay(forecastWay),
+                              stormInfo, forecastWay,
             new NamedArray("latitude", CommonUnit.degree, lats),
             new NamedArray("longitude", CommonUnit.degree, lons), times);
 
@@ -1218,6 +1218,7 @@ public class STIStormDataSource extends StormDataSource {
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 Way way = new Way(results.getString(1));
+                addWay(way);
                 forecastWays.add(way);
             }
         }
