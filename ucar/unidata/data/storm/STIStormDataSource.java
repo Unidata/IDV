@@ -40,6 +40,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.visad.Util;
 
 import visad.*;
+import visad.Set;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
@@ -52,14 +53,8 @@ import java.rmi.RemoteException;
 import java.sql.*;
 
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -101,7 +96,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        return true;
+        return false;
     }
 
     /**
@@ -140,6 +135,36 @@ public class STIStormDataSource extends StormDataSource {
 
     /** _more_ */
     public static RealType TYPE_RADIUSWHOLEGALE;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY10RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY20RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY30RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY40RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY50RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY60RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY70RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY80RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY90RADIUS;
+
+    /** _more_ */
+    public static RealType TYPE_PROBABILITY100RADIUS;
 
     /** _more_ */
     public static RealType TYPE_PROBABILITYRADIUS;
@@ -255,7 +280,7 @@ public class STIStormDataSource extends StormDataSource {
     /** the stormInfo and track */
     private List<StormInfo> stormInfos;
 
-
+    private HashMap<String, float[]> wayfhourToRadius;
 
 
 
@@ -288,14 +313,33 @@ public class STIStormDataSource extends StormDataSource {
                                             Util.parseUnit("mb"));
             TYPE_RADIUSMODERATEGALE = makeRealType("radiusmoderategale",
                     "Moderate_Gale_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITYRADIUS = makeRealType("probabilityradius",
-                    "Probability_Radius", Util.parseUnit("km"));
             TYPE_RADIUSWHOLEGALE = makeRealType("radiuswholegale",
                     "Whole_Gale_Radius", Util.parseUnit("km"));
             TYPE_MOVEDIRECTION = makeRealType("movedirection",
                     "Storm_Direction", CommonUnit.degree);
             TYPE_MOVESPEED = makeRealType("movespeed", "Storm_Speed",
                                           Util.parseUnit("m/s"));
+            TYPE_PROBABILITY10RADIUS = makeRealType("probabilityradius10",
+                    "Probability_10%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY20RADIUS = makeRealType("probabilityradius20",
+                    "Probability_20%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY30RADIUS = makeRealType("probabilityradius30",
+                    "Probability_30%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY40RADIUS = makeRealType("probabilityradius40",
+                    "Probability_40%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY50RADIUS = makeRealType("probabilityradius50",
+                    "Probability_50%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY60RADIUS = makeRealType("probabilityradius60",
+                    "Probability_60%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY70RADIUS = makeRealType("probabilityradius70",
+                    "Probability_70%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY80RADIUS = makeRealType("probabilityradius80",
+                    "Probability_80%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY90RADIUS = makeRealType("probabilityradius90",
+                    "Probability_90%_Radius", Util.parseUnit("km"));
+            TYPE_PROBABILITY100RADIUS = makeRealType("probabilityradius100",
+                    "Probability_100%_Radius", Util.parseUnit("km"));
+
         }
     }
 
@@ -379,7 +423,7 @@ public class STIStormDataSource extends StormDataSource {
         StormTrackCollection trackCollection = new StormTrackCollection();
         List<Way>            forecastWays    = getForecastWays(stormInfo);
 
-
+        getWayProbabilityRadius();
         for (Way forecastWay : forecastWays) {
             if ((waysToUse != null) && (waysToUse.size() > 0)
                     && (waysToUse.get(forecastWay.getId()) == null)) {
@@ -442,7 +486,7 @@ public class STIStormDataSource extends StormDataSource {
     /**
      * If d is a missing value return  NaN. Else return d
      * @param d The value
-     * @param Nan if d is missing else d
+     * @param d if d is missing else d
      *
      * @return _more_
      */
@@ -542,8 +586,12 @@ public class STIStormDataSource extends StormDataSource {
                                    getValue(results.getDouble(col++))));
                 attrs.add(new Real(TYPE_MOVESPEED,
                                    getValue(results.getDouble(col++))));
-                radius = fhour * 50.0f / 24.0f;
-                attrs.add(new Real(TYPE_PROBABILITYRADIUS, radius));
+                String key =  forecastWay.getName().toUpperCase() + Integer.toString(fhour);
+                float [] radiuses = wayfhourToRadius.get(key);
+                if(radiuses != null) {
+                    //radius = fhour * 50.0f / 24.0f;
+                    addprobabilityradiusAttrs(attrs, radiuses);
+                }
                 //                System.err.println("setting radius =" + radius + "  forecast hour = " + fhour + " way=" + forecastWay);
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -571,7 +619,19 @@ public class STIStormDataSource extends StormDataSource {
 
     }
 
+    private void addprobabilityradiusAttrs(List<Real> attrs, float [] radiuses){
+        attrs.add(new Real(TYPE_PROBABILITY10RADIUS, radiuses[0]));
+        attrs.add(new Real(TYPE_PROBABILITY20RADIUS, radiuses[1]));
+        attrs.add(new Real(TYPE_PROBABILITY30RADIUS, radiuses[2]));
+        attrs.add(new Real(TYPE_PROBABILITY40RADIUS, radiuses[3]));
+        attrs.add(new Real(TYPE_PROBABILITY50RADIUS, radiuses[4]));
+        attrs.add(new Real(TYPE_PROBABILITY60RADIUS, radiuses[5]));
+        attrs.add(new Real(TYPE_PROBABILITY70RADIUS, radiuses[6]));
+        attrs.add(new Real(TYPE_PROBABILITY80RADIUS, radiuses[7]));
+        attrs.add(new Real(TYPE_PROBABILITY90RADIUS, radiuses[8]));
+        attrs.add(new Real(TYPE_PROBABILITY100RADIUS, radiuses[9]));
 
+    }
     /**
      * _more_
      *
@@ -754,6 +814,56 @@ public class STIStormDataSource extends StormDataSource {
         }
         return startDates;
     }
+
+    /**
+     * _more_
+     *
+      *
+     * @return _more_
+     * @throws Exception _more_
+     */
+    protected void getWayProbabilityRadius() throws Exception  {
+
+        String columns = SqlUtil.comma(new String[] { COL_PROBILITY_WAYNAME,
+                 COL_PROBILITY_FHOUR, COL_PROBILITY_P10, COL_PROBILITY_P20,
+                 COL_PROBILITY_P30, COL_PROBILITY_P40, COL_PROBILITY_P50,
+                 COL_PROBILITY_P60, COL_PROBILITY_P70, COL_PROBILITY_P80,
+                 COL_PROBILITY_P90, COL_PROBILITY_P100 });
+
+        List whereList = new ArrayList();
+
+        String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_PROBILITY),
+                                          SqlUtil.makeAnd(whereList));
+        Statement        statement = evaluate(query);
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet        results;
+        wayfhourToRadius = new HashMap();
+        while ((results = iter.next()) != null) {
+
+            while (results.next()) {
+                float [] wp = new float [10];
+                int col   = 1;
+                String wayName = results.getString(col++);
+                int fhour  = results.getInt(col++);
+                wp[0]  = results.getFloat(col++);
+                wp[1]  = results.getFloat(col++);
+                wp[2]  = results.getFloat(col++);
+                wp[3]  = results.getFloat(col++);
+                wp[4]  = results.getFloat(col++);
+                wp[5]  = results.getFloat(col++);
+                wp[6]  = results.getFloat(col++);
+                wp[7]  = results.getFloat(col++);
+                wp[8]  = results.getFloat(col++);
+                wp[9]  = results.getFloat(col++);
+
+                String key = wayName + Integer.toString(fhour);
+                System.err.println ("wpppppp " +  key + "  data "+ wp[0] + " and " + wp[1]);
+                wayfhourToRadius.put(key, wp);
+            }
+        }
+    }
+
+
 
     /**
      * _more_
