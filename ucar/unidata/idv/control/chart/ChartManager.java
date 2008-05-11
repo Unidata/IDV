@@ -982,6 +982,11 @@ public abstract class ChartManager implements ImageObserver {
     }
 
 
+    private boolean alwaysShowFirstChart = true;
+    public void setAlwaysShowFirstChart(boolean alwaysShowFirstChart) {
+        this.alwaysShowFirstChart = alwaysShowFirstChart;
+    }
+
     /**
      * update gui
      *
@@ -996,7 +1001,7 @@ public abstract class ChartManager implements ImageObserver {
         boolean needToUpdate = false;
         for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
             ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
-            if (chartHolder.hasParameters() || (plotIdx == 0)) {
+            if (chartHolder.hasParameters() || (alwaysShowFirstChart && plotIdx == 0)) {
                 if ( !chartHolder.getBeingShown()) {
                     needToUpdate = true;
                 }
@@ -1029,7 +1034,7 @@ public abstract class ChartManager implements ImageObserver {
 
         for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
             ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
-            if ( !chartHolder.hasParameters() && (plotIdx > 0)) {
+            if (!chartHolder.hasParameters() && (!alwaysShowFirstChart || plotIdx > 0)) {
                 chartHolder.setBeingShown(false);
                 continue;
             }
