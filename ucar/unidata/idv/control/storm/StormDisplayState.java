@@ -46,6 +46,7 @@ import ucar.unidata.idv.control.chart.*;
 
 
 import ucar.unidata.ui.drawing.*;
+import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.ColorTable;
 
@@ -421,10 +422,13 @@ public class StormDisplayState {
             GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif", this,
                                      "deactivate");
         unloadBtn.setToolTipText("Remove this storm");
+        String label = "Storm: " +
+            stormInfo.toString() + 
+            "   " + 
+            stormInfo.getStartTime().formattedString("yyyy-MM-dd",DateUtil.TIMEZONE_GMT);
 
         JComponent top =
-            GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel("Storm: "
-                + stormInfo), unloadBtn), new Insets(0, 0, 0, 0));
+            GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel(label), unloadBtn), new Insets(0, 0, 0, 0));
 
 
 
@@ -562,6 +566,7 @@ public class StormDisplayState {
         wayComp    = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
         tabbedPane = GuiUtils.getNestedTabbedPane();
         tabbedPane.addTab("Tracks", wayComp);
+        tabbedPane.addTab("Table", getTrackTable());
 
         if (charts.size() == 0) {
             charts.add(
@@ -1097,58 +1102,26 @@ public class StormDisplayState {
     /**
      * _more_
      */
-    public void doit() {
-        trackModel = new AbstractTableModel() {
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
+    private JComponent getTrackTable() {
+        TreePanel tableTreePanel = new TreePanel(true, 150);
+        int width = 400;
+        int height=400;
+        for (StormTrack track : trackCollection.getTracks()) {
+            StormTrackTableModel tableModel = new StormTrackTableModel(this, track);
+            JTable trackTable = new JTable(tableModel);
+            JScrollPane scroller = GuiUtils.makeScrollPane(trackTable, width,
+                                                       height);
+            scroller.setBorder(BorderFactory.createLoweredBevelBorder());
+            JComponent contents  = scroller;
+            if(!track.getWay().isObservation()) {
+                contents = GuiUtils.topCenter(GuiUtils.left(GuiUtils.inset(new JLabel(track.getTrackStartTime().toString()),5)), contents);
             }
-
-            public int getRowCount() {
-                if (trackCollection == null) {
-                    return 0;
-                }
-                return trackCollection.getTracks().size();
-            }
-
-            public int getColumnCount() {
-                return 2;
-            }
-
-            public void setValueAt(Object aValue, int rowIndex,
-                                   int columnIndex) {}
-
-            public Object getValueAt(int row, int column) {
-
-                if ((trackCollection == null)
-                        || (row >= trackCollection.getTracks().size())) {
-                    return "";
-                }
-                StormTrack track = trackCollection.getTracks().get(row);
-                if (column == 0) {
-                    return track.getWay();
-                }
-                return track.getTrackStartTime();
-            }
-
-            public String getColumnName(int column) {
-                if (column == 0) {
-                    return stormTrackControl.getWayName();
-                }
-                return "Date";
-            }
-        };
+            tableTreePanel.addComponent(contents, track.getWay().toString(),
+                                        track.getTrackStartTime().toString(),null);
+        }
 
 
-        trackTable = new JTable(trackModel);
-
-        int width  = 300;
-        int height = 400;
-        JScrollPane scroller = GuiUtils.makeScrollPane(trackTable, width,
-                                   height);
-        scroller.setBorder(BorderFactory.createLoweredBevelBorder());
-        scroller.setPreferredSize(new Dimension(width, height));
-        scroller.setMinimumSize(new Dimension(width, height));
-
+        return tableTreePanel;
     }
 
 
