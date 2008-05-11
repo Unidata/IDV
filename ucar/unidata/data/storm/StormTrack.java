@@ -126,7 +126,12 @@ public class StormTrack {
     }
 
 
-
+    public StormTrackPoint findPointWithForecastHour(int hour) {
+        for (StormTrackPoint stp : trackPoints) {
+            if(stp.getForecastHour()==hour) return stp;
+        }
+        return null;
+    }
 
     /**
      * _more_

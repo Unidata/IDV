@@ -104,6 +104,11 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static RealType TYPE_DISTANCEERROR;
 
+    /** _more_ */
+    public static RealType TYPE_MINPRESSURE;
+
+    public static RealType TYPE_MAXWINDSPEED_KTS;
+
 
 
     /** _more_ */
@@ -179,10 +184,13 @@ public abstract class StormDataSource extends DataSourceImpl {
         if (TYPE_STORMCATEGORY == null) {
             TYPE_STORMCATEGORY = Util.makeRealType("stormcategory",
                     "Storm_Category", null);
-        }
-        if (TYPE_DISTANCEERROR == null) {
+            TYPE_MINPRESSURE = makeRealType("minpressure", "Min_Pressure",
+                                            Util.parseUnit("mb"));
             TYPE_DISTANCEERROR = Util.makeRealType("forecastlocationerror",
                     "Distance_Error", Util.parseUnit("km"));
+            TYPE_MAXWINDSPEED_KTS = makeRealType("maxwindspeedkts", "Max_Windspeed",
+                                             Util.parseUnit("kts"));
+
         }
     }
 

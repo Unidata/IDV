@@ -216,10 +216,18 @@ public class AtcfStormDataSource extends StormDataSource {
         int xcnt = 0;
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
+            if(i==0) System.err.println(line);
             List   toks = StringUtil.split(line, ",", true);
+
+            //BASIN,CY,YYYYMMDDHH,TECHNUM,TECH,TAU,LatN/S,LonE/W,VMAX,MSLP,TY,RAD,WINDCODE,RAD1,RAD2,RAD3,RAD4,RADP,RRP,MRD,GUSTS,EYE,SUBREGION,MAXSEAS,INITIALS,DIR,SPEED,STORMNAME,DEPTH,SEAS,SEASCODE,SEAS1,SEAS2,SEAS3,SEAS4
             //AL, 01, 2007050612,   , BEST,   0, 355N,  740W,  35, 1012, EX,  34, NEQ,    0,    0,    0,  120, 
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
-            int    category   = getCategory((String) toks.get(9));
+
+            int    category   = getCategory((String) toks.get(10));
+            Real windspeed = new Real(TYPE_MAXWINDSPEED_KTS, new Double((String) toks.get(8)).doubleValue());
+            double pressure  = new Double((String) toks.get(9)).doubleValue();
+
+            if(category!=CATEGORY_XX) System.err.println("cat:"  + category);
             String dateString = (String) toks.get(2);
             String wayString  = (String) toks.get(4);
             //            if (okWays.get(wayString) == null) {
@@ -281,6 +289,10 @@ public class AtcfStormDataSource extends StormDataSource {
 
             List<Real> attributes = new ArrayList<Real>();
             attributes.add(new Real(TYPE_STORMCATEGORY, (double) category));
+            attributes.add(new Real(TYPE_MINPRESSURE, pressure));
+            attributes.add(windspeed);
+
+
             StormTrackPoint stp = new StormTrackPoint(elt,
                                       new DateTime(dttm), forecastHour,
                                       attributes);

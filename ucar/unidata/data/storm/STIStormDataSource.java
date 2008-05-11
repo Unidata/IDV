@@ -96,7 +96,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        return false;
+        return true;
     }
 
     /**
@@ -127,8 +127,6 @@ public class STIStormDataSource extends StormDataSource {
     /** _more_ */
     public static RealType TYPE_MAXWINDSPEED;
 
-    /** _more_ */
-    public static RealType TYPE_MINPRESSURE;
 
     /** _more_ */
     public static RealType TYPE_RADIUSMODERATEGALE;
@@ -309,8 +307,6 @@ public class STIStormDataSource extends StormDataSource {
             //TODO: Make sure these are the right units
             TYPE_MAXWINDSPEED = makeRealType("maxwindspeed", "Max_Windspeed",
                                              Util.parseUnit("m/s"));
-            TYPE_MINPRESSURE = makeRealType("minpressure", "Min_Pressure",
-                                            Util.parseUnit("mb"));
             TYPE_RADIUSMODERATEGALE = makeRealType("radiusmoderategale",
                     "Moderate_Gale_Radius", Util.parseUnit("km"));
             TYPE_RADIUSWHOLEGALE = makeRealType("radiuswholegale",

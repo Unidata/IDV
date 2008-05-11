@@ -42,7 +42,7 @@ import java.util.List;
  * Time: 1:45:38 PM
  * To change this template use File | Settings | File Templates.
  */
-public class StormTrackPoint {
+public class StormTrackPoint implements Comparable {
 
     /** _more_ */
     private EarthLocation trackPointLocation;
@@ -72,6 +72,21 @@ public class StormTrackPoint {
         this.forecastHour       = forecastHour;
         this.attributes         = attrs;
     }
+
+
+    /**
+     * Compare this object to another.
+     * @param o object in question.
+     * @return spec from Comparable interface.
+     */
+    public int compareTo(Object o) {
+        if (o instanceof StormTrackPoint) {
+            StormTrackPoint that = (StormTrackPoint) o;
+            return  (trackPointTime.compareTo(that.trackPointTime));
+        }
+        return toString().compareTo(o.toString());
+    }
+
 
     /**
      *  Set the ForecastHour property.
