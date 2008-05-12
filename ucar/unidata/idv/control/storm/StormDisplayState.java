@@ -144,6 +144,14 @@ public class StormDisplayState {
     private static String ID_FORECAST_RINGS = "id.forecast.rings";
 
 
+    /** _more_ */
+    private static String ID_FORECAST_COLOR = "id.forecast.color";
+
+
+    /** _more_ */
+    private static String ID_OBS_COLOR = "id.obs.color";
+
+
     /** The array of colors we cycle through */
     private static Color[] colors = {
         Color.RED, Color.PINK, Color.MAGENTA, Color.ORANGE, Color.YELLOW,
@@ -442,6 +450,7 @@ public class StormDisplayState {
      * @return _more_
      */
     private JComponent makeList(List stormParams, final Object id) {
+        if(stormParams==null || stormParams.size()==0) return GuiUtils.filler(2,10);
         final JList list = new JList(new Vector(stormParams));
         list.setVisibleRowCount(4);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -470,6 +479,29 @@ public class StormDisplayState {
 
         JScrollPane sp = new JScrollPane(list);
         return sp;
+    }
+
+
+    private JComponent makeBox(List stormParams, final Object id) {
+        if(stormParams==null || stormParams.size()==0) return GuiUtils.filler(2,10);
+        final JComboBox box = new JComboBox(new Vector(stormParams));
+        box.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                Object  selected = box.getSelectedItem();
+                if(selected == null || selected instanceof String) {
+                    params.remove(id);
+                } else {
+                    params.put(id, selected);
+                }
+                try {
+                    updateDisplays();
+                } catch (Exception exc) {
+                    stormTrackControl.logException("setting cones", exc);
+                }
+
+            }
+        });
+        return box;
     }
 
 
@@ -515,129 +547,140 @@ public class StormDisplayState {
             }
         }
 
-        Vector radiusAttrNames = null;
+        Vector radiusParams = null;
         Vector attrNames       = null;
         if ((params != null) && (params.size() > 0)) {
             attrNames = new Vector();
             for (StormParam param : params) {
                 if (Unit.canConvert(param.getUnit(), CommonUnit.meter)) {
-                    if (radiusAttrNames == null) {
-                        radiusAttrNames = new Vector();
+                    if (radiusParams == null) {
+                        radiusParams = new Vector();
                     }
-                    radiusAttrNames.add(param);
+                    radiusParams.add(param);
                 }
                 attrNames.add(param);
             }
         }
 
 
-        List components = new ArrayList();
+
         //Sort them by name
+
         List<Way> ways             = Misc.sort(trackCollection.getWayList());
         boolean   haveDoneForecast = false;
-        String[] colLabels = { "", "", /*"Visible",*/ "Track",
-                               ((radiusAttrNames != null)
-                                ? "Cone"
-                                : ""), ((radiusAttrNames != null)
-                                        ? "Rings"
-                                        : "") };
-        int  numCols    = colLabels.length;
+        List<String> colLabels = (List<String>)Misc.newList("","","Track");
+        if(radiusParams!=null) {
+            colLabels.add("Cone");
+            colLabels.add("Rings");
+        }
+        int  numCols    = colLabels.size();
 
 
         List paramComps = new ArrayList();
         paramComps.add(new JLabel(""));
         paramComps.add(new JLabel("<html><u><i>Color By</i></u></html>"));
-        paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
-        paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
+        if(radiusParams != null) {
+            paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
+            paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
+        }
         attrNames.add(0, "Fixed");
 
+        JComponent obsColorByBox      = makeBox(attrNames,ID_OBS_COLOR);
+        JComponent forecastColorByBox      = makeBox(attrNames,ID_FORECAST_COLOR);
 
-
-        JComboBox obsColorByBox      = new JComboBox(new Vector(attrNames));
-        JComboBox forecastColorByBox = new JComboBox(new Vector(attrNames));
 
         paramComps.add(
             GuiUtils.top(
                 GuiUtils.inset(
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(obsColorByBox));
-        paramComps.add(makeList(radiusAttrNames, ID_OBS_CONE));
-        paramComps.add(makeList(radiusAttrNames, ID_OBS_RINGS));
+        if(radiusParams != null) {
+            paramComps.add(makeList(radiusParams, ID_OBS_CONE));
+            paramComps.add(GuiUtils.top(makeBox(radiusParams, ID_OBS_RINGS)));
+        }
 
         paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
-                new Insets(4, 0, 0, 0))));
+                                                   new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(forecastColorByBox));
-        paramComps.add(makeList(radiusAttrNames, ID_FORECAST_CONE));
-        paramComps.add(makeList(radiusAttrNames, ID_FORECAST_RINGS));
+        if(radiusParams != null) {
+            paramComps.add(makeList(radiusParams, ID_FORECAST_CONE));
+            paramComps.add(GuiUtils.top(makeBox(radiusParams, ID_FORECAST_RINGS)));
+        }
 
 
         GuiUtils.tmpInsets = new Insets(4, 2, 0, 2);
         JComponent paramComp = GuiUtils.doLayout(paramComps, 4,
                                    GuiUtils.WT_N, GuiUtils.WT_N);
 
-        attrNames.add(0, "Fixed");
+        List comps = new ArrayList();
+
         for (Way way : ways) {
             WayDisplayState wds = getWayDisplayState(way);
             if ( !stormTrackControl.okToShowWay(wds.getWay())) {
                 continue;
             }
-            JLabel wayLabel = new JLabel(way.toString());
+            JComponent labelComp = GuiUtils.hbox(
+                                                 wds.getWayState().getCheckBox(this), new JLabel(way.toString()));
 
+            JComponent swatch = GuiUtils.wrap(wds.getColorSwatch());
             if (way.isObservation()) {
                 //We put the obs in the front of the list
                 int col = 0;
-                components.add(col++, GuiUtils.wrap(wds.getColorSwatch()));
-                components.add(
-                    col++,
-                    GuiUtils.hbox(
-                        wds.getWayState().getCheckBox(this), wayLabel));
-                components.add(col++, wds.getTrackState().getCheckBox(this));
-                components.add(col++, wds.getConeState().getCheckBox(this));
-                components.add(col++, wds.getRingsState().getCheckBox(this));
+                comps.add(col++, swatch);
+                comps.add(col++,labelComp);
+                comps.add(col++, wds.getTrackState().getCheckBox(this));
+                if(radiusParams != null) {
+                    comps.add(col++, wds.getConeState().getCheckBox(this));
+                    comps.add(col++, wds.getRingsState().getCheckBox(this));
+                }
 
             } else {
                 if ( !haveDoneForecast) {
+
                     //Put the forecast info here
                     haveDoneForecast = true;
                     for (int colIdx = 0; colIdx < numCols; colIdx++) {
-                        components.add(GuiUtils.filler(2, 5));
+                        comps.add(GuiUtils.filler());
                     }
 
-                    components.add(GuiUtils.filler());
-                    components.add(
+                    comps.add(GuiUtils.filler());
+                    comps.add(
                         GuiUtils.hbox(
                             forecastState.getWayState().getCheckBox(this),
                             GuiUtils.lLabel("Forecasts:")));
-                    components.add(
+                    comps.add(
                         forecastState.getTrackState().getCheckBox(this));
-                    components.add(
-                        forecastState.getConeState().getCheckBox(this));
-                    components.add(
-                        forecastState.getRingsState().getCheckBox(this));
+                    if(radiusParams!=null) {
+                        comps.add(
+                                       forecastState.getConeState().getCheckBox(this));
+                        comps.add(
+                                       forecastState.getRingsState().getCheckBox(this));
+                    }
                 }
-                components.add(GuiUtils.wrap(wds.getColorSwatch()));
-                components.add(
-                    GuiUtils.hbox(
-                        wds.getWayState().getCheckBox(this), wayLabel));
-                components.add(wds.getTrackState().getCheckBox(this));
-                components.add(wds.getConeState().getCheckBox(this));
-                components.add(wds.getRingsState().getCheckBox(this));
+                comps.add(swatch);
+                comps.add(labelComp);
+                comps.add(wds.getTrackState().getCheckBox(this));
+                if(radiusParams !=null) {
+                    comps.add(wds.getConeState().getCheckBox(this));
+                    comps.add(wds.getRingsState().getCheckBox(this));
+                }
             }
         }
 
-        for (int colIdx = 0; colIdx < colLabels.length; colIdx++) {
-            if (colLabels[colIdx].length() > 0) {
-                components.add(colIdx,
-                               new JLabel("<html><u><i>" + colLabels[colIdx]
+        for (int colIdx = 0; colIdx < numCols; colIdx++) {
+            String s = colLabels.get(colIdx);
+            if (s.length() > 0) {
+                comps.add(colIdx,
+                               new JLabel("<html><u><i>" + s
                                           + "</i></u></html>"));
             } else {
-                components.add(colIdx, new JLabel(""));
+                comps.add(colIdx, new JLabel(""));
             }
         }
 
 
         GuiUtils.tmpInsets = new Insets(2, 2, 0, 2);
-        JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(components,
+        JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(comps,
                                  numCols, GuiUtils.WT_N, GuiUtils.WT_N));
         //Put the list of ways into a scroller if there are lots of them
         if (ways.size() > 10) {
@@ -720,15 +763,6 @@ public class StormDisplayState {
 
 
 
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected StormParam getForecastParam() {
-        return forecastState.getTrackParam();
-    }
 
 
     /**
@@ -899,11 +933,27 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    protected List<StormParam> getRingsParams(WayDisplayState way) {
+    protected StormParam getRingsParam(WayDisplayState way) {
         if (way.getWay().isObservation()) {
-            return getParams(ID_OBS_RINGS);
+            return (StormParam)params.get(ID_OBS_RINGS);
         }
-        return getParams(ID_FORECAST_RINGS);
+        return (StormParam)params.get(ID_FORECAST_RINGS);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param way _more_
+     *
+     * @return _more_
+     */
+    protected StormParam getColorParam(WayDisplayState way) {
+        if (way.getWay().isObservation()) {
+            return (StormParam)params.get(ID_OBS_COLOR);
+        }
+        return (StormParam)params.get(ID_FORECAST_COLOR);
     }
 
 
@@ -930,41 +980,22 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     protected void updateDisplays() throws Exception {
-        List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
-        for (WayDisplayState wayDisplayState : wayDisplayStates) {
-            wayDisplayState.updateDisplay();
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param wayDisplayState _more_
-     */
-    protected void wayVisibilityChanged(WayDisplayState wayDisplayState) {}
-
-
-
-    /**
-     * _more_
-     *
-     * @param wayDisplayState _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void wayParamChanged(WayDisplayState wayDisplayState)
-            throws Exception {
-        if (forecastState == wayDisplayState) {
+        DisplayMaster displayMaster =
+            stormTrackControl.getDisplayMaster();
+        boolean wasActive = displayMaster.ensureInactive();
+        try {
             List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
-            for (WayDisplayState way : wayDisplayStates) {
-                if (way.usingDefaultParam()) {
-                    way.makeTrackField();
-                }
+            for (WayDisplayState wayDisplayState : wayDisplayStates) {
+                wayDisplayState.updateDisplay();
+            }
+        } finally {
+            if (wasActive) {
+                try {
+                    displayMaster.setActive(true);
+                } catch (Exception exc) {}
             }
         }
     }
-
 
 
 
@@ -1025,6 +1056,48 @@ public class StormDisplayState {
 
 
 
+    /**
+         Animation animation = stormTrackControl.getAnimation();
+         if (animation == null) {
+            return;
+        }
+        List<StormTrack> visibleTracks = new ArrayList<StormTrack>();
+        Real currentAnimationTime = animation.getAniValue();
+       if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
+            return;
+        }
+       Iterate way display states
+         boolean             visible = false;
+         if(wds.shouldShowTrack() && wds.hasTrackDisplay()) {
+         FieldImpl field = (FieldImplt)wds.getTrackDisplay().getData()
+         if(field==null) continue;
+         Set timeSet = GridUtil.getTimeSet();
+         if(timeSet == null) continue;
+         if (timeSet.getLength() == 1) {
+            visible = true;
+        } else {
+            //Else work the visad magic
+            float timeValueFloat = (float) currentAnimationTime.getValue(
+                                       timeSet.getSetUnits()[0]);
+            //            System.err.println("multiple times:" + timeValueFloat);
+            float[][] value = {
+                { timeValueFloat }
+            };
+            int[]     index = timeSet.valueToIndex(value);
+            //            System.err.println("index:" + index[0]);
+            visible = (index[0] >= 0);
+        }
+        if(visible) {
+        //Find the closest track in wds in time
+             visibleTracks.add(..);
+        }
+        }
+
+
+        Now search in space
+     **/
+
+
 
 
 
@@ -1062,6 +1135,9 @@ public class StormDisplayState {
         Real[]        values       = ((param == null)
                                       ? null
                                       : track.getTrackAttributeValues(param));
+        if(param!=null && values!=null) {
+            System.err.println("param:" + param + " values=" + (values!=null));
+        }
         for (int i = 0; i < numPoints; i++) {
             Real value = ((values == null)
                           ? dfltReal

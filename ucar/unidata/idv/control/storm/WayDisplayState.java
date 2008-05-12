@@ -100,7 +100,7 @@ public class WayDisplayState {
     /** _more_          */
     private DisplayState  coneState = new DisplayState("Show/Hide Cone",false);
 
-
+    /** _more_          */
     private DisplayState  ringsState = new DisplayState("Show/Hide Rings",false);
 
 
@@ -124,10 +124,6 @@ public class WayDisplayState {
     /** _more_ */
     private Color color;
 
-
-    /** _more_ */
-    private JComboBox paramBox;
-
     /** _more_ */
     private GuiUtils.ColorSwatch colorSwatch;
 
@@ -150,10 +146,8 @@ public class WayDisplayState {
     private String colorTable = "Bright38";
 
     private List<StormParam> coneParams;
-    private List<StormParam> ringsParams;
-
-    /** _more_ */
     private StormParam ringsParam;
+    private StormParam colorParam;
 
 
 
@@ -227,7 +221,6 @@ public class WayDisplayState {
 
 
 
-
     public  void updateDisplay() throws Exception {
         //        FieldImpl field = makeTrackField(obsTrack, null);
         //        obsDisplayState.addTrack(obsTrack, field);
@@ -243,12 +236,18 @@ public class WayDisplayState {
         getHolder().setVisible(true);
 
         if(shouldShowTrack()) {
-            if(!hasTrackDisplay()) {
+            StormParam tmp = stormDisplayState.getColorParam(this);
+
+            if(!hasTrackDisplay() || !Misc.equals(colorParam, tmp)) {
+                boolean hadTrack = hasTrackDisplay();
+                colorParam = tmp;
+                System.err.println(colorParam);
                 FieldImpl trackField = makeTrackField();
                 if(trackField!=null) {
                     getTrackDisplay().setTrack(trackField);
                 }
-                if(way.isObservation()) 
+                setTrackColor();
+                if(!hadTrack && way.isObservation()) 
                     getLabelDisplay().setStationData(
                                                      PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
             }
@@ -273,6 +272,7 @@ public class WayDisplayState {
                         getConesHolder().addDisplayable(coneDisplay);
                     }
                 }
+                setConeColor();
             }
             getConesHolder().setVisible(true);
         } else {
@@ -428,17 +428,16 @@ public class WayDisplayState {
      * @return _more_
      */
     public float[][] getColorPalette() {
-        StormParam param = getTrackParam();
-        if ((param != null) && (colorTable != null)) {
-            ColorTable ct =
-                stormDisplayState.getStormTrackControl().getControlContext()
-                    .getColorTableManager().getColorTable(colorTable);
+        if ((colorParam != null) && (colorTable != null)) {
+            ColorTable ct = stormDisplayState.getStormTrackControl().getColorTable();
+            System.err.println("Using:" + ct);
+            //                stormDisplayState.getStormTrackControl().getControlContext()
+            //                    .getColorTableManager().getColorTable(colorTable);
             if (ct != null) {
                 return stormDisplayState.getStormTrackControl()
                     .getColorTableForDisplayable(ct);
             }
         }
-
         return getColorPalette(getColor());
     }
 
@@ -456,60 +455,6 @@ public class WayDisplayState {
             c = Color.red;
         }
         return ColorTableDefaults.allOneColor(c, true);
-    }
-
-    /**
-     * _more_
-     *
-     * @param attrNames _more_
-     *
-     * @return _more_
-     */
-    protected Component getParamComponent(Vector attrNames) {
-        if ((attrNames == null) || (attrNames.size() == 0)) {
-            return GuiUtils.filler();
-        }
-        if (paramBox == null) {
-            paramBox = new JComboBox(attrNames);
-            paramBox.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        makeTrackField();
-                        setTrackColor();
-                        stormDisplayState.wayParamChanged(
-                            WayDisplayState.this);
-                    } catch (Exception exc) {
-                        LogUtil.logException("Making new field", exc);
-                    }
-                }
-            });
-        }
-        return paramBox;
-    }
-
-
-    /** _more_          */
-    private JComboBox radiusBox;
-
-    /**
-     * _more_
-     *
-     * @param radiusAttrNames _more_
-     *
-     * @return _more_
-     */
-    protected JComponent getRadiusComp(Vector radiusAttrNames) {
-        radiusBox = ((radiusAttrNames != null)
-                     ? new JComboBox(radiusAttrNames)
-                     : null);
-
-        JComponent radiusComp;
-        if (radiusBox != null) {
-            radiusComp = radiusBox;
-        } else {
-            radiusComp = (JComponent) GuiUtils.filler();
-        }
-        return radiusComp;
     }
 
 
@@ -532,50 +477,6 @@ public class WayDisplayState {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean usingDefaultParam() {
-        if (paramBox == null) {
-            return false;
-        }
-        TwoFacedObject tfo = (TwoFacedObject) paramBox.getSelectedItem();
-        Object         id  = tfo.getId();
-        if (id == null) {
-            return false;
-        }
-        if (id instanceof StormParam) {
-            return false;
-        }
-        return id.toString().equals("default");
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected StormParam getTrackParam() {
-        if (paramBox == null) {
-            return null;
-        }
-        TwoFacedObject tfo = (TwoFacedObject) paramBox.getSelectedItem();
-        Object         id  = tfo.getId();
-        if (id == null) {
-            return null;
-        }
-        if (id instanceof StormParam) {
-            return (StormParam) id;
-        }
-        if (id.toString().equals("default")) {
-            return stormDisplayState.getForecastParam();
-        }
-        return null;
-    }
 
 
     /**
@@ -623,12 +524,12 @@ public class WayDisplayState {
         List<DateTime>  times  = new ArrayList<DateTime>();
 
         pointObs = new ArrayList<PointOb>();
-        StormParam      param  = getTrackParam();
         for (StormTrack track : tracks) {
-            FieldImpl field = stormDisplayState.makeTrackField(track, param);
+            FieldImpl field = stormDisplayState.makeTrackField(track, colorParam);
             if(field == null) {
                 continue;
             }
+            System.err.println ("field:" + field);
             fields.add(field);
             times.add(track.getTrackStartTime());
             pointObs.addAll(makePointObs(track));
@@ -637,6 +538,7 @@ public class WayDisplayState {
         if (fields.size() == 0) {
             return null;
         }
+        //        if(fields.size()==1) return fields.get(0);
         return Util.makeTimeField(fields, times);
     }
 
@@ -730,7 +632,6 @@ public class WayDisplayState {
     protected FieldImpl makeConeField(StormParam stormParam) throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
-        StormParam      param  = getTrackParam();
         for (StormTrack track : tracks) {
             StormTrack coneTrack =         makeConeTrack(track,
                                                          stormParam);
