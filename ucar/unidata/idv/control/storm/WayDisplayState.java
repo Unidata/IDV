@@ -92,12 +92,13 @@ public class WayDisplayState {
     private Way way;
 
     /** _more_ */
-    private boolean visible = true;
+    private DisplayState  wayState = new DisplayState("Show/Hide All",true);
 
     private DisplayState  trackState = new DisplayState("Show/Hide Track",true);
 
     /** _more_          */
     private DisplayState  coneState = new DisplayState("Show/Hide Cone",false);
+
 
     private DisplayState  ringsState = new DisplayState("Show/Hide Rings",false);
 
@@ -227,11 +228,15 @@ public class WayDisplayState {
         //        obsDisplayState.addTrack(obsTrack, field);
         //        obsDisplayState.getTrackDisplay().setTrack(field);
 
+        //        System.err.println (way + " " + shouldShow() + " " + shouldShowTrack() + " " + shouldShowCone());
         if(!shouldShow()) {
             if(holder!=null) holder.setVisible(false);
             return;
         }
         
+
+        getHolder().setVisible(true);
+
         if(shouldShowTrack()) {
             if(!hasTrackDisplay()) {
                 getTrackDisplay().setTrack(makeTrackField());
@@ -258,28 +263,28 @@ public class WayDisplayState {
         }
 
 
-        if(holder != null) {
-            holder.setVisible(true);
-        }
     }
 
 
 
     public boolean shouldShow() {
-        if (!way.isObservation() && !stormDisplayState.getForecastVisible()) return false;
+        if (!way.isObservation() && !stormDisplayState.getForecastState().getWayState().getVisible()) return false;
         //        return visible;
-        return trackState.getVisible();
+        return wayState.getVisible();
     }
 
     public boolean shouldShowTrack() {
+        if (!way.isObservation() && !stormDisplayState.getForecastState().getTrackState().getVisible()) return false;
         return shouldShow() &&  trackState.getVisible();
     }
 
     public boolean shouldShowRings() {
+        if (!way.isObservation() && !stormDisplayState.getForecastState().getRingsState().getVisible()) return false;
         return shouldShow() &&  ringsState.getVisible();
     }
 
     public boolean shouldShowCone() {
+        if (!way.isObservation() && !stormDisplayState.getForecastState().getConeState().getVisible()) return false;
         return shouldShow() &&  coneState.getVisible();
     }
 
@@ -837,30 +842,29 @@ public DisplayState getRingsState () {
 
 
 
+/**
+Set the WayState property.
+
+@param value The new value for WayState
+**/
+public void setWayState (DisplayState value) {
+	wayState = value;
+}
+
+/**
+Get the WayState property.
+
+@return The WayState
+**/
+public DisplayState getWayState () {
+	return wayState;
+}
 
 
 
 
-    /**
-     * Set the Visible property.
-     *
-     * @param value The new value for Visible
-     *
-     * @throws Exception _more_
-     */
-    public void setVisible(boolean value) throws Exception {
-        this.visible = value;
-    }
 
 
-    /**
-     * Get the Visible property.
-     *
-     * @return The Visible
-     */
-    public boolean getVisible() {
-        return visible;
-    }
 
 
 

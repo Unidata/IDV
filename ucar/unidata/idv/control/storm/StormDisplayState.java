@@ -236,7 +236,10 @@ public class StormDisplayState {
     public StormDisplayState(StormInfo stormInfo) throws Exception {
         this.stormInfo = stormInfo;
         forecastState  = new WayDisplayState(this, new Way("forecaststate"));
-        forecastState.setVisible(false);
+        forecastState.getWayState().setVisible(false);
+        forecastState.getConeState().setVisible(true);
+        forecastState.getTrackState().setVisible(true);
+        forecastState.getRingsState().setVisible(true);
     }
 
 
@@ -411,7 +414,7 @@ public class StormDisplayState {
      */
     public boolean getForecastVisible() {
         //        return forecastState.getVisible();
-        return forecastState.getTrackState().getVisible();
+        return forecastState.getWayState().getVisible();
     }
 
     /**
@@ -474,24 +477,17 @@ public class StormDisplayState {
         //Sort them by name
         List<Way> ways             = Misc.sort(trackCollection.getWayList());
         boolean   haveDoneForecast = false;
-        //        components.add(GuiUtils.italicizeFont(new JLabel("<html><u>Track Type</u></html>")));
-        components.add(new JLabel("<html><u><i>Track Type</i></u></html>"));
-        components.add(new JLabel("<html><u><i>Visible</i></u></html>"));
-        components.add(new JLabel("<html><u><i>Color</i></u></html>"));
-        components.add(new JLabel("<html><u><i>Color Field</i></u></html>"));
+        String[] colLabels = {
+            "Type", /*"Visible",*/ "Track","Color", "Color Field",(radiusAttrNames != null?"Cone":""),
+            (radiusAttrNames != null?"Rings":"")
+        };
+        int numCols=colLabels.length;
 
-        components.add(new JLabel(((radiusAttrNames != null)
-                                   ? "<html><u><i>Cone</i></u></html>"
-                                   : "")));
-
-
-        components.add(new JLabel(((radiusAttrNames != null)
-                                   ? "<html><u><i>Rings</i></u></html>"
-                                   : "")));
-
+        for(int colIdx=0;colIdx<colLabels.length;colIdx++) {
+            components.add(new JLabel("<html><u><i>"+ colLabels[colIdx]+"</i></u></html>"));
+        }
 
         attrNames.add(0, new TwoFacedObject("Fixed", null));
-        int numCols=6;
         for (Way way : ways) {
             WayDisplayState wds = getWayDisplayState(way);
             if ( !stormTrackControl.okToShowWay(wds.getWay())) {
@@ -505,8 +501,12 @@ public class StormDisplayState {
 
 
             if (way.isObservation()) {
+                //We put the obs in the front of the list
                 int col=0;
-                components.add(numCols+col++, wayLabel);
+                components.add(numCols+col++, GuiUtils.hbox(wds.getWayState().getCheckBox(this), wayLabel));
+                //                components.add(numCols+col++,
+                //                               GuiUtils.left(wds.getWayState().getCheckBox(this)));
+
                 components.add(numCols+col++,
                                GuiUtils.left(wds.getTrackState().getCheckBox(this)));
 
@@ -515,27 +515,41 @@ public class StormDisplayState {
                         GuiUtils.wrap(wds.getColorSwatch())));
                 components.add(numCols+col++, 
                                wds.getParamComponent(tmpAttrNames));
-                components.add(GuiUtils.filler());
-                //                components.add(numCols+col++,wds.getConeState().getCheckBox(this));
+                components.add(numCols+col++, GuiUtils.filler());
+
                 components.add(numCols+col++,
                                wds.getRingsState().getCheckBox(this));
 
             } else {
                 if ( !haveDoneForecast) {
+                    //Put the forecast info here
                     haveDoneForecast = true;
                     for(int colIdx=0;colIdx<numCols;colIdx++) 
                         components.add(GuiUtils.filler(2, 5));
 
-                    components.add(GuiUtils.lLabel("Forecasts:"));
+                    components.add(GuiUtils.hbox(forecastState.getWayState().getCheckBox(this), GuiUtils.lLabel("Forecasts:")));
+
+                    //                    components.add(
+                    //                        GuiUtils.left(forecastState.getWayState().getCheckBox(this)));
+
                     components.add(
                         GuiUtils.left(forecastState.getTrackState().getCheckBox(this)));
+
                     components.add(GuiUtils.filler());
                     components.add(GuiUtils.filler());
-                    components.add(GuiUtils.filler());
-                    components.add(
-                        forecastState.getParamComponent(attrNames));
+
+
+                    components.add(forecastState.getConeState().getCheckBox(this));
+                    components.add(forecastState.getRingsState().getCheckBox(this));
+
+                //                    components.add(GuiUtils.filler());
+                //                    components.add(
+                //                        forecastState.getParamComponent(attrNames));
                 }
-                components.add(wayLabel);
+                components.add(GuiUtils.hbox(wds.getWayState().getCheckBox(this), wayLabel));
+                //                components.add(
+                //                               GuiUtils.left());
+
                 components.add(
                     GuiUtils.left(wds.getTrackState().getCheckBox(this)));
                 components.add(
@@ -546,8 +560,6 @@ public class StormDisplayState {
                 //                    wds.getParamComponent(tmpAttrNames));
 
                 components.add(wds.getConeState().getCheckBox(this));
-
-
                 components.add(wds.getRingsState().getCheckBox(this));
             }
         }
@@ -631,6 +643,8 @@ public class StormDisplayState {
     }
 
 
+
+
     /**
      * _more_
      *
@@ -649,7 +663,7 @@ public class StormDisplayState {
      * @return _more_
      */
     protected boolean canShowWay(Way way) {
-        return getWayDisplayState(way).getVisible();
+        return getWayDisplayState(way).getWayState().getVisible();
     }
 
     /**
