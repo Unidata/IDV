@@ -116,5 +116,27 @@ public boolean getCanDoDifference () {
         return Util.cleanTypeName(type.getName()).replace("_", " ");
     }
 
+
+/**
+Set the Type property.
+
+@param value The new value for Type
+**/
+public void setType (RealType value) {
+	type = value;
+}
+
+/**
+Get the Type property.
+
+@return The Type
+**/
+public RealType getType () {
+	return type;
+}
+
+
+
+
 }
 
