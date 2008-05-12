@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -126,62 +127,131 @@ import javax.swing.table.*;
  */
 
 public class StormTrackTableModel extends AbstractTableModel {
-    private StormDisplayState  stormDisplayState;
+
+    /** _more_          */
+    private StormDisplayState stormDisplayState;
+
+    /** _more_          */
     private StormTrack track;
+
+    /** _more_          */
     private List<StormTrackPoint> points;
+
+    /** _more_          */
     private List<StormParam> params;
 
-    public  StormTrackTableModel(StormDisplayState  stormDisplayState, StormTrack track) {
+    /**
+     * _more_
+     *
+     * @param stormDisplayState _more_
+     * @param track _more_
+     */
+    public StormTrackTableModel(StormDisplayState stormDisplayState,
+                                StormTrack track) {
         this.stormDisplayState = stormDisplayState;
-        this.track = track;
-        this.points = track.getTrackPoints();
-        this.params = track.getParams();
+        this.track             = track;
+        this.points            = track.getTrackPoints();
+        this.params            = track.getParams();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param rowIndex _more_
+     * @param columnIndex _more_
+     *
+     * @return _more_
+     */
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getRowCount() {
         return points.size();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getColumnCount() {
-        return 3+params.size();
+        return 3 + params.size();
     }
 
-    public void setValueAt(Object aValue, int rowIndex,
-                           int columnIndex) {}
+    /**
+     * _more_
+     *
+     * @param aValue _more_
+     * @param rowIndex _more_
+     * @param columnIndex _more_
+     */
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {}
 
+    /**
+     * _more_
+     *
+     * @param row _more_
+     * @param column _more_
+     *
+     * @return _more_
+     */
     public Object getValueAt(int row, int column) {
         if (row >= points.size()) {
             return "";
         }
-        StormTrackPoint stp= points.get(row);
-        if(column == 0) {
-            if(track.getWay().isObservation()) 
+        StormTrackPoint stp = points.get(row);
+        if (column == 0) {
+            if (track.getWay().isObservation()) {
                 return stp.getTrackPointTime();
-            return ""+stp.getForecastHour();
+            }
+            return "" + stp.getForecastHour();
         }
-        if(column == 1) return stp.getTrackPointLocation().getLatitude();
-        if(column == 2) return stp.getTrackPointLocation().getLongitude();
-        StormParam param  = params.get(column-3);
-        Real r =  stp.getAttribute(param);
-        if(r!=null) return r.toString();
+        if (column == 1) {
+            return stp.getTrackPointLocation().getLatitude();
+        }
+        if (column == 2) {
+            return stp.getTrackPointLocation().getLongitude();
+        }
+        StormParam param = params.get(column - 3);
+        Real       r     = stp.getAttribute(param);
+        if (r != null) {
+            return r.toString();
+        }
         return "";
     }
 
+    /**
+     * _more_
+     *
+     * @param column _more_
+     *
+     * @return _more_
+     */
     public String getColumnName(int column) {
-        if(column == 0) {
-            return track.getWay().isObservation()?"Time":"Hour";
+        if (column == 0) {
+            return track.getWay().isObservation()
+                   ? "Time"
+                   : "Hour";
         }
-        if(column == 1) return "Lat";
-        if(column == 2) return "Lon";
-        StormParam param= params.get(column-3);
-        Unit unit = param.getUnit();
-        return param.toString() +(unit==null?"":"[" + unit +"]");
+        if (column == 1) {
+            return "Lat";
+        }
+        if (column == 2) {
+            return "Lon";
+        }
+        StormParam param = params.get(column - 3);
+        Unit       unit  = param.getUnit();
+        return param.toString() + ((unit == null)
+                                   ? ""
+                                   : "[" + unit + "]");
     }
 
 

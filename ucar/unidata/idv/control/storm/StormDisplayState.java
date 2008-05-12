@@ -21,7 +21,11 @@
  */
 
 
+
 package ucar.unidata.idv.control.storm;
+
+
+import org.apache.poi.hssf.usermodel.*;
 
 
 import ucar.unidata.data.DataChoice;
@@ -36,17 +40,17 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.idv.control.chart.*;
+import ucar.unidata.ui.TreePanel;
 
 
 
 
 import ucar.unidata.ui.drawing.*;
-import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.FileManager;
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
@@ -86,7 +90,6 @@ import visad.georef.LatLonTuple;
 import visad.util.DataUtility;
 
 import java.awt.*;
-import java.io.*;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -94,6 +97,8 @@ import java.awt.Container;
 import java.awt.event.*;
 
 import java.beans.*;
+
+import java.io.*;
 
 import java.rmi.RemoteException;
 
@@ -115,8 +120,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.*;
-
-import org.apache.poi.hssf.usermodel.*;
 
 
 
@@ -317,10 +320,11 @@ public class StormDisplayState {
             active          = false;
             stormTrackControl.removeDisplayable(holder);
             holder = null;
-            if(mainContents!=null) {
+            if (mainContents != null) {
                 mainContents.removeAll();
                 mainContents.add(BorderLayout.NORTH, originalContents);
-                List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
+                List<WayDisplayState> wayDisplayStates =
+                    getWayDisplayStates();
                 for (WayDisplayState wayDisplayState : wayDisplayStates) {
                     wayDisplayState.deactivate();
                 }
@@ -365,15 +369,17 @@ public class StormDisplayState {
         JComponent top = GuiUtils.hbox(loadBtn, topLabel);
         originalContents = GuiUtils.inset(top, 5);
         JComponent contents = GuiUtils.top(originalContents);
-        final int cnt = xcnt++;
+        final int  cnt      = xcnt++;
         contents = new JPanel(new BorderLayout()) {
-                public String toString() {
-                    return "contents:" + cnt +" " + xxx();
-                }
-            };
+            public String toString() {
+                return "contents:" + cnt + " " + xxx();
+            }
+        };
         contents.add(BorderLayout.NORTH, originalContents);
         return contents;
     }
+
+    /** _more_          */
     static int xcnt = 0;
 
     /**
@@ -416,19 +422,20 @@ public class StormDisplayState {
             GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif", this,
                                      "deactivate");
         unloadBtn.setToolTipText("Remove this storm");
-        String label = "Storm: " +
-            stormInfo.toString() + 
-            "   " + 
-            stormInfo.getStartTime().formattedString("yyyy-MM-dd",DateUtil.TIMEZONE_GMT);
+        String label =
+            "Storm: " + stormInfo.toString() + "   "
+            + stormInfo.getStartTime().formattedString("yyyy-MM-dd",
+                DateUtil.TIMEZONE_GMT);
 
         JComponent top =
-            GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel(label), unloadBtn), new Insets(0, 0, 0, 0));
+            GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel(label),
+                unloadBtn), new Insets(0, 0, 0, 0));
 
 
 
-        List<StormParam> params = new ArrayList<StormParam>();
-        Hashtable      seenTypes      = new Hashtable();
-        Hashtable      seenWays       = new Hashtable();
+        List<StormParam> params    = new ArrayList<StormParam>();
+        Hashtable        seenTypes = new Hashtable();
+        Hashtable        seenWays  = new Hashtable();
         for (StormTrack track : trackCollection.getTracks()) {
             if (seenWays.get(track.getWay()) != null) {
                 continue;
@@ -448,8 +455,7 @@ public class StormDisplayState {
         if ((params != null) && (params.size() > 0)) {
             attrNames = new Vector();
             for (StormParam param : params) {
-                if (Unit.canConvert(param.getUnit(),
-                                    CommonUnit.meter)) {
+                if (Unit.canConvert(param.getUnit(), CommonUnit.meter)) {
                     if (radiusAttrNames == null) {
                         radiusAttrNames = new Vector();
                         radiusAttrNames.add(new TwoFacedObject("None", null));
@@ -481,7 +487,7 @@ public class StormDisplayState {
             if ( !stormTrackControl.okToShowWay(wayDisplayState.getWay())) {
                 continue;
             }
-            JLabel    wayLabel  = new JLabel(way.toString());
+            JLabel wayLabel     = new JLabel(way.toString());
 
 
             Vector tmpAttrNames = new Vector(attrNames);
@@ -493,9 +499,10 @@ public class StormDisplayState {
                 components.add(
                     1 + 5,
                     GuiUtils.left(wayDisplayState.getVisiblityCheckBox()));
-                components.add(2 + 5, wayDisplayState.getRingsVisiblityCheckBox());
+                components.add(2 + 5,
+                               wayDisplayState.getRingsVisiblityCheckBox());
                 //wayDisplayState.getRadiusComp(radiusAttrNames));
-                
+
                 //                components.add(2+5, GuiUtils.left(wayDisplayState.getRingsVisiblityCheckBox()));
                 components.add(
                     3 + 5,
@@ -575,13 +582,28 @@ public class StormDisplayState {
     }
 
 
+    /**
+     * Class ParamSelector _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private static class ParamSelector {
+
+        /** _more_          */
         List<StormParam> params;
+
+        /** _more_          */
         JList list;
-        public ParamSelector(List<StormParam> types) {
-            
-        }
-    } 
+
+        /**
+         * _more_
+         *
+         * @param types _more_
+         */
+        public ParamSelector(List<StormParam> types) {}
+    }
 
 
 
@@ -889,6 +911,7 @@ public class StormDisplayState {
      *
      * @param track _more_
      * @param type _more_
+     * @param param _more_
      *
      * @return _more_
      *
@@ -965,6 +988,7 @@ public class StormDisplayState {
      * @param track _more_
      * @param wState _more_
      * @param type _more_
+     * @param param _more_
      *
      *
      * @throws Exception _more_
@@ -1081,23 +1105,31 @@ public class StormDisplayState {
 
     /**
      * _more_
+     *
+     * @return _more_
      */
     private JComponent getTrackTable() {
         TreePanel tableTreePanel = new TreePanel(true, 150);
-        int width = 400;
-        int height=400;
+        int       width          = 400;
+        int       height         = 400;
         for (StormTrack track : trackCollection.getTracks()) {
-            StormTrackTableModel tableModel = new StormTrackTableModel(this, track);
+            StormTrackTableModel tableModel = new StormTrackTableModel(this,
+                                                  track);
             JTable trackTable = new JTable(tableModel);
             JScrollPane scroller = GuiUtils.makeScrollPane(trackTable, width,
-                                                       height);
+                                       height);
             scroller.setBorder(BorderFactory.createLoweredBevelBorder());
-            JComponent contents  = scroller;
-            if(!track.getWay().isObservation()) {
-                contents = GuiUtils.topCenter(GuiUtils.left(GuiUtils.inset(new JLabel(track.getTrackStartTime().toString()),5)), contents);
+            JComponent contents = scroller;
+            if ( !track.getWay().isObservation()) {
+                contents = GuiUtils.topCenter(
+                    GuiUtils.left(
+                        GuiUtils.inset(
+                            new JLabel(track.getTrackStartTime().toString()),
+                            5)), contents);
             }
             tableTreePanel.addComponent(contents, track.getWay().toString(),
-                                        track.getTrackStartTime().toString(),null);
+                                        track.getTrackStartTime().toString(),
+                                        null);
         }
 
 
@@ -1105,25 +1137,34 @@ public class StormDisplayState {
     }
 
 
-             
+
+    /**
+     * _more_
+     */
     public void writeToXls() {
         try {
-            JCheckBox justObservationCbx = new JCheckBox("Just Observation", false);
+            JCheckBox justObservationCbx = new JCheckBox("Just Observation",
+                                               false);
             JCheckBox justForecastCbx = new JCheckBox("Just Forecast", false);
-            JCheckBox mostRecentForecastCbx = new JCheckBox("Most Recent Forecasts", false);
-            JComponent accessory = GuiUtils.top(GuiUtils.vbox(justObservationCbx, justForecastCbx,mostRecentForecastCbx));
+            JCheckBox mostRecentForecastCbx =
+                new JCheckBox("Most Recent Forecasts", false);
+            JComponent accessory =
+                GuiUtils.top(GuiUtils.vbox(justObservationCbx,
+                                           justForecastCbx,
+                                           mostRecentForecastCbx));
 
-            String filename =
-                FileManager.getWriteFile(Misc.newList(FileManager.FILTER_XLS), FileManager.SUFFIX_XLS,accessory);
+            String filename = FileManager.getWriteFile(
+                                  Misc.newList(FileManager.FILTER_XLS),
+                                  FileManager.SUFFIX_XLS, accessory);
             if (filename == null) {
                 return;
             }
 
-            List<Way> waysToUse = new ArrayList<Way>();
-            Hashtable<Way,List> trackMap = new Hashtable<Way,List>();
+            List<Way>            waysToUse = new ArrayList<Way>();
+            Hashtable<Way, List> trackMap  = new Hashtable<Way, List>();
             for (StormTrack track : trackCollection.getTracks()) {
                 List tracks = trackMap.get(track.getWay());
-                if(tracks==null) {
+                if (tracks == null) {
                     tracks = new ArrayList();
                     trackMap.put(track.getWay(), tracks);
                     waysToUse.add(track.getWay());
@@ -1132,20 +1173,23 @@ public class StormDisplayState {
             }
 
 
-            Hashtable sheetNames = new Hashtable();
-            HSSFWorkbook     wb      = new HSSFWorkbook();
-            StormTrack obsTrack = trackCollection.getObsTrack();
+            Hashtable    sheetNames = new Hashtable();
+            HSSFWorkbook wb         = new HSSFWorkbook();
+            StormTrack   obsTrack   = trackCollection.getObsTrack();
             //Write the obs track first
-            if(obsTrack!=null &&!justForecastCbx.isSelected()) {
+            if ((obsTrack != null) && !justForecastCbx.isSelected()) {
                 write(wb, obsTrack, sheetNames);
             }
-            if(!justObservationCbx.isSelected()) {
+            if ( !justObservationCbx.isSelected()) {
                 waysToUse = Misc.sort(waysToUse);
-                for(Way way: waysToUse) {
-                    if(way.isObservation()) continue;
-                    List<StormTrack> tracks = (List<StormTrack>)Misc.sort(trackMap.get(way));
-                    if(mostRecentForecastCbx.isSelected()) {
-                        write(wb, tracks.get(tracks.size()-1), sheetNames);
+                for (Way way : waysToUse) {
+                    if (way.isObservation()) {
+                        continue;
+                    }
+                    List<StormTrack> tracks =
+                        (List<StormTrack>) Misc.sort(trackMap.get(way));
+                    if (mostRecentForecastCbx.isSelected()) {
+                        write(wb, tracks.get(tracks.size() - 1), sheetNames);
                     } else {
                         for (StormTrack track : tracks) {
                             write(wb, track, sheetNames);
@@ -1161,42 +1205,60 @@ public class StormDisplayState {
         }
     }
 
-    protected void write(HSSFWorkbook wb, StormTrack track, Hashtable sheetNames) {
+    /**
+     * _more_
+     *
+     * @param wb _more_
+     * @param track _more_
+     * @param sheetNames _more_
+     */
+    protected void write(HSSFWorkbook wb, StormTrack track,
+                         Hashtable sheetNames) {
         int cnt = 0;
-        String dateString =  track.getTrackStartTime().formattedString("yyyy-MM-dd hhmm",DateUtil.TIMEZONE_GMT);
-        String sheetName = track.getWay() + " - " +dateString;
-        if(sheetName.length()>30) sheetName = sheetName.substring(0,29);
+        String dateString =
+            track.getTrackStartTime().formattedString("yyyy-MM-dd hhmm",
+                DateUtil.TIMEZONE_GMT);
+        String sheetName = track.getWay() + " - " + dateString;
+        if (sheetName.length() > 30) {
+            sheetName = sheetName.substring(0, 29);
+        }
         //The sheet name length is limited
-        while(sheetNames.get(sheetName)!=null) {
-            sheetName = (cnt++)+" " +sheetName;
-            if(sheetName.length()>30) sheetName = sheetName.substring(0,29);
+        while (sheetNames.get(sheetName) != null) {
+            sheetName = (cnt++) + " " + sheetName;
+            if (sheetName.length() > 30) {
+                sheetName = sheetName.substring(0, 29);
+            }
         }
         sheetNames.put(sheetName, sheetName);
-        HSSFSheet        sheet= wb.createSheet(sheetName);
+        HSSFSheet        sheet  = wb.createSheet(sheetName);
 
-        int rowCnt = 0;
+        int              rowCnt = 0;
         List<StormParam> params = track.getParams();
-        HSSFCell cell;
-        HSSFRow row;
+        HSSFCell         cell;
+        HSSFRow          row;
 
 
-        for(StormTrackPoint stp: track.getTrackPoints()) {
-            if(rowCnt==0) {
-                row  = sheet.createRow((short) rowCnt++);
-                row.createCell((short)0).setCellValue("Time");
-                row.createCell((short)1).setCellValue("Latitude");
-                row.createCell((short)2).setCellValue("Longitude");
+        for (StormTrackPoint stp : track.getTrackPoints()) {
+            if (rowCnt == 0) {
+                row = sheet.createRow((short) rowCnt++);
+                row.createCell((short) 0).setCellValue("Time");
+                row.createCell((short) 1).setCellValue("Latitude");
+                row.createCell((short) 2).setCellValue("Longitude");
                 for (int colIdx = 0; colIdx < params.size(); colIdx++) {
-                    row.createCell((short)(colIdx+3)).setCellValue(params.get(colIdx).toString());
+                    row.createCell((short) (colIdx + 3)).setCellValue(
+                        params.get(colIdx).toString());
                 }
             }
-            row  = sheet.createRow((short) rowCnt++);
-            row.createCell((short)0).setCellValue(stp.getTrackPointTime().toString());
-            row.createCell((short)1).setCellValue(stp.getTrackPointLocation().getLatitude().getValue());
-            row.createCell((short)2).setCellValue(stp.getTrackPointLocation().getLongitude().getValue());
+            row = sheet.createRow((short) rowCnt++);
+            row.createCell((short) 0).setCellValue(
+                stp.getTrackPointTime().toString());
+            row.createCell((short) 1).setCellValue(
+                stp.getTrackPointLocation().getLatitude().getValue());
+            row.createCell((short) 2).setCellValue(
+                stp.getTrackPointLocation().getLongitude().getValue());
             for (int colIdx = 0; colIdx < params.size(); colIdx++) {
                 Real r = stp.getAttribute(params.get(colIdx));
-                cell = row.createCell((short) (colIdx+3));
+                cell = row.createCell((short) (colIdx + 3));
                 cell.setCellValue(r.getValue());
             }
         }

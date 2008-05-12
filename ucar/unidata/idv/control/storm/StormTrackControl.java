@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -67,9 +68,15 @@ import javax.swing.*;
 public class StormTrackControl extends DisplayControlImpl {
 
 
-    private final static String  PREF_STORMDISPLAYSTATE = "pref.stormdisplaystate";
-    private final static String  PREF_OKWAYS = "pref.okways";
-    private final static String  PREF_OKPARAMS = "pref.okparams";
+    /** _more_          */
+    private final static String PREF_STORMDISPLAYSTATE =
+        "pref.stormdisplaystate";
+
+    /** _more_          */
+    private final static String PREF_OKWAYS = "pref.okways";
+
+    /** _more_          */
+    private final static String PREF_OKPARAMS = "pref.okparams";
 
 
 
@@ -84,6 +91,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /** _more_          */
     private Hashtable preferences;
 
 
@@ -94,10 +102,10 @@ public class StormTrackControl extends DisplayControlImpl {
     private Hashtable<String, Boolean> okParams;
 
 
-    /** _more_          */
+    /** _more_ */
     private String startTime;
 
-    /** _more_          */
+    /** _more_ */
     private String endTime;
 
     /** _more_ */
@@ -172,18 +180,21 @@ public class StormTrackControl extends DisplayControlImpl {
         getColorTableWidget(getRangeForColorTable());
         stormDataSource = (StormDataSource) dataSources.get(0);
 
-        if(okWays ==null) {
-            okWays = (Hashtable<String,Boolean>) getPreferences().get(PREF_OKWAYS);
+        if (okWays == null) {
+            okWays = (Hashtable<String,
+                                Boolean>) getPreferences().get(PREF_OKWAYS);
         }
-        if(okWays==null) {
-            okWays = new Hashtable<String,Boolean>();
+        if (okWays == null) {
+            okWays = new Hashtable<String, Boolean>();
         }
 
-        if(okParams ==null) {
-            okParams = (Hashtable<String,Boolean>) getPreferences().get(PREF_OKPARAMS);
+        if (okParams == null) {
+            okParams =
+                (Hashtable<String,
+                           Boolean>) getPreferences().get(PREF_OKPARAMS);
         }
-        if(okParams==null) {
-            okParams  = new Hashtable<String,Boolean>();
+        if (okParams == null) {
+            okParams = new Hashtable<String, Boolean>();
         }
 
 
@@ -216,7 +227,9 @@ public class StormTrackControl extends DisplayControlImpl {
         if (way.isObservation()) {
             return true;
         }
-        if(okWays == null) return true;
+        if (okWays == null) {
+            return true;
+        }
         if ((okWays.size() > 0) && (okWays.get(way.getId()) == null)) {
             return false;
         }
@@ -228,10 +241,14 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @param way _more_
      *
+     * @param realType _more_
+     *
      * @return _more_
      */
     protected boolean okToShowParam(RealType realType) {
-        if(okParams == null) return true;
+        if (okParams == null) {
+            return true;
+        }
         if ((okParams.size() > 0) && (okParams.get(realType) == null)) {
             return false;
         }
@@ -243,10 +260,10 @@ public class StormTrackControl extends DisplayControlImpl {
      * _more_
      */
     public void showWaySelectDialog() {
-        List                  checkBoxes       = new ArrayList();
-        List                  useWays          = new ArrayList();
-        List                  allWays          = new ArrayList<Way>();
-        for (Way way: stormDataSource.getWays()) {
+        List checkBoxes = new ArrayList();
+        List useWays    = new ArrayList();
+        List allWays    = new ArrayList<Way>();
+        for (Way way : stormDataSource.getWays()) {
             if (way.isObservation()) {
                 continue;
             }
@@ -257,20 +274,24 @@ public class StormTrackControl extends DisplayControlImpl {
         }
         useWays = Misc.sort(useWays);
         allWays = Misc.sort(allWays);
-        JCheckBox writeAsPreferenceCbx = new JCheckBox("Save as preference", false);
+        JCheckBox writeAsPreferenceCbx = new JCheckBox("Save as preference",
+                                             false);
         TwoListPanel tlp = new TwoListPanel(allWays, "Don't Use", useWays,
                                             "Use", null, false);
-        JComponent contents = GuiUtils.centerBottom(tlp, GuiUtils.left(writeAsPreferenceCbx));
-        if ( !GuiUtils.showOkCancelDialog(null, getWayName() + " Selection",contents,
-                                          null)) {
+        JComponent contents = GuiUtils.centerBottom(tlp,
+                                  GuiUtils.left(writeAsPreferenceCbx));
+        if ( !GuiUtils.showOkCancelDialog(null, getWayName() + " Selection",
+                                          contents, null)) {
             return;
         }
         List only = tlp.getCurrentEntries();
-        
+
         if (only.size() == allWays.size()) {
-            onlyShowTheseWays(new ArrayList<Way>(),writeAsPreferenceCbx.isSelected());
+            onlyShowTheseWays(new ArrayList<Way>(),
+                              writeAsPreferenceCbx.isSelected());
         } else {
-            onlyShowTheseWays((List<Way>) only,writeAsPreferenceCbx.isSelected());
+            onlyShowTheseWays((List<Way>) only,
+                              writeAsPreferenceCbx.isSelected());
         }
 
     }
@@ -305,8 +326,10 @@ public class StormTrackControl extends DisplayControlImpl {
      * _more_
      *
      * @param ways _more_
+     * @param writeAsPreference _more_
      */
-    protected void onlyShowTheseWays(List<Way> ways, boolean writeAsPreference) {
+    protected void onlyShowTheseWays(List<Way> ways,
+                                     boolean writeAsPreference) {
         okWays = new Hashtable();
         for (Way way : ways) {
             okWays.put(way.getId(), new Boolean(true));
@@ -317,7 +340,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 getStormDisplayState(stormInfo);
             stormDisplayState.reload();
         }
-        if(writeAsPreference) {
+        if (writeAsPreference) {
             putPreference(PREF_OKWAYS, okWays);
         }
 
@@ -358,29 +381,49 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param items _more_
+     * @param forMenuBar _more_
+     */
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
-        StormDisplayState     current          =
-            getCurrentStormDisplayState();
-        if(current!=null && current.getActive()) {
-            items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,"writeToXls"));
+        StormDisplayState current = getCurrentStormDisplayState();
+        if ((current != null) && current.getActive()) {
+            items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,
+                                            "writeToXls"));
         }
-        super.getSaveMenuItems(items,  forMenuBar);
+        super.getSaveMenuItems(items, forMenuBar);
     }
 
+    /**
+     * _more_
+     *
+     * @param items _more_
+     * @param forMenuBar _more_
+     */
     protected void getEditMenuItems(List items, boolean forMenuBar) {
-        StormDisplayState     current          =
-            getCurrentStormDisplayState();
-        if(current!=null && current.getActive()) {
-            items.add(GuiUtils.makeMenuItem("Add Forecast Time Chart", current, "addForecastTimeChart"));
-            items.add(GuiUtils.makeMenuItem("Add Forecast Hour Chart", current, "addForecastHourChart"));
+        StormDisplayState current = getCurrentStormDisplayState();
+        if ((current != null) && current.getActive()) {
+            items.add(GuiUtils.makeMenuItem("Add Forecast Time Chart",
+                                            current, "addForecastTimeChart"));
+            items.add(GuiUtils.makeMenuItem("Add Forecast Hour Chart",
+                                            current, "addForecastHourChart"));
             items.add(GuiUtils.makeMenuItem("Select " + getWaysName()
-                                            + " To Use", this, "showWaySelectDialog"));
-            items.add(GuiUtils.makeMenuItem("Save Storm Display as Preference", this, "saveStormDisplayState"));
+                                            + " To Use", this,
+                                                "showWaySelectDialog"));
+            items.add(
+                GuiUtils.makeMenuItem(
+                    "Save Storm Display as Preference", this,
+                    "saveStormDisplayState"));
         }
-        if(getPreferences().get(PREF_STORMDISPLAYSTATE)!=null) {
-            items.add(GuiUtils.makeMenuItem("Remove Storm Display Preference", this, "deleteStormDisplayState"));
+        if (getPreferences().get(PREF_STORMDISPLAYSTATE) != null) {
+            items.add(
+                GuiUtils.makeMenuItem(
+                    "Remove Storm Display Preference", this,
+                    "deleteStormDisplayState"));
         }
-        super.getEditMenuItems(items,  forMenuBar);
+        super.getEditMenuItems(items, forMenuBar);
     }
 
 
@@ -494,12 +537,17 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private Hashtable getPreferences() {
-        if(preferences==null) {
-            String path = stormDataSource.getClass().getName()+".StormTrackControl.xml";
+        if (preferences == null) {
+            String path = stormDataSource.getClass().getName()
+                          + ".StormTrackControl.xml";
             preferences =
-                (Hashtable) getIdv().getStore().getEncodedFile(
-                                                               path);
+                (Hashtable) getIdv().getStore().getEncodedFile(path);
             if (preferences == null) {
                 preferences = new Hashtable();
             }
@@ -507,40 +555,59 @@ public class StormTrackControl extends DisplayControlImpl {
         return preferences;
     }
 
-    
 
+
+    /**
+     * _more_
+     */
     public void deleteStormDisplayState() {
-        String template = (String)getPreferences().get(PREF_STORMDISPLAYSTATE);
-        if(template!=null) {
+        String template =
+            (String) getPreferences().get(PREF_STORMDISPLAYSTATE);
+        if (template != null) {
             getPreferences().remove(PREF_STORMDISPLAYSTATE);
             writePreferences();
         }
     }
 
+    /**
+     * _more_
+     */
     public void saveStormDisplayState() {
         try {
-            StormDisplayState     current          =
-                getCurrentStormDisplayState();
-            if(current == null) return;
+            StormDisplayState current = getCurrentStormDisplayState();
+            if (current == null) {
+                return;
+            }
             boolean wasActive = current.getActive();
             current.setActive(false);
             current.setStormTrackControl(null);
-            String xml = getIdv().encodeObject(current,false);
-            current.setStormTrackControl(this);        
+            String xml = getIdv().encodeObject(current, false);
+            current.setStormTrackControl(this);
             current.setActive(wasActive);
             putPreference(PREF_STORMDISPLAYSTATE, xml);
-            userMessage("<html>Preference saved. <br>Note: This will take effect for new display controls</html>");
+            userMessage(
+                "<html>Preference saved. <br>Note: This will take effect for new display controls</html>");
         } catch (Exception exc) {
             logException("Saving storm display", exc);
         }
 
     }
 
+    /**
+     * _more_
+     */
     private void writePreferences() {
-        String path = stormDataSource.getClass().getName()+".StormTrackControl.xml";
+        String path = stormDataSource.getClass().getName()
+                      + ".StormTrackControl.xml";
         getIdv().getStore().putEncodedFile(path, preferences);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param object _more_
+     */
     private void putPreference(String key, Object object) {
         getPreferences().put(key, object);
         writePreferences();
@@ -559,14 +626,18 @@ public class StormTrackControl extends DisplayControlImpl {
             stormDisplayStateMap.get(stormInfo);
         try {
             if (stormDisplayState == null) {
-                String template = (String)getPreferences().get(PREF_STORMDISPLAYSTATE);
-                if(template!=null) {
+                String template =
+                    (String) getPreferences().get(PREF_STORMDISPLAYSTATE);
+                if (template != null) {
                     try {
-                        stormDisplayState = (StormDisplayState) getIdv().decodeObject(template);
+                        stormDisplayState =
+                            (StormDisplayState) getIdv().decodeObject(
+                                template);
                         stormDisplayState.setStormInfo(stormInfo);
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         logException("Creating storm display", exc);
-                        System.err.println ("Error decoding preference:" + exc);
+                        System.err.println("Error decoding preference:"
+                                           + exc);
                         //noop
                     }
                 }
