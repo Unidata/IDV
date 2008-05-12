@@ -335,12 +335,13 @@ public class StormTrack implements Comparable {
      * @param param _more_
      * @return _more_
      */
-    public Real[] getTrackAttributeValues(StormParam param) {
+    public Real[] getTrackAttributeValues(StormParam param) throws VisADException {
         if (param == null) {
             return null;
         }
         int    size            = trackPoints.size();
         Real[] trackAttributes = new Real[size];
+        Real missing = null;
         for (int i = 0; i < size; i++) {
             Real value = trackPoints.get(i).getAttribute(param);
             if (value == null) {
@@ -349,8 +350,12 @@ public class StormTrack implements Comparable {
                 }
                 trackAttributes[i] = null;
             } else {
+                if(missing==null) missing =  value.cloneButValue(Double.NaN);
                 trackAttributes[i] = value;
             }
+        }
+        for(int i=0;i<size;i++) {
+            if(trackAttributes[i] ==null) trackAttributes[i] = missing;
         }
         return trackAttributes;
     }
