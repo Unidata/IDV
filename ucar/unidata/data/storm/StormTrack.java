@@ -35,6 +35,7 @@ import visad.georef.EarthLocation;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Hashtable;
 
 
 /**
@@ -295,20 +296,30 @@ public class StormTrack implements Comparable {
     }
 
 
+    private List<StormParam> params=null;
+
+
     /**
      * _more_
      *
      * @return _more_
      */
     public List<StormParam> getParams() {
-        List<StormParam> params = new ArrayList<StormParam>();
-        if (trackPoints.size() > 0) {
-            List<Real> reals = trackPoints.get(0).getTrackAttributes();
-            for (Real r : reals) {
-                params.add(new StormParam((RealType) r.getType()));
+        if(params==null) {
+            params = new ArrayList<StormParam>();
+            Hashtable seenParam = new Hashtable();
+            for(StormTrackPoint stp: trackPoints) {
+                List<Real> reals = stp.getTrackAttributes();
+                for (Real r : reals) {
+                    RealType type = (RealType) r.getType();
+                    if(seenParam.get(type)==null) {
+                        seenParam.put(type,type);
+                        params.add(new StormParam(type));
+                    }
+                }
             }
-
         }
+        
         return params;
     }
 

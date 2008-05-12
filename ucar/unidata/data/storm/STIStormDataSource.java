@@ -98,7 +98,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        return true;
+        return false;
     }
 
     /**
@@ -646,19 +646,16 @@ public class STIStormDataSource extends StormDataSource {
                 attrs.add(
                     PARAM_MOVESPEED.getReal(
                         getValue(results.getDouble(col++))));
-                String key = forecastWay.getName().toUpperCase()
-                             + Integer.toString(fhour);
-                float[] radiuses = wayfhourToRadius.get(key);
-                if (radiuses != null) {
-                    //radius = fhour * 50.0f / 24.0f;
-                    addprobabilityradiusAttrs(attrs, radiuses);
-                }
-                //                System.err.println("setting radius =" + radius + "  forecast hour = " + fhour + " way=" + forecastWay);
+                float[] radiuses = getProbabilityRadius(forecastWay, fhour);
+                DateTime dttm = getDateTime(year, month, day, hour + fhour);
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
                                    altReal);
-                DateTime dttm = getDateTime(year, month, day, hour + fhour);
+                if (radiuses != null) {
+                    //radius = fhour * 50.0f / 24.0f;
+                    addProbabilityRadiusAttrs(attrs, radiuses);
+                }
                 StormTrackPoint stp = new StormTrackPoint(elt, dttm, fhour,
                                           attrs);
                 if ( !elt.isMissing()) {
@@ -680,6 +677,19 @@ public class STIStormDataSource extends StormDataSource {
 
     }
 
+    private float[] getProbabilityRadius(Way way, int forecastHour) {
+        String key = way.getName().toUpperCase()   + forecastHour;
+        //        System.out.println("get:" + key + " " +(wayfhourToRadius.get(key)!=null));
+        return  wayfhourToRadius.get(key);
+    }
+
+    private void  putProbabilityRadius(Way way, int forecastHour, float[] radiuses) {
+        String key = way.getName().toUpperCase()   + forecastHour;
+        //        System.out.println("put:" + key); 
+        wayfhourToRadius.put(key, radiuses);
+    }
+
+
     /**
      * _more_
      *
@@ -688,7 +698,7 @@ public class STIStormDataSource extends StormDataSource {
      *
      * @throws Exception _more_
      */
-    private void addprobabilityradiusAttrs(List<Real> attrs, float[] radiuses)
+    private void addProbabilityRadiusAttrs(List<Real> attrs, float[] radiuses)
             throws Exception {
         attrs.add(PARAM_PROBABILITY10RADIUS.getReal(radiuses[0]));
         attrs.add(PARAM_PROBABILITY20RADIUS.getReal(radiuses[1]));
@@ -930,10 +940,7 @@ public class STIStormDataSource extends StormDataSource {
                 wp[7] = results.getFloat(col++);
                 wp[8] = results.getFloat(col++);
                 wp[9] = results.getFloat(col++);
-
-                String key = wayName + Integer.toString(fhour);
-                //                System.err.println ("wpppppp " +  key + "  data "+ wp[0] + " and " + wp[1]);
-                wayfhourToRadius.put(key, wp);
+                putProbabilityRadius(new Way(wayName), fhour,wp);
             }
         }
     }
@@ -1224,7 +1231,7 @@ public class STIStormDataSource extends StormDataSource {
         String columns = SqlUtil.distinct(COL_TYPHOON_STORMID);
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK));
         //        System.err.println (query);
-        System.err.println(query);
+        //        System.err.println(query);
         SqlUtil.Iterator iter = SqlUtil.getIterator(evaluate(query));
         ResultSet        results;
         List<StormInfo>  stormInfos = new ArrayList<StormInfo>();
@@ -1232,7 +1239,7 @@ public class STIStormDataSource extends StormDataSource {
             while (results.next()) {
                 String   id        = results.getString(1);
                 DateTime startTime = getStormStartTime(id);
-                System.err.println(id + " " + startTime);
+                //                System.err.println(id + " " + startTime);
                 StormInfo sinfo = new StormInfo(id, startTime);
                 stormInfos.add(sinfo);
             }
@@ -1435,21 +1442,23 @@ public class STIStormDataSource extends StormDataSource {
             //Drop the table  - ignore any errors
             //          SqlUtil.loadSql("drop table " + TABLE_TRACK, stmt, false);
 
-            //Load in the test data
-            try {
-                stmt.execute("select count(*) from typhoon");
-                System.err.println("Derby DB OK");
-            } catch (Exception exc) {
-                System.err.println("exc;" + exc);
-                System.err.println("Creating test database");
-                String initSql = IOUtil.readContents(
-                                     "/ucar/unidata/data/storm/testdb.sql",
-                                     getClass());
+            if(useDerby()) {
+                //Load in the test data
+                try {
+                    stmt.execute("select count(*) from typhoon");
+                    System.err.println("Derby DB OK");
+                } catch (Exception exc) {
+                    System.err.println("exc;" + exc);
+                    System.err.println("Creating test database");
+                    String initSql = IOUtil.readContents(
+                                                         "/ucar/unidata/data/storm/testdb.sql",
+                                                         getClass());
 
-                connection.setAutoCommit(false);
-                SqlUtil.loadSql(initSql, stmt, false);
-                connection.commit();
-                connection.setAutoCommit(true);
+                    connection.setAutoCommit(false);
+                    SqlUtil.loadSql(initSql, stmt, false);
+                    connection.commit();
+                    connection.setAutoCommit(true);
+                }
             }
         } catch (Exception exc) {
             exc.printStackTrace();

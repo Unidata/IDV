@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -56,7 +58,6 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.*;
 
@@ -116,9 +117,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.*;
 import javax.swing.table.*;
 
 
@@ -130,6 +129,20 @@ import javax.swing.table.*;
  */
 
 public class StormDisplayState {
+
+
+    /** _more_ */
+    private static String ID_OBS_CONE = "id.obs.cone";
+
+    /** _more_ */
+    private static String ID_OBS_RINGS = "id.obs.rings";
+
+    /** _more_ */
+    private static String ID_FORECAST_CONE = "id.forecast.cone";
+
+    /** _more_ */
+    private static String ID_FORECAST_RINGS = "id.forecast.rings";
+
 
     /** The array of colors we cycle through */
     private static Color[] colors = {
@@ -212,6 +225,8 @@ public class StormDisplayState {
     /** _more_ */
     private JComponent originalContents;
 
+    /** _more_ */
+    private Hashtable params = new Hashtable();
 
 
     /** _more_ */
@@ -383,7 +398,7 @@ public class StormDisplayState {
         return contents;
     }
 
-    /** _more_          */
+    /** _more_ */
     static int xcnt = 0;
 
     /**
@@ -417,6 +432,50 @@ public class StormDisplayState {
         return forecastState.getWayState().getVisible();
     }
 
+
+    /**
+     * _more_
+     *
+     * @param stormParams _more_
+     * @param id _more_
+     *
+     * @return _more_
+     */
+    private JComponent makeList(List stormParams, final Object id) {
+        final JList list = new JList(new Vector(stormParams));
+        list.setVisibleRowCount(4);
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        list.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                List<StormParam> selected = new ArrayList<StormParam>();
+                selected.addAll(Misc.toList(list.getSelectedValues()));
+                try {
+                    params.put(id, selected);
+                    updateDisplays();
+                } catch (Exception exc) {
+                    stormTrackControl.logException("setting cones", exc);
+                }
+
+            }
+        });
+
+        List selected = (List) params.get(id);
+        if ((selected != null) && (selected.size() > 0)) {
+            int[] indices = new int[selected.size()];
+            for (int i = 0; i < selected.size(); i++) {
+                indices[i] = stormParams.indexOf(selected.get(i));
+            }
+            list.setSelectedIndices(indices);
+        }
+
+        JScrollPane sp = new JScrollPane(list);
+        return sp;
+    }
+
+
+
+
+
     /**
      * _more_
      */
@@ -438,23 +497,24 @@ public class StormDisplayState {
 
 
 
-        List<StormParam> params    = new ArrayList<StormParam>();
-        Hashtable        seenTypes = new Hashtable();
-        Hashtable        seenWays  = new Hashtable();
+        List<StormParam> params     = new ArrayList<StormParam>();
+        Hashtable        seenParams = new Hashtable();
+        Hashtable        seenWays   = new Hashtable();
         for (StormTrack track : trackCollection.getTracks()) {
-            if (seenWays.get(track.getWay()) != null) {
-                continue;
-            }
-            seenWays.put(track.getWay(), track.getWay());
+            //            if (seenWays.get(track.getWay()) != null) {
+            //                continue;
+            //            }
+            //            seenWays.put(track.getWay(), track.getWay());
             List<StormParam> trackParams = track.getParams();
             for (StormParam param : trackParams) {
-                if (seenTypes.get(param) != null) {
+                if (seenParams.get(param) != null) {
                     continue;
                 }
-                seenTypes.put(param, param);
+                seenParams.put(param, param);
                 params.add(param);
             }
         }
+
         Vector radiusAttrNames = null;
         Vector attrNames       = null;
         if ((params != null) && (params.size() > 0)) {
@@ -463,12 +523,10 @@ public class StormDisplayState {
                 if (Unit.canConvert(param.getUnit(), CommonUnit.meter)) {
                     if (radiusAttrNames == null) {
                         radiusAttrNames = new Vector();
-                        radiusAttrNames.add(new TwoFacedObject("None", null));
                     }
-                    radiusAttrNames.add(new TwoFacedObject(param.toString(),
-                            param));
+                    radiusAttrNames.add(param);
                 }
-                attrNames.add(new TwoFacedObject(param.toString(), param));
+                attrNames.add(param);
             }
         }
 
@@ -477,96 +535,110 @@ public class StormDisplayState {
         //Sort them by name
         List<Way> ways             = Misc.sort(trackCollection.getWayList());
         boolean   haveDoneForecast = false;
-        String[] colLabels = {
-            "Type", /*"Visible",*/ "Track","Color", "Color Field",(radiusAttrNames != null?"Cone":""),
-            (radiusAttrNames != null?"Rings":"")
-        };
-        int numCols=colLabels.length;
+        String[] colLabels = { "", "", /*"Visible",*/ "Track",
+                               ((radiusAttrNames != null)
+                                ? "Cone"
+                                : ""), ((radiusAttrNames != null)
+                                        ? "Rings"
+                                        : "") };
+        int  numCols    = colLabels.length;
 
-        for(int colIdx=0;colIdx<colLabels.length;colIdx++) {
-            components.add(new JLabel("<html><u><i>"+ colLabels[colIdx]+"</i></u></html>"));
-        }
 
-        attrNames.add(0, new TwoFacedObject("Fixed", null));
+        List paramComps = new ArrayList();
+        paramComps.add(new JLabel(""));
+        paramComps.add(new JLabel("<html><u><i>Color By</i></u></html>"));
+        paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
+        paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
+        attrNames.add(0, "Fixed");
+
+
+
+        JComboBox obsColorByBox      = new JComboBox(new Vector(attrNames));
+        JComboBox forecastColorByBox = new JComboBox(new Vector(attrNames));
+
+        paramComps.add(
+            GuiUtils.top(
+                GuiUtils.inset(
+                    new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
+        paramComps.add(GuiUtils.top(obsColorByBox));
+        paramComps.add(makeList(radiusAttrNames, ID_OBS_CONE));
+        paramComps.add(makeList(radiusAttrNames, ID_OBS_RINGS));
+
+        paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
+                new Insets(4, 0, 0, 0))));
+        paramComps.add(GuiUtils.top(forecastColorByBox));
+        paramComps.add(makeList(radiusAttrNames, ID_FORECAST_CONE));
+        paramComps.add(makeList(radiusAttrNames, ID_FORECAST_RINGS));
+
+
+        GuiUtils.tmpInsets = new Insets(4, 2, 0, 2);
+        JComponent paramComp = GuiUtils.doLayout(paramComps, 4,
+                                   GuiUtils.WT_N, GuiUtils.WT_N);
+
+        attrNames.add(0, "Fixed");
         for (Way way : ways) {
             WayDisplayState wds = getWayDisplayState(way);
             if ( !stormTrackControl.okToShowWay(wds.getWay())) {
                 continue;
             }
-            JLabel wayLabel     = new JLabel(way.toString());
-
-
-            Vector tmpAttrNames = new Vector(attrNames);
-            tmpAttrNames.add(1, new TwoFacedObject("Default", "default"));
-
+            JLabel wayLabel = new JLabel(way.toString());
 
             if (way.isObservation()) {
                 //We put the obs in the front of the list
-                int col=0;
-                components.add(numCols+col++, GuiUtils.hbox(wds.getWayState().getCheckBox(this), wayLabel));
-                //                components.add(numCols+col++,
-                //                               GuiUtils.left(wds.getWayState().getCheckBox(this)));
-
-                components.add(numCols+col++,
-                               GuiUtils.left(wds.getTrackState().getCheckBox(this)));
-
-                components.add(numCols+col++,
-                    GuiUtils.left(
-                        GuiUtils.wrap(wds.getColorSwatch())));
-                components.add(numCols+col++, 
-                               wds.getParamComponent(tmpAttrNames));
-                components.add(numCols+col++, GuiUtils.filler());
-
-                components.add(numCols+col++,
-                               wds.getRingsState().getCheckBox(this));
+                int col = 0;
+                components.add(col++, GuiUtils.wrap(wds.getColorSwatch()));
+                components.add(
+                    col++,
+                    GuiUtils.hbox(
+                        wds.getWayState().getCheckBox(this), wayLabel));
+                components.add(col++, wds.getTrackState().getCheckBox(this));
+                components.add(col++, wds.getConeState().getCheckBox(this));
+                components.add(col++, wds.getRingsState().getCheckBox(this));
 
             } else {
                 if ( !haveDoneForecast) {
                     //Put the forecast info here
                     haveDoneForecast = true;
-                    for(int colIdx=0;colIdx<numCols;colIdx++) 
+                    for (int colIdx = 0; colIdx < numCols; colIdx++) {
                         components.add(GuiUtils.filler(2, 5));
+                    }
 
-                    components.add(GuiUtils.hbox(forecastState.getWayState().getCheckBox(this), GuiUtils.lLabel("Forecasts:")));
-
-                    //                    components.add(
-                    //                        GuiUtils.left(forecastState.getWayState().getCheckBox(this)));
-
+                    components.add(GuiUtils.filler());
                     components.add(
-                        GuiUtils.left(forecastState.getTrackState().getCheckBox(this)));
-
-                    components.add(GuiUtils.filler());
-                    components.add(GuiUtils.filler());
-
-
-                    components.add(forecastState.getConeState().getCheckBox(this));
-                    components.add(forecastState.getRingsState().getCheckBox(this));
-
-                //                    components.add(GuiUtils.filler());
-                //                    components.add(
-                //                        forecastState.getParamComponent(attrNames));
+                        GuiUtils.hbox(
+                            forecastState.getWayState().getCheckBox(this),
+                            GuiUtils.lLabel("Forecasts:")));
+                    components.add(
+                        forecastState.getTrackState().getCheckBox(this));
+                    components.add(
+                        forecastState.getConeState().getCheckBox(this));
+                    components.add(
+                        forecastState.getRingsState().getCheckBox(this));
                 }
-                components.add(GuiUtils.hbox(wds.getWayState().getCheckBox(this), wayLabel));
-                //                components.add(
-                //                               GuiUtils.left());
-
+                components.add(GuiUtils.wrap(wds.getColorSwatch()));
                 components.add(
-                    GuiUtils.left(wds.getTrackState().getCheckBox(this)));
-                components.add(
-                    GuiUtils.left(
-                        GuiUtils.wrap(wds.getColorSwatch())));
-                components.add(GuiUtils.filler());
-                //                components.add(
-                //                    wds.getParamComponent(tmpAttrNames));
-
+                    GuiUtils.hbox(
+                        wds.getWayState().getCheckBox(this), wayLabel));
+                components.add(wds.getTrackState().getCheckBox(this));
                 components.add(wds.getConeState().getCheckBox(this));
                 components.add(wds.getRingsState().getCheckBox(this));
             }
         }
 
+        for (int colIdx = 0; colIdx < colLabels.length; colIdx++) {
+            if (colLabels[colIdx].length() > 0) {
+                components.add(colIdx,
+                               new JLabel("<html><u><i>" + colLabels[colIdx]
+                                          + "</i></u></html>"));
+            } else {
+                components.add(colIdx, new JLabel(""));
+            }
+        }
+
+
         GuiUtils.tmpInsets = new Insets(2, 2, 0, 2);
         JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(components,
-                                                                numCols, GuiUtils.WT_NNN, GuiUtils.WT_N));
+                                 numCols, GuiUtils.WT_N, GuiUtils.WT_N));
         //Put the list of ways into a scroller if there are lots of them
         if (ways.size() > 10) {
             int width  = 300;
@@ -578,6 +650,10 @@ public class StormDisplayState {
             scroller.setMinimumSize(new Dimension(width, height));
             wayComp = scroller;
         }
+
+        wayComp = GuiUtils.topLeft(GuiUtils.vbox(GuiUtils.left(paramComp),
+                GuiUtils.filler(2, 10), GuiUtils.lLabel("Visibility:"),
+                GuiUtils.left(wayComp)));
 
         wayComp    = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
         tabbedPane = GuiUtils.getNestedTabbedPane();
@@ -615,10 +691,10 @@ public class StormDisplayState {
      */
     private static class ParamSelector {
 
-        /** _more_          */
+        /** _more_ */
         List<StormParam> params;
 
-        /** _more_          */
+        /** _more_ */
         JList list;
 
         /**
@@ -784,12 +860,75 @@ public class StormDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
+    protected List<StormParam> getParams(Object id) {
+        List<StormParam> l = (List<StormParam>) params.get(id);
+        if (l == null) {
+            l = new ArrayList<StormParam>();
+            params.put(id, l);
+        }
+        return l;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param way _more_
+     *
+     * @return _more_
+     */
+    protected List<StormParam> getConeParams(WayDisplayState way) {
+        if (way.getWay().isObservation()) {
+            return getParams(ID_OBS_CONE);
+        }
+        return getParams(ID_FORECAST_CONE);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param way _more_
+     *
+     * @return _more_
+     */
+    protected List<StormParam> getRingsParams(WayDisplayState way) {
+        if (way.getWay().isObservation()) {
+            return getParams(ID_OBS_RINGS);
+        }
+        return getParams(ID_FORECAST_RINGS);
+    }
+
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     protected void updateCharts() throws Exception {
         for (StormTrackChart stormTrackChart : charts) {
             stormTrackChart.updateChart();
         }
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     protected void updateDisplays() throws Exception {
         List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
         for (WayDisplayState wayDisplayState : wayDisplayStates) {
@@ -803,9 +942,7 @@ public class StormDisplayState {
      *
      * @param wayDisplayState _more_
      */
-    protected void wayVisibilityChanged(WayDisplayState wayDisplayState) {
-
-    }
+    protected void wayVisibilityChanged(WayDisplayState wayDisplayState) {}
 
 
 
@@ -1302,6 +1439,31 @@ public class StormDisplayState {
     public List<StormTrackChart> getCharts() {
         return charts;
     }
+
+
+
+    /**
+     * Set the Params property.
+     *
+     * @param value The new value for Params
+     */
+    public void setParams(Hashtable value) {
+        params = value;
+    }
+
+    /**
+     * Get the Params property.
+     *
+     * @return The Params
+     */
+    public Hashtable getParams() {
+        return params;
+    }
+
+
+
+
+
 
 
 }

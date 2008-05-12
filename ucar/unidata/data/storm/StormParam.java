@@ -54,6 +54,9 @@ public class StormParam {
     /** _more_          */
     private boolean canDoDifference = true;
 
+    public StormParam() {
+    }
+
     /**
      * _more_
      *
