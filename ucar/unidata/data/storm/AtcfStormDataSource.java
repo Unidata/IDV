@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -216,18 +217,24 @@ public class AtcfStormDataSource extends StormDataSource {
         int xcnt = 0;
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
-            if(i==0) System.err.println(line);
-            List   toks = StringUtil.split(line, ",", true);
+            if (i == 0) {
+                System.err.println(line);
+            }
+            List toks = StringUtil.split(line, ",", true);
 
             //BASIN,CY,YYYYMMDDHH,TECHNUM,TECH,TAU,LatN/S,LonE/W,VMAX,MSLP,TY,RAD,WINDCODE,RAD1,RAD2,RAD3,RAD4,RADP,RRP,MRD,GUSTS,EYE,SUBREGION,MAXSEAS,INITIALS,DIR,SPEED,STORMNAME,DEPTH,SEAS,SEASCODE,SEAS1,SEAS2,SEAS3,SEAS4
             //AL, 01, 2007050612,   , BEST,   0, 355N,  740W,  35, 1012, EX,  34, NEQ,    0,    0,    0,  120, 
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
 
-            int    category   = getCategory((String) toks.get(10));
-            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(new Double((String) toks.get(8)).doubleValue());
-            double pressure  = new Double((String) toks.get(9)).doubleValue();
+            int category = getCategory((String) toks.get(10));
+            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(
+                                 new Double(
+                                     (String) toks.get(8)).doubleValue());
+            double pressure = new Double((String) toks.get(9)).doubleValue();
 
-            if(category!=CATEGORY_XX) System.err.println("cat:"  + category);
+            if (category != CATEGORY_XX) {
+                System.err.println("cat:" + category);
+            }
             String dateString = (String) toks.get(2);
             String wayString  = (String) toks.get(4);
             //            if (okWays.get(wayString) == null) {
@@ -267,10 +274,11 @@ public class AtcfStormDataSource extends StormDataSource {
             }
             StormTrack track = (StormTrack) trackMap.get(key);
             if (track == null) {
-                way   = (isBest
-                         ? Way.OBSERVATION
-                         : way);
-                track = new StormTrack(stormInfo, addWay(way), new DateTime(dttm));
+                way = (isBest
+                       ? Way.OBSERVATION
+                       : way);
+                track = new StormTrack(stormInfo, addWay(way),
+                                       new DateTime(dttm));
                 trackMap.put(key, track);
                 tracks.addTrack(track);
             }

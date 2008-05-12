@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -126,12 +127,19 @@ public class StormTrack implements Comparable {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public int compareTo(Object o) {
         if (o instanceof StormTrack) {
             StormTrack that = (StormTrack) o;
 
-            double v1=getTrackStartTime().getValue();
-            double v2=that.getTrackStartTime().getValue();
+            double     v1   = getTrackStartTime().getValue();
+            double     v2   = that.getTrackStartTime().getValue();
             if (v1 < v2) {
                 return -1;
             }
@@ -144,9 +152,18 @@ public class StormTrack implements Comparable {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param hour _more_
+     *
+     * @return _more_
+     */
     public StormTrackPoint findPointWithForecastHour(int hour) {
         for (StormTrackPoint stp : trackPoints) {
-            if(stp.getForecastHour()==hour) return stp;
+            if (stp.getForecastHour() == hour) {
+                return stp;
+            }
         }
         return null;
     }
@@ -314,6 +331,8 @@ public class StormTrack implements Comparable {
      *
      *
      * @param type _more_
+     *
+     * @param param _more_
      * @return _more_
      */
     public Real[] getTrackAttributeValues(StormParam param) {

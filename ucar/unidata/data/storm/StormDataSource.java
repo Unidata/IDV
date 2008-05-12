@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -107,6 +108,7 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static StormParam PARAM_MINPRESSURE;
 
+    /** _more_          */
     public static StormParam PARAM_MAXWINDSPEED_KTS;
 
 
@@ -182,14 +184,18 @@ public abstract class StormDataSource extends DataSourceImpl {
      */
     protected void initTypes() throws VisADException {
         if (PARAM_STORMCATEGORY == null) {
-            PARAM_STORMCATEGORY = new StormParam(Util.makeRealType("stormcategory",
+            PARAM_STORMCATEGORY =
+                new StormParam(Util.makeRealType("stormcategory",
                     "Storm_Category", null));
-            PARAM_MINPRESSURE = new StormParam(makeRealType("minpressure", "Min_Pressure",
-                                            Util.parseUnit("mb")));
-            PARAM_DISTANCEERROR = new StormParam(Util.makeRealType("forecastlocationerror",
+            PARAM_MINPRESSURE = new StormParam(makeRealType("minpressure",
+                    "Min_Pressure", Util.parseUnit("mb")));
+            PARAM_DISTANCEERROR =
+                new StormParam(Util.makeRealType("forecastlocationerror",
                     "Distance_Error", Util.parseUnit("km")));
-            PARAM_MAXWINDSPEED_KTS = new StormParam(makeRealType("maxwindspeedkts", "Max_Windspeed",
-                                             Util.parseUnit("kts")));
+            PARAM_MAXWINDSPEED_KTS =
+                new StormParam(makeRealType("maxwindspeedkts",
+                                            "Max_Windspeed",
+                                            Util.parseUnit("kts")));
 
         }
     }
@@ -253,18 +259,33 @@ public abstract class StormDataSource extends DataSourceImpl {
 
 
 
+    /** _more_          */
     private Hashtable seenWays = new Hashtable();
+
+    /** _more_          */
     private List<Way> ways = new ArrayList();
 
+    /**
+     * _more_
+     *
+     * @param way _more_
+     *
+     * @return _more_
+     */
     protected Way addWay(Way way) {
-        if(seenWays.get(way) ==null) {
-            seenWays.put(way,way);
+        if (seenWays.get(way) == null) {
+            seenWays.put(way, way);
             ways.add(way);
         }
         return way;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Way> getWays() {
         return new ArrayList<Way>(ways);
     }
@@ -327,65 +348,110 @@ public abstract class StormDataSource extends DataSourceImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param obsTrack _more_
+     * @param fctTrack _more_
+     * @param param _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static StormTrack difference(StormTrack obsTrack,
                                         StormTrack fctTrack, StormParam param)
-        throws VisADException, RemoteException {
+            throws VisADException, RemoteException {
         List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
         List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();
         List<StormTrackPoint> diffPoints = new ArrayList<StormTrackPoint>();
 
         for (StormTrackPoint forecastPoint : fctTrackPoints) {
             Real forecastValue = forecastPoint.getAttribute(param);
-            if(forecastValue == null) continue;
-            DateTime        forecastDttm     = forecastPoint.getTrackPointTime();
-            StormTrackPoint[] range = getClosestPointRange(obsTrackPoints, forecastDttm);
-            if(range == null) continue;
-            Real obsValue=null;
-            if(range.length==1) {
+            if (forecastValue == null) {
+                continue;
+            }
+            DateTime forecastDttm = forecastPoint.getTrackPointTime();
+            StormTrackPoint[] range = getClosestPointRange(obsTrackPoints,
+                                          forecastDttm);
+            if (range == null) {
+                continue;
+            }
+            Real obsValue = null;
+            if (range.length == 1) {
                 //exact match:
-                obsValue  = range[0].getAttribute(param);
+                obsValue = range[0].getAttribute(param);
             } else {
                 //Interpolate between the two points
                 Real v1 = range[0].getAttribute(param);
                 Real v2 = range[1].getAttribute(param);
-                if(v1 == null || v2 == null) continue;
-                DateTime t1 = range[0].getTrackPointTime();            
-                DateTime t2 = range[1].getTrackPointTime();            
-                double percent = forecastDttm.getValue()-t1.getValue()/(t2.getValue()-t1.getValue());
+                if ((v1 == null) || (v2 == null)) {
+                    continue;
+                }
+                DateTime t1 = range[0].getTrackPointTime();
+                DateTime t2 = range[1].getTrackPointTime();
+                double percent = forecastDttm.getValue()
+                                 - t1.getValue()
+                                   / (t2.getValue() - t1.getValue());
 
-                double interpolatedValue  = v2.getValue() + percent*(v2.getValue()-v1.getValue());
-                obsValue =v1.cloneButValue(interpolatedValue);
-                System.err.println ("interp %:" + percent +  " v:" + obsValue + " v1:" + v1 + " v2:" + v2 + "\n\tt1:" + t1 + " t2:" + t2);
+                double interpolatedValue = v2.getValue()
+                                           + percent
+                                             * (v2.getValue()
+                                                - v1.getValue());
+                obsValue = v1.cloneButValue(interpolatedValue);
+                System.err.println("interp %:" + percent + " v:" + obsValue
+                                   + " v1:" + v1 + " v2:" + v2 + "\n\tt1:"
+                                   + t1 + " t2:" + t2);
             }
 
-            if(obsValue == null) continue;
+            if (obsValue == null) {
+                continue;
+            }
 
             Real difference = (Real) forecastValue.__sub__(obsValue);
-            StormTrackPoint newStormTrackPoint = new  StormTrackPoint(forecastPoint.getTrackPointLocation(), forecastDttm,forecastPoint.getForecastHour(), new ArrayList<Real>());
+            StormTrackPoint newStormTrackPoint =
+                new StormTrackPoint(forecastPoint.getTrackPointLocation(),
+                                    forecastDttm,
+                                    forecastPoint.getForecastHour(),
+                                    new ArrayList<Real>());
             newStormTrackPoint.addAttribute(difference);
             diffPoints.add(newStormTrackPoint);
         }
-        if(diffPoints.size()==0) return null;
-        return new StormTrack(fctTrack.getStormInfo(),fctTrack.getWay(),
+        if (diffPoints.size() == 0) {
+            return null;
+        }
+        return new StormTrack(fctTrack.getStormInfo(), fctTrack.getWay(),
                               diffPoints);
     }
 
+    /**
+     * _more_
+     *
+     * @param aList _more_
+     * @param dt _more_
+     *
+     * @return _more_
+     */
     public static StormTrackPoint[] getClosestPointRange(
             List<StormTrackPoint> aList, DateTime dt) {
-        double          timeToLookFor    = dt.getValue();
-        int             numPoints    = aList.size();
-        double lastTime = -1;
+        double timeToLookFor = dt.getValue();
+        int    numPoints     = aList.size();
+        double lastTime      = -1;
 
         for (int i = 0; i < numPoints; i++) {
-            StormTrackPoint stp   = aList.get(i);
+            StormTrackPoint stp         = aList.get(i);
             double          currentTime = stp.getTrackPointTime().getValue();
-            if(timeToLookFor==currentTime) {
-                return new StormTrackPoint[]{stp};
+            if (timeToLookFor == currentTime) {
+                return new StormTrackPoint[] { stp };
             }
-            if(timeToLookFor<currentTime) {
-                if(i==0) return null;
-                if(timeToLookFor>lastTime)
-                    return new StormTrackPoint[]{aList.get(i-1), stp};
+            if (timeToLookFor < currentTime) {
+                if (i == 0) {
+                    return null;
+                }
+                if (timeToLookFor > lastTime) {
+                    return new StormTrackPoint[] { aList.get(i - 1), stp };
+                }
             }
             lastTime = currentTime;
         }

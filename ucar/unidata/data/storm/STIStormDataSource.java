@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -52,9 +53,10 @@ import java.rmi.RemoteException;
 
 import java.sql.*;
 
+import java.util.*;
+
 
 import java.util.Date;
-import java.util.*;
 
 
 /**
@@ -79,14 +81,14 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String DEFAULT_DERBY_URL =
         "jdbc:derby:test;create=true";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_DERBY_HOUR = "hh";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_DERBY_YEAR = "yyyy";
 
 
@@ -239,24 +241,52 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
+    /** _more_          */
     private static final String TABLE_PROBILITY = "probility";
 
 
 
-    private static final String COL_PROBILITY_WAYNAME="wayname";
-    private static final String COL_PROBILITY_FHOUR="fhour";
-    private static final String COL_PROBILITY_P10="p10";
-    private static final String COL_PROBILITY_P20="p20";
-    private static final String COL_PROBILITY_P30="p30";
-    private static final String COL_PROBILITY_P40="p40";
-    private static final String COL_PROBILITY_P50="p50";
-    private static final String COL_PROBILITY_P60="p60";
-    private static final String COL_PROBILITY_P70="p70";
-    private static final String COL_PROBILITY_P80="p80";
-    private static final String COL_PROBILITY_P90="p90";
-    private static final String COL_PROBILITY_P100="p100";
-    private static final String COL_PROBILITY_ERROR="error";
-    private static final String COL_PROBILITY_REMARK="remark";
+    /** _more_          */
+    private static final String COL_PROBILITY_WAYNAME = "wayname";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_FHOUR = "fhour";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P10 = "p10";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P20 = "p20";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P30 = "p30";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P40 = "p40";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P50 = "p50";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P60 = "p60";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P70 = "p70";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P80 = "p80";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P90 = "p90";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_P100 = "p100";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_ERROR = "error";
+
+    /** _more_          */
+    private static final String COL_PROBILITY_REMARK = "remark";
 
 
     /** _more_ */
@@ -277,6 +307,7 @@ public class STIStormDataSource extends StormDataSource {
     /** the stormInfo and track */
     private List<StormInfo> stormInfos;
 
+    /** _more_          */
     private HashMap<String, float[]> wayfhourToRadius;
 
 
@@ -304,36 +335,62 @@ public class STIStormDataSource extends StormDataSource {
         super.initTypes();
         if (PARAM_MAXWINDSPEED == null) {
             //TODO: Make sure these are the right units
-            PARAM_MAXWINDSPEED = new StormParam(makeRealType("maxwindspeed", "Max_Windspeed",
-                                             Util.parseUnit("m/s")));
-            PARAM_RADIUSMODERATEGALE = new StormParam(makeRealType("radiusmoderategale",
-                    "Moderate_Gale_Radius", Util.parseUnit("km")));
-            PARAM_RADIUSWHOLEGALE = new StormParam(makeRealType("radiuswholegale",
-                    "Whole_Gale_Radius", Util.parseUnit("km")));
-            PARAM_MOVEDIRECTION = new StormParam(makeRealType("movedirection",
-                    "Storm_Direction", CommonUnit.degree));
-            PARAM_MOVESPEED = new StormParam(makeRealType("movespeed", "Storm_Speed",
-                                          Util.parseUnit("m/s")));
-            PARAM_PROBABILITY10RADIUS = new StormParam(makeRealType("probabilityradius10",
-                    "Probability_10%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY20RADIUS = new StormParam(makeRealType("probabilityradius20",
-                    "Probability_20%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY30RADIUS = new StormParam(makeRealType("probabilityradius30",
-                    "Probability_30%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY40RADIUS = new StormParam(makeRealType("probabilityradius40",
-                    "Probability_40%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY50RADIUS = new StormParam(makeRealType("probabilityradius50",
-                    "Probability_50%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY60RADIUS = new StormParam(makeRealType("probabilityradius60",
-                    "Probability_60%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY70RADIUS = new StormParam(makeRealType("probabilityradius70",
-                    "Probability_70%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY80RADIUS = new StormParam(makeRealType("probabilityradius80",
-                    "Probability_80%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY90RADIUS = new StormParam(makeRealType("probabilityradius90",
-                    "Probability_90%_Radius", Util.parseUnit("km")));
-            PARAM_PROBABILITY100RADIUS = new StormParam(makeRealType("probabilityradius100",
-                    "Probability_100%_Radius", Util.parseUnit("km")));
+            PARAM_MAXWINDSPEED = new StormParam(makeRealType("maxwindspeed",
+                    "Max_Windspeed", Util.parseUnit("m/s")));
+            PARAM_RADIUSMODERATEGALE =
+                new StormParam(makeRealType("radiusmoderategale",
+                                            "Moderate_Gale_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_RADIUSWHOLEGALE =
+                new StormParam(makeRealType("radiuswholegale",
+                                            "Whole_Gale_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_MOVEDIRECTION =
+                new StormParam(makeRealType("movedirection",
+                                            "Storm_Direction",
+                                            CommonUnit.degree));
+            PARAM_MOVESPEED = new StormParam(makeRealType("movespeed",
+                    "Storm_Speed", Util.parseUnit("m/s")));
+            PARAM_PROBABILITY10RADIUS =
+                new StormParam(makeRealType("probabilityradius10",
+                                            "Probability_10%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY20RADIUS =
+                new StormParam(makeRealType("probabilityradius20",
+                                            "Probability_20%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY30RADIUS =
+                new StormParam(makeRealType("probabilityradius30",
+                                            "Probability_30%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY40RADIUS =
+                new StormParam(makeRealType("probabilityradius40",
+                                            "Probability_40%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY50RADIUS =
+                new StormParam(makeRealType("probabilityradius50",
+                                            "Probability_50%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY60RADIUS =
+                new StormParam(makeRealType("probabilityradius60",
+                                            "Probability_60%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY70RADIUS =
+                new StormParam(makeRealType("probabilityradius70",
+                                            "Probability_70%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY80RADIUS =
+                new StormParam(makeRealType("probabilityradius80",
+                                            "Probability_80%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY90RADIUS =
+                new StormParam(makeRealType("probabilityradius90",
+                                            "Probability_90%_Radius",
+                                            Util.parseUnit("km")));
+            PARAM_PROBABILITY100RADIUS =
+                new StormParam(makeRealType("probabilityradius100",
+                                            "Probability_100%_Radius",
+                                            Util.parseUnit("km")));
 
         }
     }
@@ -526,9 +583,10 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
         //        if(true) return getForecastTrackX(stormInfo, sTime, forecastWay);
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_FHOUR,
-            COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE,
-            COL_TYPHOON_RADIUSMG, COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(),
+            COL_TYPHOON_FHOUR, COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE,
+            COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
+            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED
         });
 
 
@@ -544,7 +602,8 @@ public class STIStormDataSource extends StormDataSource {
                                           SqlUtil.makeAnd(whereList));
         query = query + " order by  "
                 + SqlUtil.comma(new String[] { getColYear(),
-                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_FHOUR });
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(),
+                COL_TYPHOON_FHOUR });
         //        System.err.println (query);
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
@@ -569,21 +628,28 @@ public class STIStormDataSource extends StormDataSource {
                     getLatLonValue(results.getDouble(col++));
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
-                attrs.add(PARAM_MAXWINDSPEED.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MINPRESSURE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_RADIUSMODERATEGALE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_RADIUSWHOLEGALE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MOVEDIRECTION.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MOVESPEED.getReal(
-                                   getValue(results.getDouble(col++))));
-                String key =  forecastWay.getName().toUpperCase() + Integer.toString(fhour);
-                float [] radiuses = wayfhourToRadius.get(key);
-                if(radiuses != null) {
+                attrs.add(
+                    PARAM_MAXWINDSPEED.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MINPRESSURE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_RADIUSMODERATEGALE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_RADIUSWHOLEGALE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MOVEDIRECTION.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MOVESPEED.getReal(
+                        getValue(results.getDouble(col++))));
+                String key = forecastWay.getName().toUpperCase()
+                             + Integer.toString(fhour);
+                float[] radiuses = wayfhourToRadius.get(key);
+                if (radiuses != null) {
                     //radius = fhour * 50.0f / 24.0f;
                     addprobabilityradiusAttrs(attrs, radiuses);
                 }
@@ -614,19 +680,29 @@ public class STIStormDataSource extends StormDataSource {
 
     }
 
-    private void addprobabilityradiusAttrs(List<Real> attrs, float [] radiuses) throws Exception {
-        attrs.add(PARAM_PROBABILITY10RADIUS.getReal( radiuses[0]));
-        attrs.add(PARAM_PROBABILITY20RADIUS.getReal( radiuses[1]));
-        attrs.add(PARAM_PROBABILITY30RADIUS.getReal( radiuses[2]));
-        attrs.add(PARAM_PROBABILITY40RADIUS.getReal( radiuses[3]));
-        attrs.add(PARAM_PROBABILITY50RADIUS.getReal( radiuses[4]));
-        attrs.add(PARAM_PROBABILITY60RADIUS.getReal( radiuses[5]));
-        attrs.add(PARAM_PROBABILITY70RADIUS.getReal( radiuses[6]));
-        attrs.add(PARAM_PROBABILITY80RADIUS.getReal( radiuses[7]));
-        attrs.add(PARAM_PROBABILITY90RADIUS.getReal( radiuses[8]));
-        attrs.add(PARAM_PROBABILITY100RADIUS.getReal( radiuses[9]));
+    /**
+     * _more_
+     *
+     * @param attrs _more_
+     * @param radiuses _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addprobabilityradiusAttrs(List<Real> attrs, float[] radiuses)
+            throws Exception {
+        attrs.add(PARAM_PROBABILITY10RADIUS.getReal(radiuses[0]));
+        attrs.add(PARAM_PROBABILITY20RADIUS.getReal(radiuses[1]));
+        attrs.add(PARAM_PROBABILITY30RADIUS.getReal(radiuses[2]));
+        attrs.add(PARAM_PROBABILITY40RADIUS.getReal(radiuses[3]));
+        attrs.add(PARAM_PROBABILITY50RADIUS.getReal(radiuses[4]));
+        attrs.add(PARAM_PROBABILITY60RADIUS.getReal(radiuses[5]));
+        attrs.add(PARAM_PROBABILITY70RADIUS.getReal(radiuses[6]));
+        attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
+        attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
+        attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
 
     }
+
     /**
      * _more_
      *
@@ -666,9 +742,10 @@ public class STIStormDataSource extends StormDataSource {
             throws Exception {
 
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_FHOUR,
-            COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE,
-            COL_TYPHOON_RADIUSMG, COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(),
+            COL_TYPHOON_FHOUR, COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE,
+            COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
+            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED
         });
 
 
@@ -729,7 +806,7 @@ public class STIStormDataSource extends StormDataSource {
 
 
         return new StormTrack(
-                              stormInfo, forecastWay,
+            stormInfo, forecastWay,
             new NamedArray("latitude", CommonUnit.degree, lats),
             new NamedArray("longitude", CommonUnit.degree, lons), times);
 
@@ -778,14 +855,15 @@ public class STIStormDataSource extends StormDataSource {
             Way way)
             throws Exception {
 
-        String columns = SqlUtil.comma(new String[] { getColYear(), COL_TYPHOON_MONTH,
-                COL_TYPHOON_DAY, getColHour() });
+        String columns = SqlUtil.comma(new String[] { getColYear(),
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour() });
 
         List whereList = new ArrayList();
         whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID,
                                  SqlUtil.quote(stormInfo.getStormId())));
         whereList.add(SqlUtil.eq(COL_TYPHOON_FHOUR, ZEROHOUR));
-        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY, SqlUtil.quote(way.getId())));
+        whereList.add(SqlUtil.eq(COL_TYPHOON_WAY,
+                                 SqlUtil.quote(way.getId())));
 
         String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_TRACK),
                                           SqlUtil.makeAnd(whereList));
@@ -813,21 +891,23 @@ public class STIStormDataSource extends StormDataSource {
     /**
      * _more_
      *
-      *
+     * 
      * @return _more_
      * @throws Exception _more_
      */
-    protected void getWayProbabilityRadius() throws Exception  {
+    protected void getWayProbabilityRadius() throws Exception {
 
-        String columns = SqlUtil.comma(new String[] { COL_PROBILITY_WAYNAME,
-                 COL_PROBILITY_FHOUR, COL_PROBILITY_P10, COL_PROBILITY_P20,
-                 COL_PROBILITY_P30, COL_PROBILITY_P40, COL_PROBILITY_P50,
-                 COL_PROBILITY_P60, COL_PROBILITY_P70, COL_PROBILITY_P80,
-                 COL_PROBILITY_P90, COL_PROBILITY_P100 });
+        String columns = SqlUtil.comma(new String[] {
+            COL_PROBILITY_WAYNAME, COL_PROBILITY_FHOUR, COL_PROBILITY_P10,
+            COL_PROBILITY_P20, COL_PROBILITY_P30, COL_PROBILITY_P40,
+            COL_PROBILITY_P50, COL_PROBILITY_P60, COL_PROBILITY_P70,
+            COL_PROBILITY_P80, COL_PROBILITY_P90, COL_PROBILITY_P100
+        });
 
         List whereList = new ArrayList();
 
-        String query = SqlUtil.makeSelect(columns, Misc.newList(TABLE_PROBILITY),
+        String query = SqlUtil.makeSelect(columns,
+                                          Misc.newList(TABLE_PROBILITY),
                                           SqlUtil.makeAnd(whereList));
         Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
@@ -836,20 +916,20 @@ public class STIStormDataSource extends StormDataSource {
         while ((results = iter.next()) != null) {
 
             while (results.next()) {
-                float [] wp = new float [10];
-                int col   = 1;
-                String wayName = results.getString(col++);
-                int fhour  = results.getInt(col++);
-                wp[0]  = results.getFloat(col++);
-                wp[1]  = results.getFloat(col++);
-                wp[2]  = results.getFloat(col++);
-                wp[3]  = results.getFloat(col++);
-                wp[4]  = results.getFloat(col++);
-                wp[5]  = results.getFloat(col++);
-                wp[6]  = results.getFloat(col++);
-                wp[7]  = results.getFloat(col++);
-                wp[8]  = results.getFloat(col++);
-                wp[9]  = results.getFloat(col++);
+                float[] wp      = new float[10];
+                int     col     = 1;
+                String  wayName = results.getString(col++);
+                int     fhour   = results.getInt(col++);
+                wp[0] = results.getFloat(col++);
+                wp[1] = results.getFloat(col++);
+                wp[2] = results.getFloat(col++);
+                wp[3] = results.getFloat(col++);
+                wp[4] = results.getFloat(col++);
+                wp[5] = results.getFloat(col++);
+                wp[6] = results.getFloat(col++);
+                wp[7] = results.getFloat(col++);
+                wp[8] = results.getFloat(col++);
+                wp[9] = results.getFloat(col++);
 
                 String key = wayName + Integer.toString(fhour);
                 //                System.err.println ("wpppppp " +  key + "  data "+ wp[0] + " and " + wp[1]);
@@ -913,9 +993,11 @@ public class STIStormDataSource extends StormDataSource {
             Way wy)
             throws Exception {
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_LATITUDE,
-            COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
-            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED, COL_TYPHOON_WAY
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(),
+            COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE,
+            COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
+            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED,
+            COL_TYPHOON_WAY
         });
 
         List whereList = new ArrayList();
@@ -950,18 +1032,24 @@ public class STIStormDataSource extends StormDataSource {
                     getLatLonValue(results.getDouble(col++));
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
-                attrs.add(PARAM_MAXWINDSPEED.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MINPRESSURE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_RADIUSMODERATEGALE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_RADIUSWHOLEGALE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MOVEDIRECTION.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MOVESPEED.getReal(
-                                   getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MAXWINDSPEED.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MINPRESSURE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_RADIUSMODERATEGALE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_RADIUSWHOLEGALE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MOVEDIRECTION.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MOVESPEED.getReal(
+                        getValue(results.getDouble(col++))));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -1004,9 +1092,11 @@ public class STIStormDataSource extends StormDataSource {
             Way wy, DateTime before, DateTime after, List pts)
             throws Exception {
         String columns = SqlUtil.comma(new String[] {
-            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(), COL_TYPHOON_LATITUDE,
-            COL_TYPHOON_LONGITUDE, COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
-            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED, COL_TYPHOON_WAY
+            getColYear(), COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour(),
+            COL_TYPHOON_LATITUDE, COL_TYPHOON_LONGITUDE,
+            COL_TYPHOON_WINDSPEED, COL_TYPHOON_PRESSURE, COL_TYPHOON_RADIUSMG,
+            COL_TYPHOON_RADIUSWG, COL_TYPHOON_MOVEDIR, COL_TYPHOON_MOVESPEED,
+            COL_TYPHOON_WAY
         });
 
         List whereList = new ArrayList();
@@ -1043,18 +1133,24 @@ public class STIStormDataSource extends StormDataSource {
                     getLatLonValue(results.getDouble(col++));
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
-                attrs.add(PARAM_MAXWINDSPEED.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MINPRESSURE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_RADIUSMODERATEGALE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_RADIUSWHOLEGALE.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MOVEDIRECTION.getReal(
-                                   getValue(results.getDouble(col++))));
-                attrs.add(PARAM_MOVESPEED.getReal(
-                                   getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MAXWINDSPEED.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MINPRESSURE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_RADIUSMODERATEGALE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_RADIUSWHOLEGALE.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MOVEDIRECTION.getReal(
+                        getValue(results.getDouble(col++))));
+                attrs.add(
+                    PARAM_MOVESPEED.getReal(
+                        getValue(results.getDouble(col++))));
 
 
                 EarthLocation elt =
@@ -1154,8 +1250,8 @@ public class STIStormDataSource extends StormDataSource {
      * @throws Exception _more_
      */
     protected DateTime getStormStartTime(String id) throws Exception {
-        String columns = SqlUtil.comma(new String[] { getColYear(), COL_TYPHOON_MONTH,
-                COL_TYPHOON_DAY, getColHour() });
+        String columns = SqlUtil.comma(new String[] { getColYear(),
+                COL_TYPHOON_MONTH, COL_TYPHOON_DAY, getColHour() });
 
         List whereList = new ArrayList();
         whereList.add(SqlUtil.eq(COL_TYPHOON_STORMID, SqlUtil.quote(id)));

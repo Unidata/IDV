@@ -21,7 +21,9 @@
  */
 
 
+
 package ucar.unidata.data.storm;
+
 
 import ucar.visad.Util;
 
@@ -46,57 +48,98 @@ import java.util.List;
  */
 public class StormParam {
 
+    /** _more_          */
     RealType type;
 
+    /** _more_          */
     private boolean canDoDifference = true;
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public StormParam(RealType type) {
         this.type = type;
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param canDoDifference _more_
+     */
     public StormParam(RealType type, boolean canDoDifference) {
         this(type);
         this.canDoDifference = canDoDifference;
     }
 
 
-    public Real getReal(double  value) throws VisADException {
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public Real getReal(double value) throws VisADException {
         return new Real(type, value);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Unit getUnit() {
         return type.getDefaultUnit();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int hashCode() {
         return type.hashCode();
     }
 
-/**
-Set the CanDoDifference property.
+    /**
+     * Set the CanDoDifference property.
+     *
+     * @param value The new value for CanDoDifference
+     */
+    public void setCanDoDifference(boolean value) {
+        canDoDifference = value;
+    }
 
-@param value The new value for CanDoDifference
-**/
-public void setCanDoDifference (boolean value) {
-	canDoDifference = value;
-}
-
-/**
-Get the CanDoDifference property.
-
-@return The CanDoDifference
-**/
-public boolean getCanDoDifference () {
-	return canDoDifference;
-}
-
-
+    /**
+     * Get the CanDoDifference property.
+     *
+     * @return The CanDoDifference
+     */
+    public boolean getCanDoDifference() {
+        return canDoDifference;
+    }
 
 
 
+
+
+    /**
+     * _more_
+     *
+     * @param attributes _more_
+     *
+     * @return _more_
+     */
     public Real getAttribute(List<Real> attributes) {
-        if(attributes==null) return null;
+        if (attributes == null) {
+            return null;
+        }
         for (Real attr : attributes) {
             if (attr.getType().equals(type)) {
                 return attr;
@@ -105,35 +148,49 @@ public boolean getCanDoDifference () {
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
-        if(!this.getClass().equals(o.getClass())) return false;
+        if ( !this.getClass().equals(o.getClass())) {
+            return false;
+        }
         StormParam that = (StormParam) o;
         return this.type.equals(that.type);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return Util.cleanTypeName(type.getName()).replace("_", " ");
     }
 
 
-/**
-Set the Type property.
+    /**
+     * Set the Type property.
+     *
+     * @param value The new value for Type
+     */
+    public void setType(RealType value) {
+        type = value;
+    }
 
-@param value The new value for Type
-**/
-public void setType (RealType value) {
-	type = value;
-}
-
-/**
-Get the Type property.
-
-@return The Type
-**/
-public RealType getType () {
-	return type;
-}
+    /**
+     * Get the Type property.
+     *
+     * @return The Type
+     */
+    public RealType getType() {
+        return type;
+    }
 
 
 

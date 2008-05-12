@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -82,7 +83,7 @@ public class StormTrackPoint implements Comparable {
     public int compareTo(Object o) {
         if (o instanceof StormTrackPoint) {
             StormTrackPoint that = (StormTrackPoint) o;
-            return  (trackPointTime.compareTo(that.trackPointTime));
+            return (trackPointTime.compareTo(that.trackPointTime));
         }
         return toString().compareTo(o.toString());
     }
@@ -175,6 +176,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @param type _more_
      *
+     * @param param _more_
+     *
      * @param type _more_
      *
      * @return _more_
@@ -185,10 +188,10 @@ public class StormTrackPoint implements Comparable {
 
     /**
      *  _more_
-     * 
+     *
      *  @param attr _more_
-     * 
-     * 
+     *
+     *
      *  @return _more_
      */
     public void addAttribute(Real attr) {
