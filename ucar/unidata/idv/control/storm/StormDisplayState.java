@@ -1135,9 +1135,6 @@ public class StormDisplayState {
         Real[]        values       = ((param == null)
                                       ? null
                                       : track.getTrackAttributeValues(param));
-        if(param!=null && values!=null) {
-            System.err.println("param:" + param + " values=" + (values!=null));
-        }
         for (int i = 0; i < numPoints; i++) {
             Real value = ((values == null)
                           ? dfltReal

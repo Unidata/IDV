@@ -27,6 +27,8 @@ package ucar.unidata.idv.control.storm;
 
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
+import ucar.unidata.data.grid.GridUtil;
+
 
 
 import ucar.unidata.data.storm.*;
@@ -40,6 +42,8 @@ import visad.bom.Radar2DCoordinateSystem;
 
 import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.ui.colortable.ColorTableManager;
+
+import ucar.unidata.util.Range;
 
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.Misc;
@@ -142,8 +146,6 @@ public class WayDisplayState {
     /** _more_ */
     private CompositeDisplayable conesHolder;
 
-    /** _more_ */
-    private String colorTable = "Bright38";
 
     private List<StormParam> coneParams;
     private StormParam ringsParam;
@@ -220,7 +222,6 @@ public class WayDisplayState {
 
 
 
-
     public  void updateDisplay() throws Exception {
         //        FieldImpl field = makeTrackField(obsTrack, null);
         //        obsDisplayState.addTrack(obsTrack, field);
@@ -245,6 +246,11 @@ public class WayDisplayState {
                 FieldImpl trackField = makeTrackField();
                 if(trackField!=null) {
                     getTrackDisplay().setTrack(trackField);
+                    Range[] range = GridUtil.getMinMax(trackField);
+                    getTrackDisplay().setRangeForColor(range[0].getMin(),
+                                                       range[0].getMax());
+                    
+
                 }
                 setTrackColor();
                 if(!hadTrack && way.isObservation()) 
@@ -428,9 +434,9 @@ public class WayDisplayState {
      * @return _more_
      */
     public float[][] getColorPalette() {
-        if ((colorParam != null) && (colorTable != null)) {
+        if (colorParam != null) {
             ColorTable ct = stormDisplayState.getStormTrackControl().getColorTable();
-            System.err.println("Using:" + ct);
+            //            System.err.println("Using:" + ct);
             //                stormDisplayState.getStormTrackControl().getControlContext()
             //                    .getColorTableManager().getColorTable(colorTable);
             if (ct != null) {
@@ -529,7 +535,6 @@ public class WayDisplayState {
             if(field == null) {
                 continue;
             }
-            System.err.println ("field:" + field);
             fields.add(field);
             times.add(track.getTrackStartTime());
             pointObs.addAll(makePointObs(track));
@@ -873,17 +878,9 @@ public DisplayState getWayState () {
      * @param value The new value for ColorTable
      */
     public void setColorTable(String value) {
-        colorTable = value;
     }
 
-    /**
-     * Get the ColorTable property.
-     *
-     * @return The ColorTable
-     */
-    public String getColorTable() {
-        return colorTable;
-    }
+
 
     /**
      * _more_
