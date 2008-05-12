@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: TrackControl.java,v 1.69 2007/08/21 11:32:08 jeffmc Exp $
  *
  * Copyright 1997-2004 Unidata Program Center/University Corporation for
@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -38,6 +36,8 @@ import ucar.unidata.geoloc.ProjectionPoint;
 import ucar.unidata.geoloc.ProjectionPointImpl;
 import ucar.unidata.geoloc.projection.FlatEarth;
 
+import visad.bom.Radar2DCoordinateSystem;
+
 import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.ui.colortable.ColorTableManager;
 
@@ -47,6 +47,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.display.*;
+import ucar.visad.Util;
 
 import visad.*;
 
@@ -78,11 +79,14 @@ import javax.swing.event.*;
 public class WayDisplayState {
 
 
+    /** Type for Azimuth */
+    private final RealType azimuthType = RealType.getRealType("Azimuth",
+                                             CommonUnit.degree);
+
+
     /** _more_ */
     private StormDisplayState stormDisplayState;
 
-    /** _more_ */
-    private JCheckBox visibilityCbx;
 
     /** _more_ */
     private Way way;
@@ -90,26 +94,30 @@ public class WayDisplayState {
     /** _more_ */
     private boolean visible = true;
 
-    /** _more_ */
-    private boolean ringsVisible = false;
+    private DisplayState  trackState = new DisplayState("Show/Hide Track",true);
 
     /** _more_          */
-    private JCheckBox ringsVisibilityCbx;
+    private DisplayState  coneState = new DisplayState("Show/Hide Cone",false);
+
+    private DisplayState  ringsState = new DisplayState("Show/Hide Rings",false);
+
+
+    List<PointOb> pointObs = new ArrayList<PointOb>();
+
 
     /** _more_          */
-    private boolean coneVisible = false;
+    private JCheckBox ringsCbx;
+
 
     /** _more_ */
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
 
-    /** _more_ */
-    private List<FieldImpl> fields = new ArrayList<FieldImpl>();
 
     /** _more_ */
     private List<DateTime> times = new ArrayList<DateTime>();
 
-    /** _more_ */
-    private List<PointOb> pointObs = new ArrayList<PointOb>();
+
+
 
     /** _more_ */
     private Color color;
@@ -124,11 +132,17 @@ public class WayDisplayState {
     /** _more_ */
     private CompositeDisplayable holder;
 
-    /** _more_ */
-    private CompositeDisplayable ringsHolder;
+    private  StationModelDisplayable labelDisplay;
+
 
     /** _more_ */
     private TrackDisplayable trackDisplay;
+
+    /** _more_ */
+    private CompositeDisplayable ringsDisplay;
+
+    /** _more_ */
+    private TrackDisplayable coneDisplay;
 
     /** _more_ */
     private String colorTable = "Bright38";
@@ -176,18 +190,111 @@ public class WayDisplayState {
     protected void setRings(StormParam ringsParam, List<RingSet> rings)
             throws VisADException, RemoteException {
         this.ringsParam = ringsParam;
-        if (ringsHolder == null) {
-            ringsHolder = new CompositeDisplayable("rings holder");
-            addDisplayable(ringsHolder);
+        if (ringsDisplay == null) {
+            ringsDisplay = new CompositeDisplayable("rings holder");
+            addDisplayable(ringsDisplay);
         }
-        ringsHolder.clearDisplayables();
+        ringsDisplay.clearDisplayables();
         if (rings != null) {
             for (RingSet ring : rings) {
-                ringsHolder.addDisplayable(ring);
+                ringsDisplay.addDisplayable(ring);
             }
         }
-        setRingsVisible(getRingsVisible());
     }
+
+
+    public boolean hasTrackDisplay() {
+        return trackDisplay!=null;
+    }
+
+    public boolean hasRingsDisplay() {
+        return ringsDisplay!=null;
+    }
+
+    public boolean hasConeDisplay() {
+        return coneDisplay!=null;
+    }
+
+
+    public void clearConeDisplay() {
+        if(coneDisplay!=null) {
+        }
+    }
+
+
+    public  void updateDisplay() throws Exception {
+        //        FieldImpl field = makeTrackField(obsTrack, null);
+        //        obsDisplayState.addTrack(obsTrack, field);
+        //        obsDisplayState.getTrackDisplay().setTrack(field);
+
+        if(!shouldShow()) {
+            if(holder!=null) holder.setVisible(false);
+            return;
+        }
+        
+        if(shouldShowTrack()) {
+            if(!hasTrackDisplay()) {
+                getTrackDisplay().setTrack(makeTrackField());
+                if(way.isObservation()) 
+                    getLabelDisplay().setStationData(
+                                                     PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
+            }
+            getTrackDisplay().setVisible(true);
+        } else {
+            if(hasTrackDisplay()) {
+                getTrackDisplay().setVisible(false);
+            }
+        }
+
+        if(shouldShowCone()) {
+            if(!hasConeDisplay()) {
+                getConeDisplay().setTrack(makeConeField());
+            }
+            getConeDisplay().setVisible(true);
+        } else {
+            if(hasConeDisplay()) {
+                getConeDisplay().setVisible(false);
+            }
+        }
+
+
+        if(holder != null) {
+            holder.setVisible(true);
+        }
+    }
+
+
+
+    public boolean shouldShow() {
+        if (!way.isObservation() && !stormDisplayState.getForecastVisible()) return false;
+        //        return visible;
+        return trackState.getVisible();
+    }
+
+    public boolean shouldShowTrack() {
+        return shouldShow() &&  trackState.getVisible();
+    }
+
+    public boolean shouldShowRings() {
+        return shouldShow() &&  ringsState.getVisible();
+    }
+
+    public boolean shouldShowCone() {
+        return shouldShow() &&  coneState.getVisible();
+    }
+
+
+    public StationModelDisplayable getLabelDisplay() throws VisADException, RemoteException {
+        if(labelDisplay==null) {
+            labelDisplay =
+                new StationModelDisplayable("dots");
+            addDisplayable(labelDisplay);
+            labelDisplay.setScale(1.0f);
+            labelDisplay.setStationModel(stormDisplayState.getObservationStationModel());
+        }
+        return labelDisplay;
+    }
+
 
 
     /**
@@ -210,6 +317,25 @@ public class WayDisplayState {
             addDisplayable(trackDisplay);
         }
         return trackDisplay;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public TrackDisplayable getConeDisplay() throws Exception {
+        if (coneDisplay == null) {
+            coneDisplay = new TrackDisplayable("cone_"
+                    + stormDisplayState.getStormInfo().getStormId());
+            coneDisplay.setUseTimesInAnimation(false);
+            setConeColor();
+            addDisplayable(coneDisplay);
+        }
+        return coneDisplay;
     }
 
 
@@ -240,12 +366,11 @@ public class WayDisplayState {
                 public void setBackground(Color newColor) {
                     super.setBackground(newColor);
                     WayDisplayState.this.color = newColor;
-                    if (trackDisplay != null) {
-                        try {
-                            setTrackColor();
-                        } catch (Exception exc) {
-                            LogUtil.logException("Setting color", exc);
-                        }
+                    try {
+                        setTrackColor();
+                        setConeColor();
+                    } catch (Exception exc) {
+                        LogUtil.logException("Setting color", exc);
                     }
                 }
             };
@@ -261,7 +386,7 @@ public class WayDisplayState {
      * @return _more_
      */
     public float[][] getColorPalette() {
-        StormParam param = getParam();
+        StormParam param = getTrackParam();
         if ((param != null) && (colorTable != null)) {
             ColorTable ct =
                 stormDisplayState.getStormTrackControl().getControlContext()
@@ -307,7 +432,7 @@ public class WayDisplayState {
             paramBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
-                        makeField();
+                        makeTrackField();
                         setTrackColor();
                         stormDisplayState.wayParamChanged(
                             WayDisplayState.this);
@@ -356,6 +481,13 @@ public class WayDisplayState {
         if (trackDisplay != null) {
             trackDisplay.setColorPalette(getColorPalette());
         }
+
+    }
+
+    private void setConeColor() throws Exception {
+        if (coneDisplay != null) {
+            coneDisplay.setColorPalette(getColorPalette());
+        }
     }
 
     /**
@@ -378,15 +510,14 @@ public class WayDisplayState {
         return id.toString().equals("default");
     }
 
-    //    protected ColorTable getParamColorTable() {
-    //    }
+
 
     /**
      * _more_
      *
      * @return _more_
      */
-    protected StormParam getParam() {
+    protected StormParam getTrackParam() {
         if (paramBox == null) {
             return null;
         }
@@ -412,82 +543,17 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public void deactivate() throws VisADException, RemoteException {
-        ringsHolder = null;
+        ringsDisplay = null;
         if (holder != null) {}
         trackDisplay = null;
         holder       = null;
-        ringsHolder  = null;
+        ringsDisplay  = null;
         tracks       = new ArrayList<StormTrack>();
-        fields       = new ArrayList<FieldImpl>();
         times        = new ArrayList<DateTime>();
-        pointObs     = new ArrayList<PointOb>();
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public JCheckBox getVisiblityCheckBox() {
-        if (visibilityCbx == null) {
-            visibilityCbx = new JCheckBox("", getVisible());
-            visibilityCbx.setToolTipText("Show/Hide Track");
-            visibilityCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        setVisible(visibilityCbx.isSelected());
-                        stormDisplayState.wayVisibilityChanged(
-                            WayDisplayState.this);
-                    } catch (Exception exc) {
-                        LogUtil.logException("Toggling way visibility", exc);
-                    }
-                }
-            });
-
-
-        }
-        return visibilityCbx;
     }
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public JCheckBox getRingsVisiblityCheckBox() {
-        if (ringsVisibilityCbx == null) {
-            ringsVisibilityCbx = new JCheckBox("", getRingsVisible());
-            ringsVisibilityCbx.setToolTipText("Show/Hide Track");
-            ringsVisibilityCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        setRingsVisible(ringsVisibilityCbx.isSelected());
-                        //                        stormDisplayState.wayRingsVisibilityChanged(
-                        //                            WayDisplayState.this);
-                    } catch (Exception exc) {
-                        LogUtil.logException("Toggling way rings visibility",
-                                             exc);
-                    }
-                }
-            });
-
-
-        }
-        return ringsVisibilityCbx;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List<PointOb> getPointObs() {
-        return pointObs;
-    }
 
     /** _more_ */
     private static TextType textType;
@@ -504,35 +570,133 @@ public class WayDisplayState {
     }
 
 
+
     /**
      * _more_
      *
      * @throws Exception _more_
      */
-    protected void makeField() throws Exception {
+    protected FieldImpl makeTrackField() throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
 
-        StormParam      param  = getParam();
+        pointObs = new ArrayList<PointOb>();
+        StormParam      param  = getTrackParam();
         for (StormTrack track : tracks) {
-            StormTrack cornTrack =
-                makeCornTrack(track,
-                              STIStormDataSource.PARAM_PROBABILITY10RADIUS);
-            FieldImpl field = stormDisplayState.makeField(track, param);
-            //  fields.add(field);
-            FieldImpl cfield = stormDisplayState.makeField(cornTrack, param);
-            fields.add(cfield);
+            fields.add(stormDisplayState.makeTrackField(track, param));
+            times.add(track.getTrackStartTime());
+            pointObs.addAll(makePointObs(track));
+        }
 
-            //  times.add(track.getTrackStartTime());
+        if (fields.size() == 0) {
+            return null;
+        }
+        return Util.makeTimeField(fields, times);
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param track _more_
+     * @param wState _more_
+     * @param type _more_
+     * @param param _more_
+     *
+     *
+     * @throws Exception _more_
+     */
+    private void makeRingField(StormTrack track, 
+                               StormParam param)
+            throws Exception {
+        param = STIStormDataSource.PARAM_RADIUSMODERATEGALE;
+        List<EarthLocation> locations    = track.getLocations();
+        int                 numPoints    = locations.size();
+        List<RingSet>       rings        = new ArrayList<RingSet>();
+        double[][]          newRangeVals = new double[2][numPoints];
+        //TODO: Use a real type
+        Real[] values = track.getTrackAttributeValues(param);
+        if (values == null) {
+            setRings(null, null);
+            return;
+        }
+        for (int i = 0; i < numPoints; i++) {
+            if ((values[i] != null) && !values[i].isMissing()) {
+                rings.add(makeRingSet(locations.get(i), values[i]));
+            }
+        }
+        setRings(param, rings);
+    }
+
+
+    /**
+     * _more_
+     *
+     *
+     *
+     * @param el _more_
+     * @param r _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private RingSet makeRingSet(EarthLocation el, Real r)
+            throws VisADException, RemoteException {
+        double lat = el.getLatitude().getValue();
+        double lon = el.getLongitude().getValue();
+        Radar2DCoordinateSystem r2Dcs =
+            new Radar2DCoordinateSystem((float) lat, (float) lon);
+        RealTupleType rtt = new RealTupleType((RealType) r.getType(),
+                                azimuthType, r2Dcs, null);
+        Color   ringColor = Color.gray;
+
+        RingSet rss       = new RingSet("range rings", rtt, ringColor);
+        // set initial spacing etc.
+        rss.setRingValues(r, r);
+        //        rss.setRingValues(
+        //            new Real(rangeType, r, CommonUnit.meter.scale(1000)),
+        //            new Real(rangeType, r, CommonUnit.meter.scale(1000)));
+        rss.setVisible(true);
+
+        /** width for range rings */
+        float radialWidth = 1.f;
+
+        rss.setLineWidth(radialWidth);
+
+        return rss;
+
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected FieldImpl makeConeField() throws Exception {
+        List<FieldImpl> fields = new ArrayList<FieldImpl>();
+        List<DateTime>  times  = new ArrayList<DateTime>();
+        StormParam      param  = getTrackParam();
+        for (StormTrack track : tracks) {
+            StormTrack coneTrack =
+                makeConeTrack(track,
+                              STIStormDataSource.PARAM_PROBABILITY10RADIUS);
+            fields.add(stormDisplayState.makeTrackField(coneTrack, null));
             times.add(track.getTrackStartTime());
         }
 
         if (fields.size() == 0) {
-            return;
+            return null;
         }
-
-        FieldImpl timeField = ucar.visad.Util.makeTimeField(fields, times);
-        getTrackDisplay().setTrack(timeField);
+        return Util.makeTimeField(fields, times);
     }
 
 
@@ -544,21 +708,16 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public void addTrack(StormTrack track, FieldImpl field) throws Exception {
-        tracks.add(track);
-        times.add(track.getTrackStartTime());
-        fields.add(field);
-
+    List<PointOb> makePointObs(StormTrack track)  throws Exception {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getTrackStartTime();
-        List<StormTrackPoint> locs          = track.getTrackPoints();
-        //        return makePointOb(el,dt, new RealTuple(new Real[] { new Real(0) }));
+        List<StormTrackPoint> stps          = track.getTrackPoints();
         if (textType == null) {
             textType = new TextType("label");
         }
-
-        for (int i = 0; i < locs.size(); i++) {
-            StormTrackPoint stp   = locs.get(i);
+        List<PointOb> pointObs = new ArrayList<PointOb>();
+        for (int i = 0; i < stps.size(); i++) {
+            StormTrackPoint stp   = stps.get(i);
             DateTime        time  = startTime;
             String          label = "";
             if (isObservation) {
@@ -576,19 +735,9 @@ public class WayDisplayState {
                 PointObFactory.makePointOb(
                     stp.getTrackPointLocation(), time, tuple));
         }
-
-
+        return pointObs;
     }
 
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List getFields() {
-        return fields;
-    }
 
     /**
      * _more_
@@ -619,40 +768,78 @@ public class WayDisplayState {
      */
     public void addDisplayable(Displayable displayable)
             throws VisADException, RemoteException {
-
         getHolder().addDisplayable(displayable);
-        if (way.isObservation()) {
-            displayable.setVisible(getVisible());
-        } else {
-            displayable.setVisible(getVisible()
-                                   && stormDisplayState.getForecastVisible());
-        }
     }
 
 
 
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void checkVisibility() throws Exception {
-        if (holder != null) {
-            for (Iterator iter = holder.iterator(); iter.hasNext(); ) {
-                Displayable displayable = (Displayable) iter.next();
-                if (way.isObservation()) {
-                    displayable.setVisible(getVisible());
-                } else {
-                    displayable.setVisible(
-                        getVisible()
-                        && stormDisplayState.getForecastVisible());
-                }
-            }
-            //setRingsVisible(ringsVisible);
-        }
 
-    }
+
+/**
+Set the ConeState property.
+
+@param value The new value for ConeState
+**/
+public void setConeState (DisplayState value) {
+	coneState = value;
+}
+
+/**
+Get the ConeState property.
+
+@return The ConeState
+**/
+public DisplayState getConeState () {
+	return coneState;
+}
+
+
+
+
+/**
+Set the TrackState property.
+
+@param value The new value for TrackState
+**/
+public void setTrackState (DisplayState value) {
+	trackState = value;
+}
+
+/**
+Get the TrackState property.
+
+@return The TrackState
+**/
+public DisplayState getTrackState () {
+	return trackState;
+}
+
+
+
+/**
+Set the RingsState property.
+
+@param value The new value for RingsState
+**/
+public void setRingsState (DisplayState value) {
+	ringsState = value;
+}
+
+/**
+Get the RingsState property.
+
+@return The RingsState
+**/
+public DisplayState getRingsState () {
+	return ringsState;
+}
+
+
+
+
+
+
 
     /**
      * Set the Visible property.
@@ -663,56 +850,7 @@ public class WayDisplayState {
      */
     public void setVisible(boolean value) throws Exception {
         this.visible = value;
-        checkVisibility();
     }
-
-    /**
-     * Set the Visible property.
-     *
-     * @param value The new value for Visible
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    public void setRingsVisible(boolean value)
-            throws VisADException, RemoteException {
-        this.ringsVisible = value;
-        if (ringsHolder != null) {
-            ringsHolder.setVisible(ringsVisible);
-        }
-    }
-
-
-
-    /**
-     * Get the RingsVisible property.
-     *
-     * @return The RingsVisible
-     */
-    public boolean getRingsVisible() {
-        return ringsVisible;
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param ringDisplayable _more_
-     *
-     * @throws Exception _more_
-     */
-    private void setRingVisibility(Displayable ringDisplayable)
-            throws Exception {
-        if (way.isObservation()) {
-            ringDisplayable.setVisible(getVisible() && getRingsVisible());
-        } else {
-            ringDisplayable.setVisible(
-                getVisible() && getRingsVisible()
-                && stormDisplayState.getForecastVisible());
-        }
-    }
-
 
 
     /**
@@ -837,17 +975,17 @@ public class WayDisplayState {
      *
      * @throws VisADException _more_
      */
-    public StormTrack makeCornTrack(StormTrack track, StormParam param)
+    public StormTrack makeConeTrack(StormTrack track, StormParam param)
             throws VisADException {
         List<StormTrackPoint> stps          = getRealTrackPoints(track,
-                                                  param);
+                                                                 param);
         int                   size          = stps.size();
         int                   numberOfPoint = size * 2 + 11;
-        StormTrackPoint[]     cornPoints = new StormTrackPoint[numberOfPoint];
+        StormTrackPoint[]     conePoints = new StormTrackPoint[numberOfPoint];
 
         StormTrackPoint       stp1          = stps.get(0);
-        cornPoints[0]                 = stp1;  // first point  & last point
-        cornPoints[numberOfPoint - 1] = stp1;
+        conePoints[0]                 = stp1;  // first point  & last point
+        conePoints[numberOfPoint - 1] = stp1;
 
         StormTrackPoint stp2;
         StormTrackPoint stp;
@@ -858,17 +996,17 @@ public class WayDisplayState {
             stp2 = stps.get(i);
             //right point
             stp = getPointToCircleTangencyPoint(stp1, stp2, param, true);
-            cornPoints[i] = stp;
+            conePoints[i] = stp;
             //left point
             stp = getPointToCircleTangencyPoint(stp1, stp2, param, false);
-            cornPoints[numberOfPoint - i - 1] = stp;
+            conePoints[numberOfPoint - i - 1] = stp;
             stp1                              = stp2;
         }
 
         // end point half circle take 11 points
         StormTrackPoint last   = stps.get(size - 1);
         EarthLocation   lastEl = last.getTrackPointLocation();
-        EarthLocation   endEl = cornPoints[size - 1].getTrackPointLocation();
+        EarthLocation   endEl = conePoints[size - 1].getTrackPointLocation();
         double          ang    = getCircleAngleRange(lastEl, endEl);
 
         Real            r      = last.getAttribute(param);
@@ -877,16 +1015,16 @@ public class WayDisplayState {
                                            last.getTrackPointTime());
 
         for (int i = 0; i < 11; i++) {
-            cornPoints[size + i] = halfCircle[i];
+            conePoints[size + i] = halfCircle[i];
         }
 
-        List cornList = new ArrayList<StormTrackPoint>();
+        List coneList = new ArrayList<StormTrackPoint>();
         for (int i = 0; i < numberOfPoint; i++) {
-            cornList.add(cornPoints[i]);
+            coneList.add(conePoints[i]);
         }
 
-        return new StormTrack(track.getStormInfo(), new Way("CORN"),
-                              cornList);
+        return new StormTrack(track.getStormInfo(), new Way("CONE"),
+                              coneList);
 
     }
 
