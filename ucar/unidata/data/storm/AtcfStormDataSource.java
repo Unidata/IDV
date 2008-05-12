@@ -163,6 +163,11 @@ public class AtcfStormDataSource extends StormDataSource {
         return stormInfos;
     }
 
+    private double getDouble(String s) {
+        if(s.length()==0)return Double.NaN;
+        return new Double(s).doubleValue();
+    }
+
 
     /**
      * _more_
@@ -227,10 +232,9 @@ public class AtcfStormDataSource extends StormDataSource {
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
 
             int category = getCategory((String) toks.get(10));
-            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(
-                                 new Double(
-                                     (String) toks.get(8)).doubleValue());
-            double pressure = new Double((String) toks.get(9)).doubleValue();
+            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(getDouble(
+                                                                      (String) toks.get(8)));
+            double pressure = getDouble((String) toks.get(9));
 
             if (category != CATEGORY_XX) {
                 System.err.println("cat:" + category);
