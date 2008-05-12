@@ -179,14 +179,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @return _more_
      */
-    public Real getAttribute(RealType type) {
-        if(attributes==null) return null;
-        for (Real attr : attributes) {
-            if (attr.getType().equals(type)) {
-                return attr;
-            }
-        }
-        return null;
+    public Real getAttribute(StormParam param) {
+        return param.getAttribute(attributes);
     }
 
     /**

@@ -33,6 +33,8 @@ import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.storm.*;
 
 
+
+
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -127,12 +129,13 @@ public class StormTrackTableModel extends AbstractTableModel {
     private StormDisplayState  stormDisplayState;
     private StormTrack track;
     private List<StormTrackPoint> points;
-    private List<RealType> types;
+    private List<StormParam> params;
+
     public  StormTrackTableModel(StormDisplayState  stormDisplayState, StormTrack track) {
         this.stormDisplayState = stormDisplayState;
         this.track = track;
         this.points = track.getTrackPoints();
-        this.types = track.getTypes();
+        this.params = track.getParams();
     }
 
 
@@ -140,12 +143,13 @@ public class StormTrackTableModel extends AbstractTableModel {
         return false;
     }
 
+
     public int getRowCount() {
         return points.size();
     }
 
     public int getColumnCount() {
-        return 3+types.size();
+        return 3+params.size();
     }
 
     public void setValueAt(Object aValue, int rowIndex,
@@ -163,8 +167,8 @@ public class StormTrackTableModel extends AbstractTableModel {
         }
         if(column == 1) return stp.getTrackPointLocation().getLatitude();
         if(column == 2) return stp.getTrackPointLocation().getLongitude();
-        RealType type = types.get(column-3);
-        Real r =  stp.getAttribute(type);
+        StormParam param  = params.get(column-3);
+        Real r =  stp.getAttribute(param);
         if(r!=null) return r.toString();
         return "";
     }
@@ -175,9 +179,9 @@ public class StormTrackTableModel extends AbstractTableModel {
         }
         if(column == 1) return "Lat";
         if(column == 2) return "Lon";
-        RealType type = types.get(column-3);
-        Unit unit = type.getDefaultUnit();
-        return stormDisplayState.getLabel(type) +(unit==null?"":"[" + unit +"]");
+        StormParam param= params.get(column-3);
+        Unit unit = param.getUnit();
+        return param.toString() +(unit==null?"":"[" + unit +"]");
     }
 
 

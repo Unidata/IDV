@@ -125,53 +125,52 @@ public class STIStormDataSource extends StormDataSource {
 
 
     /** _more_ */
-    public static RealType TYPE_MAXWINDSPEED;
-
-
-    /** _more_ */
-    public static RealType TYPE_RADIUSMODERATEGALE;
+    public static StormParam PARAM_MAXWINDSPEED;
 
     /** _more_ */
-    public static RealType TYPE_RADIUSWHOLEGALE;
+    public static StormParam PARAM_RADIUSMODERATEGALE;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY10RADIUS;
+    public static StormParam PARAM_RADIUSWHOLEGALE;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY20RADIUS;
+    public static StormParam PARAM_PROBABILITY10RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY30RADIUS;
+    public static StormParam PARAM_PROBABILITY20RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY40RADIUS;
+    public static StormParam PARAM_PROBABILITY30RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY50RADIUS;
+    public static StormParam PARAM_PROBABILITY40RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY60RADIUS;
+    public static StormParam PARAM_PROBABILITY50RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY70RADIUS;
+    public static StormParam PARAM_PROBABILITY60RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY80RADIUS;
+    public static StormParam PARAM_PROBABILITY70RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY90RADIUS;
+    public static StormParam PARAM_PROBABILITY80RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITY100RADIUS;
+    public static StormParam PARAM_PROBABILITY90RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_PROBABILITYRADIUS;
+    public static StormParam PARAM_PROBABILITY100RADIUS;
 
     /** _more_ */
-    public static RealType TYPE_MOVEDIRECTION;
+    public static StormParam PARAM_PROBABILITYRADIUS;
 
     /** _more_ */
-    public static RealType TYPE_MOVESPEED;
+    public static StormParam PARAM_MOVEDIRECTION;
+
+    /** _more_ */
+    public static StormParam PARAM_MOVESPEED;
 
 
 
@@ -303,38 +302,38 @@ public class STIStormDataSource extends StormDataSource {
      */
     protected void initTypes() throws VisADException {
         super.initTypes();
-        if (TYPE_MAXWINDSPEED == null) {
+        if (PARAM_MAXWINDSPEED == null) {
             //TODO: Make sure these are the right units
-            TYPE_MAXWINDSPEED = makeRealType("maxwindspeed", "Max_Windspeed",
-                                             Util.parseUnit("m/s"));
-            TYPE_RADIUSMODERATEGALE = makeRealType("radiusmoderategale",
-                    "Moderate_Gale_Radius", Util.parseUnit("km"));
-            TYPE_RADIUSWHOLEGALE = makeRealType("radiuswholegale",
-                    "Whole_Gale_Radius", Util.parseUnit("km"));
-            TYPE_MOVEDIRECTION = makeRealType("movedirection",
-                    "Storm_Direction", CommonUnit.degree);
-            TYPE_MOVESPEED = makeRealType("movespeed", "Storm_Speed",
-                                          Util.parseUnit("m/s"));
-            TYPE_PROBABILITY10RADIUS = makeRealType("probabilityradius10",
-                    "Probability_10%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY20RADIUS = makeRealType("probabilityradius20",
-                    "Probability_20%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY30RADIUS = makeRealType("probabilityradius30",
-                    "Probability_30%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY40RADIUS = makeRealType("probabilityradius40",
-                    "Probability_40%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY50RADIUS = makeRealType("probabilityradius50",
-                    "Probability_50%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY60RADIUS = makeRealType("probabilityradius60",
-                    "Probability_60%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY70RADIUS = makeRealType("probabilityradius70",
-                    "Probability_70%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY80RADIUS = makeRealType("probabilityradius80",
-                    "Probability_80%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY90RADIUS = makeRealType("probabilityradius90",
-                    "Probability_90%_Radius", Util.parseUnit("km"));
-            TYPE_PROBABILITY100RADIUS = makeRealType("probabilityradius100",
-                    "Probability_100%_Radius", Util.parseUnit("km"));
+            PARAM_MAXWINDSPEED = new StormParam(makeRealType("maxwindspeed", "Max_Windspeed",
+                                             Util.parseUnit("m/s")));
+            PARAM_RADIUSMODERATEGALE = new StormParam(makeRealType("radiusmoderategale",
+                    "Moderate_Gale_Radius", Util.parseUnit("km")));
+            PARAM_RADIUSWHOLEGALE = new StormParam(makeRealType("radiuswholegale",
+                    "Whole_Gale_Radius", Util.parseUnit("km")));
+            PARAM_MOVEDIRECTION = new StormParam(makeRealType("movedirection",
+                    "Storm_Direction", CommonUnit.degree));
+            PARAM_MOVESPEED = new StormParam(makeRealType("movespeed", "Storm_Speed",
+                                          Util.parseUnit("m/s")));
+            PARAM_PROBABILITY10RADIUS = new StormParam(makeRealType("probabilityradius10",
+                    "Probability_10%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY20RADIUS = new StormParam(makeRealType("probabilityradius20",
+                    "Probability_20%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY30RADIUS = new StormParam(makeRealType("probabilityradius30",
+                    "Probability_30%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY40RADIUS = new StormParam(makeRealType("probabilityradius40",
+                    "Probability_40%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY50RADIUS = new StormParam(makeRealType("probabilityradius50",
+                    "Probability_50%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY60RADIUS = new StormParam(makeRealType("probabilityradius60",
+                    "Probability_60%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY70RADIUS = new StormParam(makeRealType("probabilityradius70",
+                    "Probability_70%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY80RADIUS = new StormParam(makeRealType("probabilityradius80",
+                    "Probability_80%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY90RADIUS = new StormParam(makeRealType("probabilityradius90",
+                    "Probability_90%_Radius", Util.parseUnit("km")));
+            PARAM_PROBABILITY100RADIUS = new StormParam(makeRealType("probabilityradius100",
+                    "Probability_100%_Radius", Util.parseUnit("km")));
 
         }
     }
@@ -570,17 +569,17 @@ public class STIStormDataSource extends StormDataSource {
                     getLatLonValue(results.getDouble(col++));
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
-                attrs.add(new Real(TYPE_MAXWINDSPEED,
+                attrs.add(PARAM_MAXWINDSPEED.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MINPRESSURE,
+                attrs.add(PARAM_MINPRESSURE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE,
+                attrs.add(PARAM_RADIUSMODERATEGALE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE,
+                attrs.add(PARAM_RADIUSWHOLEGALE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVEDIRECTION,
+                attrs.add(PARAM_MOVEDIRECTION.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVESPEED,
+                attrs.add(PARAM_MOVESPEED.getReal(
                                    getValue(results.getDouble(col++))));
                 String key =  forecastWay.getName().toUpperCase() + Integer.toString(fhour);
                 float [] radiuses = wayfhourToRadius.get(key);
@@ -615,17 +614,17 @@ public class STIStormDataSource extends StormDataSource {
 
     }
 
-    private void addprobabilityradiusAttrs(List<Real> attrs, float [] radiuses){
-        attrs.add(new Real(TYPE_PROBABILITY10RADIUS, radiuses[0]));
-        attrs.add(new Real(TYPE_PROBABILITY20RADIUS, radiuses[1]));
-        attrs.add(new Real(TYPE_PROBABILITY30RADIUS, radiuses[2]));
-        attrs.add(new Real(TYPE_PROBABILITY40RADIUS, radiuses[3]));
-        attrs.add(new Real(TYPE_PROBABILITY50RADIUS, radiuses[4]));
-        attrs.add(new Real(TYPE_PROBABILITY60RADIUS, radiuses[5]));
-        attrs.add(new Real(TYPE_PROBABILITY70RADIUS, radiuses[6]));
-        attrs.add(new Real(TYPE_PROBABILITY80RADIUS, radiuses[7]));
-        attrs.add(new Real(TYPE_PROBABILITY90RADIUS, radiuses[8]));
-        attrs.add(new Real(TYPE_PROBABILITY100RADIUS, radiuses[9]));
+    private void addprobabilityradiusAttrs(List<Real> attrs, float [] radiuses) throws Exception {
+        attrs.add(PARAM_PROBABILITY10RADIUS.getReal( radiuses[0]));
+        attrs.add(PARAM_PROBABILITY20RADIUS.getReal( radiuses[1]));
+        attrs.add(PARAM_PROBABILITY30RADIUS.getReal( radiuses[2]));
+        attrs.add(PARAM_PROBABILITY40RADIUS.getReal( radiuses[3]));
+        attrs.add(PARAM_PROBABILITY50RADIUS.getReal( radiuses[4]));
+        attrs.add(PARAM_PROBABILITY60RADIUS.getReal( radiuses[5]));
+        attrs.add(PARAM_PROBABILITY70RADIUS.getReal( radiuses[6]));
+        attrs.add(PARAM_PROBABILITY80RADIUS.getReal( radiuses[7]));
+        attrs.add(PARAM_PROBABILITY90RADIUS.getReal( radiuses[8]));
+        attrs.add(PARAM_PROBABILITY100RADIUS.getReal( radiuses[9]));
 
     }
     /**
@@ -853,7 +852,7 @@ public class STIStormDataSource extends StormDataSource {
                 wp[9]  = results.getFloat(col++);
 
                 String key = wayName + Integer.toString(fhour);
-                System.err.println ("wpppppp " +  key + "  data "+ wp[0] + " and " + wp[1]);
+                //                System.err.println ("wpppppp " +  key + "  data "+ wp[0] + " and " + wp[1]);
                 wayfhourToRadius.put(key, wp);
             }
         }
@@ -951,17 +950,17 @@ public class STIStormDataSource extends StormDataSource {
                     getLatLonValue(results.getDouble(col++));
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
-                attrs.add(new Real(TYPE_MAXWINDSPEED,
+                attrs.add(PARAM_MAXWINDSPEED.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MINPRESSURE,
+                attrs.add(PARAM_MINPRESSURE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE,
+                attrs.add(PARAM_RADIUSMODERATEGALE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE,
+                attrs.add(PARAM_RADIUSWHOLEGALE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVEDIRECTION,
+                attrs.add(PARAM_MOVEDIRECTION.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVESPEED,
+                attrs.add(PARAM_MOVESPEED.getReal(
                                    getValue(results.getDouble(col++))));
 
                 EarthLocation elt =
@@ -1044,17 +1043,17 @@ public class STIStormDataSource extends StormDataSource {
                     getLatLonValue(results.getDouble(col++));
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
-                attrs.add(new Real(TYPE_MAXWINDSPEED,
+                attrs.add(PARAM_MAXWINDSPEED.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MINPRESSURE,
+                attrs.add(PARAM_MINPRESSURE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSMODERATEGALE,
+                attrs.add(PARAM_RADIUSMODERATEGALE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_RADIUSWHOLEGALE,
+                attrs.add(PARAM_RADIUSWHOLEGALE.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVEDIRECTION,
+                attrs.add(PARAM_MOVEDIRECTION.getReal(
                                    getValue(results.getDouble(col++))));
-                attrs.add(new Real(TYPE_MOVESPEED,
+                attrs.add(PARAM_MOVESPEED.getReal(
                                    getValue(results.getDouble(col++))));
 
 

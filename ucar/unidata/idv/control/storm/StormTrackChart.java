@@ -155,7 +155,7 @@ public class StormTrackChart {
     private int forecastHour=0;
 
     /** _more_ */
-    private List<RealType> chartParams = new ArrayList();
+    private List<StormParam> chartParams = new ArrayList<StormParam>();
 
     /** _more_ */
     private List<Way> chartWays = new ArrayList();
@@ -290,16 +290,6 @@ public class StormTrackChart {
 
 
 
-    /**
-     * _more_
-     *
-     * @param realType _more_
-     *
-     * @return _more_
-     */
-    protected boolean showChart(RealType realType) {
-        return true;
-    }
 
 
 
@@ -403,14 +393,14 @@ public class StormTrackChart {
 
 
         //Get the types from the first forecast track
-        List<RealType> types = new ArrayList<RealType>();
+        List<StormParam> params = new ArrayList<StormParam>();
         for (StormTrack track : stormDisplayState.getTrackCollection()
                 .getTracks()) {
             if (track == null) {
                 continue;
             }
             if ( !track.isObservation()) {
-                types = track.getTypes();
+                params = track.getParams();
                 break;
             }
         }
@@ -418,11 +408,11 @@ public class StormTrackChart {
 
 
         //If we didn't get any from the forecast track use the obs track
-        if (types.size() == 0) {
+        if (params.size() == 0) {
             StormTrack obsTrack =
                 stormDisplayState.getTrackCollection().getObsTrack();
             if (obsTrack != null) {
-                types = obsTrack.getTypes();
+                params = obsTrack.getParams();
             }
         }
 
@@ -469,18 +459,18 @@ public class StormTrackChart {
 
 
         List paramComps = new ArrayList();
-        for (RealType type : types) {
-            final RealType theRealType   = type;
-            boolean        useChartParam = chartParams.contains(theRealType);
+        for (StormParam param : params) {
+            final StormParam theParam   = param;
+            boolean        useChartParam = chartParams.contains(theParam);
             final JCheckBox cbx =
-                new JCheckBox(stormDisplayState.getLabel(type),
+                new JCheckBox(param.toString(),
                               useChartParam);
             cbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     if (cbx.isSelected()) {
-                        addChartParam(theRealType);
+                        addChartParam(theParam);
                     } else {
-                        removeChartParam(theRealType);
+                        removeChartParam(theParam);
                     }
                 }
             });
@@ -552,11 +542,10 @@ public class StormTrackChart {
      * _more_
      *
      * @param stormTrack _more_
-     * @param paramType _more_
      *
      * @return _more_
      */
-    protected LineState makeLine(StormTrack stormTrack, RealType paramType) {
+    protected LineState makeLine(StormTrack stormTrack, StormParam param) {
         List<Real>            values      = new ArrayList<Real>();
         List<DateTime>        times       = stormTrack.getTrackTimes();
         List<StormTrackPoint> trackPoints = stormTrack.getTrackPoints();
@@ -564,7 +553,7 @@ public class StormTrackChart {
         double                max         = 0;
         Unit                  unit        = null;
         for (int pointIdx = 0; pointIdx < times.size(); pointIdx++) {
-            Real value = trackPoints.get(pointIdx).getAttribute(paramType);
+            Real value = trackPoints.get(pointIdx).getAttribute(param);
             if (value == null) {
                 continue;
             }
@@ -585,8 +574,8 @@ public class StormTrackChart {
             return null;
         }
         //        System.err.println("");
-        String paramTypeLabel = stormDisplayState.getLabel(paramType);
-        String label = stormTrack.getWay().toString();  // +":" + paramTypeLabel;
+        String paramLabel = param.toString();
+        String label = stormTrack.getWay().toString();  // +":" + paramLabel;
         LineState lineState = new LineState();
         lineState.setRangeIncludesZero(true);
         if (stormTrack.getWay().isObservation()) {
@@ -595,11 +584,11 @@ public class StormTrackChart {
             lineState.setWidth(1);
         }
         lineState.setRange(new Range(min, max));
-        lineState.setChartName(paramTypeLabel);
+        lineState.setChartName(paramLabel);
         lineState.setAxisLabel("[" + unit + "]");
 
-        //        System.err.println (paramType + " " +  StormDataSource.TYPE_STORMCATEGORY);
-        if (Misc.equals(paramType, StormDataSource.TYPE_STORMCATEGORY)) {
+        //        System.err.println (param + " " +  StormDataSource.TYPE_STORMCATEGORY);
+        if (Misc.equals(param, StormDataSource.PARAM_STORMCATEGORY)) {
             //            lineState.setShape(LineState.LINETYPE_BAR);
             lineState.setLineType(LineState.LINETYPE_BAR);
             lineState.setLineType(LineState.LINETYPE_AREA);
@@ -626,9 +615,9 @@ public class StormTrackChart {
      *
      * @param theRealType _more_
      */
-    private void removeChartParam(RealType theRealType) {
-        while (chartParams.contains(theRealType)) {
-            chartParams.remove(theRealType);
+    private void removeChartParam(StormParam param) {
+        while (chartParams.contains(param)) {
+            chartParams.remove(param);
         }
         updateChart();
     }
@@ -636,11 +625,10 @@ public class StormTrackChart {
     /**
      * _more_
      *
-     * @param theRealType _more_
      */
-    private void addChartParam(RealType theRealType) {
-        if ( !chartParams.contains(theRealType)) {
-            chartParams.add(theRealType);
+    private void addChartParam(StormParam param) {
+        if ( !chartParams.contains(param)) {
+            chartParams.add(param);
         }
         updateChart();
     }
@@ -762,21 +750,21 @@ public class StormTrackChart {
 
             List<LineState> lines = new ArrayList<LineState>();
 
-            for (RealType type : chartParams) {
-                List<LineState> linesForType = new ArrayList<LineState>();
+            for (StormParam param : chartParams) {
+                List<LineState> linesForParam = new ArrayList<LineState>();
                 for (StormTrack track : tracksToUse) {
                     LineState lineState = null;
-                    if (chartDifference && canDoDifference(type)) {
+                    if (chartDifference && param.getCanDoDifference()) {
                         if (track.getWay().isObservation()) {
                             continue;
                         }
                         track = StormDataSource.difference(obsTrack, track,
-                                type);
+                                param);
                         if (track != null) {
-                            lineState = makeLine(track, type);
+                            lineState = makeLine(track, param);
                         }
                     } else {
-                        lineState = makeLine(track, type);
+                        lineState = makeLine(track, param);
                     }
                     if (lineState == null) {
                         continue;
@@ -784,24 +772,24 @@ public class StormTrackChart {
                     //Only add it if there are values
                     if (lineState.getRange().getMin()
                             == lineState.getRange().getMin()) {
-                        linesForType.add(lineState);
+                        linesForParam.add(lineState);
                     }
                 }
                 double max = Double.NEGATIVE_INFINITY;
                 double min = Double.POSITIVE_INFINITY;;
-                for (LineState lineState : linesForType) {
+                for (LineState lineState : linesForParam) {
                     Range r = lineState.getRange();
                     min = Math.min(min, r.getMin());
                     max = Math.max(max, r.getMax());
                 }
-                //                System.err.println(type + " min/max:" + min + "/" + max);
+                //                System.err.println(param + " min/max:" + min + "/" + max);
                 boolean first = true;
-                for (LineState lineState : linesForType) {
+                for (LineState lineState : linesForParam) {
                     lineState.setAxisVisible(first);
                     first = false;
                     lineState.setRange(new Range(min, max));
                 }
-                lines.addAll(linesForType);
+                lines.addAll(linesForParam);
             }
             getChart().setTracks(lines);
         } catch (Exception exc) {
@@ -810,20 +798,6 @@ public class StormTrackChart {
         }
     }
 
-
-    /**
-     * _more_
-     *
-     * @param type _more_
-     *
-     * @return _more_
-     */
-    private boolean canDoDifference(RealType type) {
-        if (type.equals(StormDataSource.TYPE_DISTANCEERROR)) {
-            return false;
-        }
-        return true;
-    }
 
 
 
@@ -836,7 +810,7 @@ public class StormTrackChart {
      *
      * @param value The new value for ChartParams
      */
-    public void setChartParams(List<RealType> value) {
+    public void setChartParams(List<StormParam> value) {
         chartParams = value;
     }
 
@@ -845,7 +819,7 @@ public class StormTrackChart {
      *
      * @return The ChartParams
      */
-    public List<RealType> getChartParams() {
+    public List<StormParam> getChartParams() {
         return chartParams;
     }
 

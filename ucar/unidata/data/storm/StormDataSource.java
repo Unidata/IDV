@@ -102,12 +102,12 @@ public abstract class StormDataSource extends DataSourceImpl {
     public static final int CATEGORY_XX = 15;  // - unknown.
 
     /** _more_ */
-    public static RealType TYPE_DISTANCEERROR;
+    public static StormParam PARAM_DISTANCEERROR;
 
     /** _more_ */
-    public static RealType TYPE_MINPRESSURE;
+    public static StormParam PARAM_MINPRESSURE;
 
-    public static RealType TYPE_MAXWINDSPEED_KTS;
+    public static StormParam PARAM_MAXWINDSPEED_KTS;
 
 
 
@@ -130,7 +130,7 @@ public abstract class StormDataSource extends DataSourceImpl {
 
 
     /** _more_ */
-    public static RealType TYPE_STORMCATEGORY;
+    public static StormParam PARAM_STORMCATEGORY;
 
 
     /**
@@ -181,15 +181,15 @@ public abstract class StormDataSource extends DataSourceImpl {
      * @throws VisADException _more_
      */
     protected void initTypes() throws VisADException {
-        if (TYPE_STORMCATEGORY == null) {
-            TYPE_STORMCATEGORY = Util.makeRealType("stormcategory",
-                    "Storm_Category", null);
-            TYPE_MINPRESSURE = makeRealType("minpressure", "Min_Pressure",
-                                            Util.parseUnit("mb"));
-            TYPE_DISTANCEERROR = Util.makeRealType("forecastlocationerror",
-                    "Distance_Error", Util.parseUnit("km"));
-            TYPE_MAXWINDSPEED_KTS = makeRealType("maxwindspeedkts", "Max_Windspeed",
-                                             Util.parseUnit("kts"));
+        if (PARAM_STORMCATEGORY == null) {
+            PARAM_STORMCATEGORY = new StormParam(Util.makeRealType("stormcategory",
+                    "Storm_Category", null));
+            PARAM_MINPRESSURE = new StormParam(makeRealType("minpressure", "Min_Pressure",
+                                            Util.parseUnit("mb")));
+            PARAM_DISTANCEERROR = new StormParam(Util.makeRealType("forecastlocationerror",
+                    "Distance_Error", Util.parseUnit("km")));
+            PARAM_MAXWINDSPEED_KTS = new StormParam(makeRealType("maxwindspeedkts", "Max_Windspeed",
+                                             Util.parseUnit("kts")));
 
         }
     }
@@ -321,21 +321,21 @@ public abstract class StormDataSource extends DataSourceImpl {
             DateTime        dt     = stp.getTrackPointTime();
             StormTrackPoint stpObs = getClosestPoint(obsTrackPoints, dt);
             double          der    = getDistance(stpObs, stp);
-            stp.addAttribute(new Real(TYPE_DISTANCEERROR, der));
+            stp.addAttribute(PARAM_DISTANCEERROR.getReal(der));
         }
 
     }
 
 
     public static StormTrack difference(StormTrack obsTrack,
-                                        StormTrack fctTrack, RealType type)
+                                        StormTrack fctTrack, StormParam param)
         throws VisADException, RemoteException {
         List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
         List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();
         List<StormTrackPoint> diffPoints = new ArrayList<StormTrackPoint>();
 
         for (StormTrackPoint forecastPoint : fctTrackPoints) {
-            Real forecastValue = forecastPoint.getAttribute(type);
+            Real forecastValue = forecastPoint.getAttribute(param);
             if(forecastValue == null) continue;
             DateTime        forecastDttm     = forecastPoint.getTrackPointTime();
             StormTrackPoint[] range = getClosestPointRange(obsTrackPoints, forecastDttm);
@@ -343,11 +343,11 @@ public abstract class StormDataSource extends DataSourceImpl {
             Real obsValue=null;
             if(range.length==1) {
                 //exact match:
-                obsValue  = range[0].getAttribute(type);
+                obsValue  = range[0].getAttribute(param);
             } else {
                 //Interpolate between the two points
-                Real v1 = range[0].getAttribute(type);
-                Real v2 = range[1].getAttribute(type);
+                Real v1 = range[0].getAttribute(param);
+                Real v2 = range[1].getAttribute(param);
                 if(v1 == null || v2 == null) continue;
                 DateTime t1 = range[0].getTrackPointTime();            
                 DateTime t2 = range[1].getTrackPointTime();            

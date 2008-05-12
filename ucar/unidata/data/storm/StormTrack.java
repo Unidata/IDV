@@ -43,7 +43,7 @@ import java.util.List;
  * Time: 5:00:17 PM
  * To change this template use File | Settings | File Templates.
  */
-public class StormTrack {
+public class StormTrack implements Comparable {
 
     /** _more_ */
     private String trackId;
@@ -123,6 +123,24 @@ public class StormTrack {
         this.trackPoints = new ArrayList();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + startTime.getValue();
+    }
+
+
+    public int compareTo(Object o) {
+        if (o instanceof StormTrack) {
+            StormTrack that = (StormTrack) o;
+
+            double v1=getTrackStartTime().getValue();
+            double v2=that.getTrackStartTime().getValue();
+            if (v1 < v2) {
+                return -1;
+            }
+            if (v1 > v2) {
+                return 1;
+            }
+            return 0;
+        }
+        return toString().compareTo(o.toString());
     }
 
 
@@ -265,16 +283,16 @@ public class StormTrack {
      *
      * @return _more_
      */
-    public List<RealType> getTypes() {
-        List<RealType> types = new ArrayList<RealType>();
+    public List<StormParam> getParams() {
+        List<StormParam> params = new ArrayList<StormParam>();
         if (trackPoints.size() > 0) {
             List<Real> reals = trackPoints.get(0).getTrackAttributes();
             for (Real r : reals) {
-                types.add((RealType) r.getType());
+                params.add(new StormParam((RealType) r.getType()));
             }
 
         }
-        return types;
+        return params;
     }
 
     /**
@@ -298,14 +316,14 @@ public class StormTrack {
      * @param type _more_
      * @return _more_
      */
-    public Real[] getTrackAttributeValues(RealType type) {
-        if (type == null) {
+    public Real[] getTrackAttributeValues(StormParam param) {
+        if (param == null) {
             return null;
         }
         int    size            = trackPoints.size();
         Real[] trackAttributes = new Real[size];
         for (int i = 0; i < size; i++) {
-            Real value = trackPoints.get(i).getAttribute(type);
+            Real value = trackPoints.get(i).getAttribute(param);
             if (value == null) {
                 if (i == 0) {
                     return null;

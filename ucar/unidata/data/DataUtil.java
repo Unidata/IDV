@@ -375,23 +375,31 @@ public class DataUtil {
      * @throws Exception _more_
      */
     public static void writeXls(String filename, List rows) throws Exception {
+        writeXls(filename, Misc.newList(rows), null);
+    }
+
+    public static void writeXls(String filename,  List<List> rowsList,List<String> names) throws Exception {
         HSSFWorkbook     wb      = new HSSFWorkbook();
         FileOutputStream fileOut = new FileOutputStream(filename);
-        HSSFSheet        sheet   = wb.createSheet();
-        for (int i = 0; i < rows.size(); i++) {
-            HSSFRow row  = sheet.createRow((short) i);
-            List    cols = (List) rows.get(i);
-            for (int colIdx = 0; colIdx < cols.size(); colIdx++) {
-                Object   o    = cols.get(colIdx);
-                HSSFCell cell = row.createCell((short) colIdx);
-                if (o instanceof Double) {
-                    cell.setCellValue(((Double) o).doubleValue());
-                } else if (o instanceof Real) {
-                    cell.setCellValue(((Real) o).getValue());
-                } else if (o instanceof Integer) {
-                    cell.setCellValue(((Integer) o).intValue());
-                } else {
-                    cell.setCellValue(o.toString());
+        for(int sheetIdx=0;sheetIdx<rowsList.size();sheetIdx++) {
+            String sheetName = (names!=null?names.get(sheetIdx):null);
+            HSSFSheet        sheet   = (sheetName!=null?wb.createSheet(sheetName):wb.createSheet());
+            List rows = rowsList.get(sheetIdx);
+            for (int i = 0; i < rows.size(); i++) {
+                HSSFRow row  = sheet.createRow((short) i);
+                List    cols = (List) rows.get(i);
+                for (int colIdx = 0; colIdx < cols.size(); colIdx++) {
+                    Object   o    = cols.get(colIdx);
+                    HSSFCell cell = row.createCell((short) colIdx);
+                    if (o instanceof Double) {
+                        cell.setCellValue(((Double) o).doubleValue());
+                    } else if (o instanceof Real) {
+                        cell.setCellValue(((Real) o).getValue());
+                    } else if (o instanceof Integer) {
+                        cell.setCellValue(((Integer) o).intValue());
+                    } else {
+                        cell.setCellValue(o.toString());
+                    }
                 }
             }
         }
