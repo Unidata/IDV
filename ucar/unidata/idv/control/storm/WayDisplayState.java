@@ -555,8 +555,6 @@ public class WayDisplayState {
      * _more_
      *
      * @param track _more_
-     * @param wState _more_
-     * @param type _more_
      * @param param _more_
      *
      *
@@ -655,7 +653,6 @@ public class WayDisplayState {
      * _more_
      *
      * @param track _more_
-     * @param field _more_
      *
      * @throws Exception _more_
      */
