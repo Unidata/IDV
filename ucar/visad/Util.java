@@ -2931,19 +2931,28 @@ public final class Util {
     public static FieldImpl makeTimeField(List ranges, List times)
             throws VisADException, RemoteException {
         FieldImpl fi      = null;
+        Hashtable timeToData = new Hashtable();
+        for(int i=0;i<times.size();i++) {
+            timeToData.put(times.get(i), ranges.get(i));
+        }
+
         Set       timeSet = makeTimeSet(times);
-        for (int i = 0; i < times.size(); i++) {
-            Data range = (Data)ranges.get(i);
+        int setSize = timeSet.getLength();
+
+        Object obj = times.get(0);
+        DateTime dttm=null;
+        if(obj instanceof DateTime) {
+            dttm = (DateTime)  obj;
+        } else if(obj instanceof Date) {
+            dttm = new DateTime((Date)obj);
+        } else {
+            throw new IllegalArgumentException("Unknown date type:" + obj);
+        }
+
+        for (int i = 0; i < setSize;i++) {
+            Object time = timeSet.__getitem__(i);
+            Data range = (Data)timeToData.get(time);
             if (fi == null) {
-                DateTime dttm;
-                Object obj = times.get(i);
-                if(obj instanceof DateTime) {
-                    dttm = (DateTime)  obj;
-                } else if(obj instanceof Date) {
-                    dttm = new DateTime((Date)obj);
-                } else {
-                    throw new IllegalArgumentException("Unknown date type:" + obj);
-                }
                 fi = new FieldImpl(new FunctionType(dttm.getType(),
                         range.getType()), timeSet);
             }
