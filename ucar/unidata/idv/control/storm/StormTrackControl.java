@@ -1117,7 +1117,7 @@ public class StormTrackControl extends DisplayControlImpl {
         List            theStormStates = getStormDisplayStates();
 
         if (theStormStates != null) {
-            result = findClosestOb(el, theStormStates, animationValue);
+            result = findClosestPoint(el, theStormStates, animationValue);
 
         }
 
@@ -1177,7 +1177,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    VisAD problem
      */
-    protected List findClosestOb(EarthLocation el,
+    protected List findClosestPoint(EarthLocation el,
                                             List<StormDisplayState> theStates,
                                             Real animationValue)
             throws VisADException, RemoteException, Exception {
@@ -1211,10 +1211,10 @@ public class StormTrackControl extends DisplayControlImpl {
                     track = tracks.get(0);
                 } else {
                     WayDisplayState       trackWDS   = sds.getWayDisplayState(way); //get(Way.OBSERVATION);
-                    boolean visible = getVisibleTracks( animationValue, trackWDS );
+                    boolean visible = checkTracksVisible( animationValue, trackWDS );
                     if(visible){
                         List<StormTrack>      tracks   = wayToTracksMap.get(way);
-                        track = getForecastTrack(tracks, animationValue);
+                        track = getClosestTimeForecastTrack(tracks, animationValue);
                     }
                 }
 
@@ -1249,7 +1249,7 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-    private boolean getVisibleTracks( Real currentAnimationTime, WayDisplayState wds )throws Exception {
+    private boolean checkTracksVisible( Real currentAnimationTime, WayDisplayState wds )throws Exception {
 
 
 
@@ -1283,7 +1283,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
        return  visible;
   }
-    private StormTrack getForecastTrack(List<StormTrack> tracks, Real pTime) throws VisADException {
+    private StormTrack getClosestTimeForecastTrack(List<StormTrack> tracks, Real pTime) throws VisADException {
 
         DateTime dt = new DateTime(pTime); // pTime.
         double timeToLookFor = dt.getValue();
