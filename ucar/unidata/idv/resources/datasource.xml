@@ -56,11 +56,13 @@
      factory="ucar.unidata.data.point.DbPointDataSource"
      label="Point data database"/>
 
+<!--
   <datasource
      id="DB.STORMTRACK"
      fileselection="true"
      factory="ucar.unidata.data.storm.STIStormDataSource"
      label="STI Storm Data"/>
+-->
 
   <datasource
      id="STORM.ATCF"
