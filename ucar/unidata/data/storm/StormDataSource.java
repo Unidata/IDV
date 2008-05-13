@@ -182,7 +182,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @throws VisADException _more_
      */
-    protected void initTypes() throws VisADException {
+    protected void initParams() throws VisADException {
         if (PARAM_STORMCATEGORY == null) {
             PARAM_STORMCATEGORY =
                 new StormParam(Util.makeRealType("stormcategory",

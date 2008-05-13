@@ -98,7 +98,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        return false;
+        return true;
     }
 
     /**
@@ -331,8 +331,8 @@ public class STIStormDataSource extends StormDataSource {
      *
      * @throws VisADException _more_
      */
-    protected void initTypes() throws VisADException {
-        super.initTypes();
+    protected void initParams() throws VisADException {
+        super.initParams();
         if (PARAM_MAXWINDSPEED == null) {
             //TODO: Make sure these are the right units
             PARAM_MAXWINDSPEED = new StormParam(makeRealType("maxwindspeed",
@@ -471,6 +471,7 @@ public class STIStormDataSource extends StormDataSource {
     public StormTrackCollection getTrackCollection(StormInfo stormInfo,
             Hashtable<String, Boolean> waysToUse)
             throws Exception {
+        initParams();
         long                 t1              = System.currentTimeMillis();
         StormTrackCollection trackCollection = new StormTrackCollection();
         List<Way>            forecastWays    = getForecastWays(stormInfo);
@@ -611,7 +612,6 @@ public class STIStormDataSource extends StormDataSource {
         double                radius = 0;
         List<StormTrackPoint> pts    = new ArrayList();
 
-        initTypes();
         Real altReal = new Real(RealType.Altitude, 0);
         while ((results = iter.next()) != null) {
             while (results.next()) {

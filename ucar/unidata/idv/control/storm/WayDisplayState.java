@@ -531,7 +531,7 @@ public class WayDisplayState {
 
         pointObs = new ArrayList<PointOb>();
         for (StormTrack track : tracks) {
-            FieldImpl field = stormDisplayState.makeTrackField(track, colorParam);
+            FieldImpl field = stormDisplayState.getStormTrackControl().makeTrackField(track, colorParam);
             if(field == null) {
                 continue;
             }
@@ -640,7 +640,7 @@ public class WayDisplayState {
         for (StormTrack track : tracks) {
             StormTrack coneTrack =         makeConeTrack(track,
                                                          stormParam);
-            fields.add(stormDisplayState.makeTrackField(coneTrack, null));
+            fields.add(stormDisplayState.getStormTrackControl().makeTrackField(coneTrack, null));
             times.add(track.getTrackStartTime());
         }
 

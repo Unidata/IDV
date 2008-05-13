@@ -161,8 +161,6 @@ public class StormDisplayState {
     /** _more_ */
     private static int[] nextColor = { 0 };
 
-    /** _more_ */
-    private static int cnt = 0;
 
 
     /** _more_ */
@@ -1098,79 +1096,6 @@ public class StormDisplayState {
      **/
 
 
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param track _more_
-     * @param type _more_
-     * @param param _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected FieldImpl makeTrackField(StormTrack track, StormParam param)
-            throws Exception {
-
-        List<DateTime>      times     = track.getTrackTimes();
-        List<EarthLocation> locations = track.getLocations();
-        int                 numPoints = times.size();
-        Unit                timeUnit  = ((DateTime) times.get(0)).getUnit();
-
-        RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
-        Real                dfltReal  = new Real(dfltRealType, 1);
-
-        RealType timeType =
-            RealType.getRealType(DataUtil.cleanName("track_time" + cnt + "_"
-                + timeUnit), timeUnit);
-        RealTupleType rangeType    = null;
-        double[][]    newRangeVals = new double[2][numPoints];
-        float[]       alts         = new float[numPoints];
-        float[]       lats         = new float[numPoints];
-        float[]       lons         = new float[numPoints];
-        Real[]        values       = ((param == null)
-                                      ? null
-                                      : track.getTrackAttributeValues(param));
-        for (int i = 0; i < numPoints; i++) {
-            Real value = ((values == null)
-                          ? dfltReal
-                          : values[i]);
-            //Set the dflt so we can use its unit later
-            dfltReal = value;
-            if (rangeType == null) {
-                rangeType =
-                    new RealTupleType(RealType.getRealType("trackrange_"
-                        + cnt, value.getUnit()), timeType);
-            }
-            DateTime      dateTime = (DateTime) times.get(i);
-            EarthLocation el       = locations.get(i);
-            newRangeVals[0][i] = value.getValue();
-            newRangeVals[1][i] = dateTime.getValue();
-            lats[i]            = (float) el.getLatitude().getValue();
-            lons[i]            = (float) el.getLongitude().getValue();
-            alts[i]            = 1;
-            //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
-        }
-        GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
-                                alts);
-        Set[] rangeSets = new Set[2];
-        rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
-        rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
-        FunctionType newType =
-            new FunctionType(((SetType) llaSet.getType()).getDomain(),
-                             rangeType);
-        FlatField timeTrack = new FlatField(newType, llaSet,
-                                            (CoordinateSystem) null,
-                                            rangeSets,
-                                            new Unit[] { dfltReal.getUnit(),
-                timeUnit });
-        timeTrack.setSamples(newRangeVals, false);
-        return timeTrack;
-    }
 
 
 

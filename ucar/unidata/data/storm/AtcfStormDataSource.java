@@ -184,6 +184,7 @@ public class AtcfStormDataSource extends StormDataSource {
                             Hashtable<String, Boolean> waysToUse)
             throws Exception {
 
+
         long   t1    = System.currentTimeMillis();
         byte[] bytes = readFile(trackFile);
         long   t2    = System.currentTimeMillis();
@@ -218,7 +219,7 @@ public class AtcfStormDataSource extends StormDataSource {
         okWays.put("NGX", "");
         okWays.put("BAMS", "");*/
         Hashtable seenDate = new Hashtable();
-        initTypes();
+        initParams();
         int xcnt = 0;
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
@@ -237,7 +238,7 @@ public class AtcfStormDataSource extends StormDataSource {
             double pressure = getDouble((String) toks.get(9));
 
             if (category != CATEGORY_XX) {
-                System.err.println("cat:" + category);
+                //                System.err.println("cat:" + category);
             }
             String dateString = (String) toks.get(2);
             String wayString  = (String) toks.get(4);
@@ -331,11 +332,19 @@ public class AtcfStormDataSource extends StormDataSource {
         long                 t1     = System.currentTimeMillis();
         StormTrackCollection tracks = new StormTrackCollection();
 
-        String trackFile = path + "/" + getYear(stormInfo.getStartTime())
-                           + "/" + "a" + stormInfo.getBasin().toLowerCase()
-                           + stormInfo.getNumber()
-                           + getYear(stormInfo.getStartTime()) + ".dat.gz";
-        readTracks(stormInfo, tracks, trackFile, waysToUse);
+        String trackFile;
+        System.err.println ("wtu:" + waysToUse);
+        boolean justObs = 
+            waysToUse!=null && waysToUse.size()==1 && waysToUse.get(Way.OBSERVATION.toString())!=null;
+        System.err.println ("Just obs:" + justObs);
+        if(!justObs) {
+            trackFile = path + "/" + getYear(stormInfo.getStartTime())
+                + "/" + "a" + stormInfo.getBasin().toLowerCase()
+                + stormInfo.getNumber()
+                + getYear(stormInfo.getStartTime()) + ".dat.gz";
+            readTracks(stormInfo, tracks, trackFile, waysToUse);
+        }
+        //Now  read the b"est file
         trackFile = path + "/" + getYear(stormInfo.getStartTime()) + "/"
                     + "b" + stormInfo.getBasin().toLowerCase()
                     + stormInfo.getNumber()

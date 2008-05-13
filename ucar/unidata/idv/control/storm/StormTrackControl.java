@@ -28,10 +28,16 @@ package ucar.unidata.idv.control.storm;
 
 
 import ucar.unidata.data.DataChoice;
+
+import ucar.unidata.data.point.*;
 import ucar.unidata.data.storm.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
+import ucar.unidata.data.DataUtil;
+
+import ucar.unidata.ui.drawing.*;
+import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.MenuUtil;
@@ -51,7 +57,12 @@ import java.awt.*;
 
 import java.rmi.RemoteException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Enumeration;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.*;
@@ -78,6 +89,8 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_          */
     private final static String PREF_OKPARAMS = "pref.okparams";
 
+    /** _more_ */
+    private static int cnt = 0;
 
 
 
@@ -134,7 +147,7 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private TreePanel treePanel;
 
-
+    private Hashtable<Integer,JComponent> yearToComponent = new Hashtable<Integer,JComponent>();
     /**
      * Create a new Track Control; set the attribute flags
      */
@@ -200,6 +213,83 @@ public class StormTrackControl extends DisplayControlImpl {
 
         return true;
     }
+
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param track _more_
+     * @param type _more_
+     * @param param _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected FieldImpl makeTrackField(StormTrack track, StormParam param)
+            throws Exception {
+
+        List<StormTrackPoint> points =  track.getTrackPoints();
+        int                 numPoints = points.size();
+        Unit                timeUnit  = points.get(0).getTrackPointTime().getUnit();
+
+        RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
+        Real                dfltReal  = new Real(dfltRealType, 1);
+
+        RealType timeType =
+            RealType.getRealType(DataUtil.cleanName("track_time" + cnt + "_"
+                + timeUnit), timeUnit);
+        RealTupleType rangeType    = null;
+        double[][]    newRangeVals = new double[2][numPoints];
+        float[]       alts         = new float[numPoints];
+        float[]       lats         = new float[numPoints];
+        float[]       lons         = new float[numPoints];
+        Real[]        values       = ((param == null)
+                                      ? null
+                                      : track.getTrackAttributeValues(param));
+        for (int pointIdx = 0; pointIdx < numPoints; pointIdx++) {
+            StormTrackPoint stp = points.get(pointIdx);
+            Real value = ((values == null)
+                          ? dfltReal
+                          : values[pointIdx]);
+            //Set the dflt so we can use its unit later
+            dfltReal = value;
+            if (rangeType == null) {
+                rangeType =
+                    new RealTupleType(RealType.getRealType("trackrange_"
+                        + cnt, value.getUnit()), timeType);
+            }
+            DateTime      dateTime = stp.getTrackPointTime();
+            EarthLocation el       = stp.getTrackPointLocation();
+            newRangeVals[0][pointIdx] = value.getValue();
+            newRangeVals[1][pointIdx] = dateTime.getValue();
+            lats[pointIdx]            = (float) el.getLatitude().getValue();
+            lons[pointIdx]            = (float) el.getLongitude().getValue();
+            //            System.err.println("\tpt:" + el + " " + dateTime);
+            alts[pointIdx]            = 1;
+            //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
+        }
+        GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
+                                alts);
+        Set[] rangeSets = new Set[2];
+        rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
+        rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
+        FunctionType newType =
+            new FunctionType(((SetType) llaSet.getType()).getDomain(),
+                             rangeType);
+        FlatField timeTrack = new FlatField(newType, llaSet,
+                                            (CoordinateSystem) null,
+                                            rangeSets,
+                                            new Unit[] { dfltReal.getUnit(),
+                timeUnit });
+        timeTrack.setSamples(newRangeVals, false);
+        return timeTrack;
+    }
+
 
 
 
@@ -673,7 +763,126 @@ public class StormTrackControl extends DisplayControlImpl {
         } catch (Exception exc) {
             logException("Setting new storm info", exc);
         }
+        if(yearList.size()>0) {
+            loadYears();
+        }
     }
+
+    
+
+    private Hashtable yearData = new Hashtable();
+    private TrackDisplayable yearTrackDisplay;
+    private StationModelDisplayable yearLabelDisplay;
+    private List<Integer> yearList = new ArrayList<Integer>();
+
+
+    public void removeYear(Integer y) {
+        if(!yearList.contains(y)) return;
+        yearList.remove(y);
+        final JComponent yearComponent = yearToComponent.get(y);
+        if(yearComponent!=null) {
+            yearComponent.removeAll();
+            yearComponent.add(BorderLayout.CENTER,
+                              GuiUtils.topLeft(
+                                               GuiUtils.makeButton("Load Year", this, "loadYear", y)));
+        }
+    }
+
+    public void loadYear(Integer y) {
+        if(yearList.contains(y)) return;
+        yearList.add(y);
+        final JComponent yearComponent = yearToComponent.get(y);
+        if(yearComponent!=null) {
+            yearComponent.removeAll();
+            yearComponent.add(BorderLayout.CENTER,
+                              GuiUtils.topLeft(
+                                               GuiUtils.makeButton("Remove Year", this, "removeYear", y)));
+        }
+        loadYears();
+    }
+
+
+    public void loadYears() {
+        Misc.run(new Runnable() {
+                public void run() {
+                    loadYearsInner();
+                }
+            });
+    }
+
+
+    private void loadYearsInner() {
+        try {
+            JLabel label = new JLabel();
+            GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            //Go in reverse order so we get the latest first
+            List fields = new ArrayList();
+            List times  = new ArrayList();
+            Hashtable<String, Boolean> obsWays  = new Hashtable<String, Boolean>();
+            obsWays.put(Way.OBSERVATION.toString(), new Boolean(true));
+            List<PointOb> pointObs = new     ArrayList<PointOb>();
+            TextType textType = TextType.getTextType("ID");
+            for(Integer y: yearList) {
+                int year   = y.intValue();
+                for (int i = stormInfos.size() - 1; i >= 0; i--) {
+                    StormInfo stormInfo = stormInfos.get(i);
+                    cal.setTime(ucar.visad.Util.makeDate(stormInfo.getStartTime()));
+                    int stormYear = cal.get(Calendar.YEAR);
+                    if(stormYear!=year) continue;
+
+                    Object key  = year+"_"+stormInfo.getStormId();
+                    StormTrack obsTrack =  (StormTrack) yearData.get(key);
+                    if(obsTrack == null) {
+                        label.setText("Loading " + stormInfo);
+                        StormTrackCollection tracks= stormDataSource.getTrackCollection(stormInfo,
+                                                                                        obsWays);
+                        obsTrack = tracks.getObsTrack();
+                        if(obsTrack == null) continue;
+                        yearData.put(key, obsTrack);
+                    }
+
+                    FieldImpl field = makeTrackField(obsTrack, null);
+                    StormTrackPoint stp = obsTrack.getTrackPoints().get(0);
+                    times.add(stormInfo.getStartTime());
+                    fields.add(field);
+
+                    Tuple tuple = new Tuple(new Data[] {
+                        new visad.Text(textType, stormInfo.toString()) });
+                    pointObs.add(
+                                 PointObFactory.makePointOb(
+                                                            stp.getTrackPointLocation(), stormInfo.getStartTime(), tuple));
+                    //                System.err.println(stormInfo + " " +stp.getTrackPointLocation() + " " + stormInfo.getStartTime());
+                }
+            }
+
+            label.setText("Done");
+            //            if(times.size()==0) {
+            //                return;
+            //            }
+            if(yearTrackDisplay == null) {
+                yearTrackDisplay = new TrackDisplayable("year track ");
+                addDisplayable(yearTrackDisplay);
+
+                yearLabelDisplay =  new StationModelDisplayable("storm year labels");
+                yearLabelDisplay.setScale(1.0f);
+                StationModelManager smm =
+                    getControlContext().getStationModelManager();
+                StationModel model =
+                    smm.getStationModel("Location");
+                yearLabelDisplay.setStationModel(model);
+                addDisplayable(yearLabelDisplay);
+            }
+
+            yearTrackDisplay.setTrack(Util.makeTimeField(fields, times));
+            yearLabelDisplay.setStationData(
+                                            PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
+
+        } catch (Exception exc) {
+            logException("Loading year", exc);
+        }
+
+    }
+
 
     /**
      * Make the gui
@@ -691,10 +900,11 @@ public class StormTrackControl extends DisplayControlImpl {
         //Get the storm infos and sort them
         stormInfos =
             (List<StormInfo>) Misc.sort(stormDataSource.getStormInfos());
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+
         Hashtable         years                  = new Hashtable();
         JComponent        firstComponent         = null;
         JComponent        firstSelectedComponent = null;
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         //Go in reverse order so we get the latest first
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             StormInfo stormInfo = stormInfos.get(i);
@@ -706,10 +916,19 @@ public class StormTrackControl extends DisplayControlImpl {
             String category = "" + year;
             if (years.get(category) == null) {
                 years.put(category, category);
-                JComponent categoryComponent =
-                    new JLabel(
-                        "Allow user to view all observed tracks for a given year");
-                treePanel.addCategoryComponent(category, categoryComponent);
+                JPanel yearComponent = new JPanel(new BorderLayout());
+                if(yearList.contains(new Integer(year))) {
+                    yearComponent.add(BorderLayout.CENTER,
+                                      GuiUtils.topLeft(
+                                                       GuiUtils.makeButton("Remove Year", this, "removeYear", new Integer(year))));
+
+                } else {
+                    yearComponent.add(BorderLayout.CENTER,
+                                      GuiUtils.topLeft(
+                                                       GuiUtils.makeButton("Load Year", this, "loadYear", new Integer(year))));
+                }
+                yearToComponent.put(new Integer(year), yearComponent);
+                treePanel.addCategoryComponent(category, GuiUtils.inset(yearComponent, new Insets(5,5,5,5)));
             }
             JComponent panelContents = stormDisplayState.getContents();
             if (stormInfo.getBasin() != null) {
@@ -1054,6 +1273,27 @@ public class StormTrackControl extends DisplayControlImpl {
     public String getEndTime() {
         return endTime;
     }
+
+
+
+
+/**
+Set the YearList property.
+
+@param value The new value for YearList
+**/
+public void setYearList (List<Integer> value) {
+	yearList = value;
+}
+
+/**
+Get the YearList property.
+
+@return The YearList
+**/
+public List<Integer> getYearList () {
+	return yearList;
+}
 
 
 
