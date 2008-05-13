@@ -40,6 +40,7 @@ argument -Dfoo=bar) -->
             jarfile="${jars_dest}/sti.jar"
             >
             <include name="ucar/unidata/apps/sti/**"/>
+            <include name="ucar/unidata/apps/sti/maps/**"/>
         </jar>
     </target>
 
