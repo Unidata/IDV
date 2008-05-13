@@ -785,7 +785,11 @@ public class StormTrackControl extends DisplayControlImpl {
             yearComponent.add(BorderLayout.CENTER,
                               GuiUtils.topLeft(
                                                GuiUtils.makeButton("Load Year", this, "loadYear", y)));
+            yearComponent.invalidate();
+            yearComponent.validate();
+            yearComponent.repaint();
         }
+        loadYears();
     }
 
     public void loadYear(Integer y) {
@@ -797,6 +801,9 @@ public class StormTrackControl extends DisplayControlImpl {
             yearComponent.add(BorderLayout.CENTER,
                               GuiUtils.topLeft(
                                                GuiUtils.makeButton("Remove Year", this, "removeYear", y)));
+            yearComponent.invalidate();
+            yearComponent.validate();
+            yearComponent.repaint();
         }
         loadYears();
     }
@@ -833,7 +840,7 @@ public class StormTrackControl extends DisplayControlImpl {
                     Object key  = year+"_"+stormInfo.getStormId();
                     StormTrack obsTrack =  (StormTrack) yearData.get(key);
                     if(obsTrack == null) {
-                        label.setText("Loading " + stormInfo);
+                        //                        label.setText("Loading " + stormInfo);
                         StormTrackCollection tracks= stormDataSource.getTrackCollection(stormInfo,
                                                                                         obsWays);
                         obsTrack = tracks.getObsTrack();
@@ -851,14 +858,17 @@ public class StormTrackControl extends DisplayControlImpl {
                     pointObs.add(
                                  PointObFactory.makePointOb(
                                                             stp.getTrackPointLocation(), stormInfo.getStartTime(), tuple));
-                    //                System.err.println(stormInfo + " " +stp.getTrackPointLocation() + " " + stormInfo.getStartTime());
                 }
             }
 
-            label.setText("Done");
-            //            if(times.size()==0) {
-            //                return;
-            //            }
+            if(times.size()==0) {
+                removeDisplayable(yearTrackDisplay);
+                removeDisplayable(yearLabelDisplay);
+                yearTrackDisplay = null;
+                yearLabelDisplay = null;
+                return;
+            }
+
             if(yearTrackDisplay == null) {
                 yearTrackDisplay = new TrackDisplayable("year track ");
                 addDisplayable(yearTrackDisplay);
