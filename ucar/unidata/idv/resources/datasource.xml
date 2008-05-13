@@ -66,7 +66,7 @@
      id="STORM.ATCF"
      fileselection="true"
      factory="ucar.unidata.data.storm.AtcfStormDataSource"
-     label="Atcf Storm Data"/>
+     label="ATCF Storm Data"/>
 
 
   <datasource

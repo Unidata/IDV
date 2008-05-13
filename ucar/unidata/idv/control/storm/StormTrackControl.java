@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -103,6 +101,8 @@ public class StormTrackControl extends DisplayControlImpl {
         GuiUtils.getImageIcon("/ucar/unidata/idv/control/storm/blank.gif");
 
 
+
+    private StormDisplayState localStormDisplayState;
 
     /** _more_          */
     private Hashtable preferences;
@@ -395,6 +395,9 @@ public class StormTrackControl extends DisplayControlImpl {
      * @return _more_
      */
     public StormDisplayState getCurrentStormDisplayState() {
+        if(localStormDisplayState!=null)  return localStormDisplayState;
+        if(treePanel == null) return null;
+
         Component comp = treePanel.getVisibleComponent();
         if (comp == null) {
             return null;
@@ -453,7 +456,8 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param stormDisplayState _more_
      */
     public void viewStorm(StormDisplayState stormDisplayState) {
-        treePanel.show(stormDisplayState.getContents());
+        if(treePanel != null) 
+            treePanel.show(stormDisplayState.getContents());
     }
 
     /**
@@ -905,12 +909,31 @@ public class StormTrackControl extends DisplayControlImpl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
-        treePanel = new TreePanel(true, 150);
 
         //Get the storm infos and sort them
         stormInfos =
             (List<StormInfo>) Misc.sort(stormDataSource.getStormInfos());
 
+        if(stormInfos.size()==1) {
+            try {
+                if(localStormDisplayState==null) {
+                    localStormDisplayState = new StormDisplayState(stormInfos.get(0));
+                }
+                stormDisplayStateMap =
+                    new Hashtable<StormInfo, StormDisplayState>();
+                localStormDisplayState.setStormTrackControl(this);
+                stormDisplayStateMap.put(stormInfos.get(0), localStormDisplayState);
+                localStormDisplayState.setIsOnlyChild(true);
+                JComponent comp =  localStormDisplayState.getContents();
+                localStormDisplayState.loadStorm();
+                return comp;
+            } catch (Exception exc) {
+                logException("Creating storm display", exc);
+                return new JLabel("Error");
+            }
+        }
+        localStormDisplayState = null;
+        treePanel = new TreePanel(true, 150);
         Hashtable         years                  = new Hashtable();
         JComponent        firstComponent         = null;
         JComponent        firstSelectedComponent = null;
@@ -1011,10 +1034,11 @@ public class StormTrackControl extends DisplayControlImpl {
      */
     public void stormChanged(StormDisplayState stormDisplayState) {
         activeStorms = null;
-        treePanel.setIcon(stormDisplayState.getContents(),
-                          stormDisplayState.getActive()
-                          ? ICON_ON
-                          : ICON_OFF);
+        if(treePanel!=null)
+            treePanel.setIcon(stormDisplayState.getContents(),
+                              stormDisplayState.getActive()
+                              ? ICON_ON
+                              : ICON_OFF);
     }
 
 
@@ -1305,6 +1329,24 @@ public List<Integer> getYearList () {
 	return yearList;
 }
 
+
+/**
+Set the LocalStormDisplayState property.
+
+@param value The new value for LocalStormDisplayState
+**/
+public void setLocalStormDisplayState (StormDisplayState value) {
+	localStormDisplayState = value;
+}
+
+/**
+Get the LocalStormDisplayState property.
+
+@return The LocalStormDisplayState
+**/
+public StormDisplayState getLocalStormDisplayState () {
+	return localStormDisplayState;
+}
 
 
 

@@ -158,7 +158,7 @@ public class StormTrackCollection {
                 Iterator its = tracks.iterator();
                 while (its.hasNext()) {
                     StormTrack track = (StormTrack) its.next();
-                    DateTime   st    = track.getTrackStartTime();
+                    DateTime   st    = track.getStartTime();
                     startTimes.add(st);
                 }
                 if (startTimes.size() > 0) {

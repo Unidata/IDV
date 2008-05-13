@@ -92,6 +92,8 @@ public class AtcfStormDataSource extends StormDataSource {
     private List<StormInfo> stormInfos;
 
 
+    private  StormTrackCollection localTracks;
+
     /**
      * _more_
      *
@@ -118,12 +120,23 @@ public class AtcfStormDataSource extends StormDataSource {
 
 
 
+
     /**
      * _more_
      */
     protected void initAfter() {
         try {
             stormInfos = new ArrayList<StormInfo>();
+            if(path.toLowerCase().endsWith(".gz") || path.toLowerCase().endsWith(".dat")) {
+                String name  = IOUtil.stripExtension(IOUtil.getFileTail(path));
+                StormInfo si = new StormInfo(name, 
+                                             new DateTime(new Date()));
+                stormInfos.add(si);
+                localTracks =  new StormTrackCollection();
+                readTracks(si, localTracks, path, null);
+                return;
+            }
+
             byte[]           bytes      = readFile(path + "/storm.table");
             String           stormTable = new String(bytes);
             List lines = StringUtil.split(stormTable, "\n", true, true);
@@ -193,7 +206,7 @@ public class AtcfStormDataSource extends StormDataSource {
             return;
         }
 
-        if (trackFile.endsWith(".gz")) {
+        if (trackFile.toLowerCase().endsWith(".gz")) {
             GZIPInputStream zin =
                 new GZIPInputStream(new ByteArrayInputStream(bytes));
             bytes = IOUtil.readBytes(zin);
@@ -329,14 +342,14 @@ public class AtcfStormDataSource extends StormDataSource {
     public StormTrackCollection getTrackCollection(StormInfo stormInfo,
             Hashtable<String, Boolean> waysToUse)
             throws Exception {
+        if(localTracks!=null) return localTracks;
+
         long                 t1     = System.currentTimeMillis();
         StormTrackCollection tracks = new StormTrackCollection();
 
         String trackFile;
-        System.err.println ("wtu:" + waysToUse);
         boolean justObs = 
             waysToUse!=null && waysToUse.size()==1 && waysToUse.get(Way.OBSERVATION.toString())!=null;
-        System.err.println ("Just obs:" + justObs);
         if(!justObs) {
             trackFile = path + "/" + getYear(stormInfo.getStartTime())
                 + "/" + "a" + stormInfo.getBasin().toLowerCase()

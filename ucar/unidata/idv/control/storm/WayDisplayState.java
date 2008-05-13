@@ -536,7 +536,7 @@ public class WayDisplayState {
                 continue;
             }
             fields.add(field);
-            times.add(track.getTrackStartTime());
+            times.add(track.getStartTime());
             pointObs.addAll(makePointObs(track));
         }
 
@@ -641,7 +641,7 @@ public class WayDisplayState {
             StormTrack coneTrack =         makeConeTrack(track,
                                                          stormParam);
             fields.add(stormDisplayState.getStormTrackControl().makeTrackField(coneTrack, null));
-            times.add(track.getTrackStartTime());
+            times.add(track.getStartTime());
         }
 
         if (fields.size() == 0) {
@@ -661,7 +661,7 @@ public class WayDisplayState {
      */
     List<PointOb> makePointObs(StormTrack track)  throws Exception {
         boolean               isObservation = way.isObservation();
-        DateTime              startTime     = track.getTrackStartTime();
+        DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
         if (textType == null) {
             textType = new TextType("label");
@@ -675,7 +675,7 @@ public class WayDisplayState {
                 time = stp.getTrackPointTime();
             } else {
                 if (i == 0) {
-                    label = way + ": " + track.getTrackStartTime();
+                    label = way + ": " + track.getStartTime();
                 } else {
                     label = "" + stp.getForecastHour() + "H";
                 }

@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -178,7 +175,7 @@ public class StormDisplayState {
     /** _more_ */
     private CompositeDisplayable holder;
 
-
+    private boolean isOnlyChild = false;
 
     /** _more_ */
     private StormInfo stormInfo;
@@ -265,6 +262,9 @@ public class StormDisplayState {
 
 
 
+    protected void setIsOnlyChild(boolean isOnlyChild) {
+        this.isOnlyChild = isOnlyChild;
+    }
 
     /**
      * _more_
@@ -697,7 +697,8 @@ public class StormDisplayState {
                 GuiUtils.left(wayComp)));
 
         wayComp    = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
-        tabbedPane = GuiUtils.getNestedTabbedPane();
+        //        tabbedPane = GuiUtils.getNestedTabbedPane();
+        tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Tracks", wayComp);
         tabbedPane.addTab("Table", getTrackTable());
 
@@ -871,13 +872,23 @@ public class StormDisplayState {
             obsDisplayState = getWayDisplayState(Way.OBSERVATION);
             StormTrack obsTrack = trackCollection.getObsTrack();
 
+            List<DateTime> times = new ArrayList<DateTime>();
             if (obsTrack != null) {
-                List<DateTime> times = obsTrack.getTrackTimes();
+                times = obsTrack.getTrackTimes();
+            } else {
+                for (StormTrack track : trackCollection.getTracks()) {
+                    times.add(track.getStartTime());
+                }
+            }
+            if(times.size()>0) {
+                times = (List<DateTime>)Misc.sort(Misc.makeUnique(times));
                 timesHolder = new LineDrawing("track_time"
                         + stormInfo.getStormId());
                 timesHolder.setManipulable(false);
                 timesHolder.setVisible(false);
-                timesHolder.setData(ucar.visad.Util.makeTimeSet(times));
+                Set timeSet = ucar.visad.Util.makeTimeSet(times);
+                //                System.err.println("time set:" + timeSet);
+                timesHolder.setData(timeSet);
                 holder.addDisplayable(timesHolder);
             }
         }
@@ -983,8 +994,11 @@ public class StormDisplayState {
         boolean wasActive = displayMaster.ensureInactive();
         try {
             List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
-            for (WayDisplayState wayDisplayState : wayDisplayStates) {
-                wayDisplayState.updateDisplay();
+            for (WayDisplayState wds : wayDisplayStates) {
+                if ( !stormTrackControl.okToShowWay(wds.getWay())) {
+                    continue;
+                }
+                wds.updateDisplay();
             }
         } finally {
             if (wasActive) {
@@ -1047,12 +1061,7 @@ public class StormDisplayState {
         return null;
     }
 
-
-
-
     //        ucar.visad.Util.makeTimeField(List<Data> ranges, List times)
-
-
 
     /**
          Animation animation = stormTrackControl.getAnimation();
@@ -1168,11 +1177,11 @@ public class StormDisplayState {
                 contents = GuiUtils.topCenter(
                     GuiUtils.left(
                         GuiUtils.inset(
-                            new JLabel(track.getTrackStartTime().toString()),
+                            new JLabel(track.getStartTime().toString()),
                             5)), contents);
             }
             tableTreePanel.addComponent(contents, track.getWay().toString(),
-                                        track.getTrackStartTime().toString(),
+                                        track.getStartTime().toString(),
                                         null);
         }
 
@@ -1260,7 +1269,7 @@ public class StormDisplayState {
                          Hashtable sheetNames) {
         int cnt = 0;
         String dateString =
-            track.getTrackStartTime().formattedString("yyyy-MM-dd hhmm",
+            track.getStartTime().formattedString("yyyy-MM-dd hhmm",
                 DateUtil.TIMEZONE_GMT);
         String sheetName = track.getWay() + " - " + dateString;
         if (sheetName.length() > 30) {

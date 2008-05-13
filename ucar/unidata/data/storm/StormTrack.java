@@ -139,8 +139,8 @@ public class StormTrack implements Comparable {
         if (o instanceof StormTrack) {
             StormTrack that = (StormTrack) o;
 
-            double     v1   = getTrackStartTime().getValue();
-            double     v2   = that.getTrackStartTime().getValue();
+            double     v1   = getStartTime().getValue();
+            double     v2   = that.getStartTime().getValue();
             if (v1 < v2) {
                 return -1;
             }
@@ -202,7 +202,7 @@ public class StormTrack implements Comparable {
      *
      * @param id _more_
      */
-    public void setTrackId(String id) {
+    public void setId(String id) {
         this.trackId = id;
     }
 
@@ -211,7 +211,7 @@ public class StormTrack implements Comparable {
      *
      * @return _more_
      */
-    public String getTrackId() {
+    public String getId() {
         return trackId;
     }
 
@@ -222,7 +222,7 @@ public class StormTrack implements Comparable {
      *
      * @return _more_
      */
-    public DateTime getTrackStartTime() {
+    public DateTime getStartTime() {
         StormTrackPoint firstPoint = trackPoints.get(0);
         return firstPoint.getTrackPointTime();
 
@@ -428,60 +428,6 @@ public class StormTrack implements Comparable {
     }
 
 
-
-    /**
-     * Set the Lats property.
-     *
-     * @param value The new value for Lats
-     */
-    public void setLats(NamedArray value) {
-        lats = value;
-    }
-
-    /**
-     * Get the Lats property.
-     *
-     * @return The Lats
-     */
-    public NamedArray getLats() {
-        return lats;
-    }
-
-    /**
-     * Set the Lons property.
-     *
-     * @param value The new value for Lons
-     */
-    public void setLons(NamedArray value) {
-        lons = value;
-    }
-
-    /**
-     * Get the Lons property.
-     *
-     * @return The Lons
-     */
-    public NamedArray getLons() {
-        return lons;
-    }
-
-    /**
-     * Set the Times property.
-     *
-     * @param value The new value for Times
-     */
-    public void setTimes(List<DateTime> value) {
-        times = value;
-    }
-
-    /**
-     * Get the Times property.
-     *
-     * @return The Times
-     */
-    public List<DateTime> getTimes() {
-        return times;
-    }
 
 
 

@@ -317,7 +317,7 @@ public class StormTrackChart {
             if ( !chartWays.contains(track.getWay())) {
                 continue;
             }
-            DateTime dttm = track.getTrackStartTime();
+            DateTime dttm = track.getStartTime();
             if (seenForecastTime.get(dttm) == null) {
                 seenForecastTime.put(dttm, dttm);
                 forecastTimes.add(dttm);
@@ -766,7 +766,7 @@ public class StormTrackChart {
                     List<StormTrack> tracksFromWay = wayToTracks.get(way);
                     for (StormTrack track : tracksFromWay) {
                         if (Misc.equals(forecastTime,
-                                        track.getTrackStartTime())) {
+                                        track.getStartTime())) {
                             tracksToUse.add(track);
                         }
                     }
