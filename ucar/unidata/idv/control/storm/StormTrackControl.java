@@ -33,6 +33,7 @@ import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.*;
@@ -48,6 +49,7 @@ import ucar.visad.Util;
 import ucar.visad.display.*;
 
 import visad.*;
+import visad.Set;
 
 import visad.georef.EarthLocation;
 
@@ -55,12 +57,7 @@ import java.awt.*;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Enumeration;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
@@ -223,7 +220,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * _more_
      *
      * @param track _more_
-     * @param type _more_
+     *
      * @param param _more_
      *
      * @return _more_
@@ -328,8 +325,6 @@ public class StormTrackControl extends DisplayControlImpl {
 
     /**
      * _more_
-     *
-     * @param way _more_
      *
      * @param realType _more_
      *
@@ -456,7 +451,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param stormDisplayState _more_
      */
     public void viewStorm(StormDisplayState stormDisplayState) {
-        if(treePanel != null) 
+        if(treePanel != null)
             treePanel.show(stormDisplayState.getContents());
     }
 
@@ -772,7 +767,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
     }
 
-    
+
 
     private Hashtable yearData = new Hashtable();
     private TrackDisplayable yearTrackDisplay;
@@ -1120,17 +1115,15 @@ public class StormTrackControl extends DisplayControlImpl {
 
         List            result         = new ArrayList();
         List            theStormStates = getStormDisplayStates();
+
         if (theStormStates != null) {
-            ob = findClosestOb(el, theStormStates);
+            result = findClosestOb(el, theStormStates, animationValue);
+
         }
 
         // System.err.println("R = "+ r);
 
-        if (ob != null) {
-            result.add("<tr><td>" + getMenuLabel() + ":</td></tr> "
-                       + formatStormTrackPoint(ob));
-            // +  "</tr>");
-        }
+
         return result;
     }
 
@@ -1184,10 +1177,11 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    VisAD problem
      */
-    protected StormTrackPoint findClosestOb(EarthLocation el,
-                                            List<StormDisplayState> theStates)
-            throws VisADException, RemoteException {
-
+    protected List findClosestOb(EarthLocation el,
+                                            List<StormDisplayState> theStates,
+                                            Real animationValue)
+            throws VisADException, RemoteException, Exception {
+        List            result         = new ArrayList();
         if ((el == null) || (theStates == null)) {
             return null;
         }
@@ -1198,38 +1192,127 @@ public class StormTrackControl extends DisplayControlImpl {
 
         int[]           clickPt     = boxToScreen(earthToBox(el));
         double          minDistance = 20;
+        Way              wyy = null;
         //        System.err.println ("click:" + clickPt[0]+"/"+clickPt[1] + " " +minDistance);
 
         for (int i = 0; i < numStates; i++) {
             StormDisplayState sds   = theStates.get(i);
             StormInfo         sinfo = sds.getStormInfo();
-            Hashtable<Way, WayDisplayState> wdMap =
-                sds.getWayDisplayStateMap();
+            HashMap<Way, List> wayToTracksMap =
+                sds.getTrackCollection().getWayToTracksHashMap();
             // Way obsWay = new Way(Way.OBSERVATION);
+            java.util.Set<Way> ways = wayToTracksMap.keySet();
 
-            WayDisplayState       obsWDS   = wdMap.get(Way.OBSERVATION);
+            for(Way way: ways) {
+                StormTrack track = null;
+                if(way.equals(Way.OBSERVATION)) {
+                  //  WayDisplayState       trackWDS   = wayToTracksMap.get(way); //get(Way.OBSERVATION);
+                    List<StormTrack>      tracks   =  wayToTracksMap.get(way);
+                    track = tracks.get(0);
+                } else {
+                    WayDisplayState       trackWDS   = sds.getWayDisplayState(way); //get(Way.OBSERVATION);
+                    boolean visible = getVisibleTracks( animationValue, trackWDS );
+                    if(visible){
+                        List<StormTrack>      tracks   = wayToTracksMap.get(way);
+                        track = getForecastTrack(tracks, animationValue);
+                    }
+                }
 
-            List<StormTrack>      tracks   = obsWDS.getTracks();
-            StormTrack            obsTrack = tracks.get(0);
-
-            List<StormTrackPoint> stpList  = obsTrack.getTrackPoints();
-            int                   size     = stpList.size();
-            for (int j = 0; j < size; j++) {
-                StormTrackPoint stp      = stpList.get(j);
-                EarthLocation   stpLoc   = stp.getTrackPointLocation();
-                int[]           obScreen = boxToScreen(earthToBox(stpLoc));
-                double distance = GuiUtils.distance(obScreen, clickPt);
-                if (distance < minDistance) {
-                    closestOb   = stp;
-                    minDistance = distance;
+                if(track == null) continue;
+                //System.err.println(way + " track time is: " + track.getStartTime());
+                List<StormTrackPoint> stpList  = track.getTrackPoints();
+                int                   size     = stpList.size();
+                for (int j = 0; j < size; j++) {
+                    StormTrackPoint stp      = stpList.get(j);
+                    EarthLocation   stpLoc   = stp.getTrackPointLocation();
+                    int[]           obScreen = boxToScreen(earthToBox(stpLoc));
+                    double distance = GuiUtils.distance(obScreen, clickPt);
+                    if (distance < minDistance) {
+                        closestOb   = stp;
+                        minDistance = distance;
+                        wyy = new Way(track.getWay().toString());
+                    }
                 }
             }
-
             //            System.err.println ("\t" + obScreen[0]+"/"+obScreen[1] + " d:" + distance);
 
         }
-        return closestOb;
+
+        if (closestOb != null) {
+            //System.err.println ("track is " + wyy.toString());
+            result.add("<tr><td>" + "Way: " + wyy.toString() +"</td></tr> "
+                       + formatStormTrackPoint(closestOb));
+            // +  "</tr>");
+        }
+
+        return result;
     }
+
+
+    private boolean getVisibleTracks( Real currentAnimationTime, WayDisplayState wds )throws Exception {
+
+
+
+        if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
+            return false;
+        }
+       // Iterate way display states
+        boolean             visible = false;
+        if(wds.shouldShowTrack() && wds.hasTrackDisplay()) {
+            FieldImpl field = (FieldImpl)wds.getTrackDisplay().getData();
+            if(field==null)
+                return false;
+            Set timeSet = GridUtil.getTimeSet(field);
+            if(timeSet == null)
+                return false;
+            if (timeSet.getLength() == 1) {
+                return true;
+            } else {
+                //Else work the visad magic
+                float timeValueFloat = (float) currentAnimationTime.getValue(
+                                           timeSet.getSetUnits()[0]);
+                //            System.err.println("multiple times:" + timeValueFloat);
+                float[][] value = {
+                    { timeValueFloat }
+                };
+                int[]     index = timeSet.valueToIndex(value);
+                //            System.err.println("index:" + index[0]);
+                return visible = (index[0] >= 0);
+            }
+
+        }
+       return  visible;
+  }
+    private StormTrack getForecastTrack(List<StormTrack> tracks, Real pTime) throws VisADException {
+
+        DateTime dt = new DateTime(pTime); // pTime.
+        double timeToLookFor = dt.getValue();
+        int    numPoints     = tracks.size();
+        double lastTime      = -1;
+
+       //  for(StormTrack track: tracks){
+       //      if(track.getTrackStartTime().equals(dt))
+       //         return track;
+       //  }
+        for (int i = 0; i < numPoints; i++) {
+            StormTrack st         = tracks.get(i);
+            double          currentTime = st.getStartTime().getValue();
+            if (timeToLookFor == currentTime) {
+                return st;
+            }
+            if (timeToLookFor < currentTime) {
+                if (i == 0) {
+                    return null;
+                }
+                if (timeToLookFor > lastTime) {
+                    return tracks.get(i - 1);
+                }
+            }
+            lastTime = currentTime;
+        }
+        return null;
+    }
+
 
     /**
      * Set the OkWays property.
