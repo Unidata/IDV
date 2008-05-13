@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtables>
+<stationtable category="STI" name="Cities"  href="/ucar/unidata/apps/sti/cities.xml"/>
+</stationtables>

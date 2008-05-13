@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../" default="plugin" name="StiIdv">
+
+    <import file="../../../build.xml"/>
+
+    <target name="sti" depends="init">
+<!--
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+        >
+        <include name="ucar/unidata/apps/sti/**"/>
+        </javac>
+-->
+    </target>
+
+<!--
+            manifest="${srcdir}/ucar/unidata/apps/sti/sti.manifest"
+-->
+
+
+    <target name="stijar" depends="sti">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/sti.jar"
+            >
+            <include name="ucar/unidata/apps/sti/**"/>
+        </jar>
+    </target>
+
+    <target name="plugin" depends="stijar">
+        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+             <fileset file="lib/sti.jar"/>
+        </copy>
+    </target>
+
+
+</project>

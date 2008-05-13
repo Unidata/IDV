@@ -1,0 +1,9 @@
+<?xml version="1.0"   encoding="ISO-8859-1"?>
+<datasources>
+  <datasource
+     id="DB.STORMTRACK"
+     fileselection="true"
+     factory="ucar.unidata.data.storm.STIStormDataSource"
+     label="STI Storm Data"/>
+
+</datasources>
