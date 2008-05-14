@@ -1570,8 +1570,8 @@ public class JythonManager extends IdvManager implements ActionListener {
     private PythonInterpreter getUiInterpreter() {
         if (uiInterpreter == null) {
             uiInterpreter = new PythonInterpreter();
-            initBasicInterpreter(uiInterpreter);
-
+            addInterpreter(uiInterpreter);
+            //            initBasicInterpreter(uiInterpreter);
         }
         return uiInterpreter;
     }
