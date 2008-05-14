@@ -127,6 +127,9 @@ public class ShapeUtility {
     /** shape id */
     public static final String PIN = "PIN";
 
+    public static final String HURRICANE = "HURRICANE";
+    public static final String TROPICALSTORM = "TROPICALSTORM";
+
     /** The identifier for a square station location marker */
     public static final int MISC_ID_SQUARE = 0;
 
@@ -166,6 +169,11 @@ public class ShapeUtility {
     /** The identifier for a minus station location marker */
     public static final int MISC_ID_MINUS = 16;
 
+    public static final int MISC_ID_TROPICALSTORM = 17;
+
+    /** The identifier for a minus station location marker */
+    public static final int MISC_ID_HURRICANE = 18;
+
     /** shape name from WeatherSymbols */
     public static final String CIRCLE = "CIRCLE";
 
@@ -187,13 +195,15 @@ public class ShapeUtility {
 
     /** shape names from WeatherSymbols */
     public static final String[] MISC_NAMES = {
-        CIRCLE, FILLED_CIRCLE, DIAMOND, FILLED_DIAMOND, STAR, FILLED_STAR
+        CIRCLE, FILLED_CIRCLE, DIAMOND, FILLED_DIAMOND, STAR, FILLED_STAR, TROPICALSTORM, HURRICANE, 
     };
 
     /** shape ids from WeatherSymbols */
     public static final int[] MISC_IDS = {
         MISC_ID_CIRCLE, MISC_ID_FILLED_CIRCLE, MISC_ID_DIAMOND,
-        MISC_ID_FILLED_DIAMOND, MISC_ID_STAR, MISC_ID_FILLED_STAR
+        MISC_ID_FILLED_DIAMOND, MISC_ID_STAR, MISC_ID_FILLED_STAR,
+        MISC_ID_TROPICALSTORM,
+        MISC_ID_HURRICANE
     };
 
 
