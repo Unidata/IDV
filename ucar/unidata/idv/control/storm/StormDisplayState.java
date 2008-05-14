@@ -1023,12 +1023,12 @@ public class StormDisplayState {
     protected StationModel getObservationStationModel() {
         StationModel model       = new StationModel("TrackLocation");
         ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
-        shapeSymbol.setShape(ucar.visad.ShapeUtility.FILLED_CIRCLE);
-        shapeSymbol.setScale(0.8f);
+        shapeSymbol.setShape(ucar.visad.ShapeUtility.HURRICANE);
+        shapeSymbol.setScale(2.0f);
         shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
         shapeSymbol.setRectPoint(Glyph.PT_MM);
+        shapeSymbol.setForeground(null);
         model.addSymbol(shapeSymbol);
-
         return model;
     }
 

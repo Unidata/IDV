@@ -321,13 +321,14 @@ public class WayDisplayState {
     }
 
 
-    public StationModelDisplayable getLabelDisplay() throws VisADException, RemoteException {
+    public StationModelDisplayable getLabelDisplay() throws Exception {
         if(labelDisplay==null) {
             labelDisplay =
                 new StationModelDisplayable("dots");
             addDisplayable(labelDisplay);
-            labelDisplay.setScale(1.0f);
+            labelDisplay.setScale(stormDisplayState.getStormTrackControl().getDisplayScale());
             labelDisplay.setStationModel(stormDisplayState.getObservationStationModel());
+            setLabelColor();
         }
         return labelDisplay;
     }
@@ -417,6 +418,7 @@ public class WayDisplayState {
                     try {
                         setTrackColor();
                         setConeColor();
+                        setLabelColor();
                     } catch (Exception exc) {
                         LogUtil.logException("Setting color", exc);
                     }
@@ -475,6 +477,12 @@ public class WayDisplayState {
             trackDisplay.setColorPalette(getColorPalette());
         }
 
+    }
+
+    private void setLabelColor() throws Exception {
+        if(labelDisplay!=null) {
+            labelDisplay.setColor(getColor());
+        }
     }
 
     private void setConeColor() throws Exception {
