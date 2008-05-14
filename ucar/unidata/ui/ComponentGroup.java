@@ -253,6 +253,7 @@ public class ComponentGroup extends ComponentHolder {
     public JComponent doMakeContents() {
         desktop        = new JDesktopPane();
         tabbedPane     = new JTabbedPane();
+        GuiUtils.handleHeavyWeightComponentsInTabs(tabbedPane);
         container      = new JPanel(new GridLayout(numRows, numColumns, 5,
                 5));
         outerContainer = GuiUtils.center(container);
