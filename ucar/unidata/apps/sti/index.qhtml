@@ -9,5 +9,7 @@
 
 Welcome to the Shanghai Typhoon Institute IDV
 
+<p>
+<a href="jython:loadStiData(idv)">Load STI Storm Database</a>
 </body>
 </html>
