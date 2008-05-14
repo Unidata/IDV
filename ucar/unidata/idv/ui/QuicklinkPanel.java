@@ -425,7 +425,11 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 amLoading = true;
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 setEnabled(false);
-                handleHyperLink(id);
+                try {
+                    handleHyperLink(id);
+                } catch(Exception exc) {
+                    logException("Handling link:" + id, exc);
+                }
                 setCursor(Cursor.getDefaultCursor());
                 setEnabled(true);
                 amLoading = false;
