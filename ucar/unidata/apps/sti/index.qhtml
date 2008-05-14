@@ -8,6 +8,10 @@
 <h1 align="center">STI IDV</h1>
 
 Welcome to the Shanghai Typhoon Institute IDV
+<p>
+     基于UNIDATA的IDV气象资料台风版显示软件
+<p>
+     适用于台风预报,科研及其它气象科研工作
 
 <p>
 <a href="jython:loadStiData(idv)">Load STI Storm Database</a>
