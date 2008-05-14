@@ -1115,17 +1115,22 @@ public class StormTrackControl extends DisplayControlImpl {
 
         List            result         = new ArrayList();
         List            theStormStates = getStormDisplayStates();
-
         if (theStormStates != null) {
-            result = findClosestPoint(el, theStormStates, animationValue);
+            Object[] pair = findClosestPoint(el,
+                                             theStormStates,
+                                             animationValue, 20);
+            if(pair!=null) {
+                StormTrack closestTrack = (StormTrack) pair[0];
+                StormTrackPoint closestOb = (StormTrackPoint) pair[1];
+                result.add("<tr><td>" + "Way: " + closestTrack.getWay() +"</td></tr> "
+                           + formatStormTrackPoint(closestTrack, closestOb));
 
+            }
         }
-
-        // System.err.println("R = "+ r);
-
 
         return result;
     }
+
 
     /**
      * _more_
@@ -1137,62 +1142,54 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected String formatStormTrackPoint(StormTrackPoint stp)
+    protected String formatStormTrackPoint(StormTrack stormTrack, StormTrackPoint stp)
             throws VisADException, RemoteException {
         Unit   displayUnit = getDisplayUnit();
         double value;
-
-        String result = "";
         if (stp == null) {
-            result = "";
-        } else {
-            List<Real> values = stp.getTrackAttributes();
-            //            result = "<tr><td>" + "Storm: "
-            //                     + stp.toString() + "</td></tr>";
-            result = result + "<tr><td>" + "Track Point Time: "
-                     + stp.getTrackPointTime() + "</td></tr>";
-            for (Real r : values) {
-                result = result + "<tr><td>"
-                         + ((RealType) r.getType()).getName().replace("_",
-                             " ") + r.getValue() + "[" + r.getUnit()
-                                  + "]</td></tr>";
-            }
-
-            int length = result.length();
-            result = StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
+            return "";
+        } 
+        List<StormParam> params = stormTrack.getParams();
+        //            result = "<tr><td>" + "Storm: "
+        //                     + stp.toString() + "</td></tr>";
+        String result =  "<tr><td>" + "Track Point Time:</td><td align=right>"
+            + stp.getTrackPointTime() + "</td></tr>";
+        for(StormParam param: params) {
+            Real r = stp.getAttribute(param);
+            if(r==null) continue;
+            Unit unit = param.getUnit();
+            result = result + "<tr><td>"
+                + param.toString() + ":</td><td align=right>" + Misc.format(r.getValue()) +
+                (unit!=null?("[" + unit +"]"):"")
+                + "</td></tr>";
         }
 
-        return result;
+        int length = result.length();
+        return  StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
     }
 
 
+
     /**
-     * Find the closest ob in the field to the particular EarthLocation
+     * This finds the StormTrack and StormTrackPoint that is closest to the given location
      *
-     * @param el  the EarthLocation
-     * @param theStates _more_
-     *
-     * @return the closest ob (may be null);
-     *
-     * @throws RemoteException   Java RMI problem
-     * @throws VisADException    VisAD problem
+     * @return A 2-tuple. First element is the StormTrack. Second element is the ob.
+     *      Or null if none found
      */
-    protected List findClosestPoint(EarthLocation el,
-                                            List<StormDisplayState> theStates,
-                                            Real animationValue)
-            throws VisADException, RemoteException, Exception {
-        List            result         = new ArrayList();
+    protected Object[] findClosestPoint(EarthLocation el,
+                                        List<StormDisplayState> theStates,
+                                        Real animationValue, int distanceThresholdPixels)
+        throws Exception {
         if ((el == null) || (theStates == null)) {
             return null;
         }
 
         int             numStates   = theStates.size();
         StormTrackPoint closestOb   = null;
-
+        StormTrack closestTrack = null;
 
         int[]           clickPt     = boxToScreen(earthToBox(el));
-        double          minDistance = 20;
-        Way              wyy = null;
+        double          minDistance = distanceThresholdPixels;
         //        System.err.println ("click:" + clickPt[0]+"/"+clickPt[1] + " " +minDistance);
 
         for (int i = 0; i < numStates; i++) {
@@ -1208,7 +1205,9 @@ public class StormTrackControl extends DisplayControlImpl {
                 if(way.equals(Way.OBSERVATION)) {
                   //  WayDisplayState       trackWDS   = wayToTracksMap.get(way); //get(Way.OBSERVATION);
                     List<StormTrack>      tracks   =  wayToTracksMap.get(way);
-                    track = tracks.get(0);
+                    if(tracks.size()>0) {
+                        track = tracks.get(0);
+                    }
                 } else {
                     WayDisplayState       trackWDS   = sds.getWayDisplayState(way); //get(Way.OBSERVATION);
                     boolean visible = checkTracksVisible( animationValue, trackWDS );
@@ -1230,7 +1229,7 @@ public class StormTrackControl extends DisplayControlImpl {
                     if (distance < minDistance) {
                         closestOb   = stp;
                         minDistance = distance;
-                        wyy = new Way(track.getWay().toString());
+                        closestTrack = track;
                     }
                 }
             }
@@ -1239,20 +1238,16 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
         if (closestOb != null) {
-            //System.err.println ("track is " + wyy.toString());
-            result.add("<tr><td>" + "Way: " + wyy.toString() +"</td></tr> "
-                       + formatStormTrackPoint(closestOb));
-            // +  "</tr>");
+            return new Object[]{closestTrack, closestOb};
         }
 
-        return result;
+        return null;
     }
 
 
+
+
     private boolean checkTracksVisible( Real currentAnimationTime, WayDisplayState wds )throws Exception {
-
-
-
         if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
             return false;
         }
