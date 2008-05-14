@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -168,6 +169,9 @@ public class StationModelDisplayable extends DisplayableData {
 
     /** A cache of shapes */
     private Hashtable shapeCache = new Hashtable();
+
+    /** _more_          */
+    private Color myColor;
 
 
     /**
@@ -373,6 +377,23 @@ public class StationModelDisplayable extends DisplayableData {
         }
         this.stationData = stationData;  // hold around for posterity
         setDisplayActive();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setColor(Color c) throws VisADException, RemoteException {
+        super.setColor(c);
+        myColor = c;
+        if (stationData != null) {
+            setStationData(stationData);
+        }
     }
 
 
@@ -607,7 +628,7 @@ public class StationModelDisplayable extends DisplayableData {
         Set  set = data.getDomainSet();
         Data tmp = data.getSample(0);
         if (tmp.isMissing()) {
-           return null;
+            return null;
         }
 
         PointOb       firstOb   = (PointOb) data.getSample(0);
@@ -842,8 +863,9 @@ public class StationModelDisplayable extends DisplayableData {
                     }
                 } else if (metSymbol instanceof WeatherSymbol) {
                     double value;
-                    if(workDataArray[0] instanceof Text) {
-                        value = new Double(workDataArray[0].toString()).doubleValue();
+                    if (workDataArray[0] instanceof Text) {
+                        value = new Double(
+                            workDataArray[0].toString()).doubleValue();
                     } else {
                         value = ((Real) workDataArray[0]).getValue();
                     }
@@ -1098,6 +1120,9 @@ public class StationModelDisplayable extends DisplayableData {
                                         ucar.unidata.util.GuiUtils
                                             .decodeColor(colorString, null);
                                 }
+                                //                                if(theColor == null) {
+                                //                                    theColor = myColor;
+                                //                                }
                                 if (theColor != null) {
                                     ShapeUtility.setColor(shapes[s],
                                             theColor);
@@ -1108,6 +1133,9 @@ public class StationModelDisplayable extends DisplayableData {
                                || (ctParam.length() == 0)) {
                         if (metSymbol.shouldBeColored()) {
                             Color theColor = metSymbol.getForeground();
+                            if (theColor == null) {
+                                theColor = myColor;
+                            }
                             if (theColor != null) {
                                 ShapeUtility.setColor(shapes[s], theColor);
                             }
