@@ -3,6 +3,7 @@
 <!-- Customized IDVs -->
 <plugin name="Workshop IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/workshop.jar" description="Workshop specific configuration" category="Customized IDVs"/>
 <plugin name="Simple IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/simpleidv.jar" description="A simpler user interface for the IDV" category="Customized IDVs"/>
+<plugin name="STI IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/sti.jar" description="Shanghai Tropical Institute IDV" category="Customized IDVs"/>
 <plugin name="GEON IDV" url="http://geon.unavco.org/unavco/geonidv_plugin/geonidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
 <plugin name="T-Rex IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
 
