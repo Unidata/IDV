@@ -539,6 +539,7 @@ public class StormDisplayState {
         }
 
         Vector radiusParams = null;
+        Vector obsRadiusParams = null;
         Vector attrNames       = null;
         if ((params != null) && (params.size() > 0)) {
             attrNames = new Vector();
@@ -547,12 +548,22 @@ public class StormDisplayState {
                     if (radiusParams == null) {
                         radiusParams = new Vector();
                     }
-                    radiusParams.add(param);
+                    if (obsRadiusParams == null) {
+                        obsRadiusParams = new Vector();
+                    }
+                    if(param.getType().toString().contains("Probability")  ) {
+                        radiusParams.add(param);
+                    }
+
+                    if(param.getType().toString().contains("Gale")   ) {
+                        obsRadiusParams.add(param);
+                    }
+
+
                 }
                 attrNames.add(param);
             }
         }
-
 
 
         //Sort them by name
@@ -586,8 +597,8 @@ public class StormDisplayState {
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(obsColorByBox));
         if(radiusParams != null) {
-            paramComps.add(makeList(radiusParams, ID_OBS_CONE));
-            paramComps.add(GuiUtils.top(makeBox(radiusParams, ID_OBS_RINGS)));
+            paramComps.add(makeList(obsRadiusParams, ID_OBS_CONE));
+            paramComps.add(GuiUtils.top(makeBox(obsRadiusParams, ID_OBS_RINGS)));
         }
 
         paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
