@@ -2,13 +2,14 @@
 import javax.swing;
 
 from javax.swing import JTextField
+from javax.swing import JPasswordField
 from javax.swing import JLabel
 from ucar.unidata.util import GuiUtils;
 
 def loadStiData(idv):
 	hostField = JTextField('',30);
 	userField = JTextField('',30);
-	passwordField = JTextField('',30);
+	passwordField = JPasswordField('',30);
 	comps = ArrayList();
 	comps.add(JLabel("Database Host:"));
 	comps.add(GuiUtils.inset(hostField,4));
