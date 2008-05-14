@@ -1,14 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stationtable elevunit="feet" name="STI Locations">
-<stn name="Bishop" lat="37.36361" lon="-118.39417" county="Inyo" pop="3575" elev="4147" />
-<stn name="Independence" lat="36.80278" lon="-118.19917" county="Inyo" pop="574" elev="3936" />
-<stn name="Lone Pine" lat="36.60611" lon="-118.06194" county="Inyo" pop="1655" elev="3733" />
-<stn name="Mammoth Lakes Airport" lat="37.62389" lon="-118.83861" county="Mono" elev="7128" />
-<stn name="Visalia" lat="36.33028" lon="-119.29111" county="Tulare" pop="91565" elev="331" />
-<stn name="Fresno" lat="36.74778" lon="-119.77139" county="Fresno" pop="427652" elev="296" />
-<stn name="Selma" lat="36.57083" lon="-119.61111" county="Fresno" pop="19444" elev="308" />
-<stn name="Tulare" lat="36.20778" lon="-119.34639" county="Tulare" pop="43994" elev="288" />
-<stn name="Delano" lat="35.76889" lon="-119.24611" county="Kern" pop="38824" elev="316" />
-<stn name="Lemoore" lat="36.30083" lon="-119.78194" county="Kings" pop="19712" elev="225" />
-<stn name="Porterville" lat="36.06528" lon="-119.01583" county="Tulare" pop="39615" elev="459" />
+<stn name="Bangka " lat="2:30:S" lon="106:00:E"/>
+<stn name="Bangkok " lat="13:45:N" lon="100:31:E"/>
+<stn name="Beijing " lat="39:56:N" lon="116:24:E"/>
+<stn name="Guandong " lat="23:06:N" lon="113:16:E"/>
+<stn name="Cheju-do " lat="33:20:N" lon="126:30:E"/>
+<stn name="Chennai " lat="13:04:N" lon="80:16:E"/>
+<stn name="China, People's Republic of" lat="35:00:N" lon="105:00:E"/>
+<stn name="China, Republic of" lat="23:30:N" lon="121:00:E"/>
+ <stn name="Cochin China " lat="11:00:N" lon="107:00:E"/>
+<stn name="Colombo " lat="6:56:N" lon="79:51:E"/>
+<stn name="East Pakistan " lat="24:00:N" lon="90:00:E"/>
+<stn name="Filipinas " lat="13:00:N" lon="122:00:E"/>
+<stn name="George Town " lat="5:26:N" lon="100:16:E"/>
+<stn name="Goa " lat="15:20:N" lon="74:00:E"/>
+<stn name="Gobi " lat="42:30:N" lon="107:00:E"/>
+<stn name="Greater Sunda Islands" lat="2:00:S" lon="110:00:E"/>
+<stn name="Hainan Dao " lat="19:00:N" lon="109:30:E"/>
+<stn name="Haiphong " lat="20:52:N" lon="106:41:E"/>
+<stn name="Hanoi " lat="21:02:N" lon="105:51:E"/>
+<stn name="Ho Chi Minh City " lat="10:45:N" lon="106:40:E"/>
+<stn name="Hokkaido " lat="44:00:N" lon="143:00:E"/>
+<stn name="Hong Kong " lat="22:15:N" lon="114:10:E"/>
+<stn name="Honshu " lat="36:00:N" lon="138:00:E"/>
+<stn name="Inland Sea" lat="34:20:N" lon="133:30:E"/>
+<stn name="Inner Mongolia " lat="42:00:N" lon="113:00:E"/>
+<stn name="Jakarta " lat="6:10:S" lon="106:48:E"/>
+<stn name="Kathmandu " lat="27:43:N" lon="85:19:E"/>
+<stn name="Kazakstan " lat="48:00:N" lon="68:00:E"/>
+<stn name="Kobe " lat="34:41:N" lon="135:10:E"/>
+<stn name="Korea, Democratic People's Republic of" lat="40:00:N" lon="127:00:E"/>
+<stn name="Korea, Republic of" lat="37:00:N" lon="127:30:E"/>
+<stn name="Kowloon " lat="22:18:N" lon="114:10:E"/>
+<stn name="Lakshadweep " lat="10:00:N" lon="73:00:E"/>
+<stn name="Lantau Island" lat="22:15:N" lon="113:55:E"/>
+<stn name="Lao " lat="18:00:N" lon="105:00:E"/>
+<stn name="Luzon " lat="16:00:N" lon="121:00:E"/>
+<stn name="Macao" lat="22:10:N" lon="113:33:E"/>
+<stn name="Malay Peninsula" lat="7:10:N" lon="100:35:E"/>
+<stn name="Male " lat="4:10:N" lon="73:31:E"/>
+<stn name="Manchukuo " lat="44:00:N" lon="124:00:E"/>
+<stn name="Manchuria " lat="44:00:N" lon="124:00:E"/>
+<stn name="Manila " lat="14:35:N" lon="121:00:E"/>
+<stn name="Mongol Uls " lat="46:00:N" lon="105:00:E"/>
+<stn name="Mount Pinatubo " lat="15:08:N" lon="120:21:E"/>
+<stn name="Myanma, Myanmar" lat="22:00:N" lon="98:00:E"/>
+<stn name="Nampo-shoto " lat="30:00:N" lon="140:00:E"/>
+<stn name="Natuna Besar Islands" lat="3:30:N" lon="102:30:E"/>
+<stn name="Negros " lat="10:00:N" lon="123:00:E"/>
+<stn name="Netherlands East Indies " lat="5:00:S" lon="120:00:E"/>
+<stn name="New Delhi " lat="28:36:N" lon="77:12:E"/>
+<stn name="New Guinea " lat="5:00:S" lon="140:00:E"/>
+<stn name="New Territories " lat="22:24:N" lon="114:10:E"/>
+<stn name="Nicobar Islands" lat="8:00:N" lon="93:30:E"/>
+<stn name="Nihon " lat="36:00:N" lon="138:00:E"/>
+<stn name="Nippon " lat="36:00:N" lon="138:00:E"/>
+<stn name="North Korea" lat="40:00:N" lon="127:00:E"/>
+<stn name="North Vietnam " lat="23:00:N" lon="106:00:E"/>
+<stn name="Okinawa " lat="26:30:N" lon="128:00:E"/>
+<stn name="Outer Mongolia " lat="46:00:N" lon="105:00:E"/>
+<stn name="P'yongyang " lat="39:01:N" lon="125:45:E"/>
+<stn name="Palawan " lat="9:30:N" lon="118:30:E"/>
+<stn name="Pamirs " lat="38:00:N" lon="73:00:E"/>
+<stn name="Panay " lat="11:15:N" lon="122:30:E"/>
+<stn name="Parece Vela " lat="20:20:N" lon="136:00:E"/>
+<stn name="Penang Island" lat="5:23:N" lon="100:15:E"/>
+<stn name="Pescadores " lat="23:30:N" lon="119:30:E"/>
+<stn name="Phnom Penh " lat="11:33:N" lon="104:55:E"/>
+<stn name="Pilipinas " lat="13:00:N" lon="122:00:E"/>
+<stn name="Pinatubo, Mount " lat="15:08:N" lon="120:21:E"/>
+<stn name="Portuguese Timor " lat="9:00:S" lon="126:00:E"/>
+<stn name="Prathet Thai " lat="15:00:N" lon="100:00:E"/>
+<stn name="Punjab " lat="30:50:N" lon="73:30:E"/>
+<stn name="Qazaqstan " lat="48:00:N" lon="68:00:E"/>
+<stn name="Quemoy " lat="24:27:N" lon="118:23:E"/>
+<stn name="Rangoon " lat="16:47:N" lon="96:10:E"/>
+<stn name="Ryukyu Islands" lat="26:30:N" lon="128:00:E"/>
+<stn name="Sabah " lat="5:20:N" lon="117:10:E"/>
+<stn name="Saigon " lat="10:45:N" lon="106:40:E"/>
+<stn name="Sakishima Islands" lat="24:30:N" lon="124:00:E"/>
+<stn name="Samar " lat="12:00:N" lon="125:00:E"/>
+<stn name="Sarawak " lat="2:30:N" lon="113:30:E"/>
+<stn name="Seoul " lat="37:34:N" lon="127:00:E"/>
+<stn name="Serendib " lat="7:00:N" lon="81:00:E"/>
+<stn name="Shikoku " lat="33:45:N" lon="133:30:E"/>
+<stn name="Siam " lat="15:00:N" lon="100:00:E"/>
+<stn name="Sikkim " lat="27:50:N" lon="88:30:E"/>
+<stn name="Singapore " lat="1:17:N" lon="103:51:E"/>
+<stn name="Sinkiang " lat="42:00:N" lon="86:00:E"/>
+<stn name="Songkhla " lat="7:12:N" lon="100:36:E"/>
+<stn name="South Korea" lat="37:00:N" lon="127:30:E"/>
+<stn name="South Vietnam " lat="12:00:N" lon="108:00:E"/>
+<stn name="Sulawesi " lat="2:00:S" lon="121:00:E"/>
+<stn name="Sulu Archipelago " lat="6:00:N" lon="121:00:E"/>
+<stn name="Sumatra " lat="0:00:N" lon="102:00:E"/>
+<stn name="Sumba " lat="10:00:S" lon="120:00:E"/>
+<stn name="Sumbawa " lat="8:30:S" lon="118:00:E"/>
+<stn name="Sunda Islands " lat="2:00:S" lon="110:00:E"/>
+<stn name="Tadzhikistan " lat="39:00:N" lon="71:00:E"/>
+<stn name="Taipei " lat="25:03:N" lon="121:30:E"/>
+<stn name="Tashkent " lat="41:20:N" lon="69:18:E"/>
+<stn name="Thimphu " lat="27:28:N" lon="89:39:E"/>
+<stn name="Tibet " lat="32:00:N" lon="90:00:E"/>
+<stn name="Tien Shan " lat="42:00:N" lon="80:00:E"/>
+<stn name="Tien Shan " lat="42:00:N" lon="80:00:E"/>
+<stn name="Timor " lat="9:00:S" lon="125:00:E"/>
+<stn name="Timor-Leste, Timor Lorosae " lat="9:00:N" lon="126:00:E"/>
+<stn name="Tokyo " lat="35:42:N" lon="139:46:E"/>
+<stn name="Turkmenia " lat="40:00:N" lon="60:00:E"/>
+<stn name="Turkmeniya " lat="40:00:N" lon="60:00:E"/>
+<stn name="Ulaanbaatar " lat="47:55:N" lon="106:53:E"/>
+<stn name="Ullung-do " lat="37:29:N" lon="130:52:E"/>
+<stn name="Ural Mountains" lat="60:00:N" lon="60:00:E"/>
+<stn name="Ussuri River" lat="48:28:N" lon="135:02:E"/>
+<stn name="Vientiane " lat="17:58:N" lon="102:36:E"/>
+<stn name="Volcano Islands" lat="25:00:N" lon="141:00:E"/>
+<stn name="Xianggang " lat="22:15:N" lon="114:10:E"/>
+<stn name="Yalu River" lat="39:55:N" lon="124:20:E"/>
+<stn name="Yalu River" lat="39:55:N" lon="124:20:E"/>
+<stn name="Zhong Guo " lat="35:00:N" lon="105:00:E"/>
+<stn name="Zhonghua " lat="35:00:N" lon="105:00:E"/>
 </stationtable>
