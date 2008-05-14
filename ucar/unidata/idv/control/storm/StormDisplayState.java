@@ -24,6 +24,11 @@
 package ucar.unidata.idv.control.storm;
 
 
+import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.data.gis.KmlUtil;
+
+import org.w3c.dom.*;
+
 import org.apache.poi.hssf.usermodel.*;
 
 
@@ -42,6 +47,7 @@ import ucar.unidata.idv.control.chart.*;
 import ucar.unidata.ui.TreePanel;
 
 
+import ucar.unidata.util.IOUtil;
 
 
 import ucar.unidata.ui.drawing.*;
@@ -395,26 +401,13 @@ public class StormDisplayState {
         originalContents = GuiUtils.inset(top, 5);
         JComponent contents = GuiUtils.top(originalContents);
         final int  cnt      = xcnt++;
-        contents = new JPanel(new BorderLayout()) {
-            public String toString() {
-                return "contents:" + cnt + " " + xxx();
-            }
-        };
+        contents = new JPanel(new BorderLayout());
         contents.add(BorderLayout.NORTH, originalContents);
         return contents;
     }
 
     /** _more_ */
     static int xcnt = 0;
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String xxx() {
-        return stormInfo.toString();
-    }
 
 
     /**
@@ -1196,15 +1189,15 @@ public class StormDisplayState {
      */
     public void writeToXls() {
         try {
-            JCheckBox justObservationCbx = new JCheckBox("Just Observation",
-                                               false);
-            JCheckBox justForecastCbx = new JCheckBox("Just Forecast", false);
-            JCheckBox mostRecentForecastCbx =
+            JCheckBox obsCbx = new JCheckBox("Observation",
+                                               true);
+            JCheckBox forecastCbx = new JCheckBox("Forecast", true);
+            JCheckBox mostRecentCbx =
                 new JCheckBox("Most Recent Forecasts", false);
             JComponent accessory =
-                GuiUtils.top(GuiUtils.vbox(justObservationCbx,
-                                           justForecastCbx,
-                                           mostRecentForecastCbx));
+                GuiUtils.top(GuiUtils.vbox(obsCbx,
+                                           forecastCbx,
+                                           mostRecentCbx));
 
             String filename = FileManager.getWriteFile(
                                   Misc.newList(FileManager.FILTER_XLS),
@@ -1230,10 +1223,10 @@ public class StormDisplayState {
             HSSFWorkbook wb         = new HSSFWorkbook();
             StormTrack   obsTrack   = trackCollection.getObsTrack();
             //Write the obs track first
-            if ((obsTrack != null) && !justForecastCbx.isSelected()) {
+            if ((obsTrack != null) && obsCbx.isSelected()) {
                 write(wb, obsTrack, sheetNames);
             }
-            if ( !justObservationCbx.isSelected()) {
+            if (forecastCbx.isSelected()) {
                 waysToUse = Misc.sort(waysToUse);
                 for (Way way : waysToUse) {
                     if (way.isObservation()) {
@@ -1241,7 +1234,7 @@ public class StormDisplayState {
                     }
                     List<StormTrack> tracks =
                         (List<StormTrack>) Misc.sort(trackMap.get(way));
-                    if (mostRecentForecastCbx.isSelected()) {
+                    if (mostRecentCbx.isSelected()) {
                         write(wb, tracks.get(tracks.size() - 1), sheetNames);
                     } else {
                         for (StormTrack track : tracks) {
@@ -1316,6 +1309,117 @@ public class StormDisplayState {
             }
         }
     }
+
+
+
+    /**
+     * _more_
+     */
+    public void writeToGE() {
+            JCheckBox obsCbx = new JCheckBox("Observation",
+                                               true);
+            JCheckBox forecastCbx = new JCheckBox("Forecast", true);
+            JCheckBox mostRecentCbx =
+                new JCheckBox("Most Recent Forecasts", false);
+            JComponent accessory =
+                GuiUtils.top(GuiUtils.vbox(obsCbx,
+                                           forecastCbx,
+                                           mostRecentCbx));
+
+            String filename = FileManager.getWriteFile(
+                                  Misc.newList(FileManager.FILTER_KML),
+                                  FileManager.SUFFIX_KML, accessory);
+            if (filename == null) {
+                return;
+            }
+
+            writeToGE(filename, obsCbx.isSelected(),
+                      forecastCbx.isSelected(),
+                      mostRecentCbx.isSelected());
+        }
+
+
+    public void writeToGE(String filename, boolean doObs, boolean doForecast, boolean mostRecent) {
+        try {
+            List<Way>            waysToUse = new ArrayList<Way>();
+            Hashtable<Way, List> trackMap  = new Hashtable<Way, List>();
+            for (StormTrack track : trackCollection.getTracks()) {
+                List tracks = trackMap.get(track.getWay());
+                if (tracks == null) {
+                    tracks = new ArrayList();
+                    trackMap.put(track.getWay(), tracks);
+                    waysToUse.add(track.getWay());
+                }
+                tracks.add(track);
+            }
+
+            Element kmlNode = KmlUtil.kml("");
+            
+            Element topFolder = KmlUtil.folder(kmlNode, "Storm: " + stormInfo.toString() + "   "
+                                       + stormInfo.getStartTime().formattedString("yyyy-MM-dd",
+                                                                                  DateUtil.TIMEZONE_GMT));
+            StormTrack   obsTrack   = trackCollection.getObsTrack();
+            //Write the obs track first
+            if ((obsTrack != null) && doObs) {
+                writeToGE(topFolder, obsTrack);
+            }
+            if (doForecast) {
+                waysToUse = Misc.sort(waysToUse);
+                for (Way way : waysToUse) {
+                    if (way.isObservation()) {
+                        continue;
+                    }
+                    Element wayNode = KmlUtil.folder(topFolder, stormTrackControl.getWayName() +": " + way);
+                    List<StormTrack> tracks =
+                        (List<StormTrack>) Misc.sort(trackMap.get(way));
+                    if (mostRecent) {
+                        writeToGE(wayNode,tracks.get(tracks.size() - 1));
+                    } else {
+                        for (StormTrack track : tracks) {
+                            writeToGE(wayNode, track);
+                        }
+                    }
+                }
+            }
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            IOUtil.writeBytes(new File(filename), XmlUtil.toString(kmlNode).getBytes());
+        } catch (Exception exc) {
+            stormTrackControl.logException("Writing KML", exc);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param wb _more_
+     * @param track _more_
+     * @param sheetNames _more_
+     */
+    protected void writeToGE(Element parent, StormTrack track) {
+        Element placemark = KmlUtil.placemark(parent,"Track",""+track.getStartTime());
+        int cnt = 0;
+        String dateString =
+            track.getStartTime().formattedString("yyyy-MM-dd hhmm",
+                DateUtil.TIMEZONE_GMT);
+        String sheetName = track.getWay() + " - " + dateString;
+        int              rowCnt = 0;
+        List<StormParam> params = track.getParams();
+        StringBuffer sb = new StringBuffer();
+        for (StormTrackPoint stp : track.getTrackPoints()) {
+            EarthLocation el = stp.getTrackPointLocation();
+            sb.append(el.getLongitude().getValue());            sb.append(",");
+            sb.append(el.getLatitude().getValue());
+            sb.append(",");
+            sb.append(el.getAltitude().getValue());
+            sb.append("\n");
+        }
+        Element linestring = KmlUtil.linestring(placemark, false, false, sb.toString());
+        //        KmlUtil.timestamp(linestring, track.getStartTime());
+        KmlUtil.timestamp(placemark, track.getStartTime());
+    }
+
+
 
 
 

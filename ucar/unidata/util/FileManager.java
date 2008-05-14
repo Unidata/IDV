@@ -829,6 +829,12 @@ public class FileManager {
     /** Suffix for CSV files */
     public static final String SUFFIX_XLS = ".xls";
 
+    /** Suffix for CSV files */
+    public static final String SUFFIX_KML = ".kml";
+
+    /** Suffix for CSV files */
+    public static final String SUFFIX_KMZ = ".kmz";
+
     /** Suffix for JPEG files */
     public static final String SUFFIX_JPG = ".jpg";
 
@@ -875,6 +881,12 @@ public class FileManager {
         new PatternFileFilter(".+\\.xls",
                               "Microsoft Excel files",
                               SUFFIX_XLS);
+
+    /** Filter for xls files */
+    public static final PatternFileFilter FILTER_KML =
+        new PatternFileFilter(".+\\.kml",
+                              "Google Earth files",
+                              SUFFIX_KML);
 
     /** File filter used for bundle files */
     public static final PatternFileFilter FILTER_JAR =

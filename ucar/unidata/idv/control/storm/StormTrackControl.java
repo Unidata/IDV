@@ -481,9 +481,17 @@ public class StormTrackControl extends DisplayControlImpl {
         if ((current != null) && current.getActive()) {
             items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,
                                             "writeToXls"));
+
+            items.add(GuiUtils.makeMenuItem("Export to Google Earth", current,
+                                            "writeToGE"));
         }
         super.getSaveMenuItems(items, forMenuBar);
     }
+
+
+
+
+
 
     /**
      * _more_
