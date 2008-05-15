@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.storm;
 
 
@@ -108,7 +106,7 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static StormParam PARAM_MINPRESSURE;
 
-    /** _more_          */
+    /** _more_ */
     public static StormParam PARAM_MAXWINDSPEED_KTS;
 
 
@@ -174,6 +172,26 @@ public abstract class StormDataSource extends DataSourceImpl {
                                     : Util.cleanName(unit.toString())) + "]";
         return ucar.visad.Util.makeRealType(id, alias, unit);
     }
+
+
+
+    /**
+     * _more_
+     */
+    protected final void initAfter() {
+        try {
+            incrOutstandingGetDataCalls();
+            initializeStormData();
+        } finally {
+            decrOutstandingGetDataCalls();
+        }
+    }
+
+
+    /**
+     * _more_
+     */
+    protected void initializeStormData() {}
 
 
 
@@ -252,17 +270,58 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @throws Exception _more_
      */
-    public abstract StormTrackCollection getTrackCollection(
+    public StormTrackCollection getTrackCollection(StormInfo stormInfo,
+            Hashtable<String, Boolean> waysToUse)
+            throws Exception {
+        try {
+            incrOutstandingGetDataCalls();
+            return getTrackCollectionInner(stormInfo, waysToUse);
+        } finally {
+            decrOutstandingGetDataCalls();
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getWayName() {
+        return "Way";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getWaysName() {
+        return getWayName() + "s";
+    }
+
+    /**
+     * _more_
+     *
+     * @param stormInfo _more_
+     * @param waysToUse _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public abstract StormTrackCollection getTrackCollectionInner(
             StormInfo stormInfo, Hashtable<String, Boolean> waysToUse)
      throws Exception;
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable seenWays = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private List<Way> ways = new ArrayList();
 
     /**
@@ -339,7 +398,7 @@ public abstract class StormDataSource extends DataSourceImpl {
         List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();
 
         for (StormTrackPoint stp : fctTrackPoints) {
-            DateTime        dt     = stp.getTrackPointTime();
+            DateTime        dt     = stp.getTime();
             StormTrackPoint stpObs = getClosestPoint(obsTrackPoints, dt);
             double          der    = getDistance(stpObs, stp);
             stp.addAttribute(PARAM_DISTANCEERROR.getReal(der));
@@ -372,7 +431,7 @@ public abstract class StormDataSource extends DataSourceImpl {
             if (forecastValue == null) {
                 continue;
             }
-            DateTime forecastDttm = forecastPoint.getTrackPointTime();
+            DateTime forecastDttm = forecastPoint.getTime();
             StormTrackPoint[] range = getClosestPointRange(obsTrackPoints,
                                           forecastDttm);
             if (range == null) {
@@ -389,8 +448,8 @@ public abstract class StormDataSource extends DataSourceImpl {
                 if ((v1 == null) || (v2 == null)) {
                     continue;
                 }
-                DateTime t1 = range[0].getTrackPointTime();
-                DateTime t2 = range[1].getTrackPointTime();
+                DateTime t1 = range[0].getTime();
+                DateTime t2 = range[1].getTime();
                 double percent = forecastDttm.getValue()
                                  - t1.getValue()
                                    / (t2.getValue() - t1.getValue());
@@ -411,7 +470,7 @@ public abstract class StormDataSource extends DataSourceImpl {
 
             Real difference = (Real) forecastValue.__sub__(obsValue);
             StormTrackPoint newStormTrackPoint =
-                new StormTrackPoint(forecastPoint.getTrackPointLocation(),
+                new StormTrackPoint(forecastPoint.getLocation(),
                                     forecastDttm,
                                     forecastPoint.getForecastHour(),
                                     new ArrayList<Real>());
@@ -441,7 +500,7 @@ public abstract class StormDataSource extends DataSourceImpl {
 
         for (int i = 0; i < numPoints; i++) {
             StormTrackPoint stp         = aList.get(i);
-            double          currentTime = stp.getTrackPointTime().getValue();
+            double          currentTime = stp.getTime().getValue();
             if (timeToLookFor == currentTime) {
                 return new StormTrackPoint[] { stp };
             }
@@ -483,8 +542,8 @@ public abstract class StormDataSource extends DataSourceImpl {
             StormTrackPoint stp11   = aList.get(i);
             StormTrackPoint stp21   = aList.get(numPoints - i - 1);
 
-            double          p1Value = stp11.getTrackPointTime().getValue();
-            double          p2Value = stp21.getTrackPointTime().getValue();
+            double          p1Value = stp11.getTime().getValue();
+            double          p2Value = stp21.getTime().getValue();
             double          diff1   = Math.abs(p1Value - pValue);
             double          diff2   = Math.abs(p2Value - pValue);
 
@@ -508,8 +567,8 @@ public abstract class StormDataSource extends DataSourceImpl {
         }
 
         double        diff = minDiffLeft + minDiffRight;
-        EarthLocation el1  = stp1.getTrackPointLocation();
-        EarthLocation el2  = stp1.getTrackPointLocation();
+        EarthLocation el1  = stp1.getLocation();
+        EarthLocation el2  = stp1.getLocation();
 
         double lat = ((diff - minDiffLeft) * el1.getLatitude().getValue()
                       + (diff - minDiffRight)
@@ -537,13 +596,15 @@ public abstract class StormDataSource extends DataSourceImpl {
     public static double getDistance(StormTrackPoint p1, StormTrackPoint p2) {
 
 
-        EarthLocation el1 = p1.getTrackPointLocation();
-        EarthLocation el2 = p2.getTrackPointLocation();
+        EarthLocation el1 = p1.getLocation();
+        EarthLocation el2 = p2.getLocation();
 
 
-        Bearing b = Bearing.calculateBearing(el1.getLatitude().getValue(), el1.getLongitude().getValue(),
-                                             el2.getLatitude().getValue(), el2.getLongitude().getValue(),
-                                           null);
+        Bearing b = Bearing.calculateBearing(el1.getLatitude().getValue(),
+                                             el1.getLongitude().getValue(),
+                                             el2.getLatitude().getValue(),
+                                             el2.getLongitude().getValue(),
+                                             null);
         return b.getDistance();
 
     }

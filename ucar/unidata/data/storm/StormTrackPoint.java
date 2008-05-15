@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.storm;
 
 
@@ -46,10 +44,10 @@ import java.util.List;
 public class StormTrackPoint implements Comparable {
 
     /** _more_ */
-    private EarthLocation trackPointLocation;
+    private EarthLocation location;
 
     /** _more_ */
-    private DateTime trackPointTime;
+    private DateTime time;
 
     /** _more_ */
     private List<Real> attributes;
@@ -68,10 +66,10 @@ public class StormTrackPoint implements Comparable {
      */
     public StormTrackPoint(EarthLocation pointLocation, DateTime time,
                            int forecastHour, List<Real> attrs) {
-        this.trackPointLocation = pointLocation;
-        this.trackPointTime     = time;
-        this.forecastHour       = forecastHour;
-        this.attributes         = attrs;
+        this.location     = pointLocation;
+        this.time         = time;
+        this.forecastHour = forecastHour;
+        this.attributes   = attrs;
     }
 
 
@@ -83,7 +81,7 @@ public class StormTrackPoint implements Comparable {
     public int compareTo(Object o) {
         if (o instanceof StormTrackPoint) {
             StormTrackPoint that = (StormTrackPoint) o;
-            return (trackPointTime.compareTo(that.trackPointTime));
+            return (time.compareTo(that.time));
         }
         return toString().compareTo(o.toString());
     }
@@ -114,8 +112,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @param time _more_
      */
-    public void setTrackPointTime(DateTime time) {
-        this.trackPointTime = time;
+    public void setTime(DateTime time) {
+        this.time = time;
     }
 
     /**
@@ -123,8 +121,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @return _more_
      */
-    public DateTime getTrackPointTime() {
-        return trackPointTime;
+    public DateTime getTime() {
+        return time;
     }
 
     /**
@@ -132,8 +130,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @param point _more_
      */
-    public void setTrackPointLocation(EarthLocation point) {
-        this.trackPointLocation = point;
+    public void setLocation(EarthLocation point) {
+        this.location = point;
     }
 
     /**
@@ -141,8 +139,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @return _more_
      */
-    public EarthLocation getTrackPointLocation() {
-        return trackPointLocation;
+    public EarthLocation getLocation() {
+        return location;
     }
 
 
@@ -168,7 +166,7 @@ public class StormTrackPoint implements Comparable {
      * @return _more_
      */
     public String toString() {
-        return trackPointLocation + "";
+        return location + "";
     }
 
     /**

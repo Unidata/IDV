@@ -20,12 +20,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.storm;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 
 
 import visad.*;
@@ -33,9 +33,9 @@ import visad.*;
 import visad.georef.EarthLocation;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import java.util.List;
-import java.util.Hashtable;
 
 
 /**
@@ -46,6 +46,10 @@ import java.util.Hashtable;
  * To change this template use File | Settings | File Templates.
  */
 public class StormTrack implements Comparable {
+
+    /** _more_          */
+    private LatLonRect bbox;
+
 
     /** _more_ */
     private String trackId;
@@ -63,8 +67,6 @@ public class StormTrack implements Comparable {
     /** _more_ */
     private NamedArray lons;
 
-    /** _more_ */
-    private List<DateTime> times;
 
     /** _more_ */
     private List<StormTrackPoint> trackPoints;
@@ -72,23 +74,6 @@ public class StormTrack implements Comparable {
     //private Date trackStartTime;
 
 
-    /**
-     * _more_
-     *
-     * @param stormInfo _more_
-     * @param way _more_
-     * @param lats _more_
-     * @param lons _more_
-     * @param times _more_
-     */
-    public StormTrack(StormInfo stormInfo, Way way, NamedArray lats,
-                      NamedArray lons, List<DateTime> times) {
-        this.stormInfo = stormInfo;
-        this.way       = way;
-        this.lats      = lats;
-        this.lons      = lons;
-        this.times     = times;
-    }
 
 
     /**
@@ -104,7 +89,7 @@ public class StormTrack implements Comparable {
         this.way         = way;
         this.trackPoints = new ArrayList<StormTrackPoint>(pts);
         StormTrackPoint firstPoint     = (StormTrackPoint) pts.get(0);
-        DateTime        trackStartTime = firstPoint.getTrackPointTime();
+        DateTime        trackStartTime = firstPoint.getTime();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + trackStartTime.getValue();
     }
@@ -125,6 +110,36 @@ public class StormTrack implements Comparable {
         this.trackPoints = new ArrayList();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + startTime.getValue();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public LatLonRect getBoundingBox() {
+        if (trackPoints.size() == 0) {
+            return null;
+        }
+        if (bbox == null) {
+            //  public LatLonRect(LatLonPoint left, LatLonPoint right) {
+            double minLon = Double.POSITIVE_INFINITY;
+            double maxLon = Double.NEGATIVE_INFINITY;
+            double minLat = Double.POSITIVE_INFINITY;
+            double maxLat = Double.NEGATIVE_INFINITY;
+            for (StormTrackPoint stp : trackPoints) {
+                EarthLocation el = stp.getLocation();
+                minLat = Math.min(minLat, el.getLatitude().getValue());
+                maxLat = Math.max(maxLat, el.getLatitude().getValue());
+                minLon = Math.min(minLon, el.getLongitude().getValue());
+                maxLon = Math.max(maxLon, el.getLongitude().getValue());
+            }
+
+            bbox = new LatLonRect(new LatLonPointImpl(maxLat, minLon),
+                                  new LatLonPointImpl(minLat, maxLon));
+        }
+        return bbox;
     }
 
 
@@ -224,7 +239,7 @@ public class StormTrack implements Comparable {
      */
     public DateTime getStartTime() {
         StormTrackPoint firstPoint = trackPoints.get(0);
-        return firstPoint.getTrackPointTime();
+        return firstPoint.getTime();
 
     }
 
@@ -290,13 +305,14 @@ public class StormTrack implements Comparable {
     public List<DateTime> getTrackTimes() {
         List<DateTime> trackTimes = new ArrayList();
         for (StormTrackPoint stp : trackPoints) {
-            trackTimes.add(stp.getTrackPointTime());
+            trackTimes.add(stp.getTime());
         }
         return trackTimes;
     }
 
 
-    private List<StormParam> params=null;
+    /** _more_          */
+    private List<StormParam> params = null;
 
 
     /**
@@ -305,21 +321,21 @@ public class StormTrack implements Comparable {
      * @return _more_
      */
     public List<StormParam> getParams() {
-        if(params==null) {
+        if (params == null) {
             params = new ArrayList<StormParam>();
             Hashtable seenParam = new Hashtable();
-            for(StormTrackPoint stp: trackPoints) {
+            for (StormTrackPoint stp : trackPoints) {
                 List<Real> reals = stp.getTrackAttributes();
                 for (Real r : reals) {
                     RealType type = (RealType) r.getType();
-                    if(seenParam.get(type)==null) {
-                        seenParam.put(type,type);
+                    if (seenParam.get(type) == null) {
+                        seenParam.put(type, type);
                         params.add(new StormParam(type));
                     }
                 }
             }
         }
-        
+
         return params;
     }
 
@@ -331,7 +347,7 @@ public class StormTrack implements Comparable {
     public List<EarthLocation> getLocations() {
         List<EarthLocation> locs = new ArrayList();
         for (StormTrackPoint stp : trackPoints) {
-            locs.add(stp.getTrackPointLocation());
+            locs.add(stp.getLocation());
         }
         return locs;
     }
@@ -344,14 +360,17 @@ public class StormTrack implements Comparable {
      *
      * @param param _more_
      * @return _more_
+     *
+     * @throws VisADException _more_
      */
-    public Real[] getTrackAttributeValues(StormParam param) throws VisADException {
+    public Real[] getTrackAttributeValues(StormParam param)
+            throws VisADException {
         if (param == null) {
             return null;
         }
         int    size            = trackPoints.size();
         Real[] trackAttributes = new Real[size];
-        Real missing = null;
+        Real   missing         = null;
         for (int i = 0; i < size; i++) {
             Real value = trackPoints.get(i).getAttribute(param);
             if (value == null) {
@@ -360,12 +379,16 @@ public class StormTrack implements Comparable {
                 }
                 trackAttributes[i] = null;
             } else {
-                if(missing==null) missing =  value.cloneButValue(Double.NaN);
+                if (missing == null) {
+                    missing = value.cloneButValue(Double.NaN);
+                }
                 trackAttributes[i] = value;
             }
         }
-        for(int i=0;i<size;i++) {
-            if(trackAttributes[i] ==null) trackAttributes[i] = missing;
+        for (int i = 0; i < size; i++) {
+            if (trackAttributes[i] == null) {
+                trackAttributes[i] = missing;
+            }
         }
         return trackAttributes;
     }

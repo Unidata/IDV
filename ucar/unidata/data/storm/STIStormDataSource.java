@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.storm;
 
 
@@ -241,51 +239,51 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String TABLE_PROBILITY = "probility";
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_WAYNAME = "wayname";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_FHOUR = "fhour";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P10 = "p10";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P20 = "p20";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P30 = "p30";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P40 = "p40";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P50 = "p50";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P60 = "p60";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P70 = "p70";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P80 = "p80";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P90 = "p90";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_P100 = "p100";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_ERROR = "error";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_PROBILITY_REMARK = "remark";
 
 
@@ -307,7 +305,7 @@ public class STIStormDataSource extends StormDataSource {
     /** the stormInfo and track */
     private List<StormInfo> stormInfos;
 
-    /** _more_          */
+    /** _more_ */
     private HashMap<String, float[]> wayfhourToRadius;
 
 
@@ -424,7 +422,7 @@ public class STIStormDataSource extends StormDataSource {
     /**
      * _more_
      */
-    protected void initAfter() {
+    protected void initializeStormData() {
         try {
             File userDir =
                 getDataContext().getIdv().getObjectStore().getUserDirectory();
@@ -468,7 +466,7 @@ public class STIStormDataSource extends StormDataSource {
      *
      * @throws Exception _more_
      */
-    public StormTrackCollection getTrackCollection(StormInfo stormInfo,
+    public StormTrackCollection getTrackCollectionInner(StormInfo stormInfo,
             Hashtable<String, Boolean> waysToUse)
             throws Exception {
         initParams();
@@ -609,10 +607,10 @@ public class STIStormDataSource extends StormDataSource {
         Statement             statement = evaluate(query);
         SqlUtil.Iterator      iter      = SqlUtil.getIterator(statement);
         ResultSet             results;
-        double                radius = 0;
-        List<StormTrackPoint> pts    = new ArrayList();
+        double                radius  = 0;
+        List<StormTrackPoint> pts     = new ArrayList();
 
-        Real altReal = new Real(RealType.Altitude, 0);
+        Real                  altReal = new Real(RealType.Altitude, 0);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 //                System.err.println ("row " + cnt);
@@ -677,14 +675,30 @@ public class STIStormDataSource extends StormDataSource {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param way _more_
+     * @param forecastHour _more_
+     *
+     * @return _more_
+     */
     private float[] getProbabilityRadius(Way way, int forecastHour) {
-        String key = way.getName().toUpperCase()   + forecastHour;
+        String key = way.getName().toUpperCase() + forecastHour;
         //        System.out.println("get:" + key + " " +(wayfhourToRadius.get(key)!=null));
-        return  wayfhourToRadius.get(key);
+        return wayfhourToRadius.get(key);
     }
 
-    private void  putProbabilityRadius(Way way, int forecastHour, float[] radiuses) {
-        String key = way.getName().toUpperCase()   + forecastHour;
+    /**
+     * _more_
+     *
+     * @param way _more_
+     * @param forecastHour _more_
+     * @param radiuses _more_
+     */
+    private void putProbabilityRadius(Way way, int forecastHour,
+                                      float[] radiuses) {
+        String key = way.getName().toUpperCase() + forecastHour;
         //        System.out.println("put:" + key);
         wayfhourToRadius.put(key, radiuses);
     }
@@ -854,7 +868,7 @@ public class STIStormDataSource extends StormDataSource {
                 wp[7] = results.getFloat(col++);
                 wp[8] = results.getFloat(col++);
                 wp[9] = results.getFloat(col++);
-                putProbabilityRadius(new Way(wayName), fhour,wp);
+                putProbabilityRadius(new Way(wayName), fhour, wp);
             }
         }
     }
@@ -880,9 +894,8 @@ public class STIStormDataSource extends StormDataSource {
         List<StormTrackPoint> obsBABJ = getObservationTrack(stormInfo,
                                             babjWay);
 
-        DateTime timeMin = obsBABJ.get(0).getTrackPointTime();
-        DateTime timeMax = obsBABJ.get(obsBABJ.size()
-                                       - 1).getTrackPointTime();
+        DateTime timeMin = obsBABJ.get(0).getTime();
+        DateTime timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
 
         // get list of ways
         List<Way> ways = getForecastWays(stormInfo);
@@ -891,8 +904,8 @@ public class STIStormDataSource extends StormDataSource {
             if ( !way.equals(babjWay)) {
                 obsBABJ = getObservationTrack(stormInfo, way, timeMin,
                         timeMax, obsBABJ);
-                timeMin = obsBABJ.get(0).getTrackPointTime();
-                timeMax = obsBABJ.get(obsBABJ.size() - 1).getTrackPointTime();
+                timeMin = obsBABJ.get(0).getTime();
+                timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
             }
         }
 
@@ -1356,7 +1369,7 @@ public class STIStormDataSource extends StormDataSource {
             //Drop the table  - ignore any errors
             //          SqlUtil.loadSql("drop table " + TABLE_TRACK, stmt, false);
 
-            if(useDerby()) {
+            if (useDerby()) {
                 //Load in the test data
                 try {
                     stmt.execute("select count(*) from typhoon");
@@ -1364,9 +1377,10 @@ public class STIStormDataSource extends StormDataSource {
                 } catch (Exception exc) {
                     System.err.println("exc;" + exc);
                     System.err.println("Creating test database");
-                    String initSql = IOUtil.readContents(
-                                                         "/ucar/unidata/data/storm/testdb.sql",
-                                                         getClass());
+                    String initSql =
+                        IOUtil.readContents(
+                            "/ucar/unidata/data/storm/testdb.sql",
+                            getClass());
 
                     connection.setAutoCommit(false);
                     SqlUtil.loadSql(initSql, stmt, false);

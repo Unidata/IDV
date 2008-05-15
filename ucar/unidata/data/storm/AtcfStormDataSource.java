@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.storm;
 
 
@@ -92,7 +90,8 @@ public class AtcfStormDataSource extends StormDataSource {
     private List<StormInfo> stormInfos;
 
 
-    private  StormTrackCollection localTracks;
+    /** _more_          */
+    private StormTrackCollection localTracks;
 
     /**
      * _more_
@@ -124,20 +123,21 @@ public class AtcfStormDataSource extends StormDataSource {
     /**
      * _more_
      */
-    protected void initAfter() {
+    protected void initializeStormData() {
         try {
             stormInfos = new ArrayList<StormInfo>();
-            if(path.toLowerCase().endsWith(".gz") || path.toLowerCase().endsWith(".dat")) {
-                String name  = IOUtil.stripExtension(IOUtil.getFileTail(path));
-                StormInfo si = new StormInfo(name, 
-                                             new DateTime(new Date()));
+            if (path.toLowerCase().endsWith(".gz")
+                    || path.toLowerCase().endsWith(".dat")) {
+                String name  =
+                    IOUtil.stripExtension(IOUtil.getFileTail(path));
+                StormInfo si = new StormInfo(name, new DateTime(new Date()));
                 stormInfos.add(si);
-                localTracks =  new StormTrackCollection();
+                localTracks = new StormTrackCollection();
                 readTracks(si, localTracks, path, null);
                 return;
             }
 
-            byte[]           bytes      = readFile(path + "/storm.table");
+            byte[]           bytes = readFile(path + "/storm.table", false);
             String           stormTable = new String(bytes);
             List lines = StringUtil.split(stormTable, "\n", true, true);
 
@@ -176,8 +176,17 @@ public class AtcfStormDataSource extends StormDataSource {
         return stormInfos;
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     private double getDouble(String s) {
-        if(s.length()==0)return Double.NaN;
+        if (s.length() == 0) {
+            return Double.NaN;
+        }
         return new Double(s).doubleValue();
     }
 
@@ -199,11 +208,12 @@ public class AtcfStormDataSource extends StormDataSource {
 
 
         long   t1    = System.currentTimeMillis();
-        byte[] bytes = readFile(trackFile);
+        byte[] bytes = readFile(trackFile, true);
         long   t2    = System.currentTimeMillis();
-        System.err.println("read time:" + (t2 - t1));
+        //        System.err.println("read time:" + (t2 - t1));
         if (bytes == null) {
-            return;
+            throw new BadDataException("Unable to read track file for:"
+                                       + stormInfo);
         }
 
         if (trackFile.toLowerCase().endsWith(".gz")) {
@@ -223,7 +233,7 @@ public class AtcfStormDataSource extends StormDataSource {
         SimpleDateFormat fmt       = new SimpleDateFormat("yyyyMMddHH");
         Hashtable        trackMap  = new Hashtable();
         Real             altReal   = new Real(RealType.Altitude, 0);
-        System.err.println("obs:" + lines.size());
+        //        System.err.println("obs:" + lines.size());
         /*        Hashtable okWays = new Hashtable();
         okWays.put(WAY_CARQ, "");
         okWays.put(WAY_WRNG, "");
@@ -237,7 +247,7 @@ public class AtcfStormDataSource extends StormDataSource {
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
             if (i == 0) {
-                System.err.println(line);
+                //                System.err.println(line);
             }
             List toks = StringUtil.split(line, ",", true);
 
@@ -246,8 +256,8 @@ public class AtcfStormDataSource extends StormDataSource {
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
 
             int category = getCategory((String) toks.get(10));
-            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(getDouble(
-                                                                      (String) toks.get(8)));
+            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(
+                                 getDouble((String) toks.get(8)));
             double pressure = getDouble((String) toks.get(9));
 
             if (category != CATEGORY_XX) {
@@ -328,6 +338,16 @@ public class AtcfStormDataSource extends StormDataSource {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getWayName() {
+        return "Tech";
+    }
+
+
 
     /**
      * _more_
@@ -339,22 +359,25 @@ public class AtcfStormDataSource extends StormDataSource {
      *
      * @throws Exception _more_
      */
-    public StormTrackCollection getTrackCollection(StormInfo stormInfo,
+    public StormTrackCollection getTrackCollectionInner(StormInfo stormInfo,
             Hashtable<String, Boolean> waysToUse)
             throws Exception {
-        if(localTracks!=null) return localTracks;
+        if (localTracks != null) {
+            return localTracks;
+        }
 
         long                 t1     = System.currentTimeMillis();
         StormTrackCollection tracks = new StormTrackCollection();
 
-        String trackFile;
-        boolean justObs = 
-            waysToUse!=null && waysToUse.size()==1 && waysToUse.get(Way.OBSERVATION.toString())!=null;
-        if(!justObs) {
-            trackFile = path + "/" + getYear(stormInfo.getStartTime())
-                + "/" + "a" + stormInfo.getBasin().toLowerCase()
-                + stormInfo.getNumber()
-                + getYear(stormInfo.getStartTime()) + ".dat.gz";
+        String               trackFile;
+        boolean justObs = (waysToUse != null) && (waysToUse.size() == 1)
+                          && (waysToUse.get(Way.OBSERVATION.toString())
+                              != null);
+        if ( !justObs) {
+            trackFile = path + "/" + getYear(stormInfo.getStartTime()) + "/"
+                        + "a" + stormInfo.getBasin().toLowerCase()
+                        + stormInfo.getNumber()
+                        + getYear(stormInfo.getStartTime()) + ".dat.gz";
             readTracks(stormInfo, tracks, trackFile, waysToUse);
         }
         //Now  read the b"est file
@@ -395,12 +418,14 @@ public class AtcfStormDataSource extends StormDataSource {
      * _more_
      *
      * @param file _more_
+     * @param ignoreErrors _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    private byte[] readFile(String file) throws Exception {
+    private byte[] readFile(String file, boolean ignoreErrors)
+            throws Exception {
         if (new File(file).exists()) {
             return IOUtil.readBytes(IOUtil.getInputStream(file, getClass()));
         }
@@ -422,14 +447,22 @@ public class AtcfStormDataSource extends StormDataSource {
                 if (ftp.retrieveFile(url.getPath(), bos)) {
                     return bos.toByteArray();
                 }
+            } catch (org.apache.commons.net.ftp
+                    .FTPConnectionClosedException fcce) {
+                lastException = fcce;
+                //Wait a bit
+                Misc.sleep(250 * (i + 1));
             } catch (Exception exc) {
-                lastException = exc;
+                if ( !ignoreErrors) {
+                    throw exc;
+                }
+                return null;
             }
-            //Wait a bit
-            Misc.sleep(100);
         }
         if (lastException != null) {
-            throw lastException;
+            if ( !ignoreErrors) {
+                throw lastException;
+            }
         }
         //            throw new FileNotFoundException("Could not read file: " + file);
         return null;

@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.storm;
 
 
@@ -48,14 +46,16 @@ import java.util.List;
  */
 public class StormParam {
 
-    /** _more_          */
+    /** _more_ */
     RealType type;
 
-    /** _more_          */
+    /** _more_ */
     private boolean canDoDifference = true;
 
-    public StormParam() {
-    }
+    /**
+     * _more_
+     */
+    public StormParam() {}
 
     /**
      * _more_
