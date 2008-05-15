@@ -26,8 +26,8 @@ package ucar.unidata.data.storm;
 
 
 import ucar.unidata.data.*;
-import ucar.unidata.geoloc.ProjectionPointImpl;
-import ucar.unidata.geoloc.projection.FlatEarth;
+
+import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.util.DateUtil;
 
@@ -536,18 +536,15 @@ public abstract class StormDataSource extends DataSourceImpl {
      */
     public static double getDistance(StormTrackPoint p1, StormTrackPoint p2) {
 
-        FlatEarth     e1  = new FlatEarth();
-        FlatEarth     e2  = new FlatEarth();
 
         EarthLocation el1 = p1.getTrackPointLocation();
         EarthLocation el2 = p2.getTrackPointLocation();
-        ProjectionPointImpl pp1 =
-            e1.latLonToProj(el1.getLatitude().getValue(),
-                            el1.getLongitude().getValue());
-        ProjectionPointImpl pp2 =
-            e2.latLonToProj(el2.getLatitude().getValue(),
-                            el2.getLongitude().getValue());
-        return pp1.distance(pp2);
+
+
+        Bearing b = Bearing.calculateBearing(el1.getLatitude().getValue(), el1.getLongitude().getValue(),
+                                             el2.getLatitude().getValue(), el2.getLongitude().getValue(),
+                                           null);
+        return b.getDistance();
 
     }
 }
