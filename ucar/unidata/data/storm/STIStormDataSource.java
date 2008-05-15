@@ -98,7 +98,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        return true;
+        return false;
     }
 
     /**
@@ -685,7 +685,7 @@ public class STIStormDataSource extends StormDataSource {
 
     private void  putProbabilityRadius(Way way, int forecastHour, float[] radiuses) {
         String key = way.getName().toUpperCase()   + forecastHour;
-        //        System.out.println("put:" + key); 
+        //        System.out.println("put:" + key);
         wayfhourToRadius.put(key, radiuses);
     }
 
@@ -815,7 +815,7 @@ public class STIStormDataSource extends StormDataSource {
     /**
      * _more_
      *
-     * 
+     *
      * @return _more_
      * @throws Exception _more_
      */
