@@ -26,7 +26,11 @@ package ucar.unidata.data.gis;
 import visad.DateTime;
 
 import ucar.unidata.xml.XmlUtil;
+
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.StringUtil;
+import java.awt.Color;
+
 
 import org.w3c.dom.*;
 
@@ -38,105 +42,81 @@ import org.w3c.dom.*;
  * @version $Revision: 1.38 $ $Date: 2007/04/16 20:34:52 $
  */
 public class KmlUtil {
-    /** kml tag id */
-    public static final String TAG_GROUNDOVERLAY = "GroundOverlay";
 
-
-    public static final String TAG_TIMESTAMP = "TimeStamp";
-    public static final String TAG_WHEN = "When";
-
-    public static final String TAG_TESSELATE = "tesselate";
-    public static final String TAG_EXTRUDE = "extrude";
-
-    public static final String TAG_PHOTOOVERLAY = "PhotoOverlay";
-
-    /** xml tag */
-    public static final String TAG_URL = "Url";
-
-    /** xml tag */
-    public static final String TAG_HREF = "href";
-
-    /** xml tag */
-    public static final String TAG_LINK = "Link";
-
-    public static final String TAG_VISIBLE = "visible";
-
-
-    /** xml tag */
-    public static final String TAG_SCHEMA = "Schema";
-
-    /** kml tag id */
-    public static final String TAG_NETWORKLINK = "NetworkLink";
-
-    /** kml tag id */
-    public static final String TAG_MULTIGEOMETRY = "MultiGeometry";
-
-    /** kml tag id */
-    public static final String TAG_DOCUMENT = "Document";
-
-    /** kml tag id */
-    public static final String TAG_FOLDER = "Folder";
-
-    /** xml tag */
-    public static final String TAG_KML = "kml";
-
-    /** kml tag id */
-    public static final String TAG_PLACEMARK = "Placemark";
-
-    /** kml tag id */
-    public static final String TAG_NAME = "name";
+    //J-
+    public static final String TAG_ALTITUDE = "altitude";
+    public static final String TAG_ALTITUDEMODE = "altitudeMode";
+    public static final String TAG_BOTTOMFOV = "bottomFov";
+    public static final String TAG_CAMERA = "Camera";
+    public static final String TAG_COLOR = "color";
+    public static final String TAG_COLORMODE = "colorMode";
+    public static final String TAG_COORDINATES = "coordinates";
 
     public static final String TAG_DESCRIPTION = "description";
-
-    public static final String TAG_COORDINATES = "coordinates";
-    public static final String TAG_LINESTRING = "LineString";
-
-
-    /** xml tags */
-    public static final String TAG_NEAR = "near";
-
-    public static final String TAG_CAMERA = "Camera";
-
-    public static final String TAG_LONGITUDE = "longitude";
-    public static final String TAG_LATITUDE = "latitude";
-    public static final String TAG_ALTITUDE = "altitude";
-    public static final String TAG_HEADING = "heading";
-    public static final String TAG_TILT = "tilt";
-    public static final String TAG_ROLL = "roll";
-
-
-    public static final String TAG_VIEWVOLUME = "ViewVolume";
-
-
-
-    public static final String TAG_LEFTFOV = "leftFov";
-    public static final String TAG_RIGHTFOV = "rightFov";
-    public static final String TAG_BOTTOMFOV = "bottomFov";
-    public static final String TAG_TOPFOV = "topFov";
-
-
-    /** xml tags */
-    public static final String TAG_VIEWBOUNDSCALE = "viewBoundScale";
-
-    /** xml tags */
-    public static final String TAG_LATLONBOX = "LatLonBox";
-
-    /** xml tags */
-    public static final String TAG_NORTH = "north";
-
-    /** xml tags */
-    public static final String TAG_SOUTH = "south";
-
-    /** xml tags */
+    public static final String TAG_DOCUMENT = "Document";
     public static final String TAG_EAST = "east";
+    public static final String TAG_EXTRUDE = "extrude";
+    public static final String TAG_FOLDER = "Folder";
+    public static final String TAG_GROUNDOVERLAY = "GroundOverlay";
+    public static final String TAG_HEADING = "heading";
+    public static final String TAG_HREF = "href";
+    public static final String TAG_ICON = "Icon";
+    public static final String TAG_ICONSTYLE = "IconStyle";
+    public static final String TAG_KML = "kml";
+    public static final String TAG_LATITUDE = "latitude";
+    public static final String TAG_LATLONBOX = "LatLonBox";
+    public static final String TAG_LEFTFOV = "leftFov";
+    public static final String TAG_LINESTRING = "LineString";
+    public static final String TAG_LINESTYLE = "LineStyle";
+    public static final String TAG_LINK = "Link";
+    public static final String TAG_LONGITUDE = "longitude";
+    public static final String TAG_MULTIGEOMETRY = "MultiGeometry";
+    public static final String TAG_NAME = "name";
+    public static final String TAG_NEAR = "near";
+    public static final String TAG_NETWORKLINK = "NetworkLink";
+    public static final String TAG_NORTH = "north";
+    public static final String TAG_PHOTOOVERLAY = "PhotoOverlay";
+    public static final String TAG_PLACEMARK = "Placemark";
+    public static final String TAG_POINT = "Point";
 
-    /** xml tags */
-    public static final String TAG_WEST = "west";
 
-    /** xml tags */
+
+    public static final String TAG_RIGHTFOV = "rightFov";
+    public static final String TAG_ROLL = "roll";
     public static final String TAG_ROTATION = "rotation";
+    public static final String TAG_SCHEMA = "Schema";
+    public static final String TAG_SOUTH = "south";
+    public static final String TAG_STYLE = "Style";
+    public static final String TAG_STYLEURL = "styleUrl";
+    public static final String TAG_TESSELATE = "tesselate";
+    public static final String TAG_TILT = "tilt";
+    public static final String TAG_TIMESTAMP = "TimeStamp";
+    public static final String TAG_TOPFOV = "topFov";
+    public static final String TAG_URL = "Url";
+    public static final String TAG_VIEWVOLUME = "ViewVolume";
+    public static final String TAG_VIEWBOUNDSCALE = "viewBoundScale";
+    public static final String TAG_VISIBLE = "visible";
+    public static final String TAG_WEST = "west";
+    public static final String TAG_WHEN = "when";
+    public static final String TAG_WIDTH = "width";
+    //J+
 
+
+
+
+
+    public static final String ATTR_ID = "id";
     public static final String ATTR_NAME = "name";
+
+
+
+    public static Element makeElement(Element parent, String tag) {
+        Element child = parent.getOwnerDocument().createElement(tag);
+        parent.appendChild(child);
+        return child;
+    }
+
+
 
 
     public static Element kml(String name) {
@@ -150,15 +130,9 @@ public class KmlUtil {
         return document(parent, name, false);
     }
 
-    public static Element makeElement(Element parent, String tag) {
-        Element child = parent.getOwnerDocument().createElement(tag);
-        parent.appendChild(child);
-        return child;
-    }
-
 
     public static Element document(Element parent, String name, boolean visible) {
-        Element node = parent.getOwnerDocument().createElement(TAG_DOCUMENT);
+        Element node = makeElement(parent,TAG_DOCUMENT);
         name(node,name);
         visible(node,visible);
         return node;
@@ -186,6 +160,48 @@ public class KmlUtil {
     }
 
 
+    public static Element styleurl(Element parent, String url) {
+        //<styleUrl>#linestyleExample</styleUrl>
+        return makeText(parent, TAG_STYLEURL, url);
+    }
+
+    public  static Element style(Element parent, String id) {
+        Element style =  makeElement(parent, TAG_STYLE);
+        style.setAttribute(ATTR_ID, id);
+        return style;
+    }
+
+
+    /*
+        <Style id="globeIcon">
+      <IconStyle>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pal3/icon19.png</href>
+        </Icon>
+      </IconStyle>
+      </Style>*/
+    public  static Element iconstyle(Element parent, String id, String url) {
+        Element style = style(parent, id);
+        Element iconstyle = makeElement(style, TAG_ICONSTYLE);
+        Element icon = makeElement(iconstyle, TAG_ICON);
+        Element href = makeText(icon, TAG_HREF,url);
+        return style;
+    }
+
+
+    public  static Element linestyle(Element parent, String id, Color color, int width) {
+        Element style = style(parent, id);
+        Element linestyle = makeElement(style, TAG_LINESTYLE);
+        makeText(linestyle, TAG_COLOR, "ff"+StringUtil.toHexString(color).substring(1));
+        makeText(linestyle, TAG_COLORMODE, "normal");
+        makeText(linestyle, TAG_WIDTH,""+width);
+        return linestyle;
+        /*<LineStyle id="ID">
+  <color>ffffffff</color>            <!-- kml:color -->
+  <colorMode>normal</colorMode>      <!-- colorModeEnum: normal or random -->
+  <width>1</width>                   <!-- float -->
+  </LineStyle>*/
+     }
     public static Element linestring(Element parent, boolean extrude, boolean tesselate, String coordinates) {        Element node = makeElement(parent, TAG_LINESTRING);
         makeText(node,TAG_EXTRUDE, (extrude?"1":"0"));
         makeText(node,TAG_TESSELATE, (tesselate?"1":"0"));
@@ -235,11 +251,43 @@ public class KmlUtil {
 
 
     public static Element placemark(Element parent, String name, String description) {
-       Element node = makeElement(parent,TAG_PLACEMARK);
+        Element node = makeElement(parent,TAG_PLACEMARK);
         name(node, name);
         description(node, description);
         return node;
     }
+
+
+    public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) {
+        Element placemark = placemark(parent, name, description);
+        makeText(placemark, TAG_STYLEURL, style);
+        visible(placemark, true);
+        Element point = makeElement(placemark, TAG_POINT);
+        makeText(point, TAG_COORDINATES, el.getLongitude().getValue() +"," +
+                 el.getLatitude().getValue() +"," +
+                 el.getAltitude().getValue() +" ");
+        return placemark;
+    }
+
+    /*
+      <Placemark>
+        <name>Floating placemark</name>
+        <visibility>0</visibility>
+        <description>Floats a defined distance above the ground.</description>
+        <LookAt>
+          <longitude>-122.0839597145766</longitude>
+          <latitude>37.42222904525232</latitude>
+          <altitude>0</altitude>
+          <range>500.6566641072245</range>
+          <tilt>40.5575073395506</tilt>
+          <heading>-148.4122922628044</heading>
+        </LookAt>
+        <styleUrl>#downArrowIcon</styleUrl>
+        <Point>
+          <altitudeMode>relativeToGround</altitudeMode>
+          <coordinates>-122.084075,37.4220033612141,50</coordinates>
+        </Point>
+        </Placemark>*/
 
 
 }

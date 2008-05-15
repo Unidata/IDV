@@ -1330,19 +1330,25 @@ public class StormDisplayState {
 
 
 
+    private JCheckBox obsCbx;
+    private JCheckBox forecastCbx;
+    private JCheckBox mostRecentCbx;
+
+
     /**
      * _more_
      */
     public void writeToGE() {
-            JCheckBox obsCbx = new JCheckBox("Observation",
-                                               true);
-            JCheckBox forecastCbx = new JCheckBox("Forecast", true);
-            JCheckBox mostRecentCbx =
+        if(obsCbx==null) {
+            obsCbx = new JCheckBox("Observation",  true);
+            forecastCbx = new JCheckBox("Forecast", true);
+            mostRecentCbx =
                 new JCheckBox("Most Recent Forecasts", false);
-            JComponent accessory =
-                GuiUtils.top(GuiUtils.vbox(obsCbx,
-                                           forecastCbx,
-                                           mostRecentCbx));
+        }
+        JComponent accessory =
+            GuiUtils.top(GuiUtils.vbox(obsCbx,
+                                       forecastCbx,
+                                       mostRecentCbx));
 
             String filename = FileManager.getWriteFile(
                                   Misc.newList(FileManager.FILTER_KML),
@@ -1351,13 +1357,17 @@ public class StormDisplayState {
                 return;
             }
 
+            try {
             writeToGE(filename, obsCbx.isSelected(),
                       forecastCbx.isSelected(),
                       mostRecentCbx.isSelected());
+        } catch (Exception exc) {
+            stormTrackControl.logException("Writing KML", exc);
+        }
         }
 
 
-    public void writeToGE(String filename, boolean doObs, boolean doForecast, boolean mostRecent) {
+    public void writeToGE(String filename, boolean doObs, boolean doForecast, boolean mostRecent) throws VisADException, RemoteException  {
         try {
             List<Way>            waysToUse = new ArrayList<Way>();
             Hashtable<Way, List> trackMap  = new Hashtable<Way, List>();
@@ -1372,14 +1382,20 @@ public class StormDisplayState {
             }
 
             Element kmlNode = KmlUtil.kml("");
+            Element docNode = KmlUtil.document(kmlNode,"");
+            Hashtable state = new Hashtable();
             
-            Element topFolder = KmlUtil.folder(kmlNode, "Storm: " + stormInfo.toString() + "   "
+            KmlUtil.iconstyle(docNode,"hurricaneicon","http://www.unidata.ucar.edu/software/idv/kml/images/hurricane.png");
+
+
+            Element topFolder = KmlUtil.folder(docNode, "Storm: " + stormInfo.toString() + "   "
                                        + stormInfo.getStartTime().formattedString("yyyy-MM-dd",
                                                                                   DateUtil.TIMEZONE_GMT));
             StormTrack   obsTrack   = trackCollection.getObsTrack();
             //Write the obs track first
             if ((obsTrack != null) && doObs) {
-                writeToGE(topFolder, obsTrack);
+                Element obsFolder = KmlUtil.folder(topFolder, "Observation");
+                writeToGE(docNode, state, obsFolder, obsTrack);
             }
             if (doForecast) {
                 waysToUse = Misc.sort(waysToUse);
@@ -1391,10 +1407,10 @@ public class StormDisplayState {
                     List<StormTrack> tracks =
                         (List<StormTrack>) Misc.sort(trackMap.get(way));
                     if (mostRecent) {
-                        writeToGE(wayNode,tracks.get(tracks.size() - 1));
+                        writeToGE(docNode, state, wayNode,tracks.get(tracks.size() - 1));
                     } else {
                         for (StormTrack track : tracks) {
-                            writeToGE(wayNode, track);
+                            writeToGE(docNode, state, wayNode, track);
                         }
                     }
                 }
@@ -1414,8 +1430,12 @@ public class StormDisplayState {
      * @param track _more_
 
      */
-    protected void writeToGE(Element parent, StormTrack track) {
-        Element placemark = KmlUtil.placemark(parent,"Track",""+track.getStartTime());
+    protected void writeToGE(Element docNode, Hashtable state, Element parent, StormTrack track) throws VisADException, RemoteException {
+        Element placemark = KmlUtil.placemark(parent,"Track","<html>" + stormTrackControl.getWayName()+":" +
+                                              track.getWay() +"<br>" +
+                                              ""+track.getStartTime()+
+                                              "</html>");
+
         int cnt = 0;
         String dateString =
             track.getStartTime().formattedString("yyyy-MM-dd hhmm",
@@ -1426,15 +1446,37 @@ public class StormDisplayState {
         StringBuffer sb = new StringBuffer();
         for (StormTrackPoint stp : track.getTrackPoints()) {
             EarthLocation el = stp.getTrackPointLocation();
-            sb.append(el.getLongitude().getValue());            sb.append(",");
+            if(track.getWay().isObservation()) {
+                Element icon = KmlUtil.placemark(parent, "Time:" + stp.getTrackPointTime(),
+                                                 "<html><table>" +
+                                                 stormTrackControl.formatStormTrackPoint(track, stp) +
+                                                 "</table></html>",
+                                                 el,"#hurricaneicon");
+                KmlUtil.timestamp(icon, stp.getTrackPointTime());
+            }
+
+            sb.append(el.getLongitude().getValue());      
+            sb.append(",");
             sb.append(el.getLatitude().getValue());
             sb.append(",");
             sb.append(el.getAltitude().getValue());
             sb.append("\n");
         }
+
+        String styleUrl = "linestyle"+track.getWay();
+        if(state.get(styleUrl)==null) {
+            Element style = KmlUtil.linestyle(docNode,styleUrl,getWayDisplayState(track.getWay()).getColor(),
+                                              track.getWay().isObservation()?3:2);
+            state.put(styleUrl, style);
+        }
+        KmlUtil.styleurl(placemark,"#"+ styleUrl);
         Element linestring = KmlUtil.linestring(placemark, false, false, sb.toString());
         //        KmlUtil.timestamp(linestring, track.getStartTime());
-        KmlUtil.timestamp(placemark, track.getStartTime());
+        if(!track.getWay().isObservation()) {
+            KmlUtil.timestamp(placemark, track.getStartTime());
+        } else {
+
+        }
     }
 
 
