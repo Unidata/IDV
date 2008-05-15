@@ -341,7 +341,6 @@ public class StormTrack implements Comparable {
      * _more_
      *
      *
-     * @param type _more_
      *
      * @param param _more_
      * @return _more_
