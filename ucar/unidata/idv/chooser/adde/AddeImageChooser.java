@@ -1293,7 +1293,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ( !getDoAbsoluteTimes()) {
             return;
         }
-        setPropertiesState(getASelectedTime());
+        if(getIdv().getProperty("idv.chooser.addeimage.updateontimechange", true)) {
+            setPropertiesState(getASelectedTime(), false);
+        }
     }
 
 
