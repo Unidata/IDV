@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -128,16 +124,16 @@ import javax.swing.table.*;
 
 public class StormTrackTableModel extends AbstractTableModel {
 
-    /** _more_          */
+    /** _more_ */
     private StormDisplayState stormDisplayState;
 
-    /** _more_          */
+    /** _more_ */
     private StormTrack track;
 
-    /** _more_          */
+    /** _more_ */
     private List<StormTrackPoint> points;
 
-    /** _more_          */
+    /** _more_ */
     private List<StormParam> params;
 
     /**
@@ -210,15 +206,15 @@ public class StormTrackTableModel extends AbstractTableModel {
         StormTrackPoint stp = points.get(row);
         if (column == 0) {
             if (track.getWay().isObservation()) {
-                return stp.getTrackPointTime();
+                return stp.getTime();
             }
             return "" + stp.getForecastHour();
         }
         if (column == 1) {
-            return stp.getTrackPointLocation().getLatitude();
+            return stp.getLocation().getLatitude();
         }
         if (column == 2) {
-            return stp.getTrackPointLocation().getLongitude();
+            return stp.getLocation().getLongitude();
         }
         StormParam param = params.get(column - 3);
         Real       r     = stp.getAttribute(param);

@@ -20,23 +20,25 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.storm;
 
 
-import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.data.gis.KmlUtil;
+import org.apache.poi.hssf.usermodel.*;
 
 import org.w3c.dom.*;
-
-import org.apache.poi.hssf.usermodel.*;
 
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.storm.*;
+import ucar.unidata.geoloc.LatLonPointImpl;
+
+
+
+import ucar.unidata.geoloc.LatLonRect;
 
 
 import ucar.unidata.idv.ControlContext;
@@ -47,9 +49,6 @@ import ucar.unidata.idv.control.chart.*;
 import ucar.unidata.ui.TreePanel;
 
 
-import ucar.unidata.util.IOUtil;
-
-
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.ColorTable;
@@ -58,9 +57,15 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 
+
+import ucar.unidata.util.IOUtil;
+
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
+
+
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.*;
 
@@ -80,8 +85,6 @@ import ucar.visad.display.TrackDisplayable;
 
 
 import visad.*;
-
-
 
 import visad.georef.EarthLocation;
 
@@ -181,6 +184,7 @@ public class StormDisplayState {
     /** _more_ */
     private CompositeDisplayable holder;
 
+    /** _more_          */
     private boolean isOnlyChild = false;
 
     /** _more_ */
@@ -268,6 +272,48 @@ public class StormDisplayState {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public LatLonRect getBoundingBox() {
+        if (trackCollection == null) {
+            return null;
+        }
+        double  minLon = Double.POSITIVE_INFINITY;
+        double  maxLon = Double.NEGATIVE_INFINITY;
+        double  minLat = Double.POSITIVE_INFINITY;
+        double  maxLat = Double.NEGATIVE_INFINITY;
+
+        boolean didone = false;
+        for (StormTrack track : trackCollection.getTracks()) {
+            if ( !stormTrackControl.okToShowWay(track.getWay())) {
+                continue;
+            }
+            LatLonRect bbox = track.getBoundingBox();
+            if (bbox == null) {
+                continue;
+            }
+            minLon = Math.min(minLon, bbox.getLonMin());
+            maxLon = Math.max(maxLon, bbox.getLonMax());
+            minLat = Math.min(minLat, bbox.getLatMin());
+            maxLat = Math.max(maxLat, bbox.getLatMax());
+            didone = true;
+        }
+        if ( !didone) {
+            return null;
+        }
+        return new LatLonRect(new LatLonPointImpl(maxLat, minLon),
+                              new LatLonPointImpl(minLat, maxLon));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param isOnlyChild _more_
+     */
     protected void setIsOnlyChild(boolean isOnlyChild) {
         this.isOnlyChild = isOnlyChild;
     }
@@ -441,7 +487,9 @@ public class StormDisplayState {
      * @return _more_
      */
     private JComponent makeList(List stormParams, final Object id) {
-        if(stormParams==null || stormParams.size()==0) return GuiUtils.filler(2,10);
+        if ((stormParams == null) || (stormParams.size() == 0)) {
+            return GuiUtils.filler(2, 10);
+        }
         final JList list = new JList(new Vector(stormParams));
         list.setVisibleRowCount(4);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -473,13 +521,23 @@ public class StormDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param stormParams _more_
+     * @param id _more_
+     *
+     * @return _more_
+     */
     private JComponent makeBox(List stormParams, final Object id) {
-        if(stormParams==null || stormParams.size()==0) return GuiUtils.filler(2,10);
+        if ((stormParams == null) || (stormParams.size() == 0)) {
+            return GuiUtils.filler(2, 10);
+        }
         final JComboBox box = new JComboBox(new Vector(stormParams));
         box.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                Object  selected = box.getSelectedItem();
-                if(selected == null || selected instanceof String) {
+            public void actionPerformed(ActionEvent ae) {
+                Object selected = box.getSelectedItem();
+                if ((selected == null) || (selected instanceof String)) {
                     params.remove(id);
                 } else {
                     params.put(id, selected);
@@ -496,19 +554,26 @@ public class StormDisplayState {
     }
 
 
-    private List<StormParam> getDistanceParams(List<StormParam> params){
-        if ((params == null) || (params.size() == 0)){
+    /**
+     * _more_
+     *
+     * @param params _more_
+     *
+     * @return _more_
+     */
+    private List<StormParam> getDistanceParams(List<StormParam> params) {
+        if ((params == null) || (params.size() == 0)) {
             return null;
         }
 
-        List<StormParam>  attrNames = new ArrayList<StormParam>();
+        List<StormParam> attrNames = new ArrayList<StormParam>();
         for (StormParam param : params) {
-                if (Unit.canConvert(param.getUnit(), CommonUnit.meter)) {
+            if (Unit.canConvert(param.getUnit(), CommonUnit.meter)) {
 
-                     attrNames.add(param);
-                }
-
+                attrNames.add(param);
             }
+
+        }
         return attrNames;
     }
 
@@ -534,17 +599,17 @@ public class StormDisplayState {
 
 
 
-        List<StormParam> forecastParams     = new ArrayList<StormParam>();
-        Hashtable        seenParams = new Hashtable();
-        List<StormParam> obsParams     = new ArrayList<StormParam>();
-        Hashtable        seenWays   = new Hashtable();
+        List<StormParam> forecastParams = new ArrayList<StormParam>();
+        Hashtable        seenParams     = new Hashtable();
+        List<StormParam> obsParams      = new ArrayList<StormParam>();
+        Hashtable        seenWays       = new Hashtable();
         for (StormTrack track : trackCollection.getTracks()) {
             //            if (seenWays.get(track.getWay()) != null) {
             //                continue;
             //            }
             //            seenWays.put(track.getWay(), track.getWay());
             List<StormParam> trackParams = track.getParams();
-            if(track.getWay().isObservation()){
+            if (track.getWay().isObservation()) {
                 obsParams.addAll(trackParams);
                 continue;
             }
@@ -557,16 +622,17 @@ public class StormDisplayState {
             }
         }
 
-        List<StormParam> forecastRadiusParams = getDistanceParams(forecastParams);
+        List<StormParam> forecastRadiusParams =
+            getDistanceParams(forecastParams);
         List<StormParam> obsRadiusParams = getDistanceParams(obsParams);
 
 
         //Sort them by name
 
-        List<Way> ways             = Misc.sort(trackCollection.getWayList());
-        boolean   haveDoneForecast = false;
-        List<String> colLabels = (List<String>)Misc.newList("","","Track");
-        if(forecastRadiusParams!=null ||obsRadiusParams != null ) {
+        List<Way>    ways = Misc.sort(trackCollection.getWayList());
+        boolean      haveDoneForecast = false;
+        List<String> colLabels = (List<String>) Misc.newList("", "", "Track");
+        if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
             colLabels.add("Cone");
             colLabels.add("Rings");
         }
@@ -576,18 +642,19 @@ public class StormDisplayState {
         List paramComps = new ArrayList();
         paramComps.add(new JLabel(""));
         paramComps.add(new JLabel("<html><u><i>Color By</i></u></html>"));
-        if(forecastRadiusParams != null || obsRadiusParams != null ) {
+        if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
             paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
             paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
         }
 
-        List obsColorParams = new ArrayList(obsParams);
+        List obsColorParams      = new ArrayList(obsParams);
         List forecastColorParams = new ArrayList(forecastParams);
         obsColorParams.add(0, "Fixed");
         forecastColorParams.add(0, "Fixed");
 
-        JComponent obsColorByBox      = makeBox(obsColorParams,ID_OBS_COLOR);
-        JComponent forecastColorByBox      = makeBox(forecastColorParams,ID_FORECAST_COLOR);
+        JComponent obsColorByBox = makeBox(obsColorParams, ID_OBS_COLOR);
+        JComponent forecastColorByBox = makeBox(forecastColorParams,
+                                            ID_FORECAST_COLOR);
 
 
         paramComps.add(
@@ -595,9 +662,10 @@ public class StormDisplayState {
                 GuiUtils.inset(
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(obsColorByBox));
-        if(obsRadiusParams != null) {
+        if (obsRadiusParams != null) {
             paramComps.add(makeList(obsRadiusParams, ID_OBS_CONE));
-            paramComps.add(GuiUtils.top(makeBox(obsRadiusParams, ID_OBS_RINGS)));
+            paramComps.add(GuiUtils.top(makeBox(obsRadiusParams,
+                    ID_OBS_RINGS)));
         } else {
             paramComps.add(GuiUtils.filler());
             paramComps.add(GuiUtils.filler());
@@ -605,12 +673,13 @@ public class StormDisplayState {
 
 
         paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
-                                                   new Insets(4, 0, 0, 0))));
+                new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(forecastColorByBox));
 
-        if(forecastRadiusParams != null) {
+        if (forecastRadiusParams != null) {
             paramComps.add(makeList(forecastRadiusParams, ID_FORECAST_CONE));
-            paramComps.add(GuiUtils.top(makeBox(forecastRadiusParams, ID_FORECAST_RINGS)));
+            paramComps.add(GuiUtils.top(makeBox(forecastRadiusParams,
+                    ID_FORECAST_RINGS)));
         } else {
             paramComps.add(GuiUtils.filler());
             paramComps.add(GuiUtils.filler());
@@ -628,17 +697,18 @@ public class StormDisplayState {
             if ( !stormTrackControl.okToShowWay(wds.getWay())) {
                 continue;
             }
-            JComponent labelComp = GuiUtils.hbox(
-                                                 wds.getWayState().getCheckBox(this), new JLabel(way.toString()));
+            JComponent labelComp =
+                GuiUtils.hbox(wds.getWayState().getCheckBox(this),
+                              new JLabel(way.toString()));
 
             JComponent swatch = GuiUtils.wrap(wds.getColorSwatch());
             if (way.isObservation()) {
                 //We put the obs in the front of the list
                 int col = 0;
                 comps.add(col++, swatch);
-                comps.add(col++,labelComp);
+                comps.add(col++, labelComp);
                 comps.add(col++, wds.getTrackState().getCheckBox(this));
-                if(obsRadiusParams != null) {
+                if (obsRadiusParams != null) {
                     comps.add(col++, wds.getConeState().getCheckBox(this));
                     comps.add(col++, wds.getRingsState().getCheckBox(this));
                 }
@@ -659,17 +729,17 @@ public class StormDisplayState {
                             GuiUtils.lLabel("Forecasts:")));
                     comps.add(
                         forecastState.getTrackState().getCheckBox(this));
-                    if(forecastRadiusParams!=null) {
+                    if (forecastRadiusParams != null) {
                         comps.add(
-                                       forecastState.getConeState().getCheckBox(this));
+                            forecastState.getConeState().getCheckBox(this));
                         comps.add(
-                                       forecastState.getRingsState().getCheckBox(this));
+                            forecastState.getRingsState().getCheckBox(this));
                     }
                 }
                 comps.add(swatch);
                 comps.add(labelComp);
                 comps.add(wds.getTrackState().getCheckBox(this));
-                if(forecastRadiusParams !=null) {
+                if (forecastRadiusParams != null) {
                     comps.add(wds.getConeState().getCheckBox(this));
                     comps.add(wds.getRingsState().getCheckBox(this));
                 }
@@ -680,8 +750,7 @@ public class StormDisplayState {
             String s = colLabels.get(colIdx);
             if (s.length() > 0) {
                 comps.add(colIdx,
-                               new JLabel("<html><u><i>" + s
-                                          + "</i></u></html>"));
+                          new JLabel("<html><u><i>" + s + "</i></u></html>"));
             } else {
                 comps.add(colIdx, new JLabel(""));
             }
@@ -707,7 +776,7 @@ public class StormDisplayState {
                 GuiUtils.filler(2, 10), GuiUtils.lLabel("Visibility:"),
                 GuiUtils.left(wayComp)));
 
-        wayComp    = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
+        wayComp = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
         //        tabbedPane = GuiUtils.getNestedTabbedPane();
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Tracks", wayComp);
@@ -806,6 +875,7 @@ public class StormDisplayState {
                 boolean wasActive = displayMaster.ensureInactive();
                 try {
                     synchronized (MUTEX) {
+                        stormTrackControl.showWaitCursor();
                         showStormInner();
                         stormTrackControl.stormChanged(
                             StormDisplayState.this);
@@ -813,6 +883,7 @@ public class StormDisplayState {
                 } catch (Exception exc) {
                     stormTrackControl.logException("Showing storm", exc);
                 } finally {
+                    stormTrackControl.showNormalCursor();
                     if (wasActive) {
                         try {
                             displayMaster.setActive(true);
@@ -868,6 +939,7 @@ public class StormDisplayState {
             mainContents.invalidate();
             mainContents.validate();
             mainContents.repaint();
+
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
                     stormInfo, stormTrackControl.getOkWays());
@@ -881,9 +953,9 @@ public class StormDisplayState {
                 wayDisplayState.addTrack(track);
             }
             obsDisplayState = getWayDisplayState(Way.OBSERVATION);
-            StormTrack obsTrack = trackCollection.getObsTrack();
+            StormTrack     obsTrack = trackCollection.getObsTrack();
 
-            List<DateTime> times = new ArrayList<DateTime>();
+            List<DateTime> times    = new ArrayList<DateTime>();
             if (obsTrack != null) {
                 times = obsTrack.getTrackTimes();
             } else {
@@ -891,8 +963,8 @@ public class StormDisplayState {
                     times.add(track.getStartTime());
                 }
             }
-            if(times.size()>0) {
-                times = (List<DateTime>)Misc.sort(Misc.makeUnique(times));
+            if (times.size() > 0) {
+                times = (List<DateTime>) Misc.sort(Misc.makeUnique(times));
                 timesHolder = new LineDrawing("track_time"
                         + stormInfo.getStormId());
                 timesHolder.setManipulable(false);
@@ -955,9 +1027,9 @@ public class StormDisplayState {
      */
     protected StormParam getRingsParam(WayDisplayState way) {
         if (way.getWay().isObservation()) {
-            return (StormParam)params.get(ID_OBS_RINGS);
+            return (StormParam) params.get(ID_OBS_RINGS);
         }
-        return (StormParam)params.get(ID_FORECAST_RINGS);
+        return (StormParam) params.get(ID_FORECAST_RINGS);
     }
 
 
@@ -971,9 +1043,9 @@ public class StormDisplayState {
      */
     protected StormParam getColorParam(WayDisplayState way) {
         if (way.getWay().isObservation()) {
-            return (StormParam)params.get(ID_OBS_COLOR);
+            return (StormParam) params.get(ID_OBS_COLOR);
         }
-        return (StormParam)params.get(ID_FORECAST_COLOR);
+        return (StormParam) params.get(ID_FORECAST_COLOR);
     }
 
 
@@ -1000,9 +1072,8 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     protected void updateDisplays() throws Exception {
-        DisplayMaster displayMaster =
-            stormTrackControl.getDisplayMaster();
-        boolean wasActive = displayMaster.ensureInactive();
+        DisplayMaster displayMaster = stormTrackControl.getDisplayMaster();
+        boolean       wasActive     = displayMaster.ensureInactive();
         try {
             List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
             for (WayDisplayState wds : wayDisplayStates) {
@@ -1075,45 +1146,47 @@ public class StormDisplayState {
     //        ucar.visad.Util.makeTimeField(List<Data> ranges, List times)
 
     /**
-         Animation animation = stormTrackControl.getAnimation();
-         if (animation == null) {
-            return;
-        }
-        List<StormTrack> visibleTracks = new ArrayList<StormTrack>();
-        Real currentAnimationTime = animation.getAniValue();
-       if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
-            return;
-        }
-       Iterate way display states
-         boolean             visible = false;
-         if(wds.shouldShowTrack() && wds.hasTrackDisplay()) {
-         FieldImpl field = (FieldImplt)wds.getTrackDisplay().getData()
-         if(field==null) continue;
-         Set timeSet = GridUtil.getTimeSet();
-         if(timeSet == null) continue;
-         if (timeSet.getLength() == 1) {
-            visible = true;
-        } else {
-            //Else work the visad magic
-            float timeValueFloat = (float) currentAnimationTime.getValue(
-                                       timeSet.getSetUnits()[0]);
-            //            System.err.println("multiple times:" + timeValueFloat);
-            float[][] value = {
-                { timeValueFloat }
-            };
-            int[]     index = timeSet.valueToIndex(value);
-            //            System.err.println("index:" + index[0]);
-            visible = (index[0] >= 0);
-        }
-        if(visible) {
-        //Find the closest track in wds in time
-             visibleTracks.add(..);
-        }
-        }
-
-
-        Now search in space
-     **/
+     *    Animation animation = stormTrackControl.getAnimation();
+     *    if (animation == null) {
+     *       return;
+     *   }
+     *   List<StormTrack> visibleTracks = new ArrayList<StormTrack>();
+     *   Real currentAnimationTime = animation.getAniValue();
+     *  if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
+     *       return;
+     *   }
+     *  Iterate way display states
+     *    boolean             visible = false;
+     *    if(wds.shouldShowTrack() && wds.hasTrackDisplay()) {
+     *    FieldImpl field = (FieldImplt)wds.getTrackDisplay().getData()
+     *    if(field==null) continue;
+     *    Set timeSet = GridUtil.getTimeSet();
+     *    if(timeSet == null) continue;
+     *    if (timeSet.getLength() == 1) {
+     *       visible = true;
+     *   } else {
+     *       //Else work the visad magic
+     *       float timeValueFloat = (float) currentAnimationTime.getValue(
+     *                                  timeSet.getSetUnits()[0]);
+     *       //            System.err.println("multiple times:" + timeValueFloat);
+     *       float[][] value = {
+     *           { timeValueFloat }
+     *       };
+     *       int[]     index = timeSet.valueToIndex(value);
+     *       //            System.err.println("index:" + index[0]);
+     *       visible = (index[0] >= 0);
+     *   }
+     *   if(visible) {
+     *   //Find the closest track in wds in time
+     *        visibleTracks.add(..);
+     *   }
+     *   }
+     *
+     *
+     *   Now search in space
+     *
+     * @param stormTrackChart _more_
+     */
 
 
 
@@ -1207,15 +1280,12 @@ public class StormDisplayState {
      */
     public void writeToXls() {
         try {
-            JCheckBox obsCbx = new JCheckBox("Observation",
-                                               true);
+            JCheckBox obsCbx      = new JCheckBox("Observation", true);
             JCheckBox forecastCbx = new JCheckBox("Forecast", true);
-            JCheckBox mostRecentCbx =
-                new JCheckBox("Most Recent Forecasts", false);
-            JComponent accessory =
-                GuiUtils.top(GuiUtils.vbox(obsCbx,
-                                           forecastCbx,
-                                           mostRecentCbx));
+            JCheckBox mostRecentCbx = new JCheckBox("Most Recent Forecasts",
+                                          false);
+            JComponent accessory = GuiUtils.top(GuiUtils.vbox(obsCbx,
+                                       forecastCbx, mostRecentCbx));
 
             String filename = FileManager.getWriteFile(
                                   Misc.newList(FileManager.FILTER_XLS),
@@ -1314,12 +1384,11 @@ public class StormDisplayState {
                 }
             }
             row = sheet.createRow((short) rowCnt++);
-            row.createCell((short) 0).setCellValue(
-                stp.getTrackPointTime().toString());
+            row.createCell((short) 0).setCellValue(stp.getTime().toString());
             row.createCell((short) 1).setCellValue(
-                stp.getTrackPointLocation().getLatitude().getValue());
+                stp.getLocation().getLatitude().getValue());
             row.createCell((short) 2).setCellValue(
-                stp.getTrackPointLocation().getLongitude().getValue());
+                stp.getLocation().getLongitude().getValue());
             for (int colIdx = 0; colIdx < params.size(); colIdx++) {
                 Real r = stp.getAttribute(params.get(colIdx));
                 cell = row.createCell((short) (colIdx + 3));
@@ -1330,44 +1399,23 @@ public class StormDisplayState {
 
 
 
-    private JCheckBox obsCbx;
-    private JCheckBox forecastCbx;
-    private JCheckBox mostRecentCbx;
 
 
     /**
      * _more_
+     *
+     * @param docNode _more_
+     * @param state _more_
+     * @param doObs _more_
+     * @param doForecast _more_
+     * @param mostRecent _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public void writeToGE() {
-        if(obsCbx==null) {
-            obsCbx = new JCheckBox("Observation",  true);
-            forecastCbx = new JCheckBox("Forecast", true);
-            mostRecentCbx =
-                new JCheckBox("Most Recent Forecasts", false);
-        }
-        JComponent accessory =
-            GuiUtils.top(GuiUtils.vbox(obsCbx,
-                                       forecastCbx,
-                                       mostRecentCbx));
-
-            String filename = FileManager.getWriteFile(
-                                  Misc.newList(FileManager.FILTER_KML),
-                                  FileManager.SUFFIX_KML, accessory);
-            if (filename == null) {
-                return;
-            }
-
-            try {
-            writeToGE(filename, obsCbx.isSelected(),
-                      forecastCbx.isSelected(),
-                      mostRecentCbx.isSelected());
-        } catch (Exception exc) {
-            stormTrackControl.logException("Writing KML", exc);
-        }
-        }
-
-
-    public void writeToGE(String filename, boolean doObs, boolean doForecast, boolean mostRecent) throws VisADException, RemoteException  {
+    public void writeToKml(Element docNode, Hashtable state, boolean doObs,
+                           boolean doForecast, boolean mostRecent)
+            throws VisADException, RemoteException {
         try {
             List<Way>            waysToUse = new ArrayList<Way>();
             Hashtable<Way, List> trackMap  = new Hashtable<Way, List>();
@@ -1381,17 +1429,13 @@ public class StormDisplayState {
                 tracks.add(track);
             }
 
-            Element kmlNode = KmlUtil.kml("");
-            Element docNode = KmlUtil.document(kmlNode,"");
-            Hashtable state = new Hashtable();
-            
-            KmlUtil.iconstyle(docNode,"hurricaneicon","http://www.unidata.ucar.edu/software/idv/kml/images/hurricane.png");
-
-
-            Element topFolder = KmlUtil.folder(docNode, "Storm: " + stormInfo.toString() + "   "
-                                       + stormInfo.getStartTime().formattedString("yyyy-MM-dd",
-                                                                                  DateUtil.TIMEZONE_GMT));
-            StormTrack   obsTrack   = trackCollection.getObsTrack();
+            Element topFolder =
+                KmlUtil.folder(
+                    docNode,
+                    "Storm: " + stormInfo.toString() + "   "
+                    + stormInfo.getStartTime().formattedString(
+                        "yyyy-MM-dd", DateUtil.TIMEZONE_GMT));
+            StormTrack obsTrack = trackCollection.getObsTrack();
             //Write the obs track first
             if ((obsTrack != null) && doObs) {
                 Element obsFolder = KmlUtil.folder(topFolder, "Observation");
@@ -1403,11 +1447,14 @@ public class StormDisplayState {
                     if (way.isObservation()) {
                         continue;
                     }
-                    Element wayNode = KmlUtil.folder(topFolder, stormTrackControl.getWayName() +": " + way);
+                    Element wayNode = KmlUtil.folder(topFolder,
+                                          stormTrackControl.getWayName()
+                                          + ": " + way);
                     List<StormTrack> tracks =
                         (List<StormTrack>) Misc.sort(trackMap.get(way));
                     if (mostRecent) {
-                        writeToGE(docNode, state, wayNode,tracks.get(tracks.size() - 1));
+                        writeToGE(docNode, state, wayNode,
+                                  tracks.get(tracks.size() - 1));
                     } else {
                         for (StormTrack track : tracks) {
                             writeToGE(docNode, state, wayNode, track);
@@ -1415,8 +1462,7 @@ public class StormDisplayState {
                     }
                 }
             }
-            FileOutputStream fileOut = new FileOutputStream(filename);
-            IOUtil.writeBytes(new File(filename), XmlUtil.toString(kmlNode).getBytes());
+
         } catch (Exception exc) {
             stormTrackControl.logException("Writing KML", exc);
         }
@@ -1426,36 +1472,45 @@ public class StormDisplayState {
     /**
      * _more_
      *
+     *
+     * @param docNode _more_
+     * @param state _more_
      * @param parent _more_
      * @param track _more_
-
+     *
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    protected void writeToGE(Element docNode, Hashtable state, Element parent, StormTrack track) throws VisADException, RemoteException {
-        Element placemark = KmlUtil.placemark(parent,"Track","<html>" + stormTrackControl.getWayName()+":" +
-                                              track.getWay() +"<br>" +
-                                              ""+track.getStartTime()+
-                                              "</html>");
+    protected void writeToGE(Element docNode, Hashtable state,
+                             Element parent, StormTrack track)
+            throws VisADException, RemoteException {
+        Element placemark = KmlUtil.placemark(parent, "Track",
+                                "<html>" + stormTrackControl.getWayName()
+                                + ":" + track.getWay() + "<br>" + ""
+                                + track.getStartTime() + "</html>");
 
         int cnt = 0;
         String dateString =
             track.getStartTime().formattedString("yyyy-MM-dd hhmm",
                 DateUtil.TIMEZONE_GMT);
-        String sheetName = track.getWay() + " - " + dateString;
-        int              rowCnt = 0;
-        List<StormParam> params = track.getParams();
-        StringBuffer sb = new StringBuffer();
+        String           sheetName = track.getWay() + " - " + dateString;
+        int              rowCnt    = 0;
+        List<StormParam> params    = track.getParams();
+        StringBuffer     sb        = new StringBuffer();
         for (StormTrackPoint stp : track.getTrackPoints()) {
-            EarthLocation el = stp.getTrackPointLocation();
-            if(track.getWay().isObservation()) {
-                Element icon = KmlUtil.placemark(parent, "Time:" + stp.getTrackPointTime(),
-                                                 "<html><table>" +
-                                                 stormTrackControl.formatStormTrackPoint(track, stp) +
-                                                 "</table></html>",
-                                                 el,"#hurricaneicon");
-                KmlUtil.timestamp(icon, stp.getTrackPointTime());
+            EarthLocation el = stp.getLocation();
+            if (track.getWay().isObservation()) {
+                Element icon = KmlUtil.placemark(
+                                   parent, "Time:" + stp.getTime(),
+                                   "<html><table>"
+                                   + stormTrackControl.formatStormTrackPoint(
+                                       track, stp) + "</table></html>", el,
+                                           "#hurricaneicon");
+                KmlUtil.timestamp(icon, stp.getTime());
             }
 
-            sb.append(el.getLongitude().getValue());      
+            sb.append(el.getLongitude().getValue());
             sb.append(",");
             sb.append(el.getLatitude().getValue());
             sb.append(",");
@@ -1463,20 +1518,24 @@ public class StormDisplayState {
             sb.append("\n");
         }
 
-        String styleUrl = "linestyle"+track.getWay();
-        if(state.get(styleUrl)==null) {
-            Element style = KmlUtil.linestyle(docNode,styleUrl,getWayDisplayState(track.getWay()).getColor(),
-                                              track.getWay().isObservation()?3:2);
+        String styleUrl = "linestyle" + track.getWay();
+        if (state.get(styleUrl) == null) {
+            Element style =
+                KmlUtil.linestyle(
+                    docNode, styleUrl,
+                    getWayDisplayState(track.getWay()).getColor(),
+                    track.getWay().isObservation()
+                    ? 3
+                    : 2);
             state.put(styleUrl, style);
         }
-        KmlUtil.styleurl(placemark,"#"+ styleUrl);
-        Element linestring = KmlUtil.linestring(placemark, false, false, sb.toString());
+        KmlUtil.styleurl(placemark, "#" + styleUrl);
+        Element linestring = KmlUtil.linestring(placemark, false, false,
+                                 sb.toString());
         //        KmlUtil.timestamp(linestring, track.getStartTime());
-        if(!track.getWay().isObservation()) {
+        if ( !track.getWay().isObservation()) {
             KmlUtil.timestamp(placemark, track.getStartTime());
-        } else {
-
-        }
+        } else {}
     }
 
 

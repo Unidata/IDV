@@ -20,13 +20,14 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.storm;
+
+
 import ucar.unidata.util.LogUtil;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -39,19 +40,39 @@ import javax.swing.event.*;
 
 public class DisplayState {
 
+    /** _more_          */
     private JCheckBox cbx;
+
+    /** _more_          */
     private boolean visible;
+
+    /** _more_          */
     private String name;
 
-    public DisplayState() {
-    }
+    /**
+     * _more_
+     */
+    public DisplayState() {}
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param visible _more_
+     */
     public DisplayState(String name, boolean visible) {
-        this.name = name;
+        this.name    = name;
         this.visible = visible;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param stormDisplayState _more_
+     *
+     * @return _more_
+     */
     public JCheckBox getCheckBox(final StormDisplayState stormDisplayState) {
         if (cbx == null) {
             cbx = new JCheckBox("", getVisible());
@@ -73,41 +94,41 @@ public class DisplayState {
 
 
 
-/**
-Set the Visible property.
+    /**
+     * Set the Visible property.
+     *
+     * @param value The new value for Visible
+     */
+    public void setVisible(boolean value) {
+        visible = value;
+    }
 
-@param value The new value for Visible
-**/
-public void setVisible (boolean value) {
-	visible = value;
-}
+    /**
+     * Get the Visible property.
+     *
+     * @return The Visible
+     */
+    public boolean getVisible() {
+        return visible;
+    }
 
-/**
-Get the Visible property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@return The Visible
-**/
-public boolean getVisible () {
-	return visible;
-}
-
-/**
-Set the Name property.
-
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
-
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
 
 }

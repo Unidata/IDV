@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -153,7 +149,7 @@ public class StormTrackChart {
     /** _more_ */
     private DateTime forecastTime;
 
-    /** _more_          */
+    /** _more_ */
     private int forecastHour = 0;
 
     /** _more_ */
@@ -765,8 +761,7 @@ public class StormTrackChart {
                 for (Way way : chartWays) {
                     List<StormTrack> tracksFromWay = wayToTracks.get(way);
                     for (StormTrack track : tracksFromWay) {
-                        if (Misc.equals(forecastTime,
-                                        track.getStartTime())) {
+                        if (Misc.equals(forecastTime, track.getStartTime())) {
                             tracksToUse.add(track);
                         }
                     }

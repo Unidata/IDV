@@ -4,19 +4,31 @@ The problem is that if you are comparing different forecast tracks based on colo
 for each. We need to either take the min/max values of all tracks or perhaps have parameter names for the StormParams
 and use the DisplayConvention to find the default range.
 
+
 There are still some occasional time animation problems. This is where our Animation Displayable and AnimationWidget have the correct set of times but the visad.Animation control time set has been set by the scalar map because it ignores the flag on the control that says don't calculate the time set.
 This is a race condition in that it only happens occasionally.
+
 
 Also -Yuan saw some funny behavior with the forecast tracks and maybe not picking up the right on in time. We need to make sure that what we show is the right time, etc.
 
 
+
+DONE: 
 The kml generation should be moved to the TrackControl and all of the active storms should be generated - not just the current storm.
 Also - when the user selects a full years worth of storms to show those tracks should also get put into the kml.
 
+
+
 We should have a user selectable station model for the obs points instead of the one we generate.
 
+DONE: 
 We need to calculate the spatial bounds to make a projection for the "Use projection from data"
+
 
 Add a user preference dialog for selecting what parameters are of interest. This is especially useful for the tabular displays where we end up having 20 columns of attributes.
 
+
+
+DONE:
 When loading lots of files through the ATCF data source (e.g., when loading a years worth of obs) the ftp server breaks the connection - as though its throttling back.
+Note - This still happens but we handle the error better

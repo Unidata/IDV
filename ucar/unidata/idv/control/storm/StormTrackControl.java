@@ -20,29 +20,37 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.storm;
 
 
-import ucar.unidata.data.DataChoice;
+import org.w3c.dom.*;
 
+
+import ucar.unidata.data.*;
+import ucar.unidata.data.DataUtil;
+
+import ucar.unidata.data.gis.KmlUtil;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.*;
 import ucar.unidata.data.storm.*;
+
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
-import ucar.unidata.data.DataUtil;
-import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.Util;
 
@@ -52,8 +60,12 @@ import visad.*;
 import visad.Set;
 
 import visad.georef.EarthLocation;
+import visad.georef.MapProjection;
 
 import java.awt.*;
+import java.awt.event.*;
+
+import java.io.*;
 
 import java.rmi.RemoteException;
 
@@ -61,6 +73,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -74,14 +87,14 @@ import javax.swing.*;
 public class StormTrackControl extends DisplayControlImpl {
 
 
-    /** _more_          */
+    /** _more_ */
     private final static String PREF_STORMDISPLAYSTATE =
         "pref.stormdisplaystate";
 
-    /** _more_          */
+    /** _more_ */
     private final static String PREF_OKWAYS = "pref.okways";
 
-    /** _more_          */
+    /** _more_ */
     private final static String PREF_OKPARAMS = "pref.okparams";
 
     /** _more_ */
@@ -99,9 +112,10 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /** _more_          */
     private StormDisplayState localStormDisplayState;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable preferences;
 
 
@@ -144,7 +158,28 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private TreePanel treePanel;
 
-    private Hashtable<Integer,JComponent> yearToComponent = new Hashtable<Integer,JComponent>();
+    /** _more_          */
+    private Hashtable<Integer, JComponent> yearToComponent =
+        new Hashtable<Integer, JComponent>();
+
+
+    /** _more_          */
+    private Hashtable yearData = new Hashtable();
+
+    /** _more_          */
+    private TrackDisplayable yearTrackDisplay;
+
+    /** _more_          */
+    private StationModelDisplayable yearLabelDisplay;
+
+    /** _more_          */
+    private List<Integer> yearList = new ArrayList<Integer>();
+
+    /** _more_          */
+    private List<StormTrack> yearTracks = new ArrayList<StormTrack>();
+
+
+
     /**
      * Create a new Track Control; set the attribute flags
      */
@@ -230,12 +265,12 @@ public class StormTrackControl extends DisplayControlImpl {
     protected FieldImpl makeTrackField(StormTrack track, StormParam param)
             throws Exception {
 
-        List<StormTrackPoint> points =  track.getTrackPoints();
-        int                 numPoints = points.size();
-        Unit                timeUnit  = points.get(0).getTrackPointTime().getUnit();
+        List<StormTrackPoint> points    = track.getTrackPoints();
+        int                   numPoints = points.size();
+        Unit                  timeUnit  = points.get(0).getTime().getUnit();
 
         RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
-        Real                dfltReal  = new Real(dfltRealType, 1);
+        Real                  dfltReal  = new Real(dfltRealType, 1);
 
         RealType timeType =
             RealType.getRealType(DataUtil.cleanName("track_time" + cnt + "_"
@@ -249,10 +284,10 @@ public class StormTrackControl extends DisplayControlImpl {
                                       ? null
                                       : track.getTrackAttributeValues(param));
         for (int pointIdx = 0; pointIdx < numPoints; pointIdx++) {
-            StormTrackPoint stp = points.get(pointIdx);
-            Real value = ((values == null)
-                          ? dfltReal
-                          : values[pointIdx]);
+            StormTrackPoint stp   = points.get(pointIdx);
+            Real            value = ((values == null)
+                                     ? dfltReal
+                                     : values[pointIdx]);
             //Set the dflt so we can use its unit later
             dfltReal = value;
             if (rangeType == null) {
@@ -260,14 +295,14 @@ public class StormTrackControl extends DisplayControlImpl {
                     new RealTupleType(RealType.getRealType("trackrange_"
                         + cnt, value.getUnit()), timeType);
             }
-            DateTime      dateTime = stp.getTrackPointTime();
-            EarthLocation el       = stp.getTrackPointLocation();
+            DateTime      dateTime = stp.getTime();
+            EarthLocation el       = stp.getLocation();
             newRangeVals[0][pointIdx] = value.getValue();
             newRangeVals[1][pointIdx] = dateTime.getValue();
             lats[pointIdx]            = (float) el.getLatitude().getValue();
             lons[pointIdx]            = (float) el.getLongitude().getValue();
             //            System.err.println("\tpt:" + el + " " + dateTime);
-            alts[pointIdx]            = 1;
+            alts[pointIdx] = 1;
             //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
         }
         GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
@@ -390,8 +425,12 @@ public class StormTrackControl extends DisplayControlImpl {
      * @return _more_
      */
     public StormDisplayState getCurrentStormDisplayState() {
-        if(localStormDisplayState!=null)  return localStormDisplayState;
-        if(treePanel == null) return null;
+        if (localStormDisplayState != null) {
+            return localStormDisplayState;
+        }
+        if (treePanel == null) {
+            return null;
+        }
 
         Component comp = treePanel.getVisibleComponent();
         if (comp == null) {
@@ -451,8 +490,9 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param stormDisplayState _more_
      */
     public void viewStorm(StormDisplayState stormDisplayState) {
-        if(treePanel != null)
+        if (treePanel != null) {
             treePanel.show(stormDisplayState.getContents());
+        }
     }
 
     /**
@@ -482,9 +522,9 @@ public class StormTrackControl extends DisplayControlImpl {
             items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,
                                             "writeToXls"));
 
-            items.add(GuiUtils.makeMenuItem("Export to Google Earth", current,
-                                            "writeToGE"));
         }
+        items.add(GuiUtils.makeMenuItem("Export to Google Earth", this,
+                                        "writeToKml"));
         super.getSaveMenuItems(items, forMenuBar);
     }
 
@@ -598,7 +638,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @return _more_
      */
     public String getWayName() {
-        return "Way";
+        return stormDataSource.getWayName();
     }
 
     /**
@@ -607,8 +647,89 @@ public class StormTrackControl extends DisplayControlImpl {
      * @return _more_
      */
     public String getWaysName() {
-        return "Ways";
+        return stormDataSource.getWaysName();
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected String getDataProjectionLabel() {
+        return "Use Projection From Tracks";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public MapProjection getDataProjection() {
+        return null;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasMapProjection() {
+        return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public MapProjection getDataProjectionForMenu() {
+        try {
+            double minLon = Double.POSITIVE_INFINITY;
+            double maxLon = Double.NEGATIVE_INFINITY;
+            double minLat = Double.POSITIVE_INFINITY;
+            double maxLat = Double.NEGATIVE_INFINITY;
+            List<StormDisplayState> stormDisplayStates =
+                getStormDisplayStates();
+            boolean didone = false;
+            for (StormDisplayState stormDisplayState : getActiveStorms()) {
+                LatLonRect bbox = stormDisplayState.getBoundingBox();
+                if (bbox == null) {
+                    continue;
+                }
+                minLon = Math.min(minLon, bbox.getLonMin());
+                maxLon = Math.max(maxLon, bbox.getLonMax());
+                minLat = Math.min(minLat, bbox.getLatMin());
+                maxLat = Math.max(maxLat, bbox.getLatMax());
+                didone = true;
+            }
+
+            for (StormTrack track : yearTracks) {
+                LatLonRect bbox = track.getBoundingBox();
+                if (bbox == null) {
+                    continue;
+                }
+                minLon = Math.min(minLon, bbox.getLonMin());
+                maxLon = Math.max(maxLon, bbox.getLonMax());
+                minLat = Math.min(minLat, bbox.getLatMin());
+                maxLat = Math.max(maxLat, bbox.getLatMax());
+                didone = true;
+
+            }
+
+
+            if ( !didone) {
+                return null;
+            }
+            return ucar.visad.Util.makeMapProjection(minLat, minLon, maxLat,
+                    maxLon);
+        } catch (Exception exc) {
+            logException("Error making projection from tracks", exc);
+            return null;
+        }
+
+    }
+
 
 
     /**
@@ -766,32 +887,49 @@ public class StormTrackControl extends DisplayControlImpl {
                     stormDisplayStateMap.get(key);
                 stormDisplayState.setStormTrackControl(this);
                 stormDisplayState.initDone();
+
+                MapProjection mapProjection = getDataProjectionForMenu();
+                if (mapProjection != null) {
+                    MapViewManager mvm = getMapViewManager();
+                    if (mvm != null) {
+                        mvm.setMapProjection(
+                            mapProjection, true,
+                            getDisplayConventions().getMapProjectionLabel(
+                                mapProjection, this), true);
+                    }
+                }
+
             }
         } catch (Exception exc) {
             logException("Setting new storm info", exc);
         }
-        if(yearList.size()>0) {
+        if (yearList.size() > 0) {
             loadYears();
         }
     }
 
 
 
-    private Hashtable yearData = new Hashtable();
-    private TrackDisplayable yearTrackDisplay;
-    private StationModelDisplayable yearLabelDisplay;
-    private List<Integer> yearList = new ArrayList<Integer>();
 
 
+
+    /**
+     * _more_
+     *
+     * @param y _more_
+     */
     public void removeYear(Integer y) {
-        if(!yearList.contains(y)) return;
+        if ( !yearList.contains(y)) {
+            return;
+        }
         yearList.remove(y);
         final JComponent yearComponent = yearToComponent.get(y);
-        if(yearComponent!=null) {
+        if (yearComponent != null) {
             yearComponent.removeAll();
-            yearComponent.add(BorderLayout.CENTER,
-                              GuiUtils.topLeft(
-                                               GuiUtils.makeButton("Load Year", this, "loadYear", y)));
+            yearComponent.add(
+                BorderLayout.CENTER,
+                GuiUtils.topLeft(
+                    GuiUtils.makeButton("Load Year", this, "loadYear", y)));
             yearComponent.invalidate();
             yearComponent.validate();
             yearComponent.repaint();
@@ -799,76 +937,170 @@ public class StormTrackControl extends DisplayControlImpl {
         loadYears();
     }
 
-    public void loadYear(Integer y) {
-        if(yearList.contains(y)) return;
+
+    /**
+     * _more_
+     *
+     * @param y _more_
+     */
+    public void loadYear(final Integer y) {
+        Misc.run(new Runnable() {
+            public void run() {
+                loadYearInner(y);
+            }
+        });
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param y _more_
+     */
+    private void loadYearInner(Integer y) {
+        if (yearList.contains(y)) {
+            return;
+        }
         yearList.add(y);
-        final JComponent yearComponent = yearToComponent.get(y);
-        if(yearComponent!=null) {
+        final JComponent yearComponent  = yearToComponent.get(y);
+        JLabel           label          = new JLabel();
+        JComponent       errorComponent = new JPanel(new BorderLayout());
+        if (yearComponent != null) {
             yearComponent.removeAll();
             yearComponent.add(BorderLayout.CENTER,
-                              GuiUtils.topLeft(
-                                               GuiUtils.makeButton("Remove Year", this, "removeYear", y)));
+                              GuiUtils.top(GuiUtils.vbox(label,
+                                  errorComponent)));
             yearComponent.invalidate();
             yearComponent.validate();
             yearComponent.repaint();
         }
-        loadYears();
+        loadYearsInner(label, errorComponent);
+
+        if (yearComponent != null) {
+            yearComponent.removeAll();
+            yearComponent.add(
+                BorderLayout.CENTER,
+                GuiUtils.topLeft(
+                    GuiUtils.makeButton(
+                        "Remove Year", this, "removeYear", y)));
+            yearComponent.invalidate();
+            yearComponent.validate();
+            yearComponent.repaint();
+        }
+
+
     }
 
 
+    /**
+     * _more_
+     */
     public void loadYears() {
         Misc.run(new Runnable() {
-                public void run() {
-                    loadYearsInner();
-                }
-            });
+            public void run() {
+                loadYearsInner(null, null);
+            }
+        });
     }
 
 
-    private void loadYearsInner() {
+
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param errorComponent _more_
+     */
+    private void loadYearsInner(JLabel label, JComponent errorComponent) {
+
+        String currentMessage = "";
+
         try {
-            JLabel label = new JLabel();
-            GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+            GregorianCalendar cal =
+                new GregorianCalendar(DateUtil.TIMEZONE_GMT);
             //Go in reverse order so we get the latest first
             List fields = new ArrayList();
             List times  = new ArrayList();
-            Hashtable<String, Boolean> obsWays  = new Hashtable<String, Boolean>();
+            Hashtable<String, Boolean> obsWays = new Hashtable<String,
+                                                     Boolean>();
             obsWays.put(Way.OBSERVATION.toString(), new Boolean(true));
-            List<PointOb> pointObs = new     ArrayList<PointOb>();
-            TextType textType = TextType.getTextType("ID");
-            for(Integer y: yearList) {
-                int year   = y.intValue();
+            List<PointOb> pointObs = new ArrayList<PointOb>();
+            TextType      textType = TextType.getTextType("ID");
+            yearTracks.clear();
+            String          errors       = "";
+            final boolean[] ok           = { true };
+            JButton         cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    ok[0] = false;
+                }
+            });
+            JLabel errorLabel = new JLabel();
+            if (errorComponent != null) {
+                errorComponent.add(
+                    GuiUtils.top(
+                        GuiUtils.vbox(
+                            GuiUtils.filler(5, 10),
+                            GuiUtils.left(cancelButton), errorLabel)));
+            }
+            for (Integer y : yearList) {
+                int year = y.intValue();
                 for (int i = stormInfos.size() - 1; i >= 0; i--) {
+                    if ( !ok[0]) {
+                        break;
+                    }
                     StormInfo stormInfo = stormInfos.get(i);
-                    cal.setTime(ucar.visad.Util.makeDate(stormInfo.getStartTime()));
+                    cal.setTime(
+                        ucar.visad.Util.makeDate(stormInfo.getStartTime()));
                     int stormYear = cal.get(Calendar.YEAR);
-                    if(stormYear!=year) continue;
-
-                    Object key  = year+"_"+stormInfo.getStormId();
-                    StormTrack obsTrack =  (StormTrack) yearData.get(key);
-                    if(obsTrack == null) {
-                        //                        label.setText("Loading " + stormInfo);
-                        StormTrackCollection tracks= stormDataSource.getTrackCollection(stormInfo,
-                                                                                        obsWays);
-                        obsTrack = tracks.getObsTrack();
-                        if(obsTrack == null) continue;
-                        yearData.put(key, obsTrack);
+                    if (stormYear != year) {
+                        continue;
                     }
 
-                    FieldImpl field = makeTrackField(obsTrack, null);
-                    StormTrackPoint stp = obsTrack.getTrackPoints().get(0);
+                    Object     key      = year + "_" + stormInfo.getStormId();
+                    StormTrack obsTrack = (StormTrack) yearData.get(key);
+                    if (obsTrack == null) {
+                        if (label != null) {
+                            label.setText("Loading " + stormInfo + "...");
+                        }
+                        currentMessage = "Loading " + stormInfo;
+                        try {
+                            StormTrackCollection tracks =
+                                stormDataSource.getTrackCollection(stormInfo,
+                                    obsWays);
+                            obsTrack = tracks.getObsTrack();
+                            if (obsTrack == null) {
+                                continue;
+                            }
+                            yearData.put(key, obsTrack);
+                        } catch (BadDataException bde) {
+                            errors = errors + "Error " + currentMessage
+                                     + "<br>";
+                            if (errorLabel != null) {
+                                errorLabel.setText("<html><br><hr><i>"
+                                        + errors + "</i></html>");
+                            }
+                            continue;
+                        }
+                    }
+
+                    yearTracks.add(obsTrack);
+                    FieldImpl       field = makeTrackField(obsTrack, null);
+                    StormTrackPoint stp   = obsTrack.getTrackPoints().get(0);
                     times.add(stormInfo.getStartTime());
                     fields.add(field);
 
                     Tuple tuple = new Tuple(new Data[] {
-                        new visad.Text(textType, stormInfo.toString()) });
+                                      new visad.Text(textType,
+                                          stormInfo.toString()) });
                     pointObs.add(
-                                 PointObFactory.makePointOb(
-                                                            stp.getTrackPointLocation(), stormInfo.getStartTime(), tuple));
+                        PointObFactory.makePointOb(
+                            stp.getLocation(), stormInfo.getStartTime(),
+                            tuple));
                 }
             }
 
-            if(times.size()==0) {
+            if (times.size() == 0) {
                 removeDisplayable(yearTrackDisplay);
                 removeDisplayable(yearLabelDisplay);
                 yearTrackDisplay = null;
@@ -876,28 +1108,103 @@ public class StormTrackControl extends DisplayControlImpl {
                 return;
             }
 
-            if(yearTrackDisplay == null) {
+            if (yearTrackDisplay == null) {
                 yearTrackDisplay = new TrackDisplayable("year track ");
                 addDisplayable(yearTrackDisplay);
 
-                yearLabelDisplay =  new StationModelDisplayable("storm year labels");
+                yearLabelDisplay =
+                    new StationModelDisplayable("storm year labels");
                 yearLabelDisplay.setScale(1.0f);
                 StationModelManager smm =
                     getControlContext().getStationModelManager();
-                StationModel model =
-                    smm.getStationModel("Location");
+                StationModel model = smm.getStationModel("Location");
                 yearLabelDisplay.setStationModel(model);
                 addDisplayable(yearLabelDisplay);
             }
 
             yearTrackDisplay.setTrack(Util.makeTimeField(fields, times));
             yearLabelDisplay.setStationData(
-                                            PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
+                PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
 
         } catch (Exception exc) {
-            logException("Loading year", exc);
+            logException("Error " + currentMessage, exc);
+        }
+        if (label != null) {
+            label.setText("Done Loading");
         }
 
+    }
+
+
+    /** _more_          */
+    private JCheckBox obsCbx;
+
+    /** _more_          */
+    private JCheckBox forecastCbx;
+
+    /** _more_          */
+    private JCheckBox mostRecentCbx;
+
+
+    /**
+     * _more_
+     */
+    public void writeToKml() {
+        if (obsCbx == null) {
+            obsCbx        = new JCheckBox("Observation", true);
+            forecastCbx   = new JCheckBox("Forecast", true);
+            mostRecentCbx = new JCheckBox("Most Recent Forecasts", false);
+        }
+        JComponent accessory = GuiUtils.top(GuiUtils.vbox(obsCbx,
+                                   forecastCbx, mostRecentCbx));
+
+        String filename =
+            FileManager.getWriteFile(Misc.newList(FileManager.FILTER_KML),
+                                     FileManager.SUFFIX_KML, accessory);
+        if (filename == null) {
+            return;
+        }
+
+        try {
+            writeToKml(filename, obsCbx.isSelected(),
+                       forecastCbx.isSelected(), mostRecentCbx.isSelected());
+        } catch (Exception exc) {
+            logException("Writing KML", exc);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     * @param doObs _more_
+     * @param doForecast _more_
+     * @param mostRecent _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void writeToKml(String filename, boolean doObs,
+                           boolean doForecast, boolean mostRecent)
+            throws VisADException, RemoteException {
+        try {
+            Element kmlNode = KmlUtil.kml("");
+            Element docNode = KmlUtil.document(kmlNode, "");
+            KmlUtil.iconstyle(
+                docNode, "hurricaneicon",
+                "http://www.unidata.ucar.edu/software/idv/kml/images/hurricane.png");
+            Hashtable state = new Hashtable();
+            for (StormDisplayState stormDisplayState : getActiveStorms()) {
+                stormDisplayState.writeToKml(docNode, state, doObs,
+                                             doForecast, mostRecent);
+            }
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            IOUtil.writeBytes(new File(filename),
+                              XmlUtil.toString(kmlNode).getBytes());
+
+        } catch (Exception exc) {
+            logException("Writing KML", exc);
+        }
     }
 
 
@@ -917,17 +1224,19 @@ public class StormTrackControl extends DisplayControlImpl {
         stormInfos =
             (List<StormInfo>) Misc.sort(stormDataSource.getStormInfos());
 
-        if(stormInfos.size()==1) {
+        if (stormInfos.size() == 1) {
             try {
-                if(localStormDisplayState==null) {
-                    localStormDisplayState = new StormDisplayState(stormInfos.get(0));
+                if (localStormDisplayState == null) {
+                    localStormDisplayState =
+                        new StormDisplayState(stormInfos.get(0));
                 }
-                stormDisplayStateMap =
-                    new Hashtable<StormInfo, StormDisplayState>();
+                stormDisplayStateMap = new Hashtable<StormInfo,
+                        StormDisplayState>();
                 localStormDisplayState.setStormTrackControl(this);
-                stormDisplayStateMap.put(stormInfos.get(0), localStormDisplayState);
+                stormDisplayStateMap.put(stormInfos.get(0),
+                                         localStormDisplayState);
                 localStormDisplayState.setIsOnlyChild(true);
-                JComponent comp =  localStormDisplayState.getContents();
+                JComponent comp = localStormDisplayState.getContents();
                 localStormDisplayState.loadStorm();
                 return comp;
             } catch (Exception exc) {
@@ -936,7 +1245,7 @@ public class StormTrackControl extends DisplayControlImpl {
             }
         }
         localStormDisplayState = null;
-        treePanel = new TreePanel(true, 150);
+        treePanel              = new TreePanel(true, 150);
         Hashtable         years                  = new Hashtable();
         JComponent        firstComponent         = null;
         JComponent        firstSelectedComponent = null;
@@ -953,18 +1262,26 @@ public class StormTrackControl extends DisplayControlImpl {
             if (years.get(category) == null) {
                 years.put(category, category);
                 JPanel yearComponent = new JPanel(new BorderLayout());
-                if(yearList.contains(new Integer(year))) {
-                    yearComponent.add(BorderLayout.CENTER,
-                                      GuiUtils.topLeft(
-                                                       GuiUtils.makeButton("Remove Year", this, "removeYear", new Integer(year))));
+                if (yearList.contains(new Integer(year))) {
+                    yearComponent.add(
+                        BorderLayout.CENTER,
+                        GuiUtils.topLeft(
+                            GuiUtils.makeButton(
+                                "Remove Year", this, "removeYear",
+                                new Integer(year))));
 
                 } else {
-                    yearComponent.add(BorderLayout.CENTER,
-                                      GuiUtils.topLeft(
-                                                       GuiUtils.makeButton("Load Year", this, "loadYear", new Integer(year))));
+                    yearComponent.add(
+                        BorderLayout.CENTER,
+                        GuiUtils.topLeft(
+                            GuiUtils.makeButton(
+                                "Load Year", this, "loadYear",
+                                new Integer(year))));
                 }
                 yearToComponent.put(new Integer(year), yearComponent);
-                treePanel.addCategoryComponent(category, GuiUtils.inset(yearComponent, new Insets(5,5,5,5)));
+                treePanel.addCategoryComponent(category,
+                        GuiUtils.inset(yearComponent,
+                                       new Insets(5, 5, 5, 5)));
             }
             JComponent panelContents = stormDisplayState.getContents();
             if (stormInfo.getBasin() != null) {
@@ -1037,11 +1354,12 @@ public class StormTrackControl extends DisplayControlImpl {
      */
     public void stormChanged(StormDisplayState stormDisplayState) {
         activeStorms = null;
-        if(treePanel!=null)
+        if (treePanel != null) {
             treePanel.setIcon(stormDisplayState.getContents(),
                               stormDisplayState.getActive()
                               ? ICON_ON
                               : ICON_OFF);
+        }
     }
 
 
@@ -1124,13 +1442,13 @@ public class StormTrackControl extends DisplayControlImpl {
         List            result         = new ArrayList();
         List            theStormStates = getStormDisplayStates();
         if (theStormStates != null) {
-            Object[] pair = findClosestPoint(el,
-                                             theStormStates,
+            Object[] pair = findClosestPoint(el, theStormStates,
                                              animationValue, 20);
-            if(pair!=null) {
-                StormTrack closestTrack = (StormTrack) pair[0];
-                StormTrackPoint closestOb = (StormTrackPoint) pair[1];
-                result.add("<tr><td>" + "Way: " + closestTrack.getWay() +"</td></tr> "
+            if (pair != null) {
+                StormTrack      closestTrack = (StormTrack) pair[0];
+                StormTrackPoint closestOb    = (StormTrackPoint) pair[1];
+                result.add("<tr><td>" + "Way: " + closestTrack.getWay()
+                           + "</td></tr> "
                            + formatStormTrackPoint(closestTrack, closestOb));
 
             }
@@ -1143,6 +1461,8 @@ public class StormTrackControl extends DisplayControlImpl {
     /**
      * _more_
      *
+     *
+     * @param stormTrack _more_
      * @param stp _more_
      *
      * @return _more_
@@ -1150,30 +1470,34 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected String formatStormTrackPoint(StormTrack stormTrack, StormTrackPoint stp)
+    protected String formatStormTrackPoint(StormTrack stormTrack,
+                                           StormTrackPoint stp)
             throws VisADException, RemoteException {
         Unit   displayUnit = getDisplayUnit();
         double value;
         if (stp == null) {
             return "";
-        } 
+        }
         List<StormParam> params = stormTrack.getParams();
         //            result = "<tr><td>" + "Storm: "
         //                     + stp.toString() + "</td></tr>";
-        String result =  "<tr><td>" + "Track Point Time:</td><td align=right>"
-            + stp.getTrackPointTime() + "</td></tr>";
-        for(StormParam param: params) {
+        String result = "<tr><td>" + "Track Point Time:</td><td align=right>"
+                        + stp.getTime() + "</td></tr>";
+        for (StormParam param : params) {
             Real r = stp.getAttribute(param);
-            if(r==null) continue;
+            if (r == null) {
+                continue;
+            }
             Unit unit = param.getUnit();
-            result = result + "<tr><td>"
-                + param.toString() + ":</td><td align=right>" + Misc.format(r.getValue()) +
-                (unit!=null?("[" + unit +"]"):"")
-                + "</td></tr>";
+            result = result + "<tr><td>" + param.toString()
+                     + ":</td><td align=right>" + Misc.format(r.getValue())
+                     + ((unit != null)
+                        ? ("[" + unit + "]")
+                        : "") + "</td></tr>";
         }
 
         int length = result.length();
-        return  StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
+        return StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
     }
 
 
@@ -1181,23 +1505,31 @@ public class StormTrackControl extends DisplayControlImpl {
     /**
      * This finds the StormTrack and StormTrackPoint that is closest to the given location
      *
+     *
+     * @param el _more_
+     * @param theStates _more_
+     * @param animationValue _more_
+     * @param distanceThresholdPixels _more_
      * @return A 2-tuple. First element is the StormTrack. Second element is the ob.
      *      Or null if none found
+     *
+     * @throws Exception _more_
      */
     protected Object[] findClosestPoint(EarthLocation el,
                                         List<StormDisplayState> theStates,
-                                        Real animationValue, int distanceThresholdPixels)
-        throws Exception {
+                                        Real animationValue,
+                                        int distanceThresholdPixels)
+            throws Exception {
         if ((el == null) || (theStates == null)) {
             return null;
         }
 
-        int             numStates   = theStates.size();
-        StormTrackPoint closestOb   = null;
-        StormTrack closestTrack = null;
+        int             numStates    = theStates.size();
+        StormTrackPoint closestOb    = null;
+        StormTrack      closestTrack = null;
 
-        int[]           clickPt     = boxToScreen(earthToBox(el));
-        double          minDistance = distanceThresholdPixels;
+        int[]           clickPt      = boxToScreen(earthToBox(el));
+        double          minDistance  = distanceThresholdPixels;
         //        System.err.println ("click:" + clickPt[0]+"/"+clickPt[1] + " " +minDistance);
 
         for (int i = 0; i < numStates; i++) {
@@ -1208,35 +1540,40 @@ public class StormTrackControl extends DisplayControlImpl {
             // Way obsWay = new Way(Way.OBSERVATION);
             java.util.Set<Way> ways = wayToTracksMap.keySet();
 
-            for(Way way: ways) {
+            for (Way way : ways) {
                 StormTrack track = null;
-                if(way.equals(Way.OBSERVATION)) {
-                  //  WayDisplayState       trackWDS   = wayToTracksMap.get(way); //get(Way.OBSERVATION);
-                    List<StormTrack>      tracks   =  wayToTracksMap.get(way);
-                    if(tracks.size()>0) {
+                if (way.equals(Way.OBSERVATION)) {
+                    //  WayDisplayState       trackWDS   = wayToTracksMap.get(way); //get(Way.OBSERVATION);
+                    List<StormTrack> tracks = wayToTracksMap.get(way);
+                    if (tracks.size() > 0) {
                         track = tracks.get(0);
                     }
                 } else {
-                    WayDisplayState       trackWDS   = sds.getWayDisplayState(way); //get(Way.OBSERVATION);
-                    boolean visible = checkTracksVisible( animationValue, trackWDS );
-                    if(visible){
-                        List<StormTrack>      tracks   = wayToTracksMap.get(way);
-                        track = getClosestTimeForecastTrack(tracks, animationValue);
+                    WayDisplayState trackWDS = sds.getWayDisplayState(way);  //get(Way.OBSERVATION);
+                    boolean visible = checkTracksVisible(animationValue,
+                                          trackWDS);
+                    if (visible) {
+                        List<StormTrack> tracks = wayToTracksMap.get(way);
+                        track = getClosestTimeForecastTrack(tracks,
+                                animationValue);
                     }
                 }
 
-                if(track == null) continue;
+                if (track == null) {
+                    continue;
+                }
                 //System.err.println(way + " track time is: " + track.getStartTime());
-                List<StormTrackPoint> stpList  = track.getTrackPoints();
-                int                   size     = stpList.size();
+                List<StormTrackPoint> stpList = track.getTrackPoints();
+                int                   size    = stpList.size();
                 for (int j = 0; j < size; j++) {
                     StormTrackPoint stp      = stpList.get(j);
-                    EarthLocation   stpLoc   = stp.getTrackPointLocation();
-                    int[]           obScreen = boxToScreen(earthToBox(stpLoc));
+                    EarthLocation   stpLoc   = stp.getLocation();
+                    int[]           obScreen =
+                        boxToScreen(earthToBox(stpLoc));
                     double distance = GuiUtils.distance(obScreen, clickPt);
                     if (distance < minDistance) {
-                        closestOb   = stp;
-                        minDistance = distance;
+                        closestOb    = stp;
+                        minDistance  = distance;
                         closestTrack = track;
                     }
                 }
@@ -1246,7 +1583,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
         if (closestOb != null) {
-            return new Object[]{closestTrack, closestOb};
+            return new Object[] { closestTrack, closestOb };
         }
 
         return null;
@@ -1255,19 +1592,34 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-    private boolean checkTracksVisible( Real currentAnimationTime, WayDisplayState wds )throws Exception {
-        if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
+    /**
+     * _more_
+     *
+     * @param currentAnimationTime _more_
+     * @param wds _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean checkTracksVisible(Real currentAnimationTime,
+                                       WayDisplayState wds)
+            throws Exception {
+        if ((currentAnimationTime == null)
+                || currentAnimationTime.isMissing()) {
             return false;
         }
-       // Iterate way display states
-        boolean             visible = false;
-        if(wds.shouldShowTrack() && wds.hasTrackDisplay()) {
-            FieldImpl field = (FieldImpl)wds.getTrackDisplay().getData();
-            if(field==null)
+        // Iterate way display states
+        boolean visible = false;
+        if (wds.shouldShowTrack() && wds.hasTrackDisplay()) {
+            FieldImpl field = (FieldImpl) wds.getTrackDisplay().getData();
+            if (field == null) {
                 return false;
+            }
             Set timeSet = GridUtil.getTimeSet(field);
-            if(timeSet == null)
+            if (timeSet == null) {
                 return false;
+            }
             if (timeSet.getLength() == 1) {
                 return true;
             } else {
@@ -1284,22 +1636,35 @@ public class StormTrackControl extends DisplayControlImpl {
             }
 
         }
-       return  visible;
-  }
-    private StormTrack getClosestTimeForecastTrack(List<StormTrack> tracks, Real pTime) throws VisADException {
+        return visible;
+    }
 
-        DateTime dt = new DateTime(pTime); // pTime.
-        double timeToLookFor = dt.getValue();
-        int    numPoints     = tracks.size();
-        double lastTime      = -1;
+    /**
+     * _more_
+     *
+     * @param tracks _more_
+     * @param pTime _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    private StormTrack getClosestTimeForecastTrack(List<StormTrack> tracks,
+            Real pTime)
+            throws VisADException {
 
-       //  for(StormTrack track: tracks){
-       //      if(track.getTrackStartTime().equals(dt))
-       //         return track;
-       //  }
+        DateTime dt            = new DateTime(pTime);  // pTime.
+        double   timeToLookFor = dt.getValue();
+        int      numPoints     = tracks.size();
+        double   lastTime      = -1;
+
+        //  for(StormTrack track: tracks){
+        //      if(track.getTrackStartTime().equals(dt))
+        //         return track;
+        //  }
         for (int i = 0; i < numPoints; i++) {
-            StormTrack st         = tracks.get(i);
-            double          currentTime = st.getStartTime().getValue();
+            StormTrack st          = tracks.get(i);
+            double     currentTime = st.getStartTime().getValue();
             if (timeToLookFor == currentTime) {
                 return st;
             }
@@ -1397,42 +1762,42 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-/**
-Set the YearList property.
+    /**
+     * Set the YearList property.
+     *
+     * @param value The new value for YearList
+     */
+    public void setYearList(List<Integer> value) {
+        yearList = value;
+    }
 
-@param value The new value for YearList
-**/
-public void setYearList (List<Integer> value) {
-	yearList = value;
-}
-
-/**
-Get the YearList property.
-
-@return The YearList
-**/
-public List<Integer> getYearList () {
-	return yearList;
-}
+    /**
+     * Get the YearList property.
+     *
+     * @return The YearList
+     */
+    public List<Integer> getYearList() {
+        return yearList;
+    }
 
 
-/**
-Set the LocalStormDisplayState property.
+    /**
+     * Set the LocalStormDisplayState property.
+     *
+     * @param value The new value for LocalStormDisplayState
+     */
+    public void setLocalStormDisplayState(StormDisplayState value) {
+        localStormDisplayState = value;
+    }
 
-@param value The new value for LocalStormDisplayState
-**/
-public void setLocalStormDisplayState (StormDisplayState value) {
-	localStormDisplayState = value;
-}
-
-/**
-Get the LocalStormDisplayState property.
-
-@return The LocalStormDisplayState
-**/
-public StormDisplayState getLocalStormDisplayState () {
-	return localStormDisplayState;
-}
+    /**
+     * Get the LocalStormDisplayState property.
+     *
+     * @return The LocalStormDisplayState
+     */
+    public StormDisplayState getLocalStormDisplayState() {
+        return localStormDisplayState;
+    }
 
 
 
