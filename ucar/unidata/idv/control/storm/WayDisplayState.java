@@ -1094,11 +1094,20 @@ public DisplayState getWayState () {
 
         for (int i = 0; i < size; i++) {
             double          af   = (angle + i * 15 * Math.PI / 180.0) * 180.0 /Math.PI;
-            if(af <= 90) {
+            // change angle to azimuth
+            if(af <= 90 && af >= 0) {
                 af = 90 - af;
-            } else {
+            }
+            else if ( af > 90 && af <= 180) {
                 af = 360 + (90 - af);
             }
+            else if ( af < 0 && af >= -180) {
+                af = 90 - af;
+            }
+            else if ( af > 180 && af <= 360) {
+                af = 450 - af;
+            }
+
 
             LatLonPointImpl lp = Bearing.findPoint(lat0, lon0, af, r, null);
 
