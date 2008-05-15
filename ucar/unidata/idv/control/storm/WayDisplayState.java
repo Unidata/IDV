@@ -32,11 +32,9 @@ import ucar.unidata.data.grid.GridUtil;
 
 
 import ucar.unidata.data.storm.*;
-import ucar.unidata.geoloc.LatLonPoint;
-import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.geoloc.ProjectionPoint;
-import ucar.unidata.geoloc.ProjectionPointImpl;
+import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.FlatEarth;
+import ucar.unidata.geoloc.projection.LatLonProjection;
 
 import visad.bom.Radar2DCoordinateSystem;
 
@@ -998,26 +996,37 @@ public DisplayState getWayState () {
         Real          rl   = sp2.getAttribute(param);
 
         double        r    = rl.getValue();
-        FlatEarth     e1   = new FlatEarth();
-        FlatEarth     e2   = new FlatEarth();
-        ProjectionPointImpl p1 =
-            e1.latLonToProj(el1.getLatitude().getValue(),
-                            el1.getLongitude().getValue());
-        ProjectionPointImpl p2 =
-            e2.latLonToProj(el2.getLatitude().getValue(),
-                            el2.getLongitude().getValue());
-        double dist = p1.distance(p2);
+        double        lat1 = el1.getLatitude().getValue();
+        double        lon1 = el1.getLongitude().getValue();
+        LatLonPointImpl    p1 =
+           new LatLonPointImpl ( lat1, lon1);
+
+        double        lat2 = el2.getLatitude().getValue();
+        double        lon2 = el2.getLongitude().getValue();
+        LatLonPointImpl p2 =
+            new LatLonPointImpl(lat2,lon2);
+
+        LatLonProjection pj1 = new LatLonProjection();
+        ProjectionPoint pp1 = pj1.latLonToProj(p1);
+        LatLonProjection pj2 = new LatLonProjection();
+        ProjectionPoint pp2 = pj2.latLonToProj(p2);
+
+        Bearing b = Bearing.calculateBearing(lat1, lon1,
+                                             lat2, lon2,
+                                           null);
+        double dist =b.getDistance();
+
 
         if ( !right) {
             sign = -1;
         }
-        double x = p2.getX() + sign * r * (p2.getY() - p1.getY()) / dist;
-        double y = p2.getY() + sign * r * (p1.getX() - p2.getX()) / dist;
+        double x = pp2.getX() + sign * r * (pp2.getY() - pp1.getY()) / dist;
+        double y = pp2.getY() + sign * r * (pp1.getX() - pp2.getX()) / dist;
 
 
         ProjectionPoint pp   = new ProjectionPointImpl(x, y);
         LatLonPointImpl lp   = new LatLonPointImpl();
-        FlatEarth       e3   = new FlatEarth();
+        LatLonProjection       e3   = new LatLonProjection();
         LatLonPoint     lp11 = e3.projToLatLon(pp, lp);
 
         EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
@@ -1037,15 +1046,23 @@ public DisplayState getWayState () {
      */
     public double getCircleAngleRange(EarthLocation c, EarthLocation d) {
 
-        FlatEarth e1 = new FlatEarth();
-        ProjectionPointImpl p1 = e1.latLonToProj(c.getLatitude().getValue(),
-                                     c.getLongitude().getValue());
-        FlatEarth e2 = new FlatEarth();
-        ProjectionPointImpl p2 = e2.latLonToProj(d.getLatitude().getValue(),
-                                     d.getLongitude().getValue());
 
-        double dx = p2.getX() - p1.getX();
-        double dy = p2.getY() - p1.getY();
+        double        lat1 = c.getLatitude().getValue();
+        double        lon1 = c.getLongitude().getValue();
+        LatLonPointImpl    p1 =
+           new LatLonPointImpl ( lat1, lon1);
+
+        double        lat2 = d.getLatitude().getValue();
+        double        lon2 = d.getLongitude().getValue();      
+        LatLonPointImpl p2 =
+            new LatLonPointImpl(lat2,lon2);
+
+        LatLonProjection pj1 = new LatLonProjection();
+        ProjectionPoint pp1 = pj1.latLonToProj(p1);
+        LatLonProjection pj2 = new LatLonProjection();
+        ProjectionPoint pp2 = pj2.latLonToProj(p2);
+        double dx = pp2.getX() - pp1.getX();
+        double dy = pp2.getY() - pp1.getY();
 
         double a  = Math.atan2(dy, dx);
 
@@ -1065,6 +1082,38 @@ public DisplayState getWayState () {
      * @throws VisADException _more_
      */
     public StormTrackPoint[] getHalfCircleTrackPoint(EarthLocation c,
+            double angle, double r, DateTime dt)
+            throws VisADException {
+        // return 10 track point
+        int               size  = 11;
+
+        StormTrackPoint[] track = new StormTrackPoint[size];
+
+        double lat0 = c.getLatitude().getValue();
+        double lon0 = c.getLongitude().getValue();
+
+        for (int i = 0; i < size; i++) {
+            double          af   = (angle + i * 15 * Math.PI / 180.0) * 180.0 /Math.PI;
+            if(af <= 90) {
+                af = 90 - af;
+            } else {
+                af = 360 + (90 - af);
+            }
+
+            LatLonPointImpl lp = Bearing.findPoint(lat0, lon0, af, r, null);
+
+
+            EarthLocation el = new EarthLocationLite(lp.getLatitude(),
+                                   lp.getLongitude(), 0);
+            StormTrackPoint sp = new StormTrackPoint(el, dt, 0, null);
+
+            track[i] = sp;
+        }
+
+        return track;
+    }
+
+    public StormTrackPoint[] getHalfCircleTrackPointOld(EarthLocation c,
             double angle, double r, DateTime dt)
             throws VisADException {
         // return 10 track point
@@ -1093,8 +1142,6 @@ public DisplayState getWayState () {
 
         return track;
     }
-
-
 
 
 
