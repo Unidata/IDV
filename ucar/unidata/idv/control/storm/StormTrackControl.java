@@ -33,6 +33,7 @@ import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.*;
 import ucar.unidata.data.storm.*;
+import ucar.unidata.data.storm.StormInfo;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.MapViewManager;
@@ -262,6 +263,12 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @throws Exception _more_
      */
+
+
+    RealType dfltRealType;
+    RealType timeType;
+
+    Hashtable rangeTypes = new Hashtable();
     protected FieldImpl makeTrackField(StormTrack track, StormParam param)
             throws Exception {
 
@@ -269,13 +276,19 @@ public class StormTrackControl extends DisplayControlImpl {
         int                   numPoints = points.size();
         Unit                  timeUnit  = points.get(0).getTime().getUnit();
 
-        RealType dfltRealType = RealType.getRealType("Default_" + (cnt++));
+
+        cnt++;
+        if(dfltRealType==null) {
+                dfltRealType = RealType.getRealType("Default_" + (cnt));
+            timeType =
+            RealType.getRealType(DataUtil.cleanName("track_time" +  "_" +cnt
+                + timeUnit), timeUnit);
+        }
         Real                  dfltReal  = new Real(dfltRealType, 1);
 
-        RealType timeType =
-            RealType.getRealType(DataUtil.cleanName("track_time" + cnt + "_"
-                + timeUnit), timeUnit);
+
         RealTupleType rangeType    = null;
+
         double[][]    newRangeVals = new double[2][numPoints];
         float[]       alts         = new float[numPoints];
         float[]       lats         = new float[numPoints];
@@ -291,9 +304,14 @@ public class StormTrackControl extends DisplayControlImpl {
             //Set the dflt so we can use its unit later
             dfltReal = value;
             if (rangeType == null) {
-                rangeType =
-                    new RealTupleType(RealType.getRealType("trackrange_"
-                        + cnt, value.getUnit()), timeType);
+                    String key = "unit:" + value.getUnit();
+                    rangeType = (RealTupleType) rangeTypes.get(key);
+                    if(rangeType == null) {
+                    rangeType =
+                      new RealTupleType(RealType.getRealType("trackrange_"  +cnt
+                           , value.getUnit()), timeType);
+                            rangeTypes.put(key, rangeType);
+                    }
             }
             DateTime      dateTime = stp.getTime();
             EarthLocation el       = stp.getLocation();
