@@ -463,7 +463,7 @@ public class StormTrackChart {
             chartWayComp = makeScroller(chartWayComp, 100, 150);
         }
         chartComps.add(GuiUtils.inset(chartWayComp, inset));
-
+        chartComps.add(GuiUtils.filler(5, 10));
         chartComps.add(GuiUtils.lLabel((isHourly()
                                         ? "Forecast Hour:"
                                         : "Forecast Time:")));
