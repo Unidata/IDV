@@ -1049,7 +1049,66 @@ public class WayDisplayState {
         }
         return newStps;
     }
+    /**
+      * _more_
+      *
+      * @param track _more_
+      * @param param _more_
+      *
+      * @return _more_
+      *
+      * @throws VisADException _more_
+      */
+     public StormTrack makeRingTrack(StormTrack track, StormParam param)
+             throws VisADException {
 
+         List<StormTrackPoint> stps          = getRealTrackPoints(track,
+                                                   param);
+         int                   numberOfPoint = 73;
+         StormTrackPoint[]     ringPoints = new StormTrackPoint[numberOfPoint];
+
+         StormTrackPoint       stp1          = stps.get(0);
+
+
+         // circle  1 to n
+         double azi = 0.0;
+         for (int i = 1; i < numberOfPoint; i++) {
+             StormTrackPoint stp = getCirclePoint(stp1, param, azi);
+             ringPoints[i] = stp;
+             azi = azi + 5;
+         }
+
+        List ringList = new ArrayList<StormTrackPoint>();
+        for (int i = 0; i < numberOfPoint; i++) {
+            ringList.add(ringPoints[i]);
+        }
+
+
+         return new StormTrack(track.getStormInfo(), new Way("RING"),
+                               ringList);
+
+     }
+
+     public StormTrackPoint getCirclePoint(StormTrackPoint stp, StormParam sp,
+            double azimuth)
+            throws VisADException {
+        //
+        Real            r      = stp.getAttribute(sp);
+        double r0 = 0;
+        if( r != null) r0 = r.getValue();
+        EarthLocation el = stp.getLocation();
+        double lat0 = el.getLatitude().getValue();
+        double lon0 = el.getLongitude().getValue();
+        DateTime dt = stp.getTime();
+        LatLonPointImpl lp = Bearing.findPoint(lat0, lon0, azimuth, r0, null);
+
+        EarthLocation el1 = new EarthLocationLite(lp.getLatitude(),
+                                   lp.getLongitude(), 0);
+        StormTrackPoint stp1 = new StormTrackPoint(el1, dt, 0, null);
+
+
+        return stp1;
+    }
     /**
      * _more_
      *
