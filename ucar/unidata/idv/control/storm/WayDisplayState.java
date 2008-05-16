@@ -298,17 +298,23 @@ public class WayDisplayState {
         if (shouldShowRings()) {
             StormParam tmp = stormDisplayState.getRingsParam(this);
             if ( !hasRingsDisplay() || !Misc.equals(tmp, ringsParam)) {
-                ringsParam = tmp;
+                this.ringsParam = tmp;
                 getRingsHolder().clearDisplayables();
                 setRingsColor();
-                for (StormTrack track : tracks) {
-                    List<RingSet> rings =  makeRings(track, ringsParam);
-                    if (rings != null) {
-                        for (RingSet ring : rings) {
-                            ringsHolder.addDisplayable(ring);
-                        }
+               // for (StormParam param : ringsParam) {
+                    TrackDisplayable ringDisplay = makeRingDisplay(ringsParam);
+                    if (ringDisplay != null) {
+                        ringsHolder.addDisplayable(ringDisplay);
                     }
-                }
+              //  }
+             //   for (StormTrack track : tracks) {
+             //       List<RingSet> rings =  makeRings(track, ringsParam);
+             //       if (rings != null) {
+             //           for (RingSet ring : rings) {
+             //               ringsHolder.addDisplayable(ring);
+             //           }
+             //       }
+            //    }
                 setRingsColor();
             }
             getRingsHolder().setVisible(true);
@@ -491,7 +497,20 @@ public class WayDisplayState {
         return coneDisplay;
     }
 
-
+    public TrackDisplayable makeRingDisplay(StormParam param)
+            throws Exception {
+        FieldImpl field = makeRingField(param);
+        if (field == null) {
+            return null;
+        }
+        TrackDisplayable ringDisplay =
+            new TrackDisplayable(
+                "ring_" + stormDisplayState.getStormInfo().getStormId());
+        ringDisplay.setUseTimesInAnimation(false);
+        ringDisplay.setTrack(field);
+        ringDisplay.setUseTimesInAnimation(false);
+        return ringDisplay;
+    }
 
 
     /**
@@ -794,6 +813,23 @@ public class WayDisplayState {
         return Util.makeTimeField(fields, times);
     }
 
+    protected FieldImpl makeRingField(StormParam stormParam)
+            throws Exception {
+        List<FieldImpl> fields = new ArrayList<FieldImpl>();
+        List<DateTime>  times  = new ArrayList<DateTime>();
+        for (StormTrack track : tracks) {
+
+            fields.add( makeRingTracks(track, stormParam));
+
+            times.add(track.getStartTime());
+
+        }
+
+        if (fields.size() == 0) {
+            return null;
+        }
+        return Util.makeTimeField(fields, times);
+    }
 
     /**
      * _more_
@@ -1059,47 +1095,68 @@ public class WayDisplayState {
       *
       * @throws VisADException _more_
       */
-     public StormTrack makeRingTrack(StormTrack track, StormParam param)
-             throws VisADException {
+     public FieldImpl makeRingTracks(StormTrack track, StormParam param)
+             throws Exception {
 
-         List<StormTrackPoint> stps          = getRealTrackPoints(track,
+        List<StormTrackPoint> stps          = getRealTrackPoints(track,
                                                    param);
-         int                   numberOfPoint = 73;
-         StormTrackPoint[]     ringPoints = new StormTrackPoint[numberOfPoint];
+        List<StormTrack> stracks = new ArrayList();
 
-         StormTrackPoint       stp1          = stps.get(0);
+        int size = stps.size();
+        DateTime       dt    = stps.get(0).getTime();
 
 
-         // circle  1 to n
-         double azi = 0.0;
-         for (int i = 1; i < numberOfPoint; i++) {
-             StormTrackPoint stp = getCirclePoint(stp1, param, azi);
-             ringPoints[i] = stp;
-             azi = azi + 5;
-         }
+        for(int i= 0; i < size; i++) {
+            StormTrackPoint       stp0         = stps.get(i);
+            int                   numberOfPoint = 73;
+            StormTrackPoint[]     ringPoints = new StormTrackPoint[numberOfPoint];
+            Real           r      = stp0.getAttribute(param);
 
-        List ringList = new ArrayList<StormTrackPoint>();
-        for (int i = 0; i < numberOfPoint; i++) {
-            ringList.add(ringPoints[i]);
+            if(r != null) {
+             // circle
+                double rr = r.getValue();
+
+                double azi = 0.0;
+
+                for (int j = 0; j < numberOfPoint; j++) {
+
+                    StormTrackPoint stp = getCirclePoint(stp0, rr, azi, dt);
+                     ringPoints[j] = stp;
+                     azi = azi + 5;
+                 }
+
+                 List ringList = new ArrayList<StormTrackPoint>();
+                 for (int j = 0; j < numberOfPoint; j++) {
+                    ringList.add(ringPoints[j]);
+                 }
+
+                 stracks.add(new StormTrack(track.getStormInfo(), new Way("RING"),
+                                   ringList));
+            }
         }
 
+        Data[] datas= new Data[stracks.size()];
+        int i=0;
+        for(StormTrack stkk: stracks){
 
-         return new StormTrack(track.getStormInfo(), new Way("RING"),
-                               ringList);
+             datas[i++] =  stormDisplayState.getStormTrackControl().makeTrackField(
+                    stkk, null);
+        }
+
+        return Util.indexedField(datas, false);
+
 
      }
 
-     public StormTrackPoint getCirclePoint(StormTrackPoint stp, StormParam sp,
-            double azimuth)
+     public StormTrackPoint getCirclePoint(StormTrackPoint stp, double r0,
+            double azimuth, DateTime dt)
             throws VisADException {
         //
-        Real            r      = stp.getAttribute(sp);
-        double r0 = 0;
-        if( r != null) r0 = r.getValue();
+
         EarthLocation el = stp.getLocation();
         double lat0 = el.getLatitude().getValue();
         double lon0 = el.getLongitude().getValue();
-        DateTime dt = stp.getTime();
+        //DateTime dt = stp.getTime();
         LatLonPointImpl lp = Bearing.findPoint(lat0, lon0, azimuth, r0, null);
 
         EarthLocation el1 = new EarthLocationLite(lp.getLatitude(),
