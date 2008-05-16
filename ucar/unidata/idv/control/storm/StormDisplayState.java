@@ -534,13 +534,15 @@ public class StormDisplayState {
             return GuiUtils.filler(2, 10);
         }
         final JComboBox box = new JComboBox(new Vector(stormParams));
+        StormParam stormParam = (StormParam)params.get(id);
+        if(stormParam!=null) box.setSelectedItem(stormParam);
         box.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 Object selected = box.getSelectedItem();
                 if ((selected == null) || (selected instanceof String)) {
                     params.remove(id);
                 } else {
-                    params.put(id, selected);
+                   params.put(id, selected);
                 }
                 try {
                     updateDisplays();
@@ -574,6 +576,7 @@ public class StormDisplayState {
             }
 
         }
+        if(attrNames.size() == 0) return null;
         return attrNames;
     }
 
@@ -633,8 +636,8 @@ public class StormDisplayState {
         boolean      haveDoneForecast = false;
         List<String> colLabels = (List<String>) Misc.newList("", "", "Track");
         if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
-            colLabels.add("Cone");
             colLabels.add("Rings");
+            colLabels.add("Cone");
         }
         int  numCols    = colLabels.size();
 
@@ -643,8 +646,11 @@ public class StormDisplayState {
         paramComps.add(new JLabel(""));
         paramComps.add(new JLabel("<html><u><i>Color By</i></u></html>"));
         if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
-            paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
             paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
+            paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
+        } else {
+            paramComps.add(GuiUtils.filler());
+            paramComps.add(GuiUtils.filler());
         }
 
         List obsColorParams      = new ArrayList(obsParams);
@@ -663,9 +669,16 @@ public class StormDisplayState {
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(obsColorByBox));
         if (obsRadiusParams != null) {
-            paramComps.add(makeList(obsRadiusParams, ID_OBS_CONE));
+            //If its not set then set it
+            if(params.get(ID_OBS_RINGS)==null) {
+                params.put(ID_OBS_RINGS, obsRadiusParams.get(0));
+            }
+            if(params.get(ID_OBS_CONE)==null) {
+                params.put(ID_OBS_CONE, Misc.newList(obsRadiusParams.get(0)));
+            }
             paramComps.add(GuiUtils.top(makeBox(obsRadiusParams,
                     ID_OBS_RINGS)));
+            paramComps.add(makeList(obsRadiusParams, ID_OBS_CONE));
         } else {
             paramComps.add(GuiUtils.filler());
             paramComps.add(GuiUtils.filler());
@@ -677,9 +690,16 @@ public class StormDisplayState {
         paramComps.add(GuiUtils.top(forecastColorByBox));
 
         if (forecastRadiusParams != null) {
-            paramComps.add(makeList(forecastRadiusParams, ID_FORECAST_CONE));
+            //If its not set then set it
+            if(params.get(ID_FORECAST_RINGS)==null) {
+                params.put(ID_FORECAST_RINGS, forecastRadiusParams.get(0));
+            }
+            if(params.get(ID_FORECAST_CONE)==null) {
+                params.put(ID_FORECAST_CONE, Misc.newList(obsRadiusParams.get(0)));
+            }
             paramComps.add(GuiUtils.top(makeBox(forecastRadiusParams,
                     ID_FORECAST_RINGS)));
+            paramComps.add(makeList(forecastRadiusParams, ID_FORECAST_CONE));
         } else {
             paramComps.add(GuiUtils.filler());
             paramComps.add(GuiUtils.filler());
@@ -709,8 +729,8 @@ public class StormDisplayState {
                 comps.add(col++, labelComp);
                 comps.add(col++, wds.getTrackState().getCheckBox(this));
                 if (obsRadiusParams != null) {
-                    comps.add(col++, wds.getConeState().getCheckBox(this));
                     comps.add(col++, wds.getRingsState().getCheckBox(this));
+                    comps.add(col++, wds.getConeState().getCheckBox(this));
                 }
 
             } else {
@@ -731,17 +751,18 @@ public class StormDisplayState {
                         forecastState.getTrackState().getCheckBox(this));
                     if (forecastRadiusParams != null) {
                         comps.add(
-                            forecastState.getConeState().getCheckBox(this));
-                        comps.add(
                             forecastState.getRingsState().getCheckBox(this));
+
+                        comps.add(
+                            forecastState.getConeState().getCheckBox(this));
                     }
                 }
                 comps.add(swatch);
                 comps.add(labelComp);
                 comps.add(wds.getTrackState().getCheckBox(this));
                 if (forecastRadiusParams != null) {
-                    comps.add(wds.getConeState().getCheckBox(this));
                     comps.add(wds.getRingsState().getCheckBox(this));
+                    comps.add(wds.getConeState().getCheckBox(this));
                 }
             }
         }

@@ -697,6 +697,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 if (bbox == null) {
                     continue;
                 }
+                System.err.println ("bbox:" + bbox);
                 minLon = Math.min(minLon, bbox.getLonMin());
                 maxLon = Math.max(maxLon, bbox.getLonMax());
                 minLat = Math.min(minLat, bbox.getLatMin());
@@ -714,13 +715,13 @@ public class StormTrackControl extends DisplayControlImpl {
                 minLat = Math.min(minLat, bbox.getLatMin());
                 maxLat = Math.max(maxLat, bbox.getLatMax());
                 didone = true;
-
             }
 
 
             if ( !didone) {
                 return null;
             }
+            System.err.println ("v:" + minLon +" " +  maxLon);
             return ucar.visad.Util.makeMapProjection(minLat, minLon, maxLat,
                     maxLon);
         } catch (Exception exc) {

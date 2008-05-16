@@ -115,9 +115,6 @@ public class WayDisplayState {
     List<PointOb> pointObs = new ArrayList<PointOb>();
 
 
-    /** _more_ */
-    private JCheckBox ringsCbx;
-
 
     /** _more_ */
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
@@ -191,30 +188,6 @@ public class WayDisplayState {
     }
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param ringsParam _more_
-     * @param rings _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    protected void setRings(StormParam ringsParam, List<RingSet> rings)
-            throws VisADException, RemoteException {
-        this.ringsParam = ringsParam;
-        if (ringsHolder == null) {
-            ringsHolder = new CompositeDisplayable("rings holder");
-            addDisplayable(ringsHolder);
-        }
-        ringsHolder.clearDisplayables();
-        if (rings != null) {
-            for (RingSet ring : rings) {
-                ringsHolder.addDisplayable(ring);
-            }
-        }
-    }
 
 
     /**
@@ -322,20 +295,34 @@ public class WayDisplayState {
         }
 
 
+        if (shouldShowRings()) {
+            StormParam tmp = stormDisplayState.getRingsParam(this);
+            if ( !hasRingsDisplay() || !Misc.equals(tmp, ringsParam)) {
+                ringsParam = tmp;
+                getRingsHolder().clearDisplayables();
+                setRingsColor();
+                for (StormTrack track : tracks) {
+                    List<RingSet> rings =  makeRings(track, ringsParam);
+                    if (rings != null) {
+                        for (RingSet ring : rings) {
+                            ringsHolder.addDisplayable(ring);
+                        }
+                    }
+                }
+                setRingsColor();
+            }
+            getRingsHolder().setVisible(true);
+        } else {
+            if (hasRingsDisplay()) {
+                getRingsHolder().setVisible(false);
+            }
+        }
+
+
     }
 
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param params _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void resetRings(List<StormParam> params) throws Exception {}
 
 
     /**
@@ -465,6 +452,24 @@ public class WayDisplayState {
     /**
      * _more_
      *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public CompositeDisplayable getRingsHolder() throws Exception {
+        if (ringsHolder == null) {
+            ringsHolder = new CompositeDisplayable("rings_"
+                    + stormDisplayState.getStormInfo().getStormId());
+            ringsHolder.setUseTimesInAnimation(false);
+            addDisplayable(ringsHolder);
+        }
+        return ringsHolder;
+    }
+
+
+    /**
+     * _more_
+     *
      * @param param _more_
      *
      * @return _more_
@@ -517,6 +522,7 @@ public class WayDisplayState {
                     try {
                         setTrackColor();
                         setConeColor();
+                        setRingsColor();
                         setLabelColor();
                     } catch (Exception exc) {
                         LogUtil.logException("Setting color", exc);
@@ -597,7 +603,18 @@ public class WayDisplayState {
      */
     private void setConeColor() throws Exception {
         if (conesHolder != null) {
-            conesHolder.setColorPalette(getColorPalette());
+            conesHolder.setColorPalette(getColorPalette(getColor()));
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    private void setRingsColor() throws Exception {
+        if (ringsHolder != null) {
+            ringsHolder.setColor(getColor());
         }
     }
 
@@ -682,25 +699,27 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    private void makeRingField(StormTrack track, StormParam param)
+    private List<RingSet> makeRings(StormTrack track, StormParam param)
             throws Exception {
-        param = STIStormDataSource.PARAM_RADIUSMODERATEGALE;
+        if(param == null) {
+            System.err.println ("couldn't find rings param:" + param);
+            return null;
+        }
         List<EarthLocation> locations    = track.getLocations();
         int                 numPoints    = locations.size();
         List<RingSet>       rings        = new ArrayList<RingSet>();
         double[][]          newRangeVals = new double[2][numPoints];
-        //TODO: Use a real type
         Real[] values = track.getTrackAttributeValues(param);
         if (values == null) {
-            setRings(null, null);
-            return;
+            System.err.println ("couldn't find ring value:" + param);
+            return null;
         }
         for (int i = 0; i < numPoints; i++) {
             if ((values[i] != null) && !values[i].isMissing()) {
                 rings.add(makeRingSet(locations.get(i), values[i]));
             }
         }
-        setRings(param, rings);
+        return rings;
     }
 
 
