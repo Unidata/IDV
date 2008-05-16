@@ -426,10 +426,7 @@ public class StormTrackChart {
 
         Insets inset      = new Insets(2, 7, 0, 0);
         List   chartComps = new ArrayList();
-        chartComps.add(GuiUtils.lLabel((isHourly()
-                                        ? "Forecast Hour:"
-                                        : "Forecast Time:")));
-        chartComps.add(GuiUtils.inset(chartTimeBox, inset));
+
         List<Way> ways =
             Misc.sort(stormDisplayState.getTrackCollection().getWayList());
         List wayComps = new ArrayList();
@@ -467,6 +464,10 @@ public class StormTrackChart {
         }
         chartComps.add(GuiUtils.inset(chartWayComp, inset));
 
+        chartComps.add(GuiUtils.lLabel((isHourly()
+                                        ? "Forecast Hour:"
+                                        : "Forecast Time:")));
+        chartComps.add(GuiUtils.inset(chartTimeBox, inset));
 
         List paramComps = new ArrayList();
         for (StormParam param : params) {
