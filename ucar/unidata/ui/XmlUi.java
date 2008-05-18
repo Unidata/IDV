@@ -1069,10 +1069,14 @@ public class XmlUi implements ActionListener, ItemListener {
             }
             if (v == null) {
                 v = XmlUtil.getAttributeFromTree(node.getParentNode(),
+                        inheritNameOldWay(attr));
+            }
+            if (v == null) {
+                v = XmlUtil.getAttributeFromTree(node.getParentNode(),
                         inheritName(attr));
             }
         }
-        if ((v != null) && v.startsWith("prop:")) {
+        if ((v != null) && (v.startsWith("prop:") || v.startsWith("prop_"))) {
             v = getProperty(v.substring(5));
         }
 
@@ -1099,9 +1103,14 @@ public class XmlUi implements ActionListener, ItemListener {
      * @param attr attr name
      * @return i:attr
      */
-    public static String inheritName(String attr) {
+    public static String inheritNameOldWay(String attr) {
         return "i:" + attr;
     }
+
+    public static String inheritName(String attr) {
+        return "i_" + attr;
+    }
+
 
     /**
      * Get the attribute value
