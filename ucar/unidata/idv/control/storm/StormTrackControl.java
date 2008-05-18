@@ -265,8 +265,6 @@ public class StormTrackControl extends DisplayControlImpl {
      */
 
 
-    RealType dfltRealType;
-    RealType timeType;
 
     Hashtable rangeTypes = new Hashtable();
     protected FieldImpl makeTrackField(StormTrack track, StormParam param)
@@ -276,20 +274,14 @@ public class StormTrackControl extends DisplayControlImpl {
         int                   numPoints = points.size();
         Unit                  timeUnit  = points.get(0).getTime().getUnit();
 
-
         cnt++;
-        if(dfltRealType==null) {
-                dfltRealType = RealType.getRealType("Default_" + (cnt));
-            timeType =
-            RealType.getRealType(DataUtil.cleanName("track_time" +  "_" +cnt
-                + timeUnit), timeUnit);
-        }
+        RealType  dfltRealType = RealType.getRealType("Default_" + (cnt));
         Real                  dfltReal  = new Real(dfltRealType, 1);
 
 
-        RealTupleType rangeType    = null;
+        RealType rangeType    = null;
 
-        double[][]    newRangeVals = new double[2][numPoints];
+        double[][]    newRangeVals = new double[1][numPoints];
         float[]       alts         = new float[numPoints];
         float[]       lats         = new float[numPoints];
         float[]       lons         = new float[numPoints];
@@ -304,19 +296,18 @@ public class StormTrackControl extends DisplayControlImpl {
             //Set the dflt so we can use its unit later
             dfltReal = value;
             if (rangeType == null) {
-                    String key = "unit:" + value.getUnit();
-                    rangeType = (RealTupleType) rangeTypes.get(key);
-                    if(rangeType == null) {
+                String key = track.getWay() +"_unit:" + value.getUnit();
+                rangeType = (RealType) rangeTypes.get(key);
+                if(rangeType == null) {
                     rangeType =
-                      new RealTupleType(RealType.getRealType("trackrange_"  +cnt
-                           , value.getUnit()), timeType);
-                            rangeTypes.put(key, rangeType);
-                    }
+                        RealType.getRealType("trackrange_"  +cnt, value.getUnit());
+                    rangeTypes.put(key, rangeType);
+                }
             }
             DateTime      dateTime = stp.getTime();
             EarthLocation el       = stp.getLocation();
             newRangeVals[0][pointIdx] = value.getValue();
-            newRangeVals[1][pointIdx] = dateTime.getValue();
+            //            newRangeVals[1][pointIdx] = dateTime.getValue();
             lats[pointIdx]            = (float) el.getLatitude().getValue();
             lons[pointIdx]            = (float) el.getLongitude().getValue();
             //            System.err.println("\tpt:" + el + " " + dateTime);
@@ -325,22 +316,19 @@ public class StormTrackControl extends DisplayControlImpl {
         }
         GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
                                 alts);
-        Set[] rangeSets = new Set[2];
-        rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
-        rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
+        Set[] rangeSets = new Set[1];
+        rangeSets[0] = new DoubleSet(new SetType(rangeType));
+        //        rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
         FunctionType newType =
             new FunctionType(((SetType) llaSet.getType()).getDomain(),
                              rangeType);
-        FlatField timeTrack = new FlatField(newType, llaSet,
-                                            (CoordinateSystem) null,
-                                            rangeSets,
-                                            new Unit[] { dfltReal.getUnit(),
-                timeUnit });
-        timeTrack.setSamples(newRangeVals, false);
-        return timeTrack;
+        FlatField trackField = new FlatField(newType, llaSet,
+                                        (CoordinateSystem) null,
+                                        rangeSets,
+                                        new Unit[] { dfltReal.getUnit()});
+        trackField.setSamples(newRangeVals, false);
+        return trackField;
     }
-
-
 
 
 
