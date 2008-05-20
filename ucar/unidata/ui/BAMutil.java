@@ -74,8 +74,8 @@ public class BAMutil {
      *  @return the Icon or null if not found
      */
     public static ImageIcon getIcon(String name, boolean errMsg) {
-        return ucar.unidata.util.Resource.getIcon(defaultResourcePath + name
-                + ".gif", errMsg);
+        return ucar.unidata.util.GuiUtils.getScaledImageIcon(defaultResourcePath + name
+                + ".gif", null, true);
     }
 
     /**
@@ -379,8 +379,8 @@ public class BAMutil {
                                            int accel) {
         if (icon_name != null) {
             act.putValue(Action.SMALL_ICON, getIcon(icon_name, true));
-            act.putValue(BAMutil.ROLLOVER_ICON,
-                         getIcon(icon_name + "Sel", false));
+            //            act.putValue(BAMutil.ROLLOVER_ICON,
+            //                         getIcon(icon_name + "Sel", false));
         }
         act.putValue(Action.SHORT_DESCRIPTION, action_name);
         act.putValue(Action.LONG_DESCRIPTION, action_name);
