@@ -290,8 +290,8 @@ public class ViewpointControl implements ActionListener {
 
 
         pButton = GuiUtils.getToggleImageButton(
-            GuiUtils.getImageIcon(ICON_PERSPECTIVE),
-            GuiUtils.getImageIcon(ICON_PARALLEL), 2, 2);
+            GuiUtils.getScaledImageIcon(ICON_PERSPECTIVE,null,true),
+            GuiUtils.getScaledImageIcon(ICON_PARALLEL,null,true), 2, 2);
         pButton.setSelected(isPerspective);
         pButton.setToolTipText("Set parallel/perspective projection");
         pButton.addActionListener(new ActionListener() {
@@ -343,8 +343,8 @@ public class ViewpointControl implements ActionListener {
         });
         toolbar.add(vertScaleButton);
         rotateButton = GuiUtils.getToggleImageButton(
-            GuiUtils.getImageIcon("/auxdata/ui/icons/Rotate16.gif"),
-            GuiUtils.getImageIcon("/auxdata/ui/icons/Rotate16.gif"), 2, 2);
+            GuiUtils.getScaledImageIcon("/auxdata/ui/icons/Rotate16.gif",null,true),
+            GuiUtils.getScaledImageIcon("/auxdata/ui/icons/Rotate16.gif",null,true), 2, 2);
         rotateButton.setToolTipText("Auto-rotate");
         rotateButton.setSelected(getAutoRotate());
         rotateButton.addActionListener(new ActionListener() {
@@ -370,7 +370,7 @@ public class ViewpointControl implements ActionListener {
      * @return The button
      */
     private JButton makeButton(String icon, String cmd, String tooltip) {
-        JButton button = GuiUtils.getImageButton(icon, getClass(), 2, 2);
+        JButton button = GuiUtils.getScaledImageButton(icon, getClass(), 2, 2);
         button.setToolTipText(tooltip);
         button.setActionCommand(cmd);
         button.addActionListener(this);
@@ -408,7 +408,7 @@ public class ViewpointControl implements ActionListener {
         for (int i = 0; i < perspectiveCmds.length; i++) {
             mi = new JMenuItem(perspectiveNames[i]);
             mi.setMnemonic(perspectiveNames[i].charAt(0));
-            mi.setIcon(GuiUtils.getImageIcon(perspectiveIcons[i]));
+            mi.setIcon(GuiUtils.getScaledImageIcon(perspectiveIcons[i],null,true));
             mi.setActionCommand(perspectiveCmds[i]);
             mi.addActionListener(this);
             viewMenu.add(mi);
@@ -430,7 +430,7 @@ public class ViewpointControl implements ActionListener {
 
         viewMenu.add(mi = new JMenuItem("Viewpoint Dialog..."));
         mi.setMnemonic('D');
-        mi.setIcon(GuiUtils.getImageIcon(ICON_USERVIEW));
+        mi.setIcon(GuiUtils.getScaledImageIcon(ICON_USERVIEW,null,true));
         mi.setActionCommand(CMD_ROTATEDIALOG);
         mi.addActionListener(this);
 
@@ -471,7 +471,7 @@ public class ViewpointControl implements ActionListener {
         JMenuItem mi = new JMenuItem("Vertical Scale...");
         viewMenu.add(mi);
         mi.setMnemonic('V');
-        mi.setIcon(GuiUtils.getImageIcon(ICON_SETVERTICALSCALE));
+        mi.setIcon(GuiUtils.getScaledImageIcon(ICON_SETVERTICALSCALE,null,true));
         mi.setActionCommand(CMD_SETVERTICALSCALE);
         mi.addActionListener(this);
     }

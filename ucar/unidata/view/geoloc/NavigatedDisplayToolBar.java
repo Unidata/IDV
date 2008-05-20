@@ -116,7 +116,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
      * @return button
      */
     private JButton makeButton(String path, String toolTip) {
-        JButton button = GuiUtils.getImageButton(path, getClass(), 0, 0);
+        JButton button = GuiUtils.getScaledImageButton(path, getClass(), 0, 0);
         //        JButton button = GuiUtils.getImageButton(path,getClass(),2,2);
         button.setToolTipText(toolTip);
         add(button);
