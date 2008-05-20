@@ -96,6 +96,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
+        if(dbUrl!=null && dbUrl.indexOf("derby")>=0) return true;
         return false;
     }
 
@@ -408,6 +409,9 @@ public class STIStormDataSource extends StormDataSource {
                               Hashtable properties)
             throws Exception {
         super(descriptor, "STI Storm Data", "STI Storm Data", properties);
+        if(url!=null && url.trim().equals("test")) {
+            url = DEFAULT_DERBY_URL;
+        }
         if ((url == null) || url.trim().equalsIgnoreCase("default")
                 || (url.trim().length() == 0)) {
             url = (useDerby()
