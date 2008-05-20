@@ -188,10 +188,8 @@ public class GuiUtils extends LayoutUtil {
     public static String CMD_STOP = "Stop";
 
 
-
     /** Used by apps for having a common font for buttons */
     public static final Font buttonFont = new Font("Dialog", Font.BOLD, 10);
-
 
 
     /** Holds a mapping from image filename to Image object */
@@ -228,6 +226,25 @@ public class GuiUtils extends LayoutUtil {
         GuiUtils.CMD_UPDATE = Msg.msg(GuiUtils.CMD_UPDATE);
         GuiUtils.CMD_START  = Msg.msg(GuiUtils.CMD_START);
         GuiUtils.CMD_STOP   = Msg.msg(GuiUtils.CMD_STOP);
+    }
+
+
+    private static int dfltIconSize = -1;
+    public static void setDefaultIconSize(int size) {
+        dfltIconSize = size;
+    }
+    public static int getDefaultIconSize() {
+        return dfltIconSize;
+    }
+
+    private static Font dfltFont;
+    public static void setDefaultFont(Font font) {
+        dfltFont = font;
+    }
+
+    public static Font getDefaultFont() {
+        if(dfltFont!=null) return dfltFont;
+        return null;
     }
 
 
@@ -767,12 +784,34 @@ public class GuiUtils extends LayoutUtil {
 
     public static ImageIcon getImageIcon(String file, Class c,
                                          boolean cache) {
+        if(c==null) c = GuiUtils.class;
         Image image = getImage(file, c, cache);
         if (image == null) {
             return null;
         }
         return new ImageIcon(image);
     }
+
+
+    public static ImageIcon getScaledImageIcon(String file, Class c,
+                                               boolean cache) {
+        ImageIcon icon = getImageIcon(file, c, cache);
+        if (icon == null) {
+            return null;
+        }
+        int w = icon.getIconWidth();
+        //        System.err.println (file + " " + w);
+        if(w>0 && w<dfltIconSize) {
+            Image image = icon.getImage();
+            int h = image.getHeight(null);
+            h = (int)(h*(dfltIconSize/(double)w));
+            image = image.getScaledInstance(dfltIconSize, h,0);
+            icon.setImage(image);
+        }
+        return icon;
+
+    }
+
 
 
 
@@ -2244,6 +2283,13 @@ public class GuiUtils extends LayoutUtil {
     public static JButton getImageButton(String icon, Class origin,
                                          int hInset, int vInset) {
         return getImageButton(getImageIcon(icon, origin), hInset, vInset);
+    }
+
+
+
+    public static JButton getScaledImageButton(String icon, Class origin,
+                                         int hInset, int vInset) {
+        return getImageButton(getScaledImageIcon(icon, origin, true), hInset, vInset);
     }
 
     /**
@@ -4750,8 +4796,6 @@ public class GuiUtils extends LayoutUtil {
          * @param c the component
          */
         public void paint(Graphics g, JComponent c) {
-
-
             JLabel label = (JLabel) c;
             String text  = label.getText();
             Icon   icon  = (label.isEnabled())
