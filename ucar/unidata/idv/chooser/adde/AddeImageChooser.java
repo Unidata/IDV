@@ -804,7 +804,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         JPanel imagePanel = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N);
 
-        return GuiUtils.centerBottom(imagePanel, getDefaultButtons(this));
+        return GuiUtils.top(GuiUtils.centerBottom(imagePanel, getDefaultButtons(this)));
     }
 
 

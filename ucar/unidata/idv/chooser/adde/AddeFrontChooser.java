@@ -140,8 +140,8 @@ public class AddeFrontChooser extends AddeChooser {
 
         JComponent buttons = getDefaultButtons();
         setHaveData(true);
-        return GuiUtils.vbox(GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
-                GuiUtils.WT_N), buttons);
+        return GuiUtils.topLeft(GuiUtils.vbox(GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
+                GuiUtils.WT_N), buttons));
     }
 
 

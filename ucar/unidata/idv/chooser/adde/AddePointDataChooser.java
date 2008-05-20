@@ -203,7 +203,7 @@ public class AddePointDataChooser extends AddeChooser {
         GuiUtils.tmpInsets = GRID_INSETS;
         JComponent top = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NN,
                                            GuiUtils.WT_N);
-        return GuiUtils.centerBottom(top, getDefaultButtons());
+        return GuiUtils.topLeft(GuiUtils.centerBottom(top, getDefaultButtons()));
     }
 
     /**

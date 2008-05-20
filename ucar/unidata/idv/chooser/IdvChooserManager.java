@@ -595,7 +595,6 @@ public class IdvChooserManager extends IdvManager {
         }
 
 
-
         try {
             processChooserXml();
         } catch (Exception exc) {
@@ -688,9 +687,11 @@ public class IdvChooserManager extends IdvManager {
         }
         //      Trace.msg("Done: " + className);
 
-        JComponent chooserContents =
-            GuiUtils.topCenter(GuiUtils.inset(contents, 5),
-                               GuiUtils.filler());
+        JComponent chooserContents = (JComponent)contents;
+
+        //        JComponent chooserContents =
+        //            GuiUtils.topCenter(GuiUtils.inset(contents, 5),
+        //                               GuiUtils.filler());
         componentToChooserId.put(chooserContents, id);
 
         if (chooser instanceof XmlChooser) {

@@ -326,7 +326,7 @@ public class FileChooser extends IdvChooser {
             chooserPanel = GuiUtils.centerRight(fileChooser,
                     GuiUtils.top(accessory));
         }
-        JPanel filePanel = GuiUtils.vbox(chooserPanel, getDefaultButtons());
+        JPanel filePanel = GuiUtils.centerBottom(chooserPanel, getDefaultButtons());
 
         List   topComps  = new ArrayList();
         getTopComponents(topComps);

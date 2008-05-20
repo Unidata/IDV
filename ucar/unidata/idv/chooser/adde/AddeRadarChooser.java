@@ -234,8 +234,17 @@ public class AddeRadarChooser extends AddeImageChooser {
         getComponents(comps);
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel imagePanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
-                                GuiUtils.WT_N);
+                                GuiUtils.WT_NNYN);
+        /*
 
+        JScrollPane sp =
+            new JScrollPane(
+                            imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JViewport vp = sp.getViewport();
+        vp.setViewSize(new Dimension(200, 400));
+        sp.setPreferredSize(new Dimension(200, 400));
+        */
         return GuiUtils.centerBottom(imagePanel, getDefaultButtons(this));
     }
 

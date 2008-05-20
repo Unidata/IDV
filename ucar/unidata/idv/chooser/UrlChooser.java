@@ -191,6 +191,7 @@ public class UrlChooser extends IdvChooser implements ActionListener {
                     GuiUtils.top(switchBtn)), urlButtons);
 
         }
+        mainContents = GuiUtils.inset(mainContents,5);
         setHaveData(true);
         return GuiUtils.top(mainContents);
     }

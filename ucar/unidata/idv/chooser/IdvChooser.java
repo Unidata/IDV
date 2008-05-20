@@ -269,7 +269,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
             autoCreateDisplayCbx.setToolTipText(
                 "Automatically create a display when data is loaded");
             buttons = GuiUtils.flow(new Component[] { buttons,
-                    autoCreateDisplayCbx });
+                                                      autoCreateDisplayCbx });
         }
         return buttons;
     }
@@ -965,7 +965,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
                     super.paint(g);
                 }
             };
-            topPanel.add("Center", innerContents);
+            topPanel.add(BorderLayout.CENTER, innerContents);
             this.setLayout(new BorderLayout());
             this.add(BorderLayout.CENTER, topPanel);
             //            contents = topPanel;

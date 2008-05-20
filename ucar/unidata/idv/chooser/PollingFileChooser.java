@@ -165,7 +165,7 @@ public class PollingFileChooser extends FileChooser {
                                             GuiUtils.WT_N);
         contents = GuiUtils.left(contents);
         setHaveData(true);
-        return GuiUtils.vbox(contents, getDefaultButtons());
+        return GuiUtils.topLeft(GuiUtils.vbox(contents, getDefaultButtons()));
     }
 
 
