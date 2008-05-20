@@ -386,7 +386,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         };
 
         for (int i = 0; i < buttonInfo.length; i++) {
-            JButton btn = GuiUtils.getImageButton(buttonInfo[i][2],
+            JButton btn = GuiUtils.getScaledImageButton(buttonInfo[i][2],
                               getClass(), 2, 2);
             btn.setToolTipText(buttonInfo[i][0]);
             btn.setActionCommand(buttonInfo[i][1]);
