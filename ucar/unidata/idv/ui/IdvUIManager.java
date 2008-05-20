@@ -521,6 +521,48 @@ public class IdvUIManager extends IdvManager {
             getProperty("idv.animation.bigicon", false);
 
 
+        UIDefaults defaults = UIManager.getDefaults();
+        JLabel tmp = new JLabel("");
+        
+        String iconSize =
+            (String) getIdv().getStateManager()
+            .getPreferenceOrProperty("idv.ui.iconsize");
+
+        String fontSize =
+            (String) getIdv().getStateManager()
+            .getPreferenceOrProperty("idv.ui.fontsize");
+
+
+        if(iconSize!=null) {
+            GuiUtils.setDefaultIconSize(new Integer(iconSize).intValue());
+        }
+
+        if(fontSize!=null) {
+        String [] landf = {
+      "Button",	"ToggleButton", "RadioButton", "CheckBox", "Colorchooser", "ComboBox",	"FileChooser",	"FileView","InternalFrame", "DesktopIcon",	"Label",	"List",	"MenuBar",	"MenuItem", "RadioButtonMenuItem", "CheckBoxMenuItem",	"Menu",	"PopupMenu",	"OptionPane", "Panel",	"ProgressBar",	"Separator","List","ScrollPane",
+            "Slider",
+            "SplitPane",
+            "TabbedPane",
+            "Table",
+            "TableHeader",
+            "TextField",
+            "PasswordField",
+            "TextPane",
+            "TextArea",
+            "EditorPane",
+            "TitledBorder",
+            "Toolbar",
+            "ToolTip",
+        "tree"};
+        int size = new Integer(fontSize).intValue();
+        Font dfltFont  = tmp.getFont().deriveFont((float)size);
+        GuiUtils.setDefaultFont(dfltFont);
+
+        for(int i=0;i<landf.length;i++) {
+            defaults.put(landf[i] +".font",  dfltFont);
+        }
+        }
+
         if (getStateManager().getProperty(PROP_UI_DESKTOP, false)) {
             desktopPane = new JDesktopPane();
             desktopPane.setPreferredSize(new Dimension(700, 500));

@@ -118,6 +118,11 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
         setContentType("text/html");
         addHyperlinkListener(this);
         editors.add(this);
+        putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        Font f = GuiUtils.getDefaultFont();
+        if(f!=null) {
+            this.setFont(f);
+        }
     }
 
 
