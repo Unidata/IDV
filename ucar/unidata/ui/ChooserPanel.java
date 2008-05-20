@@ -71,7 +71,7 @@ import javax.swing.event.ListSelectionListener;
 public class ChooserPanel extends JPanel implements ActionListener {
 
     /** The spacing used in the grid layout */
-    protected static final int GRID_SPACING = 4;
+    protected static final int GRID_SPACING = 3;
 
     /** Used by derived classes when they do a GuiUtils.doLayout */
     protected static final Insets GRID_INSETS = new Insets(GRID_SPACING,
