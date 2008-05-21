@@ -204,6 +204,17 @@ public class WayDisplayState {
      *
      * @return _more_
      */
+    public boolean hasLabelDisplay() {
+        return labelDisplay != null;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasRingsDisplay() {
         return ringsHolder != null;
     }
@@ -247,7 +258,6 @@ public class WayDisplayState {
             if ( !hasTrackDisplay() || !Misc.equals(colorParam, tmp)) {
                 boolean hadTrack = hasTrackDisplay();
                 colorParam = tmp;
-                System.err.println(colorParam);
                 FieldImpl trackField = makeTrackField();
                 if (trackField != null) {
                     getTrackDisplay().setTrack(trackField);
@@ -268,6 +278,9 @@ public class WayDisplayState {
         } else {
             if (hasTrackDisplay()) {
                 getTrackDisplay().setVisible(false);
+            }
+            if (hasLabelDisplay()) {
+                getLabelDisplay().setVisible(false);
             }
         }
 
@@ -301,20 +314,10 @@ public class WayDisplayState {
                 this.ringsParam = tmp;
                 getRingsHolder().clearDisplayables();
                 setRingsColor();
-               // for (StormParam param : ringsParam) {
-                    TrackDisplayable ringDisplay = makeRingDisplay(ringsParam);
-                    if (ringDisplay != null) {
-                        ringsHolder.addDisplayable(ringDisplay);
-                    }
-              //  }
-             //   for (StormTrack track : tracks) {
-             //       List<RingSet> rings =  makeRings(track, ringsParam);
-             //       if (rings != null) {
-             //           for (RingSet ring : rings) {
-             //               ringsHolder.addDisplayable(ring);
-             //           }
-             //       }
-            //    }
+                TrackDisplayable ringDisplay = makeRingDisplay(ringsParam);
+                if (ringDisplay != null) {
+                    getRingsHolder().addDisplayable(ringDisplay);
+                }
                 setRingsColor();
             }
             getRingsHolder().setVisible(true);
@@ -497,6 +500,7 @@ public class WayDisplayState {
         return coneDisplay;
     }
 
+
     public TrackDisplayable makeRingDisplay(StormParam param)
             throws Exception {
         FieldImpl field = makeRingField(param);
@@ -507,8 +511,9 @@ public class WayDisplayState {
             new TrackDisplayable(
                 "ring_" + stormDisplayState.getStormInfo().getStormId());
         ringDisplay.setUseTimesInAnimation(false);
-        ringDisplay.setTrack(field);
+        ringDisplay.setVisible(true);
         ringDisplay.setUseTimesInAnimation(false);
+        ringDisplay.setTrack(field);
         return ringDisplay;
     }
 
@@ -709,82 +714,6 @@ public class WayDisplayState {
 
 
 
-    /**
-     * _more_
-     *
-     * @param track _more_
-     * @param param _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    private List<RingSet> makeRings(StormTrack track, StormParam param)
-            throws Exception {
-        if(param == null) {
-            System.err.println ("couldn't find rings param:" + param);
-            return null;
-        }
-        List<EarthLocation> locations    = track.getLocations();
-        int                 numPoints    = locations.size();
-        List<RingSet>       rings        = new ArrayList<RingSet>();
-        double[][]          newRangeVals = new double[2][numPoints];
-        Real[] values = track.getTrackAttributeValues(param);
-        if (values == null) {
-            System.err.println ("couldn't find ring value:" + param);
-            return null;
-        }
-        for (int i = 0; i < numPoints; i++) {
-            if ((values[i] != null) && !values[i].isMissing()) {
-                rings.add(makeRingSet(locations.get(i), values[i]));
-            }
-        }
-        return rings;
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     *
-     * @param el _more_
-     * @param r _more_
-     *
-     * @return _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    private RingSet makeRingSet(EarthLocation el, Real r)
-            throws VisADException, RemoteException {
-        double lat = el.getLatitude().getValue();
-        double lon = el.getLongitude().getValue();
-        Radar2DCoordinateSystem r2Dcs =
-            new Radar2DCoordinateSystem((float) lat, (float) lon);
-        RealTupleType rtt = new RealTupleType((RealType) r.getType(),
-                                azimuthType, r2Dcs, null);
-        Color   ringColor = Color.gray;
-
-        RingSet rss       = new RingSet("range rings", rtt, ringColor);
-        // set initial spacing etc.
-        rss.setRingValues(r, r);
-        //        rss.setRingValues(
-        //            new Real(rangeType, r, CommonUnit.meter.scale(1000)),
-        //            new Real(rangeType, r, CommonUnit.meter.scale(1000)));
-        rss.setVisible(true);
-
-        /** width for range rings */
-        float radialWidth = 1.f;
-
-        rss.setLineWidth(radialWidth);
-
-        return rss;
-
-    }
-
-
-
-
 
     /**
      * _more_
@@ -818,11 +747,9 @@ public class WayDisplayState {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
         for (StormTrack track : tracks) {
-
-            fields.add( makeRingTracks(track, stormParam));
-
+            FieldImpl ringField = makeRingTracks(track, stormParam);
+            fields.add(ringField); 
             times.add(track.getStartTime());
-
         }
 
         if (fields.size() == 0) {
@@ -1085,6 +1012,7 @@ public class WayDisplayState {
         }
         return newStps;
     }
+
     /**
       * _more_
       *
@@ -1097,15 +1025,11 @@ public class WayDisplayState {
       */
      public FieldImpl makeRingTracks(StormTrack track, StormParam param)
              throws Exception {
-
-        List<StormTrackPoint> stps          = getRealTrackPoints(track,
-                                                   param);
+        List<StormTrackPoint> stps  = getRealTrackPoints(track,
+                                                         param);
         List<StormTrack> stracks = new ArrayList();
-
         int size = stps.size();
         DateTime       dt    = stps.get(0).getTime();
-
-
         for(int i= 0; i < size; i++) {
             StormTrackPoint       stp0         = stps.get(i);
             int                   numberOfPoint = 73;
@@ -1138,14 +1062,10 @@ public class WayDisplayState {
         Data[] datas= new Data[stracks.size()];
         int i=0;
         for(StormTrack stkk: stracks){
-
              datas[i++] =  stormDisplayState.getStormTrackControl().makeTrackField(
-                    stkk, null);
+                                                                                   stkk, null);
         }
-
         return Util.indexedField(datas, false);
-
-
      }
 
      public StormTrackPoint getCirclePoint(StormTrackPoint stp, double r0,

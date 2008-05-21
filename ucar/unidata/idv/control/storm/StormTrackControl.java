@@ -263,24 +263,13 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @throws Exception _more_
      */
-
-
-
     Hashtable rangeTypes = new Hashtable();
     protected FieldImpl makeTrackField(StormTrack track, StormParam param)
             throws Exception {
 
         List<StormTrackPoint> points    = track.getTrackPoints();
         int                   numPoints = points.size();
-        Unit                  timeUnit  = points.get(0).getTime().getUnit();
-
-        cnt++;
-        RealType  dfltRealType = RealType.getRealType("Default_" + (cnt));
-        Real                  dfltReal  = new Real(dfltRealType, 1);
-
-
         RealType rangeType    = null;
-
         double[][]    newRangeVals = new double[1][numPoints];
         float[]       alts         = new float[numPoints];
         float[]       lats         = new float[numPoints];
@@ -288,44 +277,42 @@ public class StormTrackControl extends DisplayControlImpl {
         Real[]        values       = ((param == null)
                                       ? null
                                       : track.getTrackAttributeValues(param));
+        Unit unit = (param!=null?param.getUnit():null);
         for (int pointIdx = 0; pointIdx < numPoints; pointIdx++) {
             StormTrackPoint stp   = points.get(pointIdx);
             Real            value = ((values == null)
-                                     ? dfltReal
+                                     ? null
                                      : values[pointIdx]);
+
             //Set the dflt so we can use its unit later
-            dfltReal = value;
             if (rangeType == null) {
-                String key = track.getWay() +"_unit:" + value.getUnit();
+                String key = track.getWay() +"_" + param;
                 rangeType = (RealType) rangeTypes.get(key);
                 if(rangeType == null) {
-                    rangeType =
-                        RealType.getRealType("trackrange_"  +cnt, value.getUnit());
+                    cnt++;
+                    rangeType =Util.makeRealType("trackrange_" + track.getWay() +"_"  +cnt, unit);
                     rangeTypes.put(key, rangeType);
                 }
             }
-            DateTime      dateTime = stp.getTime();
             EarthLocation el       = stp.getLocation();
-            newRangeVals[0][pointIdx] = value.getValue();
-            //            newRangeVals[1][pointIdx] = dateTime.getValue();
+            newRangeVals[0][pointIdx] = (value!=null?value.getValue():0);
             lats[pointIdx]            = (float) el.getLatitude().getValue();
             lons[pointIdx]            = (float) el.getLongitude().getValue();
-            //            System.err.println("\tpt:" + el + " " + dateTime);
             alts[pointIdx] = 1;
             //            if(Math.abs(lats[i])>90) System.err.println("bad lat:" + lats[i]);
         }
         GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons,
                                 alts);
-        Set[] rangeSets = new Set[1];
-        rangeSets[0] = new DoubleSet(new SetType(rangeType));
-        //        rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
+        Set[] rangeSets = new Set[]{
+            new DoubleSet(new SetType(rangeType))
+        });
         FunctionType newType =
             new FunctionType(((SetType) llaSet.getType()).getDomain(),
                              rangeType);
         FlatField trackField = new FlatField(newType, llaSet,
                                         (CoordinateSystem) null,
                                         rangeSets,
-                                        new Unit[] { dfltReal.getUnit()});
+                                             new Unit[] { unit});
         trackField.setSamples(newRangeVals, false);
         return trackField;
     }
@@ -703,7 +690,6 @@ public class StormTrackControl extends DisplayControlImpl {
                 if (bbox == null) {
                     continue;
                 }
-                System.err.println ("bbox:" + bbox);
                 minLon = Math.min(minLon, bbox.getLonMin());
                 maxLon = Math.max(maxLon, bbox.getLonMax());
                 minLat = Math.min(minLat, bbox.getLatMin());
@@ -727,7 +713,6 @@ public class StormTrackControl extends DisplayControlImpl {
             if ( !didone) {
                 return null;
             }
-            System.err.println ("v:" + minLon +" " +  maxLon);
             return ucar.visad.Util.makeMapProjection(minLat, minLon, maxLat,
                     maxLon);
         } catch (Exception exc) {
