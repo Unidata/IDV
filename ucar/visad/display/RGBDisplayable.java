@@ -376,6 +376,9 @@ public abstract class RGBDisplayable extends DisplayableData {
             table[0][m] = color.getRed() / 255.f;    // Red amount  
             table[1][m] = color.getGreen() / 255.f;  // Green
             table[2][m] = color.getBlue() / 255.f;   // Blue  
+            if(alphaflag) {
+                table[3][m] = color.getAlpha() / 255.f;   // alpha
+            }
         }
         setColorPalette(table);
     }
