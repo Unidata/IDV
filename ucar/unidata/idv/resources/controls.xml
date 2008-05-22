@@ -172,7 +172,7 @@ example:
     categories="RADAR_VOLUME" 
     class="ucar.unidata.idv.control.Level2ColorCrossSectionControl" 
     description="Color-shaded cross section" 
-    label="Color-Shaded Vertical Cross Section" 
+    label="Color-Shaded Cross Section" 
     xxxicon="/ucar/unidata/idv/images/crosssection.png"
     displaycategory="Radar Views"
     properties="displayName=Color-Shaded Cross Section;windowVisible=true;smoothed=false;" />
@@ -198,7 +198,7 @@ example:
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ContourCrossSectionControl"
      description="Contour cross section"
-     label="Contour Vertical Cross Section"
+     label="Contour Cross Section"
      icon="/ucar/unidata/idv/images/crosssection.jpg"
      displaycategory="Cross sections"
      properties="displayName=Contour Cross Section;windowVisible=true;autoScaleYAxis=true;"/>
@@ -207,7 +207,7 @@ example:
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ContourCrossSectionControl"
      description="Color-filled contour cross section"
-     label="Color-Filled Contour Vertical Cross Section"
+     label="Color-Filled Contour Cross Section"
      xxxicon="/ucar/unidata/idv/images/crosssection.jpg"
      displaycategory="Cross sections"
      properties="displayName=Color-Filled Contour Cross Section;windowVisible=true;colorFill=true;autoScaleYAxis=true;"/>
@@ -216,7 +216,7 @@ example:
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ColorCrossSectionControl"
      description="Color-shaded cross section"
-     label="Color-Shaded Vertical Cross Section"
+     label="Color-Shaded Cross Section"
      xxxicon="/ucar/unidata/idv/images/crosssection.jpg"
      displaycategory="Cross sections"
      properties="displayName=Color-Shaded Cross Section;windowVisible=true;smoothed=false;autoScaleYAxis=true;"/>
@@ -423,8 +423,8 @@ example:
     id="planviewflowoverz" 
     categories="*-flowvector-*" 
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Plan view of flow vectors over topography" 
-    label="Vector Plan View Over Topography" 
+    description="Flow vectors over topography" 
+    label="Vectors Over Topography" 
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
     properties="displayName=Vector Plan View Over Topography;multipleIsTopography=true" />
@@ -433,8 +433,8 @@ example:
     id="windbarbplanoverz" 
     categories="*-flowvector-*" 
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Wind barb plan view of flow vectors over topography" 
-    label="Wind Barb Plan View Over Topography" 
+    description="Wind barbs over topography" 
+    label="Wind Barbs Over Topography" 
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
     properties="windbarbs=true;displayName=Wind Barb Plan View Over Topography;multipleIsTopography=true" />
@@ -489,10 +489,10 @@ example:
      description="Plan view contour plot on topography"
      doeslevels="true"
      icon="/ucar/unidata/idv/images/planview.png"
-     label="Contour Plan View Over Topography"
+     label="Contours Over Topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
-     properties="displayName=Contour Plan View Over Topography;multipleIsTopography=true">
+     properties="displayName=Contours Over Topography;multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -500,12 +500,12 @@ example:
      id="planviewcontourfilledoverz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
-     description="Color-filled contour plan view on topography"
-     label="Color-Filled Contour Plan View Over Topography"
+     description="Color-filled contour over topography"
+     label="Color-Filled Contours Over Topography"
      doeslevels="true"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
-     properties="displayName=Color-Filled Contour Plan View Over Topography;colorFill=true;multipleIsTopography=true">
+     properties="displayName=Color-Filled Contours Over Topography;colorFill=true;multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -514,11 +514,11 @@ example:
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ColorPlanViewControl"
      doeslevels="true"
-     description="Plan view color-shaded image on topography"
-     label="Color-Shaded Plan View Over Topography"
+     description="Color-shaded image over topography"
+     label="Color-Shaded Image Over Topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
-     properties="displayName=Color-Shaded Plan View Over Topography;smoothed=false;multipleIsTopography=true">
+     properties="displayName=Color-Shaded Image Over Topography;smoothed=false;multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -532,7 +532,7 @@ example:
      label="3 Color (RGB) Image over topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation])"
      displaycategory="Imagery"
-     properties="displayName= 3 Color Image Over Topography View;multipleIsTopography=true">
+     properties="displayName= 3 Color Image Over Topography;multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
