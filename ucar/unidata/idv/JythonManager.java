@@ -1346,13 +1346,11 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     public void appendTmpJython(String jython) {
         String oldJython = tmpHolder.getText();
-        //Don't add it if we have it.
-        if (oldJython.indexOf(jython) >= 0) {
-            return;
+        if (oldJython.indexOf(jython) < 0) {
+            String newJython = oldJython + "\n\n## Imported jython from bundle\n"
+                + jython;
+            tmpHolder.setText(newJython);
         }
-        String newJython = oldJython + "\n\n## Imported jython from bundle\n"
-                           + jython;
-        tmpHolder.setText(newJython);
         evaluateLibJython(false, tmpHolder);
     }
 
