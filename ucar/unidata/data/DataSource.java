@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -213,11 +214,12 @@ public interface DataSource {
     /**
      * A utility method to find all data choices that match the pattern
      *
-     * @param pattern pattern
+     *
+     * @param id _more_
      *
      * @return  List of data choices
      */
-    public List findDataChoices(String pattern);
+    public List findDataChoices(Object id);
 
     /**
      * Get the type name of this DataSource

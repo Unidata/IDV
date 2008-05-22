@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -1487,68 +1488,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  the DataChoice which has id or <code>null</code>
      */
     public DataChoice findDataChoice(Object id) {
-        if (id == null) {
-            id = "#0";
+        List choices = findDataChoices(id);
+        if ((choices != null) && (choices.size() > 0)) {
+            return (DataChoice) choices.get(0);
         }
-        String           asString = id.toString();
-        List<DataChoice> choices  = getDataChoices();
-        if (asString.startsWith("#")) {
-            try {
-                int index = new Integer(asString.substring(1)).intValue();
-                if ((index < choices.size()) && (index >= 0)) {
-                    return (DataChoice) choices.get(index);
-                }
-            } catch (NumberFormatException nfe) {}
-        }
-
-        //First check if the choice.id equals the given id
-        for (DataChoice choice : choices) {
-            if (choice.getId().equals(id)) {
-                return choice.cloneMe();
-            }
-        }
-
-        //Now check the toString
-        for (DataChoice choice : choices) {
-            if (choice.toString().equals(asString)) {
-                return choice;
-            }
-            if (choice.getName().equals(asString)) {
-                return choice;
-            }
-        }
-
-        //Now check for aliases
-        for (DataChoice choice : choices) {
-            String canonical =
-                DataAlias.aliasToCanonical(choice.getName().toString());
-            if ((canonical != null)
-                    && canonical.toLowerCase().equals(
-                        asString.toLowerCase())) {
-                return choice;
-            }
-        }
-
-
-        if (id instanceof String) {
-            String  sid      = id.toString();
-            boolean isRegexp = false;
-            if (sid.startsWith("pattern:")) {
-                isRegexp = true;
-                sid      = sid.substring(8);
-            } else {
-                isRegexp = StringUtil.containsRegExp(sid);
-            }
-            if (isRegexp) {
-                for (DataChoice choice : choices) {
-                    if (StringUtil.stringMatch(choice.getDescription(), sid,
-                            true, false)) {
-                        return choice;
-                    }
-                }
-            }
-        }
-
         return null;
     }
 
@@ -1567,8 +1510,73 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      *
      * @return  the DataChoice which has id or <code>null</code>
      */
-    public List findDataChoices(String id) {
-        List   result   = new ArrayList();
+    public List findDataChoices(Object id) {
+
+        List result = new ArrayList();
+
+        if (id == null) {
+            id = "#0";
+        }
+        String           asString = id.toString();
+        List<DataChoice> choices  = getDataChoices();
+
+        if (asString.startsWith("#")) {
+            try {
+                int index = new Integer(asString.substring(1)).intValue();
+                if ((index < choices.size()) && (index >= 0)) {
+                    return Misc.newList(choices.get(index));
+                }
+            } catch (NumberFormatException nfe) {}
+        }
+
+        String  sid      = null;
+        boolean isRegexp = false;
+        if (id instanceof String) {
+            sid = id.toString();
+            if (sid.startsWith("pattern:")) {
+                isRegexp = true;
+                sid      = sid.substring(8);
+            } else {
+                isRegexp = StringUtil.containsRegExp(sid);
+            }
+        }
+
+        //First check if the choice.id equals the given id
+        for (DataChoice choice : choices) {
+            if (choice.getId().equals(id)) {
+                result.add(choice.cloneMe());
+                continue;
+            }
+            if (choice.toString().equals(asString)) {
+                result.add(choice.cloneMe());
+                continue;
+            }
+            if (choice.getName().equals(asString)) {
+                result.add(choice.cloneMe());
+                continue;
+            }
+
+            String canonical =
+                DataAlias.aliasToCanonical(choice.getName().toString());
+            if ((canonical != null)
+                    && canonical.toLowerCase().equals(
+                        asString.toLowerCase())) {
+                result.add(choice.cloneMe());
+                continue;
+            }
+
+
+            if ((sid != null) && isRegexp) {
+                if (StringUtil.stringMatch(choice.getDescription(), sid,
+                                           true, false)) {
+                    result.add(choice.cloneMe());
+                    continue;
+                }
+            }
+        }
+        return result;
+
+        /*
         String asString = id.toString();
         List   choices  = getDataChoices();
         if (asString.startsWith("#")) {
@@ -1596,7 +1604,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 continue;
             }
             List aliases = DataAlias.getAliasesOf(asString);
-            if (alias != null) {
+            if (alias != null && aliases!=null) {
                 boolean gotIt = false;
                 for (int aliasIdx = 0; !gotIt && (aliasIdx < aliases.size());
                         aliasIdx++) {
@@ -1622,10 +1630,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
 
-
-
-
         return result;
+        */
     }
 
 
