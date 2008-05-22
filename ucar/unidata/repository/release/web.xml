@@ -11,10 +11,11 @@
 
   <context-param>
     <param-name>args</param-name>
+    <param-value>-Djdms.db=derby,-Dramadda_home=/web/repository</param-value>
+
 <!--
-    <param-value>-Djdms.db=derby,-Dramada_home=/web/repository</param-value>
--->
     <param-value>-Djdms.db=derby</param-value>
+-->
     <description>
       Database used by the repository.
     </description>
