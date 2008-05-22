@@ -520,19 +520,23 @@ public class CatalogOutputHandler extends OutputHandler {
                     SERVICE_HTTP, ATTR_URLPATH, urlPath });
         }
         if (entry.getResource().isUrl()) {
-            URL    url     = new URL(entry.getResource().getPath());
-            String service = url.getProtocol() + "://" + url.getHost();
-            if (url.getPort() > 0) {
-                service = service + ":" + url.getPort();
-            }
-            addService(catalogInfo, service, service);
-            String tail = url.getPath();
-            if (url.getQuery() != null) {
-                tail = tail + "?" + url.getQuery();
-            }
-            XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
-                           new String[] { ATTR_SERVICENAME,
-                                          service, ATTR_URLPATH, tail });
+            //            try {
+                URL    url     = new URL(entry.getResource().getPath());
+                String service = url.getProtocol() + "://" + url.getHost();
+                if (url.getPort() > 0) {
+                    service = service + ":" + url.getPort();
+                }
+                addService(catalogInfo, service, service);
+                String tail = url.getPath();
+                if (url.getQuery() != null) {
+                    tail = tail + "?" + url.getQuery();
+                }
+                XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
+                               new String[] { ATTR_SERVICENAME,
+                                              service, ATTR_URLPATH, tail });
+                //            } catch (java.net.MalformedURLException mfe) {
+                //For now
+                //            }
         }
 
         if (entry.getResource().isFile()) {
