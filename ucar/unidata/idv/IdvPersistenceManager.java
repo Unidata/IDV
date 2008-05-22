@@ -3163,7 +3163,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             final String theJython = jython;
             JLabel label =
                 new JLabel(
-                    "<html>The bundle contained the following jython library.<br>What would you like to do with this?<br></html>");
+                    "<html>The bundle contained the following jython library.<p>&nbsp;&nbsp; What would you like to do with this?<br></html>");
             final JDialog dialog =
                 GuiUtils.createDialog("Load Jython Library", true);
 
@@ -3208,7 +3208,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             JPanel buttons = GuiUtils.hbox(Misc.newList(addItBtn, addTmpBtn,
                                  addSelectedBtn, dontLoadBtn), 5);
             JPanel comp =
-                GuiUtils.topCenter(GuiUtils.inset(GuiUtils.vbox(label,
+                GuiUtils.topCenter(GuiUtils.inset(GuiUtils.vbox(GuiUtils.inset(label,5),
                     buttons), 5), GuiUtils.makeScrollPane(textArea, 300,
                         500));
             dialog.getContentPane().add(comp);
