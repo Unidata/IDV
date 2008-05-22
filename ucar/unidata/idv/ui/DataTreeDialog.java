@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -91,6 +92,7 @@ public class DataTreeDialog implements ActionListener {
     private static final String CMD_POPUPDATACHOOSER = "Add New Data Source";
 
 
+    /** _more_          */
     private JDialog dialog;
 
     /** Reference to the IDV */
@@ -143,8 +145,8 @@ public class DataTreeDialog implements ActionListener {
                           List selectedDataChoices) {
 
 
-    //        super(idv.getIdvUIManager().getFrame(), TITLE, true);
-        dialog = GuiUtils.createDialog(null,TITLE,true);
+        //        super(idv.getIdvUIManager().getFrame(), TITLE, true);
+        dialog = GuiUtils.createDialog(null, TITLE, true);
         //        super(LogUtil.getCurrentWindow(), TITLE, true);
         this.idv         = idv;
         this.operands    = operands;
@@ -181,7 +183,7 @@ public class DataTreeDialog implements ActionListener {
                 }
             });
             idv.getIdvUIManager().addDataSourceHolder(dataTree);
-            dataTree.setMultipleSelect(false);
+            dataTree.setMultipleSelect(operand.getMultiple());
             if (selectedDataChoices != null) {
                 dataTree.selectChoices(selectedDataChoices);
             } else if (operand.getPattern() != null) {
@@ -225,12 +227,14 @@ public class DataTreeDialog implements ActionListener {
      * @param doubleClick user double clicked
      */
     private void treeClick(int index, boolean doubleClick) {
-        DataTree    tree       = (DataTree) dataTrees.get(index);
-        DataChoice  dataChoice = tree.getSelectedDataChoice();
-        DataOperand operand    = (DataOperand) operands.get(index);
+        DataTree    tree    = (DataTree) dataTrees.get(index);
+        DataOperand operand = (DataOperand) operands.get(index);
         DataSelectionWidget dsw =
             (DataSelectionWidget) dataSelectionWidgets.get(index);
+
+        DataChoice dataChoice = tree.getSelectedDataChoice();
         dsw.updateSelectionTab(dataChoice);
+
         if (doubleClick) {
             addMultiple(new Integer(index));
         }
@@ -259,18 +263,16 @@ public class DataTreeDialog implements ActionListener {
      * @param index Which list
      */
     public void addMultiple(Integer index) {
-        DataTree   tree       = (DataTree) dataTrees.get(index.intValue());
-        DataChoice dataChoice = tree.getSelectedDataChoice();
-        if (dataChoice == null) {
-            return;
-        }
+        DataTree tree = (DataTree) dataTrees.get(index.intValue());
         DataSelectionWidget dsw =
             (DataSelectionWidget) dataSelectionWidgets.get(index.intValue());
-        JList      list          = (JList) multiLists.get(index.intValue());
-        Vector     v             = new Vector(GuiUtils.getItems(list));
-        DataChoice newDataChoice = dataChoice.createClone();
-        newDataChoice.setDataSelection(dsw.createDataSelection(true));
-        v.add(newDataChoice);
+        JList  list = (JList) multiLists.get(index.intValue());
+        Vector v    = new Vector(GuiUtils.getItems(list));
+        for (DataChoice dataChoice : tree.getSelectedDataChoices()) {
+            DataChoice newDataChoice = dataChoice.createClone();
+            newDataChoice.setDataSelection(dsw.createDataSelection(true));
+            v.add(newDataChoice);
+        }
         list.setListData(v);
     }
 
@@ -332,9 +334,9 @@ public class DataTreeDialog implements ActionListener {
                 JScrollPane multiScroller =
                     GuiUtils.makeScrollPane(multiList, 250, 100);
                 multiScroller.setPreferredSize(new Dimension(250, 100));
-                JButton multiBtn =
-                    GuiUtils.makeButton("Add selected entry>>", this,
-                                        "addMultiple", new Integer(index));
+                JButton multiBtn = GuiUtils.makeButton("Add selected>>",
+                                       this, "addMultiple",
+                                       new Integer(index));
                 multiComp = GuiUtils.topCenter(GuiUtils.left(multiBtn),
                         multiScroller);
                 //                treeContents = GuiUtils.vbox((treeContents, multiBtn), multiScroller);

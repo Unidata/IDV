@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -1049,7 +1050,7 @@ public class DataTree extends DataSourceHolder {
         //For now rebuild the data object to tree node mapping
         //This is overkill
         rebuildMaps();
-        if (cnt != 0 || true) {
+        if ((cnt != 0) || true) {
             treeStructureChanged(parentNode);
         }
 
@@ -1173,9 +1174,20 @@ public class DataTree extends DataSourceHolder {
      *
      * @return List of selected data choices
      */
-    public List getSelectedDataChoices() {
-        TreePath[] paths   = tree.getSelectionModel().getSelectionPaths();
-        List       choices = new ArrayList();
+    public List<DataChoice> getSelectedDataChoicesRecursive() {
+        return null;
+    }
+
+
+
+    /**
+     * Get the list of selected data choices
+     *
+     * @return List of selected data choices
+     */
+    public List<DataChoice> getSelectedDataChoices() {
+        TreePath[]       paths = tree.getSelectionModel().getSelectionPaths();
+        List<DataChoice> choices = new ArrayList<DataChoice>();
         if (paths == null) {
             return choices;
         }
