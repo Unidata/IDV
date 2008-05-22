@@ -191,6 +191,17 @@ public class AtcfStormDataSource extends StormDataSource {
     }
 
 
+    protected void initParams() throws VisADException {
+        super.initParams();
+        if (obsParams == null) {
+        obsParams = new StormParam[]{
+            PARAM_STORMCATEGORY,
+            PARAM_MINPRESSURE,
+            PARAM_MAXWINDSPEED_KTS};
+
+        }
+    }
+
     /**
      * _more_
      *
@@ -256,10 +267,6 @@ public class AtcfStormDataSource extends StormDataSource {
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
 
             int category = getCategory((String) toks.get(10));
-            Real windspeed = PARAM_MAXWINDSPEED_KTS.getReal(
-                                 getDouble((String) toks.get(8)));
-            double pressure = getDouble((String) toks.get(9));
-
             if (category != CATEGORY_XX) {
                 //                System.err.println("cat:" + category);
             }
@@ -306,7 +313,7 @@ public class AtcfStormDataSource extends StormDataSource {
                        ? Way.OBSERVATION
                        : way);
                 track = new StormTrack(stormInfo, addWay(way),
-                                       new DateTime(dttm));
+                                       new DateTime(dttm),obsParams);
                 trackMap.put(key, track);
                 tracks.addTrack(track);
             }
@@ -324,10 +331,12 @@ public class AtcfStormDataSource extends StormDataSource {
                                           longitude), altReal);
 
             List<Real> attributes = new ArrayList<Real>();
+
+            double windspeed = getDouble((String) toks.get(8));
+            double pressure = getDouble((String) toks.get(9));
             attributes.add(PARAM_STORMCATEGORY.getReal((double) category));
             attributes.add(PARAM_MINPRESSURE.getReal(pressure));
-            attributes.add(windspeed);
-
+            attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(pressure));
 
             StormTrackPoint stp = new StormTrackPoint(elt,
                                       new DateTime(dttm), forecastHour,

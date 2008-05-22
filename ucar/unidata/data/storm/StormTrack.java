@@ -27,6 +27,8 @@ import ucar.unidata.data.*;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
+import ucar.unidata.util.Misc;
+
 
 import visad.*;
 
@@ -46,6 +48,10 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class StormTrack implements Comparable {
+
+
+    /** _more_          */
+    private List<StormParam> params = null;
 
     /** _more_          */
     private LatLonRect bbox;
@@ -74,8 +80,6 @@ public class StormTrack implements Comparable {
     //private Date trackStartTime;
 
 
-
-
     /**
      * _more_
      *
@@ -84,17 +88,17 @@ public class StormTrack implements Comparable {
      * @param pts _more_
      */
     public StormTrack(StormInfo stormInfo, Way way,
-                      List<StormTrackPoint> pts) {
+                      List<StormTrackPoint> pts, StormParam[] params) {
         this.stormInfo   = stormInfo;
         this.way         = way;
+        if(params!=null)
+            this.params = (List<StormParam>)Misc.toList(params);
         this.trackPoints = new ArrayList<StormTrackPoint>(pts);
         StormTrackPoint firstPoint     = (StormTrackPoint) pts.get(0);
         DateTime        trackStartTime = firstPoint.getTime();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + trackStartTime.getValue();
     }
-
-
 
 
     /**
@@ -104,9 +108,11 @@ public class StormTrack implements Comparable {
      * @param way _more_
      * @param startTime _more_
      */
-    public StormTrack(StormInfo stormInfo, Way way, DateTime startTime) {
+    public StormTrack(StormInfo stormInfo, Way way, DateTime startTime,StormParam[] params) {
         this.stormInfo   = stormInfo;
         this.way         = way;
+        if(params!=null)
+            this.params = (List<StormParam>)Misc.toList(params);
         this.trackPoints = new ArrayList();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + startTime.getValue();
@@ -310,9 +316,6 @@ public class StormTrack implements Comparable {
         return trackTimes;
     }
 
-
-    /** _more_          */
-    private List<StormParam> params = null;
 
 
     /**

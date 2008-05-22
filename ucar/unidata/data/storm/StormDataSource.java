@@ -132,6 +132,10 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static StormParam PARAM_STORMCATEGORY;
 
+    protected StormParam[] obsParams;
+    protected StormParam[] forecastParams;
+
+
 
     /**
      * _more_
@@ -391,7 +395,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @throws VisADException _more_
      */
-    public static void setStormTrackForecastError(StormTrack obsTrack,
+    public static void addDistanceError(StormTrack obsTrack,
             StormTrack fctTrack)
             throws VisADException {
         List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
@@ -481,7 +485,7 @@ public abstract class StormDataSource extends DataSourceImpl {
             return null;
         }
         return new StormTrack(fctTrack.getStormInfo(), fctTrack.getWay(),
-                              diffPoints);
+                              diffPoints, null);
     }
 
     /**

@@ -49,8 +49,9 @@ public class StormParam {
     /** _more_ */
     RealType type;
 
-    /** _more_ */
     private boolean canDoDifference = true;
+
+    private boolean derived = false;
 
     /**
      * _more_
@@ -66,17 +67,10 @@ public class StormParam {
         this.type = type;
     }
 
-    /**
-     * _more_
-     *
-     * @param type _more_
-     * @param canDoDifference _more_
-     */
-    public StormParam(RealType type, boolean canDoDifference) {
+    public StormParam(RealType type, boolean derived) {
         this(type);
-        this.canDoDifference = canDoDifference;
+        this.derived = derived;
     }
-
 
     /**
      * _more_
@@ -195,6 +189,24 @@ public class StormParam {
         return type;
     }
 
+
+/**
+Set the Derived property.
+
+@param value The new value for Derived
+**/
+public void setDerived (boolean value) {
+	derived = value;
+}
+
+/**
+Get the Derived property.
+
+@return The Derived
+**/
+public boolean getDerived () {
+	return derived;
+}
 
 
 
