@@ -88,27 +88,18 @@ public class WayDisplayState {
                                              CommonUnit.degree);
 
 
-    /** _more_ */
-    private StormDisplayState stormDisplayState;
-
-
-    /** _more_ */
     private Way way;
 
     /** _more_ */
-    private DisplayState wayState = new DisplayState("Show/Hide All", true);
+    private StormDisplayState stormDisplayState;
 
-    /** _more_          */
-    private DisplayState trackState = new DisplayState("Show/Hide Track",
-                                          true);
+    private DisplayState trackState;
 
-    /** _more_ */
-    private DisplayState coneState = new DisplayState("Show/Hide Cone",
-                                         false);
+    private DisplayState coneState;
+    private DisplayState wayState;
 
     /** _more_ */
-    private DisplayState ringsState = new DisplayState("Show/Hide Rings",
-                                          false);
+    private DisplayState ringsState;
 
 
     /** _more_          */
@@ -122,6 +113,7 @@ public class WayDisplayState {
 
     /** _more_ */
     private List<DateTime> times = new ArrayList<DateTime>();
+
 
 
 
@@ -143,7 +135,7 @@ public class WayDisplayState {
     private TrackDisplayable trackDisplay;
 
     /** _more_ */
-    private CompositeDisplayable ringsHolder;
+    private TrackDisplayable ringsDisplay;
 
     /** _more_ */
     private CompositeDisplayable conesHolder;
@@ -162,10 +154,25 @@ public class WayDisplayState {
 
 
 
+
+    public WayDisplayState() {}
+
+
     /**
      * _more_
+     *
+     *
+     * @param stormDisplayState _more_
+     * @param way _more_
      */
-    public WayDisplayState() {}
+    public WayDisplayState(StormDisplayState stormDisplayState, Way way) {
+        this.stormDisplayState = stormDisplayState;
+        this.way               = way;
+        wayState = new DisplayState(this, "Show/Hide All", true);
+        trackState = new DisplayState(this,"Show/Hide Track", true);
+        coneState = new DisplayState(this,"Show/Hide Cone", false);
+        ringsState = new DisplayState(this,"Show/Hide Rings", false);
+    }
 
 
 
@@ -216,7 +223,7 @@ public class WayDisplayState {
      * @return _more_
      */
     public boolean hasRingsDisplay() {
-        return ringsHolder != null;
+        return ringsDisplay != null;
     }
 
     /**
@@ -312,18 +319,19 @@ public class WayDisplayState {
             StormParam tmp = stormDisplayState.getRingsParam(this);
             if ( !hasRingsDisplay() || !Misc.equals(tmp, ringsParam)) {
                 this.ringsParam = tmp;
-                getRingsHolder().clearDisplayables();
                 setRingsColor();
-                TrackDisplayable ringDisplay = makeRingDisplay(ringsParam);
-                if (ringDisplay != null) {
-                    getRingsHolder().addDisplayable(ringDisplay);
+                FieldImpl field = makeRingsField(ringsParam);
+                if (field == null) {
+                    getRingsDisplay().setData(new Real(0));
+                } else {
+                    getRingsDisplay().setTrack(field);
                 }
                 setRingsColor();
             }
-            getRingsHolder().setVisible(true);
+            getRingsDisplay().setVisible(true);
         } else {
             if (hasRingsDisplay()) {
-                getRingsHolder().setVisible(false);
+                getRingsDisplay().setVisible(false);
             }
         }
 
@@ -465,15 +473,19 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public CompositeDisplayable getRingsHolder() throws Exception {
-        if (ringsHolder == null) {
-            ringsHolder = new CompositeDisplayable("rings_"
-                    + stormDisplayState.getStormInfo().getStormId());
-            ringsHolder.setUseTimesInAnimation(false);
-            addDisplayable(ringsHolder);
+    public TrackDisplayable getRingsDisplay() throws Exception {
+        if(ringsDisplay == null) {
+            ringsDisplay =
+                new TrackDisplayable(
+                                     "ring_" + stormDisplayState.getStormInfo().getStormId()+"_"+getWay());
+            ringsDisplay.setVisible(true);
+            ringsDisplay.setUseTimesInAnimation(false);
+            addDisplayable(ringsDisplay);
         }
-        return ringsHolder;
+        return ringsDisplay;
     }
+
+
 
 
     /**
@@ -501,34 +513,10 @@ public class WayDisplayState {
     }
 
 
-    public TrackDisplayable makeRingDisplay(StormParam param)
-            throws Exception {
-        FieldImpl field = makeRingField(param);
-        if (field == null) {
-            return null;
-        }
-        TrackDisplayable ringDisplay =
-            new TrackDisplayable(
-                "ring_" + stormDisplayState.getStormInfo().getStormId());
-        ringDisplay.setUseTimesInAnimation(false);
-        ringDisplay.setVisible(true);
-        ringDisplay.setUseTimesInAnimation(false);
-        ringDisplay.setTrack(field);
-        return ringDisplay;
-    }
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param stormDisplayState _more_
-     * @param way _more_
-     */
-    public WayDisplayState(StormDisplayState stormDisplayState, Way way) {
-        this.stormDisplayState = stormDisplayState;
-        this.way               = way;
-    }
+
+
 
 
     /**
@@ -637,8 +625,8 @@ public class WayDisplayState {
      * @throws Exception _more_
      */
     private void setRingsColor() throws Exception {
-        if (ringsHolder != null) {
-            ringsHolder.setColor(getColor());
+        if (ringsDisplay != null) {
+            ringsDisplay.setColor(getColor());
         }
     }
 
@@ -651,7 +639,7 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public void deactivate() throws VisADException, RemoteException {
-        ringsHolder = null;
+        ringsDisplay = null;
         conesHolder = null;
         if (holder != null) {}
         trackDisplay = null;
@@ -742,21 +730,6 @@ public class WayDisplayState {
         return Util.makeTimeField(fields, times);
     }
 
-    protected FieldImpl makeRingField(StormParam stormParam)
-            throws Exception {
-        List<FieldImpl> fields = new ArrayList<FieldImpl>();
-        List<DateTime>  times  = new ArrayList<DateTime>();
-        for (StormTrack track : tracks) {
-            FieldImpl ringField = makeRingTracks(track, stormParam);
-            fields.add(ringField); 
-            times.add(track.getStartTime());
-        }
-
-        if (fields.size() == 0) {
-            return null;
-        }
-        return Util.makeTimeField(fields, times);
-    }
 
     /**
      * _more_
@@ -1013,6 +986,23 @@ public class WayDisplayState {
         return newStps;
     }
 
+    protected FieldImpl makeRingsField(StormParam stormParam)
+            throws Exception {
+        List<FieldImpl> fields = new ArrayList<FieldImpl>();
+        List<DateTime>  times  = new ArrayList<DateTime>();
+        for (StormTrack track : tracks) {
+            FieldImpl ringField = makeRingTracks(track, stormParam);
+            fields.add(ringField); 
+            times.add(track.getStartTime());
+        }
+
+        if (fields.size() == 0) {
+            return null;
+        }
+        return Util.makeTimeField(fields, times);
+    }
+
+
     /**
       * _more_
       *
@@ -1030,40 +1020,30 @@ public class WayDisplayState {
         List<StormTrack> stracks = new ArrayList();
         int size = stps.size();
         DateTime       dt    = stps.get(0).getTime();
+        Way ringWay = new Way(getWay()+"_RING");
+        int  numberOfPoints = 73;
+        double angleDelta =  360.0/numberOfPoints;
         for(int i= 0; i < size; i++) {
-            StormTrackPoint       stp0         = stps.get(i);
-            int                   numberOfPoint = 73;
-            StormTrackPoint[]     ringPoints = new StormTrackPoint[numberOfPoint];
-            Real           r      = stp0.getAttribute(param);
-
+            StormTrackPoint       stp         = stps.get(i);
+            Real           r      = stp.getAttribute(param);
             if(r != null) {
-             // circle
                 double rr = r.getValue();
-
                 double azi = 0.0;
-
-                for (int j = 0; j < numberOfPoint; j++) {
-
-                    StormTrackPoint stp = getCirclePoint(stp0, rr, azi, dt);
-                     ringPoints[j] = stp;
-                     azi = azi + 5;
+                List ringList = new ArrayList<StormTrackPoint>();
+                for (int j = 0; j < numberOfPoints; j++) {
+                    ringList.add(getCirclePoint(stp, rr, azi, dt));
+                    azi = azi + angleDelta;
                  }
-
-                 List ringList = new ArrayList<StormTrackPoint>();
-                 for (int j = 0; j < numberOfPoint; j++) {
-                    ringList.add(ringPoints[j]);
-                 }
-
-                 stracks.add(new StormTrack(track.getStormInfo(), new Way("RING"),
-                                   ringList));
+                 stracks.add(new StormTrack(track.getStormInfo(), ringWay,
+                                            ringList,null));
             }
         }
 
         Data[] datas= new Data[stracks.size()];
         int i=0;
-        for(StormTrack stkk: stracks){
+        for(StormTrack ringTrack: stracks){
              datas[i++] =  stormDisplayState.getStormTrackControl().makeTrackField(
-                                                                                   stkk, null);
+                                                                                   ringTrack, null);
         }
         return Util.indexedField(datas, false);
      }
@@ -1146,7 +1126,7 @@ public class WayDisplayState {
         }
 
         return new StormTrack(track.getStormInfo(), new Way("CONE"),
-                              coneList);
+                              coneList,null);
 
     }
 

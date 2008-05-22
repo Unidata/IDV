@@ -24,6 +24,7 @@ package ucar.unidata.idv.control.storm;
 
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.GuiUtils;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -39,6 +40,8 @@ import javax.swing.event.*;
  */
 
 public class DisplayState {
+
+    private WayDisplayState wayDisplayState;
 
     /** _more_          */
     private JCheckBox cbx;
@@ -60,7 +63,8 @@ public class DisplayState {
      * @param name _more_
      * @param visible _more_
      */
-    public DisplayState(String name, boolean visible) {
+    public DisplayState(WayDisplayState wayDisplayState, String name, boolean visible) {
+        this.wayDisplayState = wayDisplayState;
         this.name    = name;
         this.visible = visible;
     }
@@ -73,7 +77,7 @@ public class DisplayState {
      *
      * @return _more_
      */
-    public JCheckBox getCheckBox(final StormDisplayState stormDisplayState) {
+    public JCheckBox getCheckBox() {
         if (cbx == null) {
             cbx = new JCheckBox("", getVisible());
             cbx.setToolTipText(name);
@@ -81,7 +85,7 @@ public class DisplayState {
                 public void actionPerformed(ActionEvent ae) {
                     try {
                         setVisible(cbx.isSelected());
-                        stormDisplayState.updateDisplays();
+                        wayDisplayState.getStormDisplayState().displayStateChanged(DisplayState.this);
                     } catch (Exception exc) {
                         LogUtil.logException("Toggling way visible", exc);
                     }
@@ -129,6 +133,24 @@ public class DisplayState {
     public String getName() {
         return name;
     }
+
+/**
+Set the WayDisplayState property.
+
+@param value The new value for WayDisplayState
+**/
+public void setWayDisplayState (WayDisplayState value) {
+	wayDisplayState = value;
+}
+
+/**
+Get the WayDisplayState property.
+
+@return The WayDisplayState
+**/
+public WayDisplayState getWayDisplayState () {
+	return wayDisplayState;
+}
 
 
 }

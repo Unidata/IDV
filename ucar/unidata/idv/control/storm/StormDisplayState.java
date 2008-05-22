@@ -41,6 +41,9 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
 
+import ucar.unidata.ui.TableSorter;
+
+
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -268,6 +271,23 @@ public class StormDisplayState {
         forecastState.getConeState().setVisible(true);
         forecastState.getTrackState().setVisible(true);
         forecastState.getRingsState().setVisible(true);
+    }
+
+
+    private void checkVisibility() {
+        List<WayDisplayState> wayDisplayStates =
+            getWayDisplayStates();
+        for (WayDisplayState wds : wayDisplayStates) {
+            if(wds.getWay().isObservation()) continue;
+            wds.getWayState().getCheckBox().setBackground(forecastState.getWayState().getVisible()?null:
+                                                          Color.gray);
+            wds.getRingsState().getCheckBox().setBackground(forecastState.getRingsState().getVisible()?null:
+                                                          Color.gray);
+            wds.getConeState().getCheckBox().setBackground(forecastState.getConeState().getVisible()?null:
+                                                          Color.gray);
+            wds.getTrackState().getCheckBox().setBackground(forecastState.getTrackState().getVisible()?null:
+                                                          Color.gray);
+        }
     }
 
 
@@ -718,7 +738,7 @@ public class StormDisplayState {
                 continue;
             }
             JComponent labelComp =
-                GuiUtils.hbox(wds.getWayState().getCheckBox(this),
+                GuiUtils.hbox(wds.getWayState().getCheckBox(),
                               new JLabel(way.toString()));
 
             JComponent swatch = GuiUtils.wrap(wds.getColorSwatch());
@@ -727,10 +747,10 @@ public class StormDisplayState {
                 int col = 0;
                 comps.add(col++, swatch);
                 comps.add(col++, labelComp);
-                comps.add(col++, wds.getTrackState().getCheckBox(this));
+                comps.add(col++, wds.getTrackState().getCheckBox());
                 if (obsRadiusParams != null) {
-                    comps.add(col++, wds.getRingsState().getCheckBox(this));
-                    comps.add(col++, wds.getConeState().getCheckBox(this));
+                    comps.add(col++, wds.getRingsState().getCheckBox());
+                    comps.add(col++, wds.getConeState().getCheckBox());
                 }
 
             } else {
@@ -745,24 +765,24 @@ public class StormDisplayState {
                     comps.add(GuiUtils.filler());
                     comps.add(
                         GuiUtils.hbox(
-                            forecastState.getWayState().getCheckBox(this),
+                            forecastState.getWayState().getCheckBox(),
                             GuiUtils.lLabel("Forecasts:")));
                     comps.add(
-                        forecastState.getTrackState().getCheckBox(this));
+                        forecastState.getTrackState().getCheckBox());
                     if (forecastRadiusParams != null) {
                         comps.add(
-                            forecastState.getRingsState().getCheckBox(this));
+                            forecastState.getRingsState().getCheckBox());
 
                         comps.add(
-                            forecastState.getConeState().getCheckBox(this));
+                            forecastState.getConeState().getCheckBox());
                     }
                 }
                 comps.add(swatch);
                 comps.add(labelComp);
-                comps.add(wds.getTrackState().getCheckBox(this));
+                comps.add(wds.getTrackState().getCheckBox());
                 if (forecastRadiusParams != null) {
-                    comps.add(wds.getRingsState().getCheckBox(this));
-                    comps.add(wds.getConeState().getCheckBox(this));
+                    comps.add(wds.getRingsState().getCheckBox());
+                    comps.add(wds.getConeState().getCheckBox());
                 }
             }
         }
@@ -822,6 +842,7 @@ public class StormDisplayState {
         mainContents.validate();
         mainContents.repaint();
 
+        checkVisibility();
     }
 
 
@@ -1087,6 +1108,13 @@ public class StormDisplayState {
 
 
 
+    protected void displayStateChanged(DisplayState displayState)  throws Exception {
+        updateDisplays();
+        if(displayState.getWayDisplayState() == forecastState) {
+            checkVisibility();
+        }
+    }
+
     /**
      * _more_
      *
@@ -1273,7 +1301,12 @@ public class StormDisplayState {
         for (StormTrack track : trackCollection.getTracks()) {
             StormTrackTableModel tableModel = new StormTrackTableModel(this,
                                                   track);
-            JTable trackTable = new JTable(tableModel);
+            TableSorter sorter = new TableSorter(tableModel);
+            JTable trackTable = new JTable(sorter);
+            JTableHeader header = trackTable.getTableHeader();
+            header.setToolTipText("Click to sort");
+            sorter.setTableHeader(trackTable.getTableHeader());
+
             JScrollPane scroller = GuiUtils.makeScrollPane(trackTable, width,
                                        height);
             scroller.setBorder(BorderFactory.createLoweredBevelBorder());

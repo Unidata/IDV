@@ -251,6 +251,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    private Hashtable rangeTypes = new Hashtable();
 
     /**
      * _more_
@@ -263,7 +264,6 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @throws Exception _more_
      */
-    Hashtable rangeTypes = new Hashtable();
     protected FieldImpl makeTrackField(StormTrack track, StormParam param)
             throws Exception {
 
@@ -305,7 +305,7 @@ public class StormTrackControl extends DisplayControlImpl {
                                 alts);
         Set[] rangeSets = new Set[]{
             new DoubleSet(new SetType(rangeType))
-        });
+        };
         FunctionType newType =
             new FunctionType(((SetType) llaSet.getType()).getDomain(),
                              rangeType);

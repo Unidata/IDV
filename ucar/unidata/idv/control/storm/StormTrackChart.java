@@ -39,6 +39,8 @@ import ucar.unidata.idv.control.chart.*;
 
 
 
+
+
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.ColorTable;
@@ -754,7 +756,7 @@ public class StormTrackChart {
                         tracksToUse.add(
                             new StormTrack(
                                 stormDisplayState.getStormInfo(), way,
-                                points));
+                                points,null));
                     }
                 }
 

@@ -147,7 +147,13 @@ public class StormTrackTableModel extends AbstractTableModel {
         this.stormDisplayState = stormDisplayState;
         this.track             = track;
         this.points            = track.getTrackPoints();
-        this.params            = track.getParams();
+        List<StormParam> tmp = track.getParams();
+        this.params = new ArrayList<StormParam>();
+        for(StormParam param: tmp) {
+            if(!param.getDerived()) {
+                this.params.add(param);
+            }
+        }
     }
 
 
