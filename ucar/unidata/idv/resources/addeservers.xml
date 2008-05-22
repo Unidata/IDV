@@ -59,7 +59,9 @@ they essentially get it from their container type tag.
        type="radar"/>
   </server>
   <server name="twister.millersville.edu"/>
+<!--
   <server name="pscwx.plymouth.edu"/>
+-->
   <server name="idd.unl.edu">
     <group
        names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO"
