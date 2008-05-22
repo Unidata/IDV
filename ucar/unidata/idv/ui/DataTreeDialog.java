@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -92,7 +93,7 @@ public class DataTreeDialog implements ActionListener {
     private static final String CMD_POPUPDATACHOOSER = "Add New Data Source";
 
 
-    /** _more_          */
+    /** _more_ */
     private JDialog dialog;
 
     /** Reference to the IDV */
@@ -192,10 +193,16 @@ public class DataTreeDialog implements ActionListener {
                         dataSourceIdx < dataSources.size(); dataSourceIdx++) {
                     DataSource dataSource =
                         (DataSource) dataSources.get(dataSourceIdx);
-                    DataChoice dataChoice =
-                        dataSource.findDataChoice(pattern);
-                    if (dataChoice != null) {
-                        dataTree.selectChoices(Misc.newList(dataChoice));
+                    List choices = dataSource.findDataChoices(pattern);
+                    //                    DataChoice dataChoice =
+                    //                        dataSource.findDataChoice(pattern);
+                    //                    if (dataChoice != null) {
+                    //                        dataTree.selectChoices(Misc.newList(dataChoice));
+                    if ((choices != null) && (choices.size() > 0)) {
+                        if ( !operand.getMultiple()) {
+                            choices = Misc.newList(choices.get(0));
+                        }
+                        dataTree.selectChoices(choices);
                         break;
                     }
                 }
