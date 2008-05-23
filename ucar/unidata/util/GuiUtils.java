@@ -5033,6 +5033,31 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    public static void positionAndFitToScreen(Window window, Rectangle bounds) {
+        Dimension screenSize =
+            Toolkit.getDefaultToolkit().getScreenSize();
+        int diff;
+        diff = (bounds.x+bounds.width)-screenSize.width ;
+        if(diff>0) {
+            bounds.x -=  Math.min(diff, bounds.x);
+            diff = screenSize.width-(bounds.x+bounds.width);
+            if(diff>0) {
+                bounds.width -= diff;
+            }
+        }
+        diff = (bounds.y+bounds.height)-screenSize.height;
+        if(diff>0) {
+            bounds.y -=  Math.min(diff, bounds.y);
+            diff = screenSize.height-(bounds.y+bounds.height);
+            if(diff>0) {
+                bounds.height -= diff;
+            }
+        }
+        window.setBounds(bounds);
+    }
+
+
+
     /**
      * Walk the tree and set any heavyweight components visibility.
      * If we encounter a JTabbedPane then only show the components
