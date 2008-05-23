@@ -404,7 +404,9 @@ public class MultiFrame {
      */
     public void setBounds(Rectangle bounds) {
         if (frame != null) {
-            frame.setBounds(bounds);
+            if(bounds!=null) {
+                GuiUtils.positionAndFitToScreen(frame, bounds);
+            }
         } else {
             internalFrame.setBounds(bounds);
         }
