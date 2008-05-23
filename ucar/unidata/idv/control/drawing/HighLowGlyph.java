@@ -186,7 +186,12 @@ public class HighLowGlyph extends DrawingGlyph {
         if (pressureString == null) {
             return false;
         }
-        pressure = Misc.parseNumber(pressureString);
+        pressureString = pressureString.trim();
+        if(pressureString.length() == 0) {
+            pressure = Double.NaN;
+        } else {
+            pressure = Misc.parseNumber(pressureString);
+        }
 
         return super.initFromUser(control, event);
     }
@@ -382,7 +387,12 @@ public class HighLowGlyph extends DrawingGlyph {
         if ( !super.applyProperties(compMap)) {
             return false;
         }
-        pressure = Misc.parseNumber(pressureFld.getText().trim());
+        String txt = pressureFld.getText().trim();
+        if(txt.length() == 0) {
+            pressure = Double.NaN;
+        } else {
+            pressure = Misc.parseNumber(txt);
+        }
         return true;
     }
 
@@ -398,7 +408,8 @@ public class HighLowGlyph extends DrawingGlyph {
         //Call parent with dummy list
         super.getPropertiesComponents(new ArrayList(), compMap);
         getTimePropertiesComponents(comps, compMap);
-        pressureFld = new JTextField(Misc.format(pressure), 8);
+        String label = (pressure==pressure?Misc.format(pressure):"");
+        pressureFld = new JTextField(label, 8);
         comps.add(GuiUtils.rLabel("Pressure:"));
         comps.add(GuiUtils.left(pressureFld));
     }
@@ -431,7 +442,7 @@ public class HighLowGlyph extends DrawingGlyph {
                                              ? "H"
                                              : "L"));
         Data theData1 = null;
-        Text t2       = new Text(textType2, Misc.format(pressure));
+        Text t2       = new Text(textType2, (pressure==pressure?Misc.format(pressure):" "));
         Data theData2 = null;
 
         if (isInLatLonSpace()) {
