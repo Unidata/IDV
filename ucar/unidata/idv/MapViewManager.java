@@ -1558,18 +1558,45 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void setCurrentAsProjection() {
         try {
-            Rectangle screenBounds =
-                getMapDisplay().getComponent().getBounds();
-            double[] ulXY =
-                getMapDisplay().getSpatialCoordinatesFromScreen(0, 0);
-            double[] lrXY = getMapDisplay().getSpatialCoordinatesFromScreen(
-                                screenBounds.width, screenBounds.height);
+            NavigatedDisplay display = getMapDisplay();
+            Rectangle screenBounds =  display.getComponent().getBounds();
+            LatLonPoint ulLLP =null;
+            LatLonPoint lrLLP =null;
 
-            LatLonPoint ulLLP =
-                getMapDisplay().getEarthLocation(ulXY).getLatLonPoint();
-            LatLonPoint lrLLP =
-                getMapDisplay().getEarthLocation(lrXY).getLatLonPoint();
+            int sw = screenBounds.width;            
+            int sh = screenBounds.height;
+            int x=0;
+            int y=0;
 
+            while(x<sw&& y<sh) {
+                double[] ulXY =
+                    display.getSpatialCoordinatesFromScreen(x, y);
+                ulLLP =
+                    getMapDisplay().getEarthLocation(ulXY).getLatLonPoint();
+                if(!ulLLP.getLatitude().isMissing() && !ulLLP.getLongitude().isMissing()) {
+                    break;
+                }
+                ulLLP = null;
+                x++;
+                y++;
+            }
+
+            while(sw>0 && sh>0) {
+                double[] lrXY = display.getSpatialCoordinatesFromScreen(sw,sh);
+                lrLLP =
+                    getMapDisplay().getEarthLocation(lrXY).getLatLonPoint();
+                if(!lrLLP.getLatitude().isMissing() && !lrLLP.getLongitude().isMissing()) {
+                    break;
+                }
+                lrLLP = null;
+                sw--;
+                sh--;
+            }
+
+            if(ulLLP == null || lrLLP == null) {
+                LogUtil.userMessage("Could not create a valid projection");
+                return;
+            }
 
 
             double minX = Math.min(ulLLP.getLongitude().getValue(),
