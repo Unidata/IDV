@@ -2577,11 +2577,25 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
 
 
+        boolean isZidv = ArgsManager.isZidvFile(xmlFile);
+
+
+        if(!isZidv && !ArgsManager.isXidvFile(xmlFile)) {
+            //If we cannot tell what it is then try to open it as a zidv file
+            try {
+                ZipInputStream zin =
+                    new ZipInputStream(IOUtil.getInputStream(xmlFile));
+                isZidv=(zin.getNextEntry()!=null);
+            } catch(Exception exc) {
+            }
+        }
+
+
         String bundleContents = null;
         try {
             //Is this a zip file
             //            System.err.println ("file "  + xmlFile);
-            if (ArgsManager.isZidvFile(xmlFile)) {
+            if (isZidv) {
                 //                System.err.println (" is zidv");
                 boolean ask   = getStore().get(PREF_ZIDV_ASK, true);
                 boolean toTmp = getStore().get(PREF_ZIDV_SAVETOTMP, true);
@@ -2632,11 +2646,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 IOUtil.makeDir(tmpDir);
 
                 getStateManager().putProperty(PROP_ZIDVPATH, tmpDir);
+
                 ZipInputStream zin =
-                    new ZipInputStream(IOUtil.getInputStream(xmlFile));
-                ZipEntry ze = null;
+                        new ZipInputStream(IOUtil.getInputStream(xmlFile));
                 //                Object loadId = JobManager.getManager().startLoad("Unpacking zidv file", true);
-                while ((ze = zin.getNextEntry()) != null) {
+                ZipEntry ze;
+                while ((ze = zin.getNextEntry())!=null) {
                     String entryName = ze.getName();
                     //                    if ( !JobManager.getManager().canContinue(loadId)) {
                     //                        JobManager.getManager().stopLoad(loadId);
@@ -2821,11 +2836,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             comps.add(new JLabel("Value"));
             for (int i = 0; i < unknowns.size(); i++) {
                 String           macro = (String) unknowns.get(i);
+                //If its really not a bundle 
+                if (macro.length()>100) {
+                    throw new IllegalStateException("One of the bundle macros is quite long. Perhaps this is not a bundle file?");
+                }
                 final JTextField fld   = new JTextField("", 40);
                 fields.add(fld);
                 comps.add(GuiUtils.lLabel(macro));
                 comps.add(GuiUtils.centerRight(fld,
                         GuiUtils.makeFileBrowseButton(fld)));
+            }
+            if(comps.size()>20) {
+                throw new IllegalStateException("There seems to be a plethora of bundle macros. Perhaps this is not a bundle file?");
             }
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
             JComponent panel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
