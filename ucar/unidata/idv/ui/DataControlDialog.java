@@ -636,12 +636,25 @@ public class DataControlDialog implements ActionListener {
             return cd.getToolTipText();
         }
 
-
-
-
     }
 
 
+    private void controlTreeChanged() {
+        Object[] cd = getSelectedControls();
+        synchronized (ENABLE_MUTEX) {
+            for (int i = 0; i < createBtns.size(); i++) {
+                ((JButton) createBtns.get(i)).setEnabled(
+                                                         cd.length > 0);
+            }
+        }
+
+        if(dataSelectionWidget!=null) {
+            List levels = null;
+            if(cd.length == 1) levels =  ((ControlDescriptor)cd[0]).getLevels();
+            dataSelectionWidget.setLevelsFromDisplay(levels);
+        }
+
+    }
 
 
     /**
@@ -679,13 +692,7 @@ public class DataControlDialog implements ActionListener {
                 checkSettings();
                 Misc.run(new Runnable() {
                     public void run() {
-                        Object[] cd = getSelectedControls();
-                        synchronized (ENABLE_MUTEX) {
-                            for (int i = 0; i < createBtns.size(); i++) {
-                                ((JButton) createBtns.get(i)).setEnabled(
-                                    cd.length > 0);
-                            }
-                        }
+                        controlTreeChanged();
                     }
                 });
             }

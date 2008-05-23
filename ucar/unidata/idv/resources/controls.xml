@@ -145,6 +145,8 @@ example:
      class="ucar.unidata.idv.control.CappiControl"
      description="CAPPI"
      label="CAPPI"
+     doeslevels="true"
+     levels="1000[m],2000[m],3000[m],4000[m],5000[m],6000[m],7000[m],8000[m],9000[m],10000[m],12000[m],14000[m],16000[m]"
      xxxicon="/ucar/unidata/idv/images/planview.png"
      displaycategory="Radar Views"
      properties="displayName=CAPPI;smoothed=false;allowSmoothing=false"/>

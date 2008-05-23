@@ -121,6 +121,8 @@ public class ControlDescriptor {
     /** Xml &quot;label&quot; attribute name  for the control descriptor xml */
     public static final String ATTR_LABEL = "label";
 
+    public static final String ATTR_LEVELS = "levels";
+
     /** Xml &quot;properties&quot; attribute name  for the control descriptor xml */
     public static final String TAG_PROPERTY = "property";
 
@@ -228,6 +230,8 @@ public class ControlDescriptor {
     /** The controls.xml node */
     Element node;
 
+    private List  levels;
+
     /**
      * Parameterless constructor for xml encoding/decoding
      */
@@ -259,6 +263,8 @@ public class ControlDescriptor {
 
 
 
+
+
     /**
      * Create the descriptor
      *
@@ -285,6 +291,19 @@ public class ControlDescriptor {
                 "");
         canStandAlone = XmlUtil.getAttribute(node, ATTR_CANSTANDALONE, false);
         doesLevels    = XmlUtil.getAttribute(node, ATTR_DOESLEVELS, false);
+
+        if (XmlUtil.hasAttribute(node, ATTR_LEVELS)) {
+            List<String> toks = StringUtil.split(XmlUtil.getAttribute(node, ATTR_LEVELS),",", true,true);
+            levels  = new ArrayList();
+            try {
+            for(String tok: toks) {
+                levels.add(ucar.visad.Util.toReal(tok));
+            }
+            } catch (Throwable exc) {
+                logException("Processing levels", exc);
+            }
+        }
+
 
         properties    = new Hashtable();
         properties.put(PROP_DISPLAYNAME, label);
@@ -602,6 +621,11 @@ public class ControlDescriptor {
     public boolean canStandAlone() {
         return canStandAlone;
     }
+
+    public List getLevels() {
+        return levels;
+    }
+
 
     /**
      * Does levels

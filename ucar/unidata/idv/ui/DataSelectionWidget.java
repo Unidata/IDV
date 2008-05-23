@@ -154,6 +154,8 @@ public class DataSelectionWidget {
     /** Current list of levels */
     private List levels;
 
+    private List levelsFromDisplay;
+
     /** _more_ */
     private boolean defaultLevelToFirst = true;
 
@@ -170,6 +172,8 @@ public class DataSelectionWidget {
 
     /** Last data source we were displaying for */
     private DataSource lastDataSource;
+
+    private DataChoice lastDataChoice;
 
     /** Keeps track of the tab label so we can reselect that tab when we update */
     private String currentLbl;
@@ -258,11 +262,12 @@ public class DataSelectionWidget {
         int[] selected = levelsList.getSelectedIndices();
         //None selected or the 'All Levels'
         if ((selected.length == 0)
-                || ((selected.length == 1) && (selected[0] == 0))) {
+                || ((selected.length == 1) && (selected[0] == 0) && levelsFromDisplay==null)) {
             return NO_LEVELS;
         }
+        int indexOffset = (levelsFromDisplay==null?1:0);
         if (selected.length == 1) {
-            lastLevel = levels.get(selected[0] - 1);
+            lastLevel = levels.get(selected[0] - indexOffset);
             //            idv.getStore().put("idv.dataselector.level", lastLevel);
             return new Object[] { lastLevel };
         }
@@ -284,7 +289,7 @@ public class DataSelectionWidget {
             return NO_LEVELS;
         }
 
-        return new Object[] { levels.get(first - 1), levels.get(last - 1) };
+        return new Object[] { levels.get(first - indexOffset), levels.get(last - indexOffset) };
     }
 
 
@@ -341,6 +346,7 @@ public class DataSelectionWidget {
                                          DataChoice dc) {
 
         //        System.err.println("update tab " + dataSource + " " + dc);
+        lastDataChoice = dc;
         boolean newDataSource = false;
         if (lastDataSource != dataSource) {
             dataSourceChanged(dataSource);
@@ -384,7 +390,7 @@ public class DataSelectionWidget {
         }
 
 
-        levels = dc.getAllLevels(new DataSelection(GeoSelection.STRIDE_BASE));
+        levels = (levelsFromDisplay!=null?levelsFromDisplay:dc.getAllLevels(new DataSelection(GeoSelection.STRIDE_BASE)));
         if ((levels != null) && (levels.size() > 1)) {
             if (levelsList == null) {
                 levelsList = new JList();
@@ -397,7 +403,8 @@ public class DataSelectionWidget {
                 levelsTab = levelsScroller;
             }
             Vector levelsForGui = new Vector();
-            levelsForGui.add(new TwoFacedObject("All Levels", null));
+            if(levelsFromDisplay==null)
+                levelsForGui.add(new TwoFacedObject("All Levels", null));
             for (int i = 0; i < levels.size(); i++) {
                 Object o = levels.get(i);
                 if (o instanceof visad.Real) {
@@ -554,6 +561,7 @@ public class DataSelectionWidget {
         dataSelection.setGeoSelection(geoSelection);
         Object[] levelRange = getSelectedLevelRange();
         if ((levelRange != null) && (levelRange.length > 0)) {
+
             if (addLevels || (levelRange.length == 2)) {
                 if (levelRange.length == 1) {
                     dataSelection.setLevel(levelRange[0]);
@@ -880,6 +888,14 @@ public class DataSelectionWidget {
         //      scroller.setBorder(BorderFactory.createMatteBorder(1,2,0,0,Color.gray));
         return new JComponent[] { timesList, allTimesButton,
                                   GuiUtils.topCenter(top, scroller) };
+    }
+
+
+    public void setLevelsFromDisplay(List levels) {
+        if(!Misc.equals(levelsFromDisplay, levels)) {
+            levelsFromDisplay = levels;
+            updateSelectionTab(lastDataSource,lastDataChoice);
+        }
     }
 
     /**
