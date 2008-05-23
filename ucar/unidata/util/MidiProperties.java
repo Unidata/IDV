@@ -250,13 +250,18 @@ public class MidiProperties {
         Instrument[]   instruments = MidiManager.getInstrumentList();
 
         TwoFacedObject selected = new TwoFacedObject("None", new Integer(-1));
-        for (int i = 0; (i < instruments.length) && (i < 128); i++) {
-            TwoFacedObject tfo = new TwoFacedObject(instruments[i].getName(),
-                                     new Integer(i));
-            if (instruments[i].getName().equals(instrumentName)) {
-                selected = tfo;
+        if(instruments!=null) {
+            for (int i = 0; (i < instruments.length) && (i < 128); i++) {
+                if(instruments[i]==null) continue;
+                String name = instruments[i].getName();
+                if(name==null) continue;
+                TwoFacedObject tfo = new TwoFacedObject(name,
+                                                        new Integer(i));
+                if (name.equals(instrumentName)) {
+                    selected = tfo;
+                }
+                v.add(tfo);
             }
-            v.add(tfo);
         }
         comps.add(GuiUtils.left(instrumentBox = new JComboBox(v)));
         instrumentBox.setSelectedItem(selected);
