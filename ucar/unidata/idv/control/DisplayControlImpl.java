@@ -4272,10 +4272,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void initWindow(IdvWindow window) {
         window.setTitle(getTitle());
         window.setContents(outerContents);
-        window.setLocation(windowX, windowY);
         if (windowSize != null) {
-            window.setSize(windowSize);
+            window.setWindowBounds(new Rectangle(windowX, windowY, windowSize.width, windowSize.height));
+        } else {
+            window.setLocation(windowX, windowY);
         }
+
         if (myWindowVisible) {
             show();
         } else {
