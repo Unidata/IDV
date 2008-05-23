@@ -501,8 +501,8 @@ public class GuiUtils extends LayoutUtil {
 
     public static boolean checkHeight(int height) {
         if(height>100) {
-            LogUtil.printMessage("Got large height when setting preferred size:" + height);
-            LogUtil.printMessage(LogUtil.getStackTrace());
+            //            LogUtil.printMessage("Got large height when setting preferred size:" + height);
+            //            LogUtil.printMessage(LogUtil.getStackTrace());
             return false;
         }
         return true;
