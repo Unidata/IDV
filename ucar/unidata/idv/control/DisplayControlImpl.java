@@ -203,6 +203,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** current time label */
     private DateTime currentTime;
 
+    private DateTime firstTime;
+
     /** listening for times flag */
     private boolean listeningForTimes = false;
 
@@ -1334,6 +1336,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+    protected boolean hasTimeMacro(String t) {
+        return UtcDate.containsTimeMacro(t) ||
+            t.indexOf(MACRO_FHOUR) >=0;
+            
+    }
+
     /**
      * A hook to allow derived classes to tell us to add this
      * as an animation listener
@@ -1341,8 +1349,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return Add as animation listener
      */
     protected boolean shouldAddAnimationListener() {
-        return UtcDate.containsTimeMacro(getLegendLabelTemplate())
-               || UtcDate.containsTimeMacro(getExtraLabelTemplate());
+        return hasTimeMacro(getLegendLabelTemplate()) ||
+            hasTimeMacro(getExtraLabelTemplate());
     }
 
 
@@ -3385,12 +3393,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     DateTime dt = new DateTime(samples[0][i],
                                       s.getSetUnits()[0]);
                     String label = UtcDate.applyTimeMacro(template, dt);
+                    label =  applyForecastHourMacro(label, dt);
                     Text   t     = new Text(tt, label);
                     fi.setSample(i, t, false);
                 }
                 data = fi;
             } else {
                 String label = UtcDate.applyTimeMacro(template, null);
+                label =  applyForecastHourMacro(label, null);
                 data = new Text(tt, label);
             }
         } catch (VisADException ve) {
@@ -3603,16 +3613,36 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List patterns = new ArrayList();
         List values   = new ArrayList();
         addLabelMacros(template, patterns, values);
-        if (timeOk && UtcDate.containsTimeMacro(template)) {
+        if (timeOk && hasTimeMacro(template)) {
             if (currentTime == null) {
                 checkTimestampLabel(null);
             }
-            template = UtcDate.applyTimeMacro(template, currentTime);
+            if(UtcDate.containsTimeMacro(template)) {
+                template = UtcDate.applyTimeMacro(template, currentTime);
+            }
+            template = applyForecastHourMacro(template, currentTime);
         }
         return StringUtil.replaceList(template, patterns, values);
     }
 
 
+    private String applyForecastHourMacro(String t, DateTime currentTime) {
+        if(t.indexOf(MACRO_FHOUR)>=0) {
+            String v = "";
+            if(firstTime!=null && currentTime!=null) {
+                try {
+                    double diff = currentTime.getValue(CommonUnit.secondsSinceTheEpoch) -
+                        firstTime.getValue(CommonUnit.secondsSinceTheEpoch);
+                    v = ((int)(diff/60/60))+"H";
+                } catch(Exception exc) {
+                    System.err.println ("Error:" + exc);
+                    exc.printStackTrace();
+                }
+            }
+            return  t.replace(MACRO_FHOUR, v);
+        }
+        return t;
+    }
 
 
     /**
@@ -5390,8 +5420,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         setExtraLabelTemplate(extraLabelTemplateFld.getText().trim());
 
         setLegendLabelTemplate(legendLabelTemplateFld.getText());
-        if (UtcDate.containsTimeMacro(legendLabelTemplate)
-                || UtcDate.containsTimeMacro(extraLabelTemplate)) {
+        if (hasTimeMacro(legendLabelTemplate)
+                || hasTimeMacro(extraLabelTemplate)) {
             try {
                 if (animation == null) {
                     getAnimation();
@@ -5468,6 +5498,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (haveDataTimes()) {
             names.add(MACRO_TIMESTAMP);
             labels.add("Time Stamp");
+            names.add(MACRO_FHOUR);
+            labels.add("Forecast Hour");
         }
     }
 
@@ -7269,14 +7301,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return true if the time is in the label
      */
     private boolean checkTimestampLabel(Real time) {
-        boolean hasTimestamp = false;
+        boolean hasTimestamp = shouldAddAnimationListener();
 
-        if (UtcDate.containsTimeMacro(getLegendLabelTemplate())) {
-            hasTimestamp = true;
-        }
-        if (UtcDate.containsTimeMacro(getExtraLabelTemplate())) {
-            hasTimestamp = true;
-        }
         if ( !hasTimestamp) {
             return false;
         }
@@ -7298,10 +7324,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             Set timeSet = getDataTimeSet();
             if (timeSet == null) {
                 currentTime = null;
+                firstTime = null;
             } else {
                 currentTime = new DateTime(time);
                 Unit setUnit = timeSet.getSetUnits()[0];
+
                 if (Unit.canConvert(time.getUnit(), setUnit)) {
+                    if(timeSet.getLength()>0) {
+                        Data firstSetTime = timeSet.__getitem__(0);
+                        if(firstSetTime instanceof Real) {
+                            double firstTimeValue = ((Real)firstSetTime).getValue(currentTime.getUnit());
+                            firstTime = new DateTime(time.cloneButValue(firstTimeValue));
+                        }
+                    }
                     double timeVal = time.getValue(setUnit);
                     int    index   = timeSet.doubleToIndex(new double[][] {
                         new double[] { timeVal }

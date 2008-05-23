@@ -191,6 +191,8 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** Macro for the display  unit for the label */
     public static final String MACRO_TIMESTAMP = UtcDate.MACRO_TIMESTAMP;
 
+    public static final String MACRO_FHOUR = "%fhour%";
+
     /** String used as the action command for the color setting button */
     public static final String CMD_COLORS = "cmd.colors";
 
