@@ -3683,7 +3683,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     "useImages"));
         }
 
-        viewMenu.add(GuiUtils.makeMenu("Rendering", renderItems));
+        //        viewMenu.add(GuiUtils.makeMenu("Rendering", renderItems));
+
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
         captureMenu.add(GuiUtils.makeMenuItem("Image...", this,
