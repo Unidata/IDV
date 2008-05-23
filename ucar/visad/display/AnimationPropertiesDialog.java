@@ -396,6 +396,8 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                         roundToField.getTime(), maxSeconds) + endOffset);
             }
 
+
+
             String startDataText = ((min != null)
                                     ? min.toString()
                                     : "");
@@ -523,8 +525,17 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                                            AnimationSetInfo.TIMEMODE_DATA);
         endTimeBox.addActionListener(boxListener);
 
-        startTimePicker = new DateTimePicker();
-        endTimePicker   = new DateTimePicker();
+        Date startDate = null;
+        Date endDate = null;
+        try {
+            //            DateTime[] times = animationWidget.getTimes();
+            //            startDate = (times!=null&&times.length>0?ucar.visad.Util.makeDate(times[0]):null);
+            //            endDate = (times!=null&&times.length>0?ucar.visad.Util.makeDate(times[times.length-1]):null);
+        } catch(Exception exc) {
+            //noop
+        }
+        startTimePicker = new DateTimePicker(startDate);
+        endTimePicker   = new DateTimePicker(endDate);
 
 
         List comps = new ArrayList();
@@ -556,8 +567,6 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
         startCurrentModeLabel  = new JLabel(" ");
         endCurrentModeLabel    = new JLabel(" ");
-
-
 
 
         startExtra.add("" + AnimationSetInfo.TIMEMODE_DATA,
@@ -928,6 +937,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         endOffsetField.setTime(aniSet.getEndOffsetMinutes());
         roundToField.setTime(aniSet.getRoundTo());
         pollIntervalFld.setText("" + aniSet.getPollMinutes());
+        System.err.println ("setting from anisetinfo:" + aniSet.getStartFixedDate());
         startTimePicker.setDate(aniSet.getStartFixedDate());
         endTimePicker.setDate(aniSet.getEndFixedDate());
         checkEnabled();
