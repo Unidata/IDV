@@ -252,6 +252,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private boolean capturingAuto = false;
 
+    private JCheckBox beepCbx  = new JCheckBox("Beep", false);
 
     /** The window for the main gui */
     JDialog mainDialog;
@@ -698,7 +699,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         JPanel runPanel =
             GuiUtils.hflow(Misc.newList(GuiUtils.rLabel(" Rate: "),
                                         captureRateFld,
-                                        new JLabel(" seconds")));
+                                        new JLabel(" seconds"), beepCbx));
 
 
         int maxBtnWidth =
@@ -1319,6 +1320,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     public void run() {
         capturingAuto = true;
         while (capturingAuto) {
+            if(beepCbx!=null && beepCbx.isSelected()) {
+                Toolkit.getDefaultToolkit().beep();
+            }
             grabImageAndBlock();
             if ( !capturingAuto) {
                 return;
