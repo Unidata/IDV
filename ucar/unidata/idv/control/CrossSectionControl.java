@@ -571,8 +571,8 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
 
-    private double fmt(double latlon) {
-        return  ((int)(latlon*1000))/(double)1000.0;
+    private String fmt(double latlon) {
+        return  getDisplayConventions().formatLatLon(latlon);
     }
 
     private void updatePositionWidget() {
