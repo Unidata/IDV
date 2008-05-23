@@ -791,11 +791,15 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         }
         widgets.put(PREF_LOOKANDFEEL, lookAndFeelBox);
 
+        
+        GuiUtils.setHFill();
+        JComponent editorComp = GuiUtils.doLayout(new Component[]{jythonEditorField,
+                                                                  GuiUtils.makeFileBrowseButton(jythonEditorField)},2, GuiUtils.WT_YN, GuiUtils.WT_N);
+
         JComponent topPanel = GuiUtils.formLayout(new Component[] {
             GuiUtils.rLabel("Resource Sitepath:"),
             GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
-            GuiUtils.left(GuiUtils.centerRight(jythonEditorField,
-                GuiUtils.makeFileBrowseButton(jythonEditorField))),
+            GuiUtils.left(editorComp),
             GuiUtils.rLabel("Look & Feel:"), GuiUtils.left(lookAndFeelBox)
         });
         Object[][] prefs1 = {
