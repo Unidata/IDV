@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -126,20 +125,39 @@ public class VolumeRenderControl extends GridDisplayControl {
     }
 
     /**
+     * Add in any special control widgets to the current list of widgets.
+     *
+     * @param controlWidgets  list of control widgets
+     *
+     * @throws VisADException   VisAD error
+     * @throws RemoteException   RMI error
+     */
+    public void getControlWidgets(List controlWidgets)
+            throws VisADException, RemoteException {
+        super.getControlWidgets(controlWidgets);
+        JCheckBox textureToggle = GuiUtils.makeCheckbox("", this,
+                                      "useTexture3D");
+        controlWidgets.add(
+            new WrapperWidget(
+                this, GuiUtils.rLabel("Use 3D Texture:"),
+                GuiUtils.leftCenter(textureToggle, GuiUtils.filler())));
+    }
+
+    /**
      * Add checkbox type settings to the Properties panel
      *
      * @param comps  list of checkbox components
      * @param methodNameToSettingsMap  hashtable of methods to checkbox
+     * protected void addCheckBoxSettings(List comps,
+     *                                  Hashtable methodNameToSettingsMap) {
+     *   super.addCheckBoxSettings(comps, methodNameToSettingsMap);
+     *   JCheckBox cbx;
+     *   methodNameToSettingsMap.put("setUseTexture3D",
+     *                               cbx = new JCheckBox("Use Texture3D",
+     *                                   getUseTexture3D()));
+     *   comps.add(cbx);
+     * }
      */
-    protected void addCheckBoxSettings(List comps,
-                                       Hashtable methodNameToSettingsMap) {
-        super.addCheckBoxSettings(comps, methodNameToSettingsMap);
-        JCheckBox cbx;
-        methodNameToSettingsMap.put("setUseTexture3D",
-                                    cbx = new JCheckBox("Use Texture3D",
-                                        getUseTexture3D()));
-        comps.add(cbx);
-    }
 
     /**
      * Set the data in this control.
