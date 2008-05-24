@@ -81,7 +81,8 @@ public class AtcfStormDataSource extends StormDataSource {
 
     /** _more_ */
     private static String DEFAULT_PATH =
-        "ftp://anonymous:password@ftp.tpc.ncep.noaa.gov/atcf/archive";
+
+        "ftp://anonymous:password@ftp.nhc.noaa.gov/atcf/archive";
 
     /** _more_ */
     private String path;

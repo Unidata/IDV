@@ -80,6 +80,14 @@ public class StormTrack implements Comparable {
     //private Date trackStartTime;
 
 
+    public StormTrack(StormTrack track) {
+        this.stormInfo  = track.stormInfo;
+        this.way  = track.way;
+        this.params  = track.params;
+        this.trackId  = track.trackId;
+        this.trackPoints  = new ArrayList<StormTrackPoint>(track.trackPoints);
+    }
+
     /**
      * _more_
      *
