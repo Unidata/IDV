@@ -1699,7 +1699,7 @@ public class StormDisplayState {
      * @param nextColor _more_
      * @return The next color in the list
      */
-    private static Color getNextColor(int[] nextColor) {
+    public static Color getNextColor(int[] nextColor) {
         if (nextColor[0] >= colors.length) {
             nextColor[0] = 0;
         }
