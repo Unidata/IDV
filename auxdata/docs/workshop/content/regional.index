@@ -56,14 +56,6 @@ title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:T
 >>>datadisplays/imagery/RadarOnSat.html
 >>>datadisplays/imagery/DoingMoreWithImagery.html
 
->>datadisplays/level2/index.html
->>>datadisplays/level2/LoadingLevelIIData.html
->>>datadisplays/level2/LevelIISweepDisplays.html
->>>datadisplays/level2/LevelIIRhiDisplays.html
->>>datadisplays/level2/LevelIIVolumeScan.html
->>>datadisplays/level2/LevelIIIsosurfaceDisplays.html
->>>datadisplays/level2/DoingMoreLevelII.html
-
 >>savingstate/index.html
 >>>savingstate/Bundles.html
 >>>savingstate/MoreBundles.html
@@ -77,6 +69,14 @@ title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:T
 #+>>>savingstate/CmdLineImageCapture.html
 #+>>>savingstate/CmdLineMovieCapture.html
 -dev/example.xidv.txt
+
+>>datadisplays/level2/index.html
+>>>datadisplays/level2/LoadingLevelIIData.html
+>>>datadisplays/level2/LevelIISweepDisplays.html
+>>>datadisplays/level2/LevelIIRhiDisplays.html
+>>>datadisplays/level2/LevelIIVolumeScan.html
+>>>datadisplays/level2/LevelIIIsosurfaceDisplays.html
+>>>datadisplays/level2/DoingMoreLevelII.html
 
 
 >>title:Point Observations:The IDV can display a variety of point observations
@@ -134,9 +134,6 @@ title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:T
 #-advanced/WindSpeedTutorial.html
 #>>advanced/Collaboration.html
 
->>isl/main.index
-
-
 >>resources/colortable/index.html
 >>>resources/colortable/Introduction.html
 >>>resources/colortable/CreatingANewTable.html
@@ -155,6 +152,9 @@ title:2008 Unidata Regional IDV Training Workshop at Plymouth State>index.html:T
 >>>resources/stationmodel/StationModelEditor.html
 >>>resources/stationmodel/StationModelEditor2.html
 >>>resources/stationmodel/JythonInStationModels.html
+
+
+>>isl/main.index
 
 
 >>title:Configuring IDV Sites:In this section we will cover how to configure the IDV to share common resources within a site installation.
