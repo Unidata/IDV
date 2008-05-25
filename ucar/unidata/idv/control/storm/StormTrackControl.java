@@ -936,6 +936,7 @@ public class StormTrackControl extends DisplayControlImpl {
         TextType      textType = TextType.getTextType("ID");
         List fields = new ArrayList();
         List times  = new ArrayList();
+        List<StormTrack> obsTracks = new ArrayList<StormTrack>();
         List<PointOb> pointObs = new ArrayList<PointOb>();
 
         JWindow errorWindow=null;
@@ -953,7 +954,6 @@ public class StormTrackControl extends DisplayControlImpl {
         boolean doYearTime = false;
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             if(yds.getState()!=yds.STATE_LOADING) {
-                System.err.println("quitting on yds");
                 yds.setState(YearDisplayState.STATE_INACTIVE);
                 yds.setStatus("");
                 if(errorWindow!=null) {
@@ -1013,6 +1013,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 if(!doYearTime) {
                     dttm = stormInfo.getStartTime();
                 }
+                obsTracks.add(obsTrack);
                 times.add(dttm);
                 fields.add(field);
                 Tuple tuple = new Tuple(new Data[] {
@@ -1028,7 +1029,7 @@ public class StormTrackControl extends DisplayControlImpl {
         if(errorWindow!=null) {
             errorWindow.setVisible(false);
         }
-        yds.setData(times, fields, pointObs);
+        yds.setData(obsTracks, times, fields, pointObs);
         yds.setState(YearDisplayState.STATE_ACTIVE);
         yds.setStatus("");
     }
@@ -1086,6 +1087,17 @@ public class StormTrackControl extends DisplayControlImpl {
                 stormDisplayState.writeToKml(docNode, state, doObs,
                                              doForecast, mostRecent);
             }
+
+            List<YearDisplayState> ydss = getYearDisplayStates();
+            for (YearDisplayState yds : ydss) {
+                if(!yds.getActive()) continue;
+                Element yearNode = KmlUtil.folder(docNode,
+                                                  "Year:" + yds.getYear());
+                for(StormTrack track: yds.getStormTracks()) {
+                    writeToGE(docNode, state, yearNode, track, yds.getColor());
+                }
+            }
+
             FileOutputStream fileOut = new FileOutputStream(filename);
             IOUtil.writeBytes(new File(filename),
                               XmlUtil.toString(kmlNode).getBytes());
@@ -1094,6 +1106,78 @@ public class StormTrackControl extends DisplayControlImpl {
             logException("Writing KML", exc);
         }
     }
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param docNode _more_
+     * @param state _more_
+     * @param parent _more_
+     * @param track _more_
+     *
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void writeToGE(Element docNode, Hashtable state,
+                             Element parent, StormTrack track, Color color)
+            throws VisADException, RemoteException {
+        Element placemark = KmlUtil.placemark(parent, "Track",
+                                "<html>" + getWayName()
+                                + ":" + track.getWay() + "<br>" + ""
+                                + track.getStartTime() + "</html>");
+
+        int cnt = 0;
+        String dateString =
+            track.getStartTime().formattedString("yyyy-MM-dd hhmm",
+                DateUtil.TIMEZONE_GMT);
+        String           sheetName = track.getWay() + " - " + dateString;
+        int              rowCnt    = 0;
+        List<StormParam> params    = track.getParams();
+        StringBuffer     sb        = new StringBuffer();
+        for (StormTrackPoint stp : track.getTrackPoints()) {
+            EarthLocation el = stp.getLocation();
+            if (track.getWay().isObservation()) {
+                Element icon = KmlUtil.placemark(
+                                   parent, "Time:" + stp.getTime(),
+                                   "<html><table>"
+                                   + formatStormTrackPoint(
+                                       track, stp) + "</table></html>", el,
+                                           "#hurricaneicon");
+                KmlUtil.timestamp(icon, stp.getTime());
+            }
+
+            sb.append(el.getLongitude().getValue());
+            sb.append(",");
+            sb.append(el.getLatitude().getValue());
+            sb.append(",");
+            sb.append(el.getAltitude().getValue());
+            sb.append("\n");
+        }
+
+        String styleUrl = "linestyle" + track.getWay();
+        if (state.get(styleUrl) == null) {
+            Element style =
+                KmlUtil.linestyle(
+                    docNode, styleUrl,
+                    color,
+                    track.getWay().isObservation()
+                    ? 3
+                    : 2);
+            state.put(styleUrl, style);
+        }
+        KmlUtil.styleurl(placemark, "#" + styleUrl);
+        Element linestring = KmlUtil.linestring(placemark, false, false,
+                                 sb.toString());
+        //        KmlUtil.timestamp(linestring, track.getStartTime());
+        if ( !track.getWay().isObservation()) {
+            KmlUtil.timestamp(placemark, track.getStartTime());
+        } else {}
+    }
+
 
 
     /**

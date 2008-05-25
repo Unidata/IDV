@@ -202,7 +202,9 @@ public class YearDisplayState {
     }
 
 
-    public void setData(List times, List fields, List pointObs) throws Exception {
+    public void setData(List<StormTrack> tracks, List times, List fields, List pointObs) throws Exception {
+        stormTracks.clear();
+        stormTracks.addAll(tracks);
         if (trackDisplay == null) {
             trackDisplay = new TrackDisplayable("year track ");
             stormTrackControl.addDisplayable(trackDisplay);
