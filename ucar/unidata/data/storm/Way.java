@@ -53,7 +53,7 @@ public class Way implements Comparable {
      * @param id _more_
      */
     public Way(String id) {
-        this(id, id);
+        this.id = id;
     }
 
     /**
@@ -101,7 +101,10 @@ public class Way implements Comparable {
      * @return _more_
      */
     public String toString() {
-        return name;
+        if(name!=null) {
+            return id+": " +name;
+        }
+        return id;
     }
 
     /**
@@ -160,7 +163,7 @@ public class Way implements Comparable {
     public int compareTo(Object o) {
         if (o instanceof Way) {
             Way that = (Way) o;
-            return this.name.toLowerCase().compareTo(that.name.toLowerCase());
+            return this.id.toLowerCase().compareTo(that.id.toLowerCase());
         }
         return toString().compareTo(o.toString());
     }

@@ -328,6 +328,9 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     private List<Way> ways = new ArrayList();
 
+    private Hashtable<String,Way> wayMap = new Hashtable<String,Way>();
+
+
     /**
      * _more_
      *
@@ -342,6 +345,20 @@ public abstract class StormDataSource extends DataSourceImpl {
         }
         return way;
     }
+
+
+
+
+    protected Way getWay(String w, String name) {
+        Way way = wayMap.get(w);
+        if(way == null) {
+            way = new Way(w,name);
+            wayMap.put(w,way);
+        }
+        addWay(way);
+        return way;
+    }
+
 
 
     /**

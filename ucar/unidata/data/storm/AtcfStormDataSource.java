@@ -81,8 +81,7 @@ public class AtcfStormDataSource extends StormDataSource {
 
     /** _more_ */
     private static String DEFAULT_PATH =
-
-        "ftp://anonymous:password@ftp.nhc.noaa.gov/atcf/archive";
+        "ftp://anonymous:password@ftp.nhc.noaa.gov/atcf";
 
     /** _more_ */
     private String path;
@@ -120,12 +119,18 @@ public class AtcfStormDataSource extends StormDataSource {
 
 
 
+    private String getFullPath(String suffix) {
+        return  path + "/" + suffix;
+    }
+
+
 
     /**
      * _more_
      */
     protected void initializeStormData() {
         try {
+            incrOutstandingGetDataCalls();
             stormInfos = new ArrayList<StormInfo>();
             if (path.toLowerCase().endsWith(".gz")
                     || path.toLowerCase().endsWith(".dat")) {
@@ -138,7 +143,27 @@ public class AtcfStormDataSource extends StormDataSource {
                 return;
             }
 
-            byte[]           bytes = readFile(path + "/storm.table", false);
+            byte[]           techs = readFile(getFullPath("nhc_techlist.dat"), true);
+            if(techs!=null) {
+                /*
+NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
+ 00 CARQ   0      0     0      0        0         1                 Combined ARQ Position
+ 00 WRNG   0      0     0      0        0         1                 Warning
+                */
+                int cnt = 0;
+                for(String line:  StringUtil.split(new String(techs), "\n", true, true)) {
+                    if(cnt++==0) continue;
+                    if(line.length()>67) {
+                        String id = line.substring(3,10).trim();
+                        String name = line.substring(67).trim();
+                        //                        System.out.println (id + ":"  +name);
+                        getWay(id, name);
+                    }
+                }
+            }
+
+
+            byte[]           bytes = readFile(getFullPath("archive/storm.table"), false);
             String           stormTable = new String(bytes);
             List lines = StringUtil.split(stormTable, "\n", true, true);
 
@@ -164,6 +189,8 @@ public class AtcfStormDataSource extends StormDataSource {
             }
         } catch (Exception exc) {
             logException("Error initializing ATCF data", exc);
+        } finally {
+            decrOutstandingGetDataCalls();
         }
     }
 
@@ -296,7 +323,7 @@ public class AtcfStormDataSource extends StormDataSource {
             Date dttm = fmt.parse(dateString);
             convertCal.setTime(dttm);
             String key;
-            Way    way = new Way(wayString);
+            Way    way = getWay(wayString,null);
             if ( !isBest && (waysToUse != null) && (waysToUse.size() > 0)
                     && (waysToUse.get(wayString) == null)) {
                 continue;
@@ -384,17 +411,17 @@ public class AtcfStormDataSource extends StormDataSource {
                           && (waysToUse.get(Way.OBSERVATION.toString())
                               != null);
         if ( !justObs) {
-            trackFile = path + "/" + getYear(stormInfo.getStartTime()) + "/"
+            trackFile = getFullPath("archive/" + getYear(stormInfo.getStartTime()) + "/"
                         + "a" + stormInfo.getBasin().toLowerCase()
                         + stormInfo.getNumber()
-                        + getYear(stormInfo.getStartTime()) + ".dat.gz";
+                        + getYear(stormInfo.getStartTime()) + ".dat.gz");
             readTracks(stormInfo, tracks, trackFile, waysToUse);
         }
         //Now  read the b"est file
-        trackFile = path + "/" + getYear(stormInfo.getStartTime()) + "/"
+        trackFile = getFullPath("archive/"+getYear(stormInfo.getStartTime()) + "/"
                     + "b" + stormInfo.getBasin().toLowerCase()
                     + stormInfo.getNumber()
-                    + getYear(stormInfo.getStartTime()) + ".dat.gz";
+                    + getYear(stormInfo.getStartTime()) + ".dat.gz");
         readTracks(stormInfo, tracks, trackFile, null);
         long t2 = System.currentTimeMillis();
         System.err.println("time: " + (t2 - t1));
