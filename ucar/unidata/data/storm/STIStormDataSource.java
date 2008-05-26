@@ -722,7 +722,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private float[] getProbabilityRadius(Way way, int forecastHour) {
-        String key = way.getName().toUpperCase() + forecastHour;
+        String key = way.getId().toUpperCase() + forecastHour;
         //        System.out.println("get:" + key + " " +(wayfhourToRadius.get(key)!=null));
         return wayfhourToRadius.get(key);
     }
@@ -736,7 +736,7 @@ public class STIStormDataSource extends StormDataSource {
      */
     private void putProbabilityRadius(Way way, int forecastHour,
                                       float[] radiuses) {
-        String key = way.getName().toUpperCase() + forecastHour;
+        String key = way.getId().toUpperCase() + forecastHour;
         //        System.out.println("put:" + key);
         wayfhourToRadius.put(key, radiuses);
     }

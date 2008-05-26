@@ -33,8 +33,7 @@ package ucar.unidata.data.storm;
 public class Way implements Comparable {
 
     /** _more_ */
-    public static final Way OBSERVATION = new Way("Observation",
-                                              "Observation");
+    public static final Way OBSERVATION = new Way("Observation");
 
     /** _more_ */
     private String id;
