@@ -1223,6 +1223,7 @@ public class StormTrackControl extends DisplayControlImpl {
         JComponent        firstSelectedComponent = null;
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
+        List yearPanels = new ArrayList();
         List yearComps = new ArrayList();
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             StormInfo stormInfo = stormInfos.get(i);
@@ -1235,11 +1236,18 @@ public class StormTrackControl extends DisplayControlImpl {
                 yearComps.add(GuiUtils.wrap(yds.getColorSwatch()));
                 yearComps.add(yds.getLabel());
                 years.put(new Integer(year),"");
+                if(yearComps.size()>20) {
+                    GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+                    yearPanels.add(GuiUtils.doLayout(yearComps, 4, GuiUtils.WT_NNNY, GuiUtils.WT_N));
+                    yearComps = new ArrayList();
+                }
             }
         }
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        JComponent yearComponent = GuiUtils.doLayout(yearComps, 4, GuiUtils.WT_NNNY, GuiUtils.WT_N);
-        if(yearComps.size()>1) {
+        yearPanels.add(GuiUtils.doLayout(yearComps, 4, GuiUtils.WT_NNNY, GuiUtils.WT_N));
+
+        JComponent yearComponent = GuiUtils.vbox(yearPanels);
+        if(yearPanels.size()>0) {
             int width  = 300;
             int height = 400;
             JScrollPane scroller = GuiUtils.makeScrollPane(GuiUtils.top(yearComponent), width,

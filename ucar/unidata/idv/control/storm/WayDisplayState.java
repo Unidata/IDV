@@ -1125,7 +1125,7 @@ public class WayDisplayState {
             coneList.add(conePoints[i]);
         }
 
-        return new StormTrack(track.getStormInfo(), new Way("CONE"),
+        return new StormTrack(track.getStormInfo(), new Way(getWay() +"_CONE"),
                               coneList,null);
 
     }
