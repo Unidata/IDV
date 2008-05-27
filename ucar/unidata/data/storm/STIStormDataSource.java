@@ -525,6 +525,7 @@ public class STIStormDataSource extends StormDataSource {
         }
         StormTrack obsTrack = getObservationTrack(stormInfo);
         //                                         (Way) forecastWays.get(0));
+        if(obsTrack!=null) {
         List<StormTrack> tracks = trackCollection.getTracks();
         for (StormTrack stk : tracks) {
             addDistanceError(obsTrack, stk);
@@ -532,6 +533,7 @@ public class STIStormDataSource extends StormDataSource {
         long t2 = System.currentTimeMillis();
         System.err.println("time:" + (t2 - t1));
         trackCollection.addTrack(obsTrack);
+        }
         return trackCollection;
     }
 
@@ -931,6 +933,8 @@ public class STIStormDataSource extends StormDataSource {
         //first get the obs from BABJ
         List<StormTrackPoint> obsBABJ = getObservationTrack(stormInfo,
                                             babjWay);
+
+        if(obsBABJ.size()==0) return null;
 
         DateTime timeMin = obsBABJ.get(0).getTime();
         DateTime timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();

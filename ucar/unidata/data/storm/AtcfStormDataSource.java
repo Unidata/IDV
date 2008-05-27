@@ -347,12 +347,15 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             }
             String latString = (String) toks.get(6);
             String lonString = (String) toks.get(7);
-            latString = latString.substring(0, 2) + "."
-                        + latString.substring(2);
-            lonString = lonString.substring(0, 2) + "."
-                        + lonString.substring(2);
-            double latitude  = Misc.decodeLatLon(latString);
-            double longitude = Misc.decodeLatLon(lonString);
+            String t  = latString +" " + lonString;
+            
+            boolean south = latString.endsWith("S");
+            boolean west = lonString.endsWith("W");
+            double latitude = Double.parseDouble(latString.substring(0,latString.length()-1))/10.0;
+            double longitude = Double.parseDouble(lonString.substring(0,lonString.length()-1))/10.0;
+            if(south) latitude=-latitude;
+            if(west) longitude=-longitude;
+
             EarthLocation elt =
                 new EarthLocationLite(new Real(RealType.Latitude, latitude),
                                       new Real(RealType.Longitude,
