@@ -1148,6 +1148,12 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StationModel getObservationStationModel() {
+
+        StationModelManager smm =
+            stormTrackControl.getControlContext().getStationModelManager();
+        return smm.getStationModel("Storm>Hurricane");
+
+        /*
         StationModel model       = new StationModel("TrackLocation");
         ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
         shapeSymbol.setShape(ucar.visad.ShapeUtility.HURRICANE);
@@ -1157,6 +1163,7 @@ public class StormDisplayState {
         shapeSymbol.setForeground(null);
         model.addSymbol(shapeSymbol);
         return model;
+        */
     }
 
 
@@ -1166,6 +1173,10 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StationModel getForecastStationModel() {
+        StationModelManager smm =
+            stormTrackControl.getControlContext().getStationModelManager();
+        StationModel sm  = smm.getStationModel("Storm>Forecast Track");
+        if(sm!=null) return sm;
           StationModel model = new StationModel("TrackLocation");
           /*
           TextSymbol textSymbol = new TextSymbol("label","the label");
