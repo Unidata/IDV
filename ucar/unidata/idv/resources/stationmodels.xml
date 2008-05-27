@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <object class="java.util.ArrayList" >
+
+
     <method name="add" >
         <object class="ucar.unidata.ui.symbol.StationModel" >
             <property name="Name" >
@@ -1893,6 +1895,119 @@
             </property>
         </object>
     </method>
+<method name="add">
+<object class="ucar.unidata.ui.symbol.StationModel">
+    <property name="Name">
+        <string><![CDATA[Label]]></string>
+    </property>
+    <property name="List">
+        <object class="java.util.ArrayList">
+            <method name="add">
+                <object class="ucar.unidata.ui.symbol.TextSymbol">
+                    <property name="Value">
+                        <string><![CDATA[LOCATION]]></string>
+                    </property>
+                    <property name="Font">
+                        <object class="java.awt.Font">
+                            <constructor>
+                                <string><![CDATA[sansserif.bold]]></string>
+                                <int>0</int>
+                                <int>12</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="Scale">
+                        <double>0.8</double>
+                    </property>
+                    <property name="RectPoint">
+                        <string><![CDATA[UL]]></string>
+                    </property>
+                    <property name="ParamIds">
+                        <array class="string" length="1">
+                            <string><![CDATA[ID]]></string>
+                        </array>
+                    </property>
+                    <property name="ParamDescs">
+                        <array class="string" length="1">
+                            <string><![CDATA[Parameter]]></string>
+                        </array>
+                    </property>
+                    <property name="RotateXInfo">
+                        <object class="ucar.unidata.ui.symbol.RotateInfo">
+                            <property name="Param">
+                                <string stringvalue=""/>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="RotateYInfo">
+                        <object class="ucar.unidata.ui.symbol.RotateInfo">
+                            <property name="Type">
+                                <int>1</int>
+                            </property>
+                            <property name="Param">
+                                <string stringvalue=""/>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="RotateZInfo">
+                        <object class="ucar.unidata.ui.symbol.RotateInfo">
+                            <property name="Type">
+                                <int>2</int>
+                            </property>
+                            <property name="Param">
+                                <string stringvalue=""/>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="ColorMappings">
+                        <object class="java.util.ArrayList"/>
+                    </property>
+                    <property name="Id">
+                        <string><![CDATA[ID-1108399097352-0]]></string>
+                    </property>
+                    <property name="Foreground">
+                        <object class="java.awt.Color">
+                            <constructor>
+                                <int>0</int>
+                                <int>255</int>
+                                <int>255</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="Stretchy">
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="BeingCreated">
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="Filled">
+                        <boolean>true</boolean>
+                    </property>
+                    <field name="bounds">
+                        <object class="java.awt.Rectangle">
+                            <constructor>
+                                <int>0</int>
+                                <int>0</int>
+                                <int>66</int>
+                                <int>15</int>
+                            </constructor>
+                        </object>
+                    </field>
+                    <field name="underline">
+                        <java.lang.Boolean>false</java.lang.Boolean>
+                    </field>
+                    <field name="url">
+                        <null/>
+                    </field>
+                    <field name="baseline">
+                        <java.lang.Integer>0</java.lang.Integer>
+                    </field>
+                </object>
+            </method>
+        </object>
+    </property>
+</object>
+</method>
     <method name="add">
         <object class="ucar.unidata.ui.symbol.StationModel">
             <property name="Name">
