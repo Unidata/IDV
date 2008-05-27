@@ -2008,6 +2008,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
         int                      iazim = (int) (rhiAz / res + res / 2.0);
 
+        if (iazim > 359) {
+            iazim = 0;
+        }
         float[][] rdata = (float[][]) rhiData.get(Integer.toString(iazim));
 
 
