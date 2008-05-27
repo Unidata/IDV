@@ -364,7 +364,7 @@ public class NamedStationImpl implements NamedStation {
             return false;
         }
         NamedStation that = (NamedStation) o;
-        return (id.equals(that.getID()) && name.equals(that.getName())
+        return (id.equals(that.getID()) //&& name.equals(that.getName())
                 && (latitude == that.getLatitude())
                 && (longitude == that.getLongitude())
                 && (getAltitude().equals(that.getAltitude())));
