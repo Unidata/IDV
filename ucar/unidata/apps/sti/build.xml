@@ -37,7 +37,7 @@ argument -Dfoo=bar) -->
             basedir="${srcdir}"
             compress="true"
             update="false"
-            jarfile="${jars_dest}/sti.jar"
+            jarfile="${jars_dest}/tcidv.jar"
             >
             <include name="ucar/unidata/apps/sti/**"/>
             <include name="ucar/unidata/apps/sti/maps/**"/>
@@ -46,7 +46,7 @@ argument -Dfoo=bar) -->
 
     <target name="plugin" depends="stijar">
         <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
-             <fileset file="lib/sti.jar"/>
+             <fileset file="lib/tcidv.jar"/>
         </copy>
     </target>
 
