@@ -133,6 +133,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Full lat/lon capable flag for the command object */
     public static final int FLAG_FULLLATLON = 1 << 2;
 
+    public static final int FLAG_STRAIGHT = 1 << 3;
 
     /** Select command */
     public static final DrawingCommand CMD_SELECT =
@@ -184,6 +185,8 @@ public class DrawingControl extends DisplayControlImpl {
     /** Holds the list of fonts */
     private JComboBox fontBox;
 
+    private JTextField scaleFld;
+
     /** The z slider */
     private JPanel zPositionPanel;
 
@@ -202,6 +205,12 @@ public class DrawingControl extends DisplayControlImpl {
 
     /** Is filled turned on */
     private boolean filled = false;
+
+    /** Filled mode */
+    private JCheckBox straightCbx;
+
+    /** Is filled turned on */
+    private boolean straight = false;
 
     /** Is in full lat lon mode */
     private JCheckBox fullLatLonCbx;
@@ -278,6 +287,9 @@ public class DrawingControl extends DisplayControlImpl {
 
     /** For exporting file */
     private JCheckBox loadAsMapData;
+
+
+    private double frontScale = 1.0;
 
 
     /**
@@ -1278,6 +1290,10 @@ public class DrawingControl extends DisplayControlImpl {
             fullLatLonCbx.setEnabled(command.isCapable(FLAG_FULLLATLON));
         }
 
+        if (straightCbx != null) {
+            straightCbx.setEnabled(command.isCapable(FLAG_STRAIGHT));
+        }
+
         setCurrentGlyph(currentGlyph, null);
         currentCmd = command;
         setCursor();
@@ -1355,8 +1371,8 @@ public class DrawingControl extends DisplayControlImpl {
     protected List getShapeCommands() {
         List commands = new ArrayList();
         commands.add(GlyphCreatorCommand.CMD_SMOOTHPOLYGON);
-        commands.add(GlyphCreatorCommand.CMD_POLYGON);
-        commands.add(GlyphCreatorCommand.CMD_LINE);
+        //        commands.add(GlyphCreatorCommand.CMD_POLYGON);
+        //        commands.add(GlyphCreatorCommand.CMD_LINE);
         commands.add(GlyphCreatorCommand.CMD_RECTANGLE);
         commands.add(GlyphCreatorCommand.CMD_DIAMOND);
         commands.add(GlyphCreatorCommand.CMD_ARROW);
@@ -1392,11 +1408,11 @@ public class DrawingControl extends DisplayControlImpl {
                         + StringUtil.getAnOrA(label) + " "
                         + label, "Click and drag: create "
                                  + StringUtil.getAnOrA(label) + " "
-                                 + label, icon) {
+                                 + label, icon,DrawingControl.FLAG_STRAIGHT) {
                     public DrawingGlyph createGlyph(DrawingControl control,
                             DisplayEvent event)
                             throws VisADException, RemoteException {
-                        return new FrontGlyph(control, event, type);
+                        return new FrontGlyph(control, event, type,!getStraight());
                     }
                 });
             }
@@ -1532,6 +1548,7 @@ public class DrawingControl extends DisplayControlImpl {
 
 
         filledCbx     = new JCheckBox("Filled", filled);
+        straightCbx     = new JCheckBox("Straight", straight);
         fullLatLonCbx = new JCheckBox("Full Lat/Lon", fullLatLon);
         useTimeCbx    = new JCheckBox("Draw In Current Time", useTime);
         ignoreTimeCbx = new JCheckBox("Show All", ignoreTime);
@@ -1600,7 +1617,7 @@ public class DrawingControl extends DisplayControlImpl {
         widgets.add(GuiUtils.rLabel("Shapes:"));
         if (showFilledCbx()) {
             widgets.add(GuiUtils.leftCenter(makeButtonPanel(shapes, bg),
-                                            GuiUtils.left(filledCbx)));
+                                            GuiUtils.left(GuiUtils.hbox(filledCbx, straightCbx))));
         } else {
             widgets.add(GuiUtils.left(makeButtonPanel(shapes, bg)));
         }
@@ -1669,6 +1686,13 @@ public class DrawingControl extends DisplayControlImpl {
         styleWidgets.add(GuiUtils.rLabel("Justification:"));
         styleWidgets.add(GuiUtils.left(justPanel));
 
+
+
+        if(getShowFronts()) {
+            scaleFld = new JTextField(""+frontScale,5);
+            styleWidgets.add(GuiUtils.rLabel("Front Scale:"));
+            styleWidgets.add(GuiUtils.left(scaleFld));
+        }
 
 
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
@@ -2313,6 +2337,28 @@ public class DrawingControl extends DisplayControlImpl {
         return filled;
     }
 
+
+    /**
+     *  Set the Straight property.
+     *
+     *  @param value The new value for Straight
+     */
+    public void setStraight(boolean value) {
+        straight = value;
+    }
+
+    /**
+     *  Get the Straight property.
+     *
+     *  @return The Straight
+     */
+    public boolean getStraight() {
+        if (straightCbx != null) {
+            return straightCbx.isSelected();
+        }
+        return straight;
+    }
+
     /**
      * Set the FullLatLon property.
      *
@@ -2660,6 +2706,30 @@ public class DrawingControl extends DisplayControlImpl {
     public boolean getShowFronts() {
         return showFronts;
     }
+
+    /**
+       Set the FrontScale property.
+
+       @param value The new value for FrontScale
+    **/
+    public void setFrontScale (double value) {
+	frontScale = value;
+    }
+
+    /**
+       Get the FrontScale property.
+
+       @return The FrontScale
+    **/
+    public double getFrontScale () {
+        if(scaleFld!=null) {
+            return Double.parseDouble(scaleFld.getText().trim());
+        }
+	return frontScale;
+    }
+
+
+
 
 
 }
