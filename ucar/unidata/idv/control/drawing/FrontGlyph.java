@@ -83,15 +83,18 @@ import javax.swing.event.ChangeEvent;
  * @author IDV Development Team
  * @version $Revision: 1.16 $
  */
-public class FrontGlyph extends DrawingGlyph
+public class FrontGlyph extends PolyGlyph
 //PolyGlyph 
 {
 
-    /** Shows the fronts */
-    FrontDrawer frontDrawer;
-
     /** Xml attribute name */
     public static final String ATTR_FRONTTYPE = "fronttype";
+
+    public static final String ATTR_FRONTSCALE = "frontscale";
+
+
+    /** Shows the fronts */
+    private FrontDrawer frontDrawer;
 
     /** _The front type we show */
     private String frontType = FrontDrawer.TYPE_COLD_FRONT;
@@ -102,11 +105,15 @@ public class FrontGlyph extends DrawingGlyph
     /** for changing type */
     private JComboBox typeBox;
 
+    private JTextField scaleFld;
+
     /** for flipping orientation */
     private JCheckBox flipItCbx;
 
     /** for flipping orientation */
     private boolean flipIt = false;
+
+    private double frontScale= 1.0;
 
 
     /**
@@ -126,7 +133,7 @@ public class FrontGlyph extends DrawingGlyph
      */
     public FrontGlyph(DrawingControl control, DisplayEvent event)
             throws VisADException, RemoteException {
-        this(control, event, FrontDrawer.TYPE_COLD_FRONT);
+        this(control, event, FrontDrawer.TYPE_COLD_FRONT,false);
     }
 
     /**
@@ -139,13 +146,16 @@ public class FrontGlyph extends DrawingGlyph
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    public FrontGlyph(DrawingControl control, DisplayEvent event, String type)
+    public FrontGlyph(DrawingControl control, DisplayEvent event, String type, boolean smooth)
             throws VisADException, RemoteException {
-        //        super(control, event);
-        super(control, event, true);
+        super(control, event, smooth);
         frontType = type;
+        frontScale = control.getFrontScale();
     }
 
+    protected FrontDrawer getFrontDrawer() {
+        return frontDrawer;
+    }
 
 
     /**
@@ -162,15 +172,19 @@ public class FrontGlyph extends DrawingGlyph
             return false;
         }
         setCoordType(COORD_LATLON);
-        frontDrawer = new FrontDrawer(8, frontType);
-        frontDrawer.setFlipTheFlip(flipIt);
+        frontDrawer = doMakeFrontDrawer();
         HighLowGlyph.setAnimationSet(frontDrawer, getTimeValues());
         addDisplayable(frontDrawer);
         return true;
     }
 
 
-
+    protected FrontDrawer doMakeFrontDrawer() 
+        throws VisADException, RemoteException {
+        FrontDrawer frontDrawer = new FrontDrawer(8, frontType);
+        frontDrawer.setFlipTheFlip(flipIt);
+        return frontDrawer;
+    }
 
 
     /**
@@ -233,9 +247,7 @@ public class FrontGlyph extends DrawingGlyph
      * @param compMap comp map
      */
     protected void getPropertiesComponents(List comps, Hashtable compMap) {
-        //Call parent with dummy list
-        super.getPropertiesComponents(new Vector(), compMap);
-        if (getCreatedByUser()) {
+        if (shouldAddFrontProperties()) {
             Object selected = null;
             Vector items    = new Vector();
             for (int i = 0; i < FrontDrawer.TYPES.length; i++) {
@@ -259,8 +271,23 @@ public class FrontGlyph extends DrawingGlyph
             comps.add(GuiUtils.filler());
             comps.add(GuiUtils.left(flipItCbx));
         }
-        //        super.getPropertiesComponents(comps, compMap);
-        getTimePropertiesComponents(comps, compMap);
+        scaleFld = new JTextField(""+frontScale,5);
+        comps.add(GuiUtils.rLabel("Scale:"));
+        comps.add(GuiUtils.left(scaleFld));
+        super.getPropertiesComponents(comps, compMap);
+        //getTimePropertiesComponents(comps, compMap);
+    }
+
+    protected void createDisplayable()
+            throws VisADException, RemoteException {
+    }
+
+    protected boolean shouldAddFrontProperties() {
+        return getCreatedByUser();
+    }
+
+    protected boolean shouldShowColorSelector() {
+        return false;
     }
 
     /**
@@ -290,33 +317,23 @@ public class FrontGlyph extends DrawingGlyph
                 frontDrawer.setFrontType(frontType);
             }
         }
+        if(scaleFld!=null) {
+            frontScale = Double.parseDouble(scaleFld.getText().trim());
+        }
         return super.applyProperties(compMap);
     }
 
 
     /**
-     * Can we show calculated distance
+     * Can we show calculated area
      *
      * @return true
      */
-    public boolean canShowDistance() {
-        return true;
+    public boolean canShowArea() {
+        return false;
     }
 
 
-
-    /**
-     * Do the flythru
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    public void doFlythrough() throws VisADException, RemoteException {
-        control.getNavigatedDisplay().flythrough(getPointValues(true));
-        if (propDialog != null) {
-            propDialog.dispose();
-        }
-    }
 
 
     /**
@@ -333,6 +350,7 @@ public class FrontGlyph extends DrawingGlyph
             throws VisADException, RemoteException {
         super.initFromXml(control, node);
         frontType = XmlUtil.getAttribute(node, ATTR_FRONTTYPE, frontType);
+        frontScale = XmlUtil.getAttribute(node, ATTR_FRONTSCALE, frontScale);
         setName(FrontDrawer.getLabel(frontType));
     }
 
@@ -345,6 +363,7 @@ public class FrontGlyph extends DrawingGlyph
     protected void addAttributes(Element e) {
         super.addAttributes(e);
         e.setAttribute(ATTR_FRONTTYPE, frontType);
+        e.setAttribute(ATTR_FRONTSCALE, frontScale+"");
     }
 
     /**
@@ -380,8 +399,8 @@ public class FrontGlyph extends DrawingGlyph
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public static void setBaseScale(DrawingControl control,
-                                    FrontDrawer frontDrawer)
+    protected void setBaseScale(DrawingControl control,
+                                FrontDrawer frontDrawer)
             throws VisADException, RemoteException {
         EarthLocation el1 = control.boxToEarth(new double[] { -1, 0, 0 });
         EarthLocation el2 = control.boxToEarth(new double[] { 1, 0, 0 });
@@ -390,7 +409,7 @@ public class FrontGlyph extends DrawingGlyph
                      - el2.getLatLonPoint().getLongitude().getValue());
         //Guess at a base scale which is 1/4 of the width of the visadbox in degrees
         //go figure
-        frontDrawer.setScale(width / 4);
+        frontDrawer.setScale(frontScale*(width / 4));
     }
 
     /**
@@ -431,16 +450,19 @@ public class FrontGlyph extends DrawingGlyph
      */
     public void updateLocation() throws VisADException, RemoteException {
         if (points.size() == 0) {
-            System.out.println("points = 0");
             return;
         }
-        float[][] curve = getPointValues();
         setBaseScale(control, frontDrawer);
         frontDrawer.setConstantPosition(
             control.getVerticalValue(getZPosition()),
             control.getNavigatedDisplay().getDisplayAltitudeType());
-        frontDrawer.setCurve(curve, getTimeValues());
+        frontDrawer.setCurve(getCurve(), getTimeValues());
         super.updateLocation();
+    }
+
+    protected float[][] getCurve() throws VisADException, RemoteException {
+        return getPointValues();
+
     }
 
 
@@ -471,12 +493,77 @@ public class FrontGlyph extends DrawingGlyph
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public DrawingGlyph handleMouseDragged(DisplayEvent event)
+    public DrawingGlyph xxhandleMouseDragged(DisplayEvent event)
             throws VisADException, RemoteException {
         points.add(getPoint(event));
         updateLocation();
         return this;
     }
+
+
+
+    /**
+     * Handle event
+     *
+     * @param event The display event.
+     *
+     * @return This or null
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    /*
+    public DrawingGlyph handleMouseDragged(DisplayEvent event)
+            throws VisADException, RemoteException {
+        if (smooth) {
+            points.add(getPoint(event));
+        } else {
+            lastPoint = getPoint(event);
+            if (points.size() < 2) {
+                points.add(getPoint(event));
+            } else {
+                points.set(points.size() - 1, getPoint(event));
+            }
+        }
+        updateLocation();
+        return this;
+    }
+    */
+
+
+    /**
+     * Handle event.
+     *
+     * @param event The display event.
+     *
+     * @return This or null
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    /*
+    public DrawingGlyph handleKeyPressed(DisplayEvent event)
+            throws VisADException, RemoteException {
+        if (smooth || (points.size() < 2) || (lastPoint == null)) {
+            return this;
+        }
+        InputEvent inputEvent = event.getInputEvent();
+        if ( !(inputEvent instanceof KeyEvent)) {
+            return this;
+        }
+        KeyEvent keyEvent = (KeyEvent) inputEvent;
+        if (keyEvent.getKeyCode() != KeyEvent.VK_SPACE) {
+            return this;
+        }
+        points.add(lastPoint);
+        lastPoint = null;
+        updateLocation();
+        return this;
+    }
+    */
+
+
+
 
 
     /**
@@ -536,6 +623,24 @@ public class FrontGlyph extends DrawingGlyph
         return flipIt;
     }
 
+
+    /**
+       Set the FrontScale property.
+
+       @param value The new value for FrontScale
+    **/
+    public void setFrontScale (double value) {
+	frontScale = value;
+    }
+
+    /**
+       Get the FrontScale property.
+
+       @return The FrontScale
+    **/
+    public double getFrontScale () {
+	return frontScale;
+    }
 
 
 }

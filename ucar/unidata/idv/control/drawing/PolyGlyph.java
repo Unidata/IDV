@@ -295,7 +295,9 @@ public class PolyGlyph extends LineGlyph {
         //            Data filledData = tryToFill(Misc.toFloat(lineVals), theData);
         //            if(filledData!=null) theData = filledData;
         //        } catch(Exception exc) {}
-        lineDisplayable.setData(theData);
+        if (lineDisplayable != null) {
+            lineDisplayable.setData(theData);
+        }
         super.updateLocation();
     }
 

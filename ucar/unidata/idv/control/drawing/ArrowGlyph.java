@@ -79,10 +79,10 @@ import javax.swing.event.ChangeEvent;
  * @author IDV Development Team
  * @version $Revision: 1.2 $
  */
-public class ArrowGlyph extends DrawingGlyph {
+public class ArrowGlyph extends FrontGlyph {
 
     /** Draws shape */
-    FrontDrawer frontDrawer;
+    //    FrontDrawer frontDrawer;
 
     /**
      * Ctor
@@ -99,41 +99,16 @@ public class ArrowGlyph extends DrawingGlyph {
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    public ArrowGlyph(DrawingControl control, DisplayEvent event)
+    public ArrowGlyph(DrawingControl control, DisplayEvent event, boolean smooth)
             throws VisADException, RemoteException {
-        super(control, event);
+        super(control, event, FrontDrawer.TYPE_UPPER_LEVEL_JET,smooth);
     }
 
-
-
-    /**
-     * Init at the end
-     *
-     * @return Success
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    protected boolean initFinalInner()
-            throws VisADException, RemoteException {
-        if ( !super.initFinalInner()) {
-            return false;
-        }
-        frontDrawer = new FrontDrawer(8, FrontDrawer.TYPE_UPPER_LEVEL_JET,
-                                      false);
-        addDisplayable(frontDrawer);
-        //frontDrawer.setLineWidth(getLineWidth());
-        return true;
+    protected FrontDrawer doMakeFrontDrawer()
+        throws VisADException, RemoteException {
+        return new  FrontDrawer(8, FrontDrawer.TYPE_UPPER_LEVEL_JET,
+                                   false);
     }
-
-    /**
-     * make the displayable
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    protected void createDisplayable()
-            throws VisADException, RemoteException {}
 
 
     /**
@@ -142,10 +117,10 @@ public class ArrowGlyph extends DrawingGlyph {
      * @param value width
      */
     public void setLineWidth(float value) {
-        //super.setLineWidth(value);
+        //        super.setLineWidth(value);
         try {
-            if (frontDrawer != null) {
-                frontDrawer.setLineWidth(value);
+            if (getFrontDrawer() != null) {
+                getFrontDrawer().setLineWidth(value);
             }
         } catch (Exception exc) {
             LogUtil.logException("Setting line width", exc);
@@ -154,73 +129,7 @@ public class ArrowGlyph extends DrawingGlyph {
 
 
 
-    /**
-     * Can we show calculated distance
-     *
-     * @return true
-     */
-    public boolean canShowDistance() {
-        return true;
-    }
-
-
-
-
-    /**
-     * viewpoint changed
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    public void viewpointChanged() throws VisADException, RemoteException {
-        if (frontDrawer != null) {
-            updateLocation();
-        }
-    }
-
-    /**
-     * projection  changed
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    public void projectionChanged() throws VisADException, RemoteException {
-        if (frontDrawer != null) {
-            updateLocation();
-        }
-    }
-
-
-
-    /**
-     * Get points used to select this glyph.
-     *
-     * @return Selection points
-     */
-    protected List getSelectionPoints() {
-        if (actualPoints == null) {
-            return super.getSelectionPoints();
-        }
-        if (actualPoints.size() > 2) {
-            return Misc.newList(actualPoints.get(0),
-                                actualPoints.get(actualPoints.size() - 1));
-        }
-        return actualPoints;
-    }
-
-
-
-
-    /**
-     * Glyph moved. Update the Displayable location.
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    public void updateLocation() throws VisADException, RemoteException {
-        if (points.size() == 0) {
-            return;
-        }
+    protected float[][] getCurve() throws VisADException, RemoteException {
         float[][] curve  = getLatLons(points);
         int       length = curve[0].length;
         //Flip them so we get the arrow pointed in the right direction
@@ -230,29 +139,17 @@ public class ArrowGlyph extends DrawingGlyph {
                 inverse[i][length - j - 1] = curve[i][j];
             }
         }
-        FrontGlyph.setBaseScale(control, frontDrawer);
-        frontDrawer.setCurve(inverse, getTimeValues());
-        super.updateLocation();
+        return inverse;
     }
 
 
-    /**
-     * Handle event
-     *
-     * @param event The display event.
-     *
-     * @return This or null
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    public DrawingGlyph handleMouseDragged(DisplayEvent event)
-            throws VisADException, RemoteException {
-        points.add(getPoint(event));
-        updateLocation();
-        return this;
+    protected boolean shouldAddFrontProperties() {
+        return false;
     }
 
+    protected boolean shouldShowColorSelector() {
+        return true;
+    }
 
     /**
      * Get xml tag name to use

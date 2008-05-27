@@ -27,7 +27,10 @@ import ucar.unidata.idv.control.DrawingControl;
 
 import ucar.visad.display.FrontDrawer;
 
-
+import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.*;
+import java.awt.event.*;
 
 import visad.*;
 
@@ -46,13 +49,13 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
 
     /** command */
     public static final DrawingCommand CMD_SMOOTHPOLYGON =
-        new GlyphCreatorCommand("Create a smooth polygon",
-                                "Click and drag: create a smooth polygon",
-                                "/auxdata/ui/icons/SmoothPoly16.gif") {
+        new GlyphCreatorCommand("Create a polygon",
+                                "Click and drag: create a polygon",
+                                "/auxdata/ui/icons/SmoothPoly16.gif",DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
-            return new PolyGlyph(control, event, true);
+            return new PolyGlyph(control, event, !control.getStraight());
         }
     };
 
@@ -61,11 +64,11 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
         new GlyphCreatorCommand(
             "Create a polygon",
             "Click and drag: create a polygon. Space key to add points",
-            "/auxdata/ui/icons/Poly16.gif", DrawingControl.FLAG_FILLED) {
+            "/auxdata/ui/icons/Poly16.gif", DrawingControl.FLAG_FILLED|DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
-            return new PolyGlyph(control, event, false);
+            return new PolyGlyph(control, event, !control.getStraight());
         }
     };
 
@@ -123,11 +126,11 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
     public static final DrawingCommand CMD_ARROW =
         new GlyphCreatorCommand("Create an arrow",
                                 "Click and drag: create an arrow",
-                                "/auxdata/ui/icons/Arrow16.gif") {
+                                "/auxdata/ui/icons/Arrow16.gif",DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
-            return new ArrowGlyph(control, event);
+            return new ArrowGlyph(control, event, !control.getStraight());
         }
     };
 
