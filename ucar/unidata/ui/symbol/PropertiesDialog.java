@@ -321,7 +321,7 @@ public class PropertiesDialog implements ActionListener {
 
 
         if (fgColorSwatch.getSwatchColor() == null) {
-            symbol.setForeground(Color.black);
+            symbol.setForeground(null);
         } else {
             symbol.setForeground(fgColorSwatch.getSwatchColor());
         }
