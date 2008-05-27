@@ -90,6 +90,7 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** Widget for properties */
     private JComboBox stationBox;
 
+    private NamedStation    namedStation = null;
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -245,7 +246,7 @@ public class CDMRadarDataSource extends RadarDataSource {
         String          stationID    = da.getStationID();
         String          stationName  = da.getStationName();
         String          dataFormat   = da.getDataFormatName();
-        NamedStation    namedStation = null;
+        //NamedStation    namedStation = null;
         if (getProperties() != null) {
             Object o = getProperties().get(STATION_LOCATION);
             if (o instanceof NamedStation) {
@@ -255,8 +256,8 @@ public class CDMRadarDataSource extends RadarDataSource {
         EarthLocation rdLocation = da.getStationLocation();
         setName(makeName(da));
         if (namedStation == null) {
-            try {
-                namedStation = new NamedStationImpl(stationID, stationName,
+            try {             
+                namedStation = new NamedStationImpl(stationID.substring(1), stationName,
                         rdLocation.getLatitude().getValue(),
                         rdLocation.getLongitude().getValue(),
                         rdLocation.getAltitude().getValue(),
@@ -472,14 +473,16 @@ public class CDMRadarDataSource extends RadarDataSource {
             items.addAll(getStations().values());
             Collections.sort(items);
             stationBox = new JComboBox(items);
-            NamedStation namedStation = null;
-            Object       o            = (getProperties() != null)
-                                        ? getProperties().get(
-                                            STATION_LOCATION)
-                                        : null;
+           // NamedStation namedStation = null;
+            if(namedStation == null) {
+                Object       o            = (getProperties() != null)
+                                            ? getProperties().get(
+                                                STATION_LOCATION)
+                                            : null;
 
-            if ((o != null) && (o instanceof NamedStation)) {
-                namedStation = (NamedStation) o;
+                if ((o != null) && (o instanceof NamedStation)) {
+                    namedStation = (NamedStation) o;
+                }
             }
             if (namedStation != null) {
                 stationBox.setSelectedItem(namedStation);
