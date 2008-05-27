@@ -527,6 +527,8 @@ public class GuiUtils extends LayoutUtil {
      */
     public static class ColorSwatch extends JPanel {
 
+        boolean doAlpha = false;
+
         /** color of the swatch */
         Color color;
 
@@ -539,7 +541,6 @@ public class GuiUtils extends LayoutUtil {
         /** label */
         String label;
 
-
         /**
          * Create a new ColorSwatch for the specified color
          *
@@ -547,6 +548,11 @@ public class GuiUtils extends LayoutUtil {
          * @param dialogLabel  label for the dialog
          */
         public ColorSwatch(Color c, String dialogLabel) {
+            this(c, dialogLabel, false);
+        }
+
+        public ColorSwatch(Color c, String dialogLabel,boolean alphaOk) {
+            this.doAlpha = alphaOk;
             this.color = c;
             this.label = dialogLabel;
             setMinimumSize(new Dimension(40, 10));
@@ -569,11 +575,25 @@ public class GuiUtils extends LayoutUtil {
                 }
             });
 
+
+
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    Color newColor = JColorChooser.showDialog(null, label,
-                                         ColorSwatch.this.getBackground());
+                    Color oldColor = ColorSwatch.this.getBackground();
+                    int alpha =  oldColor.getAlpha();
+                    JColorChooser chooser = new JColorChooser(oldColor);
+                    JSlider alphaSlider = new JSlider(0,255,alpha);
+                    JComponent contents;
+                    if(doAlpha) 
+                        contents = centerBottom(chooser, inset(hbox(new JLabel("Transparency:"), alphaSlider), new Insets(5,5,5,5)));
+                    else contents = chooser;
+                    if(!showOkCancelDialog(null,label, contents, null)) return;
+                    alpha = alphaSlider.getValue();
+                    //                    Color newColor = JColorChooser.showDialog(null, label,
+                    //                                                              oldColor);
+                    Color newColor = chooser.getColor();
                     if (newColor != null) {
+                        newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alpha);
                         ColorSwatch.this.setBackground(newColor);
                     }
                 }
@@ -634,9 +654,16 @@ public class GuiUtils extends LayoutUtil {
          * @param g  graphics
          */
         public void paint(Graphics g) {
+            Rectangle b = getBounds();
+            if (color != null) {
+                g.setColor(Color.black);
+                for(int x=0;x<b.width;x+=4) {
+                    g.fillRect(x,0,2,b.height);
+                }
+            }
+
             super.paint(g);
             if (color == null) {
-                Rectangle b = getBounds();
                 g.setColor(Color.black);
                 g.drawLine(0, 0, b.width, b.height);
                 g.drawLine(b.width, 0, 0, b.height);
