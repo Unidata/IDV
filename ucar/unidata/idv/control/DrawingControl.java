@@ -1650,9 +1650,25 @@ public class DrawingControl extends DisplayControlImpl {
 
 
         Color     c            = getColor();
-        Component colorCbx     = doMakeColorControl(((c == null)
-                ? Color.red
-                : c));
+        //        Component colorCbx     = doMakeColorControl(((c == null)
+        //                ? Color.red
+        //                : c));
+        if(c == null) c = Color.red;
+        GuiUtils.ColorSwatch colorSwatch =  new GuiUtils.ColorSwatch(c,
+                                                                     "Set color",true) {
+                public void setBackground(Color newColor) {        
+                    super.setBackground(newColor);
+                    try {
+                    setColor(newColor);
+                    } catch (Exception exc) {
+                        logException("Setting color", exc);
+                    }
+                }
+            };
+        colorSwatch.setMinimumSize(new Dimension(20, 20));
+        colorSwatch.setPreferredSize(new Dimension(20, 20));
+        Component colorCbx = colorSwatch;
+
         JComboBox widthComp    = doMakeLineWidthBox(lineWidth);
         widthComp.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1676,11 +1692,11 @@ public class DrawingControl extends DisplayControlImpl {
         JPanel justPanel = GuiUtils.flow(new Component[] { justificationBox,
                 vertJustificationBox });
 
-
         styleWidgets.add(GuiUtils.rLabel("Color:"));
         styleWidgets.add(GuiUtils.left(GuiUtils.hflow(Misc.newList(colorCbx,
-                GuiUtils.rLabel("Line Width:  "),
-                GuiUtils.left(widthComp)), 4, 0)));
+                                                                   GuiUtils.filler(10,5),
+                                                                   GuiUtils.rLabel("Line Width:  "),
+                                                                   GuiUtils.left(widthComp)), 4, 0)));
         styleWidgets.add(GuiUtils.rLabel("Font:"));
         styleWidgets.add(GuiUtils.left(fontPanel));
         styleWidgets.add(GuiUtils.rLabel("Justification:"));
