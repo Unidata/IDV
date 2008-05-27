@@ -1470,9 +1470,10 @@ public abstract class DrawingGlyph {
             comps.add(GuiUtils.left(box));
             compMap.put(ATTR_COLOR, box);
             */
-            colorSwatch = new GuiUtils.ColorSwatch(color, "");
-            comps.add(GuiUtils.left(GuiUtils.hbox(colorSwatch,
-                    colorSwatch.getSetButton())));
+            colorSwatch = new GuiUtils.ColorSwatch(color, "",true);
+            colorSwatch.setMinimumSize(new Dimension(20, 20));
+            colorSwatch.setPreferredSize(new Dimension(20, 20));
+            comps.add(GuiUtils.left(colorSwatch));
             //        compMap.put(ATTR_COLOR, box);
         }
 
