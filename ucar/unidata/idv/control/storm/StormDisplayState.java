@@ -1165,31 +1165,23 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    private StationModel getForecastStationModel() {
-        /*
-          StationModelDisplayable dots  = new StationModelDisplayable("dots");
-          wayDisplayState.addDisplayable(dots);
+    protected StationModel getForecastStationModel() {
           StationModel model = new StationModel("TrackLocation");
+          /*
           TextSymbol textSymbol = new TextSymbol("label","the label");
           textSymbol.setScale(1.5f);
           textSymbol.setRectPoint(Glyph.PT_UL);
           textSymbol.bounds = new java.awt.Rectangle(10,0,21,15);
-          model.addSymbol(textSymbol);
+          model.addSymbol(textSymbol);*/
 
           ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
-          shapeSymbol.setScale(0.5f);
+          shapeSymbol.setScale(0.3f);
           shapeSymbol.setShape(ucar.visad.ShapeUtility.CIRCLE);
           shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
           shapeSymbol.setRectPoint(Glyph.PT_MM);
           model.addSymbol(shapeSymbol);
-          forecastHolder.addDisplayable(dots);
-          dots.setScale(1.0f);
-          dots.setStationModel(model);
-          dots.setStationData(PointObFactory.makeTimeSequenceOfPointObs( wayDisplayState.getPointObs(),
-          -1,-1));
-
-        */
-        return null;
+          return model;
+          //        return null;
     }
 
     //        ucar.visad.Util.makeTimeField(List<Data> ranges, List times)

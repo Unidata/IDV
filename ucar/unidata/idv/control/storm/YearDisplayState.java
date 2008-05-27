@@ -201,16 +201,22 @@ public class YearDisplayState {
         return ""+ year;
     }
 
+    private List pointObs;
 
-    public void setData(List<StormTrack> tracks, List times, List fields, List pointObs) throws Exception {
+    protected List getPointObs() {
+        return pointObs;
+    }
+
+    public void setData(boolean doYearTime, List<StormTrack> tracks, List times, List fields, List pointObs) throws Exception {
+        this.pointObs = pointObs;
         stormTracks.clear();
         stormTracks.addAll(tracks);
         if (trackDisplay == null) {
             trackDisplay = new TrackDisplayable("year track ");
+            trackDisplay.setLineWidth(2);
             stormTrackControl.addDisplayable(trackDisplay);
             trackDisplay.setColor(color);
-
-            labelDisplay =
+            /*            labelDisplay =
                 new StationModelDisplayable("storm year labels");
             labelDisplay.setScale(
                 stormTrackControl.getDisplayScale());
@@ -218,12 +224,27 @@ public class YearDisplayState {
                 stormTrackControl.getControlContext().getStationModelManager();
             StationModel model = smm.getStationModel("Location");
             labelDisplay.setStationModel(model);
-            stormTrackControl.addDisplayable(labelDisplay);
+            stormTrackControl.addDisplayable(labelDisplay);*/
         }
 
-        trackDisplay.setTrack(Util.makeTimeField(fields, times));
-        labelDisplay.setStationData(
-                                    PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
+        if(doYearTime) {
+            DateTime  dttm = (DateTime)times.get(0);
+            trackDisplay.setOverrideAnimationSet(Misc.newList(dttm));
+            Data[] datas = (Data[]) fields.toArray(new Data[fields.size()]);
+            times = Misc.newList(new DateTime(dttm.cloneButValue(dttm.getValue()-1000)),
+                                 dttm,
+                                 new DateTime(dttm.cloneButValue(dttm.getValue()+1000)));
+            FieldImpl indexField = Util.indexedField(datas,false);
+            fields  = Misc.newList(indexField, indexField, indexField);
+            trackDisplay.setTrack(Util.makeTimeField(fields, times));
+            //            System.err.println ("field:" + Util.makeTimeField(fields, times));
+        } else {
+            trackDisplay.setOverrideAnimationSet((List)null);
+            trackDisplay.setTrack(Util.makeTimeField(fields, times));
+            //            System.err.println ("no year");
+            //            labelDisplay.setStationData(
+            //                                        PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
+        }
 
     } 
 

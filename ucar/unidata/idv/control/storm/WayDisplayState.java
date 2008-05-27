@@ -275,10 +275,13 @@ public class WayDisplayState {
 
                 }
                 setTrackColor();
-                if ( !hadTrack && way.isObservation()) {
-                    getLabelDisplay().setStationData(
-                        PointObFactory.makeTimeSequenceOfPointObs(
-                            pointObs, -1, -1));
+                if ( !hadTrack) {
+                    FieldImpl pointField =   PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1);
+                   if(way.isObservation()) {
+                       getLabelDisplay().setStationData(pointField);
+                   } else {
+                       getLabelDisplay().setStationData(pointField);
+                   }
                 }
             }
             getTrackDisplay().setVisible(true);
@@ -416,8 +419,13 @@ public class WayDisplayState {
             addDisplayable(labelDisplay);
             labelDisplay.setScale(
                 stormDisplayState.getStormTrackControl().getDisplayScale());
-            labelDisplay.setStationModel(
-                stormDisplayState.getObservationStationModel());
+            if(way.isObservation()) {
+                labelDisplay.setStationModel(
+                                             stormDisplayState.getObservationStationModel());
+            } else {
+                labelDisplay.setStationModel(
+                                             stormDisplayState.getForecastStationModel());
+            }
             setLabelColor();
         }
         return labelDisplay;

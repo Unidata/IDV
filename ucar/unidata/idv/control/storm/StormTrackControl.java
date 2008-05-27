@@ -161,9 +161,15 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private TreePanel treePanel;
 
+    private static final int YEAR_TIME_MODE_YEAR = 0;
+    private static final int YEAR_TIME_MODE_STORM = 1;
+
+    private int yearTimeMode = YEAR_TIME_MODE_YEAR;
     private Hashtable<Integer,YearDisplayState> yearDisplayStateMap = new Hashtable<Integer,YearDisplayState>();
 
     private Hashtable yearData=new Hashtable();
+
+    private JComboBox timeModeBox;
 
 
     /** _more_          */
@@ -910,10 +916,44 @@ public class StormTrackControl extends DisplayControlImpl {
                 return;
             }
         }
+        loadYearPointData();
     }
 
 
+    private StationModelDisplayable yearLabels;
 
+    private void loadYearPointData() {
+        try {
+        if(yearLabels==null) {
+            yearLabels =
+                new StationModelDisplayable("storm year labels");
+            yearLabels.setScale(getDisplayScale());
+            StationModelManager smm =
+                getControlContext().getStationModelManager();
+            StationModel model = smm.getStationModel("Label");
+            yearLabels.setStationModel(model);
+            addDisplayable(yearLabels);
+        }
+
+        List allPointObs = new ArrayList();
+        List<YearDisplayState> ydss = getYearDisplayStates();
+        for (YearDisplayState yds : ydss) {
+            if(!yds.getActive()) continue;
+            List tmp = yds.getPointObs();
+            if(tmp!=null) allPointObs.addAll(tmp);
+        }
+
+        if(allPointObs.size()==0) {
+            removeDisplayable(yearLabels);
+            yearLabels = null;
+        } else {
+        yearLabels.setStationData(
+                                  PointObFactory.makeTimeSequenceOfPointObs(allPointObs, -1, -1));
+        }
+                } catch (Exception exc) {
+                    logException("Loading year", exc);
+                }
+    }
 
 
 
@@ -923,6 +963,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 try {
                     yds.setState(yds.STATE_LOADING);
                     loadYearInner(yds);
+                    loadYearPointData();
                 } catch (Exception exc) {
                     logException("Loading year", exc);
                 }
@@ -944,6 +985,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         GregorianCalendar cal =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         Hashtable<String, Boolean> obsWays = new Hashtable<String,
@@ -951,7 +993,7 @@ public class StormTrackControl extends DisplayControlImpl {
         obsWays.put(Way.OBSERVATION.toString(), new Boolean(true));
         String currentMessage = "";
         String errors = "";
-        boolean doYearTime = false;
+        boolean doYearTime = yearTimeMode == YEAR_TIME_MODE_YEAR;
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             if(yds.getState()!=yds.STATE_LOADING) {
                 yds.setState(YearDisplayState.STATE_INACTIVE);
@@ -1024,18 +1066,17 @@ public class StormTrackControl extends DisplayControlImpl {
                                                         stp.getLocation(), dttm,
                                                         tuple));
             }
-
         }
         if(errorWindow!=null) {
             errorWindow.setVisible(false);
         }
-        yds.setData(obsTracks, times, fields, pointObs);
+        yds.setData(doYearTime,obsTracks, times, fields, pointObs);
         yds.setState(YearDisplayState.STATE_ACTIVE);
         yds.setStatus("");
     }
 
 
-            /**
+    /**
      * _more_
      */
     public void writeToKml() {
@@ -1257,7 +1298,19 @@ public class StormTrackControl extends DisplayControlImpl {
             scroller.setMinimumSize(new Dimension(width, height));
             yearComponent = scroller;
         }
-        treePanel.addComponent(GuiUtils.top(yearComponent), null, "Yearly Tracks",null);
+        timeModeBox = new JComboBox(new Vector(Misc.newList("Start Year", "Storm Date")));
+        timeModeBox.setSelectedIndex(yearTimeMode);
+        timeModeBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    yearTimeMode = timeModeBox.getSelectedIndex();
+                    Misc.run(StormTrackControl.this,"initYears");
+                }
+            });
+
+        
+        JComponent yearTopComp = GuiUtils.inset(GuiUtils.left(GuiUtils.label("Time Mode: ", timeModeBox)),5); 
+        
+        treePanel.addComponent(GuiUtils.topCenter(yearTopComp, yearComponent), null, "Yearly Tracks",null);
 
         years                  = new Hashtable();
 
@@ -1816,6 +1869,25 @@ public class StormTrackControl extends DisplayControlImpl {
     public StormDisplayState getLocalStormDisplayState() {
         return localStormDisplayState;
     }
+
+
+/**
+Set the YearTimeMode property.
+
+@param value The new value for YearTimeMode
+**/
+public void setYearTimeMode (int value) {
+	yearTimeMode = value;
+}
+
+/**
+Get the YearTimeMode property.
+
+@return The YearTimeMode
+**/
+public int getYearTimeMode () {
+	return yearTimeMode;
+}
 
 
 
