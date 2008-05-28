@@ -190,7 +190,6 @@ public class StormTrackChart {
      * @param stormDisplayState _more_
      * @param name _more_
      *
-     * @throws Exception _more_
      */
     public StormTrackChart(StormDisplayState stormDisplayState, String name) {
         this(stormDisplayState, name, MODE_FORECASTTIME);
@@ -626,7 +625,6 @@ public class StormTrackChart {
     /**
      * _more_
      *
-     * @param theRealType _more_
      *
      * @param param _more_
      */
@@ -756,7 +754,7 @@ public class StormTrackChart {
                         tracksToUse.add(
                             new StormTrack(
                                 stormDisplayState.getStormInfo(), way,
-                                points,null));
+                                points, null));
                     }
                 }
 

@@ -23,8 +23,10 @@
 package ucar.unidata.idv.control.storm;
 
 
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.GuiUtils;
+
+
+import ucar.unidata.util.LogUtil;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -41,15 +43,16 @@ import javax.swing.event.*;
 
 public class DisplayState {
 
+    /** _more_ */
     private WayDisplayState wayDisplayState;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox cbx;
 
-    /** _more_          */
+    /** _more_ */
     private boolean visible;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
     /**
@@ -60,20 +63,22 @@ public class DisplayState {
     /**
      * _more_
      *
+     *
+     * @param wayDisplayState _more_
      * @param name _more_
      * @param visible _more_
      */
-    public DisplayState(WayDisplayState wayDisplayState, String name, boolean visible) {
+    public DisplayState(WayDisplayState wayDisplayState, String name,
+                        boolean visible) {
         this.wayDisplayState = wayDisplayState;
-        this.name    = name;
-        this.visible = visible;
+        this.name            = name;
+        this.visible         = visible;
     }
 
 
     /**
      * _more_
      *
-     * @param stormDisplayState _more_
      *
      * @return _more_
      */
@@ -85,7 +90,8 @@ public class DisplayState {
                 public void actionPerformed(ActionEvent ae) {
                     try {
                         setVisible(cbx.isSelected());
-                        wayDisplayState.getStormDisplayState().displayStateChanged(DisplayState.this);
+                        wayDisplayState.getStormDisplayState()
+                            .displayStateChanged(DisplayState.this);
                     } catch (Exception exc) {
                         LogUtil.logException("Toggling way visible", exc);
                     }
@@ -134,23 +140,23 @@ public class DisplayState {
         return name;
     }
 
-/**
-Set the WayDisplayState property.
+    /**
+     * Set the WayDisplayState property.
+     *
+     * @param value The new value for WayDisplayState
+     */
+    public void setWayDisplayState(WayDisplayState value) {
+        wayDisplayState = value;
+    }
 
-@param value The new value for WayDisplayState
-**/
-public void setWayDisplayState (WayDisplayState value) {
-	wayDisplayState = value;
-}
-
-/**
-Get the WayDisplayState property.
-
-@return The WayDisplayState
-**/
-public WayDisplayState getWayDisplayState () {
-	return wayDisplayState;
-}
+    /**
+     * Get the WayDisplayState property.
+     *
+     * @return The WayDisplayState
+     */
+    public WayDisplayState getWayDisplayState() {
+        return wayDisplayState;
+    }
 
 
 }

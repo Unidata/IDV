@@ -122,36 +122,48 @@ import javax.swing.table.*;
 
 public class YearDisplayState {
 
+    /** _more_ */
     public static final int STATE_INACTIVE = 0;
-    public static final int STATE_LOADING = 1;    
+
+    /** _more_ */
+    public static final int STATE_LOADING = 1;
+
+    /** _more_ */
     public static final int STATE_ACTIVE = 2;
 
-    private static int[]nextColor={0};
+    /** _more_ */
+    private static int[] nextColor = { 0 };
 
     /** _more_ */
     private StormTrackControl stormTrackControl;
 
+    /** _more_ */
     private int year;
 
+    /** _more_ */
     private Color color;
 
 
     /** _more_ */
-    private int state =STATE_INACTIVE;
+    private int state = STATE_INACTIVE;
 
-    /** _more_          */
+    /** _more_ */
     private TrackDisplayable trackDisplay;
 
-    /** _more_          */
+    /** _more_ */
     private StationModelDisplayable labelDisplay;
 
-    /** _more_          */
+    /** _more_ */
     private List<StormTrack> stormTracks = new ArrayList<StormTrack>();
 
 
+    /** _more_ */
     private JLabel label;
-    private JButton  button;
 
+    /** _more_ */
+    private JButton button;
+
+    /** _more_ */
     private GuiUtils.ColorSwatch colorSwatch;
 
     /**
@@ -163,16 +175,22 @@ public class YearDisplayState {
     /**
      * _more_
      *
-     * @param stormInfo _more_
      *
-     * @throws Exception _more_
+     * @param stormTrackControl _more_
+     * @param year _more_
+     *
      */
     public YearDisplayState(StormTrackControl stormTrackControl, int year) {
         this.stormTrackControl = stormTrackControl;
-        this.year = year;
-        color = StormDisplayState.getNextColor(nextColor);
+        this.year              = year;
+        color                  = StormDisplayState.getNextColor(nextColor);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent getColorSwatch() {
         if (colorSwatch == null) {
             colorSwatch = new GuiUtils.ColorSwatch(getColor(),
@@ -180,12 +198,12 @@ public class YearDisplayState {
                 public void setBackground(Color newColor) {
                     super.setBackground(newColor);
                     YearDisplayState.this.color = newColor;
-                    if(trackDisplay!=null) {
+                    if (trackDisplay != null) {
                         try {
-                        trackDisplay.setColor(newColor);
-                    } catch (Exception exc) {
-                        LogUtil.logException("Setting color", exc);
-                    }
+                            trackDisplay.setColor(newColor);
+                        } catch (Exception exc) {
+                            LogUtil.logException("Setting color", exc);
+                        }
                     }
                 }
             };
@@ -197,17 +215,41 @@ public class YearDisplayState {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        return ""+ year;
+        return "" + year;
     }
 
+    /** _more_ */
     private List pointObs;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected List getPointObs() {
         return pointObs;
     }
 
-    public void setData(boolean doYearTime, List<StormTrack> tracks, List times, List fields, List pointObs) throws Exception {
+    /**
+     * _more_
+     *
+     * @param doYearTime _more_
+     * @param tracks _more_
+     * @param times _more_
+     * @param fields _more_
+     * @param pointObs _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setData(boolean doYearTime, List<StormTrack> tracks,
+                        List times, List fields, List pointObs)
+            throws Exception {
         this.pointObs = pointObs;
         stormTracks.clear();
         stormTracks.addAll(tracks);
@@ -227,77 +269,102 @@ public class YearDisplayState {
             stormTrackControl.addDisplayable(labelDisplay);*/
         }
 
-        if(doYearTime) {
-            DateTime  dttm = (DateTime)times.get(0);
+        if (doYearTime) {
+            DateTime dttm = (DateTime) times.get(0);
             trackDisplay.setOverrideAnimationSet(Misc.newList(dttm));
             Data[] datas = (Data[]) fields.toArray(new Data[fields.size()]);
-            times = Misc.newList(new DateTime(dttm.cloneButValue(dttm.getValue()-1000)),
-                                 dttm,
-                                 new DateTime(dttm.cloneButValue(dttm.getValue()+1000)));
-            FieldImpl indexField = Util.indexedField(datas,false);
-            fields  = Misc.newList(indexField, indexField, indexField);
+            times =
+                Misc.newList(new DateTime(dttm.cloneButValue(dttm.getValue()
+                    - 1000)), dttm,
+                              new DateTime(dttm.cloneButValue(dttm.getValue()
+                                  + 1000)));
+            FieldImpl indexField = Util.indexedField(datas, false);
+            fields = Misc.newList(indexField, indexField, indexField);
             trackDisplay.setTrack(Util.makeTimeField(fields, times));
             //            System.err.println ("field:" + Util.makeTimeField(fields, times));
         } else {
-            trackDisplay.setOverrideAnimationSet((List)null);
+            trackDisplay.setOverrideAnimationSet((List) null);
             trackDisplay.setTrack(Util.makeTimeField(fields, times));
             //            System.err.println ("no year");
             //            labelDisplay.setStationData(
             //                                        PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1));
         }
 
-    } 
+    }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JButton getButton() {
-        if(button==null) {
+        if (button == null) {
             button = new JButton("");
             GuiUtils.setFixedWidthFont(button);
             setState(state);
             button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        if(state == STATE_ACTIVE) {
-                            state = STATE_INACTIVE;
-                            unload();
-                        } else if(state == STATE_LOADING) {
-                            state = STATE_INACTIVE;
-                        } else if(state == STATE_INACTIVE) {
-                            state = STATE_LOADING;
-                            stormTrackControl.loadYear(YearDisplayState.this);
-                        }
-                        setState(state);
+                public void actionPerformed(ActionEvent ae) {
+                    if (state == STATE_ACTIVE) {
+                        state = STATE_INACTIVE;
+                        unload();
+                    } else if (state == STATE_LOADING) {
+                        state = STATE_INACTIVE;
+                    } else if (state == STATE_INACTIVE) {
+                        state = STATE_LOADING;
+                        stormTrackControl.loadYear(YearDisplayState.this);
                     }
-                });
+                    setState(state);
+                }
+            });
         }
         return button;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public void setStatus(String msg) {
         getLabel().setText(msg);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JLabel getLabel() {
-        if(label==null) {
+        if (label == null) {
             label = new JLabel("");
         }
         return label;
     }
 
 
+    /**
+     * _more_
+     */
     public void unload() {
-        if (trackDisplay!= null) {
+        if (trackDisplay != null) {
             try {
-            stormTrackControl.removeDisplayable(trackDisplay);
-            stormTrackControl.removeDisplayable(labelDisplay);
-                    } catch (Exception exc) {
-                        LogUtil.logException("Unloading tracks", exc);
-                    }
-            trackDisplay =null;
-            labelDisplay =null;
+                stormTrackControl.removeDisplayable(trackDisplay);
+                stormTrackControl.removeDisplayable(labelDisplay);
+            } catch (Exception exc) {
+                LogUtil.logException("Unloading tracks", exc);
+            }
+            trackDisplay = null;
+            labelDisplay = null;
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<StormTrack> getStormTracks() {
         return stormTracks;
     }
@@ -321,42 +388,42 @@ public class YearDisplayState {
         this.stormTrackControl = stormTrackControl;
     }
 
-/**
-Set the Year property.
+    /**
+     * Set the Year property.
+     *
+     * @param value The new value for Year
+     */
+    public void setYear(int value) {
+        year = value;
+    }
 
-@param value The new value for Year
-**/
-public void setYear (int value) {
-	year = value;
-}
-
-/**
-Get the Year property.
-
-@return The Year
-**/
-public int getYear () {
-	return year;
-}
+    /**
+     * Get the Year property.
+     *
+     * @return The Year
+     */
+    public int getYear() {
+        return year;
+    }
 
 
-/**
-Set the Color property.
+    /**
+     * Set the Color property.
+     *
+     * @param value The new value for Color
+     */
+    public void setColor(Color value) {
+        color = value;
+    }
 
-@param value The new value for Color
-**/
-public void setColor (Color value) {
-	color = value;
-}
-
-/**
-Get the Color property.
-
-@return The Color
-**/
-public Color getColor () {
-	return color;
-}
+    /**
+     * Get the Color property.
+     *
+     * @return The Color
+     */
+    public Color getColor() {
+        return color;
+    }
 
 
 
@@ -371,32 +438,32 @@ public Color getColor () {
     }
 
 
-/**
-Set the State property.
-
-@param value The new value for State
-**/
-public void setState (int value) {
-	state = value;
-        if(button!=null) {
-            if(state == STATE_ACTIVE) {
+    /**
+     * Set the State property.
+     *
+     * @param value The new value for State
+     */
+    public void setState(int value) {
+        state = value;
+        if (button != null) {
+            if (state == STATE_ACTIVE) {
                 button.setText("Unload");
-            } else  if(state == STATE_LOADING) {
+            } else if (state == STATE_LOADING) {
                 button.setText("Cancel");
-            } else  if(state == STATE_INACTIVE) {
+            } else if (state == STATE_INACTIVE) {
                 button.setText("Load  ");
             }
         }
-}
+    }
 
-/**
-Get the State property.
-
-@return The State
-**/
-public int getState () {
-	return state;
-}
+    /**
+     * Get the State property.
+     *
+     * @return The State
+     */
+    public int getState() {
+        return state;
+    }
 
 
 }

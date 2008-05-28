@@ -149,8 +149,8 @@ public class StormTrackTableModel extends AbstractTableModel {
         this.points            = track.getTrackPoints();
         List<StormParam> tmp = track.getParams();
         this.params = new ArrayList<StormParam>();
-        for(StormParam param: tmp) {
-            if(!param.getDerived()) {
+        for (StormParam param : tmp) {
+            if ( !param.getDerived()) {
                 this.params.add(param);
             }
         }

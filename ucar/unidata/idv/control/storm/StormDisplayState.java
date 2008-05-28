@@ -41,15 +41,15 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
 
-import ucar.unidata.ui.TableSorter;
-
-
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.idv.control.LayoutModelWidget;
 import ucar.unidata.idv.control.chart.*;
+
+
+import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TreePanel;
 
 
@@ -79,6 +79,7 @@ import ucar.visad.display.*;
 
 
 import ucar.visad.display.*;
+
 import visad.*;
 
 import visad.georef.EarthLocation;
@@ -88,12 +89,11 @@ import visad.georef.LatLonPoint;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
 
-import javax.swing.table.*;
 import java.io.*;
+
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -102,6 +102,11 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
+import javax.swing.table.*;
 
 
 
@@ -122,6 +127,7 @@ public class StormDisplayState {
     /** _more_ */
     private static String ID_OBS_RINGS = "id.obs.rings";
 
+    /** _more_ */
     private static String ID_OBS_LAYOUTMODEL = "id.obs.layoutmodel";
 
 
@@ -135,6 +141,7 @@ public class StormDisplayState {
     /** _more_ */
     private static String ID_FORECAST_COLOR = "id.forecast.color";
 
+    /** _more_ */
     private static String ID_FORECAST_LAYOUTMODEL = "id.forecast.layoutmodel";
 
 
@@ -168,7 +175,7 @@ public class StormDisplayState {
     /** _more_ */
     private CompositeDisplayable holder;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isOnlyChild = false;
 
     /** _more_ */
@@ -200,9 +207,11 @@ public class StormDisplayState {
     /** _more_ */
     private WayDisplayState obsDisplayState;
 
+    /** _more_ */
     private String obsLayoutModelName = "Storm>Hurricane";
 
-    private String forecastLayoutModelName="Storm>Forecast Track";
+    /** _more_ */
+    private String forecastLayoutModelName = "Storm>Forecast Track";
 
     /** time holder */
     private DisplayableData timesHolder = null;
@@ -249,19 +258,31 @@ public class StormDisplayState {
     }
 
 
+    /**
+     * _more_
+     */
     private void checkVisibility() {
-        List<WayDisplayState> wayDisplayStates =
-            getWayDisplayStates();
+        List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
         for (WayDisplayState wds : wayDisplayStates) {
-            if(wds.getWay().isObservation()) continue;
-            wds.getWayState().getCheckBox().setBackground(forecastState.getWayState().getVisible()?null:
-                                                          Color.gray);
-            wds.getRingsState().getCheckBox().setBackground(forecastState.getRingsState().getVisible()?null:
-                                                          Color.gray);
-            wds.getConeState().getCheckBox().setBackground(forecastState.getConeState().getVisible()?null:
-                                                          Color.gray);
-            wds.getTrackState().getCheckBox().setBackground(forecastState.getTrackState().getVisible()?null:
-                                                          Color.gray);
+            if (wds.getWay().isObservation()) {
+                continue;
+            }
+            wds.getWayState().getCheckBox().setBackground(
+                forecastState.getWayState().getVisible()
+                ? null
+                : Color.gray);
+            wds.getRingsState().getCheckBox().setBackground(
+                forecastState.getRingsState().getVisible()
+                ? null
+                : Color.gray);
+            wds.getConeState().getCheckBox().setBackground(
+                forecastState.getConeState().getVisible()
+                ? null
+                : Color.gray);
+            wds.getTrackState().getCheckBox().setBackground(
+                forecastState.getTrackState().getVisible()
+                ? null
+                : Color.gray);
         }
     }
 
@@ -385,11 +406,21 @@ public class StormDisplayState {
 
 
 
+    /**
+     * _more_
+     *
+     * @param sm _more_
+     */
     public void setObsLayoutModel(StationModel sm) {
         obsLayoutModelName = sm.getName();
         updateLayoutModel(true);
     }
 
+    /**
+     * _more_
+     *
+     * @param sm _more_
+     */
     public void setForecastLayoutModel(StationModel sm) {
         forecastLayoutModelName = sm.getName();
         updateLayoutModel(false);
@@ -397,20 +428,35 @@ public class StormDisplayState {
 
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     */
     protected void handleChangedStationModel(String name) {
-        if(Misc.equals(obsLayoutModelName, name)) updateLayoutModel(true);
-        if(Misc.equals(forecastLayoutModelName, name)) updateLayoutModel(false);
+        if (Misc.equals(obsLayoutModelName, name)) {
+            updateLayoutModel(true);
+        }
+        if (Misc.equals(forecastLayoutModelName, name)) {
+            updateLayoutModel(false);
+        }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param forObs _more_
+     */
     public void updateLayoutModel(boolean forObs) {
-        List<WayDisplayState> wayDisplayStates =
-            getWayDisplayStates();
+        List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
         try {
-        for (WayDisplayState wds : wayDisplayStates) {
-            if(wds.getWay().isObservation() && !forObs) continue;
-            wds.updateLayoutModel();
-        }
+            for (WayDisplayState wds : wayDisplayStates) {
+                if (wds.getWay().isObservation() && !forObs) {
+                    continue;
+                }
+                wds.updateLayoutModel();
+            }
         } catch (Exception exc) {
             stormTrackControl.logException("Updating layout models", exc);
         }
@@ -565,16 +611,18 @@ public class StormDisplayState {
         if ((stormParams == null) || (stormParams.size() == 0)) {
             return GuiUtils.filler(2, 10);
         }
-        final JComboBox box = new JComboBox(new Vector(stormParams));
-        StormParam stormParam = (StormParam)params.get(id);
-        if(stormParam!=null) box.setSelectedItem(stormParam);
+        final JComboBox box        = new JComboBox(new Vector(stormParams));
+        StormParam      stormParam = (StormParam) params.get(id);
+        if (stormParam != null) {
+            box.setSelectedItem(stormParam);
+        }
         box.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 Object selected = box.getSelectedItem();
                 if ((selected == null) || (selected instanceof String)) {
                     params.remove(id);
                 } else {
-                   params.put(id, selected);
+                    params.put(id, selected);
                 }
                 try {
                     updateDisplays();
@@ -608,7 +656,9 @@ public class StormDisplayState {
             }
 
         }
-        if(attrNames.size() == 0) return null;
+        if (attrNames.size() == 0) {
+            return null;
+        }
         return attrNames;
     }
 
@@ -633,8 +683,14 @@ public class StormDisplayState {
                 unloadBtn), new Insets(0, 0, 0, 0));
 
 
-        JComponent obsLayoutModelComp = new LayoutModelWidget(stormTrackControl,this,"setObsLayoutModel",getObservationLayoutModel());
-        JComponent forecastLayoutModelComp = new LayoutModelWidget(stormTrackControl,this,"setForecastLayoutModel",getForecastLayoutModel());
+        JComponent obsLayoutModelComp =
+            new LayoutModelWidget(stormTrackControl, this,
+                                  "setObsLayoutModel",
+                                  getObservationLayoutModel());
+        JComponent forecastLayoutModelComp =
+            new LayoutModelWidget(stormTrackControl, this,
+                                  "setForecastLayoutModel",
+                                  getForecastLayoutModel());
 
 
         List<StormParam> forecastParams = new ArrayList<StormParam>();
@@ -688,7 +744,7 @@ public class StormDisplayState {
             paramComps.add(GuiUtils.filler());
         }
 
-        
+
         List obsColorParams      = new ArrayList(obsParams);
         List forecastColorParams = new ArrayList(forecastParams);
         obsColorParams.add(0, "Fixed");
@@ -703,13 +759,14 @@ public class StormDisplayState {
             GuiUtils.top(
                 GuiUtils.inset(
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
-        paramComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,obsLayoutModelComp)));
+        paramComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,
+                obsLayoutModelComp)));
         if (obsRadiusParams != null) {
             //If its not set then set it
-            if(params.get(ID_OBS_RINGS)==null) {
+            if (params.get(ID_OBS_RINGS) == null) {
                 params.put(ID_OBS_RINGS, obsRadiusParams.get(0));
             }
-            if(params.get(ID_OBS_CONE)==null) {
+            if (params.get(ID_OBS_CONE) == null) {
                 params.put(ID_OBS_CONE, Misc.newList(obsRadiusParams.get(0)));
             }
             paramComps.add(GuiUtils.top(makeBox(obsRadiusParams,
@@ -723,16 +780,18 @@ public class StormDisplayState {
 
         paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
                 new Insets(4, 0, 0, 0))));
-        paramComps.add(GuiUtils.top(GuiUtils.vbox(forecastColorByBox,forecastLayoutModelComp)));
+        paramComps.add(GuiUtils.top(GuiUtils.vbox(forecastColorByBox,
+                forecastLayoutModelComp)));
         //        paramComps.add(GuiUtils.top(forecastColorByBox));
 
         if (forecastRadiusParams != null) {
             //If its not set then set it
-            if(params.get(ID_FORECAST_RINGS)==null) {
+            if (params.get(ID_FORECAST_RINGS) == null) {
                 params.put(ID_FORECAST_RINGS, forecastRadiusParams.get(0));
             }
-            if(params.get(ID_FORECAST_CONE)==null) {
-                params.put(ID_FORECAST_CONE, Misc.newList(obsRadiusParams.get(0)));
+            if (params.get(ID_FORECAST_CONE) == null) {
+                params.put(ID_FORECAST_CONE,
+                           Misc.newList(obsRadiusParams.get(0)));
             }
             paramComps.add(GuiUtils.top(makeBox(forecastRadiusParams,
                     ID_FORECAST_RINGS)));
@@ -784,14 +843,12 @@ public class StormDisplayState {
                         GuiUtils.hbox(
                             forecastState.getWayState().getCheckBox(),
                             GuiUtils.lLabel("Forecasts:")));
-                    comps.add(
-                        forecastState.getTrackState().getCheckBox());
+                    comps.add(forecastState.getTrackState().getCheckBox());
                     if (forecastRadiusParams != null) {
                         comps.add(
                             forecastState.getRingsState().getCheckBox());
 
-                        comps.add(
-                            forecastState.getConeState().getCheckBox());
+                        comps.add(forecastState.getConeState().getCheckBox());
                     }
                 }
                 comps.add(swatch);
@@ -1128,9 +1185,17 @@ public class StormDisplayState {
 
 
 
-    protected void displayStateChanged(DisplayState displayState)  throws Exception {
+    /**
+     * _more_
+     *
+     * @param displayState _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void displayStateChanged(DisplayState displayState)
+            throws Exception {
         updateDisplays();
-        if(displayState.getWayDisplayState() == forecastState) {
+        if (displayState.getWayDisplayState() == forecastState) {
             checkVisibility();
         }
     }
@@ -1168,7 +1233,10 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StationModel getObservationLayoutModel() {
-        if(obsLayoutModelName==null || obsLayoutModelName.equals("none")) return null;
+        if ((obsLayoutModelName == null)
+                || obsLayoutModelName.equals("none")) {
+            return null;
+        }
 
         StationModelManager smm =
             stormTrackControl.getControlContext().getStationModelManager();
@@ -1193,13 +1261,18 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StationModel getForecastLayoutModel() {
-        if(forecastLayoutModelName==null || forecastLayoutModelName.equals("none")) return null;
+        if ((forecastLayoutModelName == null)
+                || forecastLayoutModelName.equals("none")) {
+            return null;
+        }
         StationModelManager smm =
             stormTrackControl.getControlContext().getStationModelManager();
-        StationModel sm  = smm.getStationModel(forecastLayoutModelName);
-        if(sm!=null) return sm;
-        StationModel model = new StationModel("TrackLocation");
-        ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
+        StationModel sm = smm.getStationModel(forecastLayoutModelName);
+        if (sm != null) {
+            return sm;
+        }
+        StationModel model       = new StationModel("TrackLocation");
+        ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
         shapeSymbol.setScale(0.3f);
         shapeSymbol.setShape(ucar.visad.ShapeUtility.CIRCLE);
         shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
@@ -1317,9 +1390,9 @@ public class StormDisplayState {
         for (StormTrack track : trackCollection.getTracks()) {
             StormTrackTableModel tableModel = new StormTrackTableModel(this,
                                                   track);
-            TableSorter sorter = new TableSorter(tableModel);
-            JTable trackTable = new JTable(sorter);
-            JTableHeader header = trackTable.getTableHeader();
+            TableSorter  sorter     = new TableSorter(tableModel);
+            JTable       trackTable = new JTable(sorter);
+            JTableHeader header     = trackTable.getTableHeader();
             header.setToolTipText("Click to sort");
             sorter.setTableHeader(trackTable.getTableHeader());
 
@@ -1509,7 +1582,9 @@ public class StormDisplayState {
             //Write the obs track first
             if ((obsTrack != null) && doObs) {
                 Element obsFolder = KmlUtil.folder(topFolder, "Observation");
-                stormTrackControl.writeToGE(docNode, state, obsFolder, obsTrack,getWayDisplayState(obsTrack.getWay()).getColor());
+                stormTrackControl.writeToGE(
+                    docNode, state, obsFolder, obsTrack,
+                    getWayDisplayState(obsTrack.getWay()).getColor());
             }
             if (doForecast) {
                 waysToUse = Misc.sort(waysToUse);
@@ -1523,15 +1598,17 @@ public class StormDisplayState {
                     List<StormTrack> tracks =
                         (List<StormTrack>) Misc.sort(trackMap.get(way));
                     if (mostRecent) {
-                        StormTrack recent  = tracks.get(tracks.size() - 1);
-                        stormTrackControl.writeToGE(docNode, state, wayNode,
-                                                    recent,
-                                                    getWayDisplayState(recent.getWay()).getColor());
+                        StormTrack recent = tracks.get(tracks.size() - 1);
+                        stormTrackControl.writeToGE(
+                            docNode, state, wayNode, recent,
+                            getWayDisplayState(recent.getWay()).getColor());
                     } else {
                         for (StormTrack track : tracks) {
-                            stormTrackControl.writeToGE(docNode, state, wayNode, track,
-                                                        getWayDisplayState(track.getWay()).getColor());
-                                                        
+                            stormTrackControl.writeToGE(
+                                docNode, state, wayNode, track,
+                                getWayDisplayState(
+                                    track.getWay()).getColor());
+
                         }
                     }
                 }
@@ -1696,43 +1773,43 @@ public class StormDisplayState {
     }
 
 
-/**
-Set the ObsLayoutModelName property.
+    /**
+     * Set the ObsLayoutModelName property.
+     *
+     * @param value The new value for ObsLayoutModelName
+     */
+    public void setObsLayoutModelName(String value) {
+        obsLayoutModelName = value;
+    }
 
-@param value The new value for ObsLayoutModelName
-**/
-public void setObsLayoutModelName (String value) {
-	obsLayoutModelName = value;
-}
-
-/**
-Get the ObsLayoutModelName property.
-
-@return The ObsLayoutModelName
-**/
-public String getObsLayoutModelName () {
-	return obsLayoutModelName;
-}
+    /**
+     * Get the ObsLayoutModelName property.
+     *
+     * @return The ObsLayoutModelName
+     */
+    public String getObsLayoutModelName() {
+        return obsLayoutModelName;
+    }
 
 
 
-/**
-Set the ForecastLayoutModelName property.
+    /**
+     * Set the ForecastLayoutModelName property.
+     *
+     * @param value The new value for ForecastLayoutModelName
+     */
+    public void setForecastLayoutModelName(String value) {
+        forecastLayoutModelName = value;
+    }
 
-@param value The new value for ForecastLayoutModelName
-**/
-public void setForecastLayoutModelName (String value) {
-	forecastLayoutModelName = value;
-}
-
-/**
-Get the ForecastLayoutModelName property.
-
-@return The ForecastLayoutModelName
-**/
-public String getForecastLayoutModelName () {
-	return forecastLayoutModelName;
-}
+    /**
+     * Get the ForecastLayoutModelName property.
+     *
+     * @return The ForecastLayoutModelName
+     */
+    public String getForecastLayoutModelName() {
+        return forecastLayoutModelName;
+    }
 
 
 
