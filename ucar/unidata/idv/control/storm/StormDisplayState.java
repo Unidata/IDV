@@ -78,46 +78,23 @@ import ucar.visad.display.*;
 
 
 import ucar.visad.display.*;
-import ucar.visad.display.Animation;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.SelectRangeDisplayable;
-import ucar.visad.display.SelectorPoint;
-import ucar.visad.display.StationModelDisplayable;
-import ucar.visad.display.TrackDisplayable;
-
-
-
 import visad.*;
 
 import visad.georef.EarthLocation;
-
 import visad.georef.EarthLocationLite;
-
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
-import visad.georef.LatLonTuple;
-
-import visad.util.DataUtility;
 
 import java.awt.*;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
-import java.beans.*;
-
+import javax.swing.table.*;
 import java.io.*;
-
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
-
-
 import java.util.Arrays;
-
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -125,9 +102,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+
 
 
 
@@ -146,6 +121,9 @@ public class StormDisplayState {
     /** _more_ */
     private static String ID_OBS_RINGS = "id.obs.rings";
 
+    private static String ID_OBS_LAYOUTMODEL = "id.obs.layoutmodel";
+
+
     /** _more_ */
     private static String ID_FORECAST_CONE = "id.forecast.cone";
 
@@ -155,6 +133,8 @@ public class StormDisplayState {
 
     /** _more_ */
     private static String ID_FORECAST_COLOR = "id.forecast.color";
+
+    private static String ID_FORECAST_LAYOUTMODEL = "id.forecast.layoutmodel";
 
 
     /** _more_ */
@@ -213,21 +193,15 @@ public class StormDisplayState {
 
 
     /** _more_ */
-    //    private List<StormTrack> tracks;
-
-    /** _more_ */
-    private JTable trackTable;
-
-    /** _more_ */
-    private AbstractTableModel trackModel;
-
-    /** _more_ */
     private StormTrackControl stormTrackControl;
 
 
     /** _more_ */
     private WayDisplayState obsDisplayState;
 
+    private String obsStationModelName = "Storm>Hurricane";
+
+    private String forecastStationModelName="Storm>Forecast Track";
 
     /** time holder */
     private DisplayableData timesHolder = null;
@@ -402,6 +376,20 @@ public class StormDisplayState {
      */
     protected StormTrackCollection getTrackCollection() {
         return trackCollection;
+    }
+
+
+    public void updateStationModel(boolean forObs) {
+        List<WayDisplayState> wayDisplayStates =
+            getWayDisplayStates();
+        try {
+        for (WayDisplayState wds : wayDisplayStates) {
+            if(wds.getWay().isObservation() && !forObs) continue;
+            wds.updateStationModel();
+        }
+        } catch (Exception exc) {
+            stormTrackControl.logException("Updating layout models", exc);
+        }
     }
 
 
@@ -1148,11 +1136,11 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StationModel getObservationStationModel() {
+        if(obsStationModelName==null || obsStationModelName.equals("none")) return null;
 
         StationModelManager smm =
             stormTrackControl.getControlContext().getStationModelManager();
-        return smm.getStationModel("Storm>Hurricane");
-
+        return smm.getStationModel(obsStationModelName);
         /*
         StationModel model       = new StationModel("TrackLocation");
         ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
@@ -1173,26 +1161,19 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StationModel getForecastStationModel() {
+        if(forecastStationModelName==null || forecastStationModelName.equals("none")) return null;
         StationModelManager smm =
             stormTrackControl.getControlContext().getStationModelManager();
-        StationModel sm  = smm.getStationModel("Storm>Forecast Track");
+        StationModel sm  = smm.getStationModel(forecastStationModelName);
         if(sm!=null) return sm;
-          StationModel model = new StationModel("TrackLocation");
-          /*
-          TextSymbol textSymbol = new TextSymbol("label","the label");
-          textSymbol.setScale(1.5f);
-          textSymbol.setRectPoint(Glyph.PT_UL);
-          textSymbol.bounds = new java.awt.Rectangle(10,0,21,15);
-          model.addSymbol(textSymbol);*/
-
-          ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
-          shapeSymbol.setScale(0.3f);
-          shapeSymbol.setShape(ucar.visad.ShapeUtility.CIRCLE);
-          shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
-          shapeSymbol.setRectPoint(Glyph.PT_MM);
-          model.addSymbol(shapeSymbol);
-          return model;
-          //        return null;
+        StationModel model = new StationModel("TrackLocation");
+        ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
+        shapeSymbol.setScale(0.3f);
+        shapeSymbol.setShape(ucar.visad.ShapeUtility.CIRCLE);
+        shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
+        shapeSymbol.setRectPoint(Glyph.PT_MM);
+        model.addSymbol(shapeSymbol);
+        return model;
     }
 
     //        ucar.visad.Util.makeTimeField(List<Data> ranges, List times)
@@ -1683,7 +1664,43 @@ public class StormDisplayState {
     }
 
 
+/**
+Set the ObsStationModelName property.
 
+@param value The new value for ObsStationModelName
+**/
+public void setObsStationModelName (String value) {
+	obsStationModelName = value;
+}
+
+/**
+Get the ObsStationModelName property.
+
+@return The ObsStationModelName
+**/
+public String getObsStationModelName () {
+	return obsStationModelName;
+}
+
+
+
+/**
+Set the ForecastStationModelName property.
+
+@param value The new value for ForecastStationModelName
+**/
+public void setForecastStationModelName (String value) {
+	forecastStationModelName = value;
+}
+
+/**
+Get the ForecastStationModelName property.
+
+@return The ForecastStationModelName
+**/
+public String getForecastStationModelName () {
+	return forecastStationModelName;
+}
 
 
 

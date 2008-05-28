@@ -454,8 +454,6 @@ public class StationLocationControl extends StationModelControl {
     }
 
 
-
-
     /**
      * Called by the init method to create the
      * <code>StationModelDisplayable</code> used for this instance.
@@ -1640,7 +1638,8 @@ public class StationLocationControl extends StationModelControl {
         });
 
 
-        stationModelPanel = makeStationModelWidget();
+        //        stationModelPanel = makeStationModelWidget();
+        stationModelPanel = layoutModelWidget = new LayoutModelWidget(this,"",getStationModel());
         JRadioButton[] displayRbs =
             GuiUtils.makeRadioButtons(Misc.newList("Predefined:",
                 "Layout Model:"), (useStationModel
@@ -1753,6 +1752,9 @@ public class StationLocationControl extends StationModelControl {
         stationJList.setListData(new Vector(stationTableNames));
         return stationScroller;
     }
+
+
+
 
     /**
      * The id or station button was pressed

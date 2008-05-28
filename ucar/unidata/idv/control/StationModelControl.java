@@ -210,6 +210,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** widget */
     private JButton changeButton;
 
+    protected LayoutModelWidget layoutModelWidget;
 
     static {
         lockIcon = new ImageIcon(
@@ -2152,9 +2153,8 @@ public class StationModelControl extends ObsDisplayControl {
     private void setStationModel(StationModel sm) {
         try {
             stationModel = sm;
-            if ((stationLabel != null) && (sm != null)) {
-                stationLabel.setText(sm.getDisplayName());
-                changeButton.setText(sm.getDisplayName());
+            if(layoutModelWidget!=null) {
+                layoutModelWidget.setLayoutModel(sm);
             }
             myDisplay.setStationModel(sm, false);
             loadData();
@@ -2163,6 +2163,11 @@ public class StationModelControl extends ObsDisplayControl {
         } catch (Exception exc) {
             logException("setting station model", exc);
         }
+    }
+
+
+    protected void setLayoutModel(String id, ucar.unidata.ui.symbol.StationModel stationModel) {
+        setStationModel(stationModel);
     }
 
 
@@ -2361,10 +2366,8 @@ public class StationModelControl extends ObsDisplayControl {
         scaleBtn.addActionListener(scaleListener);
 
 
-
-
         JPanel stationModelPanel =
-            GuiUtils.hbox(makeStationModelWidget(),
+            GuiUtils.hbox(layoutModelWidget=new LayoutModelWidget(this,"",getStationModel()),
                           GuiUtils.rLabel("   Scale:"),
                           GuiUtils.hflow(Misc.newList(scaleField, scaleBtn),
                                          4, 0));
@@ -2392,64 +2395,6 @@ public class StationModelControl extends ObsDisplayControl {
      */
     public void test() {
         loadDataInThread();
-    }
-
-
-    /**
-     * Make the gui widget for setting the station model
-     *
-     * @return the widget
-     */
-    protected JPanel makeStationModelWidget() {
-        stationLabel = new JLabel(getStationModel().getDisplayName());
-        JButton editButton =
-            GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
-                                    getClass());
-        editButton.setToolTipText("Show the station model editor");
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                editStationTable();
-            }
-        });
-
-
-        changeButton = new JButton(getStationModel().getDisplayName());
-        changeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                StationModelManager smm =
-                    getControlContext().getStationModelManager();
-                ObjectListener listener = new ObjectListener(null) {
-                    public void actionPerformed(ActionEvent ae) {
-                        Misc.run(new Runnable() {
-                            public void run() {
-                                showWaitCursor();
-                                try {
-                                    setStationModel((StationModel) theObject);
-                                    changeButton.setText(
-                                        getStationModel().getDisplayName());
-                                    stationLabel.setText(
-                                        getStationModel().getDisplayName());
-                                } catch (Exception exc) {
-                                    logException("Changing station model",
-                                            exc);
-                                }
-                                showNormalCursor();
-                            }
-                        });
-                    }
-                };
-
-                JPopupMenu popup =
-                    GuiUtils.makePopupMenu(
-                        StationModelCanvas.makeStationModelMenuItems(
-                            smm.getStationModels(), listener, smm));
-                popup.show(changeButton, changeButton.getSize().width / 2,
-                           changeButton.getSize().height);
-            }
-        });
-
-        return GuiUtils.hflow(Misc.newList(editButton, changeButton), 4, 0);
-
     }
 
 

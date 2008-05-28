@@ -49,11 +49,11 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 
+import ucar.unidata.ui.symbol.*;
 import ucar.visad.display.*;
 
 import visad.*;
 
-import visad.bom.Radar2DCoordinateSystem;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
@@ -276,12 +276,15 @@ public class WayDisplayState {
                 }
                 setTrackColor();
                 if ( !hadTrack) {
-                    FieldImpl pointField =   PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1);
-                   if(way.isObservation()) {
-                       getLabelDisplay().setStationData(pointField);
-                   } else {
-                       getLabelDisplay().setStationData(pointField);
-                   }
+                    getLabelDisplay();
+                    if(hasLabelDisplay()) {
+                        FieldImpl pointField =   PointObFactory.makeTimeSequenceOfPointObs(pointObs, -1, -1);
+                        if(way.isObservation()) {
+                            getLabelDisplay().setStationData(pointField);
+                        } else {
+                            getLabelDisplay().setStationData(pointField);
+                        }
+                    }
                 }
             }
             getTrackDisplay().setVisible(true);
@@ -406,6 +409,21 @@ public class WayDisplayState {
     }
 
 
+    public void updateStationModel() throws VisADException, RemoteException  {
+        if (labelDisplay == null) {
+            return;
+        }
+        StationModel sm  = (way.isObservation()?stormDisplayState.getObservationStationModel():
+                            stormDisplayState.getForecastStationModel());
+        if(sm==null) {
+            removeDisplayable(labelDisplay);
+            labelDisplay = null;
+            return;
+        }
+        labelDisplay.setStationModel(sm);
+    }
+
+
     /**
      * _more_
      *
@@ -415,18 +433,16 @@ public class WayDisplayState {
      */
     public StationModelDisplayable getLabelDisplay() throws Exception {
         if (labelDisplay == null) {
-            labelDisplay = new StationModelDisplayable("dots");
-            addDisplayable(labelDisplay);
-            labelDisplay.setScale(
-                stormDisplayState.getStormTrackControl().getDisplayScale());
-            if(way.isObservation()) {
-                labelDisplay.setStationModel(
-                                             stormDisplayState.getObservationStationModel());
-            } else {
-                labelDisplay.setStationModel(
-                                             stormDisplayState.getForecastStationModel());
+            StationModel sm  = (way.isObservation()?stormDisplayState.getObservationStationModel():
+                                stormDisplayState.getForecastStationModel());
+            if(sm!=null) {
+                labelDisplay = new StationModelDisplayable("dots");
+                addDisplayable(labelDisplay);
+                labelDisplay.setScale(
+                                      stormDisplayState.getStormTrackControl().getDisplayScale());
+                setLabelColor();
+                updateStationModel();
             }
-            setLabelColor();
         }
         return labelDisplay;
     }
@@ -808,6 +824,11 @@ public class WayDisplayState {
     public void addDisplayable(Displayable displayable)
             throws VisADException, RemoteException {
         getHolder().addDisplayable(displayable);
+    }
+
+    public void removeDisplayable(Displayable displayable)
+            throws VisADException, RemoteException {
+        getHolder().removeDisplayable(displayable);
     }
 
 

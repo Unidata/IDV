@@ -2894,6 +2894,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    protected void setLayoutModel(String id, ucar.unidata.ui.symbol.StationModel stationModel) {
+    }
+
     /**
      * Initialize the DataInstance
      *
