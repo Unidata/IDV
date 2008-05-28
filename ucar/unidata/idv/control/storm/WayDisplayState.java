@@ -110,7 +110,8 @@ public class WayDisplayState {
     /** _more_ */
     List<PointOb> pointObs = new ArrayList<PointOb>();
 
-
+     /** _more_ */
+    List<PointOb> allPointObs = new ArrayList<PointOb>();
 
     /** _more_ */
     private List<StormTrack> tracks = new ArrayList<StormTrack>();
@@ -135,6 +136,8 @@ public class WayDisplayState {
     /** _more_ */
     private StationModelDisplayable labelDisplay;
 
+    /** _more_ */
+    private StationModelDisplayable obsPointDisplay;
 
     /** _more_ */
     private TrackDisplayable trackDisplay;
@@ -224,7 +227,9 @@ public class WayDisplayState {
         return labelDisplay != null;
     }
 
-
+   public boolean hasObsPointDisplay() {
+        return obsPointDisplay != null;
+    }
 
     /**
      * _more_
@@ -296,6 +301,17 @@ public class WayDisplayState {
                         } else {
                             getLabelDisplay().setStationData(pointField);
                         }
+                    }
+                    getObsPointDisplay();
+                    if(way.isObservation()){
+                    if (hasObsPointDisplay()) {
+                        FieldImpl pointField =
+                            PointObFactory.makeTimeSequenceOfPointObs(
+                                allPointObs, -1, -1);
+
+                            getObsPointDisplay().setStationData(pointField);
+
+                    }
                     }
                 }
             }
@@ -433,7 +449,7 @@ public class WayDisplayState {
             return;
         }
         StationModel sm = (way.isObservation()
-                           ? stormDisplayState.getObservationLayoutModel()
+                           ? stormDisplayState.getObsLayoutModel()
                            : stormDisplayState.getForecastLayoutModel());
         if (sm == null) {
             removeDisplayable(labelDisplay);
@@ -454,7 +470,7 @@ public class WayDisplayState {
     public StationModelDisplayable getLabelDisplay() throws Exception {
         if (labelDisplay == null) {
             StationModel sm = (way.isObservation()
-                               ? stormDisplayState.getObservationLayoutModel()
+                               ? stormDisplayState.getObsLayoutModel()
                                : stormDisplayState.getForecastLayoutModel());
             if (sm != null) {
                 labelDisplay = new StationModelDisplayable("dots");
@@ -469,6 +485,21 @@ public class WayDisplayState {
         return labelDisplay;
     }
 
+    public StationModelDisplayable getObsPointDisplay() throws Exception {
+            if (obsPointDisplay == null) {
+                StationModel sm = stormDisplayState.getObsPointLayoutModel();
+                if (sm != null) {
+                    obsPointDisplay = new StationModelDisplayable("dots");
+                    addDisplayable(obsPointDisplay);
+                    obsPointDisplay
+                        .setScale(stormDisplayState.getStormTrackControl()
+                            .getDisplayScale());
+                    setLabelColor();
+                    updateLayoutModel();
+                }
+            }
+            return obsPointDisplay;
+        }
 
 
     /**
@@ -725,6 +756,7 @@ public class WayDisplayState {
         List<DateTime>  times  = new ArrayList<DateTime>();
 
         pointObs = new ArrayList<PointOb>();
+        allPointObs = new ArrayList<PointOb>();
         for (StormTrack track : tracks) {
             FieldImpl field =
                 stormDisplayState.getStormTrackControl().makeTrackField(
@@ -734,7 +766,10 @@ public class WayDisplayState {
             }
             fields.add(field);
             times.add(track.getStartTime());
-            pointObs.addAll(makePointObs(track));
+            pointObs.addAll(makePointObs(track, !way.isObservation()));
+            if(way.isObservation()){
+               allPointObs.addAll(makePointObs(track, true));
+            }
         }
 
         if (fields.size() == 0) {
@@ -786,7 +821,7 @@ public class WayDisplayState {
      * @return _more_
      * @throws Exception _more_
      */
-    List<PointOb> makePointObs(StormTrack track) throws Exception {
+    private List<PointOb> makePointObs(StormTrack track, boolean useStartTime) throws Exception {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
@@ -799,11 +834,9 @@ public class WayDisplayState {
         List<StormParam> params   = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
             StormTrackPoint stp   = stps.get(i);
-            DateTime        time  = startTime;
+            DateTime        time  = (useStartTime?startTime:stp.getTime());
             String          label = "";
-            if (isObservation) {
-                time = stp.getTime();
-            } else {
+            if (!isObservation) {
                 if (i == 0) {
                     label = way + ": " + track.getStartTime();
                 } else {

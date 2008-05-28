@@ -210,6 +210,8 @@ public class StormDisplayState {
     /** _more_ */
     private String obsLayoutModelName = "Storm>Hurricane";
 
+    private String obsPointLayoutModelName = "Storm>Forecast Track";
+
     /** _more_ */
     private String forecastLayoutModelName = "Storm>Forecast Track";
 
@@ -415,6 +417,15 @@ public class StormDisplayState {
         obsLayoutModelName = sm.getName();
         updateLayoutModel(true);
     }
+    /**
+      * _more_
+      *
+      * @param sm _more_
+      */
+     public void setObsPointLayoutModel(StationModel sm) {
+         obsPointLayoutModelName = sm.getName();
+         updateLayoutModel(true);
+     }
 
     /**
      * _more_
@@ -686,7 +697,11 @@ public class StormDisplayState {
         JComponent obsLayoutModelComp =
             new LayoutModelWidget(stormTrackControl, this,
                                   "setObsLayoutModel",
-                                  getObservationLayoutModel());
+                                  getObsLayoutModel());
+        JComponent obsPointLayoutModelComp =
+            new LayoutModelWidget(stormTrackControl, this,
+                                  "setObsPointLayoutModel",
+                                  getObsPointLayoutModel());
         JComponent forecastLayoutModelComp =
             new LayoutModelWidget(stormTrackControl, this,
                                   "setForecastLayoutModel",
@@ -760,7 +775,8 @@ public class StormDisplayState {
                 GuiUtils.inset(
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
         paramComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,
-                obsLayoutModelComp)));
+                obsLayoutModelComp, obsPointLayoutModelComp)));
+
         if (obsRadiusParams != null) {
             //If its not set then set it
             if (params.get(ID_OBS_RINGS) == null) {
@@ -1230,7 +1246,7 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    protected StationModel getObservationLayoutModel() {
+    protected StationModel getObsLayoutModel() {
         if ((obsLayoutModelName == null)
                 || obsLayoutModelName.equals("none")) {
             return null;
@@ -1252,6 +1268,27 @@ public class StormDisplayState {
         */
     }
 
+    protected StationModel getObsPointLayoutModel() {
+           if ((obsPointLayoutModelName == null)
+                   || obsPointLayoutModelName.equals("none")) {
+               return null;
+           }
+
+           StationModelManager smm =
+               stormTrackControl.getControlContext().getStationModelManager();
+           return smm.getStationModel(obsPointLayoutModelName);
+           /*
+           StationModel model       = new StationModel("TrackLocation");
+           ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
+           shapeSymbol.setShape(ucar.visad.ShapeUtility.HURRICANE);
+           shapeSymbol.setScale(2.0f);
+           shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
+           shapeSymbol.setRectPoint(Glyph.PT_MM);
+           shapeSymbol.setForeground(null);
+           model.addSymbol(shapeSymbol);
+           return model;
+           */
+       }
 
     /**
      * _more_
@@ -1789,6 +1826,23 @@ public class StormDisplayState {
         return obsLayoutModelName;
     }
 
+    /**
+      * Set the ObsLayoutModelName property.
+      *
+      * @param value The new value for ObsLayoutModelName
+      */
+     public void setObsPointLayoutModelName(String value) {
+         obsPointLayoutModelName = value;
+     }
+
+     /**
+      * Get the ObsLayoutModelName property.
+      *
+      * @return The ObsLayoutModelName
+      */
+     public String getObsPointLayoutModelName() {
+         return obsPointLayoutModelName;
+     }
 
 
     /**
