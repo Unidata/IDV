@@ -2165,6 +2165,10 @@ public class StationModelControl extends ObsDisplayControl {
         }
     }
 
+    public void setStationModelFromWidget(StationModel sm) {
+        setStationModel(sm);
+    }
+
 
     protected void setLayoutModel(String id, ucar.unidata.ui.symbol.StationModel stationModel) {
         setStationModel(stationModel);
@@ -2367,7 +2371,7 @@ public class StationModelControl extends ObsDisplayControl {
 
 
         JPanel stationModelPanel =
-            GuiUtils.hbox(layoutModelWidget=new LayoutModelWidget(this,"",getStationModel()),
+            GuiUtils.hbox(layoutModelWidget=new LayoutModelWidget(this,this,"setStationModelFromWidget",getStationModel()),
                           GuiUtils.rLabel("   Scale:"),
                           GuiUtils.hflow(Misc.newList(scaleField, scaleBtn),
                                          4, 0));

@@ -1639,7 +1639,7 @@ public class StationLocationControl extends StationModelControl {
 
 
         //        stationModelPanel = makeStationModelWidget();
-        stationModelPanel = layoutModelWidget = new LayoutModelWidget(this,"",getStationModel());
+        stationModelPanel = layoutModelWidget=new LayoutModelWidget(this,this,"setStationModelFromWidget",getStationModel());
         JRadioButton[] displayRbs =
             GuiUtils.makeRadioButtons(Misc.newList("Predefined:",
                 "Layout Model:"), (useStationModel
