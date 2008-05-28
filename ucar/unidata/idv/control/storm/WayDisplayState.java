@@ -58,6 +58,7 @@ import visad.*;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
+import java.text.DecimalFormat;
 import java.awt.*;
 
 import java.util.Date;
@@ -860,6 +861,7 @@ public class WayDisplayState {
         }
         List<PointOb>    pointObs = new ArrayList<PointOb>();
 
+        DecimalFormat format = new DecimalFormat("0.#");
         Date startDate = Util.makeDate(startTime);
         List<StormParam> params   = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
@@ -874,12 +876,11 @@ public class WayDisplayState {
                 } else {
                     label = "" + stp.getForecastHour() + "H";
                 }
-            }      else if(useStartTime&&i>0) {
-                    Date       dttm = Util.makeDate(stp.getTime());
-                    double diffSeconds= (dttm.getTime()-startDate.getTime())*1000.0;
-                    double    diffHours = diffSeconds/3600;
-                    diffHours = ((int)(diffHours*100))/100.0;
-                    label = diffHours+"H";
+            }      else if(useStartTime && i>0) {
+                Date       dttm = Util.makeDate(stp.getTime());
+                double diffSeconds= (dttm.getTime()-startDate.getTime())/1000.0;
+                double    diffHours = diffSeconds/3600.0;
+                label = format.format(diffHours)+"H";
 
             }
             Data[] data = new Data[params.size() + 1];
