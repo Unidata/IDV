@@ -764,7 +764,6 @@ public class STIStormDataSource extends StormDataSource {
         attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
         attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
         attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
-
     }
 
     /**

@@ -22,6 +22,7 @@
 
 package ucar.unidata.data.storm;
 
+import ucar.unidata.data.DataChoice;
 
 import ucar.visad.Util;
 
@@ -65,6 +66,7 @@ public class StormParam {
      */
     public StormParam(RealType type) {
         this.type = type;
+        if(type!=null) DataChoice.addCurrentName(Util.cleanTypeName(type));
     }
 
     public StormParam(RealType type, boolean derived) {
