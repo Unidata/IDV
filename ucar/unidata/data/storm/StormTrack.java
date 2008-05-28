@@ -50,10 +50,10 @@ import java.util.List;
 public class StormTrack implements Comparable {
 
 
-    /** _more_          */
+    /** _more_ */
     private List<StormParam> params = null;
 
-    /** _more_          */
+    /** _more_ */
     private LatLonRect bbox;
 
 
@@ -80,12 +80,17 @@ public class StormTrack implements Comparable {
     //private Date trackStartTime;
 
 
+    /**
+     * _more_
+     *
+     * @param track _more_
+     */
     public StormTrack(StormTrack track) {
-        this.stormInfo  = track.stormInfo;
-        this.way  = track.way;
-        this.params  = track.params;
-        this.trackId  = track.trackId;
-        this.trackPoints  = new ArrayList<StormTrackPoint>(track.trackPoints);
+        this.stormInfo   = track.stormInfo;
+        this.way         = track.way;
+        this.params      = track.params;
+        this.trackId     = track.trackId;
+        this.trackPoints = new ArrayList<StormTrackPoint>(track.trackPoints);
     }
 
     /**
@@ -94,13 +99,15 @@ public class StormTrack implements Comparable {
      * @param stormInfo _more_
      * @param way _more_
      * @param pts _more_
+     * @param params _more_
      */
     public StormTrack(StormInfo stormInfo, Way way,
                       List<StormTrackPoint> pts, StormParam[] params) {
-        this.stormInfo   = stormInfo;
-        this.way         = way;
-        if(params!=null)
-            this.params = (List<StormParam>)Misc.toList(params);
+        this.stormInfo = stormInfo;
+        this.way       = way;
+        if (params != null) {
+            this.params = (List<StormParam>) Misc.toList(params);
+        }
         this.trackPoints = new ArrayList<StormTrackPoint>(pts);
         StormTrackPoint firstPoint     = (StormTrackPoint) pts.get(0);
         DateTime        trackStartTime = firstPoint.getTime();
@@ -115,12 +122,15 @@ public class StormTrack implements Comparable {
      * @param stormInfo _more_
      * @param way _more_
      * @param startTime _more_
+     * @param params _more_
      */
-    public StormTrack(StormInfo stormInfo, Way way, DateTime startTime,StormParam[] params) {
-        this.stormInfo   = stormInfo;
-        this.way         = way;
-        if(params!=null)
-            this.params = (List<StormParam>)Misc.toList(params);
+    public StormTrack(StormInfo stormInfo, Way way, DateTime startTime,
+                      StormParam[] params) {
+        this.stormInfo = stormInfo;
+        this.way       = way;
+        if (params != null) {
+            this.params = (List<StormParam>) Misc.toList(params);
+        }
         this.trackPoints = new ArrayList();
         this.trackId = stormInfo.toString() + "_" + way + "_"
                        + startTime.getValue();

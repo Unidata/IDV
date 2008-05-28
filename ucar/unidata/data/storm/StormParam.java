@@ -22,6 +22,7 @@
 
 package ucar.unidata.data.storm;
 
+
 import ucar.unidata.data.DataChoice;
 
 import ucar.visad.Util;
@@ -50,8 +51,10 @@ public class StormParam {
     /** _more_ */
     RealType type;
 
+    /** _more_ */
     private boolean canDoDifference = true;
 
+    /** _more_ */
     private boolean derived = false;
 
     /**
@@ -66,9 +69,17 @@ public class StormParam {
      */
     public StormParam(RealType type) {
         this.type = type;
-        if(type!=null) DataChoice.addCurrentName(Util.cleanTypeName(type));
+        if (type != null) {
+            DataChoice.addCurrentName(Util.cleanTypeName(type));
+        }
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param derived _more_
+     */
     public StormParam(RealType type, boolean derived) {
         this(type);
         this.derived = derived;
@@ -192,23 +203,23 @@ public class StormParam {
     }
 
 
-/**
-Set the Derived property.
+    /**
+     * Set the Derived property.
+     *
+     * @param value The new value for Derived
+     */
+    public void setDerived(boolean value) {
+        derived = value;
+    }
 
-@param value The new value for Derived
-**/
-public void setDerived (boolean value) {
-	derived = value;
-}
-
-/**
-Get the Derived property.
-
-@return The Derived
-**/
-public boolean getDerived () {
-	return derived;
-}
+    /**
+     * Get the Derived property.
+     *
+     * @return The Derived
+     */
+    public boolean getDerived() {
+        return derived;
+    }
 
 
 

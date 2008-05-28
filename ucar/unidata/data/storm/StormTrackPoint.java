@@ -172,11 +172,8 @@ public class StormTrackPoint implements Comparable {
     /**
      * _more_
      *
-     * @param type _more_
      *
      * @param param _more_
-     *
-     * @param type _more_
      *
      * @return _more_
      */
@@ -189,8 +186,6 @@ public class StormTrackPoint implements Comparable {
      *
      *  @param attr _more_
      *
-     *
-     *  @return _more_
      */
     public void addAttribute(Real attr) {
         if (attributes == null) {

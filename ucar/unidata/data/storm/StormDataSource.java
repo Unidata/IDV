@@ -132,7 +132,10 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static StormParam PARAM_STORMCATEGORY;
 
+    /** _more_ */
     protected StormParam[] obsParams;
+
+    /** _more_ */
     protected StormParam[] forecastParams;
 
 
@@ -328,7 +331,8 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     private List<Way> ways = new ArrayList();
 
-    private Hashtable<String,Way> wayMap = new Hashtable<String,Way>();
+    /** _more_ */
+    private Hashtable<String, Way> wayMap = new Hashtable<String, Way>();
 
 
     /**
@@ -349,11 +353,19 @@ public abstract class StormDataSource extends DataSourceImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param w _more_
+     * @param name _more_
+     *
+     * @return _more_
+     */
     protected Way getWay(String w, String name) {
         Way way = wayMap.get(w);
-        if(way == null) {
-            way = new Way(w,name);
-            wayMap.put(w,way);
+        if (way == null) {
+            way = new Way(w, name);
+            wayMap.put(w, way);
         }
         addWay(way);
         return way;
@@ -413,7 +425,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      * @throws VisADException _more_
      */
     public static void addDistanceError(StormTrack obsTrack,
-            StormTrack fctTrack)
+                                        StormTrack fctTrack)
             throws VisADException {
         List<StormTrackPoint> obsTrackPoints = obsTrack.getTrackPoints();
         List<StormTrackPoint> fctTrackPoints = fctTrack.getTrackPoints();

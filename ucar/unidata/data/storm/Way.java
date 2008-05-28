@@ -100,8 +100,8 @@ public class Way implements Comparable {
      * @return _more_
      */
     public String toString() {
-        if(name!=null) {
-            return id+": " +name;
+        if (name != null) {
+            return id + ": " + name;
         }
         return id;
     }

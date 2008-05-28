@@ -90,7 +90,7 @@ public class AtcfStormDataSource extends StormDataSource {
     private List<StormInfo> stormInfos;
 
 
-    /** _more_          */
+    /** _more_ */
     private StormTrackCollection localTracks;
 
     /**
@@ -119,8 +119,15 @@ public class AtcfStormDataSource extends StormDataSource {
 
 
 
+    /**
+     * _more_
+     *
+     * @param suffix _more_
+     *
+     * @return _more_
+     */
     private String getFullPath(String suffix) {
-        return  path + "/" + suffix;
+        return path + "/" + suffix;
     }
 
 
@@ -143,18 +150,21 @@ public class AtcfStormDataSource extends StormDataSource {
                 return;
             }
 
-            byte[]           techs = readFile(getFullPath("nhc_techlist.dat"), true);
-            if(techs!=null) {
+            byte[] techs = readFile(getFullPath("nhc_techlist.dat"), true);
+            if (techs != null) {
                 /*
 NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
  00 CARQ   0      0     0      0        0         1                 Combined ARQ Position
  00 WRNG   0      0     0      0        0         1                 Warning
                 */
                 int cnt = 0;
-                for(String line:  StringUtil.split(new String(techs), "\n", true, true)) {
-                    if(cnt++==0) continue;
-                    if(line.length()>67) {
-                        String id = line.substring(3,10).trim();
+                for (String line : StringUtil.split(new String(techs), "\n",
+                        true, true)) {
+                    if (cnt++ == 0) {
+                        continue;
+                    }
+                    if (line.length() > 67) {
+                        String id   = line.substring(3, 10).trim();
                         String name = line.substring(67).trim();
                         //                        System.out.println (id + ":"  +name);
                         getWay(id, name);
@@ -163,7 +173,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             }
 
 
-            byte[]           bytes = readFile(getFullPath("archive/storm.table"), false);
+            byte[] bytes = readFile(getFullPath("archive/storm.table"),
+                                    false);
             String           stormTable = new String(bytes);
             List lines = StringUtil.split(stormTable, "\n", true, true);
 
@@ -219,13 +230,17 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
     }
 
 
+    /**
+     * _more_
+     *
+     * @throws VisADException _more_
+     */
     protected void initParams() throws VisADException {
         super.initParams();
         if (obsParams == null) {
-        obsParams = new StormParam[]{
-            PARAM_STORMCATEGORY,
-            PARAM_MINPRESSURE,
-            PARAM_MAXWINDSPEED_KTS};
+            obsParams = new StormParam[] { PARAM_STORMCATEGORY,
+                                           PARAM_MINPRESSURE,
+                                           PARAM_MAXWINDSPEED_KTS };
 
         }
     }
@@ -323,7 +338,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             Date dttm = fmt.parse(dateString);
             convertCal.setTime(dttm);
             String key;
-            Way    way = getWay(wayString,null);
+            Way    way = getWay(wayString, null);
             if ( !isBest && (waysToUse != null) && (waysToUse.size() > 0)
                     && (waysToUse.get(wayString) == null)) {
                 continue;
@@ -341,20 +356,26 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                        ? Way.OBSERVATION
                        : way);
                 track = new StormTrack(stormInfo, addWay(way),
-                                       new DateTime(dttm),obsParams);
+                                       new DateTime(dttm), obsParams);
                 trackMap.put(key, track);
                 tracks.addTrack(track);
             }
-            String latString = (String) toks.get(6);
-            String lonString = (String) toks.get(7);
-            String t  = latString +" " + lonString;
-            
-            boolean south = latString.endsWith("S");
-            boolean west = lonString.endsWith("W");
-            double latitude = Double.parseDouble(latString.substring(0,latString.length()-1))/10.0;
-            double longitude = Double.parseDouble(lonString.substring(0,lonString.length()-1))/10.0;
-            if(south) latitude=-latitude;
-            if(west) longitude=-longitude;
+            String  latString = (String) toks.get(6);
+            String  lonString = (String) toks.get(7);
+            String  t         = latString + " " + lonString;
+
+            boolean south     = latString.endsWith("S");
+            boolean west      = lonString.endsWith("W");
+            double latitude = Double.parseDouble(latString.substring(0,
+                                  latString.length() - 1)) / 10.0;
+            double longitude = Double.parseDouble(lonString.substring(0,
+                                   lonString.length() - 1)) / 10.0;
+            if (south) {
+                latitude = -latitude;
+            }
+            if (west) {
+                longitude = -longitude;
+            }
 
             EarthLocation elt =
                 new EarthLocationLite(new Real(RealType.Latitude, latitude),
@@ -363,8 +384,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
             List<Real> attributes = new ArrayList<Real>();
 
-            double windspeed = getDouble((String) toks.get(8));
-            double pressure = getDouble((String) toks.get(9));
+            double     windspeed  = getDouble((String) toks.get(8));
+            double     pressure   = getDouble((String) toks.get(9));
             attributes.add(PARAM_STORMCATEGORY.getReal((double) category));
             attributes.add(PARAM_MINPRESSURE.getReal(pressure));
             attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(pressure));
@@ -414,20 +435,25 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                           && (waysToUse.get(Way.OBSERVATION.toString())
                               != null);
         if ( !justObs) {
-            trackFile = getFullPath("archive/" + getYear(stormInfo.getStartTime()) + "/"
-                        + "a" + stormInfo.getBasin().toLowerCase()
-                        + stormInfo.getNumber()
-                        + getYear(stormInfo.getStartTime()) + ".dat.gz");
+            trackFile = getFullPath("archive/"
+                                    + getYear(stormInfo.getStartTime()) + "/"
+                                    + "a"
+                                    + stormInfo.getBasin().toLowerCase()
+                                    + stormInfo.getNumber()
+                                    + getYear(stormInfo.getStartTime())
+                                    + ".dat.gz");
             readTracks(stormInfo, tracks, trackFile, waysToUse);
         }
         //Now  read the b"est file
-        trackFile = getFullPath("archive/"+getYear(stormInfo.getStartTime()) + "/"
-                    + "b" + stormInfo.getBasin().toLowerCase()
-                    + stormInfo.getNumber()
-                    + getYear(stormInfo.getStartTime()) + ".dat.gz");
+        trackFile = getFullPath("archive/"
+                                + getYear(stormInfo.getStartTime()) + "/"
+                                + "b" + stormInfo.getBasin().toLowerCase()
+                                + stormInfo.getNumber()
+                                + getYear(stormInfo.getStartTime())
+                                + ".dat.gz");
         readTracks(stormInfo, tracks, trackFile, null);
         long t2 = System.currentTimeMillis();
-        System.err.println("time: " + (t2 - t1));
+        //        System.err.println("time: " + (t2 - t1));
 
         return tracks;
     }

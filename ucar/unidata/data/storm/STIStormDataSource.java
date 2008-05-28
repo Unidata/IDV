@@ -99,7 +99,9 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
     private boolean useDerby() {
-        if(dbUrl!=null && dbUrl.indexOf("derby")>=0) return true;
+        if ((dbUrl != null) && (dbUrl.indexOf("derby") >= 0)) {
+            return true;
+        }
         return false;
     }
 
@@ -357,72 +359,60 @@ public class STIStormDataSource extends StormDataSource {
             PARAM_PROBABILITY10RADIUS =
                 new StormParam(makeRealType("probabilityradius10",
                                             "Probability_10%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY20RADIUS =
                 new StormParam(makeRealType("probabilityradius20",
                                             "Probability_20%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY30RADIUS =
                 new StormParam(makeRealType("probabilityradius30",
                                             "Probability_30%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY40RADIUS =
                 new StormParam(makeRealType("probabilityradius40",
                                             "Probability_40%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY50RADIUS =
                 new StormParam(makeRealType("probabilityradius50",
                                             "Probability_50%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY60RADIUS =
                 new StormParam(makeRealType("probabilityradius60",
                                             "Probability_60%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY70RADIUS =
                 new StormParam(makeRealType("probabilityradius70",
                                             "Probability_70%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY80RADIUS =
                 new StormParam(makeRealType("probabilityradius80",
                                             "Probability_80%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY90RADIUS =
                 new StormParam(makeRealType("probabilityradius90",
                                             "Probability_90%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
             PARAM_PROBABILITY100RADIUS =
                 new StormParam(makeRealType("probabilityradius100",
                                             "Probability_100%_Radius",
-                                            Util.parseUnit("km")),true);
+                                            Util.parseUnit("km")), true);
 
-        obsParams = new StormParam[] {
-            PARAM_MAXWINDSPEED,
-            PARAM_MINPRESSURE,
-            PARAM_RADIUSMODERATEGALE,
-            PARAM_RADIUSWHOLEGALE,
-            PARAM_MOVEDIRECTION,
-            PARAM_MOVESPEED
-        };
+            obsParams = new StormParam[] {
+                PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
+                PARAM_RADIUSMODERATEGALE, PARAM_RADIUSWHOLEGALE,
+                PARAM_MOVEDIRECTION, PARAM_MOVESPEED
+            };
 
-        forecastParams = new StormParam[]{
-            PARAM_MAXWINDSPEED,
-            PARAM_MINPRESSURE,
-            PARAM_RADIUSMODERATEGALE,
-            PARAM_RADIUSWHOLEGALE,
-            PARAM_MOVEDIRECTION,
-            PARAM_MOVESPEED,
-            PARAM_DISTANCEERROR,
-            PARAM_PROBABILITY10RADIUS,
-            PARAM_PROBABILITY20RADIUS,
-            PARAM_PROBABILITY30RADIUS,
-            PARAM_PROBABILITY40RADIUS,
-            PARAM_PROBABILITY50RADIUS,
-            PARAM_PROBABILITY60RADIUS,
-            PARAM_PROBABILITY70RADIUS,
-            PARAM_PROBABILITY80RADIUS,
-            PARAM_PROBABILITY90RADIUS,
-            PARAM_PROBABILITY100RADIUS
-        };
+            forecastParams = new StormParam[] {
+                PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
+                PARAM_RADIUSMODERATEGALE, PARAM_RADIUSWHOLEGALE,
+                PARAM_MOVEDIRECTION, PARAM_MOVESPEED, PARAM_DISTANCEERROR,
+                PARAM_PROBABILITY10RADIUS, PARAM_PROBABILITY20RADIUS,
+                PARAM_PROBABILITY30RADIUS, PARAM_PROBABILITY40RADIUS,
+                PARAM_PROBABILITY50RADIUS, PARAM_PROBABILITY60RADIUS,
+                PARAM_PROBABILITY70RADIUS, PARAM_PROBABILITY80RADIUS,
+                PARAM_PROBABILITY90RADIUS, PARAM_PROBABILITY100RADIUS
+            };
         }
     }
 
@@ -443,7 +433,7 @@ public class STIStormDataSource extends StormDataSource {
                               Hashtable properties)
             throws Exception {
         super(descriptor, "STI Storm Data", "STI Storm Data", properties);
-        if(url!=null && url.trim().equals("test")) {
+        if ((url != null) && url.trim().equals("test")) {
             url = DEFAULT_DERBY_URL;
         }
         if ((url == null) || url.trim().equalsIgnoreCase("default")
@@ -525,14 +515,14 @@ public class STIStormDataSource extends StormDataSource {
         }
         StormTrack obsTrack = getObservationTrack(stormInfo);
         //                                         (Way) forecastWays.get(0));
-        if(obsTrack!=null) {
-        List<StormTrack> tracks = trackCollection.getTracks();
-        for (StormTrack stk : tracks) {
-            addDistanceError(obsTrack, stk);
-        }
-        long t2 = System.currentTimeMillis();
-        System.err.println("time:" + (t2 - t1));
-        trackCollection.addTrack(obsTrack);
+        if (obsTrack != null) {
+            List<StormTrack> tracks = trackCollection.getTracks();
+            for (StormTrack stk : tracks) {
+                addDistanceError(obsTrack, stk);
+            }
+            long t2 = System.currentTimeMillis();
+            //        System.err.println("time:" + (t2 - t1));
+            trackCollection.addTrack(obsTrack);
         }
         return trackCollection;
     }
@@ -708,7 +698,8 @@ public class STIStormDataSource extends StormDataSource {
                                + " from query:" + SqlUtil.makeAnd(whereList));
         }
         if (pts.size() > 0) {
-            return new StormTrack(stormInfo, forecastWay, pts, forecastParams);
+            return new StormTrack(stormInfo, forecastWay, pts,
+                                  forecastParams);
         } else {
             return null;
         }
@@ -869,7 +860,6 @@ public class STIStormDataSource extends StormDataSource {
      * _more_
      *
      *
-     * @return _more_
      * @throws Exception _more_
      */
     protected void getWayProbabilityRadius() throws Exception {
@@ -933,7 +923,9 @@ public class STIStormDataSource extends StormDataSource {
         List<StormTrackPoint> obsBABJ = getObservationTrack(stormInfo,
                                             babjWay);
 
-        if(obsBABJ.size()==0) return null;
+        if (obsBABJ.size() == 0) {
+            return null;
+        }
 
         DateTime timeMin = obsBABJ.get(0).getTime();
         DateTime timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
@@ -950,7 +942,8 @@ public class STIStormDataSource extends StormDataSource {
             }
         }
 
-        return new StormTrack(stormInfo, addWay(Way.OBSERVATION), obsBABJ,obsParams);
+        return new StormTrack(stormInfo, addWay(Way.OBSERVATION), obsBABJ,
+                              obsParams);
     }
 
     /**
@@ -1043,7 +1036,7 @@ public class STIStormDataSource extends StormDataSource {
                 //                                seenDate.put(date,date);
                 // seenDate.put(date,key);
                 StormTrackPoint stp = new StormTrackPoint(elt, date, 0,
-                                                          attrs);
+                                          attrs);
                 obsPts.add(stp);
             }
         }
