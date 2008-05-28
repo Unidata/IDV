@@ -236,6 +236,8 @@ public class ShapeUtility {
         new TwoFacedObject("Sphere", FILLED_SPHERE),
         new TwoFacedObject("2-D Airplane", AIRPLANE),
         new TwoFacedObject("3-D Airplane", AIRPLANE3D),
+        new TwoFacedObject("Hurricane", HURRICANE),
+        new TwoFacedObject("Tropical Storm", TROPICALSTORM),
         new TwoFacedObject("None", NONE)
     };
 
