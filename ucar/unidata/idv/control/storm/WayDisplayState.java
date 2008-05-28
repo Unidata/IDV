@@ -60,6 +60,7 @@ import visad.georef.EarthLocationLite;
 
 import java.awt.*;
 
+import java.util.Date;
 import java.awt.Color;
 import java.awt.event.*;
 
@@ -859,7 +860,7 @@ public class WayDisplayState {
         }
         List<PointOb>    pointObs = new ArrayList<PointOb>();
 
-
+        Date startDate = Util.makeDate(startTime);
         List<StormParam> params   = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
             StormTrackPoint stp   = stps.get(i);
@@ -869,10 +870,17 @@ public class WayDisplayState {
             String          label = "";
             if ( !isObservation) {
                 if (i == 0) {
-                    label = way + ": " + track.getStartTime();
+   //                 label = way.getId() + ": " + track.getStartTime();
                 } else {
                     label = "" + stp.getForecastHour() + "H";
                 }
+            }      else if(useStartTime&&i>0) {
+                    Date       dttm = Util.makeDate(stp.getTime());
+                    double diffSeconds= (dttm.getTime()-startDate.getTime())*1000.0;
+                    double    diffHours = diffSeconds/3600;
+                    diffHours = ((int)(diffHours*100))/100.0;
+                    label = diffHours+"H";
+
             }
             Data[] data = new Data[params.size() + 1];
             data[0] = new visad.Text(textType, label);
