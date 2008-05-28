@@ -2933,7 +2933,10 @@ public final class Util {
         FieldImpl fi      = null;
         Hashtable timeToData = new Hashtable();
         for(int i=0;i<times.size();i++) {
-            timeToData.put(times.get(i), ranges.get(i));
+            Data range = (Data) ranges.get(i);
+            if(range!=null)  {
+                timeToData.put(times.get(i), ranges.get(i));
+            }
         }
 
         Set       timeSet = makeTimeSet(times);
@@ -2952,6 +2955,7 @@ public final class Util {
         for (int i = 0; i < setSize;i++) {
             Object time = timeSet.__getitem__(i);
             Data range = (Data)timeToData.get(time);
+            if(range == null) continue;
             if (fi == null) {
                 fi = new FieldImpl(new FunctionType(dttm.getType(),
                         range.getType()), timeSet);
