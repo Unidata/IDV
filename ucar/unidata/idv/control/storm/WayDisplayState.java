@@ -409,12 +409,12 @@ public class WayDisplayState {
     }
 
 
-    public void updateStationModel() throws VisADException, RemoteException  {
+    public void updateLayoutModel() throws VisADException, RemoteException  {
         if (labelDisplay == null) {
             return;
         }
-        StationModel sm  = (way.isObservation()?stormDisplayState.getObservationStationModel():
-                            stormDisplayState.getForecastStationModel());
+        StationModel sm  = (way.isObservation()?stormDisplayState.getObservationLayoutModel():
+                            stormDisplayState.getForecastLayoutModel());
         if(sm==null) {
             removeDisplayable(labelDisplay);
             labelDisplay = null;
@@ -433,15 +433,15 @@ public class WayDisplayState {
      */
     public StationModelDisplayable getLabelDisplay() throws Exception {
         if (labelDisplay == null) {
-            StationModel sm  = (way.isObservation()?stormDisplayState.getObservationStationModel():
-                                stormDisplayState.getForecastStationModel());
+            StationModel sm  = (way.isObservation()?stormDisplayState.getObservationLayoutModel():
+                                stormDisplayState.getForecastLayoutModel());
             if(sm!=null) {
                 labelDisplay = new StationModelDisplayable("dots");
                 addDisplayable(labelDisplay);
                 labelDisplay.setScale(
                                       stormDisplayState.getStormTrackControl().getDisplayScale());
                 setLabelColor();
-                updateStationModel();
+                updateLayoutModel();
             }
         }
         return labelDisplay;
@@ -772,6 +772,9 @@ public class WayDisplayState {
             textType = new TextType("label");
         }
         List<PointOb> pointObs = new ArrayList<PointOb>();
+
+
+        List<StormParam> params = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
             StormTrackPoint stp   = stps.get(i);
             DateTime        time  = startTime;
@@ -785,8 +788,14 @@ public class WayDisplayState {
                     label = "" + stp.getForecastHour() + "H";
                 }
             }
-            Tuple tuple = new Tuple(new Data[] {
-                              new visad.Text(textType, label) });
+            Data[]data = new Data[params.size()+1];
+            data[0] = new visad.Text(textType, label);
+            for(int paramIdx=0;paramIdx<params.size();paramIdx++) {
+                Real r = stp.getAttribute(params.get(paramIdx));
+                if(r==null) r = params.get(paramIdx).getReal(Double.NaN);
+                data[paramIdx+1] = r;
+            }
+            Tuple tuple = new Tuple(data);
             pointObs.add(PointObFactory.makePointOb(stp.getLocation(), time,
                     tuple));
         }

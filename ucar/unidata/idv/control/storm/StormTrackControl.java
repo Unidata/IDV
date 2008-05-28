@@ -63,6 +63,7 @@ import visad.Set;
 import visad.georef.EarthLocation;
 import visad.georef.MapProjection;
 
+import java.beans.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -901,6 +902,14 @@ public class StormTrackControl extends DisplayControlImpl {
             logException("Setting new storm info", exc);
         }
         Misc.run(this,"initYears");
+        getControlContext().getStationModelManager()
+            .addPropertyChangeListener(this);
+    }
+
+    public void doRemove() throws VisADException, RemoteException {
+        getControlContext().getStationModelManager()
+            .removePropertyChangeListener(this);
+        super.doRemove();
     }
 
 
@@ -1424,6 +1433,37 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+
+    /**
+     * Property change method.
+     *
+     * @param evt   event to act on
+     */
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(
+                StationModelManager.PROP_RESOURCECHANGE)) {
+            StationModel changedModel = (StationModel) evt.getNewValue();
+            handleChangedStationModel(changedModel.getName());
+        } else if (evt.getPropertyName().equals(
+                StationModelManager.PROP_RESOURCEREMOVE)) {
+            StationModel changedModel = (StationModel) evt.getOldValue();
+            handleChangedStationModel(changedModel.getName());
+        }
+        super.propertyChange(evt);
+    }
+
+
+    private void handleChangedStationModel(String name) {
+        for (int i = stormInfos.size() - 1; i >= 0; i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            StormDisplayState stormDisplayState =
+                getStormDisplayState(stormInfo);
+            if(stormDisplayState.getActive()) {
+                stormDisplayState.handleChangedStationModel(name);
+            }
+        }
+
+    }
 
     /**
      *  Set the StormDisplayStates property.

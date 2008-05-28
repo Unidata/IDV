@@ -48,6 +48,7 @@ import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
 
+import ucar.unidata.idv.control.LayoutModelWidget;
 import ucar.unidata.idv.control.chart.*;
 import ucar.unidata.ui.TreePanel;
 
@@ -199,9 +200,9 @@ public class StormDisplayState {
     /** _more_ */
     private WayDisplayState obsDisplayState;
 
-    private String obsStationModelName = "Storm>Hurricane";
+    private String obsLayoutModelName = "Storm>Hurricane";
 
-    private String forecastStationModelName="Storm>Forecast Track";
+    private String forecastLayoutModelName="Storm>Forecast Track";
 
     /** time holder */
     private DisplayableData timesHolder = null;
@@ -263,6 +264,8 @@ public class StormDisplayState {
                                                           Color.gray);
         }
     }
+
+
 
 
 
@@ -379,13 +382,34 @@ public class StormDisplayState {
     }
 
 
-    public void updateStationModel(boolean forObs) {
+
+
+
+    public void setObsLayoutModel(StationModel sm) {
+        obsLayoutModelName = sm.getName();
+        updateLayoutModel(true);
+    }
+
+    public void setForecastLayoutModel(StationModel sm) {
+        forecastLayoutModelName = sm.getName();
+        updateLayoutModel(false);
+    }
+
+
+
+    protected void handleChangedStationModel(String name) {
+        if(Misc.equals(obsLayoutModelName, name)) updateLayoutModel(true);
+        if(Misc.equals(forecastLayoutModelName, name)) updateLayoutModel(false);
+    }
+
+
+    public void updateLayoutModel(boolean forObs) {
         List<WayDisplayState> wayDisplayStates =
             getWayDisplayStates();
         try {
         for (WayDisplayState wds : wayDisplayStates) {
             if(wds.getWay().isObservation() && !forObs) continue;
-            wds.updateStationModel();
+            wds.updateLayoutModel();
         }
         } catch (Exception exc) {
             stormTrackControl.logException("Updating layout models", exc);
@@ -609,6 +633,9 @@ public class StormDisplayState {
                 unloadBtn), new Insets(0, 0, 0, 0));
 
 
+        JComponent obsLayoutModelComp = new LayoutModelWidget(stormTrackControl,this,"setObsLayoutModel",getObservationLayoutModel());
+        JComponent forecastLayoutModelComp = new LayoutModelWidget(stormTrackControl,this,"setForecastLayoutModel",getForecastLayoutModel());
+
 
         List<StormParam> forecastParams = new ArrayList<StormParam>();
         Hashtable        seenParams     = new Hashtable();
@@ -652,7 +679,7 @@ public class StormDisplayState {
 
         List paramComps = new ArrayList();
         paramComps.add(new JLabel(""));
-        paramComps.add(new JLabel("<html><u><i>Color By</i></u></html>"));
+        paramComps.add(new JLabel("<html><u><i>Track</i></u></html>"));
         if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
             paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
             paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
@@ -661,6 +688,7 @@ public class StormDisplayState {
             paramComps.add(GuiUtils.filler());
         }
 
+        
         List obsColorParams      = new ArrayList(obsParams);
         List forecastColorParams = new ArrayList(forecastParams);
         obsColorParams.add(0, "Fixed");
@@ -675,7 +703,7 @@ public class StormDisplayState {
             GuiUtils.top(
                 GuiUtils.inset(
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
-        paramComps.add(GuiUtils.top(obsColorByBox));
+        paramComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,obsLayoutModelComp)));
         if (obsRadiusParams != null) {
             //If its not set then set it
             if(params.get(ID_OBS_RINGS)==null) {
@@ -695,7 +723,8 @@ public class StormDisplayState {
 
         paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
                 new Insets(4, 0, 0, 0))));
-        paramComps.add(GuiUtils.top(forecastColorByBox));
+        paramComps.add(GuiUtils.top(GuiUtils.vbox(forecastColorByBox,forecastLayoutModelComp)));
+        //        paramComps.add(GuiUtils.top(forecastColorByBox));
 
         if (forecastRadiusParams != null) {
             //If its not set then set it
@@ -832,6 +861,9 @@ public class StormDisplayState {
 
         checkVisibility();
     }
+
+
+
 
 
     /**
@@ -1135,12 +1167,12 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    protected StationModel getObservationStationModel() {
-        if(obsStationModelName==null || obsStationModelName.equals("none")) return null;
+    protected StationModel getObservationLayoutModel() {
+        if(obsLayoutModelName==null || obsLayoutModelName.equals("none")) return null;
 
         StationModelManager smm =
             stormTrackControl.getControlContext().getStationModelManager();
-        return smm.getStationModel(obsStationModelName);
+        return smm.getStationModel(obsLayoutModelName);
         /*
         StationModel model       = new StationModel("TrackLocation");
         ShapeSymbol  shapeSymbol = new ShapeSymbol(0, 0);
@@ -1160,11 +1192,11 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    protected StationModel getForecastStationModel() {
-        if(forecastStationModelName==null || forecastStationModelName.equals("none")) return null;
+    protected StationModel getForecastLayoutModel() {
+        if(forecastLayoutModelName==null || forecastLayoutModelName.equals("none")) return null;
         StationModelManager smm =
             stormTrackControl.getControlContext().getStationModelManager();
-        StationModel sm  = smm.getStationModel(forecastStationModelName);
+        StationModel sm  = smm.getStationModel(forecastLayoutModelName);
         if(sm!=null) return sm;
         StationModel model = new StationModel("TrackLocation");
         ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
@@ -1665,41 +1697,41 @@ public class StormDisplayState {
 
 
 /**
-Set the ObsStationModelName property.
+Set the ObsLayoutModelName property.
 
-@param value The new value for ObsStationModelName
+@param value The new value for ObsLayoutModelName
 **/
-public void setObsStationModelName (String value) {
-	obsStationModelName = value;
+public void setObsLayoutModelName (String value) {
+	obsLayoutModelName = value;
 }
 
 /**
-Get the ObsStationModelName property.
+Get the ObsLayoutModelName property.
 
-@return The ObsStationModelName
+@return The ObsLayoutModelName
 **/
-public String getObsStationModelName () {
-	return obsStationModelName;
+public String getObsLayoutModelName () {
+	return obsLayoutModelName;
 }
 
 
 
 /**
-Set the ForecastStationModelName property.
+Set the ForecastLayoutModelName property.
 
-@param value The new value for ForecastStationModelName
+@param value The new value for ForecastLayoutModelName
 **/
-public void setForecastStationModelName (String value) {
-	forecastStationModelName = value;
+public void setForecastLayoutModelName (String value) {
+	forecastLayoutModelName = value;
 }
 
 /**
-Get the ForecastStationModelName property.
+Get the ForecastLayoutModelName property.
 
-@return The ForecastStationModelName
+@return The ForecastLayoutModelName
 **/
-public String getForecastStationModelName () {
-	return forecastStationModelName;
+public String getForecastLayoutModelName () {
+	return forecastLayoutModelName;
 }
 
 
