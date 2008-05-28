@@ -876,7 +876,7 @@ public class StormDisplayState {
         JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(comps,
                                  numCols, GuiUtils.WT_N, GuiUtils.WT_N));
         //Put the list of ways into a scroller if there are lots of them
-        if (ways.size() > 10) {
+        if (ways.size() > 6) {
             int width  = 300;
             int height = 400;
             JScrollPane scroller = GuiUtils.makeScrollPane(wayComp, width,
@@ -1098,10 +1098,8 @@ public class StormDisplayState {
         updateDisplays();
         updateCharts();
 
-
-
         long t2 = System.currentTimeMillis();
-        System.err.println("time:" + (t2 - t1));
+        //        System.err.println("time:" + (t2 - t1));
     }
 
 

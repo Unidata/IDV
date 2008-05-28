@@ -1002,6 +1002,19 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    public void unloadYear(final YearDisplayState yds) {
+        Misc.run(new Runnable() {
+            public void run() {
+                try {
+                    loadYearPointData();
+                } catch (Exception exc) {
+                    logException("Loading year", exc);
+                }
+            }
+        });
+    }
+
+
     /**
      * _more_
      *
@@ -1413,12 +1426,12 @@ public class StormTrackControl extends DisplayControlImpl {
             treePanel.show(firstComponent);
         }
 
-        treePanel.setPreferredSize(new Dimension(500, 400));
+        //        treePanel.setPreferredSize(new Dimension(500, 400));
         JComponent contents = treePanel;
 
         //        JComponent contents = GuiUtils.topCenter(GuiUtils.left(box),
         //                                  scroller);
-        contents.setPreferredSize(new Dimension(500, 400));
+        //        contents.setPreferredSize(new Dimension(500, 400));
 
 
         if ((startTime != null) && (endTime != null)) {
