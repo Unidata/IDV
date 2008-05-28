@@ -42,6 +42,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
+import java.lang.reflect.*;
 
 
 /**
@@ -54,7 +55,8 @@ import javax.swing.text.*;
 public class LayoutModelWidget extends JPanel {
     DisplayControlImpl control;
 
-    String id;
+    Object layoutModelListener;
+    Method method;
 
     /** widget */
     private JButton changeButton;
@@ -68,11 +70,13 @@ public class LayoutModelWidget extends JPanel {
     /**
      * Default constructor.
      */
-    public LayoutModelWidget(DisplayControlImpl control, String id,   StationModel layoutModel) {
+    public LayoutModelWidget(DisplayControlImpl control, Object layoutModelListener,  String methodName, StationModel layoutModel) {
         this.control = control;
-        this.id = id;
         setLayout(new BorderLayout());
         this.add(makeStationModelWidget());
+        this.layoutModelListener = layoutModelListener;
+        method =  Misc.findMethod(layoutModelListener.getClass(), methodName,
+                         new Class[]{StationModel.class});
         setLayoutModel(layoutModel);
     }
 
@@ -108,7 +112,7 @@ public class LayoutModelWidget extends JPanel {
                                 try {
                                     layoutModel =  (StationModel) theObject;
                                     changeButton.setText(layoutModel.getDisplayName());
-                                    control.setLayoutModel(id, layoutModel);
+                                    method.invoke(layoutModelListener, new Object[]{layoutModel});
                                 } catch (Exception exc) {
                                     control.logException("Changing layout model",
                                                          exc);
