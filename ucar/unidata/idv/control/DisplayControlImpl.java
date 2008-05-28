@@ -203,6 +203,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** current time label */
     private DateTime currentTime;
 
+    /** first time */
     private DateTime firstTime;
 
     /** listening for times flag */
@@ -1336,10 +1337,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+    /**
+     * Does this have a time macro string?
+     *
+     * @param t  the string to check
+     *
+     * @return true if there is a time macro
+     */
     protected boolean hasTimeMacro(String t) {
-        return UtcDate.containsTimeMacro(t) ||
-            t.indexOf(MACRO_FHOUR) >=0;
-            
+        return UtcDate.containsTimeMacro(t) || (t.indexOf(MACRO_FHOUR) >= 0);
+
     }
 
     /**
@@ -1349,8 +1356,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return Add as animation listener
      */
     protected boolean shouldAddAnimationListener() {
-        return hasTimeMacro(getLegendLabelTemplate()) ||
-            hasTimeMacro(getExtraLabelTemplate());
+        return hasTimeMacro(getLegendLabelTemplate())
+               || hasTimeMacro(getExtraLabelTemplate());
     }
 
 
@@ -2665,6 +2672,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             inDataChangeCall = false;
             logException("Handling new data for display: " + toString(), exc);
         }
+        updateLegendAndList();
         showNormalCursor();
     }
 
@@ -2892,7 +2900,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         return initializeDataInstance(dataChoice);
     }
-
 
 
     /**
@@ -3394,15 +3401,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     DateTime dt = new DateTime(samples[0][i],
                                       s.getSetUnits()[0]);
                     String label = UtcDate.applyTimeMacro(template, dt);
-                    label =  applyForecastHourMacro(label, dt);
-                    Text   t     = new Text(tt, label);
+                    label = applyForecastHourMacro(label, dt);
+                    Text t = new Text(tt, label);
                     fi.setSample(i, t, false);
                 }
                 data = fi;
             } else {
                 String label = UtcDate.applyTimeMacro(template, null);
-                label =  applyForecastHourMacro(label, null);
-                data = new Text(tt, label);
+                label = applyForecastHourMacro(label, null);
+                data  = new Text(tt, label);
             }
         } catch (VisADException ve) {
             logException("Getting display list data", ve);
@@ -3618,7 +3625,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (currentTime == null) {
                 checkTimestampLabel(null);
             }
-            if(UtcDate.containsTimeMacro(template)) {
+            if (UtcDate.containsTimeMacro(template)) {
                 template = UtcDate.applyTimeMacro(template, currentTime);
             }
             template = applyForecastHourMacro(template, currentTime);
@@ -3627,20 +3634,29 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    /**
+     * Apply the forecast hour macro
+     *
+     * @param t label string
+     * @param currentTime first time
+     *
+     * @return modified string
+     */
     private String applyForecastHourMacro(String t, DateTime currentTime) {
-        if(t.indexOf(MACRO_FHOUR)>=0) {
+        if (t.indexOf(MACRO_FHOUR) >= 0) {
             String v = "";
-            if(firstTime!=null && currentTime!=null) {
+            if ((firstTime != null) && (currentTime != null)) {
                 try {
-                    double diff = currentTime.getValue(CommonUnit.secondsSinceTheEpoch) -
-                        firstTime.getValue(CommonUnit.secondsSinceTheEpoch);
-                    v = ((int)(diff/60/60))+"H";
-                } catch(Exception exc) {
-                    System.err.println ("Error:" + exc);
+                    double diff =
+                        currentTime.getValue(CommonUnit.secondsSinceTheEpoch)
+                        - firstTime.getValue(CommonUnit.secondsSinceTheEpoch);
+                    v = ((int) (diff / 60 / 60)) + "H";
+                } catch (Exception exc) {
+                    System.err.println("Error:" + exc);
                     exc.printStackTrace();
                 }
             }
-            return  t.replace(MACRO_FHOUR, v);
+            return t.replace(MACRO_FHOUR, v);
         }
         return t;
     }
@@ -4304,7 +4320,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         window.setTitle(getTitle());
         window.setContents(outerContents);
         if (windowSize != null) {
-            window.setWindowBounds(new Rectangle(windowX, windowY, windowSize.width, windowSize.height));
+            window.setWindowBounds(new Rectangle(windowX, windowY,
+                    windowSize.width, windowSize.height));
         } else {
             window.setLocation(windowX, windowY);
         }
@@ -7325,17 +7342,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             Set timeSet = getDataTimeSet();
             if (timeSet == null) {
                 currentTime = null;
-                firstTime = null;
+                firstTime   = null;
             } else {
                 currentTime = new DateTime(time);
                 Unit setUnit = timeSet.getSetUnits()[0];
 
                 if (Unit.canConvert(time.getUnit(), setUnit)) {
-                    if(timeSet.getLength()>0) {
+                    if (timeSet.getLength() > 0) {
                         Data firstSetTime = timeSet.__getitem__(0);
-                        if(firstSetTime instanceof Real) {
-                            double firstTimeValue = ((Real)firstSetTime).getValue(currentTime.getUnit());
-                            firstTime = new DateTime(time.cloneButValue(firstTimeValue));
+                        if (firstSetTime instanceof Real) {
+                            double firstTimeValue =
+                                ((Real) firstSetTime).getValue(
+                                    currentTime.getUnit());
+                            firstTime = new DateTime(
+                                time.cloneButValue(firstTimeValue));
                         }
                     }
                     double timeVal = time.getValue(setUnit);
