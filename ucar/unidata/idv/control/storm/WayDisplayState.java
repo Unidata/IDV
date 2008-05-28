@@ -110,7 +110,7 @@ public class WayDisplayState {
     /** _more_ */
     List<PointOb> pointObs = new ArrayList<PointOb>();
 
-     /** _more_ */
+    /** _more_ */
     List<PointOb> allPointObs = new ArrayList<PointOb>();
 
     /** _more_ */
@@ -227,7 +227,12 @@ public class WayDisplayState {
         return labelDisplay != null;
     }
 
-   public boolean hasObsPointDisplay() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasObsPointDisplay() {
         return obsPointDisplay != null;
     }
 
@@ -303,15 +308,16 @@ public class WayDisplayState {
                         }
                     }
                     getObsPointDisplay();
-                    if(way.isObservation()){
-                    if (hasObsPointDisplay()) {
-                        FieldImpl pointField =
-                            PointObFactory.makeTimeSequenceOfPointObs(
-                                allPointObs, -1, -1);
+
+                    if (way.isObservation()) {
+                        if (hasObsPointDisplay()) {
+                            FieldImpl pointField =
+                                PointObFactory.makeTimeSequenceOfPointObs(
+                                    allPointObs, -1, -1);
 
                             getObsPointDisplay().setStationData(pointField);
 
-                    }
+                        }
                     }
                 }
             }
@@ -445,18 +451,29 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public void updateLayoutModel() throws VisADException, RemoteException {
-        if (labelDisplay == null) {
-            return;
+        StationModel sm;
+        if (way.isObservation() && (obsPointDisplay != null)) {
+            sm = stormDisplayState.getObsPointLayoutModel();
+            if (sm == null) {
+                removeDisplayable(obsPointDisplay);
+                obsPointDisplay = null;
+            } else {
+                obsPointDisplay.setStationModel(sm);
+            }
         }
-        StationModel sm = (way.isObservation()
-                           ? stormDisplayState.getObsLayoutModel()
-                           : stormDisplayState.getForecastLayoutModel());
-        if (sm == null) {
-            removeDisplayable(labelDisplay);
-            labelDisplay = null;
-            return;
+
+
+        if (labelDisplay != null) {
+            sm = (way.isObservation()
+                  ? stormDisplayState.getObsLayoutModel()
+                  : stormDisplayState.getForecastLayoutModel());
+            if (sm == null) {
+                removeDisplayable(labelDisplay);
+                labelDisplay = null;
+            } else {
+                labelDisplay.setStationModel(sm);
+            }
         }
-        labelDisplay.setStationModel(sm);
     }
 
 
@@ -485,21 +502,28 @@ public class WayDisplayState {
         return labelDisplay;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public StationModelDisplayable getObsPointDisplay() throws Exception {
-            if (obsPointDisplay == null) {
-                StationModel sm = stormDisplayState.getObsPointLayoutModel();
-                if (sm != null) {
-                    obsPointDisplay = new StationModelDisplayable("dots");
-                    addDisplayable(obsPointDisplay);
-                    obsPointDisplay
-                        .setScale(stormDisplayState.getStormTrackControl()
-                            .getDisplayScale());
-                    setLabelColor();
-                    updateLayoutModel();
-                }
+        if (obsPointDisplay == null) {
+            StationModel sm = stormDisplayState.getObsPointLayoutModel();
+            if (sm != null) {
+                obsPointDisplay = new StationModelDisplayable("dots");
+                addDisplayable(obsPointDisplay);
+                obsPointDisplay
+                    .setScale(stormDisplayState.getStormTrackControl()
+                        .getDisplayScale());
+                setLabelColor();
+                updateLayoutModel();
             }
-            return obsPointDisplay;
         }
+        return obsPointDisplay;
+    }
 
 
     /**
@@ -683,6 +707,9 @@ public class WayDisplayState {
         if (labelDisplay != null) {
             labelDisplay.setColor(getColor());
         }
+        if (obsPointDisplay != null) {
+            obsPointDisplay.setColor(getColor());
+        }
     }
 
     /**
@@ -755,7 +782,7 @@ public class WayDisplayState {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
 
-        pointObs = new ArrayList<PointOb>();
+        pointObs    = new ArrayList<PointOb>();
         allPointObs = new ArrayList<PointOb>();
         for (StormTrack track : tracks) {
             FieldImpl field =
@@ -767,8 +794,8 @@ public class WayDisplayState {
             fields.add(field);
             times.add(track.getStartTime());
             pointObs.addAll(makePointObs(track, !way.isObservation()));
-            if(way.isObservation()){
-               allPointObs.addAll(makePointObs(track, true));
+            if (way.isObservation()) {
+                allPointObs.addAll(makePointObs(track, true));
             }
         }
 
@@ -816,12 +843,14 @@ public class WayDisplayState {
      * _more_
      *
      * @param track _more_
+     * @param useStartTime _more_
      *
      *
      * @return _more_
      * @throws Exception _more_
      */
-    private List<PointOb> makePointObs(StormTrack track, boolean useStartTime) throws Exception {
+    private List<PointOb> makePointObs(StormTrack track, boolean useStartTime)
+            throws Exception {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
@@ -834,9 +863,11 @@ public class WayDisplayState {
         List<StormParam> params   = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
             StormTrackPoint stp   = stps.get(i);
-            DateTime        time  = (useStartTime?startTime:stp.getTime());
+            DateTime        time  = (useStartTime
+                                     ? startTime
+                                     : stp.getTime());
             String          label = "";
-            if (!isObservation) {
+            if ( !isObservation) {
                 if (i == 0) {
                     label = way + ": " + track.getStartTime();
                 } else {

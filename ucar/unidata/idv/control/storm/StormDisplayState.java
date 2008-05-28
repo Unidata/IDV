@@ -894,7 +894,7 @@ public class StormDisplayState {
         //Put the list of ways into a scroller if there are lots of them
         if (ways.size() > 6) {
             int width  = 300;
-            int height = 400;
+            int height = 300;
             JScrollPane scroller = GuiUtils.makeScrollPane(wayComp, width,
                                        height);
             scroller.setBorder(BorderFactory.createLoweredBevelBorder());
