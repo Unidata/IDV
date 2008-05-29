@@ -1405,18 +1405,42 @@ public class WayDisplayState {
         LatLonPointImpl  p2   = new LatLonPointImpl(lat2, lon2);
 
         LatLonProjection pj1  = new LatLonProjection();
-        ProjectionPoint  pp1  = pj1.latLonToProj(p1);
+        //ProjectionPoint  pp1  = pj1.latLonToProj(p1);
         LatLonProjection pj2  = new LatLonProjection();
-        ProjectionPoint  pp2  = pj2.latLonToProj(p2);
+        //ProjectionPoint  pp2  = pj2.latLonToProj(p2);
 
-        Bearing b = Bearing.calculateBearing(lat1, lon1, lat2, lon2, null);
-        double           dist = b.getDistance();
+        //Bearing b = Bearing.calculateBearing(lat1, lon1, lat2, lon2, null);
+        //double           dist = b.getDistance();
 
 
         if ( !right) {
             sign = -1;
         }
-        double x = pp2.getX() + sign * r * (pp2.getY() - pp1.getY()) / dist;
+
+        double af = getCircleAngleRange( el1,  el2);
+        af = af * 180.0 / Math.PI;
+        if(right) {
+            af = af -90;
+        } else {
+            af = af +90;
+        }
+        // change angle to azimuth
+        if ((af <= 90) && (af >= 0)) {
+            af = 90 - af;
+        } else if ((af > 90) && (af <= 180)) {
+            af = 360 + (90 - af);
+        } else if ((af < 0) && (af >= -180)) {
+            af = 90 - af;
+        } else if ((af > 180) && (af <= 360)) {
+            af = 450 - af;
+        } else if ((af < -180) && (af >= -360)) {
+            af = -270 - af;
+        }
+
+
+       LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, af, r, null);
+
+/*        double x = pp2.getX() + sign * r * (pp2.getY() - pp1.getY()) / dist;
         double y = pp2.getY() + sign * r * (pp1.getX() - pp2.getX()) / dist;
 
 
@@ -1427,6 +1451,9 @@ public class WayDisplayState {
 
         EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
                                lp11.getLongitude(), 0);
+                               */
+        EarthLocation el = new EarthLocationLite(lp1.getLatitude(),
+                                   lp1.getLongitude(), 0);
         StormTrackPoint sp = new StormTrackPoint(el, sp1.getTime(), 0, null);
         return sp;
     }
@@ -1497,6 +1524,8 @@ public class WayDisplayState {
                 af = 90 - af;
             } else if ((af > 180) && (af <= 360)) {
                 af = 450 - af;
+            } else if ((af < -180) && (af >= -360)) {
+                af = -270 - af;
             }
 
 
