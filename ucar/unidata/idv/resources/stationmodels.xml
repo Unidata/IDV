@@ -2524,7 +2524,7 @@
 <method name="add">
 <object class="ucar.unidata.ui.symbol.StationModel">
     <property name="Name">
-        <string><![CDATA[Storm>Forecast Track]]></string>
+        <string><![CDATA[Storm>Forecast Hour]]></string>
     </property>
     <property name="List">
         <object class="java.util.ArrayList">
@@ -2615,7 +2615,7 @@
                     </property>
                     <property name="ParamIds">
                         <array class="string" length="1">
-                            <string><![CDATA[label]]></string>
+                            <string><![CDATA[fhour]]></string>
                         </array>
                     </property>
                     <property name="ParamDescs">
