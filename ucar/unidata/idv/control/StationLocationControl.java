@@ -1673,7 +1673,7 @@ public class StationLocationControl extends StationModelControl {
         JPanel displayPanel = GuiUtils.doLayout(new Component[] {
                                   displayRbs[0],
                                   displayRbs[1], symbolPanel,
-                                  stationModelPanel }, 2, GuiUtils.WT_N,
+                                 GuiUtils.top(GuiUtils.left(stationModelPanel)) }, 2, GuiUtils.WT_N,
                                       GuiUtils.WT_N);
 
 

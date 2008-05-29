@@ -2371,14 +2371,14 @@ public class StationModelControl extends ObsDisplayControl {
 
 
         JPanel stationModelPanel =
-            GuiUtils.hbox(layoutModelWidget=new LayoutModelWidget(this,this,"setStationModelFromWidget",getStationModel()),
+            GuiUtils.hbox(GuiUtils.left(layoutModelWidget=new LayoutModelWidget(this,this,"setStationModelFromWidget",getStationModel())),
                           GuiUtils.rLabel("   Scale:"),
                           GuiUtils.hflow(Misc.newList(scaleField, scaleBtn),
                                          4, 0));
 
         controlWidgets.add(
             new WrapperWidget(
-                this, GuiUtils.rLabel("Layout Model:"), stationModelPanel));
+                this, GuiUtils.rLabel("Layout Model:"), GuiUtils.left(stationModelPanel)));
 
 
         controlWidgets.add(
