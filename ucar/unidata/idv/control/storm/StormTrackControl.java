@@ -38,6 +38,7 @@ import ucar.unidata.data.storm.StormInfo;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
 
@@ -333,6 +334,19 @@ public class StormTrackControl extends DisplayControlImpl {
         return trackField;
     }
 
+
+
+
+    public void setColorTable(String whichColorTable,
+                              ColorTable newColorTable)
+            throws RemoteException, VisADException {
+        
+        super.setColorTable(whichColorTable, newColorTable);
+        List<StormDisplayState> active = getActiveStorms();
+        for (StormDisplayState sds: active) {
+            sds.colorTableChanged();
+        }
+    }
 
 
 

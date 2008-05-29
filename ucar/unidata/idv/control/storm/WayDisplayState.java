@@ -283,18 +283,28 @@ public class WayDisplayState {
 
         if (shouldShowTrack()) {
             StormParam tmp = stormDisplayState.getColorParam(this);
-
             if ( !hasTrackDisplay() || !Misc.equals(colorParam, tmp)) {
                 boolean hadTrack = hasTrackDisplay();
                 colorParam = tmp;
                 FieldImpl trackField = makeTrackField();
                 if (trackField != null) {
                     getTrackDisplay().setTrack(trackField);
-                    Range[] range = GridUtil.getMinMax(trackField);
-                    getTrackDisplay().setRangeForColor(range[0].getMin(),
-                            range[0].getMax());
+                    Range range = null;
+                    if(colorParam!=null) {
+                        String paramName = colorParam.getName();
+                        range = stormDisplayState.getStormTrackControl().getIdv().getParamDefaultsEditor().getParamRange(paramName);
 
-
+                        Unit displayUnit = stormDisplayState.getStormTrackControl().getIdv().getParamDefaultsEditor().getParamDisplayUnit(paramName);
+                        System.err.println ("paramName:" + paramName + " range:" + range+ " unit:" + displayUnit);
+                        if(displayUnit!=null) {
+                            getTrackDisplay().setDisplayUnit(displayUnit);
+                        }
+                    }
+                    if(range == null) {
+                        range = GridUtil.getMinMax(trackField)[0];
+                    }
+                    getTrackDisplay().setRangeForColor(range.getMin(),
+                            range.getMax());
                 }
                 setTrackColor();
                 if ( !hadTrack) {
@@ -324,6 +334,7 @@ public class WayDisplayState {
                 }
             }
             getTrackDisplay().setVisible(true);
+            setTrackColor();
         } else {
             if (hasTrackDisplay()) {
                 getTrackDisplay().setVisible(false);
@@ -542,6 +553,7 @@ public class WayDisplayState {
             if (way.isObservation()) {
                 trackDisplay.setLineWidth(3);
             } else {
+                trackDisplay.setLineWidth(2);
                 trackDisplay.setUseTimesInAnimation(false);
             }
             setTrackColor();
@@ -758,7 +770,7 @@ public class WayDisplayState {
 
 
     /** _more_ */
-    private static TextType textType;
+    private static TextType fhourType;
 
     /**
      * _more_
@@ -856,8 +868,8 @@ public class WayDisplayState {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
-        if (textType == null) {
-            textType = new TextType("label");
+        if (fhourType == null) {
+            fhourType = new TextType("fhour");
         }
         List<PointOb>    pointObs = new ArrayList<PointOb>();
 
@@ -884,7 +896,7 @@ public class WayDisplayState {
 
             }
             Data[] data = new Data[params.size() + 1];
-            data[0] = new visad.Text(textType, label);
+            data[0] = new visad.Text(fhourType, label);
             for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                 Real r = stp.getAttribute(params.get(paramIdx));
                 if (r == null) {
@@ -906,8 +918,8 @@ public class WayDisplayState {
             throws Exception {
         DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
-        if (textType == null) {
-            textType = new TextType("label");
+        if (fhourType == null) {
+            fhourType = new TextType("fhour");
         }
         List<PointOb>    pointObs = new ArrayList<PointOb>();
         DecimalFormat format = new DecimalFormat("0.#");
@@ -926,7 +938,7 @@ public class WayDisplayState {
                     label = format.format(diffHours)+"H";
                 }
                 Data[] data = new Data[params.size() + 1];
-                data[0] = new visad.Text(textType, label);
+                data[0] = new visad.Text(fhourType, label);
                 for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                     Real r = stp.getAttribute(params.get(paramIdx));
                     if (r == null) {

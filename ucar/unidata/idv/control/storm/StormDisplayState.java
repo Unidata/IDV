@@ -49,6 +49,7 @@ import ucar.unidata.idv.control.LayoutModelWidget;
 import ucar.unidata.idv.control.chart.*;
 
 
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TreePanel;
 
@@ -210,10 +211,10 @@ public class StormDisplayState {
     /** _more_ */
     private String obsLayoutModelName = "Storm>Hurricane";
 
-    private String obsPointLayoutModelName = "Storm>Forecast Track";
+    private String obsPointLayoutModelName = "Storm>Forecast Hour";
 
     /** _more_ */
-    private String forecastLayoutModelName = "Storm>Forecast Track";
+    private String forecastLayoutModelName = "Storm>Forecast Hour";
 
     /** time holder */
     private DisplayableData timesHolder = null;
@@ -288,7 +289,13 @@ public class StormDisplayState {
         }
     }
 
-
+    public void colorTableChanged() {
+        try {
+            updateDisplays();        
+        } catch (Exception exc) {
+            stormTrackControl.logException("Changing color table", exc);
+        }
+    }
 
 
 
@@ -939,9 +946,10 @@ public class StormDisplayState {
         JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(comps,
                                  numCols, GuiUtils.WT_N, GuiUtils.WT_N));
         //Put the list of ways into a scroller if there are lots of them
+        System.err.println ("ways:" + ways.size());
         if (ways.size() > 6) {
             int width  = 300;
-            int height = 300;
+            int height = 200;
             JScrollPane scroller = GuiUtils.makeScrollPane(wayComp, width,
                                        height);
             scroller.setBorder(BorderFactory.createLoweredBevelBorder());
