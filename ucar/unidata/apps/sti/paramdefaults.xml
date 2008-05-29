@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<params>
+<!-- 
+table is color table name; see for example colortables.xml and 
+color table editor displays 
+name is in lower case only
+range values are in units of display units or whatever units     
+derived parameter computations come up with unless otherwise
+specified  -->
+  <param
+     name="Probability.*"
+     range_min="0"
+     range_max="500"
+     unit="km"/>
+</params>
