@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -58,16 +59,17 @@ import visad.*;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
-import java.text.DecimalFormat;
 import java.awt.*;
-
-import java.util.Date;
 import java.awt.Color;
 import java.awt.event.*;
 
 import java.rmi.RemoteException;
 
+import java.text.DecimalFormat;
+
 import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -266,11 +268,6 @@ public class WayDisplayState {
      */
     public void updateDisplay() throws Exception {
 
-        //        FieldImpl field = makeTrackField(obsTrack, null);
-        //        obsDisplayState.addTrack(obsTrack, field);
-        //        obsDisplayState.getTrackDisplay().setTrack(field);
-
-
         if ( !shouldShow()) {
             if (holder != null) {
                 holder.setVisible(false);
@@ -278,9 +275,7 @@ public class WayDisplayState {
             return;
         }
 
-        //        System.err.println (way + " " + shouldShow() + " " + shouldShowTrack() + " " + shouldShowCone());
         getHolder().setVisible(true);
-
         if (shouldShowTrack()) {
             StormParam tmp = stormDisplayState.getColorParam(this);
             if ( !hasTrackDisplay() || !Misc.equals(colorParam, tmp)) {
@@ -290,17 +285,22 @@ public class WayDisplayState {
                 if (trackField != null) {
                     getTrackDisplay().setTrack(trackField);
                     Range range = null;
-                    if(colorParam!=null) {
+                    if (colorParam != null) {
                         String paramName = colorParam.getName();
-                        range = stormDisplayState.getStormTrackControl().getIdv().getParamDefaultsEditor().getParamRange(paramName);
+                        range =
+                            stormDisplayState.getStormTrackControl().getIdv()
+                                .getParamDefaultsEditor()
+                                .getParamRange(paramName);
 
-                        Unit displayUnit = stormDisplayState.getStormTrackControl().getIdv().getParamDefaultsEditor().getParamDisplayUnit(paramName);
-                        System.err.println ("paramName:" + paramName + " range:" + range+ " unit:" + displayUnit);
-                        if(displayUnit!=null) {
+                        Unit displayUnit =
+                            stormDisplayState.getStormTrackControl().getIdv()
+                                .getParamDefaultsEditor()
+                                .getParamDisplayUnit(paramName);
+                        if (displayUnit != null) {
                             getTrackDisplay().setDisplayUnit(displayUnit);
                         }
                     }
-                    if(range == null) {
+                    if (range == null) {
                         range = GridUtil.getMinMax(trackField)[0];
                     }
                     getTrackDisplay().setRangeForColor(range.getMin(),
@@ -334,6 +334,12 @@ public class WayDisplayState {
                 }
             }
             getTrackDisplay().setVisible(true);
+            if (hasLabelDisplay()) {
+                getLabelDisplay().setVisible(true);
+            }
+            if (hasObsPointDisplay()) {
+                getObsPointDisplay().setVisible(true);
+            }
             setTrackColor();
         } else {
             if (hasTrackDisplay()) {
@@ -342,6 +348,10 @@ public class WayDisplayState {
             if (hasLabelDisplay()) {
                 getLabelDisplay().setVisible(false);
             }
+            if (hasObsPointDisplay()) {
+                getObsPointDisplay().setVisible(false);
+            }
+
         }
 
 
@@ -671,7 +681,6 @@ public class WayDisplayState {
         if (colorParam != null) {
             ColorTable ct =
                 stormDisplayState.getStormTrackControl().getColorTable();
-            //            System.err.println("Using:" + ct);
             //                stormDisplayState.getStormTrackControl().getControlContext()
             //                    .getColorTableManager().getColorTable(colorTable);
             if (ct != null) {
@@ -871,11 +880,11 @@ public class WayDisplayState {
         if (fhourType == null) {
             fhourType = new TextType("fhour");
         }
-        List<PointOb>    pointObs = new ArrayList<PointOb>();
+        List<PointOb>    pointObs  = new ArrayList<PointOb>();
 
-        DecimalFormat format = new DecimalFormat("0.#");
-        Date startDate = Util.makeDate(startTime);
-        List<StormParam> params   = track.getParams();
+        DecimalFormat    format    = new DecimalFormat("0.#");
+        Date             startDate = Util.makeDate(startTime);
+        List<StormParam> params    = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
             StormTrackPoint stp   = stps.get(i);
             DateTime        time  = (useStartTime
@@ -884,15 +893,16 @@ public class WayDisplayState {
             String          label = "";
             if ( !isObservation) {
                 if (i == 0) {
-   //                 label = way.getId() + ": " + track.getStartTime();
+                    //                 label = way.getId() + ": " + track.getStartTime();
                 } else {
                     label = "" + stp.getForecastHour() + "H";
                 }
-            }      else if(useStartTime && i>0) {
-                Date       dttm = Util.makeDate(stp.getTime());
-                double diffSeconds= (dttm.getTime()-startDate.getTime())/1000.0;
-                double    diffHours = diffSeconds/3600.0;
-                label = format.format(diffHours)+"H";
+            } else if (useStartTime && (i > 0)) {
+                Date dttm = Util.makeDate(stp.getTime());
+                double diffSeconds = (dttm.getTime() - startDate.getTime())
+                                     / 1000.0;
+                double diffHours = diffSeconds / 3600.0;
+                label = format.format(diffHours) + "H";
 
             }
             Data[] data = new Data[params.size() + 1];
@@ -914,28 +924,37 @@ public class WayDisplayState {
 
 
 
-    private List<PointOb> makeObsPointObs(StormTrack track) 
-            throws Exception {
-        DateTime              startTime     = track.getStartTime();
-        List<StormTrackPoint> stps          = track.getTrackPoints();
+    /**
+     * _more_
+     *
+     * @param track _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private List<PointOb> makeObsPointObs(StormTrack track) throws Exception {
+        DateTime              startTime = track.getStartTime();
+        List<StormTrackPoint> stps      = track.getTrackPoints();
         if (fhourType == null) {
             fhourType = new TextType("fhour");
         }
         List<PointOb>    pointObs = new ArrayList<PointOb>();
-        DecimalFormat format = new DecimalFormat("0.#");
+        DecimalFormat    format   = new DecimalFormat("0.#");
         List<StormParam> params   = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
-            StormTrackPoint baseStp   = stps.get(i);
-            DateTime        baseTime  =  baseStp.getTime();
-            Date baseDate = Util.makeDate(baseTime);
-            for(int j=i;j<stps.size();j++) {
+            StormTrackPoint baseStp  = stps.get(i);
+            DateTime        baseTime = baseStp.getTime();
+            Date            baseDate = Util.makeDate(baseTime);
+            for (int j = i; j < stps.size(); j++) {
                 StormTrackPoint stp   = stps.get(j);
                 String          label = "";
-                if(j>0) {
-                    Date       dttm = Util.makeDate(stp.getTime());
-                    double diffSeconds= (dttm.getTime()-baseDate.getTime())/1000.0;
-                    double    diffHours = diffSeconds/3600.0;
-                    label = format.format(diffHours)+"H";
+                if (j > 0) {
+                    Date dttm = Util.makeDate(stp.getTime());
+                    double diffSeconds = (dttm.getTime()
+                                          - baseDate.getTime()) / 1000.0;
+                    double diffHours = diffSeconds / 3600.0;
+                    label = format.format(diffHours) + "H";
                 }
                 Data[] data = new Data[params.size() + 1];
                 data[0] = new visad.Text(fhourType, label);
@@ -947,8 +966,8 @@ public class WayDisplayState {
                     data[paramIdx + 1] = r;
                 }
                 Tuple tuple = new Tuple(data);
-                pointObs.add(PointObFactory.makePointOb(stp.getLocation(), baseTime,
-                                                        tuple));
+                pointObs.add(PointObFactory.makePointOb(stp.getLocation(),
+                        baseTime, tuple));
             }
         }
         return pointObs;
@@ -1232,7 +1251,7 @@ public class WayDisplayState {
         DateTime              dt             = stps.get(0).getTime();
         Way                   ringWay        = new Way(getWay() + "_RING");
         int                   numberOfPoints = 73;
-        double                angleDelta     = 360.0 / (numberOfPoints-1);
+        double                angleDelta     = 360.0 / (numberOfPoints - 1);
         for (int i = 0; i < size; i++) {
             StormTrackPoint stp = stps.get(i);
             Real            r   = stp.getAttribute(param);
@@ -1467,7 +1486,8 @@ public class WayDisplayState {
         double            lon0  = c.getLongitude().getValue();
 
         for (int i = 0; i < size; i++) {
-            double af = (angle + (i+1) * 15 * Math.PI / 180.0) * 180.0 / Math.PI;
+            double af = (angle + (i + 1) * 15 * Math.PI / 180.0) * 180.0
+                        / Math.PI;
             // change angle to azimuth
             if ((af <= 90) && (af >= 0)) {
                 af = 90 - af;
