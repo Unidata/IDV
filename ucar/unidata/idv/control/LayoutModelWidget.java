@@ -27,11 +27,12 @@ import ucar.unidata.idv.ControlContext;
 import ucar.unidata.ui.symbol.*;
 
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.LayoutUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
-
+import java.util.List;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -64,14 +65,19 @@ public class LayoutModelWidget extends JPanel {
     /** station model to use */
     StationModel layoutModel;
 
-
+    private boolean addNone = false;
 
 
     /**
      * Default constructor.
      */
     public LayoutModelWidget(DisplayControlImpl control, Object layoutModelListener,  String methodName, StationModel layoutModel) {
+        this(control,layoutModelListener, methodName, layoutModel, false);
+    }
+
+    public LayoutModelWidget(DisplayControlImpl control, Object layoutModelListener,  String methodName, StationModel layoutModel, boolean addNone) {
         this.control = control;
+        this.addNone = addNone;
         setLayout(new BorderLayout());
         this.add(makeStationModelWidget());
         this.layoutModelListener = layoutModelListener;
@@ -93,9 +99,6 @@ public class LayoutModelWidget extends JPanel {
         editButton.setToolTipText("Show the layout model editor");
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                if(layoutModel!=null) {
-                    control.getControlContext().getStationModelManager().show(layoutModel);
-                }
             }
         });
 
@@ -123,19 +126,42 @@ public class LayoutModelWidget extends JPanel {
                     }
                 };
 
-                JPopupMenu popup =
-                    GuiUtils.makePopupMenu(
-                        StationModelCanvas.makeStationModelMenuItems(
-                            smm.getStationModels(), listener, smm));
+                List items = StationModelCanvas.makeStationModelMenuItems(
+                                                                          smm.getStationModels(), listener, smm);
+                items.add(0,GuiUtils.MENU_SEPARATOR);
+                if(addNone) {
+                    items.add(0,GuiUtils.makeMenuItem("None", LayoutModelWidget.this, "setNone"));
+                }
+                items.add(0,
+                          GuiUtils.makeMenuItem("Edit",LayoutModelWidget.this, "editLayoutModel"));
+                JPopupMenu popup =GuiUtils.makePopupMenu(items);
                 popup.show(changeButton, changeButton.getSize().width / 2,
                            changeButton.getSize().height);
             }
         });
 
-        return GuiUtils.hflow(Misc.newList(editButton, changeButton), 4, 0);
+        return changeButton;
+        //        return GuiUtils.hflow(Misc.newList(editButton, changeButton), 4, 0);
 
     }
 
+
+    public void setNone() {
+        layoutModel =  null;
+        changeButton.setText("None");
+        try {
+        method.invoke(layoutModelListener, new Object[]{layoutModel});
+        } catch (Exception exc) {
+            control.logException("Clearing layout model",
+                                 exc);
+        }
+    }
+
+    public void editLayoutModel() {
+        if(layoutModel!=null) {
+            control.getControlContext().getStationModelManager().show(layoutModel);
+        }
+    }
 
     public StationModel getLayoutModel() {
         return layoutModel;
