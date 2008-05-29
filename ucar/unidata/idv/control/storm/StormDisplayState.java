@@ -855,7 +855,7 @@ public class StormDisplayState {
         topComps.add(obsLayoutComp);
         topComps.add(GuiUtils.filler());
 
-        topComps.add(GuiUtils.rLabel("Color:"));
+        topComps.add(GuiUtils.rLabel("Color By:"));
         topComps.add(obsColorByBox);
         topComps.add(forecastColorByBox);
 
