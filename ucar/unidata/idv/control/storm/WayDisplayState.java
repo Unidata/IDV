@@ -797,7 +797,7 @@ public class WayDisplayState {
             times.add(track.getStartTime());
             pointObs.addAll(makePointObs(track, !way.isObservation()));
             if (way.isObservation()) {
-                allPointObs.addAll(makePointObs(track, true));
+                allPointObs.addAll(makeObsPointObs(track));
             }
         }
 
@@ -898,6 +898,52 @@ public class WayDisplayState {
         }
         return pointObs;
     }
+
+
+
+
+    private List<PointOb> makeObsPointObs(StormTrack track) 
+            throws Exception {
+        DateTime              startTime     = track.getStartTime();
+        List<StormTrackPoint> stps          = track.getTrackPoints();
+        if (textType == null) {
+            textType = new TextType("label");
+        }
+        List<PointOb>    pointObs = new ArrayList<PointOb>();
+        DecimalFormat format = new DecimalFormat("0.#");
+        List<StormParam> params   = track.getParams();
+        for (int i = 0; i < stps.size(); i++) {
+            StormTrackPoint baseStp   = stps.get(i);
+            DateTime        baseTime  =  baseStp.getTime();
+            Date baseDate = Util.makeDate(baseTime);
+            for(int j=i;j<stps.size();j++) {
+                StormTrackPoint stp   = stps.get(j);
+                String          label = "";
+                if(j>0) {
+                    Date       dttm = Util.makeDate(stp.getTime());
+                    double diffSeconds= (dttm.getTime()-baseDate.getTime())/1000.0;
+                    double    diffHours = diffSeconds/3600.0;
+                    label = format.format(diffHours)+"H";
+                }
+                Data[] data = new Data[params.size() + 1];
+                data[0] = new visad.Text(textType, label);
+                for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
+                    Real r = stp.getAttribute(params.get(paramIdx));
+                    if (r == null) {
+                        r = params.get(paramIdx).getReal(Double.NaN);
+                    }
+                    data[paramIdx + 1] = r;
+                }
+                Tuple tuple = new Tuple(data);
+                pointObs.add(PointObFactory.makePointOb(stp.getLocation(), baseTime,
+                                                        tuple));
+            }
+        }
+        return pointObs;
+    }
+
+
+
 
 
     /**

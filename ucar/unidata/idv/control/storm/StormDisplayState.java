@@ -414,7 +414,7 @@ public class StormDisplayState {
      * @param sm _more_
      */
     public void setObsLayoutModel(StationModel sm) {
-        obsLayoutModelName = sm.getName();
+        obsLayoutModelName = (sm==null?null:sm.getName());
         updateLayoutModel(true);
     }
     /**
@@ -423,7 +423,7 @@ public class StormDisplayState {
       * @param sm _more_
       */
      public void setObsPointLayoutModel(StationModel sm) {
-         obsPointLayoutModelName = sm.getName();
+         obsPointLayoutModelName = (sm==null?null:sm.getName());
          updateLayoutModel(true);
      }
 
@@ -433,7 +433,7 @@ public class StormDisplayState {
      * @param sm _more_
      */
     public void setForecastLayoutModel(StationModel sm) {
-        forecastLayoutModelName = sm.getName();
+        forecastLayoutModelName = (sm==null?null:sm.getName());
         updateLayoutModel(false);
     }
 
@@ -694,20 +694,6 @@ public class StormDisplayState {
                 unloadBtn), new Insets(0, 0, 0, 0));
 
 
-        JComponent obsLayoutModelComp =
-            new LayoutModelWidget(stormTrackControl, this,
-                                  "setObsLayoutModel",
-                                  getObsLayoutModel());
-        JComponent obsPointLayoutModelComp =
-            new LayoutModelWidget(stormTrackControl, this,
-                                  "setObsPointLayoutModel",
-                                  getObsPointLayoutModel());
-        JComponent forecastLayoutModelComp =
-            new LayoutModelWidget(stormTrackControl, this,
-                                  "setForecastLayoutModel",
-                                  getForecastLayoutModel());
-
-
         List<StormParam> forecastParams = new ArrayList<StormParam>();
         Hashtable        seenParams     = new Hashtable();
         List<StormParam> obsParams      = new ArrayList<StormParam>();
@@ -735,6 +721,29 @@ public class StormDisplayState {
             getDistanceParams(forecastParams);
         List<StormParam> obsRadiusParams = getDistanceParams(obsParams);
 
+        if (obsRadiusParams != null) {
+            //If its not set then set it
+            if (params.get(ID_OBS_RINGS) == null) {
+                params.put(ID_OBS_RINGS, obsRadiusParams.get(0));
+            }
+            if (params.get(ID_OBS_CONE) == null) {
+                params.put(ID_OBS_CONE, Misc.newList(obsRadiusParams.get(0)));
+            }
+        }
+        if (forecastRadiusParams != null) {
+            //If its not set then set it
+            if (params.get(ID_FORECAST_RINGS) == null) {
+                params.put(ID_FORECAST_RINGS, forecastRadiusParams.get(0));
+            }
+            if (params.get(ID_FORECAST_CONE) == null) {
+                params.put(ID_FORECAST_CONE,
+                           Misc.newList(obsRadiusParams.get(0)));
+            }
+        }
+
+
+
+
 
         //Sort them by name
 
@@ -748,16 +757,6 @@ public class StormDisplayState {
         int  numCols    = colLabels.size();
 
 
-        List paramComps = new ArrayList();
-        paramComps.add(new JLabel(""));
-        paramComps.add(new JLabel("<html><u><i>Track</i></u></html>"));
-        if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
-            paramComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
-            paramComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
-        } else {
-            paramComps.add(GuiUtils.filler());
-            paramComps.add(GuiUtils.filler());
-        }
 
 
         List obsColorParams      = new ArrayList(obsParams);
@@ -765,62 +764,110 @@ public class StormDisplayState {
         obsColorParams.add(0, "Fixed");
         forecastColorParams.add(0, "Fixed");
 
+
+        JComponent obsLayoutComp =
+            new LayoutModelWidget(stormTrackControl, this,
+                                  "setObsLayoutModel",
+                                  getObsLayoutModel(),true);
+        JComponent obsPointLayoutComp =
+            new LayoutModelWidget(stormTrackControl, this,
+                                  "setObsPointLayoutModel",
+                                  getObsPointLayoutModel(),true);
+        JComponent forecastLayoutComp =
+            new LayoutModelWidget(stormTrackControl, this,
+                                  "setForecastLayoutModel",
+                                  getForecastLayoutModel(),true);
+
         JComponent obsColorByBox = makeBox(obsColorParams, ID_OBS_COLOR);
         JComponent forecastColorByBox = makeBox(forecastColorParams,
-                                            ID_FORECAST_COLOR);
+                                                ID_FORECAST_COLOR);
+
+        JComponent obsConeComp = (obsRadiusParams!=null?
+                                  makeList(obsRadiusParams, ID_OBS_CONE):
+                                  (JComponent)GuiUtils.filler());
+        JComponent obsRingComp = (obsRadiusParams!=null?
+                                  GuiUtils.top(makeBox(obsRadiusParams,
+                                                       ID_OBS_RINGS)):
+                                  (JComponent) GuiUtils.filler());
 
 
-        paramComps.add(
+        JComponent forecastConeComp = (forecastRadiusParams!=null?
+                                  makeList(forecastRadiusParams, ID_FORECAST_CONE):
+                                  (JComponent)GuiUtils.filler());
+        JComponent forecastRingComp = (forecastRadiusParams!=null?
+                                  GuiUtils.top(makeBox(forecastRadiusParams,
+                                                       ID_FORECAST_RINGS)):
+                                  (JComponent) GuiUtils.filler());
+
+
+
+        List topComps = new ArrayList();
+
+        /*
+
+        topComps.add(new JLabel(""));
+        topComps.add(new JLabel("<html><u><i>Track</i></u></html>"));
+        if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
+            topComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
+            topComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
+        } else {
+            topComps.add(GuiUtils.filler());
+            topComps.add(GuiUtils.filler());
+        }
+
+
+        topComps.add(
             GuiUtils.top(
                 GuiUtils.inset(
                     new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
-        paramComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,
-                obsLayoutModelComp, obsPointLayoutModelComp)));
-
-        if (obsRadiusParams != null) {
-            //If its not set then set it
-            if (params.get(ID_OBS_RINGS) == null) {
-                params.put(ID_OBS_RINGS, obsRadiusParams.get(0));
-            }
-            if (params.get(ID_OBS_CONE) == null) {
-                params.put(ID_OBS_CONE, Misc.newList(obsRadiusParams.get(0)));
-            }
-            paramComps.add(GuiUtils.top(makeBox(obsRadiusParams,
-                    ID_OBS_RINGS)));
-            paramComps.add(makeList(obsRadiusParams, ID_OBS_CONE));
-        } else {
-            paramComps.add(GuiUtils.filler());
-            paramComps.add(GuiUtils.filler());
-        }
+        topComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,
+                obsLayoutComp, obsPointLayoutComp)));
 
 
-        paramComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
+        topComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
                 new Insets(4, 0, 0, 0))));
-        paramComps.add(GuiUtils.top(GuiUtils.vbox(forecastColorByBox,
-                forecastLayoutModelComp)));
-        //        paramComps.add(GuiUtils.top(forecastColorByBox));
+        topComps.add(GuiUtils.top(GuiUtils.vbox(forecastColorByBox,
+                forecastLayoutComp)));
 
-        if (forecastRadiusParams != null) {
-            //If its not set then set it
-            if (params.get(ID_FORECAST_RINGS) == null) {
-                params.put(ID_FORECAST_RINGS, forecastRadiusParams.get(0));
-            }
-            if (params.get(ID_FORECAST_CONE) == null) {
-                params.put(ID_FORECAST_CONE,
-                           Misc.newList(obsRadiusParams.get(0)));
-            }
-            paramComps.add(GuiUtils.top(makeBox(forecastRadiusParams,
-                    ID_FORECAST_RINGS)));
-            paramComps.add(makeList(forecastRadiusParams, ID_FORECAST_CONE));
-        } else {
-            paramComps.add(GuiUtils.filler());
-            paramComps.add(GuiUtils.filler());
-        }
+
 
 
         GuiUtils.tmpInsets = new Insets(4, 2, 0, 2);
-        JComponent paramComp = GuiUtils.doLayout(paramComps, 4,
+        JComponent paramComp = GuiUtils.doLayout(topComps, 4,
                                    GuiUtils.WT_N, GuiUtils.WT_N);
+        */
+        topComps.add(new JLabel(""));
+        topComps.add(GuiUtils.cLabel("<html><u><i>Observation</i></u></html>"));
+        topComps.add(GuiUtils.cLabel("<html><u><i>Forecast</i></u></html>"));
+
+        topComps.add(GuiUtils.rLabel("Points:"));
+        topComps.add(obsPointLayoutComp);
+        topComps.add(forecastLayoutComp);
+
+        topComps.add(GuiUtils.rLabel("Animation:"));
+        topComps.add(obsLayoutComp);
+        topComps.add(GuiUtils.filler());
+
+        topComps.add(GuiUtils.rLabel("Color:"));
+        topComps.add(obsColorByBox);
+        topComps.add(forecastColorByBox);
+
+
+
+        if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
+            topComps.add(GuiUtils.rLabel("Rings:"));
+            topComps.add(obsRingComp);
+            topComps.add(forecastRingComp);
+            topComps.add(GuiUtils.rLabel("Cone:"));
+            topComps.add(obsConeComp);
+            topComps.add(forecastConeComp);
+        }
+
+
+        GuiUtils.tmpInsets = new Insets(4, 4, 0, 2);
+        JComponent paramComp = GuiUtils.doLayout(topComps, 3,
+                                   GuiUtils.WT_N, GuiUtils.WT_N);
+
 
         List comps = new ArrayList();
 
