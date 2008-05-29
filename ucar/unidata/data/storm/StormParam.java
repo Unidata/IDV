@@ -183,6 +183,10 @@ public class StormParam {
         return Util.cleanTypeName(type.getName()).replace("_", " ");
     }
 
+    public String getName() {
+        return Util.cleanTypeName(type.getName());
+    }
+
 
     /**
      * Set the Type property.
