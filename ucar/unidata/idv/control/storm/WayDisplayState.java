@@ -1220,7 +1220,7 @@ public class WayDisplayState {
         DateTime              dt             = stps.get(0).getTime();
         Way                   ringWay        = new Way(getWay() + "_RING");
         int                   numberOfPoints = 73;
-        double                angleDelta     = 360.0 / numberOfPoints;
+        double                angleDelta     = 360.0 / (numberOfPoints-1);
         for (int i = 0; i < size; i++) {
             StormTrackPoint stp = stps.get(i);
             Real            r   = stp.getAttribute(param);
@@ -1455,7 +1455,7 @@ public class WayDisplayState {
         double            lon0  = c.getLongitude().getValue();
 
         for (int i = 0; i < size; i++) {
-            double af = (angle + i * 15 * Math.PI / 180.0) * 180.0 / Math.PI;
+            double af = (angle + (i+1) * 15 * Math.PI / 180.0) * 180.0 / Math.PI;
             // change angle to azimuth
             if ((af <= 90) && (af >= 0)) {
                 af = 90 - af;
