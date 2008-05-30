@@ -340,7 +340,6 @@ public class StormTrackControl extends DisplayControlImpl {
     public void setColorTable(String whichColorTable,
                               ColorTable newColorTable)
             throws RemoteException, VisADException {
-        
         super.setColorTable(whichColorTable, newColorTable);
         List<StormDisplayState> active = getActiveStorms();
         for (StormDisplayState sds: active) {

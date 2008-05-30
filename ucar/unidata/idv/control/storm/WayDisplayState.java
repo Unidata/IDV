@@ -467,6 +467,7 @@ public class WayDisplayState {
     }
 
 
+
     /**
      * _more_
      *
@@ -484,7 +485,6 @@ public class WayDisplayState {
                 obsPointDisplay.setStationModel(sm);
             }
         }
-
 
         if (labelDisplay != null) {
             sm = (way.isObservation()
@@ -678,15 +678,10 @@ public class WayDisplayState {
      * @return _more_
      */
     public float[][] getColorPalette() {
-        if (colorParam != null) {
-            ColorTable ct =
-                stormDisplayState.getStormTrackControl().getColorTable();
-            //                stormDisplayState.getStormTrackControl().getControlContext()
-            //                    .getColorTableManager().getColorTable(colorTable);
-            if (ct != null) {
-                return stormDisplayState.getStormTrackControl()
-                    .getColorTableForDisplayable(ct);
-            }
+        ColorTable ct =  stormDisplayState.getColorTable(colorParam);
+        if (ct != null) {
+            return stormDisplayState.getStormTrackControl()
+                .getColorTableForDisplayable(ct);
         }
         return getColorPalette(getColor());
     }

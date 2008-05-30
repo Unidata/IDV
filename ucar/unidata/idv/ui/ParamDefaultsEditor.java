@@ -1583,13 +1583,17 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
      * @return The {@link ucar.unidata.util.ColorTable} found or null
      */
     public ColorTable getParamColorTable(String paramName) {
+        return getParamColorTable(paramName, true);
+    }
+
+    public ColorTable getParamColorTable(String paramName, boolean useDefault) {
         ColorTable vc = getColorTable(paramName);
         //Try the canonical names.
         if (vc == null) {
             vc = getColorTable(DataAlias.aliasToCanonical(paramName));
         }
 
-        if (vc == null) {
+        if (vc == null && useDefault) {
             vc = getIdv().getColorTableManager().getDefaultColorTable();
         }
         return vc;

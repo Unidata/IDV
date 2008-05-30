@@ -50,6 +50,7 @@ import ucar.unidata.idv.control.chart.*;
 
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.ui.colortable.ColorTableCanvas;
 import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TreePanel;
 
@@ -83,6 +84,7 @@ import ucar.visad.display.*;
 
 import visad.*;
 
+import visad.util.ColorPreview;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 import visad.georef.EarthLocationTuple;
@@ -160,6 +162,8 @@ public class StormDisplayState {
     private static int[] nextColor = { 0 };
 
 
+    private JLabel obsColorTableLabel;
+    private JLabel forecastColorTableLabel;
 
     /** _more_ */
     private List<StormTrackChart> charts = new ArrayList<StormTrackChart>();
@@ -625,11 +629,12 @@ public class StormDisplayState {
      *
      * @return _more_
      */
-    private JComponent makeBox(List stormParams, final Object id) {
+    private JComponent makeBox(List stormParams, final Object id, String tooltip) {
         if ((stormParams == null) || (stormParams.size() == 0)) {
             return GuiUtils.filler(2, 10);
         }
         final JComboBox box        = new JComboBox(new Vector(stormParams));
+        box.setToolTipText(tooltip);
         StormParam      stormParam = (StormParam) params.get(id);
         if (stormParam != null) {
             box.setSelectedItem(stormParam);
@@ -650,6 +655,7 @@ public class StormDisplayState {
 
             }
         });
+
         return box;
     }
 
@@ -785,16 +791,19 @@ public class StormDisplayState {
                                   "setForecastLayoutModel",
                                   getForecastLayoutModel(),true);
 
-        JComponent obsColorByBox = makeBox(obsColorParams, ID_OBS_COLOR);
+        JComponent obsColorByBox = makeBox(obsColorParams, ID_OBS_COLOR,
+                                           "Parameter used for coloring observation track");
         JComponent forecastColorByBox = makeBox(forecastColorParams,
-                                                ID_FORECAST_COLOR);
+                                                ID_FORECAST_COLOR,
+                                                "Parameter used for coloring forecast tracks");
 
         JComponent obsConeComp = (obsRadiusParams!=null?
                                   makeList(obsRadiusParams, ID_OBS_CONE):
                                   (JComponent)GuiUtils.filler());
         JComponent obsRingComp = (obsRadiusParams!=null?
                                   GuiUtils.top(makeBox(obsRadiusParams,
-                                                       ID_OBS_RINGS)):
+                                                       ID_OBS_RINGS,
+                                                       "Parameter used for observation rings")):
                                   (JComponent) GuiUtils.filler());
 
 
@@ -803,8 +812,9 @@ public class StormDisplayState {
                                   (JComponent)GuiUtils.filler());
         JComponent forecastRingComp = (forecastRadiusParams!=null?
                                   GuiUtils.top(makeBox(forecastRadiusParams,
-                                                       ID_FORECAST_RINGS)):
-                                  (JComponent) GuiUtils.filler());
+                                                       ID_FORECAST_RINGS,
+                                                       "Parameter used for forecast rings")):
+                                       (JComponent) GuiUtils.filler());
 
 
 
@@ -855,10 +865,15 @@ public class StormDisplayState {
         topComps.add(obsLayoutComp);
         topComps.add(GuiUtils.filler());
 
-        topComps.add(GuiUtils.rLabel("Color By:"));
-        topComps.add(obsColorByBox);
-        topComps.add(forecastColorByBox);
 
+        forecastColorTableLabel = new JLabel(" ");
+        forecastColorTableLabel.setToolTipText("Color table preview");
+        obsColorTableLabel = new JLabel(" ");
+        obsColorTableLabel.setToolTipText("Color table preview");
+
+        topComps.add(GuiUtils.rLabel("Color By:"));
+        topComps.add(GuiUtils.vbox(obsColorByBox,obsColorTableLabel));
+        topComps.add(GuiUtils.vbox(forecastColorByBox,forecastColorTableLabel));
 
 
         if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
@@ -946,7 +961,6 @@ public class StormDisplayState {
         JComponent wayComp = GuiUtils.topLeft(GuiUtils.doLayout(comps,
                                  numCols, GuiUtils.WT_N, GuiUtils.WT_N));
         //Put the list of ways into a scroller if there are lots of them
-        System.err.println ("ways:" + ways.size());
         if (ways.size() > 6) {
             int width  = 300;
             int height = 200;
@@ -1230,7 +1244,11 @@ public class StormDisplayState {
      * @return _more_
      */
     protected StormParam getColorParam(WayDisplayState way) {
-        if (way.getWay().isObservation()) {
+        return getColorParam(way.getWay().isObservation());
+    }
+
+    protected StormParam getColorParam(boolean forObs) {
+        if (forObs) {
             return (StormParam) params.get(ID_OBS_COLOR);
         }
         return (StormParam) params.get(ID_FORECAST_COLOR);
@@ -1292,9 +1310,51 @@ public class StormDisplayState {
                 } catch (Exception exc) {}
             }
         }
+
+
+        if(obsColorTableLabel!=null) {
+            ColorTable ct=null;
+
+            ct = getColorTable(getColorParam(true));
+            obsColorTableLabel.setIcon((ct!=null?ColorTableCanvas.getIcon(ct):null));
+
+            ct = getColorTable(getColorParam(false));
+            forecastColorTableLabel.setIcon((ct!=null?ColorTableCanvas.getIcon(ct):null));
+
+            obsColorTableLabel.setToolTipText(getColorTableToolTip(true));
+            forecastColorTableLabel.setToolTipText(getColorTableToolTip(false));
+        }
     }
 
 
+    protected String  getColorTableToolTip(boolean forObs) {
+        StormParam param = getColorParam(forObs);
+        if(param == null) return "Color table preview";
+        Range  range =   getStormTrackControl().getIdv()
+            .getParamDefaultsEditor()
+            .getParamRange(param.getName());
+        if(range==null) return "Color table preview";
+
+        Unit displayUnit =
+            getStormTrackControl().getIdv()
+            .getParamDefaultsEditor()
+            .getParamDisplayUnit(param.getName());
+
+        String unit = (displayUnit!=null?"[" + displayUnit +"]":"");
+        return "Range: " + range.getMin()+unit+" - " + range.getMax()+unit;
+    }
+
+    protected ColorTable getColorTable(StormParam param) {
+        if(param==null) return null;
+        ColorTable ct =
+            getStormTrackControl().getIdv()
+            .getParamDefaultsEditor()
+            .getParamColorTable(param.getName(),false);
+        if(ct==null) {
+            ct = getStormTrackControl().getColorTable();
+        }
+        return ct;
+    }
 
     /**
      * _more_

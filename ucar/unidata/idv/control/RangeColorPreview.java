@@ -128,7 +128,6 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
 
 
 
-
     /**
      * Create a new color table preview
      *
