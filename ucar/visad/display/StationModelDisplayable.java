@@ -396,6 +396,9 @@ public class StationModelDisplayable extends DisplayableData {
         }
     }
 
+    public Color getColor() {
+        return myColor;
+    }
 
 
     /**
