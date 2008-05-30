@@ -231,6 +231,29 @@ public class WayDisplayState {
         return labelDisplay != null;
     }
 
+
+    private void removeTrackDisplay() throws VisADException,RemoteException  {
+        if(trackDisplay!=null) {
+            removeDisplayable(trackDisplay);
+            trackDisplay = null;
+        }
+    }
+
+
+    private void removeLabelDisplay() throws VisADException,RemoteException  {
+        if(labelDisplay!=null) {
+            removeDisplayable(labelDisplay);
+            labelDisplay = null;
+        }
+    }
+
+    private void removeObsPointDisplay() throws VisADException,RemoteException  {
+        if(obsPointDisplay!=null) {
+            removeDisplayable(obsPointDisplay);
+            obsPointDisplay = null;
+        }
+    }
+
     /**
      * _more_
      *
@@ -277,10 +300,11 @@ public class WayDisplayState {
 
         getHolder().setVisible(true);
         if (shouldShowTrack()) {
-            StormParam tmp = stormDisplayState.getColorParam(this);
-            if ( !hasTrackDisplay() || !Misc.equals(colorParam, tmp)) {
-                boolean hadTrack = hasTrackDisplay();
-                colorParam = tmp;
+            StormParam tmpParam = stormDisplayState.getColorParam(this);
+            boolean hadTrack = hasTrackDisplay();
+            boolean paramChanged = !Misc.equals(colorParam, tmpParam);
+            if (!hadTrack || paramChanged) {
+                colorParam = tmpParam;
                 FieldImpl trackField = makeTrackField();
                 if (trackField != null) {
                     getTrackDisplay().setTrack(trackField);
@@ -304,56 +328,18 @@ public class WayDisplayState {
                         range = GridUtil.getMinMax(trackField)[0];
                     }
                     getTrackDisplay().setRangeForColor(range.getMin(),
-                            range.getMax());
+                    range.getMax());
                 }
-                setTrackColor();
-                if ( !hadTrack) {
-                    getLabelDisplay();
-                    if (hasLabelDisplay()) {
-                        FieldImpl pointField =
-                            PointObFactory.makeTimeSequenceOfPointObs(
-                                pointObs, -1, -1);
-                        if (way.isObservation()) {
-                            getLabelDisplay().setStationData(pointField);
-                        } else {
-                            getLabelDisplay().setStationData(pointField);
-                        }
-                    }
-                    getObsPointDisplay();
-
-                    if (way.isObservation()) {
-                        if (hasObsPointDisplay()) {
-                            FieldImpl pointField =
-                                PointObFactory.makeTimeSequenceOfPointObs(
-                                    allPointObs, -1, -1);
-
-                            getObsPointDisplay().setStationData(pointField);
-
-                        }
-                    }
-                }
-            }
-            getTrackDisplay().setVisible(true);
-            if (hasLabelDisplay()) {
-                getLabelDisplay().setVisible(true);
-            }
-            if (hasObsPointDisplay()) {
-                getObsPointDisplay().setVisible(true);
             }
             setTrackColor();
+            getTrackDisplay().setVisible(true);
         } else {
             if (hasTrackDisplay()) {
                 getTrackDisplay().setVisible(false);
             }
-            if (hasLabelDisplay()) {
-                getLabelDisplay().setVisible(false);
-            }
-            if (hasObsPointDisplay()) {
-                getObsPointDisplay().setVisible(false);
-            }
-
         }
 
+        updateLayoutModel();
 
 
         if (shouldShowCone()) {
@@ -474,30 +460,61 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void updateLayoutModel() throws VisADException, RemoteException {
+    public void updateLayoutModel() throws Exception {
         StationModel sm;
-        if (way.isObservation() && (obsPointDisplay != null)) {
-            sm = stormDisplayState.getObsPointLayoutModel();
-            if (sm == null) {
-                removeDisplayable(obsPointDisplay);
-                obsPointDisplay = null;
-            } else {
-                obsPointDisplay.setStationModel(sm);
+        //If we are showing the track then create (if needed) the station model displays
+        if(shouldShowTrack()) {
+            if (way.isObservation()) {
+                sm = stormDisplayState.getObsPointLayoutModel();
+                //We won't create them (or will remove them) if the layout model is null
+                if (sm == null) {
+                    removeObsPointDisplay();
+                } else {
+                    if (!hasObsPointDisplay()) {
+                        FieldImpl pointField =
+                            PointObFactory.makeTimeSequenceOfPointObs(
+                                                                      allPointObs, -1, -1);
+                    
+                        getObsPointDisplay().setStationData(pointField);
+                    }
+                    if (hasObsPointDisplay() && !Misc.equals(sm, getObsPointDisplay().getStationModel())) {
+                        getObsPointDisplay().setStationModel(sm);
+                    }
+                }
             }
-        }
 
-        if (labelDisplay != null) {
+
             sm = (way.isObservation()
                   ? stormDisplayState.getObsLayoutModel()
                   : stormDisplayState.getForecastLayoutModel());
             if (sm == null) {
-                removeDisplayable(labelDisplay);
-                labelDisplay = null;
+                removeLabelDisplay();
             } else {
-                labelDisplay.setStationModel(sm);
+                if (!hasLabelDisplay()) {
+                    FieldImpl pointField =
+                        PointObFactory.makeTimeSequenceOfPointObs(
+                                                                  pointObs, -1, -1);
+                    getLabelDisplay().setStationData(pointField);
+                }
+                if (hasLabelDisplay()&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
+                    getLabelDisplay().setStationModel(sm);
+                }
             }
         }
+
+        setLabelColor();
+        if (hasObsPointDisplay()) {
+            getObsPointDisplay().setVisible(shouldShowTrack());
+        }
+
+
+        if (hasLabelDisplay()) {
+            getLabelDisplay().setVisible(shouldShowTrack());
+        }
+
     }
+
+
 
 
     /**
@@ -518,8 +535,6 @@ public class WayDisplayState {
                 labelDisplay
                     .setScale(stormDisplayState.getStormTrackControl()
                         .getDisplayScale());
-                setLabelColor();
-                updateLayoutModel();
             }
         }
         return labelDisplay;
@@ -534,16 +549,11 @@ public class WayDisplayState {
      */
     public StationModelDisplayable getObsPointDisplay() throws Exception {
         if (obsPointDisplay == null) {
-            StationModel sm = stormDisplayState.getObsPointLayoutModel();
-            if (sm != null) {
-                obsPointDisplay = new StationModelDisplayable("dots");
-                addDisplayable(obsPointDisplay);
-                obsPointDisplay
-                    .setScale(stormDisplayState.getStormTrackControl()
-                        .getDisplayScale());
-                setLabelColor();
-                updateLayoutModel();
-            }
+            obsPointDisplay = new StationModelDisplayable("dots");
+            addDisplayable(obsPointDisplay);
+            obsPointDisplay
+                .setScale(stormDisplayState.getStormTrackControl()
+                          .getDisplayScale());
         }
         return obsPointDisplay;
     }
@@ -722,13 +732,15 @@ public class WayDisplayState {
      * @throws Exception _more_
      */
     private void setLabelColor() throws Exception {
-        if (labelDisplay != null) {
-            labelDisplay.setColor(getColor());
+        Color c = getColor();
+        if (labelDisplay != null&& !Misc.equals(c, labelDisplay.getColor())) {
+            labelDisplay.setColor(c);
         }
-        if (obsPointDisplay != null) {
-            obsPointDisplay.setColor(getColor());
+        if (obsPointDisplay != null&& !Misc.equals(c, obsPointDisplay.getColor())) {
+            obsPointDisplay.setColor(c);
         }
     }
+
 
     /**
      * _more_

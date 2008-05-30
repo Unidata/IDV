@@ -801,9 +801,9 @@ public class StormDisplayState {
                                   makeList(obsRadiusParams, ID_OBS_CONE):
                                   (JComponent)GuiUtils.filler());
         JComponent obsRingComp = (obsRadiusParams!=null?
-                                  GuiUtils.top(makeBox(obsRadiusParams,
-                                                       ID_OBS_RINGS,
-                                                       "Parameter used for observation rings")):
+                                  makeBox(obsRadiusParams,
+                                          ID_OBS_RINGS,
+                                          "Parameter used for observation rings"):
                                   (JComponent) GuiUtils.filler());
 
 
@@ -811,48 +811,15 @@ public class StormDisplayState {
                                   makeList(forecastRadiusParams, ID_FORECAST_CONE):
                                   (JComponent)GuiUtils.filler());
         JComponent forecastRingComp = (forecastRadiusParams!=null?
-                                  GuiUtils.top(makeBox(forecastRadiusParams,
-                                                       ID_FORECAST_RINGS,
-                                                       "Parameter used for forecast rings")):
+                                       makeBox(forecastRadiusParams,
+                                               ID_FORECAST_RINGS,
+                                               "Parameter used for forecast rings"):
                                        (JComponent) GuiUtils.filler());
 
 
 
         List topComps = new ArrayList();
 
-        /*
-
-        topComps.add(new JLabel(""));
-        topComps.add(new JLabel("<html><u><i>Track</i></u></html>"));
-        if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
-            topComps.add(new JLabel("<html><u><i>Rings</i></u></html>"));
-            topComps.add(new JLabel("<html><u><i>Cone</i></u></html>"));
-        } else {
-            topComps.add(GuiUtils.filler());
-            topComps.add(GuiUtils.filler());
-        }
-
-
-        topComps.add(
-            GuiUtils.top(
-                GuiUtils.inset(
-                    new JLabel("Observation:"), new Insets(4, 0, 0, 0))));
-        topComps.add(GuiUtils.top(GuiUtils.vbox(obsColorByBox,
-                obsLayoutComp, obsPointLayoutComp)));
-
-
-        topComps.add(GuiUtils.top(GuiUtils.inset(new JLabel("Forecasts:"),
-                new Insets(4, 0, 0, 0))));
-        topComps.add(GuiUtils.top(GuiUtils.vbox(forecastColorByBox,
-                forecastLayoutComp)));
-
-
-
-
-        GuiUtils.tmpInsets = new Insets(4, 2, 0, 2);
-        JComponent paramComp = GuiUtils.doLayout(topComps, 4,
-                                   GuiUtils.WT_N, GuiUtils.WT_N);
-        */
         topComps.add(new JLabel(""));
         topComps.add(GuiUtils.cLabel("<html><u><i>Observation</i></u></html>"));
         topComps.add(GuiUtils.cLabel("<html><u><i>Forecast</i></u></html>"));
@@ -886,7 +853,7 @@ public class StormDisplayState {
         }
 
 
-        GuiUtils.tmpInsets = new Insets(4, 4, 0, 2);
+        GuiUtils.tmpInsets = new Insets(4, 2, 2, 2);
         JComponent paramComp = GuiUtils.doLayout(topComps, 3,
                                    GuiUtils.WT_N, GuiUtils.WT_N);
 
