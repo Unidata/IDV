@@ -270,26 +270,33 @@ public class StormDisplayState {
      */
     private void checkVisibility() {
         List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
+        Color bgcolor = Color.lightGray;
+        
+        boolean rowOk = forecastState.getWayState().getVisible();
+        forecastState.getRingsState().setBackground(rowOk? null: bgcolor);
+        forecastState.getConeState().setBackground(rowOk? null: bgcolor);
+        forecastState.getTrackState().setBackground(rowOk? null: bgcolor);
         for (WayDisplayState wds : wayDisplayStates) {
+            rowOk = wds.getWayState().getVisible();
             if (wds.getWay().isObservation()) {
-                continue;
+                wds.getRingsState().setBackground(rowOk? null: bgcolor);
+                wds.getConeState().setBackground(rowOk? null: bgcolor);
+                wds.getTrackState().setBackground(rowOk? null: bgcolor);
+            } else {
+                rowOk =  rowOk&&forecastState.getWayState().getVisible();
+            wds.getWayState().setBackground(forecastState.getWayState().getVisible()
+                                            ? null
+                                            : bgcolor);
+            wds.getRingsState().setBackground(rowOk&&forecastState.getRingsState().getVisible()
+                                              ? null
+                                              : bgcolor);
+            wds.getConeState().setBackground(rowOk&&forecastState.getConeState().getVisible()
+                                             ? null
+                                             : bgcolor);
+            wds.getTrackState().setBackground(rowOk&&forecastState.getTrackState().getVisible()
+                                              ? null
+                                              : bgcolor);
             }
-            wds.getWayState().getCheckBox().setBackground(
-                forecastState.getWayState().getVisible()
-                ? null
-                : Color.gray);
-            wds.getRingsState().getCheckBox().setBackground(
-                forecastState.getRingsState().getVisible()
-                ? null
-                : Color.gray);
-            wds.getConeState().getCheckBox().setBackground(
-                forecastState.getConeState().getVisible()
-                ? null
-                : Color.gray);
-            wds.getTrackState().getCheckBox().setBackground(
-                forecastState.getTrackState().getVisible()
-                ? null
-                : Color.gray);
         }
     }
 
@@ -591,7 +598,7 @@ public class StormDisplayState {
             return GuiUtils.filler(2, 10);
         }
         final JList list = new JList(new Vector(stormParams));
-        list.setVisibleRowCount(4);
+        list.setVisibleRowCount(3);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
@@ -607,6 +614,7 @@ public class StormDisplayState {
             }
         });
 
+        list.setToolTipText("<html>Parameter used for cone<br>Control-click for multiple select</html>");
         List selected = (List) params.get(id);
         if ((selected != null) && (selected.size() > 0)) {
             int[] indices = new int[selected.size()];
@@ -762,7 +770,7 @@ public class StormDisplayState {
 
         List<Way>    ways = Misc.sort(trackCollection.getWayList());
         boolean      haveDoneForecast = false;
-        List<String> colLabels = (List<String>) Misc.newList("", "", "Track");
+        List<String> colLabels = (List<String>) Misc.newList("", "Show", "Track");
         if ((forecastRadiusParams != null) || (obsRadiusParams != null)) {
             colLabels.add("Rings");
             colLabels.add("Cone");
@@ -853,7 +861,7 @@ public class StormDisplayState {
         }
 
 
-        GuiUtils.tmpInsets = new Insets(4, 2, 2, 2);
+        GuiUtils.tmpInsets = new Insets(4, 4, 2, 2);
         JComponent paramComp = GuiUtils.doLayout(topComps, 3,
                                    GuiUtils.WT_N, GuiUtils.WT_N);
 
@@ -867,7 +875,7 @@ public class StormDisplayState {
             }
             JComponent labelComp =
                 GuiUtils.hbox(wds.getWayState().getCheckBox(),
-                              new JLabel(way.toString()));
+                              new JLabel(" " + way.toString()));
 
             JComponent swatch = GuiUtils.wrap(wds.getColorSwatch());
             if (way.isObservation()) {
@@ -875,10 +883,10 @@ public class StormDisplayState {
                 int col = 0;
                 comps.add(col++, swatch);
                 comps.add(col++, labelComp);
-                comps.add(col++, wds.getTrackState().getCheckBox());
+                comps.add(col++, GuiUtils.wrap(wds.getTrackState().getCheckBox()));
                 if (obsRadiusParams != null) {
-                    comps.add(col++, wds.getRingsState().getCheckBox());
-                    comps.add(col++, wds.getConeState().getCheckBox());
+                    comps.add(col++, GuiUtils.wrap(wds.getRingsState().getCheckBox()));
+                    comps.add(col++, GuiUtils.wrap(wds.getConeState().getCheckBox()));
                 }
 
             } else {
@@ -894,21 +902,21 @@ public class StormDisplayState {
                     comps.add(
                         GuiUtils.hbox(
                             forecastState.getWayState().getCheckBox(),
-                            GuiUtils.lLabel("Forecasts:")));
-                    comps.add(forecastState.getTrackState().getCheckBox());
+                            GuiUtils.lLabel("<html><u><i>Forecasts:</i></u></html>")));
+                    comps.add(GuiUtils.wrap(forecastState.getTrackState().getCheckBox()));
                     if (forecastRadiusParams != null) {
-                        comps.add(
-                            forecastState.getRingsState().getCheckBox());
+                        comps.add(GuiUtils.wrap(
+                            forecastState.getRingsState().getCheckBox()));
 
-                        comps.add(forecastState.getConeState().getCheckBox());
+                        comps.add(GuiUtils.wrap(forecastState.getConeState().getCheckBox()));
                     }
                 }
                 comps.add(swatch);
                 comps.add(labelComp);
-                comps.add(wds.getTrackState().getCheckBox());
+                comps.add(GuiUtils.wrap(wds.getTrackState().getCheckBox()));
                 if (forecastRadiusParams != null) {
-                    comps.add(wds.getRingsState().getCheckBox());
-                    comps.add(wds.getConeState().getCheckBox());
+                    comps.add(GuiUtils.wrap(wds.getRingsState().getCheckBox()));
+                    comps.add(GuiUtils.wrap(wds.getConeState().getCheckBox()));
                 }
             }
         }
@@ -940,7 +948,7 @@ public class StormDisplayState {
         }
 
         wayComp = GuiUtils.topLeft(GuiUtils.vbox(GuiUtils.left(paramComp),
-                GuiUtils.filler(2, 10), GuiUtils.lLabel("Visibility:"),
+                                                 GuiUtils.filler(2, 10), /*GuiUtils.lLabel("Visibility:"),*/
                 GuiUtils.left(wayComp)));
 
         wayComp = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
@@ -1249,9 +1257,7 @@ public class StormDisplayState {
     protected void displayStateChanged(DisplayState displayState)
             throws Exception {
         updateDisplays();
-        if (displayState.getWayDisplayState() == forecastState) {
-            checkVisibility();
-        }
+        checkVisibility();
     }
 
     /**

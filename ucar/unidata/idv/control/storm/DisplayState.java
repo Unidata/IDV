@@ -76,6 +76,10 @@ public class DisplayState {
     }
 
 
+    protected void setBackground(Color c) {
+        getCheckBox().setBackground(c);
+    }
+
     /**
      * _more_
      *
@@ -85,6 +89,7 @@ public class DisplayState {
     public JCheckBox getCheckBox() {
         if (cbx == null) {
             cbx = new JCheckBox("", getVisible());
+            cbx.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
             cbx.setToolTipText(name);
             cbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
