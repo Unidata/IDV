@@ -62,6 +62,8 @@ public class LayoutModelWidget extends JPanel {
     /** widget */
     private JButton changeButton;
 
+    private JLabel label;
+
     /** station model to use */
     StationModel layoutModel;
 
@@ -102,7 +104,10 @@ public class LayoutModelWidget extends JPanel {
             }
         });
 
-        changeButton = new JButton("");
+        label = new JLabel(" ");
+        changeButton = GuiUtils.getImageButton("/auxdata/ui/icons/DownDown.gif", getClass());
+        changeButton.setToolTipText("Click to change layout model");
+        //        changeButton = new JButton("");
         changeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 StationModelManager smm =
@@ -114,7 +119,10 @@ public class LayoutModelWidget extends JPanel {
                                 control.showWaitCursor();
                                 try {
                                     layoutModel =  (StationModel) theObject;
-                                    changeButton.setText(layoutModel.getDisplayName());
+                                    if(layoutModel!=null) {
+                                        //                                    changeButton.setText(layoutModel.getDisplayName());
+                                        label.setText(layoutModel.getDisplayName());
+                                    }
                                     method.invoke(layoutModelListener, new Object[]{layoutModel});
                                 } catch (Exception exc) {
                                     control.logException("Changing layout model",
@@ -140,7 +148,9 @@ public class LayoutModelWidget extends JPanel {
             }
         });
 
-        return changeButton;
+        //        return GuiUtils.leftCenter(changeButton, label);
+        return GuiUtils.centerRight(label,GuiUtils.inset(changeButton, new Insets(0,4,0,0)));
+        //        return changeButton;
         //        return GuiUtils.hflow(Misc.newList(editButton, changeButton), 4, 0);
 
     }
@@ -148,7 +158,8 @@ public class LayoutModelWidget extends JPanel {
 
     public void setNone() {
         layoutModel =  null;
-        changeButton.setText("None");
+        //        changeButton.setText("None");
+        label.setText("None");
         try {
         method.invoke(layoutModelListener, new Object[]{layoutModel});
         } catch (Exception exc) {
@@ -170,11 +181,13 @@ public class LayoutModelWidget extends JPanel {
     public void setLayoutModel(StationModel sm) {
         this.layoutModel = sm;
         if (sm != null) {
-            changeButton.setText(sm.getDisplayName());
+            //            changeButton.setText(sm.getDisplayName());
+            label.setText(sm.getDisplayName());
         } else {
-            changeButton.setText("None");
+            //            changeButton.setText("None");
+            label.setText("None");
         }
-
+        label.repaint();
     } 
 
 }
