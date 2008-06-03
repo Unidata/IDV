@@ -472,6 +472,9 @@ public class StormTrackChart {
 
         List paramComps = new ArrayList();
         for (StormParam param : params) {
+            if(param.getIsChartParam() == false){
+                continue;
+            }
             final StormParam theParam      = param;
             boolean          useChartParam = chartParams.contains(theParam);
             final JCheckBox cbx = new JCheckBox(param.toString(),
