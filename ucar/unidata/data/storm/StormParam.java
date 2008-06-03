@@ -57,6 +57,9 @@ public class StormParam {
     /** _more_ */
     private boolean derived = false;
 
+    /** _more_ */
+    private boolean isChartParam = true;
+
     /**
      * _more_
      */
@@ -85,6 +88,30 @@ public class StormParam {
         this.derived = derived;
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param derived _more_
+     */
+    public StormParam(RealType type, boolean derived, boolean canDoDiff) {
+        this(type);
+        this.derived = derived;
+        this.canDoDifference = canDoDiff;
+    }
+
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param derived _more_
+     */
+    public StormParam(RealType type, boolean derived, boolean canDoDiff, boolean chartList) {
+        this(type);
+        this.derived = derived;
+        this.canDoDifference = canDoDiff;
+        this.isChartParam = chartList;
+    }
     /**
      * _more_
      *
@@ -136,6 +163,23 @@ public class StormParam {
     }
 
 
+    /**
+     * Set the CanDoDifference property.
+     *
+     * @param value The new value for CanDoDifference
+     */
+    public void setIsChartParam(boolean value) {
+        isChartParam = value;
+    }
+
+    /**
+     * Get the CanDoDifference property.
+     *
+     * @return The CanDoDifference
+     */
+    public boolean getIsChartParam() {
+        return isChartParam;
+    }
 
 
 

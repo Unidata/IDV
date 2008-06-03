@@ -216,7 +216,7 @@ public abstract class StormDataSource extends DataSourceImpl {
                     "Min_Pressure", Util.parseUnit("mb")));
             PARAM_DISTANCEERROR =
                 new StormParam(Util.makeRealType("forecastlocationerror",
-                    "Distance_Error", Util.parseUnit("km")));
+                    "Distance_Error", Util.parseUnit("km")), true, false);
             PARAM_MAXWINDSPEED_KTS =
                 new StormParam(makeRealType("maxwindspeedkts",
                                             "Max_Windspeed",
