@@ -572,10 +572,36 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      */
 
-    public double getValue(double d) {
+    public double getValue(double d, String name) {
         if ((d == 9999) || (d == 999)) {
             return Double.NaN;
         }
+
+        if(name.equalsIgnoreCase(PARAM_MAXWINDSPEED.getName())) {
+            if ((d < 0) || (d > 60))
+                return Double.NaN;
+        }
+        else if(name.equalsIgnoreCase(PARAM_MINPRESSURE.getName())){
+            if ((d < 800) || (d > 1050))
+                return Double.NaN;
+        }
+        else if(name.equalsIgnoreCase(PARAM_RADIUSMODERATEGALE.getName())){
+            if ((d < 0) || (d > 900))
+                return Double.NaN;
+        }
+        else if(name.equalsIgnoreCase(PARAM_RADIUSWHOLEGALE.getName())){
+            if ((d < 0) || (d > 500))
+                return Double.NaN;
+        }
+        else if(name.equalsIgnoreCase(PARAM_MOVESPEED.getName())){
+            if ((d < 0) || (d > 55))
+                return Double.NaN;
+        }
+        else if(name.equalsIgnoreCase(PARAM_MOVEDIRECTION.getName())){
+            if ((d < 0) || (d > 360))
+                return Double.NaN;
+        }
+
         return d;
     }
 
@@ -654,26 +680,30 @@ public class STIStormDataSource extends StormDataSource {
 
                 double     latitude =
                     getLatLonValue(results.getDouble(col++));
+                if(latitude > 90 || latitude < -90)
+                    continue;
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
+                if(longitude > 360 || longitude < -180)
+                    continue;
                 attrs.add(
                     PARAM_MAXWINDSPEED.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MAXWINDSPEED.getName())));
                 attrs.add(
                     PARAM_MINPRESSURE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MINPRESSURE.getName())));
                 attrs.add(
                     PARAM_RADIUSMODERATEGALE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_RADIUSMODERATEGALE.getName())));
                 attrs.add(
                     PARAM_RADIUSWHOLEGALE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_RADIUSWHOLEGALE.getName())));
                 attrs.add(
                     PARAM_MOVEDIRECTION.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MOVEDIRECTION.getName())));
                 attrs.add(
                     PARAM_MOVESPEED.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MOVESPEED.getName())));
                 float[] radiuses = getProbabilityRadius(forecastWay, fhour);
                 DateTime dttm = getDateTime(year, month, day, hour + fhour);
                 EarthLocation elt =
@@ -999,26 +1029,30 @@ public class STIStormDataSource extends StormDataSource {
                 int        hour     = results.getInt(col++);
                 double     latitude =
                     getLatLonValue(results.getDouble(col++));
+                if(latitude > 90 || latitude < -90)
+                    continue;
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
+                if(longitude > 360 || longitude < -180)
+                    continue;
                 attrs.add(
                     PARAM_MAXWINDSPEED.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MAXWINDSPEED.getName())));
                 attrs.add(
                     PARAM_MINPRESSURE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MINPRESSURE.getName())));
                 attrs.add(
                     PARAM_RADIUSMODERATEGALE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_RADIUSMODERATEGALE.getName())));
                 attrs.add(
                     PARAM_RADIUSWHOLEGALE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_RADIUSWHOLEGALE.getName())));
                 attrs.add(
                     PARAM_MOVEDIRECTION.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MOVEDIRECTION.getName())));
                 attrs.add(
                     PARAM_MOVESPEED.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MOVESPEED.getName())));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
@@ -1100,27 +1134,31 @@ public class STIStormDataSource extends StormDataSource {
                 int        hour     = results.getInt(col++);
                 double     latitude =
                     getLatLonValue(results.getDouble(col++));
+                if(latitude > 90 || latitude < -90)
+                    continue;
                 double longitude    =
                     getLatLonValue(results.getDouble(col++));
+                if(longitude > 360 || longitude < -180)
+                    continue;
+
                 attrs.add(
                     PARAM_MAXWINDSPEED.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MAXWINDSPEED.getName())));
                 attrs.add(
                     PARAM_MINPRESSURE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MINPRESSURE.getName())));
                 attrs.add(
                     PARAM_RADIUSMODERATEGALE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_RADIUSMODERATEGALE.getName())));
                 attrs.add(
                     PARAM_RADIUSWHOLEGALE.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_RADIUSWHOLEGALE.getName())));
                 attrs.add(
                     PARAM_MOVEDIRECTION.getReal(
-                        getValue(results.getDouble(col++))));
+                        getValue(results.getDouble(col++), PARAM_MOVEDIRECTION.getName())));
                 attrs.add(
                     PARAM_MOVESPEED.getReal(
-                        getValue(results.getDouble(col++))));
-
+                        getValue(results.getDouble(col++), PARAM_MOVESPEED.getName())));
 
                 EarthLocation elt =
                     new EarthLocationLite(new Real(RealType.Latitude,
