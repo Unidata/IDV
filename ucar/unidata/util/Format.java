@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2008 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -51,6 +51,26 @@ public class Format {
     }
 
     /**
+     * Blank fill sbuff with blanks, until position tabStop.
+     * @param sbuff StringBuilder to manipulate
+     * @param tabStop pad out to here
+     * @param alwaysOne true if you want to guarentee at least one space.
+     */
+    public static void tab(StringBuilder sbuff, int tabStop,
+                           boolean alwaysOne) {
+        int len = sbuff.length();
+        if (tabStop > len) {
+            sbuff.setLength(tabStop);
+            for (int i = len; i < tabStop; i++) {
+                sbuff.setCharAt(i, ' ');
+            }
+        } else if (alwaysOne) {
+            sbuff.setLength(len + 1);
+            sbuff.setCharAt(len, ' ');
+        }
+    }
+
+    /**
      * Create a new string by padding the existing one with blanks to specified width.
      * Do nothing if length is already greater or equal to width.
      *
@@ -75,8 +95,8 @@ public class Format {
         if (s.length() >= width) {
             return s;
         }
-        StringBuffer sbuff = new StringBuffer(width);
-        int          need  = width - s.length();
+        StringBuilder sbuff = new StringBuilder(width);
+        int           need  = width - s.length();
         sbuff.setLength(need);
         for (int i = 0; i < need; i++) {
             sbuff.setCharAt(i, ' ');
@@ -220,14 +240,14 @@ public class Format {
         }
 
         // deal with decimal point
-        StringBuffer number, fraction;
-        int          dotInd = mantissa.indexOf('.');
+        StringBuilder number, fraction;
+        int           dotInd = mantissa.indexOf('.');
         if (dotInd == -1) {
-            number   = new StringBuffer(mantissa);
-            fraction = new StringBuffer("");
+            number   = new StringBuilder(mantissa);
+            fraction = new StringBuilder("");
         } else {
-            number   = new StringBuffer(mantissa.substring(0, dotInd));
-            fraction = new StringBuffer(mantissa.substring(dotInd + 1));
+            number   = new StringBuilder(mantissa.substring(0, dotInd));
+            fraction = new StringBuilder(mantissa.substring(dotInd + 1));
         }
 
         // number of significant figures
@@ -254,7 +274,7 @@ public class Format {
             if (((numFigs == 0) || number.toString().equals("0"))
                     && (fracFigs > 0)) {
                 numFigs = 0;
-                number  = new StringBuffer("");
+                number  = new StringBuilder("");
                 for (int i = 0; i < fraction.length(); ++i) {
                     if (fraction.charAt(i) != '0') {
                         break;
@@ -413,7 +433,6 @@ public class Format {
 
 }
 
-
 /**
  * Double value formatting.
  *  @param d the number to format.
@@ -459,49 +478,4 @@ public class Format {
 //
 // Visit the ACME Labs Java page for up-to-date versions of this and other
 // fine Java utilities: http://www.acme.com/java/
-
-/*
- *  Change History:
- *  $Log: Format.java,v $
- *  Revision 1.9  2006/08/24 20:22:39  jeffmc
- *  Remove dependencies from ucar.unidata.util
- *
- *  Revision 1.8  2006/05/05 19:19:34  jeffmc
- *  Refactor some of the tabbedpane border methods.
- *  Also, since I ran jindent on everything to test may as well caheck it all in
- *
- *  Revision 1.7  2005/08/11 16:51:16  jeffmc
- *  jindent
- *
- *  Revision 1.6  2005/07/29 00:30:06  caron
- *  add formatByteSize() to make nice print of size in bytes
- *
- *  Revision 1.5  2005/03/10 18:40:06  jeffmc
- *  jindent and javadoc
- *
- *  Revision 1.4  2005/01/12 15:29:44  dmurray
- *  jindent and javadoc
- *
- *  Revision 1.3  2004/12/22 13:28:16  dmurray
- *  Jindent.  somebody else should fix the _more_'s.
- *
- *  Revision 1.2  2004/09/25 00:09:45  caron
- *  add images, thredds tab
- *
- *  Revision 1.1  2004/09/22 13:55:16  caron
- *  move to ucar.unidata.util
- *
- *  Revision 1.3  2004/07/12 23:40:19  caron
- *  2.2 alpha 1.0 checkin
- *
- *  Revision 1.2  2004/07/06 19:28:13  caron
- *  pre-alpha checkin
- *
- *  Revision 1.1.1.1  2003/12/04 21:05:28  caron
- *  checkin 2.2
- *
- *  Revision 1.3  2003/07/12 23:08:57  caron
- *  add cvs headers, trailers
- *
- */
 

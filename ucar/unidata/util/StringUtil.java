@@ -23,6 +23,7 @@
 
 package ucar.unidata.util;
 
+
 import java.text.ParsePosition;
 
 
@@ -55,8 +56,13 @@ public class StringUtil {
 
 
 
-    public  static boolean notEmpty(String s) {
-        return s!=null && s.trim().length()>0;
+    /**
+     * Check if the string is not empty
+     * @param s  String to check
+     * @return true if it's not the empty string (len > 0)
+     */
+    public static boolean notEmpty(String s) {
+        return (s != null) && (s.trim().length() > 0);
     }
 
     /**
@@ -273,7 +279,7 @@ public class StringUtil {
     };
 
 
-    
+
     /**
      * Replace special characters with entities for XML attributes.
      * special: '&', '<', '>', '\'', '"', '\r', '\n'
@@ -339,8 +345,8 @@ public class StringUtil {
      *
      * @return resulting string
      */
-    static private String replace(String x, char[] replaceChar,
-                                  String[] replaceWith) {
+    static public String replace(String x, char[] replaceChar,
+                                 String[] replaceWith) {
         // common case no replacement
         boolean ok = true;
         for (int i = 0; i < replaceChar.length; i++) {
@@ -376,8 +382,8 @@ public class StringUtil {
      *
      * @return resulting string
      */
-    static private String unreplace(String x, String[] orgReplace,
-                                    char[] orgChar) {
+    static public String unreplace(String x, String[] orgReplace,
+                                   char[] orgChar) {
         // common case no replacement
         boolean ok = true;
         for (int i = 0; i < orgReplace.length; i++) {
@@ -2092,8 +2098,7 @@ public class StringUtil {
      *
      * @throws Exception some problem
      */
-    public static void main(String[] args) throws Exception {
-    }
+    public static void main(String[] args) throws Exception {}
 
 
 
