@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -130,7 +131,8 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** The path to the editor executable */
     public static final String PROP_JYTHON_EDITOR = "idv.jython.editor";
 
-    private static final Color COLOR_DISABLED =  new Color(210,210, 210);
+    /** _more_          */
+    private static final Color COLOR_DISABLED = new Color(210, 210, 210);
 
     /** any errors */
     private boolean inError = false;
@@ -145,10 +147,10 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** _more_ */
     private JTextField findFld;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox caseCbx;
 
-    /** _more_          */
+    /** _more_ */
     JToggleButton highlightAllBtn;
 
     /** One text component per tab */
@@ -537,8 +539,8 @@ public class JythonManager extends IdvManager implements ActionListener {
 
             highlightAllBtn.setToolTipText("Highlight All");
             caseCbx = new JCheckBox("Match case", false);
-            caseCbx.addActionListener(
-                GuiUtils.makeActionListener(this, "searchFor", null));
+            caseCbx.addActionListener(GuiUtils.makeActionListener(this,
+                    "searchFor", null));
             findFld = new JTextField("", 20);
             JButton nextBtn = GuiUtils.makeImageButton(
                                   "/auxdata/ui/icons/SearchNext16.gif", this,
@@ -655,7 +657,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                                             GuiUtils.hfill(findFld),
                                             buttons));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
-                                                       bottomPanel);
+                    bottomPanel);
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
             return null;
@@ -719,7 +721,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                                     String path, String text)
             throws VisADException {
 
-        final LibHolder[]   holderArray  = { null };
+        final LibHolder[]    holderArray  = { null };
         final MyPythonEditor jythonEditor = new MyPythonEditor() {
             public void undoableEditHappened(UndoableEditEvent e) {
                 if ((holderArray[0] != null)
@@ -744,18 +746,17 @@ public class JythonManager extends IdvManager implements ActionListener {
         jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 holderArray[0].setSearchIndex(new Point(e.getX(), e.getY()));
-                if (!SwingUtilities.isRightMouseButton(e)) {
+                if ( !SwingUtilities.isRightMouseButton(e)) {
                     return;
                 }
-                JTextComponent comp = jythonEditor.getTextComponent();
-                int point = comp.viewToModel(new Point(e.getX(),
-                                                       e.getY()));
-                String text  = comp.getText();
-                String token = "";
-                int    idx   = point;
-                List items = new ArrayList();
-                JMenuItem helpMenuItem = null;
-                if(idx<0 || idx>=text.length()) {
+                JTextComponent comp         = jythonEditor.getTextComponent();
+                int point = comp.viewToModel(new Point(e.getX(), e.getY()));
+                String         text         = comp.getText();
+                String         token        = "";
+                int            idx          = point;
+                List           items        = new ArrayList();
+                JMenuItem      helpMenuItem = null;
+                if ((idx < 0) || (idx >= text.length())) {
                     return;
                 }
                 while (idx >= 0) {
@@ -784,39 +785,36 @@ public class JythonManager extends IdvManager implements ActionListener {
                 if ((token != null) && (token.trim().length() > 0)) {
                     token = token.trim();
                     List funcs = findJythonMethods(true,
-                                                   Misc.newList(holderArray[0]));
+                                     Misc.newList(holderArray[0]));
                     for (int i = 0; i < funcs.size(); i++) {
                         PyFunction func = (PyFunction) funcs.get(i);
                         if (func.__name__.equals(token)) {
 
                             items.add(
-                                      GuiUtils.makeMenuItem(
-                                                            "Make formula for " + token,
-                                                            JythonManager.this, "makeFormula",
-                                                            func));
+                                GuiUtils.makeMenuItem(
+                                    "Make formula for " + token,
+                                    JythonManager.this, "makeFormula", func));
                             String helpLink = "idv.tools.jythonlib."
-                                + func.__name__;
-                            if (Help.getDefaultHelp().isValidID(
-                                                                helpLink)) {
-                                helpMenuItem =
-                                    GuiUtils.makeMenuItem("Help",
-                                                          JythonManager.this, "showHelp",
-                                                          helpLink);
+                                              + func.__name__;
+                            if (Help.getDefaultHelp().isValidID(helpLink)) {
+                                helpMenuItem = GuiUtils.makeMenuItem("Help",
+                                        JythonManager.this, "showHelp",
+                                        helpLink);
                             }
                             break;
                         }
                     }
                 }
-                if(holderArray[0].isEditable()) {
+                if (holderArray[0].isEditable()) {
                     items.add(GuiUtils.makeMenu("Insert Procedure Call",
-                                                makeProcedureMenu(jythonEditor, "insertText",
-                                                                  null)));
+                            makeProcedureMenu(jythonEditor, "insertText",
+                                null)));
 
                     items.add(
-                              GuiUtils.makeMenu(
-                                                "Insert Idv Action",
-                                                getIdv().getIdvUIManager().makeActionMenu(
-                                                                                          jythonEditor, "insertText", true)));
+                        GuiUtils.makeMenu(
+                            "Insert Idv Action",
+                            getIdv().getIdvUIManager().makeActionMenu(
+                                jythonEditor, "insertText", true)));
                 }
 
                 if (helpMenuItem != null) {
@@ -828,7 +826,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 popup.show(jythonEditor.getTextComponent(), e.getX(),
                            e.getY());
             }
-            });
+        });
 
         jythonEditor.setPreferredSize(new Dimension(500, 400));
         JComponent wrapper = GuiUtils.center(jythonEditor);
@@ -1282,6 +1280,8 @@ public class JythonManager extends IdvManager implements ActionListener {
         interpreter.exec("from visad.python.JPythonMethods import *");
         interpreter.exec(
             "import ucar.unidata.data.grid.GridUtil as GridUtil");
+        interpreter.exec(
+            "import ucar.unidata.data.grid.GridMath as GridMath");
         interpreter.exec("import ucar.unidata.data.DataUtil as DataUtil");
         interpreter.exec("import ucar.visad.Util as Util");
         interpreter.exec("import ucar.unidata.util.StringUtil as StringUtil");
@@ -1347,8 +1347,9 @@ public class JythonManager extends IdvManager implements ActionListener {
     public void appendTmpJython(String jython) {
         String oldJython = tmpHolder.getText();
         if (oldJython.indexOf(jython) < 0) {
-            String newJython = oldJython + "\n\n## Imported jython from bundle\n"
-                + jython;
+            String newJython = oldJython
+                               + "\n\n## Imported jython from bundle\n"
+                               + jython;
             tmpHolder.setText(newJython);
         }
         evaluateLibJython(false, tmpHolder);
@@ -2122,10 +2123,17 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @param descriptor The descriptor for the formula.
      */
     public void showFormulaDialog(DerivedDataDescriptor descriptor) {
-        showFormulaDialog(descriptor, (descriptor==null));
+        showFormulaDialog(descriptor, (descriptor == null));
     }
 
-    public void showFormulaDialog(DerivedDataDescriptor descriptor, boolean isNew) {
+    /**
+     * _more_
+     *
+     * @param descriptor _more_
+     * @param isNew _more_
+     */
+    public void showFormulaDialog(DerivedDataDescriptor descriptor,
+                                  boolean isNew) {
         List                 categories = new ArrayList();
         DescriptorDataSource dds        = getDescriptorDataSource();
         if (dds != null) {
@@ -2146,7 +2154,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
         }
 
-        new FormulaDialog(getIdv(), descriptor, null, categories,isNew);
+        new FormulaDialog(getIdv(), descriptor, null, categories, isNew);
     }
 
 
@@ -2476,7 +2484,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         /** widget */
         MyPythonEditor pythonEditor;
 
-        /** _more_          */
+        /** _more_ */
         JTextComponent textComp;
 
 
@@ -2508,8 +2516,8 @@ public class JythonManager extends IdvManager implements ActionListener {
          * @param wrapper wrapper
          */
         public LibHolder(boolean editable, JythonManager jythonManager,
-                         String label, MyPythonEditor editor, String filePath,
-                         JComponent wrapper) {
+                         String label, MyPythonEditor editor,
+                         String filePath, JComponent wrapper) {
             if (allPainter == null) {
                 allPainter = new DefaultHighlighter.DefaultHighlightPainter(
                     Color.yellow);
@@ -2538,7 +2546,8 @@ public class JythonManager extends IdvManager implements ActionListener {
             if ( !editable) {
                 pythonEditor.getTextComponent().setEditable(false);
                 pythonEditor.getTextComponent().setBackground(COLOR_DISABLED);
-                pythonEditor.getLineNumberComponent().setBackground(COLOR_DISABLED);
+                pythonEditor.getLineNumberComponent().setBackground(
+                    COLOR_DISABLED);
             }
 
         }
@@ -2605,7 +2614,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         /** _more_ */
         int lastIndex = -1;
 
-        /** _more_          */
+        /** _more_ */
         int currentIndex = -1;
 
         /**
@@ -2631,13 +2640,13 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
         }
 
-        /** _more_          */
+        /** _more_ */
         List highlights = new ArrayList();
 
-        /** _more_          */
+        /** _more_ */
         static DefaultHighlighter.DefaultHighlightPainter allPainter;
 
-        /** _more_          */
+        /** _more_ */
         static DefaultHighlighter.DefaultHighlightPainter onePainter;
 
         /**
@@ -2765,10 +2774,27 @@ public class JythonManager extends IdvManager implements ActionListener {
 
     }
 
-    private static  class MyPythonEditor extends JPythonEditor {
-        public MyPythonEditor() throws VisADException {
-        }
+    /**
+     * Class MyPythonEditor _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
+    private static class MyPythonEditor extends JPythonEditor {
 
+        /**
+         * _more_
+         *
+         * @throws VisADException _more_
+         */
+        public MyPythonEditor() throws VisADException {}
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public JTextComponent getLineNumberComponent() {
             return lineNumbers;
         }
