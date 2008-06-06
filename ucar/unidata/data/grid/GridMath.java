@@ -101,6 +101,21 @@ public class GridMath {
     }
 
     /**
+     * Take the arctangent of two grids
+     *
+     * @param grid1  first grid
+     * @param grid2  second grid
+     *
+     * @return  the arctangent of the grids
+     *
+     * @throws VisADException  problem doing the math
+     */
+    public static FieldImpl atan2(FieldImpl grid1, FieldImpl grid2)
+            throws VisADException {
+        return doMath(grid1, grid2, Data.ATAN2);
+    }
+
+    /**
      * Do the math.  This method handles making the data as compatible
      * as possible before actually going off and doing the math.
      *
