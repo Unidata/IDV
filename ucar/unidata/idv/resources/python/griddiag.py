@@ -22,7 +22,7 @@ def atn2(S1,S2):
       ATN2 (S1, S2) = ATAN ( S1 / S2 )
   </div>
   """
-  return atan2(S1,S2)
+  return GridMath.atan2(S1,S2)
 
 def add(S1,S2):
   """ Addition 
@@ -30,7 +30,7 @@ def add(S1,S2):
       ADD  (S1, S2) = S1 + S2
   </div>
   """
-  return S1+S2
+  return GridMath.add(S1,S2)
 
 def mul(S1,S2):
   """ Multiply 
@@ -38,7 +38,7 @@ def mul(S1,S2):
       MUL  (S1, S2) = S1 * S2
   </div>
   """
-  return S1*S2
+  return GridMath.multiply(S1,S2)
 
 def quo(S1,S2):
   """ Divide 
@@ -46,7 +46,7 @@ def quo(S1,S2):
       QUO  (S1, S2) = S1 / S2
   </div>
   """
-  return S1/S2
+  return GridMath.divide(S1,S2)
 
 def sub(S1,S2):
   """ Subtract 
@@ -54,7 +54,7 @@ def sub(S1,S2):
       SUB  (S1, S2) = S1 - S2
   </div>
   """
-  return S1-S2
+  return GridMath.subtract(S1,S2)
 
 # Scalar quantities
 def adv(S,V):
@@ -71,7 +71,7 @@ def avg(S1,S2):
       AVG  (S1, S2) = ( S1 + S2 ) / 2
   </div>
   """
-  return quo(add(S1,S2),2);
+  return add(S1,S2)/2
 
 def avor(V):
   """ Absolute Vorticity 
