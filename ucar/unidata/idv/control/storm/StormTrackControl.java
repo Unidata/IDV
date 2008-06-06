@@ -53,6 +53,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.Util;
 
@@ -203,7 +204,9 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-
+    public NavigatedDisplay getVM(){
+        return getNavigatedDisplay();
+    }
 
     /**
      * Call to help make this kind of Display Control; also calls code to
@@ -260,8 +263,81 @@ public class StormTrackControl extends DisplayControlImpl {
 
         return true;
     }
+    /**
+     * Signal base class to add this as a control listener
+     *
+     * @return Add as control listener
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
 
 
+    /** locking object */
+    private Object MUTEX = new Object();
+     public void viewpointChanged() {
+       super.viewpointChanged();
+       synchronized (MUTEX) {
+           StormDisplayState sds = getCurrentStormDisplayState();
+           HashMap<Way, List> wayToTracksMap =
+                sds.getTrackCollection().getWayToTracksHashMap();
+            // Way obsWay = new Way(Way.OBSERVATION);
+            java.util.Set<Way> ways = wayToTracksMap.keySet();
+
+            for (Way way : ways) {
+               
+                if (way.equals(Way.OBSERVATION)) {
+                    WayDisplayState obsWDS = sds.getWayDisplayState(way);
+                    try {
+                        obsWDS.updateLayoutModel();
+                    } catch (Exception exc) {
+                        logException("view point Changed", exc);
+                        return;
+                    }
+                }
+
+             }
+
+      /*         if ( !getHaveInitialized() || !getActive()) {
+               return;
+           }
+           Rectangle2D newBounds    = calculateRectangle();
+           boolean     shouldReload = false;
+           if ((lastViewBounds == null) || (lastViewBounds.getWidth() == 0)
+                   || (lastViewBounds.getHeight() == 0)) {
+               shouldReload = true;
+           } else if ( !(newBounds.equals(lastViewBounds))) {
+               double widthratio = newBounds.getWidth()
+                                   / lastViewBounds.getWidth();
+               double heightratio = newBounds.getHeight()
+                                    / lastViewBounds.getHeight();
+               double xdiff = Math.abs(newBounds.getX()
+                                       - lastViewBounds.getX());
+               double ydiff = Math.abs(newBounds.getY()
+                                       - lastViewBounds.getY());
+               // See if this is 20% greater or smaller than before.
+               if ((((widthratio < .80) || (widthratio > 1.20))
+                       && ((heightratio < .80)
+                           || (heightratio > 1.20))) || ((xdiff
+                              > .2 * lastViewBounds.getWidth()) || (ydiff
+                                  > .2 * lastViewBounds.getHeight()))) {
+                   shouldReload = true;
+               }
+           }
+           float newScale = getScaleFromDisplayable();
+           if (Float.floatToIntBits(lastViewScale)
+                   != Float.floatToIntBits(newScale)) {
+               shouldReload = true;
+           }
+           if (shouldReload) {
+
+                updateLayoutModel();
+
+           }
+               */
+       }
+
+   }
 
 
 

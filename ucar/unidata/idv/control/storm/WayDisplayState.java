@@ -49,6 +49,10 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.gis.SpatialGrid;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.NavigatedViewManager;
 
 import ucar.visad.Util;
 import ucar.visad.display.*;
@@ -61,6 +65,7 @@ import visad.georef.EarthLocationLite;
 
 import java.awt.*;
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.awt.event.*;
 
 import java.rmi.RemoteException;
@@ -470,12 +475,14 @@ public class WayDisplayState {
                 if (sm == null) {
                     removeObsPointDisplay();
                 } else {
-                    if (!hasObsPointDisplay()) {
+                    if (true) { //(!hasObsPointDisplay()) {
                         FieldImpl pointField =
                             PointObFactory.makeTimeSequenceOfPointObs(
                                                                       allPointObs, -1, -1);
-                    
-                        getObsPointDisplay().setStationData(pointField);
+
+                            FieldImpl pointField1 = doDeclutter(pointField, sm);
+                            getObsPointDisplay().setStationData(pointField1);
+
                     }
                     if (hasObsPointDisplay() && !Misc.equals(sm, getObsPointDisplay().getStationModel())) {
                         getObsPointDisplay().setStationModel(sm);
@@ -494,7 +501,8 @@ public class WayDisplayState {
                     FieldImpl pointField =
                         PointObFactory.makeTimeSequenceOfPointObs(
                                                                   pointObs, -1, -1);
-                    getLabelDisplay().setStationData(pointField);
+
+                       getLabelDisplay().setStationData(pointField);
                 }
                 if (hasLabelDisplay()&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
                     getLabelDisplay().setStationModel(sm);
@@ -514,7 +522,166 @@ public class WayDisplayState {
 
     }
 
+    /**
+     * Declutters the observations.  This is just a wrapper around
+     * the real decluttering in doTheActualDecluttering(FieldImpl)
+     * to handle the case where there is a time sequence of observations.
+     *
+     * @param  obs initial field of observations.
+     *
+     * @return a decluttered version of obs
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private FieldImpl doDeclutter(FieldImpl obs, StationModel sModel)
+            throws VisADException, RemoteException {
 
+
+      //  long      millis           = System.currentTimeMillis();
+        boolean   isTimeSequence   = GridUtil.isTimeSequence(obs);
+        FieldImpl declutteredField = null;
+        if (isTimeSequence) {
+            Set timeSet = obs.getDomainSet();
+            declutteredField = new FieldImpl((FunctionType) obs.getType(),
+                                             timeSet);
+            int numTimes = timeSet.getLength();
+            for (int i = 0; i < numTimes; i++) {
+                FieldImpl oneTime = (FieldImpl) obs.getSample(i);
+                FieldImpl subTime = doTheActualDecluttering(oneTime, sModel);
+                if (subTime != null) {
+                    declutteredField.setSample(i, subTime, false);
+                }
+            }
+        } else {
+            declutteredField = doTheActualDecluttering(obs, sModel);
+        }
+        //System.out.println("Subsetting took : " +
+        //    (System.currentTimeMillis() - millis) + " ms");
+        return declutteredField;
+    }
+
+    /**
+     * a     * Declutters a single timestep of observations.
+     *
+     * @param pointObs  point observations for one timestep.
+     *
+     * @return a decluttered version of pointObs
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+       /** grid for decluttering */
+    private SpatialGrid stationGrid;
+
+    private FieldImpl doTheActualDecluttering(FieldImpl pointObs, StationModel sm)
+            throws VisADException, RemoteException {
+        if ((pointObs == null) || pointObs.isMissing()) {
+            return pointObs;
+        }
+        FieldImpl retField    = null;
+        Set       domainSet   = pointObs.getDomainSet();
+        int       numObs      = domainSet.getLength();
+        Vector    v           = new Vector();
+
+        long      t1          = System.currentTimeMillis();
+        Rectangle glyphBounds = sm.getBounds();
+        float myScale = getObsPointDisplay().getScale()* .0025f
+                        * getDeclutterFilter();
+        //System.out.println("\ndecluttering  myScale=" + myScale +
+        //                           " filter=" +getDeclutterFilter());
+        Rectangle2D scaledGlyphBounds =
+            new Rectangle2D.Double(glyphBounds.getX() * myScale,
+                                   glyphBounds.getY() * myScale,
+                                   glyphBounds.getWidth() * myScale,
+                                   glyphBounds.getHeight() * myScale);
+        NavigatedDisplay   navDisplay = stormDisplayState.getStormTrackControl().getNavigatedDisplay();
+
+        Rectangle2D.Double obBounds   = new Rectangle2D.Double();
+        obBounds.width  = scaledGlyphBounds.getWidth();
+        obBounds.height = scaledGlyphBounds.getHeight();
+
+        if (stationGrid == null) {
+            stationGrid = new SpatialGrid(200, 200);
+        }
+        stationGrid.clear();
+        stationGrid.setGrid(getBounds(), scaledGlyphBounds);
+        if (getDeclutterFilter() < 0.3f) {
+            //      stationGrid.setOverlap((int)((1.0-getDeclutterFilter())*100));
+            //      stationGrid.setOverlap(          (int)((.5f-getDeclutterFilter())*100));
+        } else {
+            //      stationGrid.setOverlap(0);
+        }
+
+        double[] xyz = new double[3];
+        //TODO: The repeated getSpatialCoords is a bit expensive
+        for (int i = 0; i < numObs; i++) {
+            PointOb ob = (PointOb) pointObs.getSample(i);
+            xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
+                    xyz);
+            obBounds.x = xyz[0];
+            obBounds.y = xyz[1];
+            if (stationGrid.markIfClear(obBounds, "")) {
+                v.add(ob);  // is in the bounds
+            }
+        }
+        //      stationGrid.print();
+        long t2 = System.currentTimeMillis();
+
+
+        if (v.isEmpty()) {
+            retField = new FieldImpl(
+                (FunctionType) pointObs.getType(),
+                new Integer1DSet(
+                    ((SetType) domainSet.getType()).getDomain(), 1));
+            retField.setSample(0, pointObs.getSample(0), false);
+        } else if (v.size() == numObs) {
+            retField = pointObs;  // all were in domain, just return input
+        } else {
+            retField = new FieldImpl(
+                (FunctionType) pointObs.getType(),
+                new Integer1DSet(
+                    ((SetType) domainSet.getType()).getDomain(), v.size()));
+            retField.setSamples((PointOb[]) v.toArray(new PointOb[v.size()]),
+                                false, false);
+        }
+
+        long t3 = System.currentTimeMillis();
+        //System.err.println("size:" + v.size() +" declutter:" + (t2-t1) + " " + (t3-t2));
+
+
+        return retField;
+    }
+
+    /** decluttering filter factor */
+    private float declutterFilter = 1.0f;
+    public float getDeclutterFilter() {
+            return declutterFilter;
+    }
+
+
+    protected Rectangle2D getBounds() {
+        return calculateRectangle();
+    }
+
+    protected Rectangle2D calculateRectangle() {
+         try {
+             Rectangle2D.Double box = stormDisplayState.getStormTrackControl().getNavigatedDisplay().getVisadBox();
+             if ( !box.isEmpty()) {
+                 // pad rectangle by 5%
+                 double deltaWidth  = (double) (.05 * box.width);
+                 double deltaHeight = (double) (.05 * box.height);
+                 double newX        = box.x - deltaWidth;
+                 double newY        = box.y - deltaHeight;
+                 box.setRect(newX, newY, box.width + (2.0 * deltaWidth),
+                             box.height + (2.0 * deltaHeight));
+             }
+             return box;
+         } catch (Exception excp) {
+             LogUtil.logException("calculating Rectangle ", excp);
+             return new Rectangle2D.Double(0, 0, 0, 0);
+         }
+     }
 
 
     /**
@@ -547,7 +714,7 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public StationModelDisplayable getObsPointDisplay() throws Exception {
+    public StationModelDisplayable getObsPointDisplay() throws VisADException, RemoteException {
         if (obsPointDisplay == null) {
             obsPointDisplay = new StationModelDisplayable("dots");
             addDisplayable(obsPointDisplay);
