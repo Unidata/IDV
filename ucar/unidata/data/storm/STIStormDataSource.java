@@ -343,11 +343,11 @@ public class STIStormDataSource extends StormDataSource {
                     "Max_Windspeed", Util.parseUnit("m/s")));
             PARAM_RADIUSMODERATEGALE =
                 new StormParam(makeRealType("radiusmoderategale",
-                                            "Moderate_Gale_Radius",
+                                            "Radius_of_Beaufort_Scale7",
                                             Util.parseUnit("km")));
             PARAM_RADIUSWHOLEGALE =
                 new StormParam(makeRealType("radiuswholegale",
-                                            "Whole_Gale_Radius",
+                                            "Radius_of_Beaufort_Scale10",
                                             Util.parseUnit("km")));
             PARAM_MOVEDIRECTION =
                 new StormParam(makeRealType("movedirection",
@@ -961,7 +961,7 @@ public class STIStormDataSource extends StormDataSource {
         DateTime timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
 
         // get list of ways
-        List<Way> ways = getForecastWays(stormInfo);
+   /*     List<Way> ways = getForecastWays(stormInfo);
 
         for (Way way : ways) {
             if ( !way.equals(babjWay)) {
@@ -971,7 +971,7 @@ public class STIStormDataSource extends StormDataSource {
                 timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
             }
         }
-
+     */
         return new StormTrack(stormInfo, addWay(Way.OBSERVATION), obsBABJ,
                               obsParams);
     }

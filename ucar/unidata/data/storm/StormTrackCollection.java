@@ -182,5 +182,41 @@ public class StormTrackCollection {
         return (StormTrack) tracks.get(0);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public void setObsTrack(Way way) {
+        // first remove the obs track
+        List<StormTrack> obtracks = wayToTracksHashMap.get(Way.OBSERVATION);
+        StormTrack obtrack = obtracks.get(0);
+        StormInfo sInfo = obtrack.getStormInfo();
+        List<StormParam> obParams = obtrack.getParams();
+        int size = obParams.size();
+        StormParam [] obParam = new StormParam [size];
+        int i = 0;
+        for(StormParam sp : obParams){
+            obParam[i] = sp;
+            i++;
+        }
+        wayToTracksHashMap.remove(Way.OBSERVATION);
+
+        // now construct the obs track
+        List<StormTrackPoint> newObsPoints = new ArrayList();
+        List<StormTrack> tracks = getTrackList(way);
+
+        for(StormTrack stk: tracks) {
+            List<StormTrackPoint> stkPoints = stk.getTrackPoints();
+            newObsPoints.add(stkPoints.get(0));
+        }
+
+        StormTrack stk = new StormTrack(sInfo, Way.OBSERVATION, newObsPoints,
+                             obParam);
+
+        addTrack(stk);
+    }
+
+
 }
 
