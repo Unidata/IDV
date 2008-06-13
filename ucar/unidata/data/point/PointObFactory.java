@@ -22,7 +22,11 @@
 
 
 
+
 package ucar.unidata.data.point;
+
+
+import au.gov.bom.aifs.osa.analysis.Barnes;
 
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
@@ -1041,16 +1045,29 @@ public class PointObFactory {
      */
     public static PointOb makePointOb(EarthLocation el, DateTime dt)
             throws VisADException, RemoteException {
-        return makePointOb(el,dt, new RealTuple(new Real[] { new Real(0) }));
+        return makePointOb(el, dt, new RealTuple(new Real[] { new Real(0) }));
     }
 
 
-    public static PointOb makePointOb(EarthLocation el, DateTime dt, Tuple tuple)
+    /**
+     * Make a point ob
+     *
+     * @param el earth location
+     * @param dt date time
+     * @param tuple  data
+     *
+     * @return the point ob
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static PointOb makePointOb(EarthLocation el, DateTime dt,
+                                      Tuple tuple)
             throws VisADException, RemoteException {
         if (dt == null) {
             dt = new DateTime(Double.NaN);
         }
-        return new PointObTuple(el, dt,tuple);
+        return new PointObTuple(el, dt, tuple);
     }
 
     /**
@@ -1148,20 +1165,27 @@ public class PointObFactory {
      *  Perform an object analysis on a set of point obs
      *
      * @param pointObs Observations to analyze
+     * @param type  RealTypes of parameter
+     * @param xSpacing  x spacing (degrees)
+     * @param ySpacing  y spacing (degrees)
+     * @param numPasses number of passes
      *
      * @return  Grid of objectively analyzed data
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException problem getting the data
      */
-    public static FieldImpl barnes(FieldImpl pointObs, RealType type, double xSpacing, double ySpacing, int numPasses)
+    public static FieldImpl barnes(FieldImpl pointObs, RealType type,
+                                   float xSpacing, float ySpacing,
+                                   int numPasses)
             throws VisADException, RemoteException {
         FieldImpl retFI = null;
         if (GridUtil.isTimeSequence(pointObs)) {
             Set timeSet = GridUtil.getTimeSet(pointObs);
             for (int i = 0; i < timeSet.getLength(); i++) {
                 FieldImpl oneTime =
-                    barnesOneTime((FieldImpl) pointObs.getSample(i), type,  xSpacing, ySpacing, numPasses);
+                    barnesOneTime((FieldImpl) pointObs.getSample(i), type,
+                                  xSpacing, ySpacing, numPasses);
                 if ((retFI == null) && (oneTime != null)) {
                     FunctionType ft =
                         new FunctionType(
@@ -1169,10 +1193,13 @@ public class PointObFactory {
                             oneTime.getType());
                     retFI = new FieldImpl(ft, timeSet);
                 }
-                if (oneTime != null) retFI.setSample(i, oneTime, false);
+                if (oneTime != null) {
+                    retFI.setSample(i, oneTime, false);
+                }
             }
         } else {
-            retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses);
+            retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing,
+                                  numPasses);
         }
         return retFI;
     }
@@ -1183,24 +1210,31 @@ public class PointObFactory {
      *
      * @param pointObs Observations to analyze
      * @param type  RealTypes of parameter
+     * @param xSpacing  x spacing (degrees)
+     * @param ySpacing  y spacing (degrees)
+     * @param numPasses number of passes
      *
      * @return  Grid of objectively analyzed data
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException problem getting the data
      */
-    public static FlatField barnesOneTime(FieldImpl pointObs, RealType type, double xSpacing, double ySpacing, int numPasses)
+    public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
+                                          float xSpacing, float ySpacing,
+                                          int numPasses)
             throws VisADException, RemoteException {
         int       numObs    = pointObs.getLength();
         float[][] domainPts = new float[2][numObs];
         float[][] paramVals = new float[1][numObs];
         PointOb   firstOb   = (PointOb) pointObs.getSample(0);
         // TODO: May not be a tuple
-        Tuple     data        = (Tuple) firstOb.getData();
-        TupleType ttype       = (TupleType) data.getType();
+        Tuple     data  = (Tuple) firstOb.getData();
+        TupleType ttype = (TupleType) data.getType();
         //System.out.println("type = " + ttype);
-        int  typeIndex = ttype.getIndex(type);
-        if (typeIndex == -1) return null;
+        int typeIndex = ttype.getIndex(type);
+        if (typeIndex == -1) {
+            return null;
+        }
         float latMin = 90;
         float lonMin = 180;
         float latMax = -90;
@@ -1231,44 +1265,54 @@ public class PointObFactory {
             }
             domainPts[0][i] = lon;
             Tuple obData = (Tuple) po.getData();
-            Real val = (Real) obData.getComponent(typeIndex);
+            Real  val    = (Real) obData.getComponent(typeIndex);
             //System.out.println("val["+i+"] ="+ val);
             paramVals[0][i] = (float) val.getValue(type.getDefaultUnit());
         }
         //System.out.println("lat = " + latMin + "-"+latMax+", lon = " +lonMin+"-"+lonMax);
-        Barnes.AnalysisParameters ap =
-            Barnes.getRecommendedParameters(lonMin, latMin, lonMax, latMax,
-                                            domainPts);
-        double[][] griddedData = Barnes.point2grid(lonMin, latMin, lonMax,
-                                     latMax, new float[][] {
+        float[] faGridX     = null;
+        float[] faGridY     = null;
+        float   scaleLength = 1.0f;
+        float   gain        = 1.0f;
+        if ((xSpacing == 0) || (ySpacing == 0)) {
+            Barnes.AnalysisParameters ap =
+                Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
+                    latMax, domainPts);
+            faGridX     = ap.getGridXArray();
+            faGridY     = ap.getGridYArray();
+            scaleLength = (float) ap.getScaleLengthGU();
+        } else {
+            faGridX = Barnes.getRecommendedGridX(lonMin, lonMax, xSpacing);
+            faGridY = Barnes.getRecommendedGridY(latMin, latMax, ySpacing);
+        }
+        double[][] griddedData = Barnes.point2grid(faGridX, faGridY,
+                                     new float[][] {
             domainPts[0], domainPts[1], paramVals[0]
-        }, numPasses);
-        //double[][] griddedData = Barnes.point2grid(ap.faGridX, ap.faGridY,
-        //new float[][] {domainPts[0], domainPts[1], paramVals[0]},
-        //                                          (float) ap.scaleLengthGU,
-        //                                          1.0f, 3);
+        }, scaleLength, gain, numPasses);
 
         float[][] faaDomainSet =
-            new float[2][ap.faGridX.length * ap.faGridY.length];
+            new float[2][faGridX.length * faGridY.length];
         float[][] faaGridValues3 =
-            new float[1][ap.faGridX.length * ap.faGridY.length];
+            new float[1][faGridX.length * faGridY.length];
 
         int m = 0;
-        for (int j = 0; j < ap.faGridY.length; j++) {
-            for (int i = 0; i < ap.faGridX.length; i++) {
-                faaDomainSet[0][m]   = ap.faGridY[j];
-                faaDomainSet[1][m]   = ap.faGridX[i];
+        for (int j = 0; j < faGridY.length; j++) {
+            for (int i = 0; i < faGridX.length; i++) {
+                faaDomainSet[0][m]   = faGridY[j];
+                faaDomainSet[1][m]   = faGridX[i];
                 faaGridValues3[0][m] = (float) griddedData[i][j];
                 m++;
             }
         }
 
-        Gridded2DDoubleSet g2ddsSet =
-            new Gridded2DDoubleSet(RealTupleType.LatitudeLongitudeTuple,
-                                   faaDomainSet, ap.faGridX.length,
-                                   ap.faGridY.length);
+        Gridded2DSet g2ddsSet =
+            new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple,
+                             faaDomainSet, faGridX.length, faGridY.length,
+                             (CoordinateSystem) null, (Unit[]) null,
+                             (ErrorEstimate[]) null, false);
         FunctionType ftLatLon2Param =
-            new FunctionType(RealTupleType.LatitudeLongitudeTuple, new RealTupleType(type));
+            new FunctionType(RealTupleType.LatitudeLongitudeTuple,
+                             new RealTupleType(type));
         FlatField retData = new FlatField(ftLatLon2Param, g2ddsSet);
         retData.setSamples(faaGridValues3, false);
         return retData;
