@@ -1982,11 +1982,12 @@ public class GuiUtils extends LayoutUtil {
         }
         final int size   = list.getModel().getSize();
         int[]     steps  = {
-            1, 2, 3, 4, 5, 10, 20
+            1, 2, 3, 4, 5, 10, 20, 24
         };
         String[]  labels = {
             "all", "every other one", "every third one", "every fourth one",
-            "every fifth one", "every tenth one", "every twentieth one"
+            "every fifth one", "every tenth one", 
+            "every twentieth one", "every twenty-fourth one"
         };
         List  items     = new ArrayList();
         JMenu rangeMenu = new JMenu("Select Range");
