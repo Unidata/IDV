@@ -1836,6 +1836,23 @@ public class StormDisplayState {
      *
      *  @return The ForecastState
      */
+    public WayDisplayState getObservationState() {
+        return obsDisplayState;
+    }
+    /**
+     *  Set the ForecastState property.
+     *
+     *  @param value The new value for ForecastState
+     */
+    public void setObservationState(WayDisplayState value) {
+        obsDisplayState = value;
+    }
+
+    /**
+     *  Get the ForecastState property.
+     *
+     *  @return The ForecastState
+     */
     public WayDisplayState getForecastState() {
         return forecastState;
     }

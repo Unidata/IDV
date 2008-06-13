@@ -103,6 +103,9 @@ public class StormTrackControl extends DisplayControlImpl {
     private final static String PREF_OKWAYS = "pref.okways";
 
     /** _more_ */
+    private final static String PREF_OBWAYS = "pref.obways";
+
+    /** _more_ */
     private final static String PREF_OKPARAMS = "pref.okparams";
 
     /** _more_ */
@@ -129,6 +132,8 @@ public class StormTrackControl extends DisplayControlImpl {
 
     /** _more_ */
     private Hashtable<String, Boolean> okWays;
+
+    private Hashtable<String, Boolean> obWay;
 
     /** _more_ */
     private Hashtable<String, Boolean> okParams;
@@ -513,10 +518,64 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
     }
+    /**
+     * _more_
+     */
+    public void showObsWaySelectDialog() {
+        List bom = new ArrayList();
+        List wayComps = new ArrayList();
+        List<Way> ways =
+            Misc.sort(stormDataSource.getWays());
+        int i = 0;
+        int ob = 0;
+        for (Way way : ways) {
+            wayComps.add(way.getId()); //.getName());
 
+            if ( way.isObservation()) {
+                ob = i;
+            }
+            i++;
+        }
+        JRadioButton[] jrbs =
+                            GuiUtils.makeRadioButtons( wayComps, ob, this, "getObsFromThisWay");
 
+        JCheckBox writeAsPreferenceCbx = new JCheckBox("Save as preference",
+                                             false);
 
+        bom.add(writeAsPreferenceCbx);
+       //wayComps.add(writeAsPreferenceCbx);
+        JComponent contents =  GuiUtils.centerBottom(GuiUtils.vbox(jrbs), GuiUtils.vbox(bom));
 
+        if ( !GuiUtils.showOkCancelDialog(null, "Observation " + getWayName() + " Selection",
+                                          contents, null)) {
+            return;
+        }
+
+        if (writeAsPreferenceCbx.isSelected()) {
+            putPreference(PREF_OBWAYS, obWay);
+        }
+
+    }
+
+    public void  getObsFromThisWay(int idx){
+        List<Way> ways =
+            Misc.sort(stormDataSource.getWays());
+        Way thisWay = ways.get(idx);
+
+        System.out.println("select observation from this forecast way " + thisWay.getId());
+
+        StormDisplayState sds = getCurrentStormDisplayState();
+        StormTrackCollection tcl = sds.getTrackCollection();
+        tcl.setObsTrack(thisWay);
+
+        for (int i = stormInfos.size() - 1; i >= 0; i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            StormDisplayState stormDisplayState =
+                getStormDisplayState(stormInfo);
+            stormDisplayState.reload();
+        }
+
+    }
     /**
      * _more_
      *
@@ -644,6 +703,9 @@ public class StormTrackControl extends DisplayControlImpl {
                                             current, "addForecastTimeChart"));
             items.add(GuiUtils.makeMenuItem("Add Forecast Hour Chart",
                                             current, "addForecastHourChart"));
+            items.add(GuiUtils.makeMenuItem("Select " + getWayName()
+                                            + " As Observation", this,
+                                                "showObsWaySelectDialog"));
             items.add(GuiUtils.makeMenuItem("Select " + getWaysName()
                                             + " To Use", this,
                                                 "showWaySelectDialog"));
@@ -1991,6 +2053,10 @@ public class StormTrackControl extends DisplayControlImpl {
         okWays = value;
     }
 
+    public void setOBWay(Hashtable<String, Boolean> value) {
+         obWay = value;
+     }
+
     /**
      * Get the OkWays property.
      *
@@ -2000,7 +2066,9 @@ public class StormTrackControl extends DisplayControlImpl {
         return okWays;
     }
 
-
+    public Hashtable<String, Boolean> getOBWay() {
+        return obWay;
+    }
     /**
      * Set the OkParams property.
      *
