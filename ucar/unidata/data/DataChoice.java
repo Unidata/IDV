@@ -344,6 +344,14 @@ public abstract class DataChoice {
     }
 
 
+    public void setLevelSelection(Real level) {
+        if (myDataSelection == null) {
+            myDataSelection = new DataSelection();
+        }
+        myDataSelection.setLevel(level);
+        
+    }
+
     /**
      * Get all the levels associated with this choice
      *
