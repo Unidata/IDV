@@ -93,6 +93,7 @@ import ucar.visad.display.DisplayMaster;
 
 
 import visad.Data;
+import visad.Real;
 import visad.VisADException;
 
 
@@ -5192,6 +5193,18 @@ public class IdvUIManager extends IdvManager {
                         choiceIdx++) {
                     ((DataChoice) choices.get(choiceIdx)).setTimeSelection(
                         times);
+                }
+            }
+            String level = operand.getProperty(operand.PROP_LEVEL);
+            if(level!=null) {
+                try {
+                Real l = ucar.visad.Util.toReal(level.trim(),"(",")");
+                for (int choiceIdx = 0; choiceIdx < choices.size();
+                        choiceIdx++) {
+                    ((DataChoice) choices.get(choiceIdx)).setLevelSelection(l);
+                }
+                } catch(Exception  exc) {
+                    throw new ucar.unidata.util.WrapperException(exc);
                 }
             }
             if (operand.getMultiple()) {
