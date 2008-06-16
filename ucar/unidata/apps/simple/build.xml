@@ -37,7 +37,7 @@ argument -Dfoo=bar) -->
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
             </manifest> 
             <include name="ucar/unidata/apps/simple/**"/>
         </jar>

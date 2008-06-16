@@ -314,7 +314,10 @@ public class DataManager {
 
         org.apache.commons.httpclient.auth.CredentialsProvider provider =
             new IdvAuthenticator(dataContext.getIdv());
-        ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
+        //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
+        org.apache.commons.httpclient.HttpClient client = ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
+        opendap.dap.DConnect2.setHttpClient(client);
+        ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(client);
 
         String defaultBoundingBoxString =
             dataContext.getIdv().getProperty(PROP_GEOSUBSET_BBOX,
@@ -435,6 +438,7 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
+        //ucar.nc2.NetcdfFileCache.init(1,10,20*60);
         ucar.grib.GribResourceReader.setGribResourceReader(
             new ucar.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
@@ -475,14 +479,14 @@ public class DataManager {
         }
         ResourceCollection njResources =
             resourceManager.getResources(IdvResourceManager.RSC_NJCONFIG);
-        StringBuffer errlog = new StringBuffer();
+        StringBuilder errlog = new StringBuilder();
         for (int i = 0; i < njResources.size(); i++) {
             try {
                 Object r = njResources.get(i);
                 // System.out.println("resource = " + r);
                 InputStream is = IOUtil.getInputStream(r.toString());
                 if (is != null) {
-                    ucar.nc2.util.RuntimeConfigParser.read(is, errlog);
+                    ucar.nc2.util.xml.RuntimeConfigParser.read(is, errlog);
                 }
             } catch (Exception exc) {
                 // System.err.println ("bad config:"+ exc);

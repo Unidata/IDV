@@ -177,7 +177,7 @@ public abstract class PointDataSource extends FilesDataSource {
         binWidthField.setTime(binWidth);
         binRoundToField.setTime(binRoundTo);
         List roundToItems = Misc.toList(new Object[] {
-            new TwoFacedObject("Predefined", new Double(0)),
+            new TwoFacedObject("Change", new Double(0)),
             new TwoFacedObject("On the hour", new Double(60)),
             new TwoFacedObject("5 after", new Double(5)),
             new TwoFacedObject("10 after", new Double(10)),
@@ -194,7 +194,7 @@ public abstract class PointDataSource extends FilesDataSource {
                                            "setRoundToFromComboBox");
 
         List widthItems = Misc.toList(new Object[] {
-            new TwoFacedObject("Predefined", new Double(0)),
+            new TwoFacedObject("Change", new Double(0)),
             new TwoFacedObject("5 minutes", new Double(5)),
             new TwoFacedObject("10 minutes", new Double(10)),
             new TwoFacedObject("15 minutes", new Double(15)),

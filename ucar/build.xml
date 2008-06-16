@@ -74,7 +74,7 @@ argument -Dfoo=bar) -->
 
 
 
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/nc2.2.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar;${libsdir}/j2h.jar;"/>
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar;${libsdir}/j2h.jar;"/>
 
 
 
@@ -96,7 +96,6 @@ argument -Dfoo=bar) -->
 
     <target name="jarthejars" depends="init">
         <antcall target="external.jar"/>
-        <antcall target="nc2.2.jar"/>
     </target>
 
 
@@ -643,7 +642,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>

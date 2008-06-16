@@ -58,7 +58,7 @@
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar nc2.2.jar"/>
+              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar ncIdv.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>

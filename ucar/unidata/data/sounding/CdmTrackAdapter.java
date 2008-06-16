@@ -23,10 +23,8 @@
 package ucar.unidata.data.sounding;
 
 
-import thredds.catalog.DataType;
 
 import ucar.ma2.Array;
-
 import ucar.ma2.Index;
 import ucar.ma2.Index0D;
 import ucar.ma2.Range;
@@ -34,6 +32,7 @@ import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
 
 import ucar.nc2.VariableSimpleIF;
+import ucar.nc2.constants.FeatureType;
 import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
 import ucar.nc2.dt.TypedDataset;
@@ -119,11 +118,11 @@ public class CdmTrackAdapter extends TrackAdapter {
             throws Exception {
         super(dataSource, filename, pointDataFilter, stride, lastNMinutes);
         TrajectoryObsDataset tod = null;
-        StringBuffer         buf = new StringBuffer();
+        StringBuilder         buf = new StringBuilder();
         try {
             //tod = TrajectoryObsDatasetFactory.open(filename);
             tod = (TrajectoryObsDataset) TypedDatasetFactory.open(
-                DataType.TRAJECTORY, filename, null, buf);
+                FeatureType.TRAJECTORY, filename, null, buf);
         } catch (java.io.FileNotFoundException fnfe) {
             throw new BadDataException("Could not open data source:"
                                        + filename);

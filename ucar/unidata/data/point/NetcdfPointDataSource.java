@@ -234,12 +234,12 @@ public class NetcdfPointDataSource extends PointDataSource {
             sources = new ArrayList();
             sources.add(file);
         }
-        StringBuffer    buf     = new StringBuffer();
+        StringBuilder    buf     = new StringBuilder();
         PointObsDataset pods    = null;
         Exception       toThrow = new Exception("Datset is null");
         try {
             pods = (PointObsDataset) TypedDatasetFactory.open(
-                thredds.catalog.DataType.POINT, file, null, buf);
+                ucar.nc2.constants.FeatureType.POINT, file, null, buf);
         } catch (Exception exc) {
             pods = null;
         }
@@ -291,9 +291,9 @@ public class NetcdfPointDataSource extends PointDataSource {
                 return null;
             }
             /*
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             PointObsDataset pods = (PointObsDataset) TypedDatasetFactory.open(
-                                       thredds.catalog.DataType.POINT,
+                                       ucar.nc2.constants.FeatureType.POINT,
                                        source, null, buf);
             if (pods == null) {
                 throw new BadDataException(
@@ -318,7 +318,7 @@ public class NetcdfPointDataSource extends PointDataSource {
      */
     public static void main(String[] args) {
         try {
-            StringBuffer buf   = new StringBuffer();
+            StringBuilder buf   = new StringBuilder();
             int          cnt   = ((args.length > 1)
                                   ? new Integer(args[1]).intValue()
                                   : 1);
@@ -327,7 +327,7 @@ public class NetcdfPointDataSource extends PointDataSource {
                 long tt1 = System.currentTimeMillis();
                 PointObsDataset pods =
                     (PointObsDataset) TypedDatasetFactory.open(
-                        thredds.catalog.DataType.POINT, args[0], null, buf);
+                        ucar.nc2.constants.FeatureType.POINT, args[0], null, buf);
                 long tt2 = System.currentTimeMillis();
                 if (pods == null) {
                     throw new BadDataException(

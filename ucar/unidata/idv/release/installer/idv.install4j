@@ -24,7 +24,7 @@
       <fileEntry mountPoint="1" file="%SRCDIR%/lib/local-visad.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
       <fileEntry mountPoint="1" file="%SRCDIR%/lib/visad.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
       <fileEntry mountPoint="1" file="%SRCDIR%/lib/jython.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/nc2.2.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
+      <fileEntry mountPoint="1" file="%SRCDIR%/lib/ncIdv.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
       <fileEntry mountPoint="1" file="%SRCDIR%/lib/simpleidv.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
       <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" dontUninstall="false" />
       <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" dontUninstall="false" />
@@ -48,7 +48,7 @@
           <entry location="local-visad.jar" launcher="false" />
           <entry location="visad.jar" launcher="false" />
           <entry location="jython.jar" launcher="false" />
-          <entry location="nc2.2.jar" launcher="false" />
+          <entry location="ncIdv.jar" launcher="false" />
           <entry location="simpleidv.jar" launcher="false" />
           <entry location="LICENSE" launcher="false" />
           <entry location="LICENSE.apache" launcher="false" />

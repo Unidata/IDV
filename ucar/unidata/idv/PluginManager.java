@@ -2560,7 +2560,7 @@ public class PluginManager extends IdvManager {
                 loadedClasses.put(jarEntry.getName(), c);
                 if (java.text.DateFormat.class.isAssignableFrom(c)) {
                     visad.DateTime.setDateFormatClass(c);
-                } else if (ucar.nc2.IOServiceProvider.class.isAssignableFrom(
+                } else if (ucar.nc2.iosp.IOServiceProvider.class.isAssignableFrom(
                         c)) {
                     ucar.nc2.NetcdfFile.registerIOProvider(c);
                 } else if (ucar.nc2.dataset.CoordSysBuilderIF.class

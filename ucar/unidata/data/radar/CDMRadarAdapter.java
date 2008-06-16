@@ -236,8 +236,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         try {
             Trace.call1("CDMRadarAdapter:open dataset");
             rds = (RadialDatasetSweep) TypedDatasetFactory.open(
-                thredds.catalog.DataType.RADIAL, swpFileName, null,
-                new StringBuffer());
+                ucar.nc2.constants.FeatureType.RADIAL, swpFileName, null,
+                new StringBuilder());
             Trace.call2("CDMRadarAdapter:open dataset");
             stationID      = rds.getRadarID();
             stationName    = rds.getRadarName();

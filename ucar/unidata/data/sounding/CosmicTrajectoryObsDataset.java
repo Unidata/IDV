@@ -23,6 +23,7 @@
 package ucar.unidata.data.sounding;
 
 
+import ucar.ma2.Array;
 import ucar.ma2.DataType;
 
 import ucar.nc2.Attribute;
@@ -173,7 +174,7 @@ public class CosmicTrajectoryObsDataset extends SingleTrajectoryObsDataset imple
         Attribute newUnits =
             new Attribute("units", "seconds since 1980-01-06 00:00:00");
         timeVar.addAttribute(newUnits);
-        timeVar.setCachedData(ncd.makeArray(DataType.DOUBLE, numTimes,
+        timeVar.setCachedData(Array.makeArray(DataType.DOUBLE, numTimes,
                                             endTime,
                                             ((startTime - endTime)
                                              / numTimes)), true);
@@ -252,7 +253,7 @@ public class CosmicTrajectoryObsDataset extends SingleTrajectoryObsDataset imple
      */
     public TypedDataset open(NetcdfDataset ncd,
                              ucar.nc2.util.CancelTask task,
-                             StringBuffer errlog)
+                             StringBuilder errlog)
             throws IOException {
         return new CosmicTrajectoryObsDataset(ncd);
     }
@@ -262,8 +263,8 @@ public class CosmicTrajectoryObsDataset extends SingleTrajectoryObsDataset imple
      *
      * @return the datatype
      */
-    public thredds.catalog.DataType getScientificDataType() {
-        return thredds.catalog.DataType.TRAJECTORY;
+    public ucar.nc2.constants.FeatureType getScientificDataType() {
+        return ucar.nc2.constants.FeatureType.TRAJECTORY;
     }
 
     /**

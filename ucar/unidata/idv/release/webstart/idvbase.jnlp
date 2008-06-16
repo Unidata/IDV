@@ -11,7 +11,7 @@
         <jar href="IDV/jython.jar"/>
         <jar href="IDV/local-visad.jar"/>
         <jar href="IDV/visad.jar"/>
-        <jar href="IDV/nc2.2.jar"/>
+        <jar href="IDV/ncIdv.jar"/>
         <extension name="Java3D" href="java3D/java3D.jnlp"/>
    </resources> 
    <component-desc>
