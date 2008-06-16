@@ -1982,12 +1982,12 @@ public class GuiUtils extends LayoutUtil {
         }
         final int size   = list.getModel().getSize();
         int[]     steps  = {
-            1, 2, 3, 4, 5, 10, 20, 24
+            1, 2, 3, 4, 5, 10, 20
         };
         String[]  labels = {
             "all", "every other one", "every third one", "every fourth one",
             "every fifth one", "every tenth one", 
-            "every twentieth one", "every twenty-fourth one"
+            "every twentieth one"
         };
         List  items     = new ArrayList();
         JMenu rangeMenu = new JMenu("Select Range");
@@ -2009,6 +2009,42 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+        JMenuItem selectStrideMenuItem = new JMenuItem("Choose Interval");
+        selectStrideMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    JTextField stepFld = new JTextField("1",4);
+                    JTextField startFld = new JTextField("1",4);
+                    tmpInsets = INSETS_5; 
+                    JComponent contents = doLayout(new Component[]{rLabel("Start Index:"),
+                                                                   startFld,
+                                                                   rLabel("Interval:"),
+                                                                   stepFld},
+                                                   2,
+                                                   WT_NN,
+                                                   WT_N);
+                    contents = vbox(new JLabel("Choose Selection Interval"),
+                                    contents);
+                    contents = inset(contents, 5);
+
+                    while(true) {
+                        if(!showOkCancelDialog(null, "Selection Interval", contents, list)) return;
+                        try {
+                            int start = new Integer(startFld.getText().trim()).intValue()-1;
+                            int step = new Integer(stepFld.getText().trim()).intValue();
+                            list.clearSelection();
+                            for (int idx = start; idx < size; idx += step) {
+                                list.addSelectionInterval(idx, idx);
+                            }
+                            return;
+                        } catch(NumberFormatException nfe) {
+                            LogUtil.userErrorMessage("Bad input value");
+                        }
+                    }
+                }
+            });
+        items.add(MENU_SEPARATOR);
+        items.add(selectStrideMenuItem);
+        items.add(MENU_SEPARATOR);
         for (int i = 0; i < steps.length; i++) {
             if (steps[i] > size) {
                 break;
