@@ -216,12 +216,14 @@ public abstract class Displayable {
      * @throws RemoteException  Java RMI failure.
      */
     public void toFront() throws RemoteException, VisADException {
-        if (displayMaster != null) {
+        //We only remove and then add ourselves when we are not part of a compositedisplayable
+        if (displayMaster != null && parent == null) {
             DisplayMaster myMaster = displayMaster;
             myMaster.removeDisplayable(this);
             myMaster.addDisplayable(this);
         }
     }
+
 
     /**
      * Get the display master. If none set on this displayable
