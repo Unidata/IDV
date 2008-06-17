@@ -702,6 +702,11 @@ public class DataSelectionWidget {
         if (getUseAllTimes()) {
             return null;
         }
+        return getSelectedDateTimesInList();
+    }
+
+
+    private List getSelectedDateTimesInList() {
         if (timesList == null) {
             return new ArrayList();
         }
@@ -738,8 +743,9 @@ public class DataSelectionWidget {
      * @param selected The selected times
      */
     public void setTimes(List all, List selected) {
-        //        Misc.printStack("DSW.setTimes  " + all,5,null);
-
+        if(all!=null && Misc.equals(allDateTimes, all) && (selected==null ||selected.size()==0)) {
+            selected = getSelectedDateTimesInList();
+        }
         setTimes(timesList, allTimesButton, all, selected);
         if (all != null) {
             allDateTimes = new ArrayList(all);
