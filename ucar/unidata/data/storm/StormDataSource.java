@@ -109,7 +109,7 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static StormParam PARAM_MAXWINDSPEED_KTS;
 
-
+    public boolean isObsWayChangeable = false;
 
     /** _more_ */
     public static final int[] CATEGORY_VALUES = {
@@ -216,7 +216,7 @@ public abstract class StormDataSource extends DataSourceImpl {
                     "Min_Pressure", Util.parseUnit("mb")));
             PARAM_DISTANCEERROR =
                 new StormParam(Util.makeRealType("forecastlocationerror",
-                    "Distance_Error", Util.parseUnit("km")), true, false);
+                    "Mean_Distance_Error", Util.parseUnit("km")), true, false);
             PARAM_MAXWINDSPEED_KTS =
                 new StormParam(makeRealType("maxwindspeedkts",
                                             "Max_Windspeed",
@@ -278,11 +278,12 @@ public abstract class StormDataSource extends DataSourceImpl {
      * @throws Exception _more_
      */
     public StormTrackCollection getTrackCollection(StormInfo stormInfo,
-            Hashtable<String, Boolean> waysToUse)
+            Hashtable<String, Boolean> waysToUse, Way obsWay)
             throws Exception {
+
         try {
             incrOutstandingGetDataCalls();
-            return getTrackCollectionInner(stormInfo, waysToUse);
+            return getTrackCollectionInner(stormInfo, waysToUse, obsWay);
         } finally {
             decrOutstandingGetDataCalls();
         }
@@ -318,11 +319,10 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @throws Exception _more_
      */
+
     public abstract StormTrackCollection getTrackCollectionInner(
-            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse)
+            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse, Way obWay)
      throws Exception;
-
-
 
 
     /** _more_ */
@@ -618,6 +618,13 @@ public abstract class StormDataSource extends DataSourceImpl {
 
     }
 
+    public boolean getIsObsWayChangeable(){
+        return isObsWayChangeable;
+    }
+
+    public void setIsObsWayChangeable(boolean isChangeable){
+        isObsWayChangeable = isChangeable;
+    }
     /**
      * _more_
      *

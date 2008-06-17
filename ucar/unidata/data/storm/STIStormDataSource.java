@@ -495,8 +495,10 @@ public class STIStormDataSource extends StormDataSource {
      *
      * @throws Exception _more_
      */
+ 
+
     public StormTrackCollection getTrackCollectionInner(StormInfo stormInfo,
-            Hashtable<String, Boolean> waysToUse)
+            Hashtable<String, Boolean> waysToUse, Way obWay)
             throws Exception {
         long                 t1              = System.currentTimeMillis();
         StormTrackCollection trackCollection = new StormTrackCollection();
@@ -513,7 +515,7 @@ public class STIStormDataSource extends StormDataSource {
                 trackCollection.addTrackList(forecastTracks);
             }
         }
-        StormTrack obsTrack = getObservationTrack(stormInfo);
+        StormTrack obsTrack = getObservationTrack(stormInfo, obWay);
         //                                         (Way) forecastWays.get(0));
         if (obsTrack != null) {
             List<StormTrack> tracks = trackCollection.getTracks();
@@ -524,6 +526,9 @@ public class STIStormDataSource extends StormDataSource {
             //        System.err.println("time:" + (t2 - t1));
             trackCollection.addTrack(obsTrack);
         }
+
+        setIsObsWayChangeable(true); 
+
         return trackCollection;
     }
 
@@ -949,33 +954,24 @@ public class STIStormDataSource extends StormDataSource {
         List obsPts  = null;
         Way  babjWay = new Way("babj");
         addWay(babjWay);
-        //first get the obs from BABJ
-        List<StormTrackPoint> obsBABJ = getObservationTrack(stormInfo,
-                                            babjWay);
+        return getObservationTrack(stormInfo, babjWay);
+    }
 
-        if (obsBABJ.size() == 0) {
+    protected StormTrack getObservationTrack(StormInfo stormInfo, Way obWay)
+            throws Exception {
+        
+        addWay(obWay);
+        //first get the obs from one specific way
+        List<StormTrackPoint> obsTrackPoints = getObservationTrackPoints(stormInfo, obWay);
+
+        if (obsTrackPoints.size() == 0) {
             return null;
         }
 
-        DateTime timeMin = obsBABJ.get(0).getTime();
-        DateTime timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
-
-        // get list of ways
-   /*     List<Way> ways = getForecastWays(stormInfo);
-
-        for (Way way : ways) {
-            if ( !way.equals(babjWay)) {
-                obsBABJ = getObservationTrack(stormInfo, way, timeMin,
-                        timeMax, obsBABJ);
-                timeMin = obsBABJ.get(0).getTime();
-                timeMax = obsBABJ.get(obsBABJ.size() - 1).getTime();
-            }
-        }
-     */
-        return new StormTrack(stormInfo, addWay(Way.OBSERVATION), obsBABJ,
+        
+        return new StormTrack(stormInfo, addWay(Way.OBSERVATION), obsTrackPoints,
                               obsParams);
     }
-
     /**
      * _more_
      *
@@ -987,7 +983,7 @@ public class STIStormDataSource extends StormDataSource {
      * @return _more_
      * @throws Exception _more_
      */
-    protected List<StormTrackPoint> getObservationTrack(StormInfo stormInfo,
+    protected List<StormTrackPoint> getObservationTrackPoints(StormInfo stormInfo,
             Way wy)
             throws Exception {
         String columns = SqlUtil.comma(new String[] {
@@ -1493,7 +1489,7 @@ public class STIStormDataSource extends StormDataSource {
         StormInfo sInfo     = (StormInfo) sInfoList.get(0);
         sInfo = s.getStormInfo(sid);
         String               sd             = sInfo.getStormId();
-        StormTrackCollection cls = s.getTrackCollection(sInfo, null);
+        StormTrackCollection cls = s.getTrackCollection(sInfo, null, null);
         StormTrack           obsTrack       = cls.getObsTrack();
         List                 trackPointList = obsTrack.getTrackPoints();
         List                 trackPointTime = obsTrack.getTrackTimes();

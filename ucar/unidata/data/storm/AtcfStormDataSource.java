@@ -421,7 +421,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
      * @throws Exception _more_
      */
     public StormTrackCollection getTrackCollectionInner(StormInfo stormInfo,
-            Hashtable<String, Boolean> waysToUse)
+            Hashtable<String, Boolean> waysToUse, Way obWay)
             throws Exception {
         if (localTracks != null) {
             return localTracks;
@@ -457,7 +457,6 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
         return tracks;
     }
-
 
 
 
