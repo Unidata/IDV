@@ -248,8 +248,10 @@ public class PreferenceList {
      */
     public void saveState(JComboBox box) {
         chosen = box.getSelectedItem();
-        checkIfInList(box, chosen.toString());
-        writeState();
+        if(chosen != null){
+            checkIfInList(box, chosen.toString());
+            writeState();
+        }
     }
 
 
