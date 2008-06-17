@@ -21,13 +21,13 @@
  */
 
 
-
 package ucar.unidata.view.geoloc;
 
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
@@ -1506,7 +1506,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                            ? GeoUtils.normalizeLongitude360(latlonalt[1])
                            : GeoUtils.normalizeLongitude(latlonalt[1]);
             */
-            t2           = mapProjection.fromReference(t2);
+            t2 = mapProjection.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
@@ -1579,7 +1579,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                            ? GeoUtils.normalizeLongitude360(latlonalt[1])
                            : GeoUtils.normalizeLongitude(latlonalt[1]);
             */
-            t2           = mapProjection.fromReference(t2);
+            t2 = mapProjection.fromReference(t2);
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
@@ -1792,11 +1792,12 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         panel.setLayout(new BorderLayout());
         panel.add(navDisplay.getComponent(), BorderLayout.CENTER);
         panel.add((navDisplay.getDisplayMode() == navDisplay.MODE_3D)
-                  ? (Component) ucar.unidata.util.GuiUtils.leftRight(
-                      new NavigatedDisplayToolBar(navDisplay),
-                      vpc.getToolBar())
-                  : (Component) new NavigatedDisplayToolBar(
-                      navDisplay), BorderLayout.NORTH);
+                  ? (Component) ucar.unidata.util.GuiUtils.topCenterBottom(
+                      vpc.getToolBar(JToolBar.VERTICAL),
+                      new NavigatedDisplayToolBar(
+                          navDisplay, JToolBar.VERTICAL), GuiUtils.filler())
+                  : (Component) new NavigatedDisplayToolBar(navDisplay,
+                  JToolBar.VERTICAL), BorderLayout.WEST);
         JPanel readout = new JPanel();
         readout.add(new NavigatedDisplayCursorReadout(navDisplay));
         readout.add(new RangeAndBearingReadout(navDisplay));
@@ -1828,6 +1829,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 pm.show();
             }
         });
+
+        /*
+        EarthLocationTuple elt = new EarthLocationTuple(40,-105, 8000);
+        SelectorPoint sp = new SelectorPoint("foo", elt);
+        sp.setFixed(false,false,true);
+        sp.setColor(Color.black);
+        navDisplay.addDisplayable(sp);
+        */
         navDisplay.getDisplay().getGraphicsModeControl().setScaleEnable(true);
         frame.pack();
         frame.setVisible(true);
