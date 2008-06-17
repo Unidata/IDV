@@ -1085,7 +1085,8 @@ public class StormDisplayState {
      */
     protected void addDisplayable(Displayable displayable)
             throws VisADException, RemoteException {
-        holder.addDisplayable(displayable);
+        if(holder != null)
+            holder.addDisplayable(displayable);
     }
 
     /**
@@ -1121,7 +1122,7 @@ public class StormDisplayState {
 
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
-                    stormInfo, stormTrackControl.getOkWays());
+                    stormInfo, stormTrackControl.getOkWays(), stormTrackControl.getOBWay());
             initCenterContents();
             stormTrackControl.addDisplayable(holder =
                 new CompositeDisplayable());

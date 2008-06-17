@@ -103,7 +103,7 @@ public class StormTrackControl extends DisplayControlImpl {
     private final static String PREF_OKWAYS = "pref.okways";
 
     /** _more_ */
-    private final static String PREF_OBWAYS = "pref.obways";
+    private final static String PREF_OBWAY = "pref.obway";
 
     /** _more_ */
     private final static String PREF_OKPARAMS = "pref.okparams";
@@ -133,7 +133,7 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private Hashtable<String, Boolean> okWays;
 
-    private Hashtable<String, Boolean> obWay;
+    private Way obWay;
 
     /** _more_ */
     private Hashtable<String, Boolean> okParams;
@@ -252,10 +252,15 @@ public class StormTrackControl extends DisplayControlImpl {
             okWays = (Hashtable<String,
                                 Boolean>) getPreferences().get(PREF_OKWAYS);
         }
+        if (obWay == null) {
+            obWay = (Way) getPreferences().get(PREF_OBWAY);
+        }
         if (okWays == null) {
             okWays = new Hashtable<String, Boolean>();
         }
-
+        if (obWay == null) {
+            obWay = new Way("babj");
+        }
         if (okParams == null) {
             okParams =
                 (Hashtable<String,
@@ -552,7 +557,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
         if (writeAsPreferenceCbx.isSelected()) {
-            putPreference(PREF_OBWAYS, obWay);
+            putPreference(PREF_OBWAY, obWay);
         }
 
     }
@@ -564,9 +569,10 @@ public class StormTrackControl extends DisplayControlImpl {
 
         System.out.println("select observation from this forecast way " + thisWay.getId());
 
-        StormDisplayState sds = getCurrentStormDisplayState();
-        StormTrackCollection tcl = sds.getTrackCollection();
-        tcl.setObsTrack(thisWay);
+        obWay = thisWay;
+       // StormDisplayState sds = getCurrentStormDisplayState();
+       // StormTrackCollection tcl = sds.getTrackCollection();
+       // tcl.setObsTrack(thisWay);
 
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             StormInfo stormInfo = stormInfos.get(i);
@@ -703,9 +709,11 @@ public class StormTrackControl extends DisplayControlImpl {
                                             current, "addForecastTimeChart"));
             items.add(GuiUtils.makeMenuItem("Add Forecast Hour Chart",
                                             current, "addForecastHourChart"));
-            items.add(GuiUtils.makeMenuItem("Select " + getWayName()
+            if(stormDataSource.getIsObsWayChangeable()){
+                items.add(GuiUtils.makeMenuItem("Select " + getWayName()
                                             + " As Observation", this,
                                                 "showObsWaySelectDialog"));
+            }
             items.add(GuiUtils.makeMenuItem("Select " + getWaysName()
                                             + " To Use", this,
                                                 "showWaySelectDialog"));
@@ -1238,7 +1246,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 try {
                     StormTrackCollection tracks =
                         stormDataSource.getTrackCollection(stormInfo,
-                            obsWays);
+                            obsWays, obWay);
                     obsTrack = tracks.getObsTrack();
                     if (obsTrack == null) {
                         continue;
@@ -2053,7 +2061,7 @@ public class StormTrackControl extends DisplayControlImpl {
         okWays = value;
     }
 
-    public void setOBWay(Hashtable<String, Boolean> value) {
+    public void setOBWay(Way value) {
          obWay = value;
      }
 
@@ -2066,7 +2074,7 @@ public class StormTrackControl extends DisplayControlImpl {
         return okWays;
     }
 
-    public Hashtable<String, Boolean> getOBWay() {
+    public Way getOBWay() {
         return obWay;
     }
     /**

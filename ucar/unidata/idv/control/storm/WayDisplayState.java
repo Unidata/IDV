@@ -484,7 +484,7 @@ public class WayDisplayState {
                             getObsPointDisplay().setStationData(pointField1);
 
                     }
-                    if (hasObsPointDisplay() && !Misc.equals(sm, getObsPointDisplay().getStationModel())) {
+                    if (hasObsPointDisplay() ) { //&& !Misc.equals(sm, getObsPointDisplay().getStationModel())) {
                         getObsPointDisplay().setStationModel(sm);
                     }
                 }
@@ -497,14 +497,14 @@ public class WayDisplayState {
             if (sm == null) {
                 removeLabelDisplay();
             } else {
-                if (!hasLabelDisplay()) {
+                if (true) { //(!hasLabelDisplay()) {
                     FieldImpl pointField =
                         PointObFactory.makeTimeSequenceOfPointObs(
                                                                   pointObs, -1, -1);
 
                        getLabelDisplay().setStationData(pointField);
                 }
-                if (hasLabelDisplay()&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
+                if (hasLabelDisplay() ) { //&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
                     getLabelDisplay().setStationModel(sm);
                 }
             }
@@ -900,10 +900,10 @@ public class WayDisplayState {
      */
     private void setLabelColor() throws Exception {
         Color c = getColor();
-        if (labelDisplay != null&& !Misc.equals(c, labelDisplay.getColor())) {
+        if (labelDisplay != null ) { //&& !Misc.equals(c, labelDisplay.getColor())) {
             labelDisplay.setColor(c);
         }
-        if (obsPointDisplay != null&& !Misc.equals(c, obsPointDisplay.getColor())) {
+        if (obsPointDisplay != null) { //&& !Misc.equals(c, obsPointDisplay.getColor())) {
             obsPointDisplay.setColor(c);
         }
     }
@@ -944,6 +944,8 @@ public class WayDisplayState {
         conesHolder  = null;
         if (holder != null) {}
         trackDisplay = null;
+        labelDisplay = null;
+        obsPointDisplay = null;       
         holder       = null;
         tracks       = new ArrayList<StormTrack>();
         times        = new ArrayList<DateTime>();
