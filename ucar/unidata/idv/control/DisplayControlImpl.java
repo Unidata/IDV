@@ -9590,24 +9590,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public float getDisplayScale() throws VisADException, RemoteException {
         NavigatedDisplay navDisplay = getNavigatedDisplay();
         if (navDisplay != null) {
-            DisplayImpl display = (DisplayImpl) navDisplay.getDisplay();
-            if (display != null) {
-                ProjectionControl pc          =
-                    display.getProjectionControl();
-                double[]          init_matrix = pc.getSavedProjectionMatrix();
-                double[]          rot_a       = new double[3];
-                double[]          trans_a     = new double[3];
-                double[]          scale_a     = new double[1];
-                MouseBehavior     mouse       = display.getMouseBehavior();
-                mouse.instance_unmake_matrix(rot_a, scale_a, trans_a,
-                                             init_matrix);
-                double init_zoom = scale_a[0];
-                //System.out.println("initial zoom = " + init_zoom);
-                double[] matrix = pc.getMatrix();
-                mouse.instance_unmake_matrix(rot_a, scale_a, trans_a, matrix);
-                //System.out.println("Current zoom = " + scale_a[0]);
-                return ((float) (init_zoom / scale_a[0]));
-            }
+            return navDisplay.getDisplayScale();
         }
         return 1.0f;
     }
