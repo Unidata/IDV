@@ -400,6 +400,14 @@ public class StationModelDisplayable extends DisplayableData {
         return myColor;
     }
 
+    public void toFront() throws RemoteException, VisADException {
+        super.toFront();
+        DisplayMaster master = getDisplayMaster();
+        if (master != null) {
+            setScale(master.getDisplayScale());
+        }
+    }
+
 
     /**
      * Set up the ScalarMaps for this Displayable
@@ -1480,7 +1488,6 @@ public class StationModelDisplayable extends DisplayableData {
         if (shapeControl != null) {
             //We set auto scale false here so the shape control 
             //clears out its controllistener which was keeping around the old initial scale
-
             shapeControl.setAutoScale(false);
             shapeControl.setScale(newScale);
             shapeControl.setAutoScale(true);
