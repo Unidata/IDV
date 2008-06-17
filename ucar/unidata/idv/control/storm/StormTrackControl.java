@@ -533,13 +533,18 @@ public class StormTrackControl extends DisplayControlImpl {
             Misc.sort(stormDataSource.getWays());
         int i = 0;
         int ob = 0;
-        for (Way way : ways) {
-            wayComps.add(way.getId()); //.getName());
+        Way obc = (Way) getPreferences().get(PREF_OBWAY) ;
 
-            if ( way.isObservation()) {
+        for (Way way : ways) {
+            if ( way.equals(obc)) {
                 ob = i;
             }
-            i++;
+
+            if(!way.isObservation()) {
+                wayComps.add(way.getId()); //.getName());
+                i++;
+            }
+
         }
         JRadioButton[] jrbs =
                             GuiUtils.makeRadioButtons( wayComps, ob, this, "getObsFromThisWay");
@@ -550,11 +555,14 @@ public class StormTrackControl extends DisplayControlImpl {
         bom.add(writeAsPreferenceCbx);
        //wayComps.add(writeAsPreferenceCbx);
         JComponent contents =  GuiUtils.centerBottom(GuiUtils.vbox(jrbs), GuiUtils.vbox(bom));
-
+        int width  = 80;
+        int height = 200;
+        JScrollPane contentsC  = GuiUtils.makeScrollPane(GuiUtils.top(contents), width, height);
         if ( !GuiUtils.showOkCancelDialog(null, "Observation " + getWayName() + " Selection",
-                                          contents, null)) {
+                                          contentsC, null)) {
             return;
         }
+
 
         if (writeAsPreferenceCbx.isSelected()) {
             putPreference(PREF_OBWAY, obWay);

@@ -698,6 +698,7 @@ public class WayDisplayState {
                                : stormDisplayState.getForecastLayoutModel());
             if (sm != null) {
                 labelDisplay = new StationModelDisplayable("dots");
+                labelDisplay.setUseTimesInAnimation(false);
                 addDisplayable(labelDisplay);
                 labelDisplay
                     .setScale(stormDisplayState.getStormTrackControl()
@@ -717,6 +718,7 @@ public class WayDisplayState {
     public StationModelDisplayable getObsPointDisplay() throws VisADException, RemoteException {
         if (obsPointDisplay == null) {
             obsPointDisplay = new StationModelDisplayable("dots");
+            obsPointDisplay.setUseTimesInAnimation(false);
             addDisplayable(obsPointDisplay);
             obsPointDisplay
                 .setScale(stormDisplayState.getStormTrackControl()
