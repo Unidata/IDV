@@ -1024,6 +1024,11 @@ abstract public class DisplayMaster {
     public void setProjectionMatrix(double[] newMatrix)
             throws VisADException, RemoteException {
         checkDestroyed();
+        
+        //        System.err.print ("DisplayMaster.setProjectionMatrix ");
+        //        for(int i=0;i<newMatrix.length;i++) 
+        //            System.err.print(" " + newMatrix[i]);
+        //        System.err.println(" ");
         display.getProjectionControl().setMatrix(newMatrix);
     }
 
@@ -1255,6 +1260,39 @@ abstract public class DisplayMaster {
         }
 
     }
+
+
+    /**
+     * Get the scaling factor for probes and such. The scaling is
+     * the parameter that gets passed to TextControl.setSize() and
+     * ShapeControl.setScale().
+     *
+     * @return ratio of the current matrix scale factor to the
+     *         saved matrix scale factor.
+     * @throws VisADException problem determining scale
+     * @throws RemoteException problem determining scale for remote display
+     */
+    public float getDisplayScale() {
+        if (display != null) {
+            ProjectionControl pc          =
+                display.getProjectionControl();
+            double[]          init_matrix = pc.getSavedProjectionMatrix();
+            double[]          rot_a       = new double[3];
+            double[]          trans_a     = new double[3];
+            double[]          scale_a     = new double[1];
+            MouseBehavior     mouse       = display.getMouseBehavior();
+            mouse.instance_unmake_matrix(rot_a, scale_a, trans_a,
+                                         init_matrix);
+            double init_zoom = scale_a[0];
+            //System.out.println("initial zoom = " + init_zoom);
+            double[] matrix = pc.getMatrix();
+            mouse.instance_unmake_matrix(rot_a, scale_a, trans_a, matrix);
+            //System.out.println("Current zoom = " + scale_a[0]);
+            return ((float) (init_zoom / scale_a[0]));
+        }
+        return 1.0f;
+    }
+
 
     /**
      *  Translate (X,Y position) of the display
