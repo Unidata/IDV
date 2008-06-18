@@ -719,6 +719,8 @@ public class Admin extends RepositoryManager {
         } else if (request.defined(ACTION_START)) {
             Misc.run(this, "runDatabaseCleanUp", request);
             return new Result(request.url(URL_ADMIN_CLEANUP));
+        } else if (request.defined(ACTION_CLEARCACHE)) {
+            getRepository().clearCache();
         }
         String status = cleanupStatus.toString();
         if (runningCleanup) {
@@ -732,6 +734,8 @@ public class Admin extends RepositoryManager {
             sb.append("<p>");
             sb.append(HtmlUtil.submit(msg("Start cleanup"), ACTION_START));
 
+            sb.append("<p>");
+            sb.append(HtmlUtil.submit(msg("Clear cache"), ACTION_CLEARCACHE));
 
         }
         sb.append("</form>");

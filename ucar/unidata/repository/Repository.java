@@ -4498,15 +4498,16 @@ public class Repository implements Constants, Tables, RequestHandler,
                     entries.add(entry);
                 }
             } else {
-                Date createDate = new Date();
-                Date[] dateRange = request.getDateRange(ARG_FROMDATE,
-                                       ARG_TODATE, createDate);
-                String newName = request.getString(ARG_NAME,
-                                     entry.getLabel());
                 if (entry.isTopGroup()) {
                     throw new IllegalArgumentException(
                         "Cannot edit top-level group");
                 }
+                Date[] dateRange = request.getDateRange(ARG_FROMDATE,
+                                       ARG_TODATE, new Date());
+                String newName = request.getString(ARG_NAME,
+                                     entry.getLabel());
+
+
                 if (entry.isGroup()) {
                     if (newName.indexOf(Group.IDDELIMITER) >= 0) {
                         throw new IllegalArgumentException(
@@ -4528,20 +4529,22 @@ public class Repository implements Constants, Tables, RequestHandler,
                     entry.setResource(
                         new Resource(request.getString(ARG_RESOURCE, BLANK)));
                 }
+
+                //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);
+
                 if (dateRange[0] != null) {
                     entry.setStartDate(dateRange[0].getTime());
                 }
                 if (dateRange[1] == null) {
                     dateRange[1] = dateRange[0];
                 }
+
                 if (dateRange[1] != null) {
                     entry.setEndDate(dateRange[1].getTime());
                 }
                 setEntryState(request, entry);
                 entries.add(entry);
             }
-
-
             insertEntries(entries, newEntry);
         }
         if (entries.size() == 1) {

@@ -770,6 +770,8 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_START = "action.start";
 
+    public static final String ACTION_CLEARCACHE = "action.clearcache";
+
     /** _more_ */
     public static final String ACTION_STOP = "action.stop";
 
