@@ -94,6 +94,9 @@ public class DataSourceDescriptor {
     /** pattern file filter */
     private FileFilter patternFilter;
 
+    private String ncmlTemplate;
+
+
     /**
      * Default constructor; does nothing
      */
@@ -352,6 +355,25 @@ public class DataSourceDescriptor {
     public String getPatterns() {
         return patterns;
     }
+
+    /**
+       Set the NcmlTemplate property.
+
+       @param value The new value for NcmlTemplate
+    **/
+    public void setNcmlTemplate (String value) {
+	ncmlTemplate = value;
+    }
+
+    /**
+       Get the NcmlTemplate property.
+
+       @return The NcmlTemplate
+    **/
+    public String getNcmlTemplate () {
+	return ncmlTemplate;
+    }
+
 
 
 }

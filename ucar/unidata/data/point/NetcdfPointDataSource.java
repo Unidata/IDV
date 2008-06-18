@@ -238,6 +238,7 @@ public class NetcdfPointDataSource extends PointDataSource {
         PointObsDataset pods    = null;
         Exception       toThrow = new Exception("Datset is null");
         try {
+            file = convertSourceFile(file);
             pods = (PointObsDataset) TypedDatasetFactory.open(
                 ucar.nc2.constants.FeatureType.POINT, file, null, buf);
         } catch (Exception exc) {
@@ -276,16 +277,15 @@ public class NetcdfPointDataSource extends PointDataSource {
         } else {
             source = id.toString();
         }
+
+
+
         FieldImpl obs    = null;
         Trace.call1("NetcdfPointDatasource:makeObs");
         if (obs == null) {
             //TODO: We are nulling out the data set to fix a bug where we cannot
             //use the same data set twice in a row
             this.dataset = null;
-
-
-
-
             PointObsDataset pods = getDataset();
             if (pods == null) {
                 return null;

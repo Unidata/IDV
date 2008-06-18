@@ -975,6 +975,7 @@ public class GeoGridDataSource extends GridDataSource {
         }
 
         try {
+            file =  convertSourceFile(file);
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (java.io.FileNotFoundException fnfe) {

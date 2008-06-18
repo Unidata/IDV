@@ -317,6 +317,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    public String convertSourceFile(String source) throws Exception {
+        if(descriptor.getNcmlTemplate()!=null) {
+            String ncml  = IOUtil.readContents(descriptor.getNcmlTemplate(), getClass());
+            String file = getDataContext().getObjectStore().getUniqueTmpFile(
+                                                                             "ncmltemplate", ".ncml");
+            ncml = ncml.replace("%location%", ""+IOUtil.getURL(source, getClass()));
+            //            System.err.println ("ncml" + ncml);
+            IOUtil.writeFile(file, ncml);
+            return file;
+        }
+        return source;
+    }
+
     /**
      * Can this do a field mask?
      *

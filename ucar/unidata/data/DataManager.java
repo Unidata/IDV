@@ -158,6 +158,8 @@ public class DataManager {
     /** The XML attribute for allowing multiple data choices */
     public static final String ATTR_DOESMULTIPLES = "doesmultiples";
 
+    public static final String ATTR_NCMLTEMPLATE = "ncmltemplate";
+
     /** The XML "id" attribute */
     public static final String ATTR_ID = "id";
 
@@ -647,6 +649,9 @@ public class DataManager {
                                              Misc.findClass(factory),
                                              patterns, fileSelection,
                                              doesMultiples, properties);
+                if(XmlUtil.hasAttribute(datasourceNode,ATTR_NCMLTEMPLATE)) {
+                    descriptor.setNcmlTemplate(XmlUtil.getAttribute(datasourceNode,ATTR_NCMLTEMPLATE));
+                }
                 descriptors.add(descriptor);
                 idToDescriptor.put(id, descriptor);
             }
@@ -1331,6 +1336,8 @@ public class DataManager {
                             + definingObject.getClass()));
                     continue;
                 }
+
+
                 DataSourceFactory factory =
                     (DataSourceFactory) ctor.newInstance(new Object[] {
                         descriptor,
