@@ -3360,6 +3360,9 @@ public class IdvUIManager extends IdvManager {
         } catch (ClassNotFoundException exc) {
             props.append("none");
         }
+        props.append("<br> ");
+        props.append("Heap size: ");
+        props.append(Misc.format(Runtime.getRuntime().maxMemory()/1000000.0) + " " + Msg.msg("MB"));
 
         JEditorPane propsLbl = new JEditorPane();
         propsLbl.setEditable(false);
@@ -5616,6 +5619,7 @@ public class IdvUIManager extends IdvManager {
         append(extra, "java.vendor", System.getProperty("java.vendor"));
         append(extra, "java.version", System.getProperty("java.version"));
         append(extra, "java.home", System.getProperty("java.home"));
+        append(extra, "java.heap", Misc.format(Runtime.getRuntime().maxMemory()/1000000.0) + " " + Msg.msg("MB"));
 
         StringBuffer javaInfo = new StringBuffer();
         javaInfo.append("Java: home: " + System.getProperty("java.home"));
