@@ -743,7 +743,9 @@ public class DataSelectionWidget {
      * @param selected The selected times
      */
     public void setTimes(List all, List selected) {
-        if(all!=null && Misc.equals(allDateTimes, all) && (selected==null ||selected.size()==0)) {
+        //if we are not using defaults and the new list is the same as the old list
+        //then keep around the currently selected times
+        if(!getUseAllTimes() && Misc.equals(allDateTimes, all)) {
             selected = getSelectedDateTimesInList();
         }
         setTimes(timesList, allTimesButton, all, selected);
