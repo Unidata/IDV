@@ -579,14 +579,24 @@ public abstract class NavigatedViewManager extends ViewManager {
                 navDisplay.center(navDisplay.getEarthLocation(box));
             }
         }
+
+
         if ((eventId == DisplayEvent.MOUSE_PRESSED)
                 || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
             MouseEvent mouseEvent = (MouseEvent) inputEvent;
-            if (!(mouseEvent.isControlDown() || !SwingUtilities.isMiddleMouseButton(mouseEvent))) {
-                if (cursorReadoutWindow == null) {
-                    cursorReadoutWindow = new CursorReadoutWindow(this);
+            int[][][] functionMap = getMaster().getMouseFunctionMap();
+            if(functionMap!=null) {
+                int ctrlIdx = (mouseEvent.isControlDown()?1:0);
+                int shiftIdx = (mouseEvent.isShiftDown()?1:0);
+                int mouseIdx = (SwingUtilities.isLeftMouseButton(mouseEvent)?0:(
+                                                                                SwingUtilities.isMiddleMouseButton(mouseEvent)?1:2));
+                int function = functionMap[mouseIdx][ctrlIdx][shiftIdx];
+                if (function==MouseHelper.CURSOR_TRANSLATE) {
+                    if (cursorReadoutWindow == null) {
+                        cursorReadoutWindow = new CursorReadoutWindow(this);
+                    }
+                    cursorReadoutWindow.handleMousePressedOrDragged(mouseEvent);
                 }
-                cursorReadoutWindow.handleMousePressedOrDragged(mouseEvent);
             }
         } else if (eventId == DisplayEvent.MOUSE_RELEASED) {
             MouseEvent mouseEvent = (MouseEvent) inputEvent;
