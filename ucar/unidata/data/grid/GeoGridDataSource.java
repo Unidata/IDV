@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -50,9 +51,9 @@ import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
 
-import ucar.unidata.util.CatalogUtil;
-
 import ucar.unidata.util.CacheManager;
+
+import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -138,7 +139,7 @@ public class GeoGridDataSource extends GridDataSource {
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
 
-    /** _more_ */
+    /** property timesize */
     public static final String PROP_TIMESIZE = "prop.timesize";
 
     /** This is used to synchronize geogrid read access */
@@ -188,7 +189,7 @@ public class GeoGridDataSource extends GridDataSource {
     /** Keep track of the max grid size */
     private int max3D;
 
-    /** _more_ */
+    /** category attributes */
     private static String[] categoryAttributes = { "GRIB_param_category" };
 
 
@@ -451,6 +452,12 @@ public class GeoGridDataSource extends GridDataSource {
         return super.getDataPaths();
     }
 
+    /**
+     * Update the state
+     *
+     * @param newObject new object
+     * @param newProperties  properties
+     */
     public void updateState(Object newObject, Hashtable newProperties) {
         removeProperty(PROP_RESOLVERURL);
         super.updateState(newObject, newProperties);
@@ -465,7 +472,7 @@ public class GeoGridDataSource extends GridDataSource {
     public void setTmpPaths(List paths) {
         //TODO: Figure out what to do here
         String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
-        oldResolverUrl =resolverUrl;
+        oldResolverUrl = resolverUrl;
         if (((paths != null) && (paths.size() > 0)) && (resolverUrl != null)
                 && (resolverUrl.length() > 0)) {
             Hashtable properties = getProperties();
@@ -474,11 +481,13 @@ public class GeoGridDataSource extends GridDataSource {
             }
             String firstone = paths.get(0).toString();
             //If we are being saved as a zidv then we remove the resolverurl
-            if(firstone.indexOf(ucar.unidata.idv.IdvPersistenceManager.PROP_ZIDVPATH)>=0) {
+            if (firstone
+                    .indexOf(ucar.unidata.idv.IdvPersistenceManager
+                        .PROP_ZIDVPATH) >= 0) {
                 getProperties().remove(PROP_RESOLVERURL);
             } else {
                 String resolvedUrl = CatalogUtil.resolveUrl(firstone,
-                                                               properties);
+                                         properties);
                 if (resolvedUrl != null) {
                     setProperty(PROP_RESOLVERURL, firstone);
                 }
@@ -568,9 +577,9 @@ public class GeoGridDataSource extends GridDataSource {
 
 
     /**
-     * _more_
+     * Get the label for the save data file option
      *
-     * @return _more_
+     * @return label
      */
     protected String getSaveDataFileLabel() {
         return (isFileBased()
@@ -579,9 +588,9 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
     /**
-     * _more_
+     * Make savel local actions
      *
-     * @param actions _more_
+     * @param actions list of actions
      */
     protected void makeSaveLocalActions(List actions) {
         String         lbl = (isFileBased()
@@ -622,13 +631,13 @@ public class GeoGridDataSource extends GridDataSource {
                                        boolean changeLinks)
             throws Exception {
 
-        List      choices            = getDataChoices();
-        final List<JCheckBox>      checkboxes         = new ArrayList<JCheckBox>();
-        List      categories         = new ArrayList();
-        Hashtable catMap             = new Hashtable();
-        Hashtable currentDataChoices = new Hashtable();
+        List                  choices            = getDataChoices();
+        final List<JCheckBox> checkboxes         = new ArrayList<JCheckBox>();
+        List                  categories         = new ArrayList();
+        Hashtable             catMap             = new Hashtable();
+        Hashtable             currentDataChoices = new Hashtable();
 
-        List      displays = getDataContext().getIdv().getDisplayControls();
+        List displays = getDataContext().getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
                 ((DisplayControl) displays.get(i)).getDataChoices();
@@ -691,14 +700,14 @@ public class GeoGridDataSource extends GridDataSource {
 
         final JCheckBox allCbx = new JCheckBox("Select All");
         allCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    for(JCheckBox cbx: checkboxes) {
-                        cbx.setSelected(allCbx.isSelected());
-                    }
+            public void actionPerformed(ActionEvent ae) {
+                for (JCheckBox cbx : checkboxes) {
+                    cbx.setSelected(allCbx.isSelected());
                 }
-            });
-        List catComps = new ArrayList();
-        JTabbedPane tab = new JTabbedPane();
+            }
+        });
+        List        catComps = new ArrayList();
+        JTabbedPane tab      = new JTabbedPane();
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 3, GuiUtils.WT_NYN,
@@ -716,8 +725,10 @@ public class GeoGridDataSource extends GridDataSource {
         //        JComponent contents = GuiUtils.hbox(catComps);
         JComponent contents = tab;
         contents = GuiUtils.topCenter(
-                                      GuiUtils.inset(GuiUtils.leftRight(new JLabel("Select the fields to download"), allCbx),5),
-            contents);
+            GuiUtils.inset(
+                GuiUtils.leftRight(
+                    new JLabel("Select the fields to download"),
+                    allCbx), 5), contents);
         contents = GuiUtils.inset(contents, 5);
         if ( !GuiUtils.showOkCancelDialog(null, "", contents, null)) {
             return null;
@@ -800,12 +811,12 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
     /**
-     * _more_
+     * Get the local directory
      *
-     * @param label _more_
-     * @param prefix _more_
+     * @param label   a label
+     * @param prefix  the prefix
      *
-     * @return _more_
+     * @return the path
      */
     protected String getLocalDirectory(String label, String prefix) {
         changeDataPathsCbx.setToolTipText(
@@ -870,7 +881,7 @@ public class GeoGridDataSource extends GridDataSource {
         if ((sb2d != null) || (sb3d != null)) {
             sb = new StringBuffer(desc);
             String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
-            if(resolverUrl!=null) {
+            if (resolverUrl != null) {
                 sb.append("<p>");
                 sb.append("Resolver URL:" + resolverUrl);
             }
@@ -891,10 +902,15 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
+    /** old resolver URL */
     private String oldResolverUrl;
+
+    /**
+     * Reset the tmp state
+     */
     public void resetTmpState() {
         super.resetTmpState();
-        if(oldResolverUrl!=null) {
+        if (oldResolverUrl != null) {
             setProperty(PROP_RESOLVERURL, oldResolverUrl);
         }
 
@@ -926,10 +942,11 @@ public class GeoGridDataSource extends GridDataSource {
         //Make sythetic data ncml file
         if (sources.size() > 1) {
             StringBuffer sb = new StringBuffer();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append(
                 "<netcdf xmlns=\"http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2\">\n");
             sb.append(
-                "<aggregation type=\"joinExisting\" dimName=\"time\">\n");
+                "<aggregation type=\"joinExisting\" dimName=\"time\" timeUnitsChange=\"true\">\n");
             for (int i = 0; i < sources.size(); i++) {
                 String s = sources.get(i).toString();
                 try {
@@ -962,7 +979,8 @@ public class GeoGridDataSource extends GridDataSource {
             return gds;
         } catch (java.io.FileNotFoundException fnfe) {
             setInError(true);
-            LogUtil.consoleMessage("Original error:\n" + fnfe.toString()+"\n"+LogUtil.getStackTrace(fnfe));
+            LogUtil.consoleMessage("Original error:\n" + fnfe.toString()
+                                   + "\n" + LogUtil.getStackTrace(fnfe));
             throw new BadDataException("Unable to open grid:\n" + file);
         } catch (Exception exc) {
             setInError(true);
@@ -1161,7 +1179,7 @@ public class GeoGridDataSource extends GridDataSource {
      *
      *
      * @param dataChoice The data choice we are getting levels for
-     * @param dataSelection _more_
+     * @param dataSelection  the data selection
      * @return  List of all available levels
      */
     public List getAllLevels(DataChoice dataChoice,
@@ -1397,8 +1415,9 @@ public class GeoGridDataSource extends GridDataSource {
         GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
                                      givenDataSelection, requestProperties,
                                      fromLevelIndex, toLevelIndex);
-        if(adapter == null) {
-            throw new BadDataException("Could not find field:" + dataChoice.getStringId());
+        if (adapter == null) {
+            throw new BadDataException("Could not find field:"
+                                       + dataChoice.getStringId());
         }
         Trace.call2("GeoGridDataSource.make GeoGridAdapter");
 
@@ -1652,25 +1671,25 @@ public class GeoGridDataSource extends GridDataSource {
             }
 
             // see if we have any categorization
-            Group group = null;
+            Group            group    = null;
             VariableEnhanced variable = cfield.getVariable();
             if (variable != null) {
                 group = variable.getParentGroup();
-              if (group != null && !group.equals("")) {
-                String append = group.getName();
-                if (append != null) {
-                    append = append.replaceAll("/", "");
-                    append = append.replaceAll(DataCategory.DIVIDER, "_");
+                if ((group != null) && !group.equals("")) {
+                    String append = group.getName();
+                    if (append != null) {
+                        append = append.replaceAll("/", "");
+                        append = append.replaceAll(DataCategory.DIVIDER, "_");
+                    }
+                    DataCategory cat = (DataCategory) categories.get(0);
+                    cat = cat.copyAndAppend(append);
+                    List newCategories = new ArrayList();
+                    newCategories.add(cat);
+                    for (int i = 1; i < categories.size(); i++) {
+                        newCategories.add(categories.get(i));
+                    }
+                    categories = newCategories;
                 }
-                DataCategory cat = (DataCategory) categories.get(0);
-                cat = cat.copyAndAppend(append);
-                List newCategories = new ArrayList();
-                newCategories.add(cat);
-                for (int i = 1; i < categories.size(); i++) {
-                    newCategories.add(categories.get(i));
-                }
-                categories = newCategories;
-              }
             }
 
 
