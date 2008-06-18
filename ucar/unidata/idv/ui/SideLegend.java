@@ -1,5 +1,5 @@
 /*
- * $Id: SideLegend.java,v 1.43 2007/07/30 18:16:22 dmurray Exp $
+ * $Id: SideLegend.java,v 1.2 2008/05/08 23:59:18 jbeavers Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -27,13 +28,13 @@ import ucar.unidata.idv.*;
 
 
 import ucar.unidata.idv.ui.*;
+
+import ucar.unidata.ui.DragPanel;
 import ucar.unidata.ui.DropPanel;
 
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.ui.DragPanel;
 
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Resource;
@@ -117,9 +118,10 @@ public class SideLegend extends IdvLegend {
         displaysLbl.setFont(font.deriveFont(font.getSize()
                                             + 3.0f).deriveFont(Font.BOLD));
 
-        JComponent floatComp  = getFloatButton();
+        JComponent floatComp = getFloatButton();
         JComponent outerPanel =
-            GuiUtils.topCenter(GuiUtils.centerRight(displaysLbl,floatComp), legendsPanel);
+            GuiUtils.topCenter(GuiUtils.centerRight(displaysLbl, floatComp),
+                               legendsPanel);
         JScrollPane scroller =
             new JScrollPane(
                 outerPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -175,7 +177,7 @@ public class SideLegend extends IdvLegend {
                 category = "Displays";
             }
             CategoryPanel categoryPanel =
-               (CategoryPanel) categoryToPanel.get(category);
+                (CategoryPanel) categoryToPanel.get(category);
             if (categoryPanel == null) {
                 categoryPanel = new CategoryPanel(this, category);
                 categoryPanels.add(categoryPanel);
@@ -245,13 +247,12 @@ public class SideLegend extends IdvLegend {
      * @param control The control
      * @param selected Is visibility on or off
      */
-    private void displayControlVisibilityChanged(DisplayControl control,
-            boolean selected) {
-        for (int i = 0; i < categoryPanels.size(); i++) {
-            CategoryPanel categoryPanel =
-                (CategoryPanel) categoryPanels.get(i);
-            if (categoryPanel.containsDisplayControl(control)) {
-                categoryPanel.controlVisibilityChanged(selected);
+    private void displayControlVisibilityChanged(
+            final DisplayControl control, final boolean selected) {
+        for (CategoryPanel panel : (List<CategoryPanel>) categoryPanels) {
+            if (panel.containsDisplayControl(control)) {
+                control.setDisplayVisibility(selected);
+                panel.controlVisibilityChanged(selected);
                 break;
             }
         }
@@ -324,7 +325,7 @@ public class SideLegend extends IdvLegend {
          */
         protected void doMakeContents() {
             super.doMakeContents();
-            contents =  new DragPanel(control, contents);
+            contents = new DragPanel(control, contents);
             //            contents  = GuiUtils.inset(contents, new Insets(0, 6, 0, 0));
         }
 
@@ -405,17 +406,34 @@ public class SideLegend extends IdvLegend {
             setComponents(new JLabel("  " + category), visCbx, null);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean makeDropPanel() {
             return true;
         }
 
+        /**
+         * _more_
+         *
+         * @param object _more_
+         *
+         * @return _more_
+         */
         public boolean dropOk(Object object) {
             return object instanceof DisplayControl;
         }
 
+        /**
+         * _more_
+         *
+         * @param object _more_
+         */
         public void doDrop(Object object) {
-            ((DisplayControl)object).setDisplayCategory(category);
-            legend.viewManager.displayControlChanged((DisplayControl)object);
+            ((DisplayControl) object).setDisplayCategory(category);
+            legend.viewManager.displayControlChanged((DisplayControl) object);
         }
 
 
@@ -424,24 +442,35 @@ public class SideLegend extends IdvLegend {
          *
          * @param toWhat What the visibility was changed to
          */
-        public void controlVisibilityChanged(boolean toWhat) {
-            if (ignoreVisChanges) {
-                return;
-            }
-            ignoreVisChanges = toWhat;
+        //        public void controlVisibilityChanged(boolean toWhat) {
+        //            if (ignoreVisChanges) {
+        //              System.err.println("debug: ignoring for some reason");
+        //                return;
+        //            }
+        //            ignoreVisChanges = toWhat;
+        //            boolean anyOn = false;
+        //            for (int i = displayControls.size() - 1; i >= 0; i--) {
+        //                DisplayControl control =
+        //                    (DisplayControl) displayControls.get(i);
+        //                anyOn = control.getDisplayVisibility();
+        //                
+        //                System.err.println("control=" + control.getMenuLabel() + " vis=" + control.getDisplayVisibility() + " anyOn=" + anyOn + " toWhat=" + toWhat);
+        //            }
+        //            //            System.err.println ("anyOn:" + anyOn + " toWhat:" + toWhat);
+        //            //Don't do this now.
+        //                        //visCbx.setSelected(anyOn);
+        //            ignoreVisChanges = false;
+        //        }
+        public void controlVisibilityChanged(final boolean toWhat) {
             boolean anyOn = false;
-            for (int i = displayControls.size() - 1; i >= 0; i--) {
-                DisplayControl control =
-                    (DisplayControl) displayControls.get(i);
-                anyOn |= control.getDisplayVisibility();
+            for (DisplayControl dc : (List<DisplayControl>) displayControls) {
+                if (dc.getDisplayVisibility()) {
+                    anyOn = true;
+                    break;
+                }
             }
-            //            System.err.println ("anyOn:" + anyOn + " toWhat:" + toWhat);
-            //Don't do this now.
-            //            visCbx.setSelected(anyOn);
-            ignoreVisChanges = false;
+            visCbx.setSelected(anyOn);
         }
-
-
 
 
 
@@ -506,8 +535,10 @@ public class SideLegend extends IdvLegend {
                 }
                 control.setDisplayVisibility(on);
                 //Don't be too tricky here for now
-                if(true) continue;
-                
+                if (true) {
+                    continue;
+                }
+
                 if (on) {
                     control.setDisplayVisibility(
                         lastVisibility.booleanValue());
