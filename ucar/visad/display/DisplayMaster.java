@@ -186,6 +186,8 @@ abstract public class DisplayMaster {
     private int[][] wheelEventMap = EventMap.IDV_WHEEL_FUNCTIONS;
 
 
+    private  int[][][] mouseFunctionMap;
+
     /**
      * Set the mapping between mouse wheel event and function
      *
@@ -1122,10 +1124,15 @@ abstract public class DisplayMaster {
      * @throws VisADException
      */
     public void setMouseFunctions(int[][][] map) throws VisADException {
+        mouseFunctionMap = map;
         display.getDisplayRenderer().getMouseBehavior().getMouseHelper()
             .setFunctionMap(map);
     }
 
+
+    public int[][][] getMouseFunctionMap() {
+        return mouseFunctionMap;
+    }
 
     /**
      * Get the current mouse behavior
