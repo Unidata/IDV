@@ -69,7 +69,7 @@
 <station idn="000543" id="SHV" name="Shreveport" st="LA" co="US" lat="32:27:03" lon="-93:50:29" elev="83"/>
 <station idn="000339" id="POE" name="Lake Charles/Fort Polk" st="LA" co="US" lat="31:09:20" lon="-92:58:33" elev="124"/>
 <station idn="000323" id="BOX" name="Boston/Taunton" st="MA" co="US" lat="41:57:21" lon="-71:08:13" elev="36"/>
-<station idn="000303" id="LWX" name="Baltimore/Wash/Sterling" st="MD" co="US" lat="38:58:31" lon="-77:28:40" elev="83"/>
+<station idn="000303" id="LWX" name="Baltimore/Wash/Sterling" st="MD" co="US" lat="38:58:34" lon="-77:29:15" elev="88"/>
 <station idn="000528" id="GYX" name="Portland/Gray" st="ME" co="US" lat="43:53:29" lon="-70:15:23" elev="125"/>
 <station idn="000329" id="CBW" name="Portland/Houlton" st="ME" co="US" lat="46:02:21" lon="-67:48:23" elev="227"/>
 <station idn="000349" id="DTX" name="Detroit/White Lake" st="MI" co="US" lat="42:41:59" lon="-83:28:18" elev="327"/>
