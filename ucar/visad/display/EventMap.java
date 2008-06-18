@@ -66,7 +66,7 @@ abstract public class EventMap {
     /** Mouse function names */
     public static final String[] MOUSE_FUNCTION_NAMES = {
         "None", "Rotate", "Zoom", "Translate", "Selection",
-        "Cursor Translate", "Cursor Zoom", "Cursor Rotate",
+        "Cursor/Data Readout", "Cursor Zoom", "Cursor Rotate",
     };
 
 
