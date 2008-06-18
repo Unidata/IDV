@@ -7212,8 +7212,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ((choices == null) || (choices.size() == 0)) {
             return;
         }
+
         final List clonedList =
             DataChoice.cloneDataChoices((List) choices.get(0));
+        dataSelection = ((DataChoice)clonedList.get(0)).getDataSelection();
         Misc.run(new Runnable() {
             public void run() {
                 try {
