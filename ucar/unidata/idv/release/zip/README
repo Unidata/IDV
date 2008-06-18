@@ -8,7 +8,7 @@ programs. It should contain the following files:
     jython.jar            - Jython
     local-visad.jar       - UPC mods to VisAD not yet in visad.jar
     visad.jar             - VisAD
-    nc2.2.jar             - netcdf 2.2 library
+    ncIdv.jar             - netcdf-Java 4.0 library
 
 There is also an example JNLP file (localjars.jnlp) which allows
 you to stage the JARS above as a WebStart distribution.  To use
@@ -21,7 +21,7 @@ this:
    this on machines with 512 Mb or more, you can bump up the 
    max-heap-size parameter to "384m" or "512m" for better performance:
 
-         <j2se version="1.4" max-heap-size="512m" /> 
+         <j2se version="1.5" max-heap-size="512m" /> 
 
 3) Configure your Web server so that all files with the .jnlp file 
    extension are set to the application/x-java-jnlp-file MIME type.
