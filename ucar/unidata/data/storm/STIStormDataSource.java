@@ -66,7 +66,7 @@ import java.util.Date;
  */
 public class STIStormDataSource extends StormDataSource {
 
-    /** _more_          */
+    /** _more_ */
     private static final Way DEFAULT_OBSERVATION_WAY = new Way("babj");
 
     /* Use this for mysql:     */
@@ -108,7 +108,12 @@ public class STIStormDataSource extends StormDataSource {
     }
 
 
-    public  String getId(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getId() {
         return "sti";
     }
 

@@ -251,6 +251,11 @@ public abstract class StormDataSource extends DataSourceImpl {
      */
     public abstract List<StormInfo> getStormInfos();
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public abstract String getId();
 
 

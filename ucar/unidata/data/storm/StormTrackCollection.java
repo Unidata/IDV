@@ -187,7 +187,6 @@ public class StormTrackCollection {
      *
      *
      * @param way _more_
-     * @return _more_
      */
     public void setObsTrack(Way way) {
         // first remove the obs track
