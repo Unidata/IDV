@@ -1122,7 +1122,7 @@ public class StormDisplayState {
 
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
-                    stormInfo, stormTrackControl.getOkWays(), stormTrackControl.getOBWay());
+                    stormInfo, stormTrackControl.getOkWays(), stormTrackControl.getObservationWay());
             initCenterContents();
             stormTrackControl.addDisplayable(holder =
                 new CompositeDisplayable());

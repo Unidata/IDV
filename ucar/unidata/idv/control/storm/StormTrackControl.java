@@ -97,16 +97,16 @@ public class StormTrackControl extends DisplayControlImpl {
 
     /** _more_ */
     private final static String PREF_STORMDISPLAYSTATE =
-        "pref.stormdisplaystate";
+        "pref.stormtrackcontrol.stormdisplaystate";
 
     /** _more_ */
-    private final static String PREF_OKWAYS = "pref.okways";
+    private final static String PREF_OKWAYS = "pref.stormtrackcontrol.okways";
 
     /** _more_ */
-    private final static String PREF_OBWAY = "pref.obway";
+    private final static String PREF_OBWAY = "pref.stormtrackcontrol.observationway";
 
     /** _more_ */
-    private final static String PREF_OKPARAMS = "pref.okparams";
+    private final static String PREF_OKPARAMS = "pref.stormtrackcontrol.okparams";
 
     /** _more_ */
     private static int cnt = 0;
@@ -133,7 +133,7 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private Hashtable<String, Boolean> okWays;
 
-    private Way obWay;
+    private Way observationWay;
 
     /** _more_ */
     private Hashtable<String, Boolean> okParams;
@@ -252,14 +252,14 @@ public class StormTrackControl extends DisplayControlImpl {
             okWays = (Hashtable<String,
                                 Boolean>) getPreferences().get(PREF_OKWAYS);
         }
-        if (obWay == null) {
-            obWay = (Way) getPreferences().get(PREF_OBWAY);
+        if (observationWay == null) {
+            observationWay = (Way) getPreferences().get(PREF_OBWAY);
+            if (observationWay == null) {
+                observationWay  = stormDataSource.getDefaultObservationWay();
+            }
         }
         if (okWays == null) {
             okWays = new Hashtable<String, Boolean>();
-        }
-        if (obWay == null) {
-            obWay = new Way("babj");
         }
         if (okParams == null) {
             okParams =
@@ -273,6 +273,118 @@ public class StormTrackControl extends DisplayControlImpl {
 
         return true;
     }
+
+
+    private TwoListPanel waysToUseSelector;
+    private JCheckBox waysToUsePreferenceCbx;
+    private List<Way> allWays;
+    private List<Way> useWays;
+    private JCheckBox obsWayPreferenceCbx;
+    private List<JRadioButton> obsWayRadioButtons;
+
+    protected void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+        useWays    = new ArrayList<Way>();
+        allWays    = new ArrayList<Way>();
+        for (Way way : stormDataSource.getWays()) {
+            if (way.isObservation()) {
+                continue;
+            }
+            allWays.add(way);
+            if (okToShowWay(way)) {
+                useWays.add(way);
+            }
+        }
+        useWays = (List<Way>)Misc.sort(useWays);
+        allWays = (List<Way>)Misc.sort(allWays);
+        if(waysToUsePreferenceCbx==null) {
+            waysToUsePreferenceCbx = new JCheckBox("Save as preference",
+                                                   false);
+        }
+        waysToUseSelector = new TwoListPanel(allWays, "Don't Use", useWays,
+                                            "Use", null, false);
+        JComponent contents = GuiUtils.centerBottom(waysToUseSelector,
+                                  GuiUtils.left(waysToUsePreferenceCbx));
+        jtp.add(getWaysName() + " to use", contents);
+
+
+
+        if(stormDataSource.getIsObservationWayChangeable()) {
+            obsWayRadioButtons = new ArrayList<JRadioButton>();
+            ButtonGroup bg = new ButtonGroup();
+            for (Way way : allWays) {
+                if (way.isObservation()) {
+                    continue;
+                }
+                JRadioButton jrb = new JRadioButton(way.getId(), Misc.equals(observationWay, way));
+                obsWayRadioButtons.add(jrb);
+                bg.add(jrb);
+            }
+
+            if(obsWayPreferenceCbx == null) {
+                obsWayPreferenceCbx = new JCheckBox("Save as preference",  false);
+            }
+
+            JComponent obsWayContents =  GuiUtils.topLeft(GuiUtils.doLayout(obsWayRadioButtons,(obsWayRadioButtons.size()>10?2:1),GuiUtils.WT_N,GuiUtils.WT_N)); 
+            int width  = 200;
+            int height = 150;
+            if(obsWayRadioButtons.size()>10) {
+                obsWayContents = GuiUtils.makeScrollPane(obsWayContents, width, height);
+            }
+            jtp.add("Observation " + getWayName(),
+                    GuiUtils.centerBottom(obsWayContents,
+                                          GuiUtils.left(obsWayPreferenceCbx)));
+        }
+        
+    }
+
+
+
+    public boolean doApplyProperties() {
+        if(!super.doApplyProperties()) return false;
+        
+        List only = Misc.sort(waysToUseSelector.getCurrentEntries());
+        boolean changed = false;
+        if(!useWays.equals(only)) {
+            changed = true;
+            if (only.size() == allWays.size()) {
+                onlyShowTheseWays(new ArrayList<Way>(),
+                                  waysToUsePreferenceCbx.isSelected());
+            } else {
+                onlyShowTheseWays((List<Way>) only,
+                                  waysToUsePreferenceCbx.isSelected());
+            }
+        }
+
+        if(stormDataSource.getIsObservationWayChangeable()) {
+            Way newObsWay=null;
+            for(int i=0;i<obsWayRadioButtons.size();i++) {
+                if(obsWayRadioButtons.get(i).isSelected()) {
+                    newObsWay  = allWays.get(i);
+                    break;
+                }
+            }
+
+            if(newObsWay!=null && !Misc.equals(newObsWay, observationWay)) {
+                changed = true;
+                observationWay = newObsWay;
+                if (obsWayPreferenceCbx.isSelected()) {
+                    putPreference(PREF_OBWAY, observationWay);
+                }
+            }
+        }
+
+
+        if(changed) {
+            reloadStormTracks();
+        }
+        return true;
+    }
+
+
+
+
+
     /**
      * Signal base class to add this as a control listener
      *
@@ -484,112 +596,10 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-    /**
-     * _more_
-     */
-    public void showWaySelectDialog() {
-        List checkBoxes = new ArrayList();
-        List useWays    = new ArrayList();
-        List allWays    = new ArrayList<Way>();
-        for (Way way : stormDataSource.getWays()) {
-            if (way.isObservation()) {
-                continue;
-            }
-            allWays.add(way);
-            if (okToShowWay(way)) {
-                useWays.add(way);
-            }
-        }
-        useWays = Misc.sort(useWays);
-        allWays = Misc.sort(allWays);
-        JCheckBox writeAsPreferenceCbx = new JCheckBox("Save as preference",
-                                             false);
-        TwoListPanel tlp = new TwoListPanel(allWays, "Don't Use", useWays,
-                                            "Use", null, false);
-        JComponent contents = GuiUtils.centerBottom(tlp,
-                                  GuiUtils.left(writeAsPreferenceCbx));
-        if ( !GuiUtils.showOkCancelDialog(null, getWayName() + " Selection",
-                                          contents, null)) {
-            return;
-        }
-        List only = tlp.getCurrentEntries();
-
-        if (only.size() == allWays.size()) {
-            onlyShowTheseWays(new ArrayList<Way>(),
-                              writeAsPreferenceCbx.isSelected());
-        } else {
-            onlyShowTheseWays((List<Way>) only,
-                              writeAsPreferenceCbx.isSelected());
-        }
-
-    }
-    /**
-     * _more_
-     */
-    public void showObsWaySelectDialog() {
-        List bom = new ArrayList();
-        List wayComps = new ArrayList();
-        List<Way> ways =
-            Misc.sort(stormDataSource.getWays());
-        int i = 0;
-        int ob = 0;
-        Way obc = (Way) getPreferences().get(PREF_OBWAY) ;
-
-        for (Way way : ways) {
-            if ( way.equals(obc)) {
-                ob = i;
-            }
-
-            if(!way.isObservation()) {
-                wayComps.add(way.getId()); //.getName());
-                i++;
-            }
-
-        }
-        JRadioButton[] jrbs =
-                            GuiUtils.makeRadioButtons( wayComps, ob, this, "getObsFromThisWay");
-
-        JCheckBox writeAsPreferenceCbx = new JCheckBox("Save as preference",
-                                             false);
-
-        bom.add(writeAsPreferenceCbx);
-       //wayComps.add(writeAsPreferenceCbx);
-        JComponent contents =  GuiUtils.centerBottom(GuiUtils.vbox(jrbs), GuiUtils.vbox(bom));
-        int width  = 80;
-        int height = 200;
-        JScrollPane contentsC  = GuiUtils.makeScrollPane(GuiUtils.top(contents), width, height);
-        if ( !GuiUtils.showOkCancelDialog(null, "Observation " + getWayName() + " Selection",
-                                          contentsC, null)) {
-            return;
-        }
 
 
-        if (writeAsPreferenceCbx.isSelected()) {
-            putPreference(PREF_OBWAY, obWay);
-        }
 
-    }
 
-    public void  getObsFromThisWay(int idx){
-        List<Way> ways =
-            Misc.sort(stormDataSource.getWays());
-        Way thisWay = ways.get(idx);
-
-        System.out.println("select observation from this forecast way " + thisWay.getId());
-
-        obWay = thisWay;
-       // StormDisplayState sds = getCurrentStormDisplayState();
-       // StormTrackCollection tcl = sds.getTrackCollection();
-       // tcl.setObsTrack(thisWay);
-
-        for (int i = stormInfos.size() - 1; i >= 0; i--) {
-            StormInfo stormInfo = stormInfos.get(i);
-            StormDisplayState stormDisplayState =
-                getStormDisplayState(stormInfo);
-            stormDisplayState.reload();
-        }
-
-    }
     /**
      * _more_
      *
@@ -620,23 +630,26 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    private void reloadStormTracks() {
+        for (int i = stormInfos.size() - 1; i >= 0; i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            StormDisplayState stormDisplayState =
+                getStormDisplayState(stormInfo);
+            stormDisplayState.reload();
+        }
+    }
+
     /**
      * _more_
      *
      * @param ways _more_
      * @param writeAsPreference _more_
      */
-    protected void onlyShowTheseWays(List<Way> ways,
+    private void onlyShowTheseWays(List<Way> ways,
                                      boolean writeAsPreference) {
         okWays = new Hashtable();
         for (Way way : ways) {
             okWays.put(way.getId(), new Boolean(true));
-        }
-        for (int i = stormInfos.size() - 1; i >= 0; i--) {
-            StormInfo stormInfo = stormInfos.get(i);
-            StormDisplayState stormDisplayState =
-                getStormDisplayState(stormInfo);
-            stormDisplayState.reload();
         }
         if (writeAsPreference) {
             putPreference(PREF_OKWAYS, okWays);
@@ -690,6 +703,18 @@ public class StormTrackControl extends DisplayControlImpl {
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
         StormDisplayState current = getCurrentStormDisplayState();
         if ((current != null) && current.getActive()) {
+            items.add(
+                GuiUtils.makeMenuItem(
+                    "Save Storm Display as Preference", this,
+                    "saveStormDisplayState"));
+
+            if (getPreferences().get(PREF_STORMDISPLAYSTATE) != null) {
+                items.add(
+                          GuiUtils.makeMenuItem(
+                                                "Remove Storm Display Preference", this,
+                                                "deleteStormDisplayState"));
+            }
+            items.add(GuiUtils.MENU_SEPARATOR);
             items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,
                                             "writeToXls"));
 
@@ -717,24 +742,6 @@ public class StormTrackControl extends DisplayControlImpl {
                                             current, "addForecastTimeChart"));
             items.add(GuiUtils.makeMenuItem("Add Forecast Hour Chart",
                                             current, "addForecastHourChart"));
-            if(stormDataSource.getIsObsWayChangeable()){
-                items.add(GuiUtils.makeMenuItem("Select " + getWayName()
-                                            + " As Observation", this,
-                                                "showObsWaySelectDialog"));
-            }
-            items.add(GuiUtils.makeMenuItem("Select " + getWaysName()
-                                            + " To Use", this,
-                                                "showWaySelectDialog"));
-            items.add(
-                GuiUtils.makeMenuItem(
-                    "Save Storm Display as Preference", this,
-                    "saveStormDisplayState"));
-        }
-        if (getPreferences().get(PREF_STORMDISPLAYSTATE) != null) {
-            items.add(
-                GuiUtils.makeMenuItem(
-                    "Remove Storm Display Preference", this,
-                    "deleteStormDisplayState"));
         }
         super.getEditMenuItems(items, forMenuBar);
     }
@@ -1254,7 +1261,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 try {
                     StormTrackCollection tracks =
                         stormDataSource.getTrackCollection(stormInfo,
-                            obsWays, obWay);
+                            obsWays, observationWay);
                     obsTrack = tracks.getObsTrack();
                     if (obsTrack == null) {
                         continue;
@@ -2069,8 +2076,8 @@ public class StormTrackControl extends DisplayControlImpl {
         okWays = value;
     }
 
-    public void setOBWay(Way value) {
-         obWay = value;
+    public void setObservationWay(Way value) {
+         observationWay = value;
      }
 
     /**
@@ -2082,8 +2089,8 @@ public class StormTrackControl extends DisplayControlImpl {
         return okWays;
     }
 
-    public Way getOBWay() {
-        return obWay;
+    public Way getObservationWay() {
+        return observationWay;
     }
     /**
      * Set the OkParams property.
