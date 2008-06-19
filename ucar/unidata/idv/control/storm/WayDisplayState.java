@@ -480,8 +480,6 @@ public class WayDisplayState {
     /**
      * _more_
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
      *
      * @throws Exception _more_
      */
@@ -766,7 +764,6 @@ public class WayDisplayState {
      *
      * @return _more_
      *
-     * @throws Exception _more_
      *
      * @throws RemoteException _more_
      * @throws VisADException _more_

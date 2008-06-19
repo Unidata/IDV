@@ -163,10 +163,10 @@ public class StormDisplayState {
     private static int[] nextColor = { 0 };
 
 
-    /** _more_          */
+    /** _more_ */
     private JLabel obsColorTableLabel;
 
-    /** _more_          */
+    /** _more_ */
     private JLabel forecastColorTableLabel;
 
     /** _more_ */
@@ -219,7 +219,7 @@ public class StormDisplayState {
     /** _more_ */
     private String obsLayoutModelName = "Storm>Hurricane";
 
-    /** _more_          */
+    /** _more_ */
     private String obsPointLayoutModelName = "Storm>Forecast Hour";
 
     /** _more_ */
@@ -465,7 +465,7 @@ public class StormDisplayState {
 
     /**
      *  _more_
-     * 
+     *
      *  @param sm _more_
      */
     public void setObsPointLayoutModel(StationModel sm) {
@@ -999,10 +999,10 @@ public class StormDisplayState {
             wayComp = scroller;
         }
 
-        wayComp = GuiUtils.left(GuiUtils.doLayout(new Component[]{GuiUtils.left(paramComp),
-                                                                     GuiUtils.filler(2, 10), 
-                                                                     GuiUtils.left(wayComp)},
-                1, GuiUtils.WT_N,GuiUtils.WT_NNY));
+        wayComp = GuiUtils.left(GuiUtils.doLayout(new Component[] {
+            GuiUtils.left(paramComp),
+            GuiUtils.filler(2, 10), GuiUtils.left(wayComp) }, 1,
+                GuiUtils.WT_N, GuiUtils.WT_NNY));
 
         wayComp = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
         //        tabbedPane = GuiUtils.getNestedTabbedPane();
@@ -2028,7 +2028,7 @@ public class StormDisplayState {
 
     /**
      *  Set the ObsLayoutModelName property.
-     * 
+     *
      *  @param value The new value for ObsLayoutModelName
      */
     public void setObsPointLayoutModelName(String value) {
