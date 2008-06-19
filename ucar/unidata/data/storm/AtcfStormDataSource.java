@@ -415,6 +415,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
      *
      * @param stormInfo _more_
      * @param waysToUse _more_
+     * @param observationWay _more_
      *
      * @return _more_
      *

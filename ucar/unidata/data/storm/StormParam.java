@@ -93,10 +93,11 @@ public class StormParam {
      *
      * @param type _more_
      * @param derived _more_
+     * @param canDoDiff _more_
      */
     public StormParam(RealType type, boolean derived, boolean canDoDiff) {
         this(type);
-        this.derived = derived;
+        this.derived         = derived;
         this.canDoDifference = canDoDiff;
     }
 
@@ -105,13 +106,17 @@ public class StormParam {
      *
      * @param type _more_
      * @param derived _more_
+     * @param canDoDiff _more_
+     * @param chartList _more_
      */
-    public StormParam(RealType type, boolean derived, boolean canDoDiff, boolean chartList) {
+    public StormParam(RealType type, boolean derived, boolean canDoDiff,
+                      boolean chartList) {
         this(type);
-        this.derived = derived;
+        this.derived         = derived;
         this.canDoDifference = canDoDiff;
-        this.isChartParam = chartList;
+        this.isChartParam    = chartList;
     }
+
     /**
      * _more_
      *
@@ -227,6 +232,11 @@ public class StormParam {
         return Util.cleanTypeName(type.getName()).replace("_", " ");
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getName() {
         return Util.cleanTypeName(type.getName());
     }

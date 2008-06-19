@@ -215,7 +215,8 @@ public abstract class StormDataSource extends DataSourceImpl {
                     "Min_Pressure", Util.parseUnit("mb")));
             PARAM_DISTANCEERROR =
                 new StormParam(Util.makeRealType("forecastlocationerror",
-                    "Mean_Distance_Error", Util.parseUnit("km")), true, false);
+                    "Mean_Distance_Error", Util.parseUnit("km")), true,
+                        false);
             PARAM_MAXWINDSPEED_KTS =
                 new StormParam(makeRealType("maxwindspeedkts",
                                             "Max_Windspeed",
@@ -271,6 +272,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @param stormInfo _more_
      * @param waysToUse _more_
+     * @param obsWay _more_
      *
      * @return _more_
      *
@@ -313,6 +315,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @param stormInfo _more_
      * @param waysToUse _more_
+     * @param observationWay _more_
      *
      * @return _more_
      *
@@ -320,7 +323,8 @@ public abstract class StormDataSource extends DataSourceImpl {
      */
 
     public abstract StormTrackCollection getTrackCollectionInner(
-            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse, Way observationWay)
+            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse,
+            Way observationWay)
      throws Exception;
 
 
@@ -617,10 +621,20 @@ public abstract class StormDataSource extends DataSourceImpl {
 
     }
 
-    public boolean getIsObservationWayChangeable(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsObservationWayChangeable() {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Way getDefaultObservationWay() {
         return null;
     }
