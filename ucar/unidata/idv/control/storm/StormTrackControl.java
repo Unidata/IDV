@@ -204,11 +204,35 @@ public class StormTrackControl extends DisplayControlImpl {
     private JCheckBox mostRecentCbx;
 
 
+    /** _more_          */
+    private TwoListPanel waysToUseSelector;
+
+    /** _more_          */
+    private JCheckBox waysToUsePreferenceCbx;
+
+    /** _more_          */
+    private List<Way> allWays;
+
+    /** _more_          */
+    private List<Way> useWays;
+
+    /** _more_          */
+    private JCheckBox obsWayPreferenceCbx;
+
+    /** _more_          */
+    private List<JRadioButton> obsWayRadioButtons;
+
+
     /**
      * Create a new Track Control; set the attribute flags
      */
     public StormTrackControl() {
         setAttributeFlags(FLAG_COLORTABLE);
+    }
+
+
+    protected String getPref(String basePref) {
+        return basePref +"." + stormDataSource.getId();
     }
 
 
@@ -258,10 +282,10 @@ public class StormTrackControl extends DisplayControlImpl {
 
         if (okWays == null) {
             okWays = (Hashtable<String,
-                                Boolean>) getPreferences().get(PREF_OKWAYS);
+                      Boolean>) getPreferences().get(getPref(PREF_OKWAYS));
         }
         if (observationWay == null) {
-            observationWay = (Way) getPreferences().get(PREF_OBWAY);
+            observationWay = (Way) getPreferences().get(getPref(PREF_OBWAY));
             if (observationWay == null) {
                 observationWay = stormDataSource.getDefaultObservationWay();
             }
@@ -272,7 +296,7 @@ public class StormTrackControl extends DisplayControlImpl {
         if (okParams == null) {
             okParams =
                 (Hashtable<String,
-                           Boolean>) getPreferences().get(PREF_OKPARAMS);
+                 Boolean>) getPreferences().get(getPref(PREF_OKPARAMS));
         }
         if (okParams == null) {
             okParams = new Hashtable<String, Boolean>();
@@ -283,23 +307,6 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-    /** _more_          */
-    private TwoListPanel waysToUseSelector;
-
-    /** _more_          */
-    private JCheckBox waysToUsePreferenceCbx;
-
-    /** _more_          */
-    private List<Way> allWays;
-
-    /** _more_          */
-    private List<Way> useWays;
-
-    /** _more_          */
-    private JCheckBox obsWayPreferenceCbx;
-
-    /** _more_          */
-    private List<JRadioButton> obsWayRadioButtons;
 
     /**
      * _more_
@@ -404,12 +411,13 @@ public class StormTrackControl extends DisplayControlImpl {
                 }
             }
 
-            if ((newObsWay != null)
-                    && !Misc.equals(newObsWay, observationWay)) {
-                changed        = true;
-                observationWay = newObsWay;
+            if (newObsWay != null) {
+                if(!Misc.equals(newObsWay, observationWay)) {
+                    changed        = true;
+                    observationWay = newObsWay;
+                }
                 if (obsWayPreferenceCbx.isSelected()) {
-                    putPreference(PREF_OBWAY, observationWay);
+                    putPreference(getPref(PREF_OBWAY), observationWay);
                 }
             }
         }
@@ -708,7 +716,7 @@ public class StormTrackControl extends DisplayControlImpl {
             okWays.put(way.getId(), new Boolean(true));
         }
         if (writeAsPreference) {
-            putPreference(PREF_OKWAYS, okWays);
+            putPreference(getPref(PREF_OKWAYS), okWays);
         }
 
     }
@@ -764,7 +772,7 @@ public class StormTrackControl extends DisplayControlImpl {
                     "Save Storm Display as Preference", this,
                     "saveStormDisplayState"));
 
-            if (getPreferences().get(PREF_STORMDISPLAYSTATE) != null) {
+            if (getPreferences().get(getPref(PREF_STORMDISPLAYSTATE)) != null) {
                 items.add(
                     GuiUtils.makeMenuItem(
                         "Remove Storm Display Preference", this,
@@ -1025,9 +1033,9 @@ public class StormTrackControl extends DisplayControlImpl {
      */
     public void deleteStormDisplayState() {
         String template =
-            (String) getPreferences().get(PREF_STORMDISPLAYSTATE);
+            (String) getPreferences().get(getPref(PREF_STORMDISPLAYSTATE));
         if (template != null) {
-            getPreferences().remove(PREF_STORMDISPLAYSTATE);
+            getPreferences().remove(getPref(PREF_STORMDISPLAYSTATE));
             writePreferences();
         }
     }
@@ -1047,7 +1055,7 @@ public class StormTrackControl extends DisplayControlImpl {
             String xml = getIdv().encodeObject(current, false);
             current.setStormTrackControl(this);
             current.setActive(wasActive);
-            putPreference(PREF_STORMDISPLAYSTATE, xml);
+            putPreference(getPref(PREF_STORMDISPLAYSTATE), xml);
             userMessage(
                 "<html>Preference saved. <br>Note: This will take effect for new display controls</html>");
         } catch (Exception exc) {
@@ -1090,7 +1098,7 @@ public class StormTrackControl extends DisplayControlImpl {
         try {
             if (stormDisplayState == null) {
                 String template =
-                    (String) getPreferences().get(PREF_STORMDISPLAYSTATE);
+                    (String) getPreferences().get(getPref(PREF_STORMDISPLAYSTATE));
                 if (template != null) {
                     try {
                         stormDisplayState =

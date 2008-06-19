@@ -107,6 +107,11 @@ public class STIStormDataSource extends StormDataSource {
         return false;
     }
 
+
+    public  String getId(){
+        return "sti";
+    }
+
     /**
      * _more_
      *

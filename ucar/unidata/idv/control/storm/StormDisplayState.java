@@ -999,9 +999,10 @@ public class StormDisplayState {
             wayComp = scroller;
         }
 
-        wayComp = GuiUtils.topLeft(GuiUtils.vbox(GuiUtils.left(paramComp),
-                GuiUtils.filler(2, 10),  /*GuiUtils.lLabel("Visibility:"),*/
-                GuiUtils.left(wayComp)));
+        wayComp = GuiUtils.left(GuiUtils.doLayout(new Component[]{GuiUtils.left(paramComp),
+                                                                     GuiUtils.filler(2, 10), 
+                                                                     GuiUtils.left(wayComp)},
+                1, GuiUtils.WT_N,GuiUtils.WT_NNY));
 
         wayComp = GuiUtils.inset(wayComp, new Insets(0, 5, 0, 0));
         //        tabbedPane = GuiUtils.getNestedTabbedPane();
