@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -36,6 +35,9 @@ import ucar.unidata.data.storm.*;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.FlatEarth;
 import ucar.unidata.geoloc.projection.LatLonProjection;
+import ucar.unidata.gis.SpatialGrid;
+import ucar.unidata.idv.NavigatedViewManager;
+import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.ui.colortable.ColorTableManager;
@@ -50,9 +52,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-import ucar.unidata.gis.SpatialGrid;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.NavigatedViewManager;
 
 import ucar.visad.Util;
 import ucar.visad.display.*;
@@ -65,8 +64,8 @@ import visad.georef.EarthLocationLite;
 
 import java.awt.*;
 import java.awt.Color;
-import java.awt.geom.Rectangle2D;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 
 import java.rmi.RemoteException;
 
@@ -237,23 +236,42 @@ public class WayDisplayState {
     }
 
 
-    private void removeTrackDisplay() throws VisADException,RemoteException  {
-        if(trackDisplay!=null) {
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private void removeTrackDisplay() throws VisADException, RemoteException {
+        if (trackDisplay != null) {
             removeDisplayable(trackDisplay);
             trackDisplay = null;
         }
     }
 
 
-    private void removeLabelDisplay() throws VisADException,RemoteException  {
-        if(labelDisplay!=null) {
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private void removeLabelDisplay() throws VisADException, RemoteException {
+        if (labelDisplay != null) {
             removeDisplayable(labelDisplay);
             labelDisplay = null;
         }
     }
 
-    private void removeObsPointDisplay() throws VisADException,RemoteException  {
-        if(obsPointDisplay!=null) {
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private void removeObsPointDisplay()
+            throws VisADException, RemoteException {
+        if (obsPointDisplay != null) {
             removeDisplayable(obsPointDisplay);
             obsPointDisplay = null;
         }
@@ -305,10 +323,10 @@ public class WayDisplayState {
 
         getHolder().setVisible(true);
         if (shouldShowTrack()) {
-            StormParam tmpParam = stormDisplayState.getColorParam(this);
-            boolean hadTrack = hasTrackDisplay();
-            boolean paramChanged = !Misc.equals(colorParam, tmpParam);
-            if (!hadTrack || paramChanged) {
+            StormParam tmpParam     = stormDisplayState.getColorParam(this);
+            boolean    hadTrack     = hasTrackDisplay();
+            boolean    paramChanged = !Misc.equals(colorParam, tmpParam);
+            if ( !hadTrack || paramChanged) {
                 colorParam = tmpParam;
                 FieldImpl trackField = makeTrackField();
                 if (trackField != null) {
@@ -333,7 +351,7 @@ public class WayDisplayState {
                         range = GridUtil.getMinMax(trackField)[0];
                     }
                     getTrackDisplay().setRangeForColor(range.getMin(),
-                    range.getMax());
+                            range.getMax());
                 }
             }
             setTrackColor();
@@ -464,27 +482,29 @@ public class WayDisplayState {
      *
      * @throws RemoteException _more_
      * @throws VisADException _more_
+     *
+     * @throws Exception _more_
      */
     public void updateLayoutModel() throws Exception {
         StationModel sm;
         //If we are showing the track then create (if needed) the station model displays
-        if(shouldShowTrack()) {
+        if (shouldShowTrack()) {
             if (way.isObservation()) {
                 sm = stormDisplayState.getObsPointLayoutModel();
                 //We won't create them (or will remove them) if the layout model is null
                 if (sm == null) {
                     removeObsPointDisplay();
                 } else {
-                    if (true) { //(!hasObsPointDisplay()) {
+                    if (true) {  //(!hasObsPointDisplay()) {
                         FieldImpl pointField =
                             PointObFactory.makeTimeSequenceOfPointObs(
-                                                                      allPointObs, -1, -1);
+                                allPointObs, -1, -1);
 
-                            FieldImpl pointField1 = doDeclutter(pointField, sm);
-                            getObsPointDisplay().setStationData(pointField1);
+                        FieldImpl pointField1 = doDeclutter(pointField, sm);
+                        getObsPointDisplay().setStationData(pointField1);
 
                     }
-                    if (hasObsPointDisplay() ) { //&& !Misc.equals(sm, getObsPointDisplay().getStationModel())) {
+                    if (hasObsPointDisplay()) {  //&& !Misc.equals(sm, getObsPointDisplay().getStationModel())) {
                         getObsPointDisplay().setStationModel(sm);
                     }
                 }
@@ -497,14 +517,14 @@ public class WayDisplayState {
             if (sm == null) {
                 removeLabelDisplay();
             } else {
-                if (true) { //(!hasLabelDisplay()) {
+                if (true) {  //(!hasLabelDisplay()) {
                     FieldImpl pointField =
-                        PointObFactory.makeTimeSequenceOfPointObs(
-                                                                  pointObs, -1, -1);
+                        PointObFactory.makeTimeSequenceOfPointObs(pointObs,
+                            -1, -1);
 
-                       getLabelDisplay().setStationData(pointField);
+                    getLabelDisplay().setStationData(pointField);
                 }
-                if (hasLabelDisplay() ) { //&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
+                if (hasLabelDisplay()) {  //&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
                     getLabelDisplay().setStationModel(sm);
                 }
             }
@@ -528,6 +548,7 @@ public class WayDisplayState {
      * to handle the case where there is a time sequence of observations.
      *
      * @param  obs initial field of observations.
+     * @param sModel _more_
      *
      * @return a decluttered version of obs
      *
@@ -538,7 +559,7 @@ public class WayDisplayState {
             throws VisADException, RemoteException {
 
 
-      //  long      millis           = System.currentTimeMillis();
+        //  long      millis           = System.currentTimeMillis();
         boolean   isTimeSequence   = GridUtil.isTimeSequence(obs);
         FieldImpl declutteredField = null;
         if (isTimeSequence) {
@@ -571,10 +592,23 @@ public class WayDisplayState {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-       /** grid for decluttering */
+
+    /** grid for decluttering */
     private SpatialGrid stationGrid;
 
-    private FieldImpl doTheActualDecluttering(FieldImpl pointObs, StationModel sm)
+    /**
+     * _more_
+     *
+     * @param pointObs _more_
+     * @param sm _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private FieldImpl doTheActualDecluttering(FieldImpl pointObs,
+            StationModel sm)
             throws VisADException, RemoteException {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
@@ -586,7 +620,7 @@ public class WayDisplayState {
 
         long      t1          = System.currentTimeMillis();
         Rectangle glyphBounds = sm.getBounds();
-        float myScale = getObsPointDisplay().getScale()* .0025f
+        float myScale = getObsPointDisplay().getScale() * .0025f
                         * getDeclutterFilter();
         //System.out.println("\ndecluttering  myScale=" + myScale +
         //                           " filter=" +getDeclutterFilter());
@@ -595,9 +629,10 @@ public class WayDisplayState {
                                    glyphBounds.getY() * myScale,
                                    glyphBounds.getWidth() * myScale,
                                    glyphBounds.getHeight() * myScale);
-        NavigatedDisplay   navDisplay = stormDisplayState.getStormTrackControl().getNavigatedDisplay();
+        NavigatedDisplay navDisplay =
+            stormDisplayState.getStormTrackControl().getNavigatedDisplay();
 
-        Rectangle2D.Double obBounds   = new Rectangle2D.Double();
+        Rectangle2D.Double obBounds = new Rectangle2D.Double();
         obBounds.width  = scaledGlyphBounds.getWidth();
         obBounds.height = scaledGlyphBounds.getHeight();
 
@@ -655,33 +690,51 @@ public class WayDisplayState {
 
     /** decluttering filter factor */
     private float declutterFilter = 1.0f;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public float getDeclutterFilter() {
-            return declutterFilter;
+        return declutterFilter;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected Rectangle2D getBounds() {
         return calculateRectangle();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected Rectangle2D calculateRectangle() {
-         try {
-             Rectangle2D.Double box = stormDisplayState.getStormTrackControl().getNavigatedDisplay().getVisadBox();
-             if ( !box.isEmpty()) {
-                 // pad rectangle by 5%
-                 double deltaWidth  = (double) (.05 * box.width);
-                 double deltaHeight = (double) (.05 * box.height);
-                 double newX        = box.x - deltaWidth;
-                 double newY        = box.y - deltaHeight;
-                 box.setRect(newX, newY, box.width + (2.0 * deltaWidth),
-                             box.height + (2.0 * deltaHeight));
-             }
-             return box;
-         } catch (Exception excp) {
-             LogUtil.logException("calculating Rectangle ", excp);
-             return new Rectangle2D.Double(0, 0, 0, 0);
-         }
-     }
+        try {
+            Rectangle2D.Double box =
+                stormDisplayState.getStormTrackControl().getNavigatedDisplay()
+                    .getVisadBox();
+            if ( !box.isEmpty()) {
+                // pad rectangle by 5%
+                double deltaWidth  = (double) (.05 * box.width);
+                double deltaHeight = (double) (.05 * box.height);
+                double newX        = box.x - deltaWidth;
+                double newY        = box.y - deltaHeight;
+                box.setRect(newX, newY, box.width + (2.0 * deltaWidth),
+                            box.height + (2.0 * deltaHeight));
+            }
+            return box;
+        } catch (Exception excp) {
+            LogUtil.logException("calculating Rectangle ", excp);
+            return new Rectangle2D.Double(0, 0, 0, 0);
+        }
+    }
 
 
     /**
@@ -714,15 +767,18 @@ public class WayDisplayState {
      * @return _more_
      *
      * @throws Exception _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public StationModelDisplayable getObsPointDisplay() throws VisADException, RemoteException {
+    public StationModelDisplayable getObsPointDisplay()
+            throws VisADException, RemoteException {
         if (obsPointDisplay == null) {
             obsPointDisplay = new StationModelDisplayable("dots");
             obsPointDisplay.setUseTimesInAnimation(false);
             addDisplayable(obsPointDisplay);
-            obsPointDisplay
-                .setScale(stormDisplayState.getStormTrackControl()
-                          .getDisplayScale());
+            obsPointDisplay.setScale(
+                stormDisplayState.getStormTrackControl().getDisplayScale());
         }
         return obsPointDisplay;
     }
@@ -857,7 +913,7 @@ public class WayDisplayState {
      * @return _more_
      */
     public float[][] getColorPalette() {
-        ColorTable ct =  stormDisplayState.getColorTable(colorParam);
+        ColorTable ct = stormDisplayState.getColorTable(colorParam);
         if (ct != null) {
             return stormDisplayState.getStormTrackControl()
                 .getColorTableForDisplayable(ct);
@@ -902,10 +958,10 @@ public class WayDisplayState {
      */
     private void setLabelColor() throws Exception {
         Color c = getColor();
-        if (labelDisplay != null ) { //&& !Misc.equals(c, labelDisplay.getColor())) {
+        if (labelDisplay != null) {  //&& !Misc.equals(c, labelDisplay.getColor())) {
             labelDisplay.setColor(c);
         }
-        if (obsPointDisplay != null) { //&& !Misc.equals(c, obsPointDisplay.getColor())) {
+        if (obsPointDisplay != null) {  //&& !Misc.equals(c, obsPointDisplay.getColor())) {
             obsPointDisplay.setColor(c);
         }
     }
@@ -945,12 +1001,12 @@ public class WayDisplayState {
         ringsDisplay = null;
         conesHolder  = null;
         if (holder != null) {}
-        trackDisplay = null;
-        labelDisplay = null;
-        obsPointDisplay = null;       
-        holder       = null;
-        tracks       = new ArrayList<StormTrack>();
-        times        = new ArrayList<DateTime>();
+        trackDisplay    = null;
+        labelDisplay    = null;
+        obsPointDisplay = null;
+        holder          = null;
+        tracks          = new ArrayList<StormTrack>();
+        times           = new ArrayList<DateTime>();
     }
 
 
@@ -1584,7 +1640,7 @@ public class WayDisplayState {
 
         LatLonProjection pj1  = new LatLonProjection();
         //ProjectionPoint  pp1  = pj1.latLonToProj(p1);
-        LatLonProjection pj2  = new LatLonProjection();
+        LatLonProjection pj2 = new LatLonProjection();
         //ProjectionPoint  pp2  = pj2.latLonToProj(p2);
 
         //Bearing b = Bearing.calculateBearing(lat1, lon1, lat2, lon2, null);
@@ -1595,12 +1651,12 @@ public class WayDisplayState {
             sign = -1;
         }
 
-        double af = getCircleAngleRange( el1,  el2);
+        double af = getCircleAngleRange(el1, el2);
         af = af * 180.0 / Math.PI;
-        if(right) {
-            af = af -90;
+        if (right) {
+            af = af - 90;
         } else {
-            af = af +90;
+            af = af + 90;
         }
         // change angle to azimuth
         if ((af <= 90) && (af >= 0)) {
@@ -1616,22 +1672,22 @@ public class WayDisplayState {
         }
 
 
-       LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, af, r, null);
+        LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, af, r, null);
 
-/*        double x = pp2.getX() + sign * r * (pp2.getY() - pp1.getY()) / dist;
-        double y = pp2.getY() + sign * r * (pp1.getX() - pp2.getX()) / dist;
+        /*        double x = pp2.getX() + sign * r * (pp2.getY() - pp1.getY()) / dist;
+                double y = pp2.getY() + sign * r * (pp1.getX() - pp2.getX()) / dist;
 
 
-        ProjectionPoint  pp   = new ProjectionPointImpl(x, y);
-        LatLonPointImpl  lp   = new LatLonPointImpl();
-        LatLonProjection e3   = new LatLonProjection();
-        LatLonPoint      lp11 = e3.projToLatLon(pp, lp);
+                ProjectionPoint  pp   = new ProjectionPointImpl(x, y);
+                LatLonPointImpl  lp   = new LatLonPointImpl();
+                LatLonProjection e3   = new LatLonProjection();
+                LatLonPoint      lp11 = e3.projToLatLon(pp, lp);
 
-        EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
-                               lp11.getLongitude(), 0);
-                               */
+                EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
+                                       lp11.getLongitude(), 0);
+                                       */
         EarthLocation el = new EarthLocationLite(lp1.getLatitude(),
-                                   lp1.getLongitude(), 0);
+                               lp1.getLongitude(), 0);
         StormTrackPoint sp = new StormTrackPoint(el, sp1.getTime(), 0, null);
         return sp;
     }

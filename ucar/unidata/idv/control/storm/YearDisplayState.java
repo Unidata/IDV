@@ -351,7 +351,7 @@ public class YearDisplayState {
         if (trackDisplay != null) {
             try {
                 stormTrackControl.removeDisplayable(trackDisplay);
-                if(labelDisplay!=null) {
+                if (labelDisplay != null) {
                     stormTrackControl.removeDisplayable(labelDisplay);
                 }
                 stormTrackControl.unloadYear(this);

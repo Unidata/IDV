@@ -76,6 +76,11 @@ public class DisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     */
     protected void setBackground(Color c) {
         getCheckBox().setBackground(c);
     }

@@ -38,12 +38,12 @@ import ucar.unidata.data.storm.StormInfo;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.util.ColorTable;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
 
 import ucar.unidata.ui.drawing.*;
 import ucar.unidata.ui.symbol.*;
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -52,8 +52,8 @@ import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.xml.XmlUtil;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.Util;
 
@@ -103,10 +103,12 @@ public class StormTrackControl extends DisplayControlImpl {
     private final static String PREF_OKWAYS = "pref.stormtrackcontrol.okways";
 
     /** _more_ */
-    private final static String PREF_OBWAY = "pref.stormtrackcontrol.observationway";
+    private final static String PREF_OBWAY =
+        "pref.stormtrackcontrol.observationway";
 
     /** _more_ */
-    private final static String PREF_OKPARAMS = "pref.stormtrackcontrol.okparams";
+    private final static String PREF_OKPARAMS =
+        "pref.stormtrackcontrol.okparams";
 
     /** _more_ */
     private static int cnt = 0;
@@ -133,6 +135,7 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private Hashtable<String, Boolean> okWays;
 
+    /** _more_          */
     private Way observationWay;
 
     /** _more_ */
@@ -209,7 +212,12 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-    public NavigatedDisplay getVM(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public NavigatedDisplay getVM() {
         return getNavigatedDisplay();
     }
 
@@ -255,7 +263,7 @@ public class StormTrackControl extends DisplayControlImpl {
         if (observationWay == null) {
             observationWay = (Way) getPreferences().get(PREF_OBWAY);
             if (observationWay == null) {
-                observationWay  = stormDataSource.getDefaultObservationWay();
+                observationWay = stormDataSource.getDefaultObservationWay();
             }
         }
         if (okWays == null) {
@@ -275,17 +283,33 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    /** _more_          */
     private TwoListPanel waysToUseSelector;
+
+    /** _more_          */
     private JCheckBox waysToUsePreferenceCbx;
+
+    /** _more_          */
     private List<Way> allWays;
+
+    /** _more_          */
     private List<Way> useWays;
+
+    /** _more_          */
     private JCheckBox obsWayPreferenceCbx;
+
+    /** _more_          */
     private List<JRadioButton> obsWayRadioButtons;
 
+    /**
+     * _more_
+     *
+     * @param jtp _more_
+     */
     protected void addPropertiesComponents(JTabbedPane jtp) {
         super.addPropertiesComponents(jtp);
-        useWays    = new ArrayList<Way>();
-        allWays    = new ArrayList<Way>();
+        useWays = new ArrayList<Way>();
+        allWays = new ArrayList<Way>();
         for (Way way : stormDataSource.getWays()) {
             if (way.isObservation()) {
                 continue;
@@ -295,57 +319,72 @@ public class StormTrackControl extends DisplayControlImpl {
                 useWays.add(way);
             }
         }
-        useWays = (List<Way>)Misc.sort(useWays);
-        allWays = (List<Way>)Misc.sort(allWays);
-        if(waysToUsePreferenceCbx==null) {
+        useWays = (List<Way>) Misc.sort(useWays);
+        allWays = (List<Way>) Misc.sort(allWays);
+        if (waysToUsePreferenceCbx == null) {
             waysToUsePreferenceCbx = new JCheckBox("Save as preference",
-                                                   false);
+                    false);
         }
         waysToUseSelector = new TwoListPanel(allWays, "Don't Use", useWays,
-                                            "Use", null, false);
+                                             "Use", null, false);
         JComponent contents = GuiUtils.centerBottom(waysToUseSelector,
                                   GuiUtils.left(waysToUsePreferenceCbx));
         jtp.add(getWaysName() + " to use", contents);
 
 
 
-        if(stormDataSource.getIsObservationWayChangeable()) {
+        if (stormDataSource.getIsObservationWayChangeable()) {
             obsWayRadioButtons = new ArrayList<JRadioButton>();
             ButtonGroup bg = new ButtonGroup();
             for (Way way : allWays) {
                 if (way.isObservation()) {
                     continue;
                 }
-                JRadioButton jrb = new JRadioButton(way.getId(), Misc.equals(observationWay, way));
+                JRadioButton jrb = new JRadioButton(way.getId(),
+                                       Misc.equals(observationWay, way));
                 obsWayRadioButtons.add(jrb);
                 bg.add(jrb);
             }
 
-            if(obsWayPreferenceCbx == null) {
-                obsWayPreferenceCbx = new JCheckBox("Save as preference",  false);
+            if (obsWayPreferenceCbx == null) {
+                obsWayPreferenceCbx = new JCheckBox("Save as preference",
+                        false);
             }
 
-            JComponent obsWayContents =  GuiUtils.topLeft(GuiUtils.doLayout(obsWayRadioButtons,(obsWayRadioButtons.size()>10?2:1),GuiUtils.WT_N,GuiUtils.WT_N)); 
+            JComponent obsWayContents =
+                GuiUtils.topLeft(GuiUtils.doLayout(obsWayRadioButtons,
+                    ((obsWayRadioButtons.size() > 10)
+                     ? 2
+                     : 1), GuiUtils.WT_N, GuiUtils.WT_N));
             int width  = 200;
             int height = 150;
-            if(obsWayRadioButtons.size()>10) {
-                obsWayContents = GuiUtils.makeScrollPane(obsWayContents, width, height);
+            if (obsWayRadioButtons.size() > 10) {
+                obsWayContents = GuiUtils.makeScrollPane(obsWayContents,
+                        width, height);
             }
-            jtp.add("Observation " + getWayName(),
-                    GuiUtils.centerBottom(obsWayContents,
-                                          GuiUtils.left(obsWayPreferenceCbx)));
+            jtp.add(
+                "Observation " + getWayName(),
+                GuiUtils.centerBottom(
+                    obsWayContents, GuiUtils.left(obsWayPreferenceCbx)));
         }
-        
+
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean doApplyProperties() {
-        if(!super.doApplyProperties()) return false;
-        
-        List only = Misc.sort(waysToUseSelector.getCurrentEntries());
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+
+        List    only    = Misc.sort(waysToUseSelector.getCurrentEntries());
         boolean changed = false;
-        if(!useWays.equals(only)) {
+        if ( !useWays.equals(only)) {
             changed = true;
             if (only.size() == allWays.size()) {
                 onlyShowTheseWays(new ArrayList<Way>(),
@@ -356,17 +395,18 @@ public class StormTrackControl extends DisplayControlImpl {
             }
         }
 
-        if(stormDataSource.getIsObservationWayChangeable()) {
-            Way newObsWay=null;
-            for(int i=0;i<obsWayRadioButtons.size();i++) {
-                if(obsWayRadioButtons.get(i).isSelected()) {
-                    newObsWay  = allWays.get(i);
+        if (stormDataSource.getIsObservationWayChangeable()) {
+            Way newObsWay = null;
+            for (int i = 0; i < obsWayRadioButtons.size(); i++) {
+                if (obsWayRadioButtons.get(i).isSelected()) {
+                    newObsWay = allWays.get(i);
                     break;
                 }
             }
 
-            if(newObsWay!=null && !Misc.equals(newObsWay, observationWay)) {
-                changed = true;
+            if ((newObsWay != null)
+                    && !Misc.equals(newObsWay, observationWay)) {
+                changed        = true;
                 observationWay = newObsWay;
                 if (obsWayPreferenceCbx.isSelected()) {
                     putPreference(PREF_OBWAY, observationWay);
@@ -375,7 +415,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
 
-        if(changed) {
+        if (changed) {
             reloadStormTracks();
         }
         return true;
@@ -397,17 +437,21 @@ public class StormTrackControl extends DisplayControlImpl {
 
     /** locking object */
     private Object MUTEX = new Object();
-     public void viewpointChanged() {
-       super.viewpointChanged();
-       synchronized (MUTEX) {
-           StormDisplayState sds = getCurrentStormDisplayState();
-           HashMap<Way, List> wayToTracksMap =
+
+    /**
+     * _more_
+     */
+    public void viewpointChanged() {
+        super.viewpointChanged();
+        synchronized (MUTEX) {
+            StormDisplayState sds = getCurrentStormDisplayState();
+            HashMap<Way, List> wayToTracksMap =
                 sds.getTrackCollection().getWayToTracksHashMap();
             // Way obsWay = new Way(Way.OBSERVATION);
             java.util.Set<Way> ways = wayToTracksMap.keySet();
 
             for (Way way : ways) {
-               
+
                 if (way.equals(Way.OBSERVATION)) {
                     WayDisplayState obsWDS = sds.getWayDisplayState(way);
                     try {
@@ -418,48 +462,48 @@ public class StormTrackControl extends DisplayControlImpl {
                     }
                 }
 
-             }
+            }
 
-      /*         if ( !getHaveInitialized() || !getActive()) {
-               return;
-           }
-           Rectangle2D newBounds    = calculateRectangle();
-           boolean     shouldReload = false;
-           if ((lastViewBounds == null) || (lastViewBounds.getWidth() == 0)
-                   || (lastViewBounds.getHeight() == 0)) {
-               shouldReload = true;
-           } else if ( !(newBounds.equals(lastViewBounds))) {
-               double widthratio = newBounds.getWidth()
-                                   / lastViewBounds.getWidth();
-               double heightratio = newBounds.getHeight()
-                                    / lastViewBounds.getHeight();
-               double xdiff = Math.abs(newBounds.getX()
-                                       - lastViewBounds.getX());
-               double ydiff = Math.abs(newBounds.getY()
-                                       - lastViewBounds.getY());
-               // See if this is 20% greater or smaller than before.
-               if ((((widthratio < .80) || (widthratio > 1.20))
-                       && ((heightratio < .80)
-                           || (heightratio > 1.20))) || ((xdiff
-                              > .2 * lastViewBounds.getWidth()) || (ydiff
-                                  > .2 * lastViewBounds.getHeight()))) {
-                   shouldReload = true;
-               }
-           }
-           float newScale = getScaleFromDisplayable();
-           if (Float.floatToIntBits(lastViewScale)
-                   != Float.floatToIntBits(newScale)) {
-               shouldReload = true;
-           }
-           if (shouldReload) {
+            /*         if ( !getHaveInitialized() || !getActive()) {
+                     return;
+                 }
+                 Rectangle2D newBounds    = calculateRectangle();
+                 boolean     shouldReload = false;
+                 if ((lastViewBounds == null) || (lastViewBounds.getWidth() == 0)
+                         || (lastViewBounds.getHeight() == 0)) {
+                     shouldReload = true;
+                 } else if ( !(newBounds.equals(lastViewBounds))) {
+                     double widthratio = newBounds.getWidth()
+                                         / lastViewBounds.getWidth();
+                     double heightratio = newBounds.getHeight()
+                                          / lastViewBounds.getHeight();
+                     double xdiff = Math.abs(newBounds.getX()
+                                             - lastViewBounds.getX());
+                     double ydiff = Math.abs(newBounds.getY()
+                                             - lastViewBounds.getY());
+                     // See if this is 20% greater or smaller than before.
+                     if ((((widthratio < .80) || (widthratio > 1.20))
+                             && ((heightratio < .80)
+                                 || (heightratio > 1.20))) || ((xdiff
+                                    > .2 * lastViewBounds.getWidth()) || (ydiff
+                                        > .2 * lastViewBounds.getHeight()))) {
+                         shouldReload = true;
+                     }
+                 }
+                 float newScale = getScaleFromDisplayable();
+                 if (Float.floatToIntBits(lastViewScale)
+                         != Float.floatToIntBits(newScale)) {
+                     shouldReload = true;
+                 }
+                 if (shouldReload) {
 
-                updateLayoutModel();
+                      updateLayoutModel();
 
-           }
-               */
-       }
+                 }
+                     */
+        }
 
-   }
+    }
 
 
 
@@ -535,12 +579,21 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param whichColorTable _more_
+     * @param newColorTable _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public void setColorTable(String whichColorTable,
                               ColorTable newColorTable)
             throws RemoteException, VisADException {
         super.setColorTable(whichColorTable, newColorTable);
         List<StormDisplayState> active = getActiveStorms();
-        for (StormDisplayState sds: active) {
+        for (StormDisplayState sds : active) {
             sds.colorTableChanged();
         }
     }
@@ -630,6 +683,9 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     */
     private void reloadStormTracks() {
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
             StormInfo stormInfo = stormInfos.get(i);
@@ -646,7 +702,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param writeAsPreference _more_
      */
     private void onlyShowTheseWays(List<Way> ways,
-                                     boolean writeAsPreference) {
+                                   boolean writeAsPreference) {
         okWays = new Hashtable();
         for (Way way : ways) {
             okWays.put(way.getId(), new Boolean(true));
@@ -710,9 +766,9 @@ public class StormTrackControl extends DisplayControlImpl {
 
             if (getPreferences().get(PREF_STORMDISPLAYSTATE) != null) {
                 items.add(
-                          GuiUtils.makeMenuItem(
-                                                "Remove Storm Display Preference", this,
-                                                "deleteStormDisplayState"));
+                    GuiUtils.makeMenuItem(
+                        "Remove Storm Display Preference", this,
+                        "deleteStormDisplayState"));
             }
             items.add(GuiUtils.MENU_SEPARATOR);
             items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,
@@ -1176,6 +1232,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param yds _more_
+     */
     public void unloadYear(final YearDisplayState yds) {
         Misc.run(new Runnable() {
             public void run() {
@@ -2076,9 +2137,14 @@ public class StormTrackControl extends DisplayControlImpl {
         okWays = value;
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void setObservationWay(Way value) {
-         observationWay = value;
-     }
+        observationWay = value;
+    }
 
     /**
      * Get the OkWays property.
@@ -2089,9 +2155,15 @@ public class StormTrackControl extends DisplayControlImpl {
         return okWays;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Way getObservationWay() {
         return observationWay;
     }
+
     /**
      * Set the OkParams property.
      *
