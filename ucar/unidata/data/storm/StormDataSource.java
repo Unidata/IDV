@@ -109,7 +109,6 @@ public abstract class StormDataSource extends DataSourceImpl {
     /** _more_ */
     public static StormParam PARAM_MAXWINDSPEED_KTS;
 
-    public boolean isObsWayChangeable = false;
 
     /** _more_ */
     public static final int[] CATEGORY_VALUES = {
@@ -321,7 +320,7 @@ public abstract class StormDataSource extends DataSourceImpl {
      */
 
     public abstract StormTrackCollection getTrackCollectionInner(
-            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse, Way obWay)
+            StormInfo stormInfo, Hashtable<String, Boolean> waysToUse, Way observationWay)
      throws Exception;
 
 
@@ -618,13 +617,14 @@ public abstract class StormDataSource extends DataSourceImpl {
 
     }
 
-    public boolean getIsObsWayChangeable(){
-        return isObsWayChangeable;
+    public boolean getIsObservationWayChangeable(){
+        return false;
     }
 
-    public void setIsObsWayChangeable(boolean isChangeable){
-        isObsWayChangeable = isChangeable;
+    public Way getDefaultObservationWay() {
+        return null;
     }
+
     /**
      * _more_
      *

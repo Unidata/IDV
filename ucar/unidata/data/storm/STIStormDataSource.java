@@ -66,6 +66,7 @@ import java.util.Date;
  */
 public class STIStormDataSource extends StormDataSource {
 
+    private static final Way DEFAULT_OBSERVATION_WAY = new Way("babj");
 
     /* Use this for mysql:     */
 
@@ -498,8 +499,10 @@ public class STIStormDataSource extends StormDataSource {
  
 
     public StormTrackCollection getTrackCollectionInner(StormInfo stormInfo,
-            Hashtable<String, Boolean> waysToUse, Way obWay)
+            Hashtable<String, Boolean> waysToUse, Way observationWay)
             throws Exception {
+        if(observationWay == null) observationWay = DEFAULT_OBSERVATION_WAY;
+
         long                 t1              = System.currentTimeMillis();
         StormTrackCollection trackCollection = new StormTrackCollection();
         List<Way>            forecastWays    = getForecastWays(stormInfo);
@@ -515,7 +518,7 @@ public class STIStormDataSource extends StormDataSource {
                 trackCollection.addTrackList(forecastTracks);
             }
         }
-        StormTrack obsTrack = getObservationTrack(stormInfo, obWay);
+        StormTrack obsTrack = getObservationTrack(stormInfo, observationWay);
         //                                         (Way) forecastWays.get(0));
         if (obsTrack != null) {
             List<StormTrack> tracks = trackCollection.getTracks();
@@ -526,9 +529,6 @@ public class STIStormDataSource extends StormDataSource {
             //        System.err.println("time:" + (t2 - t1));
             trackCollection.addTrack(obsTrack);
         }
-
-        setIsObsWayChangeable(true); 
-
         return trackCollection;
     }
 
@@ -939,30 +939,11 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
-    /**
-     * _more_
-     *
-     *
-     *
-     * @param stormInfo _more_
-     *
-     * @return _more_
-     * @throws Exception _more_
-     */
-    protected StormTrack getObservationTrack(StormInfo stormInfo)
+    protected StormTrack getObservationTrack(StormInfo stormInfo, Way observationWay)
             throws Exception {
-        List obsPts  = null;
-        Way  babjWay = new Way("babj");
-        addWay(babjWay);
-        return getObservationTrack(stormInfo, babjWay);
-    }
-
-    protected StormTrack getObservationTrack(StormInfo stormInfo, Way obWay)
-            throws Exception {
-        
-        addWay(obWay);
+        addWay(observationWay);
         //first get the obs from one specific way
-        List<StormTrackPoint> obsTrackPoints = getObservationTrackPoints(stormInfo, obWay);
+        List<StormTrackPoint> obsTrackPoints = getObservationTrackPoints(stormInfo, observationWay);
 
         if (obsTrackPoints.size() == 0) {
             return null;
@@ -972,6 +953,17 @@ public class STIStormDataSource extends StormDataSource {
         return new StormTrack(stormInfo, addWay(Way.OBSERVATION), obsTrackPoints,
                               obsParams);
     }
+
+    public boolean getIsObservationWayChangeable(){
+        return true;
+    }
+
+    public Way getDefaultObservationWay() {
+        return DEFAULT_OBSERVATION_WAY;
+    }
+
+
+
     /**
      * _more_
      *
