@@ -620,6 +620,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <exclude name="ucar/unidata/apps/lead/**"/>
             <exclude name="ucar/unidata/apps/rico/**"/>
             <exclude name="ucar/unidata/apps/trex/**"/>
+            <exclude name="ucar/unidata/apps/workshop/**"/>
             <exclude name="ucar/unidata/gridviewer/**/*.*"/>
             <exclude name="ucar/unidata/grid/**"/>
             <exclude name="ucar/unidata/geoloc/**"/>
