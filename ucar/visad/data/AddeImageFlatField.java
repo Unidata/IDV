@@ -90,10 +90,6 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
     private DateTime startTime;
 
 
-    /** _more_ */
-    private AreaFile areaFile;
-
-
     /** _more_          */
     private AddeImageDescriptor aid;
 
@@ -315,25 +311,11 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected AreaFile getAreaFile() {
-        try {
-            if (myParent != null) {
-                return ((AddeImageFlatField) myParent).getAreaFile();
-            }
-            if (areaFile == null) {
-                readData();
-            }
-            return areaFile;
-        } catch (Exception exc) {
-            throw new ucar.unidata.util.WrapperException(exc);
-        }
+    private void checkReadData() {
+        if(!haveReadData) readData();
     }
 
+    private boolean haveReadData = false;
 
     /** _more_ */
     private int[][] dirNavAux;
@@ -347,6 +329,13 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
     /** _more_ */
     private int[] dir;
 
+    private String getDirNavAuxFile() {
+        String file = getCacheFile();
+        if(file!=null)
+            return file + ".dirnavaux";
+        return null;
+    }
+
     /**
      * _more_
      *
@@ -356,46 +345,29 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
         if (myParent != null) {
             return ((AddeImageFlatField) myParent).getDirNavAux();
         }
+        checkReadData();
+        String file = getDirNavAuxFile();
         if (dirNavAux == null) {
-            String file = getCacheFile();
-            if (file != null) {
-                file = file + ".dirnavaux";
-                if (new File(file).exists()) {
-                    try {
-                        FileInputStream istream = new FileInputStream(file);
-                        BufferedInputStream bis =
-                            new BufferedInputStream(istream, 1000000);
-                        ObjectInputStream ois = new ObjectInputStream(bis);
-                        dirNavAux = (int[][]) ois.readObject();
-                        ois.close();
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                    }
-                }
-            }
-
-            if (dirNavAux == null) {
-                dirNavAux = new int[][] {
-                    (int[]) getAreaFile().getAreaDirectory()
-                        .getDirectoryBlock().clone(),
-                    getAreaFile().getNav(), getAreaFile().getAux()
-                };
-
+            if (file != null && new File(file).exists()) {
                 try {
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BufferedOutputStream bos = new BufferedOutputStream(fos,
-                                                   100000);
-                    ObjectOutputStream p = new ObjectOutputStream(bos);
-                    p.writeObject(dirNavAux);
-                    p.flush();
-                    fos.close();
+                    FileInputStream istream = new FileInputStream(file);
+                    BufferedInputStream bis =
+                        new BufferedInputStream(istream, 1000000);
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    dirNavAux = (int[][]) ois.readObject();
+                    ois.close();
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
             }
         }
-        return dirNavAux;
+        int[][]tmp = dirNavAux;
+        if(file!=null) {
+            dirNavAux = null;
+        }
+        return tmp;
     }
+
 
 
     /**
@@ -467,15 +439,16 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
             /*
-            AreaAdapter aa = new AreaAdapter(aid.getImageInfo().makeAddeUrl(), false);
-            visad.meteorology.SingleBandedImage ff = aa.getImage();
+              AreaAdapter aa = new AreaAdapter(aid.getImageInfo().makeAddeUrl(), false);
+              visad.meteorology.SingleBandedImage ff = aa.getImage();
 
 
-            float[][]samples = ff.getFloats(false);
-            areaFile = aa.getAreaFile();
+              float[][]samples = ff.getFloats(false);
+              areaFile = aa.getAreaFile();
             */
-            areaFile = AreaFileFactory.getAreaFileInstance(
-                aid.getImageInfo().makeAddeUrl());
+            haveReadData = true;
+            AreaFile areaFile = AreaFileFactory.getAreaFileInstance(
+                                                                    aid.getImageInfo().makeAddeUrl());
             float[][][] flt_samples = areaFile.getFloatData();
             int         nEles       = aid.getImageInfo().getElements();
             int         nLines      = aid.getImageInfo().getLines();
@@ -492,6 +465,26 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
                 }
             }
 
+
+
+            dirNavAux = new int[][] {
+                (int[]) areaFile.getAreaDirectory()
+                .getDirectoryBlock().clone(),
+                areaFile.getNav(), areaFile.getAux()
+            };
+
+
+
+            String file = getDirNavAuxFile();
+            if(file!=null) {
+                FileOutputStream fos = new FileOutputStream(file);
+                BufferedOutputStream bos = new BufferedOutputStream(fos,
+                                                                    100000);
+                ObjectOutputStream p = new ObjectOutputStream(bos);
+                p.writeObject(dirNavAux);
+                p.flush();
+                fos.close();
+            }
             return samples;
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
