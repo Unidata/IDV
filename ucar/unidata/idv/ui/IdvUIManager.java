@@ -525,8 +525,8 @@ public class IdvUIManager extends IdvManager {
         UIDefaults defaults = UIManager.getDefaults();
         JLabel tmp = new JLabel("");
         
-        String iconSize =
-            (String) getIdv().getStateManager()
+        Object iconSize = 
+            getIdv().getStateManager()
             .getPreferenceOrProperty("idv.ui.iconsize");
 
         String fontSize =
@@ -535,7 +535,7 @@ public class IdvUIManager extends IdvManager {
 
 
         if(iconSize!=null) {
-            GuiUtils.setDefaultIconSize(new Integer(iconSize).intValue());
+            GuiUtils.setDefaultIconSize(new Integer(iconSize.toString()).intValue());
         }
 
         if(fontSize!=null) {
