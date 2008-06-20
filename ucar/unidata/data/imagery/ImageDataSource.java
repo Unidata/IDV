@@ -991,7 +991,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 return result;
             }
 
-            System.err.println("Making aiff");
             AddeImageInfo aii     = aid.getImageInfo();
 
 
