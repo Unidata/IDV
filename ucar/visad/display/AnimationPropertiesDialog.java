@@ -937,7 +937,6 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         endOffsetField.setTime(aniSet.getEndOffsetMinutes());
         roundToField.setTime(aniSet.getRoundTo());
         pollIntervalFld.setText("" + aniSet.getPollMinutes());
-        System.err.println ("setting from anisetinfo:" + aniSet.getStartFixedDate());
         startTimePicker.setDate(aniSet.getStartFixedDate());
         endTimePicker.setDate(aniSet.getEndFixedDate());
         checkEnabled();
