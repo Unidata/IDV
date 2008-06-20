@@ -20,22 +20,25 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
 
-
-
-import visad.*;
-import visad.util.DataUtility;
-
-import java.rmi.RemoteException;
-
-import java.util.Arrays;
 
 import ucar.unidata.beans.*;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.display.AnimationInfo;
+
+
+
+import visad.*;
+
+import visad.util.DataUtility;
+
+import java.rmi.RemoteException;
+
+import java.util.Arrays;
 
 
 /**
@@ -72,6 +75,7 @@ public class Animation extends Displayable {
      */
     public static final int REVERSE = 1;
 
+    /** _more_          */
     private boolean enabled = true;
 
     /** ScalarMap for animation */
@@ -95,13 +99,14 @@ public class Animation extends Displayable {
     /** Value for the current animation step */
     private Real aniValue = null;
 
+    /** _more_          */
     private Real lastTime;
 
     /** a Real that represents the missing value for aniRealType */
     private Real missingValue = null;
 
     /** Object for locking */
-    private final Object lock = new Object();
+    private final Object MUTEX = new Object();
 
     /** AnimationInfo used to represent the configuration */
     private AnimationInfo animationInfo;  // won't be null
@@ -198,8 +203,6 @@ public class Animation extends Displayable {
      *
      * @param realType              The {@link visad.RealType} of the animation
      *                              parameter.
-     * @throws NullPointerException if <code>realType</code> is
-     *                              <code>null</code>.
      * @throws VisADException       VisAD failure.
      * @throws RemoteException      Java RMI failure.
      */
@@ -209,7 +212,7 @@ public class Animation extends Displayable {
         RealType oldType = null;
         boolean  isNew   = false;
 
-        synchronized (lock) {
+        synchronized (MUTEX) {
             if ( !realType.equals(aniRealType)) {
                 oldType     = aniRealType;
                 aniRealType = realType;
@@ -257,7 +260,7 @@ public class Animation extends Displayable {
         boolean   isNewMap = false;
         missingValue = new Real(aniRealType);
 
-        synchronized (lock) {
+        synchronized (MUTEX) {
             oldMap       = animationMap;
             newMap       = new ScalarMap(aniRealType, Display.Animation);
             animationMap = newMap;
@@ -309,7 +312,6 @@ public class Animation extends Displayable {
      *
      * @param ai                    The animation parameters.
      *
-     * @throws NullPointerException if the argument is <code>null</code>.
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisADError
      */
@@ -319,7 +321,7 @@ public class Animation extends Displayable {
             throw new NullPointerException();
         }
 
-        synchronized (lock) {
+        synchronized (MUTEX) {
             animationInfo.set(ai);
         }
         resetAnimationInfo();
@@ -390,7 +392,7 @@ public class Animation extends Displayable {
         }
         setFwdSteps(newFwdTimes);
         setBackSteps(newBackTimes);
-	setAnimating(animationInfo.getRunning());
+        setAnimating(animationInfo.getRunning());
     }
 
 
@@ -400,8 +402,8 @@ public class Animation extends Displayable {
      * @param on  Whether or not looping should be on.
      */
     public void setAnimating(boolean on) {
-	animationInfo.setRunning(on);
-        if (!on) {
+        animationInfo.setRunning(on);
+        if ( !on) {
             animationThread = null;
             return;
         }
@@ -419,7 +421,8 @@ public class Animation extends Displayable {
     private void runAnimation() {
         try {
             Thread myThread = Thread.currentThread();
-            while ((myThread == animationThread) && animationInfo.getRunning()) {
+            while ((myThread == animationThread)
+                    && animationInfo.getRunning()) {
                 long sleepTime = 500;
                 int  nextIndex = getCurrent();
                 if (direction) {
@@ -473,16 +476,22 @@ public class Animation extends Displayable {
      *
      * @param timeValue The time value to check
      * @return Is the time value the current one being displayed
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public boolean shouldShow(Real timeValue) 
-        throws VisADException, RemoteException {
-        if(animationSet == null || animationSet.getLength()==0) {
+    public boolean shouldShow(Real timeValue)
+            throws VisADException, RemoteException {
+        if ((animationSet == null) || (animationSet.getLength() == 0)) {
             return true;
         }
-        float timeValueFloat = (float)timeValue.getValue(animationSet.getSetUnits()[0]);
-        float[][]value = {{timeValueFloat}};
-        int[] index = animationSet.valueToIndex(value);
-        return (index[0]==getCurrent());
+        float timeValueFloat =
+            (float) timeValue.getValue(animationSet.getSetUnits()[0]);
+        float[][] value = {
+            { timeValueFloat }
+        };
+        int[]     index = animationSet.valueToIndex(value);
+        return (index[0] == getCurrent());
     }
 
 
@@ -492,7 +501,7 @@ public class Animation extends Displayable {
      * @return  true if looping; false if not looping.
      */
     public boolean isAnimating() {
-        return animationInfo.getRunning() && animationThread!=null;
+        return animationInfo.getRunning() && (animationThread != null);
     }
 
     /**
@@ -529,21 +538,31 @@ public class Animation extends Displayable {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Real getCurrentAnimationValue() {
-        DateTime[] times = getTimes();
-        int current =getCurrent();
-        if(times !=null && current>=0 && current<times.length) {
+        DateTime[] times   = getTimes();
+        int        current = getCurrent();
+        if ((times != null) && (current >= 0) && (current < times.length)) {
             return times[current];
         }
         return null;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public DateTime[] getTimes() {
         if (animationSet != null) {
             return getDateTimeArray(animationSet);
-	} 
-	return null;
+        }
+        return null;
     }
 
 
@@ -730,8 +749,8 @@ public class Animation extends Displayable {
             return;
         }
         try {
-	    //Maybe try to set this here for now
-	    aniValue = newTime;
+            //Maybe try to set this here for now
+            aniValue = newTime;
             int index = animationSet.doubleToIndex(new double[][] {
                 { newTime.getValue(animationSet.getSetUnits()[0]) }
             })[0];
@@ -767,21 +786,21 @@ public class Animation extends Displayable {
             if (checkUserFrames) {
                 newIndex = clipIndex(newIndex, dir);
             }
-            if(enabled) {
-            if (control == null) {
-                if ((animationSet != null) && (newIndex >= 0)
-                        && (newIndex < animationSet.getLength())) {
-                    RealTuple tuple =
-                        visad.util.DataUtility.getSample(animationSet,
-                                                         newIndex);
-                    aniValue = (Real) tuple.getComponent(0);
+            if (enabled) {
+                if (control == null) {
+                    if ((animationSet != null) && (newIndex >= 0)
+                            && (newIndex < animationSet.getLength())) {
+                        RealTuple tuple =
+                            visad.util.DataUtility.getSample(animationSet,
+                                newIndex);
+                        aniValue = (Real) tuple.getComponent(0);
+                    }
+                } else {
+                    control.setCurrent(newIndex);
                 }
-            } else {
-                control.setCurrent(newIndex);
-            }
             }
             //            System.err.println ("setCurrent.fire ANI_VALUE");
-            if(!Misc.equals(lastTime, aniValue)) {
+            if ( !Misc.equals(lastTime, aniValue)) {
                 lastTime = aniValue;
                 firePropertyChange(ANI_VALUE, "old value", aniValue);
             }
@@ -809,15 +828,17 @@ public class Animation extends Displayable {
         try {
             int nextIndex = getCurrent();
             if (direction == FORWARD) {
-                if(anyStepsForward())
+                if (anyStepsForward()) {
                     nextIndex++;
-                else
-                    nextIndex=0;
+                } else {
+                    nextIndex = 0;
+                }
             } else {
-                if(anyStepsBack())
+                if (anyStepsBack()) {
                     nextIndex--;
-                else
-                    nextIndex = getNumSteps()-1;
+                } else {
+                    nextIndex = getNumSteps() - 1;
+                }
             }
             setCurrent(clipIndex(nextIndex, direction == FORWARD));
         } catch (Exception ve) {
@@ -862,8 +883,8 @@ public class Animation extends Displayable {
                 }
                 nextGoodIndex += delta;
             }
-            nextGoodIndex = Math.max(Math.min(nextGoodIndex, stepsOk.length
-                                              - 1), 0);
+            nextGoodIndex = Math.max(Math.min(nextGoodIndex,
+                    stepsOk.length - 1), 0);
             while ((nextGoodIndex >= 0) && (nextGoodIndex < stepsOk.length)
                     && !stepsOk[nextGoodIndex]) {
                 nextGoodIndex -= delta;
@@ -958,7 +979,7 @@ public class Animation extends Displayable {
                 AnimationControl newControl =
                     (AnimationControl) animationMap.getControl();
 
-                synchronized (lock) {
+                synchronized (MUTEX) {
                     oldControl       = animationControl;
                     animationControl = newControl;
                 }
@@ -1010,9 +1031,12 @@ public class Animation extends Displayable {
          * @param ce   event that occured
          */
         public void controlChanged(ControlEvent ce) {
-            synchronized (lock) {
-                try {
-                    Real oldTime = aniValue;
+            try {
+                boolean doFireChange = false;
+                Real    oldTime      = null;
+                Real    newTime      = null;
+                synchronized (MUTEX) {
+                    oldTime  = aniValue;
                     aniValue = missingValue;
                     int index = getCurrent();
                     if (animationSet != null) {
@@ -1023,15 +1047,19 @@ public class Animation extends Displayable {
                         }
                     }
 
+                    newTime = aniValue;
                     /* For now lets not fire the event. We handle this all ourselves now */
-                    if (!Misc.equals(oldTime, aniValue)) {
-                        lastTime = aniValue;
-                        firePropertyChange(ANI_VALUE, oldTime, aniValue);
+                    if ( !Misc.equals(oldTime, aniValue)) {
+                        lastTime     = aniValue;
+                        doFireChange = true;
                     }
-                    /* */
-                } catch (Exception excp) {
-                    LogUtil.logException("Error", excp);
                 }
+                //Do this here out of the synchronized block to keep from deadlocking
+                if (doFireChange) {
+                    firePropertyChange(ANI_VALUE, oldTime, aniValue);
+                }
+            } catch (Exception excp) {
+                LogUtil.logException("Error", excp);
             }
         }
     }
@@ -1081,13 +1109,13 @@ public class Animation extends Displayable {
      */
     public static DateTime[] getDateTimeArray(Set timeSet) {
         if (timeSet == null) {
-            return new DateTime[]{};
+            return new DateTime[] {};
         }
         try {
             if (timeSet instanceof Gridded1DSet) {
                 return DateTime.timeSetToArray((Gridded1DSet) timeSet);
             } else if (timeSet instanceof SingletonSet) {
-                return new DateTime[]{ new DateTime(
+                return new DateTime[] { new DateTime(
                     (Real) ((SingletonSet) timeSet).getData().getComponent(
                         0)) };
             }
@@ -1096,37 +1124,32 @@ public class Animation extends Displayable {
         } catch (RemoteException re) {
             ;
         }
-        return new DateTime[]{};
+        return new DateTime[] {};
 
     }
 
     /**
-       Set the Enabled property.
-
-       @param value The new value for Enabled
-    **/
-    public void setEnabled (boolean value) {
-	enabled = value;
-        if(enabled!=value && value) {
-            setCurrent(currentIndex,false);
+     *  Set the Enabled property.
+     *
+     *  @param value The new value for Enabled
+     */
+    public void setEnabled(boolean value) {
+        enabled = value;
+        if ((enabled != value) && value) {
+            setCurrent(currentIndex, false);
         }
     }
 
     /**
-       Get the Enabled property.
-
-       @return The Enabled
-    **/
-    public boolean getEnabled () {
-	return enabled;
+     *  Get the Enabled property.
+     *
+     *  @return The Enabled
+     */
+    public boolean getEnabled() {
+        return enabled;
     }
 
 
 
 }
-
-
-
-
-
 
