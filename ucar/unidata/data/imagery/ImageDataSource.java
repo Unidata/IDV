@@ -984,19 +984,20 @@ public abstract class ImageDataSource extends DataSourceImpl {
         //        System.err.println ("source:" + source);
         //For now handle non adde urls here
         try {
-            if ( !source.startsWith("adde:")) {
+            if (false && !source.startsWith("adde:")) {
                 AreaAdapter aa = new AreaAdapter(source, false);
                 result = aa.getImage();
                 putCache(source, result);
                 return result;
             }
 
+            System.err.println("Making aiff");
             AddeImageInfo aii     = aid.getImageInfo();
-
 
 
             AreaDirectory areaDir = null;
             try {
+                if(aii!=null) {
                 if (getCacheDataToDisk()) {
                     if (currentDirs != null) {
                         int    pos        =
@@ -1024,20 +1025,23 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         }
                     }
                 }
+                }
             } catch (Exception exc) {
                 LogUtil.printMessage("error looking up area dir");
                 exc.printStackTrace();
                 return null;
             }
 
+            if(areaDir == null) areaDir = aid.getDirectory();
 
             if ( !fromSequence) {
                 areaDir = null;
-            }
+            } 
+
             if (areaDir != null) {
-                int hash = aii.makeAddeUrl().hashCode();
+                int hash = (aii!=null?aii.makeAddeUrl().hashCode():areaDir.hashCode());
                 String filename = IOUtil.joinDir(getDataCachePath(),
-                                      "image_" + hash + "_" + aii.getBand()
+                                                 "image_" + hash + "_" + (aii!=null?aii.getBand():0)
                                       + "_"
                                       + ((areaDir.getStartTime() != null)
                                          ? "" + areaDir.getStartTime()

@@ -198,9 +198,11 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
+        //        int nLines = aid.getImageInfo().getLines();
+        //        int nEles  = aid.getImageInfo().getElements();
+        int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():areaDirectory.getLines());
+        int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():areaDirectory.getElements());
 
-        int nLines = aid.getImageInfo().getLines();
-        int nEles  = aid.getImageInfo().getElements();
 
         // make the VisAD RealTypes for the dimension variables
         RealType line    = RealType.getRealType("ImageLine", null, null);
@@ -447,11 +449,13 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
               areaFile = aa.getAreaFile();
             */
             haveReadData = true;
-            AreaFile areaFile = AreaFileFactory.getAreaFileInstance(
-                                                                    aid.getImageInfo().makeAddeUrl());
+            AreaFile areaFile = AreaFileFactory.getAreaFileInstance(aid.getImageInfo()!=null?
+                                                                    aid.getImageInfo().makeAddeUrl():
+                                                                    aid.getSource());
             float[][][] flt_samples = areaFile.getFloatData();
-            int         nEles       = aid.getImageInfo().getElements();
-            int         nLines      = aid.getImageInfo().getLines();
+            int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():aid.getDirectory().getLines());
+            int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():aid.getDirectory().getElements());
+
             float[][]   samples     = new float[1][nEles * nLines];
 
 
