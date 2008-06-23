@@ -653,6 +653,7 @@ public class LogUtil {
      */
     public static void consoleMessage(String msg) {
         checkConsole();
+        msg = Msg.msg(msg);
         consoleText.append(msg + "\n");
     }
 
@@ -781,6 +782,7 @@ public class LogUtil {
      */
     public static void printException(LogCategory log_, String xmsg,
                                       Throwable exc, byte[] fileBytes) {
+    	xmsg = Msg.msg(xmsg);
         File f = null;
         if (fileBytes != null) {
             f = CacheManager.getTmpFile("error");
@@ -1030,6 +1032,7 @@ public class LogUtil {
      */
     public static void userMessage(LogCategory log_, String msg,
                                    boolean andLog) {
+    	msg = Msg.msg(msg);
         if (andLog && (log_ != null)) {
             log_.error(msg);
         }
@@ -1089,6 +1092,7 @@ public class LogUtil {
      * @param msg The message
      */
     public static void userErrorMessage(LogCategory log_, String msg) {
+    	msg = Msg.msg(msg);
         if (log_ != null) {
             log_.error(msg);
         }
@@ -1193,6 +1197,7 @@ public class LogUtil {
      * @param msg The message to show
      */
     public static void message(String msg) {
+    	msg = Msg.msg(msg);
         lastMessageString = msg;
 
         for (int i = 0; i < messageLogs.size(); i++) {
