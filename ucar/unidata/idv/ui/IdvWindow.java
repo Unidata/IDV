@@ -173,9 +173,10 @@ public class IdvWindow extends MultiFrame {
         final WindowAdapter[] wa = { null };
         addWindowListener(wa[0] = new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                doClose();
-                removeWindowListener(wa[0]);
-                lastActiveWindow = null;
+                if (doClose()) {
+                  removeWindowListener(wa[0]);
+                  lastActiveWindow = null;
+                }
             }
             public void windowActivated(WindowEvent e) {
                 lastActiveWindow = IdvWindow.this;
