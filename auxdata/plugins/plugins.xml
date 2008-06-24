@@ -39,6 +39,8 @@
 <plugin name="Test Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
 <plugin name="Jython Dev. Control" url="http://www.unidata.ucar.edu/software/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
 
+<!-- Data Helpers -->
+<plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="http://www.unidata.ucar.edu/software/idv/plugins/pam.jar"/>
 
 <!--
 <plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
