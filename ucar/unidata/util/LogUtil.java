@@ -157,7 +157,7 @@ public class LogUtil {
          * @param msg The message
          */
         public void error(String msg) {
-	    System.err.println("ERROR: " + msg);
+            System.err.println("ERROR: " + msg);
         }
 
 
@@ -171,9 +171,9 @@ public class LogUtil {
         }
 
         /**
-         * _more_
+         * Is debug enabled?
          *
-         * @return _more_
+         * @return true if debug is enabled
          */
         public boolean isDebugEnabled() {
             return debug;
@@ -265,11 +265,9 @@ public class LogUtil {
      *  of the given Class. For now this just returns the one Properties
      *  file found. In the future we will want to look at the user's local properties, site properties, etc.
      *
-     *  @param The property filename to look for.
-     *  @param Where to look.
+     *  @param filename The property filename to look for.
+     *  @param origin Where to look.
      *
-     * @param filename
-     * @param origin
      *  @return The properties.
      */
     private static Properties[] getProperties(String filename, Class origin) {
@@ -443,7 +441,15 @@ public class LogUtil {
         printExceptions("Errors have occured", errorMessages, exceptions);
     }
 
-    public static void printExceptions(String label, List errorMessages, List exceptions) {
+    /**
+     * Print exceptions
+     *
+     * @param label label for the dialog
+     * @param errorMessages  list of error messages
+     * @param exceptions List of exceptions
+     */
+    public static void printExceptions(String label, List errorMessages,
+                                       List exceptions) {
         if (exceptions == null) {
             return;
         }
@@ -456,11 +462,10 @@ public class LogUtil {
             printExceptionsNoGui(errorMessages, exceptions);
             return;
         }
-        JComponent contents  =LayoutUtil.topCenter(new JLabel(label),
-                            getMultiExceptionsPanel(errorMessages,
-                                                    exceptions));
-        GuiUtils.showDialog("Errors",
-                            contents, getCurrentWindow());
+        JComponent contents = LayoutUtil.topCenter(new JLabel(label),
+                                  getMultiExceptionsPanel(errorMessages,
+                                      exceptions));
+        GuiUtils.showDialog("Errors", contents, getCurrentWindow());
     }
 
 
@@ -486,7 +491,7 @@ public class LogUtil {
                 inner = innerInner;
             }
         }
-        if (inner== null) {
+        if (inner == null) {
             return exc;
         }
         return inner;
@@ -531,7 +536,7 @@ public class LogUtil {
                         stackMessage.append(getStackTrace(innerException));
                         stackMessage.append("Exception thrown at:\n");
                     }
-		    theException.printStackTrace();
+                    theException.printStackTrace();
                     stackMessage.append(theException.getMessage() + "\n");
                     stackMessage.append(getStackTrace(theException));
                     sp.getViewport().setViewPosition(new Point(0, 0));
@@ -547,10 +552,10 @@ public class LogUtil {
             comps.add(jb);
             comps.add(new JLabel("  " + message + "  "));
         }
-        JPanel jp = LayoutUtil.doLayout(LayoutUtil.getComponentArray(comps), 2,
-                                      LayoutUtil.WT_NY, LayoutUtil.WT_N);
-        JScrollPane jpScroll = GuiUtils.makeScrollPane(LayoutUtil.top(jp), 100,
-                                   100);
+        JPanel jp = LayoutUtil.doLayout(LayoutUtil.getComponentArray(comps),
+                                        2, LayoutUtil.WT_NY, LayoutUtil.WT_N);
+        JScrollPane jpScroll = GuiUtils.makeScrollPane(LayoutUtil.top(jp),
+                                   100, 100);
         jpScroll.setPreferredSize(new Dimension(100, 100));
         jpScroll.setSize(new Dimension(100, 100));
         JPanel contents = LayoutUtil.topCenter(jpScroll, sp);
@@ -721,11 +726,11 @@ public class LogUtil {
      */
     public static void registerWindow(final Window w) {
         WindowListener windowListener = new WindowAdapter() {
-                public void 	windowClosing(WindowEvent e) {
-                    //                    System.err.println("window closing");
-                    currentWindows.remove(w);
-                    e.getWindow().removeWindowListener(this);
-                }
+            public void windowClosing(WindowEvent e) {
+                //                    System.err.println("window closing");
+                currentWindows.remove(w);
+                e.getWindow().removeWindowListener(this);
+            }
 
             public void windowActivated(WindowEvent e) {
                 synchronized (currentWindows) {
@@ -782,7 +787,6 @@ public class LogUtil {
      */
     public static void printException(LogCategory log_, String xmsg,
                                       Throwable exc, byte[] fileBytes) {
-    	xmsg = Msg.msg(xmsg);
         File f = null;
         if (fileBytes != null) {
             f = CacheManager.getTmpFile("error");
@@ -806,24 +810,27 @@ public class LogUtil {
      * Tell the user about it.
      */
     public static void printException(LogCategory log_, String xmsg,
-                                      Throwable originalException, File file) {
+                                      Throwable originalException,
+                                      File file) {
 
 
-	//	Misc.printStack("\n******* LogUtil", 10,null);
+        xmsg = Msg.msg(xmsg);
+        //      Misc.printStack("\n******* LogUtil", 10,null);
 
-	Throwable exc = originalException;
+        Throwable exc        = originalException;
         Throwable wrappedExc = getInnerException(originalException);
         if (wrappedExc != null) {
             exc = wrappedExc;
         }
         String excMessage = exc.getMessage();
-	//Add the message if its a wrapper exception
-	if(originalException instanceof WrapperException) {
-	    String msg = originalException.getMessage();
-	    if(excMessage!=null && msg!=null && msg.length()>0 && !msg.trim().equals(excMessage.trim())) {
-		excMessage = msg +" " + excMessage;
-	    }
-	}
+        //Add the message if its a wrapper exception
+        if (originalException instanceof WrapperException) {
+            String msg = originalException.getMessage();
+            if ((excMessage != null) && (msg != null) && (msg.length() > 0)
+                    && !msg.trim().equals(excMessage.trim())) {
+                excMessage = msg + " " + excMessage;
+            }
+        }
 
         if (excMessage == null) {
             excMessage = "\n" + exc.getClass().getName();
@@ -832,7 +839,7 @@ public class LogUtil {
         }
 
         //"An error has occurred:\n"
-        String msg =  xmsg+" " + excMessage;
+        String msg = xmsg + " " + excMessage;
         if (file != null) {
             msg = msg + "\n\n" + "View file at:" + file;
         }
@@ -915,11 +922,13 @@ public class LogUtil {
                                      LayoutUtil.WT_N);
 
             buttons = LayoutUtil.inset(buttons, 5);
-            JComponent messageComp = LayoutUtil.inset(getMessageComponent(msg),
-                                         new Insets(8, 0, 8, 8));
+            JComponent messageComp =
+                LayoutUtil.inset(getMessageComponent(msg),
+                                 new Insets(8, 0, 8, 8));
 
 
-            JComponent topPanel = LayoutUtil.leftCenter(errorLbl, messageComp);
+            JComponent topPanel = LayoutUtil.leftCenter(errorLbl,
+                                      messageComp);
             topPanel.setBackground(Color.red);
 
 
@@ -1032,7 +1041,7 @@ public class LogUtil {
      */
     public static void userMessage(LogCategory log_, String msg,
                                    boolean andLog) {
-    	msg = Msg.msg(msg);
+        msg = Msg.msg(msg);
         if (andLog && (log_ != null)) {
             log_.error(msg);
         }
@@ -1045,7 +1054,7 @@ public class LogUtil {
             GuiUtils.removeModalDialogComponent(label);
         } else {
             if ( !(andLog && (log_ != null))) {
-		System.err.println(msg);
+                System.err.println(msg);
             }
         }
     }
@@ -1060,7 +1069,8 @@ public class LogUtil {
      */
     private static JComponent getMessageComponent(String msg) {
         if (msg.startsWith("<html>")) {
-            Component[]comps = GuiUtils.getHtmlComponent(msg,null,500,400);
+            Component[] comps = GuiUtils.getHtmlComponent(msg, null, 500,
+                                    400);
             return (JScrollPane) comps[1];
         }
 
@@ -1092,7 +1102,7 @@ public class LogUtil {
      * @param msg The message
      */
     public static void userErrorMessage(LogCategory log_, String msg) {
-    	msg = Msg.msg(msg);
+        msg = Msg.msg(msg);
         if (log_ != null) {
             log_.error(msg);
         }
@@ -1197,7 +1207,8 @@ public class LogUtil {
      * @param msg The message to show
      */
     public static void message(String msg) {
-    	msg = Msg.msg(msg);
+
+        msg               = Msg.msg(msg);
         lastMessageString = msg;
 
         for (int i = 0; i < messageLogs.size(); i++) {
