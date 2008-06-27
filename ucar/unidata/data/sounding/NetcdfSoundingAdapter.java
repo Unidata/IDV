@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -747,9 +748,9 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                         if (multiLevel) {
                             j[1] = i;
                         }
-                        p[i] = (press.getFloat(j) == pFill)
-                               ? Float.NaN
-                               : press.getFloat(j);
+                        p[i]   = (press.getFloat(j) == pFill)
+                                 ? Float.NaN
+                                 : press.getFloat(j);
                         spd[i] = (speed.getFloat(j) == spdFill)
                                  ? Float.NaN
                                  : speed.getFloat(j);
@@ -928,19 +929,21 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
      */
     private void getVariables() throws Exception {
 
-        String    defaultIdVar   = "wmoStaNum";
-        String    defaultTimeVar = "relTime";
+        String    idVar   = getDflt("stationIDVariable", "wmoStaNum");
+        Attribute a       = nc.getAttribute("timeVariables");
+        String    timeVar = (a != null)
+                            ? a.getStringValue()
+                            : getDflt("soundingTimeVariable", "relTime");
 
-        Attribute version        = nc.getAttribute("version");
-        /*
+        Attribute version = nc.getAttribute("version");
         if ((version != null)
                 && (version.getStringValue().indexOf(
                     "Forecast Systems Lab 1.3") >= 0)) {
-            defaultIdVar   = "wmoStat";
-            defaultTimeVar = "synTime";
+            idVar   = "wmoStat";
+            timeVar = "synTime";
         }
-        */
-        stid = nc.get(getDflt("stationIDVariable", defaultIdVar));
+
+        stid = nc.get(idVar);
         if (stid == null) {
             throw new Exception("Unable to find station id variable");
         }
@@ -960,10 +963,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
             throw new Exception("Unable to find station elevation variable");
         }
 
-        Attribute a = nc.getAttribute("timeVariables");
-        time = nc.get((a != null)
-                      ? a.getStringValue()
-                      : getDflt("soundingTimeVariable", defaultTimeVar));
+        time = nc.get(timeVar);
         if (time == null) {
             throw new Exception("Unable to find sounding time variable");
         }
