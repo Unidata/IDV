@@ -400,30 +400,8 @@ public class StormTrackChart {
 
 
 
+        List<StormParam> params = getStormTrackParams();
 
-        //Get the types from the first forecast track
-        List<StormParam> params = new ArrayList<StormParam>();
-        for (StormTrack track : stormDisplayState.getTrackCollection()
-                .getTracks()) {
-            if (track == null) {
-                continue;
-            }
-            if ( !track.isObservation()) {
-                params = track.getParams();
-                break;
-            }
-        }
-
-
-
-        //If we didn't get any from the forecast track use the obs track
-        if (params.size() == 0) {
-            StormTrack obsTrack =
-                stormDisplayState.getTrackCollection().getObsTrack();
-            if (obsTrack != null) {
-                params = obsTrack.getParams();
-            }
-        }
 
         Insets inset      = new Insets(2, 7, 0, 0);
         List   chartComps = new ArrayList();
@@ -472,9 +450,9 @@ public class StormTrackChart {
 
         List paramComps = new ArrayList();
         for (StormParam param : params) {
-            if (param.getIsChartParam() == false) {
-                continue;
-            }
+         //   if (param.getIsChartParam() == false) {
+         //       continue;
+         //   }
             final StormParam theParam      = param;
             boolean          useChartParam = chartParams.contains(theParam);
             final JCheckBox cbx = new JCheckBox(param.toString(),
@@ -520,6 +498,38 @@ public class StormTrackChart {
 
     }
 
+    protected List getStormTrackParams(){
+
+        //Get the types from the first forecast track
+        List<StormParam> params;
+
+        params = stormDisplayState.getStormChartParams();
+     
+        
+        if(params == null || params.size() == 0){
+            for (StormTrack track : stormDisplayState.getTrackCollection()
+                    .getTracks()) {
+                if (track == null) {
+                    continue;
+                }
+                if ( !track.isObservation()) {
+                    params = track.getParams();
+                    break;
+                }
+            }
+
+            //If we didn't get any from the forecast track use the obs track
+            if (params.size() == 0) {
+                StormTrack obsTrack =
+                    stormDisplayState.getTrackCollection().getObsTrack();
+                if (obsTrack != null) {
+                    params = obsTrack.getParams();
+                }
+            }
+        }
+        return params;
+
+    }
     /**
      * _more_
      */

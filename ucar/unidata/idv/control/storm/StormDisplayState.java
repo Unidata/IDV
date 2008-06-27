@@ -434,10 +434,19 @@ public class StormDisplayState {
         }
         deactivate();
         active = true;
-        showStorm();
+
     }
 
+    /**
+     * _more_
+     */
+    protected void reloadChart() {
 
+        for (StormTrackChart stormTrackChart : charts) {
+            stormTrackChart.deactivate();
+            stormTrackChart.updateChart();
+        }
+    }
     /**
      * _more_
      *
@@ -1594,7 +1603,21 @@ public class StormDisplayState {
 
     }
 
+    public List<StormParam> getStormChartParams() {
+        Hashtable<String, Boolean> s1 =  stormTrackControl.getOkParams();
+        List<StormParam> allParams = stormTrackControl.getTrackParams();
 
+        List<StormParam> params = new ArrayList();
+
+        for(StormParam sp : allParams){
+            if(s1.get(sp.getName()) != null && s1.get(sp.getName()) == true)
+                params.add(sp);
+        }
+
+        return params;
+       // return stormTrackControl.getChartParamFromSelector();
+
+    }
     /**
      * _more_
      *
