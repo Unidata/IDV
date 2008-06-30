@@ -22,11 +22,9 @@
 
 
 
+
 package ucar.unidata.util;
 
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -35,6 +33,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -57,6 +59,7 @@ public class JobManager {
     /** _more_ */
     private static Hashtable loadMap = new Hashtable();
 
+    /** _more_          */
     private static Hashtable dialogMap = new Hashtable();
 
 
@@ -88,28 +91,53 @@ public class JobManager {
         return startLoad(name, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param jobId _more_
+     * @param msg _more_
+     */
     public void setDialogLabel1(Object jobId, String msg) {
-        if(jobId==null) return;
+        if (jobId == null) {
+            return;
+        }
         DialogInfo dialogInfo = (DialogInfo) dialogMap.get(jobId);
-        if(dialogInfo!=null) {
-            dialogInfo.label1.setText(msg); 
+        if (dialogInfo != null) {
+            dialogInfo.label1.setText(msg);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param jobId _more_
+     * @param msg _more_
+     */
     public void setDialogLabel2(Object jobId, String msg) {
-        if(jobId==null) return;
+        if (jobId == null) {
+            return;
+        }
         DialogInfo dialogInfo = (DialogInfo) dialogMap.get(jobId);
-        if(dialogInfo!=null) {
-            dialogInfo.label2.setText(msg); 
+        if (dialogInfo != null) {
+            dialogInfo.label2.setText(msg);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param jobId _more_
+     *
+     * @return _more_
+     */
     public String getDialogLabel2(Object jobId) {
-        if(jobId==null) return null;
+        if (jobId == null) {
+            return null;
+        }
         DialogInfo dialogInfo = (DialogInfo) dialogMap.get(jobId);
-        if(dialogInfo!=null) {
+        if (dialogInfo != null) {
             return dialogInfo.label2.getText();
         }
         return null;
@@ -117,53 +145,128 @@ public class JobManager {
 
 
 
+    /**
+     * Class DialogInfo _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private class DialogInfo {
+
+        /** _more_          */
         JDialog dialog;
+
+        /** _more_          */
         JLabel label1;
+
+        /** _more_          */
         JLabel label2;
+
+        /** _more_          */
         Object jobId;
-        public DialogInfo(Object id, String name, boolean showDialog) {
-            jobId = id;
-            dialog =  GuiUtils.createDialog(null, name, false);
+
+        /**
+         * _more_
+         *
+         * @param id _more_
+         * @param name _more_
+         * @param modal _more_
+         */
+        public DialogInfo(Object id, String name, boolean modal) {
+            jobId  = id;
+            dialog = GuiUtils.createDialog(null, name, modal);
             JButton cancelBtn = new JButton("Cancel");
             cancelBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        stopLoad(jobId);
-                        dialog.dispose();
-                    }
-                });
-            JLabel         waitLbl        = new JLabel(new ImageIcon(GuiUtils.getImage("/ucar/unidata/idv/images/wait.gif")));
+                public void actionPerformed(ActionEvent ae) {
+                    stopLoad(jobId);
+                    dialog.dispose();
+                }
+            });
+            JLabel waitLbl =
+                new JLabel(
+                    new ImageIcon(
+                        GuiUtils.getImage(
+                            "/ucar/unidata/idv/images/wait.gif")));
             label1 = new JLabel("                                   ");
             label2 = new JLabel("                                   ");
-            if(showDialog) {
-                JComponent contents = LayoutUtil.vbox(LayoutUtil.hbox(new JLabel(name), LayoutUtil.inset(waitLbl,5)),
-                                                      LayoutUtil.vbox(LayoutUtil.filler(300,5),
-                                                                      label1,
-                                                                      label2),
-                                                      LayoutUtil.wrap(LayoutUtil.inset(cancelBtn,10)));
+            JComponent contents = LayoutUtil.vbox(
+                                      LayoutUtil.hbox(
+                                          new JLabel(name),
+                                          LayoutUtil.inset(
+                                              waitLbl, 5)), LayoutUtil.vbox(
+                                                  LayoutUtil.filler(300, 5),
+                                                  label1,
+                                                  label2), LayoutUtil.wrap(
+                                                      LayoutUtil.inset(
+                                                          cancelBtn, 10)));
 
-                dialog.getContentPane().add(LayoutUtil.inset(contents,5));
-                dialog.pack();
-                GuiUtils.packInCenter(dialog);
-                dialog.show();
-            }
+            dialog.getContentPane().add(LayoutUtil.inset(contents, 5));
+            dialog.pack();
+            GuiUtils.packInCenter(dialog);
         }
+
+        /**
+         * _more_
+         */
+        public void showDialog() {
+            dialog.show();
+        }
+
+
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param showDialog _more_
+     *
+     * @return _more_
+     */
     public Object startLoad(String name, boolean showDialog) {
+        return startLoad(name, showDialog, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param showDialog _more_
+     * @param modal _more_
+     *
+     * @return _more_
+     */
+    public Object startLoad(final String name, final boolean showDialog,
+                            final boolean modal) {
         synchronized (MUTEX) {
             final Object id = new Integer(++objectCount);
             loadMap.put(id, name);
-            dialogMap.put(id, new DialogInfo(id, name,showDialog));
+            Misc.run(new Runnable() {
+                public void run() {
+                    DialogInfo dialogInfo = new DialogInfo(id, name, modal);
+                    dialogMap.put(id, dialogInfo);
+                    if (showDialog) {
+                        dialogInfo.showDialog();
+                    }
+                }
+            });
             return id;
         }
     }
 
 
-    public void startLoad(String name, Object id) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param id _more_
+     */
+    public void startLoad(final String name, final Object id) {
         synchronized (MUTEX) {
             loadMap.put(id, name);
-            dialogMap.put(id, new DialogInfo(id, name,false));
+            dialogMap.put(id, new DialogInfo(id, name, false));
         }
     }
 
@@ -215,7 +318,7 @@ public class JobManager {
             }
             loadMap.remove(id);
             DialogInfo dialogInfo = (DialogInfo) dialogMap.get(id);
-            if(dialogInfo!=null && dialogInfo.dialog!=null) {
+            if ((dialogInfo != null) && (dialogInfo.dialog != null)) {
                 dialogInfo.dialog.dispose();
                 dialogMap.remove(id);
             }
