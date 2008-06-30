@@ -3256,9 +3256,13 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             slider.setMinorTickSpacing((int) (megs - 2) / 10);
             //            slider.setPaintTicks(true);
             slider.setSnapToTicks(true);
+            final long timeNow = System.currentTimeMillis();
             ChangeListener sizeListener =
                 new javax.swing.event.ChangeListener() {
                 public void stateChanged(ChangeEvent evt) {
+                    //A hack so we don't respond to the first event that we get from the slider when
+                    //the dialog is first shown
+                    if(System.currentTimeMillis()-timeNow<500) return;
                     JSlider slider = (JSlider) evt.getSource();
                     int pixelsPerImage = 1000000 * slider.getValue()
                                          / listHolder[0].size() / 4;
