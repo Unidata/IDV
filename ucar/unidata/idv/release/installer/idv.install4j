@@ -1,73 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="3.2.4">
+<install4j version="4.1.3" transformSequenceNumber="2">
   <directoryPresets config="/usr/local/jdk1.5.0_11-java3D1.5.1/jre" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="%SHORT_NAME%_%VERSION%_%PLATFORM%_installer" compression="6" lzmaCompression="false" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.4" allPathsRelative="false" backupOnSave="false" autoSave="false" macSignature="????" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true">
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.6" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+    <languages skipLanguageSelection="false">
+      <principalLanguage id="en" customLocalizationFile="" />
+      <additionalLanguages />
+    </languages>
     <searchSequence>
       <registry />
       <envVar name="JAVA_HOME" />
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="INSTALLDIR" value="IDV_%VERSION%" />
+      <variable name="INSTALLDIR" value="IDV_${compiler:sys.version}" />
       <variable name="NOJRE" value="nojre" />
       <variable name="SRCDIR" value="/upc/share/idv" />
     </variables>
   </application>
   <files>
+    <filesets />
+    <roots />
     <mountPoints>
-      <mountPoint name="" id="1" location="" mode="755" />
+      <mountPoint id="1" root="" location="" mode="755" />
     </mountPoints>
     <entries>
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/idv.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/auxdata.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/external.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/local-visad.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/visad.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/jython.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/ncIdv.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/lib/simpleidv.jar" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE.jdom" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE.jpeg2000" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE.jython" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/LICENSE.visad" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/licenses/NOTICE" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/installer/idv.gif" overwrite="4" shared="false" mode="644" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/installer/runIDV" overwrite="5" shared="false" mode="755" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/installer/runIDV.bat" overwrite="5" shared="false" mode="755" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/installer/simpleIDV" overwrite="5" shared="false" mode="755" dontUninstall="false" />
-      <fileEntry mountPoint="1" file="%SRCDIR%/ucar/unidata/idv/release/installer/simpleIDV.bat" overwrite="5" shared="false" mode="755" dontUninstall="false" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/idv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/auxdata.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/external.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/local-visad.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/visad.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/jython.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/ncIdv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/simpleidv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jdom" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jpeg2000" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jython" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.visad" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/NOTICE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.gif" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
     </entries>
     <components>
-      <component name="IDV Components" id="67">
+      <component name="IDV Components" id="67" displayDescription="false" selected="true" mandatory="true" downloadable="false">
+        <description />
         <include all="false">
-          <entry location="idv.jar" launcher="false" />
-          <entry location="auxdata.jar" launcher="false" />
-          <entry location="external.jar" launcher="false" />
-          <entry location="local-visad.jar" launcher="false" />
-          <entry location="visad.jar" launcher="false" />
-          <entry location="jython.jar" launcher="false" />
-          <entry location="ncIdv.jar" launcher="false" />
-          <entry location="simpleidv.jar" launcher="false" />
-          <entry location="LICENSE" launcher="false" />
-          <entry location="LICENSE.apache" launcher="false" />
-          <entry location="LICENSE.jdom" launcher="false" />
-          <entry location="LICENSE.jpeg2000" launcher="false" />
-          <entry location="LICENSE.jython" launcher="false" />
-          <entry location="LICENSE.visad" launcher="false" />
-          <entry location="NOTICE" launcher="false" />
-          <entry location="idv.gif" launcher="false" />
+          <entry location="idv.jar" fileType="regular" />
+          <entry location="auxdata.jar" fileType="regular" />
+          <entry location="external.jar" fileType="regular" />
+          <entry location="local-visad.jar" fileType="regular" />
+          <entry location="visad.jar" fileType="regular" />
+          <entry location="jython.jar" fileType="regular" />
+          <entry location="ncIdv.jar" fileType="regular" />
+          <entry location="simpleidv.jar" fileType="regular" />
+          <entry location="LICENSE" fileType="regular" />
+          <entry location="LICENSE.apache" fileType="regular" />
+          <entry location="LICENSE.jdom" fileType="regular" />
+          <entry location="LICENSE.jpeg2000" fileType="regular" />
+          <entry location="LICENSE.jython" fileType="regular" />
+          <entry location="LICENSE.visad" fileType="regular" />
+          <entry location="NOTICE" fileType="regular" />
+          <entry location="idv.gif" fileType="regular" />
         </include>
+        <dependencies />
       </component>
-      <component name="IDV launchers (e.g runIDV, runIDV.bat)" id="66">
+      <component name="IDV launchers (e.g runIDV, runIDV.bat)" id="66" displayDescription="false" selected="true" mandatory="false" downloadable="false">
+        <description />
         <include all="false">
-          <entry location="runIDV" launcher="false" />
-          <entry location="runIDV.bat" launcher="false" />
-          <entry location="simpleIDV" launcher="false" />
-          <entry location="simpleIDV.bat" launcher="false" />
-          <entry location="IDV" launcher="true" />
+          <entry location="runIDV" fileType="regular" />
+          <entry location="runIDV.bat" fileType="regular" />
+          <entry location="simpleIDV" fileType="regular" />
+          <entry location="simpleIDV.bat" fileType="regular" />
+          <entry location="IDV" fileType="launcher" />
         </include>
+        <dependencies />
       </component>
     </components>
   </files>
@@ -76,169 +86,411 @@
     <launcher name="runIDV.bat" id="7" external="true" excludeFromMenu="false" menuName="IDV" externalFile="runIDV.bat" />
     <launcher name="simpleIDV" id="4" external="true" excludeFromMenu="false" menuName="" externalFile="simpleIDV" />
     <launcher name="simpleIDV.bat" id="9" external="true" excludeFromMenu="false" menuName="Simple IDV" externalFile="simpleIDV.bat" />
-    <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="%SRCDIR%/ucar/unidata/idv/release/installer/idv.gif" pngIcon32File="%SRCDIR%/ucar/unidata/idv/release/installer/idv.gif" macServiceDependencies="" allowUserChangeServiceStartType="true">
-      <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="">
-        <versionInfo include="false" fileVersion="" companyName="" fileDescription="" legalCopyright="" productVersion="" internalName="" />
+    <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.gif" pngIcon32File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.gif" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="">
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
         <text>
           <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version %VERSION%" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="ucar.unidata.idv.DefaultIdv" vmParameters="-Xmx512m" arguments="" allowVMPassthroughParameters="true" minVersion="" maxVersion="" preferredVM="" allowBetaVM="false" jdkOnly="false">
-        <searchSequence>
-          <registry />
-          <envVar name="JAVA_HOME" />
-          <envVar name="JDK_HOME" />
-        </searchSequence>
+      <java mainClass="ucar.unidata.idv.DefaultIdv" vmParameters="-Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="">
         <classPath>
           <archive location="idv.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories />
       </java>
       <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
     </launcher>
   </launchers>
-  <installerGui installerType="1" runUninstallerOnUpdate="false" addOnAppId="" suggestPreviousLocations="false" allowUnattendedInstall="true" useCustomHeaderImage="true" customHeaderImage="%SRCDIR%/ucar/unidata/idv/images/logo.gif" customSize="false" customWidth="500" customHeight="390">
-    <customCode preAction="false" preActionClass="" postAction="false" postActionClass="" preUninstallAction="false" preUninstallActionClass="" postUninstallAction="false" postUninstallActionClass="" initHandler="false" initHandlerClass="" directoryValidator="false" directoryValidatorClass="" installationHandler="false" installationHandlerClass="" />
-    <standardScreens>
-      <screen id="welcome" enabled="true" useCustomBanner="false" bannerImageFile="" background="255,255,102" />
-      <screen id="license" enabled="true" file="%SRCDIR%/ucar/unidata/idv/release/installer/readme.txt" />
-      <screen id="location" enabled="true" showSpace="true" suggestAppDir="true" />
-      <screen id="components" enabled="false" allSelected="true" firstMandatory="false">
-        <selectedComponents />
-        <mandatoryComponents>
-          <componentIds refId="67" />
-        </mandatoryComponents>
-      </screen>
-      <screen id="programGroup" enabled="true" />
-      <screen id="fileAssociations" enabled="false">
-        <associations />
-      </screen>
-      <screen id="services" enabled="true" allSelected="true">
-        <selectedServiceLaunchers />
-      </screen>
-      <screen id="additionalTasks" enabled="true" customTasksPlacement="1">
-        <customTasks />
-      </screen>
-      <screen id="preInfo" enabled="false" file="" />
-      <screen id="install" enabled="true" />
-      <screen id="postInfo" enabled="false" file="" />
-      <screen id="finished" enabled="true" useCustomBanner="false" bannerImageFile="" background="255,255,255" />
-    </standardScreens>
-    <customScreens />
+  <installerGui installerType="1" suggestPreviousProgramGroup="false" addOnAppId="" suggestPreviousLocations="false">
+    <customCode useInstalledFiles="false" />
+    <applications>
+      <application name="" id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" customIcnsFile="" customIcoFile="">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.InstallerApplication">
+              <void property="allowConsole">
+                <boolean>false</boolean>
+              </void>
+              <void property="allowUnattended">
+                <boolean>false</boolean>
+              </void>
+              <void property="resizable">
+                <boolean>false</boolean>
+              </void>
+              <void property="watermark">
+                <boolean>false</boolean>
+              </void>
+            </object>
+          </java>
+        </serializedBean>
+        <startup>
+          <screen name="" id="75" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="76" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.WelcomeScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="77" beanClass="com.install4j.runtime.beans.screens.LicenseScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.LicenseScreen">
+                  <void property="displayedTextFile">
+                    <object class="com.install4j.api.beans.ExternalFile">
+                      <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/readme.txt</string>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="78" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="79" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="80" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="true" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="81" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.InstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="82" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                      <void property="programGroupName">
+                        <string>${compiler:sys.fullName}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="83" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
+                      <void property="itemName">
+                        <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="84" beanClass="com.install4j.runtime.beans.screens.FinishedScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.FinishedScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+      <application name="" id="uninstaller" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" customIcnsFile="" customIcoFile="">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.UninstallerApplication">
+              <void property="allowConsole">
+                <boolean>false</boolean>
+              </void>
+              <void property="allowUnattended">
+                <boolean>false</boolean>
+              </void>
+              <void property="resizable">
+                <boolean>false</boolean>
+              </void>
+              <void property="watermark">
+                <boolean>false</boolean>
+              </void>
+            </object>
+          </java>
+        </serializedBean>
+        <startup>
+          <screen name="" id="86" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="87" beanClass="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="88" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="89" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.UninstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="90" beanClass="com.install4j.runtime.beans.screens.UninstallFailureScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallFailureScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="91" beanClass="com.install4j.runtime.beans.screens.UninstallSuccessScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallSuccessScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+    </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Linux Installer" id="3" mediaFileName="%SHORT_NAME%_%VERSION%_linux-i386_installer" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="linux-i386-1.5.0_11_java3d1.3.1" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" allowUserStartAfterFinish="false" launchExecutableId="" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="1" desktopLauncherId="" customScriptMode="1" customScriptFile="">
-      <selectedLaunchers>
+    <unixInstaller name="Linux Installer" id="3" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-i386-1.5.0_11_java3d1.3.1" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers>
+        <launcher id="7" />
+        <launcher id="9" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
+      </exclude>
+      <variables />
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
+    </unixInstaller>
+    <win32 name="Windows" id="8" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.5.0_11_j3d.1.3.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
+      <excludedLaunchers>
         <launcher id="2" />
         <launcher id="4" />
         <launcher id="49" />
-      </selectedLaunchers>
-      <messageSet language="English" />
-      <exclude>
-        <entry location="runIDV.bat" launcher="false" />
-        <entry location="simpleIDV.bat" launcher="false" />
-      </exclude>
-      <variables />
-      <excludedScreenIds />
-      <customScriptLines />
-    </unixInstaller>
-    <win32 name="Windows" id="8" mediaFileName="" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="windows-x86-1.5.0_11_j3d.1.3.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" allowUserStartAfterFinish="true" launchExecutableId="7" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="3" desktopLauncherId="7" programGroup="Integrated Data Viewer %VERSION%" allowUserDisableStartMenuCreation="false" reboot="false" rebootUninstaller="false" modeQuickLaunchIon="3">
-      <selectedLaunchers>
-        <launcher id="7" />
-        <launcher id="9" />
-      </selectedLaunchers>
-      <messageSet language="English" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude />
       <variables />
-      <excludedScreenIds />
-      <additionalStartMenuEntries />
     </win32>
-    <macosFolder name="Mac OS X Folder" id="12" mediaFileName="" installDir="%INSTALLDIR%" allLaunchers="false" customInstallBaseDir="" allowUserStartAfterFinish="true" launchExecutableId="49" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="1" desktopLauncherId="" customScriptMode="1" customScriptFile="">
-      <selectedLaunchers>
-        <launcher id="49" />
-      </selectedLaunchers>
-      <messageSet language="English" />
+    <macosFolder name="Mac OS X Folder" id="12" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers>
+        <launcher id="2" />
+        <launcher id="7" />
+        <launcher id="4" />
+        <launcher id="9" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
-        <entry location="runIDV.bat" launcher="false" />
-        <entry location="simpleIDV.bat" launcher="false" />
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
       </exclude>
       <variables />
-      <excludedScreenIds />
-      <customScriptLines />
     </macosFolder>
-    <unixInstaller name="Solaris x86" id="56" mediaFileName="%SHORT_NAME%_%VERSION%_solaris-x86_intel_installer" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="solaris-x86-1.5.0_11_java3d1.4.0" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" allowUserStartAfterFinish="false" launchExecutableId="" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="1" desktopLauncherId="" customScriptMode="1" customScriptFile="">
-      <selectedLaunchers>
-        <launcher id="2" />
-        <launcher id="4" />
-        <launcher id="49" />
-      </selectedLaunchers>
-      <messageSet language="English" />
-      <exclude>
-        <entry location="runIDV.bat" launcher="false" />
-        <entry location="simpleIDV.bat" launcher="false" />
-      </exclude>
-      <variables />
-      <excludedScreenIds />
-      <customScriptLines />
-    </unixInstaller>
-    <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="%SHORT_NAME%_%VERSION%_%PLATFORM%_%NOJRE%_installer" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" allowUserStartAfterFinish="false" launchExecutableId="" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="1" desktopLauncherId="" customScriptMode="1" customScriptFile="">
-      <selectedLaunchers>
-        <launcher id="2" />
-        <launcher id="4" />
-        <launcher id="49" />
-      </selectedLaunchers>
-      <messageSet language="English" />
-      <exclude>
-        <entry location="runIDV.bat" launcher="false" />
-        <entry location="simpleIDV.bat" launcher="false" />
-      </exclude>
-      <variables />
-      <excludedScreenIds />
-      <customScriptLines />
-    </unixInstaller>
-    <unixInstaller name="Solaris SPARC" id="61" mediaFileName="%SHORT_NAME%_%VERSION%_solaris-sparc_installer" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="solaris-sparc-1.5.0_11_java3d1.4.0" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" allowUserStartAfterFinish="false" launchExecutableId="" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="1" desktopLauncherId="" customScriptMode="1" customScriptFile="">
-      <selectedLaunchers>
-        <launcher id="2" />
-        <launcher id="4" />
-        <launcher id="49" />
-      </selectedLaunchers>
-      <messageSet language="English" />
-      <exclude>
-        <entry location="runIDV.bat" launcher="false" />
-        <entry location="simpleIDV.bat" launcher="false" />
-      </exclude>
-      <variables />
-      <excludedScreenIds />
-      <customScriptLines />
-    </unixInstaller>
-    <win32 name="Windows Vista" id="81" mediaFileName="idv_%VERSION%_windows_vista_installer" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="windows-x86-1.6.0_01_j3d1.5.1" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" allowUserStartAfterFinish="true" launchExecutableId="7" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="3" desktopLauncherId="7" programGroup="Integrated Data Viewer %VERSION%" allowUserDisableStartMenuCreation="false" reboot="false" rebootUninstaller="false" modeQuickLaunchIon="3">
-      <selectedLaunchers>
+    <unixInstaller name="Solaris x86" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-x86-1.5.0_11_java3d1.4.0" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers>
         <launcher id="7" />
         <launcher id="9" />
-      </selectedLaunchers>
-      <messageSet language="English" />
-      <exclude />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
+      </exclude>
       <variables />
-      <excludedScreenIds />
-      <additionalStartMenuEntries />
-    </win32>
-    <unixInstaller name="Linux J3D1.5.1" id="83" mediaFileName="%SHORT_NAME%_%VERSION%_linux-i386_j3d1.5.1_installer" installDir="%INSTALLDIR%" allLaunchers="false" includedJRE="linux-i386-1.5.0_11_j3d1.5.1" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" allowUserStartAfterFinish="false" launchExecutableId="" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" adminRequired="false" languageID="en" modeDesktopIcon="1" desktopLauncherId="" customScriptMode="1" customScriptFile="">
-      <selectedLaunchers>
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
+    </unixInstaller>
+    <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_${compiler:NOJRE}_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers>
+        <launcher id="7" />
+        <launcher id="9" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
+      </exclude>
+      <variables />
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
+    </unixInstaller>
+    <unixInstaller name="Solaris SPARC" id="61" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-sparc_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-sparc-1.5.0_11_java3d1.4.0" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers>
+        <launcher id="7" />
+        <launcher id="9" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
+      </exclude>
+      <variables />
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
+    </unixInstaller>
+    <win32 name="Windows Vista" id="81" mediaFileName="idv_${compiler:sys.version}_windows_vista_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.6.0_01_j3d1.5.1" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
+      <excludedLaunchers>
         <launcher id="2" />
         <launcher id="4" />
         <launcher id="49" />
-      </selectedLaunchers>
-      <messageSet language="English" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude />
+      <variables />
+    </win32>
+    <unixInstaller name="Linux J3D1.5.1" id="83" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_j3d1.5.1_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-i386-1.5.0_11_j3d1.5.1" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers>
+        <launcher id="7" />
+        <launcher id="9" />
+      </excludedLaunchers>
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
-        <entry location="runIDV.bat" launcher="false" />
-        <entry location="simpleIDV.bat" launcher="false" />
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
       </exclude>
       <variables />
-      <excludedScreenIds />
-      <customScriptLines />
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true">
