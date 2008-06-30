@@ -823,6 +823,8 @@ public class FileManager {
     /** Suffix for XML files */
     public static final String SUFFIX_XML = ".xml";
 
+    public static final String SUFFIX_AVI = ".avi";
+
     /** Suffix for CSV files */
     public static final String SUFFIX_CSV = ".csv";
 
@@ -915,11 +917,11 @@ public class FileManager {
 
     /** Filter for QuickTime files */
     public static final PatternFileFilter FILTER_MOV =
-        new PatternFileFilter(".+\\.mov", "QuickTime files (*.mov)");
+        new PatternFileFilter(".+\\.mov", "QuickTime files (*.mov)",SUFFIX_MOV);
 
     /** Filter for QuickTime files */
     public static final PatternFileFilter FILTER_AVI =
-        new PatternFileFilter(".+\\.mov", "AVI files (*.avi)");
+        new PatternFileFilter(".+\\.avi", "AVI files (*.avi)", SUFFIX_AVI);
 
     /** Filter for QuickTime files */
     public static final PatternFileFilter FILTER_ANIMATEDGIF =
