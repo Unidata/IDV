@@ -2105,28 +2105,31 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         List copyDataSources = new ArrayList();
         List fileComps       = new ArrayList();
         List copyComps       = new ArrayList();
+        List notSavedLabels      = new ArrayList();
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource          dataSource = (DataSource) dataSources.get(i);
             List                files      = dataSource.getDataPaths();
             DataSourceComponent dsc = new DataSourceComponent(dataSource);
 
+            String dataSourceName = DataSelector.getNameForDataSource(dataSource);
             if (dataSource.canSaveDataToLocalDisk()) {
                 copyDataSources.add(dsc);
-                dsc.cbx.setText(
-                    DataSelector.getNameForDataSource(dataSource));
+                dsc.cbx.setText(dataSourceName);
+
                 copyComps.add(dsc.cbx);
             } else {
                 if ((files == null) || (files.size() == 0)) {
+                    notSavedLabels.add(new JLabel(dataSourceName));
                     continue;
                 }
                 if ( !new File(files.get(0).toString()).exists()) {
+                    notSavedLabels.add(new JLabel(dataSourceName));
                     continue;
                 }
                 fileDataSources.add(dsc);
                 fileComps.add(dsc.cbx);
                 fileComps.add(
-                    new JLabel(
-                        DataSelector.getNameForDataSource(dataSource)));
+                              new JLabel(dataSourceName));
                 long size = 0;
                 for (int fileIdx = 0; fileIdx < files.size(); fileIdx++) {
                     String file = files.get(fileIdx).toString();
@@ -2143,16 +2146,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
         }
 
-        if ((fileDataSources.size() == 0) && (copyDataSources.size() == 0)) {
+        if ((notSavedLabels.size()==0) && (fileDataSources.size() == 0) && (copyDataSources.size() == 0)) {
             return new ArrayList();
         }
+
+
 
 
         List comps = new ArrayList();
         if (copyComps.size() > 0) {
             copyComps.add(
                 0, new JLabel(
-                    "Which remote data sources should be copied over and included?"));
+                    "Remote data to be copied over and included:"));
             comps.add(GuiUtils.vbox(copyComps));
         }
 
@@ -2163,10 +2168,20 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             comps.add(
                 GuiUtils
                     .vbox(new JLabel(
-                        "Which local data sources should be included?"), GuiUtils
+                        "Local data to include:"), GuiUtils
                             .doLayout(
                                 fileComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N)));
+        }
+
+        if(notSavedLabels.size()>0) {
+            if (copyComps.size() ==0 && 
+                fileDataSources.size()==0) {
+                comps.add(new JLabel("No data will be included in the ZIDV file"));
+            }
+            notSavedLabels.add(0, new JLabel("Other data sources:"));
+            notSavedLabels.add(0, new JLabel(" "));
+            comps.add(GuiUtils.vbox(notSavedLabels));
         }
 
         JComponent panel = GuiUtils.vbox(comps);
