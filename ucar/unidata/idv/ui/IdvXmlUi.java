@@ -159,9 +159,13 @@ public class IdvXmlUi extends XmlUi {
                                             IdvUIManager uiManager) {
         root.removeAttribute(ATTR_ID);
         NodeList elements = XmlUtil.getElements(root);
-        String iconSize =
-            (String) uiManager.getIdv().getStateManager()
+        Object iconSize =
+            uiManager.getIdv().getStateManager()
                 .getPreferenceOrProperty("idv.ui.iconsize");
+        if(iconSize==null) {
+            iconSize =  uiManager.getIdv().getStateManager()
+                .getPreferenceOrProperty("idv.ui.minimumiconsize");
+        }
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             child.removeAttribute(ATTR_ID);
@@ -184,12 +188,12 @@ public class IdvXmlUi extends XmlUi {
                     if (iconSize != null) {
                         if (image.indexOf("16") >= 0) {
                             String tmp = StringUtil.replace(image, "16",
-                                             iconSize);
+                                                            iconSize.toString());
                             if (GuiUtils.getImage(tmp, IdvXmlUi.class, true,
                                     true) != null) {
                                 image = tmp;
                             } else {
-                                child.setAttribute("imagewidth", iconSize);
+                                child.setAttribute("imagewidth", iconSize.toString());
                             }
                         } else {
                             //                            System.err.println ("No dimension in name:" + image);

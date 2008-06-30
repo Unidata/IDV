@@ -527,7 +527,7 @@ public class IdvUIManager extends IdvManager {
         
         Object iconSize = 
             getIdv().getStateManager()
-            .getPreferenceOrProperty("idv.ui.iconsize");
+            .getPreferenceOrProperty("idv.ui.minimumiconsize");
 
         String fontSize =
             (String) getIdv().getStateManager()
