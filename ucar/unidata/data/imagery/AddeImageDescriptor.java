@@ -108,10 +108,14 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
     public AddeImageDescriptor(AddeImageDescriptor that) {
         this.myDirectory = that.myDirectory;
         this.mySource    = that.mySource;
-        try {
-            this.myTime = new DateTime(that.myTime);
-        } catch (Exception exc) {
-            this.myTime = that.myTime;
+        this.isRelative  = that.isRelative;
+        this.relativeIndex = that.relativeIndex; 
+        if(that.myTime!=null) {
+            try {
+                this.myTime = new DateTime(that.myTime);
+            } catch (Exception exc) {
+                this.myTime = that.myTime;
+            }
         }
         this.myInfo = that.myInfo;
     }
