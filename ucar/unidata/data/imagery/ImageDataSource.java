@@ -125,6 +125,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private List myDataChoices = new ArrayList();
 
 
+    /** _more_ */
+    private AreaDirectory[][] currentDirs;
+
+
     /**
      *  The parameterless constructor for unpersisting.
      */
@@ -950,7 +954,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 return null;
             }
         }
-
         return makeImage(aid, false);
 
     }
@@ -993,37 +996,36 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
             AddeImageInfo aii     = aid.getImageInfo();
 
-
             AreaDirectory areaDir = null;
             try {
                 if(aii!=null) {
-                if (getCacheDataToDisk()) {
-                    if (currentDirs != null) {
-                        int    pos        =
-                            Math.abs(aii.getDatasetPosition());
-                        int    band       = 0;
-                        String bandString = aii.getBand();
-                        if ((bandString != null)
+                    //                    if (getCacheDataToDisk()) {
+                        if (currentDirs != null) {
+                            int    pos        =
+                                Math.abs(aii.getDatasetPosition());
+                            int    band       = 0;
+                            String bandString = aii.getBand();
+                            if ((bandString != null)
                                 && !bandString.equals(aii.ALL)) {
-                            band = new Integer(bandString).intValue();
-                        }
-                        //TODO: even though the band is non-zero we might only get back one band
-                        band = 0;
-                        areaDir =
-                            currentDirs[currentDirs.length - pos - 1][band];
-                        //System.err.println("pos:" + aii.getDatasetPosition() + " date:" + areaDir.getStartTime() + " " + band);
-                    } else {
-                        //If its absolute time then just use the AD from the descriptor
-                        if ((aii.getStartDate() != null)
-                                || (aii.getEndDate() != null)) {
-                            areaDir = aid.getDirectory();
-                            //                            System.err.println("absolute time:" + areaDir.getStartTime());
-                            //                            System.err.println(" from aii:" +aii.getStartDate());
+                                band = new Integer(bandString).intValue();
+                            }
+                            //TODO: even though the band is non-zero we might only get back one band
+                            band = 0;
+                            areaDir =
+                                currentDirs[currentDirs.length - pos - 1][band];
+                            //                            System.err.println("pos:" + aii.getDatasetPosition() + " date:" + areaDir.getStartTime() + " " + band);
                         } else {
-                            //                            System.err.println("relative time without currentDirs " + fromSequence);
+                            //If its absolute time then just use the AD from the descriptor
+                            if ((aii.getStartDate() != null)
+                                || (aii.getEndDate() != null)) {
+                                areaDir = aid.getDirectory();
+                                //                            System.err.println("absolute time:" + areaDir.getStartTime());
+                                //                            System.err.println(" from aii:" +aii.getStartDate());
+                            } else {
+                                //                            System.err.println("relative time without currentDirs " + fromSequence);
+                            }
                         }
-                    }
-                }
+                        //                    }
                 }
             } catch (Exception exc) {
                 LogUtil.printMessage("error looking up area dir");
@@ -1031,11 +1033,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 return null;
             }
 
-            if(areaDir == null) areaDir = aid.getDirectory();
+            if(areaDir == null) {
+                areaDir = aid.getDirectory();
+            }
 
             if ( !fromSequence) {
                 areaDir = null;
             } 
+
 
             if (areaDir != null) {
                 int hash = (aii!=null?aii.makeAddeUrl().hashCode():areaDir.hashCode());
@@ -1102,6 +1107,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             DataSelection subset)
             throws VisADException, RemoteException {
 
+
         try {
             List descriptorsToUse = new ArrayList();
             if (hasBandInfo(dataChoice)) {
@@ -1136,10 +1142,12 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
             AddeImageInfo biggestPosition = null;
             int           pos             = 0;
+            boolean anyRelative = false;
             //Find the descriptor with the largets position
             for (Iterator iter =
                     descriptorsToUse.iterator(); iter.hasNext(); ) {
                 AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
+                if(aid.getIsRelative())  anyRelative = true;
                 AddeImageInfo       aii = aid.getImageInfo();
 
                 //Are we dealing with area files here?
@@ -1152,11 +1160,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 //Check if this is absolute time
                 if ((aii.getStartDate() != null)
                         || (aii.getEndDate() != null)) {
-                    //                    System.err.println("found an absolute time");
                     biggestPosition = null;
                     break;
                 }
-                if (Math.abs(aii.getDatasetPosition()) > pos) {
+                if (biggestPosition == null || Math.abs(aii.getDatasetPosition()) > pos) {
                     pos             = Math.abs(aii.getDatasetPosition());
                     biggestPosition = aii;
                 }
@@ -1164,7 +1171,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
             //            System.err.println(getCacheDataToDisk() + " " + biggestPosition);
 
-            if (getCacheDataToDisk() && (biggestPosition != null)) {
+            //If any of them are relative then read in the list of AreaDirectorys so we can get the correct absolute times
+            if (anyRelative && (biggestPosition != null)) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
                 AreaDirectoryList adl =
                     new AreaDirectoryList(biggestPosition.makeAddeUrl());
@@ -1173,7 +1181,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
             } else {
                 currentDirs = null;
             }
-
 
             if (sequenceManager == null) {
                 sequenceManager = new ImageSequenceManager();
@@ -1193,6 +1200,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         continue;
                     }
                 }
+
 
                 String label = "";
                 if (parent != null) {
@@ -1223,8 +1231,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
     }
 
-    /** _more_ */
-    AreaDirectory[][] currentDirs;
 
 
     /**
@@ -1293,7 +1299,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 //Not sure what to do here.
                             }
                         }
-
                         aii.setBand("" + bi.getBandNumber());
                         aii.setUnit(bi.getPreferredUnit());
                         desc.setImageInfo(aii);
