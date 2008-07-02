@@ -95,7 +95,7 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
         this.mySource      = that.mySource;
         this.relativeIndex = relativeIndex;
         this.myInfo        = that.myInfo;
-        isRelative         = true;
+        this.isRelative    = true;
     }
 
 
@@ -170,7 +170,7 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
      */
     private void processSource() {
         //Try it as a file first or as a URL
-        if (IOUtil.isHttpProtocol(mySource) || (new File(mySource)).exists()) {
+        if (IOUtil.isHttpProtocol(mySource) || isFromFile()) {
             myDirectory = processSourceAsFile(mySource);
         } else {
             myDirectory = processSourceAsAddeUrl(mySource);

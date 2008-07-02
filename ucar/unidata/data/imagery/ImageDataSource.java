@@ -114,10 +114,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
     /** list of image times */
     protected List imageTimes = new ArrayList();
 
-    /** sequence manager for displaying data */
-    private ImageSequenceManager sequenceManager;
-
-
     /** My composite */
     private CompositeDataChoice myCompositeDataChoice;
 
@@ -954,8 +950,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 return null;
             }
         }
-        return makeImage(aid, false);
-
+        return makeImage(aid, false,"");
     }
 
 
@@ -972,9 +967,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @throws VisADException     VisAD problem
      */
     private SingleBandedImage makeImage(AddeImageDescriptor aid,
-                                        boolean fromSequence)
+                                        boolean fromSequence, String readLabel)
             throws VisADException, RemoteException {
-
         if (aid == null) {
             return null;
         }
@@ -985,21 +979,20 @@ public abstract class ImageDataSource extends DataSourceImpl {
             return result;
         }
         //        System.err.println ("source:" + source);
-        //For now handle non adde urls here
         try {
-            if (false && !source.startsWith("adde:")) {
+            /* Lets not do this right now so we can cache area files
+            if (!source.startsWith("adde:")) {
                 AreaAdapter aa = new AreaAdapter(source, false);
                 result = aa.getImage();
                 putCache(source, result);
                 return result;
-            }
+                }*/
 
             AddeImageInfo aii     = aid.getImageInfo();
-
             AreaDirectory areaDir = null;
             try {
                 if(aii!=null) {
-                    //                    if (getCacheDataToDisk()) {
+                    //if (getCacheDataToDisk()) {
                         if (currentDirs != null) {
                             int    pos        =
                                 Math.abs(aii.getDatasetPosition());
@@ -1019,10 +1012,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
                             if ((aii.getStartDate() != null)
                                 || (aii.getEndDate() != null)) {
                                 areaDir = aid.getDirectory();
-                                //                            System.err.println("absolute time:" + areaDir.getStartTime());
-                                //                            System.err.println(" from aii:" +aii.getStartDate());
+                                //System.err.println("absolute time:" + areaDir.getStartTime());
+                                //System.err.println(" from aii:" +aii.getStartDate());
                             } else {
-                                //                            System.err.println("relative time without currentDirs " + fromSequence);
+                                //System.err.println("relative time without currentDirs " + fromSequence);
                             }
                         }
                         //                    }
@@ -1037,10 +1030,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 areaDir = aid.getDirectory();
             }
 
-            if ( !fromSequence) {
+            if (!fromSequence) {
                 areaDir = null;
             } 
-
 
             if (areaDir != null) {
                 int hash = (aii!=null?aii.makeAddeUrl().hashCode():areaDir.hashCode());
@@ -1054,10 +1046,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
                 AddeImageFlatField aiff = AddeImageFlatField.create(aid,
                                               areaDir, getCacheDataToDisk(),
-                                              filename, getCacheClearDelay());
-
-
-                aiff.setReadLabel(readLabel);
+                                              filename, getCacheClearDelay(), readLabel);
                 result = aiff;
                 if (sampleRanges == null) {
                     sampleRanges = aiff.getRanges(true);
@@ -1085,13 +1074,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
         } catch (java.io.IOException ioe) {
             throw new VisADException("Creating AreaAdapter - " + ioe);
         }
-
-
     }
 
 
-    /** _more_ */
-    String readLabel;
 
     /**
      * Create the  image sequence defined by the given dataChoice.
@@ -1182,10 +1167,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 currentDirs = null;
             }
 
-            if (sequenceManager == null) {
-                sequenceManager = new ImageSequenceManager();
-            }
-            sequenceManager.clearSequence();
+            ImageSequenceManager sequenceManager= new ImageSequenceManager();
             ImageSequence sequence = null;
             int           cnt      = 1;
             DataChoice    parent   = dataChoice.getParent();
@@ -1201,7 +1183,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     }
                 }
 
-
                 String label = "";
                 if (parent != null) {
                     label = label + parent.toString() + " ";
@@ -1213,11 +1194,11 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     }
                 }
                 label = label + dataChoice.toString();
-                readLabel = "Time: " + (cnt++) + "/"
+                String readLabel = "Time: " + (cnt++) + "/"
                             + descriptorsToUse.size() + "  " + label;
 
                 try {
-                    SingleBandedImage image = makeImage(aid, true);
+                    SingleBandedImage image = makeImage(aid, true, readLabel);
                     if (image != null) {
                         sequence = sequenceManager.addImageToSequence(image);
                     }
@@ -1373,22 +1354,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
         hashCode ^= imageList.hashCode();
         return hashCode;
     }
-
-
-
-    /**
-     * Called when Datasource is removed.
-     */
-    public void doRemove() {
-        super.doRemove();
-        if (sequenceManager != null) {
-            sequenceManager.clearSequence();
-        }
-        sequenceManager = null;
-    }
-
-
-
 
 
 
