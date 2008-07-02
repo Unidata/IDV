@@ -404,6 +404,11 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
         return "Load";
     }
 
+
+
+    protected Hashtable showMap = new Hashtable();
+
+
     /**
      * handle event
      *
@@ -443,12 +448,37 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
     }
 
+    protected String getHeader(String header) {
+        return "<b>"
+                +  header
+                + "</b><hr>";
+    }
+
+    protected boolean isOpen(String cat) {
+        cat = cat.replace(">","&gt;");
+        return Misc.equals(showMap.get(cat),"open");
+
+    }
+
+
     /**
      * Handle a hyperlinke
      *
      * @param id  the hyperlink ID
      */
     protected void handleHyperLink(String id) {
+        if(id.startsWith("toggle:")) {
+            String category = id.substring(7);
+            category = category.replace(">","&gt;");
+            if(isOpen(category)) 
+                showMap.put(category,"closed");
+            else
+                showMap.put(category,"open");
+            doUpdate();
+            return;
+        }
+
+
         if (id.startsWith("qobject:")) {
             List tokens = StringUtil.split(id, ":");
             if (tokens.size() != 3) {
@@ -537,7 +567,6 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
             if (typeName.endsWith("s")) {
                 typeName = typeName.substring(0, typeName.length() - 1);
             }
-
         }
 
 
@@ -600,24 +629,17 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
             Hashtable    ht   = new Hashtable();
             List bundles = getIdv().getPersistenceManager().getBundles(type);
             StringBuffer html = new StringBuffer("<html><body>");
-            html.append(
-                "<h2>"
-                + getIdv().getPersistenceManager().getBundleTitle(type)
-                + "</h2>");
-            //            html.append("<a href=\"manage\">Manage...</a> ");
-            //            if (type == IdvPersistenceManager.BUNDLES_FAVORITES) {
-            //                html.append("<a href=\"save\">Save as Favorite...</a> ");
-            //            }
-            //            html.append("<hr style=\"margin:0;\">");
+            html.append(getHeader(getIdv().getPersistenceManager().getBundleTitle(type)));
             if (bundles.size() == 0) {
                 html.append(
                     "<h2> No Saved "
                     + getIdv().getPersistenceManager().getBundleTitle(type)
                     + "</h2>");
             } else {
-                html.append("<ul style=\"margin-top:0;\">\n");
+                //                html.append("<ul style=\"margin-top:0;\">\n");
             }
 
+            int catCnt = 0;
             for (int bundleIdx = 0; bundleIdx < bundles.size(); bundleIdx++) {
                 SavedBundle bundle     = (SavedBundle) bundles.get(bundleIdx);
                 List        categories = bundle.getCategories();
@@ -625,17 +647,23 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 if (categories.size() > 0) {
                     String catString = StringUtil.join(" &gt; ", categories);
                     StringBuffer catBuffer = (StringBuffer) ht.get(catString);
+                    boolean open = isOpen(catString);
                     if (catBuffer == null) {
-                        catBuffer = new StringBuffer("<li>" + catString
-                                + "\n<ul style=\"margin-top:0;\">\n");
+                        String img = (open?"<img src=\"idvresource:/auxdata/ui/icons/CategoryOpen.gif\" border=\"0\">":
+                                      "<img src=\"idvresource:/auxdata/ui/icons/CategoryClosed.gif\" border=\"0\">");
+                        catBuffer = new StringBuffer((catCnt>0?"<br>":"")+"&nbsp;&nbsp;" + "<a href=\"toggle:" + catString+"\">" +img+"</a> " +
+                                                     catString +(open? "\n<ul style=\"margin-top:0;margin-bottom:0;\">\n":""));
+                        catCnt++;
                         ht.put(catString, catBuffer);
                         cats.add(catString);
                     }
-                    catBuffer.append(
-                        "<li> <a href=\"" + id + "\"> "
-                        + GuiUtils.getLocalName(
-                            bundle.toString(), bundle.getLocal(),
-                            false) + "</a>\n");
+                    if(open) {
+                        catBuffer.append(
+                                         "<li> <a href=\"" + id + "\"> "
+                                         + GuiUtils.getLocalName(
+                                                                 bundle.toString(), bundle.getLocal(),
+                                                                 false) + "</a>\n");
+                    }
                 } else {
                     html.append("<li> <a href=\"" + id + "\"> " + bundle
                                 + "</a>\n");
@@ -645,10 +673,13 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 String       catString = (String) cats.get(i);
                 StringBuffer sb        = (StringBuffer) ht.get(catString);
                 html.append(sb.toString());
-                html.append("</ul>");
+                boolean open = isOpen(catString);
+                if(open)
+                    html.append("</ul>");
             }
 
-            html.append("</ul></body></html>");
+            html.append("</body></html>");
+            //            html.append("</ul></body></html>");
             return html.toString();
         }
 
@@ -660,6 +691,11 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          * @param object the object
          */
         public void objectClicked(String command, Object object) {
+
+            if(command.startsWith("toggle:")) {
+                return;
+            }
+
             if (command.equals("manage")) {
                 getIdv().getIdvUIManager().showBundleDialog(type);
                 return;
@@ -716,9 +752,9 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
             StringBuffer html      = new StringBuffer("<html><body>");
             List         histories = getIdv().getHistory();
             if (histories.size() == 0) {
-                html.append("<h2>No History </h2>");
+                html.append(getHeader("No History"));
             } else {
-                html.append("<h2>History</h2>");
+                html.append(getHeader("History"));
             }
 
             StringBuffer dataSourceHtml = new StringBuffer();
@@ -805,7 +841,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          * @return html
          */
         protected String getHtml() {
-            StringBuffer html = new StringBuffer("<html><body><table>");
+            StringBuffer html = new StringBuffer("<html><body>" + getHeader("Special Displays"));
             List controlDescriptors =
                 getIdv().getIdvUIManager().getStandAloneControlDescriptors();
             List      cats   = new ArrayList();
@@ -832,16 +868,19 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                 String       cat = (String) cats.get(i);
                 StringBuffer sb  = (StringBuffer) catMap.get(cat);
                 if (colCnt == 0) {
-                    html.append("<tr valign=\"top\">");
+                    //                    html.append("<tr valign=\"top\">");
                 } else if (colCnt == 2) {
-                    html.append("</tr>");
+                    //                    html.append("</tr>");
                 }
                 colCnt++;
-                html.append("<td><b>&nbsp;&nbsp;&nbsp;&nbsp;" + cat + "</b>"
-                            + sb + "</td><td> &nbsp; &nbsp;&nbsp;</td>");
+                html.append("<b>&nbsp;&nbsp;&nbsp;&nbsp;" + cat + "</b>"
+                            + sb);
+                //                html.append("<td><b>&nbsp;&nbsp;&nbsp;&nbsp;" + cat + "</b>"
+                //                            + sb + "</td><td> &nbsp; &nbsp;&nbsp;</td>");
             }
 
-            html.append("</table></body></html>");
+            html.append("</body></html>");
+            //            html.append("</table></body></html>");
             return html.toString();
         }
 
