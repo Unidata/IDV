@@ -41,6 +41,8 @@ import ucar.unidata.util.Trace;
 import ucar.visad.Util;
 
 import ucar.visad.data.CachedFlatField;
+import ucar.visad.quantities.AirPressure;
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -4006,6 +4008,196 @@ public class GridUtil {
         }
     }
 
+    /**
+     * Set the pressure values for a grid
+     *
+     * @param grid  grid to change
+     * @param pressValues  pressure values. Must match number of levels in
+     *                     the grid.  Units are millibars.
+     *
+     * @return a grid with vertical levels in pressure
+     *
+     * @throws VisADException  problem setting the values
+     */
+    public static FieldImpl setPressureValues(FieldImpl grid,
+            float[] pressValues)
+            throws VisADException {
+        return setVerticalValues(grid, pressValues,
+                                 AirPressure.getRealType(),
+                                 CommonUnits.MILLIBAR);
+    }
+
+    /**
+     * Set the altitude values for a grid
+     *
+     * @param grid  grid to change
+     * @param altValues    altitude values. Must match number of levels in
+     *                     the grid.  Units are meters.
+     *
+     * @return a grid with vertical levels in meters
+     *
+     * @throws VisADException  problem setting the values
+     */
+    public static FieldImpl setAltitudeValues(FieldImpl grid,
+            float[] altValues)
+            throws VisADException {
+        return setVerticalValues(grid, altValues, RealType.Altitude,
+                                 CommonUnit.meter);
+    }
+
+    /**
+     * Set the vertical values
+     *
+     * @param grid  the grid to change
+     * @param newValues  the new vertical values.  Must match the number
+     *                   of vertical levels in the grid.
+     * @param vertType  the type of the data
+     * @param vertUnit  the  unit of <code>newValues</code>
+     *
+     * @return  modified grid
+     *
+     * @throws VisADException  problem setting the values
+     */
+    public static FieldImpl setVerticalValues(FieldImpl grid,
+            float[] newValues, RealType vertType, Unit vertUnit)
+            throws VisADException {
+        FieldImpl  newField  = null;
+        SampledSet domainSet = getSpatialDomain(grid);
+        if ( !(domainSet instanceof Gridded3DSet)) {
+            throw new VisADException("Not a 3D set");
+        }
+        newField =
+            setSpatialDomain(grid,
+                             newVerticalDomain((Gridded3DSet) domainSet,
+                                 newValues, vertType, vertUnit), false);
+        return newField;
+    }
+
+    /**
+     * Set the vertical values in the domain
+     *
+     * @param domainSet  the domain to change
+     * @param newValues  the new vertical values.  Must match the number
+     *                   of vertical levels in the domainSet.
+     * @param vertType  the type of the data
+     * @param vertUnit  the  unit of <code>newValues</code>
+     *
+     * @return  modified domain
+     *
+     * @throws VisADException  problem setting the values
+     */
+    private static Gridded3DSet newVerticalDomain(Gridded3DSet domainSet,
+            float[] newValues, RealType vertType, Unit vertUnit)
+            throws VisADException {
+
+        Gridded3DSet newDSet   = null;
+        int[]        lengths   = domainSet.getLengths();
+        int          setLength = domainSet.getLength();
+        if ((lengths[2] != newValues.length)
+                && (setLength != newValues.length)) {
+            throw new VisADException(
+                "newValues size not equal to domain vertical dimension size");
+        }
+        float[] vertVals = null;
+        if (newValues.length == setLength) {
+            vertVals = newValues;
+        } else {
+            vertVals = new float[setLength];
+            int l = 0;
+            for (int k = 0; k < lengths[2]; k++) {
+                for (int j = 0; j < lengths[1]; j++) {
+                    for (int i = 0; i < lengths[0]; i++) {
+                        vertVals[l++] = newValues[k];
+                    }
+                }
+            }
+        }
+        float[][]        setVals   = domainSet.getSamples(true);
+        float[][]        refVals   = null;
+        RealTupleType    setType =
+            ((SetType) domainSet.getType()).getDomain();
+        CoordinateSystem cs        = domainSet.getCoordinateSystem();
+        RealTupleType    refType   = (cs != null)
+                                     ? cs.getReference()
+                                     : setType;
+        ErrorEstimate[]  oldErrors = domainSet.getSetErrors();
+        ErrorEstimate[]  newErrors = new ErrorEstimate[oldErrors.length];
+        if (cs != null) {
+            Trace.call1("GridUtil.transformCoordinates");
+            // transform to the reference
+            refVals = CoordinateSystem.transformCoordinates(refType,
+                    refType.getCoordinateSystem(), refType.getDefaultUnits(),
+                    newErrors, setType, cs, domainSet.getSetUnits(),
+                    oldErrors, setVals, false);
+
+            Trace.call2("GeoGridAdapter.transformCoordinates");
+
+        } else {
+            refVals    = new float[3][];
+            refVals[0] = setVals[0];
+            refVals[1] = setVals[1];
+
+        }
+        refVals[2] = vertVals;
+
+        // now create a new domain type based on the vertical transform
+        Unit       vtu        = vertUnit;
+        RealType[] types      = refType.getRealComponents();
+        boolean    isPressure = false;
+
+
+        if ( !Unit.canConvert(vtu, CommonUnit.meter)) {  // other than height
+            if (Unit.canConvert(vtu, CommonUnits.MILLIBAR)) {
+                isPressure = true;
+            } else {
+                throw new VisADException("unknown vertical coordinate");
+            }
+        }
+        RealTupleType newDomainType = new RealTupleType(types[0], types[1],
+                                          RealType.Altitude);
+
+
+        if (isPressure) {  // convert to altitude using standard atmos
+            CoordinateSystem vcs =
+                DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
+            refVals[2] = vcs.toReference(new float[][] {
+                refVals[2]
+            }, new Unit[] { vtu })[0];
+            vtu        = vcs.getReferenceUnits()[0];
+        }
+        //for (int i = 0; i < 10; i++) {
+        //    System.out.println("vals["+i+"] = " + refVals[2][i]);
+        //}
+
+        Unit[] newDomainUnits = newDomainType.getDefaultUnits();
+        newDomainUnits[2] = vtu;
+
+
+        Gridded3DSet newDomain =
+            (Gridded3DSet) GriddedSet.create(newDomainType, refVals, lengths,
+                                             null, newDomainUnits, newErrors,
+                                             false, false);
+
+        EmpiricalCoordinateSystem ecs =
+            new EmpiricalCoordinateSystem(domainSet, newDomain);
+
+
+        CoordinateSystem gcs = ecs;
+
+
+        RealTupleType newSetType =
+            new RealTupleType(setType.getRealComponents(), gcs, null);
+
+        Trace.call1("GeoGridAdapter final GriddedSet");
+        newDSet = (Gridded3DSet) GriddedSet.create(newSetType,
+                domainSet.getSamples(false), lengths, null,
+                domainSet.getSetUnits(), oldErrors, false, false);
+
+
+        return newDSet;
+
+
+    }
 
 }
 
