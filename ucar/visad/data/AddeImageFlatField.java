@@ -118,11 +118,12 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
                               FunctionType type, Set domainSet,
                               CoordinateSystem rangeCoordSys,
                               CoordinateSystem[] rangeCoordSysArray,
-                              Set[] rangeSets, Unit[] units)
+                              Set[] rangeSets, Unit[] units, String readLabel)
             throws VisADException {
         super(that, copy, type, domainSet, rangeCoordSys, rangeCoordSysArray,
               rangeSets, units);
         this.domainSet = that.domainSet;
+        this.readLabel  = readLabel;
     }
 
     /**
@@ -148,7 +149,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
             throws VisADException {
         return new AddeImageFlatField(this, copy, type, domainSet,
                                       rangeCoordSys, rangeCoordSysArray,
-                                      rangeSets, units);
+                                      rangeSets, units, readLabel);
     }
 
 
@@ -167,9 +168,10 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      */
     public AddeImageFlatField(FunctionType type, Set domainSet,
                               CoordinateSystem rangeCoordSys,
-                              Set[] rangeSets, Unit[] units, float[][] floats)
+                              Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
             throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
+        this.readLabel  =readLabel;
     }
 
 
@@ -193,10 +195,8 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
                                             AreaDirectory areaDirectory,
                                             boolean shouldCache,
                                             String cacheFile,
-                                            long cacheClearDelay)
+                                            long cacheClearDelay, String readLabel)
             throws VisADException, RemoteException {
-
-
 
         //        int nLines = aid.getImageInfo().getLines();
         //        int nEles  = aid.getImageInfo().getElements();
@@ -299,7 +299,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
         AddeImageFlatField aiff = new AddeImageFlatField(image_type,
                                       domain_set, null, rangeSets,
-                                      rangeUnits, null);
+                                      rangeUnits, null, readLabel);
         aiff.bandIndices = bandIndices;
         aiff.aid         = aid;
         cs.aiff          = aiff;
