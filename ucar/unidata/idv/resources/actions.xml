@@ -159,6 +159,12 @@
      description="Edit parameter aliases"
      group="Tools"
      action="jython:idv.showAliasEditor ();"/>
+
+  <action
+     id="edit.resources"
+     description="View Resources"
+     group="Tools"
+     action="jython:idv.showResourceViewer ();"/>
   <action
      id="edit.projections"
      description="Edit projections"

@@ -197,6 +197,7 @@
          tooltip="Create and Change Projections"
          action="action:edit.projections"
         />
+
       <menuitem
          label="Parameter Alias Editor"
          tooltip="Define Aliases for Data Fields"
@@ -219,6 +220,10 @@
       <menuitem
          label="Plugin Creator"
          action="action:plugins.create"/>
+      <menuitem
+         label="View Resources"
+         tooltip="View all resource"
+         action="action:edit.resources"/>
    </menu>
    <menu
      id="help"
