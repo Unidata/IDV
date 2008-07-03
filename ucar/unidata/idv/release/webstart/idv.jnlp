@@ -4,10 +4,10 @@
         spec="1.0+" 
         codebase = "@IDV_CODEBASE@" href="IDV/idv.jnlp"> 
        <information> 
-         <title>Integrated Data Viewer</title> 
+         <title>Integrated Data Viewer @IDV_VERSION_SPACE@</title> 
          <vendor>Unidata</vendor> 
          <homepage href="http://www.unidata.ucar.edu/software/idv/index.html"/> 
-         <description>Integrated Data Viewer(IDV)</description> 
+         <description>Integrated Data Viewer (IDV)</description> 
          <description kind="short">A tool for geoscientific analysis and visualization.
         </description> 
         <icon href="IDV/idv.gif"/> 
