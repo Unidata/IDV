@@ -866,6 +866,24 @@ public class StringUtil {
     }
 
     /**
+     * _more_
+     *
+     * @param input _more_
+     * @param patternString _more_
+     *
+     * @return _more_
+     */
+    public static boolean regexpMatch(String input, String patternString) {
+        Pattern pattern = (Pattern) patternCache.get(patternString);
+        if (pattern == null) {
+            pattern = Pattern.compile(patternString);
+            patternCache.put(patternString, pattern);
+        }
+        return pattern.matcher(input).find();
+    }
+
+
+    /**
      * Check to see if the string starts with a vowel.
      *
      * @param  value  String to check
