@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -31,6 +32,7 @@ import org.w3c.dom.NodeList;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.NamedList;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -185,6 +187,7 @@ public class DerivedNeed {
      */
     public List getDataChoices(Hashtable choicesSoFar) {
 
+        //        System.err.println ("getDataChoices");
         for (int i = 0; i < paramSets.size(); i++) {
             List[] result = getDataChoicesFromParams(choicesSoFar,
                                 (List) paramSets.get(i));
@@ -236,6 +239,7 @@ public class DerivedNeed {
         boolean allMatched  = true;
         List    dataChoices = null;
         List    paramNames  = null;
+        //        System.err.println ("\tfrom Params:" + params);
         for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
             String param = (String) params.get(paramIdx);
             DataChoice dataChoice = getDataChoice(param, choicesSoFar,
@@ -315,6 +319,25 @@ public class DerivedNeed {
 
         //Look at all of the data choices created so far with the given  parameter name
         List choiceList = (List) choicesSoFar.get(paramName);
+
+
+        //        System.err.println ("\t\tfindDataChoice " + paramName);
+        if (choiceList == null) {
+            if (StringUtil.containsRegExp(paramName)) {
+                //                System.err.println ("\t\tisregexp");
+                for (Enumeration keys = choicesSoFar.keys();
+                        keys.hasMoreElements(); ) {
+                    String tmp = (String) keys.nextElement();
+                    //                    System.err.println ("\t\t\t" + tmp);
+                    if (StringUtil.regexpMatch(tmp, paramName)) {
+                        choiceList = (List) choicesSoFar.get(tmp);
+                        //                        System.err.println ("Got it from a regexp:" + paramName + " " + choiceList);
+                        break;
+                    }
+                }
+
+            }
+        }
 
 
         //Don't have any, return null
