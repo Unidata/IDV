@@ -325,7 +325,7 @@ public class DataTreeDialog implements ActionListener {
             DataChoice dataChoice =
                 ((DataTree) dataTrees.get(i)).getSelectedDataChoice();
             dsw.updateSelectionTab(dataChoice);
-            String labelString = StringUtil.replace(operand.getDescription(),
+            String labelString = StringUtil.replace(operand.getLabel(),
                                      "_", " ");
             if ( !labelString.startsWith("<html")) {
                 labelString = "<html>Field: <i><b>" + labelString
