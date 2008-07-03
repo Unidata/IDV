@@ -380,7 +380,7 @@ public class StormTrackControl extends DisplayControlImpl {
                                              "Selected Parameters", null, false);
         JComponent paramsContents = GuiUtils.centerBottom(chartParamsSelector,
                                   GuiUtils.left(chartParamsPreferenceCbx));
-        jtp.add("Chart Parameters Selector", paramsContents);
+        jtp.add("Chart Parameters", paramsContents);
 
         //observation way selector
         if (stormDataSource.getIsObservationWayChangeable()) {
@@ -473,9 +473,8 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
         List    onlyCP    = chartParamsSelector.getCurrentEntries();
-        boolean changedCP = false;
         if ( !useParams.equals(onlyCP)) {
-            changedCP = true;
+            changed = true;
             if (onlyCP.size() == allParams.size()) {
                 onlyShowTheseParams(new ArrayList<StormParam>(),
                                   chartParamsPreferenceCbx.isSelected());
@@ -509,9 +508,7 @@ public class StormTrackControl extends DisplayControlImpl {
         if (changed) {
             reloadStormTracks();
         }
-         if (changedCP) {
-            reloadStormTrackCharts();
-        }
+
         return true;
     }
 
@@ -692,8 +689,7 @@ public class StormTrackControl extends DisplayControlImpl {
                               ColorTable newColorTable)
             throws RemoteException, VisADException {
         super.setColorTable(whichColorTable, newColorTable);
-        List<StormDisplayState> active = getActiveStorms();
-        for (StormDisplayState sds : active) {
+        for (StormDisplayState sds : getActiveStorms()) {
             sds.colorTableChanged();
         }
     }
@@ -783,28 +779,24 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    private List<StormDisplayState> getStormDisplays() {
+        List<StormDisplayState> states = new ArrayList<StormDisplayState>();
+        for (int i = stormInfos.size() - 1; i >= 0; i--) {
+            StormInfo stormInfo = stormInfos.get(i);
+            states.add(getStormDisplayState(stormInfo));
+        }
+        return states;
+    }
+
     /**
      * _more_
      */
     private void reloadStormTracks() {
-        for (int i = stormInfos.size() - 1; i >= 0; i--) {
-            StormInfo stormInfo = stormInfos.get(i);
-            StormDisplayState stormDisplayState =
-                getStormDisplayState(stormInfo);
+        for (StormDisplayState stormDisplayState: getActiveStorms()) {
             stormDisplayState.reload();
         }
     }
-    /**
-     * _more_
-     */
-    private void reloadStormTrackCharts() {
-        for (int i = stormInfos.size() - 1; i >= 0; i--) {
-            StormInfo stormInfo = stormInfos.get(i);
-            StormDisplayState stormDisplayState =
-                getStormDisplayState(stormInfo);
-            stormDisplayState.reloadChart();
-        }
-    }
+
     /**
      * _more_
      *
@@ -865,13 +857,8 @@ public class StormTrackControl extends DisplayControlImpl {
      * _more_
      */
     public void unloadAllTracks() {
-        for (int i = stormInfos.size() - 1; i >= 0; i--) {
-            StormInfo stormInfo = stormInfos.get(i);
-            StormDisplayState stormDisplayState =
-                getStormDisplayState(stormInfo);
-            if (stormDisplayState.getActive()) {
-                stormDisplayState.deactivate();
-            }
+        for (StormDisplayState stormDisplayState:getActiveStorms()) {
+            stormDisplayState.deactivate();
         }
     }
 

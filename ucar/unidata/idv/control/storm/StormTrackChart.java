@@ -252,8 +252,6 @@ public class StormTrackChart {
         JComponent chartComp = GuiUtils.leftCenter(chartLeft,
                                    GuiUtils.topCenter(chartTop,
                                        getChart().getContents()));
-
-
         return chartComp;
     }
 
@@ -358,7 +356,6 @@ public class StormTrackChart {
      * _more_
      */
     protected void createChart() {
-
         if (madeChart) {
             return;
         }
@@ -396,8 +393,6 @@ public class StormTrackChart {
                 }
             }
         });
-
-
 
 
         List<StormParam> params = getStormTrackParams();
@@ -495,17 +490,12 @@ public class StormTrackChart {
         chartLeft.invalidate();
         chartLeft.validate();
         chartLeft.repaint();
-
     }
 
+
     protected List getStormTrackParams(){
-
         //Get the types from the first forecast track
-        List<StormParam> params;
-
-        params = stormDisplayState.getStormChartParams();
-     
-        
+        List<StormParam> params = stormDisplayState.getStormChartParams();
         if(params == null || params.size() == 0){
             for (StormTrack track : stormDisplayState.getTrackCollection()
                     .getTracks()) {
@@ -692,12 +682,10 @@ public class StormTrackChart {
      * _more_
      */
     protected void updateChart() {
-
         try {
             if ( !madeChart) {
                 createChart();
             }
-
             ignoreChartTimeChanges = true;
             if (isHourly()) {
                 List<Integer>        forecastHours = findForecastHours();
