@@ -37,6 +37,7 @@ import ucar.unidata.idv.publish.PublishManager;
 import ucar.unidata.idv.test.TestManager;
 
 import ucar.unidata.idv.ui.AliasEditor;
+import ucar.unidata.idv.ui.ResourceViewer;
 import java.awt.Color;
 
 
@@ -127,6 +128,8 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
 
     /** The data alias editor */
     protected AliasEditor aliasEditor;
+
+    protected ResourceViewer resourceViewer;
 
 
     /** The porojection manager */
@@ -749,6 +752,35 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
      */
     public void showAliasEditor() {
         getAliasEditor().show();
+    }
+
+
+    protected ResourceViewer doMakeResourceViewer() {
+        return (ResourceViewer) makeManager(ResourceViewer.class,
+                                         new Object[] { idv });
+    }
+
+
+    /**
+     * Create, if needed, and return the
+     * {@link ucar.unidata.idv.ui.AliasEditor}
+     *
+     * @return The alias editor
+     */
+    public ResourceViewer getResourceViewer() {
+        if (resourceViewer == null) {
+            resourceViewer = doMakeResourceViewer();
+        }
+        return resourceViewer;
+    }
+
+
+
+    /**
+     *  Show the alias editor
+     */
+    public void showResourceViewer() {
+        getResourceViewer().show();
     }
 
 
