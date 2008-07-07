@@ -1585,6 +1585,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                     result.add(choice.cloneMe());
                     continue;
                 }
+                if (StringUtil.stringMatch(choice.getName(), sid,
+                                           true, false)) {
+                    result.add(choice.cloneMe());
+                    continue;
+                }
             }
         }
         return result;
