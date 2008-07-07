@@ -62,6 +62,7 @@ public class ParamInfo {
     /** The display unit to use */
     private Unit displayUnit;
 
+
     /**
      * ctor
      */
@@ -78,6 +79,8 @@ public class ParamInfo {
         this(other.name, other.colorTableName, other.range,
              other.contourInfo, other.displayUnit);
     }
+
+
 
 
     /**

@@ -251,7 +251,10 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
             }
             return ctor.newInstance(args);
         } catch (Exception exc) {
-            throw new WrapperException(exc);
+            Throwable thr = ucar.unidata.util.LogUtil.getInnerException(exc);
+            System.err.println ("Error:" + thr);
+            thr.printStackTrace();
+            throw new WrapperException(thr);
         }
     }
 

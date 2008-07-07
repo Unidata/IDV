@@ -243,6 +243,8 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
      */
     public class ParamDefaultsTable extends JTable {
 
+        String label;
+
         /**
          *  A list of {@link ParamInfo} objects.
          */
@@ -880,7 +882,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
         if (infos.size() == 0) {
             //            infos.add(new ParamInfo("", null, null, null, null));
         }
-        JTable table = new ParamDefaultsTable(infos, isWritable);
+        ParamDefaultsTable table = new ParamDefaultsTable(infos, isWritable);
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         String editableStr = "";
         if ( !isWritable) {
@@ -893,6 +895,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
         JPanel tablePanel = GuiUtils.topCenter(GuiUtils.inset(label, 4),
                                 new JScrollPane(table));
 
+        table.label = resources.getShortName(i);
         tableTabbedPane.add(resources.getShortName(i), tablePanel);
         myTables.add(table);
     }
@@ -988,6 +991,20 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
                 ((ParamDefaultsTable) myTables.get(i)).getParamInfoList());
             if (justFirst) {
                 break;
+            }
+        }
+        return infos;
+    }
+
+
+    public List getResources() {
+        List infos = new ArrayList();
+        for (int i = 0; i < myTables.size(); i++) {
+            ParamDefaultsTable paramDefaultsTable = (ParamDefaultsTable) myTables.get(i);
+            for(ParamInfo paramInfo:(List<ParamInfo>) paramDefaultsTable.getParamInfoList()) {
+                infos.add(new ResourceViewer.ResourceWrapper(paramInfo, paramInfo.toString(),
+                                                             paramDefaultsTable.label,       
+                                                             paramDefaultsTable.isEditable));
             }
         }
         return infos;

@@ -100,7 +100,7 @@ public class AliasEditor extends IdvManager {
     private List tableModels = new ArrayList();
 
     /** list of table models */
-    private List displayedTableModels = new ArrayList();
+    private List<AliasTableModel> displayedTableModels = new ArrayList<AliasTableModel>();
 
     /** The list of JTable-s, one for each resource */
     private List tables = new ArrayList();
@@ -140,6 +140,19 @@ public class AliasEditor extends IdvManager {
         editEntry(null, 0, true);
     }
 
+    public List getResources() {
+        List aliases = new ArrayList();
+        for(AliasTableModel model: displayedTableModels) {
+            for(DataAlias dataAlias: (List<DataAlias>)model.aliases) {
+                aliases.add(new ResourceViewer.ResourceWrapper(dataAlias, dataAlias.toString(),
+                                                               model.label,
+                                                               isEditableResource(model.resourceIdx)));
+            }
+        }
+        return aliases;
+    }
+
+
     /**
      * Initialize. Load in the resources and create the GUI.
      */
@@ -160,6 +173,7 @@ public class AliasEditor extends IdvManager {
                                              resourceIdx);
 
 
+            tableModel.label = ""+resources.get(resourceIdx);
             tableModels.add(tableModel);
             if (root != null) {
                 List dataAliases = DataAlias.createDataAliases(root);
@@ -531,6 +545,8 @@ public class AliasEditor extends IdvManager {
      */
     private static class AliasTableModel extends AbstractTableModel {
 
+        String label;
+ 
         /** The names of the data aliases */
         List names = new ArrayList();
 
