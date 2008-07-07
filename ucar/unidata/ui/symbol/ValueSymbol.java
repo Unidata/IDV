@@ -62,7 +62,7 @@ public class ValueSymbol extends TextSymbol {
      *
      */
     public ValueSymbol(DisplayCanvas canvas, int x, int y) {
-        this(canvas, x, y, "value", "Parameter");
+        this(canvas, x, y, "", "Parameter");
     }
 
     /**

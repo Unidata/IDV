@@ -317,7 +317,7 @@ public class TextSymbol extends MetSymbol {
             }
         }
         if ((v == null) || (v.length() == 0)) {
-            v = "value";
+            v = "";
         }
         return v;
     }
