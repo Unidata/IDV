@@ -2728,6 +2728,12 @@ public class StationModelControl extends ObsDisplayControl {
         }
         dsd.addPropertyValue(new Boolean(getUseDataTimes()), "useDataTimes",
                              "Use Data Times", SETTINGS_GROUP_DISPLAY);
+
+        dsd.addPropertyValue(getStationModelName(), "stationModelName",
+                             "Layout Model", SETTINGS_GROUP_DISPLAY);
+
+
+
         if ( !isChartEnabled()) {
             return;
         }
