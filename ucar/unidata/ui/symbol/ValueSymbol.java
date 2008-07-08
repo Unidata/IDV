@@ -145,7 +145,7 @@ public class ValueSymbol extends TextSymbol {
      * @return The label
      */
     public String getLabel() {
-        return "Value Symbol: " + formatNumber(value);
+        return "Value Symbol: " + getName();
     }
 
 

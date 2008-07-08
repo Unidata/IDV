@@ -162,7 +162,7 @@ public class TextSymbol extends MetSymbol {
      * @return label
      */
     public String getLabel() {
-        return "Text Symbol: " + valStr;
+        return "Text Symbol: " + getName();
     }
 
     /**
