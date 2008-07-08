@@ -160,6 +160,11 @@ public abstract class StormDataSource extends DataSourceImpl {
     }
 
 
+    public boolean canAddCurrentName(DataChoice dataChoice){
+        return false;
+    }
+
+
     /**
      * _more_
      *

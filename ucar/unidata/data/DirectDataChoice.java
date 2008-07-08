@@ -138,13 +138,12 @@ public class DirectDataChoice extends DataChoice {
                             Hashtable properties) {
         super(id, name, description, categories, properties);
         //        addCurrentName(name);
-
-
-
-        addCurrentName(
-            new TwoFacedObject(
-                DataSourceImpl.getNameForDataSource(dataSource, 30, true)
-                + ">" + name, name));
+        if(dataSource.canAddCurrentName(this)) {
+            addCurrentName(
+                           new TwoFacedObject(
+                                              DataSourceImpl.getNameForDataSource(dataSource, 30, true)
+                                              + ">" + name, name));
+        }
         this.myDataSelection = dataSelection;
         this.dataSource      = dataSource;
     }

@@ -526,7 +526,7 @@ public class PointObFactory {
                                           ? (Real) ob.getComponent(altIndex)
                                           : new Real(RealType.Altitude, 0));
 
-                Data rest = null;
+                Tuple rest = null;
                 // now make data
                 Data[] others = (allReals == true)
                                 ? new Real[numNotRequired]
@@ -555,6 +555,13 @@ public class PointObFactory {
                     obs[i]         = pot;
                     finalTupleType =
                         Tuple.buildTupleType(pot.getComponents());
+                    
+                    Data []comps = rest.getComponents();
+                    for(int compIdx=0;compIdx<comps.length;compIdx++) {
+                        String name = ucar.visad.Util.cleanTypeName(comps[compIdx].getType());
+                        DataChoice.addCurrentName(new TwoFacedObject("Point Data"+">" + name,name));
+                    }
+
                 } else {
                     obs[i] = new PointObTuple(location, dateTime, rest,
                             finalTupleType, false);

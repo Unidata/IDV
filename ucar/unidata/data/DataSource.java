@@ -573,5 +573,7 @@ public interface DataSource {
     public void createAutoDisplay(String displayType,
                                   DataContext dataContext);
 
+    public boolean canAddCurrentName(DataChoice dataChoice);
+
 }
 

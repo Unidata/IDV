@@ -390,6 +390,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    public boolean canAddCurrentName(DataChoice dataChoice){
+        return true;
+    }
+
     /**
      * Write a mask file
      */

@@ -163,6 +163,9 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
 
+    public boolean canAddCurrentName(DataChoice dataChoice){
+        return false;
+    }
 
 
     /**
