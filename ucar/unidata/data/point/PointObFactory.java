@@ -50,11 +50,13 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.GeoLocationInfo;
 
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.geoloc.LatLonRect;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.JobManager;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -813,6 +815,8 @@ public class PointObFactory {
             if ( !isVarNumeric[varIdx]) {
                 allReals = false;
             }
+
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data"+">" + var.getShortName() ,var.getShortName())); 
 
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
