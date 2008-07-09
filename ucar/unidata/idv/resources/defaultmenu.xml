@@ -221,7 +221,7 @@
          label="Plugin Creator"
          action="action:plugins.create"/>
       <menuitem
-         label="View Resources"
+         label="Resource Viewer"
          tooltip="View all resource"
          action="action:edit.resources"/>
    </menu>
