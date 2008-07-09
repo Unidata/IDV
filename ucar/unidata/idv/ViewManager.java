@@ -3214,11 +3214,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param background The background color
      */
     public void setColors(Color foreground, Color background) {
-        this.foreground = foreground;
-        this.background = background;
+        if(foreground==null)
+            foreground=this.foreground;
+        if(background==null)
+            background = this.background;
         if ( !hasDisplayMaster()) {
             return;
         }
+
         getMaster().setBackground(background);
         getMaster().setForeground(foreground);
         if (legends == null) {

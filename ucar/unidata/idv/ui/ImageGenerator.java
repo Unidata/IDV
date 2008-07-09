@@ -1767,6 +1767,17 @@ public class ImageGenerator extends IdvManager {
         }
         getPersistenceManager().clearFileMapping();
 
+        if(XmlUtil.hasAttribute(node, ATTR_COLOR)) {
+            Color c = applyMacros(node, ATTR_COLOR, Color.black);
+            if(c!=null) {
+                List viewManagers = getVMManager().getViewManagers();
+                for (int i = 0; i < viewManagers.size(); i++) {
+                    ViewManager viewManager = (ViewManager) viewManagers.get(i);
+                    viewManager.setColors(null,c);
+                }
+            }
+        }
+
         return true;
 
 
@@ -2775,6 +2786,7 @@ public class ImageGenerator extends IdvManager {
             return dflt;
         }
         String result = applyMacros(value);
+        if(result.equals("none")) return null;
         return GuiUtils.decodeColor(result, dflt);
     }
 

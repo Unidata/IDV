@@ -131,7 +131,7 @@ ${description}
     </if>
 
 <!-- Load in the bundle    -->
-    <bundle file="${bundle}"/>
+    <bundle file="${bundle}" color="${transparency}"/>
 
     <property
        name="movie_files"
