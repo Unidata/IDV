@@ -32,6 +32,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import java.awt.*;
+import java.util.Date;
 
 import java.io.*;
 
@@ -70,6 +71,9 @@ public class ImageServer extends HttpServer {
 
     /** http image arg */
     public static final String ARG_PROPERTIES = "properties";
+
+    public static final String ARG_WIDTH="width";
+    public static final String ARG_HEIGHT="height";
 
     /** http image arg */
     public static final String REQ_MAKEMOVIE = "makemovie";
@@ -193,28 +197,18 @@ public class ImageServer extends HttpServer {
         protected void handleRequestInner(String path, Hashtable formArgs,
                                           Hashtable httpArgs, String content)
                 throws Exception {
-
-            //            File xf = new File("/home/jeffmc/foo.jpg");
-            //            writeBytes(new FileInputStream(xf), "image/jpg", xf.length());
-            //            log("done");
-            //            if(true) return;
-
-
-            String imageFile = null;
-            if (imageFile == null) {
-                imageFile = (String) formArgs.get(ARG_FILE);
-            }
-            int width = Misc.getProperty(server.getProperties(), "width",
-                                         400);
-            int height = Misc.getProperty(server.getProperties(), "height",
-                                          300);
-
-            idv.getStateManager().setViewSize(new Dimension(width, height));
+            String imageFile = (String) formArgs.get(ARG_FILE);
             String request        = (String) formArgs.get(ARG_REQUEST);
             String dataSourceName = (String) formArgs.get(ARG_DATASOURCE);
             String paramName      = (String) formArgs.get(ARG_PARAM);
             String displayName    = (String) formArgs.get(ARG_DISPLAY);
             String properties     = (String) formArgs.get(ARG_PROPERTIES);
+
+            int width = Misc.getProperty(formArgs, "width",  -1);
+            int height = Misc.getProperty(formArgs, "height", -1);
+            if(width>0 && height>0) {
+                idv.getStateManager().setViewSize(new Dimension(width, height));
+            }
 
             if (request == null) {
                 request = REQ_MAKEIMAGE;
@@ -234,6 +228,7 @@ public class ImageServer extends HttpServer {
                 imageFile = idv.getObjectStore().getTmpFile(uid);
             }
 
+            System.err.println("image:" + imageFile);
             String bundle = (String) server.getProperties().get("bundle");
             if (bundle == null) {
                 bundle = (String) formArgs.get(ARG_BUNDLE);
@@ -266,6 +261,7 @@ public class ImageServer extends HttpServer {
 
             log("Waiting until displays are done");
             IdvManager.waitUntilDisplaysAreDone(idv.getIdvUIManager());
+            Misc.sleep(2000);
             log("Done waiting");
             long t3 = System.currentTimeMillis();
 
@@ -281,9 +277,17 @@ public class ImageServer extends HttpServer {
             long t4 = System.currentTimeMillis();
             log("Total Time:" + (t4 - t1) + " Load bundle:" + (t2 - t1)
                 + " Wait: " + (t3 - t2) + " Capture:" + (t4 - t3));
-            idv.removeAllDisplays();
-            idv.removeAllDataSources();
+            
+            idv.cleanup();
         }
+
+
+        protected void writeHeaderArgs() throws Exception {
+            super.writeHeaderArgs();
+            writeLine("Cache-Control: no-cache" + CRLF);
+            writeLine("Last-Modified:" + new Date() + CRLF);
+        }
+
     }
 
 }
