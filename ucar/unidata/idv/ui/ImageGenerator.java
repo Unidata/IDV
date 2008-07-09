@@ -1741,6 +1741,11 @@ public class ImageGenerator extends IdvManager {
             cleanup();
         }
         getIdv().getStateManager().setAlwaysLoadBundlesSynchronously(true);
+        Hashtable bundleProperties = new Hashtable();
+        if(timesList!=null) 
+            bundleProperties.put(IdvPersistenceManager.PROP_TIMESLIST,timesList);
+
+
         if (bundleFile != null) {
             debug("Loading bundle: " + bundleFile);
             if (bundleFile.endsWith(".jnlp")) {
@@ -1749,7 +1754,7 @@ public class ImageGenerator extends IdvManager {
                 String xml = IOUtil.readContents(bundleFile);
                 xml = applyMacros(xml);
                 getPersistenceManager().decodeXml(xml, false, bundleFile,
-                        null, false, true, timesList, false, false);
+                                                  null, false, true,bundleProperties, false, false);
                 //                getPersistenceManager().decodeXmlFile(bundleFile, false,
                 //                        timesList);
             }
@@ -2637,6 +2642,7 @@ public class ImageGenerator extends IdvManager {
      * @return Current properties hashtable.
      */
     private Hashtable getProperties() {
+        if(propertiesStack.size()==0) return new Hashtable();
         return (Hashtable) propertiesStack.get(propertiesStack.size() - 1);
     }
 

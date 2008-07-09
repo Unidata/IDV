@@ -708,7 +708,7 @@ public class BundleTree extends DndTree {
      */
     public void doImport(DefaultMutableTreeNode parentNode) {
         String filename = FileManager.getReadFile("Import Bundle",
-                              Misc.newList(IdvConstants.FILTER_XIDVZIDV));
+                                                  Misc.newList(uiManager.getIdv().getArgsManager().getXidvZidvFileFilter()));
         if (filename == null) {
             return;
         }
