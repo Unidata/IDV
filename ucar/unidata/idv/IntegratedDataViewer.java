@@ -1425,17 +1425,17 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         } else if (action.startsWith("help:")) {
             getIdvUIManager().showHelp(action.substring(5));
             ok = true;
-        } else if (ArgsManager.isRbiFile(action)) {
+        } else if (getArgsManager().isRbiFile(action)) {
             loadRbiFile(action);
             ok     = true;
             isFile = true;
-        } else if (ArgsManager.isXidvFile(action)
-                   || ArgsManager.isZidvFile(action)) {
+        } else if (getArgsManager().isXidvFile(action)
+                   || getArgsManager().isZidvFile(action)) {
             //TODO: If this is asynch then when  do we add this to the history list
             getPersistenceManager().decodeXmlFile(action, true);
             //We handled it
             return true;
-        } else if (ArgsManager.isIslFile(action)) {
+        } else if (getArgsManager().isIslFile(action)) {
             final String scriptFile = action;
             Misc.run(new Runnable() {
                 public void run() {
@@ -1444,7 +1444,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             });
             ok     = true;
             isFile = true;
-        } else if (ArgsManager.isJnlpFile(action)) {
+        } else if (getArgsManager().isJnlpFile(action)) {
             getPersistenceManager().decodeJnlpFile(action);
             ok     = true;
             isFile = true;
@@ -1711,8 +1711,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
     private boolean isABundle(Object obj) {
         return ((obj instanceof String)
-                && (ArgsManager.isXidvFile((String) obj)
-                    || ArgsManager.isZidvFile((String) obj)));
+                && (getArgsManager().isXidvFile((String) obj)
+                    || getArgsManager().isZidvFile((String) obj)));
     }
 
     /**
@@ -2613,7 +2613,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             }
 
             filename = FileManager.getReadFile("Open File",
-                    Misc.newList(FILTER_XIDVZIDV),
+                                               Misc.newList(getArgsManager().getXidvZidvFileFilter()),
                     GuiUtils.top(overwriteDataCbx));
             if (filename == null) {
                 return;
@@ -2621,7 +2621,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             overwriteData = overwriteDataCbx.isSelected();
         }
 
-        if (ArgsManager.isXidvFile(filename)) {
+        if (getArgsManager().isXidvFile(filename)) {
             getPersistenceManager().decodeXmlFile(filename,
                     checkUserPreference, overwriteData);
             return;
@@ -2975,6 +2975,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         } else {
             imageServer = new ImageServer(this, port);
         }
+        getArgsManager().setIsOffScreen(true);
         imageServer.init();
     }
 

@@ -793,7 +793,7 @@ public class PluginManager extends IdvManager {
      * @param label label
      */
     private void addCreateFile(String file, String label) {
-        if(ArgsManager.isBundleFile(file)) {
+        if(getArgsManager().isBundleFile(file)) {
             String name = IOUtil.getFileTail(IOUtil.stripExtension(file));
             if(!GuiUtils.showOkCancelDialog(null,"Favorite Bundle Category",
                                             GuiUtils.inset(getBundleComponent(name),10), null)) return;
@@ -922,9 +922,8 @@ public class PluginManager extends IdvManager {
     public void loadBundlesFromDisk() {
         String file =
             FileManager.getReadFileOrURL("Bundle to load into plugin",
-                                         Misc.newList(FILTER_XIDV,
-                                             FILTER_JNLP, FILTER_ISL,
-                                             FILTER_ZIDV), getBundleComponent(null));
+                                         getArgsManager().getBundleFileFilters(),
+                                         getBundleComponent(null));
         if (file == null) {
             return;
         }
@@ -1612,7 +1611,7 @@ public class PluginManager extends IdvManager {
             return;
         }
 
-        if (ArgsManager.isRbiFile(filename)) {
+        if (getArgsManager().isRbiFile(filename)) {
             if (topLevel) {
                 addPluginToList(filename);
             }
@@ -1710,7 +1709,7 @@ public class PluginManager extends IdvManager {
             List entries = cl.getEntryNames();
             for (int i = 0; i < entries.size(); i++) {
                 String entry = (String) entries.get(i);
-                if (ArgsManager.isRbiFile(entry)) {
+                if (getArgsManager().isRbiFile(entry)) {
                     loadPlugin(entry, prefix, false);
                 }
             }
@@ -1718,7 +1717,7 @@ public class PluginManager extends IdvManager {
             //Now load in everything else
             for (int i = 0; i < entries.size(); i++) {
                 String entry = (String) entries.get(i);
-                if ( !ArgsManager.isRbiFile(entry)) {
+                if ( !getArgsManager().isRbiFile(entry)) {
                     loadPlugin(entry, prefix, false, "From: " + jarLabel);
                 }
             }
@@ -1838,7 +1837,7 @@ public class PluginManager extends IdvManager {
                 is.close();
 
                 //Assume any bundle files are defined in a bundles.xml
-                if (ArgsManager.isXidvFile(name)) {
+                if (getArgsManager().isXidvFile(name)) {
                     continue;
                 }
                 if (name.toLowerCase().endsWith("manifest.mf")) {

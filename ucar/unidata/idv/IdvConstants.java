@@ -51,8 +51,6 @@ import ucar.unidata.xml.XmlUtil;
 
 public interface IdvConstants {
 
-
-
     /** Where to look for javahelp */
     public static final String DEFAULT_DOCPATH = "/auxdata/docs/userguide";
 
@@ -92,7 +90,6 @@ public interface IdvConstants {
     public static final PatternFileFilter FILTER_XIDVZIDV =
         new PatternFileFilter("(.+\\.xidv$|.+\\.zidv$)",
                               "IDV Bundles (*.xidv,*.zidv)", SUFFIX_XIDV);
-
 
     /** File filter used for bundle files */
     public static final PatternFileFilter FILTER_ZIDV =

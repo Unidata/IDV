@@ -3216,8 +3216,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void setColors(Color foreground, Color background) {
         if(foreground==null)
             foreground=this.foreground;
+        this.foreground = foreground;
         if(background==null)
             background = this.background;
+        this.background = background;
+
         if ( !hasDisplayMaster()) {
             return;
         }
@@ -4609,7 +4612,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @param images list of images
      * @param andShow true to show
-     */
+     */ 
     public void useImages(List images, boolean andShow) {
         if (imagePanel == null) {
             imagePanel = new ImagePanel();

@@ -263,6 +263,8 @@ public class LineState {
     /** for gui */
     JComboBox chartNameBox;
 
+    JTextField nameField;
+
     /** for gui */
     JTextField minRangeFld;
 
@@ -477,6 +479,11 @@ public class LineState {
             comps.add(GuiUtils.left(GuiUtils.hbox(visibleCbx, axisVisibleCbx,
                     5)));
         } else {}
+
+        nameField = new JTextField(name);
+        comps.add(GuiUtils.rLabel("Name:"));
+        comps.add(GuiUtils.left(nameField));
+        
         if (chartNames != null) {
             chartNameBox = new JComboBox(new Vector(chartNames));
             if (chartName != null) {
@@ -635,6 +642,9 @@ public class LineState {
         if (shapeBox != null) {
             shape = GuiUtils.getValueFromBox(shapeBox);
         }
+
+        name = nameField.getText().trim();
+
         if (chartNameBox != null) {
             chartName = (String) chartNameBox.getSelectedItem();
         }

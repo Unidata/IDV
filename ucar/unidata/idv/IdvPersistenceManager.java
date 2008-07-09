@@ -111,6 +111,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     public static final String PROP_ZIDVPATH = "idv.zidvpath";
 
 
+    public static final String PROP_TIMESLIST = "idv.timeslist";
+
+
 
     /** Category name */
     public static final String CAT_GENERAL = "General";
@@ -371,7 +374,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                 "displaytemplates")) };
         int[] types = { BUNDLES_FAVORITES, BUNDLES_DISPLAY };
         for (int i = 0; i < dirs.length; i++) {
-            List oldFiles = IOUtil.getFiles(null, dirs[i], true, FILTER_XIDV);
+            List oldFiles = IOUtil.getFiles(null, dirs[i], true, getArgsManager().getXidvFileFilter());
             for (int fileIdx = 0; fileIdx < oldFiles.size(); fileIdx++) {
                 didAny = true;
                 File file = (File) oldFiles.get(fileIdx);
@@ -493,7 +496,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     private void loadBundlesInDirectory(List allBundles, List categories,
                                         File file) {
-        String[] localBundles = file.list(FILTER_XIDVZIDV);
+        String[] localBundles = file.list(getArgsManager().getXidvZidvFileFilter());
         for (int i = 0; i < localBundles.length; i++) {
             String filename = IOUtil.joinDir(file.toString(),
                                              localBundles[i]);
@@ -653,9 +656,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * adds the file to the history list.
      */
     public void doSaveAs() {
-        String filename = FileManager.getWriteFile(Misc.newList(FILTER_XIDV,
-                              FILTER_JNLP, FILTER_ISL,
-                              FILTER_ZIDV), SUFFIX_XIDV, getFileAccessory());
+        String filename = FileManager.getWriteFile(getArgsManager().getBundleFileFilters(), null, getFileAccessory());
         if (filename == null) {
             return;
         }
@@ -754,7 +755,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param bundleType What type
      */
     public void export(SavedBundle bundle, int bundleType) {
-        String filename = FileManager.getWriteFile(FILTER_XIDV, SUFFIX_XIDV);
+        String filename = FileManager.getWriteFile(getArgsManager().getXidvFileFilter(),null);
         if (filename == null) {
             return;
         }
@@ -909,7 +910,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         final JComboBox catBox  = makeCategoryBox();
 
-        JCheckBox       zidvCbx = new JCheckBox("Save as ZIDV bundle", false);
+        JCheckBox       zidvCbx = new JCheckBox("Save as zipped data bundle", false);
         zidvCbx.setToolTipText(
             "Select this to save the data along with the bundle");
         JComponent zidvComp = ((suffix == null)
@@ -1267,8 +1268,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                              || filename.endsWith(SUFFIX_BAT);
 
 
-            boolean doIsl     = ArgsManager.isIslFile(filename);
-            boolean doZidv    = ArgsManager.isZidvFile(filename);
+            boolean doIsl     = getArgsManager().isIslFile(filename);
+            boolean doZidv    = getArgsManager().isZidvFile(filename);
 
             List    zidvFiles = null;
             if (doZidv) {
@@ -1325,7 +1326,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 String  bundleXml   = xml;
                 String  bundleArg   = null;
                 String bundleFile = IOUtil.stripExtension(filename)
-                                    + SUFFIX_XIDV;
+                    + getArgsManager().getXidvFileFilter().getPreferredSuffix();
 
                 if ( !embedBundle) {
                     String bundlePath = bundlePrefixFld.getText().trim();
@@ -1672,7 +1673,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param displayControl The display control to write
      */
     public void saveDisplayControl(DisplayControl displayControl) {
-        String filename = FileManager.getWriteFile(FILTER_XIDV, SUFFIX_XIDV);
+        String filename = FileManager.getWriteFile(getArgsManager().getXidvFileFilter(), null);
         if (filename == null) {
             return;
         }
@@ -1782,7 +1783,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             List   dirs   = IOUtil.getDirectories(new File(topDir), true);
             for (int dirIdx = 0; dirIdx < dirs.size(); dirIdx++) {
                 File     file          = (File) dirs.get(dirIdx);
-                String[] templateFiles = file.list(FILTER_XIDV);
+                String[] templateFiles = file.list(getArgsManager().getXidvFileFilter());
                 for (int i = 0; i < templateFiles.length; i++) {
                     String filename = IOUtil.joinDir(file.toString(),
                                           templateFiles[i]);
@@ -1811,7 +1812,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             List   dirs   = IOUtil.getDirectories(new File(topDir), true);
             for (int dirIdx = 0; dirIdx < dirs.size(); dirIdx++) {
                 File     file          = (File) dirs.get(dirIdx);
-                String[] templateFiles = file.list(FILTER_XIDV);
+                String[] templateFiles = file.list(getArgsManager().getXidvFileFilter());
                 for (int i = 0; i < templateFiles.length; i++) {
                     String filename = IOUtil.joinDir(file.toString(),
                                           templateFiles[i]);
@@ -2177,7 +2178,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         if(notSavedLabels.size()>0) {
             if (copyComps.size() ==0 && 
                 fileDataSources.size()==0) {
-                comps.add(new JLabel("No data will be included in the ZIDV file"));
+                comps.add(new JLabel("No data will be included in the bundle"));
             }
             notSavedLabels.add(0, new JLabel("Other data sources:"));
             notSavedLabels.add(0, new JLabel(" "));
@@ -2511,8 +2512,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return success
      */
     public boolean decodeXmlFile(String xmlFile, boolean checkToRemove,
-                                 List overrideTimes) {
-        return decodeXmlFile(xmlFile, null, checkToRemove, overrideTimes);
+                                 Hashtable bundleProperties) {
+        return decodeXmlFile(xmlFile, null, checkToRemove, bundleProperties);
     }
 
 
@@ -2544,10 +2545,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return success
      */
     public boolean decodeXmlFile(String xmlFile, String label,
-                                 boolean checkToRemove, List overrideTimes) {
+                                 boolean checkToRemove, Hashtable bundleProperties) {
 
         return decodeXmlFile(xmlFile, label, checkToRemove, false,
-                             overrideTimes);
+                             bundleProperties);
     }
 
 
@@ -2566,7 +2567,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     public boolean decodeXmlFile(String xmlFile, String label,
                                  boolean checkToRemove,
                                  boolean letUserChangeData,
-                                 List overrideTimes) {
+                                 Hashtable bundleProperties) {
 
         String  name        = ((label != null)
                                ? label
@@ -2592,10 +2593,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
 
 
-        boolean isZidv = ArgsManager.isZidvFile(xmlFile);
+        boolean isZidv = getArgsManager().isZidvFile(xmlFile);
 
 
-        if(!isZidv && !ArgsManager.isXidvFile(xmlFile)) {
+        if(!isZidv && !getArgsManager().isXidvFile(xmlFile)) {
             //If we cannot tell what it is then try to open it as a zidv file
             try {
                 ZipInputStream zin =
@@ -2673,7 +2674,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     //                        return false;
                     //                    }
                     //                    System.err.println ("entry : " + entryName);
-                    if (entryName.toLowerCase().endsWith(SUFFIX_XIDV)) {
+                    if (getArgsManager().isXidvFile(entryName.toLowerCase())) {
                         bundleContents = new String(IOUtil.readBytes(zin,
                                 null, false));
                     } else {
@@ -2700,7 +2701,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             Trace.call1("Decode.decodeXml");
             decodeXml(bundleContents, false, xmlFile, name, true,
-                      shouldMerge, overrideTimes, removeAll,
+                      shouldMerge, bundleProperties, removeAll,
                       letUserChangeData);
             Trace.call2("Decode.decodeXml");
             return true;
@@ -2759,20 +2760,20 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                           final String xmlFile, final String label,
                           final boolean showDialog,
                           final boolean shouldMerge,
-                          final List overrideTimes, final boolean removeAll,
+                          final Hashtable bundleProperties, final boolean removeAll,
                           final boolean letUserChangeData) {
         if ( !getStateManager().getShouldLoadBundlesSynchronously()) {
             Runnable runnable = new Runnable() {
                 public void run() {
                     decodeXmlInner(xml, fromCollab, xmlFile, label,
-                                   showDialog, shouldMerge, overrideTimes,
+                                   showDialog, shouldMerge, bundleProperties,
                                    removeAll, letUserChangeData);
                 }
             };
             Misc.run(runnable);
         } else {
             decodeXmlInner(xml, fromCollab, xmlFile, label, showDialog,
-                           shouldMerge, overrideTimes, removeAll,
+                           shouldMerge, bundleProperties, removeAll,
                            letUserChangeData);
         }
     }
@@ -2904,7 +2905,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     protected synchronized void decodeXmlInner(String xml,
             boolean fromCollab, String xmlFile, String label,
-            boolean showDialog, boolean shouldMerge, List overrideTimes,
+            boolean showDialog, boolean shouldMerge, Hashtable bundleProperties,
             boolean didRemoveAll, boolean letUserChangeData) {
         LoadBundleDialog loadDialog = new LoadBundleDialog(this, label);
         boolean          inError    = false;
@@ -2936,7 +2937,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 if (data instanceof Hashtable) {
                     Hashtable ht = (Hashtable) data;
                     instantiateFromBundle(ht, fromCollab, loadDialog,
-                                          shouldMerge, overrideTimes,
+                                          shouldMerge, bundleProperties,
                                           didRemoveAll, letUserChangeData);
                 } else if (data instanceof DisplayControl) {
                     ((DisplayControl) data).initAfterUnPersistence(getIdv(),
@@ -3181,7 +3182,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     protected void instantiateFromBundle(Hashtable ht, boolean fromCollab,
                                          LoadBundleDialog loadDialog,
                                          boolean shouldMerge,
-                                         List overrideTimes,
+                                         Hashtable bundleProperties,
                                          boolean didRemoveAll,
                                          boolean letUserChangeData)
             throws Exception {
@@ -3251,6 +3252,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             dialog.getContentPane().add(comp);
             GuiUtils.showInCenter(dialog);
         }
+
+        List overrideTimes = (bundleProperties==null?null:(List)bundleProperties.get(PROP_TIMESLIST));
 
 
         List dataSources = (List) ht.get(ID_DATASOURCES);
@@ -3322,6 +3325,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
 
 
+        //        ProjectionImpl dfltProjection = null;
+
         getVMManager().setDisplayMastersInactive();
 
         try {
@@ -3333,6 +3338,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             if (newViewManagers != null) {
                 //This just does basic initialization
                 getVMManager().unpersistViewManagers(newViewManagers);
+                for (ViewManager viewManager: (List<ViewManager>)newViewManagers) {
+                    //                    System.err.println ("vm:"+viewManager);
+                }
+
+
             }
             List newControls = (List) ht.get(ID_DISPLAYCONTROLS);
             //            newControls = new ArrayList();
@@ -3340,7 +3350,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             //If we are not merging we have to reset the ViewDescriptor id
             //in the new view managers. Then we have to tell the new display  
             //controls  to use the new view descriptor ids
-
             if ( !shouldMerge && (newViewManagers != null)) {
                 for (int i = 0; i < newViewManagers.size(); i++) {
                     ViewManager newViewManager =
@@ -3373,7 +3382,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
             //            System.err.println ("new windows:" + windows);
-
             if (newViewManagers != null) {
                 if (getArgsManager().getIsOffScreen()) {
                     Trace.call1("Decode.addViewManagers");

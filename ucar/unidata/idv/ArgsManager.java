@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -28,13 +29,14 @@ import org.w3c.dom.Node;
 
 
 import ucar.unidata.idv.ui.IdvUIManager;
-
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
+
+
+import ucar.unidata.util.PatternFileFilter;
 
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
@@ -469,16 +471,63 @@ public class ArgsManager extends IdvManager {
     }
 
     /**
+     * Return a list of file filters that match on all of the types of bundles
+     *
+     * @return list of bundle file filters
+     */
+    public List<PatternFileFilter> getBundleFileFilters() {
+        return (List<PatternFileFilter>) Misc.newList(getXidvFileFilter(),
+                                                      FILTER_JNLP, FILTER_ISL, getZidvFileFilter());
+    }
+
+
+
+    /**
+     * Get the file filter to be used for a regular xidv bundle file
+     *
+     * @return bundle file filter
+     */
+    public PatternFileFilter getXidvFileFilter() {
+        return FILTER_XIDV;
+    }
+
+    /**
+     * Get the file filter to be used for a  zidv bundle file
+     *
+     * @return bundle file filter
+     */
+    public PatternFileFilter getZidvFileFilter() {
+        return FILTER_ZIDV;
+    }
+
+    /**
+     * Get the file filter that matches both xidv and zidv files
+     *
+     * @return file filter
+     */
+    public PatternFileFilter getXidvZidvFileFilter() {
+        return FILTER_XIDVZIDV;
+    }
+
+
+    /**
      * Helper method to determine if the given  filename is a xidv bundle file
      *
      * @param name The file name
      * @return Is the file a bundle file
      */
-    public static boolean isXidvFile(String name) {
-        return IOUtil.hasSuffix(name, SUFFIX_XIDV);
+    public boolean isXidvFile(String name) {
+        return IOUtil.hasSuffix(name, getXidvFileFilter().getPreferredSuffix());
     }
 
-    public static boolean isBundleFile(String name) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
+    public boolean isBundleFile(String name) {
         return isXidvFile(name) || isZidvFile(name);
     }
 
@@ -489,7 +538,7 @@ public class ArgsManager extends IdvManager {
      * @param name The file name
      * @return Is the file a bundle file
      */
-    public static boolean isIslFile(String name) {
+    public boolean isIslFile(String name) {
         return IOUtil.hasSuffix(name, SUFFIX_ISL);
     }
 
@@ -500,8 +549,8 @@ public class ArgsManager extends IdvManager {
      *
      * @return is zidv
      */
-    public static boolean isZidvFile(String name) {
-        return IOUtil.hasSuffix(name, SUFFIX_ZIDV);
+    public boolean isZidvFile(String name) {
+        return IOUtil.hasSuffix(name, getZidvFileFilter().getPreferredSuffix());
     }
 
 
@@ -512,7 +561,7 @@ public class ArgsManager extends IdvManager {
      * @return Is the file a resource bundle file
      */
 
-    public static boolean isRbiFile(String name) {
+    public boolean isRbiFile(String name) {
         return IOUtil.hasSuffix(name, SUFFIX_RBI);
     }
 
@@ -523,7 +572,7 @@ public class ArgsManager extends IdvManager {
      * @param name The file name
      * @return Is the file a jnlp file
      */
-    public static boolean isJnlpFile(String name) {
+    public boolean isJnlpFile(String name) {
         return IOUtil.hasSuffix(name, SUFFIX_JNLP);
     }
 
