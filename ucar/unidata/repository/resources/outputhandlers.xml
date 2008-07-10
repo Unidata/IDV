@@ -5,6 +5,7 @@
   <outputhandler class="ucar.unidata.repository.XmlOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.RssOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.CatalogOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.MapOutputHandler"/>
 <!--
   <outputhandler class="ucar.unidata.repository.CsvOutputHandler"/>
 -->

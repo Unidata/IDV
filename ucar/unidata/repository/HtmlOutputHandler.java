@@ -199,7 +199,7 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.row(HtmlUtil.colspan("<center>" + links
                 + "</center>", 2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
-                OutputHandler.OUTPUT_HTML, false));
+                                                              OutputHandler.OUTPUT_HTML, false,true));
         getMetadataHtml(request, entry, sb, false);
 
         sb.append("</table>");

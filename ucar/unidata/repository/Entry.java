@@ -150,7 +150,7 @@ public class Entry extends Entity {
      * @return _more_
      */
     public boolean isFile() {
-        return resource.isFile();
+        return resource!=null && resource.isFile();
     }
 
 

@@ -539,3 +539,17 @@ function toggleVisibilityOnObject(obj, display) {
     }
 }
 
+
+
+var mapstraction;
+function MapInitialize()
+{
+	// Create a map object
+//	mapstraction = new Mapstraction('mapstraction', 'google');
+//	mapstraction = new Mapstraction('mapstraction', 'yahoo');
+	mapstraction = new Mapstraction('mapstraction', 'microsoft');
+        mapstraction.addSmallControls();
+}
+
+
+//<div style="width:400px; height:400px" id="mapstraction"></div>a

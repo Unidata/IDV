@@ -464,7 +464,7 @@ public class TypeHandler extends RepositoryManager {
             }
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
-                                           showResource));
+                                           showResource,true));
 
 
             /*
@@ -630,7 +630,7 @@ public class TypeHandler extends RepositoryManager {
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
                                              String output,
-                                             boolean showResource)
+                                             boolean showResource, boolean showMap)
             throws Exception {
         StringBuffer sb = new StringBuffer();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
@@ -694,6 +694,7 @@ public class TypeHandler extends RepositoryManager {
                                              entry.getDataType()));
             }
 
+            if(showMap) {
             if (entry.hasLocationDefined()) {
                 sb.append(HtmlUtil.formEntry(msgLabel("Location"),
                                              entry.getSouth() + "/"
@@ -707,6 +708,7 @@ public class TypeHandler extends RepositoryManager {
                                              "" + entry.getNorth(), ARG_EAST,
                                              "" + entry.getEast()));
                 sb.append(HtmlUtil.formEntry(msgLabel("Area"), img));
+            }
             }
 
             if (showResource && entry.getResource().isImage()) {

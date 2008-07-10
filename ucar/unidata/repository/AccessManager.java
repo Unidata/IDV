@@ -333,7 +333,7 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Entry filterEntry(Request request, Entry entry) throws Exception {
-        if (entry.getResource().getType().equals(Resource.TYPE_FILE)) {
+        if (entry.getResource()!=null && Misc.equals(entry.getResource().getType(),Resource.TYPE_FILE)) {
             if ( !entry.getResource().getFile().exists()) {
                 //TODO                return null;
             }
