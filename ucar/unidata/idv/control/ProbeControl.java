@@ -1655,6 +1655,9 @@ public class ProbeControl extends DisplayControlImpl {
             return rowInfo.getPointParameter() + "@"
                    + rowInfo.getStationName();
         }
+        if(rowInfo.getLineState().getName()!=null) {
+            return rowInfo.getLineState().getName();
+        }
         return rowInfo.getDataInstance().getDataChoice().getName();
     }
 
