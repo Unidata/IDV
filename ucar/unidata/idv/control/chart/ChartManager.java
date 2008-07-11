@@ -114,7 +114,7 @@ public abstract class ChartManager implements ImageObserver {
     private int gridLayoutDimension = Integer.MAX_VALUE;
 
     /** the charts */
-    protected List chartHolders = new ArrayList();
+    protected List<ChartHolder> chartHolders = new ArrayList<ChartHolder>();
 
 
     /** my control */
@@ -327,8 +327,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     protected List getPlots() {
         List plots = new ArrayList();
-        for (int i = 0; i < chartHolders.size(); i++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(i);
+        for (ChartHolder chartHolder:  chartHolders) {
             plots.add(chartHolder.getPlot());
         }
         return plots;
@@ -369,9 +368,7 @@ public abstract class ChartManager implements ImageObserver {
                     height,
                     Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
             boolean chartsShowingSomething = false;
-            for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-                ChartHolder chartHolder =
-                    (ChartHolder) chartHolders.get(plotIdx);
+            for (ChartHolder chartHolder:  chartHolders) {
                 if (chartHolder.getBeingShown()
                         && chartHolder.hasParameters()) {
                     chartsShowingSomething = true;
@@ -488,8 +485,7 @@ public abstract class ChartManager implements ImageObserver {
      * Tell the chart holds that something changed
      */
     public void signalChartChanged() {
-        for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             if (chartHolder.getChartPanel() != null) {
                 chartHolder.getChartPanel().chartChanged(
                     new ChartChangeEvent(this));
@@ -501,8 +497,7 @@ public abstract class ChartManager implements ImageObserver {
      * refresh chart holders
      */
     private void setRefresh() {
-        for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             chartHolder.getChartPanel().setRefreshBuffer(true);
         }
     }
@@ -657,8 +652,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     private List getLocations() {
         List locations = new ArrayList();
-        for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             if ( !chartHolder.getBeingShown()) {
                 continue;
             }
@@ -737,9 +731,7 @@ public abstract class ChartManager implements ImageObserver {
         }
 
         items.add(GuiUtils.MENU_SEPARATOR);
-        for (int chartIdx = 0; chartIdx < chartHolders.size(); chartIdx++) {
-            ChartHolder chartHolder =
-                (ChartHolder) chartHolders.get(chartIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             if ( !chartHolder.getBeingShown()) {
                 continue;
             }
@@ -823,8 +815,7 @@ public abstract class ChartManager implements ImageObserver {
      * @return anything to show
      */
     public boolean hasStuff() {
-        for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             if (chartHolder.hasParameters()) {
                 return true;
             }
@@ -856,8 +847,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     public List getPlotNames() {
         List names = new ArrayList();
-        for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             names.add(chartHolder.getName());
         }
         return names;
@@ -893,8 +883,7 @@ public abstract class ChartManager implements ImageObserver {
      * @return the chart or null if none found
      */
     protected ChartHolder findChartHolder(String name) {
-        for (int i = 0; i < chartHolders.size(); i++) {
-            ChartHolder tmp = (ChartHolder) chartHolders.get(i);
+        for (ChartHolder tmp:  chartHolders) {
             //If no name then use first chart
             if ((name == null) || Misc.equals(name, tmp.getName())) {
                 return tmp;
@@ -982,10 +971,6 @@ public abstract class ChartManager implements ImageObserver {
     }
 
 
-    private boolean alwaysShowFirstChart = true;
-    public void setAlwaysShowFirstChart(boolean alwaysShowFirstChart) {
-        this.alwaysShowFirstChart = alwaysShowFirstChart;
-    }
 
     /**
      * update gui
@@ -999,9 +984,17 @@ public abstract class ChartManager implements ImageObserver {
         List    comps        = new ArrayList();
         int     tabIndex     = 0;
         boolean needToUpdate = false;
+        int goodCharts = 0;
+
+        for (ChartHolder chartHolder:  chartHolders) {
+            if (chartHolder.hasParameters()) {
+                goodCharts++;
+            }
+        }
+
         for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
             ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
-            if (chartHolder.hasParameters() || (alwaysShowFirstChart && plotIdx == 0)) {
+            if (chartHolder.hasParameters() || (plotIdx==0 && goodCharts==0)) {
                 if ( !chartHolder.getBeingShown()) {
                     needToUpdate = true;
                 }
@@ -1027,16 +1020,19 @@ public abstract class ChartManager implements ImageObserver {
         }
 
 
-        for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
-            ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
+        for (ChartHolder chartHolder:  chartHolders) {
             chartHolder.resetChartPanel();
         }
 
         for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
             ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
-            if (!chartHolder.hasParameters() && (!alwaysShowFirstChart || plotIdx > 0)) {
-                chartHolder.setBeingShown(false);
-                continue;
+            if (plotIdx==0 && goodCharts==0) {
+                //if we don't have any charts then always show the first one
+            } else {
+                if (!chartHolder.hasParameters()) {
+                    chartHolder.setBeingShown(false);
+                    continue;
+                }
             }
             chartHolder.setBeingShown(true);
             if (layout == LAYOUT_TAB) {

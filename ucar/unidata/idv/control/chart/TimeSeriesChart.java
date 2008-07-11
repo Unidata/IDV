@@ -123,6 +123,9 @@ public class TimeSeriesChart extends XYChartManager {
     /** _more_          */
     private Date lastEndDate;
 
+    private String dateFormat;
+
+
     /**
      * ctor
      */
@@ -150,15 +153,6 @@ public class TimeSeriesChart extends XYChartManager {
     public TimeSeriesChart(DisplayControlImpl control, String chartName) {
         super(control, chartName);
     }
-
-    private String dateFormat;
-    public void setDateFormat(String format) {
-        dateFormat = format;
-    }
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
 
 
 
@@ -543,7 +537,7 @@ public class TimeSeriesChart extends XYChartManager {
                         continue;
                     }
                     lineState.unit = info.getUnit();
-                    lineState.setName(info.getDataInstance().getParamName());
+                    lineState.setNameIfNeeded(info.getDataInstance().getParamName());
                     if (info.getLevel() != null) {
                         lineState.setName(lineState.getName() + "@"
                                           + Util.formatReal(info.getLevel())
@@ -999,6 +993,18 @@ public class TimeSeriesChart extends XYChartManager {
         } catch (VisADException exc) {}
         catch (RemoteException exc) {}
     }
+
+
+    public void setDateFormat(String format) {
+        dateFormat = format;
+    }
+
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+
 
 }
 

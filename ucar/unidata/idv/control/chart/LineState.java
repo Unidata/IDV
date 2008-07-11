@@ -480,7 +480,7 @@ public class LineState {
                     5)));
         } else {}
 
-        nameField = new JTextField(name);
+        nameField = new JTextField(name,30);
         comps.add(GuiUtils.rLabel("Name:"));
         comps.add(GuiUtils.left(nameField));
         
@@ -994,6 +994,10 @@ public class LineState {
      */
     public String getChartName() {
         return chartName;
+    }
+
+    public void setNameIfNeeded(String value) {
+        if(name==null || name.length() == 0) setName(value);
     }
 
     /**
