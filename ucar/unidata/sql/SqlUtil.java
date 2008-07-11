@@ -902,7 +902,21 @@ public class SqlUtil {
     public static void loadSql(String sql, Statement statement,
                                boolean ignoreErrors)
             throws Exception {
+        loadSql(sql, statement, ignoreErrors, false);
+    }
+
+    public static void loadSql(String sql, Statement statement,
+                               boolean ignoreErrors, boolean printStatus)
+            throws Exception {
+
+
+        int cnt=0;
         for (String command : parseSql(sql)) {
+            if(printStatus) {
+                cnt++;
+                if(cnt%100==0) System.err.print(".");
+                if(cnt%1000==0) System.err.println("\n" + cnt);
+            }
             try {
                 command = command.trim();
                 if (command.length() > 0) {
@@ -912,7 +926,7 @@ public class SqlUtil {
                 }
             } catch (Exception exc) {
                 if ( !ignoreErrors) {
-                    //                    System.err.println("Bad sql:" + command);
+                    System.err.println("Bad sql:" + command);
                     //                    System.err.println("" + exc);
                     throw exc;
                 }
