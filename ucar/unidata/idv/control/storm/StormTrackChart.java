@@ -269,7 +269,8 @@ public class StormTrackChart {
                                     "Track Charts") {
                 protected void makeInitialChart() {}
             };
-            timeSeries.setAlwaysShowFirstChart(false);
+            //TODO make this work:
+            //timeSeries.setAlwaysShowFirstChart(false);
             timeSeries.showAnimationTime(true);
             timeSeries.setDateFormat("MM/dd HH:mm z");
         }
