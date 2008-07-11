@@ -1472,7 +1472,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 FieldImpl       field = makeTrackField(obsTrack, null);
                 StormTrackPoint stp   = obsTrack.getTrackPoints().get(0);
                 DateTime dttm = new DateTime(sdf.parse("" + yds.getYear()));
-                if ( !doYearTime) {
+                if (!doYearTime) {
                     dttm = stormInfo.getStartTime();
                 }
                 obsTracks.add(obsTrack);
@@ -1488,9 +1488,15 @@ public class StormTrackControl extends DisplayControlImpl {
         if (errorWindow != null) {
             errorWindow.setVisible(false);
         }
-        yds.setData(doYearTime, obsTracks, times, fields, pointObs);
-        yds.setState(YearDisplayState.STATE_ACTIVE);
-        yds.setStatus("");
+        //If we can't find an obs track then set the yds to be inactive
+        if(times.size()==0) {
+            yds.setStatus("No observation track found");
+            yds.setState(YearDisplayState.STATE_INACTIVE);
+        } else {
+            yds.setData(doYearTime, obsTracks, times, fields, pointObs);
+            yds.setState(YearDisplayState.STATE_ACTIVE);
+            yds.setStatus("");
+        }
     }
 
 
