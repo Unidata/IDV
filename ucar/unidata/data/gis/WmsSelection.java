@@ -199,7 +199,7 @@ public class WmsSelection {
         //          "&Exceptions=se_xml" + 
         "&Styles=" + "" + "&format=" + format + "&SRS=" + srs + "&Layers="
                    + layer + "&BBOX=" + bbox + "&width=" + imageWidth
-                   + "&height=" + imageHeight;
+                   + "&height=" + imageHeight+"&reaspect=false";
     }
 
     /**
