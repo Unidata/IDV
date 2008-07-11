@@ -111,4 +111,8 @@ CREATE TABLE  harvesters (
               content varchar(10000));
 
 
+drop table tags;
+drop table report1;
+
+
 --CREATE TABLE stats ();

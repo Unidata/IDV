@@ -267,7 +267,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     private int keyCnt = 0;
 
 
-
+    private List<String> loadFiles = new ArrayList<String>();
+    private String dumpFile;
 
 
     /** _more_ */
@@ -844,13 +845,37 @@ public class Repository implements Constants, Tables, RequestHandler,
         getConnection();
         initTypeHandlers();
         initSchema();
+
+        for(String sqlFile: (List<String>)loadFiles) {
+            System.err.println ("loading");
+            String sql  =  IOUtil.readContents(sqlFile, getClass());
+            Connection connection = getConnection();
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
+            SqlUtil.loadSql(sql, statement, false,true);
+            connection.commit();
+            connection.setAutoCommit(true);
+            System.err.println ("done");
+        }
+        readGlobals();
+
+
         initOutputHandlers();
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
+
         initUsers();
         initGroups();
         getHarvesterManager().initHarvesters();
         initLanguages();
+
+        
+
+
+
+        if(dumpFile!=null) {
+            IOUtil.writeFile(dumpFile,getDatabaseManager().makeDatabaseCopy().toString());
+        }
     }
 
     /**
@@ -961,6 +986,12 @@ public class Repository implements Constants, Tables, RequestHandler,
                 argOutputDefFiles.add(args[i]);
             } else if (args[i].indexOf("metadatahandlers.xml") >= 0) {
                 argMetadataDefFiles.add(args[i]);
+            } else if (args[i].equals("-dump")) {
+                dumpFile  = args[i+1];
+                i++;
+            } else if (args[i].equals("-load")) {
+                loadFiles.add(args[i+1]);
+                i++;
             } else if (args[i].equals("-admin")) {
                 User user = new User(args[i + 1], true);
                 user.setPassword(UserManager.hashPassword(args[i + 2]));
@@ -1583,6 +1614,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+
     /**
      * _more_
      *
@@ -1596,6 +1628,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         long   t1 = System.currentTimeMillis();
         Result result;
+
+
+
+
 
 
         if (debug) {

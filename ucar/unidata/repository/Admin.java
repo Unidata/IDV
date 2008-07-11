@@ -162,7 +162,6 @@ public class Admin extends RepositoryManager {
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
 
-
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
             //            System.err.println("table name:" + tableName);

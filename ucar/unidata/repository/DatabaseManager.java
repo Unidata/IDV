@@ -72,6 +72,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
@@ -197,6 +198,84 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    public StringBuffer makeDatabaseCopy() throws Exception {
+        StringBuffer sb = new StringBuffer();
+        DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
+        ResultSet        catalogs = dbmd.getCatalogs();
+        ResultSet tables = dbmd.getTables(null, null, null,
+                                          new String[] { "TABLE" });
+
+        while (tables.next()) {
+            String tableName = tables.getString("TABLE_NAME");
+            String tableType = tables.getString("TABLE_TYPE");
+            if (tableType == null || Misc.equals(tableType, "INDEX") ||
+                tableType.startsWith("SYSTEM")) {
+                continue;
+            }
+            
+            ResultSet        cols =  dbmd.getColumns(null,null,tableName,null);
+            int colCnt = 0;
+
+            String colNames=null;
+            List types = new ArrayList();
+            while (cols.next()) {
+                String colName = cols.getString("COLUMN_NAME");
+                if(colNames==null)
+                    colNames = " (";
+                else 
+                    colNames += ",";
+                colNames+=colName;
+                int type = cols.getInt("DATA_TYPE");
+                types.add(type);
+                colCnt++;
+            }
+            colNames += ") ";
+            System.err.println(tableName +" cnt:" + colCnt);
+
+            Statement stmt = execute("select * from " + tableName, 10000000, 0);
+            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            ResultSet        results;
+            int rowCnt = 0;
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    if(rowCnt==0) {
+                        sb.append("delete from  " + tableName + ";\n");
+                    }
+                    rowCnt++;
+                    sb.append("insert into " + tableName + colNames +" values (");
+                    for(int i=1;i<=colCnt;i++) {
+                        int type = ((Integer)types.get(i-1)).intValue();
+                        
+                        if(i>1)
+                            sb.append(",");
+                        if(type==java.sql.Types.TIMESTAMP) {
+                            Timestamp ts =  results.getTimestamp(i);
+                            //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
+                            sb.append("'" +ts.toString()+"'");
+                        } else   if(type==java.sql.Types.VARCHAR) {
+                            String s = results.getString(i);
+                            if(s!=null) {
+                                //If the target isn't mysql:
+                                //s = s.replace("'", "''");
+                                //If the target is mysql:
+                                s =  s.replace("'", "\\'");
+                                sb.append("'"+s+"'");
+                            }    else {
+                                sb.append("null");
+                            }
+                        } else {
+                            String s = results.getString(i);
+                            sb.append(s);
+                        }
+                    }
+                    sb.append(");\n");
+                }
+            }
+        }
+        return sb;
+    }
+
+
     /**
      * _more_
      *
@@ -205,7 +284,6 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected Connection makeConnection() throws Exception {
-
 
         String userName = (String) getRepository().getProperty(
                               PROP_DB_USER.replace("${db}", db));
