@@ -58,7 +58,11 @@ they essentially get it from their container type tag.
        names="RTNEXRAD"
        type="radar"/>
   </server>
-  <server name="twister.millersville.edu"/>
+  <server name="twister.millersville.edu">
+    <group
+       names="CIMSS,GINICOMP,GINIEAST,GINIWEST,NEXRCOMP,RTIMAGES,TOPO"
+       type="image"/>
+  </server>
 <!--
   <server name="pscwx.plymouth.edu"/>
 -->
@@ -70,11 +74,13 @@ they essentially get it from their container type tag.
        names="RTNEXRAD"
        type="radar"/>
   </server>
+<!--
   <server name="io.sca.uqam.ca">
     <group
        names="ME7"
        type="image"/>
   </server>
+-->
   <server name="unidata2.ssec.wisc.edu">
     <group
        names="GOESEAST,EAST,WEST"
@@ -90,7 +96,7 @@ they essentially get it from their container type tag.
        names="NANUK"
        type="image"/>
   </server>
-  <server name="gp16.ssd.nesdis.noaa.gov">
+  <server name="satepsanone.nesdis.noaa.gov">
     <group
        names="PUB"
        type="image"/>
