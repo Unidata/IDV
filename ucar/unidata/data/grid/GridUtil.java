@@ -3907,6 +3907,7 @@ public class GridUtil {
      */
     public static void writeGridToXls(FieldImpl grid, String filename)
             throws Exception {
+
         Object loadId =
             JobManager.getManager().startLoad("Writing grid to xls", true);
         try {
@@ -3938,11 +3939,15 @@ public class GridUtil {
                         continue;
                     }
                     if (sheets.size() == 0) {
-                        SampledSet ss = getSpatialDomain(ff);
-                        SampledSet latLonSet =
+                        SampledSet ss        = getSpatialDomain(ff);
+                        SampledSet latLonSet = null;
+                        if (ss.getCoordinateSystem() != null) {
                             Util.convertDomain(ss,
-                                ss.getCoordinateSystem().getReference(),
-                                null);
+                                    ss.getCoordinateSystem().getReference(),
+                                    null);
+                        } else {
+                            latLonSet = ss;
+                        }
 
                         domainVals = latLonSet.getSamples(false);
                         rowCnt     = -1;
@@ -4006,6 +4011,7 @@ public class GridUtil {
         } finally {
             JobManager.getManager().stopLoad(loadId);
         }
+
     }
 
     /**
