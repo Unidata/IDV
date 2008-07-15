@@ -240,6 +240,14 @@ public class StormDisplayState {
     /** _more_ */
     private Hashtable params = new Hashtable();
 
+    /** _more_ */
+    private static final int FORECAST_TIME_MODE = 0;
+
+    /** _more_ */
+    private int forecastTimeMode = FORECAST_TIME_MODE;
+
+    /** _more_ */
+    private JComboBox timeModeBox;
 
     /** _more_ */
     private Hashtable<Way, WayDisplayState> wayDisplayStateMap =
@@ -876,6 +884,25 @@ public class StormDisplayState {
 
         List topComps = new ArrayList();
 
+        timeModeBox = new JComboBox(new Vector(Misc.newList("On",
+                "Off")));
+        timeModeBox.setSelectedIndex(forecastTimeMode);
+        timeModeBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                forecastTimeMode = timeModeBox.getSelectedIndex();
+                try {
+                    reload(); //updateDisplays();
+                } catch (Exception exc) {
+                    stormTrackControl.logException("change forecast animation mode", exc);
+                }
+            }
+        });
+
+
+        JComponent forecastModeComp =
+            GuiUtils.inset(GuiUtils.left(GuiUtils.label("Animation Mode: ",
+                timeModeBox)), 5);
+
         topComps.add(new JLabel(""));
         topComps.add(
             GuiUtils.cLabel("<html><u><i>Observation</i></u></html>"));
@@ -887,7 +914,7 @@ public class StormDisplayState {
 
         topComps.add(GuiUtils.rLabel("Animation:"));
         topComps.add(obsLayoutComp);
-        topComps.add(GuiUtils.filler());
+        topComps.add(forecastModeComp); //GuiUtils.filler());
 
 
         forecastColorTableLabel = new JLabel(" ");
@@ -2087,8 +2114,8 @@ public class StormDisplayState {
         return forecastLayoutModelName;
     }
 
-
-
-
+    public int getForecastAnimationMode(){
+        return forecastTimeMode;
+    }
 }
 
