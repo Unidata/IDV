@@ -362,7 +362,6 @@ public class WayDisplayState {
             }
             setTrackColor();
             getTrackDisplay().setVisible(true);
-
         } else {
             if (hasTrackDisplay()) {
                 getTrackDisplay().setVisible(false);
@@ -525,14 +524,12 @@ public class WayDisplayState {
             if (sm == null) {
                 removeLabelDisplay();
             } else {
-                if (true && pointObs.size() > 0) {  //(!hasLabelDisplay()) {
-                    if(!way.isObservation() && modeParam == 0) {
+                if ( pointObs.size() > 0) {  //(!hasLabelDisplay()) {
                         FieldImpl pointField =
                             PointObFactory.makeTimeSequenceOfPointObs(pointObs,
                                 -1, -1);
 
                         getLabelDisplay().setStationData(pointField);
-                    }
                 }
                 if (hasLabelDisplay()) {  //&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
                     getLabelDisplay().setStationModel(sm);
@@ -1078,8 +1075,8 @@ public class WayDisplayState {
             datas[i++] = field;
             fields.add(field);
             times.add(track.getStartTime());
-            if(!way.isObservation() && mode == 0)
-                pointObs.addAll(makePointObs(track, !way.isObservation()));
+          //  if(!way.isObservation() && mode == 0)
+            pointObs.addAll(makePointObs(track, !way.isObservation()));
             if (way.isObservation()) {
                 allPointObs.addAll(makeObsPointObs(track));
             }
