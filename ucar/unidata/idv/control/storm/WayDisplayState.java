@@ -530,9 +530,7 @@ public class WayDisplayState {
                                 -1, -1);
 
                         getLabelDisplay().setStationData(pointField);
-                }
-                if (hasLabelDisplay()) {  //&& !Misc.equals(sm, getLabelDisplay().getStationModel())) {
-                    getLabelDisplay().setStationModel(sm);
+                        getLabelDisplay().setStationModel(sm);
                 }
             }
         }
@@ -1035,6 +1033,9 @@ public class WayDisplayState {
     /** _more_ */
     private static TextType fhourType;
 
+    /** _more_ */
+    private static TextType rhourType;
+
     /**
      * _more_
      *
@@ -1151,6 +1152,11 @@ public class WayDisplayState {
         if (fhourType == null) {
             fhourType = new TextType("fhour");
         }
+
+        if (rhourType == null) {
+            rhourType = new TextType("rhour");
+        }
+
         List<PointOb>    pointObs  = new ArrayList<PointOb>();
 
         DecimalFormat    format    = new DecimalFormat("0.#");
@@ -1161,33 +1167,42 @@ public class WayDisplayState {
             DateTime        time  = (useStartTime
                                      ? startTime
                                      : stp.getTime());
-            String          label = "";
+            String          flabel = "";
+            String          rlabel = "";
             if ( !isObservation) {
                 if (i == 0) {
                     //                 label = way.getId() + ": " + track.getStartTime();
                 } else {
-                    label = "" + stp.getForecastHour() + "H";
+                    flabel = "" + stp.getForecastHour() + "H";
+                    Date dttm = Util.makeDate(stp.getTime());
+                    rlabel = "" + dttm.toString();
                 }
             } else if (useStartTime && (i > 0)) {
                 Date dttm = Util.makeDate(stp.getTime());
                 double diffSeconds = (dttm.getTime() - startDate.getTime())
                                      / 1000.0;
                 double diffHours = diffSeconds / 3600.0;
-                label = format.format(diffHours) + "H";
 
+                flabel = format.format(diffHours) + "H";
+                rlabel = "" + dttm.toString();
             }
-            Data[] data = new Data[params.size() + 1];
-            data[0] = new visad.Text(fhourType, label);
+            Data[] data = new Data[params.size() + 2];
+
+            data[0] = new visad.Text(rhourType, rlabel);
+            data[1] = new visad.Text(fhourType, flabel);
+
             for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                 Real r = stp.getAttribute(params.get(paramIdx));
                 if (r == null) {
                     r = params.get(paramIdx).getReal(Double.NaN);
                 }
-                data[paramIdx + 1] = r;
+                data[paramIdx + 2] = r;
+
             }
             Tuple tuple = new Tuple(data);
             pointObs.add(PointObFactory.makePointOb(stp.getLocation(), time,
                     tuple));
+
         }
         return pointObs;
     }
@@ -1210,6 +1225,10 @@ public class WayDisplayState {
         if (fhourType == null) {
             fhourType = new TextType("fhour");
         }
+        if (rhourType == null) {
+            rhourType = new TextType("rhour");
+        }
+
         List<PointOb>    pointObs = new ArrayList<PointOb>();
         DecimalFormat    format   = new DecimalFormat("0.#");
         List<StormParam> params   = track.getParams();
@@ -1219,22 +1238,26 @@ public class WayDisplayState {
             Date            baseDate = Util.makeDate(baseTime);
             for (int j = i; j < stps.size(); j++) {
                 StormTrackPoint stp   = stps.get(j);
-                String          label = "";
+                String          flabel = "";
+                String          rlabel = "";
                 if (j > 0) {
                     Date dttm = Util.makeDate(stp.getTime());
                     double diffSeconds = (dttm.getTime()
                                           - baseDate.getTime()) / 1000.0;
                     double diffHours = diffSeconds / 3600.0;
-                    label = format.format(diffHours) + "H";
+                    flabel = format.format(diffHours) + "H";
+                    rlabel = "" + dttm.toString();
                 }
-                Data[] data = new Data[params.size() + 1];
-                data[0] = new visad.Text(fhourType, label);
+                Data[] data = new Data[params.size() + 2];
+                data[0] = new visad.Text(fhourType, flabel);
+                data[1] = new visad.Text(rhourType, rlabel);
+
                 for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                     Real r = stp.getAttribute(params.get(paramIdx));
                     if (r == null) {
                         r = params.get(paramIdx).getReal(Double.NaN);
                     }
-                    data[paramIdx + 1] = r;
+                    data[paramIdx + 2] = r;
                 }
                 Tuple tuple = new Tuple(data);
                 pointObs.add(PointObFactory.makePointOb(stp.getLocation(),

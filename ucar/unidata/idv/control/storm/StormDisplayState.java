@@ -897,6 +897,7 @@ public class StormDisplayState {
                 }
             }
         });
+        timeModeBox.setToolTipText("Animate tracks or show all tracks.");
 
 
         JComponent forecastModeComp =
@@ -2116,6 +2117,10 @@ public class StormDisplayState {
 
     public int getForecastAnimationMode(){
         return forecastTimeMode;
+    }
+
+    public void setForecastAnimationMode(int value){
+        forecastTimeMode = value;
     }
 }
 

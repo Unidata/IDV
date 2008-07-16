@@ -240,6 +240,8 @@ public class StormTrackControl extends DisplayControlImpl {
      * Create a new Track Control; set the attribute flags
      */
     public StormTrackControl() {
+        DataChoice.addCurrentName(new TwoFacedObject("Forecast Hour","fhour"));
+        DataChoice.addCurrentName(new TwoFacedObject("Forecast Time","rhour"));
         setAttributeFlags(FLAG_COLORTABLE);
     }
 
