@@ -131,32 +131,6 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("Entry", OUTPUT_HTML));
-            if (getRepository().isAppletEnabled(request)) {
-                types.add(new OutputType("Timeline", OUTPUT_TIMELINE));
-            }
-        } else if (what.equals(WHAT_TAG)) {
-            types.add(new OutputType("Tag Html", OUTPUT_HTML));
-            types.add(new OutputType("Tag Cloud", OUTPUT_CLOUD));
-        } else if (what.equals(WHAT_TYPE)) {
-            types.add(new OutputType("Type Html", OUTPUT_HTML));
-        } else {
-            types.add(new OutputType("Entry", OUTPUT_HTML));
-        }
-    }
 
     /**
      * _more_
@@ -361,7 +335,7 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
-            appendListHeader(request, output, WHAT_TYPE, sb);
+            //            appendListHeader(request, output, WHAT_TYPE, sb);
             sb.append("<ul>");
         }
 
@@ -401,11 +375,12 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void appendListHeader(Request request, String output,
+    protected void xappendListHeader(Request request, String output,
                                     String what, StringBuffer sb)
             throws Exception {
+        /*
         List<OutputType> outputTypes =
-            getRepository().getOutputTypesFor(request, what);
+            getRepository().xgetOutputTypesFor(request, what);
         int cnt = 0;
         sb.append("<b>");
         String initialOutput = request.getOutput("");
@@ -425,7 +400,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
         request.put(ARG_OUTPUT, initialOutput);
         sb.append("</b>");
-
+        */
     }
 
 
@@ -541,7 +516,7 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
-            appendListHeader(request, output, WHAT_ASSOCIATION, sb);
+            //            appendListHeader(request, output, WHAT_ASSOCIATION, sb);
             sb.append("<ul>");
         } else if (output.equals(OUTPUT_CLOUD)) {
             sb.append(msgHeader("Association Cloud"));

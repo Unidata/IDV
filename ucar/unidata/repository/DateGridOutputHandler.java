@@ -116,23 +116,6 @@ public class DateGridOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
-            types.add(new OutputType("Date Grid", OUTPUT_GRID));
-        }
-    }
 
     /**
      * _more_

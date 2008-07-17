@@ -916,7 +916,6 @@ public class TypeHandler extends RepositoryManager {
         }
 
         //        System.err.println("tables:" + tables);
-        //        System.err.println("clauses:" + clauses);
         return SqlUtil.select(getConnection(), what, tables,
                               Clause.and(clauses), extra,
                               getRepository().getMax(request));
@@ -1424,24 +1423,28 @@ public class TypeHandler extends RepositoryManager {
         boolean includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
         List<Clause>    areaExpressions = new ArrayList<Clause>();
         if (request.defined(ARG_AREA + "_south")) {
-            areaExpressions.add(Clause.ge(COL_ENTRIES_SOUTH,
-                                          request.get(ARG_AREA + "_south",
-                                                      0.0)));
+            areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_SOUTH,new Double(Entry.NONGEO)),
+                                           Clause.ge(COL_ENTRIES_SOUTH,
+                                                     request.get(ARG_AREA + "_south",
+                                                                 0.0))));
         }
         if (request.defined(ARG_AREA + "_north")) {
-            areaExpressions.add(Clause.le(COL_ENTRIES_NORTH,
+            areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_NORTH,new Double(Entry.NONGEO)),
+                                           Clause.le(COL_ENTRIES_NORTH,
                                            request.get(ARG_AREA + "_north",
-                                               0.0)));
+                                               0.0))));
         }
         if (request.defined(ARG_AREA + "_east")) {
-            areaExpressions.add(Clause.ge(COL_ENTRIES_EAST,
+            areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_EAST,new Double(Entry.NONGEO)),
+                                           Clause.le(COL_ENTRIES_EAST,
                                            request.get(ARG_AREA + "_east",
-                                               0.0)));
+                                               0.0))));
         }
         if (request.defined(ARG_AREA + "_west")) {
-            areaExpressions.add(Clause.le(COL_ENTRIES_WEST,
-                                           request.get(ARG_AREA + "_west",
-                                               0.0)));
+            areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_WEST,new Double(Entry.NONGEO)),
+                                           Clause.ge(COL_ENTRIES_WEST, request.get(ARG_AREA + "_west",
+                                                    0.0))));
+
         }
         if (areaExpressions.size() > 0) {
             Clause areaExpr = Clause.and(areaExpressions);

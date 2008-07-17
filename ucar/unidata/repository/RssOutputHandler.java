@@ -146,10 +146,10 @@ public class RssOutputHandler extends OutputHandler {
                                           List<Group> subGroups,
                                           List<Entry> entries, List<OutputType> types)
             throws Exception {
-        if (entries.size() == 0&& subGroups.size()==0) {
+        /*        if (entries.size() == 0&& subGroups.size()==0) {
             return;
         }
-        getOutputTypesForEntries(request, entries, types);
+        getOutputTypesForEntries(request, entries, types);*/
     }
 
 
@@ -167,7 +167,7 @@ public class RssOutputHandler extends OutputHandler {
                                             List<Entry> entries, List<OutputType> types)
             throws Exception {
         //types.add(TFO_FULL);
-        types.add(TFO_SUMMARY);
+        //        types.add(TFO_SUMMARY);
     }
 
 

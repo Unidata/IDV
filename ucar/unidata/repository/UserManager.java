@@ -1525,13 +1525,6 @@ public class UserManager extends RepositoryManager {
             public boolean canHandle(String output) {
                 return output.equals(OUTPUT_CART);
             }
-            protected void getOutputTypesFor(Request request, String what,
-                                             List<OutputType> types)
-                    throws Exception {
-                //                    if (what.equals(WHAT_ENTRIES)) {
-                //                        types.add(new OutputType("Cart", OUTPUT_CART));
-                //                    }
-            }
             protected void getOutputTypesForEntry(Request request,
                     Entry entry, List<OutputType> types)
                     throws Exception {}

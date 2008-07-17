@@ -113,18 +113,6 @@ public class ZipOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {}
-
-    /**
-     * _more_
-     *
-     * @param request _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_

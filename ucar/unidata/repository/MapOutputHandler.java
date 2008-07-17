@@ -84,7 +84,6 @@ public class MapOutputHandler extends OutputHandler {
     public static final String OUTPUT_MAP = "map.map";
 
 
-
     /**
      * _more_
      *
@@ -111,23 +110,6 @@ public class MapOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("Map", OUTPUT_MAP));
-        }
-    }
-
 
     /**
      * _more_
@@ -144,9 +126,6 @@ public class MapOutputHandler extends OutputHandler {
                                           List<Group> subGroups,
                                           List<Entry> entries, List<OutputType> types)
             throws Exception {
-        if (entries.size() == 0) {
-            return;
-        }
         getOutputTypesForEntries(request, entries, types);
     }
 
@@ -199,35 +178,37 @@ public class MapOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        entries.addAll(subGroups);
+        List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
+        entriesToUse.addAll(entries);
 
         String output = request.getOutput();
         StringBuffer sb         = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, group,
-                              false, "");
+                                                         false, "");
         sb.append(crumbs[1]);
 
-
-        sb.append("<script src=\"http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6\"></script>\n");
-        sb.append("<script src=\"" + repository.getUrlBase()+"/mapstraction.js\"></script>\n");
-
+        sb.append(importJS("http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
+        sb.append(importJS(repository.getUrlBase()+"/mapstraction.js"));
         sb.append("<div style=\"width:700px; height:500px\" id=\"mapstraction\"></div>\n");
         sb.append(script("MapInitialize();"));
-        if (entries.size() == 0) {
+        if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
             Result result = new Result("Query Results", sb,
                                        getMimeType(output));
-            result.putProperty(PROP_NAVSUBLINKS,
-                               getEntriesHeader(request, output,
-                                   WHAT_ENTRIES));
+
+            result.putProperty(
+                               PROP_NAVSUBLINKS,
+                               getHeader(
+                                         request, HtmlOutputHandler.OUTPUT_HTML,
+                                         getRepository().getOutputTypesForGroup(
+                                                                                request, group, subGroups, entries)));
             return result;
         }
 
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
         js.append("var pointList;\n");
-        for (int i = entries.size() - 1; i >= 0; i--) {
-            Entry  entry = entries.get(i);
+        for (Entry entry: entriesToUse) {
             if(entry.hasAreaDefined()) {
                 js.append("pointList = new Polyline([");
                 js.append(llp(entry.getNorth(), entry.getWest()));
@@ -266,24 +247,33 @@ var myPoly = new Polyline([new LatLonPoint(37.7945928242851,-122.395033836365), 
         }         
         sb.append(script(js.toString()));
         Result result = new Result("Results", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, output, WHAT_ENTRIES));
+        result.putProperty(
+                           PROP_NAVSUBLINKS,
+                           getHeader(
+                                     request, output,
+                                     getRepository().getOutputTypesForGroup(
+                                                                            request, group, subGroups, entries)));
+
+
         return result;
     }
 
 
 
-
-
  
-   private String llp(double lat, double lon) {
+    private String llp(double lat, double lon) {
         return "new LatLonPoint(" + lat +"," + lon+")";
 
     }
 
-        private String  script(String s) {
-            return "<script type=\"text/JavaScript\">" + s +"</script>\n";
-        }
+    private String  script(String s) {
+        return "<script type=\"text/JavaScript\">" + s +"</script>\n";
+    }
+
+    private String importJS(String jsUrl) {
+        return "<script src=\"" + jsUrl +"\"></script>\n";
+    }
+
 
 }
 

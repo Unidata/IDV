@@ -114,28 +114,6 @@ public class CsvOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("CSV", OUTPUT_CSV));
-        } else if (what.equals(WHAT_TAG)) {
-            types.add(new OutputType("Tag CSV", OUTPUT_CSV));
-        } else if (what.equals(WHAT_TYPE)) {
-            types.add(new OutputType("Type CSV", OUTPUT_CSV));
-        } else {
-            types.add(new OutputType("CSV", OUTPUT_CSV));
-        }
-    }
 
     /**
      * _more_

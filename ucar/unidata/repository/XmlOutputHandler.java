@@ -148,29 +148,6 @@ public class XmlOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType>  types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("Entries XML", OUTPUT_XML));
-        } else if (what.equals(WHAT_TAG)) {
-            types.add(new OutputType("Tag XML", OUTPUT_XML));
-        } else if (what.equals(WHAT_TYPE)) {
-            types.add(new OutputType("Type XML", OUTPUT_XML));
-        } else {
-            types.add(new OutputType("XML", OUTPUT_XML));
-        }
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
      * @param entries _more_
      * @param types _more_
      *
@@ -180,7 +157,7 @@ public class XmlOutputHandler extends OutputHandler {
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List<OutputType> types)
             throws Exception {
-        types.add(new OutputType("Entries XML", OUTPUT_XML));
+        //        types.add(new OutputType("Entries XML", OUTPUT_XML));
     }
 
 

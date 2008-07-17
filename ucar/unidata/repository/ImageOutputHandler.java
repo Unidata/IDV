@@ -119,24 +119,6 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            types.add(new OutputType("Slideshow", OUTPUT_SLIDESHOW));
-            types.add(new OutputType("Gallery", OUTPUT_GALLERY));
-            types.add(new OutputType("Image Player", OUTPUT_PLAYER));
-        }
-    }
 
 
     /**
@@ -211,10 +193,13 @@ public class ImageOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        Result result = outputEntries(request, entries);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, request.getOutput(),
-                                            WHAT_ENTRIES));
+        Result result = makeResult(request, entries);
+        result.putProperty(
+                           PROP_NAVSUBLINKS,
+                           getHeader(
+                                     request, request.getOutput(),
+                                     getRepository().getOutputTypesForGroup(
+                                                                            request, group, subGroups, entries)));
         return result;
     }
 
@@ -249,7 +234,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntries(Request request, List<Entry> entries)
+    private  Result makeResult(Request request, List<Entry> entries)
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();
@@ -257,12 +242,8 @@ public class ImageOutputHandler extends OutputHandler {
         boolean      showApplet = repository.isAppletEnabled(request);
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
-            Result result = new Result("Query Results", sb,
-                                       getMimeType(output));
-            result.putProperty(PROP_NAVSUBLINKS,
-                               getEntriesHeader(request, output,
-                                   WHAT_ENTRIES));
-            return result;
+            return  new Result("Query Results", sb,
+                               getMimeType(output));
         }
 
         if (output.equals(OUTPUT_GALLERY)) {
@@ -363,12 +344,7 @@ public class ImageOutputHandler extends OutputHandler {
                                           repository.getUrlBase());
             sb = new StringBuffer(template);
         }
-        Result result = new Result("Query Results", sb, getMimeType(output));
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, output, WHAT_ENTRIES));
-        return result;
-
-
+        return  new Result("Query Results", sb, getMimeType(output));
     }
 
 

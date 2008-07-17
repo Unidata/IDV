@@ -181,18 +181,6 @@ public class OutputHandler extends RepositoryManager {
         return false;
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {}
 
 
     /**
@@ -208,7 +196,6 @@ public class OutputHandler extends RepositoryManager {
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List<OutputType> types)
             throws Exception {}
-
 
     /**
      * _more_
@@ -244,7 +231,10 @@ public class OutputHandler extends RepositoryManager {
                                           List<Group> subGroups,
                                           List<Entry> entries, List<OutputType> types)
             throws Exception {
-        getOutputTypesFor(request, WHAT_ENTRIES, types);
+        List<Entry> allEntries = new ArrayList<Entry>();
+        allEntries.addAll(subGroups);
+        allEntries.addAll(entries);
+        getOutputTypesForEntries(request, allEntries, types);
     }
 
 
@@ -554,23 +544,6 @@ public class OutputHandler extends RepositoryManager {
         return getAjaxLink(request, entry, entry.getLabel(), false);
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param output _more_
-     * @param what _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List getEntriesHeader(Request request, String output,
-                                    String what)
-            throws Exception {
-        return getHeader(request, output,
-                         getRepository().getOutputTypesFor(request, what));
-    }
 
 
 

@@ -339,23 +339,6 @@ public class CatalogOutputHandler extends OutputHandler {
         return output.equals(OUTPUT_CATALOG);
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesFor(Request request, String what, List<OutputType> types)
-            throws Exception {
-        if (what.equals(WHAT_ENTRIES)) {
-            getOutputTypesForEntries(request, new ArrayList(), types);
-            return;
-        }
-    }
 
 
     /**

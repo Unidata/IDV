@@ -2284,29 +2284,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<OutputType> getOutputTypesFor(Request request, String what)
-            throws Exception {
-        List<OutputType> types = new ArrayList<OutputType>();
-        for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getOutputTypesFor(request, what, types);
-        }
-        return types;
-    }
-
-
     /**
      * _more_
      *
@@ -2900,9 +2877,9 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
         if (output.length() == 0) {
-            outputForm.append(HtmlUtil.formEntry(msgLabel("Type"),
-                    HtmlUtil.select(ARG_OUTPUT,
-                                    getOutputTypesFor(request, what))));
+            //            outputForm.append(HtmlUtil.formEntry(msgLabel("Type"),
+            //                    HtmlUtil.select(ARG_OUTPUT,
+            //                                    xgetOutputTypesFor(request, what))));
         } else {
             outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output));
         }
@@ -4904,6 +4881,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String output = ((request == null)
                          ? OutputHandler.OUTPUT_HTML
                          : request.getOutput());
+        output =  OutputHandler.OUTPUT_HTML;
         int    length = 0;
         if (extraArgs.length() > 0) {
             extraArgs = "&" + extraArgs;
@@ -6070,13 +6048,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected List[] getEntries(Request request) throws Exception {
         TypeHandler  typeHandler = getTypeHandler(request);
+        //        SqlUtil.debug = true;
         List<Clause> where       = typeHandler.assembleWhereClause(request);
         int          skipCnt     = request.get(ARG_SKIP, 0);
-        Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,
-                                  where,
+
+        Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,                                  where,
                                   getQueryOrderAndLimit(request, false));
 
+
         SqlUtil.debug = false;
+
         List<Entry>      entries = new ArrayList<Entry>();
         List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
