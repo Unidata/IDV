@@ -229,7 +229,7 @@ public class Clause {
      * @return _more_
      */
     public static Clause ge(String column, Object value) {
-        return new Clause(column, EXPR_GE, value);
+        return   new Clause(column, EXPR_GE, value);
     }
 
     /**
@@ -241,7 +241,7 @@ public class Clause {
      * @return _more_
      */
     public static Clause le(String column, Object value) {
-        return new Clause(column, EXPR_LE, value);
+        return  new Clause(column, EXPR_LE, value);
     }
 
     /**
@@ -266,7 +266,7 @@ public class Clause {
      * @return _more_
      */
     public static Clause ge(String column, double value) {
-        return le(column, new Double(value));
+        return ge(column, new Double(value));
     }
 
 
@@ -451,6 +451,7 @@ public class Clause {
      * @return _more_
      */
     public boolean isColumn(String col) {
+        if(column==null) return false;
         return column.equals(col);
     }
 
@@ -502,6 +503,8 @@ public class Clause {
         } else if (expr.equals(EXPR_ISNULL)) {
             sb.append(SqlUtil.group("NOT " + column + " is like ?"));
         } else {
+            if(SqlUtil.debug)
+                System.err.println (toString());
             String theExpr = column + " " + expr + " ?";
             sb.append(SqlUtil.group(theExpr));
         }
@@ -534,7 +537,8 @@ public class Clause {
         if (expr.equals(EXPR_ISNULL) || expr.equals(EXPR_JOIN)) {
             return col;
         }
-        //        System.err.println("   value:"  + value + " " + col);
+        if(SqlUtil.debug)
+            System.err.println("   value:"  + value + " " + col);
         SqlUtil.setValue(stmt, value, col);
         return col + 1;
     }
