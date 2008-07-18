@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -520,10 +521,14 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ftp.enterLocalPassiveMode();
                 if (ftp.retrieveFile(url.getPath(), bos)) {
+                    ftp.disconnect();
                     return bos.toByteArray();
                 }
             } catch (org.apache.commons.net.ftp
                     .FTPConnectionClosedException fcce) {
+                try {
+                    ftp.disconnect();
+                } catch (Exception exc) {}
                 lastException = fcce;
                 //Wait a bit
                 Misc.sleep(250 * (i + 1));
