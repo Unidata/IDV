@@ -222,7 +222,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             vectorBtn = new JRadioButton("Vector:",!isStreamlines);
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    System.err.println("Event");
                     JRadioButton source = (JRadioButton) e.getSource();
                     if(source==streamlinesBtn)
                         setStreamlines(source.isSelected());
@@ -381,7 +380,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void densitySliderChanged(int value) {
         try {
-            System.err.println("sds " + value);
             setStreamlineDensity((float) (value / 100.),true);
         } catch (Exception exc) {
             logException("Setting streamline density ", exc);
@@ -631,7 +629,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
 
         if(!fromSlider && densitySlider!=null) {
-            System.err.println("v:" + (f*100));
             densitySlider.setValue((int)(f*100));
         }
     }
