@@ -2463,9 +2463,15 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     public List getHistory() {
         if (historyList == null) {
             try {
-                historyList = (List) getStore().getEncodedFile(PREF_HISTORY);
-                if (historyList == null) {
-                    historyList = new ArrayList();
+                List tmp = (List) getStore().getEncodedFile(PREF_HISTORY);
+                historyList = new ArrayList();
+                if (tmp == null) {
+                    tmp = new ArrayList();
+                }
+                //We had a case where the history list held a null value.
+                //Not sure how that happened but put this check in
+                for(Object o: tmp) {
+                    if(o!=null) historyList.add(o);
                 }
             } catch (Exception exc) {
                 logException("Creating history list", exc);
