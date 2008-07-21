@@ -123,7 +123,7 @@
      xxxpatterns="If we use any patterns here is will screw up adding multiple grid files as separate data sources"
      fileselection="true"
      doesmultiples="true"
-     label="Aggregated GRIB files">
+     label="Aggregate Grids by Time">
     <property
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
