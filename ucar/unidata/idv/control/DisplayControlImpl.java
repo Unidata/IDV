@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -541,6 +540,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *  Used to hold the color of the display list displayable
      */
     private Color displayListColor;
+
+    /**
+     * A boolean to see if the display list got it's color from the display.
+     */
+    private boolean displayListUsesColor = false;
 
     /**
      * The color widget
@@ -1847,6 +1851,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 color = getDisplayConventions().getColor();
             }
             fd.displayable.setColor(color);
+        }
+        if (displayListUsesColor) {
+            setDisplayListColor(color, false);
         }
         activateDisplays();
     }
@@ -3466,6 +3473,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         ((TextDisplayable) d).setTextSize(size / 12.f);
         if (view.getDisplayListColor() != null) {
             d.setColor(view.getDisplayListColor());
+            displayListUsesColor = false;
         }
     }
 
@@ -3795,7 +3803,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (view.getDisplayListColor() != null) {
                 displayListColor = view.getDisplayListColor();
             } else if (color != null) {
-                displayListColor = color;
+                displayListColor     = color;
+                displayListUsesColor = true;
             } else {
                 displayListColor = getDisplayConventions().getColor();
             }
@@ -7215,7 +7224,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         final List clonedList =
             DataChoice.cloneDataChoices((List) choices.get(0));
-        dataSelection = ((DataChoice)clonedList.get(0)).getDataSelection();
+        dataSelection = ((DataChoice) clonedList.get(0)).getDataSelection();
         Misc.run(new Runnable() {
             public void run() {
                 try {
@@ -9195,7 +9204,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
-
     /**
      * Set the display list color property.
      *
@@ -9205,11 +9213,27 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void setDisplayListColor(Color newColor)
             throws RemoteException, VisADException {
+        setDisplayListColor(newColor, true);
+    }
+
+    /**
+     * Set the display list color property.
+     *
+     * @param newColor The new color
+     * @param fromUser true if this is from the user
+     * @throws RemoteException  some RMI exception occured
+     * @throws VisADException  error setting the color in VisAD
+     */
+    protected void setDisplayListColor(Color newColor, boolean fromUser)
+            throws RemoteException, VisADException {
         for (Enumeration e =
                 displayListTable.elements(); e.hasMoreElements(); ) {
             ((DisplayableData) e.nextElement()).setColor(newColor);
         }
         displayListColor = newColor;
+        if (fromUser) {
+            displayListUsesColor = false;
+        }
     }
 
 
