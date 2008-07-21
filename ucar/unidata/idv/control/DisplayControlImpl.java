@@ -807,6 +807,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** slider for setting skip values */
     protected JSlider skipSlider;
 
+    private         JSlider zPositionSlider;
+
     /** the skip value */
     private int skipValue = 0;
 
@@ -6720,12 +6722,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void zSliderChanged(int value) {
         try {
-            setZPosition((double) (value / 100.));
+            setZPosition((double) (value / 100.), true);
         } catch (Exception exc) {
             logException("Setting z position", exc);
         }
 
     }
+
+
 
     /**
      * Create the z position slider panel
@@ -6737,7 +6741,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         int min       = -100;
         int max       = 100;
         sliderPos = Math.min(Math.max(sliderPos, min), max);
-        JSlider zPositionSlider = GuiUtils.makeSlider(min, max, sliderPos,
+        zPositionSlider = GuiUtils.makeSlider(min, max, sliderPos,
                                       this, "zSliderChanged");
         JPanel labelPanel =
             GuiUtils.leftCenterRight(GuiUtils.lLabel("Bottom"),
@@ -9912,9 +9916,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void setZPosition(double value)
             throws RemoteException, VisADException {
+        setZPosition(value, false);
+    }
+
+    public void setZPosition(double value, boolean fromSlider)
+            throws RemoteException, VisADException {
         zPosition = value;
         if (getHaveInitialized()) {
             applyZPosition();
+        }
+        if(zPositionSlider!=null && !fromSlider) {
+            zPositionSlider.setValue((int)(value*100));
         }
     }
 

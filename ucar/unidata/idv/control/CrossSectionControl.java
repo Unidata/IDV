@@ -215,6 +215,10 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     
     LatLonWidget endLLW;
 
+    private JLabel rangeLabel;
+
+    private   JCheckBox autoscaleCbx;
+
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -397,6 +401,18 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         }
         loadDataFromLine();
         return true;
+    }
+
+
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
+        dsd.addPropertyValue(getVerticalAxisRange(), "verticalAxisRange", "Vertical Scale",
+                             SETTINGS_GROUP_DISPLAY);
+        if (getAllowAutoScale()) {
+            dsd.addPropertyValue(new Boolean(getAutoScaleYAxis()), "autoScaleYAxis", "Auto-Scale",
+                                 SETTINGS_GROUP_DISPLAY);
+        }
+
     }
 
 
@@ -724,7 +740,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
                 r = getRange();
             } catch (Exception e) {}
         }
-        final JLabel rangeLabel = new JLabel("  Range: " + ((r != null)
+        rangeLabel = new JLabel("  Range: " + ((r != null)
                 ? r.toString()
                 : "     "));
         JButton      rdButton   = new JButton("Change");
@@ -741,8 +757,8 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         });
         Component c = GuiUtils.hbox(rdButton, rangeLabel);
         if (getAllowAutoScale()) {
-            JCheckBox autoscaleCbx = GuiUtils.makeCheckbox("Auto-scale?",
-                                         this, "autoScaleYAxis");
+            autoscaleCbx = GuiUtils.makeCheckbox("Auto-scale?",
+                                                 this, "autoScaleYAxis");
             c = GuiUtils.leftRight(c, autoscaleCbx);
         }
         return c;
@@ -1348,6 +1364,10 @@ public abstract class CrossSectionControl extends GridDisplayControl {
                 logException("Setting Y Axis Range: ", exc);
             }
         }
+        if(rangeLabel!=null) {
+            rangeLabel.setText("  Range: "
+                               + getVerticalAxisRange().toString());
+        }
     }
 
     /**
@@ -1672,6 +1692,9 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             loadDataFromLine();
         } catch (Exception exc) {
             logException("Loading data from line", exc);
+        }
+        if(autoscaleCbx!=null) {
+            autoscaleCbx.setSelected(value);
         }
     }
 

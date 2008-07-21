@@ -81,6 +81,8 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     /** Range for flow scale */
     private Range flowRange;
 
+    ValueSliderWidget barbSizeWidget;
+
     /**
      * Create a new FlowCrossSectionControl; set attribute flags
      */
@@ -115,6 +117,18 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         }
         super.loadData(fieldImpl);
     }
+
+
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
+        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale", "Scale",
+                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(flowRange, "flowRange", "Flow Field Range",
+                             SETTINGS_GROUP_DISPLAY);
+    }
+
+
+
 
     /**
      * Called to initialize this control from the given dataChoice;
@@ -215,7 +229,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
-        ValueSliderWidget barbSizeWidget = new ValueSliderWidget(this, 1, 21,
+        barbSizeWidget = new ValueSliderWidget(this, 1, 21,
                                                "flowScale", "Scale: ");
         JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
                                      barbSizeWidget.getContents(false));
@@ -289,6 +303,9 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
                     flowScaleValue * scaleFactor);
             }
             doShare(SHARE_FLOWRANGE, flowRange);
+        }
+        if(barbSizeWidget!=null) {
+            barbSizeWidget.setValue(f);
         }
     }
 
