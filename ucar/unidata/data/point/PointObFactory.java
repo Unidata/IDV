@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -46,21 +45,21 @@ import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.*;
 
 import ucar.unidata.data.DataAlias;
+import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.GeoLocationInfo;
 
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.geoloc.LatLonRect;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.JobManager;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 
 import visad.*;
 
@@ -555,11 +554,14 @@ public class PointObFactory {
                     obs[i]         = pot;
                     finalTupleType =
                         Tuple.buildTupleType(pot.getComponents());
-                    
-                    Data []comps = rest.getComponents();
-                    for(int compIdx=0;compIdx<comps.length;compIdx++) {
-                        String name = ucar.visad.Util.cleanTypeName(comps[compIdx].getType());
-                        DataChoice.addCurrentName(new TwoFacedObject("Point Data"+">" + name,name));
+
+                    Data[] comps = rest.getComponents();
+                    for (int compIdx = 0; compIdx < comps.length; compIdx++) {
+                        String name = ucar.visad.Util.cleanTypeName(
+                                          comps[compIdx].getType());
+                        DataChoice.addCurrentName(
+                            new TwoFacedObject(
+                                "Point Data" + ">" + name, name));
                     }
 
                 } else {
@@ -823,7 +825,8 @@ public class PointObFactory {
                 allReals = false;
             }
 
-            DataChoice.addCurrentName(new TwoFacedObject("Point Data"+">" + var.getShortName() ,var.getShortName())); 
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data" + ">"
+                    + var.getShortName(), var.getShortName()));
 
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
@@ -1327,6 +1330,94 @@ public class PointObFactory {
         FlatField retData = new FlatField(ftLatLon2Param, g2ddsSet);
         retData.setSamples(faaGridValues3, false);
         return retData;
+    }
+
+    /**
+     * Extract the parameter from some point obs
+     * @param obs  Field of point obs
+     * @param paramName name of the parameter to extract
+     * @return new FieldImpl where the data for each Point ob is just the param
+     *
+     * @throws RemoteException Java RMI exception
+     * @throws VisADException  problem extracting parameter
+     */
+    public static FieldImpl extractParameter(FieldImpl obs, String paramName)
+            throws VisADException, RemoteException {
+        return extractParameter(obs, RealType.getRealType(paramName));
+    }
+
+    /**
+     * Extract the parameter from some point obs
+     * @param obs  Field of point obs
+     * @param parameter  parameter to extract
+     * @return new FieldImpl where the data for each Point ob is just the param
+     *
+     * @throws RemoteException Java RMI exception
+     * @throws VisADException  problem extracting parameter
+     */
+    public static FieldImpl extractParameter(FieldImpl obs,
+                                             RealType parameter)
+            throws VisADException, RemoteException {
+
+        boolean   isTimeSequence = GridUtil.isTimeSequence(obs);
+        FieldImpl subset         = null;
+        if (isTimeSequence) {
+            FieldImpl timeSubset = null;
+            Set       timeSet    = obs.getDomainSet();
+            int       numTimes   = timeSet.getLength();
+            for (int i = 0; i < numTimes; i++) {
+                FieldImpl timeStep = (FieldImpl) obs.getSample(i);
+                if ((timeStep == null) || timeStep.isMissing()) {
+                    continue;
+                }
+                FieldImpl newSample = extractParameter(obs, parameter);
+                if (newSample == null) {
+                    continue;
+                }
+                if (timeSubset == null) {
+                    FunctionType newFieldType =
+                        new FunctionType(
+                            ((SetType) timeSet.getType()).getDomain(),
+                            newSample.getType());
+                    timeSubset = new FieldImpl(newFieldType, timeSet);
+                }
+                timeSubset.setSample(i, newSample, false);
+            }
+            subset = timeSubset;
+        } else {
+            Set     indexSet = obs.getDomainSet();
+            PointOb po       = null;
+            try {
+                po = (PointOb) obs.getSample(0);
+            } catch (ClassCastException cce) {
+                throw new VisADException(
+                    "not a field of pointObs: "
+                    + obs.getSample(0).getClass().getName());
+            }
+            Tuple ob         = (Tuple) po.getData();
+            int   paramIndex = ((TupleType) ob.getType()).getIndex(parameter);
+            if (paramIndex == -1) {
+                throw new VisADException("Parameter does not exist in obs");
+            }
+            for (int i = 0; i < indexSet.getLength(); i++) {
+                PointOb sample = (PointOb) obs.getSample(i);
+                Tuple   data   = (Tuple) sample.getData();
+                Real    parm   = (Real) data.getComponent(paramIndex);
+                PointObTuple newPO =
+                    new PointObTuple(sample.getEarthLocation(),
+                                     sample.getDateTime(),
+                                     new RealTuple(new Real[] { parm }));
+                if (subset == null) {
+                    FunctionType subsetType =
+                        new FunctionType(
+                            ((SetType) indexSet.getType()).getDomain(),
+                            newPO.getType());
+                    subset = new FieldImpl(subsetType, indexSet);
+                }
+                subset.setSample(i, newPO, false);
+            }
+        }
+        return subset;
     }
 
     /**
