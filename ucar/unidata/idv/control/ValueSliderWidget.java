@@ -276,11 +276,21 @@ public class ValueSliderWidget {
 
     /**
      * Get the display conventions
+
      * @return the DisplayControl's display conventions.
      */
     private DisplayConventions getDisplayConventions() {
         return displayControl.getDisplayConventions();
     }
+
+    public void setValue(int value) {
+        valueReadout.setText(""+value);
+    }
+
+    public void setValue(float value) {
+        valueReadout.setText(""+value);
+    }
+
 
     /**
      * Enable or disable the widget.

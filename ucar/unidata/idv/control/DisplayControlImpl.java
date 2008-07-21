@@ -5226,8 +5226,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (colorRange != null) {
-            dsd.addPropertyValue(colorRange, "range", "Range",
+            dsd.addPropertyValue(colorRange, "range", "Color Range",
                                  SETTINGS_GROUP_DISPLAY);
+        }
+
+        if (selectRangeEnabled  && selectRange!=null) {
+            //            dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
+            //                                 SETTINGS_GROUP_DISPLAY);
         }
 
         if (contourInfo != null) {
@@ -9927,6 +9932,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         lineWidth = value;
         if (getHaveInitialized()) {
             applyLineWidth();
+        }
+        if(lww!=null) {
+            lww.setValue(value);
         }
     }
 
