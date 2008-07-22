@@ -381,6 +381,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                 key = wayString + "_" + dateString;
                 convertCal.add(Calendar.HOUR_OF_DAY, forecastHour);
             }
+            dttm = convertCal.getTime();
             StormTrack track = (StormTrack) trackMap.get(key);
             if (track == null) {
                 way = (isBest
@@ -419,7 +420,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             double     pressure   = getDouble((String) toks.get(9));
             attributes.add(PARAM_STORMCATEGORY.getReal((double) category));
             attributes.add(PARAM_MINPRESSURE.getReal(pressure));
-            attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(pressure));
+            attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(windspeed));
+
 
             StormTrackPoint stp = new StormTrackPoint(elt,
                                       new DateTime(dttm), forecastHour,
