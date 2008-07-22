@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.util;
 
 
@@ -306,6 +307,17 @@ public class IOUtil {
     }
 
 
+    /**
+     * Write the bytes held by the iven string to the outputstream
+     *
+     * @param to stream to write to
+     * @param s string to write
+     *
+     * @throws Exception on badness
+     */
+    public static void write(OutputStream to, String s) throws Exception {
+        to.write(s.getBytes());
+    }
 
     /**
      * Write to the file from the URL stream
@@ -564,7 +576,7 @@ public class IOUtil {
         if (idx < 0) {
             return f;
         }
-        f =  f.substring(idx + 1);
+        f   = f.substring(idx + 1);
         idx = f.indexOf("?");
         if (idx >= 0) {
             f = f.substring(0, idx);
