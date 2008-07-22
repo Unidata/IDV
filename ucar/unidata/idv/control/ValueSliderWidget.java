@@ -171,6 +171,10 @@ public class ValueSliderWidget {
 
         int initialValue = getInitialValue();
 
+        //        System.err.println("slider:" + sliderMin + " " + sliderMax + " " + initialValue);
+        if(sliderMax<initialValue) sliderMax = initialValue;
+        if(sliderMin>initialValue) sliderMin = initialValue;
+        //        initialValue = Math.min(Math.max(initialValue, sliderMin), sliderMax);
         sliderComps = GuiUtils.makeSliderPopup(sliderMin, sliderMax,
                 initialValue, listener);
         sliderComps[0].setToolTipText("Change " + labelText);
