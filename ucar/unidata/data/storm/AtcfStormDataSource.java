@@ -104,6 +104,12 @@ public class AtcfStormDataSource extends StormDataSource {
      */
     public AtcfStormDataSource() throws Exception {}
 
+
+    public String getFullDescription() {
+        return "ATCF Data Source<br>Path:" + path;
+    }
+
+
     /**
      * _more_
      *
@@ -529,42 +535,39 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         }
 
         URL url = new URL(file);
-        //Try to read up to 5 times
-        Exception lastException = null;
-        for (int i = 0; i < 5; i++) {
-            FTPClient ftp = new FTPClient();
-            try {
-                ftp.connect(url.getHost());
-                ftp.login("anonymous", "password");
-                ftp.setFileType(FTP.IMAGE_FILE_TYPE);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ftp.enterLocalPassiveMode();
-                if (ftp.retrieveFile(url.getPath(), bos)) {
-                    ftp.disconnect();
-                    return bos.toByteArray();
-                }
-            } catch (org.apache.commons.net.ftp
-                    .FTPConnectionClosedException fcce) {
-                try {
-                    ftp.disconnect();
-                } catch (Exception exc) {}
-                lastException = fcce;
-                //Wait a bit
-                Misc.sleep(250 * (i + 1));
-            } catch (Exception exc) {
-                if ( !ignoreErrors) {
-                    throw exc;
-                }
-                return null;
+        FTPClient ftp = new FTPClient();
+        try {
+            ftp.connect(url.getHost());
+            ftp.login("anonymous", "password");
+            ftp.setFileType(FTP.IMAGE_FILE_TYPE);
+            ftp.enterLocalPassiveMode();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            if (ftp.retrieveFile(url.getPath(), bos)) {
+                return bos.toByteArray();
+            } else {
+                throw new IOException ("Unable to retrieve file:" + url);
             }
-        }
-        if (lastException != null) {
+        } catch (org.apache.commons.net.ftp.FTPConnectionClosedException fcce) {
+            System.err.println("ftp error:" + fcce);
+            System.err.println(ftp.getReplyString());
             if ( !ignoreErrors) {
-                throw lastException;
+                throw fcce;
             }
+            return null;
+        } catch (Exception exc) {
+            if ( !ignoreErrors) {
+                throw exc;
+            }
+            return null;
+        } finally {
+            try {
+                ftp.logout();
+            } catch (Exception exc) {}
+            try {
+                ftp.disconnect();
+            } catch (Exception exc) {}
+
         }
-        //            throw new FileNotFoundException("Could not read file: " + file);
-        return null;
     }
 
 
