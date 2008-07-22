@@ -207,19 +207,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
 
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
-                "Scale: ");
-        sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
+                                               "Size");
+        sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
                                       barbSizeWidget.getContents(false));
-        if (!getWindbarbs()) {
-            sizeComponent = GuiUtils.hbox(sizeComponent,
-                                  GuiUtils.hbox(GuiUtils.filler(),
-                                      doMakeFlowRangeComponent()));
-        }
-
-
         if (!getIsThreeComponents()) {
             streamlinesBtn = new JRadioButton("Streamlines:",isStreamlines);
-            vectorBtn = new JRadioButton("Vector:",!isStreamlines);
+            vectorBtn = new JRadioButton((isWindBarbs?"Wind Barbs:":"Vectors:"),!isStreamlines);
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
