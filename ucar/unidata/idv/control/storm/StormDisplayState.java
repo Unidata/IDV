@@ -244,7 +244,7 @@ public class StormDisplayState {
     private static final int FORECAST_TIME_MODE = 0;
 
     /** _more_ */
-    private int forecastTimeMode = FORECAST_TIME_MODE;
+    private int forecastAnimationMode = FORECAST_TIME_MODE;
 
     /** _more_ */
     private JComboBox timeModeBox;
@@ -886,12 +886,13 @@ public class StormDisplayState {
 
         timeModeBox = new JComboBox(new Vector(Misc.newList("On",
                 "Off")));
-        timeModeBox.setSelectedIndex(forecastTimeMode);
+        timeModeBox.setSelectedIndex(forecastAnimationMode);
         timeModeBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                forecastTimeMode = timeModeBox.getSelectedIndex();
+                forecastAnimationMode = timeModeBox.getSelectedIndex();
                 try {
-                    reload(); //updateDisplays();
+                    //                    reload(); 
+                    updateDisplays();
                 } catch (Exception exc) {
                     stormTrackControl.logException("change forecast animation mode", exc);
                 }
@@ -2116,11 +2117,11 @@ public class StormDisplayState {
     }
 
     public int getForecastAnimationMode(){
-        return forecastTimeMode;
+        return forecastAnimationMode;
     }
 
     public void setForecastAnimationMode(int value){
-        forecastTimeMode = value;
+        forecastAnimationMode = value;
     }
 }
 
