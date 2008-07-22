@@ -69,6 +69,9 @@ import java.util.zip.GZIPInputStream;
  */
 public class AtcfStormDataSource extends StormDataSource {
 
+    private static final String PREFIX_ANALYSIS = "a";
+    private static final String PREFIX_BEST = "b";
+
     /** _more_ */
     private static final String WAY_BEST = "BEST";
 
@@ -156,7 +159,7 @@ public class AtcfStormDataSource extends StormDataSource {
                 StormInfo si = new StormInfo(name, new DateTime(new Date()));
                 stormInfos.add(si);
                 localTracks = new StormTrackCollection();
-                readTracks(si, localTracks, path, null);
+                readTracks(si, localTracks, path, null,true);
                 return;
             }
 
@@ -183,7 +186,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             }
 
 
-            byte[] bytes = readFile(getFullPath("archive/storm.table"),
+            //            byte[] bytes = readFile(getFullPath("archive/storm.table"),
+            byte[] bytes = readFile(getFullPath("index/storm_list.txt"),
                                     false);
             String           stormTable = new String(bytes);
             List lines = StringUtil.split(stormTable, "\n", true, true);
@@ -265,9 +269,10 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
      *
      * @throws Exception _more_
      */
-    private void readTracks(StormInfo stormInfo, StormTrackCollection tracks,
+    private boolean readTracks(StormInfo stormInfo, StormTrackCollection tracks,
                             String trackFile,
-                            Hashtable<String, Boolean> waysToUse)
+                            Hashtable<String, Boolean> waysToUse,
+                            boolean throwError)
             throws Exception {
 
 
@@ -275,12 +280,22 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         byte[] bytes = readFile(trackFile, true);
         long   t2    = System.currentTimeMillis();
         //        System.err.println("read time:" + (t2 - t1));
-        if (bytes == null) {
-            throw new BadDataException("Unable to read track file for:"
-                                       + stormInfo);
+        boolean isZip = trackFile.endsWith(".gz");
+        if (bytes == null && isZip) {
+            String withoutGZ = trackFile.substring(0, trackFile.length()-3);
+            bytes = readFile(withoutGZ, true);
+            isZip = false;
         }
 
-        if (trackFile.toLowerCase().endsWith(".gz")) {
+
+        if (bytes == null) {
+            if(throwError)
+                throw new BadDataException("Unable to read track file:" +
+                                           trackFile);
+            return false;
+        }
+
+        if (isZip) {
             GZIPInputStream zin =
                 new GZIPInputStream(new ByteArrayInputStream(bytes));
             bytes = IOUtil.readBytes(zin);
@@ -406,7 +421,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
             track.addPoint(stp);
         }
-
+        return true;
     }
 
     /**
@@ -445,24 +460,28 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         boolean justObs = (waysToUse != null) && (waysToUse.size() == 1)
                           && (waysToUse.get(Way.OBSERVATION.toString())
                               != null);
-        if ( !justObs) {
-            trackFile = getFullPath("archive/"
-                                    + getYear(stormInfo.getStartTime()) + "/"
-                                    + "a"
+        int nowYear =            new GregorianCalendar(DateUtil.TIMEZONE_GMT).get(Calendar.YEAR);
+        int stormYear = getYear(stormInfo.getStartTime());
+        //If its the current year then its in the aid_public dir
+        String aSubDir = (stormYear  == nowYear?"aid_public/":("archive/" + stormYear)); 
+        String bSubDir = (stormYear  == nowYear?"btk/":("archive/" + stormYear)); 
+        if (!justObs) {
+            trackFile = getFullPath(aSubDir+"/"+
+                                    PREFIX_ANALYSIS 
                                     + stormInfo.getBasin().toLowerCase()
                                     + stormInfo.getNumber()
-                                    + getYear(stormInfo.getStartTime())
+                                    + stormYear
                                     + ".dat.gz");
-            readTracks(stormInfo, tracks, trackFile, waysToUse);
+            readTracks(stormInfo, tracks, trackFile, waysToUse,true);
         }
         //Now  read the b"est file
-        trackFile = getFullPath("archive/"
-                                + getYear(stormInfo.getStartTime()) + "/"
-                                + "b" + stormInfo.getBasin().toLowerCase()
+        trackFile = getFullPath(bSubDir+"/" + 
+                                PREFIX_BEST + 
+                                stormInfo.getBasin().toLowerCase()
                                 + stormInfo.getNumber()
-                                + getYear(stormInfo.getStartTime())
+                                + stormYear
                                 + ".dat.gz");
-        readTracks(stormInfo, tracks, trackFile, null);
+        readTracks(stormInfo, tracks, trackFile, null,true);
         long t2 = System.currentTimeMillis();
         //        System.err.println("time: " + (t2 - t1));
 
