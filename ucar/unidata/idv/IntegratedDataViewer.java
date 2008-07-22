@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -103,6 +104,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.media.j3d.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -167,6 +169,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *  A list of the files that the user has opened in the past.
      */
     private List historyList = null;
+
+    /** _more_          */
+    private Object MUTEX_HISTORY = new Object();
 
 
 
@@ -351,12 +356,13 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         if ( !visad.util.Util.canDoJava3D(JAVA3D_VERSION)) {
             if (interactiveMode) {
                 LogUtil.userMessage(
-                                    "<html>This application needs Java 3D " + JAVA3D_VERSION
-                                    + " or higher to run.<br>Please see the User's Guide for more information.</html>");
+                    "<html>This application needs Java 3D " + JAVA3D_VERSION
+                    + " or higher to run.<br>Please see the User's Guide for more information.</html>");
                 bailOut();
             } else {
-                throw new IllegalArgumentException("This application needs Java 3D " + JAVA3D_VERSION
-                                    + " or higher to run.<br>Please see the User's Guide for more information.");
+                throw new IllegalArgumentException(
+                    "This application needs Java 3D " + JAVA3D_VERSION
+                    + " or higher to run.<br>Please see the User's Guide for more information.");
             }
         }
     }
@@ -1163,9 +1169,10 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         if (viewManager != null) {
             return viewManager;
         }
-        if (getArgsManager().getIsOffScreen() || (!getIdv().okToShowWindows() && !newWindow)) {
-            ViewManager vm =  getVMManager().createViewManager(viewDescriptor,
-                                                               properties);
+        if (getArgsManager().getIsOffScreen()
+                || ( !getIdv().okToShowWindows() && !newWindow)) {
+            ViewManager vm = getVMManager().createViewManager(viewDescriptor,
+                                 properties);
             return vm;
         }
         IdvWindow window = getIdvUIManager().createNewWindow();
@@ -1793,9 +1800,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @param history  the history item to move
      */
     public void moveHistoryToFront(History history) {
-        historyList.remove(history);
-        historyList.add(0, history);
-        writeHistoryList();
+        synchronized (MUTEX_HISTORY) {
+            historyList.remove(history);
+            historyList.add(0, history);
+            writeHistoryList();
+        }
     }
 
     /**
@@ -1886,13 +1895,22 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @return The data type name or null
      */
     public String selectDataType(Object definingObject) {
-        return selectDataType(definingObject,
-                "<html>Unable to figure out how to read the data:<br>&nbsp;<p>&nbsp;&nbsp;&nbsp;<i>"
-                + definingObject + "</i>"
-                              + "<br>&nbsp;<p>Please specify a data source type<br>&nbsp;</html>");
+        return selectDataType(
+            definingObject,
+            "<html>Unable to figure out how to read the data:<br>&nbsp;<p>&nbsp;&nbsp;&nbsp;<i>"
+            + definingObject + "</i>"
+            + "<br>&nbsp;<p>Please specify a data source type<br>&nbsp;</html>");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param definingObject _more_
+     * @param message _more_
+     *
+     * @return _more_
+     */
     public String selectDataType(Object definingObject, String message) {
         JComboBox dataSourcesCbx = IdvChooser.getDataSourcesComponent(false,
                                        getDataManager(), false);
@@ -2448,8 +2466,10 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * Empty the history list and write it out.
      */
     public void clearHistoryList() {
-        historyList = new ArrayList();
-        writeHistoryList();
+        synchronized (MUTEX_HISTORY) {
+            historyList = new ArrayList();
+            writeHistoryList();
+        }
     }
 
 
@@ -2461,23 +2481,27 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @return History list
      */
     public List getHistory() {
-        if (historyList == null) {
-            try {
-                List tmp = (List) getStore().getEncodedFile(PREF_HISTORY);
-                historyList = new ArrayList();
-                if (tmp == null) {
-                    tmp = new ArrayList();
+        synchronized (MUTEX_HISTORY) {
+            if (historyList == null) {
+                try {
+                    List tmp = (List) getStore().getEncodedFile(PREF_HISTORY);
+                    historyList = new ArrayList();
+                    if (tmp == null) {
+                        tmp = new ArrayList();
+                    }
+                    //We had a case where the history list held a null value.
+                    //Not sure how that happened but put this check in
+                    for (Object o : tmp) {
+                        if (o != null) {
+                            historyList.add(o);
+                        }
+                    }
+                } catch (Exception exc) {
+                    logException("Creating history list", exc);
                 }
-                //We had a case where the history list held a null value.
-                //Not sure how that happened but put this check in
-                for(Object o: tmp) {
-                    if(o!=null) historyList.add(o);
-                }
-            } catch (Exception exc) {
-                logException("Creating history list", exc);
             }
+            return new ArrayList(historyList);
         }
-        return historyList;
     }
 
 
@@ -2494,7 +2518,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * Persist the history list into its own file.
      */
     public void writeHistoryList() {
-        getStore().putEncodedFile(PREF_HISTORY, historyList);
+        synchronized (MUTEX_HISTORY) {
+            getStore().putEncodedFile(PREF_HISTORY, historyList);
+        }
         QuicklinkPanel.updateHistoryLinks();
     }
 
@@ -2507,27 +2533,29 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
     public void addToHistoryList(History newHistory) {
         getHistory();
-        while (historyList.contains(newHistory)) {
-            historyList.remove(newHistory);
-        }
-        for (int i = 0; i < historyList.size(); i++) {
-            Object obj = historyList.get(i);
-            obj.equals(newHistory);
-        }
-        //Only keep the last 20 files in the list (But keep all that have an alias)
-        List tmpList = new ArrayList(historyList);
-        for (int i = tmpList.size() - 1; i >= 0; i--) {
-            if (historyList.size() < 20) {
-                break;
+        synchronized (MUTEX_HISTORY) {
+            while (historyList.contains(newHistory)) {
+                historyList.remove(newHistory);
             }
-            History history = (History) tmpList.get(i);
-            if ( !history.hasAlias()) {
-                historyList.remove(history);
-                i--;
+            for (int i = 0; i < historyList.size(); i++) {
+                Object obj = historyList.get(i);
+                obj.equals(newHistory);
             }
+            //Only keep the last 20 files in the list (But keep all that have an alias)
+            List tmpList = new ArrayList(historyList);
+            for (int i = tmpList.size() - 1; i >= 0; i--) {
+                if (historyList.size() < 20) {
+                    break;
+                }
+                History history = (History) tmpList.get(i);
+                if ( !history.hasAlias()) {
+                    historyList.remove(history);
+                    i--;
+                }
+            }
+            historyList.add(0, newHistory);
+            writeHistoryList();
         }
-        historyList.add(0, newHistory);
-        writeHistoryList();
     }
 
 
@@ -2619,7 +2647,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             }
 
             filename = FileManager.getReadFile("Open File",
-                                               Misc.newList(getArgsManager().getXidvZidvFileFilter()),
+                    Misc.newList(getArgsManager().getXidvZidvFileFilter()),
                     GuiUtils.top(overwriteDataCbx));
             if (filename == null) {
                 return;
@@ -2881,12 +2909,15 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         IntegratedDataViewer idv = new IntegratedDataViewer(false);
         try {
             idv.getImageGenerator().processScriptFile(scriptFile);
-        }  finally {
+        } finally {
             idv.cleanup();
         }
     }
 
 
+    /**
+     * _more_
+     */
     public void cleanup() {
         getStore().cleanupTmpFiles();
         removeAllDisplays();
