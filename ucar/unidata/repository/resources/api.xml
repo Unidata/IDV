@@ -84,6 +84,7 @@
   <method handler="admin"  request="/admin/settings"    method="adminSettings"   name="Admin" toplevel="true"/>
   <method handler="admin"  request="/admin/settings/do"    method="adminSettingsDo"/>
   <method handler="admin"  request="/admin/tables"       method="adminDbTables"  />
+  <method handler="admin"  request="/admin/dumpdb"       method="adminDbDump"  />
   <method handler="admin"  request="/admin/actions"       method="adminActions"  />
   <method handler="admin"  request="/admin/stats"        method="adminStats"     />
   <method handler="admin"  request="/admin/cleanup"        method="adminCleanup" />

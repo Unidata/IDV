@@ -507,6 +507,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_QUERY = "query";
+    public static final String ARG_SQLFILE = "sqlfile";
 
     /** _more_ */
     public static final String ARG_TODATE = "todate";

@@ -874,7 +874,9 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         if(dumpFile!=null) {
-            IOUtil.writeFile(dumpFile,getDatabaseManager().makeDatabaseCopy().toString());
+            FileOutputStream fos = new FileOutputStream(dumpFile);
+            getDatabaseManager().makeDatabaseCopy(fos);
+            fos.close();
         }
     }
 
@@ -1024,15 +1026,16 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         localProperties = new Properties();
         try {
-            localProperties.load(
-                IOUtil.getInputStream(
-                    IOUtil.joinDir(
-                        getStorageManager().getRepositoryDir(),
-                        "repository.properties"), getClass()));
-        } catch (Exception exc) {}
+            String localPropertyFile = IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+                                                    "repository.properties");
+            localProperties.load(IOUtil.getInputStream(localPropertyFile, getClass()));
+        } catch (Exception exc) {
+            //            System.err.println ("error:" + exc);
+        }
 
         properties.putAll(localProperties);
         properties.putAll(argProperties);
+        //        System.err.println ("arg properties:" + argProperties);
 
         apiDefFiles = getResourcePaths(PROP_API);
         apiDefFiles.addAll(argApiDefFiles);

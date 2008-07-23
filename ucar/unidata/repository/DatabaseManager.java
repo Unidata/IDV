@@ -198,13 +198,19 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-    public StringBuffer makeDatabaseCopy() throws Exception {
-        StringBuffer sb = new StringBuffer();
+    protected void addInfo(StringBuffer sb) {
+        String dbUrl = ""+(String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
+                                                                                   db));
+        sb.append(HtmlUtil.formEntry("JDBC URL:",dbUrl));
+    }
+
+    public void makeDatabaseCopy(OutputStream os) throws Exception {
         DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
 
+        int totalRowCnt = 0;
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
             String tableType = tables.getString("TABLE_TYPE");
@@ -214,6 +220,7 @@ public class DatabaseManager extends RepositoryManager {
             }
             
             ResultSet        cols =  dbmd.getColumns(null,null,tableName,null);
+
             int colCnt = 0;
 
             String colNames=null;
@@ -230,28 +237,31 @@ public class DatabaseManager extends RepositoryManager {
                 colCnt++;
             }
             colNames += ") ";
-            System.err.println(tableName +" cnt:" + colCnt);
+            System.err.println("table:" + tableName);
 
             Statement stmt = execute("select * from " + tableName, 10000000, 0);
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
             int rowCnt = 0;
+            List valueList = new ArrayList();
+            boolean didDelete = false;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    if(rowCnt==0) {
-                        sb.append("delete from  " + tableName + ";\n");
+                    if(!didDelete) {
+                        didDelete = true;
+                        IOUtil.write(os,"delete from  " + tableName.toLowerCase() + ";\n");
                     }
+                    totalRowCnt++;
                     rowCnt++;
-                    sb.append("insert into " + tableName + colNames +" values (");
+                    StringBuffer  value = new StringBuffer("(");
                     for(int i=1;i<=colCnt;i++) {
                         int type = ((Integer)types.get(i-1)).intValue();
-                        
                         if(i>1)
-                            sb.append(",");
+                            value.append(",");
                         if(type==java.sql.Types.TIMESTAMP) {
                             Timestamp ts =  results.getTimestamp(i);
                             //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
-                            sb.append("'" +ts.toString()+"'");
+                            value.append("'" +ts.toString()+"'");
                         } else   if(type==java.sql.Types.VARCHAR) {
                             String s = results.getString(i);
                             if(s!=null) {
@@ -259,20 +269,38 @@ public class DatabaseManager extends RepositoryManager {
                                 //s = s.replace("'", "''");
                                 //If the target is mysql:
                                 s =  s.replace("'", "\\'");
-                                sb.append("'"+s+"'");
+                                s =  s.replace("\n", "\\n");
+                                value.append("'"+s+"'");
                             }    else {
-                                sb.append("null");
+                                value.append("null");
                             }
                         } else {
                             String s = results.getString(i);
-                            sb.append(s);
+                            value.append(s);
                         }
                     }
-                    sb.append(");\n");
+                    value.append(")");
+                    valueList.add(value.toString());
+                    if(valueList.size()>50) {
+                        IOUtil.write(os,"insert into " + tableName.toLowerCase() + colNames +" values ");
+                        IOUtil.write(os,StringUtil.join(",",valueList));
+                        IOUtil.write(os,";\n");
+                        valueList = new ArrayList();
+                    }
                 }
             }
+            if(valueList.size()>0) {
+                System.err.println ("\tdoing last bit");
+                if(!didDelete) {
+                    didDelete = true;
+                    IOUtil.write(os,"delete from  " + tableName.toLowerCase() + ";\n");
+                }
+                IOUtil.write(os,"insert into " + tableName.toLowerCase() + colNames +" values ");
+                IOUtil.write(os,StringUtil.join(",",valueList));
+                IOUtil.write(os,";\n");
+            }
+            System.err.println("\twrote:" + rowCnt + " rows");
         }
-        return sb;
     }
 
 

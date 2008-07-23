@@ -41,7 +41,8 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
-import java.io.File;
+import java.io.*;
+
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -104,6 +105,11 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_TABLES = new RequestUrl(this,
                                              "/admin/tables", "Database");
 
+
+    /** _more_ */
+    public RequestUrl URL_ADMIN_DUMPDB = new RequestUrl(this,
+                                             "/admin/dumpdb", "Dump Database");
+
     /** _more_ */
     public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats",
                                             "Statistics");
@@ -163,8 +169,8 @@ public class Admin extends RepositoryManager {
                                           new String[] { "TABLE" });
 
         while (tables.next()) {
-            String tableName = tables.getString("TABLE_NAME");
-            //            System.err.println("table name:" + tableName);
+            String tableName = tables.getString("TABLE_NAME"); 
+           //            System.err.println("table name:" + tableName);
             String tableType = tables.getString("TABLE_TYPE");
             //            System.err.println("table type" + tableType);
             if (Misc.equals(tableType, "INDEX")) {
@@ -395,6 +401,18 @@ public class Admin extends RepositoryManager {
     }
 
 
+    public Result adminDbDump(Request request) throws Exception {
+        File tmp = getStorageManager().getTmpFile(request,"dbdump");
+        FileOutputStream fos = new FileOutputStream(tmp);
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        getDatabaseManager().makeDatabaseCopy(bos);
+        bos.close();
+        fos.close();
+        FileInputStream is = new FileInputStream(tmp);
+        return new Result("", new BufferedInputStream(is), "text/sql");
+    }
+
+
     /**
      * _more_
      *
@@ -565,7 +583,19 @@ public class Admin extends RepositoryManager {
      */
     public Result adminStats(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(msgHeader("Repository Statistics"));
+
+        sb.append(msgHeader("Repository State"));
+        sb.append(HtmlUtil.formTable());
+
+
+        getStorageManager().addInfo(sb);
+        getDatabaseManager().addInfo(sb);
+
+
+        sb.append(HtmlUtil.formTableClose());
+        sb.append("<p>");
+
+        sb.append(msgHeader("Repository Database Statistics"));
         sb.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
                            msg("Metadata Items") };
@@ -619,20 +649,38 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSql(Request request) throws Exception {
-        String query = (String) request.getUnsafeString(ARG_QUERY,
-                           (String) null);
+        boolean bulkLoad = false;
+        String query=null;
+        String sqlFile = request.getUploadedFile(ARG_SQLFILE);
+        if(sqlFile!=null) {
+            query = IOUtil.readContents(sqlFile,getClass());
+            bulkLoad = true;
+        } else {
+            query= (String) request.getUnsafeString(ARG_QUERY,
+                                                    (String) null);
+            if(query!=null && query.trim().startsWith("file:")) {
+                query = IOUtil.readContents(query.trim().substring(5),getClass());
+                bulkLoad = true;
+            }
+        }
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("SQL"));
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.href(request.url(URL_ADMIN_TABLES),
                                 msg("View Schema")));
+        sb.append(HtmlUtil.bold("&nbsp;|&nbsp;"));
+        sb.append(HtmlUtil.href(request.url(URL_ADMIN_DUMPDB),
+                                msg("Dump Database")));
         sb.append(HtmlUtil.p());
-        sb.append(request.form(URL_ADMIN_SQL));
+        sb.append(request.uploadForm(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit(msg("Execute")));
         sb.append(HtmlUtil.br());
-        sb.append(HtmlUtil.textArea(ARG_QUERY, (query == null)
+        sb.append(HtmlUtil.textArea(ARG_QUERY, (bulkLoad?"":(query == null)
                 ? BLANK
-                : query, 10, 100));
+                                                : query), 10, 100));
+        sb.append(HtmlUtil.p());
+        sb.append("SQL File: ");
+        sb.append(HtmlUtil.fileInput(ARG_SQLFILE,""));
         sb.append(HtmlUtil.formClose());
         sb.append("<table>");
         if (query == null) {
@@ -641,6 +689,22 @@ public class Admin extends RepositoryManager {
 
         long      t1        = System.currentTimeMillis();
 
+        if(bulkLoad) {
+            System.err.println ("doing  bulk load");
+            Connection connection = getConnection();
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
+            SqlUtil.loadSql(query, statement, false,true);
+            System.err.println ("done loading");
+            connection.commit();
+            System.err.println ("done commiting");
+            connection.setAutoCommit(true);
+            return makeResult(request, msg("SQL"),
+                              new StringBuffer("Executed SQL"+"<P>" 
+                                               + HtmlUtil.space(1)
+                                               + sb.toString()));
+
+        } else {
         Statement statement = null;
         try {
             statement = getDatabaseManager().execute(query,-1,0);
@@ -697,6 +761,7 @@ public class Admin extends RepositoryManager {
                                            + HtmlUtil.space(1)
                                            + msgLabel("in") + (t2 - t1)
                                            + "ms <p>" + sb.toString()));
+        }
     }
 
     /**

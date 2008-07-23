@@ -150,6 +150,11 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    protected void addInfo(StringBuffer sb) {
+        sb.append(HtmlUtil.formEntry("Home Directory:",getRepositoryDir()));
+        sb.append(HtmlUtil.formEntry("Storage Directory:",getStorageDir()));
+    }
+
     /**
      * _more_
      *
