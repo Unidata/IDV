@@ -203,7 +203,7 @@ def sdiv(S,V):
       SDIV ( S, V ) = S * DIV ( V ) + DOT ( V, GRAD ( S ) )
   </div>
   """
-  return add(S*(div(V)) , dot(V,grad(S)))
+  return add(mul(S,(div(V))) , dot(V,grad(S)))
 
 def shr(V):
   """ Shear Deformation 
@@ -268,7 +268,7 @@ def wshr(V, Z, top, bottom):
   """
   dv = mag(vldf(V,top,bottom))
   dz = ldf(Z,top,bottom)
-  return dv/dz
+  return quo(dv,dz)
 
 # Vector output
 def age(obs,geo):
@@ -277,7 +277,7 @@ def age(obs,geo):
       AGE ( S ) = [ u (OBS) - u (GEO(S)), v (OBS) - v (GEO(S)) ]
   </div>
   """
-  return obs-geo
+  return sub(obs,geo)
 
 def dvdx(V):
   """ Partial x derivative of a vector
