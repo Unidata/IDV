@@ -17,7 +17,7 @@
         <property name="releasedir" value="${libsdir}/ramadda${version}" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
         <property name="xxxclasspath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/external.jar"/>
-        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/ramaddalib.jar:/home/jeffmc/tds.jar"/>
+        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/ramaddalib.jar:${libsdir}/tdsrepository.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -102,7 +102,7 @@
       <war webxml="${ramaddadir}/release/web.xml" destfile="${libsdir}/repository.war">
           <lib file="${libsdir}/ramadda.jar"/>
           <lib file="${libsdir}/ramaddalib.jar"/>
-          <lib file="/home/jeffmc/tds.jar"/>
+          <lib file="${libsdir}/tdsrepository.jar"/>
       </war>
 
 

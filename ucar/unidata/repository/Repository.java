@@ -3504,6 +3504,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Entry getEntry(Request request) throws Exception {
+        String entryId = request.getIdFromUrl();
         Entry entry = getEntry(request, request.getString(ARG_ID, BLANK));
         if (entry == null) {
             Entry tmp = getEntry(request, request.getString(ARG_ID, BLANK), 

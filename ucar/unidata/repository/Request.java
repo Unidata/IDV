@@ -479,6 +479,28 @@ public class Request implements Constants {
         return sb.toString();
     }
 
+    public String getIdFromUrl() {
+        //        if (this.exists(ARG_ID)) {
+        //            return this.getString(ARG_ID, "");
+        //        }
+        String path = getRequestPath();
+        System.err.println("path:" + path);
+        //Look for .../id:<id>
+        int idx = path.indexOf("id:");
+        if(idx>=0) {
+            String id = path.substring(idx+3);
+            System.err.println("id:" + id);
+            idx = id.indexOf("/");
+            if(idx>=0) {
+                id = id.substring(0,idx);
+                System.err.println("id2:" + id);
+            }
+            return id;
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *

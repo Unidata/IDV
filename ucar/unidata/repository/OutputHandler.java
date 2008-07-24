@@ -571,6 +571,7 @@ public class OutputHandler extends RepositoryManager {
             } else {
                 String url = request.getRequestPath() + outputType.getSuffix() +"?"
                     + request.getUrlArgs(ARG_MESSAGE);
+                //                System.err.println (url);
                 items.add(
                     HtmlUtil.href(url, 
                                   msg(
