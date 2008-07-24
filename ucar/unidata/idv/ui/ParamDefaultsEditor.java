@@ -1424,17 +1424,17 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
 
             if ((ci_interval != null) || (ci_base != null)) {
                 if (ci_interval == null) {
-                    ci_interval = "NaN";
+                    ci_interval = Misc.MISSING;
                 }
 
                 if (ci_base == null) {
-                    ci_base = "NaN";
+                    ci_base = Misc.MISSING;
                 }
                 if (ci_min == null) {
-                    ci_min = "NaN";
+                    ci_min = Misc.MISSING;
                 }
                 if (ci_max == null) {
-                    ci_max = "NaN";
+                    ci_max = Misc.MISSING;
                 }
                 if (ci_width == null) {
                     ci_width = "1";
