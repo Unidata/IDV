@@ -907,7 +907,8 @@ public class ThreddsHandler extends XmlHandler {
             //A hack to allow for absolute paths in urls
             String url;
             Element serviceNode = null;
-            if(urlPath.indexOf(":")>=0 || new File(urlPath).exists()) { 
+            
+            if(urlPath.indexOf("://")>=0 || new File(urlPath).exists()) { 
                 url = urlPath;
             } else {
                 serviceNode = CatalogUtil.findServiceNodeForDataset(datasetNode,
@@ -973,7 +974,7 @@ public class ThreddsHandler extends XmlHandler {
                     }
                 }
             }
-            //      System.err.println ("Absolute url:" + url);
+            System.err.println ("Absolute url:" + url);
             urlPaths.add(new XmlChooser.PropertiedAction(url, properties));
         } else {
             //For now don't deal with container dataset nodes
