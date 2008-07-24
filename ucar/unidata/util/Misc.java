@@ -78,6 +78,8 @@ public class Misc {
     /** missing string */
     public static final String MISSING = "missing";
 
+    /** NaN string */
+    public static final String NaN = "NaN";
 
     /** Default constructor; does nothing */
     public Misc() {}
@@ -1786,7 +1788,7 @@ public class Misc {
      */
     public static double parseNumber(String value)
             throws NumberFormatException {
-        if (value.equals(MISSING)) {
+        if (value.equals(MISSING) || value.equals(NaN)) {
             return Double.NaN;
         }
         try {
