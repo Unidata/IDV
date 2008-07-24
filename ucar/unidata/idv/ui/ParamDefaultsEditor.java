@@ -1440,11 +1440,11 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
                     ci_width = "1";
                 }
                 contourInfo = new ContourInfo(ci_interval,
-                        Double.parseDouble(ci_base),
-                        Double.parseDouble(ci_min),
-                        Double.parseDouble(ci_max), ci_label, ci_dash,
+                                              Misc.parseNumber(ci_base),
+                                              Misc.parseNumber(ci_min),
+                                              Misc.parseNumber(ci_max), ci_label, ci_dash,
                         ContourInfo.DEFAULT_FILL,
-                        Double.parseDouble(ci_width));
+                                              Misc.parseNumber(ci_width));
             }
 
 
@@ -1459,8 +1459,8 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
 
 
             if ((range_min != null) && (range_max != null)) {
-                range = new Range(Double.parseDouble(range_min),
-                                  Double.parseDouble(range_max));
+                range = new Range(Misc.parseNumber(range_min),
+                                  Misc.parseNumber(range_max));
             }
 
             ParamInfo paramInfo = new ParamInfo(paramName, colorTableName,
