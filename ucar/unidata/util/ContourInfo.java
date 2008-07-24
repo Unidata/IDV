@@ -136,7 +136,7 @@ public class ContourInfo {
             this.interval     = Float.NaN;
         } else {
             this.levelsString = null;
-            this.interval     = Float.parseFloat(levelsString);
+            this.interval     = (float)Misc.parseNumber(levelsString);
         }
         this.min           = min;
         this.max           = max;
@@ -447,7 +447,7 @@ public class ContourInfo {
             interval = Float.NaN;
         } else {
             if (v != null) {
-                interval = Float.parseFloat(v);
+                interval = (float)Misc.parseNumber(v);
             }
         }
         levelsString = v;
@@ -773,7 +773,7 @@ public class ContourInfo {
         if (valString.trim().equals("")) {
             return def;
         }
-        return Float.parseFloat(valString);
+        return (float)Misc.parseNumber(valString);
     }
 
     /**
