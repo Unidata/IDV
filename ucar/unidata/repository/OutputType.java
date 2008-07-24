@@ -94,6 +94,10 @@ public class OutputType extends TwoFacedObject {
 
 
 
+    public String assembleUrl(Request request) {
+        return request.getRequestPath() + getSuffix() +"?"
+            + request.getUrlArgs();
+    }
 
     
 /**

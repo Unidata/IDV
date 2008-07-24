@@ -2391,6 +2391,17 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    protected OutputHandler getOutputHandler(String type)
+            throws Exception {
+        for (OutputHandler outputHandler : outputHandlers) {
+            if (outputHandler.canHandle(type)) {
+                return outputHandler;
+            }
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *
@@ -3504,8 +3515,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Entry getEntry(Request request) throws Exception {
-        String entryId = request.getIdFromUrl();
-        Entry entry = getEntry(request, request.getString(ARG_ID, BLANK));
+        String entryId = request.getString(ARG_ID, BLANK);
+        Entry entry = getEntry(request, entryId);
         if (entry == null) {
             Entry tmp = getEntry(request, request.getString(ARG_ID, BLANK), 
                                  false);

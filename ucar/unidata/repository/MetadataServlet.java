@@ -170,7 +170,8 @@ public class MetadataServlet extends HttpServlet {
 
             Request repositoryRequest = new Request(repository,
                                                     request.getRequestURI(),
-                                                    handler.formArgs, request, response);
+                                                    handler.formArgs, request, response,
+                                                    this);
             //            System.err.println ("request:" +   request.getRequestURI());
             repositoryRequest.setIp(request.getRemoteAddr());
             repositoryRequest.setOutputStream(response.getOutputStream());

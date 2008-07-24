@@ -87,6 +87,8 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
+    public static final String SERVICE_DODS = "DODS";
+
     /** _more_ */
     public static final String CATALOG_ATTRS =
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
@@ -174,6 +176,10 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     private List<String> tdsNotPrefixes;
 
+
+    TdsOutputHandler tdsOutputHandler;
+
+    
 
     /**
      * _more_
@@ -492,6 +498,25 @@ public class CatalogOutputHandler extends OutputHandler {
         File   f    = entry.getResource().getFile();
         String path = f.toString();
         path = path.replace("\\", "/");
+
+        
+        if(tdsOutputHandler==null) {
+            tdsOutputHandler    = (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_TDS);   
+        }
+        
+        if(tdsOutputHandler.canLoad(entry)) {
+            String urlPath = tdsOutputHandler.getTdsUrl(entry);
+            addService(catalogInfo, SERVICE_DODS,
+                       getRepository().URL_ENTRY_SHOW.getFullUrl());
+            Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
+                                             dataset,
+                                             new String[] { ATTR_SERVICENAME,
+                                                            SERVICE_DODS, ATTR_URLPATH, urlPath });
+        }
+        
+        
+
+
         if (entry.getTypeHandler().canDownload(request, entry)) {
             String urlPath = HtmlUtil.url("/" + entry.getName(), ARG_ID,
                                           entry.getId());

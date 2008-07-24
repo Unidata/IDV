@@ -63,6 +63,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.*;
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 
@@ -116,6 +117,8 @@ public class Request implements Constants {
 
     private HttpServletRequest httpServletRequest;
     private HttpServletResponse httpServletResponse;
+    private HttpServlet httpServlet;
+
 
 
     /**
@@ -138,11 +141,13 @@ public class Request implements Constants {
 
     public Request(Repository repository, String type, Hashtable parameters,
                    HttpServletRequest httpServletRequest,
-                   HttpServletResponse httpServletResponse) {
+                   HttpServletResponse httpServletResponse,
+                   HttpServlet httpServlet) {
         this(repository, type, parameters);
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
-        }
+        this.httpServlet = httpServlet;
+    }
 
 
     /**
@@ -479,23 +484,56 @@ public class Request implements Constants {
         return sb.toString();
     }
 
-    public String getIdFromUrl() {
-        //        if (this.exists(ARG_ID)) {
-        //            return this.getString(ARG_ID, "");
-        //        }
-        String path = getRequestPath();
-        System.err.println("path:" + path);
-        //Look for .../id:<id>
-        int idx = path.indexOf("id:");
-        if(idx>=0) {
-            String id = path.substring(idx+3);
-            System.err.println("id:" + id);
-            idx = id.indexOf("/");
-            if(idx>=0) {
-                id = id.substring(0,idx);
-                System.err.println("id2:" + id);
+
+    public String getPathEmbeddedArgs() {
+        StringBuffer sb  = new StringBuffer();
+        int          cnt = 0;
+        for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+            Object value = parameters.get(arg);
+            if (value instanceof List) {
+                List l = (List) value;
+                if (l.size() == 0) {
+                    continue;
+                }
+                for (int i = 0; i < l.size(); i++) {
+                    String svalue = (String) l.get(i);
+                    if (svalue.length() == 0) {
+                        continue;
+                    }
+                    if (cnt++ > 0) {
+                        sb.append("/");
+                    }
+                    sb.append(arg + ":" + svalue);
+                }
+                continue;
             }
-            return id;
+            String svalue = (String) value;
+            if (svalue.length() == 0) {
+                continue;
+            }
+            if (cnt++ > 0) {
+                sb.append("/");
+            }
+            sb.append(arg + ":" + svalue);
+        }
+        return sb.toString();
+    }
+
+
+
+    public String getFromPath(String key) {
+        String path = getRequestPath();
+        //Look for .../id:<id>
+        String prefix = key+":";
+        int idx = path.indexOf(prefix);
+        if(idx>=0) {
+            String value = path.substring(idx+prefix.length());
+            idx = value.indexOf("/");
+            if(idx>=0) {
+                value = value.substring(0,idx);
+            }
+            return value;
         }
         return null;
     }
@@ -768,6 +806,9 @@ public class Request implements Constants {
      */
     private Object getValue(Object key, Object dflt) {
         Object result = parameters.get(key);
+        if(result==null) {
+            result = getFromPath(key.toString());
+        }
         if (result == null) {
             return dflt;
         }
@@ -785,6 +826,9 @@ public class Request implements Constants {
      */
     private String getValue(Object key, String dflt) {
         Object result = parameters.get(key);
+        if(result==null) {
+            result = getFromPath(key.toString());
+        }
         if (result == null) {
             return dflt;
         }
@@ -1176,14 +1220,14 @@ public class Request implements Constants {
 	return httpServletRequest;
     }
 
-
-    /**
-       Get the HttpServletResponse property.
-
-       @return The HttpServletResponse
-    **/
     public HttpServletResponse getHttpServletResponse () {
 	return httpServletResponse;
+    }
+
+
+
+    public javax.servlet.http.HttpServlet getHttpServlet() {
+        return httpServlet;
     }
 
 

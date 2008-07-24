@@ -119,5 +119,10 @@ public class RequestUrl {
     public String getLabel() {
         return label;
     }
+
+    public String getPath() {
+        return path;
+    }
+
 }
 

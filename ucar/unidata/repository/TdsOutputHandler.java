@@ -20,7 +20,7 @@
  */
 
 
-package ucar.unidata.repository.idv;
+package ucar.unidata.repository;
 
 
 
@@ -58,6 +58,7 @@ import thredds.server.opendap.GuardedDatasetImpl;
 import opendap.servlet.ReqState;
 
 import javax.servlet.http.*;
+import javax.servlet.*;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.dataset.NetcdfDataset;
 
@@ -118,8 +119,21 @@ public class TdsOutputHandler extends OutputHandler {
 
         //        if(    request.getHttpServletRequest()==null) return;
         if(canLoad(entry)) {
-            types.add(new OutputType("TDS", OUTPUT_TDS));
+            types.add(new OutputType("TDS", OUTPUT_TDS) {
+                    public String assembleUrl(Request request) {
+                        return request.getRequestPath() + getSuffix() +"/"+
+                            request.getPathEmbeddedArgs() +"/entry.das";
+                    }
+                });
         }
+    }
+
+
+    public String getTdsUrl(Entry entry) {
+        return "/"+ARG_OUTPUT+":" + OUTPUT_TDS +"/" + ARG_ID +":" +
+            entry.getId() +"/entry.das";
+        //        return getRepository().URL_ENTRY_SHOW.getPath() +"/" + ARG_OUTPUT+":" + OUTPUT_TDS +"/" + ARG_ID +":" +
+        //            entry.getId() +"/entry.das";
     }
 
 
@@ -136,7 +150,6 @@ public class TdsOutputHandler extends OutputHandler {
                 try {
                     File file = entry.getResource().getFile();
                     NetcdfFile ncfile = NetcdfDataset.acquireFile(file.toString(), null);
-                    System.err.println("OK");
                     ok = true;
                 } catch(Exception ignoreThis) {}
             }
@@ -147,9 +160,23 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
 
-    public Result outputEntry(Request request, Entry entry) throws Exception {
-        NcDODSServlet servlet  = new NcDODSServlet(request,entry);
-        System.err.println ("have stuff:" + (request.getHttpServletRequest()!=null));
+    public Result outputEntry(final Request request, Entry entry) throws Exception {
+        NcDODSServlet servlet  = new NcDODSServlet(request,entry) {
+                public ServletConfig getServletConfig () {
+                    return request.getHttpServlet().getServletConfig();
+                }
+                public ServletContext getServletContext () {
+                    return request.getHttpServlet().getServletContext();
+                }
+                public String getServletInfo () {
+                    return request.getHttpServlet().getServletInfo();
+                }
+                public Enumeration getInitParameterNames() {
+                    return request.getHttpServlet().getInitParameterNames();
+                }
+            };
+
+        servlet.init(request.getHttpServlet().getServletConfig());
         servlet.doGet(request.getHttpServletRequest(),request.getHttpServletResponse());
         Result result = new Result("");
         result.setNeedToWrite(false);

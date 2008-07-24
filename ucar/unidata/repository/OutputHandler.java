@@ -564,14 +564,15 @@ public class OutputHandler extends RepositoryManager {
         int    cnt           = 0;
         List   items         = new ArrayList();
         String initialOutput = request.getString(ARG_OUTPUT, "");
+        Object initialMessage = request.remove(ARG_MESSAGE);
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, (String) outputType.getId());
             if (outputType.getId().equals(output)) {
                 items.add(msg(outputType.toString()));
             } else {
-                String url = request.getRequestPath() + outputType.getSuffix() +"?"
-                    + request.getUrlArgs(ARG_MESSAGE);
-                //                System.err.println (url);
+                String url = outputType.assembleUrl(request);
+                //request.getRequestPath() + outputType.getSuffix() +"?"
+                //                    + request.getUrlArgs(ARG_MESSAGE);
                 items.add(
                     HtmlUtil.href(url, 
                                   msg(
@@ -579,7 +580,11 @@ public class OutputHandler extends RepositoryManager {
             }
         }
         request.put(ARG_OUTPUT, initialOutput);
+        if(initialMessage!=null) {
+            request.put(ARG_MESSAGE, initialMessage);
+        }
         return items;
+
     }
 
 
