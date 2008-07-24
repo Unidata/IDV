@@ -269,6 +269,7 @@ public class DatabaseManager extends RepositoryManager {
                                 //s = s.replace("'", "''");
                                 //If the target is mysql:
                                 s =  s.replace("'", "\\'");
+                                s =  s.replace("\r", "\\r");
                                 s =  s.replace("\n", "\\n");
                                 value.append("'"+s+"'");
                             }    else {

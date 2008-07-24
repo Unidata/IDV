@@ -524,6 +524,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FROMDATE = "fromdate";
 
+    public static final String ARG_FILESUFFIX = "filesuffix";
+
     /** _more_ */
     public static final String ARG_PRODUCT = "product";
 

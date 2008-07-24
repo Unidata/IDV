@@ -409,7 +409,7 @@ public class Admin extends RepositoryManager {
         bos.close();
         fos.close();
         FileInputStream is = new FileInputStream(tmp);
-        return new Result("", new BufferedInputStream(is), "text/sql");
+        return new Result("", is, "text/sql");
     }
 
 

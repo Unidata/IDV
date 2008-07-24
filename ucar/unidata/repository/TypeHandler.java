@@ -688,8 +688,9 @@ public class TypeHandler extends RepositoryManager {
             }
             sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeDesc));
 
+            String datatype = entry.getDataType();
             if ( !entry.getTypeHandler().hasDefaultDataType()
-                    && StringUtil.notEmpty(entry.getDataType())) {
+                 && datatype!=null && datatype.length()>0) {
                 sb.append(HtmlUtil.formEntry(msgLabel("Data Type"),
                                              entry.getDataType()));
             }
@@ -1077,13 +1078,13 @@ public class TypeHandler extends RepositoryManager {
 
         List dateSelect = new ArrayList();
         dateSelect.add(new TwoFacedObject(msg("All"), "none"));
+        dateSelect.add(new TwoFacedObject(msgLabel("Custom"), ""));
         dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
         dateSelect.add(new TwoFacedObject(msg("Last 3 hours"), "-3 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last 6 hours"), "-6 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last 12 hours"), "-12 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last day"), "-1 day"));
         dateSelect.add(new TwoFacedObject(msg("Last 7 days"), "-7 days"));
-        dateSelect.add(new TwoFacedObject(msgLabel("Custom"), ""));
         String dateSelectValue;
         if (request.exists(ARG_RELATIVEDATE)) {
             dateSelectValue = request.getString(ARG_RELATIVEDATE, "");
@@ -1193,6 +1194,9 @@ public class TypeHandler extends RepositoryManager {
                                                  collections, (collection!=null?collection.getId():null),100);
         advancedSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
                                           collectionSelect));
+
+        advancedSB.append(HtmlUtil.formEntry(msgLabel("File Suffix"),
+                                             HtmlUtil.input(ARG_FILESUFFIX,""," size=\"8\" ")));
 
 
         String name = (String) request.getString(ARG_TEXT, "");
@@ -1352,6 +1356,19 @@ public class TypeHandler extends RepositoryManager {
         if (request.defined(ARG_COLLECTION)) {
             addOrClause(COL_ENTRIES_TOP_GROUP_ID,
                         request.getString(ARG_COLLECTION, ""), where);
+        }
+
+        if (request.defined(ARG_FILESUFFIX)) {
+            List<Clause> clauses = new ArrayList<Clause>();
+            for(String tok: (List<String>) StringUtil.split(request.getString(ARG_FILESUFFIX, ""),",",true,true)) {
+                clauses.add(Clause.like(COL_ENTRIES_RESOURCE,
+                                        "%"+tok));
+            } 
+            if(clauses.size()==1) {
+                where.add(clauses.get(0));
+            } else {
+                where.add(Clause.or(clauses));
+            }
         }
 
         if (request.defined(ARG_GROUP)) {
