@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<backgroundwms>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="0"
+     title="World30"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="89.9,  -180.0, -89.9, 180.0"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="1"
+     title="GuangZhouResArea"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="26.4670256462,  105.169645641, 2.19503, 123.883938"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="2"
+     title="ShanghaiResArea"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="41.1473163573,  117.0885316044, 21.7197483957, 132.187"/>
+     <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="3"
+     title="countryw"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="83.6235961914, -180.0, -90.0, 180.0"/>
+   <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="4"
+     title="shengjie"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="53.557926178, 73.4469604492, 6.3186411858, 135.0858306885"/>
+   <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="5"
+     title="BOUNT_line"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="53.557926, 73.44696, 3.4084773, 135.08583"/>
+   <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="6"
+     title="tielu"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="53.0045814514, 84.7080383301, 21.1737880707, 131.2123718262"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="7"
+     title="yijiheliu"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="49.6204223633,  82.0426330566, 22.2230205536, 132.8490"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="8"
+     title="latlong"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="60.0,  65.0, -0.0, 165.0"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="9"
+     title="diqujie_polyline"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="51.001717,  74.832855, 18.3783280, 134.11153"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="10"
+     title="XianCh_point"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="52.968872,  75.187202, 18.505363, 134.27904"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="11"
+     title="ProvinceCapital"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="53.48333,  97.36667, 10.38333, 132.96666"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="12"
+     title="Res2_4m"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="50.4269638062,  75.9858551025, 18.2340431213, 131.1521606445"/>
+   <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="13"
+     title="station"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="37.9333000183,  0.0, 0.0, 122.6829986572"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="14"
+     title="City"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="45.7414932251,  87.6061172485, 20.0317935944, 126.6433410645"/>
+    <wms
+     server="http://gis.typhoon.gov.cn:80/wmsconnector/com.esri.wms.Esrimap/china?"
+     layer="15"
+     title="AlertLine"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="34.4138166225, 109.1364815209, 14.6412990088, 131.9677792682"/>
+</backgroundwms>
