@@ -475,8 +475,8 @@ public class UserManager extends RepositoryManager {
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         if(getRepository().isSSLEnabled()) {
-            sb.append(HtmlUtil.form(URL_USER_LOGIN.getHttpsUrl("")));
-
+            //sb.append(HtmlUtil.form(URL_USER_LOGIN.getHttpsUrl("")));
+            sb.append(HtmlUtil.form(URL_USER_LOGIN.toString()));
         } else {
             sb.append(HtmlUtil.form(URL_USER_LOGIN.toString()));
         }
