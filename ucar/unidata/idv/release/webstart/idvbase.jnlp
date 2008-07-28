@@ -12,7 +12,10 @@
         <jar href="IDV/local-visad.jar"/>
         <jar href="IDV/visad.jar"/>
         <jar href="IDV/ncIdv.jar"/>
-        <extension name="Java3D" href="java3D/java3D.jnlp"/>
+        <extension name="Java3D" href="http://download.java.net/media/java3d/webstart/release/java3d-latest.jnlp"/>
+<!-- possible alternate location
+        <extension name="Java3D" href="https://j3d-webstart.dev.java.net/release/java3d-latest.jnlp"/>
+--> 
    </resources> 
    <component-desc>
    </component-desc> 
