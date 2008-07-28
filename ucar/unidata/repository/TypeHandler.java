@@ -1077,8 +1077,7 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         List dateSelect = new ArrayList();
-        dateSelect.add(new TwoFacedObject(msg("All"), "none"));
-        dateSelect.add(new TwoFacedObject(msgLabel("Custom"), ""));
+        dateSelect.add(new TwoFacedObject(msg("Relative Date"), "none"));
         dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
         dateSelect.add(new TwoFacedObject(msg("Last 3 hours"), "-3 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last 6 hours"), "-6 hours"));
@@ -1192,8 +1191,11 @@ public class TypeHandler extends RepositoryManager {
         Entry collection =  request.getCollectionEntry();
         String collectionSelect = HtmlUtil.select(ARG_COLLECTION,
                                                  collections, (collection!=null?collection.getId():null),100);
-        advancedSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
-                                          collectionSelect));
+
+        if(collection==null) {
+            advancedSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
+                                                 collectionSelect));
+        }
 
         advancedSB.append(HtmlUtil.formEntry(msgLabel("File Suffix"),
                                              HtmlUtil.input(ARG_FILESUFFIX,""," size=\"8\" ")));
@@ -1219,18 +1221,17 @@ public class TypeHandler extends RepositoryManager {
             basicSB.append(HtmlUtil.formEntry(msgLabel("Name"),
                     name + searchExact + searchMetaData));
         }
-        basicSB.append("\n");
 
 
-        String dateHelp = " (e.g., 2007-12-11 00:00:00)";
+
+        String dateHelp = " (e.g., 2007-12-11 00:00:00, now, -1 week, +3 days, etc.)";
 
         basicSB.append(
             HtmlUtil.formEntry(
                 msgLabel("Date Range"),
-                dateSelectInput + HtmlUtil.space(1)
-                + HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
-                + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
-
+                HtmlUtil.input(ARG_FROMDATE, minDate," title=\"" + dateHelp +"\"") + " -- "
+                + HtmlUtil.input(ARG_TODATE, maxDate," title=\"" + dateHelp +"\"") +
+                HtmlUtil.space(2) + msgLabel("Or") +dateSelectInput));
 
         if (advancedForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
@@ -1296,6 +1297,13 @@ public class TypeHandler extends RepositoryManager {
                     areaWidget));
             advancedSB.append("\n");
 
+        }
+
+
+
+        if(collection!=null) {
+            basicSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
+                                                 collectionSelect));
         }
 
 
@@ -1429,7 +1437,6 @@ public class TypeHandler extends RepositoryManager {
         if (dateRange[1] != null) {
             where.add(Clause.le(COL_ENTRIES_TODATE, dateRange[1]));
         }
-
 
         Date createDate = request.get(ARG_CREATEDATE, (Date) null);
         if (createDate != null) {
@@ -1579,9 +1586,11 @@ public class TypeHandler extends RepositoryManager {
 
         String name = (String) request.getString(ARG_TEXT, "").trim();
         if (name.length() > 0) {
-            if ( !request.get(ARG_EXACT, false)) {
+            boolean doLike = false;
+            if (!request.get(ARG_EXACT, false)) {
                 List tmp = StringUtil.split(name, ",", true, true);
                 name = "%" + StringUtil.join("%,%", tmp) + "%";
+                doLike = true;
             }
             List<Clause> ors       = new ArrayList<Clause>();
             boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);

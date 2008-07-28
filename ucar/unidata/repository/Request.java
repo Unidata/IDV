@@ -989,19 +989,19 @@ public class Request implements Constants {
      */
     public Date[] getDateRange(String from, String to, Date dflt)
             throws java.text.ParseException {
-        String fromDate;
-        String toDate;
-        if (defined(ARG_RELATIVEDATE)) {
+        String fromDate="";
+        String toDate="";
+        if(defined(from) || defined(to)) {
+            
+            fromDate = (String) getDateSelect(from, "").trim();
+            toDate   = (String) getDateSelect(to, "").trim();
+        } else if (defined(ARG_RELATIVEDATE)) {
             fromDate = (String) getDateSelect(ARG_RELATIVEDATE, "").trim();
             if (fromDate.equals("none")) {
                 return new Date[] { null, null };
             }
             toDate = "now";
-        } else {
-            fromDate = (String) getDateSelect(from, "").trim();
-            toDate   = (String) getDateSelect(to, "").trim();
         }
-
         return DateUtil.getDateRange(fromDate, toDate, dflt);
     }
 
