@@ -1215,7 +1215,7 @@ public class WayDisplayState {
         int d = cal.get(Calendar.DAY_OF_MONTH);
         int h = cal.get(Calendar.HOUR_OF_DAY);
 
-        return  ""+ m + "/" + d + "/" + h;
+        return  ""+ m + "/" + d + "/" + h + "H";
     }
 
 
