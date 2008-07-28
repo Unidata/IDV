@@ -170,15 +170,16 @@ example:
     properties="windowVisible=true;displayName=Time/Height Display;" />
 
   <control
-    id="level2colorxs" 
+    id="radarcolorxs" 
     categories="RADAR_VOLUME" 
-    class="ucar.unidata.idv.control.Level2ColorCrossSectionControl" 
-    description="Color-shaded cross section" 
-    label="Color-Shaded Cross Section" 
+    class="ucar.unidata.idv.control.RadarColorCrossSectionControl" 
+    description="Color-shaded radar cross section" 
+    label="Color-Shaded Radar Cross Section" 
     xxxicon="/ucar/unidata/idv/images/crosssection.png"
     displaycategory="Radar Views"
-    properties="displayName=Color-Shaded Cross Section;windowVisible=true;smoothed=false;" />
+    properties="displayName=Color-Shaded Radar Cross Section;windowVisible=true;smoothed=false;" />
  -->
+
   <control
      id="radarvolumescan"
      categories="RADAR_VOLUME"
@@ -420,17 +421,18 @@ example:
     displaycategory="3D Surface"
     properties="streamlines=true;windbarbs=true;displayName=Streamlines Over Topography;multipleIsTopography=true" />
 
-<!--
   <control
     id="planviewflowoverz" 
     categories="*-flowvector-*" 
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
     description="Flow vectors over topography" 
     label="Vectors Over Topography" 
+    doeslevels="true"
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
     properties="displayName=Vector Plan View Over Topography;multipleIsTopography=true" />
 
+<!--
   <control
     id="windbarbplanoverz" 
     categories="*-flowvector-*" 
