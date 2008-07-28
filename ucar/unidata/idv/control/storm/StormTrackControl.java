@@ -242,6 +242,7 @@ public class StormTrackControl extends DisplayControlImpl {
     public StormTrackControl() {
         DataChoice.addCurrentName(new TwoFacedObject("Forecast Hour","fhour"));
         DataChoice.addCurrentName(new TwoFacedObject("Forecast Time","rhour"));
+        DataChoice.addCurrentName(new TwoFacedObject("Forecast STI Time","shour"));
         setAttributeFlags(FLAG_COLORTABLE);
     }
 

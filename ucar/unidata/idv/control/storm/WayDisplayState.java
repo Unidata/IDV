@@ -44,19 +44,14 @@ import ucar.unidata.ui.colortable.ColorTableManager;
 
 import ucar.unidata.ui.symbol.*;
 
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.Range;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.Util;
 import ucar.visad.display.*;
 
 import visad.*;
+import visad.Set;
 
 
 import visad.georef.EarthLocation;
@@ -71,12 +66,8 @@ import java.rmi.RemoteException;
 
 import java.text.DecimalFormat;
 
-import java.util.ArrayList;
-
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -1036,6 +1027,9 @@ public class WayDisplayState {
     /** _more_ */
     private static TextType rhourType;
 
+    /** _more_ */
+    private static TextType shourType;
+
     /**
      * _more_
      *
@@ -1157,6 +1151,9 @@ public class WayDisplayState {
             rhourType = new TextType("rhour");
         }
 
+        if (shourType == null) {
+            shourType = new TextType("shour");
+        }
         List<PointOb>    pointObs  = new ArrayList<PointOb>();
 
         DecimalFormat    format    = new DecimalFormat("0.#");
@@ -1169,6 +1166,7 @@ public class WayDisplayState {
                                      : stp.getTime());
             String          flabel = "";
             String          rlabel = "";
+            String          slabel = "";
             if ( !isObservation) {
                 if (i == 0) {
                     //                 label = way.getId() + ": " + track.getStartTime();
@@ -1176,6 +1174,7 @@ public class WayDisplayState {
                     flabel = "" + stp.getForecastHour() + "H";
                     Date dttm = Util.makeDate(stp.getTime());
                     rlabel = "" + dttm.toString();
+                    slabel = "" + getMonDayHour(dttm);;
                 }
             } else if (useStartTime && (i > 0)) {
                 Date dttm = Util.makeDate(stp.getTime());
@@ -1185,18 +1184,19 @@ public class WayDisplayState {
 
                 flabel = format.format(diffHours) + "H";
                 rlabel = "" + dttm.toString();
+                slabel = "" + getMonDayHour(dttm);
             }
-            Data[] data = new Data[params.size() + 2];
+            Data[] data = new Data[params.size() + 3];
 
             data[0] = new visad.Text(rhourType, rlabel);
             data[1] = new visad.Text(fhourType, flabel);
-
+            data[2] = new visad.Text(shourType, slabel);
             for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                 Real r = stp.getAttribute(params.get(paramIdx));
                 if (r == null) {
                     r = params.get(paramIdx).getReal(Double.NaN);
                 }
-                data[paramIdx + 2] = r;
+                data[paramIdx + 3] = r;
 
             }
             Tuple tuple = new Tuple(data);
@@ -1207,7 +1207,16 @@ public class WayDisplayState {
         return pointObs;
     }
 
+    private String getMonDayHour(Date dt){
+        Calendar cal = Calendar.getInstance();
 
+        cal.setTime(dt);
+        int m = cal.get(Calendar.MONTH);
+        int d = cal.get(Calendar.DAY_OF_MONTH);
+        int h = cal.get(Calendar.HOUR_OF_DAY);
+
+        return  ""+ m + "/" + d + "/" + h;
+    }
 
 
     /**
@@ -1228,7 +1237,9 @@ public class WayDisplayState {
         if (rhourType == null) {
             rhourType = new TextType("rhour");
         }
-
+        if (shourType == null) {
+            shourType = new TextType("shour");
+        }
         List<PointOb>    pointObs = new ArrayList<PointOb>();
         DecimalFormat    format   = new DecimalFormat("0.#");
         List<StormParam> params   = track.getParams();
@@ -1240,6 +1251,7 @@ public class WayDisplayState {
                 StormTrackPoint stp   = stps.get(j);
                 String          flabel = "";
                 String          rlabel = "";
+                String          slabel = "";
                 if (j > 0) {
                     Date dttm = Util.makeDate(stp.getTime());
                     double diffSeconds = (dttm.getTime()
@@ -1247,17 +1259,18 @@ public class WayDisplayState {
                     double diffHours = diffSeconds / 3600.0;
                     flabel = format.format(diffHours) + "H";
                     rlabel = "" + dttm.toString();
+                    slabel = "" + getMonDayHour(dttm);
                 }
-                Data[] data = new Data[params.size() + 2];
+                Data[] data = new Data[params.size() + 3];
                 data[0] = new visad.Text(fhourType, flabel);
                 data[1] = new visad.Text(rhourType, rlabel);
-
+                data[2] = new visad.Text(shourType, slabel);
                 for (int paramIdx = 0; paramIdx < params.size(); paramIdx++) {
                     Real r = stp.getAttribute(params.get(paramIdx));
                     if (r == null) {
                         r = params.get(paramIdx).getReal(Double.NaN);
                     }
-                    data[paramIdx + 2] = r;
+                    data[paramIdx + 3] = r;
                 }
                 Tuple tuple = new Tuple(data);
                 pointObs.add(PointObFactory.makePointOb(stp.getLocation(),
