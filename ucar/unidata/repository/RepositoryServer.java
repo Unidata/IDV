@@ -84,7 +84,7 @@ public class RepositoryServer extends HttpServer implements Constants {
     public void init() {
         try {
             //TODO: set the hostname on the repository
-            repository = new Repository(args, null, getPort());
+            repository = new Repository(args, null, getPort(),false);
             repository.init();
         } catch (Exception exc) {
             //            exc.printStackTrace();

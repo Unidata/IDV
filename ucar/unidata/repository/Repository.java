@@ -338,6 +338,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private int port;
 
+    private boolean inTomcat = false;
+
 
     /** _more_ */
     private boolean clientMode = false;
@@ -412,9 +414,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, String hostname, int port)
+    public Repository(String[] args, String hostname, int port, boolean inTomcat)
             throws Exception {
-        this(args, hostname, port, false);
+        this(args, hostname, port, inTomcat, false);
     }
 
 
@@ -429,10 +431,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, String hostname, int port,
+    private Repository(String[] args, String hostname, int port,
+                       boolean inTomcat,
                       boolean clientMode)
             throws Exception {
         this.clientMode = clientMode;
+        this.inTomcat = inTomcat;
         this.args       = args;
         this.hostname   = hostname;
         this.port       = port;
@@ -447,6 +451,11 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private static SimpleDateFormat sdf;
 
+
+
+    public boolean isSSLEnabled(){
+        return inTomcat;
+    }
 
 
     /**
@@ -6417,6 +6426,10 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String absoluteUrl(String url) {
         return "http://" + hostname + ":" + port + url;
+    }
+
+    public String httpsUrl(String url) {
+        return "https://" + hostname + ":" + port + url;
     }
 
 

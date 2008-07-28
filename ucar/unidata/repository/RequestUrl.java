@@ -77,6 +77,9 @@ public class RequestUrl {
         return repositorySource.getRepository().absoluteUrl(repositorySource.getRepository().getUrlBase()+path) +  suffix;
     }
 
+    public String getHttpsUrl(String suffix) {
+        return repositorySource.getRepository().httpsUrl(repositorySource.getRepository().getUrlBase()+path) +  suffix;
+    }
 
     /**
      * _more_
