@@ -33,8 +33,6 @@ import visad.*;
 
 import visad.java3d.*;
 
-import com.sun.image.codec.jpeg.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
