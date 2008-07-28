@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 
 
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 
@@ -42,6 +43,7 @@ import java.io.*;
 
 import java.net.*;
 
+import java.util.Properties;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -85,7 +87,14 @@ public class MetadataServlet extends HttpServlet {
             throws Exception {
         repository = new Repository(getInitParams(), request.getServerName(),
                                     request.getServerPort(),true);
-        repository.init();
+        String propertyFile = "/WEB-INF/repository.properties";
+        Properties webAppProperties = new Properties();
+        InputStream is = getServletContext().getResourceAsStream(propertyFile);
+        if(is!=null) {
+            webAppProperties.load(is);
+        }
+        repository.init(webAppProperties);
+
     }
 
 

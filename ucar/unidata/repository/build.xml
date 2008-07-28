@@ -41,6 +41,7 @@
             failonerror="${failonerror}" 
             nowarn="true"
             srcdir="${srcdir}"
+           target="1.5"
         >
         <include name="ucar/unidata/repository/*.java"/>
         <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
@@ -100,6 +101,8 @@
 
     <target name="war" depends="init">
       <war webxml="${ramaddadir}/release/web.xml" destfile="${libsdir}/repository.war">
+          <webinf file="${ramaddadir}/release/repository.properties"/>
+
           <lib file="${libsdir}/ramadda.jar"/>
           <lib file="${libsdir}/ramaddalib.jar"/>
           <lib file="${libsdir}/tdsrepository.jar"/>

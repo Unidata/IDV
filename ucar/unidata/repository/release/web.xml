@@ -12,7 +12,6 @@
   <context-param>
     <param-name>args</param-name>
     <param-value>-Dramadda_home=/web/repository</param-value>
-
 <!--
     <param-value>-Djdms.db=derby</param-value>
 -->

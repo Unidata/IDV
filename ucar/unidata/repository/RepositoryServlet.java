@@ -84,7 +84,7 @@ public class RepositoryServlet extends HttpServlet {
             throws Exception {
         repository = new Repository(getInitParams(), request.getServerName(),
                                     request.getServerPort(),true);
-        repository.init();
+        repository.init(null);
     }
 
 

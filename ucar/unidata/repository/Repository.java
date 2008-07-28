@@ -514,8 +514,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected void init() throws Exception {
-        initProperties();
+    protected void init(Properties properties) throws Exception {
+        initProperties(properties);
         if ( !clientMode) {
             initServer();
         }
@@ -974,13 +974,17 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected void initProperties() throws Exception {
+    protected void initProperties(Properties contextProperties) throws Exception {
 
         properties = new Properties();
         properties.load(
             IOUtil.getInputStream(
                 "/ucar/unidata/repository/resources/repository.properties",
                 getClass()));
+        if(contextProperties!=null) {
+            System.err.println("loading context:" + contextProperties);
+            properties.putAll(contextProperties);
+        }
         List<String> argEntryDefFiles    = new ArrayList();
         List<String> argApiDefFiles      = new ArrayList();
         List<String> argOutputDefFiles   = new ArrayList();
