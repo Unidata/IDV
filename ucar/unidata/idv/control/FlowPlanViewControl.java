@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -66,7 +67,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** a component to change the barb size */
     ValueSliderWidget barbSizeWidget;
 
-    JComponent  sizeComponent;
+    /** vector/barb size component */
+    JComponent sizeComponent;
 
 
     /** a component to change the skip */
@@ -75,6 +77,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** a component to change the streamline density */
     JComponent densityComponent;
 
+    /** streamline density slider */
     JSlider densitySlider;
 
     /** a label listing the range of the data */
@@ -83,7 +86,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** the density label */
     private JLabel densityLabel;
 
+    /** streamlines button */
     private JRadioButton streamlinesBtn;
+
+    /** vector/barb button */
     private JRadioButton vectorBtn;
 
 
@@ -155,6 +161,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     + ((datachoice != null)
                        ? datachoice.toString()
                        : ""), null);
+            if (getMultipleIsTopography()) {
+                planDisplay.setIgnoreExtraParameters(true);
+                planDisplay.setAdjustFlow(false);
+            }
         }
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
@@ -207,38 +217,54 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
 
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
-                                               "Size");
+                "Size");
         sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
                                       barbSizeWidget.getContents(false));
-        if (!getIsThreeComponents()) {
-            streamlinesBtn = new JRadioButton("Streamlines:",isStreamlines);
-            vectorBtn = new JRadioButton((isWindBarbs?"Wind Barbs:":"Vectors:"),!isStreamlines);
+        if ( !getIsThreeComponents()) {
+            streamlinesBtn = new JRadioButton("Streamlines:", isStreamlines);
+            vectorBtn      = new JRadioButton((isWindBarbs
+                    ? "Wind Barbs:"
+                    : "Vectors:"), !isStreamlines);
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
-                    if(source==streamlinesBtn)
+                    if (source == streamlinesBtn) {
                         setStreamlines(source.isSelected());
-                    else
-                        setStreamlines(!source.isSelected());
+                    } else {
+                        setStreamlines( !source.isSelected());
+                    }
                 }
-               };
+            };
             streamlinesBtn.addActionListener(listener);
             vectorBtn.addActionListener(listener);
             GuiUtils.buttonGroup(streamlinesBtn, vectorBtn);
             densityLabel     = GuiUtils.rLabel("Density: ");
             densityComponent = doMakeDensityComponent();
             enableDensityComponents();
-            Insets spacer = new Insets(0,30,0,0);
-            JComponent rightComp = GuiUtils.vbox(GuiUtils.left(GuiUtils.vbox(vectorBtn, 
-                                                                             GuiUtils.inset(sizeComponent,spacer))), 
-                                                 GuiUtils.left(GuiUtils.vbox(streamlinesBtn,
-                                                                             GuiUtils.inset(GuiUtils.hbox(densityLabel,densityComponent),spacer))));
+            Insets spacer = new Insets(0, 30, 0, 0);
+            JComponent rightComp =
+                GuiUtils.vbox(
+                    GuiUtils.left(
+                        GuiUtils.vbox(
+                            vectorBtn,
+                            GuiUtils.inset(
+                                sizeComponent, spacer))), GuiUtils.left(
+                                    GuiUtils.vbox(
+                                        streamlinesBtn,
+                                        GuiUtils.inset(
+                                            GuiUtils.hbox(
+                                                densityLabel,
+                                                densityComponent), spacer))));
             JLabel showLabel = GuiUtils.rLabel("Show:");
             showLabel.setVerticalTextPosition(JLabel.TOP);
-            controlWidgets.add(new WrapperWidget(this,
-
-                                                 GuiUtils.top(GuiUtils.inset(showLabel,new Insets(10,0,0,0))),
-                                                 GuiUtils.left(GuiUtils.top(rightComp))));
+            controlWidgets.add(
+                new WrapperWidget(
+                    this,
+                    GuiUtils.top(
+                        GuiUtils.inset(
+                            showLabel,
+                            new Insets(10, 0, 0, 0))), GuiUtils.left(
+                                GuiUtils.top(rightComp))));
 
             /*
             JCheckBox toggle = new JCheckBox("Show", isStreamlines);
@@ -258,8 +284,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             densityComponent));*/
         } else {
             controlWidgets.add(new WrapperWidget(this,
-                                                 GuiUtils.rLabel(getSizeLabel()),
-                                                 GuiUtils.left(sizeComponent)));
+                    GuiUtils.rLabel(getSizeLabel()),
+                    GuiUtils.left(sizeComponent)));
         }
         controlWidgets.add(
             new WrapperWidget(
@@ -269,10 +295,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                         GuiUtils.rLabel("XY:  "),
                         skipFactorWidget.getContents(false)))));
 
-        if (!getWindbarbs()) {
+        if ( !getWindbarbs()) {
             controlWidgets.add(new WrapperWidget(this,
-                                                 GuiUtils.rLabel("Range:"),
-                                                 doMakeFlowRangeComponent()));
+                    GuiUtils.rLabel("Range:"), doMakeFlowRangeComponent()));
         }
 
 
@@ -286,12 +311,13 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @return The panel that shows the streamline density slider
      */
     protected JComponent doMakeDensityComponent() {
-        int sliderPos = (int) (getStreamlineDensity() * 100);
-        int DENSITY_MIN       = 10;
-        int DENSITY_MAX       = 500;
+        int sliderPos   = (int) (getStreamlineDensity() * 100);
+        int DENSITY_MIN = 10;
+        int DENSITY_MAX = 500;
         sliderPos = Math.min(Math.max(sliderPos, DENSITY_MIN), DENSITY_MAX);
-        densitySlider = GuiUtils.makeSlider(DENSITY_MIN, DENSITY_MAX, sliderPos,
-                                            this, "densitySliderChanged");
+        densitySlider = GuiUtils.makeSlider(DENSITY_MIN, DENSITY_MAX,
+                                            sliderPos, this,
+                                            "densitySliderChanged");
         densitySlider.setToolTipText(
             "Control the density of the streamlines");
 
@@ -373,7 +399,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void densitySliderChanged(int value) {
         try {
-            setStreamlineDensity((float) (value / 100.),true);
+            setStreamlineDensity((float) (value / 100.), true);
         } catch (Exception exc) {
             logException("Setting streamline density ", exc);
         }
@@ -395,7 +421,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * enable the barb size box
      */
     private void enableBarbSizeBox() {
-        if(sizeComponent!=null) {
+        if (sizeComponent != null) {
             GuiUtils.enableTree(sizeComponent, !isStreamlines);
         }
     }
@@ -434,9 +460,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             enableBarbSizeBox();
             enableDensityComponents();
         }
-        if(streamlinesBtn !=null) {
+        if (streamlinesBtn != null) {
             streamlinesBtn.setSelected(v);
-            vectorBtn.setSelected(!v);
+            vectorBtn.setSelected( !v);
         }
     }
 
@@ -450,9 +476,14 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return isStreamlines;
     }
 
+    /**
+     * Set the skip value
+     *
+     * @param value the value
+     */
     public void setSkipValue(int value) {
         super.setSkipValue(value);
-        if(skipFactorWidget!=null) {
+        if (skipFactorWidget != null) {
             skipFactorWidget.setValue(value);
         }
     }
@@ -515,17 +546,18 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale", "Scale",
-                             SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Integer(getSkipValue()), "skipValue", "Skip Factor",
-                             SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Double(getStreamlineDensity()), "streamlineDensity", "Streamline Density",
+        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale",
+                             "Scale", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Integer(getSkipValue()), "skipValue",
+                             "Skip Factor", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Double(getStreamlineDensity()),
+                             "streamlineDensity", "Streamline Density",
                              SETTINGS_GROUP_DISPLAY);
 
         dsd.addPropertyValue(flowRange, "flowRange", "Flow Field Range",
                              SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getStreamlines()), "streamlines", "Show Streamlines",
-                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(getStreamlines()), "streamlines",
+                             "Show Streamlines", SETTINGS_GROUP_DISPLAY);
 
 
 
@@ -557,7 +589,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (getHaveInitialized()) {
             doShare(SHARE_FLOWRANGE, flowRange);
         }
-        if(barbSizeWidget!=null) {
+        if (barbSizeWidget != null) {
             barbSizeWidget.setValue(f);
         }
     }
@@ -611,18 +643,24 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param f   new flow scale
      */
     public void setStreamlineDensity(float f) {
-        setStreamlineDensity(f,false);
+        setStreamlineDensity(f, false);
     }
 
 
+    /**
+     * Set the streamline density
+     *
+     * @param f value
+     * @param fromSlider true if from slider
+     */
     public void setStreamlineDensity(float f, boolean fromSlider) {
         streamlineDensity = f;
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlineDensity(f);
         }
 
-        if(!fromSlider && densitySlider!=null) {
-            densitySlider.setValue((int)(f*100));
+        if ( !fromSlider && (densitySlider != null)) {
+            densitySlider.setValue((int) (f * 100));
         }
     }
 
@@ -735,7 +773,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * Show the color control widget in the widgets if FLAG_COLOR is set.
      * @return  false  subclasses should override
      */
-    public boolean  showColorControlWidget() {
+    public boolean showColorControlWidget() {
         return !haveMultipleFields();
     }
 
