@@ -421,7 +421,11 @@ public class Clause {
 
         for (int i = 0; i < notNots.size(); i++) {
             String value = notNots.get(i).toString();
-            clauses.add(Clause.eq(column, value));
+            if(value.startsWith("%") || value.endsWith("%")) {
+                clauses.add(Clause.like(column, value));
+            } else {
+                clauses.add(Clause.eq(column, value));
+            }
         }
 
         if ((notClauses.size() > 0) && (clauses.size() > 0)) {
