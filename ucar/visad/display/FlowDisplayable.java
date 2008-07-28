@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.visad.display;
 
 
@@ -106,6 +105,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /** flag for 3D vectors */
     private boolean is3D = false;
+
+    /** flag for ignoring extra parameters */
+    private boolean ignoreExtraParameters = false;
 
     /** Value for Northern Hemisphere orientation */
     public static final int NH_ORIENTATION = FlowControl.NH_ORIENTATION;
@@ -568,7 +570,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         // get the RealTupleType of the range data in the  FlatField
         RealTupleType rtt       = DataUtility.getFlatRangeType(ffld);
 
-        int           threeDDim = coloredByAnother
+        int           threeDDim = (coloredByAnother || ignoreExtraParameters)
                                   ? 3
                                   : 2;
         set3DFlow(rtt.getDimension() > threeDDim);
@@ -727,6 +729,15 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public void setColoredByAnother(boolean yesno) {
         coloredByAnother = yesno;
+    }
+
+    /**
+     * Set whether this GridDisplayable should ignore extra parameters
+     *
+     * @param yesno true if extra params should be ignored
+     */
+    public void setIgnoreExtraParameters(boolean yesno) {
+        ignoreExtraParameters = yesno;
     }
 }
 
