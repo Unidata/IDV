@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -526,6 +525,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
             rawLevel = newVal.getValue(rawDataUnit);
         }
         myDisplay.setSurfaceValue((float) rawLevel);
+        updateDisplayList();
         if (andDoShare) {
             doShareExternal(SHARE_SURFACEVALUE, new Double(lastRawLevel));
         }
