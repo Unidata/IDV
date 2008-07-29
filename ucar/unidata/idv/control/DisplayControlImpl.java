@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -807,7 +809,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** slider for setting skip values */
     protected JSlider skipSlider;
 
-    private         JSlider zPositionSlider;
+    /** _more_ */
+    private JSlider zPositionSlider;
 
     /** the skip value */
     private int skipValue = 0;
@@ -5232,7 +5235,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                  SETTINGS_GROUP_DISPLAY);
         }
 
-        if (selectRangeEnabled  && selectRange!=null) {
+        if (selectRangeEnabled && (selectRange != null)) {
             //            dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
             //                                 SETTINGS_GROUP_DISPLAY);
         }
@@ -6741,8 +6744,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         int min       = -100;
         int max       = 100;
         sliderPos = Math.min(Math.max(sliderPos, min), max);
-        zPositionSlider = GuiUtils.makeSlider(min, max, sliderPos,
-                                      this, "zSliderChanged");
+        zPositionSlider = GuiUtils.makeSlider(min, max, sliderPos, this,
+                "zSliderChanged");
         JPanel labelPanel =
             GuiUtils.leftCenterRight(GuiUtils.lLabel("Bottom"),
                                      GuiUtils.cLabel("Middle"),
@@ -7216,21 +7219,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected void popupDataDialog(final String dialogMessage,
                                    Component from, boolean multiples,
                                    List categories) {
-        if (categories == null) {
-            categories = getCategories();
-        }
-        DataOperand dataOperand = new DataOperand(dialogMessage,
-                                      dialogMessage, categories, multiples);
-        DataTreeDialog dataDialog =
-            new DataTreeDialog(getIdv(), from, Misc.newList(dataOperand),
-                               getControlContext().getAllDataSources(),
-                               myDataChoices);
 
-        List choices = dataDialog.getSelected();
+        List<DataChoice> choices = selectDataChoices(dialogMessage, from,
+                                       multiples, categories);
         if ((choices == null) || (choices.size() == 0)) {
             return;
         }
-
         final List clonedList =
             DataChoice.cloneDataChoices((List) choices.get(0));
         dataSelection = ((DataChoice) clonedList.get(0)).getDataSelection();
@@ -7244,6 +7238,32 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         });
 
+    }
+
+    /**
+     * Popup a DataTreeDialog
+     *
+     * @param dialogMessage message for the dialog
+     * @param from   the component that it is on
+     * @param multiples can handle multiple selections
+     * @param categories List of data categories. If
+     *
+     * @return List of selected data choices or null if none selected
+     */
+    protected List<DataChoice> selectDataChoices(final String dialogMessage,
+            Component from, boolean multiples, List categories) {
+
+        if (categories == null) {
+            categories = getCategories();
+        }
+        DataOperand dataOperand = new DataOperand(dialogMessage,
+                                      dialogMessage, categories, multiples);
+        DataTreeDialog dataDialog =
+            new DataTreeDialog(getIdv(), from, Misc.newList(dataOperand),
+                               getControlContext().getAllDataSources(),
+                               myDataChoices);
+
+        return dataDialog.getSelected();
     }
 
 
@@ -9919,14 +9939,23 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         setZPosition(value, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     * @param fromSlider _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public void setZPosition(double value, boolean fromSlider)
             throws RemoteException, VisADException {
         zPosition = value;
         if (getHaveInitialized()) {
             applyZPosition();
         }
-        if(zPositionSlider!=null && !fromSlider) {
-            zPositionSlider.setValue((int)(value*100));
+        if ((zPositionSlider != null) && !fromSlider) {
+            zPositionSlider.setValue((int) (value * 100));
         }
     }
 
@@ -9945,7 +9974,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (getHaveInitialized()) {
             applyLineWidth();
         }
-        if(lww!=null) {
+        if (lww != null) {
             lww.setValue(value);
         }
     }
