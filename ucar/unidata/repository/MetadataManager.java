@@ -194,7 +194,7 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<Metadata> getMetadata(Entry entry) throws Exception {
-        if(entry.isDummy()) {
+        if (entry.isDummy()) {
             return new ArrayList<Metadata>();
         }
         List<Metadata> metadataList = entry.getMetadata();

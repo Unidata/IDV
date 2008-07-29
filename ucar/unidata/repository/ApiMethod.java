@@ -96,10 +96,10 @@ public class ApiMethod {
     /** _more_ */
     private List actions;
 
-    /** _more_          */
+    /** _more_ */
     private Repository repository;
 
-    /** _more_          */
+    /** _more_ */
     private RequestUrl url;
 
     /**

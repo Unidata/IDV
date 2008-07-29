@@ -57,7 +57,7 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_TEMPLATE =
         new Metadata.Type("admin.template", "Page Template");
 
-    /** _more_          */
+    /** _more_ */
     public static Metadata.Type TYPE_CONTENTTEMPLATE =
         new Metadata.Type("admin.contenttemplate", "Content Template");
 
@@ -78,7 +78,7 @@ public class AdminMetadataHandler extends MetadataHandler {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private List<Metadata.Type> dummyTypeList =
         new ArrayList<Metadata.Type>();
 

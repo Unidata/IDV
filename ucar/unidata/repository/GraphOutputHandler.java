@@ -144,7 +144,8 @@ public class GraphOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
+                                          List<Entry> entries,
+                                          List<OutputType> types)
             throws Exception {
         //        getOutputTypesForEntry(request, group, types);
     }
@@ -166,12 +167,10 @@ public class GraphOutputHandler extends OutputHandler {
             return;
         }
 
-        String url   = request.entryUrl(
-                                        getRepository().URL_ENTRY_SHOW, 
-                                        entry, 
-                                        ARG_OUTPUT, OUTPUT_GRAPH);
-        links.add(new Link(url,
-                           getRepository().fileUrl(ICON_GRAPH), "Show in graph"));
+        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                      ARG_OUTPUT, OUTPUT_GRAPH);
+        links.add(new Link(url, getRepository().fileUrl(ICON_GRAPH),
+                           "Show in graph"));
     }
 
 
@@ -189,9 +188,11 @@ public class GraphOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         String graphAppletTemplate =
             getRepository().getResource(PROP_HTML_GRAPHAPPLET);
-        String type = request.getString(ARG_NODETYPE, (String)null);
-        if(type == null) {
-            type = entry.isGroup()?NODETYPE_GROUP:NODETYPE_ENTRY;
+        String type = request.getString(ARG_NODETYPE, (String) null);
+        if (type == null) {
+            type = entry.isGroup()
+                   ? NODETYPE_GROUP
+                   : NODETYPE_ENTRY;
         }
         String html =
             StringUtil.replace(graphAppletTemplate, "${id}",

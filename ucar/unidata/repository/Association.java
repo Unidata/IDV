@@ -43,8 +43,10 @@ import java.util.List;
  */
 public class Association {
 
+    /** _more_          */
     public static final String TYPE_ATTACHMENT = "attachment";
 
+    /** _more_          */
     private String id;
 
     /** _more_ */
@@ -65,38 +67,44 @@ public class Association {
     /**
      * _more_
      *
+     *
+     * @param id _more_
      * @param name _more_
+     * @param type _more_
      * @param fromId _more_
      * @param toId _more_
      */
-    public Association(String id, String name, String type, String fromId, String toId) {
-        this.id = id;
-        this.name   = name;
-        if(type == null) type = "";
-        this.type = type;
+    public Association(String id, String name, String type, String fromId,
+                       String toId) {
+        this.id   = id;
+        this.name = name;
+        if (type == null) {
+            type = "";
+        }
+        this.type   = type;
         this.fromId = fromId;
         this.toId   = toId;
     }
 
 
 
-/**
-Set the Id property.
+    /**
+     * Set the Id property.
+     *
+     * @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
+    }
 
-@param value The new value for Id
-**/
-public void setId (String value) {
-	id = value;
-}
-
-/**
-Get the Id property.
-
-@return The Id
-**/
-public String getId () {
-	return id;
-}
+    /**
+     * Get the Id property.
+     *
+     * @return The Id
+     */
+    public String getId() {
+        return id;
+    }
 
     /**
      * Set the Name property.
@@ -154,23 +162,23 @@ public String getId () {
         return toId;
     }
 
-/**
-Set the Type property.
+    /**
+     * Set the Type property.
+     *
+     * @param value The new value for Type
+     */
+    public void setType(String value) {
+        type = value;
+    }
 
-@param value The new value for Type
-**/
-public void setType (String value) {
-	type = value;
-}
-
-/**
-Get the Type property.
-
-@return The Type
-**/
-public String getType () {
-	return type;
-}
+    /**
+     * Get the Type property.
+     *
+     * @return The Type
+     */
+    public String getType() {
+        return type;
+    }
 
 
 

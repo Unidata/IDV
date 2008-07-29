@@ -85,6 +85,7 @@ public class HtmlOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_TIMELINE = "default.timeline";
 
+    /** _more_          */
     public static final String OUTPUT_TIMELINE_DATA = "default.timelinedata";
 
 
@@ -94,10 +95,10 @@ public class HtmlOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_CLOUD = "default.cloud";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_GROUPXML = "groupxml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_METADATAXML = "metadataxml";
 
 
@@ -124,7 +125,7 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)
-            || output.equals(OUTPUT_TIMELINE_DATA)
+               || output.equals(OUTPUT_TIMELINE_DATA)
                || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD)
                || output.equals(OUTPUT_GROUPXML)
                || output.equals(OUTPUT_METADATAXML);
@@ -143,7 +144,8 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         types.add(new OutputType("Entry", OUTPUT_HTML));
         if (entries.size() > 1) {
@@ -173,7 +175,7 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.row(HtmlUtil.colspan("<center>" + links
                 + "</center>", 2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
-                                                              OutputHandler.OUTPUT_HTML, false,true));
+                OutputHandler.OUTPUT_HTML, false, true));
         getMetadataHtml(request, entry, sb, false);
 
         sb.append("</table>");
@@ -246,8 +248,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public void getAssociationBlock(Request request, Entry entry,
                                     StringBuffer sb)
             throws Exception {
-        boolean canEdit= getAccessManager().canDoAction(request, entry,
-                                                        Permission.ACTION_EDIT);
+        boolean canEdit = getAccessManager().canDoAction(request, entry,
+                              Permission.ACTION_EDIT);
         List<Association> associations =
             getRepository().getAssociations(request, entry);
         if (associations.size() == 0) {
@@ -261,22 +263,29 @@ public class HtmlOutputHandler extends OutputHandler {
             if (association.getFromId().equals(entry.getId())) {
                 fromEntry = entry;
             } else {
-                fromEntry = getRepository().getEntry(request,association.getFromId());
+                fromEntry = getRepository().getEntry(request,
+                        association.getFromId());
             }
             if (association.getToId().equals(entry.getId())) {
                 toEntry = entry;
             } else {
-                toEntry = getRepository().getEntry(request,association.getToId());
+                toEntry = getRepository().getEntry(request,
+                        association.getToId());
             }
             if ((fromEntry == null) || (toEntry == null)) {
                 continue;
             }
             assocSB.append("<tr>");
-            if(canEdit) {
-                assocSB.append(HtmlUtil.cols(HtmlUtil.href(
-                                                           request.url(getRepository().URL_ASSOCIATION_DELETE,
-                                                                       ARG_ASSOCIATION,
-                                                                       association.getId()),HtmlUtil.img(getRepository().fileUrl(ICON_DELETE),msg("Delete association")))));
+            if (canEdit) {
+                assocSB.append(
+                    HtmlUtil.cols(
+                        HtmlUtil.href(
+                            request.url(
+                                getRepository().URL_ASSOCIATION_DELETE,
+                                ARG_ASSOCIATION,
+                                association.getId()), HtmlUtil.img(
+                                    getRepository().fileUrl(ICON_DELETE),
+                                    msg("Delete association")))));
             }
             assocSB.append("<td>");
             assocSB.append(((fromEntry == entry)
@@ -376,7 +385,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void xappendListHeader(Request request, String output,
-                                    String what, StringBuffer sb)
+                                     String what, StringBuffer sb)
             throws Exception {
         /*
         List<OutputType> outputTypes =

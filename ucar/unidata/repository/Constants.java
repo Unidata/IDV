@@ -80,49 +80,58 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CART = "/cart.gif";
 
+    /** _more_          */
     public static final String ICON_RSS = "/rss.gif";
 
+    /** _more_          */
     public static final String ICON_METADATA = "/metadata.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_CLOSE = "/close.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_MOVE = "/move.gif";
 
     /** _more_ */
     public static final String ICON_COMMENTS = "/comments.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_DOWNARROW = "/downarrow.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_GRAYRECT = "/grayrect.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_GRAYRECTARROW = "/grayrectarrow.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_TOOLS = "/tools.gif";
 
+    /** _more_          */
     public static final String ICON_ERROR = "/error.png";
 
+    /** _more_          */
     public static final String ICON_QUESTION = "/question.png";
 
+    /** _more_          */
     public static final String ICON_WARNING = "/warning.png";
-    public static final String ICON_PROGRESS = "/progress.gif";
-    public static final String ICON_INFORMATION= "/information.png";
 
     /** _more_          */
+    public static final String ICON_PROGRESS = "/progress.gif";
+
+    /** _more_          */
+    public static final String ICON_INFORMATION = "/information.png";
+
+    /** _more_ */
     public static final String ICON_RIGHTARROW = "/rightarrow.gif";
 
     /** _more_ */
     public static final String ICON_FOLDER = "/folder.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_FOLDER_OPEN = "/folderopen.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_FOLDER_CLOSED = "/folderclosed.gif";
 
     /** _more_ */
@@ -251,12 +260,16 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
+    public static final String ARG_STEP = "step";
+
+    /** _more_          */
     public static final String ARG_COLLECTION = "collection";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TEXT = "text";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXACT = "exact";
 
     /** _more_ */
@@ -285,7 +298,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_COMMENT = "comment";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MOVE_CONFIRM = "move.confirm";
 
     /** _more_ */
@@ -493,7 +506,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TOPLEVEL = "toplevel";
 
     /** _more_ */
@@ -507,15 +520,17 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_QUERY = "query";
+
+    /** _more_          */
     public static final String ARG_SQLFILE = "sqlfile";
 
     /** _more_ */
     public static final String ARG_TODATE = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CREATOR = "creator";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_LABEL = "label";
 
     /** _more_ */
@@ -524,6 +539,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FROMDATE = "fromdate";
 
+    /** _more_          */
     public static final String ARG_FILESUFFIX = "filesuffix";
 
     /** _more_ */
@@ -744,8 +760,14 @@ public interface Constants {
     public static final String ARG_DESCRIPTION = "description";
 
 
+    public static final String ARG_ADMIN_INSTALLNOTICESHOWN = "admin.installnoticeshown";
+
+
     /** _more_ */
-    public static final String ARG_ADMIN_HAVECREATED = "admin.havecreated";
+    public static final String ARG_ADMIN_LICENSEREAD = "admin.licenseread";
+
+    public static final String ARG_ADMIN_ADMINCREATED = "admin.admincreated";
+    public static final String ARG_ADMIN_INSTALLCOMPLETE = "admin.installcomplete";
 
 
     /** _more_ */
@@ -773,6 +795,7 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_START = "action.start";
 
+    /** _more_          */
     public static final String ACTION_CLEARCACHE = "action.clearcache";
 
     /** _more_ */

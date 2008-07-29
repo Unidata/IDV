@@ -63,12 +63,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
 
 
 
 import java.util.regex.*;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 
 /**
@@ -111,12 +112,17 @@ public class Request implements Constants {
     /** _more_ */
     private String ip;
 
-    /** _more_          */
+    /** _more_ */
     private Entry collectionEntry;
 
 
+    /** _more_          */
     private HttpServletRequest httpServletRequest;
+
+    /** _more_          */
     private HttpServletResponse httpServletResponse;
+
+    /** _more_          */
     private HttpServlet httpServlet;
 
 
@@ -139,14 +145,24 @@ public class Request implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param type _more_
+     * @param parameters _more_
+     * @param httpServletRequest _more_
+     * @param httpServletResponse _more_
+     * @param httpServlet _more_
+     */
     public Request(Repository repository, String type, Hashtable parameters,
                    HttpServletRequest httpServletRequest,
                    HttpServletResponse httpServletResponse,
                    HttpServlet httpServlet) {
         this(repository, type, parameters);
-        this.httpServletRequest = httpServletRequest;
+        this.httpServletRequest  = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
-        this.httpServlet = httpServlet;
+        this.httpServlet         = httpServlet;
     }
 
 
@@ -162,6 +178,15 @@ public class Request implements Constants {
         return entryUrl(theUrl, entry, ARG_ID);
     }
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
+     * @param arg _more_
+     *
+     * @return _more_
+     */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg) {
         if (entry.isTopGroup()) {
             return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
@@ -383,7 +408,7 @@ public class Request implements Constants {
         return (String) fileUploads.get(arg);
     }
 
-    /** _more_          */
+    /** _more_ */
     public StringBuffer tmp = new StringBuffer();
 
     /**
@@ -485,11 +510,16 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getPathEmbeddedArgs() {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
-            String arg = (String) keys.nextElement();
+            String arg   = (String) keys.nextElement();
             Object value = parameters.get(arg);
             if (value instanceof List) {
                 List l = (List) value;
@@ -522,16 +552,23 @@ public class Request implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public String getFromPath(String key) {
         String path = getRequestPath();
         //Look for .../id:<id>
-        String prefix = key+":";
-        int idx = path.indexOf(prefix);
-        if(idx>=0) {
-            String value = path.substring(idx+prefix.length());
+        String prefix = key + ":";
+        int    idx    = path.indexOf(prefix);
+        if (idx >= 0) {
+            String value = path.substring(idx + prefix.length());
             idx = value.indexOf("/");
-            if(idx>=0) {
-                value = value.substring(0,idx);
+            if (idx >= 0) {
+                value = value.substring(0, idx);
             }
             return value;
         }
@@ -806,7 +843,7 @@ public class Request implements Constants {
      */
     private Object getValue(Object key, Object dflt) {
         Object result = parameters.get(key);
-        if(result==null) {
+        if (result == null) {
             result = getFromPath(key.toString());
         }
         if (result == null) {
@@ -826,7 +863,7 @@ public class Request implements Constants {
      */
     private String getValue(Object key, String dflt) {
         Object result = parameters.get(key);
-        if(result==null) {
+        if (result == null) {
             result = getFromPath(key.toString());
         }
         if (result == null) {
@@ -989,10 +1026,10 @@ public class Request implements Constants {
      */
     public Date[] getDateRange(String from, String to, Date dflt)
             throws java.text.ParseException {
-        String fromDate="";
-        String toDate="";
-        if(defined(from) || defined(to)) {
-            
+        String fromDate = "";
+        String toDate   = "";
+        if (defined(from) || defined(to)) {
+
             fromDate = (String) getDateSelect(from, "").trim();
             toDate   = (String) getDateSelect(to, "").trim();
         } else if (defined(ARG_RELATIVEDATE)) {
@@ -1118,7 +1155,7 @@ public class Request implements Constants {
         return type + "url args:" + getUrlArgs();  // + "\n\theader args:"               + httpHeaderArgs;
     }
 
-    /** _more_          */
+    /** _more_ */
     private boolean sessionIdWasSet = false;
 
     /**
@@ -1212,20 +1249,30 @@ public class Request implements Constants {
 
 
     /**
-       Get the HttpServletRequest property.
-
-       @return The HttpServletRequest
-    **/
-    public HttpServletRequest getHttpServletRequest () {
-	return httpServletRequest;
+     *  Get the HttpServletRequest property.
+     *
+     *  @return The HttpServletRequest
+     */
+    public HttpServletRequest getHttpServletRequest() {
+        return httpServletRequest;
     }
 
-    public HttpServletResponse getHttpServletResponse () {
-	return httpServletResponse;
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public HttpServletResponse getHttpServletResponse() {
+        return httpServletResponse;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public javax.servlet.http.HttpServlet getHttpServlet() {
         return httpServlet;
     }

@@ -124,7 +124,8 @@ public class MapOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
+                                          List<Entry> entries,
+                                          List<OutputType> types)
             throws Exception {
         getOutputTypesForEntries(request, entries, types);
     }
@@ -141,7 +142,8 @@ public class MapOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         if (entries.size() > 0) {
             boolean ok = false;
@@ -181,15 +183,18 @@ public class MapOutputHandler extends OutputHandler {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);
 
-        String output = request.getOutput();
-        StringBuffer sb         = new StringBuffer();
+        String       output = request.getOutput();
+        StringBuffer sb     = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, group,
-                                                         false, "");
+                              false, "");
         sb.append(crumbs[1]);
 
-        sb.append(importJS("http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
-        sb.append(importJS(repository.getUrlBase()+"/mapstraction.js"));
-        sb.append("<div style=\"width:700px; height:500px\" id=\"mapstraction\"></div>\n");
+        sb.append(
+            importJS(
+                "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
+        sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
+        sb.append(
+            "<div style=\"width:700px; height:500px\" id=\"mapstraction\"></div>\n");
         sb.append(script("MapInitialize();"));
         if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
@@ -197,19 +202,19 @@ public class MapOutputHandler extends OutputHandler {
                                        getMimeType(output));
 
             result.putProperty(
-                               PROP_NAVSUBLINKS,
-                               getHeader(
-                                         request, HtmlOutputHandler.OUTPUT_HTML,
-                                         getRepository().getOutputTypesForGroup(
-                                                                                request, group, subGroups, entries)));
+                PROP_NAVSUBLINKS,
+                getHeader(
+                    request, HtmlOutputHandler.OUTPUT_HTML,
+                    getRepository().getOutputTypesForGroup(
+                        request, group, subGroups, entries)));
             return result;
         }
 
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
         js.append("var pointList;\n");
-        for (Entry entry: entriesToUse) {
-            if(entry.hasAreaDefined()) {
+        for (Entry entry : entriesToUse) {
+            if (entry.hasAreaDefined()) {
                 js.append("pointList = new Polyline([");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append(",");
@@ -222,37 +227,38 @@ public class MapOutputHandler extends OutputHandler {
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append("]);\n");
                 js.append("mapstraction.addPolyline(pointList);\n");
-            } 
-            if(entry.hasLocationDefined() || entry.hasAreaDefined()) {
-                String info = getRepository().getEntryUrl(request, entry) +
-                    "<table>" +
-                    entry.getTypeHandler().getInnerEntryContent(entry, request,
-                                                                OutputHandler.OUTPUT_HTML, false, false) +
-                    "</table>";
+            }
+            if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
+                String info =
+                    getRepository().getEntryUrl(request, entry) + "<table>"
+                    + entry.getTypeHandler().getInnerEntryContent(entry,
+                        request, OutputHandler.OUTPUT_HTML, false,
+                        false) + "</table>";
                 info = info.replace("\r", " ");
                 info = info.replace("\n", " ");
                 info = info.replace("\"", "\\\"");
-                js.append("marker = new Marker(" + llp(entry.getSouth(),entry.getEast()) +");\n");
-                js.append("marker.setInfoBubble(\"" +info +"\");\n");
+                js.append("marker = new Marker("
+                          + llp(entry.getSouth(), entry.getEast()) + ");\n");
+                js.append("marker.setInfoBubble(\"" + info + "\");\n");
                 js.append("mapstraction.addMarker(marker);\n");
             }
 
 
-//mapstraction.addMarker(marker);
-/*
+            //mapstraction.addMarker(marker);
+            /*
 
-var myPoly = new Polyline([new LatLonPoint(37.7945928242851,-122.395033836365), new LatLonPoint(37.7938467508748,-122.393960952759), new LatLonPoint(37.7945928242851,-122.39275932312), new LatLonPoint(37.789505810689,-122.387609481812), new LatLonPoint(37.7782792282611,-122.387351989746), new LatLonPoint(37.7768545853105,-122.390570640564), new LatLonPoint(37.7690524823224,-122.397179603577), new LatLonPoint(37.7668813159428,-122.394347190857), new LatLonPoint(37.7658635597592,-122.407650947571), new LatLonPoint(37.7689167862912,-122.408037185669), new LatLonPoint(37.7765493011063,-122.417650222778), new LatLonPoint(37.7945928242851,-122.395033836365)]);
+            var myPoly = new Polyline([new LatLonPoint(37.7945928242851,-122.395033836365), new LatLonPoint(37.7938467508748,-122.393960952759), new LatLonPoint(37.7945928242851,-122.39275932312), new LatLonPoint(37.789505810689,-122.387609481812), new LatLonPoint(37.7782792282611,-122.387351989746), new LatLonPoint(37.7768545853105,-122.390570640564), new LatLonPoint(37.7690524823224,-122.397179603577), new LatLonPoint(37.7668813159428,-122.394347190857), new LatLonPoint(37.7658635597592,-122.407650947571), new LatLonPoint(37.7689167862912,-122.408037185669), new LatLonPoint(37.7765493011063,-122.417650222778), new LatLonPoint(37.7945928242851,-122.395033836365)]);
 
-*/
-        }         
+            */
+        }
         sb.append(script(js.toString()));
         Result result = new Result("Results", sb);
         result.putProperty(
-                           PROP_NAVSUBLINKS,
-                           getHeader(
-                                     request, output,
-                                     getRepository().getOutputTypesForGroup(
-                                                                            request, group, subGroups, entries)));
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, output,
+                getRepository().getOutputTypesForGroup(
+                    request, group, subGroups, entries)));
 
 
         return result;
@@ -260,18 +266,40 @@ var myPoly = new Polyline([new LatLonPoint(37.7945928242851,-122.395033836365), 
 
 
 
- 
+
+    /**
+     * _more_
+     *
+     * @param lat _more_
+     * @param lon _more_
+     *
+     * @return _more_
+     */
     private String llp(double lat, double lon) {
-        return "new LatLonPoint(" + lat +"," + lon+")";
+        return "new LatLonPoint(" + lat + "," + lon + ")";
 
     }
 
-    private String  script(String s) {
-        return "<script type=\"text/JavaScript\">" + s +"</script>\n";
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    private String script(String s) {
+        return "<script type=\"text/JavaScript\">" + s + "</script>\n";
     }
 
+    /**
+     * _more_
+     *
+     * @param jsUrl _more_
+     *
+     * @return _more_
+     */
     private String importJS(String jsUrl) {
-        return "<script src=\"" + jsUrl +"\"></script>\n";
+        return "<script src=\"" + jsUrl + "\"></script>\n";
     }
 
 

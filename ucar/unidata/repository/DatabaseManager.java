@@ -72,8 +72,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
@@ -198,13 +198,27 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     */
     protected void addInfo(StringBuffer sb) {
-        String dbUrl = ""+(String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
-                                                                                   db));
-        sb.append(HtmlUtil.formEntry("JDBC URL:",dbUrl));
+        String dbUrl = "" + (String) getRepository().getProperty(
+                           PROP_DB_URL.replace("${db}", db));
+        sb.append(HtmlUtil.formEntry("Database:", db));
+        sb.append(HtmlUtil.formEntry("JDBC URL:", dbUrl));
     }
 
+    /**
+     * _more_
+     *
+     * @param os _more_
+     *
+     * @throws Exception _more_
+     */
     public void makeDatabaseCopy(OutputStream os) throws Exception {
+
         DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
@@ -214,24 +228,25 @@ public class DatabaseManager extends RepositoryManager {
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
             String tableType = tables.getString("TABLE_TYPE");
-            if (tableType == null || Misc.equals(tableType, "INDEX") ||
-                tableType.startsWith("SYSTEM")) {
+            if ((tableType == null) || Misc.equals(tableType, "INDEX")
+                    || tableType.startsWith("SYSTEM")) {
                 continue;
             }
-            
-            ResultSet        cols =  dbmd.getColumns(null,null,tableName,null);
 
-            int colCnt = 0;
+            ResultSet cols     = dbmd.getColumns(null, null, tableName, null);
 
-            String colNames=null;
-            List types = new ArrayList();
+            int       colCnt   = 0;
+
+            String    colNames = null;
+            List      types    = new ArrayList();
             while (cols.next()) {
                 String colName = cols.getString("COLUMN_NAME");
-                if(colNames==null)
+                if (colNames == null) {
                     colNames = " (";
-                else 
+                } else {
                     colNames += ",";
-                colNames+=colName;
+                }
+                colNames += colName;
                 int type = cols.getInt("DATA_TYPE");
                 types.add(type);
                 colCnt++;
@@ -239,40 +254,44 @@ public class DatabaseManager extends RepositoryManager {
             colNames += ") ";
             System.err.println("table:" + tableName);
 
-            Statement stmt = execute("select * from " + tableName, 10000000, 0);
+            Statement stmt = execute("select * from " + tableName, 10000000,
+                                     0);
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
-            int rowCnt = 0;
-            List valueList = new ArrayList();
-            boolean didDelete = false;
+            int              rowCnt    = 0;
+            List             valueList = new ArrayList();
+            boolean          didDelete = false;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    if(!didDelete) {
+                    if ( !didDelete) {
                         didDelete = true;
-                        IOUtil.write(os,"delete from  " + tableName.toLowerCase() + ";\n");
+                        IOUtil.write(os,
+                                     "delete from  "
+                                     + tableName.toLowerCase() + ";\n");
                     }
                     totalRowCnt++;
                     rowCnt++;
-                    StringBuffer  value = new StringBuffer("(");
-                    for(int i=1;i<=colCnt;i++) {
-                        int type = ((Integer)types.get(i-1)).intValue();
-                        if(i>1)
+                    StringBuffer value = new StringBuffer("(");
+                    for (int i = 1; i <= colCnt; i++) {
+                        int type = ((Integer) types.get(i - 1)).intValue();
+                        if (i > 1) {
                             value.append(",");
-                        if(type==java.sql.Types.TIMESTAMP) {
-                            Timestamp ts =  results.getTimestamp(i);
+                        }
+                        if (type == java.sql.Types.TIMESTAMP) {
+                            Timestamp ts = results.getTimestamp(i);
                             //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
-                            value.append("'" +ts.toString()+"'");
-                        } else   if(type==java.sql.Types.VARCHAR) {
+                            value.append("'" + ts.toString() + "'");
+                        } else if (type == java.sql.Types.VARCHAR) {
                             String s = results.getString(i);
-                            if(s!=null) {
+                            if (s != null) {
                                 //If the target isn't mysql:
                                 //s = s.replace("'", "''");
                                 //If the target is mysql:
-                                s =  s.replace("'", "\\'");
-                                s =  s.replace("\r", "\\r");
-                                s =  s.replace("\n", "\\n");
-                                value.append("'"+s+"'");
-                            }    else {
+                                s = s.replace("'", "\\'");
+                                s = s.replace("\r", "\\r");
+                                s = s.replace("\n", "\\n");
+                                value.append("'" + s + "'");
+                            } else {
                                 value.append("null");
                             }
                         } else {
@@ -282,26 +301,33 @@ public class DatabaseManager extends RepositoryManager {
                     }
                     value.append(")");
                     valueList.add(value.toString());
-                    if(valueList.size()>50) {
-                        IOUtil.write(os,"insert into " + tableName.toLowerCase() + colNames +" values ");
-                        IOUtil.write(os,StringUtil.join(",",valueList));
-                        IOUtil.write(os,";\n");
+                    if (valueList.size() > 50) {
+                        IOUtil.write(os,
+                                     "insert into " + tableName.toLowerCase()
+                                     + colNames + " values ");
+                        IOUtil.write(os, StringUtil.join(",", valueList));
+                        IOUtil.write(os, ";\n");
                         valueList = new ArrayList();
                     }
                 }
             }
-            if(valueList.size()>0) {
-                System.err.println ("\tdoing last bit");
-                if(!didDelete) {
+            if (valueList.size() > 0) {
+                System.err.println("\tdoing last bit");
+                if ( !didDelete) {
                     didDelete = true;
-                    IOUtil.write(os,"delete from  " + tableName.toLowerCase() + ";\n");
+                    IOUtil.write(os,
+                                 "delete from  " + tableName.toLowerCase()
+                                 + ";\n");
                 }
-                IOUtil.write(os,"insert into " + tableName.toLowerCase() + colNames +" values ");
-                IOUtil.write(os,StringUtil.join(",",valueList));
-                IOUtil.write(os,";\n");
+                IOUtil.write(os,
+                             "insert into " + tableName.toLowerCase()
+                             + colNames + " values ");
+                IOUtil.write(os, StringUtil.join(",", valueList));
+                IOUtil.write(os, ";\n");
             }
             System.err.println("\twrote:" + rowCnt + " rows");
         }
+
     }
 
 

@@ -155,7 +155,8 @@ public class XmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         //        types.add(new OutputType("Entries XML", OUTPUT_XML));
     }

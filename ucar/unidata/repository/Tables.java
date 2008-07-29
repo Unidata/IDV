@@ -53,10 +53,14 @@ public interface Tables {
     public static final String TABLE_ASSOCIATIONS = "associations";
 
     /** _more_ */
-    public static final String COL_ASSOCIATIONS_ID = TABLE_ASSOCIATIONS +".id";
+    public static final String COL_ASSOCIATIONS_ID = TABLE_ASSOCIATIONS
+                                                     + ".id";
 
+    /** _more_          */
     public static final String COL_ASSOCIATIONS_NAME = TABLE_ASSOCIATIONS
                                                        + ".name";
+
+    /** _more_          */
     public static final String COL_ASSOCIATIONS_TYPE = TABLE_ASSOCIATIONS
                                                        + ".type";
 
@@ -69,12 +73,11 @@ public interface Tables {
         TABLE_ASSOCIATIONS + ".to_entry_id";
 
     /** _more_ */
-    public static final String[] ARRAY_ASSOCIATIONS =
-        new String[] { COL_ASSOCIATIONS_ID,
-                       COL_ASSOCIATIONS_NAME,
-                       COL_ASSOCIATIONS_TYPE,
-                       COL_ASSOCIATIONS_FROM_ENTRY_ID,
-                       COL_ASSOCIATIONS_TO_ENTRY_ID };
+    public static final String[] ARRAY_ASSOCIATIONS = new String[] {
+                                                          COL_ASSOCIATIONS_ID,
+            COL_ASSOCIATIONS_NAME, COL_ASSOCIATIONS_TYPE,
+            COL_ASSOCIATIONS_FROM_ENTRY_ID,
+            COL_ASSOCIATIONS_TO_ENTRY_ID };
 
     /** _more_ */
     public static final String COLUMNS_ASSOCIATIONS =

@@ -89,8 +89,8 @@ public class RssOutputHandler extends OutputHandler {
         new OutputType("Full RSS Feed", OUTPUT_RSS_FULL);
 
     /** _more_ */
-    private static final OutputType TFO_SUMMARY =
-        new OutputType("RSS Feed", OUTPUT_RSS_SUMMARY);
+    private static final OutputType TFO_SUMMARY = new OutputType("RSS Feed",
+                                                      OUTPUT_RSS_SUMMARY);
 
 
 
@@ -119,15 +119,22 @@ public class RssOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links)
             throws Exception {
-        String url   = request.entryUrl(
-                                        getRepository().URL_ENTRY_SHOW, 
-                                        entry, 
-                                        ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
-        links.add(new Link(url,
-                           getRepository().fileUrl(ICON_RSS), "RSS Feed"));
+        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                      ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
+        links.add(new Link(url, getRepository().fileUrl(ICON_RSS),
+                           "RSS Feed"));
     }
 
 
@@ -144,7 +151,8 @@ public class RssOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
+                                          List<Entry> entries,
+                                          List<OutputType> types)
             throws Exception {
         /*        if (entries.size() == 0&& subGroups.size()==0) {
             return;
@@ -164,7 +172,8 @@ public class RssOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         //types.add(TFO_FULL);
         //        types.add(TFO_SUMMARY);

@@ -36,13 +36,14 @@ import java.io.*;
 
 import java.net.*;
 
-import java.util.Properties;
 import java.util.Date;
 import java.util.Enumeration;
 
 
 import java.util.Hashtable;
 import java.util.List;
+
+import java.util.Properties;
 
 
 /**
@@ -85,7 +86,7 @@ public class RepositoryServer extends HttpServer implements Constants {
     public void init() {
         try {
             //TODO: set the hostname on the repository
-            repository = new Repository(args, null, getPort(),false);
+            repository = new Repository(args, null, getPort(), false);
             repository.init(null);
         } catch (Exception exc) {
             //            exc.printStackTrace();

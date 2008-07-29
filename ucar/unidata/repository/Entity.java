@@ -431,14 +431,14 @@ public class Entity implements Cloneable {
      * @param value The new value for Permissions
      */
     public void setPermissions(List<Permission> value) {
-        permissions = value;
+        permissions   = value;
         permissionMap = new Hashtable();
         if (permissions != null) {
             for (Permission permission : permissions) {
                 permissionMap.put(permission.getAction(),
                                   permission.getRoles());
             }
-        } 
+        }
     }
 
     /**

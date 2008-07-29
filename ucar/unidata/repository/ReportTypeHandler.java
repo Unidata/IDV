@@ -60,16 +60,16 @@ import java.util.Properties;
  */
 public class ReportTypeHandler extends TypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_CONTENT = "content";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_FIELD = "column";
 
-    /** _more_          */
+    /** _more_ */
     private String formTemplatePath;
 
 

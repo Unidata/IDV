@@ -170,8 +170,8 @@ public class AccessManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_ID)) {
-            Entry entry = getRepository().getEntry(request, request.getString(ARG_ID,
-                              ""),  false);
+            Entry entry = getRepository().getEntry(request,
+                              request.getString(ARG_ID, ""), false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
                         + request.getString(ARG_ID, ""));
@@ -203,13 +203,16 @@ public class AccessManager extends RepositoryManager {
             return canDoAction(request, group, action);
         }
 
-        if(request.exists(ARG_ASSOCIATION)) {
+        if (request.exists(ARG_ASSOCIATION)) {
             Clause clause = Clause.eq(COL_ASSOCIATIONS_ID,
                                       request.getString(ARG_ASSOCIATION, ""));
-            List<Association> associations =  getRepository().getAssociations(request, clause);
-            if(associations.size()==1) {
-                Entry fromEntry = getRepository().getEntry(request, associations.get(0).getFromId());
-                Entry toEntry = getRepository().getEntry(request, associations.get(0).getToId());
+            List<Association> associations =
+                getRepository().getAssociations(request, clause);
+            if (associations.size() == 1) {
+                Entry fromEntry = getRepository().getEntry(request,
+                                      associations.get(0).getFromId());
+                Entry toEntry = getRepository().getEntry(request,
+                                    associations.get(0).getToId());
                 if (canDoAction(request, fromEntry, action)) {
                     return true;
                 }
@@ -336,7 +339,9 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Entry filterEntry(Request request, Entry entry) throws Exception {
-        if (entry.getResource()!=null && Misc.equals(entry.getResource().getType(),Resource.TYPE_FILE)) {
+        if ((entry.getResource() != null)
+                && Misc.equals(entry.getResource().getType(),
+                               Resource.TYPE_FILE)) {
             if ( !entry.getResource().getFile().exists()) {
                 //TODO                return null;
             }
@@ -477,14 +482,14 @@ public class AccessManager extends RepositoryManager {
     protected List<Permission> getPermissions(Request request, Entry entry)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            if(false) {
-                List<Permission> tmp =  new ArrayList<Permission>();
+            if (false) {
+                List<Permission> tmp = new ArrayList<Permission>();
                 tmp.add(new Permission(Permission.ACTION_VIEW,
                                        getUserManager().ROLE_ANY));
                 return tmp;
             }
-            if(entry.isGroup() && ((Group) entry).isDummy()) {
-                return  new ArrayList<Permission>();
+            if (entry.isGroup() && ((Group) entry).isDummy()) {
+                return new ArrayList<Permission>();
             }
             if (entry.getPermissions() != null) {
                 return entry.getPermissions();

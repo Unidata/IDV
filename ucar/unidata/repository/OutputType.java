@@ -79,44 +79,65 @@ import java.util.zip.*;
  */
 public class OutputType extends TwoFacedObject {
 
+    /** _more_          */
     private String suffix = "";
 
 
-    public OutputType(String name, String output,
-                      String suffix) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param output _more_
+     * @param suffix _more_
+     */
+    public OutputType(String name, String output, String suffix) {
         super(name, output);
         this.suffix = suffix;
     }
 
-    public OutputType(String name,String output) {
-        this(name, output,  "");
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param output _more_
+     */
+    public OutputType(String name, String output) {
+        this(name, output, "");
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public String assembleUrl(Request request) {
-        return request.getRequestPath() + getSuffix() +"?"
-            + request.getUrlArgs();
+        return request.getRequestPath() + getSuffix() + "?"
+               + request.getUrlArgs();
     }
 
-    
-/**
-Set the Suffix property.
 
-@param value The new value for Suffix
-**/
-public void setSuffix (String value) {
-	suffix = value;
+    /**
+     * Set the Suffix property.
+     *
+     * @param value The new value for Suffix
+     */
+    public void setSuffix(String value) {
+        suffix = value;
+    }
+
+    /**
+     * Get the Suffix property.
+     *
+     * @return The Suffix
+     */
+    public String getSuffix() {
+        return suffix;
+    }
+
+
 }
 
-/**
-Get the Suffix property.
-
-@return The Suffix
-**/
-public String getSuffix () {
-	return suffix;
-}
-
-
-}

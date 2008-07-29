@@ -78,6 +78,7 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      * @param entry _more_
      * @param request _more_
      * @param links _more_
+     * @param forMenu _more_
      *
      *
      * @throws Exception _more_

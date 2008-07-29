@@ -87,6 +87,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
+    /** _more_          */
     public static final String SERVICE_DODS = "DODS";
 
     /** _more_ */
@@ -177,9 +178,10 @@ public class CatalogOutputHandler extends OutputHandler {
     private List<String> tdsNotPrefixes;
 
 
+    /** _more_          */
     TdsOutputHandler tdsOutputHandler;
 
-    
+
 
     /**
      * _more_
@@ -306,7 +308,7 @@ public class CatalogOutputHandler extends OutputHandler {
                     String url = XmlUtil.getAttribute(child, "xlink:href");
                     Element root = XmlUtil.getRoot(url,
                                        CatalogOutputHandler.class);
-                    if(root!=null) {
+                    if (root != null) {
                         collectMetadata(repository, metadataList, root);
                     }
                 } else {
@@ -358,7 +360,8 @@ public class CatalogOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         types.add(new OutputType("Thredds Catalog", OUTPUT_CATALOG));
     }
@@ -499,22 +502,24 @@ public class CatalogOutputHandler extends OutputHandler {
         String path = f.toString();
         path = path.replace("\\", "/");
 
-        
-        if(tdsOutputHandler==null) {
-            tdsOutputHandler    = (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_TDS);   
+
+        if (tdsOutputHandler == null) {
+            tdsOutputHandler =
+                (TdsOutputHandler) getRepository().getOutputHandler(
+                    TdsOutputHandler.OUTPUT_TDS);
         }
-        
-        if(tdsOutputHandler.canLoad(entry)) {
+
+        if (tdsOutputHandler.canLoad(entry)) {
             String urlPath = tdsOutputHandler.getTdsUrl(entry);
             addService(catalogInfo, SERVICE_DODS,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
             Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
                                              dataset,
                                              new String[] { ATTR_SERVICENAME,
-                                                            SERVICE_DODS, ATTR_URLPATH, urlPath });
+                    SERVICE_DODS, ATTR_URLPATH, urlPath });
         }
-        
-        
+
+
 
 
         if (entry.getTypeHandler().canDownload(request, entry)) {
@@ -529,22 +534,22 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         if (entry.getResource().isUrl()) {
             //            try {
-                URL    url     = new URL(entry.getResource().getPath());
-                String service = url.getProtocol() + "://" + url.getHost();
-                if (url.getPort() > 0) {
-                    service = service + ":" + url.getPort();
-                }
-                addService(catalogInfo, service, service);
-                String tail = url.getPath();
-                if (url.getQuery() != null) {
-                    tail = tail + "?" + url.getQuery();
-                }
-                XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
-                               new String[] { ATTR_SERVICENAME,
-                                              service, ATTR_URLPATH, tail });
-                //            } catch (java.net.MalformedURLException mfe) {
-                //For now
-                //            }
+            URL    url     = new URL(entry.getResource().getPath());
+            String service = url.getProtocol() + "://" + url.getHost();
+            if (url.getPort() > 0) {
+                service = service + ":" + url.getPort();
+            }
+            addService(catalogInfo, service, service);
+            String tail = url.getPath();
+            if (url.getQuery() != null) {
+                tail = tail + "?" + url.getQuery();
+            }
+            XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
+                           new String[] { ATTR_SERVICENAME,
+                                          service, ATTR_URLPATH, tail });
+            //            } catch (java.net.MalformedURLException mfe) {
+            //For now
+            //            }
         }
 
         if (entry.getResource().isFile()) {

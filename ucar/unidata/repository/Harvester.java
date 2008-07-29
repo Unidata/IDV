@@ -252,8 +252,7 @@ public class Harvester extends RepositoryManager {
                 + msgLabel("Sleep") + HtmlUtil.space(1)
                 + HtmlUtil.input(
                     ATTR_SLEEP, "" + sleepMinutes,
-                    HtmlUtil.SIZE_5) + HtmlUtil.space(1)
-                                      + msg("(minutes)")));
+                    HtmlUtil.SIZE_5) + HtmlUtil.space(1) + msg("(minutes)")));
 
     }
 

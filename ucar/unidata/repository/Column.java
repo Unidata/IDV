@@ -111,10 +111,10 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     private static final String ATTR_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     private static final String ATTR_OLDNAMES = "oldnames";
 
     /** _more_ */
@@ -166,10 +166,10 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String group;
 
-    /** _more_          */
+    /** _more_ */
     private List oldNames;
 
     /** _more_ */
@@ -434,7 +434,7 @@ public class Column implements Tables, Constants {
         } else if (type.equals(TYPE_LATLON)) {
             values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
-            values[offset+1] = new Double(results.getDouble(valueIdx));
+            values[offset + 1] = new Double(results.getDouble(valueIdx));
             valueIdx++;
         } else {
             values[offset] = results.getString(valueIdx);

@@ -74,7 +74,7 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";
 
     /** _more_ */
@@ -474,7 +474,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
-        if(getRepository().isSSLEnabled()) {
+        if (getRepository().isSSLEnabled()) {
             //sb.append(HtmlUtil.form(URL_USER_LOGIN.getHttpsUrl("")));
             sb.append(HtmlUtil.form(URL_USER_LOGIN.toString()));
         } else {
@@ -593,21 +593,17 @@ public class UserManager extends RepositoryManager {
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            SqlUtil.update(getConnection(),
-                           TABLE_USERS, COL_USERS_ID,
-                           user.getId(), 
-                           new String[] {
-                               COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
-                               COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN, COL_USERS_LANGUAGE
-                           }, new Object[] {
-                               user.getName(),
-                               user.getPassword(),
-                               user.getEmail(),
-                               user.getQuestion(),
-                               user.getAnswer(), 
-                               user.getAdmin()      ? new Integer(1)
-                               : new Integer(0), user.getLanguage()
-                           });
+            SqlUtil.update(getConnection(), TABLE_USERS, COL_USERS_ID,
+                           user.getId(), new String[] {
+                COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
+                COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN,
+                COL_USERS_LANGUAGE
+            }, new Object[] {
+                user.getName(), user.getPassword(), user.getEmail(),
+                user.getQuestion(), user.getAnswer(), user.getAdmin()
+                        ? new Integer(1)
+                        : new Integer(0), user.getLanguage()
+            });
             return;
         }
 
@@ -1147,84 +1143,8 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processInitialAdminPage(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        sb.append(msgHeader("Repository Initialization"));
-        String id   = "";
-        String name = "";
-        if (request.exists(ARG_USER_ID)) {
-            id   = request.getString(ARG_USER_ID, "").trim();
-            name = request.getString(ARG_USER_NAME, name).trim();
-            String password1 = request.getString(ARG_USER_PASSWORD1,
-                                   "").trim();
-            String password2 = request.getString(ARG_USER_PASSWORD2,
-                                   "").trim();
-            boolean      okToAdd     = true;
-            StringBuffer errorBuffer = new StringBuffer();
-            if (id.length() == 0) {
-                okToAdd = false;
-                errorBuffer.append(HtmlUtil.space(2));
-                errorBuffer.append(msg("Please enter an ID"));
-                errorBuffer.append(HtmlUtil.br());
-            }
-
-            if ((password1.length() == 0) || !password1.equals(password2)) {
-                okToAdd = false;
-                errorBuffer.append(HtmlUtil.space(2));
-                errorBuffer.append(msg("Invalid password"));
-                errorBuffer.append(HtmlUtil.br());
-            }
 
 
-            if (okToAdd) {
-                makeOrUpdateUser(new User(id, name, "", "", "",
-                                          hashPassword(password1), true,
-                                          ""), false);
-                sb.append(msg("Site administrator created"));
-                sb.append(HtmlUtil.p());
-                sb.append(makeLoginForm(request));
-                getRepository().writeGlobal(ARG_ADMIN_HAVECREATED, "true");
-                return new Result("", sb);
-            }
-            sb.append(msg("Error"));
-            sb.append(HtmlUtil.br());
-            sb.append(errorBuffer);
-            sb.append(HtmlUtil.p());
-        }
-
-
-        sb.append(
-            msg(
-            "Please enter the repository administrator user name and password"));
-        sb.append(HtmlUtil.p());
-        sb.append(request.form(getRepository().URL_DUMMY));
-        sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(msgLabel("ID"),
-                                     HtmlUtil.input(ARG_USER_ID, id)));
-        sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                     HtmlUtil.input(ARG_USER_NAME, name)));
-
-        sb.append(HtmlUtil.formEntry(msgLabel("Password"),
-                                     HtmlUtil.password(ARG_USER_PASSWORD1)));
-
-        sb.append(HtmlUtil.formEntry(msgLabel("Password Again"),
-                                     HtmlUtil.password(ARG_USER_PASSWORD2)));
-
-        sb.append(
-            HtmlUtil.formEntry(
-                "", HtmlUtil.submit(msg("Make Administrator"))));
-        return new Result(msg("Initialization"), sb);
-
-    }
 
 
 
@@ -1243,7 +1163,8 @@ public class UserManager extends RepositoryManager {
         if (action.equals(ACTION_CLEAR)) {
             getCart(request).clear();
         } else if (action.equals(ACTION_ADD)) {
-            Entry entry = getRepository().getEntry(request,request.getId(""));
+            Entry entry = getRepository().getEntry(request,
+                              request.getId(""));
             if (entry == null) {
                 throw new IllegalArgumentException(
                     msgLabel("Could not find entry with id")
@@ -1280,8 +1201,8 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.p());
             boolean haveFrom = request.defined(ARG_FROM);
             if (haveFrom) {
-                Entry fromEntry =
-                    getRepository().getEntry(request,request.getString(ARG_FROM, ""));
+                Entry fromEntry = getRepository().getEntry(request,
+                                      request.getString(ARG_FROM, ""));
                 sb.append(HtmlUtil.br());
                 sb.append(msgLabel("Pick an entry  to associate with")
                           + HtmlUtil.space(1) + fromEntry.getName());

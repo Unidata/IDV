@@ -30,11 +30,12 @@ import org.apache.commons.fileupload.disk.*;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+
 
 
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
@@ -43,7 +44,6 @@ import java.io.*;
 
 import java.net.*;
 
-import java.util.Properties;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -52,6 +52,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import java.util.Properties;
 
 import java.util.StringTokenizer;
 
@@ -86,11 +88,12 @@ public class MetadataServlet extends HttpServlet {
     private void createRepository(HttpServletRequest request)
             throws Exception {
         repository = new Repository(getInitParams(), request.getServerName(),
-                                    request.getServerPort(),true);
-        String propertyFile = "/WEB-INF/repository.properties";
-        Properties webAppProperties = new Properties();
-        InputStream is = getServletContext().getResourceAsStream(propertyFile);
-        if(is!=null) {
+                                    request.getServerPort(), true);
+        String      propertyFile     = "/WEB-INF/repository.properties";
+        Properties  webAppProperties = new Properties();
+        InputStream is =
+            getServletContext().getResourceAsStream(propertyFile);
+        if (is != null) {
             webAppProperties.load(is);
         }
         repository.init(webAppProperties);
@@ -159,7 +162,7 @@ public class MetadataServlet extends HttpServlet {
             try {
                 createRepository(request);
             } catch (Exception e) {
-                logException(e,request);
+                logException(e, request);
                 response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                    "An error has occurred:" + e.getMessage());
                 return;
@@ -178,9 +181,9 @@ public class MetadataServlet extends HttpServlet {
             // create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object
 
             Request repositoryRequest = new Request(repository,
-                                                    request.getRequestURI(),
-                                                    handler.formArgs, request, response,
-                                                    this);
+                                            request.getRequestURI(),
+                                            handler.formArgs, request,
+                                            response, this);
             //            System.err.println ("request:" +   request.getRequestURI());
             repositoryRequest.setIp(request.getRemoteAddr());
             repositoryRequest.setOutputStream(response.getOutputStream());
@@ -191,7 +194,7 @@ public class MetadataServlet extends HttpServlet {
         } catch (Throwable e) {
             e = LogUtil.getInnerException(e);
             repository.log("Error:" + e, e);
-            logException(e,request);
+            logException(e, request);
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                e.getMessage());
         }
@@ -199,7 +202,7 @@ public class MetadataServlet extends HttpServlet {
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                "Unknown request:" + request.getRequestURI());
             return;
-        } 
+        }
         if (repositoryResult.getNeedToWrite()) {
             List<String> args = repositoryResult.getHttpHeaderArgs();
             if (args != null) {
@@ -215,7 +218,7 @@ public class MetadataServlet extends HttpServlet {
                 try {
                     response.sendRedirect(repositoryResult.getRedirectUrl());
                 } catch (Exception e) {
-                    logException(e,request);
+                    logException(e, request);
                 }
             } else if (repositoryResult.getInputStream() != null) {
                 try {
@@ -225,7 +228,7 @@ public class MetadataServlet extends HttpServlet {
                     IOUtil.writeTo(repositoryResult.getInputStream(), output);
                     output.close();
                 } catch (Exception e) {
-                    logException(e,request);
+                    logException(e, request);
                 }
             } else {
                 try {
@@ -235,7 +238,7 @@ public class MetadataServlet extends HttpServlet {
                     output.write(repositoryResult.getContent());
                     output.close();
                 } catch (Exception e) {
-                    logException(e,request);
+                    logException(e, request);
                 }
             }
         }
@@ -316,7 +319,7 @@ public class MetadataServlet extends HttpServlet {
                         }
                     }
                 } catch (FileUploadException e) {
-                    logException(e,request);
+                    logException(e, request);
                 }
             } else {
                 // Map containing parameter names as keys and parameter values as map values. 
@@ -366,7 +369,7 @@ public class MetadataServlet extends HttpServlet {
             try {
                 repository.checkFilePath(fileName);
             } catch (Exception e) {
-                logException(e,request);
+                logException(e, request);
                 return;
             }
             String contentType = item.getContentType();
@@ -378,7 +381,7 @@ public class MetadataServlet extends HttpServlet {
             try {
                 item.write(uploadedFile);
             } catch (Exception e) {
-                logException(e,request);
+                logException(e, request);
                 return;
             }
             fileUploads.put(fieldName, uploadedFile.toString());
@@ -403,20 +406,32 @@ public class MetadataServlet extends HttpServlet {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param exc _more_
+     */
     protected void logException(Throwable exc) {
         logException(exc, null);
     }
 
+    /**
+     * _more_
+     *
+     * @param exc _more_
+     * @param request _more_
+     */
     protected void logException(Throwable exc, HttpServletRequest request) {
         try {
             String address = "";
-            if(request!=null)
+            if (request != null) {
                 address = request.getRemoteAddr();
+            }
             //            logger.logException(logger.getStackTrace(exc), address);
-            System.err.println ("Exception: " + exc);
+            System.err.println("Exception: " + exc);
             exc.printStackTrace();
-        } catch(Exception ioe) {
-            System.err.println ("Exception in logging exception:" + ioe);
+        } catch (Exception ioe) {
+            System.err.println("Exception in logging exception:" + ioe);
         }
 
     }

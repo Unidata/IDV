@@ -128,7 +128,8 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
+                                          List<Entry> entries,
+                                          List<OutputType> types)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -148,7 +149,8 @@ public class CsvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         types.add(new OutputType("CSV", OUTPUT_CSV));
     }

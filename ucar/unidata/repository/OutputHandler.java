@@ -194,7 +194,8 @@ public class OutputHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {}
 
     /**
@@ -229,7 +230,8 @@ public class OutputHandler extends RepositoryManager {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
+                                          List<Entry> entries,
+                                          List<OutputType> types)
             throws Exception {
         List<Entry> allEntries = new ArrayList<Entry>();
         allEntries.addAll(subGroups);
@@ -494,7 +496,7 @@ public class OutputHandler extends RepositoryManager {
         }
         String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int    cnt = 0;
-        for (Entry entry : (List<Entry>)entries) {
+        for (Entry entry : (List<Entry>) entries) {
             sb.append("<li>");
             if (doForm) {
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
@@ -561,9 +563,9 @@ public class OutputHandler extends RepositoryManager {
     protected List getHeader(Request request, String output,
                              List<OutputType> outputTypes)
             throws Exception {
-        int    cnt           = 0;
-        List   items         = new ArrayList();
-        String initialOutput = request.getString(ARG_OUTPUT, "");
+        int    cnt            = 0;
+        List   items          = new ArrayList();
+        String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, (String) outputType.getId());
@@ -573,14 +575,12 @@ public class OutputHandler extends RepositoryManager {
                 String url = outputType.assembleUrl(request);
                 //request.getRequestPath() + outputType.getSuffix() +"?"
                 //                    + request.getUrlArgs(ARG_MESSAGE);
-                items.add(
-                    HtmlUtil.href(url, 
-                                  msg(
-                                      outputType.toString()), " class=\"subnavlink\" "));
+                items.add(HtmlUtil.href(url, msg(outputType.toString()),
+                                        " class=\"subnavlink\" "));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);
-        if(initialMessage!=null) {
+        if (initialMessage != null) {
             request.put(ARG_MESSAGE, initialMessage);
         }
         return items;

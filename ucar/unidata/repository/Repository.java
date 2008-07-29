@@ -77,12 +77,12 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -143,8 +143,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
                                                 "/association/add");
 
+    /** _more_          */
     public RequestUrl URL_ASSOCIATION_DELETE = new RequestUrl(this,
-                                                "/association/delete");
+                                                   "/association/delete");
 
     /** _more_ */
     public RequestUrl URL_LIST_HOME = new RequestUrl(this, "/list/home");
@@ -251,13 +252,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     /** _more_ */
-    Properties argProperties = new Properties();
-
-
-    /** _more_ */
-    private Properties localProperties = new Properties();
-
-    /** _more_ */
     private String urlBase = "/repository";
 
     /** _more_ */
@@ -267,7 +261,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     private int keyCnt = 0;
 
 
+    /** _more_          */
     private List<String> loadFiles = new ArrayList<String>();
+
+    /** _more_          */
     private String dumpFile;
 
 
@@ -338,6 +335,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private int port;
 
+    /** _more_          */
     private boolean inTomcat = false;
 
 
@@ -411,10 +409,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @param args _more_
      * @param hostname _more_
      * @param port _more_
+     * @param inTomcat _more_
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, String hostname, int port, boolean inTomcat)
+    public Repository(String[] args, String hostname, int port,
+                      boolean inTomcat)
             throws Exception {
         this(args, hostname, port, inTomcat, false);
     }
@@ -427,16 +427,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @param args _more_
      * @param hostname _more_
      * @param port _more_
+     * @param inTomcat _more_
      * @param clientMode _more_
      *
      * @throws Exception _more_
      */
     private Repository(String[] args, String hostname, int port,
-                       boolean inTomcat,
-                      boolean clientMode)
+                       boolean inTomcat, boolean clientMode)
             throws Exception {
         this.clientMode = clientMode;
-        this.inTomcat = inTomcat;
+        this.inTomcat   = inTomcat;
         this.args       = args;
         this.hostname   = hostname;
         this.port       = port;
@@ -453,7 +453,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    public boolean isSSLEnabled(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isSSLEnabled() {
         return inTomcat;
     }
 
@@ -512,6 +517,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
+     *
+     * @param properties _more_
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
@@ -855,16 +862,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         initTypeHandlers();
         initSchema();
 
-        for(String sqlFile: (List<String>)loadFiles) {
-            System.err.println ("loading");
-            String sql  =  IOUtil.readContents(sqlFile, getClass());
+        for (String sqlFile : (List<String>) loadFiles) {
+            System.err.println("loading");
+            String     sql        = IOUtil.readContents(sqlFile, getClass());
             Connection connection = getConnection();
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
-            SqlUtil.loadSql(sql, statement, false,true);
+            SqlUtil.loadSql(sql, statement, false, true);
             connection.commit();
             connection.setAutoCommit(true);
-            System.err.println ("done");
+            System.err.println("done");
         }
         readGlobals();
 
@@ -878,11 +885,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         getHarvesterManager().initHarvesters();
         initLanguages();
 
-        
 
 
 
-        if(dumpFile!=null) {
+
+        if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
             getDatabaseManager().makeDatabaseCopy(fos);
             fos.close();
@@ -972,27 +979,42 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
+     *
+     * @param contextProperties _more_
      * @throws Exception _more_
      */
-    protected void initProperties(Properties contextProperties) throws Exception {
+    protected void initProperties(Properties contextProperties)
+            throws Exception {
+
+        /*
+          order in which we load properties files
+          system
+          context (e.g., from tomcat web-inf)
+          cmd line args (both -Dname=value and .properties files)
+          (We load the above so we can define an alternate repository dir)
+          local repository directory
+          (Now load in the cmd line again because they have precedence over anything else);
+          cmd line
+         */
 
         properties = new Properties();
         properties.load(
             IOUtil.getInputStream(
                 "/ucar/unidata/repository/resources/repository.properties",
                 getClass()));
-        if(contextProperties!=null) {
-            System.err.println("loading context:" + contextProperties);
-            properties.putAll(contextProperties);
-        }
+
+        Properties   argProperties       = new Properties();
+
         List<String> argEntryDefFiles    = new ArrayList();
         List<String> argApiDefFiles      = new ArrayList();
         List<String> argOutputDefFiles   = new ArrayList();
         List<String> argMetadataDefFiles = new ArrayList();
 
+
         for (int i = 0; i < args.length; i++) {
             if (args[i].endsWith(".properties")) {
-                properties.load(IOUtil.getInputStream(args[i], getClass()));
+                argProperties.load(IOUtil.getInputStream(args[i],
+                        getClass()));
             } else if (args[i].indexOf("api.xml") >= 0) {
                 argApiDefFiles.add(args[i]);
             } else if (args[i].indexOf("types.xml") >= 0) {
@@ -1002,10 +1024,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else if (args[i].indexOf("metadatahandlers.xml") >= 0) {
                 argMetadataDefFiles.add(args[i]);
             } else if (args[i].equals("-dump")) {
-                dumpFile  = args[i+1];
+                dumpFile = args[i + 1];
                 i++;
             } else if (args[i].equals("-load")) {
-                loadFiles.add(args[i+1]);
+                loadFiles.add(args[i + 1]);
                 i++;
             } else if (args[i].equals("-admin")) {
                 User user = new User(args[i + 1], true);
@@ -1028,27 +1050,27 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
-        //Load the command line properties now so the storage manager 
-        //can get to them
+        //Load the context and the command line properties now 
+        //so the storage manager can get to them
+        if (contextProperties != null) {
+            properties.putAll(contextProperties);
+        }
         properties.putAll(argProperties);
 
 
         //Call the storage manager so it can figure out the home dir
         getStorageManager();
 
-
-        localProperties = new Properties();
         try {
-            String localPropertyFile = IOUtil.joinDir(getStorageManager().getRepositoryDir(),
-                                                    "repository.properties");
-            localProperties.load(IOUtil.getInputStream(localPropertyFile, getClass()));
-        } catch (Exception exc) {
-            //            System.err.println ("error:" + exc);
-        }
-
-        properties.putAll(localProperties);
+            //Now load in the local properties file
+            String localPropertyFile =
+                IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+                               "repository.properties");
+            properties.load(IOUtil.getInputStream(localPropertyFile,
+                    getClass()));
+        } catch (Exception exc) {}
+        //Now put back any of the cmd line arg properties because they have precedence
         properties.putAll(argProperties);
-        //        System.err.println ("arg properties:" + argProperties);
 
         apiDefFiles = getResourcePaths(PROP_API);
         apiDefFiles.addAll(argApiDefFiles);
@@ -1154,10 +1176,15 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     protected void clearCache(Entry entry) {
         //        System.err.println ("Clear cache " + entry.getId());
         entryCache.remove(entry.getId());
-        if(entry.isGroup()) {
+        if (entry.isGroup()) {
             Group group = (Group) entry;
             groupCache.remove(group.getId());
             groupCache.remove(group.getFullName());
@@ -1175,7 +1202,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         entryCache    = new Hashtable();
         groupCache    = new Hashtable();
         dataTypeList  = null;
-        topGroups = null;
+        topGroups     = null;
     }
 
 
@@ -1597,7 +1624,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             msg("Are you sure you want to delete all of the entries?"));
         sb.append(request.form(URL_ENTRY_DELETELIST));
         String hidden = HtmlUtil.hidden(ARG_IDS, idBuffer.toString());
-        String form = makeOkCancelForm(request, URL_ENTRY_DELETELIST, ARG_DELETE_CONFIRM, hidden);
+        String form = makeOkCancelForm(request, URL_ENTRY_DELETELIST,
+                                       ARG_DELETE_CONFIRM, hidden);
         sb.append(question(msgSB.toString(), form));
         sb.append("<ul>");
         new OutputHandler(this).getEntryHtml(sb, entries, request, false,
@@ -1607,12 +1635,22 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    public String makeOkCancelForm(Request request, RequestUrl url, String okArg, String extra) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param url _more_
+     * @param okArg _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public String makeOkCancelForm(Request request, RequestUrl url,
+                                   String okArg, String extra) {
         StringBuffer fb = new StringBuffer();
         fb.append(request.form(url));
         fb.append(extra);
-        String okButton     = HtmlUtil.submit(msg("OK"),
-                                              okArg);
+        String okButton     = HtmlUtil.submit(msg("OK"), okArg);
         String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
         String buttons      = buttons(okButton, cancelButton);
         fb.append(buttons);
@@ -1714,9 +1752,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                 //                                   + (t2 - t1));
             }
         }
-        if (okToAddCookie && (request
-                .getSessionIdWasSet() || (request
-                    .getSessionId() == null)) && (result != null)) {
+        if (okToAddCookie
+                && (request.getSessionIdWasSet()
+                    || (request.getSessionId() == null)) && (result
+                       != null)) {
             if (request.getSessionId() == null) {
                 request.setSessionId(getUserManager().getSessionId());
             }
@@ -1747,7 +1786,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             return null;
         }
         incoming = incoming.substring(urlBase.length());
-        if(incoming.length()==0) {
+        if (incoming.length() == 0) {
             return homeApi;
         }
 
@@ -1758,7 +1797,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         for (Group group : topGroups) {
             String name = "/" + getPathFromEntry(group);
             //            System.err.println ("\t" + name);
-            if (incoming.startsWith(name+"/")) {
+            if (incoming.startsWith(name + "/")) {
                 request.setCollectionEntry(group);
                 incoming = incoming.substring(name.length());
                 break;
@@ -1802,13 +1841,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             return getHtdocsFile(request);
         }
 
-
-        if ( !getDbProperty(ARG_ADMIN_HAVECREATED, false)) {
-            if (cmdLineUsers.size() == 0) {
-                return getUserManager().processInitialAdminPage(request);
-            } else {
-                writeGlobal(ARG_ADMIN_HAVECREATED, "true");
-            }
+        if (!getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
+            return getAdmin().doInitialization(request);
         }
 
 
@@ -1989,12 +2023,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          content + jsContent);
 
 
-        String userLink = getUserManager().getUserLinks(request);
+        String userLink    = getUserManager().getUserLinks(request);
 
         String headerImage = fileUrl("/header.jpg");
-        String headerTitle = getProperty(PROP_REPOSITORY_NAME,
-                                         "Repository");
-        html = StringUtil.replace(html, "${header.image}",headerImage);
+        String headerTitle = getProperty(PROP_REPOSITORY_NAME, "Repository");
+        html = StringUtil.replace(html, "${header.image}", headerImage);
         html = StringUtil.replace(html, "${header.title}", headerTitle);
 
         html = StringUtil.replace(html, "${userlink}", userLink);
@@ -2120,9 +2153,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     public String getProperty(String name) {
-        Map<String, String> env = System.getenv();
-        String prop = env.get(name);
-        if(prop!=null) return prop;
+        Map<String, String> env  = System.getenv();
+        String              prop = env.get(name);
+        if (prop != null) {
+            return prop;
+        }
         return (String) properties.get(name);
     }
 
@@ -2137,7 +2172,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String getProperty(String name, String dflt) {
         String prop = getProperty(name);
-        if(prop!=null) return prop;
+        if (prop != null) {
+            return prop;
+        }
         return Misc.getProperty(properties, name, dflt);
     }
 
@@ -2151,7 +2188,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public boolean getProperty(String name, boolean dflt) {
         String prop = getProperty(name);
-        if(prop!=null) return new Boolean(prop).booleanValue();
+        if (prop != null) {
+            return new Boolean(prop).booleanValue();
+        }
         return Misc.getProperty(properties, name, dflt);
     }
 
@@ -2312,9 +2351,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public List<OutputType> getOutputTypesForGroup(Request request, Group group,
-                                       List<Group> subGroups,
-                                       List<Entry> entries)
+    public List<OutputType> getOutputTypesForGroup(Request request,
+            Group group, List<Group> subGroups, List<Entry> entries)
             throws Exception {
         List<OutputType> types = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
@@ -2356,7 +2394,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public List<OutputType> getOutputTypesForEntries(Request request, List<Entry> entries)
+    public List<OutputType> getOutputTypesForEntries(Request request,
+            List<Entry> entries)
             throws Exception {
         List<OutputType> list = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
@@ -2404,8 +2443,16 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    protected OutputHandler getOutputHandler(String type)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected OutputHandler getOutputHandler(String type) throws Exception {
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandle(type)) {
                 return outputHandler;
@@ -2435,6 +2482,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public Group getDummyGroup() throws Exception {
         Group dummyGroup = new Group(groupTypeHandler, true);
@@ -2641,12 +2690,14 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @param request _more_
      * @param entry _more_
+     * @param forMenu _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected List<Link> getEntryLinks(Request request, Entry entry, boolean forMenu)
+    protected List<Link> getEntryLinks(Request request, Entry entry,
+                                       boolean forMenu)
             throws Exception {
         List<Link> links = new ArrayList<Link>();
         entry.getTypeHandler().getEntryLinks(request, entry, links, forMenu);
@@ -2675,7 +2726,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected String getEntryLinksHtml(Request request, Entry entry)
             throws Exception {
         return StringUtil.join(HtmlUtil.space(1),
-                               getEntryLinks(request, entry,false));
+                               getEntryLinks(request, entry, false));
     }
 
 
@@ -3239,7 +3290,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (fromId == null) {
             throw new IllegalArgumentException("No " + ARG_FROM + " given");
         }
-        Entry fromEntry = getEntry(request,fromId);
+        Entry fromEntry = getEntry(request, fromId);
         if (fromEntry == null) {
             throw new IllegalArgumentException("Could not find entry "
                     + fromId);
@@ -3292,7 +3343,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             throw new IllegalArgumentException("No " + ARG_TO + " given");
         }
 
-        Entry toEntry = getEntry(request,toId);
+        Entry toEntry = getEntry(request, toId);
         if (toEntry == null) {
             throw new IllegalArgumentException("Could not find entry "
                     + toId);
@@ -3342,13 +3393,14 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(toEntry.getLabel());
             sb.append(HtmlUtil.br());
 
-            String hidden = HtmlUtil.hidden(ARG_FROM, fromEntry.getId()) +
-                HtmlUtil.hidden(ARG_TO, toEntry.getId())+
-                HtmlUtil.hidden(ARG_ACTION, action);
-            String form = makeOkCancelForm(request, URL_ENTRY_COPY, ARG_MOVE_CONFIRM, hidden);
+            String hidden = HtmlUtil.hidden(ARG_FROM, fromEntry.getId())
+                            + HtmlUtil.hidden(ARG_TO, toEntry.getId())
+                            + HtmlUtil.hidden(ARG_ACTION, action);
+            String form = makeOkCancelForm(request, URL_ENTRY_COPY,
+                                           ARG_MOVE_CONFIRM, hidden);
             return new Result(msg("Move confirm"),
                               new StringBuffer(question(sb.toString(),
-                                                        form)));
+                                  form)));
         }
 
 
@@ -3437,7 +3489,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entryId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
         }
-        Entry entry = getEntry(request,entryId);
+        Entry entry = getEntry(request, entryId);
         if (entry == null) {
             throw new IllegalArgumentException(
                 "Could not find entry with id:" + entryId);
@@ -3511,7 +3563,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(Request request, String entryId, 
+    protected Entry getEntry(Request request, String entryId,
                              boolean andFilter)
             throws Exception {
         return getEntry(request, entryId, andFilter, false);
@@ -3529,9 +3581,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected Entry getEntry(Request request) throws Exception {
         String entryId = request.getString(ARG_ID, BLANK);
-        Entry entry = getEntry(request, entryId);
+        Entry  entry   = getEntry(request, entryId);
         if (entry == null) {
-            Entry tmp = getEntry(request, request.getString(ARG_ID, BLANK), 
+            Entry tmp = getEntry(request, request.getString(ARG_ID, BLANK),
                                  false);
             if (tmp != null) {
                 throw new AccessException(
@@ -3558,7 +3610,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(Request request, String entryId, 
+    protected Entry getEntry(Request request, String entryId,
                              boolean andFilter, boolean abbreviated)
             throws Exception {
         if (entryId == null) {
@@ -4047,8 +4099,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processAssociationAdd(Request request) throws Exception {
-        Entry fromEntry = getEntry(request, request.getString(ARG_FROM, BLANK));
-        Entry toEntry = getEntry(request,request.getString(ARG_TO, BLANK));
+        Entry fromEntry = getEntry(request,
+                                   request.getString(ARG_FROM, BLANK));
+        Entry toEntry = getEntry(request, request.getString(ARG_TO, BLANK));
         if (fromEntry == null) {
             throw new IllegalArgumentException("Could not find entry:"
                     + request.getString(ARG_FROM, BLANK));
@@ -4094,43 +4147,54 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processAssociationDelete(Request request) throws Exception {
         String associationId = request.getString(ARG_ASSOCIATION, "");
-        Clause clause = Clause.eq(COL_ASSOCIATIONS_ID,
-                                  associationId);
-        List<Association> associations =  getAssociations(request, clause);
-        if(associations.size()==0) {
-            return new Result(msg("Delete Associations"),
-                              new StringBuffer(error("Could not find assocation")));
+        Clause clause = Clause.eq(COL_ASSOCIATIONS_ID, associationId);
+        List<Association> associations = getAssociations(request, clause);
+        if (associations.size() == 0) {
+            return new Result(
+                msg("Delete Associations"),
+                new StringBuffer(error("Could not find assocation")));
         }
 
         Entry fromEntry = getEntry(request, associations.get(0).getFromId());
-        Entry toEntry = getEntry(request, associations.get(0).getToId());
+        Entry toEntry   = getEntry(request, associations.get(0).getToId());
 
-        if(request.exists(ARG_CANCEL)) {
+        if (request.exists(ARG_CANCEL)) {
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
 
 
-        if(request.exists(ARG_DELETE_CONFIRM)) {
-            SqlUtil.delete(getConnection(), TABLE_ASSOCIATIONS,
-                           clause);
+        if (request.exists(ARG_DELETE_CONFIRM)) {
+            SqlUtil.delete(getConnection(), TABLE_ASSOCIATIONS, clause);
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
         StringBuffer sb = new StringBuffer();
-        String form = makeOkCancelForm(request, URL_ASSOCIATION_DELETE, ARG_DELETE_CONFIRM, 
-                                       HtmlUtil.hidden(ARG_ASSOCIATION, associationId));
-        sb.append(question(msg("Are you sure you want to delete the assocation?"),
-                           form));
+        String form = makeOkCancelForm(request, URL_ASSOCIATION_DELETE,
+                                       ARG_DELETE_CONFIRM,
+                                       HtmlUtil.hidden(ARG_ASSOCIATION,
+                                           associationId));
+        sb.append(
+            question(
+                msg("Are you sure you want to delete the assocation?"),
+                form));
 
         sb.append(associations.get(0).getName());
         sb.append(HtmlUtil.br());
         sb.append(fromEntry.getLabel());
         sb.append(HtmlUtil.pad(HtmlUtil.img(fileUrl(ICON_ARROW))));
         sb.append(toEntry.getLabel());
-        return new Result(msg("Delete Associations"),
-                          sb);
-      }
+        return new Result(msg("Delete Associations"), sb);
+    }
 
 
 
@@ -4144,17 +4208,18 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     private Result asynchDeleteEntries(Request request,
                                        final List<Entry> entries) {
-        final Request        theRequest = request;
-        Entry                entry = entries.get(0);
-        if(request.getCollectionEntry()!=null) {
-            if(Misc.equals(entry.getId(),request.getCollectionEntry().getId())) {
+        final Request theRequest = request;
+        Entry         entry      = entries.get(0);
+        if (request.getCollectionEntry() != null) {
+            if (Misc.equals(entry.getId(),
+                            request.getCollectionEntry().getId())) {
                 request.setCollectionEntry(null);
             }
         }
-        Entry                group      = entries.get(0).getParentGroup();
-        final String         groupId    = entries.get(0).getParentGroupId();
+        Entry                group   = entries.get(0).getParentGroup();
+        final String         groupId = entries.get(0).getParentGroupId();
 
-        ActionManager.Action action     = new ActionManager.Action() {
+        ActionManager.Action action  = new ActionManager.Action() {
             public void run(Object actionId) throws Exception {
                 deleteEntries(theRequest, entries, actionId);
             }
@@ -4360,8 +4425,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     resourceName = IOUtil.getFileTail(resource);
                 }
 
-                String groupId = request.getString(ARG_GROUP,
-                                       (String) null);
+                String groupId = request.getString(ARG_GROUP, (String) null);
                 if (groupId == null) {
                     throw new IllegalArgumentException(
                         "You must specify a parent group");
@@ -4481,8 +4545,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 "Cannot have a '/' in group name: '" + name
                                 + "'");
                         }
-                        Entry existing = findEntryWithName(request, parentGroup, name);
-                        if (existing != null && existing.isGroup()) {
+                        Entry existing = findEntryWithName(request,
+                                             parentGroup, name);
+                        if ((existing != null) && existing.isGroup()) {
                             throw new IllegalArgumentException(
                                 "A group with the given name already exists");
 
@@ -4554,9 +4619,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                         throw new IllegalArgumentException(
                             "Cannot have a '/' in group name:" + newName);
                     }
-                    Entry existing = findEntryWithName(request, entry.getParentGroup(),newName);
-                    if (existing != null && existing.isGroup()
-                        && !existing.getId().equals(entry.getId())) {
+                    Entry existing = findEntryWithName(request,
+                                         entry.getParentGroup(), newName);
+                    if ((existing != null) && existing.isGroup()
+                            && !existing.getId().equals(entry.getId())) {
                         throw new IllegalArgumentException(
                             "A group with the given name already exists");
                     }
@@ -4626,7 +4692,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /** _more_          */
+    /** _more_ */
     List<Group> topGroups;
 
     /**
@@ -4652,7 +4718,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
             //Get the entry but don't check for access control
-            Entry e = getEntry(request,ids[i],false);
+            Entry e = getEntry(request, ids[i], false);
             if (e == null) {
                 continue;
             }
@@ -4699,8 +4765,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (request.defined(ARG_ID)) {
             entry = getEntry(request);
             if (entry == null) {
-                Entry tmp = getEntry(request,request.getString(ARG_ID, BLANK),
-                                     false);
+                Entry tmp = getEntry(request,
+                                     request.getString(ARG_ID, BLANK), false);
                 if (tmp != null) {
                     throw new IllegalArgumentException(
                         "You do not have access to this entry");
@@ -4786,11 +4852,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                     continue;
                 }
             }
-            if (!id.startsWith(prefix)) {
+            if ( !id.startsWith(prefix)) {
                 continue;
             }
             id = id.substring(prefix.length());
-            Entry entry = getEntry(request,id);
+            Entry entry = getEntry(request, id);
             if (entry != null) {
                 entries.add(entry);
             }
@@ -4799,7 +4865,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (ids != null) {
             List<String> idList = StringUtil.split(ids, ",", true, true);
             for (String id : idList) {
-                Entry entry = getEntry(request,id);
+                Entry entry = getEntry(request, id);
                 if (entry != null) {
                     entries.add(entry);
                 }
@@ -4838,14 +4904,15 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Group findGroup(Request request) throws Exception {
         String groupNameOrId = (String) request.getString(ARG_GROUP,
-                                                          (String) null);
+                                   (String) null);
         if (groupNameOrId == null) {
             throw new IllegalArgumentException("No group specified");
         }
-        Entry entry = getEntry(request, groupNameOrId,false);
-        if(entry!=null) {
-            if(!entry.isGroup()) {
-                throw new IllegalArgumentException("Not a group:" + groupNameOrId);
+        Entry entry = getEntry(request, groupNameOrId, false);
+        if (entry != null) {
+            if ( !entry.isGroup()) {
+                throw new IllegalArgumentException("Not a group:"
+                        + groupNameOrId);
             }
             return (Group) entry;
         }
@@ -4896,8 +4963,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                                    boolean makeLinkForLastGroup,
                                    String extraArgs, Group stopAt)
             throws Exception {
-        if(request == null) {
-            request = new  Request(this,"",new Hashtable());
+        if (request == null) {
+            request = new Request(this, "", new Hashtable());
         }
 
         List breadcrumbs = new ArrayList();
@@ -4909,8 +4976,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         String output = ((request == null)
                          ? OutputHandler.OUTPUT_HTML
                          : request.getOutput());
-        output =  OutputHandler.OUTPUT_HTML;
-        int    length = 0;
+        output = OutputHandler.OUTPUT_HTML;
+        int length = 0;
         if (extraArgs.length() > 0) {
             extraArgs = "&" + extraArgs;
         }
@@ -4931,12 +4998,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             length += name.length();
             titleList.add(0, name);
             String link;
-            if(request!=null) {
-                link = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                                                      parent, ARG_OUTPUT, output)+extraArgs,name);
+            if (request != null) {
+                link = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, parent,
+                        ARG_OUTPUT, output) + extraArgs, name);
             } else {
                 link = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW.toString(),
-                                                  ARG_OUTPUT, output)+extraArgs,name);
+                        ARG_OUTPUT, output) + extraArgs, name);
             }
             breadcrumbs.add(0, link);
             parent = findGroup(parent.getParentGroupId());
@@ -4948,14 +5015,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          "class=separator");
 
         String entryLink = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                                                          entry, ARG_OUTPUT, output), entry.getLabel());
+                               entry, ARG_OUTPUT, output), entry.getLabel());
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-            List<Link>   links = getEntryLinks(request, entry,true);
+            List<Link>   links = getEntryLinks(request, entry, true);
             StringBuffer menu  = new StringBuffer();
             menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
             for (Link link : links) {
@@ -4984,10 +5051,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             String linkHtml = getEntryLinksHtml(request, entry);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + HtmlUtil.rowBottom("<td class=\"entryname\" >"
-                                     + entryLink + menuLink
-                                     + "</td><td align=\"right\">" + linkHtml
-                                     + "</td>") + "</table>";
+                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink
+                                     + menuLink + "</td><td align=\"right\">"
+                                     + linkHtml + "</td>") + "</table>";
             nav = HtmlUtil.div(
                 HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")) + header,
                 HtmlUtil.cssClass("entryheader")) + menu;
@@ -5074,7 +5140,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<Entry>   entries       = new ArrayList<Entry>();
         List<Group>   subGroups     = new ArrayList<Group>();
         for (String id : ids) {
-            Entry entry = getEntry(request,id);
+            Entry entry = getEntry(request, id);
             if (entry == null) {
                 continue;
             }
@@ -5171,37 +5237,46 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    protected void getAssociationsGraph(Request request, String id, StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param id _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void getAssociationsGraph(Request request, String id,
+                                        StringBuffer sb)
+            throws Exception {
         List<Association> associations = getAssociations(request, id);
         for (Association association : associations) {
             Entry   other  = null;
             boolean isTail = true;
             if (association.getFromId().equals(id)) {
-                other  = getEntry(request,association.getToId());
+                other  = getEntry(request, association.getToId());
                 isTail = true;
             } else {
-                other  = getEntry(request,association.getFromId());
+                other  = getEntry(request, association.getFromId());
                 isTail = false;
             }
 
             if (other != null) {
-                sb.append(
-                          XmlUtil.tag(
-                                      TAG_NODE,
-                                      XmlUtil.attrs(
-                                                    ATTR_TYPE,
-                                                    (other.isGroup()?NODETYPE_GROUP:
-                                                     other.getTypeHandler().getNodeType()),
-                                                    ATTR_ID, other.getId(), ATTR_TITLE,
-                                                    other.getName())));
-                sb.append(XmlUtil.tag(TAG_EDGE,
+                sb.append(XmlUtil.tag(TAG_NODE,
                                       XmlUtil.attrs(ATTR_TYPE,
-                                                    "association", ATTR_FROM,
-                                                    (isTail
-                                                     ? id
-                                                     : other.getId()), ATTR_TO, (isTail
-                                                                                 ? other.getId()
-                                                                                 : id))));
+                                          (other.isGroup()
+                                           ? NODETYPE_GROUP
+                                           : other.getTypeHandler()
+                                           .getNodeType()), ATTR_ID,
+                                               other.getId(), ATTR_TITLE,
+                                                   other.getName())));
+                sb.append(XmlUtil.tag(TAG_EDGE,
+                                      XmlUtil.attrs(ATTR_TYPE, "association",
+                                          ATTR_FROM, (isTail
+                        ? id
+                        : other.getId()), ATTR_TO, (isTail
+                        ? other.getId()
+                        : id))));
             }
         }
 
@@ -5453,12 +5528,26 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    public String getEntryText(Request request, Entry entry, String s) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param s _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getEntryText(Request request, Entry entry, String s)
+            throws Exception {
         //<attachment name>
-        if(s.indexOf("<attachment")>=0) {
+        if (s.indexOf("<attachment") >= 0) {
             List<Association> associations = getAssociations(request, entry);
-            for(Association association: associations) {
-                if(!association.getFromId().equals(entry.getId())) continue;
+            for (Association association : associations) {
+                if ( !association.getFromId().equals(entry.getId())) {
+                    continue;
+                }
             }
         }
         return s;
@@ -5864,6 +5953,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param parent _more_
      * @param name _more_
      * @param user _more_
      * @param createIfNeeded _more_
@@ -5873,18 +5965,25 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Entry findEntryWithName(Request request, Group parent, String name) 
+    public Entry findEntryWithName(Request request, Group parent, String name)
             throws Exception {
         String groupName = parent.getFullName() + Group.IDDELIMITER + name;
-        Group group = groupCache.get(groupName);
-        if(group!=null) return group;
-        String[]ids = SqlUtil.readString(getDatabaseManager().select(COL_ENTRIES_ID,
-                                                                     TABLE_ENTRIES,
-                                                                     Clause.and(
-                                                                                Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, parent.getId()),
-                                                                                Clause.eq(COL_ENTRIES_NAME, name))));
-        if(ids.length==0) return null;
-        return getEntry(request, ids[0],false);
+        Group  group     = groupCache.get(groupName);
+        if (group != null) {
+            return group;
+        }
+        String[] ids = SqlUtil.readString(
+                           getDatabaseManager().select(
+                               COL_ENTRIES_ID, TABLE_ENTRIES,
+                               Clause.and(
+                                   Clause.eq(
+                                       COL_ENTRIES_PARENT_GROUP_ID,
+                                       parent.getId()), Clause.eq(
+                                           COL_ENTRIES_NAME, name))));
+        if (ids.length == 0) {
+            return null;
+        }
+        return getEntry(request, ids[0], false);
     }
 
 
@@ -5962,11 +6061,22 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    public Group makeNewGroup(Group parent, String name, User user) throws Exception {
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param user _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Group makeNewGroup(Group parent, String name, User user)
+            throws Exception {
         synchronized (MUTEX_GROUP) {
-            TypeHandler typeHandler =
-                getTypeHandler(TypeHandler.TYPE_GROUP);
-            Group group = new Group(getGroupId(parent), typeHandler);
+            TypeHandler typeHandler = getTypeHandler(TypeHandler.TYPE_GROUP);
+            Group       group = new Group(getGroupId(parent), typeHandler);
             group.setName(name);
             group.setParentGroup(parent);
             group.setUser(user);
@@ -6075,12 +6185,13 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected List[] getEntries(Request request) throws Exception {
-        TypeHandler  typeHandler = getTypeHandler(request);
+        TypeHandler typeHandler = getTypeHandler(request);
         //        SqlUtil.debug = true;
-        List<Clause> where       = typeHandler.assembleWhereClause(request);
-        int          skipCnt     = request.get(ARG_SKIP, 0);
+        List<Clause> where   = typeHandler.assembleWhereClause(request);
+        int          skipCnt = request.get(ARG_SKIP, 0);
 
-        Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,                                  where,
+        Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,
+                                  where,
                                   getQueryOrderAndLimit(request, false));
 
 
@@ -6099,9 +6210,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if ( !canDoSelectOffset && (skipCnt-- > 0)) {
                     continue;
                 }
-                String id = results.getString(1);
-                Entry entry = (Entry)entryCache.get(id);
-                if(entry == null) {
+                String id    = results.getString(1);
+                Entry  entry = (Entry) entryCache.get(id);
+                if (entry == null) {
                     //id,type,name,desc,group,user,file,createdata,fromdate,todate
                     TypeHandler localTypeHandler =
                         getTypeHandler(results.getString(2));
@@ -6269,53 +6380,68 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected List<Association> getAssociations(Request request,
-                                                String entryId)
-        throws Exception {
+            String entryId)
+            throws Exception {
         Entry entry = getEntry(request, entryId);
-        if(entry == null) {
+        if (entry == null) {
             System.err.println("Entry is null:" + entryId);
         }
         return getAssociations(request, entry);
     }
 
 
-    protected List<Association> getAssociations(Request request,
-                                                Entry entry) 
-        throws Exception {
-        if(entry.getAssociations()!=null) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Association> getAssociations(Request request, Entry entry)
+            throws Exception {
+        if (entry.getAssociations() != null) {
             return entry.getAssociations();
         }
-        if(entry.isDummy()) {
+        if (entry.isDummy()) {
             return new ArrayList<Association>();
         }
 
-        entry.setAssociations(getAssociations(request, 
-                               Clause.or(
-                                         Clause.eq(
-                                                   COL_ASSOCIATIONS_FROM_ENTRY_ID,
-                                                   entry.getId()), Clause.eq(
-                                                                       COL_ASSOCIATIONS_TO_ENTRY_ID,
-                                                                       entry.getId()))));
+        entry.setAssociations(
+            getAssociations(
+                request,
+                Clause.or(
+                    Clause.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, entry.getId()),
+                    Clause.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, entry.getId()))));
         return entry.getAssociations();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param clause _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected List<Association> getAssociations(Request request,
-                                                Clause clause)
+            Clause clause)
             throws Exception {
-        Statement stmt = getDatabaseManager().select(
-                             COLUMNS_ASSOCIATIONS, TABLE_ASSOCIATIONS,
-                             clause);
+        Statement stmt = getDatabaseManager().select(COLUMNS_ASSOCIATIONS,
+                             TABLE_ASSOCIATIONS, clause);
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
         ResultSet         results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 associations.add(new Association(results.getString(1),
-                                                 results.getString(2),
-                                                 results.getString(3), 
-                                                 results.getString(4),
-                                                 results.getString(5)));
+                        results.getString(2), results.getString(3),
+                        results.getString(4), results.getString(5)));
             }
         }
         return associations;
@@ -6365,7 +6491,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entry.getComments() != null) {
             return entry.getComments();
         }
-        if(entry.isDummy()) {
+        if (entry.isDummy()) {
             return new ArrayList<Comment>();
         }
         Statement stmt = getDatabaseManager().select(COLUMNS_COMMENTS,
@@ -6432,6 +6558,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         return "http://" + hostname + ":" + port + url;
     }
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public String httpsUrl(String url) {
         return "https://" + hostname + ":" + port + url;
     }
@@ -6669,7 +6802,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         clearCache();
     }
 
-    
+
 
 
     /** _more_ */
@@ -6886,11 +7019,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             clearCache();
         }
 
-        long              t1             = System.currentTimeMillis();
-        int               cnt            = 0;
-        int               metadataCnt    = 0;
+        long              t1          = System.currentTimeMillis();
+        int               cnt         = 0;
+        int               metadataCnt = 0;
 
-        PreparedStatement entryStmt = connection.prepareStatement(isNew
+        PreparedStatement entryStmt   = connection.prepareStatement(isNew
                 ? INSERT_ENTRIES
                 : UPDATE_ENTRIES);
 
@@ -6900,14 +7033,14 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         Hashtable typeStatements = new Hashtable();
 
-        int batchCnt = 0;
+        int       batchCnt       = 0;
         connection.setAutoCommit(false);
         for (Entry entry : entries) {
-            if(entry.isCollectionGroup()) {
+            if (entry.isCollectionGroup()) {
                 topGroups = null;
             }
-            TypeHandler       typeHandler   = entry.getTypeHandler();
-            String            sql           = typeHandler.getInsertSql(isNew);
+            TypeHandler typeHandler = entry.getTypeHandler();
+            String      sql         = typeHandler.getInsertSql(isNew);
             //            System.err.println("sql:" + sql);
             PreparedStatement typeStatement = null;
             if (sql != null) {

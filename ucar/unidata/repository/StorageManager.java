@@ -133,7 +133,7 @@ public class StorageManager extends RepositoryManager {
     protected void init() {
 
         repositoryDir = getRepository().getProperty(PROP_REPOSITORY_HOME,
-                                                    (String) null);
+                (String) null);
         if (repositoryDir == null) {
             repositoryDir =
                 IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),
@@ -150,9 +150,14 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     */
     protected void addInfo(StringBuffer sb) {
-        sb.append(HtmlUtil.formEntry("Home Directory:",getRepositoryDir()));
-        sb.append(HtmlUtil.formEntry("Storage Directory:",getStorageDir()));
+        sb.append(HtmlUtil.formEntry("Home Directory:", getRepositoryDir()));
+        sb.append(HtmlUtil.formEntry("Storage Directory:", getStorageDir()));
     }
 
     /**
@@ -279,13 +284,24 @@ public class StorageManager extends RepositoryManager {
      */
     public File moveToStorage(Request request, File original)
             throws Exception {
-        return moveToStorage(request, original,"");
+        return moveToStorage(request, original, "");
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param original _more_
+     * @param prefix _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public File moveToStorage(Request request, File original, String prefix)
             throws Exception {
         File newFile = new File(IOUtil.joinDir(getStorageDir(),
-                                               prefix+original.getName()));
+                           prefix + original.getName()));
         IOUtil.moveFile(original, newFile);
         return newFile;
     }

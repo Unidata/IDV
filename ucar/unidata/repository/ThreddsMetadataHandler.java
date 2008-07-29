@@ -166,7 +166,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         if (idx < 0) {
             return type.getType();
         }
-        return type.getType().substring(idx+1);
+        return type.getType().substring(idx + 1);
     }
 
     /**
@@ -203,7 +203,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             //            System.err.println ("tag:" +  getTag(TYPE_DOCUMENTATION));
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            metadata.getAttr2(), new String[] { ATTR_TYPE,
-                                                               metadata.getAttr1() });
+                    metadata.getAttr1() });
         } else if (type.equals(TYPE_PROPERTY)) {
             XmlUtil.create(doc, getTag(TYPE_PROPERTY), datasetNode,
                            new String[] { ATTR_NAME,
@@ -532,7 +532,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                     XmlUtil.getAttribute(child,
                                         "xlink:title", url), url, "", "");
             } else {
-                String type = XmlUtil.getAttribute(child, "type","summary");
+                String type = XmlUtil.getAttribute(child, "type", "summary");
                 String text = XmlUtil.getChildText(child).trim();
                 return new Metadata(getRepository().getGUID(), "",
                                     TYPE_DOCUMENTATION, type, text, "", "");
@@ -563,8 +563,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 email = XmlUtil.getAttribute(contactNode, ATTR_EMAIL, "");
                 url   = XmlUtil.getAttribute(contactNode, ATTR_URL, "");
             }
-            return new Metadata(getRepository().getGUID(), "", getType("thredds."+tag),
-                                name, vocabulary, email, url);
+            return new Metadata(getRepository().getGUID(), "",
+                                getType("thredds." + tag), name, vocabulary,
+                                email, url);
         } else if (isTag(tag, TYPE_KEYWORD)) {
             String text = XmlUtil.getChildText(child).trim();
             //Some of the catalogs have new lines in the keyword
@@ -579,10 +580,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                    || isTag(tag, TYPE_DATAFORMAT)) {
             String text = XmlUtil.getChildText(child).trim();
             text = text.replace("\n", "");
-            return new Metadata(getRepository().getGUID(), "", getType("thredds."+tag),
-                                text, "", "", "");
+            return new Metadata(getRepository().getGUID(), "",
+                                getType("thredds." + tag), text, "", "", "");
         } else if (isTag(tag, TYPE_PROPERTY)) {
-            return new Metadata(getRepository().getGUID(), "", getType("thredds."+tag),
+            return new Metadata(getRepository().getGUID(), "",
+                                getType("thredds." + tag),
                                 XmlUtil.getAttribute(child, ATTR_NAME),
                                 XmlUtil.getAttribute(child, ATTR_VALUE), "",
                                 "");

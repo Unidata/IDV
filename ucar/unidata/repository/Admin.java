@@ -108,7 +108,8 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_ADMIN_DUMPDB = new RequestUrl(this,
-                                             "/admin/dumpdb", "Dump Database");
+                                             "/admin/dumpdb",
+                                             "Dump Database");
 
     /** _more_ */
     public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats",
@@ -148,6 +149,144 @@ public class Admin extends RepositoryManager {
 
 
 
+    private boolean haveDone(String what) throws Exception {
+        return getRepository().getDbProperty(what, false);
+    }
+
+    private void didIt(String what) throws Exception {
+        getRepository().writeGlobal(what, "true");
+    }
+
+
+    private StringBuffer getLicenseForm() throws Exception {
+        StringBuffer sb = new StringBuffer();
+        String license =  IOUtil.readContents("/ucar/unidata/repository/resources/license.txt",
+                                              getClass());
+        sb.append(HtmlUtil.textArea("",license,20,50));
+        sb.append("<p>");
+        sb.append(HtmlUtil.checkbox("agree","1"));
+        sb.append("I agree to the above terms and conditions of use of the RAMADDA software");
+        sb.append("<p>");
+        return sb;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Result doInitialization(Request request) throws Exception {
+        StringBuffer sb    = new StringBuffer();
+        String       title = "";
+
+        if(Misc.equals("1", request.getString("agree",""))) {
+            didIt(ARG_ADMIN_LICENSEREAD);
+        }
+
+        if (!haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
+            title = "Installation";
+            sb.append(HtmlUtil.formTable());
+            sb.append(
+                "Here is the local file system directory where data is stored and the database information.<br>Now would be a good time to change these settings and restart RAMADDA if this is not what you want.<br>See <a target=\"other\" href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/install.html\">here</a> for installation instructions.");
+            getStorageManager().addInfo(sb);
+            getDatabaseManager().addInfo(sb);
+            sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Next"))));
+            sb.append(HtmlUtil.formTableClose());
+            didIt(ARG_ADMIN_INSTALLNOTICESHOWN);
+        }  else if (!haveDone(ARG_ADMIN_LICENSEREAD)) {
+
+            title = "License";
+            sb.append(getLicenseForm());
+            sb.append(HtmlUtil.submit(msg("Next")));
+        }  else if (!haveDone(ARG_ADMIN_ADMINCREATED)) {
+            title = "Administrator";
+            String  id        = "";
+            String  name      = "";
+            boolean triedOnce = false;
+            if (request.exists(UserManager.ARG_USER_ID)) {
+                triedOnce = true;
+                id        = request.getString(UserManager.ARG_USER_ID, "").trim();
+                name      = request.getString(UserManager.ARG_USER_NAME, name).trim();
+                String password1 = request.getString(UserManager.ARG_USER_PASSWORD1,
+                                       "").trim();
+                String password2 = request.getString(UserManager.ARG_USER_PASSWORD2,
+                                       "").trim();
+                boolean      okToAdd     = true;
+                StringBuffer errorBuffer = new StringBuffer();
+                if (id.length() == 0) {
+                    okToAdd = false;
+                    errorBuffer.append(HtmlUtil.space(2));
+                    errorBuffer.append(msg("Please enter an ID"));
+                    errorBuffer.append(HtmlUtil.br());
+                }
+
+                if ((password1.length() == 0)
+                        || !password1.equals(password2)) {
+                    okToAdd = false;
+                    errorBuffer.append(HtmlUtil.space(2));
+                    errorBuffer.append(msg("Invalid password"));
+                    errorBuffer.append(HtmlUtil.br());
+                }
+
+
+                if (okToAdd) {
+                    getUserManager().makeOrUpdateUser(new User(id, name, "", "", "",
+                                                               getUserManager().hashPassword(password1), true, ""), false);
+                    didIt(ARG_ADMIN_ADMINCREATED);
+                    didIt(ARG_ADMIN_INSTALLCOMPLETE);
+                    sb.append(msg("Site administrator created"));
+                    sb.append(HtmlUtil.p());
+                    sb.append(getUserManager().makeLoginForm(request));
+                    return new Result("", sb);
+                }
+                sb.append(msg("Error"));
+                sb.append(HtmlUtil.br());
+                sb.append(errorBuffer);
+                sb.append(HtmlUtil.p());
+            }
+
+
+            sb.append(
+                msg("Please enter a site administrator name and password"));
+            sb.append(HtmlUtil.p());
+            sb.append(request.form(getRepository().URL_DUMMY));
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.formEntry(msgLabel("ID"),
+                                         HtmlUtil.input(UserManager.ARG_USER_ID, id)));
+            sb.append(HtmlUtil.formEntry(msgLabel("Name"),
+                                         HtmlUtil.input(UserManager.ARG_USER_NAME,
+                                             name)));
+
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Password"),
+                    HtmlUtil.password(UserManager.ARG_USER_PASSWORD1)));
+
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Password Again"),
+                    HtmlUtil.password(UserManager.ARG_USER_PASSWORD2)));
+
+            sb.append(
+                HtmlUtil.formEntry(
+                    "", HtmlUtil.submit(msg("Make Administrator"))));
+        }
+
+        StringBuffer finalSB = new StringBuffer();
+        finalSB.append(request.form(getRepository().URL_DUMMY));
+        finalSB.append(msgHeader(title));
+        finalSB.append(sb);
+        finalSB.append(HtmlUtil.formClose());
+        return new Result(msg(title), finalSB);
+    }
+
+
+
 
 
     /**
@@ -169,8 +308,8 @@ public class Admin extends RepositoryManager {
                                           new String[] { "TABLE" });
 
         while (tables.next()) {
-            String tableName = tables.getString("TABLE_NAME"); 
-           //            System.err.println("table name:" + tableName);
+            String tableName = tables.getString("TABLE_NAME");
+            //            System.err.println("table name:" + tableName);
             String tableType = tables.getString("TABLE_TYPE");
             //            System.err.println("table type" + tableType);
             if (Misc.equals(tableType, "INDEX")) {
@@ -401,9 +540,18 @@ public class Admin extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminDbDump(Request request) throws Exception {
-        File tmp = getStorageManager().getTmpFile(request,"dbdump");
-        FileOutputStream fos = new FileOutputStream(tmp);
+        File tmp = getStorageManager().getTmpFile(request, "dbdump");
+        FileOutputStream     fos = new FileOutputStream(tmp);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         getDatabaseManager().makeDatabaseCopy(bos);
         bos.close();
@@ -586,12 +734,8 @@ public class Admin extends RepositoryManager {
 
         sb.append(msgHeader("Repository State"));
         sb.append(HtmlUtil.formTable());
-
-
         getStorageManager().addInfo(sb);
         getDatabaseManager().addInfo(sb);
-
-
         sb.append(HtmlUtil.formTableClose());
         sb.append("<p>");
 
@@ -649,17 +793,19 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSql(Request request) throws Exception {
+
         boolean bulkLoad = false;
-        String query=null;
-        String sqlFile = request.getUploadedFile(ARG_SQLFILE);
-        if(sqlFile!=null) {
-            query = IOUtil.readContents(sqlFile,getClass());
+        String  query    = null;
+        String  sqlFile  = request.getUploadedFile(ARG_SQLFILE);
+        if (sqlFile != null) {
+            query    = IOUtil.readContents(sqlFile, getClass());
             bulkLoad = true;
         } else {
-            query= (String) request.getUnsafeString(ARG_QUERY,
-                                                    (String) null);
-            if(query!=null && query.trim().startsWith("file:")) {
-                query = IOUtil.readContents(query.trim().substring(5),getClass());
+            query = (String) request.getUnsafeString(ARG_QUERY,
+                    (String) null);
+            if ((query != null) && query.trim().startsWith("file:")) {
+                query = IOUtil.readContents(query.trim().substring(5),
+                                            getClass());
                 bulkLoad = true;
             }
         }
@@ -675,93 +821,97 @@ public class Admin extends RepositoryManager {
         sb.append(request.uploadForm(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit(msg("Execute")));
         sb.append(HtmlUtil.br());
-        sb.append(HtmlUtil.textArea(ARG_QUERY, (bulkLoad?"":(query == null)
-                ? BLANK
-                                                : query), 10, 100));
+        sb.append(HtmlUtil.textArea(ARG_QUERY, (bulkLoad
+                ? ""
+                : (query == null)
+                  ?BLANK
+                  :query),10,100));
         sb.append(HtmlUtil.p());
         sb.append("SQL File: ");
-        sb.append(HtmlUtil.fileInput(ARG_SQLFILE,""));
+        sb.append(HtmlUtil.fileInput(ARG_SQLFILE, ""));
         sb.append(HtmlUtil.formClose());
         sb.append("<table>");
         if (query == null) {
             return makeResult(request, msg("SQL"), sb);
         }
 
-        long      t1        = System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
 
-        if(bulkLoad) {
-            System.err.println ("doing  bulk load");
+        if (bulkLoad) {
+            System.err.println("doing  bulk load");
             Connection connection = getConnection();
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
-            SqlUtil.loadSql(query, statement, false,true);
-            System.err.println ("done loading");
+            SqlUtil.loadSql(query, statement, false, true);
+            System.err.println("done loading");
             connection.commit();
-            System.err.println ("done commiting");
+            System.err.println("done commiting");
             connection.setAutoCommit(true);
             return makeResult(request, msg("SQL"),
-                              new StringBuffer("Executed SQL"+"<P>" 
-                                               + HtmlUtil.space(1)
-                                               + sb.toString()));
+                              new StringBuffer("Executed SQL" + "<P>"
+                                  + HtmlUtil.space(1) + sb.toString()));
 
         } else {
-        Statement statement = null;
-        try {
-            statement = getDatabaseManager().execute(query,-1,0);
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            throw exc;
+            Statement statement = null;
+            try {
+                statement = getDatabaseManager().execute(query, -1, 0);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                throw exc;
+            }
+
+            SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
+            ResultSet        results;
+            int              cnt    = 0;
+            Hashtable        map    = new Hashtable();
+            int              unique = 0;
+            while ((results = iter.next()) != null) {
+                ResultSetMetaData rsmd = results.getMetaData();
+                while (results.next()) {
+                    cnt++;
+                    if (cnt > 1000) {
+                        continue;
+                    }
+                    int colcnt = 0;
+                    if (cnt == 1) {
+                        sb.append("<table><tr>");
+                        for (int i = 0; i < rsmd.getColumnCount(); i++) {
+                            sb.append(
+                                HtmlUtil.col(
+                                    HtmlUtil.bold(
+                                        rsmd.getColumnLabel(i + 1))));
+                        }
+                        sb.append("</tr>");
+                    }
+                    sb.append("<tr>");
+                    while (colcnt < rsmd.getColumnCount()) {
+                        colcnt++;
+                        if (rsmd.getColumnType(colcnt)
+                                == java.sql.Types.TIMESTAMP) {
+                            Date dttm = results.getTimestamp(colcnt,
+                                            Repository.calendar);
+                            sb.append(HtmlUtil.col(formatDate(request,
+                                    dttm)));
+                        } else {
+                            sb.append(
+                                HtmlUtil.col(results.getString(colcnt)));
+                        }
+                    }
+                    sb.append("</tr>\n");
+                    //                if (cnt++ > 1000) {
+                    //                    sb.append(HtmlUtil.row("..."));
+                    //                    break;
+                    //                }
+                }
+            }
+            sb.append("</table>");
+            long t2 = System.currentTimeMillis();
+            return makeResult(request, msg("SQL"),
+                              new StringBuffer(msgLabel("Fetched rows") + cnt
+                                  + HtmlUtil.space(1) + msgLabel("in")
+                                  + (t2 - t1) + "ms <p>" + sb.toString()));
         }
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
-        ResultSet        results;
-        int              cnt    = 0;
-        Hashtable        map    = new Hashtable();
-        int              unique = 0;
-        while ((results = iter.next()) != null) {
-            ResultSetMetaData rsmd = results.getMetaData();
-            while (results.next()) {
-                cnt++;
-                if (cnt > 1000) {
-                    continue;
-                }
-                int colcnt = 0;
-                if (cnt == 1) {
-                    sb.append("<table><tr>");
-                    for (int i = 0; i < rsmd.getColumnCount(); i++) {
-                        sb.append(
-                            HtmlUtil.col(
-                                HtmlUtil.bold(rsmd.getColumnLabel(i + 1))));
-                    }
-                    sb.append("</tr>");
-                }
-                sb.append("<tr>");
-                while (colcnt < rsmd.getColumnCount()) {
-                    colcnt++;
-                    if (rsmd.getColumnType(colcnt)
-                            == java.sql.Types.TIMESTAMP) {
-                        Date dttm = results.getTimestamp(colcnt,
-                                        Repository.calendar);
-                        sb.append(HtmlUtil.col(formatDate(request, dttm)));
-                    } else {
-                        sb.append(HtmlUtil.col(results.getString(colcnt)));
-                    }
-                }
-                sb.append("</tr>\n");
-                //                if (cnt++ > 1000) {
-                //                    sb.append(HtmlUtil.row("..."));
-                //                    break;
-                //                }
-            }
-        }
-        sb.append("</table>");
-        long t2 = System.currentTimeMillis();
-        return makeResult(request, msg("SQL"),
-                          new StringBuffer(msgLabel("Fetched rows") + cnt
-                                           + HtmlUtil.space(1)
-                                           + msgLabel("in") + (t2 - t1)
-                                           + "ms <p>" + sb.toString()));
-        }
     }
 
     /**

@@ -65,7 +65,7 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CLASS = "class";
 
     /** _more_ */
@@ -480,7 +480,8 @@ public class GenericTypeHandler extends TypeHandler {
                 getTableName(), SqlUtil.comma(colNames),
                 SqlUtil.getQuestionMarks(colNames.size()));
         } else {
-            return SqlUtil.makeUpdate(getTableName(), COL_ID, Misc.listToStringArray(colNames));
+            return SqlUtil.makeUpdate(getTableName(), COL_ID,
+                                      Misc.listToStringArray(colNames));
         }
     }
 
@@ -557,6 +558,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @param request _more_
      * @param output _more_
      * @param showResource _more_
+     * @param showMap _more_
      *
      * @return _more_
      *
@@ -564,10 +566,11 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
                                              String output,
-                                             boolean showResource, boolean showMap)
+                                             boolean showResource,
+                                             boolean showMap)
             throws Exception {
         StringBuffer sb = super.getInnerEntryContent(entry, request, output,
-                                                     showResource, showMap);
+                              showResource, showMap);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int      valueIdx = 0;
             Object[] values   = entry.getValues();

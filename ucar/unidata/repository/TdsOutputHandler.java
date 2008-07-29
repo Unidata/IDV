@@ -19,15 +19,31 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
+
+
+import opendap.dap.DAP2Exception;
+
+
+
+import opendap.dap.parser.ParseException;
+
+import opendap.servlet.GuardedDataset;
+import opendap.servlet.ReqState;
+
+import org.w3c.dom.*;
+
+import thredds.server.opendap.GuardedDatasetImpl;
+
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.dataset.NetcdfDataset;
 
 
 
 import ucar.unidata.repository.*;
 
-import org.w3c.dom.*;
 import java.io.*;
+
 import java.net.*;
 
 import java.sql.Connection;
@@ -48,19 +64,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
-
-
-import opendap.dap.parser.ParseException;
-import opendap.dap.DAP2Exception;
-
-import opendap.servlet.GuardedDataset;
-import thredds.server.opendap.GuardedDatasetImpl;
-import opendap.servlet.ReqState;
+import javax.servlet.*;
 
 import javax.servlet.http.*;
-import javax.servlet.*;
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.dataset.NetcdfDataset;
 
 
 /**
@@ -80,13 +86,17 @@ public class TdsOutputHandler extends OutputHandler {
     public static final String OUTPUT_TDS = "tds";
 
 
-    private  Hashtable<String,Boolean> checkedEntries = new Hashtable<String,Boolean>();
+    /** _more_          */
+    private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
+                                                            Boolean>();
+
+    /** _more_          */
     private boolean tdsEnabled = false;
 
 
     /**
      *     _more_
-     *    
+     *
      *     @param repository _more_
      *     @param element _more_
      *     @throws Exception _more_
@@ -113,71 +123,109 @@ public class TdsOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getOutputTypesForEntry(Request request, Entry entry,
                                           List<OutputType> types)
             throws Exception {
 
         //        if(    request.getHttpServletRequest()==null) return;
-        if(canLoad(entry)) {
+        if (canLoad(entry)) {
             types.add(new OutputType("TDS", OUTPUT_TDS) {
-                    public String assembleUrl(Request request) {
-                        return request.getRequestPath() + getSuffix() +"/"+
-                            request.getPathEmbeddedArgs() +"/entry.das";
-                    }
-                });
+                public String assembleUrl(Request request) {
+                    return request.getRequestPath() + getSuffix() + "/"
+                           + request.getPathEmbeddedArgs() + "/entry.das";
+                }
+            });
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getTdsUrl(Entry entry) {
-        return "/"+ARG_OUTPUT+":" + OUTPUT_TDS +"/" + ARG_ID +":" +
-            entry.getId() +"/entry.das";
+        return "/" + ARG_OUTPUT + ":" + OUTPUT_TDS + "/" + ARG_ID + ":"
+               + entry.getId() + "/entry.das";
         //        return getRepository().URL_ENTRY_SHOW.getPath() +"/" + ARG_OUTPUT+":" + OUTPUT_TDS +"/" + ARG_ID +":" +
         //            entry.getId() +"/entry.das";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public boolean canLoad(Entry entry) {
-        if(!tdsEnabled) return false;
+        if ( !tdsEnabled) {
+            return false;
+        }
         Boolean b = checkedEntries.get(entry.getId());
-        if(b==null) {
+        if (b == null) {
             boolean ok = false;
-            if(entry.isGroup()) {
+            if (entry.isGroup()) {
                 ok = false;
-            } else if(!entry.getResource().isFile()) {
+            } else if ( !entry.getResource().isFile()) {
                 ok = false;
             } else {
                 try {
                     File file = entry.getResource().getFile();
-                    NetcdfFile ncfile = NetcdfDataset.acquireFile(file.toString(), null);
+                    NetcdfFile ncfile =
+                        NetcdfDataset.acquireFile(file.toString(), null);
                     ok = true;
-                } catch(Exception ignoreThis) {}
+                } catch (Exception ignoreThis) {}
             }
             b = new Boolean(ok);
-            checkedEntries.put(entry.getId(),b);
+            checkedEntries.put(entry.getId(), b);
         }
         return b.booleanValue();
     }
 
 
-    public Result outputEntry(final Request request, Entry entry) throws Exception {
-        NcDODSServlet servlet  = new NcDODSServlet(request,entry) {
-                public ServletConfig getServletConfig () {
-                    return request.getHttpServlet().getServletConfig();
-                }
-                public ServletContext getServletContext () {
-                    return request.getHttpServlet().getServletContext();
-                }
-                public String getServletInfo () {
-                    return request.getHttpServlet().getServletInfo();
-                }
-                public Enumeration getInitParameterNames() {
-                    return request.getHttpServlet().getInitParameterNames();
-                }
-            };
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputEntry(final Request request, Entry entry)
+            throws Exception {
+        NcDODSServlet servlet = new NcDODSServlet(request, entry) {
+            public ServletConfig getServletConfig() {
+                return request.getHttpServlet().getServletConfig();
+            }
+            public ServletContext getServletContext() {
+                return request.getHttpServlet().getServletContext();
+            }
+            public String getServletInfo() {
+                return request.getHttpServlet().getServletInfo();
+            }
+            public Enumeration getInitParameterNames() {
+                return request.getHttpServlet().getInitParameterNames();
+            }
+        };
 
         servlet.init(request.getHttpServlet().getServletConfig());
-        servlet.doGet(request.getHttpServletRequest(),request.getHttpServletResponse());
+        servlet.doGet(request.getHttpServletRequest(),
+                      request.getHttpServletResponse());
         Result result = new Result("");
         result.setNeedToWrite(false);
         return result;
@@ -185,23 +233,58 @@ public class TdsOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * Class NcDODSServlet _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public class NcDODSServlet extends opendap.servlet.AbstractServlet {
+
+        /** _more_          */
         Request request;
+
+        /** _more_          */
         Entry entry;
 
+        /**
+         * _more_
+         *
+         * @param request _more_
+         * @param entry _more_
+         */
         public NcDODSServlet(Request request, Entry entry) {
             this.request = request;
-            this.entry  = entry;
+            this.entry   = entry;
         }
 
-        protected GuardedDataset getDataset(ReqState preq) throws DAP2Exception, IOException, ParseException {
+        /**
+         * _more_
+         *
+         * @param preq _more_
+         *
+         * @return _more_
+         *
+         * @throws DAP2Exception _more_
+         * @throws IOException _more_
+         * @throws ParseException _more_
+         */
+        protected GuardedDataset getDataset(ReqState preq)
+                throws DAP2Exception, IOException, ParseException {
             HttpServletRequest request = preq.getRequest();
-            String reqPath=entry.getName();
-            String location=entry.getResource().getFile().toString();
-            GuardedDatasetImpl guardedDataset = new GuardedDatasetImpl(reqPath, location);
+            String             reqPath = entry.getName();
+            String location = entry.getResource().getFile().toString();
+            GuardedDatasetImpl guardedDataset =
+                new GuardedDatasetImpl(reqPath, location);
             return guardedDataset;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getServerVersion() {
             return "opendap/3.7";
         }

@@ -80,6 +80,7 @@ public class GroupTypeHandler extends TypeHandler {
      * @param request _more_
      * @param entry _more_
      * @param links _more_
+     * @param forMenu _more_
      *
      * @throws Exception _more_
      */

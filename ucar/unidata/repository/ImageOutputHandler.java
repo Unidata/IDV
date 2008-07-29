@@ -134,7 +134,8 @@ public class ImageOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
+                                          List<Entry> entries,
+                                          List<OutputType> types)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -154,7 +155,8 @@ public class ImageOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
+                                            List<Entry> entries,
+                                            List<OutputType> types)
             throws Exception {
         if (entries.size() > 0) {
             boolean ok = false;
@@ -195,11 +197,11 @@ public class ImageOutputHandler extends OutputHandler {
             throws Exception {
         Result result = makeResult(request, entries);
         result.putProperty(
-                           PROP_NAVSUBLINKS,
-                           getHeader(
-                                     request, request.getOutput(),
-                                     getRepository().getOutputTypesForGroup(
-                                                                            request, group, subGroups, entries)));
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, request.getOutput(),
+                getRepository().getOutputTypesForGroup(
+                    request, group, subGroups, entries)));
         return result;
     }
 
@@ -234,7 +236,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private  Result makeResult(Request request, List<Entry> entries)
+    private Result makeResult(Request request, List<Entry> entries)
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();
@@ -242,8 +244,7 @@ public class ImageOutputHandler extends OutputHandler {
         boolean      showApplet = repository.isAppletEnabled(request);
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
-            return  new Result("Query Results", sb,
-                               getMimeType(output));
+            return new Result("Query Results", sb, getMimeType(output));
         }
 
         if (output.equals(OUTPUT_GALLERY)) {
@@ -344,7 +345,7 @@ public class ImageOutputHandler extends OutputHandler {
                                           repository.getUrlBase());
             sb = new StringBuffer(template);
         }
-        return  new Result("Query Results", sb, getMimeType(output));
+        return new Result("Query Results", sb, getMimeType(output));
     }
 
 
