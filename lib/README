@@ -46,6 +46,20 @@ visad.jar in any CLASSPATH specification.
 visad.jar - This is the jar file we get from Wisconsin
 
 
+******************************************************************
+render.jar - This jar is an aglommeration of the jars used for rendering to pdf/svg/ps. 
+It includes:
+avalon-framework-4.2.0.jar
+batik-all.jar
+commons-io-1.1.jar
+commons-logging-1.0.4.jar
+fop.jar
+xml-apis-ext.jar
+xml-apis.jar
+xmlgraphics-commons-1.0.jar
+
+
+
 
 
 
