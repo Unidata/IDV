@@ -8414,6 +8414,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return isVisible;
     }
 
+    private boolean isRaster = false;
+    public boolean getIsRaster() {
+        return isRaster;
+    }
+
+    public void setIsRaster(boolean v) {
+        isRaster = v;
+    }
+
     /**
      * Set the visibility of the display and set the state of
      * any visibility buttons we may have.

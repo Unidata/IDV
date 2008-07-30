@@ -192,5 +192,9 @@ public class ImagePlanViewControl extends PlanViewControl {
         return "Use Native Image Projection";
     }
 
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 

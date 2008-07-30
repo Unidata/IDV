@@ -781,5 +781,9 @@ public class ImageSequenceControl extends BaseImageControl {
         return showProgressBar;
     }
 
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 
