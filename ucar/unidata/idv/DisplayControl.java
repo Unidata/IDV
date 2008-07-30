@@ -362,6 +362,8 @@ public interface DisplayControl extends Sharable {
      */
     public boolean getDisplayVisibility();
 
+    public boolean getIsRaster();
+
     /**
      * Make a visibility control as a JCheckbox.
      *
