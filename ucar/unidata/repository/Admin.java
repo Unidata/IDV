@@ -553,7 +553,7 @@ public class Admin extends RepositoryManager {
         File tmp = getStorageManager().getTmpFile(request, "dbdump");
         FileOutputStream     fos = new FileOutputStream(tmp);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
-        getDatabaseManager().makeDatabaseCopy(bos);
+        getDatabaseManager().makeDatabaseCopy(bos,true);
         bos.close();
         fos.close();
         FileInputStream is = new FileInputStream(tmp);
@@ -906,6 +906,8 @@ public class Admin extends RepositoryManager {
             }
             sb.append("</table>");
             long t2 = System.currentTimeMillis();
+            getRepository().clearCache();
+            getRepository().readGlobals();
             return makeResult(request, msg("SQL"),
                               new StringBuffer(msgLabel("Fetched rows") + cnt
                                   + HtmlUtil.space(1) + msgLabel("in")

@@ -15,19 +15,19 @@ By default the server is on port 8080.  To change the port do:
 
 By default RAMADDA uses a local Java Derby database. 
 To run with mysql you do:
-     java -Xmx512m -jar repository.jar -Djdms.db=mysql
+     java -Xmx512m -jar repository.jar -Dramadda.db=mysql
 
 
 The mysql database and user/password is defined in the repository.properties 
 file. To change it make a repository.properties file with the following 
 3 lines and put it in <home dir>/.unidata/repository
 
-jdms.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull
-jdms.db.mysql.user=the database user
-jdms.db.mysql.password=the database password
+ramadda.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull
+ramadda.db.mysql.user=the database user
+ramadda.db.mysql.password=the database password
 
 Or alteratively set the properties on the command line:
-     java -Xmx512m -jar repository.jar -Djdms.db=mysql -Djdms.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull -Djdms.db.mysql.user=the database user -Djdms.db.mysql.password=the database password
+     java -Xmx512m -jar repository.jar -Dramadda.db=mysql -Dramadda.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull -Dramadda.db.mysql.user=the database user -Dramadda.db.mysql.password=the database password
 
 
 

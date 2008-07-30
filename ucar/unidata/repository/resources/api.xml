@@ -29,6 +29,8 @@
 
   <method request="/entry/new"       method="processEntryNew"       actions="new"/>
 
+  <method request="/entry/xmlcreate"       method="processEntryXmlCreate"/>
+
   <method request="/comments/show"   method="processCommentsShow"/>
   <method request="/comments/add"   method="processCommentsAdd"     actions="comment"/>
   <method request="/comments/edit"   method="processCommentsEdit"   actions="edit"/>

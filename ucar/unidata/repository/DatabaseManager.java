@@ -217,7 +217,11 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void makeDatabaseCopy(OutputStream os) throws Exception {
+    public void makeDatabaseCopy(OutputStream os, boolean all) throws Exception {
+
+
+
+
 
         DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
@@ -232,6 +236,17 @@ public class DatabaseManager extends RepositoryManager {
                     || tableType.startsWith("SYSTEM")) {
                 continue;
             }
+
+
+            String tn = tableName.toLowerCase();
+            if(!all) {
+                if(tn.equals(TABLE_GLOBALS) ||
+                   tn.equals(TABLE_USERS) ||
+                   tn.equals(TABLE_PERMISSIONS) ||
+                   tn.equals(TABLE_HARVESTERS) ||
+                   tn.equals(TABLE_USERROLES)) continue;
+            }
+
 
             ResultSet cols     = dbmd.getColumns(null, null, tableName, null);
 

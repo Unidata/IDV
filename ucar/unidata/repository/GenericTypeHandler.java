@@ -251,6 +251,11 @@ public class GenericTypeHandler extends TypeHandler {
 
 
 
+    public void initializeEntry(Request request, Entry entry, Element node)
+            throws Exception {
+    }
+
+
 
     /**
      * _more_

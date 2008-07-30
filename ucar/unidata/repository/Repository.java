@@ -138,6 +138,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
                                              "/entry/search");
 
+    public RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(this,
+                                             "/entry/xmlcreate");
+
 
     /** _more_ */
     public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
@@ -192,7 +195,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form",
                                            "Edit Entry");
-
 
 
     /** _more_ */
@@ -891,7 +893,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
-            getDatabaseManager().makeDatabaseCopy(fos);
+            getDatabaseManager().makeDatabaseCopy(fos,true);
             fos.close();
         }
     }
@@ -971,7 +973,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected void usage(String message) {
         throw new IllegalArgumentException(
             message
-            + "\nusage: repository\n\t-admin <admin name> <admin password>\n\t-port <http port>\n\t-Dname=value (e.g., -Djdms.db=derby to specify the derby database)");
+            + "\nusage: repository\n\t-admin <admin name> <admin password>\n\t-port <http port>\n\t-Dname=value (e.g., -Dramadda.db=derby to specify the derby database)");
     }
 
 
@@ -1127,7 +1129,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         //This will end up being from the properties
         htdocRoots.addAll(
             StringUtil.split(
-                getProperty("jdms.html.htdocroots", BLANK), ";", true, true));
+                getProperty("ramadda.html.htdocroots", BLANK), ";", true, true));
 
 
     }
@@ -3725,10 +3727,141 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
+
+        sb.append(request.uploadForm(URL_ENTRY_XMLCREATE));
+        sb.append("File:" + HtmlUtil.fileInput(ARG_FILE, ""));
+        sb.append("<br>" + HtmlUtil.submit("Submit"));
+        sb.append(HtmlUtil.formClose());
+
+
         return new Result("New Form", sb, Result.TYPE_HTML);
     }
 
 
+
+
+    private void  processEntryXml(Request request, Element node, List newEntries, Hashtable entries, Hashtable files) throws Exception {
+        String name= XmlUtil.getAttribute(node, ATTR_NAME);
+        String type= XmlUtil.getAttribute(node, ATTR_TYPE,TypeHandler.TYPE_FILE);
+        String dataType= XmlUtil.getAttribute(node, ATTR_DATATYPE,"");
+        String description= XmlUtil.getAttribute(node, ATTR_DESCRIPTION,"");
+        String file = XmlUtil.getAttribute(node, ATTR_FILE,(String)null);
+        String url = XmlUtil.getAttribute(node, ATTR_URL,(String)null);
+        String tmpid= XmlUtil.getAttribute(node, ATTR_ID,(String)null);        
+        String parentId= XmlUtil.getAttribute(node, ATTR_PARENT,topGroup.getId());
+        Group parentGroup = (Group) entries.get(parentId);
+        if(parentGroup == null) {
+            parentGroup =    (Group)getEntry(request, parentId);
+            if(parentGroup == null) {
+                throw new IllegalArgumentException("Could not find parent:" + parentId);
+            }
+        }
+        if(!getAccessManager().canDoAction(request, parentGroup,
+                                           Permission.ACTION_NEW)) {
+                throw new IllegalArgumentException("Cannot add to parent group:" + parentId);
+        }
+
+        TypeHandler typeHandler = getTypeHandler(type);
+        if(typeHandler==null) {
+            throw new IllegalArgumentException("Could not find type:" + type);
+        }
+        String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
+                     ? getGroupId(parentGroup)
+                     : getGUID());
+
+        Resource resource;
+        if(file!=null) {
+            resource = new Resource(file, Resource.TYPE_LOCALFILE);
+        } else if(url!=null) {
+            resource = new Resource(url, Resource.TYPE_URL);
+        } else {
+            resource = new Resource("", Resource.TYPE_UNKNOWN);
+        }
+        Date createDate =new Date();
+        Date fromDate = createDate;
+        if(XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
+            fromDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_FROMDATE));
+        }
+        Date toDate = fromDate;
+        if(XmlUtil.hasAttribute(node, ATTR_TODATE)) {
+            toDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_TODATE));
+        }
+
+        Entry entry = typeHandler.createEntry(id);
+        entry.initEntry(name, description, parentGroup, "",
+                        request.getUser(),
+                        resource, dataType,
+                        createDate.getTime(),
+                        fromDate.getTime(),
+                        toDate.getTime(),
+                        null);
+        
+
+        entry.setNorth(XmlUtil.getAttribute(node, ATTR_NORTH, entry.getNorth()));
+        entry.setSouth(XmlUtil.getAttribute(node, ATTR_SOUTH, entry.getSouth()));
+        entry.setEast(XmlUtil.getAttribute(node, ATTR_EAST, entry.getEast()));
+        entry.setWest(XmlUtil.getAttribute(node, ATTR_WEST, entry.getWest()));
+
+        entry.getTypeHandler().initializeEntry(request, entry,node);
+
+
+        if(tmpid!=null) {
+            entries.put(tmpid, entry);
+        }
+        newEntries.add(entry);
+    }
+
+
+    private void  processAssociationXml(Request request,Element node,Hashtable entries, Hashtable files) throws Exception {
+
+    }
+
+
+    public Result processEntryXmlCreate(Request request) throws Exception {
+        try {
+            return processEntryXmlCreateInner(request);
+        } catch(Exception exc) {
+            return new Result("", new StringBuffer("<error>" + exc+"</error>"), Result.TYPE_XML);
+        }
+    }
+
+    private Result processEntryXmlCreateInner(Request request) throws Exception {
+        String file = request.getUploadedFile(ARG_FILE);
+        if(file==null) {
+            return new Result("", new StringBuffer("<error>No file argument given</error>"), Result.TYPE_XML);
+        }
+        Hashtable files = new Hashtable();
+        if(file.endsWith(".zip")) {
+        }
+
+        /*
+<entries>
+<entry type="" parent=""/>
+</entries>
+        */
+
+        List newEntries = new ArrayList();
+        Hashtable entries = new Hashtable();
+        Element root = XmlUtil.getRoot(file, getClass());
+        NodeList  children = XmlUtil.getElements(root);
+        for (int i = 0; i < children.getLength(); i++) {
+            Element node = (Element) children.item(i);
+            if(node.getTagName().equals(TAG_ENTRY)) {
+                processEntryXml(request,node,newEntries,entries, files);
+            } else if(node.getTagName().equals(TAG_ASSOCIATION)) {
+                processAssociationXml(request,node,entries, files);
+            } else {
+                return new Result("", new StringBuffer("<error>Unknown tag:" + node.getTagName() +"</error>"), Result.TYPE_XML);
+            }
+        }
+
+
+        insertEntries(newEntries, true);
+
+
+        StringBuffer sb = new StringBuffer("<result>ok</result>");
+        return new Result("", sb, Result.TYPE_XML);
+    }
 
 
 

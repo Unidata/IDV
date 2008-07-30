@@ -178,6 +178,10 @@ public interface Constants {
     public static final String ICON_LEFT = "/left.gif";
 
 
+    public static final String ATTR_PARENT = "parent";
+
+    public static final String ATTR_URL = "url";
+
     /** _more_ */
     public static final String ATTR_ID = "id";
 
@@ -185,8 +189,17 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+    public static final String ATTR_FROMDATE = "fromdate";
+    public static final String ATTR_TODATE = "todate";
+
+    public static final String ATTR_NORTH = "north";
+    public static final String ATTR_SOUTH = "south";
+    public static final String ATTR_EAST = "east";
+    public static final String ATTR_WEST = "west";
+
     /** _more_ */
     public static final String ATTR_TYPE = "type";
+    public static final String ATTR_DATATYPE = "datatype";
 
 
     /** _more_ */
@@ -563,62 +576,62 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
+    public static final String PROP_DOWNLOAD_OK = "ramadda.download.ok";
 
     /** _more_ */
     public static final String PROP_REPOSITORY_HOME = "ramadda_home";
 
 
     /** _more_ */
-    public static final String PROP_DEBUG = "jdms.debug";
+    public static final String PROP_DEBUG = "ramadda.debug";
 
     /** _more_ */
-    public static final String PROP_DATEFORMAT = "jdms.dateformat";
+    public static final String PROP_DATEFORMAT = "ramadda.dateformat";
 
 
     /** _more_ */
     public static final String PROP_ACCESS_REQUIRELOGIN =
-        "jdms.access.requirelogin";
+        "ramadda.access.requirelogin";
 
     /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
-        "jdms.access.adminonly";
+        "ramadda.access.adminonly";
 
     /** _more_ */
-    public static final String PROP_LANGUAGE = "jdms.language";
-
-
-    /** _more_ */
-    public static final String PROP_HTML_FOOTER = "jdms.html.footer";
-
-    /** _more_ */
-    public static final String PROP_REQUEST_PATTERN = "jdms.request.pattern";
-
-    /** _more_ */
-    public static final String PROP_REPOSITORY_NAME = "jdms.repository.name";
+    public static final String PROP_LANGUAGE = "ramadda.language";
 
 
     /** _more_ */
-    public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
+    public static final String PROP_HTML_FOOTER = "ramadda.html.footer";
 
     /** _more_ */
-    public static final String PROP_DB = "jdms.db";
+    public static final String PROP_REQUEST_PATTERN = "ramadda.request.pattern";
+
+    /** _more_ */
+    public static final String PROP_REPOSITORY_NAME = "ramadda.repository.name";
 
 
     /** _more_ */
-    public static final String PROP_DB_DERBY_HOME = "jdms.db.derby.home";
+    public static final String PROP_DB_CANCACHE = "ramadda.db.cancache";
 
     /** _more_ */
-    public static final String PROP_DB_DRIVER = "jdms.db.${db}.driver";
+    public static final String PROP_DB = "ramadda.db";
+
 
     /** _more_ */
-    public static final String PROP_DB_URL = "jdms.db.${db}.url";
+    public static final String PROP_DB_DERBY_HOME = "ramadda.db.derby.home";
 
     /** _more_ */
-    public static final String PROP_DB_USER = "jdms.db.${db}.user";
+    public static final String PROP_DB_DRIVER = "ramadda.db.${db}.driver";
 
     /** _more_ */
-    public static final String PROP_DB_PASSWORD = "jdms.db.${db}.password";
+    public static final String PROP_DB_URL = "ramadda.db.${db}.url";
+
+    /** _more_ */
+    public static final String PROP_DB_USER = "ramadda.db.${db}.user";
+
+    /** _more_ */
+    public static final String PROP_DB_PASSWORD = "ramadda.db.${db}.password";
 
 
 
@@ -626,73 +639,79 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_HARVESTERS_ACTIVE =
-        "jdms.harvesters.active";
+        "ramadda.harvesters.active";
 
     /** _more_ */
-    public static final String PROP_HARVESTERS = "jdms.harvesters";
+    public static final String PROP_HARVESTERS = "ramadda.harvesters";
 
     /** _more_ */
-    public static final String PROP_DB_SCRIPT = "jdms.db.script";
+    public static final String PROP_DB_SCRIPT = "ramadda.db.script";
 
     /** _more_ */
-    public static final String PROP_TYPES = "jdms.types";
+    public static final String PROP_TYPES = "ramadda.types";
 
     /** _more_ */
-    public static final String PROP_OUTPUTHANDLERS = "jdms.outputhandlers";
+    public static final String PROP_OUTPUTHANDLERS = "ramadda.outputhandlers";
 
     /** _more_ */
     public static final String PROP_METADATAHANDLERS =
-        "jdms.metadatahandlers";
+        "ramadda.metadatahandlers";
 
     /** _more_ */
-    public static final String PROP_NAVLINKS = "jdms.navlinks";
+    public static final String PROP_NAVLINKS = "ramadda.navlinks";
 
     /** _more_ */
-    public static final String PROP_API = "jdms.api";
+    public static final String PROP_API = "ramadda.api";
 
 
 
     /** _more_ */
-    public static final String PROP_NAVSUBLINKS = "jdms.navsublinks";
+    public static final String PROP_NAVSUBLINKS = "ramadda.navsublinks";
 
     /** _more_ */
-    public static final String PROP_SHOW_APPLET = "jdms.html.showapplet";
+    public static final String PROP_SHOW_APPLET = "ramadda.html.showapplet";
 
     /** _more_ */
-    public static final String PROP_HTML_URLBASE = "jdms.html.urlbase";
+    public static final String PROP_HTML_URLBASE = "ramadda.html.urlbase";
 
     /** _more_ */
-    public static final String PROP_HTML_TEMPLATE = "jdms.html.template";
+    public static final String PROP_HTML_TEMPLATE = "ramadda.html.template";
 
     /** _more_ */
     public static final String PROP_HTML_IMAGEPLAYER =
-        "jdms.html.imageplayer";
+        "ramadda.html.imageplayer";
 
     /** _more_ */
-    public static final String PROP_HTML_SLIDESHOW = "jdms.html.slideshow";
+    public static final String PROP_HTML_SLIDESHOW = "ramadda.html.slideshow";
 
     /** _more_ */
     public static final String PROP_HTML_TIMELINEAPPLET =
-        "jdms.html.timelineapplet";
+        "ramadda.html.timelineapplet";
 
     /** _more_ */
     public static final String PROP_HTML_MIMEPROPERTIES =
-        "jdms.html.mimeproperties";
+        "ramadda.html.mimeproperties";
 
     /** _more_ */
     public static final String PROP_HTML_GRAPHAPPLET =
-        "jdms.html.graphapplet";
+        "ramadda.html.graphapplet";
 
     /** _more_ */
     public static final String PROP_HTML_GRAPHTEMPLATE =
-        "jdms.html.graphtemplate";
+        "ramadda.html.graphtemplate";
 
 
 
     /** _more_ */
     public static final String PROP_DOWNLOAD_ASFILES =
-        "jdms.download.asfiles";
+        "ramadda.download.asfiles";
 
+
+
+
+    public static final String TAG_ENTRY = "entry";
+    public static final String ATTR_DESCRIPTION = "description";
+    public static final String ATTR_FILE = "file";
 
 
 

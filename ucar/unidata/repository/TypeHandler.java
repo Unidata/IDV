@@ -310,7 +310,9 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {}
 
 
-
+    public void initializeEntry(Request request, Entry entry, Element node)
+            throws Exception {
+    }
 
 
 
