@@ -74,7 +74,7 @@ argument -Dfoo=bar) -->
 
 
 
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar;${libsdir}/j2h.jar;"/>
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
 
 
 
@@ -86,7 +86,7 @@ argument -Dfoo=bar) -->
         <!-- javac flags -->
         <property name="failonerror" value="true"/>
         <property name="fork" value="true"/>
-        <property name="maxmemory" value="128m"/>
+        <property name="maxmemory" value="256m"/>
 
         <!-- Source verions -->
         <property name="srcversion" value="1.5"/>
@@ -118,6 +118,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/itext.jar" dest="${tmpjardir}"/>
 -->
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/render.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
