@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -43,7 +44,6 @@ import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
 
-
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
@@ -54,6 +54,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
 import ucar.unidata.util.ObjectListener;
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
@@ -67,11 +68,17 @@ import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.Plotter;
+
+
+
+
 import ucar.visad.Util;
 
 import ucar.visad.display.*;
 
 import visad.*;
+import visad.bom.SceneGraphRenderer;
 
 import visad.georef.*;
 
@@ -111,6 +118,10 @@ import java.util.zip.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+
+
+//import org.apache.batik.svggen.SVGGraphics2D;
+
 
 
 /**
@@ -1946,6 +1957,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
             int  count    = 0;
             List controls = getControls();
+
             for (int i = 0; i < controls.size(); i++) {
                 DisplayControl control = (DisplayControl) controls.get(i);
                 if ( !control.getShowInDisplayList()
@@ -3214,11 +3226,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param background The background color
      */
     public void setColors(Color foreground, Color background) {
-        if(foreground==null)
-            foreground=this.foreground;
+        if (foreground == null) {
+            foreground = this.foreground;
+        }
         this.foreground = foreground;
-        if(background==null)
+        if (background == null) {
             background = this.background;
+        }
         this.background = background;
 
         if ( !hasDisplayMaster()) {
@@ -3549,8 +3563,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Update display if needed
      *
-     * @throws RemoteException 
-     * @throws VisADException 
+     * @throws RemoteException
+     * @throws VisADException
      */
     public void updateDisplayIfNeeded()
             throws VisADException, RemoteException {
@@ -4612,7 +4626,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @param images list of images
      * @param andShow true to show
-     */ 
+     */
     public void useImages(List images, boolean andShow) {
         if (imagePanel == null) {
             imagePanel = new ImagePanel();
@@ -4817,6 +4831,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return null;
     }
 
+    public static boolean isVectorFile(String filename) {
+        return filename.toLowerCase().endsWith(".pdf")
+            || filename.toLowerCase().endsWith(".ps")
+            || filename.toLowerCase().endsWith(".eps")
+            || filename.toLowerCase().endsWith(".svg");
+    }
 
 
     /**
@@ -4858,7 +4878,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                        backgroundTransparentBtn));
 
 
-            List            filters = Misc.newList(FileManager.FILTER_IMAGE);
+            PatternFileFilter captureFilter =
+                new PatternFileFilter(
+                    ".+\\.jpg|.+\\.gif|.+\\.jpeg|.+\\.png|.+\\.pdf|.+\\.ps|.+\\.svg",
+                    "Image files (*.jpg,*.gif,*.png,*.pdf,*.ps,*.svg)");
+            List            filters = Misc.newList(captureFilter);
             GeoLocationInfo bounds  = getVisibleGeoBounds();
             if (bounds != null) {
                 filters.add(KmlDataSource.FILTER_KML);
@@ -4871,13 +4895,38 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
             if (filename != null) {
-
-                if (filename.endsWith(".pdf")) {
-                    ImageUtils.writePDF(
-                        new FileOutputStream(filename),
-                        (JComponent) getMaster().getComponent());
+                if (isVectorFile(filename)) {
+                    renderVectorFile(filename,true);
                     System.setSecurityManager(backup);
                     return;
+                }
+
+                if (filename.endsWith(".eps") || filename.endsWith(".ps")) {
+                    /*                    ImageUtils.writeEPS(
+                        new FileOutputStream(filename),
+                        (JComponent) getMaster().getComponent());
+                        System.setSecurityManager(backup);*/
+                    return;
+                }
+
+                if (filename.endsWith(".svg")) {
+                    /*
+                    Document  doc = XmlUtil.getDocument("<svg></svg>");
+                    SVGGraphics2D svgGenerator = new SVGGraphics2D(doc);
+                    JComponent comp = (JComponent)getMaster().getComponent();
+                    RepaintManager repaintManager =
+                        RepaintManager.currentManager(comp);
+                    visad.java2d.VisADCanvasJ2D.renderDirectly= true;
+                    repaintManager.setDoubleBufferingEnabled(false);
+                    comp.paint(svgGenerator);
+                    repaintManager.setDoubleBufferingEnabled(true);
+                    visad.java2d.VisADCanvasJ2D.renderDirectly= false;
+                    Writer out = new OutputStreamWriter(new FileOutputStream(filename), "UTF-8");
+                    svgGenerator.stream(out, true);
+                    //                    IOUtil.writeFile(filename, XmlUtil.toString(doc.getDocumentElement()));
+                    System.setSecurityManager(backup);
+                    return;
+                    */
                 }
 
 
@@ -4999,6 +5048,154 @@ public class ViewManager extends SharableImpl implements ActionListener,
         System.setSecurityManager(backup);
 
     }
+
+
+
+    private class MyPlottable implements Plotter.Plottable {
+
+        Dimension dim;
+        boolean preview = false;
+        public MyPlottable(boolean preview) {
+            Component comp  = getMaster().getDisplayComponent();
+            dim       = comp.getSize();
+            this.preview = preview;
+        }
+
+        public void plot(Graphics2D graphics) {
+            try {
+                //Turn off the display list 
+                boolean wasShowingDisplayList = getShowDisplayList();
+                if(wasShowingDisplayList) {
+                    setShowDisplayList(false);
+                }
+
+
+                //Find all visibile displays
+                final List<DisplayControl> onDisplays =
+                    new ArrayList<DisplayControl>();
+                for (DisplayControl control : (List<DisplayControl>) getControls()) {
+                    if (control.getDisplayVisibility()) {
+                        onDisplays.add(control);
+                    }
+                }
+
+                //If previewing then use the graphics from an image
+                BufferedImage previewImage = null;
+                if (preview) {
+                    previewImage = new BufferedImage(dim.width, dim.height,BufferedImage.TYPE_INT_RGB);
+                    graphics = (Graphics2D) previewImage.getGraphics();
+                }
+
+                //Turn off all non-raster
+                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
+                    control.toggleVisibilityForVectorRendering(DisplayControl.RASTERMODE_SHOWRASTER);
+                }
+
+                toFront();
+                Misc.sleep(250);
+
+                //capture the image of the rasters and write it into the graphics
+                BufferedImage image = getMaster().getImage(false);
+                graphics.drawImage(image, 0, 0, null);
+
+                //Now,  turn off rasters and turn on all non-raster
+                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
+                    control.toggleVisibilityForVectorRendering(DisplayControl.RASTERMODE_SHOWNONRASTER);
+                }
+
+                //Render the scene graph
+                SceneGraphRenderer renderer = new SceneGraphRenderer();
+                DisplayImpl display = (DisplayImpl) master.getDisplay();
+                renderer
+                    .plot(graphics, display,
+                          ((NavigatedDisplay) master)
+                          .getDisplayCoordinateSystem(), dim.width, dim.height);
+
+
+                //Reset all displays
+                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
+                    control.toggleVisibilityForVectorRendering(DisplayControl.RASTERMODE_SHOWALL);
+                }
+
+                //Now, draw the display list using the graphics
+                int height = dim.height;
+                int width = dim.width;
+                if(wasShowingDisplayList) {
+                    int cnt = 0;
+                    Font f    = getDisplayListFont();
+                    graphics.setFont(f);
+                    FontMetrics fm = graphics.getFontMetrics();
+                    int lineHeight = fm.getAscent() + fm.getDescent();
+                    for (DisplayControl control : (List<DisplayControl>) onDisplays) {
+                        if (!control.getShowInDisplayList()) continue;
+                        Data data = control.getDataForDisplayList();
+                        if (data == null) {
+                            continue;
+                        }
+                        String text=null;
+                        if(data instanceof visad.Text) {
+                            text = ((visad.Text)data).getValue();
+                        } else if(data instanceof FieldImpl) {
+                            Real now= animation.getCurrentAnimationValue();
+                            if(now!=null) {
+                                FieldImpl fi = (FieldImpl) data;
+                                Data rangeValue = fi.evaluate(now, Data.NEAREST_NEIGHBOR,Data.NO_ERRORS);
+                                if(rangeValue!=null && (rangeValue instanceof visad.Text)) {
+                                    text = ((visad.Text)rangeValue).getValue();
+                                }
+                            }
+                        }
+                        if(text == null || text.length()==0) continue;
+                        Color c = ((ucar.unidata.idv.control.DisplayControlImpl)control).getDisplayListColor();
+                        if(c == null) c = getDisplayListColor();
+                        graphics.setColor(c);
+                        int lineWidth = fm.stringWidth(text);
+                        graphics.drawString(text,width/2-lineWidth/2,height-2-((lineHeight+1)*cnt));
+                        cnt++;
+                    }
+                    setShowDisplayList(true);
+                }
+
+
+                if (preview) {
+                    GuiUtils.showOkCancelDialog(null, "",
+                                                new JLabel(new ImageIcon(previewImage)),
+                                                null);
+                }
+
+
+            } catch (Exception exc) {
+                throw new ucar.unidata.util.WrapperException(exc);
+            }
+
+        }
+
+
+        //TODO:For the pdf, ps, svg, this probably never gets called
+        //Not sure what to do if it does get called. Maybe get the colors from the scenegraphrenderer
+        public Color[] getColours() {
+            return new Color[] { Color.red, Color.green, Color.blue };
+        }
+
+        public int[] getSize() {
+            return new int[] { dim.width, dim.height };
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @throws Exception _more_
+     */
+    public void renderVectorFile(String filename, boolean doVectors) throws Exception {
+        Plotter plotter = new Plotter(filename);
+        plotter.plot(new MyPlottable(true));
+        plotter.plot(new MyPlottable(false));
+
+    }
+
 
 
     /**

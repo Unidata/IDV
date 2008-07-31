@@ -3270,7 +3270,10 @@ public class ImageGenerator extends IdvManager {
                     imageFile = new File(getImageFileName(loopFilename));
                 }
                 viewManager.writeImage(imageFile, true, false);
+            } else if(loopFilename!=null && ViewManager.isVectorFile(loopFilename)) {
+                viewManager.renderVectorFile(loopFilename,true);
             } else {
+
                 lastImage = viewManager.getMaster().getImage(false);
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
