@@ -756,7 +756,7 @@ public class STIStormDataSource extends StormDataSource {
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
                                    altReal);
-                if (radiuses != null) {
+                if (true) { //radiuses != null) {
                     //radius = fhour * 50.0f / 24.0f;
                     addProbabilityRadiusAttrs(attrs, radiuses);
                 }
@@ -822,16 +822,29 @@ public class STIStormDataSource extends StormDataSource {
      */
     private void addProbabilityRadiusAttrs(List<Real> attrs, float[] radiuses)
             throws Exception {
-        attrs.add(PARAM_PROBABILITY10RADIUS.getReal(radiuses[0]));
-        attrs.add(PARAM_PROBABILITY20RADIUS.getReal(radiuses[1]));
-        attrs.add(PARAM_PROBABILITY30RADIUS.getReal(radiuses[2]));
-        attrs.add(PARAM_PROBABILITY40RADIUS.getReal(radiuses[3]));
-        attrs.add(PARAM_PROBABILITY50RADIUS.getReal(radiuses[4]));
-        attrs.add(PARAM_PROBABILITY60RADIUS.getReal(radiuses[5]));
-        attrs.add(PARAM_PROBABILITY70RADIUS.getReal(radiuses[6]));
-        attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
-        attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
-        attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
+        if(radiuses != null) {
+            attrs.add(PARAM_PROBABILITY10RADIUS.getReal(radiuses[0]));
+            attrs.add(PARAM_PROBABILITY20RADIUS.getReal(radiuses[1]));
+            attrs.add(PARAM_PROBABILITY30RADIUS.getReal(radiuses[2]));
+            attrs.add(PARAM_PROBABILITY40RADIUS.getReal(radiuses[3]));
+            attrs.add(PARAM_PROBABILITY50RADIUS.getReal(radiuses[4]));
+            attrs.add(PARAM_PROBABILITY60RADIUS.getReal(radiuses[5]));
+            attrs.add(PARAM_PROBABILITY70RADIUS.getReal(radiuses[6]));
+            attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
+            attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
+            attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
+        } else {
+            attrs.add(PARAM_PROBABILITY10RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY20RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY30RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY40RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY50RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY60RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY70RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY80RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY90RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_PROBABILITY100RADIUS.getReal(Float.NaN));
+        }
     }
 
     /**
