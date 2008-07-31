@@ -5191,7 +5191,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void renderVectorFile(String filename, boolean doVectors) throws Exception {
         Plotter plotter = new Plotter(filename);
-        plotter.plot(new MyPlottable(true));
+        //        plotter.plot(new MyPlottable(true));
         plotter.plot(new MyPlottable(false));
 
     }
