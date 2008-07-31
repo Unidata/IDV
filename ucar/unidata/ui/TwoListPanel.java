@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.ui;
 
 
@@ -92,6 +94,7 @@ public class TwoListPanel extends JPanel implements ActionListener {
     /** _more_ */
     private List originalToEntries;
 
+    /** _more_ */
     private boolean showUpDownButtons = true;
 
     /**
@@ -108,15 +111,26 @@ public class TwoListPanel extends JPanel implements ActionListener {
         this(fromEntries, fromLabel, toEntries, toLabel, extraButtons, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param fromEntries _more_
+     * @param fromLabel _more_
+     * @param toEntries _more_
+     * @param toLabel _more_
+     * @param extraButtons _more_
+     * @param showUpDownButtons _more_
+     */
     public TwoListPanel(List fromEntries, String fromLabel, List toEntries,
-                        String toLabel, JComponent extraButtons,boolean showUpDownButtons) {
+                        String toLabel, JComponent extraButtons,
+                        boolean showUpDownButtons) {
 
 
         this.fromEntries         = new Vector(fromEntries);
         this.toEntries           = new Vector(toEntries);
         this.originalFromEntries = new ArrayList(fromEntries);
         this.originalToEntries   = new ArrayList(toEntries);
-        this.showUpDownButtons = showUpDownButtons;
+        this.showUpDownButtons   = showUpDownButtons;
         init(fromLabel, toLabel, extraButtons);
     }
 
@@ -139,14 +153,7 @@ public class TwoListPanel extends JPanel implements ActionListener {
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public JList getToList() {
-        return toList;
-    }
+
 
     /**
      * _more_
@@ -214,9 +221,6 @@ public class TwoListPanel extends JPanel implements ActionListener {
 
     /**
      * Set the data in the list. Try to preserve the selected index
-     *
-     * @param to The jlist to set
-     * @param toList The list of entries  to use
      *
      * @param jlist _more_
      * @param entries _more_
@@ -290,6 +294,25 @@ public class TwoListPanel extends JPanel implements ActionListener {
 
         return idx;
     }
+
+    /**
+     * Return the from list
+     *
+     * @return The from list
+     */
+    public JList getFromList() {
+        return fromList;
+    }
+
+    /**
+     * Return the to list
+     *
+     * @return The to list
+     */
+    public JList getToList() {
+        return toList;
+    }
+
 
     /**
      * _more_
@@ -493,10 +516,9 @@ public class TwoListPanel extends JPanel implements ActionListener {
                                    fromSp),
                                middlePanel,
                                GuiUtils.topCenter(GuiUtils.cLabel(toLabel),
-                                   toSp),
-                               GuiUtils.top(showUpDownButtons?GuiUtils.vbox(upButton,
-                                   downButton):new JPanel()) }, 4, GuiUtils.WT_YNYN,
-                                       GuiUtils.WT_Y);
+                                   toSp), GuiUtils.top(showUpDownButtons
+                ? GuiUtils.vbox(upButton, downButton)
+                : new JPanel()) }, 4, GuiUtils.WT_YNYN, GuiUtils.WT_Y);
         mainPanel = GuiUtils.inset(mainPanel, 5);
 
         setLayout(new BorderLayout());
