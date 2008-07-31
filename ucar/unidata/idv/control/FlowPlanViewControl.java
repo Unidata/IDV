@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -163,7 +162,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                        : ""), null);
             if (getMultipleIsTopography()) {
                 planDisplay.setIgnoreExtraParameters(true);
-                planDisplay.setAdjustFlow(false);
             }
         }
         planDisplay.setStreamlinesEnabled(isStreamlines);
@@ -444,7 +442,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @throws VisADException   VisAD error
      */
     protected void addTopographyMap() throws VisADException, RemoteException {
-        addTopographyMap(2);
+        addTopographyMap(isThreeComponents
+                         ? 3
+                         : 2);
     }
 
     /**
