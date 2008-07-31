@@ -1690,7 +1690,7 @@ public class WayDisplayState {
         StormTrackPoint stp;
 
         // circle  1 to n
-
+        
         for (int i = 1; i < size; i++) {
             stp2 = stps.get(i);
             //right point
@@ -1720,7 +1720,8 @@ public class WayDisplayState {
 
         List coneList = new ArrayList<StormTrackPoint>();
         for (int i = 0; i < numberOfPoint; i++) {
-            coneList.add(conePoints[i]);
+            if(conePoints[i] != null)
+                coneList.add(conePoints[i]);
         }
 
         return new StormTrack(track.getStormInfo(),
@@ -1749,8 +1750,13 @@ public class WayDisplayState {
         EarthLocation    el2  = sp2.getLocation();
 
         Real             rl   = sp2.getAttribute(param);
-
         double           r    = rl.getValue();
+
+        if(Float.isNaN((float)r) || r == 0.0){
+            return null;
+         }
+
+
         double           lat1 = el1.getLatitude().getValue();
         double           lon1 = el1.getLongitude().getValue();
         LatLonPointImpl  p1   = new LatLonPointImpl(lat1, lon1);
