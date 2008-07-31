@@ -32,6 +32,7 @@ import ucar.unidata.data.DataSelection;
 
 import ucar.visad.display.DisplayableData;
 
+import visad.Data;
 import visad.VisADException;
 
 import visad.georef.EarthLocation;
@@ -187,6 +188,8 @@ public interface DisplayControl extends Sharable {
      * @return Displayable to show
      */
     public DisplayableData getDisplayListDisplayable(ViewManager view);
+
+    public Data getDataForDisplayList();
 
     /**
      * Set whether the visibility of this display control is locked
@@ -362,7 +365,14 @@ public interface DisplayControl extends Sharable {
      */
     public boolean getDisplayVisibility();
 
-    public boolean getIsRaster();
+
+    public static final int RASTERMODE_SHOWRASTER = 0;
+    public static final int RASTERMODE_SHOWNONRASTER = 1;
+    public static final int RASTERMODE_SHOWALL = 2;
+
+    public void toggleVisibilityForVectorRendering(int rasterMode) throws Exception;
+
+
 
     /**
      * Make a visibility control as a JCheckbox.
