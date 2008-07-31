@@ -1748,5 +1748,10 @@ public class ImageMovieControl extends DisplayControlImpl  {
         return showImageInDisplay;
     }
 
+
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 

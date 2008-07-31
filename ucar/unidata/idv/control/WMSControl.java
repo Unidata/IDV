@@ -1533,6 +1533,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
         return scale;
     }
 
+    public boolean getIsRaster() {
+        return true;
+    }
+
 
 }
 

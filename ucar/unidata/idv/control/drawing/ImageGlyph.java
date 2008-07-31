@@ -145,6 +145,9 @@ public class ImageGlyph extends DrawingGlyph {
         this.image = image;
     }
 
+    public boolean getIsRaster() {
+        return true;
+    }
 
 
     /**

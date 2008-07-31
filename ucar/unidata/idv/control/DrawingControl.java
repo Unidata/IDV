@@ -562,6 +562,30 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
 
+    public void toggleVisibilityForVectorRendering(int rasterMode) throws Exception {
+        if(rasterMode == RASTERMODE_SHOWRASTER) {
+            for (int i = 0; i < glyphs.size(); i++) {
+                DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
+                glyph.oldVisibility = glyph.getVisibleFlag();
+                if(glyph.oldVisibility)
+                    glyph.setVisibleFlag(glyph.getIsRaster());
+            }
+        } else if(rasterMode == RASTERMODE_SHOWNONRASTER) {
+            for (int i = 0; i < glyphs.size(); i++) {
+                DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
+                if(glyph.oldVisibility)
+                    glyph.setVisibleFlag(!glyph.getIsRaster());
+            }
+
+        } else {
+            for (int i = 0; i < glyphs.size(); i++) {
+                DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
+                glyph.setVisibleFlag(glyph.oldVisibility);
+            }
+        }
+    }
+
+
     /**
      * Should this glyph be visible
      *

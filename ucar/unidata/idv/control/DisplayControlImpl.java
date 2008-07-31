@@ -3392,6 +3392,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    public Data getDataForDisplayList() {
+        return getDisplayListData();
+    }
+
+
     /**
      * Add the data to the in display legend
      *
@@ -8414,7 +8419,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return isVisible;
     }
 
+    public void toggleVisibilityForVectorRendering(int rasterMode) throws Exception {
+        if(rasterMode == RASTERMODE_SHOWRASTER) {
+            setDisplayVisibility(getIsRaster());
+        } else if(rasterMode == RASTERMODE_SHOWNONRASTER) {
+            setDisplayVisibility(!getIsRaster());
+        } else {
+            setDisplayVisibility(true);
+        }
+    }
+
+
     private boolean isRaster = false;
+
     public boolean getIsRaster() {
         return isRaster;
     }

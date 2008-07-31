@@ -170,5 +170,10 @@ public class ColorPlanViewControl extends PlanViewControl {
         return allowSmoothing;
     }
 
+
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 

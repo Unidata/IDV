@@ -179,6 +179,11 @@ public class MovieGlyph extends DrawingGlyph {
     }
 
 
+    public boolean getIsRaster() {
+        return true;
+    }
+
+
     /**
      * Init
      *

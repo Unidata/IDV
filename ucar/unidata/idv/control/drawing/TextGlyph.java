@@ -242,6 +242,9 @@ public class TextGlyph extends DrawingGlyph {
         this.text = text;
     }
 
+    public boolean getIsRaster() {
+        return true;
+    }
 
 
 

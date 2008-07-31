@@ -2937,6 +2937,13 @@ public abstract class DrawingGlyph {
     }
 
 
+    public boolean oldVisibility;
+
+    public boolean getIsRaster() {
+        return false;
+    }
+
+
     /**
      *  Set the CreatedByUser property.
      *
