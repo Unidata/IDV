@@ -30,6 +30,7 @@ import ucar.unidata.idv.*;
 import ucar.unidata.repository.Constants;
 
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -327,10 +328,33 @@ public class RamaddaPublisher extends ServerPublisher {
     }
 
     public boolean doLogin() throws Exception {
-        String url = "http://" + getServer() +"/repository/user/home?output=xml&" + "password1"+"=" + getPassword()+"&"+
-            Constants.ARG_USER_ID +"=" + getUser();
+        while(true) {
+            String url = HtmlUtil.url("https://" + getServer() +"/repository/user/home", new String[]{Constants.ARG_OUTPUT,"xml",
+                                                                                                      Constants.ARG_USER_PASSWORD,
+                                                                                                      getPassword(),
+                                                                                                      Constants.ARG_USER_ID,getUser()});
+            String contents = IOUtil.readContents(url, getClass());
+            Element root =XmlUtil.getRoot(contents);
+            if(XmlUtil.getAttribute(root,Constants.ATTR_CODE).equals("ok")) {
+                sessionId = XmlUtil.getChildText(root).trim();
+                return true;
+            }
+            String message = XmlUtil.getChildText(root).trim();
+            JTextField nameFld = new JTextField(getUser());
+            JPasswordField passwordFld = new JPasswordField(getPassword());
+            JComponent comp = GuiUtils.topCenter(new JLabel("Error:" + message),
+                                                 GuiUtils.doLayout(
+                                                                   new Component[]{
+                                                                       GuiUtils.rLabel("User Name:"),
+                                                                       nameFld,
+                                                                       GuiUtils.rLabel("Password:"),
+                                                                       passwordFld,
+                                                                   },2,GuiUtils.WT_NY, GuiUtils.WT_N));
+            
+            if(true) break;
+        }
         
-        return true;
+        return false;
     }
 
     public void doPublish(String title, final String filePath,

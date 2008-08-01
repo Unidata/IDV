@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -36,7 +37,6 @@ import ucar.unidata.idv.publish.PublishManager;
 
 
 import ucar.unidata.idv.ui.*;
-import ucar.unidata.ui.drawing.Glyph;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
 import ucar.unidata.ui.DropPanel;
@@ -44,6 +44,7 @@ import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
+import ucar.unidata.ui.drawing.Glyph;
 
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.DatedObject;
@@ -79,6 +80,7 @@ import ucar.visad.Util;
 import ucar.visad.display.*;
 
 import visad.*;
+
 import visad.bom.SceneGraphRenderer;
 
 import visad.georef.*;
@@ -641,6 +643,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** are we dirty ;-) */
     private boolean dirty = false;
+
+
+    private  VectorRenderer vectorRenderer;
+
 
 
     /**
@@ -4832,18 +4838,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @return _more_
+     */
     public static boolean isVectorFile(String filename) {
         return filename.toLowerCase().endsWith(".pdf")
-            || filename.toLowerCase().endsWith(".ps")
-            || filename.toLowerCase().endsWith(".eps")
-            || filename.toLowerCase().endsWith(".svg");
+               || filename.toLowerCase().endsWith(".ps")
+               || filename.toLowerCase().endsWith(".eps")
+               || filename.toLowerCase().endsWith(".svg");
     }
-
-    private String renderVectorLabel=null;
-    private String renderVectorPos=Glyph.PT_UL;
-    private boolean renderVectorPreview=true;
-    private int renderVectorWidth=200;
-    //    private Color renderVectorColor=Glyph.PT_UL;
 
     /**
      * Save the image (and the bundle that does with it);
@@ -4902,37 +4909,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
             if (filename != null) {
                 if (isVectorFile(filename)) {
-                    JTextField widthFld = new JTextField(""+renderVectorWidth,5);
-                    JTextArea ta = new JTextArea(renderVectorLabel,5,50);
-                    ta.setToolTipText("Use '%time%' to include current animation time");
-                    Vector positions =  new Vector(Misc.toList(new Object[]{
-                        new TwoFacedObject("Upper Left", Glyph.PT_UL),
-                        new TwoFacedObject("Upper Right", Glyph.PT_UR),
-                        new TwoFacedObject("Lower Left", Glyph.PT_LL),
-                        new TwoFacedObject("Lower Right", Glyph.PT_LR)
-                    }));
-                    JComboBox posBox = new JComboBox(positions);
-                    posBox.setSelectedItem(TwoFacedObject.findId(renderVectorPos, positions));
-
-                    JCheckBox previewCbx = new JCheckBox("",renderVectorPreview);
-                    GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-                    JComponent comp = GuiUtils.doLayout(new Component[]{
-                        GuiUtils.rLabel("Preview:"),
-                        GuiUtils.left(previewCbx),
-                        GuiUtils.rLabel("Label Position:"),
-                        GuiUtils.left(posBox),
-                        GuiUtils.rLabel("Label Width:"),
-                        GuiUtils.left(widthFld),
-                        GuiUtils.rLabel("HTML Label Text:"),
-                        GuiUtils.makeScrollPane(ta,200,100)
-                    }, 2, GuiUtils.WT_NY,GuiUtils.WT_NY);
-                    if(GuiUtils.showOkCancelDialog(null,"Legend Label",comp, null)) {
-                        renderVectorLabel = ta.getText();
-
-                        renderVectorPos = TwoFacedObject.getIdString(posBox.getSelectedItem());
-                        renderVectorWidth = new Integer(widthFld.getText().trim()).intValue();
-                        renderVectorPreview = previewCbx.isSelected();
-                        renderVectorFile(filename,renderVectorPreview,renderVectorLabel,renderVectorPos, renderVectorWidth);
+                    if(vectorRenderer==null) {
+                        vectorRenderer= new VectorRenderer(this);
+                    }
+                    if(vectorRenderer.showConfigDialog()) {
+                        vectorRenderer.renderTo(filename);
                     }
                     System.setSecurityManager(backup);
                     return;
@@ -5057,204 +5038,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     }
 
-
-
-    private class MyPlottable implements Plotter.Plottable {
-        boolean ok = true;
-        String labelHtml;
-        String labelPos = Glyph.PT_LR;                
-        Color labelBG= new Color(1.0f,1.0f,1.0f,1.0f);
-        Dimension dim;
-        boolean preview = false;
-        int labelWidth;
-
-        public MyPlottable(boolean preview, String labelHtml, String labelPos, int labelWidth) {
-            this.labelHtml = labelHtml;
-            this.labelPos = labelPos;
-            this.labelWidth = labelWidth;
-            Component comp  = getMaster().getDisplayComponent();
-            dim       = comp.getSize();
-            this.preview = preview;
-        }
-
-        public void plot(Graphics2D graphics) {
-            try {
-                //Turn off the display list 
-                boolean wasShowingDisplayList = getShowDisplayList();
-                if(wasShowingDisplayList) {
-                    setShowDisplayList(false);
-                }
-
-
-                //Find all visibile displays
-                final List<DisplayControl> onDisplays =
-                    new ArrayList<DisplayControl>();
-                for (DisplayControl control : (List<DisplayControl>) getControls()) {
-                    if (control.getDisplayVisibility()) {
-                        onDisplays.add(control);
-                    }
-                }
-
-                //If previewing then use the graphics from an image
-                BufferedImage previewImage = null;
-                if (preview) {
-                    previewImage = new BufferedImage(dim.width, dim.height,BufferedImage.TYPE_INT_RGB);
-                    graphics = (Graphics2D) previewImage.getGraphics();
-                }
-
-                //Turn off all non-raster
-                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                    control.toggleVisibilityForVectorRendering(DisplayControl.RASTERMODE_SHOWRASTER);
-                }
-
-                toFront();
-                Misc.sleep(250);
-
-                //capture the image of the rasters and write it into the graphics
-                BufferedImage image = getMaster().getImage(false);
-                graphics.drawImage(image, 0, 0, null);
-
-                //Now,  turn off rasters and turn on all non-raster
-                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                    control.toggleVisibilityForVectorRendering(DisplayControl.RASTERMODE_SHOWNONRASTER);
-                }
-
-                //Render the scene graph
-                SceneGraphRenderer renderer = new SceneGraphRenderer();
-                DisplayImpl display = (DisplayImpl) master.getDisplay();
-                renderer
-                    .plot(graphics, display,
-                          ((NavigatedDisplay) master)
-                          .getDisplayCoordinateSystem(), dim.width, dim.height);
-
-
-                //Reset all displays
-                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                    control.toggleVisibilityForVectorRendering(DisplayControl.RASTERMODE_SHOWALL);
-                }
-
-                //Now, draw the display list using the graphics
-                int height = dim.height;
-                int width = dim.width;
-                if(wasShowingDisplayList) {
-                    int cnt = 0;
-                    Font f    = getDisplayListFont();
-                    graphics.setFont(f);
-                    FontMetrics fm = graphics.getFontMetrics();
-                    int lineHeight = fm.getAscent() + fm.getDescent();
-                    for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                        if (!control.getShowInDisplayList()) continue;
-                        Data data = control.getDataForDisplayList();
-                        if (data == null) {
-                            continue;
-                        }
-                        String text=null;
-                        if(data instanceof visad.Text) {
-                            text = ((visad.Text)data).getValue();
-                        } else if(data instanceof FieldImpl) {
-                            Real now= animation.getCurrentAnimationValue();
-                            if(now!=null) {
-                                FieldImpl fi = (FieldImpl) data;
-                                Data rangeValue = fi.evaluate(now, Data.NEAREST_NEIGHBOR,Data.NO_ERRORS);
-                                if(rangeValue!=null && (rangeValue instanceof visad.Text)) {
-                                    text = ((visad.Text)rangeValue).getValue();
-                                }
-                            }
-                        }
-                        if(text == null || text.length()==0) continue;
-                        Color c = ((ucar.unidata.idv.control.DisplayControlImpl)control).getDisplayListColor();
-                        if(c == null) c = getDisplayListColor();
-                        graphics.setColor(c);
-                        int lineWidth = fm.stringWidth(text);
-                        graphics.drawString(text,width/2-lineWidth/2,height-2-((lineHeight+1)*cnt));
-                        cnt++;
-                    }
-                    setShowDisplayList(true);
-                }
-
-
-                if(labelHtml!=null && labelHtml.trim().length()>0) {
-                    Real dttm= animation.getCurrentAnimationValue();
-                    String dttmString = (dttm!=null?dttm.toString():"none");
-                    labelHtml = labelHtml.replace("%time%",dttmString);
-
-                    JEditorPane editor = ImageUtils.getEditor(null, labelHtml,
-                                                              labelWidth, null, null);
-                    editor.setBackground(Color.white);
-                    editor.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                    RepaintManager repaintManager =
-                        RepaintManager.currentManager(editor);
-
-                    repaintManager.setDoubleBufferingEnabled(false);
-                    Dimension cdim = editor.getSize();
-                    AffineTransform tform = graphics.getTransform();
-                    int dx=0,dy=0;
-                    int pad = 5;
-                    if(labelPos.equals(Glyph.PT_LR)) {
-                        dx = width-cdim.width-pad;
-                        dy = height-cdim.height-pad;
-                    } else  if(labelPos.equals(Glyph.PT_LL)) {
-                        dx = pad;
-                        dy = height-cdim.height-pad;
-                    } else  if(labelPos.equals(Glyph.PT_UL)) {
-                        dx = pad;
-                        dy = pad;
-                    } else  if(labelPos.equals(Glyph.PT_UR)) {
-                        dx = width-cdim.width-pad;
-                        dy = pad;
-                    }
-                
-                    AffineTransform translate  = AffineTransform.getTranslateInstance(dx,dy);
-                    tform.concatenate(translate);
-                    graphics.setTransform(tform);
-                    editor.paint(graphics);
-                    graphics.setTransform(tform);
-                    repaintManager.setDoubleBufferingEnabled(true);
-                }
-                if (preview) {
-                    ok = GuiUtils.showOkCancelDialog(null, "",
-                                                     new JLabel(new ImageIcon(previewImage)),
-                                                     null);
-                }
-
-
-            } catch (Exception exc) {
-                throw new ucar.unidata.util.WrapperException(exc);
-            }
-
-        }
-
-
-        //TODO:For the pdf, ps, svg, this probably never gets called
-        //Not sure what to do if it does get called. Maybe get the colors from the scenegraphrenderer
-        public Color[] getColours() {
-            return new Color[] { Color.red, Color.green, Color.blue };
-        }
-
-        public int[] getSize() {
-            return new int[] { dim.width, dim.height };
-        }
-    }
-
-    /**
-     * _more_
-     *
-     * @param filename _more_
-     *
-     * @throws Exception _more_
-     */
-    public void renderVectorFile(String filename, boolean preview,
-                                 String labelHtml, String labelPos, int labelWidth) throws Exception {
-        Plotter plotter = new Plotter(filename);
-        if(preview) {
-            MyPlottable plottable = new MyPlottable(true, labelHtml,labelPos,labelWidth);
-            plotter.plot(plottable);
-            if(!plottable.ok) return;
-
-        }
-        plotter.plot(new MyPlottable(false,labelHtml,labelPos,labelWidth));
-
-    }
 
 
 
