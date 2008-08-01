@@ -554,6 +554,7 @@ public class DerivedGridFactory {
             FieldImpl topoGrid)
             throws VisADException, RemoteException {
 
+        FieldImpl grid = paramGrid;
         RealType rt = GridUtil.getParamType(topoGrid).getRealComponents()[0];
         Unit     topoUnit = rt.getDefaultUnit();
         if ( !(Unit.canConvert(topoUnit,
@@ -568,12 +569,19 @@ public class DerivedGridFactory {
         if (MathType.findScalarType(GridUtil.getParamType(paramGrid), rt)) {
             return paramGrid;
         } else {
+            
             // check to make sure domains are compatible
             if ( !GridUtil.isTimeSequence(topoGrid)) {
                 Set paramDomain = GridUtil.getSpatialDomain(paramGrid);
-                // System.out.println("param domain " +paramDomain);
+                // System.err.println("param domain " +paramDomain);
+                if (paramDomain.getDimension() == 3 &&
+                    paramDomain.getManifoldDimension() == 2) {
+                    grid = GridUtil.make2DGridFromSlice(paramGrid, true);
+                    paramDomain = GridUtil.getSpatialDomain(grid);
+                    //System.err.println("new param domain " +paramDomain);
+                }
                 Set topoDomain = topoGrid.getDomainSet();
-                // System.out.println("topo domain " +topoDomain);
+                // System.err.println("topo domain " +topoDomain);
                 RealTupleType paramRef = null;
                 RealTupleType topoRef  = null;
                 if (paramDomain.getCoordinateSystem() != null) {
@@ -587,8 +595,8 @@ public class DerivedGridFactory {
                 } else {
                     topoRef = ((SetType) topoDomain.getType()).getDomain();
                 }
-                // System.out.println("paramRef = " + paramRef);
-                // System.out.println("topoRef = " + topoRef);
+                // System.err.println("paramRef = " + paramRef);
+                // System.err.println("topoRef = " + topoRef);
                 if ( !paramRef.equals(topoRef)) {
                     GriddedSet newSet = null;
                     if (topoDomain instanceof Linear2DSet) {
@@ -619,7 +627,7 @@ public class DerivedGridFactory {
                     }
                 }
             }
-            return combineGrids(paramGrid, topoGrid);
+            return combineGrids(grid, topoGrid);
         }
     }
 
@@ -1689,6 +1697,30 @@ public class DerivedGridFactory {
 
         return thetaFI;
     }  // end make potential temperature fieldimpl
+
+    /**
+     * Make a FieldImpl of potential vorticity
+     *
+     * @param  temperFI  grid or time sequence of grids of temperature with
+     *                   a spatial domain that includes pressure in vertical
+     * @param  wind      grid or time sequence of grids wind
+     *
+     * @return computed grid(s)
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createPotentialVorticity(FieldImpl temperFI, FieldImpl vector)
+            throws VisADException, RemoteException {
+
+        return createIPV(
+            temperFI,
+            createPressureGridFromDomain(
+                (GridUtil.isTimeSequence(temperFI) == true)
+                ? (FlatField) temperFI.getSample(0)
+                : (FlatField) temperFI), 
+            createAbsoluteVorticity(getUComponent(vector), getVComponent(vector)));
+    }
 
     /**
      * Make a FieldImpl of isentropic potential vorticity
