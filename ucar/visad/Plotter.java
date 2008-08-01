@@ -89,7 +89,7 @@ public class Plotter
 	public static final int DIFAX = 6;
 
 	public static final String[] FORMATS =
-		{ "svg", "png", "jpg", "ps", "pdf", "ps", "tiff", "difax" };
+		{ "svg", "png", "jpg", "ps", "pdf", "tiff", "difax" };
 
 	Object document;
 
