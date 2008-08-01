@@ -327,9 +327,10 @@ public class RamaddaPublisher extends ServerPublisher {
     }
 
     public boolean doLogin() throws Exception {
-        String url = "http://" + getServer() +"/repository/user/home?output=xml&" + Constants.ARG_USER_PASSWORD1+"=" + getPassword()+"&"+
+        String url = "http://" + getServer() +"/repository/user/home?output=xml&" + "password1"+"=" + getPassword()+"&"+
             Constants.ARG_USER_ID +"=" + getUser();
         
+        return true;
     }
 
     public void doPublish(String title, final String filePath,
