@@ -21,26 +21,15 @@
  */
 
 
-
-
 package ucar.visad.display;
 
 
-import ucar.unidata.util.ContourInfo;
-
 import visad.*;
-
-import visad.java2d.*;
-
 import visad.util.DataUtility;
-
-
 
 import java.awt.Color;
 
 import java.rmi.RemoteException;
-
-import java.util.*;
 
 
 
@@ -522,34 +511,6 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
     }
 
     /**
-     * Set appropriate contour levels info
-     *
-     * @param contourInfo   Contains contour and labeling information
-     *
-     * @exception VisADException   VisAD failure.
-     * @exception RemoteException  Java RMI failure.
-     */
-    public void setContourInfo(ContourInfo contourInfo)
-            throws VisADException, RemoteException {
-
-        if (contourInfo == null) {
-            return;
-        }
-
-        /*
-        setContourLevels(contourInfo.getInterval(), contourInfo.getBase(),
-                         contourInfo.getMin(), contourInfo.getMax(),
-                         contourInfo.getDashOn());
-                         */
-        setContourLevels(
-            new IrregularContourLevels(
-                contourInfo.getContourLevels(), contourInfo.getBase(),
-                contourInfo.getDashOn()));
-        setLabeling(contourInfo.getIsLabeled());
-        setLineWidth(contourInfo.getLineWidth());
-    }
-
-    /**
      * Set appropriate contour levels with super class's methods
      * (BOTH REQUIRED IN THIS ORDER)
      *    setRange(min, max);
@@ -720,3 +681,4 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
     }
 
 }
+

@@ -20,17 +20,19 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
 
 
+import ucar.unidata.beans.*;
+
+import ucar.unidata.util.ContourInfo;
+
+import visad.*;
 
 import java.rmi.RemoteException;
 
 import java.util.Iterator;
-
-import ucar.unidata.beans.*;
-
-import visad.*;
 
 
 /**
@@ -135,6 +137,9 @@ public abstract class ContourLines extends LineDrawing {
 
     /** flag for color fill */
     private volatile boolean colorFill = false;
+
+    /** dashed line style */
+    private volatile int dashedStyle = GraphicsModeControl.DASH_STYLE;
 
     /**
      * The {@link visad.Unit} for the display.
@@ -273,7 +278,8 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException  Java RMI failure.
      * @see #CONTOUR_LEVELS
      */
-    public final void setContourInterval(float inter, float base, float min, float max)
+    public final void setContourInterval(float inter, float base, float min,
+                                         float max)
             throws RemoteException, VisADException {
         setContourInterval(inter, base, min, max, false);
     }
@@ -292,7 +298,8 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException  Java RMI failure.
      * @see #CONTOUR_LEVELS
      */
-    public final void setContourInterval(float inter, float base, float min, float max, boolean dash)
+    public final void setContourInterval(float inter, float base, float min,
+                                         float max, boolean dash)
             throws RemoteException, VisADException {
 
         /*
@@ -315,7 +322,7 @@ public abstract class ContourLines extends LineDrawing {
         //                 "  min = "+min+"  max = "+max); 
 
         setContourLevels(new RegularContourLevels(inter, base, min, max,
-                                                  dash));
+                dash));
     }
 
     /**
@@ -360,6 +367,29 @@ public abstract class ContourLines extends LineDrawing {
      */
     public final float[] getContourValues() throws VisADException {
         return contourLevels.getLevels(rangeMinimum, rangeMaximum);
+    }
+
+    /**
+     * Set appropriate contour levels info
+     *
+     * @param contourInfo   Contains contour and labeling information
+     *
+     * @exception VisADException   VisAD failure.
+     * @exception RemoteException  Java RMI failure.
+     */
+    public void setContourInfo(ContourInfo contourInfo)
+            throws VisADException, RemoteException {
+
+        if (contourInfo == null) {
+            return;
+        }
+
+        setContourLevels(
+            new IrregularContourLevels(
+                contourInfo.getContourLevels(), contourInfo.getBase(),
+                contourInfo.getDashOn()));
+        setLabeling(contourInfo.getIsLabeled());
+        setLineWidth(contourInfo.getLineWidth());
     }
 
     /**
@@ -457,6 +487,29 @@ public abstract class ContourLines extends LineDrawing {
         }
     }
 
+    /**
+     * Set the dashed style.
+     * @param  style  dashed line style
+     */
+    public void setDashedStyle(int style) {
+
+        if (style != dashedStyle) {
+
+            dashedStyle = style;
+
+            if (contourControl != null) {
+                //contourControl.setDashedStyle(dashedStyle);
+            }
+        }
+    }
+
+    /**
+     * Set the dashed style.
+     * @return  dashed line style
+     */
+    public int getDashedStyle() {
+        return dashedStyle;
+    }
 
     /**
      * @throws VisADException   VisAD failure.
@@ -477,6 +530,7 @@ public abstract class ContourLines extends LineDrawing {
                         setContourLevels();
                         contourControl.enableLabels(labeling);
                         contourControl.setContourFill(colorFill);
+                        //contourControl.setDashedStyle(dashedStyle);
                     }
                 }
             }
@@ -492,8 +546,4 @@ public abstract class ContourLines extends LineDrawing {
 
     }
 }
-
-
-
-
 
