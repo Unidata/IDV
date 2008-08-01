@@ -3817,21 +3817,27 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+
     public Result processEntryXmlCreate(Request request) throws Exception {
         try {
             return processEntryXmlCreateInner(request);
         } catch(Exception exc) {
-            return new Result("", new StringBuffer("<error>" + exc+"</error>"), Result.TYPE_XML);
+            if(request.getOutput().equals("xml")) {
+                return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),""+exc),MIME_XML);
+            }
+            return new Result("Error:"+ exc, Result.TYPE_XML);
         }
     }
+
 
     private Result processEntryXmlCreateInner(Request request) throws Exception {
         String file = request.getUploadedFile(ARG_FILE);
         if(file==null) {
-            return new Result("", new StringBuffer("<error>No file argument given</error>"), Result.TYPE_XML);
+            throw new IllegalArgumentException("No file argument given");
         }
         Hashtable files = new Hashtable();
         if(file.endsWith(".zip")) {
+                
         }
 
         /*
@@ -3851,16 +3857,20 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else if(node.getTagName().equals(TAG_ASSOCIATION)) {
                 processAssociationXml(request,node,entries, files);
             } else {
-                return new Result("", new StringBuffer("<error>Unknown tag:" + node.getTagName() +"</error>"), Result.TYPE_XML);
+                throw new IllegalArgumentException("<error>Unknown tag:" + node.getTagName() +"</error>");
             }
         }
 
 
         insertEntries(newEntries, true);
 
+        if(request.getOutput().equals("xml")) {
+            //TODO: Return a list of the newly created entries
+            return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"ok"),""),MIME_XML);
+        }
 
-        StringBuffer sb = new StringBuffer("<result>ok</result>");
-        return new Result("", sb, Result.TYPE_XML);
+        StringBuffer sb = new StringBuffer("OK");
+        return new Result("", sb);
     }
 
 

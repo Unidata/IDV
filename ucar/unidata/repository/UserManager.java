@@ -244,6 +244,13 @@ public class UserManager extends RepositoryManager {
         }
 
 
+        if(user==null && request.hasParameter(ARG_SESSIONID)) {
+            Session session = sessionMap.get(request.getString(ARG_SESSIONID));
+            if (session != null) {
+                session.lastActivity = new Date();
+                user                 = session.user;
+            }
+        }
 
         //Check for url auth
         if ((user == null) && request.exists(ARG_AUTH_USER)
@@ -1333,6 +1340,9 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb   = new StringBuffer();
         User         user = request.getUser();
         if (user.getAnonymous()) {
+            if(request.getOutput().equals("xml")) {
+                return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),"No user defined"),MIME_XML);
+            }
             String msg = msg("No user defined");
             if (request.exists(ARG_FROMLOGIN)) {
                 msg = msg + HtmlUtil.p()
@@ -1344,6 +1354,9 @@ public class UserManager extends RepositoryManager {
             sb.append(
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
+        }
+        if(request.getOutput().equals("xml")) {
+            return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"ok"),user.getId()),MIME_XML);
         }
         return makeResult(request, "User Home", sb);
     }
@@ -1361,6 +1374,7 @@ public class UserManager extends RepositoryManager {
     public Result processLogin(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
         User         user = null;
+        String output = request.getOutput();
         if (request.exists(ARG_USER_ID)) {
             String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD1, "");
@@ -1376,6 +1390,9 @@ public class UserManager extends RepositoryManager {
             if (results.next()) {
                 user = getUser(results);
                 setUserSession(request, user);
+                if(output.equals("xml")) {
+                    return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"ok"),request.getSessionId()),MIME_XML);
+                }
                 if (request.exists(ARG_REDIRECT)) {
                     String redirect = new String(
                                           XmlUtil.decodeBase64(
@@ -1389,6 +1406,9 @@ public class UserManager extends RepositoryManager {
                             msg("You are logged in")));
                 }
             } else {
+                if(output.equals("xml")) {
+                    return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),"Incorrect user name or password"),MIME_XML);
+                }
                 sb.append(
                     getRepository().warning(
                         msg("Incorrect user name or password")));

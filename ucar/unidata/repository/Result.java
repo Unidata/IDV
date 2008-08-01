@@ -144,6 +144,11 @@ public class Result {
         this(title, content.toString().getBytes(), TYPE_HTML);
     }
 
+
+    public Result(String content, String mime) {
+        this("", content.getBytes(), mime);
+    }
+
     /**
      * _more_
      *

@@ -417,6 +417,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ID = "user.id";
 
+    public static final String ARG_SESSIONID = "sessionid";
+
     /** _more_ */
     public static final String ARG_ASSOCIATION = "association";
 
@@ -843,7 +845,11 @@ public interface Constants {
     public static final String BLANK = "";
 
 
+    public static final String MIME_XML = "text/xml";
 
+
+    public static final String ATTR_CODE = "code";
+    public static final String TAG_RESPONSE = "response";
 
 
 }
