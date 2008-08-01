@@ -515,6 +515,11 @@ public class HighLowGlyph extends DrawingGlyph {
     }
 
 
+    public boolean getIsRaster() {
+        return true;
+    }
+
+
 
 }
 
