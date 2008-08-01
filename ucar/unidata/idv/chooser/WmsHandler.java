@@ -431,28 +431,40 @@ public class WmsHandler extends XmlHandler {
             return;
         }
 
-        List formats = XmlUtil.findChildren(getMapNode, "Format");
-        for (int i = 0; (i < formats.size()) && (format == null); i++) {
-            Element formatNode = (Element) formats.get(i);
-            String  content    = XmlUtil.getChildText(formatNode);
-            content = content.toLowerCase();
-            if ((content.indexOf("image/png") >= 0)
-                    || (content.indexOf("image/jpeg") >= 0)
-                    || (content.indexOf("image/gif") >= 0)
-                    || (content.indexOf("image/tiff") >= 0)) {
-                format = content;
-            } else {
+        List formatNodes = XmlUtil.findChildren(getMapNode, "Format");
+        Hashtable<String,String> formatMap = new Hashtable<String,String>();
+        List formats = new ArrayList();
+        for (int i = 0; (i < formatNodes.size()) && (format == null); i++) {
+            Element formatNode = (Element) formatNodes.get(i);
+            String  content    = XmlUtil.getChildText(formatNode).toLowerCase();
+            formats.add(content);
+            formatMap.put(content,content);
+        }
+        format = formatMap.get("image/png");
+        if(format ==null)
+            format = formatMap.get("image/jpeg");
+        if(format ==null)
+            format = formatMap.get("image/gif");
+        //        if(format ==null)
+        //            format = formatMap.get("image/tiff");
+        if(format==null) {
+            for (int i = 0; (i < formatNodes.size()) && (format == null); i++) {
+                Element formatNode = (Element) formatNodes.get(i);
                 if (XmlUtil.findChildren(formatNode, "PNG").size() > 0) {
                     format = "PNG";
+                    break;
                 } else if (XmlUtil.findChildren(formatNode, "JPEG").size()
                            > 0) {
                     format = "JPEG";
+                    break;
                 } else if (XmlUtil.findChildren(formatNode, "GIF").size()
                            > 0) {
                     format = "GIF";
+                    break;
                 }
             }
         }
+
         if (format == null) {
             chooser.userMessage("No compatible image format found");
             return;
