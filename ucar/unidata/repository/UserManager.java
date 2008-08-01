@@ -124,55 +124,6 @@ public class UserManager extends RepositoryManager {
     protected RequestUrl[] userUrls = { URL_USER_SETTINGS, URL_USER_CART };
 
 
-    /** _more_ */
-    public static final String ARG_USER_DELETE_CONFIRM =
-        "user.delete.confirm";
-
-    /** _more_ */
-    public static final String ARG_USER_DELETE = "user.delete";
-
-    /** _more_ */
-    public static final String ARG_FROMLOGIN = "user.fromlogin";
-
-
-
-    /** _more_ */
-    public static final String ARG_USER_CANCEL = "user.cancel";
-
-    /** _more_ */
-    public static final String ARG_USER_CHANGE = "user.change";
-
-    /** _more_ */
-    public static final String ARG_USER_NEW = "user.new";
-
-
-    /** _more_ */
-    public static final String ARG_USER_NAME = "user.name";
-
-    /** _more_ */
-    public static final String ARG_USER_ROLES = "user.roles";
-
-    /** _more_ */
-    public static final String ARG_USER_PASSWORD1 = "user.password1";
-
-    /** _more_ */
-    public static final String ARG_USER_PASSWORD2 = "user.password2";
-
-    /** _more_ */
-    public static final String ARG_USER_EMAIL = "user.email";
-
-    /** _more_ */
-    public static final String ARG_USER_LANGUAGE = "user.language";
-
-    /** _more_ */
-    public static final String ARG_USER_QUESTION = "user.question";
-
-    /** _more_ */
-    public static final String ARG_USER_ANSWER = "user.answer";
-
-    /** _more_ */
-    public static final String ARG_USER_ADMIN = "user.admin";
-
 
 
 
@@ -496,7 +447,7 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry(msgLabel("User"),
                                      HtmlUtil.input(ARG_USER_ID, id)));
         sb.append(HtmlUtil.formEntry(msgLabel("Password"),
-                                     HtmlUtil.password(ARG_USER_PASSWORD1)));
+                                     HtmlUtil.password(ARG_USER_PASSWORD)));
         sb.append(extra);
 
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Login"))));
@@ -1377,7 +1328,7 @@ public class UserManager extends RepositoryManager {
         String output = request.getOutput();
         if (request.exists(ARG_USER_ID)) {
             String name     = request.getString(ARG_USER_ID, "");
-            String password = request.getString(ARG_USER_PASSWORD1, "");
+            String password = request.getString(ARG_USER_PASSWORD, "");
             password = hashPassword(password);
 
             Statement stmt = getDatabaseManager().select(COLUMNS_USERS,

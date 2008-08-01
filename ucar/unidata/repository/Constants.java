@@ -852,5 +852,58 @@ public interface Constants {
     public static final String TAG_RESPONSE = "response";
 
 
+    /** _more_ */
+    public static final String ARG_USER_DELETE_CONFIRM =
+        "user.delete.confirm";
+
+    /** _more_ */
+    public static final String ARG_USER_DELETE = "user.delete";
+
+    /** _more_ */
+    public static final String ARG_FROMLOGIN = "user.fromlogin";
+
+
+    /** _more_ */
+    public static final String ARG_USER_CANCEL = "user.cancel";
+
+    /** _more_ */
+    public static final String ARG_USER_CHANGE = "user.change";
+
+    /** _more_ */
+    public static final String ARG_USER_NEW = "user.new";
+
+
+    /** _more_ */
+    public static final String ARG_USER_NAME = "user.name";
+
+    /** _more_ */
+    public static final String ARG_USER_ROLES = "user.roles";
+
+    public static final String ARG_USER_PASSWORD = "user.password";
+
+    /** _more_ */
+    public static final String ARG_USER_PASSWORD1 = "user.password1";
+
+    /** _more_ */
+    public static final String ARG_USER_PASSWORD2 = "user.password2";
+
+    /** _more_ */
+    public static final String ARG_USER_EMAIL = "user.email";
+
+    /** _more_ */
+    public static final String ARG_USER_LANGUAGE = "user.language";
+
+    /** _more_ */
+    public static final String ARG_USER_QUESTION = "user.question";
+
+    /** _more_ */
+    public static final String ARG_USER_ANSWER = "user.answer";
+
+    /** _more_ */
+    public static final String ARG_USER_ADMIN = "user.admin";
+
+
+
+
 }
 
