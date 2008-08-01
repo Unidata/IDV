@@ -411,6 +411,28 @@ example:
      properties="displayName=Wind Barb Cross Section;windowVisible=true;windbarbs=true"/>
 
   <control
+    id="flowoverz" 
+    categories="*-flowvector-*" 
+    class="ucar.unidata.idv.control.FlowPlanViewControl" 
+    description="Flow vectors over topography" 
+    label="Vectors Over Topography" 
+    doeslevels="true"
+    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
+    displaycategory="3D Surface"
+    properties="displayName=Vectors Over Topography;multipleIsTopography=true" />
+
+  <control
+    id="barbsoverz" 
+    categories="*-flowvector-*" 
+    class="ucar.unidata.idv.control.FlowPlanViewControl" 
+    description="Wind barbs over topography" 
+    label="Wind Barbs Over Topography" 
+    doeslevels="true"
+    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
+    displaycategory="3D Surface"
+    properties="displayName=Wind Barbs Over Topography;multipleIsTopography=true;windbarbs=true" />
+
+  <control
     id="streamlinesoverz" 
     categories="*-flowvector-*" 
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
@@ -419,31 +441,7 @@ example:
     doeslevels="true"
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
-    properties="streamlines=true;windbarbs=true;displayName=Streamlines Over Topography;multipleIsTopography=true" />
-
-  <control
-    id="planviewflowoverz" 
-    categories="*-flowvector-*" 
-    class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Flow vectors over topography" 
-    label="Vectors Over Topography" 
-    doeslevels="true"
-    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
-    displaycategory="3D Surface"
-    properties="displayName=Vector Plan View Over Topography;multipleIsTopography=true" />
-
-<!--
-  <control
-    id="windbarbplanoverz" 
-    categories="*-flowvector-*" 
-    class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Wind barbs over topography" 
-    label="Wind Barbs Over Topography" 
-    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
-    displaycategory="3D Surface"
-    properties="windbarbs=true;displayName=Wind Barb Plan View Over Topography;multipleIsTopography=true" />
-
--->
+    properties="streamlines=true;displayName=Streamlines Over Topography;multipleIsTopography=true" />
 
 <!-- End Flow Displays -->
 
