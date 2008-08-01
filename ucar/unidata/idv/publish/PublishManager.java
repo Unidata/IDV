@@ -72,6 +72,11 @@ public class PublishManager extends IdvManager {
         super(idv);
     }
 
+    public void newPublisher() {
+
+    }
+
+
     /**
      * Do we have any publishers
      *
@@ -79,7 +84,8 @@ public class PublishManager extends IdvManager {
      */
     public boolean isPublishingEnabled() {
         //For now just return false
-        return false;
+        return true;
+        //        return false;
         //return ((publishers != null) && (publishers.size() > 0));
     }
 

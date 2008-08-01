@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <publishers>
   <publisher
-     class="ucar.unidata.idv.publish.InfoceteraBlogger"
-     dirpath="/dir/idv/steering"/>
+     class="ucar.unidata.idv.publish.RamaddaPublisher"/>
 </publishers>
