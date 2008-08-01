@@ -3271,7 +3271,7 @@ public class ImageGenerator extends IdvManager {
                 }
                 viewManager.writeImage(imageFile, true, false);
             } else if(loopFilename!=null && ViewManager.isVectorFile(loopFilename)) {
-                viewManager.renderVectorFile(loopFilename,true);
+                viewManager.renderVectorFile(loopFilename,false,"hello there",Glyph.PT_LL,200);
             } else {
 
                 lastImage = viewManager.getMaster().getImage(false);

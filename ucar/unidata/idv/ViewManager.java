@@ -36,6 +36,7 @@ import ucar.unidata.idv.publish.PublishManager;
 
 
 import ucar.unidata.idv.ui.*;
+import ucar.unidata.ui.drawing.Glyph;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
 import ucar.unidata.ui.DropPanel;
@@ -4838,6 +4839,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
             || filename.toLowerCase().endsWith(".svg");
     }
 
+    private String renderVectorLabel=null;
+    private String renderVectorPos=Glyph.PT_UL;
+    private boolean renderVectorPreview=true;
+    private int renderVectorWidth=200;
+    //    private Color renderVectorColor=Glyph.PT_UL;
 
     /**
      * Save the image (and the bundle that does with it);
@@ -4896,39 +4902,41 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
             if (filename != null) {
                 if (isVectorFile(filename)) {
-                    renderVectorFile(filename,true);
+                    JTextField widthFld = new JTextField(""+renderVectorWidth,5);
+                    JTextArea ta = new JTextArea(renderVectorLabel,5,50);
+                    ta.setToolTipText("Use '%time%' to include current animation time");
+                    Vector positions =  new Vector(Misc.toList(new Object[]{
+                        new TwoFacedObject("Upper Left", Glyph.PT_UL),
+                        new TwoFacedObject("Upper Right", Glyph.PT_UR),
+                        new TwoFacedObject("Lower Left", Glyph.PT_LL),
+                        new TwoFacedObject("Lower Right", Glyph.PT_LR)
+                    }));
+                    JComboBox posBox = new JComboBox(positions);
+                    posBox.setSelectedItem(TwoFacedObject.findId(renderVectorPos, positions));
+
+                    JCheckBox previewCbx = new JCheckBox("",renderVectorPreview);
+                    GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+                    JComponent comp = GuiUtils.doLayout(new Component[]{
+                        GuiUtils.rLabel("Preview:"),
+                        GuiUtils.left(previewCbx),
+                        GuiUtils.rLabel("Label Position:"),
+                        GuiUtils.left(posBox),
+                        GuiUtils.rLabel("Label Width:"),
+                        GuiUtils.left(widthFld),
+                        GuiUtils.rLabel("HTML Label Text:"),
+                        GuiUtils.makeScrollPane(ta,200,100)
+                    }, 2, GuiUtils.WT_NY,GuiUtils.WT_NY);
+                    if(GuiUtils.showOkCancelDialog(null,"Legend Label",comp, null)) {
+                        renderVectorLabel = ta.getText();
+
+                        renderVectorPos = TwoFacedObject.getIdString(posBox.getSelectedItem());
+                        renderVectorWidth = new Integer(widthFld.getText().trim()).intValue();
+                        renderVectorPreview = previewCbx.isSelected();
+                        renderVectorFile(filename,renderVectorPreview,renderVectorLabel,renderVectorPos, renderVectorWidth);
+                    }
                     System.setSecurityManager(backup);
                     return;
                 }
-
-                if (filename.endsWith(".eps") || filename.endsWith(".ps")) {
-                    /*                    ImageUtils.writeEPS(
-                        new FileOutputStream(filename),
-                        (JComponent) getMaster().getComponent());
-                        System.setSecurityManager(backup);*/
-                    return;
-                }
-
-                if (filename.endsWith(".svg")) {
-                    /*
-                    Document  doc = XmlUtil.getDocument("<svg></svg>");
-                    SVGGraphics2D svgGenerator = new SVGGraphics2D(doc);
-                    JComponent comp = (JComponent)getMaster().getComponent();
-                    RepaintManager repaintManager =
-                        RepaintManager.currentManager(comp);
-                    visad.java2d.VisADCanvasJ2D.renderDirectly= true;
-                    repaintManager.setDoubleBufferingEnabled(false);
-                    comp.paint(svgGenerator);
-                    repaintManager.setDoubleBufferingEnabled(true);
-                    visad.java2d.VisADCanvasJ2D.renderDirectly= false;
-                    Writer out = new OutputStreamWriter(new FileOutputStream(filename), "UTF-8");
-                    svgGenerator.stream(out, true);
-                    //                    IOUtil.writeFile(filename, XmlUtil.toString(doc.getDocumentElement()));
-                    System.setSecurityManager(backup);
-                    return;
-                    */
-                }
-
 
                 float quality = 1.0f;
                 if (medBtn.isSelected()) {
@@ -5052,10 +5060,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     private class MyPlottable implements Plotter.Plottable {
-
+        boolean ok = true;
+        String labelHtml;
+        String labelPos = Glyph.PT_LR;                
+        Color labelBG= new Color(1.0f,1.0f,1.0f,1.0f);
         Dimension dim;
         boolean preview = false;
-        public MyPlottable(boolean preview) {
+        int labelWidth;
+
+        public MyPlottable(boolean preview, String labelHtml, String labelPos, int labelWidth) {
+            this.labelHtml = labelHtml;
+            this.labelPos = labelPos;
+            this.labelWidth = labelWidth;
             Component comp  = getMaster().getDisplayComponent();
             dim       = comp.getSize();
             this.preview = preview;
@@ -5157,10 +5173,48 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
 
 
+                if(labelHtml!=null && labelHtml.trim().length()>0) {
+                    Real dttm= animation.getCurrentAnimationValue();
+                    String dttmString = (dttm!=null?dttm.toString():"none");
+                    labelHtml = labelHtml.replace("%time%",dttmString);
+
+                    JEditorPane editor = ImageUtils.getEditor(null, labelHtml,
+                                                              labelWidth, null, null);
+                    editor.setBackground(Color.white);
+                    editor.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                    RepaintManager repaintManager =
+                        RepaintManager.currentManager(editor);
+
+                    repaintManager.setDoubleBufferingEnabled(false);
+                    Dimension cdim = editor.getSize();
+                    AffineTransform tform = graphics.getTransform();
+                    int dx=0,dy=0;
+                    int pad = 5;
+                    if(labelPos.equals(Glyph.PT_LR)) {
+                        dx = width-cdim.width-pad;
+                        dy = height-cdim.height-pad;
+                    } else  if(labelPos.equals(Glyph.PT_LL)) {
+                        dx = pad;
+                        dy = height-cdim.height-pad;
+                    } else  if(labelPos.equals(Glyph.PT_UL)) {
+                        dx = pad;
+                        dy = pad;
+                    } else  if(labelPos.equals(Glyph.PT_UR)) {
+                        dx = width-cdim.width-pad;
+                        dy = pad;
+                    }
+                
+                    AffineTransform translate  = AffineTransform.getTranslateInstance(dx,dy);
+                    tform.concatenate(translate);
+                    graphics.setTransform(tform);
+                    editor.paint(graphics);
+                    graphics.setTransform(tform);
+                    repaintManager.setDoubleBufferingEnabled(true);
+                }
                 if (preview) {
-                    GuiUtils.showOkCancelDialog(null, "",
-                                                new JLabel(new ImageIcon(previewImage)),
-                                                null);
+                    ok = GuiUtils.showOkCancelDialog(null, "",
+                                                     new JLabel(new ImageIcon(previewImage)),
+                                                     null);
                 }
 
 
@@ -5189,10 +5243,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @throws Exception _more_
      */
-    public void renderVectorFile(String filename, boolean doVectors) throws Exception {
+    public void renderVectorFile(String filename, boolean preview,
+                                 String labelHtml, String labelPos, int labelWidth) throws Exception {
         Plotter plotter = new Plotter(filename);
-        //        plotter.plot(new MyPlottable(true));
-        plotter.plot(new MyPlottable(false));
+        if(preview) {
+            MyPlottable plottable = new MyPlottable(true, labelHtml,labelPos,labelWidth);
+            plotter.plot(plottable);
+            if(!plottable.ok) return;
+
+        }
+        plotter.plot(new MyPlottable(false,labelHtml,labelPos,labelWidth));
 
     }
 
