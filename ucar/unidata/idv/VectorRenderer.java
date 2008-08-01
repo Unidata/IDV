@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv;
 
 
@@ -35,6 +37,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 
 
@@ -43,7 +46,6 @@ import ucar.unidata.xml.PreferenceManager;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.Plotter;
 import ucar.visad.Util;
@@ -93,108 +95,119 @@ import javax.swing.event.*;
  */
 public class VectorRenderer implements Plotter.Plottable {
 
-    /** _more_          */
+    /** _more_ */
     private ViewManager viewManager;
 
-    /** _more_          */
-    private     boolean ok = true;
+    /** _more_ */
+    private boolean ok = true;
 
-    /** _more_          */
-    private     Dimension dim;
-
-
-
-    /** _more_          */
-    private     String labelHtml;
-
-    /** _more_          */
-    private     String labelPos = Glyph.PT_LR;
-
-    /** _more_          */
-    private     Color labelBG = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+    /** _more_ */
+    private Dimension dim;
 
 
-    /** _more_          */
-    private     int labelWidth=200;
 
-    /** _more_          */
-    private     boolean preview = false;
+    /** _more_ */
+    private String labelHtml;
 
-    private     boolean doingPreview = false;
+    /** _more_ */
+    private String labelPos = Glyph.PT_LR;
+
+    /** _more_ */
+    private Color labelBG = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+    /** _more_ */
+    private int labelWidth = 200;
+
+    /** _more_ */
+    private boolean preview = false;
+
+    /** _more_ */
+    private boolean doingPreview = false;
 
 
     /**
      * _more_
      *
      * @param viewManager _more_
-     * @param preview _more_
-     * @param labelHtml _more_
-     * @param labelPos _more_
-     * @param labelWidth _more_
      */
     public VectorRenderer(ViewManager viewManager) {
         this.viewManager = viewManager;
     }
 
-    public void renderTo(String filename)             throws Exception {
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @throws Exception _more_
+     */
+    public void renderTo(String filename) throws Exception {
         Component comp = viewManager.getMaster().getDisplayComponent();
-        dim          = comp.getSize();
+        dim = comp.getSize();
         Plotter plotter = new Plotter(filename);
         if (preview) {
             doingPreview = true;
-            ok = true;
+            ok           = true;
             plotter.plot(this);
-            if (!ok) {
+            if ( !ok) {
                 return;
             }
 
         }
-        doingPreview=false;
+        doingPreview = false;
         plotter.plot(this);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean showConfigDialog() {
+        GuiUtils.ColorSwatch labelBGFld = new GuiUtils.ColorSwatch(labelBG,
+                                              "Label Color", true);
+
+
         JTextField widthFld = new JTextField("" + labelWidth, 5);
-        JTextArea ta = new JTextArea(labelHtml, 5, 50);
+        JTextArea  ta       = new JTextArea(labelHtml, 5, 50);
         ta.setToolTipText(
-                          "<html>Can be HTML<br>Use '%time%' to include current animation time</html>");
+            "<html>Can be HTML<br>Use '%time%' to include current animation time</html>");
         Vector positions = new Vector(Misc.toList(new Object[] {
-                    new TwoFacedObject("Upper Left",
-                                       Glyph.PT_UL),
-                    new TwoFacedObject(
-                                       "Upper Right", Glyph
-                                       .PT_UR), new TwoFacedObject(
-                                                                   "Lower Left", Glyph
-                                                                   .PT_LL),
-                    new TwoFacedObject("Lower Right",
-                                       Glyph.PT_LR) }));
+                               new TwoFacedObject("Upper Left", Glyph.PT_UL),
+                               new TwoFacedObject(
+                                   "Upper Right",
+                                   Glyph.PT_UR), new TwoFacedObject(
+                                       "Lower Left", Glyph.PT_LL),
+                               new TwoFacedObject("Lower Right",
+                                   Glyph.PT_LR) }));
         JComboBox posBox = new JComboBox(positions);
-        posBox.setSelectedItem(
-                               TwoFacedObject.findId(labelPos, positions));
+        posBox.setSelectedItem(TwoFacedObject.findId(labelPos, positions));
 
-        JCheckBox previewCbx = new JCheckBox("",preview);
+        JCheckBox  previewCbx = new JCheckBox("", preview);
 
+        JComponent labelComp  = GuiUtils.hbox(new Component[] {
+            new JLabel("Position:"), posBox, new JLabel("Width:"), widthFld,
+            GuiUtils.rLabel("Background:"), labelBGFld.getPanel()
+        }, 5);
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         JComponent comp = GuiUtils.doLayout(new Component[] {
-                GuiUtils.rLabel("Preview:"),
-                GuiUtils.left(previewCbx),
-                GuiUtils.rLabel("Label Position:"),
-                GuiUtils.left(posBox),
-                GuiUtils.rLabel("Label Width:"),
-                GuiUtils.left(widthFld),
-                GuiUtils.rLabel("Label Text:"),
-                GuiUtils.makeScrollPane(ta, 200, 100)
-            }, 2, GuiUtils.WT_NY, GuiUtils.WT_NY);
-        if (GuiUtils.showOkCancelDialog(null, "Legend Label",
-                                        comp, null)) {
-            labelHtml = ta.getText();
+            GuiUtils.rLabel("Preview:"), GuiUtils.left(previewCbx),
+            GuiUtils.rLabel("Label:"), GuiUtils.left(labelComp),
+            GuiUtils.rLabel(""), GuiUtils.makeScrollPane(ta, 200, 100)
+        }, 2, GuiUtils.WT_NY, GuiUtils.WT_NY);
+        comp = GuiUtils.topCenter(
+            GuiUtils.inset(
+                new JLabel(
+                    "Note: The display needs to be in an overhead view"), 5), comp);
+        if (GuiUtils.showOkCancelDialog(null, "Legend Label", comp, null)) {
+            labelHtml  = ta.getText();
 
-            labelPos = TwoFacedObject.getIdString(
-                                                         posBox.getSelectedItem());
-            labelWidth =
-                new Integer(widthFld.getText().trim()).intValue();
-            preview = previewCbx.isSelected();
+            labelPos   = TwoFacedObject.getIdString(posBox.getSelectedItem());
+            labelWidth = new Integer(widthFld.getText().trim()).intValue();
+            labelBG    = labelBGFld.getSwatchColor();
+            preview    = previewCbx.isSelected();
             return true;
 
         } else {
@@ -214,6 +227,10 @@ public class VectorRenderer implements Plotter.Plottable {
             boolean wasShowingDisplayList = viewManager.getShowDisplayList();
             if (wasShowingDisplayList) {
                 viewManager.setShowDisplayList(false);
+            }
+            boolean wasShowingWireframe = viewManager.getWireframe();
+            if (wasShowingWireframe) {
+                viewManager.setWireframe(false);
             }
 
 
@@ -252,6 +269,10 @@ public class VectorRenderer implements Plotter.Plottable {
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
                 control.toggleVisibilityForVectorRendering(
                     DisplayControl.RASTERMODE_SHOWNONRASTER);
+            }
+
+            if (wasShowingWireframe) {
+                viewManager.setWireframe(true);
             }
 
             //Render the scene graph
@@ -337,8 +358,12 @@ public class VectorRenderer implements Plotter.Plottable {
 
                 JEditorPane editor = ImageUtils.getEditor(null, labelHtml,
                                          labelWidth, null, null);
-                
-                editor.setBackground(labelBG);
+
+                if (labelBG != null) {
+                    editor.setBackground(labelBG);
+                } else {
+                    editor.setBackground(viewManager.getBackground());
+                }
                 editor.setBorder(
                     BorderFactory.createBevelBorder(BevelBorder.RAISED));
                 RepaintManager repaintManager =
@@ -408,93 +433,93 @@ public class VectorRenderer implements Plotter.Plottable {
     }
 
     /**
-       Set the LabelHtml property.
-
-       @param value The new value for LabelHtml
-    **/
-    public void setLabelHtml (String value) {
-	labelHtml = value;
+     *  Set the LabelHtml property.
+     *
+     *  @param value The new value for LabelHtml
+     */
+    public void setLabelHtml(String value) {
+        labelHtml = value;
     }
 
     /**
-       Get the LabelHtml property.
-
-       @return The LabelHtml
-    **/
-    public String getLabelHtml () {
-	return labelHtml;
+     *  Get the LabelHtml property.
+     *
+     *  @return The LabelHtml
+     */
+    public String getLabelHtml() {
+        return labelHtml;
     }
 
     /**
-       Set the LabelPos property.
-
-       @param value The new value for LabelPos
-    **/
-    public void setLabelPos (String value) {
-	labelPos = value;
+     *  Set the LabelPos property.
+     *
+     *  @param value The new value for LabelPos
+     */
+    public void setLabelPos(String value) {
+        labelPos = value;
     }
 
     /**
-       Get the LabelPos property.
-
-       @return The LabelPos
-    **/
-    public String getLabelPos () {
-	return labelPos;
+     *  Get the LabelPos property.
+     *
+     *  @return The LabelPos
+     */
+    public String getLabelPos() {
+        return labelPos;
     }
 
     /**
-       Set the LabelBG property.
-
-       @param value The new value for LabelBG
-    **/
-    public void setLabelBG (Color value) {
-	labelBG = value;
+     *  Set the LabelBG property.
+     *
+     *  @param value The new value for LabelBG
+     */
+    public void setLabelBG(Color value) {
+        labelBG = value;
     }
 
     /**
-       Get the LabelBG property.
-
-       @return The LabelBG
-    **/
-    public Color getLabelBG () {
-	return labelBG;
+     *  Get the LabelBG property.
+     *
+     *  @return The LabelBG
+     */
+    public Color getLabelBG() {
+        return labelBG;
     }
 
     /**
-       Set the LabelWidth property.
-
-       @param value The new value for LabelWidth
-    **/
-    public void setLabelWidth (int value) {
-	labelWidth = value;
+     *  Set the LabelWidth property.
+     *
+     *  @param value The new value for LabelWidth
+     */
+    public void setLabelWidth(int value) {
+        labelWidth = value;
     }
 
     /**
-       Get the LabelWidth property.
-
-       @return The LabelWidth
-    **/
-    public int getLabelWidth () {
-	return labelWidth;
+     *  Get the LabelWidth property.
+     *
+     *  @return The LabelWidth
+     */
+    public int getLabelWidth() {
+        return labelWidth;
     }
 
     /**
-       Set the Preview property.
-
-       @param value The new value for Preview
-    **/
-    public void setPreview (boolean value) {
-	preview = value;
+     *  Set the Preview property.
+     *
+     *  @param value The new value for Preview
+     */
+    public void setPreview(boolean value) {
+        preview = value;
     }
 
     /**
-       Get the Preview property.
-
-       @return The Preview
-    **/
-    public boolean getPreview () {
-	return preview;
+     *  Get the Preview property.
+     *
+     *  @return The Preview
+     */
+    public boolean getPreview() {
+        return preview;
     }
 
 
