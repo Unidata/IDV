@@ -1109,6 +1109,7 @@ public class WayDisplayState {
         int i = 0;
         for (StormTrack track : tracks) {
             StormTrack coneTrack = makeConeTrack(track, stormParam);
+            if(coneTrack == null) continue;
             FieldImpl field = stormDisplayState.getStormTrackControl().makeTrackField(
                     coneTrack, null);
             fields.add(field);
@@ -1705,7 +1706,20 @@ public class WayDisplayState {
         // end point half circle take 11 points
         StormTrackPoint last   = stps.get(size - 1);
         EarthLocation   lastEl = last.getLocation();
-        EarthLocation   endEl  = conePoints[size - 1].getLocation();
+        StormTrackPoint endSTP = conePoints[size - 1];
+        int ii = 0;
+        while( endSTP == null && ii < (size -2)) {
+            ii++;
+            last   = stps.get(size - 1 - ii);
+            lastEl = last.getLocation();
+            endSTP = conePoints[size - 1 - ii];
+        }
+
+        if(endSTP == null || ii == (size -2)) {
+            return null;
+        }
+        EarthLocation   endEl  = endSTP.getLocation();
+
         double          ang    = getCircleAngleRange(lastEl, endEl);
 
         Real            r      = last.getAttribute(param);
