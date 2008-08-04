@@ -802,7 +802,10 @@ public class CompositeDisplayable extends Displayable {
      * @throws RemoteException    Java RMI failure.
      */
     public void clearDisplayables() throws RemoteException, VisADException {
-        removeDataReferences();
+        for (int i = 0; i < displayables.size(); i++) {
+            removeDisplayable((Displayable)displayables.get(i));
+        }
+        //removeDataReferences();
         synchronized (MUTEX) {
             displayables.clear();
         }
