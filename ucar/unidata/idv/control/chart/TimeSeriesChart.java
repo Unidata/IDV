@@ -661,6 +661,7 @@ public class TimeSeriesChart extends XYChartManager {
                     LineState  speedLineState = null;
                     LineState  dirLineState   = null;
                     Unit       speedUnit      = null;
+                    boolean polarWind = true;
                     for (int varIdx = 0; varIdx < goodVars.size(); varIdx++) {
                         PointParam plotVar =
                             (PointParam) goodVars.get(varIdx);
@@ -743,6 +744,19 @@ public class TimeSeriesChart extends XYChartManager {
                                     dirLineState = lineState;
                                     continue;
                                 }
+                                if (Misc.equals(canonical, "U")) {
+                                    speedUnit      = unit;
+                                    speedSeries    = series;
+                                    polarWind      = false;
+                                    speedLineState = lineState;
+                                    continue;
+                                }
+                                if (Misc.equals(canonical, "V")) {
+                                    dirSeries    = series;
+                                    dirLineState = lineState;
+                                    polarWind      = false;
+                                    continue;
+                                }
                                 if (Misc.equals(canonical, "CC")) {
                                     double scale = 0;
                                     String n     = lineState.getName();
@@ -772,7 +786,7 @@ public class TimeSeriesChart extends XYChartManager {
                     if ((speedSeries != null) && (dirSeries != null)) {
                         XYItemRenderer renderer =
                             new WindbarbRenderer(speedLineState, speedSeries,
-                                dirSeries, speedUnit);
+                                dirSeries, speedUnit, polarWind);
                         Axis axis = addSeries(speedSeries, speedLineState,
                                         paramIdx++, renderer, true);
                         if (speedLineState.getVerticalPosition()
