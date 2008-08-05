@@ -782,8 +782,8 @@ public abstract class XYChartManager extends ChartManager {
                 double v = dir;
                 speed     = Math.sqrt(u * u + v * v);
                 dir = Math.atan2(-u, -v);
-                if (direction < 0) {
-                    direction += 2 * Math.PI;
+                if (dir < 0) {
+                    dir += 2 * Math.PI;
                 }
             }
                 
