@@ -384,12 +384,15 @@ public abstract class ContourLines extends LineDrawing {
             return;
         }
 
+        setActive(false);
         setContourLevels(
             new IrregularContourLevels(
                 contourInfo.getContourLevels(), contourInfo.getBase(),
                 contourInfo.getDashOn()));
         setLabeling(contourInfo.getIsLabeled());
         setLineWidth(contourInfo.getLineWidth());
+        setDashedStyle(contourInfo.getDashedStyle());
+        setActive(true);
     }
 
     /**
@@ -472,8 +475,8 @@ public abstract class ContourLines extends LineDrawing {
     /**
      * Set the contour levels.  Assumes that the control is not null.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   Problem setting the contour levels
      */
     private void setContourLevels() throws VisADException, RemoteException {
         if (contourLevels != defaultContourLevels) {
@@ -490,15 +493,19 @@ public abstract class ContourLines extends LineDrawing {
     /**
      * Set the dashed style.
      * @param  style  dashed line style
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException Problem setting the dashed style
      */
-    public void setDashedStyle(int style) {
+    public void setDashedStyle(int style)
+            throws RemoteException, VisADException {
 
         if (style != dashedStyle) {
 
             dashedStyle = style;
 
             if (contourControl != null) {
-                //contourControl.setDashedStyle(dashedStyle);
+                contourControl.setDashedStyle(dashedStyle);
             }
         }
     }
@@ -530,7 +537,7 @@ public abstract class ContourLines extends LineDrawing {
                         setContourLevels();
                         contourControl.enableLabels(labeling);
                         contourControl.setContourFill(colorFill);
-                        //contourControl.setDashedStyle(dashedStyle);
+                        contourControl.setDashedStyle(dashedStyle);
                     }
                 }
             }
