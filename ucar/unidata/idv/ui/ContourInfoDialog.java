@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -87,6 +88,9 @@ public class ContourInfoDialog implements ActionListener {
 
     /** combobox for line width */
     private JComboBox widthBox;
+
+    /** combobox for dash style */
+    private JComboBox styleBox;
 
     /** title */
     private String title;
@@ -165,6 +169,29 @@ public class ContourInfoDialog implements ActionListener {
         if (unit != null) {
             labelString = " " + unit.toString() + " ";
         }
+
+
+        toggleBtn = new JCheckBox("Labels");
+        toggleBtn.setToolTipText("Toggle contour labels");
+        dashBtn = new JCheckBox("Dash:");
+        dashBtn.setToolTipText("Dash contour lines if less than base");
+
+        styleBox = new JComboBox(new String[] { "_ _ _", ".....", "_._._" });
+        styleBox.setMaximumSize(new Dimension(30, 16));
+        styleBox.setToolTipText("Set the line style");
+        Font f = Font.decode("monospaced-BOLD");
+        if (f != null) {
+            styleBox.setFont(f);
+        }
+
+        dashBtn = new JCheckBox("Dash:");
+        dashBtn.setToolTipText("Dash contour lines if less than base");
+        dashBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                styleBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
+            }
+        });
+
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         JPanel p1 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
@@ -181,20 +208,19 @@ public class ContourInfoDialog implements ActionListener {
                                  new JLabel(labelString)),
             GuiUtils.rLabel("Line Width:"),
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
-                Misc.createIntervalList(1, 5, 1), true)
+                Misc.createIntervalList(1, 5, 1), true),
+            GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn),
+            GuiUtils.filler()
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
+        contents = p1;
 
 
-
-        toggleBtn = new JCheckBox("Labels");
-        toggleBtn.setToolTipText("Toggle contour labels");
-        dashBtn = new JCheckBox("Dash");
-        dashBtn.setToolTipText("Dash contour lines if less than base");
-
+        /*
         contents = GuiUtils.vbox(p1,
                                  GuiUtils.hflow(Misc.newList(toggleBtn,
-                                     dashBtn)));
+                                     dashBtn, styleBox)));
+        */
         JPanel buttons = (showApplyBtn
                           ? GuiUtils.makeApplyOkCancelButtons(this)
                           : GuiUtils.makeOkCancelButtons(this));
@@ -205,7 +231,6 @@ public class ContourInfoDialog implements ActionListener {
             GuiUtils.packInCenter(dialog);
         }
     }
-
 
 
     /**
@@ -258,6 +283,7 @@ public class ContourInfoDialog implements ActionListener {
             myInfo.setLineWidth(
                 new Integer(
                     widthBox.getSelectedItem().toString()).intValue());
+            myInfo.setDashedStyle(styleBox.getSelectedIndex() + 1);
             // sanity check
             float[] levels = myInfo.getContourLevels();
             if (levels.length > MAX_LEVELS) {
@@ -325,8 +351,9 @@ public class ContourInfoDialog implements ActionListener {
         dashBtn.setSelected(myInfo.getDashOn());
         dashBtn.setEnabled( !myInfo.getIsFilled());
         widthBox.setSelectedItem(new Integer(myInfo.getLineWidth()));
+        styleBox.setSelectedIndex(myInfo.getDashedStyle() - 1);
+        styleBox.setEnabled(myInfo.getDashOn());
     }
-
 
 
 
@@ -338,7 +365,6 @@ public class ContourInfoDialog implements ActionListener {
     public ContourInfo getInfo() {
         return myInfo;
     }
-
 
 }
 
