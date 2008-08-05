@@ -678,6 +678,9 @@ public abstract class XYChartManager extends ChartManager {
         /** line state */
         LineState lineState;
 
+        /** Speed,Dir or U,V */
+        boolean polarWind = true;
+
         /**
          * ctor
          *
@@ -688,10 +691,25 @@ public abstract class XYChartManager extends ChartManager {
          */
         public WindbarbRenderer(LineState lineState, TimeSeries speedSeries,
                                 TimeSeries dirSeries, Unit unit) {
+            this(lineState, speedSeries, dirSeries, unit, true);
+        }
+
+
+        /**
+         * ctor
+         *
+         * @param lineState line state
+         * @param speedSeries speed data
+         * @param dirSeries dir data
+         * @param unit speed unit
+         */
+        public WindbarbRenderer(LineState lineState, TimeSeries speedSeries,
+                                TimeSeries dirSeries, Unit unit, boolean polarWind) {
             this.lineState   = lineState;
             this.speedUnit   = unit;
             this.speedSeries = speedSeries;
             this.dirSeries   = dirSeries;
+            this.polarWind   = polarWind;
         }
 
         /**
@@ -759,6 +777,16 @@ public abstract class XYChartManager extends ChartManager {
 
             double speed = speedSeries.getValue(item).doubleValue();
             double dir   = dirSeries.getValue(item).doubleValue();
+            if (!polarWind) {
+                double u = speed;
+                double v = dir;
+                speed     = Math.sqrt(u * u + v * v);
+                dir = Math.atan2(-u, -v);
+                if (direction < 0) {
+                    direction += 2 * Math.PI;
+                }
+            }
+                
             double x     = dataset.getXValue(series, item);
 
             if (Double.isNaN(x) || Double.isNaN(speed) || Double.isNaN(dir)) {
