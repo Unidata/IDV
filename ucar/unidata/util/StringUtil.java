@@ -866,20 +866,22 @@ public class StringUtil {
     }
 
     /**
-     * _more_
+     * Match a regular expression
      *
-     * @param input _more_
-     * @param patternString _more_
+     * @param input  string to match
+     * @param patternString  reg ex pattern string
      *
-     * @return _more_
+     * @return  true if a match
      */
     public static boolean regexpMatch(String input, String patternString) {
-        Pattern pattern = (Pattern) patternCache.get(patternString);
-        if (pattern == null) {
-            pattern = Pattern.compile(patternString);
-            patternCache.put(patternString, pattern);
+        synchronized (MATCH_MUTEX) {
+            Pattern pattern = (Pattern) patternCache.get(patternString);
+            if (pattern == null) {
+                pattern = Pattern.compile(patternString);
+                patternCache.put(patternString, pattern);
+            }
+            return pattern.matcher(input).find();
         }
-        return pattern.matcher(input).find();
     }
 
 
