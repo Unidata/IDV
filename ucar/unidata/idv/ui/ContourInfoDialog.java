@@ -51,7 +51,7 @@ public class ContourInfoDialog implements ActionListener {
 
 
     /** max allowable levels */
-    private static final int MAX_LEVELS = 1000;
+    private static final int MAX_LEVELS = 1500;
 
 
     /** Was the setting successful */
