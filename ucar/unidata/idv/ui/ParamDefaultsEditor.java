@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -243,6 +244,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
      */
     public class ParamDefaultsTable extends JTable {
 
+        /** label */
         String label;
 
         /**
@@ -591,8 +593,8 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
                         what = "setting range";
                         paramInfo.setRange(
                             new Range(
-                                Misc.parseDouble(minFld.getText()),
-                                Misc.parseDouble(maxFld.getText())));
+                                Misc.parseNumber(minFld.getText()),
+                                Misc.parseNumber(maxFld.getText())));
                     } else {
                         paramInfo.clearRange();
                     }
@@ -997,14 +999,21 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
     }
 
 
+    /**
+     * Get the list of resources
+     *
+     * @return the list of resources
+     */
     public List getResources() {
         List infos = new ArrayList();
         for (int i = 0; i < myTables.size(); i++) {
-            ParamDefaultsTable paramDefaultsTable = (ParamDefaultsTable) myTables.get(i);
-            for(ParamInfo paramInfo:(List<ParamInfo>) paramDefaultsTable.getParamInfoList()) {
-                infos.add(new ResourceViewer.ResourceWrapper(paramInfo, paramInfo.toString(),
-                                                             paramDefaultsTable.label,       
-                                                             paramDefaultsTable.isEditable));
+            ParamDefaultsTable paramDefaultsTable =
+                (ParamDefaultsTable) myTables.get(i);
+            for (ParamInfo paramInfo : (List<ParamInfo>) paramDefaultsTable
+                    .getParamInfoList()) {
+                infos.add(new ResourceViewer.ResourceWrapper(paramInfo,
+                        paramInfo.toString(), paramDefaultsTable.label,
+                        paramDefaultsTable.isEditable));
             }
         }
         return infos;
@@ -1219,7 +1228,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
             if (paramInfo.hasContourInfo()) {
                 ContourInfo ci = paramInfo.getContourInfo();
                 node.setAttribute(ATTR_CI_INTERVAL,
-                                  "" + ci.getIntervalString());
+                                  "" + ci.getIntervalString(true));
                 node.setAttribute(ATTR_CI_BASE, "" + ci.getBase());
                 node.setAttribute(ATTR_CI_MIN, "" + ci.getMin());
                 node.setAttribute(ATTR_CI_MAX, "" + ci.getMax());
@@ -1424,27 +1433,25 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
 
             if ((ci_interval != null) || (ci_base != null)) {
                 if (ci_interval == null) {
-                    ci_interval = Misc.MISSING;
+                    ci_interval = "NaN";
                 }
 
                 if (ci_base == null) {
-                    ci_base = Misc.MISSING;
+                    ci_base = "NaN";
                 }
                 if (ci_min == null) {
-                    ci_min = Misc.MISSING;
+                    ci_min = "NaN";
                 }
                 if (ci_max == null) {
-                    ci_max = Misc.MISSING;
+                    ci_max = "NaN";
                 }
                 if (ci_width == null) {
                     ci_width = "1";
                 }
                 contourInfo = new ContourInfo(ci_interval,
-                                              Misc.parseNumber(ci_base),
-                                              Misc.parseNumber(ci_min),
-                                              Misc.parseNumber(ci_max), ci_label, ci_dash,
-                        ContourInfo.DEFAULT_FILL,
-                                              Misc.parseNumber(ci_width));
+                        Misc.parseDouble(ci_base), Misc.parseDouble(ci_min),
+                        Misc.parseDouble(ci_max), ci_label, ci_dash,
+                        ContourInfo.DEFAULT_FILL, Misc.parseDouble(ci_width));
             }
 
 
@@ -1459,8 +1466,8 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
 
 
             if ((range_min != null) && (range_max != null)) {
-                range = new Range(Misc.parseNumber(range_min),
-                                  Misc.parseNumber(range_max));
+                range = new Range(Misc.parseDouble(range_min),
+                                  Misc.parseDouble(range_max));
             }
 
             ParamInfo paramInfo = new ParamInfo(paramName, colorTableName,
@@ -1603,14 +1610,23 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
         return getParamColorTable(paramName, true);
     }
 
-    public ColorTable getParamColorTable(String paramName, boolean useDefault) {
+    /**
+     * Get the color table for the parameters
+     *
+     * @param paramName  parameter name
+     * @param useDefault  true to use the default color table if not found
+     *
+     * @return the associated color table
+     */
+    public ColorTable getParamColorTable(String paramName,
+                                         boolean useDefault) {
         ColorTable vc = getColorTable(paramName);
         //Try the canonical names.
         if (vc == null) {
             vc = getColorTable(DataAlias.aliasToCanonical(paramName));
         }
 
-        if (vc == null && useDefault) {
+        if ((vc == null) && useDefault) {
             vc = getIdv().getColorTableManager().getDefaultColorTable();
         }
         return vc;
