@@ -1370,7 +1370,7 @@ public class PointObFactory {
                 if ((timeStep == null) || timeStep.isMissing()) {
                     continue;
                 }
-                FieldImpl newSample = extractParameter(obs, parameter);
+                FieldImpl newSample = extractParameter(timeStep, parameter);
                 if (newSample == null) {
                     continue;
                 }
