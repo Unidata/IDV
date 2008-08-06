@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -173,7 +174,7 @@ public class ContourInfo {
             this.interval     = Float.NaN;
         } else {
             this.levelsString = null;
-            this.interval     = (float) Misc.parseNumber(levelsString);
+            this.interval     = Misc.parseFloat(levelsString);
         }
         this.min           = min;
         this.max           = max;
@@ -485,7 +486,7 @@ public class ContourInfo {
             interval = Float.NaN;
         } else {
             if (v != null) {
-                interval = (float) Misc.parseNumber(v);
+                interval = (float) Misc.parseDouble(v);
             }
         }
         levelsString = v;
@@ -600,12 +601,24 @@ public class ContourInfo {
     /**
      * Get the interval as a string.  If interval is undefined,
      * return the levelsString.
-     * @return interval as String or levelsString.
+     * @return interval as String in Locale format or levelsString.
      */
     public String getIntervalString() {
+        return getIntervalString(false);
+    }
+
+    /**
+     * Get the interval as a string.  If interval is undefined,
+     * return the levelsString.
+     * @param  useDecimalFormat  format as decimal for XML storage
+     * @return interval as String or levelsString.
+     */
+    public String getIntervalString(boolean useDecimalFormat) {
         return (levelsString != null)
                ? levelsString
-               : Misc.format(interval);
+               : (useDecimalFormat)
+                 ? String.valueOf(interval)
+                 : Misc.format(interval);
     }
 
     /**
@@ -756,7 +769,7 @@ public class ContourInfo {
                 if (j > 0) {
                     sb.append("/");
                 }
-                double d = Misc.parseFloat(subTok);
+                double d = Misc.parseDouble(subTok);
                 sb.append(String.valueOf(d));
             }
         }
@@ -822,7 +835,7 @@ public class ContourInfo {
      * Get the value from a string.  Pass in a default value if the
      * string to return if the string is empty
      *
-     * @param valString string to parse
+     * @param valString string to parse.  Must be Double, not local format
      * @param def default value
      *
      * @return value of the string or the default
@@ -831,7 +844,7 @@ public class ContourInfo {
         if (valString.trim().equals("")) {
             return def;
         }
-        return (float) Misc.parseNumber(valString);
+        return Misc.parseFloat(valString);
     }
 
     /**
