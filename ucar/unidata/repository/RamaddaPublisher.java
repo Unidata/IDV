@@ -21,9 +21,9 @@
  */
 
 
-package ucar.unidata.idv.publish;
+package ucar.unidata.repository;
 
-
+import ucar.unidata.idv.publish.*;
 import HTTPClient.*;
 
 import org.w3c.dom.Element;
