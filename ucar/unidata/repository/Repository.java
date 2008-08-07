@@ -404,6 +404,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    public Repository(String hostname, int port)
+            throws Exception {
+        this(new String[]{}, hostname, port, false, false);
+    }
+
+
 
     /**
      * _more_
@@ -6720,6 +6726,10 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String getHostname() {
         return hostname;
+    }
+
+    public int getPort() {
+        return port;
     }
 
 
