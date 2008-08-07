@@ -1,4 +1,3 @@
-
 /*
  * $Id: InfoceteraBlogger.java,v 1.13 2005/05/13 18:31:06 jeffmc Exp $
  *
@@ -21,37 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.publish;
 
-
-
-import ucar.unidata.idv.*;
-
-import ucar.unidata.repository.Constants;
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.util.IOUtil;
-
-
-
-import java.awt.*;
-
-import javax.swing.*;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Properties;
-
-import java.net.*;
-
-import java.io.*;
-
-import ucar.unidata.xml.XmlUtil;
 
 import HTTPClient.*;
 
@@ -60,25 +31,55 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
+
+import ucar.unidata.idv.*;
+
+import ucar.unidata.repository.RepositoryClient;
+
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.HtmlUtil;
+
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+
+import ucar.unidata.xml.XmlUtil;
+
+
+
+import java.awt.*;
+
+import java.io.*;
+
+import java.net.*;
+
+import java.util.ArrayList;
+
+import java.util.List;
+import java.util.Properties;
+
+import javax.swing.*;
+
+
 /**
  * Note, This is very much in flux.
  * A client to an infocetera weblog (see: http://www.infocetera.com).
  *
  * @author IDV development team
  */
-public class RamaddaPublisher extends ServerPublisher {
+public class RamaddaPublisher extends IdvPublisher {
+
+    /** _more_          */
+    private RepositoryClient client;
 
 
-
-    /** Attribute name for the dirpath */
-    public static final String ATTR_DIRPATH = "dirpath";
-
-
-    private String sessionId;
+    /**
+     * _more_
+     */
+    public RamaddaPublisher() {}
 
 
-    /** Infocetera is based on a directory structure */
-    String dirPath = null;
 
     /**
      * Create the object
@@ -86,81 +87,20 @@ public class RamaddaPublisher extends ServerPublisher {
      * @param idv The idv
      */
     public RamaddaPublisher(IntegratedDataViewer idv) {
-        this(idv, null);
+        super(idv, null);
     }
 
+
     /**
-     * Create the object
+     * What is the name of this publisher
      *
-     * @param idv The idv
-     * @param element The xml element that defined us
+     * @return The name
      */
-    public RamaddaPublisher(IntegratedDataViewer idv, Element element) {
-        super(idv, element);
-    }
-
-    /**
-     * Initialize
-     */
-    protected void init() {
-        super.init();
-        String prefix = getPropertyPrefix();
-        setDirpath(
-            (String) idv.getStateManager().getPreferenceOrProperty(
-                prefix + ATTR_DIRPATH));
-        if (dirPath == null) {
-            setDirpath(XmlUtil.getAttribute(initElement, ATTR_DIRPATH,
-                                            NULL_STRING));
-        }
-    }
-
-    /**
-     * Save opff any preferences
-     */
-    protected void savePreferences() {
-        super.savePreferences();
-        String prefix = getPropertyPrefix();
-        if (dirPath != null) {
-            idv.getStateManager().putPreference(prefix + ATTR_DIRPATH,
-                                                dirPath);
-        }
+    public String getName() {
+        return "Ramadda repository";
     }
 
 
-
-    /**
-     * Check the return xml from the http post
-     *
-     * @param xml The xml we go back from infocetera
-     * @return Was this ok
-     */
-    public boolean resultOk(String xml) {
-        if (xml.indexOf("error") >= 0) {
-            return false;
-        }
-        if (xml.indexOf("Error") >= 0) {
-            return false;
-        }
-        if (xml.indexOf("ERROR") >= 0) {
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * What is the infocetera directory
-     *
-     * @param props The properties
-     * @return The infocetera directory name
-     */
-    private String getDir(Properties props) {
-        String dir = (String) props.get("dir");
-        if (dir != null) {
-            return dir;
-        }
-        return dirPath;
-    }
 
     /**
      * Post the given file to the infocetera weblog
@@ -170,6 +110,11 @@ public class RamaddaPublisher extends ServerPublisher {
      * @return Was this successful
      */
     public boolean publishFile(String file, Properties props) {
+        return false;
+    }
+
+    /*
+
         try {
             HTTPClient.NVPair[] opts = { new HTTPClient.NVPair("NAME", ""),
                                          new HTTPClient.NVPair("DESC", ""),
@@ -203,70 +148,9 @@ public class RamaddaPublisher extends ServerPublisher {
             return false;
         }
     }
+    */
 
 
-    /**
-     *  This method strips the html tags from the given html error message.
-     *  It also strips out the copyright and other footer lines
-     *  and shows the results to the user.
-     *
-     * @param msg The message
-     * @param html  The html
-     */
-    protected void showError(String msg, String html) {
-        int idx = -1;
-        if (idx < 0) {
-            idx = html.indexOf("error");
-        }
-        if (idx < 0) {
-            idx = html.indexOf("Error");
-        }
-        if (idx < 0) {
-            idx = html.indexOf("ERROR");
-        }
-        JComponent p = null;
-        if (idx >= 0) {
-            idx  = idx - 10;
-            html = html.substring(idx);
-            html = StringUtil.stripTags(html);
-            idx  = 0;
-            List lines = StringUtil.split(html, "\n");
-            html = "";
-            for (int i = 0; i < lines.size(); i++) {
-                String line = (String) lines.get(i);
-                if ((line.indexOf("Copyright") >= 0)
-                        || (line.indexOf("WTS") >= 0)
-                        || (line.indexOf("LLC") >= 0)) {
-                    continue;
-                }
-                html = html + line + "\n";
-            }
-            p = GuiUtils.makeScrollPane(new JTextArea(html, 10, 50), 10, 50);
-        } else {
-            html = "";
-        }
-        JPanel msgPanel = GuiUtils.topCenter(new JLabel(msg), p);
-        LogUtil.userErrorMessage(msgPanel);
-    }
-
-
-    /**
-     * What is the name of this publisher
-     *
-     * @return The name
-     */
-    public String getName() {
-        return "Ramadda repository";
-    }
-
-    /**
-     * Have we been configured
-     *
-     * @return Is configured
-     */
-    public boolean isConfigured() {
-        return super.isConfigured();
-    }
 
 
     /**
@@ -275,95 +159,97 @@ public class RamaddaPublisher extends ServerPublisher {
      * @return Configuration ok
      */
     public boolean configure() {
-        JTextField serverFld   = new JTextField((server == null)
-                                                ? ""
-                                                : server, 30);
-        JTextField passwordFld = new JTextField((password == null)
-                                                ? ""
-                                                : password, 30);
-        JTextField userFld     = new JTextField((user == null)
-                                                ? ""
-                                                : user, 30);
-        List       comps       = new ArrayList();
-        comps.add(GuiUtils.rLabel("Server:"));
-        comps.add(GuiUtils.inset(serverFld, 4));
-        comps.add(GuiUtils.rLabel("User name:"));
-        comps.add(GuiUtils.inset(userFld, 4));
-        comps.add(GuiUtils.rLabel("Password:"));
-        comps.add(GuiUtils.inset(passwordFld, 4));
-        JPanel p = GuiUtils.doLayout(comps, 2, GuiUtils.WT_Y,
-                                     GuiUtils.WT_NNY);
-        p = GuiUtils.topCenter(
-            GuiUtils.cLabel("Please provide the following information"), p);
+        try {
+            String     server      = ((client != null)
+                                      ? client.getHostname()
+                                      : "");
+            String     user        = ((client != null)
+                                      ? client.getUser()
+                                      : "");
+            String     password    = ((client != null)
+                                      ? client.getPassword()
+                                      : "");
 
-        while (true) {
-            if ( !GuiUtils.askOkCancel(
-                    "Configure access to Infocetera weblog", p)) {
-                return false;
+            JTextField serverFld   = new JTextField((server == null)
+                    ? ""
+                    : server, 30);
+            JTextField passwordFld = new JTextField((password == null)
+                    ? ""
+                    : password, 30);
+            JTextField userFld     = new JTextField((user == null)
+                    ? ""
+                    : user, 30);
+            List       comps       = new ArrayList();
+            comps.add(GuiUtils.rLabel("Server:"));
+            comps.add(GuiUtils.inset(serverFld, 4));
+            comps.add(GuiUtils.rLabel("User name:"));
+            comps.add(GuiUtils.inset(userFld, 4));
+            comps.add(GuiUtils.rLabel("Password:"));
+            comps.add(GuiUtils.inset(passwordFld, 4));
+            JPanel p = GuiUtils.doLayout(comps, 2, GuiUtils.WT_Y,
+                                         GuiUtils.WT_NNY);
+            p = GuiUtils.topCenter(
+                GuiUtils.cLabel("Please provide the following information"),
+                p);
+
+            while (true) {
+                if ( !GuiUtils.askOkCancel(
+                        "Configure access to Infocetera weblog", p)) {
+                    return false;
+                }
+                client = new RepositoryClient(serverFld.getText().trim(), 80,
+                        "/repository");
+                client.setUser(userFld.getText());
+                client.setPassword(passwordFld.getText());
+                if ( !isConfigured()) {
+                    LogUtil.userMessage(
+                        "One or more of the given values is null");
+                } else {
+                    break;
+                }
             }
-            setServer(serverFld.getText());
-            setUser(userFld.getText());
-            setPassword(passwordFld.getText());
-            savePreferences();
-            idv.getStateManager().writePreferences();
-            if ( !isConfigured()) {
-                LogUtil.userMessage(
-                    "One or more of the given values is null");
-            } else {
-                break;
+            return true;
+        } catch (Exception exc) {
+            LogUtil.logException("Doing configuration", exc);
+            return false;
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isConfigured() {
+        if (client == null) {
+            return false;
+        }
+        try {
+            if ( !client.getIsValidSession()) {
+                return client.doLogin();
             }
+        } catch (Exception exc) {
+            LogUtil.logException("Doing configuration", exc);
+            return false;
         }
         return true;
     }
 
-
-    private boolean validSession() throws Exception {
-        sessionId="foo";
-        if(sessionId == null) return false;
-        String url = "http://" + getServer() +"/repository/user/home?output=xml&sessionid="+ sessionId;
-        String contents = IOUtil.readContents(url, getClass());
-        Element root =XmlUtil.getRoot(contents);
-        System.err.println(contents);
-        return XmlUtil.getAttribute(root,"code").equals("ok");
-    }
-
-    public boolean doLogin() throws Exception {
-        while(true) {
-            String url = HtmlUtil.url("https://" + getServer() +"/repository/user/home", new String[]{Constants.ARG_OUTPUT,"xml",
-                                                                                                      Constants.ARG_USER_PASSWORD,
-                                                                                                      getPassword(),
-                                                                                                      Constants.ARG_USER_ID,getUser()});
-            String contents = IOUtil.readContents(url, getClass());
-            Element root =XmlUtil.getRoot(contents);
-            if(XmlUtil.getAttribute(root,Constants.ATTR_CODE).equals("ok")) {
-                sessionId = XmlUtil.getChildText(root).trim();
-                return true;
-            }
-            String message = XmlUtil.getChildText(root).trim();
-            JTextField nameFld = new JTextField(getUser());
-            JPasswordField passwordFld = new JPasswordField(getPassword());
-            JComponent comp = GuiUtils.topCenter(new JLabel("Error:" + message),
-                                                 GuiUtils.doLayout(
-                                                                   new Component[]{
-                                                                       GuiUtils.rLabel("User Name:"),
-                                                                       nameFld,
-                                                                       GuiUtils.rLabel("Password:"),
-                                                                       passwordFld,
-                                                                   },2,GuiUtils.WT_NY, GuiUtils.WT_N));
-            
-            if(true) break;
-        }
-        
-        return false;
-    }
-
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param filePath _more_
+     * @param properties _more_
+     */
     public void doPublish(String title, final String filePath,
                           String properties) {
         try {
-            if(!validSession()) {
-                if(!doLogin()) return;
+            if ( !isConfigured()) {
+                return;
             }
-        System.err.println ("do publish " + title + " " + filePath);
         } catch (Exception exc) {
             LogUtil.logException("Checking session", exc);
         }
@@ -383,72 +269,50 @@ public class RamaddaPublisher extends ServerPublisher {
      */
     public boolean publishMessage(String subject, String label, String msg,
                                   String filename, Properties props) {
-        try {
-            String link = "";
-            if (filename != null) {
-            }
-
-            HTTPClient.NVPair[] opts = {
-                new HTTPClient.NVPair("entryTitle", subject),
-                new HTTPClient.NVPair("response", "xml"),
-                new HTTPClient.NVPair("entryLink", link),
-                new HTTPClient.NVPair("entryLabel", label),
-                new HTTPClient.NVPair("entryContent", msg),
-                new HTTPClient.NVPair("dopublish", "1"),
-                new HTTPClient.NVPair("_user", user),
-                new HTTPClient.NVPair("_password", password)
-            };
-
-            HTTPConnection conn         = getConnection();
-            String         blogPostPath = getDir(props) + "/blog_change";
-            HTTPResponse   res          = conn.Post(blogPostPath, opts);
-            if (res.getStatusCode() >= 300) {
-                LogUtil.userErrorMessage(new String(res.getData()));
-                return false;
-            }
-            byte[] data = res.getData();
-            String html = new String(data);
-            System.err.println("html:" + html);
-            if ( !resultOk(html)) {
-                showError("An error has occurred posting to the weblog",
-                          html);
-                return false;
-            }
-        } catch (Exception exc) {
-            LogUtil.logException("Posting message", exc);
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * Set the infocetera directory path
-     *
-     * @param value The path
-     */
-    public void setDirpath(String value) {
-        dirPath = clean(value);
-        if (dirPath != null) {
-            //Check for valid path
-        }
+        return false;
     }
 
     /**
-     * Get the infocetera directory path
      *
-     * @return The path
+     *   try {
+     *       String link = "";
+     *       if (filename != null) {
+     *       }
+     *
+     *       HTTPClient.NVPair[] opts = {
+     *           new HTTPClient.NVPair("entryTitle", subject),
+     *           new HTTPClient.NVPair("response", "xml"),
+     *           new HTTPClient.NVPair("entryLink", link),
+     *           new HTTPClient.NVPair("entryLabel", label),
+     *           new HTTPClient.NVPair("entryContent", msg),
+     *           new HTTPClient.NVPair("dopublish", "1"),
+     *           new HTTPClient.NVPair("_user", user),
+     *           new HTTPClient.NVPair("_password", password)
+     *       };
+     *
+     *       HTTPConnection conn         = getConnection();
+     *       String         blogPostPath = getDir(props) + "/blog_change";
+     *       HTTPResponse   res          = conn.Post(blogPostPath, opts);
+     *       if (res.getStatusCode() >= 300) {
+     *           LogUtil.userErrorMessage(new String(res.getData()));
+     *           return false;
+     *       }
+     *       byte[] data = res.getData();
+     *       String html = new String(data);
+     *       System.err.println("html:" + html);
+     *       if ( !resultOk(html)) {
+     *           showError("An error has occurred posting to the weblog",
+     *                     html);
+     *           return false;
+     *       }
+     *   } catch (Exception exc) {
+     *       LogUtil.logException("Posting message", exc);
+     *       return false;
+     *   }
+     *   return true;
+     * }
      */
-    public String getDirpath() {
-        return dirPath;
-    }
 
 
 }
-
-
-
-
-
-
 

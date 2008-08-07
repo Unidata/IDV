@@ -101,6 +101,8 @@ public abstract class IdvPublisher {
 
 
 
+    public IdvPublisher() {}
+
 
     /**
      * Construct the object with the reference to the idv
