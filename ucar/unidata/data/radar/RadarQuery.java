@@ -40,6 +40,9 @@ public class RadarQuery {
     /** The station */
     private String station;
 
+    /** The product */
+    private String product;
+
     /** The list of dates */
     private DateSelection dateSelection;
 
@@ -63,7 +66,21 @@ public class RadarQuery {
         this.dateSelection = dateSelection;
     }
 
-
+    /**
+     * ctor
+     *
+     * @param collectionUrl the collection url
+     * @param station the station
+     * @param dateSelection the date selection_
+     */
+    public RadarQuery(String collectionUrl, String station,
+                      String product,
+                      DateSelection dateSelection) {
+        this.collectionUrl = collectionUrl;
+        this.station       = station;
+        this.product       = product;
+        this.dateSelection = dateSelection;
+    }
     /**
      * Set the CollectionUrl property.
      *
@@ -101,6 +118,23 @@ public class RadarQuery {
         return station;
     }
 
+    /**
+     * Set the Product property.
+     *
+     * @param value The new value for Station
+     */
+    public void setProduct(String value) {
+        product = value;
+    }
+
+    /**
+     * Get the Station property.
+     *
+     * @return The Station
+     */
+    public String getProduct() {
+        return product;
+    }
     /**
      *  Set the DateSelection property.
      *
