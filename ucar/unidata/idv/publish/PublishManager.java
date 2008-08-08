@@ -24,10 +24,17 @@ package ucar.unidata.idv.publish;
 
 
 import ucar.unidata.idv.*;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.IOUtil;
 
+import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.*;
+import java.awt.event.*;
 
 
 import ucar.unidata.xml.XmlObjectStore;
@@ -45,6 +52,7 @@ import org.w3c.dom.Node;
 
 import ucar.unidata.idv.ui.*;
 
+import java.lang.reflect.Constructor;
 
 /**
  *  This manages  the nascent publishing facility within the IDV.
@@ -60,8 +68,27 @@ import ucar.unidata.idv.ui.*;
 
 public class PublishManager extends IdvManager {
 
+    /** Xml element &quot;publisher&quot; tag name */
+    public static final String TAG_PUBLISHER = "publisher";
+
+    /**
+     * Xml element &quot;class&quot; attribute name.
+     * This is the class name of  a concrete derived class
+     * of this class.
+     */
+    public static final String ATTR_CLASS = "class";
+
+    public static final String ATTR_NAME = "name";
+
+
+
+
     /** List of {@link ucar.unidata.idv.publish.IdvPublisher}s */
-    private List publishers;
+    private List<IdvPublisher> publishers;
+
+    private List<TwoFacedObject> types = new ArrayList<TwoFacedObject>();
+
+
 
 
     /**
@@ -71,9 +98,65 @@ public class PublishManager extends IdvManager {
      */
     public PublishManager(IntegratedDataViewer idv) {
         super(idv);
+        publishers = (List<IdvPublisher>) (List) getIdv().getStore().getEncodedFile("publishers.xml");
+        if(publishers == null) {
+            publishers = new ArrayList<IdvPublisher>();
+        }
     }
 
+    public void initMenu(final JMenu menu) {
+        menu.addMenuListener(new MenuListener() {
+            public void menuCanceled(MenuEvent e) {}
+
+            public void menuDeselected(MenuEvent e) {}
+
+            public void menuSelected(MenuEvent e) {
+                menu.removeAll();
+                makeMenu(menu);
+            }
+            });
+    }
+
+    public void makeMenu(JMenu menu) {
+        JMenu newMenu = new JMenu("New");
+        menu.add(newMenu);
+        for (TwoFacedObject tfo: types) {
+            JMenuItem mi = new JMenuItem(tfo.toString());
+            newMenu.add(mi);
+            mi.addActionListener(new ObjectListener(tfo.getId()) {
+                    public void actionPerformed(ActionEvent ae) {
+                        try {
+                            IdvPublisher newPublisher = (IdvPublisher)  ((IdvPublisher) theObject).cloneMe();
+                            if(newPublisher.doInit()) {
+                                publishers.add(newPublisher);
+                                getIdv().getStore().putEncodedFile("publishers.xml", publishers);
+                            }
+                        } catch (Exception exc) {
+                            logException("Creating publisher" , exc);
+                        }
+                    }
+                });
+        }
+        if(publishers.size()>0) {
+            JMenu deleteMenu = new JMenu("Delete");
+            menu.add(deleteMenu);
+
+            menu.addSeparator();
+            for(IdvPublisher publisher:(List<IdvPublisher>) publishers) {
+                deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
+                publisher.initMenu(menu);
+            }
+        }
+    }
+
+    public void deletePublisher(IdvPublisher publisher) {
+        publishers.remove(publisher);
+        getIdv().getStore().putEncodedFile("publishers.xml", publishers);
+    }
+
+
     public void newPublisher() {
+
 
     }
 
@@ -84,10 +167,7 @@ public class PublishManager extends IdvManager {
      * @return Can we publish any content
      */
     public boolean isPublishingEnabled() {
-        //For now just return false
-        return true;
-        //        return false;
-        //return ((publishers != null) && (publishers.size() > 0));
+        return types.size()>0;
     }
 
     /**
@@ -106,7 +186,7 @@ public class PublishManager extends IdvManager {
     /**
      * Gets a publisher.
      *
-     * @return THe first publisher in the list of publishers (for now)
+     * @return The first publisher in the list of publishers (for now)
      */
     public IdvPublisher getPublisher() {
         //For now jsut return the first one
@@ -230,22 +310,65 @@ public class PublishManager extends IdvManager {
      */
     public void initPublisher() {
         try {
-            publishers = new ArrayList();
             XmlResourceCollection resources = getIdv().getResourceManager().getXmlResources(
-                                                                                       IdvResourceManager.RSC_PUBLISHERS);
-            //            if (true) return;
+                                                                                       IdvResourceManager.RSC_PUBLISHERTYPES);
             for (int resourceIdx = 0; resourceIdx < resources.size();
                  resourceIdx++) {
                 Element root       = resources.getRoot(resourceIdx);
                 if(root == null) {
                     continue;
                 }
-                publishers.addAll(IdvPublisher.getPublishers(getIdv(), root));
+                types.addAll(getPublisherTypes(getIdv(), root));
             }
         } catch (Exception exc) {
             logException("Initializing publishers", exc);
         }
     }
+
+
+    /**
+     * Process the given xml, instantiating a list
+     * of <code>IdvPublisher</code>s
+     *
+     * @param idv The idv
+     * @param root Root of the publishers.xml file
+     * @return List of publishers
+     */
+    public static List<TwoFacedObject> getPublisherTypes(IntegratedDataViewer idv, Element root) {
+        List<TwoFacedObject> publisherTypes = new ArrayList<TwoFacedObject>();
+        List nodes      = XmlUtil.findChildren(root, TAG_PUBLISHER);
+        for (int i = 0; i < nodes.size(); i++) {
+            try {
+                Element child = (Element) nodes.get(i);
+                Class publisherClass =
+                    Misc.findClass(XmlUtil.getAttribute(child, ATTR_CLASS));
+                if (publisherClass == null) {
+                    throw new IllegalArgumentException("Could not load publisher class:" + 
+                                                       XmlUtil.getAttribute(child, ATTR_CLASS));
+                }
+                Constructor ctor =
+                    Misc.findConstructor(publisherClass,
+                                         new Class[]{
+                                             IntegratedDataViewer.class,
+                                             Element.class });
+                if (ctor == null) {
+                    continue;
+                }
+                Object obj =  ctor.newInstance(new Object[]{ idv,
+                                                             child });
+                IdvPublisher idvPublisher =
+                    (IdvPublisher) ctor.newInstance(new Object[]{ idv,
+                                                                  child });
+                //                idvPublisher.init();
+                publisherTypes.add(new TwoFacedObject(XmlUtil.getAttribute(child,ATTR_NAME), idvPublisher));
+            } catch (Exception exc) {
+                LogUtil.logException("Creating publisher client", exc);
+            }
+        }
+
+        return publisherTypes;
+    }
+
 
 
     /**

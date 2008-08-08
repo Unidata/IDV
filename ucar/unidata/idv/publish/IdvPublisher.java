@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import ucar.unidata.idv.*;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.xml.XmlUtil;
@@ -45,7 +46,7 @@ import java.io.*;
 
 import HTTPClient.*;
 
-import java.lang.reflect.Constructor;
+
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,23 +70,13 @@ import org.w3c.dom.NodeList;
  *
  * @author IDV development team
  */
-public abstract class IdvPublisher {
+public abstract class IdvPublisher implements Cloneable {
 
     /**
      * A helper attribute so we can call static routines in GuiUtils
      *   without typing the whole class name
      */
     public static final GuiUtils GU = null;
-
-    /** Xml element &quot;publisher&quot; tag name */
-    public static final String TAG_PUBLISHER = "publisher";
-
-    /**
-     * Xml element &quot;class&quot; attribute name.
-     * This is the class name of  a concrete derived class
-     * of this class.
-     */
-    public static final String ATTR_CLASS = "class";
 
 
 
@@ -104,6 +95,10 @@ public abstract class IdvPublisher {
     public IdvPublisher() {}
 
 
+    public IdvPublisher cloneMe() throws CloneNotSupportedException {
+        return (IdvPublisher) this.clone();
+    }
+
     /**
      * Construct the object with the reference to the idv
      *
@@ -117,55 +112,14 @@ public abstract class IdvPublisher {
     }
 
 
-    /**
-     * Process the given xml, instantiating a list
-     * of <code>IdvPublisher</code>s
-     *
-     * @param idv The idv
-     * @param root Root of the publishers.xml file
-     * @return List of publishers
-     */
-    public static List getPublishers(IntegratedDataViewer idv, Element root) {
-        List publishers = new ArrayList();
-        List nodes      = XmlUtil.findChildren(root, TAG_PUBLISHER);
-        for (int i = 0; i < nodes.size(); i++) {
-            try {
-                Element child = (Element) nodes.get(i);
-                Class publisherClass =
-                    Misc.findClass(XmlUtil.getAttribute(child, ATTR_CLASS));
-                if (publisherClass == null) {
-                    throw new IllegalArgumentException("Could not load publisher class:" + 
-                                                       XmlUtil.getAttribute(child, ATTR_CLASS));
-                }
-                Constructor ctor =
-                    Misc.findConstructor(publisherClass,
-                                         new Class[]{
-                                             IntegratedDataViewer.class,
-                                             Element.class });
-                if (ctor == null) {
-                    continue;
-                }
-                System.err.println ("class:" + publisherClass.getName());
-                System.err.println ("ctor:" + ctor);
-                Object obj =  ctor.newInstance(new Object[]{ idv,
-                                                             child });
-                System.err.println ("obj: " + obj);
-                System.err.println ("instance" + (obj instanceof IdvPublisher));
-                IdvPublisher idvPublisher =
-                    (IdvPublisher) ctor.newInstance(new Object[]{ idv,
-                                                                  child });
-                System.err.println ("OK-----");
-                idvPublisher.init();
-                publishers.add(idvPublisher);
-                System.err.println ("Got one");
-            } catch (Exception exc) {
-                LogUtil.logException("Creating publisher client", exc);
-            }
-        }
-
-        return publishers;
+    public boolean doInit() {
+        return true;
     }
 
+
+    public void initMenu(JMenu menu) {
+        menu.add(new JMenuItem("TEST"));
+    }
 
     /**
      * Used to prefix persistent properties.
