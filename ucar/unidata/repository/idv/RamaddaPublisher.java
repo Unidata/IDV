@@ -103,6 +103,9 @@ public class RamaddaPublisher
     }
 
 
+    public void initMenu(JMenu menu) {
+    }
+
 
     /**
      * Post the given file to the infocetera weblog

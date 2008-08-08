@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <publishers>
   <publisher
+     name="RAMADDA Publisher"
      class="ucar.unidata.repository.idv.RamaddaPublisher"/>
 </publishers>
