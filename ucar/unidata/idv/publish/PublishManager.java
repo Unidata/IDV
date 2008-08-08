@@ -37,6 +37,7 @@ import ucar.unidata.xml.XmlUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import ucar.unidata.xml.XmlResourceCollection;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -230,11 +231,15 @@ public class PublishManager extends IdvManager {
     public void initPublisher() {
         try {
             publishers = new ArrayList();
+            XmlResourceCollection resources = getIdv().getResourceManager().getXmlResources(
+                                                                                       IdvResourceManager.RSC_PUBLISHERS);
             //            if (true) return;
-            Element root =
-                XmlUtil.getRoot("/ucar/unidata/idv/resources/publishers.xml",
-                                getClass());
-            if (root != null) {
+            for (int resourceIdx = 0; resourceIdx < resources.size();
+                 resourceIdx++) {
+                Element root       = resources.getRoot(resourceIdx);
+                if(root == null) {
+                    continue;
+                }
                 publishers.addAll(IdvPublisher.getPublishers(getIdv(), root));
             }
         } catch (Exception exc) {

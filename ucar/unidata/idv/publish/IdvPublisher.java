@@ -134,7 +134,8 @@ public abstract class IdvPublisher {
                 Class publisherClass =
                     Misc.findClass(XmlUtil.getAttribute(child, ATTR_CLASS));
                 if (publisherClass == null) {
-                    continue;
+                    throw new IllegalArgumentException("Could not load publisher class:" + 
+                                                       XmlUtil.getAttribute(child, ATTR_CLASS));
                 }
                 Constructor ctor =
                     Misc.findConstructor(publisherClass,
@@ -144,11 +145,19 @@ public abstract class IdvPublisher {
                 if (ctor == null) {
                     continue;
                 }
+                System.err.println ("class:" + publisherClass.getName());
+                System.err.println ("ctor:" + ctor);
+                Object obj =  ctor.newInstance(new Object[]{ idv,
+                                                             child });
+                System.err.println ("obj: " + obj);
+                System.err.println ("instance" + (obj instanceof IdvPublisher));
                 IdvPublisher idvPublisher =
                     (IdvPublisher) ctor.newInstance(new Object[]{ idv,
                                                                   child });
+                System.err.println ("OK-----");
                 idvPublisher.init();
                 publishers.add(idvPublisher);
+                System.err.println ("Got one");
             } catch (Exception exc) {
                 LogUtil.logException("Creating publisher client", exc);
             }
