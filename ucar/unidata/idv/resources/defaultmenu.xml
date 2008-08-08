@@ -35,15 +35,9 @@
        action="action:bundle.favorite.save"
        mnemonic="F"/>
     <separator/>
-<!--
+    <menu label="Publish" id="publish">
+    </menu>
 
-	     <menu label="Publish" id="publish">
-	          <menuitem label="Message" action="jython:idv.getPublishManager().publishMessage ();" />
-	          <menuitem label="Current state" action="jython:idv.getPublishManager().publishState ();" />
-                  <separator/>
-	          <menu id="publish.config" label="Configure"/>
-	     </menu>
- -->
 <!--
     <menuitem
        label="Capture All Displays..."

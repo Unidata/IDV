@@ -423,6 +423,11 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                            "Publishers",
                            "publishers\\.xml$");
 
+    /** Publishers */
+    public static final IdvResource RSC_PUBLISHERTYPES =
+        new XmlIdvResource("idv.resource.publishertypes",
+                           "Publisher Types",
+                           "publishertypes\\.xml$");
 
 
     /** Maps location table full name  to table */
