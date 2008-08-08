@@ -127,7 +127,7 @@ public class PublishManager extends IdvManager {
                     public void actionPerformed(ActionEvent ae) {
                         try {
                             IdvPublisher newPublisher = (IdvPublisher)  ((IdvPublisher) theObject).cloneMe();
-                            if(newPublisher.doInit()) {
+                            if(newPublisher.doInitNew()) {
                                 publishers.add(newPublisher);
                                 getIdv().getStore().putEncodedFile("publishers.xml", publishers);
                             }
@@ -302,7 +302,7 @@ public class PublishManager extends IdvManager {
         if ( !publishCheck()) {
             return;
         }
-        getPublisher().doPublish(title, filePath, properties);
+        //        getPublisher().doPublish(title, filePath, properties);
     }
 
     /**

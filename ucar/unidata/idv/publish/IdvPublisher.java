@@ -72,13 +72,7 @@ import org.w3c.dom.NodeList;
  */
 public abstract class IdvPublisher implements Cloneable {
 
-    /**
-     * A helper attribute so we can call static routines in GuiUtils
-     *   without typing the whole class name
-     */
-    public static final GuiUtils GU = null;
-
-
+    private String name="Publisher";
 
     /** Reference to the IDV */
     IntegratedDataViewer idv;
@@ -88,7 +82,6 @@ public abstract class IdvPublisher implements Cloneable {
 
     /** The xml element that defined this publisher */
     Element initElement;
-
 
 
 
@@ -112,23 +105,20 @@ public abstract class IdvPublisher implements Cloneable {
     }
 
 
-    public boolean doInit() {
+    public boolean doInitNew() {
         return true;
     }
 
 
     public void initMenu(JMenu menu) {
-        menu.add(new JMenuItem("TEST"));
+        menu.add(GuiUtils.makeMenuItem("Publish to " + getName(),this,"doPublish"));
     }
 
-    /**
-     * Used to prefix persistent properties.
-     *
-     * @return The property prefix
-     */
-    public String getPropertyPrefix() {
-        return "publish." + id + ".";
+
+    public void doPublish() {
     }
+
+
 
     /**
      * Initialize this publisher. A hook so derived classes
@@ -136,96 +126,36 @@ public abstract class IdvPublisher implements Cloneable {
      */
     protected void init() {}
 
-    /**
-     * Write out the preferences held by this publisher.
-     * A hook for derived classes.
-     */
-    protected void savePreferences() {}
 
-
-    /**
-     * Publish the message and the given file
-     *
-     * @param subject The subject
-     * @param label The link label for the file
-     * @param msg The message
-     * @param file The file
-     * @param props The properties
-     */
-    public void publishMessageAndFile(String subject, String label,
-                                      String msg, String file,
-                                      Properties props) {
-        if ( !isConfigured()) {
-            if ( !configure()) {
-                return;
-            }
-        }
-        if ((subject != null) && (msg != null)) {
-            if ( !publishMessage(subject, label, msg, file, props)) {
-                return;
-            }
-        }
-        if (file != null) {
-            publishFile(file, props);
-        }
-    }
-
-    /**
-     * Has this publisher been configured.
-     *
-     * @return Is configured
-     */
-    public boolean isConfigured() {
-        return true;
-    }
 
     /**
      * Get the name of this publisher
      *
      * @return The name
      */
-    public abstract String getName();
-
-    /**
-     * Configure this publisher
-     *
-     * @return Was configuration successful
-     */
-    public abstract boolean configure();
-
-    /**
-     * Called by others to publish the given content
-     *
-     * @param title Title of content
-     * @param filePath File name that was saved (e.g., an image)
-     * @param properties Other properties
-     */
-    public abstract void doPublish(String title, final String filePath,
-                                   String properties);
-
-    /**
-     * Called by others to publish the given file
-     *
-     * @param file File name that was saved (e.g., an image)
-     * @param properties Other properties
-     * @return Was this successful
-     */
-    public abstract boolean publishFile(String file, Properties properties);
+    public abstract String getTypeName();
 
 
-    /**
-     * Called by others to publish the given content
-     *
-     * @param filename File name that was saved (e.g., an image)
-     * @param props Other properties
-     * @param subject The subject line
-     * @param label The Label
-     * @param msg The message
-     * @return Was this successful
-     */
-    public abstract boolean publishMessage(String subject, String label,
-                                           String msg, String filename,
-                                           Properties props);
+
+
+
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
 
 
 
