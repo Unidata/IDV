@@ -947,6 +947,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         metadataDefFiles.addAll(argMetadataDefFiles);
 
         debug = getProperty(PROP_DEBUG, false);
+        debug = true;
         //        System.err.println ("debug:" + debug);
 
         setUrlBase((String) properties.get(PROP_HTML_URLBASE));

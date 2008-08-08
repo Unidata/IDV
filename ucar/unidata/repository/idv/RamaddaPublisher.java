@@ -73,7 +73,7 @@ public class RamaddaPublisher
     extends ucar.unidata.idv.publish.IdvPublisher {
 
     /** _more_          */
-    private RepositoryClient client;
+    private RepositoryClient repositoryClient;
 
 
     /**
@@ -98,13 +98,11 @@ public class RamaddaPublisher
      *
      * @return The name
      */
-    public String getName() {
-        return "Ramadda repository";
+    public String getTypeName() {
+        return "RAMADDA repository";
     }
 
 
-    public void initMenu(JMenu menu) {
-    }
 
 
     /**
@@ -163,21 +161,28 @@ public class RamaddaPublisher
      *
      * @return Configuration ok
      */
-    public boolean configure() {
+    public boolean doInitNew() {
         try {
-            String     server      = ((client != null)
-                                      ? client.getHostname()
+            String     server      = ((repositoryClient != null)
+                                      ? repositoryClient.getHostname()
                                       : "");
-            String     user        = ((client != null)
-                                      ? client.getUser()
+            String     user        = ((repositoryClient != null)
+                                      ? repositoryClient.getUser()
                                       : "");
-            String     password    = ((client != null)
-                                      ? client.getPassword()
+            String     password    = ((repositoryClient != null)
+                                      ? repositoryClient.getPassword()
                                       : "");
 
+            String path = ((repositoryClient!=null?repositoryClient.getUrlBase():"/repository"));
+            int port = (repositoryClient!=null?repositoryClient.getPort():80);
+            JTextField nameFld   = new JTextField(getName(), 30);
             JTextField serverFld   = new JTextField((server == null)
                     ? ""
                     : server, 30);
+            JTextField pathFld   = new JTextField((path == null)
+                    ? ""
+                    : path, 30);
+            JTextField portFld   = new JTextField(""+port);
             JTextField passwordFld = new JTextField((password == null)
                     ? ""
                     : password, 30);
@@ -185,8 +190,15 @@ public class RamaddaPublisher
                     ? ""
                     : user, 30);
             List       comps       = new ArrayList();
+            comps.add(GuiUtils.rLabel("Name:"));
+            comps.add(GuiUtils.inset(nameFld, 4));
+
             comps.add(GuiUtils.rLabel("Server:"));
             comps.add(GuiUtils.inset(serverFld, 4));
+            comps.add(GuiUtils.rLabel("Port:"));
+            comps.add(GuiUtils.inset(portFld, 4));
+            comps.add(GuiUtils.rLabel("Base Path:"));
+            comps.add(GuiUtils.inset(pathFld, 4));
             comps.add(GuiUtils.rLabel("User name:"));
             comps.add(GuiUtils.inset(userFld, 4));
             comps.add(GuiUtils.rLabel("Password:"));
@@ -202,14 +214,15 @@ public class RamaddaPublisher
                         "Configure access to Infocetera weblog", p)) {
                     return false;
                 }
-                client = new RepositoryClient(serverFld.getText().trim(), 80,
-                        "/repository");
-                client.setUser(userFld.getText());
-                client.setPassword(passwordFld.getText());
-                if ( !isConfigured()) {
-                    LogUtil.userMessage(
-                        "One or more of the given values is null");
+                setName(nameFld.getText());
+                repositoryClient = new RepositoryClient(serverFld.getText().trim(), new Integer(portFld.getText().trim()).intValue(),
+                                              pathFld.getText().trim());
+                repositoryClient.setUser(userFld.getText());
+                repositoryClient.setPassword(passwordFld.getText());
+                if (!isConfigured()) {
+                    LogUtil.userMessage("Configuration failed");
                 } else {
+                    LogUtil.userMessage("Configuration succeeded");
                     break;
                 }
             }
@@ -222,18 +235,22 @@ public class RamaddaPublisher
 
 
 
+
+
+
+
     /**
      * _more_
      *
      * @return _more_
      */
     public boolean isConfigured() {
-        if (client == null) {
+        if (repositoryClient == null) {
             return false;
         }
         try {
-            if ( !client.getIsValidSession()) {
-                return client.doLogin();
+            if (!repositoryClient.getIsValidSession()) {
+                return repositoryClient.doLogin();
             }
         } catch (Exception exc) {
             LogUtil.logException("Doing configuration", exc);
@@ -249,9 +266,9 @@ public class RamaddaPublisher
      * @param filePath _more_
      * @param properties _more_
      */
-    public void doPublish(String title, final String filePath,
-                          String properties) {
+    public void doPublish() {
         try {
+
             if ( !isConfigured()) {
                 return;
             }
@@ -262,20 +279,6 @@ public class RamaddaPublisher
     }
 
 
-    /**
-     * Post the message and the file to the infocetera weblogp
-     *
-     * @param subject The subject
-     * @param label The label for the link
-     * @param msg The weblog message
-     * @param filename Filename to post
-     * @param props  The properties that contain the infocetera dirpath
-     * @return Was this successful
-     */
-    public boolean publishMessage(String subject, String label, String msg,
-                                  String filename, Properties props) {
-        return false;
-    }
 
     /**
      *
@@ -317,6 +320,28 @@ public class RamaddaPublisher
      *   return true;
      * }
      */
+
+    /**
+       Set the RepositoryClient property.
+
+       @param value The new value for RepositoryClient
+    **/
+    public void setRepositoryClient (RepositoryClient value) {
+	repositoryClient = value;
+    }
+
+    /**
+       Get the RepositoryClient property.
+
+       @return The RepositoryClient
+    **/
+    public RepositoryClient getRepositoryClient () {
+	return repositoryClient;
+    }
+
+
+
+
 
 
 }

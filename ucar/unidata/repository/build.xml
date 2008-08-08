@@ -55,7 +55,9 @@
             compress="true"
             jarfile="${jars_dest}/ramaddaplugin.jar"
         >
+<!--
             <include name="ucar/unidata/repository/**/*.class"/>
+-->
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
 	    </jar>
 

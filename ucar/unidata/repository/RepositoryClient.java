@@ -57,6 +57,9 @@ public class RepositoryClient extends RepositoryBase {
     /** _more_          */
     private String password;
 
+    public RepositoryClient() {}
+
+
     /**
      * _more_
      *
@@ -81,7 +84,6 @@ public class RepositoryClient extends RepositoryBase {
      * @throws Exception _more_
      */
     public boolean getIsValidSession() throws Exception {
-        sessionId = "foo";
         if (sessionId == null) {
             return false;
         }
@@ -107,7 +109,7 @@ public class RepositoryClient extends RepositoryBase {
     public boolean doLogin() throws Exception {
         while (true) {
             String url =
-                HtmlUtil.url(URL_USER_HOME.getFullUrl(),
+                HtmlUtil.url(URL_USER_LOGIN.getFullUrl(),
                              new String[] {
                 ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
                 ARG_USER_ID, getUser()

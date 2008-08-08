@@ -201,8 +201,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     private boolean clientMode = false;
 
 
-    public RepositoryBase() 
-            throws Exception {
+    public RepositoryBase() {
     }
 
 

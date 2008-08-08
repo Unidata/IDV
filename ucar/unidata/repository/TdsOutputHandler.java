@@ -70,17 +70,12 @@ import javax.servlet.http.*;
 
 
 /**
- * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
 public class TdsOutputHandler extends OutputHandler {
-
-
-    //    public static void processScript(String scriptFile) throws Exception {
-
 
     /** _more_ */
     public static final String OUTPUT_TDS = "tds";
@@ -90,31 +85,27 @@ public class TdsOutputHandler extends OutputHandler {
     private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
                                                             Boolean>();
 
-    /** _more_          */
-    private boolean tdsEnabled = false;
-
 
     /**
      *     _more_
      *
      *     @param repository _more_
      *     @param element _more_
-     *     @throws Exception _more_
+     *     @throws Exception On badness
      */
     public TdsOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        tdsEnabled = true;
     }
 
 
     /**
-     * _more_
+     * Can we handle this output type
      *
      *
-     * @param output _more_
+     * @param output The output type
      *
-     * @return _more_
+     * @return Is it tds?
      */
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_TDS);
@@ -130,13 +121,13 @@ public class TdsOutputHandler extends OutputHandler {
      * @param entry _more_
      * @param types _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     protected void getOutputTypesForEntry(Request request, Entry entry,
                                           List<OutputType> types)
             throws Exception {
-
-        //        if(    request.getHttpServletRequest()==null) return;
+        //If we aren't in the tomcat world then exit
+        if(request.getHttpServletRequest()==null) return;
         if (canLoad(entry)) {
             types.add(new OutputType("TDS", OUTPUT_TDS) {
                 public String assembleUrl(Request request) {
@@ -158,22 +149,17 @@ public class TdsOutputHandler extends OutputHandler {
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":" + OUTPUT_TDS + "/" + ARG_ID + ":"
                + entry.getId() + "/entry.das";
-        //        return getRepository().URL_ENTRY_SHOW.getPath() +"/" + ARG_OUTPUT+":" + OUTPUT_TDS +"/" + ARG_ID +":" +
-        //            entry.getId() +"/entry.das";
     }
 
 
     /**
-     * _more_
+     * Can the given entry be served by the tds
      *
-     * @param entry _more_
+     * @param entry The entry
      *
-     * @return _more_
+     * @return Can the given entry be served by the tds
      */
     public boolean canLoad(Entry entry) {
-        if ( !tdsEnabled) {
-            return false;
-        }
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -197,17 +183,18 @@ public class TdsOutputHandler extends OutputHandler {
 
 
     /**
-     * _more_
+     * Serve up the entry
      *
      * @param request _more_
      * @param entry _more_
      *
      * @return _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
+        //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry) {
             public ServletConfig getServletConfig() {
                 return request.getHttpServlet().getServletConfig();
@@ -226,6 +213,7 @@ public class TdsOutputHandler extends OutputHandler {
         servlet.init(request.getHttpServlet().getServletConfig());
         servlet.doGet(request.getHttpServletRequest(),
                       request.getHttpServletResponse());
+        //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
         Result result = new Result("");
         result.setNeedToWrite(false);
         return result;
@@ -266,9 +254,9 @@ public class TdsOutputHandler extends OutputHandler {
          *
          * @return _more_
          *
-         * @throws DAP2Exception _more_
-         * @throws IOException _more_
-         * @throws ParseException _more_
+         * @throws DAP2Exception On badness
+         * @throws IOException On badness
+         * @throws ParseException On badness
          */
         protected GuardedDataset getDataset(ReqState preq)
                 throws DAP2Exception, IOException, ParseException {
