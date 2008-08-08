@@ -1670,32 +1670,11 @@ public class IdvUIManager extends IdvManager {
 
 
         final JMenu publishMenu = (JMenu) menuMap.get(MENU_PUBLISH);
-        final JMenu publishConfigMenu =
-            (JMenu) menuMap.get(MENU_PUBLISH_CONFIG);
-        if (publishConfigMenu != null) {
-            if ( !getPublishManager().isPublishingEnabled()) {
-                publishConfigMenu.getParent().remove(publishConfigMenu);
-            } else {
-                for (int i = 0;
-                        i < getPublishManager().getPublishers().size(); i++) {
-                    IdvPublisher p =
-                        (IdvPublisher) getPublishManager().getPublishers()
-                            .get(i);
-                    JMenuItem mi = new JMenuItem(p.getName());
-                    publishConfigMenu.add(mi);
-                    mi.addActionListener(new ObjectListener(p) {
-                        public void actionPerformed(ActionEvent ae) {
-                            ((IdvPublisher) theObject).configure();
-                        }
-                    });
-                }
-
-            }
-        }
-
         if (publishMenu != null) {
             if ( !getPublishManager().isPublishingEnabled()) {
                 publishMenu.getParent().remove(publishMenu);
+            } else {
+                getPublishManager().initMenu(publishMenu);
             }
         }
 
