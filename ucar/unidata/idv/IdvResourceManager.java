@@ -417,6 +417,14 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                          "nj.*Config\\.xml$");
 
 
+    /** Publishers */
+    public static final IdvResource RSC_PUBLISHERS =
+        new XmlIdvResource("idv.resource.publishers",
+                           "Publishers",
+                           "publishers\\.xml$");
+
+
+
     /** Maps location table full name  to table */
     private Hashtable locationFullNameMap = new Hashtable();
 
