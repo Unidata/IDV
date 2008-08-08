@@ -118,7 +118,7 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_SETTINGS, getUserManager().URL_USER_LIST, URL_ADMIN_STATS,
+        URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST, URL_ADMIN_STATS,
         getHarvesterManager().URL_HARVESTERS_LIST,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */

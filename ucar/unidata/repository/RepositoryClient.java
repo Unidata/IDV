@@ -46,7 +46,7 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class RepositoryClient extends Repository {
+public class RepositoryClient extends RepositoryBase {
 
     /** _more_          */
     private String sessionId;
@@ -86,7 +86,7 @@ public class RepositoryClient extends Repository {
             return false;
         }
         String url =
-            HtmlUtil.url(getUserManager().URL_USER_HOME.getFullUrl(),
+            HtmlUtil.url(URL_USER_HOME.getFullUrl(),
                          new String[] { ARG_OUTPUT,
                                         "xml", ARG_SESSIONID, sessionId });
         String  contents = IOUtil.readContents(url, getClass());
@@ -107,7 +107,7 @@ public class RepositoryClient extends Repository {
     public boolean doLogin() throws Exception {
         while (true) {
             String url =
-                HtmlUtil.url(getUserManager().URL_USER_HOME.getFullUrl(),
+                HtmlUtil.url(URL_USER_HOME.getFullUrl(),
                              new String[] {
                 ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
                 ARG_USER_ID, getUser()

@@ -99,106 +99,11 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository implements Constants, Tables, RequestHandler,
-                                   RepositorySource {
-
-
+public class Repository extends RepositoryBase implements  Tables, RequestHandler {
 
     /** _more_ */
     public static final String GROUP_TOP = "Top";
 
-    /** _more_ */
-    public RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
-
-
-    /** _more_ */
-    public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
-
-    /** _more_ */
-    public RequestUrl URL_DUMMY = new RequestUrl(this, "/dummy");
-
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
-                                                 "/entry/searchform");
-
-    /** _more_ */
-    public RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
-                                              "/comments/show");
-
-    /** _more_ */
-    public RequestUrl URL_COMMENTS_ADD = new RequestUrl(this,
-                                             "/comments/add");
-
-    /** _more_ */
-    public RequestUrl URL_COMMENTS_EDIT = new RequestUrl(this,
-                                              "/comments/edit");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
-                                             "/entry/search");
-
-    public RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(this,
-                                             "/entry/xmlcreate");
-
-
-    /** _more_ */
-    public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
-                                                "/association/add");
-
-    /** _more_          */
-    public RequestUrl URL_ASSOCIATION_DELETE = new RequestUrl(this,
-                                                   "/association/delete");
-
-    /** _more_ */
-    public RequestUrl URL_LIST_HOME = new RequestUrl(this, "/list/home");
-
-    /** _more_ */
-    public RequestUrl URL_LIST_SHOW = new RequestUrl(this, "/list/show");
-
-    /** _more_ */
-    public RequestUrl URL_GRAPH_VIEW = new RequestUrl(this, "/graph/view");
-
-    /** _more_ */
-    public RequestUrl URL_GRAPH_GET = new RequestUrl(this, "/graph/get");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_SHOW = new RequestUrl(this, "/entry/show",
-                                           "View Entry");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_COPY = new RequestUrl(this, "/entry/copy");
-
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
-                                             "/entry/delete", "Delete");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_DELETELIST = new RequestUrl(this,
-                                                 "/entry/deletelist");
-
-
-    /** _more_ */
-    public RequestUrl URL_ACCESS_FORM = new RequestUrl(this, "/access/form",
-                                            "Access");
-
-
-    /** _more_ */
-    public RequestUrl URL_ACCESS_CHANGE = new RequestUrl(this,
-                                              "/access/change");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_CHANGE = new RequestUrl(this,
-                                             "/entry/change");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form",
-                                           "Edit Entry");
-
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_NEW = new RequestUrl(this, "/entry/new");
 
 
     /** _more_ */
@@ -212,11 +117,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /** _more_ */
-    public RequestUrl URL_GETENTRIES = new RequestUrl(this, "/getentries");
-
-    /** _more_ */
-    public RequestUrl URL_ENTRY_GET = new RequestUrl(this, "/entry/get");
 
 
     /** _more_ */
@@ -224,11 +124,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private static final int ENTRY_CACHE_LIMIT = 5000;
-
-
-    /** _more_ */
-    public static final GregorianCalendar calendar =
-        new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
 
 
@@ -252,9 +147,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Properties dbProperties = new Properties();
 
-
-    /** _more_ */
-    private String urlBase = "/repository";
 
     /** _more_ */
     private long baseTime = System.currentTimeMillis();
@@ -331,18 +223,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     String[] args;
 
 
-    /** _more_ */
-    private String hostname;
-
-    /** _more_ */
-    private int port;
-
     /** _more_          */
     private boolean inTomcat = false;
 
 
-    /** _more_ */
-    private boolean clientMode = false;
 
     /** _more_ */
     private File logFile;
@@ -404,13 +288,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    public Repository(String hostname, int port)
-            throws Exception {
-        this(new String[]{}, hostname, port, false, false);
-    }
-
-
-
     /**
      * _more_
      *
@@ -424,30 +301,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     public Repository(String[] args, String hostname, int port,
                       boolean inTomcat)
             throws Exception {
-        this(args, hostname, port, inTomcat, false);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param args _more_
-     * @param hostname _more_
-     * @param port _more_
-     * @param inTomcat _more_
-     * @param clientMode _more_
-     *
-     * @throws Exception _more_
-     */
-    private Repository(String[] args, String hostname, int port,
-                       boolean inTomcat, boolean clientMode)
-            throws Exception {
-        this.clientMode = clientMode;
-        this.inTomcat   = inTomcat;
+        super(hostname,port);
+        this.inTomcat = inTomcat;
         this.args       = args;
-        this.hostname   = hostname;
-        this.port       = port;
     }
 
 
@@ -531,9 +387,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected void init(Properties properties) throws Exception {
         initProperties(properties);
-        if ( !clientMode) {
-            initServer();
-        }
+        initServer();
     }
 
 
@@ -1095,9 +949,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         debug = getProperty(PROP_DEBUG, false);
         //        System.err.println ("debug:" + debug);
 
-        urlBase = (String) properties.get(PROP_HTML_URLBASE);
-        if (urlBase == null) {
-            urlBase = BLANK;
+        setUrlBase((String) properties.get(PROP_HTML_URLBASE));
+        if (getUrlBase() == null) {
+            setUrlBase(BLANK);
         }
 
         logFile =
@@ -6696,65 +6550,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /**
-     * _more_
-     *
-     * @param url _more_
-     *
-     * @return _more_
-     */
-    public String absoluteUrl(String url) {
-        return "http://" + hostname + ":" + port + url;
-    }
-
-    /**
-     * _more_
-     *
-     * @param url _more_
-     *
-     * @return _more_
-     */
-    public String httpsUrl(String url) {
-        return "https://" + hostname + ":" + port + url;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getHostname() {
-        return hostname;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param hostname _more_
-     * @param port _more_
-     */
-    public void setHostname(String hostname, int port) {
-        this.hostname = hostname;
-        this.port     = port;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param f _more_
-     *
-     * @return _more_
-     */
-    public String fileUrl(String f) {
-        return urlBase + f;
-    }
 
 
     /**
@@ -7325,25 +7120,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-
-
-    /**
-     * Set the UrlBase property.
-     *
-     * @param value The new value for UrlBase
-     */
-    public void setUrlBase(String value) {
-        urlBase = value;
-    }
-
-    /**
-     * Get the UrlBase property.
-     *
-     * @return The UrlBase
-     */
-    public String getUrlBase() {
-        return urlBase;
-    }
 
 
 

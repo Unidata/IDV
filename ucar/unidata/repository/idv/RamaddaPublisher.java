@@ -21,9 +21,10 @@
  */
 
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.idv;
 
-import ucar.unidata.idv.publish.*;
+import ucar.unidata.idv.publish.IdvPublisher;
+
 import HTTPClient.*;
 
 import org.w3c.dom.Element;
@@ -68,7 +69,8 @@ import javax.swing.*;
  *
  * @author IDV development team
  */
-public class RamaddaPublisher extends IdvPublisher {
+public class RamaddaPublisher 
+    extends ucar.unidata.idv.publish.IdvPublisher {
 
     /** _more_          */
     private RepositoryClient client;
@@ -86,8 +88,8 @@ public class RamaddaPublisher extends IdvPublisher {
      *
      * @param idv The idv
      */
-    public RamaddaPublisher(IntegratedDataViewer idv) {
-        super(idv, null);
+    public RamaddaPublisher(IntegratedDataViewer idv, Element element) {
+        super(idv, element);
     }
 
 

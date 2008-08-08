@@ -8,6 +8,7 @@
         <property  name="version" value="0.1"/>
         <property  name="build.sysclasspath" value="ignore"/>
         <property name="srcdir" value="${basedir}"/>
+        <property name="failonerror" value="true"/>
         <property name="compiledir" value="${srcdir}"/>
         <property name="srcversion" value="1.5"/>
         <property name="jars_dest" value="${basedir}/lib"/>
@@ -31,6 +32,38 @@
 
 
     <target name="all" depends="lib,ramaddajar,release,war">
+    </target>
+
+
+    <target name="idvplugin" depends="init">
+        <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
+        <javac
+            classpath="${pluginclasspath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+           target="1.5"
+        >
+        <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
+        </javac>
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/ramaddaplugin.jar"
+        >
+            <include name="ucar/unidata/repository/**/*.class"/>
+            <include name="ucar/unidata/repository/idv/publishers.xml"/>
+	    </jar>
+
+        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+             <fileset file="${jars_dest}/ramaddaplugin.jar"/>
+        </copy>
+
+
     </target>
 
 

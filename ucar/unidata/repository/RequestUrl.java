@@ -74,8 +74,8 @@ public class RequestUrl {
      * @return _more_
      */
     public String getFullUrl(String suffix) {
-        return repositorySource.getRepository().absoluteUrl(
-            repositorySource.getRepository().getUrlBase() + path) + suffix;
+        return repositorySource.getRepositoryBase().absoluteUrl(
+            repositorySource.getRepositoryBase().getUrlBase() + path) + suffix;
     }
 
     /**
@@ -86,8 +86,8 @@ public class RequestUrl {
      * @return _more_
      */
     public String getHttpsUrl(String suffix) {
-        return repositorySource.getRepository().httpsUrl(
-            repositorySource.getRepository().getUrlBase() + path) + suffix;
+        return repositorySource.getRepositoryBase().httpsUrl(
+            repositorySource.getRepositoryBase().getUrlBase() + path) + suffix;
     }
 
     /**
@@ -96,8 +96,8 @@ public class RequestUrl {
      * @return _more_
      */
     public String getFullUrl() {
-        return repositorySource.getRepository().absoluteUrl(
-            repositorySource.getRepository().getUrlBase() + path);
+        return repositorySource.getRepositoryBase().absoluteUrl(
+            repositorySource.getRepositoryBase().getUrlBase() + path);
     }
 
     /**
@@ -106,7 +106,7 @@ public class RequestUrl {
      * @return _more_
      */
     public String toString() {
-        return repositorySource.getRepository().getUrlBase() + path;
+        return repositorySource.getRepositoryBase().getUrlBase() + path;
     }
 
 
@@ -118,7 +118,7 @@ public class RequestUrl {
      * @return _more_
      */
     public String getUrl(String collectionPath) {
-        return repositorySource.getRepository().getUrlBase() + "/"
+        return repositorySource.getRepositoryBase().getUrlBase() + "/"
                + collectionPath + path;
     }
 

@@ -122,6 +122,11 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    public RepositoryBase getRepositoryBase() {
+        return repository;
+    }
+
+
     /**
      * _more_
      *
