@@ -47,7 +47,6 @@ import ucar.unidata.idv.control.WMSControl;
 import ucar.unidata.idv.control.WMSInfo;
 
 import ucar.unidata.idv.publish.PublishManager;
-import ucar.unidata.idv.publish.ThreddsPublisher;
 
 
 import ucar.unidata.idv.ui.*;
@@ -2963,13 +2962,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
 
-    /**
-     * For now a hack for John's demo
-     */
-    public void publishToThredds() {
-        ThreddsPublisher pub = new ThreddsPublisher(this);
-        pub.publish();
-    }
 
     /**
      * Print cache statistics
