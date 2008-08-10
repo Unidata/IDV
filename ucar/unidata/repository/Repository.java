@@ -3683,6 +3683,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         try {
             return processEntryXmlCreateInner(request);
         } catch(Exception exc) {
+            System.err.println ("request:" + request);
+
             if(request.getOutput().equals("xml")) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),""+exc),MIME_XML);
             }

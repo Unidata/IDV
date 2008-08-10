@@ -250,7 +250,8 @@ public class RepositoryServer extends HttpServer implements Constants {
                 if (repository.getHostname() == null) {
                     String hostname =
                         getSocket().getLocalAddress().getHostName();
-                    repository.setHostname(hostname, getPort());
+                    repository.setHostname(hostname);
+                    repository.setPort(getPort());
                 }
 
 

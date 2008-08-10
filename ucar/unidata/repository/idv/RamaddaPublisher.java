@@ -37,6 +37,7 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.repository.RepositoryClient;
 
+import ucar.unidata.ui.HttpFormEntry;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 
@@ -64,9 +65,6 @@ import javax.swing.*;
 
 
 /**
- * Note, This is very much in flux.
- * A client to an infocetera weblog (see: http://www.infocetera.com).
- *
  * @author IDV development team
  */
 public class RamaddaPublisher 
@@ -90,8 +88,14 @@ public class RamaddaPublisher
      */
     public RamaddaPublisher(IntegratedDataViewer idv, Element element) {
         super(idv, element);
+        repositoryClient = new RepositoryClient();
     }
 
+
+    public String getName () {
+        if(repositoryClient!=null) return repositoryClient.getName();
+        return super.getName();
+    }
 
     /**
      * What is the name of this publisher
@@ -106,137 +110,13 @@ public class RamaddaPublisher
 
 
     /**
-     * Post the given file to the infocetera weblog
-     *
-     * @param file The file to post
-     * @param props  The properties that contain the infocetera dirpath
-     * @return Was this successful
-     */
-    public boolean publishFile(String file, Properties props) {
-        return false;
-    }
-
-    /*
-
-        try {
-            HTTPClient.NVPair[] opts = { new HTTPClient.NVPair("NAME", ""),
-                                         new HTTPClient.NVPair("DESC", ""),
-                                         new HTTPClient.NVPair("OVERWRITE",
-                                             "1"),
-                                         new HTTPClient.NVPair("_user", user),
-                                         new HTTPClient.NVPair("_password",
-                                             password) };
-
-            HTTPClient.NVPair[] files = { new HTTPClient.NVPair("FILE",
-                                            file) };
-            HTTPClient.NVPair[] hdrs           = new HTTPClient.NVPair[1];
-            byte[] formData = Codecs.mpFormDataEncode(opts, files, hdrs);
-            HTTPConnection      conn           = getConnection();
-            String              fileUploadPath = getDir(props) + "/files_put";
-            HTTPResponse res = conn.Post(fileUploadPath, formData, hdrs);
-            if (res.getStatusCode() >= 300) {
-                LogUtil.userErrorMessage(new String(res.getData()));
-                return false;
-            }
-            byte[] data = res.getData();
-            String html = new String(data);
-            if ( !resultOk(html)) {
-                showError("An error has occurred posting the file", html);
-                return false;
-            }
-            return true;
-
-        } catch (Exception exc) {
-            LogUtil.logException("Posting file", exc);
-            return false;
-        }
-    }
-    */
-
-
-
-
-    /**
      * Do the configuration
      *
      * @return Configuration ok
      */
     public boolean doInitNew() {
-        try {
-            String     server      = ((repositoryClient != null)
-                                      ? repositoryClient.getHostname()
-                                      : "");
-            String     user        = ((repositoryClient != null)
-                                      ? repositoryClient.getUser()
-                                      : "");
-            String     password    = ((repositoryClient != null)
-                                      ? repositoryClient.getPassword()
-                                      : "");
-
-            String path = ((repositoryClient!=null?repositoryClient.getUrlBase():"/repository"));
-            int port = (repositoryClient!=null?repositoryClient.getPort():80);
-            JTextField nameFld   = new JTextField(getName(), 30);
-            JTextField serverFld   = new JTextField((server == null)
-                    ? ""
-                    : server, 30);
-            JTextField pathFld   = new JTextField((path == null)
-                    ? ""
-                    : path, 30);
-            JTextField portFld   = new JTextField(""+port);
-            JTextField passwordFld = new JTextField((password == null)
-                    ? ""
-                    : password, 30);
-            JTextField userFld     = new JTextField((user == null)
-                    ? ""
-                    : user, 30);
-            List       comps       = new ArrayList();
-            comps.add(GuiUtils.rLabel("Name:"));
-            comps.add(GuiUtils.inset(nameFld, 4));
-
-            comps.add(GuiUtils.rLabel("Server:"));
-            comps.add(GuiUtils.inset(serverFld, 4));
-            comps.add(GuiUtils.rLabel("Port:"));
-            comps.add(GuiUtils.inset(portFld, 4));
-            comps.add(GuiUtils.rLabel("Base Path:"));
-            comps.add(GuiUtils.inset(pathFld, 4));
-            comps.add(GuiUtils.rLabel("User name:"));
-            comps.add(GuiUtils.inset(userFld, 4));
-            comps.add(GuiUtils.rLabel("Password:"));
-            comps.add(GuiUtils.inset(passwordFld, 4));
-            JPanel p = GuiUtils.doLayout(comps, 2, GuiUtils.WT_Y,
-                                         GuiUtils.WT_NNY);
-            p = GuiUtils.topCenter(
-                GuiUtils.cLabel("Please provide the following information"),
-                p);
-
-            while (true) {
-                if ( !GuiUtils.askOkCancel(
-                        "Configure access to Infocetera weblog", p)) {
-                    return false;
-                }
-                setName(nameFld.getText());
-                repositoryClient = new RepositoryClient(serverFld.getText().trim(), new Integer(portFld.getText().trim()).intValue(),
-                                              pathFld.getText().trim());
-                repositoryClient.setUser(userFld.getText());
-                repositoryClient.setPassword(passwordFld.getText());
-                if (!isConfigured()) {
-                    LogUtil.userMessage("Configuration failed");
-                } else {
-                    LogUtil.userMessage("Configuration succeeded");
-                    break;
-                }
-            }
-            return true;
-        } catch (Exception exc) {
-            LogUtil.logException("Doing configuration", exc);
-            return false;
-        }
+        return isConfigured();
     }
-
-
-
-
-
 
 
     /**
@@ -245,18 +125,10 @@ public class RamaddaPublisher
      * @return _more_
      */
     public boolean isConfigured() {
-        if (repositoryClient == null) {
-            return false;
+        if(repositoryClient==null) {
+            repositoryClient = new RepositoryClient();
         }
-        try {
-            if (!repositoryClient.getIsValidSession()) {
-                return repositoryClient.doLogin();
-            }
-        } catch (Exception exc) {
-            LogUtil.logException("Doing configuration", exc);
-            return false;
-        }
-        return true;
+        return repositoryClient.doConnect();
     }
 
     /**
@@ -267,59 +139,51 @@ public class RamaddaPublisher
      * @param properties _more_
      */
     public void doPublish() {
+        if ( !isConfigured()) {
+            return;
+        }
         try {
 
-            if ( !isConfigured()) {
+//URL_ENTRY_XMLCREATE
+
+            List entries = new ArrayList();
+            entries.
+            String[]result = HttpFormEntry.doPost(entries, 
+                                                  repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
+
+            System.err.println("result:" + result[0]+" " + result[1]);
+            /*
+            String file = "foo";
+            HTTPClient.NVPair[] opts = { new HTTPClient.NVPair(RepositoryClient.ARG_SESSIONID, repositoryClient.getSessionId()),
+                                         new HTTPClient.NVPair(RepositoryClient.ARG_OUTPUT, "xml")};
+
+            HTTPClient.NVPair[] files = { new HTTPClient.NVPair(RepositoryClient.ARG_FILE,
+                                            file) };
+            HTTPClient.NVPair[] hdrs           = new HTTPClient.NVPair[1];
+            byte[] formData = Codecs.mpFormDataEncode(opts, files, hdrs);
+            HTTPConnection      conn           = new HTTPConnection(repositoryClient.getHostname(),
+                                                                    repositoryClient.getPort());
+            String              fileUploadPath = .toString();
+            HTTPResponse res = conn.Post(fileUploadPath, formData, hdrs);
+            String xml = new String(res.getData());
+            if (res.getStatusCode() >= 300) {
+                LogUtil.userErrorMessage(new String(res.getData()));
                 return;
             }
+
+            System.err.println("xml:" + xml);
+            */
+            //            if ( !resultOk(html)) {
+            //                showError("An error has occurred posting the file", html);
+            //            }
         } catch (Exception exc) {
-            LogUtil.logException("Checking session", exc);
+            LogUtil.logException("Publishing", exc);
         }
+
 
     }
 
 
-
-    /**
-     *
-     *   try {
-     *       String link = "";
-     *       if (filename != null) {
-     *       }
-     *
-     *       HTTPClient.NVPair[] opts = {
-     *           new HTTPClient.NVPair("entryTitle", subject),
-     *           new HTTPClient.NVPair("response", "xml"),
-     *           new HTTPClient.NVPair("entryLink", link),
-     *           new HTTPClient.NVPair("entryLabel", label),
-     *           new HTTPClient.NVPair("entryContent", msg),
-     *           new HTTPClient.NVPair("dopublish", "1"),
-     *           new HTTPClient.NVPair("_user", user),
-     *           new HTTPClient.NVPair("_password", password)
-     *       };
-     *
-     *       HTTPConnection conn         = getConnection();
-     *       String         blogPostPath = getDir(props) + "/blog_change";
-     *       HTTPResponse   res          = conn.Post(blogPostPath, opts);
-     *       if (res.getStatusCode() >= 300) {
-     *           LogUtil.userErrorMessage(new String(res.getData()));
-     *           return false;
-     *       }
-     *       byte[] data = res.getData();
-     *       String html = new String(data);
-     *       System.err.println("html:" + html);
-     *       if ( !resultOk(html)) {
-     *           showError("An error has occurred posting to the weblog",
-     *                     html);
-     *           return false;
-     *       }
-     *   } catch (Exception exc) {
-     *       LogUtil.logException("Posting message", exc);
-     *       return false;
-     *   }
-     *   return true;
-     * }
-     */
 
     /**
        Set the RepositoryClient property.

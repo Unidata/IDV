@@ -35,6 +35,8 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.*;
 
 import javax.swing.*;
@@ -52,12 +54,81 @@ public class RepositoryClient extends RepositoryBase {
     private String sessionId;
 
     /** _more_          */
-    private String user;
+    private String user="";
 
     /** _more_          */
-    private String password;
+    private String password="";
+
+    private String name = "RAMADDA Client";
+
 
     public RepositoryClient() {}
+
+
+    public boolean  doConnect() {
+        String[]msg = new String[]{""};
+
+        if(!isValidSession(true, msg)) {
+            if(user.length()!=0) {
+                JLabel lbl = new JLabel("<html>Could not connect to RAMADDA:<blockquote>" + msg[0]+"</blockquote>Do you want to configure the connection?</html>");
+                if(!GuiUtils.showOkCancelDialog(null,"RAMADDA Connection Error", GuiUtils.inset(lbl,5),null)) return false;
+            }
+            return showConfigDialog();
+        }
+        return true;
+    }
+
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    private boolean  showConfigDialog() {
+        JTextField nameFld   = new JTextField(name, 30);
+        JTextField serverFld   = new JTextField(getHostname(),30);
+        JTextField pathFld   = new JTextField(getUrlBase(),30);
+        JTextField portFld   = new JTextField(""+getPort());
+        JTextField passwordFld = new JPasswordField(password);
+        JTextField userFld     = new JTextField(user,30);
+        List       comps       = new ArrayList();
+        comps.add(GuiUtils.rLabel("Name:"));
+        comps.add(GuiUtils.inset(nameFld, 4));
+        comps.add(GuiUtils.rLabel("Server:"));
+        comps.add(GuiUtils.inset(serverFld, 4));
+        comps.add(GuiUtils.rLabel("Port:"));
+        comps.add(GuiUtils.inset(portFld, 4));
+        comps.add(GuiUtils.rLabel("Base Path:"));
+        comps.add(GuiUtils.inset(pathFld, 4));
+        comps.add(GuiUtils.rLabel("User name:"));
+        comps.add(GuiUtils.inset(userFld, 4));
+        comps.add(GuiUtils.rLabel("Password:"));
+        comps.add(GuiUtils.inset(passwordFld, 4));
+        JPanel contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_Y,
+                                     GuiUtils.WT_NNY);
+        contents = GuiUtils.topCenter(
+                               GuiUtils.cLabel("Please provide the following information"),
+                               contents);
+
+        while (true) {
+            if ( !GuiUtils.askOkCancel(
+                                       "Configure access to RAMADDA", contents)) {
+                return false;
+            }
+            setName(nameFld.getText());
+            setHostname(serverFld.getText().trim());
+            setPort(new Integer(portFld.getText().trim()).intValue());
+            setUrlBase(pathFld.getText().trim());
+            user = userFld.getText().trim();
+            password = passwordFld.getText().trim();
+            String[]msg = {""};
+            if (isValidSession(true,msg)) {
+                LogUtil.userMessage("Configuration succeeded");
+                break;
+            } 
+            LogUtil.userMessage(msg[0]);
+        }
+        return true;
+    }
 
 
     /**
@@ -76,6 +147,15 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
+    public boolean isValidSession(boolean doLogin, String[]msg) {
+        if(!isValidSession(msg)) {
+            if(doLogin)  return doLogin(msg);
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * _more_
      *
@@ -83,18 +163,32 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @throws Exception _more_
      */
-    public boolean getIsValidSession() throws Exception {
+    public boolean isValidSession(String[]msg)  {
         if (sessionId == null) {
+            msg[0] = "No session id";
             return false;
         }
+        try {
         String url =
             HtmlUtil.url(URL_USER_HOME.getFullUrl(),
                          new String[] { ARG_OUTPUT,
                                         "xml", ARG_SESSIONID, sessionId });
         String  contents = IOUtil.readContents(url, getClass());
         Element root     = XmlUtil.getRoot(contents);
-        System.err.println(contents);
-        return XmlUtil.getAttribute(root, "code").equals("ok");
+        if(responseOk(root)) {
+            return true;
+        } else {
+            msg[0] =  XmlUtil.getChildText(root).trim();
+            return false;
+        }
+        } catch(Exception exc) {
+            msg[0] = "Could not connect to server:" + getHostname();
+            return false;
+        }
+    }
+
+    private boolean responseOk(Element root) {
+        return XmlUtil.getAttribute(root, ATTR_CODE).equals("ok");
     }
 
 
@@ -106,34 +200,26 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @throws Exception _more_
      */
-    public boolean doLogin() throws Exception {
-        while (true) {
-            String url =
-                HtmlUtil.url(URL_USER_LOGIN.getFullUrl(),
-                             new String[] {
-                ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
-                ARG_USER_ID, getUser()
-            });
-            String  contents = IOUtil.readContents(url, getClass());
-            Element root     = XmlUtil.getRoot(contents);
-            if (XmlUtil.getAttribute(root, ATTR_CODE).equals("ok")) {
-                sessionId = XmlUtil.getChildText(root).trim();
-                return true;
-            }
-            String         message     = XmlUtil.getChildText(root).trim();
-            JTextField     nameFld     = new JTextField(getUser());
-            JPasswordField passwordFld = new JPasswordField(getPassword());
-            JComponent comp =
-                GuiUtils.topCenter(new JLabel("Error:" + message),
-                                   GuiUtils.doLayout(new Component[] {
-                                       GuiUtils.rLabel("User Name:"),
-                                       nameFld, GuiUtils.rLabel("Password:"),
-                                       passwordFld, }, 2, GuiUtils.WT_NY,
-                                           GuiUtils.WT_N));
-
-            if (true) {
-                break;
-            }
+    public boolean doLogin(String[]msg)  {
+        try {
+        String url =
+            HtmlUtil.url(URL_USER_LOGIN.getFullUrl(),
+                         new String[] {
+                             ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
+                             ARG_USER_ID, getUser()
+                         });
+        String  contents = IOUtil.readContents(url, getClass());
+        Element root     = XmlUtil.getRoot(contents);
+        String body = XmlUtil.getChildText(root).trim();
+        if (responseOk(root)) {
+            sessionId = body;
+            return true;
+        } else {
+            msg[0] = body;
+            return false;
+        }
+        } catch(Exception exc) {
+            msg[0] = "Could not connect to server:" + getHostname();
         }
         return false;
     }
@@ -174,6 +260,24 @@ public class RepositoryClient extends RepositoryBase {
         return user;
     }
 
+
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
 
 
 
