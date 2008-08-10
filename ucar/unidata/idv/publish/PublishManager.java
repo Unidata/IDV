@@ -126,7 +126,7 @@ public class PublishManager extends IdvManager {
             mi.addActionListener(new ObjectListener(tfo.getId()) {
                     public void actionPerformed(ActionEvent ae) {
                         try {
-                            IdvPublisher newPublisher = (IdvPublisher)  ((IdvPublisher) theObject).cloneMe();
+                            IdvPublisher newPublisher = (IdvPublisher) theObject.getClass().newInstance();
                             if(newPublisher.doInitNew()) {
                                 publishers.add(newPublisher);
                                 getIdv().getStore().putEncodedFile("publishers.xml", publishers);
