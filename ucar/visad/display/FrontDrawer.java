@@ -1282,7 +1282,7 @@ public class FrontDrawer extends DisplayableData {
 
     /** _more_ */
     private static final float[] rsegmentarray = {
-        0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.05f,  // TROUGH = 9
+        0.2f, 0.2f, 0.15f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.05f,  // TROUGH = 9
         0.1f,   // RIDGE = 10
         0.05f,  // MOISTURE = 11
         0.2f,   // LOW_LEVEL_JET = 12
