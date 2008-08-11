@@ -134,6 +134,14 @@ public class HttpFormEntry {
     }
 
 
+    public HttpFormEntry(String name, String label, String value) {
+        this(TYPE_INPUT, name, label,value);
+    }
+
+
+    public static HttpFormEntry hidden(String name, String value) {
+        return new HttpFormEntry(TYPE_HIDDEN,name,"",value);
+    }
 
     /**
      * Create the entry
@@ -322,7 +330,10 @@ public class HttpFormEntry {
         if (type == TYPE_LABEL) {
             return null;
         }
-        return ((JTextComponent) component).getText();
+        if(component!=null) {
+            return ((JTextComponent) component).getText();
+        }
+        return value;
     }
 
     /**
@@ -334,10 +345,10 @@ public class HttpFormEntry {
         if (type == TYPE_HIDDEN) {
             this.value = newValue;
         }
-        if (type == TYPE_LABEL) {}
-        else {
+        if (type == TYPE_LABEL) {
+        } else if(component!=null) {
             ((JTextComponent) component).setText(newValue);
-        }
+        } 
     }
 
     /**

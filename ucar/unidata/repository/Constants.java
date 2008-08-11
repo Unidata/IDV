@@ -572,10 +572,6 @@ public interface Constants {
     /** _more_ */
     public static final String TYPE_ASSOCIATION = "association";
 
-    /** _more_ */
-    public static final String TYPE_GROUP = "group";
-
-
 
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "ramadda.download.ok";
@@ -712,6 +708,7 @@ public interface Constants {
 
 
     public static final String TAG_ENTRY = "entry";
+    public static final String TAG_ENTRIES= "entries";
     public static final String ATTR_DESCRIPTION = "description";
     public static final String ATTR_FILE = "file";
 
@@ -901,6 +898,16 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_USER_ADMIN = "user.admin";
+
+
+    /** _more_ */
+    public static final String TYPE_ANY = "any";
+
+    /** _more_ */
+    public static final String TYPE_FILE = "file";
+
+    /** _more_ */
+    public static final String TYPE_GROUP = "group";
 
 
 

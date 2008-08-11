@@ -27,6 +27,7 @@ import ucar.unidata.idv.publish.IdvPublisher;
 
 import HTTPClient.*;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -131,6 +132,44 @@ public class RamaddaPublisher
         return repositoryClient.doConnect();
     }
 
+    
+    private JComponent contents;
+    private JTextField parentGroupFld;
+    private JTextField groupNameFld;
+
+    private JTextField nameFld;
+    private JTextArea descFld;
+    private JTextField northFld;
+    private JTextField southFld;
+    private JTextField eastFld;
+    private JTextField westFld;
+
+
+
+    private void doMakeContents() {
+        parentGroupFld = new JTextField("",5);
+        groupNameFld = new JTextField("",30);
+        nameFld = new JTextField("",30);
+        descFld = new JTextArea("",5,30);
+        northFld = new JTextField("",5);
+        southFld = new JTextField("",5);
+        eastFld = new JTextField("",5);
+        westFld = new JTextField("",5);
+        JComponent bboxComp = GuiUtils.vbox(GuiUtils.wrap(northFld), GuiUtils.hbox(westFld,eastFld), GuiUtils.wrap(southFld));
+        
+
+        GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+        contents = GuiUtils.doLayout(new Component[]{
+            GuiUtils.rLabel("Name:"), nameFld,
+            GuiUtils.top(GuiUtils.rLabel("Description:")), descFld,
+            GuiUtils.rLabel("New Group Name:"), GuiUtils.centerRight(groupNameFld, new JLabel(" (Optional)")),
+            GuiUtils.rLabel("Parent Group Id:"), GuiUtils.left(parentGroupFld),
+            GuiUtils.top(GuiUtils.rLabel("BBOX:")), GuiUtils.left(bboxComp)
+        },2,GuiUtils.WT_NY, GuiUtils.WT_N);
+
+    }
+
+
     /**
      * _more_
      *
@@ -142,12 +181,53 @@ public class RamaddaPublisher
         if ( !isConfigured()) {
             return;
         }
+        if(contents==null) {
+            doMakeContents();
+        }
+
+        while(true) {
+            if(!GuiUtils.showOkCancelDialog(null,"Publish to RAMADDA",contents, null)) return;
+            String parentGroup = parentGroupFld.getText().trim();
+            if(parentGroup.length()==0) {
+                LogUtil.userMessage("You must specify a parent group id");
+            }  else {
+                break;
+            }
+            
+        }
+        
         try {
+            int cnt = 0;
+            Document doc   = XmlUtil.makeDocument();
+            Element  root  = XmlUtil.create(doc, RepositoryClient.TAG_ENTRIES, null, new String[] {});
+            String parentId = parentGroupFld.getText().trim();
+            if(groupNameFld.getText().trim().length()>0) {
+                String groupId = (cnt++)+"";
+                Element groupNode = XmlUtil.create(doc, RepositoryClient.TAG_ENTRY, root,
+                                                   new String[] {RepositoryClient.ATTR_ID, groupId,
+                                                                 RepositoryClient.ATTR_TYPE, RepositoryClient.TYPE_GROUP,
+                                                                 RepositoryClient.ATTR_PARENT, parentId, 
+                                                                 RepositoryClient.ATTR_NAME, groupNameFld.getText().trim() });
+                parentId  = groupId;
+            }
+            String bundleId = (cnt++)+"";
+            String imageId = (cnt++)+"";
+            String movieId = (cnt++)+"";
 
-//URL_ENTRY_XMLCREATE
+            Element bundleNode = XmlUtil.create(doc, RepositoryClient.TAG_ENTRY, root,
+                                                new String[] {RepositoryClient.ATTR_ID, bundleId,
+                                                              RepositoryClient.ATTR_PARENT, parentId, 
+                                                              RepositoryClient.ATTR_TYPE, RepositoryClient.TYPE_FILE,
+                                                              RepositoryClient.ATTR_NAME, nameFld.getText().trim(),
+                                                              RepositoryClient.ATTR_DESCRIPTION, descFld.getText().trim()});
 
+
+
+            String xml = XmlUtil.toString(root);
             List entries = new ArrayList();
-            entries.
+            entries.add(HttpFormEntry.hidden(RepositoryClient.ARG_SESSIONID, repositoryClient.getSessionId()));
+            entries.add(HttpFormEntry.hidden(RepositoryClient.ARG_OUTPUT, "xml"));
+            entries.add(new HttpFormEntry(RepositoryClient.ARG_FILE, "entries.xml",xml.getBytes()));
             String[]result = HttpFormEntry.doPost(entries, 
                                                   repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
 

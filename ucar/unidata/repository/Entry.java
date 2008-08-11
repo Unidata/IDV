@@ -84,6 +84,11 @@ public class Entry extends Entity {
     public Entry() {}
 
 
+    public Entry(String id) {
+        setId(id);
+    }
+
+
     /**
      * _more_
      *
@@ -91,7 +96,7 @@ public class Entry extends Entity {
      * @param typeHandler _more_
      */
     public Entry(String id, TypeHandler typeHandler) {
-        setId(id);
+        this(id);
         this.typeHandler = typeHandler;
     }
 

@@ -110,14 +110,6 @@ public class TypeHandler extends RepositoryManager {
     public static final TwoFacedObject NONE_OBJECT =
         new TwoFacedObject("None", "");
 
-    /** _more_ */
-    public static final String TYPE_ANY = "any";
-
-    /** _more_ */
-    public static final String TYPE_FILE = "file";
-
-    /** _more_ */
-    public static final String TYPE_GROUP = "group";
 
 
     /** _more_ */
