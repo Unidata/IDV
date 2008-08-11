@@ -192,9 +192,12 @@ public class KmlUtil {
     public  static Element linestyle(Element parent, String id, Color color, int width) {
         Element style = style(parent, id);
         Element linestyle = makeElement(style, TAG_LINESTYLE);
-        makeText(linestyle, TAG_COLOR, "ff"+StringUtil.toHexString(color).substring(1));
-        makeText(linestyle, TAG_COLORMODE, "normal");
-        makeText(linestyle, TAG_WIDTH,""+width);
+        if(color!=null) {
+            makeText(linestyle, TAG_COLOR, "ff"+StringUtil.toHexString(color).substring(1));
+            makeText(linestyle, TAG_COLORMODE, "normal");
+        }
+        if(width>0)
+            makeText(linestyle, TAG_WIDTH,""+width);
         return linestyle;
         /*<LineStyle id="ID">
   <color>ffffffff</color>            <!-- kml:color -->
@@ -202,12 +205,27 @@ public class KmlUtil {
   <width>1</width>                   <!-- float -->
   </LineStyle>*/
      }
+
     public static Element linestring(Element parent, boolean extrude, boolean tesselate, String coordinates) {        Element node = makeElement(parent, TAG_LINESTRING);
         makeText(node,TAG_EXTRUDE, (extrude?"1":"0"));
         makeText(node,TAG_TESSELATE, (tesselate?"1":"0"));
         coordinates(node, coordinates);
         return node;
 
+    }
+
+
+    public static Element linestring(Element parent, boolean extrude, boolean tesselate, float[][]coords) {
+        StringBuffer sb= new StringBuffer();
+        for(int i=0;i<coords[0].length;i++) {
+            sb.append(coords[1][i]);
+            sb.append(",");
+            sb.append(coords[0][i]);
+            sb.append(",");
+            sb.append(coords[2][i]);
+            sb.append(" ");
+        }
+        return linestring(parent, extrude, tesselate, sb.toString());
     }
 
 
@@ -258,6 +276,8 @@ public class KmlUtil {
     }
 
 
+
+
     public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) {
         Element placemark = placemark(parent, name, description);
         makeText(placemark, TAG_STYLEURL, style);
@@ -268,6 +288,14 @@ public class KmlUtil {
                  el.getAltitude().getValue() +" ");
         return placemark;
     }
+
+
+    public static Element placemark(Element parent, String name, String description, float[][]coords, Color color, int width) {
+        Element placemark = placemark(parent, name, description);
+        Element linestring = linestring(placemark,false,false, coords);
+        return placemark;
+    }
+
 
     /*
       <Placemark>
