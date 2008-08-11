@@ -43,6 +43,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import ucar.unidata.xml.XmlResourceCollection;
 
@@ -90,6 +91,8 @@ public class PublishManager extends IdvManager {
 
 
 
+    private List<JComboBox> comboBoxes = new  ArrayList<JComboBox>();
+
 
     /**
      * Create me with the IDV
@@ -101,6 +104,9 @@ public class PublishManager extends IdvManager {
         publishers = (List<IdvPublisher>) (List) getIdv().getStore().getEncodedFile("publishers.xml");
         if(publishers == null) {
             publishers = new ArrayList<IdvPublisher>();
+        }
+        for(IdvPublisher publisher: publishers) {
+            publisher.setIdv(getIdv());
         }
     }
 
@@ -117,6 +123,41 @@ public class PublishManager extends IdvManager {
             });
     }
 
+
+    public JComboBox makeSelector() {
+        if(!isPublishingEnabled()) return null;
+        JComboBox cbx = new JComboBox();
+        comboBoxes.add(cbx);
+        updatePublishers(false);
+        return cbx;
+    }
+
+    public void publishContent(String file, JComboBox box) {
+        if(box == null || box.getSelectedIndex()==0) {
+            return;
+        }
+        IdvPublisher publisher = (IdvPublisher) box.getSelectedItem();
+        publisher.publishContent(file);
+    }
+
+    private void  updatePublishers(boolean andWrite) {
+        if(andWrite) {
+            getIdv().getStore().putEncodedFile("publishers.xml", publishers);
+        }
+        for(JComboBox publishCbx: comboBoxes) {
+            Object selected = publishCbx.getSelectedItem();
+            Vector items = new Vector();
+            items.add("-Select Publisher-");
+            items.addAll(getIdv().getPublishManager().getPublishers());
+            GuiUtils.setListData(publishCbx, items);
+            if(selected!=null && items.contains(selected)) 
+                publishCbx.setSelectedItem(selected);
+        
+        }
+    }
+
+
+
     public void makeMenu(JMenu menu) {
         JMenu newMenu = new JMenu("New");
         menu.add(newMenu);
@@ -129,7 +170,7 @@ public class PublishManager extends IdvManager {
                             IdvPublisher newPublisher = (IdvPublisher) theObject.getClass().newInstance();
                             if(newPublisher.doInitNew()) {
                                 publishers.add(newPublisher);
-                                getIdv().getStore().putEncodedFile("publishers.xml", publishers);
+                                updatePublishers(true);
                             }
                         } catch (Exception exc) {
                             logException("Creating publisher" , exc);
@@ -141,17 +182,17 @@ public class PublishManager extends IdvManager {
             JMenu deleteMenu = new JMenu("Delete");
             menu.add(deleteMenu);
 
-            menu.addSeparator();
+            //            menu.addSeparator();
             for(IdvPublisher publisher:(List<IdvPublisher>) publishers) {
                 deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
-                publisher.initMenu(menu);
+                //                publisher.initMenu(menu);
             }
         }
     }
 
     public void deletePublisher(IdvPublisher publisher) {
         publishers.remove(publisher);
-        getIdv().getStore().putEncodedFile("publishers.xml", publishers);
+        updatePublishers(true);
     }
 
 

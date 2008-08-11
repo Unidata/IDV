@@ -605,6 +605,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** hi res button */
     private static JRadioButton hiBtn;
 
+    private JComboBox publishCbx;
+
     /** medium res button */
     private static JRadioButton medBtn;
 
@@ -3719,10 +3721,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
         captureMenu.add(GuiUtils.makeMenuItem("Print...", this,
                 "doPrintImage", null, true));
 
-        if (getPublishManager().isPublishingEnabled()) {
-            captureMenu.add(GuiUtils.makeMenuItem("Publish JPEG...", this,
-                    "doPublishImage"));
-        }
         captureMenu.add(GuiUtils.makeMenuItem("Movie...", this,
                 "startImageCapture"));
 
@@ -4866,6 +4864,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 hiBtn  = new JRadioButton("High", true);
                 medBtn = new JRadioButton("Medium", false);
                 lowBtn = new JRadioButton("Low", false);
+                publishCbx = getIdv().getPublishManager().makeSelector();
                 GuiUtils.buttonGroup(hiBtn, medBtn).add(lowBtn);
                 backgroundTransparentBtn = new JCheckBox("BG Transparent");
                 backgroundTransparentBtn.setToolTipText(
@@ -4885,10 +4884,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                              mainDisplayBtn, contentsBtn,
                                              fullWindowBtn);
 
-            JComponent accessory = GuiUtils.vbox(Misc.newList(qualityPanel,
+            List accessoryComps = Misc.newList(qualityPanel,
                                        new JLabel(" "), whatPanel,
                                        new JLabel(" "),
-                                       backgroundTransparentBtn));
+                                               backgroundTransparentBtn);
+            
+
+
+            if(publishCbx!=null) {
+                accessoryComps.add(publishCbx);
+            }
+            JComponent accessory = GuiUtils.vbox(accessoryComps);
 
 
             PatternFileFilter captureFilter =
@@ -4914,6 +4920,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                     if(vectorRenderer.showConfigDialog()) {
                         vectorRenderer.renderTo(filename);
+                        getIdv().getPublishManager().publishContent(filename, publishCbx);
                     }
                     System.setSecurityManager(backup);
                     return;
@@ -5020,10 +5027,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             zos.putNextEntry(new ZipEntry(tail + suffix));
                             zos.write(imageBytes, 0, imageBytes.length);
                             zos.close();
+                            getIdv().getPublishManager().publishContent(filename, publishCbx);
                             return;
                         }
                     }
                     ImageUtils.writeImageToFile(image, filename, quality);
+                    getIdv().getPublishManager().publishContent(filename, publishCbx);
                 }
                 if (andSaveBundle) {
                     filename = IOUtil.stripExtension(filename) + ".jnlp";

@@ -190,6 +190,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     private JComboBox saveJythonBox;
 
+    private JComboBox publishCbx;
+
     /** JCheckBox for saving all of the jython library */
     //    private JRadioButton saveAllJythonBtn;
 
@@ -474,6 +476,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             accessories.add(makeDataRelativeCbx);
             //            accessories.add(makeDataEditableCbx);
 
+
+            if(publishCbx==null)
+                publishCbx = getIdv().getPublishManager().makeSelector();
+            if(publishCbx!=null) {
+                accessories.add(publishCbx);
+            }
+
             fileAccessory = GuiUtils.top(
                 GuiUtils.vbox(
                     Misc.newList(
@@ -483,6 +492,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
         return fileAccessory;
     }
+
+
 
 
     /**
@@ -668,6 +679,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         boolean prevMakeDataRelative = makeDataRelative;
         makeDataRelative = makeDataRelativeCbx.isSelected();
         doSave(filename);
+        getPublishManager().publishContent(filename,publishCbx);
         makeDataEditable = prevMakeDataEditable;
         makeDataRelative = prevMakeDataRelative;
         getIdv().addToHistoryList(filename);
@@ -1003,9 +1015,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
             String tmpSuffix = suffix;
             if (suffix == null) {
-                tmpSuffix = (zidvCbx.isSelected()
-                             ? ".zidv"
-                             : ".xidv");
+                if (zidvCbx.isSelected())
+                    tmpSuffix =
+                        getArgsManager().getZidvFileFilter().getPreferredSuffix();
+                else
+                    tmpSuffix =
+                        getArgsManager().getXidvFileFilter().getPreferredSuffix();
             }
 
             File fullFile = new File(IOUtil.joinDir(catDir.toString(),

@@ -682,8 +682,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 GuiUtils.CMD_OK));
         JComponent publishButton;
         if (idv.getPublishManager().isPublishingEnabled()) {
-            frameButtons.add(publishButton = makeButton("Publish Movie",
-                    CMD_PUBLISH));
+            //            frameButtons.add(publishButton = makeButton("Publish Movie",
+            //                    CMD_PUBLISH));
         } else {
             //            publishButton = new JPanel();
         }
@@ -1222,6 +1222,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
 
+    private JComboBox publishCbx;
+
     private boolean writePositions= false;
 
     /**
@@ -1234,13 +1236,26 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints", writePositions);
             writePositionsCbx.setToolTipText("Also save the viewpoint matrices as an 'xidv' file");
 
-            JComponent extra =
-                GuiUtils.topCenter(
-                                   GuiUtils.vbox(
-                    GuiUtils.hflow(
+
+
+            List accessoryComps = new ArrayList();
+            accessoryComps.add(GuiUtils.hflow(
                         Misc.newList(
                             GuiUtils.rLabel(" Frames per second: "),
-                            displayRateFld)), writePositionsCbx), GuiUtils.filler());
+                            displayRateFld))); 
+            accessoryComps.add(writePositionsCbx);
+            if(publishCbx==null)
+                publishCbx = idv.getPublishManager().makeSelector();
+            if(publishCbx!=null)
+                accessoryComps.add(publishCbx);
+            JComponent extra =
+                GuiUtils.topCenter(
+                                   GuiUtils.vbox(accessoryComps),
+                                   GuiUtils.filler());
+
+
+
+
             filename =
                 FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV,
                     FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
@@ -1761,7 +1776,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 LogUtil.userErrorMessage("Error writing movie:" + ioe);
                 return;
             }
-
+            idv.getPublishManager().publishContent(movieFile, publishCbx);
         }
 
 

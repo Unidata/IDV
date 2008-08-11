@@ -75,10 +75,10 @@ public abstract class IdvPublisher implements Cloneable {
     private String name="Publisher";
 
     /** Reference to the IDV */
-    IntegratedDataViewer idv;
+    private IntegratedDataViewer idv;
 
     /** The id of this publisher */
-    String id = "id";
+    private     String id = "id";
 
     /** The xml element that defined this publisher */
     Element initElement;
@@ -105,6 +105,15 @@ public abstract class IdvPublisher implements Cloneable {
     }
 
 
+    public IntegratedDataViewer getIdv() {
+        return idv;
+    }
+
+
+    protected void setIdv(IntegratedDataViewer idv) {
+        this.idv = idv;
+    }
+
     public boolean doInitNew() {
         return true;
     }
@@ -118,6 +127,7 @@ public abstract class IdvPublisher implements Cloneable {
     public void doPublish() {
     }
 
+    public void publishContent(String file) {}
 
 
     /**
@@ -158,6 +168,9 @@ public String getName () {
 }
 
 
+    public String toString() {
+        return getName();
+    }
 
 }
 
