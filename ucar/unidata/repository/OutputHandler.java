@@ -324,9 +324,7 @@ public class OutputHandler extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
-            String  icon     = (entry.isGroup()
-                                ? getRepository().fileUrl(ICON_FOLDER_CLOSED)
-                                : getRepository().fileUrl(ICON_FILE));
+            String  icon     = getRepository().getIconUrl(entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
             String event = (entry.isGroup()
@@ -494,7 +492,7 @@ public class OutputHandler extends RepositoryManager {
                 "<ul class=\"folderblock\" style=\"list-style-image : url("
                 + getRepository().fileUrl(ICON_BLANK) + ")\">");
         }
-        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
+        //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int    cnt = 0;
         for (Entry entry : (List<Entry>) entries) {
             sb.append("<li>");
@@ -508,6 +506,7 @@ public class OutputHandler extends RepositoryManager {
             }
 
             if (showCrumbs) {
+                String img = HtmlUtil.img(getRepository().getIconUrl(entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
                 String crumbs = getRepository().getBreadCrumbs(request,

@@ -21,9 +21,10 @@
  */
 
 
+
+
 package ucar.unidata.repository.idv;
 
-import ucar.unidata.idv.publish.IdvPublisher;
 
 import HTTPClient.*;
 
@@ -35,6 +36,8 @@ import org.w3c.dom.NodeList;
 
 
 import ucar.unidata.idv.*;
+
+import ucar.unidata.idv.publish.IdvPublisher;
 
 import ucar.unidata.repository.RepositoryClient;
 
@@ -58,9 +61,10 @@ import java.io.*;
 import java.net.*;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Properties;
+import java.util.zip.*;
+
 
 import javax.swing.*;
 
@@ -68,10 +72,10 @@ import javax.swing.*;
 /**
  * @author IDV development team
  */
-public class RamaddaPublisher 
-    extends ucar.unidata.idv.publish.IdvPublisher {
+public class RamaddaPublisher extends ucar.unidata.idv.publish
+    .IdvPublisher implements ucar.unidata.repository.Constants {
 
-    /** _more_          */
+    /** _more_ */
     private RepositoryClient repositoryClient;
 
 
@@ -86,6 +90,7 @@ public class RamaddaPublisher
      * Create the object
      *
      * @param idv The idv
+     * @param element _more_
      */
     public RamaddaPublisher(IntegratedDataViewer idv, Element element) {
         super(idv, element);
@@ -93,8 +98,15 @@ public class RamaddaPublisher
     }
 
 
-    public String getName () {
-        if(repositoryClient!=null) return repositoryClient.getName();
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getName() {
+        if (repositoryClient != null) {
+            return repositoryClient.getName();
+        }
         return super.getName();
     }
 
@@ -126,46 +138,257 @@ public class RamaddaPublisher
      * @return _more_
      */
     public boolean isConfigured() {
-        if(repositoryClient==null) {
+        if (repositoryClient == null) {
             repositoryClient = new RepositoryClient();
         }
         return repositoryClient.doConnect();
     }
 
-    
+
+    /** _more_ */
     private JComponent contents;
+
+    /** _more_ */
     private JTextField parentGroupFld;
+
+    /** _more_ */
     private JTextField groupNameFld;
 
+    /** _more_ */
     private JTextField nameFld;
+
+    /** _more_ */
     private JTextArea descFld;
+
+    /** _more_ */
+    private JTextField contentsNameFld;
+
+    /** _more_ */
+    private JTextArea contentsDescFld;
+
+    /** _more_ */
     private JTextField northFld;
+
+    /** _more_ */
     private JTextField southFld;
+
+    /** _more_ */
     private JTextField eastFld;
+
+    /** _more_ */
     private JTextField westFld;
 
 
 
+    /**
+     * _more_
+     */
     private void doMakeContents() {
-        parentGroupFld = new JTextField("",5);
-        groupNameFld = new JTextField("",30);
-        nameFld = new JTextField("",30);
-        descFld = new JTextArea("",5,30);
-        northFld = new JTextField("",5);
-        southFld = new JTextField("",5);
-        eastFld = new JTextField("",5);
-        westFld = new JTextField("",5);
-        JComponent bboxComp = GuiUtils.vbox(GuiUtils.wrap(northFld), GuiUtils.hbox(westFld,eastFld), GuiUtils.wrap(southFld));
-        
+        parentGroupFld  = new JTextField("", 5);
+        groupNameFld    = new JTextField("", 30);
+        nameFld         = new JTextField("", 30);
+        descFld         = new JTextArea("", 5, 30);
+        contentsNameFld = new JTextField("", 30);
+        contentsDescFld = new JTextArea("", 5, 30);
+        northFld        = new JTextField("", 5);
+        southFld        = new JTextField("", 5);
+        eastFld         = new JTextField("", 5);
+        westFld         = new JTextField("", 5);
+        JComponent bboxComp = GuiUtils.vbox(GuiUtils.wrap(northFld),
+                                            GuiUtils.hbox(westFld, eastFld),
+                                            GuiUtils.wrap(southFld));
+
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        contents = GuiUtils.doLayout(new Component[]{
+        contents           = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Name:"), nameFld,
             GuiUtils.top(GuiUtils.rLabel("Description:")), descFld,
-            GuiUtils.rLabel("New Group Name:"), GuiUtils.centerRight(groupNameFld, new JLabel(" (Optional)")),
-            GuiUtils.rLabel("Parent Group Id:"), GuiUtils.left(parentGroupFld),
+            GuiUtils.rLabel("New Group Name:"),
+            GuiUtils.centerRight(groupNameFld, new JLabel(" (Optional)")),
+            GuiUtils.rLabel("Parent Group Id:"),
+            GuiUtils.left(parentGroupFld),
             GuiUtils.top(GuiUtils.rLabel("BBOX:")), GuiUtils.left(bboxComp)
-        },2,GuiUtils.WT_NY, GuiUtils.WT_N);
+        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param contentFile _more_
+     */
+    public void publishContent(String contentFile) {
+
+        if ( !isConfigured()) {
+            return;
+        }
+
+
+        try {
+            boolean isBundle = ((contentFile == null)
+                                ? false
+                                : getIdv().getArgsManager().isBundleFile(
+                                    contentFile));
+            if (contents == null) {
+                doMakeContents();
+            }
+            JCheckBox  doBundleCbx  = new JCheckBox("Include Bundle", true);
+            JComponent thisContents = contents;
+            if ((contentFile != null) && !isBundle) {
+                thisContents =
+                    GuiUtils.topCenter(GuiUtils.vbox(new JLabel("File: "
+                        + contentFile), doBundleCbx), contents);
+            }
+
+
+            if (contentFile != null) {
+                //            nameFld.setText(IOUtil.getFileTail(contentFile));
+            } else {
+                //            nameFld.setText("");
+            }
+
+
+            while (true) {
+
+                while (true) {
+                    if ( !GuiUtils.showOkCancelDialog(null,
+                            "Publish to RAMADDA", thisContents, null)) {
+                        return;
+                    }
+                    String parentGroup = parentGroupFld.getText().trim();
+                    if (parentGroup.length() == 0) {
+                        LogUtil.userMessage(
+                            "You must specify a parent group id");
+                    } else {
+                        break;
+                    }
+                }
+
+                String bundleFile = null;
+                if (isBundle) {
+                    bundleFile  = contentFile;
+                    contentFile = null;
+                } else if (doBundleCbx.isSelected()) {
+                    String tmpFile = contentFile;
+                    if(tmpFile==null) tmpFile = "publish.xidv";
+                    bundleFile = getIdv().getObjectStore().getTmpFile(
+                        IOUtil.stripExtension(
+                            IOUtil.getFileTail(tmpFile)) + ".xidv");
+                    getIdv().getPersistenceManager().doSave(bundleFile);
+                }
+
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ZipOutputStream       zos = new ZipOutputStream(bos);
+
+                if (contentFile != null) {
+                    zos.putNextEntry(
+                        new ZipEntry(IOUtil.getFileTail(contentFile)));
+                    byte[] bytes =
+                        IOUtil.readBytes(new FileInputStream(contentFile));
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                }
+
+                if (bundleFile != null) {
+                    zos.putNextEntry(
+                        new ZipEntry(IOUtil.getFileTail(bundleFile)));
+                    byte[] bytes =
+                        IOUtil.readBytes(new FileInputStream(bundleFile));
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                }
+
+
+
+                //        descFld.setText("");
+
+
+                int      cnt = 0;
+                Document doc = XmlUtil.makeDocument();
+                Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                   new String[] {});
+                String parentId = parentGroupFld.getText().trim();
+                if (groupNameFld.getText().trim().length() > 0) {
+                    String groupId = (cnt++) + "";
+                    Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                            new String[] {
+                        ATTR_ID, groupId, ATTR_TYPE, TYPE_GROUP, ATTR_PARENT,
+                        parentId, ATTR_NAME, groupNameFld.getText().trim()
+                    });
+                    parentId = groupId;
+                }
+                String mainId    = (cnt++) + "";
+                String contentId = (cnt++) + "";
+                String mainFile  = ((bundleFile != null)
+                                    ? bundleFile
+                                    : contentFile);
+
+
+                XmlUtil.create(doc, TAG_ENTRY, root, new String[] {
+                    ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
+                    ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
+                    nameFld.getText().trim(), ATTR_DESCRIPTION,
+                    descFld.getText().trim()
+                });
+
+                if (contentFile != null) {
+                    XmlUtil.create(doc, TAG_ENTRY, root, new String[] {
+                        ATTR_ID, contentId, ATTR_FILE,
+                        IOUtil.getFileTail(contentFile), ATTR_PARENT,
+                        parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
+                        nameFld.getText().trim() + " - Product"
+                    });
+                    if(bundleFile!=null) {
+                        XmlUtil.create(doc, TAG_ASSOCIATION, root, new String[] {
+                                ATTR_FROM, mainId,
+                                ATTR_TO, contentId,
+                                ATTR_NAME, "generated product"
+                            });
+
+                    }
+
+                }
+
+
+
+                String xml = XmlUtil.toString(root);
+
+                zos.putNextEntry(new ZipEntry("entries.xml"));
+                byte[] bytes = xml.getBytes();
+                zos.write(bytes, 0, bytes.length);
+                zos.closeEntry();
+                zos.close();
+                bos.close();
+
+
+                List entries = new ArrayList();
+                System.err.println("id:" + repositoryClient.getSessionId());
+                entries.add(HttpFormEntry.hidden(ARG_SESSIONID,
+                        repositoryClient.getSessionId()));
+                entries.add(HttpFormEntry.hidden(ARG_OUTPUT, "xml"));
+                entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
+                        bos.toByteArray()));
+                String[] result =
+                    HttpFormEntry.doPost(
+                        entries,
+                        repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
+
+                if (result[0] != null) {
+                    LogUtil.userErrorMessage("Error publishing:" + result[0]);
+                    return;
+                }
+                Element response = XmlUtil.getRoot(result[1]);
+                if (repositoryClient.responseOk(response)) {
+                    LogUtil.userMessage("Publication was successful");
+                    return;
+                }
+                String body = XmlUtil.getChildText(response).trim();
+                LogUtil.userErrorMessage("Error publishing:" + body);
+            }
+        } catch (Exception exc) {
+            LogUtil.logException("Publishing", exc);
+        }
 
     }
 
@@ -178,109 +401,27 @@ public class RamaddaPublisher
      * @param properties _more_
      */
     public void doPublish() {
-        if ( !isConfigured()) {
-            return;
-        }
-        if(contents==null) {
-            doMakeContents();
-        }
-
-        while(true) {
-            if(!GuiUtils.showOkCancelDialog(null,"Publish to RAMADDA",contents, null)) return;
-            String parentGroup = parentGroupFld.getText().trim();
-            if(parentGroup.length()==0) {
-                LogUtil.userMessage("You must specify a parent group id");
-            }  else {
-                break;
-            }
-            
-        }
-        
-        try {
-            int cnt = 0;
-            Document doc   = XmlUtil.makeDocument();
-            Element  root  = XmlUtil.create(doc, RepositoryClient.TAG_ENTRIES, null, new String[] {});
-            String parentId = parentGroupFld.getText().trim();
-            if(groupNameFld.getText().trim().length()>0) {
-                String groupId = (cnt++)+"";
-                Element groupNode = XmlUtil.create(doc, RepositoryClient.TAG_ENTRY, root,
-                                                   new String[] {RepositoryClient.ATTR_ID, groupId,
-                                                                 RepositoryClient.ATTR_TYPE, RepositoryClient.TYPE_GROUP,
-                                                                 RepositoryClient.ATTR_PARENT, parentId, 
-                                                                 RepositoryClient.ATTR_NAME, groupNameFld.getText().trim() });
-                parentId  = groupId;
-            }
-            String bundleId = (cnt++)+"";
-            String imageId = (cnt++)+"";
-            String movieId = (cnt++)+"";
-
-            Element bundleNode = XmlUtil.create(doc, RepositoryClient.TAG_ENTRY, root,
-                                                new String[] {RepositoryClient.ATTR_ID, bundleId,
-                                                              RepositoryClient.ATTR_PARENT, parentId, 
-                                                              RepositoryClient.ATTR_TYPE, RepositoryClient.TYPE_FILE,
-                                                              RepositoryClient.ATTR_NAME, nameFld.getText().trim(),
-                                                              RepositoryClient.ATTR_DESCRIPTION, descFld.getText().trim()});
-
-
-
-            String xml = XmlUtil.toString(root);
-            List entries = new ArrayList();
-            entries.add(HttpFormEntry.hidden(RepositoryClient.ARG_SESSIONID, repositoryClient.getSessionId()));
-            entries.add(HttpFormEntry.hidden(RepositoryClient.ARG_OUTPUT, "xml"));
-            entries.add(new HttpFormEntry(RepositoryClient.ARG_FILE, "entries.xml",xml.getBytes()));
-            String[]result = HttpFormEntry.doPost(entries, 
-                                                  repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
-
-            System.err.println("result:" + result[0]+" " + result[1]);
-            /*
-            String file = "foo";
-            HTTPClient.NVPair[] opts = { new HTTPClient.NVPair(RepositoryClient.ARG_SESSIONID, repositoryClient.getSessionId()),
-                                         new HTTPClient.NVPair(RepositoryClient.ARG_OUTPUT, "xml")};
-
-            HTTPClient.NVPair[] files = { new HTTPClient.NVPair(RepositoryClient.ARG_FILE,
-                                            file) };
-            HTTPClient.NVPair[] hdrs           = new HTTPClient.NVPair[1];
-            byte[] formData = Codecs.mpFormDataEncode(opts, files, hdrs);
-            HTTPConnection      conn           = new HTTPConnection(repositoryClient.getHostname(),
-                                                                    repositoryClient.getPort());
-            String              fileUploadPath = .toString();
-            HTTPResponse res = conn.Post(fileUploadPath, formData, hdrs);
-            String xml = new String(res.getData());
-            if (res.getStatusCode() >= 300) {
-                LogUtil.userErrorMessage(new String(res.getData()));
-                return;
-            }
-
-            System.err.println("xml:" + xml);
-            */
-            //            if ( !resultOk(html)) {
-            //                showError("An error has occurred posting the file", html);
-            //            }
-        } catch (Exception exc) {
-            LogUtil.logException("Publishing", exc);
-        }
-
-
+        publishContent(null);
     }
 
 
 
     /**
-       Set the RepositoryClient property.
-
-       @param value The new value for RepositoryClient
-    **/
-    public void setRepositoryClient (RepositoryClient value) {
-	repositoryClient = value;
+     *  Set the RepositoryClient property.
+     *
+     *  @param value The new value for RepositoryClient
+     */
+    public void setRepositoryClient(RepositoryClient value) {
+        repositoryClient = value;
     }
 
     /**
-       Get the RepositoryClient property.
-
-       @return The RepositoryClient
-    **/
-    public RepositoryClient getRepositoryClient () {
-	return repositoryClient;
+     *  Get the RepositoryClient property.
+     *
+     *  @return The RepositoryClient
+     */
+    public RepositoryClient getRepositoryClient() {
+        return repositoryClient;
     }
 
 

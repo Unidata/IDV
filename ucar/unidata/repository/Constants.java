@@ -137,6 +137,9 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FILE = "/file.gif";
 
+    public static final String ICON_IMAGE = "/image.gif";
+    public static final String ICON_DATA = "/data.gif";
+
     /** _more_ */
     public static final String ICON_PLUS = "/plus.gif";
 

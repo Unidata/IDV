@@ -645,7 +645,15 @@ public class TypeHandler extends RepositoryManager {
                                       entry, output));
             //            sb.append(HtmlUtil.formEntry("", nextPrev));
             //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
-            sb.append(HtmlUtil.formEntry(msgLabel("Name"), entry.getName()));
+
+            String nameString = entry.getName();
+            if (entry.getResource().isFile()
+                && getAccessManager().canDownload(request, entry)) {
+                nameString = HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                                                        + entry.getName(), ARG_ID, entry.getId()),nameString);
+            }
+
+            sb.append(HtmlUtil.formEntry(msgLabel("Name"), nameString));
 
 
 

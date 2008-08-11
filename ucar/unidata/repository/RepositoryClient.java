@@ -187,7 +187,7 @@ public class RepositoryClient extends RepositoryBase {
         }
     }
 
-    private boolean responseOk(Element root) {
+    public boolean responseOk(Element root) {
         return XmlUtil.getAttribute(root, ATTR_CODE).equals("ok");
     }
 

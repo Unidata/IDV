@@ -327,6 +327,22 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     }
 
 
+    public String getIconUrl(Entry entry) {
+        Resource resource =entry.getResource();
+        String path = resource.getPath();
+        if(entry.isGroup()) {
+            return fileUrl(ICON_FOLDER_CLOSED);
+        }
+        String img = ICON_FILE;
+        if(path!=null) {
+            String suffix = IOUtil.getFileExtension(path.toLowerCase());
+            String prop = getProperty("icon" + suffix);
+            if(prop!=null) img = prop;
+        }
+        return  fileUrl(img);
+    }
+
+
     /**
      * _more_
      *
@@ -947,7 +963,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         metadataDefFiles.addAll(argMetadataDefFiles);
 
         debug = getProperty(PROP_DEBUG, false);
-        debug = true;
         //        System.err.println ("debug:" + debug);
 
         setUrlBase((String) properties.get(PROP_HTML_URLBASE));
@@ -3607,6 +3622,13 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         String dataType= XmlUtil.getAttribute(node, ATTR_DATATYPE,"");
         String description= XmlUtil.getAttribute(node, ATTR_DESCRIPTION,"");
         String file = XmlUtil.getAttribute(node, ATTR_FILE,(String)null);
+        if(file!=null) {
+            String tmp = (String)files.get(file);
+            String newFile =
+                getStorageManager().moveToStorage(request,
+                                                  new File(tmp)).toString();
+            file = newFile;
+        }
         String url = XmlUtil.getAttribute(node, ATTR_URL,(String)null);
         String tmpid= XmlUtil.getAttribute(node, ATTR_ID,(String)null);        
         String parentId= XmlUtil.getAttribute(node, ATTR_PARENT,topGroup.getId());
@@ -3619,7 +3641,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
         if(!getAccessManager().canDoAction(request, parentGroup,
                                            Permission.ACTION_NEW)) {
-                throw new IllegalArgumentException("Cannot add to parent group:" + parentId);
+            System.err.println ("BAD");
+            throw new IllegalArgumentException("Cannot add to parent group:" + parentId);
         }
 
         TypeHandler typeHandler = getTypeHandler(type);
@@ -3631,6 +3654,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                      : getGUID());
 
         Resource resource;
+
         if(file!=null) {
             resource = new Resource(file, Resource.TYPE_LOCALFILE);
         } else if(url!=null) {
@@ -3675,6 +3699,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
     private void  processAssociationXml(Request request,Element node,Hashtable entries, Hashtable files) throws Exception {
 
+
     }
 
 
@@ -3683,10 +3708,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         try {
             return processEntryXmlCreateInner(request);
         } catch(Exception exc) {
-            System.err.println ("request:" + request);
-
             if(request.getOutput().equals("xml")) {
-                return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),""+exc),MIME_XML);
+                return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),""+exc.getMessage()),MIME_XML);
             }
             return new Result("Error:"+ exc, Result.TYPE_XML);
         }
@@ -3698,27 +3721,48 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         if(file==null) {
             throw new IllegalArgumentException("No file argument given");
         }
-        Hashtable files = new Hashtable();
+        String entriesXml = null;
+        Hashtable origFileToStorage = new Hashtable();
         if(file.endsWith(".zip")) {
-                
+            ZipInputStream zin =
+                new ZipInputStream(IOUtil.getInputStream(file));
+            ZipEntry ze;
+            while ((ze = zin.getNextEntry())!=null) {
+                String entryName = ze.getName();
+                if(entryName.equals("entries.xml")) {
+                    entriesXml =  new String(IOUtil.readBytes(zin,
+                                                              null, false));
+                } else {
+                    String name =
+                        IOUtil.getFileTail(ze.getName().toLowerCase());
+                    File f = getStorageManager().getTmpFile(request,
+                                                            name);
+                    FileOutputStream fos = new FileOutputStream(f);
+                    IOUtil.writeTo(zin, fos);
+                    fos.close();
+                    origFileToStorage.put(ze.getName(), f.toString());
+                }
+            }
+            if(entriesXml==null) {
+                throw new IllegalArgumentException ("No entries.xml file provided");
+            }
         }
 
-        /*
-<entries>
-<entry type="" parent=""/>
-</entries>
-        */
+        if(entriesXml==null) {
+            entriesXml = IOUtil.readContents(file, getClass());
+        }
+
 
         List newEntries = new ArrayList();
         Hashtable entries = new Hashtable();
-        Element root = XmlUtil.getRoot(file, getClass());
+        Element root = XmlUtil.getRoot(entriesXml);
         NodeList  children = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if(node.getTagName().equals(TAG_ENTRY)) {
-                processEntryXml(request,node,newEntries,entries, files);
+                processEntryXml(request,node,newEntries,entries, origFileToStorage);
             } else if(node.getTagName().equals(TAG_ASSOCIATION)) {
-                processAssociationXml(request,node,entries, files);
+                processAssociationXml(request,node,entries, origFileToStorage);
             } else {
                 throw new IllegalArgumentException("<error>Unknown tag:" + node.getTagName() +"</error>");
             }
@@ -4494,6 +4538,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                             IOUtil.getFileTail(ze.getName().toLowerCase());
                         File f = getStorageManager().getTmpFile(request,
                                      name);
+                        checkFilePath(f.toString());
                         FileOutputStream fos = new FileOutputStream(f);
 
                         IOUtil.writeTo(zin, fos);
@@ -4598,11 +4643,22 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                                  ? getGroupId(parentGroup)
                                  : getGUID());
 
+                    String resourceType  = Resource.TYPE_UNKNOWN;
+                    if(isFile) {
+                        resourceType = Resource.TYPE_LOCALFILE;
+                    } else {
+                        try {
+                            new  URL(theResource);
+                            resourceType = Resource.TYPE_URL;
+                        } catch(Exception exc) {}
+                            
+                    }
+
                     entry = typeHandler.createEntry(id);
                     entry.initEntry(name, description, parentGroup, "",
                                     request.getUser(),
                                     new Resource(theResource,
-                                        Resource.TYPE_LOCALFILE), dataType,
+                                                 resourceType), dataType,
                                             createDate.getTime(),
                                             theDateRange[0].getTime(),
                                             theDateRange[1].getTime(), null);
