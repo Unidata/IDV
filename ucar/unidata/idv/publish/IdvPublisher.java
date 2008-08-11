@@ -145,6 +145,7 @@ public abstract class IdvPublisher implements Cloneable {
      */
     public abstract String getTypeName();
 
+    public void configure(){}
 
 
 

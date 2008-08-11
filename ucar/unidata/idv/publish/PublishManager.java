@@ -168,6 +168,7 @@ public class PublishManager extends IdvManager {
                     public void actionPerformed(ActionEvent ae) {
                         try {
                             IdvPublisher newPublisher = (IdvPublisher) theObject.getClass().newInstance();
+                            newPublisher.setIdv(getIdv());
                             if(newPublisher.doInitNew()) {
                                 publishers.add(newPublisher);
                                 updatePublishers(true);
@@ -179,12 +180,15 @@ public class PublishManager extends IdvManager {
                 });
         }
         if(publishers.size()>0) {
+            JMenu configMenu = new JMenu("Configure");
+            menu.add(configMenu);
             JMenu deleteMenu = new JMenu("Delete");
             menu.add(deleteMenu);
 
             //            menu.addSeparator();
             for(IdvPublisher publisher:(List<IdvPublisher>) publishers) {
                 deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
+                configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),publisher,"configure", null));
                 //                publisher.initMenu(menu);
             }
         }

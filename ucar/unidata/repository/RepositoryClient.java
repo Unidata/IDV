@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -35,9 +36,11 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.*;
+
+import java.util.ArrayList;
+
+import java.util.List;
 
 import javax.swing.*;
 
@@ -50,28 +53,45 @@ import javax.swing.*;
  */
 public class RepositoryClient extends RepositoryBase {
 
-    /** _more_          */
+    /** _more_ */
     private String sessionId;
 
-    /** _more_          */
-    private String user="";
+    /** _more_ */
+    private String user = "";
+
+    /** _more_ */
+    private String password = "";
 
     /** _more_          */
-    private String password="";
-
     private String name = "RAMADDA Client";
 
 
+    /**
+     * _more_
+     */
     public RepositoryClient() {}
 
 
-    public boolean  doConnect() {
-        String[]msg = new String[]{""};
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean doConnect() {
+        String[] msg = new String[] { "" };
 
-        if(!isValidSession(true, msg)) {
-            if(user.length()!=0) {
-                JLabel lbl = new JLabel("<html>Could not connect to RAMADDA:<blockquote>" + msg[0]+"</blockquote>Do you want to configure the connection?</html>");
-                if(!GuiUtils.showOkCancelDialog(null,"RAMADDA Connection Error", GuiUtils.inset(lbl,5),null)) return false;
+        if ( !isValidSession(true, msg)) {
+            if (user.length() != 0) {
+                JLabel lbl =
+                    new JLabel(
+                        "<html>Could not connect to RAMADDA:<blockquote>"
+                        + msg[0]
+                        + "</blockquote>Do you want to configure the connection?</html>");
+                if ( !GuiUtils.showOkCancelDialog(null,
+                        "RAMADDA Connection Error", GuiUtils.inset(lbl, 5),
+                        null)) {
+                    return false;
+                }
             }
             return showConfigDialog();
         }
@@ -79,17 +99,27 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSessionId() {
         return sessionId;
     }
 
-    private boolean  showConfigDialog() {
-        JTextField nameFld   = new JTextField(name, 30);
-        JTextField serverFld   = new JTextField(getHostname(),30);
-        JTextField pathFld   = new JTextField(getUrlBase(),30);
-        JTextField portFld   = new JTextField(""+getPort());
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean showConfigDialog() {
+        JTextField nameFld     = new JTextField(name, 30);
+        JTextField serverFld   = new JTextField(getHostname(), 30);
+        JTextField pathFld     = new JTextField(getUrlBase(), 30);
+        JTextField portFld     = new JTextField("" + getPort());
         JTextField passwordFld = new JPasswordField(password);
-        JTextField userFld     = new JTextField(user,30);
+        JTextField userFld     = new JTextField(user, 30);
         List       comps       = new ArrayList();
         comps.add(GuiUtils.rLabel("Name:"));
         comps.add(GuiUtils.inset(nameFld, 4));
@@ -104,27 +134,27 @@ public class RepositoryClient extends RepositoryBase {
         comps.add(GuiUtils.rLabel("Password:"));
         comps.add(GuiUtils.inset(passwordFld, 4));
         JPanel contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_Y,
-                                     GuiUtils.WT_NNY);
+                                            GuiUtils.WT_NNY);
         contents = GuiUtils.topCenter(
-                               GuiUtils.cLabel("Please provide the following information"),
-                               contents);
+            GuiUtils.cLabel("Please provide the following information"),
+            contents);
 
         while (true) {
-            if ( !GuiUtils.askOkCancel(
-                                       "Configure access to RAMADDA", contents)) {
+            if ( !GuiUtils.askOkCancel("Configure access to RAMADDA",
+                                       contents)) {
                 return false;
             }
             setName(nameFld.getText());
             setHostname(serverFld.getText().trim());
             setPort(new Integer(portFld.getText().trim()).intValue());
             setUrlBase(pathFld.getText().trim());
-            user = userFld.getText().trim();
+            user     = userFld.getText().trim();
             password = passwordFld.getText().trim();
-            String[]msg = {""};
-            if (isValidSession(true,msg)) {
+            String[] msg = { "" };
+            if (isValidSession(true, msg)) {
                 LogUtil.userMessage("Configuration succeeded");
                 break;
-            } 
+            }
             LogUtil.userMessage(msg[0]);
         }
         return true;
@@ -147,9 +177,19 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
-    public boolean isValidSession(boolean doLogin, String[]msg) {
-        if(!isValidSession(msg)) {
-            if(doLogin)  return doLogin(msg);
+    /**
+     * _more_
+     *
+     * @param doLogin _more_
+     * @param msg _more_
+     *
+     * @return _more_
+     */
+    public boolean isValidSession(boolean doLogin, String[] msg) {
+        if ( !isValidSession(msg)) {
+            if (doLogin) {
+                return doLogin(msg);
+            }
             return false;
         }
         return true;
@@ -159,34 +199,42 @@ public class RepositoryClient extends RepositoryBase {
     /**
      * _more_
      *
+     *
+     * @param msg _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public boolean isValidSession(String[]msg)  {
+    public boolean isValidSession(String[] msg) {
         if (sessionId == null) {
             msg[0] = "No session id";
             return false;
         }
         try {
-        String url =
-            HtmlUtil.url(URL_USER_HOME.getFullUrl(),
-                         new String[] { ARG_OUTPUT,
-                                        "xml", ARG_SESSIONID, sessionId });
-        String  contents = IOUtil.readContents(url, getClass());
-        Element root     = XmlUtil.getRoot(contents);
-        if(responseOk(root)) {
-            return true;
-        } else {
-            msg[0] =  XmlUtil.getChildText(root).trim();
-            return false;
-        }
-        } catch(Exception exc) {
+            String url = HtmlUtil.url(URL_USER_HOME.getFullUrl(),
+                                      new String[] { ARG_OUTPUT,
+                    "xml", ARG_SESSIONID, sessionId });
+            String  contents = IOUtil.readContents(url, getClass());
+            Element root     = XmlUtil.getRoot(contents);
+            if (responseOk(root)) {
+                return true;
+            } else {
+                msg[0] = XmlUtil.getChildText(root).trim();
+                return false;
+            }
+        } catch (Exception exc) {
             msg[0] = "Could not connect to server:" + getHostname();
             return false;
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param root _more_
+     *
+     * @return _more_
+     */
     public boolean responseOk(Element root) {
         return XmlUtil.getAttribute(root, ATTR_CODE).equals("ok");
     }
@@ -196,29 +244,30 @@ public class RepositoryClient extends RepositoryBase {
     /**
      * _more_
      *
+     *
+     * @param msg _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public boolean doLogin(String[]msg)  {
+    public boolean doLogin(String[] msg) {
         try {
-        String url =
-            HtmlUtil.url(URL_USER_LOGIN.getFullUrl(),
-                         new String[] {
-                             ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
-                             ARG_USER_ID, getUser()
-                         });
-        String  contents = IOUtil.readContents(url, getClass());
-        Element root     = XmlUtil.getRoot(contents);
-        String body = XmlUtil.getChildText(root).trim();
-        if (responseOk(root)) {
-            sessionId = body;
-            return true;
-        } else {
-            msg[0] = body;
-            return false;
-        }
-        } catch(Exception exc) {
+            String url = HtmlUtil.url(URL_USER_LOGIN.getFullUrl(),
+                                      new String[] {
+                ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
+                ARG_USER_ID, getUser()
+            });
+            String  contents = IOUtil.readContents(url, getClass());
+            Element root     = XmlUtil.getRoot(contents);
+            String  body     = XmlUtil.getChildText(root).trim();
+            if (responseOk(root)) {
+                sessionId = body;
+                return true;
+            } else {
+                msg[0] = body;
+                return false;
+            }
+        } catch (Exception exc) {
             msg[0] = "Could not connect to server:" + getHostname();
         }
         return false;
@@ -229,7 +278,7 @@ public class RepositoryClient extends RepositoryBase {
      *
      *  @param value The new value for Password
      */
-    public void setPassword(String value) {
+    private void setPassword(String value) {
         password = value;
     }
 
@@ -238,8 +287,35 @@ public class RepositoryClient extends RepositoryBase {
      *
      *  @return The Password
      */
-    public String getPassword() {
+    private String getPassword() {
         return password;
+    }
+
+
+    /**
+     *  Method for encoding to xml the password. This simply obfuscates what is saved to disk
+     *
+     *  @param value The new value
+     */
+    public void setTmp(byte[] value) {
+        if (value == null) {
+            password = null;
+        } else {
+            password = new String(XmlUtil.decodeBase64(new String(value)));
+        }
+    }
+
+
+    /**
+     *  Method for encoding to xml the password. This simply obfuscates what is saved to disk
+     *
+     *  @return The Password
+     */
+    public byte[] getTmp() {
+        if (password == null) {
+            return null;
+        }
+        return XmlUtil.encodeBase64(password.getBytes()).getBytes();
     }
 
     /**
@@ -261,23 +337,23 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
-
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
 
 

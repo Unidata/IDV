@@ -110,6 +110,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         return super.getName();
     }
 
+
+
+
     /**
      * What is the name of this publisher
      *
@@ -120,6 +123,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     }
 
 
+    public void configure(){
+        if (repositoryClient == null) {
+            repositoryClient = new RepositoryClient();
+        }
+        repositoryClient.showConfigDialog();
+    }
 
 
     /**
