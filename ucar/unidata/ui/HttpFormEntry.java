@@ -647,6 +647,7 @@ public class HttpFormEntry {
                     //Not sure why but we have seen a couple of times
                     //the byte value '0' gets into one of these strings
                     //This causes an error in the StringPart.
+                    //                    System.err.println("
                     String value = formEntry.getValue();
                     char   with  = new String(" ").charAt(0);
                     while (value.indexOf(0) >= 0) {
