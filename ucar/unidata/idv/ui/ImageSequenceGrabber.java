@@ -1776,7 +1776,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 LogUtil.userErrorMessage("Error writing movie:" + ioe);
                 return;
             }
-            idv.getPublishManager().publishContent(movieFile, publishCbx);
+            idv.getPublishManager().publishContent(movieFile, viewManager, publishCbx);
         }
 
 

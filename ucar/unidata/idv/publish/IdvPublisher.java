@@ -127,7 +127,7 @@ public abstract class IdvPublisher implements Cloneable {
     public void doPublish() {
     }
 
-    public void publishContent(String file) {}
+    public void publishContent(String file,ViewManager fromViewmanager) {}
 
 
     /**

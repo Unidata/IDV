@@ -4885,13 +4885,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                              fullWindowBtn);
 
             List accessoryComps = Misc.newList(qualityPanel,
-                                       new JLabel(" "), whatPanel,
-                                       new JLabel(" "),
+                                               GuiUtils.filler(5,5),
+                                               whatPanel,
+                                               GuiUtils.filler(5,5),
                                                backgroundTransparentBtn);
             
 
-
             if(publishCbx!=null) {
+                accessoryComps.add(GuiUtils.filler(5,5));
                 accessoryComps.add(publishCbx);
             }
             JComponent accessory = GuiUtils.vbox(accessoryComps);
@@ -4920,7 +4921,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                     if(vectorRenderer.showConfigDialog()) {
                         vectorRenderer.renderTo(filename);
-                        getIdv().getPublishManager().publishContent(filename, publishCbx);
+                        getIdv().getPublishManager().publishContent(filename, this, publishCbx);
                     }
                     System.setSecurityManager(backup);
                     return;
@@ -5027,12 +5028,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             zos.putNextEntry(new ZipEntry(tail + suffix));
                             zos.write(imageBytes, 0, imageBytes.length);
                             zos.close();
-                            getIdv().getPublishManager().publishContent(filename, publishCbx);
+                            getIdv().getPublishManager().publishContent(filename, this, publishCbx);
                             return;
                         }
                     }
                     ImageUtils.writeImageToFile(image, filename, quality);
-                    getIdv().getPublishManager().publishContent(filename, publishCbx);
+                    getIdv().getPublishManager().publishContent(filename, this, publishCbx);
                 }
                 if (andSaveBundle) {
                     filename = IOUtil.stripExtension(filename) + ".jnlp";

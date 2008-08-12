@@ -679,7 +679,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         boolean prevMakeDataRelative = makeDataRelative;
         makeDataRelative = makeDataRelativeCbx.isSelected();
         doSave(filename);
-        getPublishManager().publishContent(filename,publishCbx);
+        getPublishManager().publishContent(filename,null,publishCbx);
         makeDataEditable = prevMakeDataEditable;
         makeDataRelative = prevMakeDataRelative;
         getIdv().addToHistoryList(filename);

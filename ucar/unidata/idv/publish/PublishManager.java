@@ -132,12 +132,12 @@ public class PublishManager extends IdvManager {
         return cbx;
     }
 
-    public void publishContent(String file, JComboBox box) {
+    public void publishContent(String file, ViewManager fromViewmanager, JComboBox box) {
         if(box == null || box.getSelectedIndex()==0) {
             return;
         }
         IdvPublisher publisher = (IdvPublisher) box.getSelectedItem();
-        publisher.publishContent(file);
+        publisher.publishContent(file, fromViewmanager);
     }
 
     private void  updatePublishers(boolean andWrite) {
