@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -331,6 +332,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private List visibilityCbs = new ArrayList();
 
+
+    /** is raster property */
+    private boolean isRaster = false;
 
 
     /**
@@ -809,7 +813,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** slider for setting skip values */
     protected JSlider skipSlider;
 
-    /** _more_ */
+    /** z position slider */
     private JSlider zPositionSlider;
 
     /** the skip value */
@@ -3392,6 +3396,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    /**
+     * Get the data for the display list
+     *
+     * @return  the dat for the display list
+     */
     public Data getDataForDisplayList() {
         return getDisplayListData();
     }
@@ -8419,23 +8428,39 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return isVisible;
     }
 
-    public void toggleVisibilityForVectorRendering(int rasterMode) throws Exception {
-        if(rasterMode == RASTERMODE_SHOWRASTER) {
+    /**
+     * Toggle the visibility for vector graphics rendering
+     *
+     * @param rasterMode  the toggle mode
+     *
+     * @throws Exception  problem toggling
+     */
+    public void toggleVisibilityForVectorGraphicsRendering(int rasterMode)
+            throws Exception {
+        if (rasterMode == RASTERMODE_SHOWRASTER) {
             setDisplayVisibility(getIsRaster());
-        } else if(rasterMode == RASTERMODE_SHOWNONRASTER) {
-            setDisplayVisibility(!getIsRaster());
+        } else if (rasterMode == RASTERMODE_SHOWNONRASTER) {
+            setDisplayVisibility( !getIsRaster());
         } else {
             setDisplayVisibility(true);
         }
     }
 
 
-    private boolean isRaster = false;
-
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
     public boolean getIsRaster() {
         return isRaster;
     }
 
+    /**
+     * Set IsRaster property
+     *
+     * @param v  the value
+     */
     public void setIsRaster(boolean v) {
         isRaster = v;
     }
@@ -9966,13 +9991,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Set the Z position
      *
-     * @param value _more_
-     * @param fromSlider _more_
+     * @param value  the value
+     * @param fromSlider  true if from slider
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
      */
     public void setZPosition(double value, boolean fromSlider)
             throws RemoteException, VisADException {
