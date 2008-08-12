@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.chooser;
 
 
@@ -39,6 +40,7 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.idv.*;
 
 import ucar.unidata.ui.XmlTree;
+import ucar.unidata.util.CatalogUtil;
 
 
 import ucar.unidata.util.FileManager;
@@ -49,15 +51,15 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.CatalogUtil;
 
 
 import ucar.unidata.xml.XmlUtil;
-import java.io.File;
 
 import java.awt.*;
 
 import java.awt.event.*;
+
+import java.io.File;
 
 
 
@@ -115,9 +117,13 @@ public class ThreddsHandler extends XmlHandler {
         root.setAttribute(CatalogUtil.ATTR_CATALOGURL, path);
     }
 
+    /**
+     * _more_
+     */
     protected void updateStatus() {
-        if(chooser.getHaveData()) {
-            chooser.setStatus("Press \"" + chooser.CMD_LOAD + "\" to load the selected data", "buttons");
+        if (chooser.getHaveData()) {
+            chooser.setStatus("Press \"" + chooser.CMD_LOAD
+                              + "\" to load the selected data", "buttons");
         } else {
             chooser.setStatus("Please select a dataset from the catalog");
         }
@@ -148,7 +154,8 @@ public class ThreddsHandler extends XmlHandler {
                 return "Rights";
             }
         }
-        String title = XmlUtil.getAttribute(node, CatalogUtil.ATTR_XLINK_TITLE,
+        String title = XmlUtil.getAttribute(node,
+                                            CatalogUtil.ATTR_XLINK_TITLE,
                                             (String) null);
         if (title != null) {
             return title;
@@ -218,7 +225,8 @@ public class ThreddsHandler extends XmlHandler {
             if (docNodes.size() == 1) {
                 node.appendChild((Element) docNodes.get(0));
             } else {
-                Element newDocNode = doc.createElement(CatalogUtil.TAG_DOCPARENT);
+                Element newDocNode =
+                    doc.createElement(CatalogUtil.TAG_DOCPARENT);
                 node.appendChild(newDocNode);
                 for (int i = 0; i < docNodes.size(); i++) {
                     newDocNode.appendChild((Element) docNodes.get(i));
@@ -266,7 +274,7 @@ public class ThreddsHandler extends XmlHandler {
                     return null;
                 }
                 if (doc.getDocumentElement().getTagName().equals(
-                                                                 CatalogUtil.TAG_CATALOG)) {
+                        CatalogUtil.TAG_CATALOG)) {
                     return doc;
                 }
                 //Else (e.g., wms) show a new xml xhooser ui
@@ -346,7 +354,9 @@ public class ThreddsHandler extends XmlHandler {
                 List    elements = tree.getSelectedElements();
                 boolean haveData = false;
                 for (int i = 0; (i < elements.size()) && !haveData; i++) {
-                    haveData = CatalogUtil.getUrlPath((Element) elements.get(i)) != null;
+                    haveData =
+                        CatalogUtil.getUrlPath((Element) elements.get(i))
+                        != null;
                 }
                 chooser.setHaveData(haveData);
             }
@@ -375,13 +385,16 @@ public class ThreddsHandler extends XmlHandler {
             TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         tree.addXlinkTag(CatalogUtil.TAG_CATALOGREF);
         if (version == CatalogUtil.THREDDS_VERSION_0_4) {
-            tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOG, CatalogUtil.TAG_CATALOGREF,
-                    CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION));
+            tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOG,
+                    CatalogUtil.TAG_CATALOGREF, CatalogUtil.TAG_COLLECTION,
+                    CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION));
         } else {
             tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOGREF,
-                    CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION,
+                    CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET,
+                    CatalogUtil.TAG_DOCUMENTATION,
                     CatalogUtil.TAG_DOCPARENT));
-            tree.addTagsToNotProcessButRecurse(Misc.newList(CatalogUtil.TAG_CATALOG));
+            tree.addTagsToNotProcessButRecurse(
+                Misc.newList(CatalogUtil.TAG_CATALOG));
         }
         tree.setIconForTag(
             GuiUtils.getImageIcon(
@@ -521,23 +534,27 @@ public class ThreddsHandler extends XmlHandler {
     private void showDocumentation(Element node) {
         String doc   = null;
         String title = null;
-        if (XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE, "").equals(CatalogUtil.VALUE_SUMMARY)) {
+        if (XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE,
+                                 "").equals(CatalogUtil.VALUE_SUMMARY)) {
             //            <documentation type="summary">
             doc   = XmlUtil.getChildText(node);
             title = "Summary";
-        } else if (XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE,
-                                        "").equals(CatalogUtil.VALUE_RIGHTS)) {
+        } else if (XmlUtil.getAttribute(
+                node, CatalogUtil.ATTR_TYPE, "").equals(
+                CatalogUtil.VALUE_RIGHTS)) {
             //            <documentation type="summary">
             doc   = XmlUtil.getChildText(node);
             title = "Rights";
         } else {
             //            <documentation xlink:href="http://cloud1.arc.nasa.gov/solve/" xlink:title="SOLVE home page"/>
-            String xlink = XmlUtil.getAttribute(node, CatalogUtil.ATTR_XLINK_HREF,
-                               (String) null);
+            String xlink = XmlUtil.getAttribute(node,
+                               CatalogUtil.ATTR_XLINK_HREF, (String) null);
             //            System.err.println("xlink:" + xlink);
             if (xlink != null) {
-                doc   = IOUtil.readContents(xlink, (String) null);
-                title = XmlUtil.getAttribute(node, CatalogUtil.ATTR_XLINK_TITLE, "");
+                doc = IOUtil.readContents(xlink, (String) null);
+                title = XmlUtil.getAttribute(node,
+                                             CatalogUtil.ATTR_XLINK_TITLE,
+                                             "");
             }
         }
 
@@ -659,19 +676,20 @@ public class ThreddsHandler extends XmlHandler {
      *  @param datasetNode The xml node the user chose.
      */
     private void process04Dataset(Element datasetNode) {
-        String serverId = XmlUtil.getAttribute(datasetNode, CatalogUtil.ATTR_SERVERID,
-                              NULL_STRING);
+        String serverId = XmlUtil.getAttribute(datasetNode,
+                              CatalogUtil.ATTR_SERVERID, NULL_STRING);
         if (serverId == null) {
             IdvChooser.errorMessage("No server id found");
             return;
         }
-        String urlPath = XmlUtil.getAttribute(datasetNode, CatalogUtil.ATTR_URLPATH,
-                             NULL_STRING);
+        String urlPath = XmlUtil.getAttribute(datasetNode,
+                             CatalogUtil.ATTR_URLPATH, NULL_STRING);
         if (urlPath == null) {
             IdvChooser.errorMessage("No urlPath found");
             return;
         }
-        Element serverNode = XmlUtil.findElement(root, CatalogUtil.TAG_SERVER, CatalogUtil.ATTR_ID,
+        Element serverNode = XmlUtil.findElement(root,
+                                 CatalogUtil.TAG_SERVER, CatalogUtil.ATTR_ID,
                                  serverId);
 
         if (serverNode == null) {
@@ -729,8 +747,8 @@ public class ThreddsHandler extends XmlHandler {
         }
 
 
-        String dataType = CatalogUtil.findDataTypeForDataset(datasetNode, root,
-                              CatalogUtil.getVersion(root), true);
+        String dataType = CatalogUtil.findDataTypeForDataset(datasetNode,
+                              root, CatalogUtil.getVersion(root), true);
 
         String serviceType  = CatalogUtil.getServiceType(serviceNode);
 
@@ -768,7 +786,8 @@ public class ThreddsHandler extends XmlHandler {
      * @return List of documentation nodes
      */
     private List getDocLinksDown(Element docNode, List list) {
-        String link = XmlUtil.getAttribute(docNode, CatalogUtil.ATTR_XLINK_HREF,
+        String link = XmlUtil.getAttribute(docNode,
+                                           CatalogUtil.ATTR_XLINK_HREF,
                                            (String) null);
         if (docNode.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
             if (link != null) {
@@ -777,9 +796,10 @@ public class ThreddsHandler extends XmlHandler {
                 }
                 list.add(link);
             } else {
-                String type = XmlUtil.getAttribute(docNode, CatalogUtil.ATTR_TYPE,
-                                  (String) null);
-                if ((type != null) && type.equals(CatalogUtil.VALUE_SUMMARY)) {
+                String type = XmlUtil.getAttribute(docNode,
+                                  CatalogUtil.ATTR_TYPE, (String) null);
+                if ((type != null)
+                        && type.equals(CatalogUtil.VALUE_SUMMARY)) {
                     String text = XmlUtil.getChildText(docNode);
                     if ((text != null) && (text.trim().length() > 0)) {
                         if (list == null) {
@@ -826,7 +846,8 @@ public class ThreddsHandler extends XmlHandler {
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
                 if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)
-                        || child.getTagName().equals(CatalogUtil.TAG_DOCPARENT)) {
+                        || child.getTagName().equals(
+                            CatalogUtil.TAG_DOCPARENT)) {
                     list = getDocLinksDown(child, list);
                 }
             }
@@ -857,19 +878,20 @@ public class ThreddsHandler extends XmlHandler {
         if (parent == null) {
             return dflt;
         }
-        NodeList elements = XmlUtil.getElements(parent, CatalogUtil.TAG_PROPERTY);
+        NodeList elements = XmlUtil.getElements(parent,
+                                CatalogUtil.TAG_PROPERTY);
         for (int i = 0; i < elements.getLength(); i++) {
             Node child = (Node) elements.item(i);
-            String nameValue = XmlUtil.getAttribute(child, CatalogUtil.ATTR_NAME,
-                                   (String) null);
+            String nameValue = XmlUtil.getAttribute(child,
+                                   CatalogUtil.ATTR_NAME, (String) null);
             if (nameValue == null) {
                 continue;
             }
             if ( !nameValue.equals(nameValueLookingFor)) {
                 continue;
             }
-            String valueValue = XmlUtil.getAttribute(child, CatalogUtil.ATTR_VALUE,
-                                    (String) null);
+            String valueValue = XmlUtil.getAttribute(child,
+                                    CatalogUtil.ATTR_VALUE, (String) null);
             if (valueValue != null) {
                 return valueValue;
             }
@@ -905,14 +927,15 @@ public class ThreddsHandler extends XmlHandler {
 
         if (urlPath != null) {
             //A hack to allow for absolute paths in urls
-            String url;
+            String  url;
             Element serviceNode = null;
-            
-            if(urlPath.indexOf("://")>=0 || new File(urlPath).exists()) { 
+
+            if ((urlPath.indexOf("://") >= 0) || new File(urlPath).exists()) {
                 url = urlPath;
             } else {
-                serviceNode = CatalogUtil.findServiceNodeForDataset(datasetNode,
-                                                        flagMissing, null);
+                serviceNode =
+                    CatalogUtil.findServiceNodeForDataset(datasetNode,
+                        flagMissing, null);
                 if (serviceNode == null) {
                     return false;
                 }
@@ -921,13 +944,13 @@ public class ThreddsHandler extends XmlHandler {
                 if (url == null) {
                     if (flagMissing) {
                         IdvChooser.errorMessage(
-                                                "Could not read any dataset urls");
+                            "Could not read any dataset urls");
                     }
                     return false;
                 }
             }
 
-            Hashtable properties  = new Hashtable();
+            Hashtable properties = new Hashtable();
             properties.put(CatalogUtil.PROP_CATALOGURL, path);
             String groupId = getPropertyAttributeFromChild(datasetNode,
                                  "group", null);
@@ -942,25 +965,31 @@ public class ThreddsHandler extends XmlHandler {
             }
 
 
-            String annotationServer =
-                getPropertyAttributeFromChild(datasetNode,
-                    CatalogUtil.VALUE_ANNOTATIONSERVER, null);
-            if (annotationServer != null) {
-                properties.put(CatalogUtil.PROP_ANNOTATIONSERVER, annotationServer);
+            List propertyNodes = XmlUtil.findChildren(datasetNode,
+                                     CatalogUtil.TAG_PROPERTY);
+            for (Element propertyNode : (List<Element>) propertyNodes) {
+                properties
+                    .put(XmlUtil
+                        .getAttribute(propertyNode,
+                                      CatalogUtil.ATTR_NAME), XmlUtil
+                                          .getAttribute(propertyNode,
+                                              CatalogUtil.ATTR_VALUE));
             }
 
-            CatalogUtil.addServiceProperties(datasetNode, properties, urlPath);
+            CatalogUtil.addServiceProperties(datasetNode, properties,
+                                             urlPath);
 
 
 
-            if(serviceNode!=null) {
+            if (serviceNode != null) {
                 //If this is a "Resolver" service type then the url points to a catalog 
                 //that holds the real url.
-                String    serviceType = CatalogUtil.getServiceType(serviceNode);
+                String serviceType = CatalogUtil.getServiceType(serviceNode);
                 getProperties(datasetNode, serviceNode, properties);
                 if (CatalogUtil.SERVICE_RESOLVER.equals(serviceType)) {
-                    String   resolverUrl = url;
-                    Object[] result = CatalogUtil.getResolverData(resolverUrl, properties);
+                    String resolverUrl = url;
+                    Object[] result =
+                        CatalogUtil.getResolverData(resolverUrl, properties);
                     if (result == null) {
                         return false;
                     }
@@ -968,13 +997,14 @@ public class ThreddsHandler extends XmlHandler {
                     serviceNode = (Element) result[2];
                     url         = (String) result[3];
                     properties.put(DataSource.PROP_RESOLVERURL, resolverUrl);
-                    String title = CatalogUtil.getTitleFromDataset((Element) datasetNode);
+                    String title = CatalogUtil.getTitleFromDataset(
+                                       (Element) datasetNode);
                     if ((title != null) && (properties != null)) {
                         properties.put(DataSource.PROP_TITLE, title);
                     }
                 }
             }
-            System.err.println ("Absolute url:" + url);
+            System.err.println("Absolute url:" + url);
             urlPaths.add(new XmlChooser.PropertiedAction(url, properties));
         } else {
             //For now don't deal with container dataset nodes
@@ -985,13 +1015,16 @@ public class ThreddsHandler extends XmlHandler {
                 return false;
             }
             //This is for dataset nodes that contain other dataset nodes.
-            List children = XmlUtil.findChildren(datasetNode, CatalogUtil.TAG_DATASET);
+            List children = XmlUtil.findChildren(datasetNode,
+                                CatalogUtil.TAG_DATASET);
             for (int i = 0; i < children.size(); i++) {
                 Element childDatasetNode = (Element) children.get(i);
                 urlPath = XmlUtil.getAttribute(childDatasetNode,
                         CatalogUtil.ATTR_URLPATH, NULL_STRING);
                 if (urlPath != null) {
-                    String base = CatalogUtil.findBaseForDataset(childDatasetNode, root);
+                    String base =
+                        CatalogUtil.findBaseForDataset(childDatasetNode,
+                            root);
                     if (base == null) {
                         return false;
                     }
@@ -1033,10 +1066,12 @@ public class ThreddsHandler extends XmlHandler {
             Element root = XmlUtil.getRoot(xml);
             String  name = XmlUtil.getAttribute(root, "name");
             System.out.println(name + "\n<ul>");
-            List children = XmlUtil.findChildren(root, CatalogUtil.TAG_DATASET);
+            List children = XmlUtil.findChildren(root,
+                                CatalogUtil.TAG_DATASET);
             for (int i = 0; i < children.size(); i++) {
                 Element child = (Element) children.get(i);
-                CatalogUtil.generateHtml(root, child, 0, bundleTemplate, jnlpTemplate);
+                CatalogUtil.generateHtml(root, child, 0, bundleTemplate,
+                                         jnlpTemplate);
             }
 
             System.out.println("</ul>");
