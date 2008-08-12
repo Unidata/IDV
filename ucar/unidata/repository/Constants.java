@@ -715,6 +715,8 @@ public interface Constants {
     public static final String ATTR_DESCRIPTION = "description";
     public static final String ATTR_FILE = "file";
 
+    public static final String TAG_METADATA = "metadata";
+
 
 
     /** _more_ */

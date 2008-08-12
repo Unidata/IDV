@@ -161,8 +161,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     }
 
 
-    /** _more_ */
-    private JComponent contents;
+
 
     private DateTimePicker fromDateFld;
 
@@ -198,12 +197,18 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     /** _more_ */
     private JTextField westFld;
 
+    private JCheckBox  doBundleCbx  = new JCheckBox("Include bundle", true);
+    private JCheckBox myAddAssociationCbx = new JCheckBox("",false);
 
+
+    private List comps;
 
     /**
      * _more_
      */
     private void doMakeContents() {
+        if(fromDateFld!=null) return;
+        comps = new ArrayList();
         Date now = new Date();
         fromDateFld   = new DateTimePicker(now);
         toDateFld   = new DateTimePicker(now);
@@ -223,9 +228,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                             GuiUtils.wrap(GuiUtils.inset(southFld,i)));
 
 
-        GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+
         JComponent dateComp = GuiUtils.hbox(fromDateFld, toDateFld);
-        contents           = GuiUtils.doLayout(new Component[] {
+        comps = Misc.toList(new Component[] {
             GuiUtils.rLabel("Name:"), nameFld,
             GuiUtils.top(GuiUtils.rLabel("Description:")), descFld,
             GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
@@ -234,9 +239,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             GuiUtils.rLabel("Parent Group Id:"),
             GuiUtils.left(parentGroupFld),
             GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
-        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        }); 
     }
 
+
+    private String lastBundleFile;
+    private String lastBundleId;
 
     /**
      * _more_
@@ -254,20 +262,36 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                 ? false
                                 : getIdv().getArgsManager().isBundleFile(
                                     contentFile));
-            if (contents == null) {
-                doMakeContents();
+
+            doMakeContents();
+            List myComps = new ArrayList(comps);
+
+
+            JCheckBox  addAssociationCbx  = null;
+            List topComps = new ArrayList();
+
+
+            if (contentFile != null && !isBundle) {
+                topComps.add(GuiUtils.rLabel("File:"));
+                topComps.add(GuiUtils.left(GuiUtils.hbox(new JLabel(IOUtil.getFileTail(contentFile)), GuiUtils.filler(10,5),doBundleCbx)));
+                if(lastBundleId!=null) {
+                    addAssociationCbx = myAddAssociationCbx;
+                    addAssociationCbx.setText("Add association with last bundle: " + IOUtil.getFileTail(lastBundleFile)); 
+                    topComps.add(GuiUtils.filler());
+                    topComps.add(addAssociationCbx);
+                }
             }
-            JCheckBox  doBundleCbx  = new JCheckBox("Include Bundle", true);
-            JComponent thisContents = contents;
-            if ((contentFile != null) && !isBundle) {
-                thisContents =
-                    GuiUtils.topCenter(GuiUtils.vbox(new JLabel("File: "
-                        + contentFile), doBundleCbx), contents);
-            }
+
+
+            topComps.addAll(myComps);
+            GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+            JComponent contents  = GuiUtils.doLayout(topComps,2, GuiUtils.WT_NY, GuiUtils.WT_N);
+
+
 
             //Get one from the list
             if(fromViewManager==null) {
-                List viewManagers = getIdv().getViewManagers();
+                List viewManagers = getIdv().getVMManager().getViewManagers();
                 if(viewManagers.size()==1) {
                     fromViewManager = (ViewManager)viewManagers.get(0);
                 }
@@ -297,17 +321,16 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 }
             }
             if (contentFile != null) {
-                //            nameFld.setText(IOUtil.getFileTail(contentFile));
+                nameFld.setText(IOUtil.getFileTail(contentFile));
             } else {
-                //            nameFld.setText("");
+                nameFld.setText("");
             }
 
 
             while (true) {
-
                 while (true) {
                     if ( !GuiUtils.showOkCancelDialog(null,
-                            "Publish to RAMADDA", thisContents, null)) {
+                            "Publish to RAMADDA", contents, null)) {
                         return;
                     }
                     String parentGroup = parentGroupFld.getText().trim();
@@ -331,7 +354,6 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                             IOUtil.getFileTail(tmpFile)) + ".xidv");
                     getIdv().getPersistenceManager().doSave(bundleFile);
                 }
-
 
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ZipOutputStream       zos = new ZipOutputStream(bos);
@@ -358,7 +380,6 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
                 //        descFld.setText("");
 
-
                 String fromDate = repositoryClient.formatDate(fromDateFld.getDate());
                 String toDate = repositoryClient.formatDate(toDateFld.getDate());
                 int      cnt = 0;
@@ -378,10 +399,14 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 }
                 String mainId    = (cnt++) + "";
                 String contentId = (cnt++) + "";
-                String mainFile  = ((bundleFile != null)
-                                    ? bundleFile
-                                    : contentFile);
-
+                String mainFile;
+                if (bundleFile != null) {
+                    mainFile = bundleFile;
+                } else {
+                    mainFile = contentFile;
+                    contentFile = null;
+                    contentId = mainId;
+                }
 
                 List attrs;
                 
@@ -423,6 +448,13 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
                 }
 
+                if(addAssociationCbx!=null && addAssociationCbx.isSelected()) {
+                    XmlUtil.create(doc, TAG_ASSOCIATION, root, new String[] {
+                        ATTR_FROM, lastBundleId,
+                        ATTR_TO, contentId,
+                        ATTR_NAME, "generated product"
+                    });
+                }
 
 
                 String xml = XmlUtil.toString(root);
@@ -435,8 +467,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 bos.close();
 
 
+
+
                 List entries = new ArrayList();
-                System.err.println("id:" + repositoryClient.getSessionId());
                 entries.add(HttpFormEntry.hidden(ARG_SESSIONID,
                         repositoryClient.getSessionId()));
                 entries.add(HttpFormEntry.hidden(ARG_OUTPUT, "xml"));
@@ -448,11 +481,19 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                         repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
 
                 if (result[0] != null) {
-                    LogUtil.userErrorMessage("Error publishing:" + result[0]);
+                    LogUtil.userErrorMessage("Error publishing:\n" + result[0]);
                     return;
                 }
                 Element response = XmlUtil.getRoot(result[1]);
                 if (repositoryClient.responseOk(response)) {
+                    if(bundleFile!=null) {
+                        //TODO: get the id of the bundle created
+                        Element firstResult = XmlUtil.findChild(response, TAG_ENTRY);
+                        if(firstResult!=null) {
+                            lastBundleId = XmlUtil.getAttribute(firstResult, ATTR_ID);
+                            lastBundleFile = bundleFile;
+                        }
+                    }
                     LogUtil.userMessage("Publication was successful");
                     return;
                 }

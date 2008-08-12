@@ -3589,7 +3589,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
-    private void  processEntryXml(Request request, Element node, List newEntries, Hashtable entries, Hashtable files) throws Exception {
+    private Entry processEntryXml(Request request, Element node, List newEntries, Hashtable entries, Hashtable files) throws Exception {
         String name= XmlUtil.getAttribute(node, ATTR_NAME);
         String type= XmlUtil.getAttribute(node, ATTR_TYPE,TypeHandler.TYPE_FILE);
         String dataType= XmlUtil.getAttribute(node, ATTR_DATATYPE,"");
@@ -3614,7 +3614,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
         if(!getAccessManager().canDoAction(request, parentGroup,
                                            Permission.ACTION_NEW)) {
-            System.err.println ("BAD");
             throw new IllegalArgumentException("Cannot add to parent group:" + parentId);
         }
 
@@ -3668,12 +3667,29 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             entries.put(tmpid, entry);
         }
         newEntries.add(entry);
+        return entry;
     }
 
 
-    private void  processAssociationXml(Request request,Element node,Hashtable entries, Hashtable files) throws Exception {
-
-
+    private String  processAssociationXml(Request request,Element node,Hashtable entries, Hashtable files) throws Exception {
+        
+        String fromId = XmlUtil.getAttribute(node, ATTR_FROM);
+        String toId = XmlUtil.getAttribute(node, ATTR_TO);
+        Entry fromEntry = (Entry) entries.get(fromId);
+        Entry toEntry = (Entry) entries.get(toId);
+        if(fromEntry == null) {
+            fromEntry  = getEntry(request, fromId);
+            if(fromEntry == null) {
+                throw new IllegalArgumentException("Could not find from entry:" + fromId);
+            }
+        }
+        if(toEntry == null) {
+            toEntry  = getEntry(request, toId);
+            if(toEntry == null) {
+                throw new IllegalArgumentException("Could not find to entry:" + toId);
+            }
+        }
+        return addAssociation(request, fromEntry, toEntry, XmlUtil.getAttribute(node,ATTR_NAME));
     }
 
 
@@ -3697,12 +3713,14 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
         String entriesXml = null;
         Hashtable origFileToStorage = new Hashtable();
+        //        System.err.println ("\nprocessing");
         if(file.endsWith(".zip")) {
             ZipInputStream zin =
                 new ZipInputStream(IOUtil.getInputStream(file));
             ZipEntry ze;
             while ((ze = zin.getNextEntry())!=null) {
                 String entryName = ze.getName();
+                //                System.err.println ("ZIP: " + ze.getName());
                 if(entryName.equals("entries.xml")) {
                     entriesXml =  new String(IOUtil.readBytes(zin,
                                                               null, false));
@@ -3714,6 +3732,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                     FileOutputStream fos = new FileOutputStream(f);
                     IOUtil.writeTo(zin, fos);
                     fos.close();
+                    //                    System.err.println ("orig file:" + ze.getName() + " tmp file:" + f);
                     origFileToStorage.put(ze.getName(), f.toString());
                 }
             }
@@ -3731,12 +3750,23 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         Hashtable entries = new Hashtable();
         Element root = XmlUtil.getRoot(entriesXml);
         NodeList  children = XmlUtil.getElements(root);
+
+        Document resultDoc = XmlUtil.makeDocument();
+        Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
+                                   new String[] {ATTR_CODE,"ok"});
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if(node.getTagName().equals(TAG_ENTRY)) {
-                processEntryXml(request,node,newEntries,entries, origFileToStorage);
+                Entry entry = processEntryXml(request,node,newEntries,entries, origFileToStorage);
+                XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot, new String[]{
+                    ATTR_ID, entry.getId()
+                });
+
             } else if(node.getTagName().equals(TAG_ASSOCIATION)) {
-                processAssociationXml(request,node,entries, origFileToStorage);
+                String id = processAssociationXml(request,node,entries, origFileToStorage);
+                XmlUtil.create(resultDoc, TAG_ASSOCIATION, resultRoot, new String[]{
+                    ATTR_ID, id
+                });
             } else {
                 throw new IllegalArgumentException("<error>Unknown tag:" + node.getTagName() +"</error>");
             }
@@ -3747,7 +3777,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
         if(request.getOutput().equals("xml")) {
             //TODO: Return a list of the newly created entries
-            return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"ok"),""),MIME_XML);
+            String xml = XmlUtil.toString(resultRoot);
+            return new Result(xml,MIME_XML);
         }
 
         StringBuffer sb = new StringBuffer("OK");
@@ -4112,6 +4143,31 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
+    private String  addAssociation(Request request, Entry fromEntry, Entry toEntry, String name) throws Exception {
+        if (!getAccessManager().canDoAction(request, fromEntry, Permission.ACTION_NEW)) {
+            throw new IllegalArgumentException("Cannot add association to " + fromEntry);
+        }
+        if (!getAccessManager().canDoAction(request, toEntry, Permission.ACTION_NEW)) {
+            throw new IllegalArgumentException("Cannot add association to " + toEntry);
+        }
+
+
+        PreparedStatement assocInsert =
+            getConnection().prepareStatement(INSERT_ASSOCIATIONS);
+        int col = 1;
+        String id = getGUID();
+        assocInsert.setString(col++,id);
+        assocInsert.setString(col++, name);
+        assocInsert.setString(col++, "");
+        assocInsert.setString(col++, fromEntry.getId());
+        assocInsert.setString(col++, toEntry.getId());
+        assocInsert.execute();
+        assocInsert.close();
+        fromEntry.setAssociations(null);
+        toEntry.setAssociations(null);
+        return id;
+    }
+
 
     /**
      * _more_
@@ -4136,19 +4192,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
         String name = request.getString(ARG_NAME, (String) null);
         if (name != null) {
-            PreparedStatement assocInsert =
-                getConnection().prepareStatement(INSERT_ASSOCIATIONS);
-            int col = 1;
-            assocInsert.setString(col++, getGUID());
-            assocInsert.setString(col++, name);
-            assocInsert.setString(col++, "");
-            assocInsert.setString(col++, fromEntry.getId());
-            assocInsert.setString(col++, toEntry.getId());
-            assocInsert.execute();
-            assocInsert.close();
-            fromEntry.setAssociations(null);
-            toEntry.setAssociations(null);
-
+            addAssociation(request, fromEntry, toEntry, name);
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
 
