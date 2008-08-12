@@ -23,23 +23,20 @@
 
 
 
+
 package ucar.unidata.repository.idv;
 
 
-import HTTPClient.*;
+
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
-import visad.DateTime;
+import ucar.unidata.data.DataSource;
 
 import ucar.unidata.idv.*;
-import ucar.visad.display.Animation;
-import ucar.visad.Util;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.unidata.idv.publish.IdvPublisher;
 
@@ -54,23 +51,31 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.unidata.xml.XmlUtil;
+
+import ucar.visad.Util;
+import ucar.visad.display.Animation;
+
+
+import visad.DateTime;
 
 
 
 import java.awt.*;
 
 import java.awt.geom.Rectangle2D;
+
 import java.io.*;
 
 import java.net.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.zip.*;
-import java.util.Date;
 
 
 import javax.swing.*;
@@ -130,7 +135,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     }
 
 
-    public void configure(){
+    /**
+     * _more_
+     */
+    public void configure() {
         if (repositoryClient == null) {
             repositoryClient = new RepositoryClient();
         }
@@ -163,15 +171,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
 
 
+    /** _more_          */
     private DateTimePicker fromDateFld;
 
+    /** _more_          */
     private DateTimePicker toDateFld;
 
-    /** _more_ */
-    private JTextField parentGroupFld;
-
-    /** _more_ */
-    private JTextField groupNameFld;
 
     /** _more_ */
     private JTextField nameFld;
@@ -197,23 +202,29 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     /** _more_ */
     private JTextField westFld;
 
-    private JCheckBox  doBundleCbx  = new JCheckBox("Include bundle", true);
-    private JCheckBox myAddAssociationCbx = new JCheckBox("",false);
+    /** _more_          */
+    private JCheckBox doBundleCbx = new JCheckBox("Include bundle", true);
+
+    /** _more_          */
+    private JCheckBox myAddAssociationCbx = new JCheckBox("", false);
 
 
+    /** _more_          */
     private List comps;
 
     /**
      * _more_
      */
     private void doMakeContents() {
-        if(fromDateFld!=null) return;
+        if (fromDateFld != null) {
+            return;
+        }
+        //        dialog = new JDialog("Publish to RAMADDA",true);
+
         comps = new ArrayList();
         Date now = new Date();
-        fromDateFld   = new DateTimePicker(now);
-        toDateFld   = new DateTimePicker(now);
-        parentGroupFld  = new JTextField("", 5);
-        groupNameFld    = new JTextField("", 30);
+        fromDateFld     = new DateTimePicker(now);
+        toDateFld       = new DateTimePicker(now);
         nameFld         = new JTextField("", 30);
         descFld         = new JTextArea("", 5, 30);
         contentsNameFld = new JTextField("", 30);
@@ -222,40 +233,61 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         southFld        = new JTextField("", 5);
         eastFld         = new JTextField("", 5);
         westFld         = new JTextField("", 5);
-        Insets i = new Insets(1,1,1,1);
-        JComponent bboxComp = GuiUtils.vbox(GuiUtils.wrap(GuiUtils.inset(northFld,i)),
-                                            GuiUtils.hbox(GuiUtils.inset(westFld,i), GuiUtils.inset(eastFld,i)),
-                                            GuiUtils.wrap(GuiUtils.inset(southFld,i)));
+        JComponent treeComp = repositoryClient.getTreeComponent();
+
+        Insets     i        = new Insets(1, 1, 1, 1);
+        JComponent bboxComp = GuiUtils.vbox(
+                                  GuiUtils.wrap(GuiUtils.inset(northFld, i)),
+                                  GuiUtils.hbox(
+                                      GuiUtils.inset(westFld, i),
+                                      GuiUtils.inset(
+                                          eastFld, i)), GuiUtils.wrap(
+                                              GuiUtils.inset(southFld, i)));
 
 
 
+        Dimension dim = new Dimension(200, 50);
+        JScrollPane descScroller = GuiUtils.makeScrollPane(descFld,
+                                       (int) dim.getWidth(),
+                                       (int) dim.getHeight());
+        descScroller.setPreferredSize(dim);
         JComponent dateComp = GuiUtils.hbox(fromDateFld, toDateFld);
         comps = Misc.toList(new Component[] {
             GuiUtils.rLabel("Name:"), nameFld,
-            GuiUtils.top(GuiUtils.rLabel("Description:")), descFld,
+            GuiUtils.top(GuiUtils.rLabel("Description:")), descScroller,
+            GuiUtils.rLabel("Parent Group:"), treeComp,
             GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
-            GuiUtils.rLabel("New Group Name:"),
-            GuiUtils.centerRight(groupNameFld, new JLabel(" (Optional)")),
-            GuiUtils.rLabel("Parent Group Id:"),
-            GuiUtils.left(parentGroupFld),
             GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
-        }); 
+        });
     }
 
 
+    /** _more_          */
     private String lastBundleFile;
+
+    /** _more_          */
     private String lastBundleId;
+
+    /** _more_          */
+    private boolean dialogOk;
+
+    /** _more_          */
+    private JDialog dialog;
 
     /**
      * _more_
      *
      * @param contentFile _more_
+     * @param fromViewManager _more_
      */
-    public void publishContent(String contentFile,ViewManager fromViewManager) {
+    public void publishContent(String contentFile,
+                               ViewManager fromViewManager) {
 
         if ( !isConfigured()) {
             return;
         }
+
+
 
         try {
             boolean isBundle = ((contentFile == null)
@@ -264,60 +296,110 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                     contentFile));
 
             doMakeContents();
-            List myComps = new ArrayList(comps);
+            List      myComps            = new ArrayList(comps);
 
 
-            JCheckBox  addAssociationCbx  = null;
-            List topComps = new ArrayList();
+            JCheckBox addAssociationCbx  = null;
+            List      topComps           = new ArrayList();
+
+            List      myDataSources      = new ArrayList();
+            List      myDataSourcesCbx   = new ArrayList();
+            List      myDataSourcesIds   = new ArrayList();
+            List      notMineDataSources = new ArrayList();
+            List      dataSources        = getIdv().getDataSources();
+            for (int i = 0; i < dataSources.size(); i++) {
+                DataSource dataSource = (DataSource) dataSources.get(i);
+                String ramaddaId =
+                    (String) dataSource.getProperty("ramadda.id");
+                String ramaddaHost =
+                    (String) dataSource.getProperty("ramadda.host");
+                if ((ramaddaId == null) || (ramaddaHost == null)) {
+                    notMineDataSources.add(dataSource);
+                    continue;
+                }
+                if ( !Misc.equals(ramaddaHost,
+                                  repositoryClient.getHostname())) {
+                    notMineDataSources.add(dataSource);
+                    continue;
+                }
+                myDataSources.add(dataSource);
+                myDataSourcesCbx.add(new JCheckBox(dataSource.toString(),
+                        false));
+                myDataSourcesIds.add(ramaddaId);
+            }
 
 
-            if (contentFile != null && !isBundle) {
+
+
+            if ((contentFile != null) && !isBundle) {
                 topComps.add(GuiUtils.rLabel("File:"));
-                topComps.add(GuiUtils.left(GuiUtils.hbox(new JLabel(IOUtil.getFileTail(contentFile)), GuiUtils.filler(10,5),doBundleCbx)));
-                if(lastBundleId!=null) {
+                topComps.add(
+                    GuiUtils.left(
+                        GuiUtils.hbox(
+                            new JLabel(IOUtil.getFileTail(contentFile)),
+                            GuiUtils.filler(10, 5), doBundleCbx)));
+                if (lastBundleId != null) {
                     addAssociationCbx = myAddAssociationCbx;
-                    addAssociationCbx.setText("Add association with last bundle: " + IOUtil.getFileTail(lastBundleFile)); 
+                    addAssociationCbx.setText(
+                        "Add association with last bundle: "
+                        + IOUtil.getFileTail(lastBundleFile));
                     topComps.add(GuiUtils.filler());
                     topComps.add(addAssociationCbx);
                 }
             }
 
 
+            int numTopComps = topComps.size();
             topComps.addAll(myComps);
-            GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-            JComponent contents  = GuiUtils.doLayout(topComps,2, GuiUtils.WT_NY, GuiUtils.WT_N);
+            if (myDataSourcesCbx.size() > 0) {
+                topComps.add(GuiUtils.rLabel("Make associations to:"));
+                topComps.add(GuiUtils.left(GuiUtils.vbox(myDataSourcesCbx)));
+            }
 
+
+            GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+            double[] wts = {
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            };
+            wts[numTopComps / 2 + 1] = 0.2;
+            wts[numTopComps / 2 + 2] = 1.0;
+
+
+            JComponent contents = GuiUtils.doLayout(topComps, 2,
+                                      GuiUtils.WT_NY, wts);
 
 
             //Get one from the list
-            if(fromViewManager==null) {
+            if (fromViewManager == null) {
                 List viewManagers = getIdv().getVMManager().getViewManagers();
-                if(viewManagers.size()==1) {
-                    fromViewManager = (ViewManager)viewManagers.get(0);
+                if (viewManagers.size() == 1) {
+                    fromViewManager = (ViewManager) viewManagers.get(0);
                 }
             }
 
-            
-            if(fromViewManager!=null) {
-                if((fromViewManager instanceof MapViewManager)) {
-                    MapViewManager mvm=(MapViewManager) fromViewManager;
-                    NavigatedDisplay navDisplay = mvm.getNavigatedDisplay();
-                    Rectangle2D.Double bbox  = navDisplay.getLatLonBox(false);
-                    if(bbox!=null) {
-                        southFld.setText(""+bbox.getY());
-                        northFld.setText(""+(bbox.getY()+bbox.getHeight()));
-                        westFld.setText(""+bbox.getX());
-                        eastFld.setText(""+(bbox.getX()+bbox.getWidth()));
+
+            if (fromViewManager != null) {
+                if ((fromViewManager instanceof MapViewManager)) {
+                    MapViewManager     mvm = (MapViewManager) fromViewManager;
+                    NavigatedDisplay   navDisplay = mvm.getNavigatedDisplay();
+                    Rectangle2D.Double bbox = navDisplay.getLatLonBox(false);
+                    if (bbox != null) {
+                        southFld.setText("" + bbox.getY());
+                        northFld.setText("" + (bbox.getY()
+                                + bbox.getHeight()));
+                        westFld.setText("" + bbox.getX());
+                        eastFld.setText("" + (bbox.getX() + bbox.getWidth()));
                     }
                 }
                 Animation anim = fromViewManager.getAnimation();
-                if(anim!=null) {
+                if (anim != null) {
                     DateTime[] dttms = anim.getTimes();
-                    if(dttms!=null && dttms.length>0) {
+                    if ((dttms != null) && (dttms.length > 0)) {
                         fromDateFld.setDate(Util.makeDate(dttms[0]));
-                        toDateFld.setDate(Util.makeDate(dttms[dttms.length-1]));
+                        toDateFld.setDate(
+                            Util.makeDate(dttms[dttms.length - 1]));
                     }
-                    
+
                 }
             }
             if (contentFile != null) {
@@ -327,16 +409,17 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             }
 
 
+            dialogOk = false;
+            String parentId = null;
             while (true) {
                 while (true) {
                     if ( !GuiUtils.showOkCancelDialog(null,
                             "Publish to RAMADDA", contents, null)) {
                         return;
                     }
-                    String parentGroup = parentGroupFld.getText().trim();
-                    if (parentGroup.length() == 0) {
-                        LogUtil.userMessage(
-                            "You must specify a parent group id");
+                    parentId = repositoryClient.getSelectedGroupFromTree();
+                    if (parentId == null) {
+                        LogUtil.userMessage("You must select a parent group");
                     } else {
                         break;
                     }
@@ -348,10 +431,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     contentFile = null;
                 } else if (doBundleCbx.isSelected()) {
                     String tmpFile = contentFile;
-                    if(tmpFile==null) tmpFile = "publish.xidv";
+                    if (tmpFile == null) {
+                        tmpFile = "publish.xidv";
+                    }
                     bundleFile = getIdv().getObjectStore().getTmpFile(
-                        IOUtil.stripExtension(
-                            IOUtil.getFileTail(tmpFile)) + ".xidv");
+                        IOUtil.stripExtension(IOUtil.getFileTail(tmpFile))
+                        + ".xidv");
                     getIdv().getPersistenceManager().doSave(bundleFile);
                 }
 
@@ -376,52 +461,61 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     zos.closeEntry();
                 }
 
-
-
                 //        descFld.setText("");
 
-                String fromDate = repositoryClient.formatDate(fromDateFld.getDate());
-                String toDate = repositoryClient.formatDate(toDateFld.getDate());
+                String fromDate =
+                    repositoryClient.formatDate(fromDateFld.getDate());
+                String toDate =
+                    repositoryClient.formatDate(toDateFld.getDate());
                 int      cnt = 0;
                 Document doc = XmlUtil.makeDocument();
                 Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                    new String[] {});
-                String parentId = parentGroupFld.getText().trim();
 
-                if (groupNameFld.getText().trim().length() > 0) {
-                    String groupId = (cnt++) + "";
-                    Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                                            new String[] {
-                        ATTR_ID, groupId, ATTR_TYPE, TYPE_GROUP, ATTR_PARENT,
-                        parentId, ATTR_NAME, groupNameFld.getText().trim()
-                    });
-                    parentId = groupId;
-                }
+
                 String mainId    = (cnt++) + "";
                 String contentId = (cnt++) + "";
                 String mainFile;
                 if (bundleFile != null) {
                     mainFile = bundleFile;
                 } else {
-                    mainFile = contentFile;
+                    mainFile    = contentFile;
                     contentFile = null;
-                    contentId = mainId;
+                    contentId   = mainId;
                 }
 
                 List attrs;
-                
+
                 attrs = Misc.toList(new String[] {
                     ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
                     ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
                     nameFld.getText().trim(), ATTR_DESCRIPTION,
-                    descFld.getText().trim(),
-                    ATTR_FROMDATE, fromDate, ATTR_TODATE, toDate
+                    descFld.getText().trim(), ATTR_FROMDATE, fromDate,
+                    ATTR_TODATE, toDate
                 });
+
+
+
                 checkAndAdd(attrs, ATTR_NORTH, northFld);
                 checkAndAdd(attrs, ATTR_SOUTH, southFld);
                 checkAndAdd(attrs, ATTR_EAST, eastFld);
                 checkAndAdd(attrs, ATTR_WEST, westFld);
-                XmlUtil.create(doc, TAG_ENTRY, root, Misc.listToStringArray(attrs));
+                XmlUtil.create(doc, TAG_ENTRY, root,
+                               Misc.listToStringArray(attrs));
+
+                for (int i = 0; i < myDataSourcesCbx.size(); i++) {
+                    if (((JCheckBox) myDataSourcesCbx.get(i)).isSelected()) {
+                        String id = (String) myDataSourcesIds.get(i);
+                        XmlUtil.create(doc, TAG_ASSOCIATION, root,
+                                       new String[] {
+                            ATTR_FROM, id, ATTR_TO, mainId, ATTR_NAME,
+                            "uses data"
+                        });
+                    }
+                }
+
+
+
 
                 if (contentFile != null) {
                     attrs = Misc.toList(new String[] {
@@ -436,22 +530,35 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     checkAndAdd(attrs, ATTR_EAST, eastFld);
                     checkAndAdd(attrs, ATTR_WEST, westFld);
 
-                    XmlUtil.create(doc, TAG_ENTRY, root,Misc.listToStringArray(attrs));
-                    if(bundleFile!=null) {
-                        XmlUtil.create(doc, TAG_ASSOCIATION, root, new String[] {
-                                ATTR_FROM, mainId,
-                                ATTR_TO, contentId,
-                                ATTR_NAME, "generated product"
-                            });
+                    XmlUtil.create(doc, TAG_ENTRY, root,
+                                   Misc.listToStringArray(attrs));
+                    if (bundleFile != null) {
+                        XmlUtil.create(doc, TAG_ASSOCIATION, root,
+                                       new String[] {
+                            ATTR_FROM, mainId, ATTR_TO, contentId, ATTR_NAME,
+                            "generated product"
+                        });
 
+                    }
+
+                    for (int i = 0; i < myDataSourcesCbx.size(); i++) {
+                        if (((JCheckBox) myDataSourcesCbx.get(
+                                i)).isSelected()) {
+                            String id = (String) myDataSourcesIds.get(i);
+                            XmlUtil.create(doc, TAG_ASSOCIATION, root,
+                                           new String[] {
+                                ATTR_FROM, id, ATTR_TO, contentId, ATTR_NAME,
+                                "uses data"
+                            });
+                        }
                     }
 
                 }
 
-                if(addAssociationCbx!=null && addAssociationCbx.isSelected()) {
+                if ((addAssociationCbx != null)
+                        && addAssociationCbx.isSelected()) {
                     XmlUtil.create(doc, TAG_ASSOCIATION, root, new String[] {
-                        ATTR_FROM, lastBundleId,
-                        ATTR_TO, contentId,
+                        ATTR_FROM, lastBundleId, ATTR_TO, contentId,
                         ATTR_NAME, "generated product"
                     });
                 }
@@ -467,12 +574,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 bos.close();
 
 
-
-
                 List entries = new ArrayList();
-                entries.add(HttpFormEntry.hidden(ARG_SESSIONID,
-                        repositoryClient.getSessionId()));
-                entries.add(HttpFormEntry.hidden(ARG_OUTPUT, "xml"));
+                repositoryClient.addUrlArgs(entries);
                 entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
                         bos.toByteArray()));
                 String[] result =
@@ -481,16 +584,19 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                         repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
 
                 if (result[0] != null) {
-                    LogUtil.userErrorMessage("Error publishing:\n" + result[0]);
+                    LogUtil.userErrorMessage("Error publishing:\n"
+                                             + result[0]);
                     return;
                 }
                 Element response = XmlUtil.getRoot(result[1]);
                 if (repositoryClient.responseOk(response)) {
-                    if(bundleFile!=null) {
+                    if (bundleFile != null) {
                         //TODO: get the id of the bundle created
-                        Element firstResult = XmlUtil.findChild(response, TAG_ENTRY);
-                        if(firstResult!=null) {
-                            lastBundleId = XmlUtil.getAttribute(firstResult, ATTR_ID);
+                        Element firstResult = XmlUtil.findChild(response,
+                                                  TAG_ENTRY);
+                        if (firstResult != null) {
+                            lastBundleId = XmlUtil.getAttribute(firstResult,
+                                    ATTR_ID);
                             lastBundleFile = bundleFile;
                         }
                     }
@@ -506,9 +612,16 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
     }
 
+    /**
+     * _more_
+     *
+     * @param attrs _more_
+     * @param attr _more_
+     * @param fld _more_
+     */
     private void checkAndAdd(List attrs, String attr, JTextField fld) {
-        String v  =fld.getText().trim();
-        if(v.length()>0) {
+        String v = fld.getText().trim();
+        if (v.length() > 0) {
             attrs.add(attr);
             attrs.add(v);
         }
@@ -523,7 +636,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      * @param properties _more_
      */
     public void doPublish() {
-        publishContent(null,null);
+        publishContent(null, null);
     }
 
 

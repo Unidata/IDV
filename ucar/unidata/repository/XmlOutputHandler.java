@@ -81,38 +81,6 @@ import java.util.zip.*;
  */
 public class XmlOutputHandler extends OutputHandler {
 
-    /** _more_ */
-    public static final String TAG_GROUPS = "groups";
-
-    /** _more_ */
-    public static final String TAG_GROUP = "group";
-
-    /** _more_ */
-    public static final String TAG_ENTRY = "entry";
-
-    /** _more_ */
-    public static final String TAG_ENTRIES = "entries";
-
-    /** _more_ */
-    public static final String TAG_DESCRIPTION = "description";
-
-
-    /** _more_ */
-    public static final String ATTR_ID = "id";
-
-    /** _more_ */
-    public static final String ATTR_GROUP = "group";
-
-    /** _more_ */
-    public static final String ATTR_TYPE = "type";
-
-    /** _more_ */
-    public static final String ATTR_RESOURCE = "resource";
-
-    /** _more_ */
-    public static final String ATTR_RESOURCE_TYPE = "resource_type";
-
-
 
     /** _more_ */
     public static final String OUTPUT_XML = "xml.xml";
@@ -386,7 +354,7 @@ public class XmlOutputHandler extends OutputHandler {
     private void getGroupTag(Group group, StringBuffer sb, boolean open) {
         sb.append(XmlUtil.openTag(TAG_GROUP,
                                   XmlUtil.attrs(ATTR_NAME,
-                                      group.getFullName(), ATTR_ID,
+                                      group.getName(), ATTR_ID,
                                       group.getId())));
 
         if ( !open) {

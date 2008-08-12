@@ -185,8 +185,6 @@ public interface Constants {
 
     public static final String ATTR_URL = "url";
 
-    /** _more_ */
-    public static final String ATTR_ID = "id";
 
 
     /** _more_ */
@@ -201,7 +199,6 @@ public interface Constants {
     public static final String ATTR_WEST = "west";
 
     /** _more_ */
-    public static final String ATTR_TYPE = "type";
     public static final String ATTR_DATATYPE = "datatype";
 
 
@@ -710,8 +707,7 @@ public interface Constants {
 
 
 
-    public static final String TAG_ENTRY = "entry";
-    public static final String TAG_ENTRIES= "entries";
+
     public static final String ATTR_DESCRIPTION = "description";
     public static final String ATTR_FILE = "file";
 
@@ -913,6 +909,41 @@ public interface Constants {
 
     /** _more_ */
     public static final String TYPE_GROUP = "group";
+
+
+
+    /** _more_ */
+    public static final String TAG_GROUPS = "groups";
+
+    /** _more_ */
+    public static final String TAG_GROUP = "group";
+
+    /** _more_ */
+    public static final String TAG_ENTRY = "entry";
+
+    /** _more_ */
+    public static final String TAG_ENTRIES = "entries";
+
+    /** _more_ */
+    public static final String TAG_DESCRIPTION = "description";
+
+
+    /** _more_ */
+    public static final String ATTR_ID = "id";
+
+    /** _more_ */
+    public static final String ATTR_GROUP = "group";
+
+    /** _more_ */
+    public static final String ATTR_TYPE = "type";
+
+    /** _more_ */
+    public static final String ATTR_RESOURCE = "resource";
+
+    /** _more_ */
+    public static final String ATTR_RESOURCE_TYPE = "resource_type";
+
+
 
 
 

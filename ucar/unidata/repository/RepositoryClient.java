@@ -22,10 +22,17 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
+import org.w3c.dom.Document;
+
+
 import org.w3c.dom.Element;
+
+import ucar.unidata.ui.HttpFormEntry;
+
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -37,12 +44,17 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
+import java.awt.event.*;
+
+
 
 import java.util.ArrayList;
 
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.tree.*;
 
 
 /**
@@ -53,6 +65,16 @@ import javax.swing.*;
  */
 public class RepositoryClient extends RepositoryBase {
 
+
+    /** _more_          */
+    JTree groupTree;
+
+    /** _more_          */
+    DefaultTreeModel treeModel;
+
+    /** _more_          */
+    GroupNode treeRoot;
+
     /** _more_ */
     private String sessionId;
 
@@ -62,7 +84,7 @@ public class RepositoryClient extends RepositoryBase {
     /** _more_ */
     private String password = "";
 
-    /** _more_          */
+    /** _more_ */
     private String name = "RAMADDA Client";
 
 
@@ -76,6 +98,301 @@ public class RepositoryClient extends RepositoryBase {
      * _more_
      *
      * @return _more_
+     */
+    public String getSelectedGroupFromTree() {
+        TreePath[] paths = groupTree.getSelectionModel().getSelectionPaths();
+        if (paths == null) {
+            return null;
+        }
+        for (int i = 0; i < paths.length; i++) {
+            Object last = paths[i].getLastPathComponent();
+            if (last == null) {
+                continue;
+            }
+            if ( !(last instanceof GroupNode)) {
+                continue;
+            }
+            return ((GroupNode) last).id;
+        }
+        return null;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JComponent getTreeComponent() {
+        if (groupTree == null) {
+            doMakeGroupTree();
+        }
+        Dimension defaultDimension = new Dimension(200, 100);
+        JScrollPane scroller = GuiUtils.makeScrollPane(groupTree,
+                                   (int) defaultDimension.getWidth(),
+                                   (int) defaultDimension.getHeight());
+        scroller.setPreferredSize(defaultDimension);
+        return scroller;
+    }
+
+    /**
+     * _more_
+     *
+     * @param node _more_
+     */
+    public void refreshTreeNode(GroupNode node) {
+        node.removeAllChildren();
+        node.haveLoaded = false;
+        node.checkExpansion();
+    }
+
+    /**
+     * _more_
+     */
+    public void refreshTree() {
+        refreshTreeNode(treeRoot);
+    }
+
+    /**
+     * _more_
+     */
+    private void doMakeGroupTree() {
+        treeRoot  = new GroupNode("Top", "0");
+        treeModel = new DefaultTreeModel(treeRoot);
+        groupTree = new GroupTree(treeModel);
+        groupTree.setToolTipText("Right-click to show menu");
+        groupTree.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if ((e.getKeyCode() == e.VK_R) && e.isControlDown()) {
+                    refreshTree();
+                }
+            }
+        });
+        groupTree.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event) {
+                treeClick(event);
+            }
+        });
+        ToolTipManager.sharedInstance().registerComponent(groupTree);
+
+        groupTree.setShowsRootHandles(true);
+        treeRoot.checkExpansion();
+    }
+
+    /**
+     * _more_
+     *
+     * @param event _more_
+     */
+    public void treeClick(MouseEvent event) {
+        TreePath path = groupTree.getPathForLocation(event.getX(),
+                            event.getY());
+        if (path == null) {
+            return;
+        }
+        Object last = path.getLastPathComponent();
+        if (last == null) {
+            return;
+        }
+        if ( !(last instanceof GroupNode)) {
+            return;
+        }
+        GroupNode groupNode = (GroupNode) last;
+        if (SwingUtilities.isRightMouseButton(event)) {
+            JPopupMenu popup = new JPopupMenu();
+            popup.add(GuiUtils.makeMenuItem("Create New Group", this,
+                                            "newGroup", groupNode));
+            popup.add(GuiUtils.makeMenuItem("Refresh", this,
+                                            "refreshTreeNode", groupNode));
+            popup.show((Component) event.getSource(), event.getX(),
+                       event.getY());
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param groupTreeNode _more_
+     */
+    public void newGroup(GroupNode groupTreeNode) {
+        try {
+            String parentId = groupTreeNode.id;
+            String name = GuiUtils.getInput("Enter a group name to create",
+                                            "Name: ", "");
+            if (name == null) {
+                return;
+            }
+            Document doc = XmlUtil.makeDocument();
+            Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                          new String[] {});
+            Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                    new String[] {
+                ATTR_ID, "1234", ATTR_TYPE, TYPE_GROUP, ATTR_PARENT, parentId,
+                ATTR_NAME, name
+            });
+
+            String xml     = XmlUtil.toString(root);
+            List   entries = new ArrayList();
+            addUrlArgs(entries);
+            entries.add(new HttpFormEntry(ARG_FILE, "entries.xml",
+                                          xml.getBytes()));
+            String[] result = HttpFormEntry.doPost(entries,
+                                  URL_ENTRY_XMLCREATE.getFullUrl());
+
+            if (result[0] != null) {
+                LogUtil.userErrorMessage("Error creating group:\n"
+                                         + result[0]);
+                return;
+            }
+            Element response = XmlUtil.getRoot(result[1]);
+            if (responseOk(response)) {
+                LogUtil.userMessage("Group created");
+                groupTreeNode.removeAllChildren();
+                groupTreeNode.haveLoaded = false;
+                groupTreeNode.checkExpansion();
+                return;
+            }
+            String body = XmlUtil.getChildText(response).trim();
+            LogUtil.userErrorMessage("Error creating group:" + body);
+        } catch (Exception exc) {
+            LogUtil.logException("Error creating group", exc);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     */
+    public void addUrlArgs(List entries) {
+        entries.add(HttpFormEntry.hidden(ARG_SESSIONID, getSessionId()));
+        entries.add(HttpFormEntry.hidden(ARG_OUTPUT, "xml"));
+
+    }
+
+    /**
+     * Class GroupNode _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
+    public class GroupNode extends DefaultMutableTreeNode {
+
+        /** Have I loaded */
+        private boolean haveLoaded = false;
+
+        /** _more_          */
+        private String id;
+
+        /**
+         * _more_
+         *
+         * @param name _more_
+         * @param id _more_
+         */
+        public GroupNode(String name, String id) {
+            super(name);
+            this.id = id;
+        }
+
+        /**
+         * Expand if needed
+         */
+        public void checkExpansion() {
+            if (haveLoaded) {
+                return;
+            }
+            haveLoaded = true;
+            //Run it in a thread
+            Misc.run(this, "checkExpansionInner");
+        }
+
+
+        /**
+         * expand if needed. This gets called in a thread from the above method.
+         */
+        public void checkExpansionInner() {
+            try {
+                removeAllChildren();
+                String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),
+                                          new String[] { ARG_ID,
+                        id, ARG_OUTPUT, "xml.xml" });
+                String  xml  = IOUtil.readContents(url, getClass());
+                Element root = XmlUtil.getRoot(xml);
+                for (Element child : (List<Element>) XmlUtil.findChildren(
+                        root, TAG_GROUP)) {
+                    GroupNode childNode =
+                        new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
+                                      XmlUtil.getAttribute(child, ATTR_ID));
+                    childNode.add(
+                        new DefaultMutableTreeNode("Please wait..."));
+                    this.add(childNode);
+                }
+                treeModel.nodeStructureChanged(this);
+            } catch (Exception exc) {
+                LogUtil.logException("Error loading group tree", exc);
+            }
+        }
+
+
+
+    }
+
+
+    /**
+     * Class GroupTree _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
+    private static class GroupTree extends JTree {
+
+        /**
+         * _more_
+         *
+         * @param model _more_
+         */
+        public GroupTree(TreeModel model) {
+            super(model);
+        }
+
+        /**
+         * _more_
+         *
+         * @param event _more_
+         *
+         * @return _more_
+         */
+        public String getToolTipText(MouseEvent event) {
+            return "Right-click to show context menu";
+        }
+
+        /**
+         * _more_
+         *
+         * @param treePath _more_
+         *
+         * @throws ExpandVetoException _more_
+         */
+        public void fireTreeWillExpand(TreePath treePath)
+                throws ExpandVetoException {
+            Object[] path = treePath.getPath();
+            if ((path.length > 0)
+                    && (path[path.length - 1] instanceof GroupNode)) {
+                ((GroupNode) path[path.length - 1]).checkExpansion();
+            }
+            super.fireTreeWillExpand(treePath);
+        }
+    }
+
+
+
+    /**
+     *     _more_
+     *    
+     *     @return _more_
      */
     public boolean doConnect() {
         String[] msg = new String[] { "" };

@@ -140,6 +140,8 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    public static final String ATTR_VALUE = "value";
+
     /** _more_ */
     public static final String ATTR_UNITS = "units";
 
@@ -151,6 +153,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String TAG_SERVICENAME = "serviceName";
+    public static final String TAG_PROPERTY = "property";
 
     /** _more_ */
     public static final String ATTR_SERVICENAME = "serviceName";
@@ -635,6 +638,16 @@ public class CatalogOutputHandler extends OutputHandler {
         Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
                                          parent, new String[] { ATTR_NAME,
                 entry.getName() });
+
+        XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
+                                         dataset, new String[] { ATTR_NAME,
+                                                                 "ramadda.id",
+                                                                 ATTR_VALUE, entry.getId()});
+        XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
+                                         dataset, new String[] { ATTR_NAME,
+                                                                 "ramadda.host",
+                                                                 ATTR_VALUE, getRepository().getHostname()});
+
         addServices(entry, request, catalogInfo, dataset);
 
         addMetadata(request, entry, catalogInfo, dataset);
