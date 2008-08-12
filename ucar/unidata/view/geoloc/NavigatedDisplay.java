@@ -1095,19 +1095,29 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public Rectangle2D.Double getLatLonBox()
             throws VisADException, RemoteException {
+        return getLatLonBox(true);
+    }
+
+
+    public Rectangle2D.Double getLatLonBox(boolean padSamples)
+            throws VisADException, RemoteException {
         java.awt.Rectangle b  = getScreenBounds();
 
-        double[]           xs = {
-            b.width * -0.1, b.width * 0.0, b.width * 0.1, b.width * 0.2,
+        double pad = (padSamples?0.1:0.0);
+        double[] xs;
+        double[] ys;
+
+        xs = new double[]{
+            b.width * -pad, b.width * 0.0, b.width * 0.1, b.width * 0.2,
             b.width * 0.3, b.width * 0.4, b.width * 0.5, b.width * 0.6,
             b.width * 0.7, b.width * 0.8, b.width * 0.9, b.width * 1.0,
-            b.width * 1.1
+            b.width * (1+pad)
         };
 
 
-        double[] ys = {
-            0 - b.height * 0.10, 0, b.height * 0.25, b.height * 0.5,
-            b.height * 1, b.height + b.height * 0.10
+        ys = new double[]{
+            0 - b.height * pad, 0, b.height * 0.25, b.height * 0.5,
+            b.height * 1, b.height + b.height * pad
         };
 
         double[] rangeX = { Double.NaN, Double.NaN };
