@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -1440,8 +1441,8 @@ public class ImageGenerator extends IdvManager {
      */
     protected boolean processTagDatasource(Element node) throws Throwable {
         debug("Creating data source");
-        Object dataObject =  applyMacros(node, ATTR_URL, (String) null);
-        if(dataObject == null) {
+        Object dataObject = applyMacros(node, ATTR_URL, (String) null);
+        if (dataObject == null) {
             dataObject = StringUtil.toString(findFiles(node));
         }
         String bundle = applyMacros(node, ATTR_BUNDLE, (String) null);
@@ -1454,8 +1455,8 @@ public class ImageGenerator extends IdvManager {
         if (dataObject != null) {
             dataSource = getIdv().makeOneDataSource(dataObject, type, null);
             if (dataSource == null) {
-                return error("Failed to create data source:" +dataObject + " "
-                             + type);
+                return error("Failed to create data source:" + dataObject
+                             + " " + type);
             }
         } else {
             try {
@@ -1742,8 +1743,10 @@ public class ImageGenerator extends IdvManager {
         }
         getIdv().getStateManager().setAlwaysLoadBundlesSynchronously(true);
         Hashtable bundleProperties = new Hashtable();
-        if(timesList!=null) 
-            bundleProperties.put(IdvPersistenceManager.PROP_TIMESLIST,timesList);
+        if (timesList != null) {
+            bundleProperties.put(IdvPersistenceManager.PROP_TIMESLIST,
+                                 timesList);
+        }
 
 
         if (bundleFile != null) {
@@ -1754,7 +1757,7 @@ public class ImageGenerator extends IdvManager {
                 String xml = IOUtil.readContents(bundleFile);
                 xml = applyMacros(xml);
                 getPersistenceManager().decodeXml(xml, false, bundleFile,
-                                                  null, false, true,bundleProperties, false, false);
+                        null, false, true, bundleProperties, false, false);
                 //                getPersistenceManager().decodeXmlFile(bundleFile, false,
                 //                        timesList);
             }
@@ -1772,13 +1775,14 @@ public class ImageGenerator extends IdvManager {
         }
         getPersistenceManager().clearFileMapping();
 
-        if(XmlUtil.hasAttribute(node, ATTR_COLOR)) {
+        if (XmlUtil.hasAttribute(node, ATTR_COLOR)) {
             Color c = applyMacros(node, ATTR_COLOR, Color.black);
-            if(c!=null) {
+            if (c != null) {
                 List viewManagers = getVMManager().getViewManagers();
                 for (int i = 0; i < viewManagers.size(); i++) {
-                    ViewManager viewManager = (ViewManager) viewManagers.get(i);
-                    viewManager.setColors(null,c);
+                    ViewManager viewManager =
+                        (ViewManager) viewManagers.get(i);
+                    viewManager.setColors(null, c);
                 }
             }
         }
@@ -2282,7 +2286,7 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Update the view managers
      */
     protected void updateViewManagers() {
         try {
@@ -2642,7 +2646,9 @@ public class ImageGenerator extends IdvManager {
      * @return Current properties hashtable.
      */
     private Hashtable getProperties() {
-        if(propertiesStack.size()==0) return new Hashtable();
+        if (propertiesStack.size() == 0) {
+            return new Hashtable();
+        }
         return (Hashtable) propertiesStack.get(propertiesStack.size() - 1);
     }
 
@@ -2792,7 +2798,9 @@ public class ImageGenerator extends IdvManager {
             return dflt;
         }
         String result = applyMacros(value);
-        if(result.equals("none")) return null;
+        if (result.equals("none")) {
+            return null;
+        }
         return GuiUtils.decodeColor(result, dflt);
     }
 
@@ -3270,8 +3278,10 @@ public class ImageGenerator extends IdvManager {
                     imageFile = new File(getImageFileName(loopFilename));
                 }
                 viewManager.writeImage(imageFile, true, false);
-            } else if(loopFilename!=null && ViewManager.isVectorFile(loopFilename)) {
-                VectorRenderer vectorRenderer = new VectorRenderer(viewManager);
+            } else if ((loopFilename != null)
+                       && ViewManager.isVectorGraphicsFile(loopFilename)) {
+                VectorGraphicsRenderer vectorRenderer =
+                    new VectorGraphicsRenderer(viewManager);
                 vectorRenderer.renderTo(loopFilename);
             } else {
 
@@ -4304,13 +4314,13 @@ public class ImageGenerator extends IdvManager {
         f.disconnect();
     }
 
-    /** _more_          */
+    /** _more_ */
     private static String[] alphabet = {
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
         "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
     };
 
-    /** _more_          */
+    /** _more_ */
     private static String[] roman = {
         "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI",
         "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XX", "XXI",
