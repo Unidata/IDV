@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -605,6 +606,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** hi res button */
     private static JRadioButton hiBtn;
 
+    /** publish checkbox */
     private JComboBox publishCbx;
 
     /** medium res button */
@@ -647,7 +649,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private boolean dirty = false;
 
 
-    private  VectorRenderer vectorRenderer;
+    /** Vector Graphics renderer */
+    private VectorGraphicsRenderer vectorRenderer;
 
 
 
@@ -4837,13 +4840,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * Check to see if the file is a vector graphics file
      *
-     * @param filename _more_
+     * @param filename  name of the file
      *
-     * @return _more_
+     * @return  true if it has the right extension
      */
-    public static boolean isVectorFile(String filename) {
+    public static boolean isVectorGraphicsFile(String filename) {
         return filename.toLowerCase().endsWith(".pdf")
                || filename.toLowerCase().endsWith(".ps")
                || filename.toLowerCase().endsWith(".eps")
@@ -4861,9 +4864,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         System.setSecurityManager(null);
         try {
             if (hiBtn == null) {
-                hiBtn  = new JRadioButton("High", true);
-                medBtn = new JRadioButton("Medium", false);
-                lowBtn = new JRadioButton("Low", false);
+                hiBtn      = new JRadioButton("High", true);
+                medBtn     = new JRadioButton("Medium", false);
+                lowBtn     = new JRadioButton("Low", false);
                 publishCbx = getIdv().getPublishManager().makeSelector();
                 GuiUtils.buttonGroup(hiBtn, medBtn).add(lowBtn);
                 backgroundTransparentBtn = new JCheckBox("BG Transparent");
@@ -4885,14 +4888,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                              fullWindowBtn);
 
             List accessoryComps = Misc.newList(qualityPanel,
-                                               GuiUtils.filler(5,5),
-                                               whatPanel,
-                                               GuiUtils.filler(5,5),
-                                               backgroundTransparentBtn);
-            
+                                      GuiUtils.filler(5, 5), whatPanel,
+                                      GuiUtils.filler(5, 5),
+                                      backgroundTransparentBtn);
 
-            if(publishCbx!=null) {
-                accessoryComps.add(GuiUtils.filler(5,5));
+
+            if (publishCbx != null) {
+                accessoryComps.add(GuiUtils.filler(5, 5));
                 accessoryComps.add(publishCbx);
             }
             JComponent accessory = GuiUtils.vbox(accessoryComps);
@@ -4915,13 +4917,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
             if (filename != null) {
-                if (isVectorFile(filename)) {
-                    if(vectorRenderer==null) {
-                        vectorRenderer= new VectorRenderer(this);
+                if (isVectorGraphicsFile(filename)) {
+                    if (vectorRenderer == null) {
+                        vectorRenderer = new VectorGraphicsRenderer(this);
                     }
-                    if(vectorRenderer.showConfigDialog()) {
+                    if (vectorRenderer.showConfigDialog()) {
                         vectorRenderer.renderTo(filename);
-                        getIdv().getPublishManager().publishContent(filename, this, publishCbx);
+                        getIdv().getPublishManager().publishContent(filename,
+                                this, publishCbx);
                     }
                     System.setSecurityManager(backup);
                     return;
@@ -5028,12 +5031,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             zos.putNextEntry(new ZipEntry(tail + suffix));
                             zos.write(imageBytes, 0, imageBytes.length);
                             zos.close();
-                            getIdv().getPublishManager().publishContent(filename, this, publishCbx);
+                            getIdv().getPublishManager().publishContent(
+                                filename, this, publishCbx);
                             return;
                         }
                     }
                     ImageUtils.writeImageToFile(image, filename, quality);
-                    getIdv().getPublishManager().publishContent(filename, this, publishCbx);
+                    getIdv().getPublishManager().publishContent(filename,
+                            this, publishCbx);
                 }
                 if (andSaveBundle) {
                     filename = IOUtil.stripExtension(filename) + ".jnlp";

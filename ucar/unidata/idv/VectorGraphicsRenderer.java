@@ -1,6 +1,4 @@
 /*
- * $Id: ViewManager.java,v 1.401 2007/08/16 14:05:04 jeffmc Exp $
- *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -22,7 +20,6 @@
 
 
 
-
 package ucar.unidata.idv;
 
 
@@ -33,24 +30,12 @@ import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.drawing.Glyph;
 
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 
-
-
-import ucar.unidata.xml.PreferenceManager;
-import ucar.unidata.xml.XmlObjectStore;
-import ucar.unidata.xml.XmlResourceCollection;
-import ucar.unidata.xml.XmlUtil;
-
 import ucar.visad.Plotter;
-import ucar.visad.Util;
-
-import ucar.visad.display.*;
 
 import visad.*;
 
@@ -73,15 +58,8 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.util.zip.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -93,54 +71,54 @@ import javax.swing.event.*;
  *
  * @author IDV development team
  */
-public class VectorRenderer implements Plotter.Plottable {
+public class VectorGraphicsRenderer implements Plotter.Plottable {
 
-    /** _more_ */
+    /** The view manager */
     private ViewManager viewManager;
 
-    /** _more_ */
+    /** ok flag */
     private boolean ok = true;
 
-    /** _more_ */
+    /** dimension */
     private Dimension dim;
 
 
 
-    /** _more_ */
+    /** label html */
     private String labelHtml;
 
-    /** _more_ */
+    /** label position */
     private String labelPos = Glyph.PT_LR;
 
-    /** _more_ */
+    /** label background */
     private Color labelBG = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
 
-    /** _more_ */
+    /** label width */
     private int labelWidth = 200;
 
-    /** _more_ */
+    /** preview flag */
     private boolean preview = false;
 
-    /** _more_ */
+    /** flag for previewing */
     private boolean doingPreview = false;
 
 
     /**
-     * _more_
+     * Create a new vector graphics renderer for the view manager
      *
-     * @param viewManager _more_
+     * @param viewManager  the ViewManager
      */
-    public VectorRenderer(ViewManager viewManager) {
+    public VectorGraphicsRenderer(ViewManager viewManager) {
         this.viewManager = viewManager;
     }
 
     /**
-     * _more_
+     * Render to the file
      *
-     * @param filename _more_
+     * @param filename  the filename
      *
-     * @throws Exception _more_
+     * @throws Exception  problem writing to the file
      */
     public void renderTo(String filename) throws Exception {
         Component comp = viewManager.getMaster().getDisplayComponent();
@@ -161,9 +139,9 @@ public class VectorRenderer implements Plotter.Plottable {
 
 
     /**
-     * _more_
+     * Show the configuration dialog
      *
-     * @return _more_
+     * @return true if successful
      */
     public boolean showConfigDialog() {
         GuiUtils.ColorSwatch labelBGFld = new GuiUtils.ColorSwatch(labelBG,
@@ -216,9 +194,9 @@ public class VectorRenderer implements Plotter.Plottable {
     }
 
     /**
-     * _more_
+     * Plot to the graphics
      *
-     * @param graphics _more_
+     * @param graphics  the graphics to plot to
      */
     public void plot(Graphics2D graphics) {
 
@@ -254,7 +232,7 @@ public class VectorRenderer implements Plotter.Plottable {
 
             //Turn off all non-raster
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                control.toggleVisibilityForVectorRendering(
+                control.toggleVisibilityForVectorGraphicsRendering(
                     DisplayControl.RASTERMODE_SHOWRASTER);
             }
 
@@ -267,7 +245,7 @@ public class VectorRenderer implements Plotter.Plottable {
 
             //Now,  turn off rasters and turn on all non-raster
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                control.toggleVisibilityForVectorRendering(
+                control.toggleVisibilityForVectorGraphicsRendering(
                     DisplayControl.RASTERMODE_SHOWNONRASTER);
             }
 
@@ -288,7 +266,7 @@ public class VectorRenderer implements Plotter.Plottable {
 
             //Reset all displays
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                control.toggleVisibilityForVectorRendering(
+                control.toggleVisibilityForVectorGraphicsRendering(
                     DisplayControl.RASTERMODE_SHOWALL);
             }
 
@@ -330,12 +308,11 @@ public class VectorRenderer implements Plotter.Plottable {
                     if ((text == null) || (text.length() == 0)) {
                         continue;
                     }
-                    Color c =
-                        ((ucar.unidata.idv.control
+                    Color c = viewManager.getDisplayListColor();
+                    if (c == null) {
+                        c = ((ucar.unidata.idv.control
                             .DisplayControlImpl) control)
                                 .getDisplayListColor();
-                    if (c == null) {
-                        c = viewManager.getDisplayListColor();
                     }
                     graphics.setColor(c);
                     int lineWidth = fm.stringWidth(text);
@@ -415,18 +392,18 @@ public class VectorRenderer implements Plotter.Plottable {
     //Not sure what to do if it does get called. Maybe get the colors from the scenegraphrenderer
 
     /**
-     * _more_
+     * Get the colours
      *
-     * @return _more_
+     * @return  the color
      */
     public Color[] getColours() {
         return new Color[] { Color.red, Color.green, Color.blue };
     }
 
     /**
-     * _more_
+     * Get the size
      *
-     * @return _more_
+     * @return  the size (width, height)
      */
     public int[] getSize() {
         return new int[] { dim.width, dim.height };

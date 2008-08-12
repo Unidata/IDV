@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -117,6 +118,15 @@ public interface DisplayControl extends Sharable {
     /** Side type legend */
     public static final int SIDE_LEGEND = 1;
 
+    /** Show raster flag */
+    public static final int RASTERMODE_SHOWRASTER = 0;
+
+    /** Show no raster flag */
+    public static final int RASTERMODE_SHOWNONRASTER = 1;
+
+    /** Show all flag */
+    public static final int RASTERMODE_SHOWALL = 2;
+
 
     /**
      * Initialize the DisplayControl.
@@ -189,6 +199,11 @@ public interface DisplayControl extends Sharable {
      */
     public DisplayableData getDisplayListDisplayable(ViewManager view);
 
+    /**
+     * Get the data for the display list
+     *
+     * @return  the data
+     */
     public Data getDataForDisplayList();
 
     /**
@@ -366,11 +381,15 @@ public interface DisplayControl extends Sharable {
     public boolean getDisplayVisibility();
 
 
-    public static final int RASTERMODE_SHOWRASTER = 0;
-    public static final int RASTERMODE_SHOWNONRASTER = 1;
-    public static final int RASTERMODE_SHOWALL = 2;
-
-    public void toggleVisibilityForVectorRendering(int rasterMode) throws Exception;
+    /**
+     * Toggle  the visibility for vector graphics rendering based on mode
+     *
+     * @param rasterMode  mode to use
+     *
+     * @throws Exception  problem toggling
+     */
+    public void toggleVisibilityForVectorGraphicsRendering(int rasterMode)
+     throws Exception;
 
 
 
@@ -478,9 +497,9 @@ public interface DisplayControl extends Sharable {
 
 
     /**
-     * _more_
+     * Set the display category
      *
-     * @param category _more_
+     * @param category  the display category
      */
     public void setDisplayCategory(String category);
 
@@ -553,16 +572,16 @@ public interface DisplayControl extends Sharable {
     public boolean getShowInTabs();
 
     /**
-     * _more_
+     * Should this be docked?
      *
-     * @return _more_
+     * @return  true if docked
      */
     public boolean shouldBeDocked();
 
     /**
-     * _more_
+     * Can this be docked
      *
-     * @return _more_
+     * @return true if can be docked
      */
     public boolean canBeDocked();
 
@@ -584,15 +603,15 @@ public interface DisplayControl extends Sharable {
     public visad.Set getTimeSet() throws RemoteException, VisADException;
 
     /**
-     * _more_
+     * Get the cursor readout
      *
-     * @param el _more_
-     * @param animationValue _more_
-     * @param animationStep _more_
+     * @param el  position
+     * @param animationValue animation value
+     * @param animationStep  animation index
      *
-     * @return _more_
+     * @return List of values
      *
-     * @throws Exception _more_
+     * @throws Exception  problem getting the cursor readout
      */
     public List getCursorReadout(EarthLocation el, visad.Real animationValue,
                                  int animationStep)
