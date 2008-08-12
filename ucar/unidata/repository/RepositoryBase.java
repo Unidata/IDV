@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import java.text.SimpleDateFormat;
 /**
  *
  *
@@ -201,6 +202,15 @@ public class RepositoryBase implements Constants, RepositorySource {
     private boolean clientMode = false;
 
 
+
+    /** _more_ */
+    public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+
+    /** _more_ */
+    protected static SimpleDateFormat sdf;
+
+
+
     public RepositoryBase() {
     }
 
@@ -210,6 +220,29 @@ public class RepositoryBase implements Constants, RepositorySource {
         this.hostname = hostname;
         this.port = port;
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @param d _more_
+     *
+     * @return _more_
+     */
+    public String formatDate(Date d) {
+        if (sdf == null) {
+            sdf = new SimpleDateFormat();
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            sdf.applyPattern(DEFAULT_TIME_FORMAT);
+        }
+
+        if (d == null) {
+            return BLANK;
+        }
+        return sdf.format(d);
+    }
+
 
 
 

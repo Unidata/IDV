@@ -309,13 +309,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
-    /** _more_ */
-    public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
-
-    /** _more_ */
-    private static SimpleDateFormat sdf;
-
-
 
     /**
      * _more_
@@ -342,26 +335,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         return  fileUrl(img);
     }
 
-
-    /**
-     * _more_
-     *
-     * @param d _more_
-     *
-     * @return _more_
-     */
-    public String formatDate(Date d) {
-        if (sdf == null) {
-            sdf = new SimpleDateFormat();
-            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-            sdf.applyPattern(DEFAULT_TIME_FORMAT);
-        }
-
-        if (d == null) {
-            return BLANK;
-        }
-        return sdf.format(d);
-    }
 
     /**
      * _more_
@@ -3664,6 +3637,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
         Date createDate =new Date();
         Date fromDate = createDate;
+        //        System.err.println("node:" + XmlUtil.toString(node));
         if(XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
             fromDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_FROMDATE));
         }

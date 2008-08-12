@@ -34,13 +34,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
+import visad.DateTime;
 
 import ucar.unidata.idv.*;
+import ucar.visad.display.Animation;
+import ucar.visad.Util;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.unidata.idv.publish.IdvPublisher;
 
 import ucar.unidata.repository.RepositoryClient;
 
+import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.HttpFormEntry;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -56,6 +61,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 
+import java.awt.geom.Rectangle2D;
 import java.io.*;
 
 import java.net.*;
@@ -64,6 +70,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.zip.*;
+import java.util.Date;
 
 
 import javax.swing.*;
@@ -157,6 +164,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     /** _more_ */
     private JComponent contents;
 
+    private DateTimePicker fromDateFld;
+
+    private DateTimePicker toDateFld;
+
     /** _more_ */
     private JTextField parentGroupFld;
 
@@ -193,6 +204,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      * _more_
      */
     private void doMakeContents() {
+        Date now = new Date();
+        fromDateFld   = new DateTimePicker(now);
+        toDateFld   = new DateTimePicker(now);
         parentGroupFld  = new JTextField("", 5);
         groupNameFld    = new JTextField("", 30);
         nameFld         = new JTextField("", 30);
@@ -203,20 +217,23 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         southFld        = new JTextField("", 5);
         eastFld         = new JTextField("", 5);
         westFld         = new JTextField("", 5);
-        JComponent bboxComp = GuiUtils.vbox(GuiUtils.wrap(northFld),
-                                            GuiUtils.hbox(westFld, eastFld),
-                                            GuiUtils.wrap(southFld));
+        Insets i = new Insets(1,1,1,1);
+        JComponent bboxComp = GuiUtils.vbox(GuiUtils.wrap(GuiUtils.inset(northFld,i)),
+                                            GuiUtils.hbox(GuiUtils.inset(westFld,i), GuiUtils.inset(eastFld,i)),
+                                            GuiUtils.wrap(GuiUtils.inset(southFld,i)));
 
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+        JComponent dateComp = GuiUtils.hbox(fromDateFld, toDateFld);
         contents           = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Name:"), nameFld,
             GuiUtils.top(GuiUtils.rLabel("Description:")), descFld,
+            GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
             GuiUtils.rLabel("New Group Name:"),
             GuiUtils.centerRight(groupNameFld, new JLabel(" (Optional)")),
             GuiUtils.rLabel("Parent Group Id:"),
             GuiUtils.left(parentGroupFld),
-            GuiUtils.top(GuiUtils.rLabel("BBOX:")), GuiUtils.left(bboxComp)
+            GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
     }
 
@@ -226,12 +243,11 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      *
      * @param contentFile _more_
      */
-    public void publishContent(String contentFile) {
+    public void publishContent(String contentFile,ViewManager fromViewManager) {
 
         if ( !isConfigured()) {
             return;
         }
-
 
         try {
             boolean isBundle = ((contentFile == null)
@@ -249,7 +265,37 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                         + contentFile), doBundleCbx), contents);
             }
 
+            //Get one from the list
+            if(fromViewManager==null) {
+                List viewManagers = getIdv().getViewManagers();
+                if(viewManagers.size()==1) {
+                    fromViewManager = (ViewManager)viewManagers.get(0);
+                }
+            }
 
+            
+            if(fromViewManager!=null) {
+                if((fromViewManager instanceof MapViewManager)) {
+                    MapViewManager mvm=(MapViewManager) fromViewManager;
+                    NavigatedDisplay navDisplay = mvm.getNavigatedDisplay();
+                    Rectangle2D.Double bbox  = navDisplay.getLatLonBox(false);
+                    if(bbox!=null) {
+                        southFld.setText(""+bbox.getY());
+                        northFld.setText(""+(bbox.getY()+bbox.getHeight()));
+                        westFld.setText(""+bbox.getX());
+                        eastFld.setText(""+(bbox.getX()+bbox.getWidth()));
+                    }
+                }
+                Animation anim = fromViewManager.getAnimation();
+                if(anim!=null) {
+                    DateTime[] dttms = anim.getTimes();
+                    if(dttms!=null && dttms.length>0) {
+                        fromDateFld.setDate(Util.makeDate(dttms[0]));
+                        toDateFld.setDate(Util.makeDate(dttms[dttms.length-1]));
+                    }
+                    
+                }
+            }
             if (contentFile != null) {
                 //            nameFld.setText(IOUtil.getFileTail(contentFile));
             } else {
@@ -313,11 +359,14 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 //        descFld.setText("");
 
 
+                String fromDate = repositoryClient.formatDate(fromDateFld.getDate());
+                String toDate = repositoryClient.formatDate(toDateFld.getDate());
                 int      cnt = 0;
                 Document doc = XmlUtil.makeDocument();
                 Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                    new String[] {});
                 String parentId = parentGroupFld.getText().trim();
+
                 if (groupNameFld.getText().trim().length() > 0) {
                     String groupId = (cnt++) + "";
                     Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
@@ -334,20 +383,35 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                     : contentFile);
 
 
-                XmlUtil.create(doc, TAG_ENTRY, root, new String[] {
+                List attrs;
+                
+                attrs = Misc.toList(new String[] {
                     ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
                     ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
                     nameFld.getText().trim(), ATTR_DESCRIPTION,
-                    descFld.getText().trim()
+                    descFld.getText().trim(),
+                    ATTR_FROMDATE, fromDate, ATTR_TODATE, toDate
                 });
+                checkAndAdd(attrs, ATTR_NORTH, northFld);
+                checkAndAdd(attrs, ATTR_SOUTH, southFld);
+                checkAndAdd(attrs, ATTR_EAST, eastFld);
+                checkAndAdd(attrs, ATTR_WEST, westFld);
+                XmlUtil.create(doc, TAG_ENTRY, root, Misc.listToStringArray(attrs));
 
                 if (contentFile != null) {
-                    XmlUtil.create(doc, TAG_ENTRY, root, new String[] {
+                    attrs = Misc.toList(new String[] {
                         ATTR_ID, contentId, ATTR_FILE,
                         IOUtil.getFileTail(contentFile), ATTR_PARENT,
                         parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
-                        nameFld.getText().trim() + " - Product"
+                        nameFld.getText().trim() + " - Product",
+                        ATTR_FROMDATE, fromDate, ATTR_TODATE, toDate
                     });
+                    checkAndAdd(attrs, ATTR_NORTH, northFld);
+                    checkAndAdd(attrs, ATTR_SOUTH, southFld);
+                    checkAndAdd(attrs, ATTR_EAST, eastFld);
+                    checkAndAdd(attrs, ATTR_WEST, westFld);
+
+                    XmlUtil.create(doc, TAG_ENTRY, root,Misc.listToStringArray(attrs));
                     if(bundleFile!=null) {
                         XmlUtil.create(doc, TAG_ASSOCIATION, root, new String[] {
                                 ATTR_FROM, mainId,
@@ -401,6 +465,14 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
     }
 
+    private void checkAndAdd(List attrs, String attr, JTextField fld) {
+        String v  =fld.getText().trim();
+        if(v.length()>0) {
+            attrs.add(attr);
+            attrs.add(v);
+        }
+    }
+
 
     /**
      * _more_
@@ -410,7 +482,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      * @param properties _more_
      */
     public void doPublish() {
-        publishContent(null);
+        publishContent(null,null);
     }
 
 
