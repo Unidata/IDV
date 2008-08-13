@@ -721,7 +721,9 @@ public class TypeHandler extends RepositoryManager {
                             "" + entry.getWest(), ARG_NORTH,
                             "" + entry.getNorth(), ARG_EAST,
                             "" + entry.getEast()));
-                    sb.append(HtmlUtil.formEntry(msgLabel("Area"), img));
+                    //                    sb.append(HtmlUtil.formEntry(msgLabel("Area"), img));
+                    String areaHtml = "<table><tr align=center><td>" +entry.getNorth() + "</td></tr><tr align=center><td>" + entry.getWest() + "  " + entry.getSouth() +"</td></tr><tr align=center><td>" + entry.getEast()+"</td></tr></table>";
+                    sb.append(HtmlUtil.formEntry(msgLabel("Area"), areaHtml));
                 }
             }
 

@@ -173,8 +173,27 @@ public class RepositoryClient extends RepositoryBase {
             }
         });
         ToolTipManager.sharedInstance().registerComponent(groupTree);
-
         groupTree.setShowsRootHandles(true);
+        final ImageIcon iconOpen =  
+            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs" +ICON_FOLDER_OPEN,
+                                  getClass());
+        final ImageIcon iconClosed =  
+            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs" +ICON_FOLDER_CLOSED,
+                                  getClass());
+
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+            public Component getTreeCellRendererComponent(JTree theTree,
+                    Object value, boolean sel, boolean expanded,
+                    boolean leaf, int row, boolean hasFocus) {
+                super.getTreeCellRendererComponent(theTree, value, sel,
+                        expanded, leaf, row, hasFocus);
+                if(expanded || leaf)
+                    setIcon(iconOpen);
+                else
+                    setIcon(iconClosed);
+                return this;
+            }};
+        groupTree.setCellRenderer(renderer);
         treeRoot.checkExpansion();
     }
 
@@ -267,8 +286,8 @@ public class RepositoryClient extends RepositoryBase {
     public void addUrlArgs(List entries) {
         entries.add(HttpFormEntry.hidden(ARG_SESSIONID, getSessionId()));
         entries.add(HttpFormEntry.hidden(ARG_OUTPUT, "xml"));
-
     }
+
 
     /**
      * Class GroupNode _more_
@@ -334,9 +353,6 @@ public class RepositoryClient extends RepositoryBase {
                 LogUtil.logException("Error loading group tree", exc);
             }
         }
-
-
-
     }
 
 

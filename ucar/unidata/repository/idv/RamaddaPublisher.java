@@ -382,13 +382,13 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 if ((fromViewManager instanceof MapViewManager)) {
                     MapViewManager     mvm = (MapViewManager) fromViewManager;
                     NavigatedDisplay   navDisplay = mvm.getNavigatedDisplay();
-                    Rectangle2D.Double bbox = navDisplay.getLatLonBox(false);
+                    Rectangle2D.Double bbox = navDisplay.getLatLonBox(false,false);
                     if (bbox != null) {
-                        southFld.setText("" + bbox.getY());
-                        northFld.setText("" + (bbox.getY()
-                                + bbox.getHeight()));
-                        westFld.setText("" + bbox.getX());
-                        eastFld.setText("" + (bbox.getX() + bbox.getWidth()));
+                        southFld.setText(getIdv().getDisplayConventions().formatLatLon(bbox.getY()));
+                        northFld.setText(getIdv().getDisplayConventions().formatLatLon((bbox.getY()
+                                + bbox.getHeight())));
+                        westFld.setText(getIdv().getDisplayConventions().formatLatLon(bbox.getX()));
+                        eastFld.setText(getIdv().getDisplayConventions().formatLatLon((bbox.getX() + bbox.getWidth())));
                     }
                 }
                 Animation anim = fromViewManager.getAnimation();

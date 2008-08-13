@@ -59,6 +59,8 @@
             <include name="ucar/unidata/repository/**/*.class"/>
 -->
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
+            <include name="ucar/unidata/repository/htdocs/folderopen.gif"/>
+            <include name="ucar/unidata/repository/htdocs/folderclosed.gif"/>
 	    </jar>
 
         <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
