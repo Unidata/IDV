@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -133,6 +134,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Full lat/lon capable flag for the command object */
     public static final int FLAG_FULLLATLON = 1 << 2;
 
+    /** flag for straight */
     public static final int FLAG_STRAIGHT = 1 << 3;
 
     /** Select command */
@@ -185,6 +187,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Holds the list of fonts */
     private JComboBox fontBox;
 
+    /** scale field */
     private JTextField scaleFld;
 
     /** The z slider */
@@ -232,6 +235,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Ignore time. Show all glyphs */
     private boolean ignoreTime = false;
 
+    /** clipboard for XML */
     private String clipboardXml;
 
     /** Message label */
@@ -289,6 +293,7 @@ public class DrawingControl extends DisplayControlImpl {
     private JCheckBox loadAsMapData;
 
 
+    /** front scale */
     private double frontScale = 1.0;
 
 
@@ -478,7 +483,7 @@ public class DrawingControl extends DisplayControlImpl {
         NodeList elements = XmlUtil.getElements(root);
         setUseTimesInAnimation(XmlUtil.getAttribute(root,
                 ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
-        if(displayHolder!=null) {
+        if (displayHolder != null) {
             displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
         }
 
@@ -562,19 +567,29 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
 
-    public void toggleVisibilityForVectorRendering(int rasterMode) throws Exception {
-        if(rasterMode == RASTERMODE_SHOWRASTER) {
+    /**
+     * Toggle the visibility for vector graphics rendering
+     *
+     * @param rasterMode  the toggle mode
+     *
+     * @throws Exception  problem toggling
+     */
+    public void toggleVisibilityForVectorGraphicsRendering(int rasterMode)
+            throws Exception {
+        if (rasterMode == RASTERMODE_SHOWRASTER) {
             for (int i = 0; i < glyphs.size(); i++) {
                 DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
                 glyph.oldVisibility = glyph.getVisibleFlag();
-                if(glyph.oldVisibility)
+                if (glyph.oldVisibility) {
                     glyph.setVisibleFlag(glyph.getIsRaster());
+                }
             }
-        } else if(rasterMode == RASTERMODE_SHOWNONRASTER) {
+        } else if (rasterMode == RASTERMODE_SHOWNONRASTER) {
             for (int i = 0; i < glyphs.size(); i++) {
                 DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
-                if(glyph.oldVisibility)
-                    glyph.setVisibleFlag(!glyph.getIsRaster());
+                if (glyph.oldVisibility) {
+                    glyph.setVisibleFlag( !glyph.getIsRaster());
+                }
             }
 
         } else {
@@ -882,8 +897,9 @@ public class DrawingControl extends DisplayControlImpl {
                     }
                     if ((keyEvent.getKeyCode() == KeyEvent.VK_V)
                             && keyEvent.isControlDown()) {
-                        if(clipboardXml != null)
+                        if (clipboardXml != null) {
                             doImportXml(clipboardXml);
+                        }
                         return;
                     }
                     if ((keyEvent.getKeyCode() == KeyEvent.VK_P)
@@ -1236,7 +1252,7 @@ public class DrawingControl extends DisplayControlImpl {
      */
     protected void doCut() throws VisADException, RemoteException {
         setDisplayInactive();
-        List tmp = new ArrayList(selectedGlyphs);
+        List tmp       = new ArrayList(selectedGlyphs);
         List cutGlyphs = new ArrayList();
 
         for (int i = 0; i < tmp.size(); i++) {
@@ -1428,15 +1444,17 @@ public class DrawingControl extends DisplayControlImpl {
                     icon = "/auxdata/ui/icons/Trough16.gif";
                 }
 
-                commands.add(new GlyphCreatorCommand("Create "
-                        + StringUtil.getAnOrA(label) + " "
-                        + label, "Click and drag: create "
-                                 + StringUtil.getAnOrA(label) + " "
-                                 + label, icon,DrawingControl.FLAG_STRAIGHT) {
+                commands.add(
+                    new GlyphCreatorCommand(
+                        "Create " + StringUtil.getAnOrA(label) + " " + label,
+                        "Click and drag: create "
+                        + StringUtil.getAnOrA(label) + " " + label, icon,
+                            DrawingControl.FLAG_STRAIGHT) {
                     public DrawingGlyph createGlyph(DrawingControl control,
                             DisplayEvent event)
                             throws VisADException, RemoteException {
-                        return new FrontGlyph(control, event, type,!getStraight());
+                        return new FrontGlyph(control, event, type,
+                                !getStraight());
                     }
                 });
             }
@@ -1572,7 +1590,7 @@ public class DrawingControl extends DisplayControlImpl {
 
 
         filledCbx     = new JCheckBox("Filled", filled);
-        straightCbx     = new JCheckBox("Straight", straight);
+        straightCbx   = new JCheckBox("Straight", straight);
         fullLatLonCbx = new JCheckBox("Full Lat/Lon", fullLatLon);
         useTimeCbx    = new JCheckBox("Draw In Current Time", useTime);
         ignoreTimeCbx = new JCheckBox("Show All", ignoreTime);
@@ -1640,8 +1658,10 @@ public class DrawingControl extends DisplayControlImpl {
                                         GuiUtils.left(enabledCbx)));
         widgets.add(GuiUtils.rLabel("Shapes:"));
         if (showFilledCbx()) {
-            widgets.add(GuiUtils.leftCenter(makeButtonPanel(shapes, bg),
-                                            GuiUtils.left(GuiUtils.hbox(filledCbx, straightCbx))));
+            widgets.add(
+                GuiUtils.leftCenter(
+                    makeButtonPanel(shapes, bg),
+                    GuiUtils.left(GuiUtils.hbox(filledCbx, straightCbx))));
         } else {
             widgets.add(GuiUtils.left(makeButtonPanel(shapes, bg)));
         }
@@ -1670,30 +1690,32 @@ public class DrawingControl extends DisplayControlImpl {
      * @return Style panel
      */
     protected JComponent doMakeStylePanel() {
-        List      styleWidgets = new ArrayList();
+        List  styleWidgets = new ArrayList();
 
 
-        Color     c            = getColor();
+        Color c            = getColor();
         //        Component colorCbx     = doMakeColorControl(((c == null)
         //                ? Color.red
         //                : c));
-        if(c == null) c = Color.red;
-        GuiUtils.ColorSwatch colorSwatch =  new GuiUtils.ColorSwatch(c,
-                                                                     "Set color",true) {
-                public void setBackground(Color newColor) {        
-                    super.setBackground(newColor);
-                    try {
+        if (c == null) {
+            c = Color.red;
+        }
+        GuiUtils.ColorSwatch colorSwatch = new GuiUtils.ColorSwatch(c,
+                                               "Set color", true) {
+            public void setBackground(Color newColor) {
+                super.setBackground(newColor);
+                try {
                     setColor(newColor);
-                    } catch (Exception exc) {
-                        logException("Setting color", exc);
-                    }
+                } catch (Exception exc) {
+                    logException("Setting color", exc);
                 }
-            };
+            }
+        };
         colorSwatch.setMinimumSize(new Dimension(20, 20));
         colorSwatch.setPreferredSize(new Dimension(20, 20));
-        Component colorCbx = colorSwatch;
+        Component colorCbx  = colorSwatch;
 
-        JComboBox widthComp    = doMakeLineWidthBox(lineWidth);
+        JComboBox widthComp = doMakeLineWidthBox(lineWidth);
         widthComp.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox theBox = (JComboBox) e.getSource();
@@ -1718,9 +1740,8 @@ public class DrawingControl extends DisplayControlImpl {
 
         styleWidgets.add(GuiUtils.rLabel("Color:"));
         styleWidgets.add(GuiUtils.left(GuiUtils.hflow(Misc.newList(colorCbx,
-                                                                   GuiUtils.filler(10,5),
-                                                                   GuiUtils.rLabel("Line Width:  "),
-                                                                   GuiUtils.left(widthComp)), 4, 0)));
+                GuiUtils.filler(10, 5), GuiUtils.rLabel("Line Width:  "),
+                GuiUtils.left(widthComp)), 4, 0)));
         styleWidgets.add(GuiUtils.rLabel("Font:"));
         styleWidgets.add(GuiUtils.left(fontPanel));
         styleWidgets.add(GuiUtils.rLabel("Justification:"));
@@ -1728,8 +1749,8 @@ public class DrawingControl extends DisplayControlImpl {
 
 
 
-        if(getShowFronts()) {
-            scaleFld = new JTextField(""+frontScale,5);
+        if (getShowFronts()) {
+            scaleFld = new JTextField("" + frontScale, 5);
             styleWidgets.add(GuiUtils.rLabel("Front Scale:"));
             styleWidgets.add(GuiUtils.left(scaleFld));
         }
@@ -1915,6 +1936,11 @@ public class DrawingControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * Import kml
+     *
+     * @param xml the KML
+     */
     private void doImportXml(String xml) {
         try {
             Element root = XmlUtil.getRoot(xml);
@@ -1941,9 +1967,11 @@ public class DrawingControl extends DisplayControlImpl {
                 return;
             }
             String xml = toXml(glyphs);
-            if(xml == null) return;
+            if (xml == null) {
+                return;
+            }
             IOUtil.writeFile(filename, xml);
-            if(loadAsMapData.isSelected()) {
+            if (loadAsMapData.isSelected()) {
                 getIdv().makeOneDataSource(filename, "FILE.MAPFILE", null);
             }
         } catch (Exception exc) {
@@ -1952,6 +1980,13 @@ public class DrawingControl extends DisplayControlImpl {
 
     }
 
+    /**
+     * Convert glyphs to XML
+     *
+     * @param glyphs list of glyphs
+     *
+     * @return  the KML
+     */
     private String toXml(List glyphs) {
         try {
 
@@ -2748,24 +2783,24 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
     /**
-       Set the FrontScale property.
-
-       @param value The new value for FrontScale
-    **/
-    public void setFrontScale (double value) {
-	frontScale = value;
+     *  Set the FrontScale property.
+     *
+     *  @param value The new value for FrontScale
+     */
+    public void setFrontScale(double value) {
+        frontScale = value;
     }
 
     /**
-       Get the FrontScale property.
-
-       @return The FrontScale
-    **/
-    public double getFrontScale () {
-        if(scaleFld!=null) {
+     *  Get the FrontScale property.
+     *
+     *  @return The FrontScale
+     */
+    public double getFrontScale() {
+        if (scaleFld != null) {
             return Double.parseDouble(scaleFld.getText().trim());
         }
-	return frontScale;
+        return frontScale;
     }
 
 
