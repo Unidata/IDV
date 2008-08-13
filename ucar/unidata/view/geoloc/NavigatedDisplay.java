@@ -1095,11 +1095,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public Rectangle2D.Double getLatLonBox()
             throws VisADException, RemoteException {
-        return getLatLonBox(true);
+        return getLatLonBox(true,true);
     }
 
 
-    public Rectangle2D.Double getLatLonBox(boolean padSamples)
+    public Rectangle2D.Double getLatLonBox(boolean padSamples, boolean normalizeLon)
             throws VisADException, RemoteException {
         java.awt.Rectangle b  = getScreenBounds();
 
@@ -1126,13 +1126,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
                 findMinMaxFromScreen((int) xs[xidx], (int) ys[yidx], rangeX,
-                                     rangeY);
+                                     rangeY,normalizeLon);
             }
         }
         for (int xidx = 0; xidx < 100; xidx++) {
             double percent = xidx / 100.0;
             findMinMaxFromScreen((int) (b.width * percent), b.height / 2,
-                                 rangeX, rangeY);
+                                 rangeX, rangeY,normalizeLon);
         }
 
         double left   = rangeX[0];
@@ -1166,6 +1166,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                                       top - bottom);
     }
 
+
+
+
     /**
      * Find min max values from the screen
      *
@@ -1177,7 +1180,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException problem accessing screen
      */
     private void findMinMaxFromScreen(int x, int y, double[] rangeX,
-                                      double[] rangeY)
+                                      double[] rangeY, boolean normalizeLon)
             throws VisADException {
         double[]      pt   = getSpatialCoordinatesFromScreen(x, y, -1);
         EarthLocation el   = getEarthLocation(pt);
@@ -1190,7 +1193,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             return;
         }
 
-        tmpx = LatLonPointImpl.lonNormal(tmpx);
+        if(normalizeLon)         tmpx = LatLonPointImpl.lonNormal(tmpx);
         if ((rangeX[0] != rangeX[0]) || (tmpx < rangeX[0])) {
             rangeX[0] = tmpx;
         }
