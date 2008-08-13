@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -187,7 +188,7 @@ public class HighLowGlyph extends DrawingGlyph {
             return false;
         }
         pressureString = pressureString.trim();
-        if(pressureString.length() == 0) {
+        if (pressureString.length() == 0) {
             pressure = Double.NaN;
         } else {
             pressure = Misc.parseNumber(pressureString);
@@ -388,7 +389,7 @@ public class HighLowGlyph extends DrawingGlyph {
             return false;
         }
         String txt = pressureFld.getText().trim();
-        if(txt.length() == 0) {
+        if (txt.length() == 0) {
             pressure = Double.NaN;
         } else {
             pressure = Misc.parseNumber(txt);
@@ -408,7 +409,9 @@ public class HighLowGlyph extends DrawingGlyph {
         //Call parent with dummy list
         super.getPropertiesComponents(new ArrayList(), compMap);
         getTimePropertiesComponents(comps, compMap);
-        String label = (pressure==pressure?Misc.format(pressure):"");
+        String label = ((pressure == pressure)
+                        ? Misc.format(pressure)
+                        : "");
         pressureFld = new JTextField(label, 8);
         comps.add(GuiUtils.rLabel("Pressure:"));
         comps.add(GuiUtils.left(pressureFld));
@@ -442,7 +445,9 @@ public class HighLowGlyph extends DrawingGlyph {
                                              ? "H"
                                              : "L"));
         Data theData1 = null;
-        Text t2       = new Text(textType2, (pressure==pressure?Misc.format(pressure):" "));
+        Text t2       = new Text(textType2, ((pressure == pressure)
+                                             ? Misc.format(pressure)
+                                             : " "));
         Data theData2 = null;
 
         if (isInLatLonSpace()) {
@@ -479,46 +484,40 @@ public class HighLowGlyph extends DrawingGlyph {
 
 
     /**
-       Set the Pressure property.
-
-       @param value The new value for Pressure
-    **/
-    public void setPressure (double value) {
-	pressure = value;
+     *  Set the Pressure property.
+     *
+     *  @param value The new value for Pressure
+     */
+    public void setPressure(double value) {
+        pressure = value;
     }
 
     /**
-       Get the Pressure property.
-
-       @return The Pressure
-    **/
-    public double getPressure () {
-	return pressure;
+     *  Get the Pressure property.
+     *
+     *  @return The Pressure
+     */
+    public double getPressure() {
+        return pressure;
     }
 
     /**
-       Set the High property.
-
-       @param value The new value for High
-    **/
-    public void setHigh (boolean value) {
-	high = value;
+     *  Set the High property.
+     *
+     *  @param value The new value for High
+     */
+    public void setHigh(boolean value) {
+        high = value;
     }
 
     /**
-       Get the High property.
-
-       @return The High
-    **/
-    public boolean getHigh () {
-	return high;
+     *  Get the High property.
+     *
+     *  @return The High
+     */
+    public boolean getHigh() {
+        return high;
     }
-
-
-    public boolean getIsRaster() {
-        return true;
-    }
-
 
 
 }
