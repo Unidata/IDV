@@ -55,7 +55,6 @@ public class Group extends Entry {
 
 
 
-
     /**
      * _more_
      *

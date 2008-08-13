@@ -181,6 +181,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     /** _more_ */
     private JTextField nameFld;
 
+    private JTextField tagFld;
+
     /** _more_ */
     private JTextArea descFld;
 
@@ -226,6 +228,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         fromDateFld     = new DateTimePicker(now);
         toDateFld       = new DateTimePicker(now);
         nameFld         = new JTextField("", 30);
+        tagFld         = new JTextField("", 30);
+        tagFld.setToolTipText("Comma separated tag values");
         descFld         = new JTextArea("", 5, 30);
         contentsNameFld = new JTextField("", 30);
         contentsDescFld = new JTextArea("", 5, 30);
@@ -255,6 +259,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         comps = Misc.toList(new Component[] {
             GuiUtils.rLabel("Name:"), nameFld,
             GuiUtils.top(GuiUtils.rLabel("Description:")), descScroller,
+            GuiUtils.rLabel("Tags:"), tagFld,
             GuiUtils.rLabel("Parent Group:"), treeComp,
             GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
             GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
@@ -473,6 +478,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                    new String[] {});
 
 
+                List tags = StringUtil.split(tagFld.getText().trim(),",",true,true);
+
                 String mainId    = (cnt++) + "";
                 String contentId = (cnt++) + "";
                 String mainFile;
@@ -485,7 +492,6 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 }
 
                 List attrs;
-
                 attrs = Misc.toList(new String[] {
                     ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
                     ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
@@ -495,26 +501,24 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 });
 
 
-
                 checkAndAdd(attrs, ATTR_NORTH, northFld);
                 checkAndAdd(attrs, ATTR_SOUTH, southFld);
                 checkAndAdd(attrs, ATTR_EAST, eastFld);
                 checkAndAdd(attrs, ATTR_WEST, westFld);
-                XmlUtil.create(doc, TAG_ENTRY, root,
-                               Misc.listToStringArray(attrs));
+                Element node;
+
+                node = XmlUtil.create(doc, TAG_ENTRY, root,
+                                      Misc.listToStringArray(attrs));
+
+                repositoryClient.addTags(node,tags);
+
 
                 for (int i = 0; i < myDataSourcesCbx.size(); i++) {
                     if (((JCheckBox) myDataSourcesCbx.get(i)).isSelected()) {
                         String id = (String) myDataSourcesIds.get(i);
-                        XmlUtil.create(doc, TAG_ASSOCIATION, root,
-                                       new String[] {
-                            ATTR_FROM, id, ATTR_TO, mainId, ATTR_NAME,
-                            "uses data"
-                        });
+                        repositoryClient.addAssociation(root,id,mainId, "uses data");
                     }
                 }
-
-
 
 
                 if (contentFile != null) {
@@ -530,26 +534,18 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     checkAndAdd(attrs, ATTR_EAST, eastFld);
                     checkAndAdd(attrs, ATTR_WEST, westFld);
 
-                    XmlUtil.create(doc, TAG_ENTRY, root,
-                                   Misc.listToStringArray(attrs));
+                    node = XmlUtil.create(doc, TAG_ENTRY, root,
+                                          Misc.listToStringArray(attrs));
+                    repositoryClient.addTags(node,tags);
                     if (bundleFile != null) {
-                        XmlUtil.create(doc, TAG_ASSOCIATION, root,
-                                       new String[] {
-                            ATTR_FROM, mainId, ATTR_TO, contentId, ATTR_NAME,
-                            "generated product"
-                        });
-
+                        repositoryClient.addAssociation(root,mainId,contentId,"generated product");
                     }
 
                     for (int i = 0; i < myDataSourcesCbx.size(); i++) {
                         if (((JCheckBox) myDataSourcesCbx.get(
                                 i)).isSelected()) {
                             String id = (String) myDataSourcesIds.get(i);
-                            XmlUtil.create(doc, TAG_ASSOCIATION, root,
-                                           new String[] {
-                                ATTR_FROM, id, ATTR_TO, contentId, ATTR_NAME,
-                                "uses data"
-                            });
+                            repositoryClient.addAssociation(root,id,contentId,"uses data");
                         }
                     }
 
@@ -557,10 +553,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
                 if ((addAssociationCbx != null)
                         && addAssociationCbx.isSelected()) {
-                    XmlUtil.create(doc, TAG_ASSOCIATION, root, new String[] {
-                        ATTR_FROM, lastBundleId, ATTR_TO, contentId,
-                        ATTR_NAME, "generated product"
-                    });
+                    repositoryClient.addAssociation(root,lastBundleId,contentId,"generated product");
                 }
 
 

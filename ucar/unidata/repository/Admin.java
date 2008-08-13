@@ -638,6 +638,7 @@ public class Admin extends RepositoryManager {
                                             getProperty(PROP_HTML_FOOTER,
                                                 ""), 5, 40)));
 
+
         sb.append(tableSubHeader(msg("Access")));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
@@ -653,6 +654,13 @@ public class Admin extends RepositoryManager {
                     getProperty(
                         PROP_ACCESS_REQUIRELOGIN, false)) + HtmlUtil.space(2)
                             + msg("Require login")));
+
+
+        String fileWidget =   HtmlUtil.textArea(PROP_LOCALFILEPATHS,
+                                                getProperty(PROP_LOCALFILEPATHS,""), 5, 40);
+        String fileLabel = "Enter one server file system directory per line.<br><b>Note:RAMADDA will provide complete access to the file directory trees defined here</b>";
+        sb.append(HtmlUtil.formEntryTop(msgLabel("File system access"), 
+                                        "<table><tr valign=top><td>" + fileWidget+"</td><td>" +fileLabel+"</td></tr></table>"));
 
 
         StringBuffer handlerSB = new StringBuffer();
@@ -698,6 +706,14 @@ public class Admin extends RepositoryManager {
             getRepository().writeGlobal(PROP_HTML_FOOTER,
                                         request.getString(PROP_HTML_FOOTER,
                                             ""));
+        }
+
+
+        if (request.exists(PROP_LOCALFILEPATHS)) {
+            getRepository().writeGlobal(PROP_LOCALFILEPATHS,
+                                        request.getString(PROP_LOCALFILEPATHS,
+                                            ""));
+            getRepository().setLocalFilePaths();
         }
 
         List<OutputHandler> outputHandlers =

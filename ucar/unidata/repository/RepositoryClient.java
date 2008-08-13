@@ -152,6 +152,26 @@ public class RepositoryClient extends RepositoryBase {
         refreshTreeNode(treeRoot);
     }
 
+    public void addTags(Element node, List<String>tags) throws Exception {
+        for(String tag: tags) {
+            XmlUtil.create(node.getOwnerDocument(), TAG_METADATA, node,
+                           new String[]{
+                               ATTR_TYPE,"enum_tag",
+                               ATTR_ATTR1, tag
+                           });
+        }
+    }
+
+    public void addAssociation(Element node, String fromId, String toId, String name) throws Exception {
+        XmlUtil.create(node.getOwnerDocument(), TAG_ASSOCIATION, node,
+                       new String[] {
+                           ATTR_FROM, fromId, ATTR_TO, toId, ATTR_NAME,
+                           name
+                       });
+    }
+
+
+
     /**
      * _more_
      */

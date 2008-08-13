@@ -573,6 +573,9 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
+
+
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "ramadda.download.ok";
 
@@ -936,6 +939,11 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_TYPE = "type";
+
+    public static final String ATTR_ATTR1 = "attr1";
+    public static final String ATTR_ATTR2 = "attr2";
+    public static final String ATTR_ATTR3 = "attr3";
+    public static final String ATTR_ATTR4 = "attr4";
 
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";

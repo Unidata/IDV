@@ -322,6 +322,7 @@ public class StorageManager extends RepositoryManager {
         String filePath = entry.getResource().getPath();
         filePath = filePath.replace("\\", "/");
         getRepository().checkFilePath(filePath);
+        if(entry.getIsLocalFile()) return true;
         return isInDownloadArea(filePath);
     }
 

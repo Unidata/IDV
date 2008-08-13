@@ -242,6 +242,13 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
+
+        if(entry.getIsLocalFile()) {
+            if(action.equals(Permission.ACTION_VIEW)) return true;
+            return false;
+        }
+
+
         User user = request.getUser();
         //The admin can do anything
         if (user.getAdmin()) {
@@ -389,6 +396,7 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canEditEntry(Request request, Entry entry)
             throws Exception {
+        if(entry.getIsLocalFile()) return false;
         return canDoAction(request, entry, Permission.ACTION_EDIT);
     }
 
