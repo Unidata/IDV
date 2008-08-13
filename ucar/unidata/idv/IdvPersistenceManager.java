@@ -472,7 +472,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                             saveDataSourcesCbx);
             accessories.add(GuiUtils.left(GuiUtils.inset(saveJythonBox,
                     new Insets(0, 3, 0, 0))));
-            accessories.add(GuiUtils.filler(1, 5));
+            accessories.add(GuiUtils.filler(1, 10));
             accessories.add(makeDataRelativeCbx);
             //            accessories.add(makeDataEditableCbx);
 
@@ -480,6 +480,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             if(publishCbx==null)
                 publishCbx = getIdv().getPublishManager().makeSelector();
             if(publishCbx!=null) {
+                accessories.add(GuiUtils.filler(1, 10));
                 accessories.add(publishCbx);
             }
 

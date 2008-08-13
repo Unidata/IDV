@@ -4879,25 +4879,24 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                      fullWindowBtn).add(contentsBtn);
             }
 
+            hiBtn.setBorder(null);
+            medBtn.setBorder(null);
+            lowBtn.setBorder(null);
+            mainDisplayBtn.setBorder(null);
+            contentsBtn.setBorder(null);
+            fullWindowBtn.setBorder(null);
+            List comps = new ArrayList();
+            comps.add(new JLabel("Quality:"));
+            comps.add(GuiUtils.inset(GuiUtils.vbox(hiBtn, medBtn, lowBtn), new Insets(2,8,10,0)));
 
-            JPanel qualityPanel = GuiUtils.vbox(new JLabel("Quality:"),
-                                      hiBtn, medBtn, lowBtn);
+            comps.add(new JLabel("Capture What:"));
+            comps.add(GuiUtils.inset(GuiUtils.vbox(mainDisplayBtn, contentsBtn,fullWindowBtn),new Insets(2,8,10,0)));
 
-            JPanel whatPanel = GuiUtils.vbox(new JLabel("Capture What:"),
-                                             mainDisplayBtn, contentsBtn,
-                                             fullWindowBtn);
-
-            List accessoryComps = Misc.newList(qualityPanel,
-                                      GuiUtils.filler(5, 5), whatPanel,
-                                      GuiUtils.filler(5, 5),
-                                      backgroundTransparentBtn);
-
-
+            comps.add(backgroundTransparentBtn);
             if (publishCbx != null) {
-                accessoryComps.add(GuiUtils.filler(5, 5));
-                accessoryComps.add(publishCbx);
+                comps.add(GuiUtils.inset(publishCbx, new Insets(10,0,0,0)));
             }
-            JComponent accessory = GuiUtils.vbox(accessoryComps);
+            JComponent accessory = GuiUtils.vbox(comps);
 
 
             PatternFileFilter captureFilter =
