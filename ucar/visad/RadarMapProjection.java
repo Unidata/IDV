@@ -118,12 +118,27 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
      * @param lon  longitude of the center point
      * @param height height of the image (pixels)
      * @param width height of the image (pixels)
-     *
      * @throws VisADException  unable to create the projection
      */
     public RadarMapProjection(double lat, double lon, int width, int height)
             throws VisADException {
-        super(makeDir(height, width), makeNav(lat, lon, height, width), null,
+         this(lat, lon, width, height, 1);
+    }
+
+    /**
+     * Create a <code>RadarMapProjection</code> centered on the
+     * lat/lon and size given.
+     *
+     * @param lat  latitude of the center point
+     * @param lon  longitude of the center point
+     * @param height height of the image (pixels)
+     * @param width height of the image (pixels)
+     * @param res resolution of the pixels (km)
+     * @throws VisADException  unable to create the projection
+     */
+    public RadarMapProjection(double lat, double lon, int width, int height, int res)
+            throws VisADException {
+        super(makeDir(height, width), makeNav(lat, lon, height, width, res), null,
               false);
         this.lat    = lat;
         this.lon    = lon;
@@ -141,14 +156,14 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
      * @return
      */
     private static int[] makeNav(double lat, double lon, int lines,
-                                 int eles) {
+                                 int eles, int res) {
         int[] nav = new int[128];
         nav[0] = AREAnav.RADR;
         nav[1] = lines / 2;
         nav[2] = eles / 2;
         nav[3] = McIDASUtil.doubleLatLonToInteger(lat);
         nav[4] = McIDASUtil.doubleLatLonToInteger(-lon);  // west pos
-        nav[5] = 1000;
+        nav[5] = 1000* res;
         return nav;
     }
 
