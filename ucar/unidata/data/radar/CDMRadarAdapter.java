@@ -2402,11 +2402,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         CoordinateSystem pCS = new CachingCoordinateSystem(
                                    new ProjectionCoordinateSystem(project));
         */
+
+        int xRes = (int)(xAxis.getMaxValue() - xAxis.getMinValue()) / (sizeX - 1);
+       
         CoordinateSystem pCS =
             new RadarMapProjection(
                 radarLocation.getLatitude().getValue(CommonUnit.degree),
                 radarLocation.getLongitude().getValue(CommonUnit.degree),
-                sizeX, sizeY);
+               sizeX, sizeY, (int)xRes);
         // make the proper RealTypes
         /*  if we use a  real projection, we need the x and y units
         xType = DataUtil.makeRealType(xAxis.getName(), xUnit);
@@ -2448,7 +2451,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                                            xUnit);
         Linear1DSet ySet = makeLinear1DSet((CoordinateAxis1D) yAxis, yType,
                                            yUnit);
-        */
+       */
 
         Linear1DSet xSet = new Linear1DSet(xType, 0, sizeX - 1, sizeX);
         Linear1DSet ySet = new Linear1DSet(yType, 0, sizeY - 1, sizeY);
