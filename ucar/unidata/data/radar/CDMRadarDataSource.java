@@ -194,6 +194,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                 List allTimes = new ArrayList();
                 List collectionTimes =
                     collection.getRadarStationTimes(query.getStation(),
+                        query.getProduct(),
                         query.getDateSelection().getStartFixedDate(),
                         query.getDateSelection().getEndFixedDate());
                 for (int timeIdx = 0; timeIdx < collectionTimes.size();
@@ -214,7 +215,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             for (int i = 0; i < times.size(); i++) {
                 Date date = (Date) times.get(i);
                 java.net.URI uri =
-                    collection.getRadarDatasetURI(query.getStation(), date);
+                    collection.getRadarDatasetURI(query.getStation(), query.getProduct(), date);
                 urls.add(uri.toString());
             }
 
