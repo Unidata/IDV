@@ -157,10 +157,26 @@ public class MapOutputHandler extends OutputHandler {
                 return;
             }
         }
-
         types.add(new OutputType("Map", OUTPUT_MAP));
     }
 
+
+
+    public Result outputEntry(Request request, Entry entry) throws Exception {
+        List<Entry> entriesToUse = new ArrayList<Entry>();
+        entriesToUse.add(entry);
+        StringBuffer sb     = new StringBuffer();
+        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+                              false, "");
+        sb.append(crumbs[1]);
+        Result result = outputMap(request, entriesToUse,sb);
+        result.putProperty(
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, request.getOutput(),
+                getRepository().getOutputTypesForEntry(request, entry)));
+        return result;
+    }
 
 
 
@@ -182,25 +198,13 @@ public class MapOutputHandler extends OutputHandler {
             throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);
-
-        String       output = request.getOutput();
         StringBuffer sb     = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, group,
                               false, "");
         sb.append(crumbs[1]);
-
-        sb.append(
-            importJS(
-                "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
-        sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
-        sb.append(
-            "<div style=\"width:700px; height:500px\" id=\"mapstraction\"></div>\n");
-        sb.append(script("MapInitialize();"));
         if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
-            Result result = new Result("Query Results", sb,
-                                       getMimeType(output));
-
+            Result result = new Result("Query Results", sb);
             result.putProperty(
                 PROP_NAVSUBLINKS,
                 getHeader(
@@ -209,6 +213,45 @@ public class MapOutputHandler extends OutputHandler {
                         request, group, subGroups, entries)));
             return result;
         }
+
+
+
+
+        Result result = outputMap(request, entriesToUse,sb);
+        result.putProperty(
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, request.getOutput(),
+                getRepository().getOutputTypesForGroup(
+                    request, group, subGroups, entries)));
+
+
+        return result;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result outputMap(Request request, List<Entry> entriesToUse, StringBuffer sb) 
+            throws Exception {
+        sb.append(
+            importJS(
+                "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
+        sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
+        sb.append(
+            "<div style=\"width:700px; height:500px\" id=\"mapstraction\"></div>\n");
+        sb.append(script("MapInitialize();"));
 
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
@@ -230,7 +273,7 @@ public class MapOutputHandler extends OutputHandler {
             }
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 String info =
-                    getRepository().getEntryUrl(request, entry) + "<table>"
+                    "<table>"
                     + entry.getTypeHandler().getInnerEntryContent(entry,
                         request, OutputHandler.OUTPUT_HTML, false,
                         false) + "</table>";
@@ -243,24 +286,10 @@ public class MapOutputHandler extends OutputHandler {
                 js.append("mapstraction.addMarker(marker);\n");
             }
 
-
             //mapstraction.addMarker(marker);
-            /*
-
-            var myPoly = new Polyline([new LatLonPoint(37.7945928242851,-122.395033836365), new LatLonPoint(37.7938467508748,-122.393960952759), new LatLonPoint(37.7945928242851,-122.39275932312), new LatLonPoint(37.789505810689,-122.387609481812), new LatLonPoint(37.7782792282611,-122.387351989746), new LatLonPoint(37.7768545853105,-122.390570640564), new LatLonPoint(37.7690524823224,-122.397179603577), new LatLonPoint(37.7668813159428,-122.394347190857), new LatLonPoint(37.7658635597592,-122.407650947571), new LatLonPoint(37.7689167862912,-122.408037185669), new LatLonPoint(37.7765493011063,-122.417650222778), new LatLonPoint(37.7945928242851,-122.395033836365)]);
-
-            */
         }
         sb.append(script(js.toString()));
         Result result = new Result("Results", sb);
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, output,
-                getRepository().getOutputTypesForGroup(
-                    request, group, subGroups, entries)));
-
-
         return result;
     }
 
