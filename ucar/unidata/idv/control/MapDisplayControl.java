@@ -549,6 +549,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             });
             mapsMenu.add(cbx);
         }
+        super.getViewMenuItems(items, forMenuBar);
     }
 
 
