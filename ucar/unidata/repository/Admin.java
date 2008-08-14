@@ -813,22 +813,23 @@ public class Admin extends RepositoryManager {
         boolean bulkLoad = false;
         String  query    = null;
         String  sqlFile  = request.getUploadedFile(ARG_SQLFILE);
-        System.err.println("sqlfile:" + sqlFile);
         if (sqlFile != null && sqlFile.length()>0 && new File(sqlFile).exists()) {
-            System.err.println("bulk-1");
             query    = IOUtil.readContents(sqlFile, getClass());
-            bulkLoad = true;
-        } else {
+            System.err.println("query:" + query);
+            if(query!=null && query.trim().length()>0) {
+                bulkLoad = true;
+            }
+        } 
+        if(!bulkLoad) {
             query = (String) request.getUnsafeString(ARG_QUERY,
                     (String) null);
             if ((query != null) && query.trim().startsWith("file:")) {
                 query = IOUtil.readContents(query.trim().substring(5),
                                             getClass());
-                System.err.println("bulk-2");
                 bulkLoad = true;
             }
         }
-        System.err.println("bulk? " + bulkLoad);
+
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("SQL"));
         sb.append(HtmlUtil.p());
