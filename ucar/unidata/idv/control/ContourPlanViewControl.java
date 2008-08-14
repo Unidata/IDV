@@ -20,17 +20,15 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
 
-
-
 import ucar.unidata.idv.DisplayConventions;
 
 import ucar.unidata.util.ContourInfo;
-
 import ucar.unidata.util.GuiUtils;
 
 import ucar.visad.display.Contour2DDisplayable;
@@ -56,7 +54,7 @@ import javax.swing.JCheckBox;
 /**
  * A control for displaying gridded data as 2D contours.
  *
- * @author Jeff McWhirter
+ * @author IDV Development Team
  * @version $Revision: 1.48 $
  */
 
@@ -242,5 +240,15 @@ public class ContourPlanViewControl extends PlanViewControl {
         super.projectionChanged();
         applyVerticalValue();
     }
+
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
+    public boolean getIsRaster() {
+        return isColorFill;
+    }
+
 }
 

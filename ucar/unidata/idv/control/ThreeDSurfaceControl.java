@@ -853,10 +853,14 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         return myDisplay.getData();
     }
 
-
-
-
-
+    /**
+     * Is this a raster display?
+     *
+     * @return  true
+     */
+    public boolean getIsRaster() {
+        return true;
+    }
 
 }
 

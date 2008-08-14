@@ -42,7 +42,7 @@ import javax.swing.*;
  * A widget for the control window for viewing contour properties and
  * launching the editor.
  *
- * @author  Jeff McWhirter
+ * @author  IDV Development Team
  * @version $Revision: 1.27 $
  */
 public class ContourWidget extends ControlWidget {

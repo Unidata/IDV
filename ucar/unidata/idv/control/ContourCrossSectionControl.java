@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -56,7 +57,7 @@ import javax.swing.*;
 /**
  * A cross section control for displaying contours.
  *
- * @author Jeff McWhirter
+ * @author IDV Development Team
  * @version $Revision: 1.31 $
  */
 public class ContourCrossSectionControl extends CrossSectionControl {
@@ -160,5 +161,13 @@ public class ContourCrossSectionControl extends CrossSectionControl {
         return isColorFill;
     }
 
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
+    public boolean getIsRaster() {
+        return isColorFill;
+    }
 }
 

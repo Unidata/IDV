@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -158,6 +159,15 @@ public class ColorCrossSectionControl extends CrossSectionControl {
      */
     public boolean getAllowSmoothing() {
         return allowSmoothing;
+    }
+
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
+    public boolean getIsRaster() {
+        return true;
     }
 }
 
