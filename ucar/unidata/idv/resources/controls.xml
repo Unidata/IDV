@@ -77,7 +77,7 @@ example:
      label="Color-Filled Contour Plan View"
      icon="/ucar/unidata/idv/images/planview.png"
      displaycategory="Plan Views"
-     properties="colorFill=true;isRaster=true">
+     properties="colorFill=true;">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
 </control>
   <control

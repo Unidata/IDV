@@ -1062,7 +1062,7 @@ Note: we can use place="default", etc., to use the default
      pattern="VIL"
      key="LINELE"
      loc="58 58"
-     mag="3 3"
+     mag="1 1"
      unit="H2O"/>
   <default
      pattern="SRM1"
@@ -1161,37 +1161,37 @@ Note: we can use place="default", etc., to use the default
      pattern="NCR"
      key="LINELE"
      loc="232 232"
-     mag="2 2"
+     mag="1 1"
      unit="ECHO"/>
   <default
      pattern="N0L"
      key="LINELE"
      loc="58 58"
-     mag="3 3"
+     mag="1 1"
      unit="ECHO"/>
   <default
      pattern="N1L"
      key="LINELE"
      loc="58 58"
-     mag="3 3"
+     mag="1 1"
      unit="ECHO"/>
   <default
      pattern="N2L"
      key="LINELE"
      loc="58 58"
-     mag="3 3"
+     mag="1 1"
      unit="ECHO"/>
   <default
      pattern="NET"
      key="LINELE"
      loc="58 58"
-     mag="3 3"
+     mag="1 1"
      unit="TOPS"/>
   <default
      pattern="NVL"
      key="LINELE"
      loc="58 58"
-     mag="3 3"
+     mag="1 1"
      unit="H2O"/>
   <default
      pattern="N1P"
