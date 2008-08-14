@@ -187,7 +187,7 @@ public abstract class NavigatedViewManager extends ViewManager {
     /** Used to show the cursor readout */
     private NavigatedDisplayCursorReadout readout;
 
-    /** _more_ */
+    /** cursor readout window */
     protected CursorReadoutWindow cursorReadoutWindow;
 
     /** vert scale widget */
@@ -307,23 +307,24 @@ public abstract class NavigatedViewManager extends ViewManager {
         initVerticalRange();
 
 
-        if(getIdv().getInteractiveMode()) {
+        if (getIdv().getInteractiveMode()) {
             if (readout == null) {
                 readout =
                     new NavigatedDisplayCursorReadout(getNavigatedDisplay(),
-                                                      null) {
-                        protected JLabel getValueDisplay() {
-                            JLabel label = super.getValueDisplay();
-                            if (label == null) {
-                                IdvWindow window = IdvWindow.findWindow(fullContents);
-                                if (window != null) {
-                                    label = ((IdvWindow) window).getMsgLabel();
-                                    setValueDisplay(label);
-                                }
+                        null) {
+                    protected JLabel getValueDisplay() {
+                        JLabel label = super.getValueDisplay();
+                        if (label == null) {
+                            IdvWindow window =
+                                IdvWindow.findWindow(fullContents);
+                            if (window != null) {
+                                label = ((IdvWindow) window).getMsgLabel();
+                                setValueDisplay(label);
                             }
-                            return label;
                         }
-                    };
+                        return label;
+                    }
+                };
             }
             readout.setActive(getShowCursor());
 
@@ -583,42 +584,49 @@ public abstract class NavigatedViewManager extends ViewManager {
 
         if ((eventId == DisplayEvent.MOUSE_PRESSED)
                 || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
-            MouseEvent mouseEvent = (MouseEvent) inputEvent;
-            int[][][] functionMap = getMaster().getMouseFunctionMap();
-            if(functionMap!=null) {
-                int ctrlIdx = (mouseEvent.isControlDown()?1:0);
-                int shiftIdx = (mouseEvent.isShiftDown()?1:0);
-                int mouseIdx = (SwingUtilities.isLeftMouseButton(mouseEvent)?0:(
-                                                                                SwingUtilities.isMiddleMouseButton(mouseEvent)?1:2));
+            MouseEvent mouseEvent  = (MouseEvent) inputEvent;
+            int[][][]  functionMap = getMaster().getMouseFunctionMap();
+            if (functionMap != null) {
+                int ctrlIdx  = (mouseEvent.isControlDown()
+                                ? 1
+                                : 0);
+                int shiftIdx = (mouseEvent.isShiftDown()
+                                ? 1
+                                : 0);
+                int mouseIdx = (SwingUtilities.isLeftMouseButton(mouseEvent)
+                                ? 0
+                                : (SwingUtilities.isMiddleMouseButton(
+                                    mouseEvent)
+                                   ? 1
+                                   : 2));
                 int function = functionMap[mouseIdx][ctrlIdx][shiftIdx];
-                if (function==MouseHelper.CURSOR_TRANSLATE) {
+                if (function == MouseHelper.CURSOR_TRANSLATE) {
                     if (cursorReadoutWindow == null) {
                         cursorReadoutWindow = new CursorReadoutWindow(this);
                     }
-                    cursorReadoutWindow.handleMousePressedOrDragged(mouseEvent);
+                    cursorReadoutWindow.handleMousePressedOrDragged(
+                        mouseEvent);
                 }
             }
         } else if (eventId == DisplayEvent.MOUSE_RELEASED) {
             MouseEvent mouseEvent = (MouseEvent) inputEvent;
             if (cursorReadoutWindow != null) {
                 cursorReadoutWindow.handleMouseReleased(mouseEvent);
-                cursorReadoutWindow      = null;
+                cursorReadoutWindow = null;
             }
         }
         super.displayChanged(de);
     }
 
-    protected void animationTimeChanged(){
+    /**
+     * Handle an animation time change
+     */
+    protected void animationTimeChanged() {
         super.animationTimeChanged();
-        if(cursorReadoutWindow!=null) {
+        if (cursorReadoutWindow != null) {
             cursorReadoutWindow.updateReadout();
         }
     }
-
-
-
-
-
 
 
     /**
@@ -1008,6 +1016,14 @@ public abstract class NavigatedViewManager extends ViewManager {
         }
     }
 
+    /**
+     * Get the display side coordinate system, subclasses should implement
+     * if there is one.
+     * @return  CoordinateSystem or null
+     */
+    public CoordinateSystem getDisplayCoordinateSystem() {
+        return getNavigatedDisplay().getDisplayCoordinateSystem();
+    }
 
 }
 

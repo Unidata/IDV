@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv;
 
 
@@ -4887,14 +4884,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
             fullWindowBtn.setBorder(null);
             List comps = new ArrayList();
             comps.add(new JLabel("Quality:"));
-            comps.add(GuiUtils.inset(GuiUtils.vbox(hiBtn, medBtn, lowBtn), new Insets(2,8,10,0)));
+            comps.add(GuiUtils.inset(GuiUtils.vbox(hiBtn, medBtn, lowBtn),
+                                     new Insets(2, 8, 10, 0)));
 
             comps.add(new JLabel("Capture What:"));
-            comps.add(GuiUtils.inset(GuiUtils.vbox(mainDisplayBtn, contentsBtn,fullWindowBtn),new Insets(2,8,10,0)));
+            comps.add(GuiUtils.inset(GuiUtils.vbox(mainDisplayBtn,
+                    contentsBtn, fullWindowBtn), new Insets(2, 8, 10, 0)));
 
             comps.add(backgroundTransparentBtn);
             if (publishCbx != null) {
-                comps.add(GuiUtils.inset(publishCbx, new Insets(10,0,0,0)));
+                comps.add(GuiUtils.inset(publishCbx,
+                                         new Insets(10, 0, 0, 0)));
             }
             JComponent accessory = GuiUtils.vbox(comps);
 
@@ -6090,6 +6090,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
         properties.put(key, value);
     }
 
+    /**
+     * Get the display side coordinate system, subclasses should implement
+     * if there is one.
+     * @return  CoordinateSystem or null
+     */
+    public CoordinateSystem getDisplayCoordinateSystem() {
+        return null;
+    }
 
 }
 

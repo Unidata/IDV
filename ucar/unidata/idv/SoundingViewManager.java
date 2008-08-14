@@ -405,5 +405,14 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
     public void setSaturationMixingRatioVisibility(boolean value) {
         saturationMixingRatioVisibility = value;
     }
+
+    /**
+     * Get the display side coordinate system, subclasses should implement
+     * if there is one.
+     * @return  CoordinateSystem or null
+     */
+    public CoordinateSystem getDisplayCoordinateSystem() {
+        return ((AerologicalDisplay) getMaster()).getCoordinateSystem();
+    }
 }
 

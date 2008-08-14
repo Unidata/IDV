@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -36,6 +37,7 @@ import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 
 import ucar.visad.Plotter;
+import ucar.visad.display.Animation;
 
 import visad.*;
 
@@ -257,11 +259,11 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             SceneGraphRenderer renderer = new SceneGraphRenderer();
             DisplayImpl display =
                 (DisplayImpl) viewManager.getMaster().getDisplay();
-            renderer
-                .plot(graphics, display,
-                      ((NavigatedDisplay) viewManager.getMaster())
-                          .getDisplayCoordinateSystem(), dim.width,
-                              dim.height);
+            boolean is3D = !viewManager.getDisplayRenderer().getMode2D();
+            renderer.setTransformToScreenCoords(is3D);
+            renderer.plot(graphics, display,
+                          viewManager.getDisplayCoordinateSystem(),
+                          dim.width, dim.height);
 
 
             //Reset all displays
@@ -291,17 +293,20 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
                     if (data instanceof visad.Text) {
                         text = ((visad.Text) data).getValue();
                     } else if (data instanceof FieldImpl) {
-                        Real now =
-                            viewManager.getAnimation()
-                                .getCurrentAnimationValue();
-                        if (now != null) {
-                            FieldImpl fi = (FieldImpl) data;
-                            Data rangeValue = fi.evaluate(now,
-                                                  Data.NEAREST_NEIGHBOR,
-                                                  Data.NO_ERRORS);
-                            if ((rangeValue != null)
-                                    && (rangeValue instanceof visad.Text)) {
-                                text = ((visad.Text) rangeValue).getValue();
+                        Animation anime = viewManager.getAnimation();
+                        if (anime != null) {
+                            Real now = anime.getCurrentAnimationValue();
+                            if (now != null) {
+                                FieldImpl fi = (FieldImpl) data;
+                                Data rangeValue = fi.evaluate(now,
+                                                      Data.NEAREST_NEIGHBOR,
+                                                      Data.NO_ERRORS);
+                                if ((rangeValue != null)
+                                        && (rangeValue
+                                            instanceof visad.Text)) {
+                                    text = ((visad.Text) rangeValue)
+                                        .getValue();
+                                }
                             }
                         }
                     }
