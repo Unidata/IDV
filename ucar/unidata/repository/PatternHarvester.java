@@ -753,7 +753,7 @@ public class PatternHarvester extends Harvester {
                                new File(fileName),
                                getRepository().getGUID() + "_");
             resource = new Resource(newFile.toString(),
-                                    Resource.TYPE_LOCALFILE);
+                                    Resource.TYPE_STOREDFILE);
         } else {
             resource = new Resource(fileName, Resource.TYPE_FILE);
         }

@@ -813,7 +813,7 @@ public class Admin extends RepositoryManager {
         boolean bulkLoad = false;
         String  query    = null;
         String  sqlFile  = request.getUploadedFile(ARG_SQLFILE);
-        if (sqlFile != null) {
+        if (sqlFile != null && sqlFile.length()>0 && new File(sqlFile).exists()) {
             query    = IOUtil.readContents(sqlFile, getClass());
             bulkLoad = true;
         } else {
@@ -854,14 +854,11 @@ public class Admin extends RepositoryManager {
         long t1 = System.currentTimeMillis();
 
         if (bulkLoad) {
-            System.err.println("doing  bulk load");
             Connection connection = getConnection();
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
             SqlUtil.loadSql(query, statement, false, true);
-            System.err.println("done loading");
             connection.commit();
-            System.err.println("done commiting");
             connection.setAutoCommit(true);
             return makeResult(request, msg("SQL"),
                               new StringBuffer("Executed SQL" + "<P>"

@@ -21,7 +21,7 @@
  */
 
 package ucar.unidata.data;
-
+import ucar.grib.grib2.Grib2Indexer;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -1545,6 +1545,8 @@ public class DataManager {
      * @throws Exception On error
      */
     public static void main(String[] args) throws Exception {
+        Grib2Indexer indexer;
+
         Trace.startTrace();
         Unit     unit     = DataUtil.parseUnit("k");
         RealType realType = DataUtil.makeRealType("temp", unit);

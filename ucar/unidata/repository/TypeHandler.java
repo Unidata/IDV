@@ -597,6 +597,7 @@ public class TypeHandler extends RepositoryManager {
     protected Link getEntryDownloadLink(Request request, Entry entry)
             throws Exception {
 
+
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }

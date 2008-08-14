@@ -342,7 +342,7 @@ public class StorageManager extends RepositoryManager {
      * @param resource _more_
      */
     public void removeFile(Resource resource) {
-        if (resource.isLocalFile()) {
+        if (resource.isStoredFile()) {
             resource.getFile().delete();
         }
     }

@@ -43,8 +43,12 @@ public class Resource {
     /** _more_ */
     public static final String TYPE_FILE = "file";
 
+    public static final String TYPE_LOCAL_DIRECTORY = "localdirectory";
+
+    public static final String TYPE_LOCAL_FILE = "localfile";
+
     /** _more_ */
-    public static final String TYPE_LOCALFILE = "localfile";
+    public static final String TYPE_STOREDFILE = "storedfile";
 
     /** _more_ */
     public static final String TYPE_URL = "url";
@@ -71,14 +75,7 @@ public class Resource {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param file _more_
-     */
-    public Resource(File file) {
-        this(file, TYPE_FILE);
-    }
+
 
     /**
      * _more_
@@ -91,6 +88,7 @@ public class Resource {
         this.path = file.toString();
         this.type = type;
     }
+
 
 
     /**
@@ -149,7 +147,7 @@ public class Resource {
      * @return _more_
      */
     public boolean isFile() {
-        if (type.equals(TYPE_FILE) || type.equals(TYPE_LOCALFILE)) {
+        if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE) || type.equals(TYPE_LOCAL_FILE)) {
             return getFile().exists();
         }
         return false;
@@ -160,8 +158,8 @@ public class Resource {
      *
      * @return _more_
      */
-    public boolean isLocalFile() {
-        return type.equals(TYPE_LOCALFILE);
+    public boolean isStoredFile() {
+        return type.equals(TYPE_STOREDFILE);
     }
 
     /**

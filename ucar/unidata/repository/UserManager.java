@@ -105,6 +105,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     private List ipUserList = new ArrayList();
 
+    public final User localFileUser = new User("localuser", false);
 
     /**
      * _more_

@@ -26,7 +26,6 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
-
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.sql.Clause;
@@ -114,8 +113,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         //        URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
     };
-
-
 
 
 
@@ -286,8 +283,9 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     private List<String> htdocRoots = new ArrayList<String>();
 
 
+    private List<String> localFilePaths = new ArrayList<String>();
 
-
+    public static final String LOCAL_FILE_ID_PREFIX = "file:";
     /**
      * _more_
      *
@@ -1127,7 +1125,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             getUserManager().makeOrUpdateUser(user, true);
         }
     }
-
 
 
 
@@ -3482,25 +3479,28 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
 
         if(isLocalFileEntry(entryId)) {
-            File f = new File(entryId.substring(5));
+            File f = new File(getFileFromId(entryId));
             File parentFile = f.getParentFile();
             if(parentFile!=null && parentFile.getParentFile()==null)
                 parentFile = null;
-            Group parent = (Group)(parentFile!=null?getEntry(request,"file:" + parentFile,andFilter, abbreviated):null);
+            Group parent = (Group)(parentFile!=null?getEntry(request,
+                                                             getIdFromFile(parentFile),andFilter, abbreviated):null);
             if(parent==null) parent = topGroup;
             TypeHandler handler = (f.isDirectory()?getTypeHandler(TypeHandler.TYPE_GROUP):getTypeHandler(TypeHandler.TYPE_FILE));
             if(!f.exists()) return null;
             Entry fileEntry = (f.isDirectory()?(Entry)new Group(entryId,handler):new Entry(entryId,handler));
             String name= f.toString();
-            if(!localFilePaths.contains(name)) {
+            
+            if(!localFilePaths.contains(name.replace("\\","/"))) {
                 name = IOUtil.getFileTail(name);
             }
             fileEntry.setIsLocalFile(true);
             fileEntry.initEntry(name, "", parent,
-                            "", new User("",false), new Resource(f),
-                            "", f.lastModified(),f.lastModified(),f.lastModified(),null);
+                                "", getUserManager().localFileUser, 
+                                new Resource(f,(f.isDirectory()?Resource.TYPE_LOCAL_DIRECTORY:
+                                                Resource.TYPE_LOCAL_FILE)),
+                                "", f.lastModified(),f.lastModified(),f.lastModified(),null);
             //            System.err.println ("parent:" + fileEntry.getParentGroup());
-
             if ( !abbreviated && (entry != null)) {
                 if (entryCache.size() > ENTRY_CACHE_LIMIT) {
                     entryCache = new Hashtable();
@@ -3661,7 +3661,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         Resource resource;
 
         if(file!=null) {
-            resource = new Resource(file, Resource.TYPE_LOCALFILE);
+            resource = new Resource(file, Resource.TYPE_STOREDFILE);
         } else if(url!=null) {
             resource = new Resource(url, Resource.TYPE_URL);
         } else {
@@ -4710,7 +4710,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
                     String resourceType  = Resource.TYPE_UNKNOWN;
                     if(isFile) {
-                        resourceType = Resource.TYPE_LOCALFILE;
+                        resourceType = Resource.TYPE_STOREDFILE;
                     } else {
                         try {
                             new  URL(theResource);
@@ -5268,6 +5268,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         List<Group>   subGroups     = new ArrayList<Group>();
         for (String id : ids) {
             Entry entry = getEntry(request, id);
+
             if (entry == null) {
                 continue;
             }
@@ -5302,11 +5303,12 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             throws Exception {
         List<String>     ids  = new ArrayList<String>();
         if(isLocalFileEntry(group.getId())) {
-            File f = new File(group.getId().substring(5));
+            File f = new File(getFileFromId(group.getId()));
             File[]files = f.listFiles();
             for(int i=0;i<files.length;i++) {
-                ids.add("file:" + files[i]);
+                ids.add(getIdFromFile(files[i]));
             }
+            ids = Misc.sort(ids);
             return ids;
         }
 
@@ -5330,9 +5332,10 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             }
         }
 
+        //Add in any local file directories
         if(topGroup.equals(group)) {
             for(String path: localFilePaths) {
-                ids.add("file:" + path);
+                ids.add(getIdFromFile(path));
             }
         }
 
@@ -6041,17 +6044,27 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
-    List<String> localFilePaths = new ArrayList<String>();
-
     public void setLocalFilePaths() {
         localFilePaths = (List<String>)StringUtil.split(getProperty(PROP_LOCALFILEPATHS,""),"\n",true,true);
     }
 
+    public String getFileFromId(String id) {
+        return id.substring(LOCAL_FILE_ID_PREFIX.length());
+    } 
+
+    public String getIdFromFile(File file) {
+        return getIdFromFile(file.toString());
+    }
+
+    public String getIdFromFile(String file) {
+        file = file.replace("\\","/");
+        return LOCAL_FILE_ID_PREFIX + file;
+    } 
+
     public boolean isLocalFileEntry(String id) {
-        if(id.startsWith("file:")) {
-            id=id.substring(5);
+        if(id.startsWith(LOCAL_FILE_ID_PREFIX)) {
+            id=id.substring(LOCAL_FILE_ID_PREFIX.length());
             for(String path: localFilePaths) {
-                //                System.err.println(id+"  " + path);
                 if(id.startsWith(path)) {
                     checkFilePath(id);
                     return true;
