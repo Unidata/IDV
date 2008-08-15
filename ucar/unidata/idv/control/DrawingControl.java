@@ -579,23 +579,23 @@ public class DrawingControl extends DisplayControlImpl {
         if (rasterMode == RASTERMODE_SHOWRASTER) {
             for (int i = 0; i < glyphs.size(); i++) {
                 DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
-                glyph.oldVisibility = glyph.getVisibleFlag();
+                glyph.oldVisibility = glyph.isVisible();
                 if (glyph.oldVisibility) {
-                    glyph.setVisibleFlag(glyph.getIsRaster());
+                    glyph.setVisible(glyph.getIsRaster());
                 }
             }
         } else if (rasterMode == RASTERMODE_SHOWNONRASTER) {
             for (int i = 0; i < glyphs.size(); i++) {
                 DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
                 if (glyph.oldVisibility) {
-                    glyph.setVisibleFlag( !glyph.getIsRaster());
+                    glyph.setVisible( !glyph.getIsRaster());
                 }
             }
 
         } else {
             for (int i = 0; i < glyphs.size(); i++) {
                 DrawingGlyph glyph = (DrawingGlyph) glyphs.get(i);
-                glyph.setVisibleFlag(glyph.oldVisibility);
+                glyph.setVisible(glyph.oldVisibility);
             }
         }
     }
