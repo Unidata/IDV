@@ -479,7 +479,7 @@ public class CatalogOutputHandler extends OutputHandler {
                     TdsOutputHandler.OUTPUT_TDS);
         }
 
-        if (tdsOutputHandler.canLoad(entry)) {
+        if (tdsOutputHandler.canLoad(request, entry)) {
             String urlPath = tdsOutputHandler.getTdsUrl(entry);
             addService(catalogInfo, SERVICE_DODS,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
@@ -615,6 +615,16 @@ public class CatalogOutputHandler extends OutputHandler {
                                                                  "ramadda.host",
                                                                  ATTR_VALUE, getRepository().getHostname()});
 
+        if(entry.getDataType()!=null) {
+            String type = entry.getDataType();
+            XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
+                           dataset, new String[] { ATTR_NAME,
+                                                   "idv.datatype",
+                                                   ATTR_VALUE, type});
+
+        }
+
+
         addServices(entry, request, catalogInfo, dataset);
 
         addMetadata(request, entry, catalogInfo, dataset);
@@ -686,7 +696,6 @@ public class CatalogOutputHandler extends OutputHandler {
             EntryGroup subGroup = entryGroup.find(typeDesc);
             subGroup.add(entry);
         }
-
 
         generate(request, entryGroup, catalogInfo, parent);
 

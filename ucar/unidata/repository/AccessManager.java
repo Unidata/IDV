@@ -242,19 +242,22 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
-
         if(entry.getIsLocalFile()) {
-            if(action.equals(Permission.ACTION_VIEW)) return true;
-            return false;
+            if(action.equals(Permission.ACTION_NEW)) return false;
+            if(action.equals(Permission.ACTION_DELETE)) return false;
         }
 
+        if(request==null) {
+            return false;
+        }
 
         User user = request.getUser();
         //The admin can do anything
         if (user.getAdmin()) {
             return true;
         }
-        if (user.equals(entry.getUser())) {
+
+        if (!user.getAnonymous() && Misc.equals(user,entry.getUser())) {
             return true;
         }
 
@@ -264,9 +267,7 @@ public class AccessManager extends RepositoryManager {
             List permissions = getPermissions(request, entry);
 
             List roles       = getRoles(request, entry, action);
-            //            System.err.println ("\tentry:" + entry.getName() + " permissions:" + permissions);
             if (roles != null) {
-                //                System.err.println ("got roles:" + roles);
                 for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
                     String  role  = (String) roles.get(roleIdx);
                     boolean doNot = false;
@@ -275,7 +276,6 @@ public class AccessManager extends RepositoryManager {
                         role  = role.substring(1);
                     }
                     if (user.isRole(role)) {
-                        //                        System.err.println ("role is: " + role);
                         return !doNot;
                     }
                 }
@@ -396,7 +396,7 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canEditEntry(Request request, Entry entry)
             throws Exception {
-        if(entry.getIsLocalFile()) return false;
+        //        if(entry.getIsLocalFile()) return false;
         return canDoAction(request, entry, Permission.ACTION_EDIT);
     }
 

@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -66,13 +67,13 @@ import javax.swing.tree.*;
 public class RepositoryClient extends RepositoryBase {
 
 
-    /** _more_          */
+    /** _more_ */
     JTree groupTree;
 
-    /** _more_          */
+    /** _more_ */
     DefaultTreeModel treeModel;
 
-    /** _more_          */
+    /** _more_ */
     GroupNode treeRoot;
 
     /** _more_ */
@@ -152,22 +153,39 @@ public class RepositoryClient extends RepositoryBase {
         refreshTreeNode(treeRoot);
     }
 
-    public void addTags(Element node, List<String>tags) throws Exception {
-        for(String tag: tags) {
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param tags _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addTags(Element node, List<String> tags) throws Exception {
+        for (String tag : tags) {
             XmlUtil.create(node.getOwnerDocument(), TAG_METADATA, node,
-                           new String[]{
-                               ATTR_TYPE,"enum_tag",
-                               ATTR_ATTR1, tag
-                           });
+                           new String[] { ATTR_TYPE,
+                                          "enum_tag", ATTR_ATTR1, tag });
         }
     }
 
-    public void addAssociation(Element node, String fromId, String toId, String name) throws Exception {
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param fromId _more_
+     * @param toId _more_
+     * @param name _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addAssociation(Element node, String fromId, String toId,
+                               String name)
+            throws Exception {
         XmlUtil.create(node.getOwnerDocument(), TAG_ASSOCIATION, node,
                        new String[] {
-                           ATTR_FROM, fromId, ATTR_TO, toId, ATTR_NAME,
-                           name
-                       });
+            ATTR_FROM, fromId, ATTR_TO, toId, ATTR_NAME, name
+        });
     }
 
 
@@ -194,12 +212,12 @@ public class RepositoryClient extends RepositoryBase {
         });
         ToolTipManager.sharedInstance().registerComponent(groupTree);
         groupTree.setShowsRootHandles(true);
-        final ImageIcon iconOpen =  
-            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs" +ICON_FOLDER_OPEN,
-                                  getClass());
-        final ImageIcon iconClosed =  
-            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs" +ICON_FOLDER_CLOSED,
-                                  getClass());
+        final ImageIcon iconOpen =
+            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs"
+                                  + ICON_FOLDER_OPEN, getClass());
+        final ImageIcon iconClosed =
+            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs"
+                                  + ICON_FOLDER_CLOSED, getClass());
 
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
             public Component getTreeCellRendererComponent(JTree theTree,
@@ -207,12 +225,14 @@ public class RepositoryClient extends RepositoryBase {
                     boolean leaf, int row, boolean hasFocus) {
                 super.getTreeCellRendererComponent(theTree, value, sel,
                         expanded, leaf, row, hasFocus);
-                if(expanded || leaf)
+                if (expanded || leaf) {
                     setIcon(iconOpen);
-                else
+                } else {
                     setIcon(iconClosed);
+                }
                 return this;
-            }};
+            }
+        };
         groupTree.setCellRenderer(renderer);
         treeRoot.checkExpansion();
     }
@@ -321,7 +341,7 @@ public class RepositoryClient extends RepositoryBase {
         /** Have I loaded */
         private boolean haveLoaded = false;
 
-        /** _more_          */
+        /** _more_ */
         private String id;
 
         /**
@@ -427,7 +447,7 @@ public class RepositoryClient extends RepositoryBase {
 
     /**
      *     _more_
-     *    
+     *
      *     @return _more_
      */
     public boolean doConnect() {
@@ -556,7 +576,6 @@ public class RepositoryClient extends RepositoryBase {
      * @param msg _more_
      * @return _more_
      *
-     * @throws Exception _more_
      */
     public boolean isValidSession(String[] msg) {
         if (sessionId == null) {
@@ -601,7 +620,6 @@ public class RepositoryClient extends RepositoryBase {
      * @param msg _more_
      * @return _more_
      *
-     * @throws Exception _more_
      */
     public boolean doLogin(String[] msg) {
         try {

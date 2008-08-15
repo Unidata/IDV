@@ -169,7 +169,8 @@ public class MapOutputHandler extends OutputHandler {
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
         sb.append(crumbs[1]);
-        Result result = outputMap(request, entriesToUse,sb);
+        getMap(request, entriesToUse,sb,700,500);
+        Result result = new Result("Results", sb);
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(
@@ -217,7 +218,8 @@ public class MapOutputHandler extends OutputHandler {
 
 
 
-        Result result = outputMap(request, entriesToUse,sb);
+        getMap(request, entriesToUse,sb,700,500);
+        Result result = new Result("Results", sb);
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(
@@ -243,16 +245,15 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private Result outputMap(Request request, List<Entry> entriesToUse, StringBuffer sb) 
+    public  void getMap(Request request, List<Entry> entriesToUse, StringBuffer sb, int width, int height) 
             throws Exception {
         sb.append(
             importJS(
                 "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
         sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
         sb.append(
-            "<div style=\"width:700px; height:500px\" id=\"mapstraction\"></div>\n");
+            "<div style=\"width:" + width+"px; height:" +height+"px\" id=\"mapstraction\"></div>\n");
         sb.append(script("MapInitialize();"));
-
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
         js.append("var pointList;\n");
@@ -289,8 +290,6 @@ public class MapOutputHandler extends OutputHandler {
             //mapstraction.addMarker(marker);
         }
         sb.append(script(js.toString()));
-        Result result = new Result("Results", sb);
-        return result;
     }
 
 
@@ -304,7 +303,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private String llp(double lat, double lon) {
+    private static String llp(double lat, double lon) {
         return "new LatLonPoint(" + lat + "," + lon + ")";
 
     }
@@ -316,7 +315,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private String script(String s) {
+    private static String script(String s) {
         return "<script type=\"text/JavaScript\">" + s + "</script>\n";
     }
 
@@ -327,7 +326,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private String importJS(String jsUrl) {
+    private static String importJS(String jsUrl) {
         return "<script src=\"" + jsUrl + "\"></script>\n";
     }
 

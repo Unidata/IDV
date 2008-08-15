@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -41,6 +42,7 @@ import ucar.nc2.dataset.NetcdfDataset;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.util.IOUtil;
 
 import java.io.*;
 
@@ -81,9 +83,21 @@ public class TdsOutputHandler extends OutputHandler {
     public static final String OUTPUT_TDS = "tds";
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
                                                             Boolean>();
+
+
+    /** _more_          */
+    private Object CACHE_MUTEX = new Object();
+
+    /** _more_          */
+    private     Hashtable<String, NetcdfFile> cache = new Hashtable<String,
+        NetcdfFile>();
+
+    /** _more_          */
+    private     List<String> cachedFiles = new ArrayList<String>();
+
 
 
     /**
@@ -96,6 +110,19 @@ public class TdsOutputHandler extends OutputHandler {
     public TdsOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+
+        //TODO: what other global configuration should be done?
+        String nj22TmpFile =
+            IOUtil.joinDir(getRepository().getStorageManager().getTmpDir(),
+                           "nj22/");
+        IOUtil.makeDir(nj22TmpFile);
+
+        //Set the temp file and the cache policy
+        ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
+
+
+        ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
+
     }
 
 
@@ -126,9 +153,8 @@ public class TdsOutputHandler extends OutputHandler {
     protected void getOutputTypesForEntry(Request request, Entry entry,
                                           List<OutputType> types)
             throws Exception {
-        //If we aren't in the tomcat world then exit
-        if(request.getHttpServletRequest()==null) return;
-        if (canLoad(entry)) {
+
+        if (canLoad(request, entry)) {
             types.add(new OutputType("TDS", OUTPUT_TDS) {
                 public String assembleUrl(Request request) {
                     return request.getRequestPath() + getSuffix() + "/"
@@ -147,8 +173,15 @@ public class TdsOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getTdsUrl(Entry entry) {
-        return "/" + ARG_OUTPUT + ":" + OUTPUT_TDS + "/" + ARG_ID + ":"
-               + entry.getId() + "/entry.das";
+        return "/" + ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_TDS) + "/" + ARG_ID + ":"
+            + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+    }
+
+
+    public String getFullTdsUrl(Entry entry) {
+        return getRepository().URL_ENTRY_SHOW.getFullUrl()+"/" +
+            ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_TDS) + "/" + ARG_ID + ":"
+            + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
 
@@ -159,7 +192,12 @@ public class TdsOutputHandler extends OutputHandler {
      *
      * @return Can the given entry be served by the tds
      */
-    public boolean canLoad(Entry entry) {
+    public boolean canLoad(Request request, Entry entry) {
+        //If we aren't in the tomcat world then exit
+        if (request.getHttpServletRequest() == null) {
+            return false;
+        }
+
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -170,6 +208,8 @@ public class TdsOutputHandler extends OutputHandler {
             } else {
                 try {
                     File file = entry.getResource().getFile();
+                    //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
+                    //Use openFile
                     NetcdfFile ncfile =
                         NetcdfDataset.acquireFile(file.toString(), null);
                     ok = true;
@@ -194,6 +234,12 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
+        
+        //        System.err.println ("entry:" + entry);
+        
+        //TODO: we create a new servlet every time we service a request.
+        //any problems with that?
+
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry) {
             public ServletConfig getServletConfig() {
@@ -211,6 +257,8 @@ public class TdsOutputHandler extends OutputHandler {
         };
 
         servlet.init(request.getHttpServlet().getServletConfig());
+
+
         servlet.doGet(request.getHttpServletRequest(),
                       request.getHttpServletResponse());
         //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
@@ -231,10 +279,15 @@ public class TdsOutputHandler extends OutputHandler {
     public class NcDODSServlet extends opendap.servlet.AbstractServlet {
 
         /** _more_          */
-        Request request;
+        public static final int CACHE_LIMIT = 2;
 
-        /** _more_          */
+        /** _more_ */
+        Request repositoryRequest;
+
+        /** _more_ */
         Entry entry;
+
+
 
         /**
          * _more_
@@ -243,7 +296,7 @@ public class TdsOutputHandler extends OutputHandler {
          * @param entry _more_
          */
         public NcDODSServlet(Request request, Entry entry) {
-            this.request = request;
+            this.repositoryRequest = request;
             this.entry   = entry;
         }
 
@@ -263,8 +316,32 @@ public class TdsOutputHandler extends OutputHandler {
             HttpServletRequest request = preq.getRequest();
             String             reqPath = entry.getName();
             String location = entry.getResource().getFile().toString();
+            NetcdfFile         ncFile  = null;
+            //TODO: Should we be caching the ncFiles? The GuardedDatasets?
+            //TODO: Is there problems having multiple GuardedDatasets accessing the same ncfile?
+            synchronized (CACHE_MUTEX) {
+                String cacheKey = repositoryRequest.getSessionId()+"_"+ location;
+                ncFile = cache.get(cacheKey);
+                if (ncFile != null) {
+                    //Bump it to the end of the list
+                    cachedFiles.remove(location);
+                    cachedFiles.add(location);
+                } else {
+                    ncFile = NetcdfDataset.acquireFile(location, null);
+                    while (cachedFiles.size() > CACHE_LIMIT) {
+                        String firstFile = cachedFiles.get(0);
+                        String firstFileCacheKey = repositoryRequest.getSessionId()+"_"+ firstFile;
+                        cachedFiles.remove(0);
+                        cache.get(firstFileCacheKey).close();
+                        cache.remove(firstFileCacheKey);
+                    }
+                    cachedFiles.add(location);
+                    cache.put(cacheKey, ncFile);
+                }
+            }
+
             GuardedDatasetImpl guardedDataset =
-                new GuardedDatasetImpl(reqPath, location);
+                new GuardedDatasetImpl(reqPath, ncFile, true);
             return guardedDataset;
         }
 

@@ -30,6 +30,7 @@ import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
@@ -520,6 +521,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getPathEmbeddedArgs() {
+        try {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
@@ -538,7 +540,7 @@ public class Request implements Constants {
                     if (cnt++ > 0) {
                         sb.append("/");
                     }
-                    sb.append(arg + ":" + svalue);
+                    sb.append(arg + ":" + encodeEmbedded(svalue));
                 }
                 continue;
             }
@@ -549,11 +551,41 @@ public class Request implements Constants {
             if (cnt++ > 0) {
                 sb.append("/");
             }
-            sb.append(arg + ":" + svalue);
+            sb.append(arg + ":" + encodeEmbedded(svalue));
         }
         return sb.toString();
+            } catch(Exception exc) {
+                throw new WrapperException(exc);
+            }
     }
 
+
+    public static String encodeEmbedded(String s)  {
+        try {
+            if(s.indexOf("/")>=0) {
+                s = "b64:"+ XmlUtil.encodeBase64(s.getBytes()).trim();
+            }
+            //            s = java.net.URLEncoder.encode(s, "UTF-8");
+            return s;
+        } catch(Exception exc) {
+            throw new WrapperException(exc);
+        }
+    }
+
+
+    public static String decodeEmbedded(String s)  {
+        try {
+            if(s.startsWith("b64:"))  {
+                s = s.substring(4);
+                //s = java.net.URLDecoder.decode(s, "UTF-8");     
+                s = new String(XmlUtil.decodeBase64(s));
+            }
+            return s;
+        } catch(Exception exc) {
+            throw new WrapperException(exc);
+        }
+        
+    }
 
 
     /**
@@ -573,6 +605,11 @@ public class Request implements Constants {
             idx = value.indexOf("/");
             if (idx >= 0) {
                 value = value.substring(0, idx);
+            }
+            try {
+                value = decodeEmbedded(value);
+            } catch(Exception exc) {
+                throw new WrapperException(exc);
             }
             return value;
         }

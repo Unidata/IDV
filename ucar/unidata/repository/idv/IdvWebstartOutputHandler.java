@@ -112,8 +112,6 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
 
 
-
-
     /**
      * _more_
      *
@@ -130,6 +128,15 @@ public class IdvWebstartOutputHandler extends OutputHandler {
            entry.getResource().getPath().endsWith(".zidv")) {
             String suffix = "/"+entry.getId()+".jnlp";
             types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
+        } else {
+            TdsOutputHandler tds = (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_TDS);
+            if(tds !=null) {
+                if(tds.canLoad(request, entry)) {
+                    String suffix = "/"+entry.getId()+".jnlp";
+                    types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
+                }
+            }
+
         }
     }
 
@@ -137,10 +144,28 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
     public Result outputEntry(Request request, Entry entry) throws Exception {
         String jnlp = getRepository().getResource("/ucar/unidata/repository/idv/template.jnlp");
-        String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                  + entry.getName(), ARG_ID, entry.getId());
-        url = getRepository().absoluteUrl(url);
-        jnlp = jnlp.replace("%URL%",url);
+
+        if(entry.getResource().getPath().endsWith(".xidv") ||
+           entry.getResource().getPath().endsWith(".zidv")) {
+
+            String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                                      + entry.getName(), ARG_ID, entry.getId());
+            url = getRepository().absoluteUrl(url);
+            jnlp = jnlp.replace("%ARG%","-bundle");
+            jnlp = jnlp.replace("%URL%",url);
+        } else {
+            TdsOutputHandler tds = (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_TDS);
+            if(tds !=null && tds.canLoad(request,entry)) {
+                jnlp = jnlp.replace("%ARG%","-data");
+                String type = "OPENDAP.GRID";
+                if(entry.getDataType()!=null) {
+                    if(entry.getDataType().equals("point")) type = "NetCDF.POINT";
+                }
+                jnlp = jnlp.replace("%URL%","type:"+type+":"+tds.getFullTdsUrl(entry));
+            }
+        }
+
+
         return new Result("",new StringBuffer(jnlp),"application/x-java-jnlp-file");
         //        return new Result("",new StringBuffer(jnlp),"text/xml");
     }

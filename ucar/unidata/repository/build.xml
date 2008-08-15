@@ -31,7 +31,7 @@
     </target>
 
 
-    <target name="all" depends="lib,ramaddajar,release,war">
+    <target name="all" depends="ramaddajar,release,war">
     </target>
 
 

@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.repository;
 
 
@@ -98,7 +100,8 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository extends RepositoryBase implements  Tables, RequestHandler {
+public class Repository extends RepositoryBase implements Tables,
+        RequestHandler {
 
     /** _more_ */
     public static final String GROUP_TOP = "Top";
@@ -152,10 +155,10 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     private int keyCnt = 0;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<String> loadFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private String dumpFile;
 
 
@@ -220,7 +223,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     String[] args;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean inTomcat = false;
 
 
@@ -283,9 +286,12 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     private List<String> htdocRoots = new ArrayList<String>();
 
 
+    /** _more_ */
     private List<String> localFilePaths = new ArrayList<String>();
 
+    /** _more_ */
     public static final String LOCAL_FILE_ID_PREFIX = "file:";
+
     /**
      * _more_
      *
@@ -299,9 +305,9 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     public Repository(String[] args, String hostname, int port,
                       boolean inTomcat)
             throws Exception {
-        super(hostname,port);
+        super(hostname, port);
         this.inTomcat = inTomcat;
-        this.args       = args;
+        this.args     = args;
     }
 
 
@@ -318,19 +324,28 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getIconUrl(Entry entry) {
-        Resource resource =entry.getResource();
-        String path = resource.getPath();
-        if(entry.isGroup()) {
+        Resource resource = entry.getResource();
+        String   path     = resource.getPath();
+        if (entry.isGroup()) {
             return fileUrl(ICON_FOLDER_CLOSED);
         }
         String img = ICON_FILE;
-        if(path!=null) {
+        if (path != null) {
             String suffix = IOUtil.getFileExtension(path.toLowerCase());
-            String prop = getProperty("icon" + suffix);
-            if(prop!=null) img = prop;
+            String prop   = getProperty("icon" + suffix);
+            if (prop != null) {
+                img = prop;
+            }
         }
-        return  fileUrl(img);
+        return fileUrl(img);
     }
 
 
@@ -740,7 +755,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
         if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
-            getDatabaseManager().makeDatabaseCopy(fos,true);
+            getDatabaseManager().makeDatabaseCopy(fos, true);
             fos.close();
         }
     }
@@ -977,7 +992,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         //This will end up being from the properties
         htdocRoots.addAll(
             StringUtil.split(
-                getProperty("ramadda.html.htdocroots", BLANK), ";", true, true));
+                getProperty("ramadda.html.htdocroots", BLANK), ";", true,
+                true));
 
 
     }
@@ -1690,7 +1706,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             return getHtdocsFile(request);
         }
 
-        if (!getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
+        if ( !getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
             return getAdmin().doInitialization(request);
         }
 
@@ -2168,7 +2184,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      * _more_
      *
      * @param table _more_
-     * @param where _more_
      * @param clause _more_
      *
      * @return _more_
@@ -2279,7 +2294,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      *
      * @throws Exception _more_
      */
-    protected OutputHandler getOutputHandler(Request request)
+    public OutputHandler getOutputHandler(Request request)
             throws Exception {
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandle(request)) {
@@ -2301,7 +2316,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      *
      * @throws Exception _more_
      */
-    protected OutputHandler getOutputHandler(String type) throws Exception {
+    public OutputHandler getOutputHandler(String type) throws Exception {
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandle(type)) {
                 return outputHandler;
@@ -2459,7 +2474,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      * _more_
      *
      *
-     * @param andList _more_
+     * @param request _more_
      *
      * @param clause _more_
      *
@@ -2467,7 +2482,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      *
      * @throws Exception _more_
      */
-    public List<Group> getGroups(Clause clause) throws Exception {
+    public List<Group> getGroups(Request request, Clause clause)
+            throws Exception {
 
         List<Clause> clauses = new ArrayList<Clause>();
         if (clause != null) {
@@ -2476,23 +2492,26 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         clauses.add(Clause.eq(COL_ENTRIES_TYPE, TypeHandler.TYPE_GROUP));
         Statement statement = getDatabaseManager().select(COL_ENTRIES_ID,
                                   TABLE_ENTRIES, clauses);
-        return getGroups(SqlUtil.readString(statement, 1));
+        return getGroups(request, SqlUtil.readString(statement, 1));
     }
 
     /**
      * _more_
      *
      *
+     *
+     * @param request _more_
      * @param groupIds _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public List<Group> getGroups(String[] groupIds) throws Exception {
+    public List<Group> getGroups(Request request, String[] groupIds)
+            throws Exception {
         List<Group> groupList = new ArrayList<Group>();
         for (int i = 0; i < groupIds.length; i++) {
-            Group group = findGroup(groupIds[i]);
+            Group group = findGroup(request, groupIds[i]);
             if (group != null) {
                 groupList.add(group);
             }
@@ -3157,7 +3176,10 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             boolean      didOne = false;
             sb.append(makeEntryHeader(request, fromEntry));
             for (Entry entry : cart) {
-                if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_NEW)) continue;
+                if ( !getAccessManager().canDoAction(request, entry,
+                        Permission.ACTION_NEW)) {
+                    continue;
+                }
                 if ( !entry.isGroup()) {
                     continue;
                 }
@@ -3478,55 +3500,63 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             return getAccessManager().filterEntry(request, entry);
         }
 
-        if(isLocalFileEntry(entryId)) {
-            File f = new File(getFileFromId(entryId));
+        if (isLocalFileEntry(entryId)) {
+            File f          = new File(getFileFromId(entryId));
             File parentFile = f.getParentFile();
-            if(parentFile!=null && parentFile.getParentFile()==null)
+            if ((parentFile != null)
+                    && (parentFile.getParentFile() == null)) {
                 parentFile = null;
-            Group parent = (Group)(parentFile!=null?getEntry(request,
-                                                             getIdFromFile(parentFile),andFilter, abbreviated):null);
-            if(parent==null) parent = topGroup;
-            TypeHandler handler = (f.isDirectory()?getTypeHandler(TypeHandler.TYPE_GROUP):getTypeHandler(TypeHandler.TYPE_FILE));
-            if(!f.exists()) return null;
-            Entry fileEntry = (f.isDirectory()?(Entry)new Group(entryId,handler):new Entry(entryId,handler));
-            String name= f.toString();
-            
-            if(!localFilePaths.contains(name.replace("\\","/"))) {
+            }
+            Group parent = (Group) ((parentFile != null)
+                                    ? getEntry(request,
+                                        getIdFromFile(parentFile), andFilter,
+                                        abbreviated)
+                                    : null);
+            if (parent == null) {
+                parent = topGroup;
+            }
+            TypeHandler handler = (f.isDirectory()
+                                   ? getTypeHandler(TypeHandler.TYPE_GROUP)
+                                   : getTypeHandler(TypeHandler.TYPE_FILE));
+            if ( !f.exists()) {
+                return null;
+            }
+            entry = (f.isDirectory()
+                     ? (Entry) new Group(entryId, handler)
+                     : new Entry(entryId, handler));
+            String name = f.toString();
+
+            if ( !localFilePaths.contains(name.replace("\\", "/"))) {
                 name = IOUtil.getFileTail(name);
             }
-            fileEntry.setIsLocalFile(true);
-            fileEntry.initEntry(name, "", parent,
-                                "", getUserManager().localFileUser, 
-                                new Resource(f,(f.isDirectory()?Resource.TYPE_LOCAL_DIRECTORY:
-                                                Resource.TYPE_LOCAL_FILE)),
-                                "", f.lastModified(),f.lastModified(),f.lastModified(),null);
-            //            System.err.println ("parent:" + fileEntry.getParentGroup());
-            if ( !abbreviated && (entry != null)) {
-                if (entryCache.size() > ENTRY_CACHE_LIMIT) {
-                    entryCache = new Hashtable();
-                }
-                entryCache.put(entryId, fileEntry);
+            entry.setIsLocalFile(true);
+            entry.initEntry(name, "", parent, "",
+                            getUserManager().localFileUser,
+                            new Resource(f, (f.isDirectory()
+                                             ? Resource.TYPE_LOCAL_DIRECTORY
+                                             : Resource
+                                             .TYPE_LOCAL_FILE)), "",
+                                                 f.lastModified(),
+                                                     f.lastModified(),
+                                                         f.lastModified(),
+                                                             null);
+        } else {
+            Statement entryStmt =
+                getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
+                                            Clause.eq(COL_ENTRIES_ID,
+                                                entryId));
+
+            ResultSet results = entryStmt.getResultSet();
+            if ( !results.next()) {
+                entryStmt.close();
+                return null;
             }
-            return fileEntry;
 
-        }
-
-        //        System.err.println ("Looking up entry:" + entryId);
-
-        Statement entryStmt = getDatabaseManager().select(COLUMNS_ENTRIES,
-                                  TABLE_ENTRIES,
-                                  Clause.eq(COL_ENTRIES_ID, entryId));
-
-        ResultSet results = entryStmt.getResultSet();
-        if ( !results.next()) {
+            TypeHandler typeHandler = getTypeHandler(results.getString(2));
+            entry = typeHandler.getEntry(results, abbreviated);
             entryStmt.close();
-            return null;
+
         }
-
-        TypeHandler typeHandler = getTypeHandler(results.getString(2));
-        entry = typeHandler.getEntry(results, abbreviated);
-        entryStmt.close();
-
         if (andFilter) {
             entry = getAccessManager().filterEntry(request, entry);
         }
@@ -3622,145 +3652,199 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
-    private Entry processEntryXml(Request request, Element node, Hashtable entries, Hashtable files) throws Exception {
-        String name= XmlUtil.getAttribute(node, ATTR_NAME);
-        String type= XmlUtil.getAttribute(node, ATTR_TYPE,TypeHandler.TYPE_FILE);
-        String dataType= XmlUtil.getAttribute(node, ATTR_DATATYPE,"");
-        String description= XmlUtil.getAttribute(node, ATTR_DESCRIPTION,"");
-        String file = XmlUtil.getAttribute(node, ATTR_FILE,(String)null);
-        if(file!=null) {
-            String tmp = (String)files.get(file);
-            String newFile =
-                getStorageManager().moveToStorage(request,
-                                                  new File(tmp)).toString();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param node _more_
+     * @param entries _more_
+     * @param files _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Entry processEntryXml(Request request, Element node,
+                                  Hashtable entries, Hashtable files)
+            throws Exception {
+        String name = XmlUtil.getAttribute(node, ATTR_NAME);
+        String type = XmlUtil.getAttribute(node, ATTR_TYPE,
+                                           TypeHandler.TYPE_FILE);
+        String dataType    = XmlUtil.getAttribute(node, ATTR_DATATYPE, "");
+        String description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, "");
+        String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
+        if (file != null) {
+            String tmp = (String) files.get(file);
+            String newFile = getStorageManager().moveToStorage(request,
+                                 new File(tmp)).toString();
             file = newFile;
         }
-        String url = XmlUtil.getAttribute(node, ATTR_URL,(String)null);
-        String tmpid= XmlUtil.getAttribute(node, ATTR_ID,(String)null);        
-        String parentId= XmlUtil.getAttribute(node, ATTR_PARENT,topGroup.getId());
+        String url   = XmlUtil.getAttribute(node, ATTR_URL, (String) null);
+        String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
+        String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
+                              topGroup.getId());
         Group parentGroup = (Group) entries.get(parentId);
-        if(parentGroup == null) {
-            parentGroup =    (Group)getEntry(request, parentId);
-            if(parentGroup == null) {
-                throw new IllegalArgumentException("Could not find parent:" + parentId);
+        if (parentGroup == null) {
+            parentGroup = (Group) getEntry(request, parentId);
+            if (parentGroup == null) {
+                throw new IllegalArgumentException("Could not find parent:"
+                        + parentId);
             }
         }
-        if(!getAccessManager().canDoAction(request, parentGroup,
-                                           Permission.ACTION_NEW)) {
-            throw new IllegalArgumentException("Cannot add to parent group:" + parentId);
+        if ( !getAccessManager().canDoAction(request, parentGroup,
+                                             Permission.ACTION_NEW)) {
+            throw new IllegalArgumentException("Cannot add to parent group:"
+                    + parentId);
         }
 
         TypeHandler typeHandler = getTypeHandler(type);
-        if(typeHandler==null) {
+        if (typeHandler == null) {
             throw new IllegalArgumentException("Could not find type:" + type);
         }
-        String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
-                     ? getGroupId(parentGroup)
-                     : getGUID());
+        String   id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
+                       ? getGroupId(parentGroup)
+                       : getGUID());
 
         Resource resource;
 
-        if(file!=null) {
+        if (file != null) {
             resource = new Resource(file, Resource.TYPE_STOREDFILE);
-        } else if(url!=null) {
+        } else if (url != null) {
             resource = new Resource(url, Resource.TYPE_URL);
         } else {
             resource = new Resource("", Resource.TYPE_UNKNOWN);
         }
-        Date createDate =new Date();
-        Date fromDate = createDate;
+        Date createDate = new Date();
+        Date fromDate   = createDate;
         //        System.err.println("node:" + XmlUtil.toString(node));
-        if(XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
+        if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
             fromDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_FROMDATE));
         }
         Date toDate = fromDate;
-        if(XmlUtil.hasAttribute(node, ATTR_TODATE)) {
+        if (XmlUtil.hasAttribute(node, ATTR_TODATE)) {
             toDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_TODATE));
         }
 
         Entry entry = typeHandler.createEntry(id);
         entry.initEntry(name, description, parentGroup, "",
-                        request.getUser(),
-                        resource, dataType,
-                        createDate.getTime(),
-                        fromDate.getTime(),
-                        toDate.getTime(),
-                        null);
-        
+                        request.getUser(), resource, dataType,
+                        createDate.getTime(), fromDate.getTime(),
+                        toDate.getTime(), null);
 
-        entry.setNorth(XmlUtil.getAttribute(node, ATTR_NORTH, entry.getNorth()));
-        entry.setSouth(XmlUtil.getAttribute(node, ATTR_SOUTH, entry.getSouth()));
+
+        entry.setNorth(XmlUtil.getAttribute(node, ATTR_NORTH,
+                                            entry.getNorth()));
+        entry.setSouth(XmlUtil.getAttribute(node, ATTR_SOUTH,
+                                            entry.getSouth()));
         entry.setEast(XmlUtil.getAttribute(node, ATTR_EAST, entry.getEast()));
         entry.setWest(XmlUtil.getAttribute(node, ATTR_WEST, entry.getWest()));
 
-        entry.getTypeHandler().initializeEntry(request, entry,node);
+        entry.getTypeHandler().initializeEntry(request, entry, node);
 
 
-        if(tmpid!=null) {
+        if (tmpid != null) {
             entries.put(tmpid, entry);
         }
         return entry;
     }
 
 
-    private String  processAssociationXml(Request request,Element node,Hashtable entries, Hashtable files) throws Exception {
-        
-        String fromId = XmlUtil.getAttribute(node, ATTR_FROM);
-        String toId = XmlUtil.getAttribute(node, ATTR_TO);
-        Entry fromEntry = (Entry) entries.get(fromId);
-        Entry toEntry = (Entry) entries.get(toId);
-        if(fromEntry == null) {
-            fromEntry  = getEntry(request, fromId);
-            if(fromEntry == null) {
-                throw new IllegalArgumentException("Could not find from entry:" + fromId);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param node _more_
+     * @param entries _more_
+     * @param files _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String processAssociationXml(Request request, Element node,
+                                         Hashtable entries, Hashtable files)
+            throws Exception {
+
+        String fromId    = XmlUtil.getAttribute(node, ATTR_FROM);
+        String toId      = XmlUtil.getAttribute(node, ATTR_TO);
+        Entry  fromEntry = (Entry) entries.get(fromId);
+        Entry  toEntry   = (Entry) entries.get(toId);
+        if (fromEntry == null) {
+            fromEntry = getEntry(request, fromId);
+            if (fromEntry == null) {
+                throw new IllegalArgumentException(
+                    "Could not find from entry:" + fromId);
             }
         }
-        if(toEntry == null) {
-            toEntry  = getEntry(request, toId);
-            if(toEntry == null) {
-                throw new IllegalArgumentException("Could not find to entry:" + toId);
+        if (toEntry == null) {
+            toEntry = getEntry(request, toId);
+            if (toEntry == null) {
+                throw new IllegalArgumentException("Could not find to entry:"
+                        + toId);
             }
         }
-        return addAssociation(request, fromEntry, toEntry, XmlUtil.getAttribute(node,ATTR_NAME));
+        return addAssociation(request, fromEntry, toEntry,
+                              XmlUtil.getAttribute(node, ATTR_NAME));
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processEntryXmlCreate(Request request) throws Exception {
         try {
             return processEntryXmlCreateInner(request);
-        } catch(Exception exc) {
-            if(request.getOutput().equals("xml")) {
-                return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),""+exc.getMessage()),MIME_XML);
+        } catch (Exception exc) {
+            if (request.getOutput().equals("xml")) {
+                return new Result(XmlUtil.tag(TAG_RESPONSE,
+                        XmlUtil.attr(ATTR_CODE, "error"),
+                        "" + exc.getMessage()), MIME_XML);
             }
-            return new Result("Error:"+ exc, Result.TYPE_XML);
+            return new Result("Error:" + exc, Result.TYPE_XML);
         }
     }
 
 
-    private Result processEntryXmlCreateInner(Request request) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result processEntryXmlCreateInner(Request request)
+            throws Exception {
+
         String file = request.getUploadedFile(ARG_FILE);
-        if(file==null) {
+        if (file == null) {
             throw new IllegalArgumentException("No file argument given");
         }
-        String entriesXml = null;
+        String    entriesXml        = null;
         Hashtable origFileToStorage = new Hashtable();
         //        System.err.println ("\nprocessing");
-        if(file.endsWith(".zip")) {
+        if (file.endsWith(".zip")) {
             ZipInputStream zin =
                 new ZipInputStream(IOUtil.getInputStream(file));
             ZipEntry ze;
-            while ((ze = zin.getNextEntry())!=null) {
+            while ((ze = zin.getNextEntry()) != null) {
                 String entryName = ze.getName();
                 //                System.err.println ("ZIP: " + ze.getName());
-                if(entryName.equals("entries.xml")) {
-                    entriesXml =  new String(IOUtil.readBytes(zin,
-                                                              null, false));
+                if (entryName.equals("entries.xml")) {
+                    entriesXml = new String(IOUtil.readBytes(zin, null,
+                            false));
                 } else {
                     String name =
                         IOUtil.getFileTail(ze.getName().toLowerCase());
-                    File f = getStorageManager().getTmpFile(request,
-                                                            name);
+                    File f = getStorageManager().getTmpFile(request, name);
                     FileOutputStream fos = new FileOutputStream(f);
                     IOUtil.writeTo(zin, fos);
                     fos.close();
@@ -3768,68 +3852,81 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                     origFileToStorage.put(ze.getName(), f.toString());
                 }
             }
-            if(entriesXml==null) {
-                throw new IllegalArgumentException ("No entries.xml file provided");
+            if (entriesXml == null) {
+                throw new IllegalArgumentException(
+                    "No entries.xml file provided");
             }
         }
 
-        if(entriesXml==null) {
+        if (entriesXml == null) {
             entriesXml = IOUtil.readContents(file, getClass());
         }
 
         //        System.err.println ("xml:" + entriesXml);
 
-        List newEntries = new ArrayList();
-        Hashtable entries = new Hashtable();
-        Element root = XmlUtil.getRoot(entriesXml);
-        NodeList  children = XmlUtil.getElements(root);
+        List      newEntries = new ArrayList();
+        Hashtable entries    = new Hashtable();
+        Element   root       = XmlUtil.getRoot(entriesXml);
+        NodeList  children   = XmlUtil.getElements(root);
 
-        Document resultDoc = XmlUtil.makeDocument();
+        Document  resultDoc  = XmlUtil.makeDocument();
         Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
-                                   new String[] {ATTR_CODE,"ok"});
+                                            new String[] { ATTR_CODE,
+                "ok" });
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
-            if(node.getTagName().equals(TAG_ENTRY)) {
-                Entry entry = processEntryXml(request,node,entries, origFileToStorage);
-                XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot, new String[]{
-                    ATTR_ID, entry.getId()
-                });
+            if (node.getTagName().equals(TAG_ENTRY)) {
+                Entry entry = processEntryXml(request, node, entries,
+                                  origFileToStorage);
+                XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
+                               new String[] { ATTR_ID,
+                        entry.getId() });
                 newEntries.add(entry);
-                NodeList  entryChildren = XmlUtil.getElements(node);
-                for (Element entryChild: (List<Element>) entryChildren) {
-                    if(entryChild.getTagName().equals(TAG_METADATA)) {
-                        entry.addMetadata(new Metadata(getGUID(),entry.getId(),
-                                                       XmlUtil.getAttribute(entryChild, ATTR_TYPE),
-                                                       XmlUtil.getAttribute(entryChild, ATTR_ATTR1,""),
-                                                       XmlUtil.getAttribute(entryChild, ATTR_ATTR2,""),
-                                                       XmlUtil.getAttribute(entryChild, ATTR_ATTR3,""),
-                                                       XmlUtil.getAttribute(entryChild, ATTR_ATTR4,"")));
+                NodeList entryChildren = XmlUtil.getElements(node);
+                for (Element entryChild : (List<Element>) entryChildren) {
+                    if (entryChild.getTagName().equals(TAG_METADATA)) {
+                        entry.addMetadata(
+                            new Metadata(
+                                getGUID(), entry.getId(),
+                                XmlUtil.getAttribute(entryChild, ATTR_TYPE),
+                                XmlUtil.getAttribute(
+                                    entryChild, ATTR_ATTR1,
+                                    ""), XmlUtil.getAttribute(
+                                        entryChild, ATTR_ATTR2,
+                                        ""), XmlUtil.getAttribute(
+                                            entryChild, ATTR_ATTR3,
+                                            ""), XmlUtil.getAttribute(
+                                                entryChild, ATTR_ATTR4, "")));
                     } else {
-                        throw new IllegalArgumentException("Unknown tag:" + node.getTagName());
+                        throw new IllegalArgumentException("Unknown tag:"
+                                + node.getTagName());
                     }
                 }
 
-            } else if(node.getTagName().equals(TAG_ASSOCIATION)) {
-                String id = processAssociationXml(request,node,entries, origFileToStorage);
-                XmlUtil.create(resultDoc, TAG_ASSOCIATION, resultRoot, new String[]{
-                    ATTR_ID, id
-                });
+            } else if (node.getTagName().equals(TAG_ASSOCIATION)) {
+                String id = processAssociationXml(request, node, entries,
+                                origFileToStorage);
+                XmlUtil.create(resultDoc, TAG_ASSOCIATION, resultRoot,
+                               new String[] { ATTR_ID,
+                        id });
             } else {
-                throw new IllegalArgumentException("Unknown tag:" + node.getTagName());
+                throw new IllegalArgumentException("Unknown tag:"
+                        + node.getTagName());
             }
         }
 
 
         insertEntries(newEntries, true);
 
-        if(request.getOutput().equals("xml")) {
+        if (request.getOutput().equals("xml")) {
             //TODO: Return a list of the newly created entries
             String xml = XmlUtil.toString(resultRoot);
-            return new Result(xml,MIME_XML);
+            return new Result(xml, MIME_XML);
         }
 
         StringBuffer sb = new StringBuffer("OK");
         return new Result("", sb);
+
     }
 
 
@@ -3857,7 +3954,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                 return makeEntryEditResult(request, entry, "Edit Entry", sb);
             }
             type  = entry.getTypeHandler().getType();
-            group = findGroup(entry.getParentGroupId());
+            group = findGroup(request, entry.getParentGroupId());
         }
         if (group == null) {
             group = findGroup(request);
@@ -3871,6 +3968,12 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         } else {
             sb.append(makeEntryHeader(request, entry));
         }
+
+        if (((entry != null) && entry.getIsLocalFile())) {
+            sb.append("This is a local file and cannot be edited");
+            return makeEntryEditResult(request, entry, "Entry Edit", sb);
+        }
+
 
         if (type == null) {
             sb.append(request.form(URL_ENTRY_FORM));
@@ -4190,20 +4293,38 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
-    private String  addAssociation(Request request, Entry fromEntry, Entry toEntry, String name) throws Exception {
-        if (!getAccessManager().canDoAction(request, fromEntry, Permission.ACTION_NEW)) {
-            throw new IllegalArgumentException("Cannot add association to " + fromEntry);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param fromEntry _more_
+     * @param toEntry _more_
+     * @param name _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String addAssociation(Request request, Entry fromEntry,
+                                  Entry toEntry, String name)
+            throws Exception {
+        if ( !getAccessManager().canDoAction(request, fromEntry,
+                                             Permission.ACTION_NEW)) {
+            throw new IllegalArgumentException("Cannot add association to "
+                    + fromEntry);
         }
-        if (!getAccessManager().canDoAction(request, toEntry, Permission.ACTION_NEW)) {
-            throw new IllegalArgumentException("Cannot add association to " + toEntry);
+        if ( !getAccessManager().canDoAction(request, toEntry,
+                                             Permission.ACTION_NEW)) {
+            throw new IllegalArgumentException("Cannot add association to "
+                    + toEntry);
         }
 
 
         PreparedStatement assocInsert =
             getConnection().prepareStatement(INSERT_ASSOCIATIONS);
-        int col = 1;
-        String id = getGUID();
-        assocInsert.setString(col++,id);
+        int    col = 1;
+        String id  = getGUID();
+        assocInsert.setString(col++, id);
         assocInsert.setString(col++, name);
         assocInsert.setString(col++, "");
         assocInsert.setString(col++, fromEntry.getId());
@@ -4372,7 +4493,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         if (request.exists(ARG_DELETE_CONFIRM)) {
             List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
-            Group group = findGroup(entry.getParentGroupId());
+            Group group = findGroup(request, entry.getParentGroupId());
             if (entry.isGroup()) {
                 return asynchDeleteEntries(request, entries);
             } else {
@@ -4477,7 +4598,12 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         TypeHandler typeHandler = null;
         boolean     newEntry    = true;
         if (request.defined(ARG_ID)) {
-            entry       = getEntry(request);
+            entry = getEntry(request);
+            if (entry.getIsLocalFile()) {
+                return new Result(request.entryUrl(URL_ENTRY_SHOW, entry,
+                        ARG_MESSAGE, "Cannot edit local files"));
+
+            }
             typeHandler = entry.getTypeHandler();
             newEntry    = false;
 
@@ -4495,7 +4621,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                 List<Entry> entries = new ArrayList<Entry>();
                 entries.add(entry);
                 deleteEntries(request, entries, null);
-                Group group = findGroup(entry.getParentGroupId());
+                Group group = findGroup(request, entry.getParentGroupId());
                 return new Result(request.entryUrl(URL_ENTRY_SHOW, group,
                         ARG_MESSAGE, "Entry is deleted"));
             }
@@ -4708,25 +4834,24 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                                  ? getGroupId(parentGroup)
                                  : getGUID());
 
-                    String resourceType  = Resource.TYPE_UNKNOWN;
-                    if(isFile) {
+                    String resourceType = Resource.TYPE_UNKNOWN;
+                    if (isFile) {
                         resourceType = Resource.TYPE_STOREDFILE;
                     } else {
                         try {
-                            new  URL(theResource);
+                            new URL(theResource);
                             resourceType = Resource.TYPE_URL;
-                        } catch(Exception exc) {}
-                            
+                        } catch (Exception exc) {}
+
                     }
 
                     entry = typeHandler.createEntry(id);
                     entry.initEntry(name, description, parentGroup, "",
                                     request.getUser(),
-                                    new Resource(theResource,
-                                                 resourceType), dataType,
-                                            createDate.getTime(),
-                                            theDateRange[0].getTime(),
-                                            theDateRange[1].getTime(), null);
+                                    new Resource(theResource, resourceType),
+                                    dataType, createDate.getTime(),
+                                    theDateRange[0].getTime(),
+                                    theDateRange[1].getTime(), null);
                     setEntryState(request, entry);
                     entries.add(entry);
                 }
@@ -4912,9 +5037,10 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
-            List<String> ids = getEntryIdsInGroup(request,
-                                   findGroup(entry.getParentGroupId()),
-                                   new ArrayList<Clause>());
+            List<String> ids =
+                getEntryIdsInGroup(
+                    request, findGroup(request, entry.getParentGroupId()),
+                    new ArrayList<Clause>());
             String nextId = null;
             for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
                 String id = ids.get(i);
@@ -5099,7 +5225,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         if (entry == null) {
             return new String[] { BLANK, BLANK };
         }
-        Group  parent = findGroup(entry.getParentGroupId());
+        Group  parent = findGroup(request, entry.getParentGroupId());
         String output = ((request == null)
                          ? OutputHandler.OUTPUT_HTML
                          : request.getOutput());
@@ -5133,7 +5259,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                         ARG_OUTPUT, output) + extraArgs, name);
             }
             breadcrumbs.add(0, link);
-            parent = findGroup(parent.getParentGroupId());
+            parent = findGroup(request, parent.getParentGroupId());
         }
         titleList.add(entry.getLabel());
         String nav;
@@ -5201,9 +5327,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      *
      * @param request _more_
      * @param entry _more_
-     * @param makeLinkForLastGroup _more_
-     * @param extraArgs _more_
-     * @param stopAt _more_
      *
      * @return A 2 element array.  First element is the title to use. Second is the links
      *
@@ -5215,7 +5338,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         if (entry == null) {
             return BLANK;
         }
-        Group parent = findGroup(entry.getParentGroupId());
+        Group parent = findGroup(request, entry.getParentGroupId());
         int   length = 0;
         while (parent != null) {
             if (length > 100) {
@@ -5229,7 +5352,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             length += name.length();
             breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
                     parent), name));
-            parent = findGroup(parent.getParentGroupId());
+            parent = findGroup(request, parent.getParentGroupId());
         }
         breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
                 entry), entry.getLabel()));
@@ -5301,11 +5424,11 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     protected List<String> getEntryIdsInGroup(Request request, Entry group,
             List<Clause> where)
             throws Exception {
-        List<String>     ids  = new ArrayList<String>();
-        if(isLocalFileEntry(group.getId())) {
-            File f = new File(getFileFromId(group.getId()));
-            File[]files = f.listFiles();
-            for(int i=0;i<files.length;i++) {
+        List<String> ids = new ArrayList<String>();
+        if (isLocalFileEntry(group.getId())) {
+            File   f     = new File(getFileFromId(group.getId()));
+            File[] files = f.listFiles();
+            for (int i = 0; i < files.length; i++) {
                 ids.add(getIdFromFile(files[i]));
             }
             ids = Misc.sort(ids);
@@ -5333,8 +5456,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
         }
 
         //Add in any local file directories
-        if(topGroup.equals(group)) {
-            for(String path: localFilePaths) {
+        if (topGroup.equals(group)) {
+            for (String path : localFilePaths) {
                 ids.add(getIdFromFile(path));
             }
         }
@@ -5532,7 +5655,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             sb.append(getEntryNodeXml(request, results));
             getAssociationsGraph(request, id, sb);
 
-            Group group = findGroup(results.getString(4));
+            Group group = findGroup(request, results.getString(4));
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                       ATTR_ID, group.getId(), ATTR_TOOLTIP,
@@ -5554,7 +5677,7 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                               getMimeTypeFromSuffix(".xml"));
         }
 
-        Group group = findGroup(id);
+        Group group = findGroup(request, id);
         if (group == null) {
             throw new IllegalArgumentException("Could not find group:" + id);
         }
@@ -5567,10 +5690,11 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
                     getGraphNodeTitle(group.getName()))));
         getAssociationsGraph(request, id, sb);
         List<Group> subGroups =
-            getGroups(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, group.getId()));
+            getGroups(request,
+                      Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, group.getId()));
 
 
-        Group parent = findGroup(group.getParentGroupId());
+        Group parent = findGroup(request, group.getParentGroupId());
         if (parent != null) {
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
@@ -6044,28 +6168,61 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
 
 
 
+    /**
+     * _more_
+     */
     public void setLocalFilePaths() {
-        localFilePaths = (List<String>)StringUtil.split(getProperty(PROP_LOCALFILEPATHS,""),"\n",true,true);
+        localFilePaths =
+            (List<String>) StringUtil.split(getProperty(PROP_LOCALFILEPATHS,
+                ""), "\n", true, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public String getFileFromId(String id) {
         return id.substring(LOCAL_FILE_ID_PREFIX.length());
-    } 
+    }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     public String getIdFromFile(File file) {
         return getIdFromFile(file.toString());
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     public String getIdFromFile(String file) {
-        file = file.replace("\\","/");
+        file = file.replace("\\", "/");
         return LOCAL_FILE_ID_PREFIX + file;
-    } 
+    }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public boolean isLocalFileEntry(String id) {
-        if(id.startsWith(LOCAL_FILE_ID_PREFIX)) {
-            id=id.substring(LOCAL_FILE_ID_PREFIX.length());
-            for(String path: localFilePaths) {
-                if(id.startsWith(path)) {
+        if (id.startsWith(LOCAL_FILE_ID_PREFIX)) {
+            id = id.substring(LOCAL_FILE_ID_PREFIX.length());
+            for (String path : localFilePaths) {
+                if (id.startsWith(path)) {
                     checkFilePath(id);
                     return true;
                 }
@@ -6078,13 +6235,18 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param id _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected Group findGroup(String id) throws Exception {
+    //    protected Group findGroup(String id) throws Exception {
+
+
+    protected Group findGroup(Request request, String id) throws Exception {
         if ((id == null) || (id.length() == 0)) {
             return null;
         }
@@ -6093,8 +6255,8 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
             return group;
         }
 
-        if(isLocalFileEntry(id)) {
-            return (Group)  getEntry(null, id);
+        if (isLocalFileEntry(id)) {
+            return (Group) getEntry(request, id);
         }
 
 
@@ -6139,9 +6301,6 @@ public class Repository extends RepositoryBase implements  Tables, RequestHandle
      * @param request _more_
      * @param parent _more_
      * @param name _more_
-     * @param user _more_
-     * @param createIfNeeded _more_
-     * @param isTop _more_
      *
      * @return _more_
      *

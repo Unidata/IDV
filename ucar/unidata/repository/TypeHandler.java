@@ -384,7 +384,7 @@ public class TypeHandler extends RepositoryManager {
         Entry  entry = createEntry(id);
         entry.initEntry(
             results.getString(col++), results.getString(col++),
-            getRepository().findGroup(results.getString(col++)),
+            getRepository().findGroup(null,results.getString(col++)),
             results.getString(col++),
             getUserManager().findUser(results.getString(col++), true),
             new Resource(results.getString(col++), results.getString(col++)),
@@ -1271,7 +1271,7 @@ public class TypeHandler extends RepositoryManager {
                                                 + ")";
             if (groupArg.length() > 0) {
                 advancedSB.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
-                Group group = getRepository().findGroup(groupArg);
+                Group group = getRepository().findGroup(request,groupArg);
                 if (group != null) {
                     advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             group.getFullName() + "&nbsp;" + searchChildren));

@@ -132,7 +132,7 @@ public class DateGridOutputHandler extends OutputHandler {
                                             List<Entry> entries,
                                             List<OutputType> types)
             throws Exception {
-        types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
+        //        types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
         types.add(new OutputType("Date Grid", OUTPUT_GRID));
     }
 
