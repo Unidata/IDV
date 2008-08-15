@@ -1,0 +1,49 @@
+<html>
+<head>
+  <title>RAMADDA Developer Notes</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+<ul>
+<li>
+Forms should be placed with a a 2 column table. The labels should be right bold and right aligned.
+You can use some HtmlUtil methods to help:
+<pre>
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry("Subject:",
+                                     HtmlUtil.input(ARG_SUBJECT, subject,
+                                         HtmlUtil.SIZE_40)));
+        sb.append(HtmlUtil.formEntryTop("Comment:",
+                                        HtmlUtil.textArea(ARG_COMMENT,
+                                            comment, 5, 40)));
+        sb.append(HtmlUtil.formTableClose());
+</pre>
+The formTable just creates a table with a certain padding. the formEntry method takes a label and some content. Note: if the content is tall (e.g., a text area) then use formEntryTop - this does a valign="top" in the table row so that the label is aligned at the top, not in the center.
+
+<li> When the repository receives a call that makes some change to the state (e.g., a form post for adding or changing a new entry) it should always redirect to some other URL after processing the request. That way if the user goes back or does a reload in the browser it doesn't apply the change again. 
+<p>
+
+You can add on an ARG_MESS url argument to show some response. e.g:
+<pre>
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                        entry.getId(), ARG_MESSAGE,
+                        "Some message here"));
+</pre>
+
+<li> When you want to show some message or warning to the user (e.g., from the AG_MESSAGE above) use the Repository.note or Repository.warning methods:
+<pre>
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, "")));
+        }
+
+or:
+
+            sb.append(getRepository().warning("Some error"));
+</pre>
+
+
+
+</ul>
+</body>

@@ -1,0 +1,27 @@
+<html>
+<head>
+  <title>RAMADDA File System Access</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+The architecture of RAMADDA is centered around a  Model/View  paradigm. The core 
+Repository is responsible for creating the Entry/Group objects and then passing 
+them off to the appropriate View component (e.g., rss output handler, html output, 
+etc.)
+<p>
+Given this, RAMADDA can be configured to also provide a view of the file system on 
+the server. The site administrator can specify any number of directory paths. For 
+each of these paths a synthetic Entry is created as a child of the top group. The 
+ids of these entries are of the form:
+file:/the/dir/path
+<p>
+Now, there are just a few methods that the core repository has that create the 
+Entry/Group objects. These methods look to see whether the given Entry id begins 
+with "file:". If it does then the file path is checked against the configured set 
+of file paths to ensure that the path is under the configured paths. (we wouldn't 
+want to allow access to just anywhere on the server). The children of a file: Entry 
+that is a directory are the subdirectories and files of that directory.
+
+</body>
