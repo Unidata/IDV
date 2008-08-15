@@ -1195,6 +1195,9 @@ public class DataManager {
         if(dataType!=null && dataType.length()==0) {
             dataType = null;
         }
+        if(dataType==null && properties!=null) {
+            dataType = (String) properties.get("idv.datatype");
+        }
         if ((dataType == null) && (definingObject instanceof String)) {
             String file = (String) definingObject;
             if (file.startsWith("type:")) {
