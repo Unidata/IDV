@@ -23,16 +23,18 @@
 
 
 
+
 package ucar.unidata.data.radar;
 
 
 import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
-
-import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
+
+
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.metdata.NamedStation;
@@ -90,7 +92,9 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** Widget for properties */
     private JComboBox stationBox;
 
-    private NamedStation    namedStation = null;
+    /** station */
+    private NamedStation namedStation = null;
+
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -188,7 +192,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             StringBuffer errlog = new StringBuffer();
 
             TDSRadarDatasetCollection collection =
-                 TDSRadarDatasetCollection.factory("test",
+                TDSRadarDatasetCollection.factory("test",
                     query.getCollectionUrl(), errlog);
             if ((times == null) || (times.size() == 0)) {
                 List allTimes = new ArrayList();
@@ -215,7 +219,8 @@ public class CDMRadarDataSource extends RadarDataSource {
             for (int i = 0; i < times.size(); i++) {
                 Date date = (Date) times.get(i);
                 java.net.URI uri =
-                    collection.getRadarDatasetURI(query.getStation(), query.getProduct(), date);
+                    collection.getRadarDatasetURI(query.getStation(),
+                        query.getProduct(), date);
                 urls.add(uri.toString());
             }
 
@@ -241,12 +246,12 @@ public class CDMRadarDataSource extends RadarDataSource {
         if ((adapters == null) || adapters.isEmpty()) {
             return;
         }
-        CDMRadarAdapter da           = (CDMRadarAdapter) adapters.get(0);
-        boolean         haveTimes    = (adapters.size() > 1);
-        RealType[]      paramTypes   = da.getParams();
-        String          stationID    = da.getStationID();
-        String          stationName  = da.getStationName();
-        String          dataFormat   = da.getDataFormatName();
+        CDMRadarAdapter da          = (CDMRadarAdapter) adapters.get(0);
+        boolean         haveTimes   = (adapters.size() > 1);
+        RealType[]      paramTypes  = da.getParams();
+        String          stationID   = da.getStationID();
+        String          stationName = da.getStationName();
+        String          dataFormat  = da.getDataFormatName();
         //NamedStation    namedStation = null;
         if (getProperties() != null) {
             Object o = getProperties().get(STATION_LOCATION);
@@ -257,9 +262,9 @@ public class CDMRadarDataSource extends RadarDataSource {
         EarthLocation rdLocation = da.getStationLocation();
         setName(makeName(da));
         if (namedStation == null) {
-            try {             
-                namedStation = new NamedStationImpl(stationID.substring(1), stationName,
-                        rdLocation.getLatitude().getValue(),
+            try {
+                namedStation = new NamedStationImpl(stationID.substring(1),
+                        stationName, rdLocation.getLatitude().getValue(),
                         rdLocation.getLongitude().getValue(),
                         rdLocation.getAltitude().getValue(),
                         CommonUnit.meter);
@@ -474,12 +479,11 @@ public class CDMRadarDataSource extends RadarDataSource {
             items.addAll(getStations().values());
             Collections.sort(items);
             stationBox = new JComboBox(items);
-           // NamedStation namedStation = null;
-            if(namedStation == null) {
-                Object       o            = (getProperties() != null)
-                                            ? getProperties().get(
-                                                STATION_LOCATION)
-                                            : null;
+            // NamedStation namedStation = null;
+            if (namedStation == null) {
+                Object o = (getProperties() != null)
+                           ? getProperties().get(STATION_LOCATION)
+                           : null;
 
                 if ((o != null) && (o instanceof NamedStation)) {
                     namedStation = (NamedStation) o;
@@ -503,9 +507,11 @@ public class CDMRadarDataSource extends RadarDataSource {
         if ( !super.applyProperties()) {
             return false;
         }
-        Object o = stationBox.getSelectedItem();
-        if (o instanceof NamedStation) {
-            setStationInfo((NamedStation) o);
+        if (stationBox != null) {
+            Object o = stationBox.getSelectedItem();
+            if (o instanceof NamedStation) {
+                setStationInfo((NamedStation) o);
+            }
         }
         return true;
     }
@@ -573,9 +579,11 @@ public class CDMRadarDataSource extends RadarDataSource {
      *
      *
      * @param dataChoice The data choice we are getting levels for
+     * @param dataSelection data selection
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice,DataSelection dataSelection) {
+    public List getAllLevels(DataChoice dataChoice,
+                             DataSelection dataSelection) {
         dataSelection = DataSelection.merge(dataSelection,
                                             getDataSelection());
 
