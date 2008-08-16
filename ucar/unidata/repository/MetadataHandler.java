@@ -120,9 +120,10 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public Metadata makeMetadata(String id, String entryId, String type,
+                                 boolean inherited,
                                  String attr1, String attr2, String attr3,
                                  String attr4) {
-        return new Metadata(id, entryId, type, attr1, attr2, attr3, attr4);
+        return new Metadata(id, entryId, type, inherited, attr1, attr2, attr3, attr4);
     }
 
 
@@ -309,7 +310,9 @@ public class MetadataHandler extends RepositoryManager {
         if (type == null) {
             return;
         }
-        String[] html = getForm(request, new Metadata(type), false);
+        Metadata metadata =new Metadata(type);
+        metadata.setEntry(entry);
+        String[] html = getForm(request, metadata, false);
         if (html == null) {
             return;
         }
@@ -343,7 +346,7 @@ public class MetadataHandler extends RepositoryManager {
      * @param request _more_
      * @return _more_
      */
-    public List<Metadata.Type> getTypes(Request request) {
+    public List<Metadata.Type> getTypes(Request request, Entry entry) {
         return types;
     }
 
@@ -382,7 +385,7 @@ public class MetadataHandler extends RepositoryManager {
             return;
         }
         metadataList.add(new Metadata(getRepository().getGUID(),
-                                      entry.getId(), type, attr1, attr2,
+                                      entry.getId(), type, DFLT_INHERITED, attr1, attr2,
                                       attr3, attr4));
     }
 
@@ -428,9 +431,7 @@ public class MetadataHandler extends RepositoryManager {
                 attr1 = request.getString(ARG_ATTR4 + suffix + ".select", "");
             }
 
-
-
-            metadataList.add(new Metadata(id, entry.getId(), type, attr1,
+            metadataList.add(new Metadata(id, entry.getId(), type, DFLT_INHERITED, attr1,
                                           attr2, attr3, attr4));
         }
     }

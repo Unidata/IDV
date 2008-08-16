@@ -403,6 +403,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_PREVIOUS = "previous";
 
+
     /** _more_ */
     public static final String ARG_APPLET = "applet";
 
@@ -713,6 +714,7 @@ public interface Constants {
 
     public static final String ATTR_DESCRIPTION = "description";
     public static final String ATTR_FILE = "file";
+    public static final String ATTR_CANDONEW = "candonew";
 
     public static final String TAG_METADATA = "metadata";
 
@@ -939,6 +941,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_TYPE = "type";
+    public static final String ATTR_INHERITED = "inherited";
 
     public static final String ATTR_ATTR1 = "attr1";
     public static final String ATTR_ATTR2 = "attr2";
@@ -954,7 +957,7 @@ public interface Constants {
 
 
 
-
+    public static final boolean DFLT_INHERITED = false;
 
 }
 

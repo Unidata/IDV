@@ -634,7 +634,7 @@ public class TypeHandler extends RepositoryManager {
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
                                              String output,
                                              boolean showResource,
-                                             boolean showMap)
+                                             boolean linkToDownload)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
@@ -648,10 +648,15 @@ public class TypeHandler extends RepositoryManager {
             //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
 
             String nameString = entry.getName();
-            if (entry.getResource().isFile()
-                && getAccessManager().canDownload(request, entry)) {
-                nameString = HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                                        + entry.getName(), ARG_ID, entry.getId()),nameString);
+            if(linkToDownload) {
+                if (entry.getResource().isFile()
+                    && getAccessManager().canDownload(request, entry)) {
+                    nameString = HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                                                            + entry.getName(), ARG_ID, entry.getId()),nameString);
+                }
+            } else {
+                    nameString = HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_SHOW), 
+                                                            ARG_ID, entry.getId()),nameString);
             }
 
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), nameString));
@@ -711,6 +716,7 @@ public class TypeHandler extends RepositoryManager {
                                              entry.getDataType()));
             }
 
+            boolean showMap = false;
             if (showMap) {
                 if (entry.hasLocationDefined()) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Location"),

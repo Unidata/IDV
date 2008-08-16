@@ -79,6 +79,8 @@ import java.util.zip.*;
 public class Metadata implements Constants, Tables {
 
 
+    private Entry entry;
+
     /** _more_ */
     private String id;
 
@@ -110,7 +112,7 @@ public class Metadata implements Constants, Tables {
      * @param type _more_
      */
     public Metadata(String type) {
-        this("", "", type, "", "", "", "");
+        this("", "", type, false,"", "", "", "");
     }
 
 
@@ -125,7 +127,7 @@ public class Metadata implements Constants, Tables {
      */
     public Metadata(String type, String attr1, String attr2, String attr3,
                     String attr4) {
-        this("", "", type, attr1, attr2, attr3, attr4);
+        this("", "", type, false, attr1, attr2, attr3, attr4);
     }
 
 
@@ -135,7 +137,7 @@ public class Metadata implements Constants, Tables {
      * @param type _more_
      */
     public Metadata(Type type) {
-        this("", "", type, "", "", "", "");
+        this("", "", type, false, "", "", "", "");
     }
 
 
@@ -152,9 +154,9 @@ public class Metadata implements Constants, Tables {
      * @param attr3 _more_
      * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, Type type, String attr1,
+    public Metadata(String id, String entryId, Type type, boolean inherited, String attr1,
                     String attr2, String attr3, String attr4) {
-        this(id, entryId, type.getType(), attr1, attr2, attr3, attr4);
+        this(id, entryId, type.getType(), inherited, attr1, attr2, attr3, attr4);
     }
 
 
@@ -169,11 +171,12 @@ public class Metadata implements Constants, Tables {
      * @param attr3 _more_
      * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, String type, String attr1,
+    public Metadata(String id, String entryId, String type, boolean inherited, String attr1,
                     String attr2, String attr3, String attr4) {
         this.id      = id;
         this.entryId = entryId;
         this.type    = type;
+        this.inherited = inherited;
         this.attr1   = attr1;
         this.attr2   = attr2;
         this.attr3   = attr3;
@@ -497,6 +500,24 @@ public class Metadata implements Constants, Tables {
 
 
     }
+
+/**
+Set the Entry property.
+
+@param value The new value for Entry
+**/
+public void setEntry (Entry value) {
+	entry = value;
+}
+
+/**
+Get the Entry property.
+
+@return The Entry
+**/
+public Entry getEntry () {
+	return entry;
+}
 
 
 

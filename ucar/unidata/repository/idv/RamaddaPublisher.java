@@ -367,7 +367,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
             wts[numTopComps / 2 + 1] = 0.2;
-            wts[numTopComps / 2 + 2] = 1.0;
+            wts[numTopComps / 2 + 3] = 1.0;
 
 
             JComponent contents = GuiUtils.doLayout(topComps, 2,

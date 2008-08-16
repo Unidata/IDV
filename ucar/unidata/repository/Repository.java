@@ -43,7 +43,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -1400,7 +1400,6 @@ public class Repository extends RepositoryBase implements Tables,
                                       List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
-                System.err.println("groups:" + subGroups);
 
                 StringBuffer idBuffer = new StringBuffer();
                 entries.addAll(subGroups);
@@ -3515,6 +3514,20 @@ public class Repository extends RepositoryBase implements Tables,
             if (parent == null) {
                 parent = topGroup;
             }
+            Metadata patternMetadata =
+                getMetadataManager().findMetadata(parent,
+                                                  AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
+            PatternFileFilter filter = null;
+            if(patternMetadata!=null && patternMetadata.getAttr1().trim().length()>0) {
+                try {
+                    filter = new PatternFileFilter(patternMetadata.getAttr1());
+                    if(!filter.accept(f)) return null;
+                } catch(Exception exc) {
+                    throw new IllegalStateException("Bad local files pattern:" + patternMetadata.getAttr1());
+                }
+            }
+
+
             TypeHandler handler = (f.isDirectory()
                                    ? getTypeHandler(TypeHandler.TYPE_GROUP)
                                    : getTypeHandler(TypeHandler.TYPE_FILE));
@@ -3889,6 +3902,7 @@ public class Repository extends RepositoryBase implements Tables,
                             new Metadata(
                                 getGUID(), entry.getId(),
                                 XmlUtil.getAttribute(entryChild, ATTR_TYPE),
+                                XmlUtil.getAttribute(entryChild, ATTR_INHERITED,DFLT_INHERITED),
                                 XmlUtil.getAttribute(
                                     entryChild, ATTR_ATTR1,
                                     ""), XmlUtil.getAttribute(
@@ -5277,15 +5291,17 @@ public class Repository extends RepositoryBase implements Tables,
             nav = StringUtil.join(separator, breadcrumbs);
             List<Link>   links = getEntryLinks(request, entry, true);
             StringBuffer menu  = new StringBuffer();
-            menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
+            menu.append("<div id=\"entrylinksmenu\" class=\"menu\"><table cellspacing=\"0\" cellpadding=\"0\">");
             for (Link link : links) {
+                menu.append("<tr><td>");
                 menu.append(HtmlUtil.img(link.getIcon()));
-                menu.append(HtmlUtil.space(2));
+                menu.append(HtmlUtil.space(1));
+                menu.append("</td><td>");
                 menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
                                           HtmlUtil.cssClass("menulink")));
-                menu.append(HtmlUtil.br());
+                menu.append("</td></tr>");
             }
-            menu.append("</div>");
+            menu.append("</table></div>");
 
             String events = HtmlUtil.onMouseOver(
                                 "setImage('menubutton','"
@@ -5386,9 +5402,10 @@ public class Repository extends RepositoryBase implements Tables,
         List<Clause>  where         =
             typeHandler.assembleWhereClause(request);
 
-        List<String>  ids = getEntryIdsInGroup(request, group, where);
         List<Entry>   entries       = new ArrayList<Entry>();
         List<Group>   subGroups     = new ArrayList<Group>();
+        try {
+        List<String>  ids = getEntryIdsInGroup(request, group, where);
         for (String id : ids) {
             Entry entry = getEntry(request, id);
 
@@ -5400,6 +5417,9 @@ public class Repository extends RepositoryBase implements Tables,
             } else {
                 entries.add(entry);
             }
+        }
+        } catch(Exception exc) {
+            request.put(ARG_MESSAGE,"Error finding children:" + exc.getMessage());
         }
         return outputHandler.outputGroup(request, group, subGroups, entries);
     }
@@ -5426,9 +5446,26 @@ public class Repository extends RepositoryBase implements Tables,
             throws Exception {
         List<String> ids = new ArrayList<String>();
         if (isLocalFileEntry(group.getId())) {
+            Metadata patternMetadata =
+                getMetadataManager().findMetadata(group,
+                                                  AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
+            PatternFileFilter filter = null;
+            if(patternMetadata!=null && patternMetadata.getAttr1().trim().length()>0) {
+                try {
+                    filter = new PatternFileFilter(patternMetadata.getAttr1());
+                } catch(Exception exc) {
+                    throw new IllegalStateException("Bad local files pattern:" + patternMetadata.getAttr1());
+                }
+            }
             File   f     = new File(getFileFromId(group.getId()));
             File[] files = f.listFiles();
             for (int i = 0; i < files.length; i++) {
+                if(files[i].isDirectory()) {
+                } else {
+                    if(filter!=null && !filter.accept(files[i])) {
+                        continue;
+                    }
+                }
                 ids.add(getIdFromFile(files[i]));
             }
             ids = Misc.sort(ids);

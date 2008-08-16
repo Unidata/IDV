@@ -215,10 +215,16 @@ public class MapOutputHandler extends OutputHandler {
             return result;
         }
 
+        sb.append("<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
+        getMap(request, entriesToUse,sb,700,400);
+        sb.append("</td><td>");
+        for (Entry entry : entriesToUse) {
+            if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
+                sb.append("<a href=\"javascript:hiliteEntry(mapstraction," + sqt(entry.getId()) +");\">" + entry.getName()+"</a><br>");
+            }
+        }
+        sb.append("</td></tr></table>");
 
-
-
-        getMap(request, entriesToUse,sb,700,500);
         Result result = new Result("Results", sb);
         result.putProperty(
             PROP_NAVSUBLINKS,
@@ -251,15 +257,20 @@ public class MapOutputHandler extends OutputHandler {
             importJS(
                 "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
         sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
+        sb.append(importJS(repository.getUrlBase() + "/mymap.js"));
         sb.append(
-            "<div style=\"width:" + width+"px; height:" +height+"px\" id=\"mapstraction\"></div>\n");
+                  "<div style=\"width:" + width+"px; height:" +height+"px\" id=\"mapstraction\"></div>\n");
         sb.append(script("MapInitialize();"));
         StringBuffer js = new StringBuffer();
+        js.append("mapstraction.resizeTo(" + width +"," + height +");\n");
         js.append("var marker;\n");
-        js.append("var pointList;\n");
+        js.append("var line;\n");
+
+
         for (Entry entry : entriesToUse) {
+            String idBase = entry.getId();
             if (entry.hasAreaDefined()) {
-                js.append("pointList = new Polyline([");
+                js.append("line = new Polyline([");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append(",");
                 js.append(llp(entry.getNorth(), entry.getEast()));
@@ -270,7 +281,7 @@ public class MapOutputHandler extends OutputHandler {
                 js.append(",");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append("]);\n");
-                js.append("mapstraction.addPolyline(pointList);\n");
+                js.append("initLine(line," + qt(entry.getId())+");\n");
             }
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 String info =
@@ -281,18 +292,26 @@ public class MapOutputHandler extends OutputHandler {
                 info = info.replace("\r", " ");
                 info = info.replace("\n", " ");
                 info = info.replace("\"", "\\\"");
+                String icon = getRepository().getIconUrl(entry);
                 js.append("marker = new Marker("
                           + llp(entry.getSouth(), entry.getEast()) + ");\n");
-                js.append("marker.setInfoBubble(\"" + info + "\");\n");
-                js.append("mapstraction.addMarker(marker);\n");
-            }
 
-            //mapstraction.addMarker(marker);
+                js.append("marker.setIcon(" + qt(icon) + ");\n");
+                js.append("marker.setInfoBubble(\"" + info + "\");\n");
+                js.append("initMarker(marker," + qt(entry.getId())+");\n");
+            }
         }
+        js.append("mapstraction.autoCenterAndZoom();\n");
         sb.append(script(js.toString()));
     }
 
+    private static String qt(String  s) {
+        return "\"" + s +"\"";
+    }
 
+    private static String sqt(String  s) {
+        return "'" + s +"'";
+    }
 
 
     /**

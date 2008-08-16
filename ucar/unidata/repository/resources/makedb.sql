@@ -45,11 +45,14 @@ CREATE INDEX ENTRIES_INDEX_TODATE ON entries (TODATE);
 CREATE TABLE  metadata (id varchar(200),
 			entry_id varchar(200),
                         type varchar(200),
+                	inherited int,
                         attr1 varchar(10000),
                         attr2 varchar(10000),
                         attr3 varchar(10000),
-                        attr4 varchar(10000));
+                        attr4 varchar(10000)
+			);
 
+alter table metadata add column  inherited int;
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);
 CREATE INDEX METADATA_INDEX_ENTRYID ON metadata (ENTRY_ID);

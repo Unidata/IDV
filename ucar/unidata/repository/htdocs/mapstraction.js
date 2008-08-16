@@ -3604,8 +3604,10 @@ Marker.prototype.openBubble = function() {
       case 'microsoft':
         var pin = this.proprietary_marker;
         // bloody microsoft -- this is broken
-        var el = $m(this.pinID + "_" + this.maps[this.api].GUID).onmouseover;
-        setTimeout(el, 1000); // wait a second in case the map is booting as it cancels the event
+//jeffmc:        var el = $m(this.pinID + "_" + this.maps[this.api].GUID).onmouseover;
+        var el = $m(this.pinID + "_" + this.map.GUID).onmouseover;
+//jeffmc:        setTimeout(el, 1000); // wait a second in case the map is booting as it cancels the event
+        setTimeout(el, 1); // wait a second in case the map is booting as it cancels the event
         break;
       case 'multimap':
         this.proprietary_marker.openInfoBox();
@@ -4023,3 +4025,5 @@ window.mxn = {
 
 })();
 mxn.activatePolluteMode();
+
+

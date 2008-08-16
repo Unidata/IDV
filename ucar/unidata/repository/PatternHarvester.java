@@ -764,8 +764,8 @@ public class PatternHarvester extends Harvester {
             List tags = StringUtil.split(tag, ",", true, true);
             for (int i = 0; i < tags.size(); i++) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
-                        entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
-                        (String) tags.get(i), "", "", ""));
+                                               entry.getId(), EnumeratedMetadataHandler.TYPE_TAG, DFLT_INHERITED,
+                                               (String) tags.get(i), "", "", ""));
             }
 
         }

@@ -218,7 +218,7 @@ public class MetadataManager extends RepositoryManager {
                 metadataList.add(
                     handler.makeMetadata(
                         results.getString(col++), results.getString(col++),
-                        results.getString(col++), results.getString(col++),
+                        results.getString(col++), results.getInt(col++)==1,results.getString(col++),
                         results.getString(col++), results.getString(col++),
                         results.getString(col++)));
             }
@@ -422,6 +422,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
             sb.append(HtmlUtil.formTable());
             for (Metadata metadata : metadataList) {
+                metadata.setEntry(entry);
                 MetadataHandler metadataHandler =
                     findMetadataHandler(metadata);
                 if (metadataHandler == null) {
@@ -473,7 +474,7 @@ public class MetadataManager extends RepositoryManager {
             for (MetadataHandler handler : metadataHandlers) {
                 String       name    = handler.getHandlerGroupName();
                 StringBuffer groupSB = null;
-                for (Metadata.Type type : handler.getTypes(request)) {
+                for (Metadata.Type type : handler.getTypes(request, entry)) {
                     if (groupSB == null) {
                         groupSB = (StringBuffer) groupMap.get(name);
                         if (groupSB == null) {
@@ -595,6 +596,7 @@ public class MetadataManager extends RepositoryManager {
         distinctMap = null;
         getDatabaseManager().executeInsert(INSERT_METADATA, new Object[] {
             metadata.getId(), metadata.getEntryId(), metadata.getType(),
+            new Integer(metadata.getInherited()?1:0),
             metadata.getAttr1(), metadata.getAttr2(), metadata.getAttr3(),
             metadata.getAttr4()
         });

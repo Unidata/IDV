@@ -61,6 +61,9 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_CONTENTTEMPLATE =
         new Metadata.Type("admin.contenttemplate", "Content Template");
 
+    public static Metadata.Type TYPE_LOCALFILE_PATTERN =
+        new Metadata.Type("admin.localfile.pattern", "Local File Pattern");
+
 
 
     /**
@@ -74,6 +77,10 @@ public class AdminMetadataHandler extends MetadataHandler {
             throws Exception {
         super(repository, node);
         addType(TYPE_TEMPLATE);
+        nonLocalTypes.add(TYPE_TEMPLATE);
+
+        addType(TYPE_LOCALFILE_PATTERN);
+
         //        addType(TYPE_CONTENTTEMPLATE);
     }
 
@@ -82,6 +89,8 @@ public class AdminMetadataHandler extends MetadataHandler {
     private List<Metadata.Type> dummyTypeList =
         new ArrayList<Metadata.Type>();
 
+    private List<Metadata.Type> nonLocalTypes = new ArrayList<Metadata.Type>();
+
     /**
      * _more_
      *
@@ -89,9 +98,12 @@ public class AdminMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public List<Metadata.Type> getTypes(Request request) {
+    public List<Metadata.Type> getTypes(Request request, Entry entry) {
         if (request.getUser().getAdmin()) {
-            return super.getTypes(request);
+            if(entry.getIsLocalFile()) {
+                return super.getTypes(request,entry);
+            }
+            return nonLocalTypes;
         }
         return dummyTypeList;
     }
@@ -119,6 +131,9 @@ public class AdminMetadataHandler extends MetadataHandler {
         String        lbl  = msgLabel(type.getLabel());
         if (type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {
             return new String[] { lbl, "Has template" };
+        }
+        if (type.equals(TYPE_LOCALFILE_PATTERN)) {
+            return new String[] { lbl, "Local File Pattern" };
         }
 
         String content = metadata.getAttr1();
@@ -151,16 +166,8 @@ public class AdminMetadataHandler extends MetadataHandler {
         if (id.length() > 0) {
             suffix = "." + id;
         }
-        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl);
-        if (forEdit) {
-            submit = "";
-        }
-        String cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
-        if (forEdit) {
-            submit = "";
-            cancel = "";
-        }
-
+        String submit = (forEdit?"":HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl));
+        String cancel = (forEdit?"":HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
         String arg1    = ARG_ATTR1 + suffix;
         String content = "";
         if (type.equals(TYPE_TEMPLATE)) {
@@ -177,6 +184,14 @@ public class AdminMetadataHandler extends MetadataHandler {
                 + HtmlUtil.formEntry(lbl,
                                      "Note: must contain macro ${content}"
                                      + "<br>" + textarea);
+        }
+        if (type.equals(TYPE_LOCALFILE_PATTERN)) {
+            if(metadata.getEntry()==null || !metadata.getEntry().getIsLocalFile()) return null;
+            String value = metadata.getAttr1();
+            String input = HtmlUtil.input(arg1, value);
+            content =
+                HtmlUtil.row(HtmlUtil.colspan(submit, 2))
+                + HtmlUtil.formEntry(lbl,input);
         }
         if ( !forEdit) {
             content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));

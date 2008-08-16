@@ -259,7 +259,7 @@ public class CatalogHarvester extends Harvester {
             }
             if (ext.length() > 0) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
-                        entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
+                        entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,DFLT_INHERITED,
                         ext, "", "", ""));
             }
             entry.initEntry(name, "", parent, "", user,
@@ -289,7 +289,7 @@ public class CatalogHarvester extends Harvester {
                     node);
             metadataList.add(new Metadata(repository.getGUID(),
                                           group.getId(),
-                                          ThreddsMetadataHandler.TYPE_LINK,
+                                          ThreddsMetadataHandler.TYPE_LINK,DFLT_INHERITED,
                                           "Imported from catalog",
                                           catalogUrl, "", ""));
 

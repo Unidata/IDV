@@ -23,7 +23,6 @@
 
 
 
-
 package ucar.unidata.repository;
 
 
@@ -194,7 +193,7 @@ public class RepositoryClient extends RepositoryBase {
      * _more_
      */
     private void doMakeGroupTree() {
-        treeRoot  = new GroupNode("Top", "0");
+        treeRoot  = new GroupNode("Top", "0",true);
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
         groupTree.setToolTipText("Right-click to show menu");
@@ -225,6 +224,10 @@ public class RepositoryClient extends RepositoryBase {
                     boolean leaf, int row, boolean hasFocus) {
                 super.getTreeCellRendererComponent(theTree, value, sel,
                         expanded, leaf, row, hasFocus);
+                if(value instanceof GroupNode) {
+                    GroupNode node = (GroupNode) value;
+                    setEnabled(node.canDoNew);
+                }
                 if (expanded || leaf) {
                     setIcon(iconOpen);
                 } else {
@@ -344,15 +347,18 @@ public class RepositoryClient extends RepositoryBase {
         /** _more_ */
         private String id;
 
+        private boolean canDoNew = false;
+
         /**
          * _more_
          *
          * @param name _more_
          * @param id _more_
          */
-        public GroupNode(String name, String id) {
+        public GroupNode(String name, String id, boolean canDoNew) {
             super(name);
             this.id = id;
+            this.canDoNew = canDoNew;
         }
 
         /**
@@ -373,24 +379,30 @@ public class RepositoryClient extends RepositoryBase {
          */
         public void checkExpansionInner() {
             try {
-                removeAllChildren();
+                GuiUtils.setCursor(groupTree, GuiUtils.waitCursor);
                 String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),
-                                          new String[] { ARG_ID,
-                        id, ARG_OUTPUT, "xml.xml" });
+                                          new String[] { ARG_ID,id, 
+                                                         ARG_OUTPUT, "xml.xml",
+                                                         ARG_SESSIONID, sessionId });
                 String  xml  = IOUtil.readContents(url, getClass());
+                removeAllChildren();
                 Element root = XmlUtil.getRoot(xml);
                 for (Element child : (List<Element>) XmlUtil.findChildren(
                         root, TAG_GROUP)) {
+                    boolean canDoNew = XmlUtil.getAttribute(child,ATTR_CANDONEW,false);
                     GroupNode childNode =
                         new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
-                                      XmlUtil.getAttribute(child, ATTR_ID));
+                                      XmlUtil.getAttribute(child, ATTR_ID),canDoNew);
                     childNode.add(
                         new DefaultMutableTreeNode("Please wait..."));
                     this.add(childNode);
                 }
                 treeModel.nodeStructureChanged(this);
             } catch (Exception exc) {
+                removeAllChildren();
                 LogUtil.logException("Error loading group tree", exc);
+            } finally {
+                GuiUtils.setCursor(groupTree, GuiUtils.normalCursor);
             }
         }
     }
