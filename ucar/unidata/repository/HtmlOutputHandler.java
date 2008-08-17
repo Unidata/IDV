@@ -675,7 +675,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (decorate) {
             detailsSB.append("</table>\n");
             sb.append(getRepository().makeShowHideBlock(request, "details",
-                    msg("Information"), detailsSB, false));
+                    msg("Metadata"), detailsSB, false));
         } else {
             //            System.err.println (detailsSB);
             sb.append(detailsSB);

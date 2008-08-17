@@ -1065,20 +1065,28 @@ public class TypeHandler extends RepositoryManager {
 
 
         if (okToShowInForm(ARG_AREA)) {
-            sb.append(HtmlUtil.formEntry("Location:",
-                                         HtmlUtil.makeLatLonBox(ARG_AREA,
-                                             ((entry != null)
-                                                 && entry.hasSouth())
-                                             ? entry.getSouth()
-                                             : Double.NaN, ((entry != null)
-                                             && entry.hasNorth())
-                    ? entry.getNorth()
-                    : Double.NaN, ((entry != null) && entry.hasEast())
-                                  ? entry.getEast()
-                                  : Double.NaN, ((entry != null)
-                                  && entry.hasWest())
-                    ? entry.getWest()
-                    : Double.NaN)));
+            StringBuffer mapSB = new StringBuffer();
+            MapOutputHandler mapOutputHandler = (MapOutputHandler) getRepository().getOutputHandler(MapOutputHandler.OUTPUT_MAP);
+            if(mapOutputHandler!=null) {
+                List<Entry> entries = new ArrayList<Entry>();
+                if(entry!=null) entries.add(entry);
+                //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
+            }
+            String latLonForm =
+                HtmlUtil.makeLatLonBox(ARG_AREA,
+                                       ((entry != null)
+                                        && entry.hasSouth())
+                                       ? entry.getSouth()
+                                       : Double.NaN, ((entry != null)
+                                                      && entry.hasNorth())
+                                       ? entry.getNorth()
+                                       : Double.NaN, ((entry != null) && entry.hasEast())
+                                       ? entry.getEast()
+                                       : Double.NaN, ((entry != null)
+                                                      && entry.hasWest())
+                                       ? entry.getWest() : Double.NaN);
+
+            sb.append(HtmlUtil.formEntry("Location:", HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(latLonForm, mapSB.toString())))));
         }
 
 

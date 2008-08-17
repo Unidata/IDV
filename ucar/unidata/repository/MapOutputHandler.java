@@ -169,7 +169,7 @@ public class MapOutputHandler extends OutputHandler {
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
         sb.append(crumbs[1]);
-        getMap(request, entriesToUse,sb,700,500);
+        getMap(request, entriesToUse,sb,700,500,true);
         Result result = new Result("Results", sb);
         result.putProperty(
             PROP_NAVSUBLINKS,
@@ -216,7 +216,7 @@ public class MapOutputHandler extends OutputHandler {
         }
 
         sb.append("<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
-        getMap(request, entriesToUse,sb,700,400);
+        getMap(request, entriesToUse,sb,700,400,true);
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
@@ -251,7 +251,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public  void getMap(Request request, List<Entry> entriesToUse, StringBuffer sb, int width, int height) 
+    public  void getMap(Request request, List<Entry> entriesToUse, StringBuffer sb, int width, int height, boolean normalControls) 
             throws Exception {
         sb.append(
             importJS(
@@ -260,7 +260,7 @@ public class MapOutputHandler extends OutputHandler {
         sb.append(importJS(repository.getUrlBase() + "/mymap.js"));
         sb.append(
                   "<div style=\"width:" + width+"px; height:" +height+"px\" id=\"mapstraction\"></div>\n");
-        sb.append(script("MapInitialize();"));
+        sb.append(script("MapInitialize(" + normalControls+");"));
         StringBuffer js = new StringBuffer();
         js.append("mapstraction.resizeTo(" + width +"," + height +");\n");
         js.append("var marker;\n");

@@ -132,7 +132,7 @@ public class DateGridOutputHandler extends OutputHandler {
                                             List<Entry> entries,
                                             List<OutputType> types)
             throws Exception {
-        //        types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
+        types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
         types.add(new OutputType("Date Grid", OUTPUT_GRID));
     }
 
@@ -172,6 +172,9 @@ public class DateGridOutputHandler extends OutputHandler {
         showNext(request, subGroups, entries, sb);
         entries.addAll(subGroups);
         Result result;
+        String[] crumbs = getRepository().getBreadCrumbs(request, group,
+                              false, "");
+        sb.append(crumbs[1]);
         if (output.equals(OUTPUT_GRID)) {
             result = outputGrid(request, group, entries, sb);
         } else {
@@ -305,30 +308,61 @@ public class DateGridOutputHandler extends OutputHandler {
     private Result outputCalendar(Request request, Group group,
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {
+        GregorianCalendar now = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        int todayDay = now.get(now.DAY_OF_MONTH);
+        int todayMonth = now.get(now.MONTH);
+        int todayYear = now.get(now.YEAR);
+        int               month  = request.get(ARG_MONTH,now.get(now.MONTH));
+        int               year   = request.get(ARG_YEAR,now.get(now.YEAR));
+        int               prevMonth  = (month==0?11:month-1);
+        int               prevYear  = (month==0?year-1:year);
+        int               nextMonth  = (month==11?0:month+1);
+        int               nextYear  =  (month==11?year+1:year);
 
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
-        GregorianCalendar tmp = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(year, month, 1);
+        SimpleDateFormat headerSdf = new SimpleDateFormat("MMMMM yyyy");
 
-        int               month  = tmp.get(tmp.MONTH);
-        int               today  = tmp.get(cal.DAY_OF_MONTH);
-        int               tmpDay = today;
-        while (month == tmp.get(tmp.MONTH)) {
-            tmpDay++;
-            tmp.set(cal.DAY_OF_MONTH, tmpDay);
-        }
+        request.put(ARG_YEAR, ""+(year-1));
+        String prevprevNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/prevprev.gif"),"Last Year"," border=0 "));
+        request.put(ARG_YEAR, ""+(year+1));
+        String nextnextNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/nextnext.gif"),"Next Year"," border=0 "));
 
-        tmp.set(cal.DAY_OF_MONTH, tmpDay - 1);
-        int lastDay = tmpDay - 1;
+        request.remove(ARG_YEAR);
+        request.remove(ARG_MONTH);
+        String nowNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/today.gif"),"Current Month"," border=0 "));
 
-        cal.clear(cal.DAY_OF_MONTH);
-        cal.set(cal.DAY_OF_MONTH, 1);
-        //        System.err.println("dom: " +        cal.get(cal.DAY_OF_MONTH) +
-        //                           "  " + cal.get(cal.DAY_OF_WEEK));  
+        request.put(ARG_MONTH, ""+prevMonth);
+        request.put(ARG_YEAR, ""+prevYear);
+        String prevNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/prev.gif"),"Previous Month"," border=0 "));
+        request.put(ARG_MONTH, ""+nextMonth);
+        request.put(ARG_YEAR, ""+nextYear);
+        String nextNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/next.gif"),"Next Month"," border=0 "));
+
+        request.remove(ARG_MONTH);
+        request.remove(ARG_YEAR);
+
+        sb.append("<center><b>" +prevprevNav+HtmlUtil.space(1) +
+                  prevNav +HtmlUtil.space(1)+nowNav+HtmlUtil.space(1) +
+                  nextNav + HtmlUtil.space(1) + nextnextNav +"</b></center>");
+        sb.append("<center><b>" +headerSdf.format(cal.getTime()) +"</b></center>");
         sb.append(
             "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
 
-        for (Entry entry : entries) {}
+        Hashtable<String,List> map = new Hashtable<String,List>();
+        GregorianCalendar mapCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        for (Entry entry : entries) {
+            mapCal.setTime(new Date(entry.getStartDate()));
+            int entryMonth =mapCal.get(mapCal.MONTH);
+            int entryYear =mapCal.get(mapCal.YEAR);
+            if(entryYear<=prevYear  && entryMonth<prevMonth) continue;
+            if(entryYear>=nextYear  && entryMonth>nextMonth) continue;
+            String key  = entryYear+"/"  + entryMonth + "/" + mapCal.get(mapCal.DAY_OF_MONTH);
+            List dayList = map.get(key);
+            if(dayList == null) map.put(key, dayList = new ArrayList());
+            String icon = getRepository().getIconUrl(entry);
+            dayList.add(/*HtmlUtil.img(icon)+*/getAjaxLink(request, entry, entry.getLabel(), true));
+        }
 
         String[] dayNames = {
             "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
@@ -339,23 +373,37 @@ public class DateGridOutputHandler extends OutputHandler {
                       + dayNames[colIdx] + "</td>");
         }
         sb.append("</tr>");
-        int dayCnt   = 0;
-        int boxCnt   = 0;
         int startDow = cal.get(cal.DAY_OF_WEEK);
+        while(startDow>1) {
+            cal.add(cal.DAY_OF_MONTH, -1);
+            startDow--;
+        }
         for (int rowIdx = 0; rowIdx < 6; rowIdx++) {
-            sb.append("<tr>");
+            sb.append("<tr valign=top>");
             for (int colIdx = 0; colIdx < 7; colIdx++) {
-                boxCnt++;
                 String content = HtmlUtil.space(1);
-                if (startDow <= boxCnt) {
-                    dayCnt++;
-                    if (dayCnt <= lastDay) {
-                        content =
-                            "<table border=0 cellspacing=\"0\" cellpadding=\"3\" width=100%><tr valign=top><td>&nbsp;</td><td align=right class=calday>"
-                            + dayCnt + "<br>&nbsp;</td></tr></table>";
-                    }
+                String bg ="";
+                int thisDay = cal.get(cal.DAY_OF_MONTH);
+                int thisMonth= cal.get(cal.MONTH);
+                int thisYear= cal.get(cal.YEAR);
+                String key  = thisYear+"/"  + thisMonth + "/" + thisDay;
+                List inner =  map.get(key);
+                if(cal.get(cal.MONTH)!=month) {
+                    bg = " style=\"background-color:lightgray;\"";
+                }  else if(todayDay==thisDay && todayMonth==thisMonth && todayYear ==thisYear) {
+                    bg = " style=\"background-color:lightblue;\"";
                 }
-                sb.append("<td class=\"calentry\">" + content + "</td>");
+                String dayContents = "&nbsp;";
+                if(inner!=null)
+                    dayContents =StringUtil.join("<br>",inner);
+                content =
+                    "<table border=0 cellspacing=\"0\" cellpadding=\"2\" width=100%><tr valign=top><td>" +dayContents+"</td><td align=right class=calday>"
+                    + thisDay + "<br>&nbsp;</td></tr></table>";
+                sb.append("<td class=\"calentry\" " + bg+" >" + content + "</td>");
+                cal.add(cal.DAY_OF_MONTH, 1);
+            }
+            if(cal.get(cal.YEAR)>=year && cal.get(cal.MONTH)>month) {
+                break;
             }
         }
 

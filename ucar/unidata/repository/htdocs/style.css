@@ -102,12 +102,12 @@ a.menulink {
 
 
 .header {
-  font-family:  Helvetica, sans-serif;
   background-repeat: no-repeat;
   background-color:#006699;
-  font-size: 24pt;
-  font-weight: bold;
+  font-size: 22pt;
+  xfont-weight: bold;
   color: white;
+  padding-top:5px;
   padding-left:5px;
 }
 
@@ -230,12 +230,14 @@ form {
 
 .nav {
    font-size: 12pt;
-   background-color : #77aa77;
-   border-bottom : 1px #666666 solid;
+   xxxbackground-color : #77aa77;
+   background-color : #77aa88;
+   xxxborder-bottom : 1px #666666 solid;
+   border-bottom : 1px #888888 solid;
    margin:0px;
-   padding-top:4;
-   padding-bottom:0;
-   padding-left:5;
+   padding-top:1;
+   padding-bottom:1;
+   padding-left:3;
    color: black;
 }
 
@@ -247,9 +249,9 @@ form {
    border-bottom : 1px #666666 solid;
    background-color : #aabbaa;
    margin:0;
-   padding-top:1;   
-   padding-bottom:0;
-   padding-left:10;
+   padding-top:2;   
+   padding-bottom:1;
+   padding-left:8;
 
 }
 

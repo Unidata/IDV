@@ -6,13 +6,20 @@ var lines = new Object();
 var markers = new Object();
 
 var mapstraction;
-function MapInitialize()
+function MapInitialize(addControls)
 {
 	// Create a map object
 //	mapstraction = new Mapstraction('mapstraction', 'google');
 //	mapstraction = new Mapstraction('mapstraction', 'yahoo');
 	mapstraction = new Mapstraction('mapstraction', 'microsoft');
-        mapstraction.addSmallControls();
+	if(!addControls) {
+		vemap = mapstraction.maps[mapstraction.api];
+		vemap.SetDashboardSize(VEDashboardSize.Tiny);
+//		vemap.SetDashboardSize(VEDashboardSize.Small);
+		vemap.LoadMap();
+	} else {
+	        mapstraction.addSmallControls();
+	} 
 }
 
 
