@@ -766,8 +766,6 @@ public class HtmlOutputHandler extends OutputHandler {
         showNext(request, subGroups, entries, sb);
 
 
-
-
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
             showApplet = output.equals(OUTPUT_TIMELINE);
             boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
@@ -796,7 +794,12 @@ public class HtmlOutputHandler extends OutputHandler {
                 getMetadataHtml(request, group, sb, true);
                 getCommentBlock(request, group, sb);
                 getAssociationBlock(request, group, sb);
+            } else {
+                List allEntries = new ArrayList(entries);
+                allEntries.addAll(subGroups);
+                sb.append(getTimelineApplet(request, allEntries));
             }
+
 
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
@@ -824,9 +827,6 @@ public class HtmlOutputHandler extends OutputHandler {
             //            entries.addAll(subGroups);
             if (entries.size() > 0) {
                 StringBuffer entriesSB = new StringBuffer();
-                if (showApplet) {
-                    entriesSB.append(getTimelineApplet(request, entries));
-                }
                 String link = getEntryHtml(entriesSB, entries, request, true,
                                            false, false);
                 sb.append(getRepository().makeShowHideBlock(request,

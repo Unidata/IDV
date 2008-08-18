@@ -220,6 +220,8 @@ public class MapOutputHandler extends OutputHandler {
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
+                sb.append(HtmlUtil.img(getRepository().getIconUrl(entry)));
+                sb.append(HtmlUtil.space(1));
                 sb.append("<a href=\"javascript:hiliteEntry(mapstraction," + sqt(entry.getId()) +");\">" + entry.getName()+"</a><br>");
             }
         }

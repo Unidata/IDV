@@ -360,8 +360,11 @@ public class DateGridOutputHandler extends OutputHandler {
             String key  = entryYear+"/"  + entryMonth + "/" + mapCal.get(mapCal.DAY_OF_MONTH);
             List dayList = map.get(key);
             if(dayList == null) map.put(key, dayList = new ArrayList());
-            String icon = getRepository().getIconUrl(entry);
-            dayList.add(/*HtmlUtil.img(icon)+*/getAjaxLink(request, entry, entry.getLabel(), true));
+            String label = entry.getLabel();
+            if(label.length()>20) {
+                label = label.substring(0,19)+"...";
+            }
+            dayList.add(getAjaxLink(request, entry, label, true));
         }
 
         String[] dayNames = {

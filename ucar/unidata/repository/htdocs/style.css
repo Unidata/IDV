@@ -301,6 +301,7 @@ a.navlink {
 }
 
 .note {
+  z-index: 1;
   margin:10px;
   padding-bottom:5px;
   padding-left:5px;
