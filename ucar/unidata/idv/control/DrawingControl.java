@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -106,6 +107,9 @@ public class DrawingControl extends DisplayControlImpl {
     public static final String ATTR_USETIMESINANIMATION =
         "usetimesinanimation";
 
+    /** xgrf attribute       */
+    public static final String ATTR_FRONTDISPLAY = "frontdisplay";
+
     /** Xml tag for the editor settings in the import/export format */
     public static final String TAG_EDITOR = "editor";
 
@@ -163,6 +167,9 @@ public class DrawingControl extends DisplayControlImpl {
 
     /** Is this control enabled */
     private boolean enabled = true;
+
+    /** Are we a font display         */
+    private boolean frontDisplay = false;
 
     /** Controls the disabled state */
     protected JCheckBox enabledCbx;
@@ -483,6 +490,8 @@ public class DrawingControl extends DisplayControlImpl {
         NodeList elements = XmlUtil.getElements(root);
         setUseTimesInAnimation(XmlUtil.getAttribute(root,
                 ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
+        frontDisplay = XmlUtil.getAttribute(root, ATTR_FRONTDISPLAY,
+                                            frontDisplay);
         if (displayHolder != null) {
             displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
         }
@@ -2804,6 +2813,24 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
 
+
+    /**
+     *  Set the FrontDisplay property.
+     *
+     *  @param value The new value for FrontDisplay
+     */
+    public void setFrontDisplay(boolean value) {
+        frontDisplay = value;
+    }
+
+    /**
+     *  Get the FrontDisplay property.
+     *
+     *  @return The FrontDisplay
+     */
+    public boolean getFrontDisplay() {
+        return frontDisplay;
+    }
 
 
 

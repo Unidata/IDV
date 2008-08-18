@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -187,6 +189,10 @@ public abstract class DrawingGlyph {
 
     /** Is this glyph visible */
     private boolean visibleFlag = true;
+
+    /** _more_ */
+    public boolean oldVisibility;
+
 
     /** Is properties dialog shown */
     protected boolean propertiesUp = false;
@@ -520,11 +526,20 @@ public abstract class DrawingGlyph {
         return true;
     }
 
+    /**
+     * Is the control a front display
+     *
+     * @return is a front display
+     */
+    protected boolean isFrontDisplay() {
+        return control.getFrontDisplay();
+    }
+
 
     /**
      * Get the default Z position for  the glyph.
      *
-     * @return _more_
+     * @return default Z position for  the glyph.
      */
     protected float getDefaultZPosition() {
         return (control == null)
@@ -993,7 +1008,8 @@ public abstract class DrawingGlyph {
             return;
         }
         Real currentAnimationTime = animation.getAniValue();
-        if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
+        if ((currentAnimationTime == null)
+                || currentAnimationTime.isMissing()) {
             setVisible(true);
             return;
         }
@@ -1470,7 +1486,7 @@ public abstract class DrawingGlyph {
             comps.add(GuiUtils.left(box));
             compMap.put(ATTR_COLOR, box);
             */
-            colorSwatch = new GuiUtils.ColorSwatch(color, "",true);
+            colorSwatch = new GuiUtils.ColorSwatch(color, "", true);
             colorSwatch.setMinimumSize(new Dimension(20, 20));
             colorSwatch.setPreferredSize(new Dimension(20, 20));
             comps.add(GuiUtils.left(colorSwatch));
@@ -2937,8 +2953,12 @@ public abstract class DrawingGlyph {
     }
 
 
-    public boolean oldVisibility;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getIsRaster() {
         return false;
     }

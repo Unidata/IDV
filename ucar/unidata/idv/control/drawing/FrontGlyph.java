@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -65,6 +67,8 @@ import java.awt.event.*;
 
 import java.rmi.RemoteException;
 
+import java.util.ArrayList;
+
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -90,6 +94,7 @@ public class FrontGlyph extends PolyGlyph
     /** Xml attribute name */
     public static final String ATTR_FRONTTYPE = "fronttype";
 
+    /** _more_ */
     public static final String ATTR_FRONTSCALE = "frontscale";
 
 
@@ -105,6 +110,7 @@ public class FrontGlyph extends PolyGlyph
     /** for changing type */
     private JComboBox typeBox;
 
+    /** _more_ */
     private JTextField scaleFld;
 
     /** for flipping orientation */
@@ -113,7 +119,8 @@ public class FrontGlyph extends PolyGlyph
     /** for flipping orientation */
     private boolean flipIt = false;
 
-    private double frontScale= 1.0;
+    /** _more_ */
+    private double frontScale = 1.0;
 
 
     /**
@@ -133,7 +140,7 @@ public class FrontGlyph extends PolyGlyph
      */
     public FrontGlyph(DrawingControl control, DisplayEvent event)
             throws VisADException, RemoteException {
-        this(control, event, FrontDrawer.TYPE_COLD_FRONT,false);
+        this(control, event, FrontDrawer.TYPE_COLD_FRONT, false);
     }
 
     /**
@@ -142,17 +149,24 @@ public class FrontGlyph extends PolyGlyph
      * @param control The control I'm in.
      * @param event The display event.
      * @param type Front type
+     * @param smooth _more_
      *
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    public FrontGlyph(DrawingControl control, DisplayEvent event, String type, boolean smooth)
+    public FrontGlyph(DrawingControl control, DisplayEvent event,
+                      String type, boolean smooth)
             throws VisADException, RemoteException {
         super(control, event, smooth);
-        frontType = type;
+        frontType  = type;
         frontScale = control.getFrontScale();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected FrontDrawer getFrontDrawer() {
         return frontDrawer;
     }
@@ -173,14 +187,24 @@ public class FrontGlyph extends PolyGlyph
         }
         setCoordType(COORD_LATLON);
         frontDrawer = doMakeFrontDrawer();
-        HighLowGlyph.setAnimationSet(frontDrawer, getTimeValues());
+        if (isFrontDisplay()) {
+            HighLowGlyph.setAnimationSet(frontDrawer, getTimeValues());
+        }
         addDisplayable(frontDrawer);
         return true;
     }
 
 
-    protected FrontDrawer doMakeFrontDrawer() 
-        throws VisADException, RemoteException {
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected FrontDrawer doMakeFrontDrawer()
+            throws VisADException, RemoteException {
         FrontDrawer frontDrawer = new FrontDrawer(8, frontType);
         frontDrawer.setFlipTheFlip(flipIt);
         return frontDrawer;
@@ -271,21 +295,36 @@ public class FrontGlyph extends PolyGlyph
             comps.add(GuiUtils.filler());
             comps.add(GuiUtils.left(flipItCbx));
         }
-        scaleFld = new JTextField(""+frontScale,5);
+        scaleFld = new JTextField("" + frontScale, 5);
         comps.add(GuiUtils.rLabel("Scale:"));
         comps.add(GuiUtils.left(scaleFld));
         super.getPropertiesComponents(comps, compMap);
         //getTimePropertiesComponents(comps, compMap);
     }
 
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     protected void createDisplayable()
-            throws VisADException, RemoteException {
-    }
+            throws VisADException, RemoteException {}
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean shouldAddFrontProperties() {
         return getCreatedByUser();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean shouldShowColorSelector() {
         return false;
     }
@@ -317,7 +356,7 @@ public class FrontGlyph extends PolyGlyph
                 frontDrawer.setFrontType(frontType);
             }
         }
-        if(scaleFld!=null) {
+        if (scaleFld != null) {
             frontScale = Double.parseDouble(scaleFld.getText().trim());
         }
         return super.applyProperties(compMap);
@@ -349,7 +388,7 @@ public class FrontGlyph extends PolyGlyph
     public void initFromXml(DrawingControl control, Element node)
             throws VisADException, RemoteException {
         super.initFromXml(control, node);
-        frontType = XmlUtil.getAttribute(node, ATTR_FRONTTYPE, frontType);
+        frontType  = XmlUtil.getAttribute(node, ATTR_FRONTTYPE, frontType);
         frontScale = XmlUtil.getAttribute(node, ATTR_FRONTSCALE, frontScale);
         setName(FrontDrawer.getLabel(frontType));
     }
@@ -363,7 +402,7 @@ public class FrontGlyph extends PolyGlyph
     protected void addAttributes(Element e) {
         super.addAttributes(e);
         e.setAttribute(ATTR_FRONTTYPE, frontType);
-        e.setAttribute(ATTR_FRONTSCALE, frontScale+"");
+        e.setAttribute(ATTR_FRONTSCALE, frontScale + "");
     }
 
     /**
@@ -409,7 +448,7 @@ public class FrontGlyph extends PolyGlyph
                      - el2.getLatLonPoint().getLongitude().getValue());
         //Guess at a base scale which is 1/4 of the width of the visadbox in degrees
         //go figure
-        frontDrawer.setScale(frontScale*(width / 4));
+        frontDrawer.setScale(frontScale * (width / 4));
     }
 
     /**
@@ -456,10 +495,21 @@ public class FrontGlyph extends PolyGlyph
         frontDrawer.setConstantPosition(
             control.getVerticalValue(getZPosition()),
             control.getNavigatedDisplay().getDisplayAltitudeType());
-        frontDrawer.setCurve(getCurve(), getTimeValues());
+
+        frontDrawer.setCurve(getCurve(), (isFrontDisplay()
+                                          ? getTimeValues()
+                                          : new ArrayList()));
         super.updateLocation();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     protected float[][] getCurve() throws VisADException, RemoteException {
         return getPointValues();
 
@@ -502,16 +552,6 @@ public class FrontGlyph extends PolyGlyph
 
 
 
-    /**
-     * Handle event
-     *
-     * @param event The display event.
-     *
-     * @return This or null
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
     /*
     public DrawingGlyph handleMouseDragged(DisplayEvent event)
             throws VisADException, RemoteException {
@@ -625,21 +665,21 @@ public class FrontGlyph extends PolyGlyph
 
 
     /**
-       Set the FrontScale property.
-
-       @param value The new value for FrontScale
-    **/
-    public void setFrontScale (double value) {
-	frontScale = value;
+     *  Set the FrontScale property.
+     *
+     *  @param value The new value for FrontScale
+     */
+    public void setFrontScale(double value) {
+        frontScale = value;
     }
 
     /**
-       Get the FrontScale property.
-
-       @return The FrontScale
-    **/
-    public double getFrontScale () {
-	return frontScale;
+     *  Get the FrontScale property.
+     *
+     *  @return The FrontScale
+     */
+    public double getFrontScale() {
+        return frontScale;
     }
 
 

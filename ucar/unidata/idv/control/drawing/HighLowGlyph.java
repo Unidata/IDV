@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -147,7 +149,9 @@ public class HighLowGlyph extends DrawingGlyph {
      */
     protected Data getTimeField(Data data)
             throws VisADException, RemoteException {
-        return Util.makeTimeRangeField(data, getTimeValues());
+        return Util.makeTimeRangeField(data, (isFrontDisplay()
+                ? getTimeValues()
+                : new ArrayList()));
     }
 
 
@@ -296,7 +300,9 @@ public class HighLowGlyph extends DrawingGlyph {
                                     * (font1.getSize() / 12.0f));
 
         addDisplayable(textDisplayable);
-        setAnimationSet(textDisplayable, getTimeValues());
+        if (isFrontDisplay()) {
+            setAnimationSet(textDisplayable, getTimeValues());
+        }
 
         textType2 = TextType.getTextType("HighLowGlyph_" + (typeCnt++));
         pressureDisplayable = new TextDisplayable("HighLowGlyph_"
@@ -315,7 +321,9 @@ public class HighLowGlyph extends DrawingGlyph {
 
 
         addDisplayable(pressureDisplayable);
-        setAnimationSet(pressureDisplayable, getTimeValues());
+        if (isFrontDisplay()) {
+            setAnimationSet(pressureDisplayable, getTimeValues());
+        }
 
         return true;
     }
