@@ -337,7 +337,8 @@ public class FrontDataSource extends FilesDataSource {
         sb.append("<shapes "
                   + XmlUtil.attrs("title", "Fronts",
                                   DrawingControl.ATTR_USETIMESINANIMATION,
-                                  "false") + ">\n");
+                                  "true",
+                                  DrawingControl.ATTR_FRONTDISPLAY,"true") + ">\n");
 
         errors   = new ArrayList();
         warnings = new ArrayList();
