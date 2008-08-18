@@ -2603,16 +2603,43 @@ public class CDMRadarAdapter implements RadarAdapter {
         int       l            = 0;
         // additional radial at the begining
         int ray0 = 0;
+        boolean addition0 = false;
+        boolean additionN = false;
         float az0 = azimuths[ray0] - 0.5f;
-        if ( az0 < 0) az0 = 0f;
-        for (int cell = 0; cell < numGates; cell++) {
-            int elem = sortedAzs[ray0] * numGates + cell;
-            domainVals3d[0][l] = cell;
-            domainVals3d[1][l] = az0;
-            domainVals3d[2][l] = elevations[sortedAzs[ray0]];
-            values[0][l++]     = rawValues[elem];
+        int rayN = numRadials - 1;
+        if( az0 >= 0) {
+            if( az0 >= 0.5 && az0 < 1.0 && azimuths[rayN] > 359.5) {
+                addition0 = true;
+                additionN = true;
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[rayN] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = 0;
+                    domainVals3d[2][l] = elevations[sortedAzs[rayN]];
+                    values[0][l++]     = rawValues[elem];
+                }
+
+            } else {
+                addition0 = true;
+            }
+        }
+        else {  // az0 < 0
+            if(Math.abs(az0) < 0.5) {
+                addition0 = true;
+                az0 = 0;
+            }
         }
 
+        if(addition0) {
+            for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[ray0] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = az0;
+                    domainVals3d[2][l] = elevations[sortedAzs[ray0]];
+                    values[0][l++]     = rawValues[elem];
+            }
+        }
+        // radial data
         for (int ray = 0; ray < numRadials; ray++) {
             for (int cell = 0; cell < numGates; cell++) {
                 int elem = sortedAzs[ray] * numGates + cell;
@@ -2625,15 +2652,27 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         // additional radial at the end of the sweep
-        int rayN = numRadials - 1;
-        float azN = azimuths[rayN] + 0.5f;
-        if ( azN > 360) azN = 360f;
-        for (int cell = 0; cell < numGates; cell++) {
-            int elem = sortedAzs[rayN] * numGates + cell;
-            domainVals3d[0][l] = cell;
-            domainVals3d[1][l] = azN;
-            domainVals3d[2][l] = elevations[sortedAzs[rayN]];
-            values[0][l++]     = rawValues[elem];
+        if(additionN == false) {
+            float azN = azimuths[rayN] + 0.5f;
+            if ( azN > 360)
+                azN = 360f;
+
+            for (int cell = 0; cell < numGates; cell++) {
+                int elem = sortedAzs[rayN] * numGates + cell;
+                domainVals3d[0][l] = cell;
+                domainVals3d[1][l] = azN;
+                domainVals3d[2][l] = elevations[sortedAzs[rayN]];
+                values[0][l++]     = rawValues[elem];
+            }
+            if(addition0 == false) {
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[ray0] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = 360;
+                    domainVals3d[2][l] = elevations[sortedAzs[ray0]];
+                    values[0][l++]     = rawValues[elem];
+                }
+            }
         }
         //check the value
         for (int samp = 0; samp < npix; samp++) {
