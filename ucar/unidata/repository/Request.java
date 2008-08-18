@@ -291,7 +291,12 @@ public class Request implements Constants {
      * @return _more_
      */
     public String uploadForm(RequestUrl theUrl) {
-        return HtmlUtil.uploadForm(url(theUrl), "");
+        return uploadForm(theUrl,"");
+    }
+
+
+    public String uploadForm(RequestUrl theUrl, String extra) {
+        return HtmlUtil.uploadForm(url(theUrl), extra);
     }
 
 

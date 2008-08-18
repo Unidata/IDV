@@ -790,7 +790,7 @@ public class HtmlOutputHandler extends OutputHandler {
             }
 
 
-            if ( !showApplet) {
+            if (!showApplet) {
                 getMetadataHtml(request, group, sb, true);
                 getCommentBlock(request, group, sb);
                 getAssociationBlock(request, group, sb);

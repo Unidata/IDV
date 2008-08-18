@@ -3990,9 +3990,9 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         if (type == null) {
-            sb.append(request.form(URL_ENTRY_FORM));
+            sb.append(request.form(URL_ENTRY_FORM, " name=\"entryform\" "));
         } else {
-            sb.append(request.uploadForm(URL_ENTRY_CHANGE));
+            sb.append(request.uploadForm(URL_ENTRY_CHANGE, " name=\"entryform\" "));
         }
 
         sb.append(HtmlUtil.formTable());
@@ -4426,6 +4426,8 @@ public class Repository extends RepositoryBase implements Tables,
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
             SqlUtil.delete(getConnection(), TABLE_ASSOCIATIONS, clause);
+            fromEntry.setAssociations(null);
+            toEntry.setAssociations(null);
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
         }
         StringBuffer sb = new StringBuffer();
@@ -7627,6 +7629,15 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+
+    public String getCalendarSelector(String formName, String fieldName) {
+        String anchorName = "anchor." + fieldName;
+        String divName = "div." + fieldName;
+        return "<A HREF=\"#\"   onClick=\"selectDate('" + divName +"',document.forms['" + formName +"']." + fieldName+",'" + anchorName +"','yyyy-dd-MM'); return false;\"   NAME=\"" + anchorName +"\" ID=\"" + anchorName +"\">"+
+            HtmlUtil.img(fileUrl(ICON_CALENDAR)," Choose date", " border=0")+
+            "</A>" +
+            "<DIV ID=\"" + divName+"\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
+    }
 
 
 }

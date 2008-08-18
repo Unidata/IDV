@@ -1036,15 +1036,16 @@ public class TypeHandler extends RepositoryManager {
                                                  fromDate,
                                                      HtmlUtil.SIZE_30)));
             } else {
+
                 sb.append(
                     HtmlUtil.formEntry(
                         "Date Range:",
                         HtmlUtil.input(
                             ARG_FROMDATE, fromDate,
-                            HtmlUtil.SIZE_30) + " -- "
+                            HtmlUtil.SIZE_30) + getRepository().getCalendarSelector("entryform", ARG_FROMDATE) +" -- "
                                 + HtmlUtil.input(
                                     ARG_TODATE, toDate,
-                                    HtmlUtil.SIZE_30) + dateHelp));
+                                    HtmlUtil.SIZE_30) + getRepository().getCalendarSelector("entryform", ARG_TODATE) +HtmlUtil.space(2) + dateHelp));
             }
             if (entry == null) {
                 List datePatterns = new ArrayList();

@@ -327,3 +327,109 @@ a.navlink {
 .calentry {
 
 }
+
+
+
+.cpYearNavigation,
+	.cpMonthNavigation
+			{
+			background-color:#006699;
+			xxxbackground-color:#6677DD;
+			text-align:center;
+			vertical-align:center;
+			text-decoration:none;
+			color:#FFFFFF;
+			font-weight:bold;
+			}
+	.cpMonthNavigation  a {
+        color: white;
+        }
+	.cpDayColumnHeader,
+	.cpYearNavigation,
+	.cpMonthNavigation,
+	.cpCurrentMonthDate,
+	.cpCurrentMonthDateDisabled,
+	.cpOtherMonthDate,
+	.cpOtherMonthDateDisabled,
+	.cpCurrentDate,
+	.cpCurrentDateDisabled,
+	.cpTodayText,
+	.cpTodayTextDisabled,
+	.cpText
+			{
+			font-family:arial;
+			font-size:8pt;
+			}
+
+
+	TD.cpDayColumnHeader
+			{
+			text-align:right;
+			border:solid thin #6677DD;
+			border-width:0 0 1 0;
+			}
+	.cpCurrentMonthDate,
+	.cpOtherMonthDate,
+	.cpCurrentDate
+			{
+			text-align:right;
+			text-decoration:none;
+			}
+	.cpCurrentMonthDateDisabled,
+	.cpOtherMonthDateDisabled,
+	.cpCurrentDateDisabled
+			{
+			color:#D0D0D0;
+			text-align:right;
+			text-decoration:line-through;
+			}
+	.cpCurrentMonthDate
+			{
+			color:#6677DD;
+			font-weight:bold;
+			}
+	.cpCurrentDate
+			{
+			color: #FFFFFF;
+			font-weight:bold;
+			}
+	.cpOtherMonthDate
+			{
+			color:#808080;
+			}
+	TD.cpCurrentDate
+			{
+			color:#FFFFFF;
+			background-color: #6677DD;
+			border-width:1;
+			border:solid thin #000000;
+			}
+	TD.cpCurrentDateDisabled
+			{
+			border-width:1;
+			border:solid thin #FFAAAA;
+			}
+	TD.cpTodayText,
+	TD.cpTodayTextDisabled
+			{
+			border:solid thin #6677DD;
+			border-width:1 0 0 0;
+			}
+	A.cpTodayText,
+	SPAN.cpTodayTextDisabled
+			{
+			height:20px;
+			}
+	A.cpTodayText
+			{
+			color:#6677DD;
+			font-weight:bold;
+			}
+	SPAN.cpTodayTextDisabled
+			{
+			color:#D0D0D0;
+			}
+	.cpBorder
+			{
+			border:solid thin #6677DD;
+			}

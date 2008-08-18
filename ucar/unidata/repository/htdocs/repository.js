@@ -314,7 +314,7 @@ function Tooltip () {
             msg = util.getDomObject('pindiv');
             hideObject(msg);
             if(img) {
-                img.obj.src  = "${urlroot}/close.gif";
+                img.obj.src  = "${urlroot}/icons/close.gif";
                 pinned = 1;
             }
         }
@@ -380,7 +380,7 @@ function Tooltip () {
     function handleTooltip(request, obj) {
         var xmlDoc=request.responseXML.documentElement;
         text = getChildText(xmlDoc);
-        obj.obj.innerHTML = "<div id=\"tooltipwrapper\" onmouseover=\"tooltip.divMouseOver();\"  onmouseout=\"tooltip.divMouseOut();\"><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.unPin();\" id=\"tooltipclose\" onmouseover=\"tooltip.divMouseOver();\" src=${urlroot}/blank.gif></td><td>" + text+"</table><div id=\"pindiv\" class=smallmessage>'p' to pin</div></div>";
+        obj.obj.innerHTML = "<div id=\"tooltipwrapper\" onmouseover=\"tooltip.divMouseOver();\"  onmouseout=\"tooltip.divMouseOut();\"><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.unPin();\" id=\"tooltipclose\" onmouseover=\"tooltip.divMouseOver();\" src=${urlroot}/icons/blank.gif></td><td>" + text+"</table><div id=\"pindiv\" class=smallmessage>'p' to pin</div></div>";
         showing = 1;
         showObject(obj);
     }
@@ -397,9 +397,9 @@ function toggleEntryForm () {
     var img = util.getDomObject('entryformimg');
     if(obj) {
         if(toggleVisibilityOnObject(obj,'')) {
-            if(img) img.obj.src =  "${urlroot}/downarrow.gif";
+            if(img) img.obj.src =  "${urlroot}/icons/downarrow.gif";
         } else {
-            if(img) img.obj.src =  "${urlroot}/rightarrow.gif";
+            if(img) img.obj.src =  "${urlroot}/icons/rightarrow.gif";
         }
     }
     var cnt = 0;
@@ -430,7 +430,7 @@ function  handleFolderList(request, id) {
     var img = util.getDomObject("img_" +id);
     var xmlDoc=request.responseXML.documentElement;
     block.obj.innerHTML = getChildText(xmlDoc);
-    if(img) img.obj.src = "${urlroot}/folderopen.gif";
+    if(img) img.obj.src = "${urlroot}/icons/folderopen.gif";
 
 }
 
@@ -441,11 +441,11 @@ function folderClick(id) {
     if(!block.obj.isOpen) {
         block.obj.isOpen = 1;
         showObject(block);
-        if(img) img.obj.src = "${urlroot}/progress.gif";
+        if(img) img.obj.src = "${urlroot}/icons/progress.gif";
         url = "${urlroot}/entry/show?id=" + id +"&output=groupxml";
 	util.loadXML( url, handleFolderList,id);
     } else {
-        if(img) img.obj.src = "${urlroot}/folderclosed.gif";
+        if(img) img.obj.src = "${urlroot}/icons/folderclosed.gif";
         block.obj.isOpen = 0;
         hideObject(block);
     }
@@ -541,3 +541,9 @@ function toggleVisibilityOnObject(obj, display) {
 
 
 
+
+
+function selectDate(div,field,id,fmt) {
+    var cal = new CalendarPopup(div);
+    cal.select(field,id,fmt);
+}

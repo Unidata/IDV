@@ -320,6 +320,9 @@ public class DateGridOutputHandler extends OutputHandler {
         int               nextYear  =  (month==11?year+1:year);
 
 
+        if(request.get(ARG_SHOWYEAR, false)) {
+        }
+
         GregorianCalendar cal = new GregorianCalendar(year, month, 1);
         SimpleDateFormat headerSdf = new SimpleDateFormat("MMMMM yyyy");
 

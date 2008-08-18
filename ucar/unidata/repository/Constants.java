@@ -78,107 +78,109 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String ICON_CART = "/cart.gif";
+    public static final String ICON_CART = "/icons/cart.gif";
+
+    public static final String ICON_CALENDAR = "/icons/calendar.gif";
 
     /** _more_          */
-    public static final String ICON_RSS = "/rss.gif";
+    public static final String ICON_RSS = "/icons/rss.gif";
 
     /** _more_          */
-    public static final String ICON_METADATA = "/metadata.gif";
+    public static final String ICON_METADATA = "/icons/metadata.gif";
 
     /** _more_ */
-    public static final String ICON_CLOSE = "/close.gif";
+    public static final String ICON_CLOSE = "/icons/close.gif";
 
     /** _more_ */
-    public static final String ICON_MOVE = "/move.gif";
+    public static final String ICON_MOVE = "/icons/move.gif";
 
     /** _more_ */
-    public static final String ICON_COMMENTS = "/comments.gif";
+    public static final String ICON_COMMENTS = "/icons/comments.gif";
 
     /** _more_ */
-    public static final String ICON_DOWNARROW = "/downarrow.gif";
+    public static final String ICON_DOWNARROW = "/icons/downarrow.gif";
 
     /** _more_ */
-    public static final String ICON_GRAYRECT = "/grayrect.gif";
+    public static final String ICON_GRAYRECT = "/icons/grayrect.gif";
 
     /** _more_ */
-    public static final String ICON_GRAYRECTARROW = "/grayrectarrow.gif";
+    public static final String ICON_GRAYRECTARROW = "/icons/grayrectarrow.gif";
 
     /** _more_ */
-    public static final String ICON_TOOLS = "/tools.gif";
+    public static final String ICON_TOOLS = "/icons/tools.gif";
 
     /** _more_          */
-    public static final String ICON_ERROR = "/error.png";
+    public static final String ICON_ERROR = "/icons/error.png";
 
     /** _more_          */
-    public static final String ICON_QUESTION = "/question.png";
+    public static final String ICON_QUESTION = "/icons/question.png";
 
     /** _more_          */
-    public static final String ICON_WARNING = "/warning.png";
+    public static final String ICON_WARNING = "/icons/warning.png";
 
     /** _more_          */
-    public static final String ICON_PROGRESS = "/progress.gif";
+    public static final String ICON_PROGRESS = "/icons/progress.gif";
 
     /** _more_          */
-    public static final String ICON_INFORMATION = "/information.png";
+    public static final String ICON_INFORMATION = "/icons/information.png";
 
     /** _more_ */
-    public static final String ICON_RIGHTARROW = "/rightarrow.gif";
+    public static final String ICON_RIGHTARROW = "/icons/rightarrow.gif";
 
     /** _more_ */
-    public static final String ICON_FOLDER = "/folder.gif";
+    public static final String ICON_FOLDER = "/icons/folder.gif";
 
     /** _more_ */
-    public static final String ICON_FOLDER_OPEN = "/folderopen.gif";
+    public static final String ICON_FOLDER_OPEN = "/icons/folderopen.gif";
 
     /** _more_ */
-    public static final String ICON_FOLDER_CLOSED = "/folderclosed.gif";
+    public static final String ICON_FOLDER_CLOSED = "/icons/folderclosed.gif";
 
     /** _more_ */
-    public static final String ICON_FILE = "/file.gif";
+    public static final String ICON_FILE = "/icons/file.gif";
 
-    public static final String ICON_IMAGE = "/image.gif";
-    public static final String ICON_DATA = "/data.gif";
-
-    /** _more_ */
-    public static final String ICON_PLUS = "/plus.gif";
+    public static final String ICON_IMAGE = "/icons/image.gif";
+    public static final String ICON_DATA = "/icons/data.gif";
 
     /** _more_ */
-    public static final String ICON_MINUS = "/minus.gif";
+    public static final String ICON_PLUS = "/icons/plus.gif";
 
     /** _more_ */
-    public static final String ICON_DELETE = "/delete.gif";
+    public static final String ICON_MINUS = "/icons/minus.gif";
 
     /** _more_ */
-    public static final String ICON_FETCH = "/fetch.gif";
+    public static final String ICON_DELETE = "/icons/delete.gif";
 
     /** _more_ */
-    public static final String ICON_SEARCH = "/search.gif";
+    public static final String ICON_FETCH = "/icons/fetch.gif";
 
     /** _more_ */
-    public static final String ICON_RIGHT = "/right.gif";
+    public static final String ICON_SEARCH = "/icons/search.gif";
 
     /** _more_ */
-    public static final String ICON_ASSOCIATION = "/association.gif";
+    public static final String ICON_RIGHT = "/icons/right.gif";
 
     /** _more_ */
-    public static final String ICON_GRAPH = "/graph.gif";
+    public static final String ICON_ASSOCIATION = "/icons/association.gif";
 
     /** _more_ */
-    public static final String ICON_EDIT = "/edit.gif";
+    public static final String ICON_GRAPH = "/icons/graph.gif";
 
     /** _more_ */
-    public static final String ICON_NEW = "/new.gif";
+    public static final String ICON_EDIT = "/icons/edit.gif";
 
     /** _more_ */
-    public static final String ICON_ARROW = "/arrow.gif";
+    public static final String ICON_NEW = "/icons/new.gif";
+
+    /** _more_ */
+    public static final String ICON_ARROW = "/icons/arrow.gif";
 
 
     /** _more_ */
-    public static final String ICON_BLANK = "/blank.gif";
+    public static final String ICON_BLANK = "/icons/blank.gif";
 
     /** _more_ */
-    public static final String ICON_LEFT = "/left.gif";
+    public static final String ICON_LEFT = "/icons/left.gif";
 
 
     public static final String ATTR_PARENT = "parent";
@@ -962,6 +964,7 @@ public interface Constants {
     public  static final String ARG_YEAR = "year";
     public  static final String ARG_MONTH = "month";
     public  static final String ARG_DAY = "day";
+    public  static final String ARG_SHOWYEAR = "showyear";
 
 
 }

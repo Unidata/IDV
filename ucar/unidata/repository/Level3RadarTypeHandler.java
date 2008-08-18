@@ -96,7 +96,7 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
                     "http://radar.weather.gov/radar.php", "rid",
                     (String) entry.getValues()[0], "product",
                     (String) entry.getValues()[1]), repository.fileUrl(
-                        "/radar.gif"), "Show NWS Radar Site"));
+                        "/icons/radar.gif"), "Show NWS Radar Site"));
     }
 
 
