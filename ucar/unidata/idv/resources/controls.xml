@@ -357,7 +357,7 @@ example:
      label="Streamline Plan View"
      doeslevels="true"
      displaycategory="Flow Displays"
-     properties="streamlines=true;displayName=Steamline Plan View;">
+     properties="streamlines=true;displayName=Streamline Plan View;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
   <control
