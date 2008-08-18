@@ -330,14 +330,20 @@ function getDateFromFormat(val,format) {
 	var mm=now.getMinutes();
 	var ss=now.getSeconds();
 	var ampm="";
+
+        //jeffmc: check for trailing time
+        /*        var index = val.indexOf(' ');
+        if(index>0) {
+            val = val.substring(0, index);
+            }*/
 	
 	while (i_format < format.length) {
 		// Get next token from format string
 		c=format.charAt(i_format);
 		token="";
 		while ((format.charAt(i_format)==c) && (i_format < format.length)) {
-			token += format.charAt(i_format++);
-			}
+                    token += format.charAt(i_format++);
+		}
 		// Extract contents of value based on format token
 		if (token=="yyyy" || token=="yy" || token=="y") {
 			if (token=="yyyy") { x=4;y=4; }
@@ -1188,10 +1194,9 @@ function CP_select(inputobj, linkname, format) {
 	var time=0;
 	if (selectedDate!=null) {
 		time = getDateFromFormat(selectedDate,format)
-		}
-	else if (inputobj.value!="") {
+	} else if (inputobj.value!="") {
 		time = getDateFromFormat(inputobj.value,format);
-		}
+	}
 	if (selectedDate!=null || inputobj.value!="") {
 		if (time==0) { this.currentDate=null; }
 		else { this.currentDate=new Date(time); }

@@ -209,6 +209,9 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     protected static SimpleDateFormat sdf;
 
+    protected static SimpleDateFormat dateSdf = new SimpleDateFormat("yyyy-MM-dd");
+    protected static SimpleDateFormat timeSdf = new SimpleDateFormat("HH:mm:ss z");
+
 
 
     public RepositoryBase() {

@@ -80,6 +80,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CART = "/icons/cart.gif";
 
+    public static final String ICON_RANGE = "/icons/range.gif";
+
     public static final String ICON_CALENDAR = "/icons/calendar.gif";
 
     /** _more_          */
@@ -556,6 +558,10 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_FROMDATE = "fromdate";
+
+    public static final String ARG_FROMDATE_TIME = ARG_FROMDATE+".time";
+    public static final String ARG_TODATE_TIME = ARG_TODATE+".time";
+
 
     /** _more_          */
     public static final String ARG_FILESUFFIX = "filesuffix";

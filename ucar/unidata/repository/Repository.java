@@ -2771,7 +2771,7 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         sb.append(HtmlUtil.form(request.url(URL_ENTRY_SEARCH, ARG_NAME,
-                                            WHAT_ENTRIES)));
+                                            WHAT_ENTRIES)," name=\"searchform\" "));
 
 
         //Put in an empty submit button so when the user presses return 
@@ -7633,10 +7633,26 @@ public class Repository extends RepositoryBase implements Tables,
     public String getCalendarSelector(String formName, String fieldName) {
         String anchorName = "anchor." + fieldName;
         String divName = "div." + fieldName;
-        return "<A HREF=\"#\"   onClick=\"selectDate('" + divName +"',document.forms['" + formName +"']." + fieldName+",'" + anchorName +"','yyyy-dd-MM'); return false;\"   NAME=\"" + anchorName +"\" ID=\"" + anchorName +"\">"+
+        return "<A HREF=\"#\"   onClick=\"selectDate('" + divName +"',document.forms['" + formName +"']." + fieldName+",'" + anchorName +"','yyyy-MM-dd'); return false;\"   NAME=\"" + anchorName +"\" ID=\"" + anchorName +"\">"+
             HtmlUtil.img(fileUrl(ICON_CALENDAR)," Choose date", " border=0")+
             "</A>" +
             "<DIV ID=\"" + divName+"\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
+    }
+
+    public String makeDateInput(Request request, String name, String formName, Date date) {
+        String dateHelp =
+            "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
+        String timeHelp =
+            "hh::mm:ss Z, e.g. 20:15:00 MST";
+
+
+        String dateString =  (date==null?"": dateSdf.format(date));
+        String timeString =  (date==null?"": timeSdf.format(date));
+
+        return HtmlUtil.input(name, dateString,
+                              HtmlUtil.SIZE_8+ " title=\"" + dateHelp + "\"") + 
+            getCalendarSelector(formName, name) + " T:" +
+            HtmlUtil.input(name+".time",timeString,HtmlUtil.SIZE_10+ " title=\"" + timeHelp + "\"");
     }
 
 

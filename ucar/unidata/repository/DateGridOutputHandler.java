@@ -309,6 +309,7 @@ public class DateGridOutputHandler extends OutputHandler {
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {
         GregorianCalendar now = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        boolean hadDate = request.defined(ARG_MONTH);
         int todayDay = now.get(now.DAY_OF_MONTH);
         int todayMonth = now.get(now.MONTH);
         int todayYear = now.get(now.YEAR);
@@ -320,8 +321,49 @@ public class DateGridOutputHandler extends OutputHandler {
         int               nextYear  =  (month==11?year+1:year);
 
 
-        if(request.get(ARG_SHOWYEAR, false)) {
+
+        int someMonth=0;
+        int someYear = 0;
+
+        Hashtable<String,List> map = new Hashtable<String,List>();
+        GregorianCalendar mapCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        int cnt = 0;
+        boolean didone = false;
+        for(int tries=0;tries<2;tries++) {
+            for (Entry entry : entries) {
+                mapCal.setTime(new Date(entry.getStartDate()));
+                int entryMonth =mapCal.get(mapCal.MONTH);
+                int entryYear =mapCal.get(mapCal.YEAR);
+                if(cnt==0) {
+                    someMonth = entryMonth;
+                    someYear = entryYear;
+                }
+                cnt++;
+                if(entryYear<=prevYear  && entryMonth<prevMonth) continue;
+                if(entryYear>=nextYear  && entryMonth>nextMonth) continue;
+                String key  = entryYear+"/"  + entryMonth + "/" + mapCal.get(mapCal.DAY_OF_MONTH);
+                List dayList = map.get(key);
+                if(dayList == null) map.put(key, dayList = new ArrayList());
+                String label = entry.getLabel();
+                if(label.length()>20) {
+                    label = label.substring(0,19)+"...";
+                }
+                dayList.add(getAjaxLink(request, entry, label, true));
+                didone = true;
+            }
+            if(didone|| hadDate) {
+                break;
+            }
+            if(cnt>0) {
+                month  = someMonth;
+                year   = someYear;
+                prevMonth  = (month==0?11:month-1);
+                prevYear  = (month==0?year-1:year);
+                nextMonth  = (month==11?0:month+1);
+                nextYear  =  (month==11?year+1:year);
+            }
         }
+
 
         GregorianCalendar cal = new GregorianCalendar(year, month, 1);
         SimpleDateFormat headerSdf = new SimpleDateFormat("MMMMM yyyy");
@@ -352,23 +394,6 @@ public class DateGridOutputHandler extends OutputHandler {
         sb.append(
             "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
 
-        Hashtable<String,List> map = new Hashtable<String,List>();
-        GregorianCalendar mapCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        for (Entry entry : entries) {
-            mapCal.setTime(new Date(entry.getStartDate()));
-            int entryMonth =mapCal.get(mapCal.MONTH);
-            int entryYear =mapCal.get(mapCal.YEAR);
-            if(entryYear<=prevYear  && entryMonth<prevMonth) continue;
-            if(entryYear>=nextYear  && entryMonth>nextMonth) continue;
-            String key  = entryYear+"/"  + entryMonth + "/" + mapCal.get(mapCal.DAY_OF_MONTH);
-            List dayList = map.get(key);
-            if(dayList == null) map.put(key, dayList = new ArrayList());
-            String label = entry.getLabel();
-            if(label.length()>20) {
-                label = label.substring(0,19)+"...";
-            }
-            dayList.add(getAjaxLink(request, entry, label, true));
-        }
 
         String[] dayNames = {
             "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"

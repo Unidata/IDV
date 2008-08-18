@@ -982,6 +982,10 @@ public class Request implements Constants {
         if (v == null) {
             return dflt;
         }
+        if (defined(name+".time")) {
+            v = v + " " +getUnsafeString(name+".time","");
+        }
+
         //TODO:Check value
         return v;
     }
@@ -1075,7 +1079,6 @@ public class Request implements Constants {
         String fromDate = "";
         String toDate   = "";
         if (defined(from) || defined(to)) {
-
             fromDate = (String) getDateSelect(from, "").trim();
             toDate   = (String) getDateSelect(to, "").trim();
         } else if (defined(ARG_RELATIVEDATE)) {

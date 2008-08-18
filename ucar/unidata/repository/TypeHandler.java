@@ -695,8 +695,8 @@ public class TypeHandler extends RepositoryManager {
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date Range"),
-                            formatDate(request, entry.getStartDate())
-                            + " -- "
+                            formatDate(request, entry.getStartDate()) +
+                                                 HtmlUtil.space(1) +HtmlUtil.img(getRepository().fileUrl(ICON_RANGE)) +HtmlUtil.space(1) 
                             + formatDate(request, entry.getEndDate())));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
@@ -1022,30 +1022,34 @@ public class TypeHandler extends RepositoryManager {
         }
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";
-        String fromDate = ((entry != null)
+        /*        String fromDate = ((entry != null)
                            ? formatDate(request,
                                         new Date(entry.getStartDate()))
                            : BLANK);
         String toDate = ((entry != null)
                          ? formatDate(request, new Date(entry.getEndDate()))
-                         : BLANK);
+                         : BLANK);*/
+
+        Date fromDate = (entry != null?
+                         new Date(entry.getStartDate()):null);
+        Date toDate = (entry != null?
+                         new Date(entry.getEndDate()):null);
+
+
         if (okToShowInForm(ARG_DATE)) {
             if ( !okToShowInForm(ARG_TODATE)) {
                 sb.append(HtmlUtil.formEntry("Date:",
-                                             HtmlUtil.input(ARG_FROMDATE,
-                                                 fromDate,
-                                                     HtmlUtil.SIZE_30)));
-            } else {
+                                             getRepository().makeDateInput(request,ARG_FROMDATE, "entryform", fromDate)));
 
+            } else {
                 sb.append(
                     HtmlUtil.formEntry(
                         "Date Range:",
-                        HtmlUtil.input(
-                            ARG_FROMDATE, fromDate,
-                            HtmlUtil.SIZE_30) + getRepository().getCalendarSelector("entryform", ARG_FROMDATE) +" -- "
-                                + HtmlUtil.input(
-                                    ARG_TODATE, toDate,
-                                    HtmlUtil.SIZE_30) + getRepository().getCalendarSelector("entryform", ARG_TODATE) +HtmlUtil.space(2) + dateHelp));
+                        getRepository().makeDateInput(request,ARG_FROMDATE, "entryform", fromDate) +
+                        HtmlUtil.space(1)+  HtmlUtil.img(getRepository().fileUrl(ICON_RANGE)) + HtmlUtil.space(1) +
+                        //                        " <b>--</b> " +
+                        getRepository().makeDateInput(request,ARG_TODATE, "entryform", toDate) +
+                        HtmlUtil.space(2)));
             }
             if (entry == null) {
                 List datePatterns = new ArrayList();
@@ -1261,19 +1265,15 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        String dateHelp =
-            " (e.g., 2007-12-11 00:00:00, now, -1 week, +3 days, etc.)";
+
 
         basicSB.append(
             HtmlUtil.formEntry(
                 msgLabel("Date Range"),
-                HtmlUtil.input(
-                    ARG_FROMDATE, minDate,
-                    " title=\"" + dateHelp + "\"") + " -- "
-                        + HtmlUtil.input(
-                            ARG_TODATE, maxDate,
-                            " title=\"" + dateHelp + "\"") + HtmlUtil.space(
-                                2) + msgLabel("Or") + dateSelectInput));
+                getRepository().makeDateInput(request,ARG_FROMDATE, "searchform", null) +
+                HtmlUtil.space(1) + HtmlUtil.img(getRepository().fileUrl(ICON_RANGE)) + HtmlUtil.space(1)  +
+                getRepository().makeDateInput(request,ARG_TODATE, "searchform", null) +
+                HtmlUtil.space(4) + msgLabel("Or") + dateSelectInput));
 
         if (advancedForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
