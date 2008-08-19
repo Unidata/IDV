@@ -84,6 +84,8 @@ Next, create an xml file that defines the entries you want to create.
 
 <ul>
 <li> The type attribute is the data types available in RAMADDA. Its best to stay with file and group. 
+<li> The parent is the actual parent id in RAMADDA.
+<li> The fromdata, todate, south, west, east, north and description are all optional. 
 <li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere. For example, you
 could create a group entry and then another entry that is a child of the group:
 <pre>
@@ -103,22 +105,36 @@ could create a group entry and then another entry that is a child of the group:
 </pre>
 
 
-<li> The parent is the actual parent id in RAMADDA.
-<li> The fromdata, todate, south, west, east, north and description are all optional. 
 </ul>
 
 <p>
 Now, zip up this xml file along with the file you want to upload and then post the zipped file to:
 <pre>http://&lt;server&gt;/repository/entry/xmlcreate</pre>
 
-Including the arguments:
+
+Include the arguments:
 <pre>
 output=xml
 sessionid=&lt;sessionid&gt;
 file=thezipfile
 </pre>
 
-You will get back the response xml with either code=ok and a list of the entry ids created:
+
+If you are not uploading files you can just post the xml file instead of the zip file.
+In that case instead of a file= attribute in the xml use url=, e.g.,:
+<pre>
+ &lt;entries&gt;
+  &lt;entry name="Some opendap url" 
+            type="file" 
+            id="0" 
+            url="the opendap url"  
+            parent="0/0" 
+&lt;/entries&gt;
+</pre>
+
+
+
+Either way, you will get back the response xml with either code=ok and a list of the entry ids created:
 <pre>
 &lt;response code="ok"&gt;
   &lt;entry id="1219161636252_0.6145187911490728_17"/&gt;
