@@ -23,7 +23,9 @@
 
 
 
+
 package ucar.unidata.xml;
+
 
 import org.w3c.dom.*;
 
@@ -49,18 +51,19 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import java.security.SignatureException;
+
 
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-
-import javax.xml.parsers.*;
-import java.security.SignatureException;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+
+import javax.xml.parsers.*;
 
 
 
@@ -169,6 +172,14 @@ public abstract class XmlUtil {
         return " " + name + "=" + quote(encodeString(value)) + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String attrs(String name, String value) {
         return " " + name + "=" + quote(encodeString(value)) + " ";
     }
@@ -268,6 +279,13 @@ public abstract class XmlUtil {
                              : "") + attrs + ">";
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static String openTag(String name) {
         return "<" + name + ">\n";
     }
@@ -980,29 +998,158 @@ public abstract class XmlUtil {
     }
 
 
-    public static Element create(Document doc, String tag, Element parent) throws Exception {
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(String tag, Element parent)
+            throws Exception {
+        return create(parent.getOwnerDocument(), tag, parent);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     * @param parent _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(String tag, Element parent, List attrs)
+            throws Exception {
+        return create(parent.getOwnerDocument(), tag, parent, attrs);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag) throws Exception {
+        return create(doc, tag, null);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag, Element parent)
+            throws Exception {
         Element child = doc.createElement(tag);
-        if(parent!=null) parent.appendChild(child);
+        if (parent != null) {
+            parent.appendChild(child);
+        }
         return child;
     }
 
 
-    public static Element create(Document doc, String tag, Element parent,String[]attrs) throws Exception {
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag, Element parent,
+                                 List attrs)
+            throws Exception {
         Element child = create(doc, tag, parent);
-        if(attrs!=null)
-            setAttributes(child, attrs);
+        if (attrs != null) {
+            setAttributes(child, Misc.listToStringArray(attrs));
+        }
         return child;
     }
 
-    public static Element create(Document doc, String tag, Element parent, String text,String[]attrs) throws Exception {
-        Element child = create(doc, tag, parent,attrs);
-        Text textNode = doc.createTextNode(text);
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag, Element parent,
+                                 String[] attrs)
+            throws Exception {
+        Element child = create(doc, tag, parent);
+        if (attrs != null) {
+            setAttributes(child, attrs);
+        }
+        return child;
+    }
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param text _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag, Element parent,
+                                 String text, String[] attrs)
+            throws Exception {
+        Element child    = create(doc, tag, parent, attrs);
+        Text    textNode = doc.createTextNode(text);
         child.appendChild(textNode);
         return child;
     }
 
-    public static Element create(Document doc, String tag, Element parent, String text) throws Exception {
-        return create(doc, tag, parent,text, null);
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(Document doc, String tag, Element parent,
+                                 String text)
+            throws Exception {
+        return create(doc, tag, parent, text, null);
     }
 
 
@@ -1018,7 +1165,9 @@ public abstract class XmlUtil {
     public static Element getRoot(String filename, Class originClass)
             throws Exception {
         Document doc = getDocument(filename, originClass);
-        if(doc == null) return null;
+        if (doc == null) {
+            return null;
+        }
         return doc.getDocumentElement();
     }
 
@@ -1107,14 +1256,18 @@ public abstract class XmlUtil {
      */
     public static Element findAncestor(Element child, String tagName) {
         Object parentObj = child.getParentNode();
-        if(!(parentObj instanceof Element)) return null;
+        if ( !(parentObj instanceof Element)) {
+            return null;
+        }
         Element parent = (Element) parentObj;
         while (parent != null) {
             if (parent.getTagName().equals(tagName)) {
                 return parent;
             }
             parentObj = parent.getParentNode();
-            if(!(parentObj instanceof Element)) return null;
+            if ( !(parentObj instanceof Element)) {
+                return null;
+            }
             parent = (Element) parentObj;
         }
         return null;
@@ -1144,7 +1297,7 @@ public abstract class XmlUtil {
      */
     private static class MyErrorHandler implements ErrorHandler {
 
-        /** _more_          */
+        /** _more_ */
         StringBuffer errors = new StringBuffer();
 
         /**
@@ -1341,12 +1494,24 @@ public abstract class XmlUtil {
     }
 
 
-    public static void appendCdataBytes(StringBuffer sb, byte[]bytes) {
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param bytes _more_
+     */
+    public static void appendCdataBytes(StringBuffer sb, byte[] bytes) {
         sb.append("<![CDATA[");
         sb.append(encodeBase64(bytes));
         sb.append("]]>");
     }
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param s _more_
+     */
     public static void appendCdata(StringBuffer sb, String s) {
         sb.append("<![CDATA[");
         sb.append(s);
@@ -1355,7 +1520,15 @@ public abstract class XmlUtil {
 
 
 
-    public static CDATASection makeCDataNode(Document doc,String text) {
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param text _more_
+     *
+     * @return _more_
+     */
+    public static CDATASection makeCDataNode(Document doc, String text) {
         return doc.createCDATASection(XmlUtil.encodeBase64(text.getBytes()));
     }
 
