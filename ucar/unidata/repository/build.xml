@@ -124,7 +124,7 @@
         <copy  file="${ramaddadir}/README" todir="${releasedir}"/>
         <delete file="${libsdir}/ramadda.tar"/>
         <tar 
-            destfile="${libsdir}/ramadda.${version}.tar">
+            destfile="${libsdir}/ramadda${version}.tar">
           <tarfileset dir="${releasedir}"
               prefix="ramadda${version}">
               <include name="*"/>

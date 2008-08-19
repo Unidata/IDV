@@ -557,7 +557,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
 
                 String xml = XmlUtil.toString(root);
-                System.out.println(xml);
+                //                System.out.println(xml);
 
                 zos.putNextEntry(new ZipEntry("entries.xml"));
                 byte[] bytes = xml.getBytes();
@@ -577,7 +577,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                              + result[0]);
                     return;
                 }
-                System.out.println(result[1]);
+                //                System.out.println(result[1]);
                 Element response = XmlUtil.getRoot(result[1]);
 
                 if (repositoryClient.responseOk(response)) {

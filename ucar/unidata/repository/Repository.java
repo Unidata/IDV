@@ -3829,6 +3829,7 @@ public class Repository extends RepositoryBase implements Tables,
         try {
             return processEntryXmlCreateInner(request);
         } catch (Exception exc) {
+            exc.printStackTrace();
             if (request.getOutput().equals("xml")) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
                         XmlUtil.attr(ATTR_CODE, "error"),
@@ -7409,6 +7410,7 @@ public class Repository extends RepositoryBase implements Tables,
                     metadataStmt.setString(col++, metadata.getId());
                     metadataStmt.setString(col++, metadata.getEntryId());
                     metadataStmt.setString(col++, metadata.getType());
+                    metadataStmt.setInt(col++, metadata.getInherited()?1:0);
                     metadataStmt.setString(col++, metadata.getAttr1());
                     metadataStmt.setString(col++, metadata.getAttr2());
                     metadataStmt.setString(col++, metadata.getAttr3());
