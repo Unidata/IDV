@@ -566,16 +566,15 @@ public class OutputHandler extends RepositoryManager {
         List   items          = new ArrayList();
         String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
+        String offextra    = " class=\"subnavoffcomp\" ";
+        String onextra = " class=\"subnavoncomp\" ";
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, (String) outputType.getId());
             if (outputType.getId().equals(output)) {
-                items.add(msg(outputType.toString()));
+                items.add(HtmlUtil.span(msg(outputType.toString()),onextra));
             } else {
                 String url = outputType.assembleUrl(request);
-                //request.getRequestPath() + outputType.getSuffix() +"?"
-                //                    + request.getUrlArgs(ARG_MESSAGE);
-                items.add(HtmlUtil.href(url, msg(outputType.toString()),
-                                        " class=\"subnavlink\" "));
+                items.add(HtmlUtil.span(HtmlUtil.href(url, msg(outputType.toString())), offextra));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);
@@ -583,7 +582,6 @@ public class OutputHandler extends RepositoryManager {
             request.put(ARG_MESSAGE, initialMessage);
         }
         return items;
-
     }
 
 

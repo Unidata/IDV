@@ -1205,13 +1205,8 @@ public class UserManager extends RepositoryManager {
      */
     private Result makeResult(Request request, String title,
                               StringBuffer sb) {
-        Result result = new Result(title, sb);
-        if ( !request.getUser().getAnonymous()) {
-            result.putProperty(PROP_NAVSUBLINKS,
-                               getRepository().getSubNavLinks(request,
-                                   userUrls));
-        }
-        return result;
+        return getRepository().makeResult(request, title, sb, 
+                                          (request.getUser().getAnonymous()?null:userUrls));
     }
 
 

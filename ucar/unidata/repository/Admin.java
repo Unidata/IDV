@@ -575,11 +575,7 @@ public class Admin extends RepositoryManager {
     protected Result makeResult(Request request, String title,
                                 StringBuffer sb)
             throws Exception {
-        Result result = new Result(title, sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
+        return getRepository().makeResult(request, title, sb, adminUrls);
     }
 
 

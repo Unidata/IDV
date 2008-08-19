@@ -1907,12 +1907,13 @@ public class Repository extends RepositoryBase implements Tables,
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml = HtmlUtil.space(1);
         if (links != null) {
-            linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
+            linksHtml = StringUtil.join("<span class=\"separator\">&nbsp;|&nbsp;</span>", links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = BLANK;
         if (sublinks != null) {
-            sublinksHtml = StringUtil.join("\n&nbsp;|&nbsp;\n", sublinks);
+            //            sublinksHtml = StringUtil.join("\n&nbsp;|&nbsp;\n", sublinks);
+            sublinksHtml = StringUtil.join("", sublinks);
         }
 
         html = StringUtil.replace(html, "${links}", linksHtml);
@@ -2875,6 +2876,19 @@ public class Repository extends RepositoryBase implements Tables,
         return getSubNavLinks(request, urls, BLANK);
     }
 
+    public Result makeResult(Request request, String title,
+                             StringBuffer sb, RequestUrl []links) {
+        Result result = new Result(title, sb);
+        if(links!=null) {
+            result.putProperty(PROP_NAVSUBLINKS,
+                               getRepository().getSubNavLinks(request,
+                                                              links));
+        }
+        return result;
+    }
+
+
+
     /**
      * _more_
      *
@@ -2887,8 +2901,8 @@ public class Repository extends RepositoryBase implements Tables,
     protected List getSubNavLinks(Request request, RequestUrl[] urls,
                                   String arg) {
         List   links    = new ArrayList();
-        String extra    = " class=\"subnavlink\" ";
-        String notextra = " class=\"subnavnolink\" ";
+        String offextra    = " class=\"subnavoffcomp\" ";
+        String onextra = " class=\"subnavoncomp\" ";
         String type     = request.getRequestPath();
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
@@ -2897,10 +2911,10 @@ public class Repository extends RepositoryBase implements Tables,
                 label = urls[i].toString();
             }
             if (urls[i].toString().equals(type)) {
-                links.add(HtmlUtil.span(label, notextra));
+                links.add(HtmlUtil.span(label, onextra));
             } else {
                 links.add(HtmlUtil.href(request.url(urls[i]) + arg, label,
-                                        extra));
+                                        offextra));
             }
         }
         return links;

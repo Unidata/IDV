@@ -8,21 +8,105 @@ body {
 }
 
 
-td {
-   font-weight: normal;
+
+A {
+   color: #0000FF;
+   text-decoration: none;
+}
+
+A:link {
+   color: #0000FF;
+}
+
+
+a:hover {
+   color: #FF0000;
+   text-decoration: underline;
+}
+
+
+
+.header {
+  border-bottom : 1px #444466 solid;
+  background-repeat: no-repeat;
+  background-color:#006699;
+  color: white;
+  padding-top:3px;
+  padding-left:5px;
+  padding-right:5px;
+}
+
+a.header  {
+	color:white;
+}
+
+.header a:hover  {
+	color:red;
+}
+
+.subnav a:hover  {
+	color:red;
+}
+
+.header a {
+	color:white;
+}
+
+
+.headercontent {
+  font-size: 20pt;
+  color: white;
+}
+
+
+.nav {
    font-size: 10pt;
-   font-family: Arial, Helvetica, sans-serif;
-}
-
-.separator {
-   font-family:  monospaced;
    font-weight: bold;
-   font-size: 12pt;
+   color: black;
 }
 
-ul {
-   margin-top:5px;
+
+.subnav {
+   font-size: 10pt;
+   padding-left:5;   
+   padding-top:3;   
+   background-color : #cccccc;
+   font-weight: bold;
+   color: black;
 }
+
+
+.subnavoncomp  {
+   background-color : #ffffff;
+   padding-left:6;   
+   padding-right:6;   
+   color:#555555;
+}
+
+.subnavoffcomp  {
+   padding-left:6;   
+   padding-right:6;   
+   margin:0;
+}
+
+.subnavoffcomp  a {
+   color:#555555;
+}
+
+a.subnavoffcomp  {
+   color:#555555;
+}
+
+.subnavoffcomp a:visited {
+   color:#555555;
+}
+
+
+.subnavoffcomp a:hover {
+   color:red;
+}
+
+
 
 
 .content {
@@ -31,26 +115,24 @@ ul {
 
 
 
-
-
-A {
-   color: #0000FF
+td {
+   font-weight: normal;
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
 }
 
-A:link {
-   color: #0000FF
+.separator {
+   font-weight: bold;
+   font-size: 12pt;
+}
+
+
+ul {
+   margin-top:5px;
 }
 
 
 
-a:hover {
-   color: #FF0000;
-   text-decoration: underline
-}
-
-A {
-   text-decoration: none
-}
 
 
 
@@ -101,15 +183,8 @@ a.menulink {
 
 
 
-.header {
-  background-repeat: no-repeat;
-  background-color:#006699;
-  font-size: 22pt;
-  xfont-weight: bold;
-  color: white;
-  padding-top:5px;
-  padding-left:5px;
-}
+
+
 
 
 .pageheading {
@@ -139,28 +214,23 @@ a.menulink {
 
 
 .entryheader {
-   padding:0px;
-   margin:0px;
-   margin-left:0px;
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 10pt;
    color: #9C9C9C;
-   border-bottom : 2px #aabbaa solid;
+   border-bottom : 1px #aabbaa solid;
 }
-
 
 
 .entryname a:hover {
 	color:red;
 }
+
 .entryname a {
    color: #9C9C9C;
 }
 
 .entryname {
-   margin:0px;
-   padding:0px;
-   padding-left:10px;
+   padding-left:15px;
    font-weight: bold;
    font-size: 12pt;
    color: #9C9C9C;
@@ -211,10 +281,6 @@ a.pagesubheadinglink:visited {
 }
 
 
-a.navtitle:visited {
-   text-decoration: none;
-   color: #FFFFFF;
-}
 
 form {
     margin:0px;
@@ -228,32 +294,6 @@ form {
 
 
 
-.nav {
-   font-size: 12pt;
-   xxxbackground-color : #77aa77;
-   background-color : #77aa88;
-   xxxborder-bottom : 1px #666666 solid;
-   border-bottom : 1px #888888 solid;
-   margin:0px;
-   padding-top:1;
-   padding-bottom:1;
-   padding-left:3;
-   color: black;
-}
-
-
-.subnav {
-   font-size: 10pt;
-   font-weight: bold;
-   color: black;
-   border-bottom : 1px #666666 solid;
-   background-color : #aabbaa;
-   margin:0;
-   padding-top:2;   
-   padding-bottom:1;
-   padding-left:8;
-
-}
 
 
 .formgroupheader {
@@ -265,34 +305,6 @@ form {
 }
 
 
-.subnavnolink {
-   font-weight: bold;
-}
-
-
-a.subnavlink {
-    font-weight: bold;
-    text-decoration: none;
-    color:#ffffff;
-    font-size: 10pt;
-}
-
-
-
-a.navlink {
-  text-decoration: none;
-  color:#ffffff;
-  font-size: 10pt;
-  font-weight: bold;
-}
-
-
-
-.navnolink {
-  font-size: 10pt;
-  font-weight: bold;
-  color:black;
-}
 
 
 
@@ -327,6 +339,7 @@ a.navlink {
 .calentry {
 
 }
+
 
 
 
