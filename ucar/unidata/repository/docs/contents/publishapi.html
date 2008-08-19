@@ -1,0 +1,143 @@
+
+
+
+<html>
+<head>
+  <title>RAMADDA Publish API</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+You can programmatically create new entries on a RAMADDA server. There is a  Java class, ucar.unidata.repository.RepositoryClient, 
+that provides some of the facilities.  You can also look at the ucar.unidata.repository.idv.RamaddaPublisher which is used within the 
+IDV to publish content to RAMADDA. This class uses the ucar.unidata.repository.InteractiveRepositoryClient class that provides some 
+GUI facilities (e.g., a group JTree component).
+
+<p>
+
+
+
+
+
+
+Lets say you want to upload a file (e.g., test.png) to RAMADDA. First you need to establish a session with RAMADDA.
+You can just do a url get with:
+<pre>
+http://&lt;server&gt;/repository/user/login?output=xml&user.password=&lt;password&gt;&user.id=&lt;user&gt;
+</pre> 
+
+The output=xml tells RAMADDA to return the result as xml.
+<p>
+The above request returns xml of the form:
+<pre>
+&lt;response code="ok"&gt;
+sessionid
+&lt;/response&gt;
+</pre>
+
+Or if there was an error:
+<pre>
+&lt;response code="error"&gt;
+some error message
+&lt;/response&gt;
+</pre>
+
+
+Subsequent posts to RAMADDA just require an extra argument:
+<pre>sessionid=&lt;sessionid&gt;</pre>
+
+You can also use   RepositoryClient code:
+<pre>
+  RepositoryClient client = new RepositoryClient(server, 80, "/repository", userId,password);
+  String[] msg = { "" };
+  if (client.isValidSession(true, msg)) {
+       System.err.println("Valid session");
+   } else {
+        System.err.println("Invalid session:" + msg[0]);
+   }
+</pre>
+
+
+
+Next, create an xml file that defines the entries you want to create.  
+
+<pre>
+ &lt;entries&gt;
+  &lt;entry name="test.png" 
+            description=""  
+            type="file" 
+            id="0" 
+            file="test.png"  
+            parent="0/0" 
+            south="-7.926" 
+            west="-198.358"
+            north="71.864" 
+            east="-3.950"
+            fromdate="2008-08-19 16:01:00 GMT"
+            todate="2008-08-19 16:01:00 GMT" 
+ /&gt;
+&lt;/entries&gt;
+</pre>
+
+
+
+<ul>
+<li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere.
+<li> The type attribute is the data types available in RAMADDA. Its best to stay with file and group. 
+<li> The parent is the actual parent id in RAMADDA.
+<li> The fromdata, todate, south, west, east, north and description are all optional. 
+</ul>
+
+<p>
+Now, zip up this xml file along with the file you want to upload and then post the zipped file to:
+<pre>http://&lt;server&gt;/repository/entry/xmlcreate</pre>
+
+Including the arguments:
+<pre>
+output=xml
+sessionid=&lt;sessionid&gt;
+file=thezipfile
+</pre>
+
+You will get back the response xml with either code=ok and a list of the entry ids created:
+<pre>
+&lt;response code="ok"&gt;
+  &lt;entry id="1219161636252_0.6145187911490728_17"/&gt;
+&lt;/response&gt;
+</pre>
+
+Or an error response:
+<pre>
+&lt;response code="error"&gt;
+error message
+&lt;/response&gt;
+</pre>
+
+
+Here is a longer version of an entries file:
+
+
+
+<pre>
+&lt;entries&gt;
+  &lt;entry description="" east="-3.950" file="test.xidv" fromdate="2008-08-19 16:01:00 GMT" id="0" name="test.png" north="71.864" parent="0/0" south="-7.926" todate="2008-08-19 16:01:00 GMT" type="file" west="-198.358"/&gt;
+  &lt;entry east="-3.950" file="test.png" fromdate="2008-08-19 16:01:00 GMT" id="1" name="test.png - Product" north="71.864" parent="0/0" south="-7.926" todate="2008-08-19 16:01:00 GMT" type="file" west="-198.358"/&gt;
+  &lt;association from="0" name="generated product" to="1"/&gt;
+&lt;/entries&gt;
+</pre>
+
+With its response:
+<pre>
+&lt;response code="ok"&gt;
+  &lt;entry id="1219161636252_0.5912686911125428_33"/&gt;
+  &lt;entry id="1219161636252_0.34475975368841827_34"/&gt;
+  &lt;association id="1219161636252_0.18087075533515407_35"/&gt;
+&lt;/response&gt;
+</pre>
+
+
+
+
+</body>
+</html>

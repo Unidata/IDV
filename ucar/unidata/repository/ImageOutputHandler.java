@@ -195,7 +195,7 @@ public class ImageOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        Result result = makeResult(request, entries);
+        Result result = makeResult(request, group, entries);
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(
@@ -236,7 +236,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private Result makeResult(Request request, List<Entry> entries)
+    private Result makeResult(Request request, Group group, List<Entry> entries)
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();
@@ -345,7 +345,13 @@ public class ImageOutputHandler extends OutputHandler {
                                           repository.getUrlBase());
             sb = new StringBuffer(template);
         }
-        return new Result("Query Results", sb, getMimeType(output));
+        String[] crumbs = getRepository().getBreadCrumbs(request, group,
+                                                         false, "");
+        StringBuffer finalSB = new StringBuffer();
+        finalSB.append(crumbs[1]);
+        finalSB.append(HtmlUtil.p());
+        finalSB.append(sb);
+        return new Result(group.getName(), finalSB, getMimeType(output));
     }
 
 

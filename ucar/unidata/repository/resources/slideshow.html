@@ -187,7 +187,7 @@ function loadImage(intImageIndex) {
 	if (arrImages.length == 1) {
 		document.getElementById("photoFrame").className = "photoFrame expanded";
 	}
-	document.getElementById("photo").src = "${root}/loadingImage.gif";
+	document.getElementById("photo").src = "${root}/icons/loadingImage.gif";
 	document.getElementById("thumb" + lastActive).className = "thumbnail";
 	document.getElementById("photo").src = arrImages[intImageIndex];
 	document.getElementById("caption").innerHTML =  arrCaptions[intImageIndex];
@@ -281,10 +281,6 @@ function addImage(image,thumb,caption) {
 
 ${imagelist}
 
-//addImage("galleries/Stories/633260111339375000/Previews/02_RTR1ME8B.jpg",
-//"galleries/Stories/633260111339375000/SmallThumbnails/02_RTR1ME8B.jpg",
-//"Lebanese supporters of assassinated Prime Minister Rafik al-Hariri wave flags as blue balloons fly over Martyrs Square during a mass rally in Beirut February 14, 2007. &nbsp;REUTERS/Sharif Karim");
-//
 
 </script>
 
@@ -303,12 +299,12 @@ ${imagelist}
 <tr valign="top">
 <td>
 <div  class="thumbFrame">
-   <div><img id="controlUp" src="${root}/up.gif" alt="scroll up" border="0"></div>
+   <div><img id="controlUp" src="${root}/icons/up.gif" alt="scroll up" border="0"></div>
    <div class="thumbnails" id="thumbnails">
 	<div id="thumbTab">
              <script language="javascript">loadThumbs();</script></div>
 	</div>
-    <div><img id="controlDown" src="${root}/down.gif" alt="scroll down" border="0"></div>
+    <div><img id="controlDown" src="${root}/icons/down.gif" alt="scroll down" border="0"></div>
 </div>
 </td>
 
@@ -317,7 +313,7 @@ ${imagelist}
 	<table id="mainImage" class="mainImage" border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr>
 	<td id="mainPhotoContainer" valign="top">
-	<a href="javascript:nextPhoto();" id="photoArea"><img id="photo" src="${root}/loading.jpg" alt="Photo" title="Click for next image" border="0" width="500"></a>
+	<a href="javascript:nextPhoto();" id="photoArea"><img id="photo" src="${root}/icons/loading.jpg" alt="Photo" title="Click for next image" border="0" width="500"></a>
 	</td>
 	</tr>
 	</table>

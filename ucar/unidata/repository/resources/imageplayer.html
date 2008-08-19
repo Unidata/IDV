@@ -336,9 +336,9 @@ function setBoxes() {
       }
       imgAttrs = attr("border",0) + attr("width", width) + attr("height",10);
       box = tag("A", attr2("HREF","JavaScript: noop()", "onClick", call("setImage", i + ",-1")),
-                  span(attr("style", "background-color:" + color),img("${root}/blank.gif",imgAttrs + gotoalt)))+"&nbsp";
+                  span(attr("style", "background-color:" + color),img("${root}/icons/blank.gif",imgAttrs + gotoalt)))+"&nbsp";
       hidebox = tag("A", attr2("HREF","JavaScript: noop()", "onClick", call("toggleImageOk",i)),
-            span(attr("style", "background-color:" + hidecolor),img("${root}/blank.gif",imgAttrs + hidealt)))+"&nbsp;";
+            span(attr("style", "background-color:" + hidecolor),img("${root}/icons/blank.gif",imgAttrs + hidealt)))+"&nbsp;";
       boxes+=box;
       hideboxes+=hidebox;
     }

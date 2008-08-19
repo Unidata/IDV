@@ -40,7 +40,7 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.idv.publish.IdvPublisher;
 
-import ucar.unidata.repository.RepositoryClient;
+import ucar.unidata.repository.InteractiveRepositoryClient;
 
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.HttpFormEntry;
@@ -88,7 +88,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     .IdvPublisher implements ucar.unidata.repository.Constants {
 
     /** _more_ */
-    private RepositoryClient repositoryClient;
+    private InteractiveRepositoryClient repositoryClient;
 
 
     /**
@@ -106,7 +106,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      */
     public RamaddaPublisher(IntegratedDataViewer idv, Element element) {
         super(idv, element);
-        repositoryClient = new RepositoryClient();
+        repositoryClient = new InteractiveRepositoryClient();
     }
 
 
@@ -140,7 +140,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      */
     public void configure() {
         if (repositoryClient == null) {
-            repositoryClient = new RepositoryClient();
+            repositoryClient = new InteractiveRepositoryClient();
         }
         repositoryClient.showConfigDialog();
     }
@@ -163,7 +163,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      */
     public boolean isConfigured() {
         if (repositoryClient == null) {
-            repositoryClient = new RepositoryClient();
+            repositoryClient = new InteractiveRepositoryClient();
         }
         return repositoryClient.doConnect();
     }
@@ -474,10 +474,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     repositoryClient.formatDate(toDateFld.getDate());
                 int      cnt = 0;
                 Document doc = XmlUtil.makeDocument();
-                Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
-                                   new String[] {});
-
-
+                //Create the top level node
+                Element root = XmlUtil.create(doc, TAG_ENTRIES);
                 List tags = StringUtil.split(tagFld.getText().trim(),",",true,true);
 
                 String mainId    = (cnt++) + "";
@@ -492,6 +490,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 }
 
                 List attrs;
+                Element node;
+
+
+                //Create entry attributes
                 attrs = Misc.toList(new String[] {
                     ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
                     ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
@@ -505,13 +507,11 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 checkAndAdd(attrs, ATTR_SOUTH, southFld);
                 checkAndAdd(attrs, ATTR_EAST, eastFld);
                 checkAndAdd(attrs, ATTR_WEST, westFld);
-                Element node;
 
-                node = XmlUtil.create(doc, TAG_ENTRY, root,
-                                      Misc.listToStringArray(attrs));
 
+                //Create the entry node
+                node = XmlUtil.create(TAG_ENTRY, root,attrs);
                 repositoryClient.addTags(node,tags);
-
 
                 for (int i = 0; i < myDataSourcesCbx.size(); i++) {
                     if (((JCheckBox) myDataSourcesCbx.get(i)).isSelected()) {
@@ -534,8 +534,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     checkAndAdd(attrs, ATTR_EAST, eastFld);
                     checkAndAdd(attrs, ATTR_WEST, westFld);
 
-                    node = XmlUtil.create(doc, TAG_ENTRY, root,
-                                          Misc.listToStringArray(attrs));
+                    node = XmlUtil.create(TAG_ENTRY, root,attrs);
                     repositoryClient.addTags(node,tags);
                     if (bundleFile != null) {
                         repositoryClient.addAssociation(root,mainId,contentId,"generated product");
@@ -558,6 +557,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
 
                 String xml = XmlUtil.toString(root);
+                System.out.println(xml);
 
                 zos.putNextEntry(new ZipEntry("entries.xml"));
                 byte[] bytes = xml.getBytes();
@@ -567,21 +567,19 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 bos.close();
 
 
-                List entries = new ArrayList();
+                List<HttpFormEntry> entries = new ArrayList<HttpFormEntry>();
                 repositoryClient.addUrlArgs(entries);
                 entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
                         bos.toByteArray()));
-                String[] result =
-                    HttpFormEntry.doPost(
-                        entries,
-                        repositoryClient.URL_ENTRY_XMLCREATE.getFullUrl());
-
+                String[] result =repositoryClient.doPost(repositoryClient.URL_ENTRY_XMLCREATE,  entries);
                 if (result[0] != null) {
                     LogUtil.userErrorMessage("Error publishing:\n"
                                              + result[0]);
                     return;
                 }
+                System.out.println(result[1]);
                 Element response = XmlUtil.getRoot(result[1]);
+
                 if (repositoryClient.responseOk(response)) {
                     if (bundleFile != null) {
                         //TODO: get the id of the bundle created
@@ -639,7 +637,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      *
      *  @param value The new value for RepositoryClient
      */
-    public void setRepositoryClient(RepositoryClient value) {
+    public void setRepositoryClient(InteractiveRepositoryClient value) {
         repositoryClient = value;
     }
 
@@ -648,7 +646,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      *
      *  @return The RepositoryClient
      */
-    public RepositoryClient getRepositoryClient() {
+    public InteractiveRepositoryClient getRepositoryClient() {
         return repositoryClient;
     }
 

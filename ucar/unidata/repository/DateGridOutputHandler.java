@@ -348,7 +348,7 @@ public class DateGridOutputHandler extends OutputHandler {
                 if(label.length()>20) {
                     label = label.substring(0,19)+"...";
                 }
-                dayList.add(getAjaxLink(request, entry, label, true));
+                dayList.add("<nobr>" +getAjaxLink(request, entry, label, true)+"</nobr>");
                 didone = true;
             }
             if(didone|| hadDate) {

@@ -617,10 +617,12 @@ public class CatalogOutputHandler extends OutputHandler {
 
         if(entry.getDataType()!=null) {
             String type = entry.getDataType();
-            XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
-                           dataset, new String[] { ATTR_NAME,
-                                                   "idv.datatype",
-                                                   ATTR_VALUE, type});
+            if(false && type!=null && type.length()>0) {
+                XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
+                               dataset, new String[] { ATTR_NAME,
+                                                       "idv.datatype",
+                                                       ATTR_VALUE, type});
+            }
 
         }
 
