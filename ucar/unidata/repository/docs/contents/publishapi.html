@@ -76,15 +76,33 @@ Next, create an xml file that defines the entries you want to create.
             east="-3.950"
             fromdate="2008-08-19 16:01:00 GMT"
             todate="2008-08-19 16:01:00 GMT" 
- /&gt;
+
 &lt;/entries&gt;
 </pre>
 
 
 
 <ul>
-<li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere.
 <li> The type attribute is the data types available in RAMADDA. Its best to stay with file and group. 
+<li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere. For example, you
+could create a group entry and then another entry that is a child of the group:
+<pre>
+ &lt;entries&gt;
+  &lt;entry name="Some group" 
+            id="0"
+            parent="0/0" 
+            type="group"  /&gt;
+
+  &lt;entry name="test.png" 
+            description=""  
+            type="file" 
+            id="1" 
+            file="test.png"  
+            parent="0"  /&gt;
+&lt;/entries&gt;
+</pre>
+
+
 <li> The parent is the actual parent id in RAMADDA.
 <li> The fromdata, todate, south, west, east, north and description are all optional. 
 </ul>
