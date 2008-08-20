@@ -308,11 +308,14 @@ public class DateGridOutputHandler extends OutputHandler {
     private Result outputCalendar(Request request, Group group,
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {
+        boolean hadDateArgs = request.defined(ARG_YEAR) ||request.defined(ARG_MONTH) ||request.defined(ARG_DAY);
+
         GregorianCalendar now = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        boolean hadDate = request.defined(ARG_MONTH);
         int todayDay = now.get(now.DAY_OF_MONTH);
         int todayMonth = now.get(now.MONTH);
         int todayYear = now.get(now.YEAR);
+
+        int               day  = request.get(ARG_DAY,now.get(now.DAY_OF_MONTH));
         int               month  = request.get(ARG_MONTH,now.get(now.MONTH));
         int               year   = request.get(ARG_YEAR,now.get(now.YEAR));
         int               prevMonth  = (month==0?11:month-1);
@@ -321,7 +324,7 @@ public class DateGridOutputHandler extends OutputHandler {
         int               nextYear  =  (month==11?year+1:year);
 
 
-
+        int someDay=0;
         int someMonth=0;
         int someYear = 0;
 
@@ -332,9 +335,11 @@ public class DateGridOutputHandler extends OutputHandler {
         for(int tries=0;tries<2;tries++) {
             for (Entry entry : entries) {
                 mapCal.setTime(new Date(entry.getStartDate()));
+                int entryDay =mapCal.get(mapCal.DAY_OF_MONTH);
                 int entryMonth =mapCal.get(mapCal.MONTH);
                 int entryYear =mapCal.get(mapCal.YEAR);
                 if(cnt==0) {
+                    someDay = entryDay;
                     someMonth = entryMonth;
                     someYear = entryYear;
                 }
@@ -351,46 +356,68 @@ public class DateGridOutputHandler extends OutputHandler {
                 dayList.add("<nobr>" +getAjaxLink(request, entry, label, true)+"</nobr>");
                 didone = true;
             }
-            if(didone|| hadDate) {
+            if(didone|| hadDateArgs) {
                 break;
             }
             if(cnt>0) {
+                day  = someDay;
                 month  = someMonth;
                 year   = someYear;
                 prevMonth  = (month==0?11:month-1);
-                prevYear  = (month==0?year-1:year);
+                prevYear   = (month==0?year-1:year);
                 nextMonth  = (month==11?0:month+1);
                 nextYear  =  (month==11?year+1:year);
             }
         }
 
 
+        String[]navIcons = {"/icons/prevprev.gif",
+                         "/icons/prev.gif",
+                         "/icons/today.gif",
+                         "/icons/next.gif",
+                         "/icons/nextnext.gif"};
+
+        String[] navLabels = {"Last Year", "Last Month","Current Month","Next Month","Next Year"};
+        List<String> navUrls  = new ArrayList<String>();
+
         GregorianCalendar cal = new GregorianCalendar(year, month, 1);
         SimpleDateFormat headerSdf = new SimpleDateFormat("MMMMM yyyy");
 
         request.put(ARG_YEAR, ""+(year-1));
-        String prevprevNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/prevprev.gif"),"Last Year"," border=0 "));
-        request.put(ARG_YEAR, ""+(year+1));
-        String nextnextNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/nextnext.gif"),"Next Year"," border=0 "));
+        request.put(ARG_MONTH, ""+(month));
+        navUrls.add(request.getUrl());
 
-        request.remove(ARG_YEAR);
-        request.remove(ARG_MONTH);
-        String nowNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/today.gif"),"Current Month"," border=0 "));
 
-        request.put(ARG_MONTH, ""+prevMonth);
-        request.put(ARG_YEAR, ""+prevYear);
-        String prevNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/prev.gif"),"Previous Month"," border=0 "));
-        request.put(ARG_MONTH, ""+nextMonth);
+        request.put(ARG_YEAR, ""+(prevYear));
+        request.put(ARG_MONTH, ""+(prevMonth));
+        navUrls.add(request.getUrl());
+
+
+        request.put(ARG_YEAR, ""+(todayYear));
+        request.put(ARG_MONTH, ""+(todayMonth));
+        navUrls.add(request.getUrl());
+
+
         request.put(ARG_YEAR, ""+nextYear);
-        String nextNav = HtmlUtil.href(request.getUrl(),HtmlUtil.img(getRepository().fileUrl("/icons/next.gif"),"Next Month"," border=0 "));
+        request.put(ARG_MONTH, ""+nextMonth);
+        navUrls.add(request.getUrl());
 
+        request.put(ARG_YEAR, ""+(year+1));
+        request.put(ARG_MONTH, ""+(month));
+        navUrls.add(request.getUrl());
+
+
+        request.remove(ARG_DAY);
         request.remove(ARG_MONTH);
         request.remove(ARG_YEAR);
 
-        sb.append("<center><b>" +prevprevNav+HtmlUtil.space(1) +
-                  prevNav +HtmlUtil.space(1)+nowNav+HtmlUtil.space(1) +
-                  nextNav + HtmlUtil.space(1) + nextnextNav +"</b></center>");
-        sb.append("<center><b>" +headerSdf.format(cal.getTime()) +"</b></center>");
+        List navList = new ArrayList();
+        for(int i=0;i<navLabels.length;i++) {
+            navList.add(HtmlUtil.href(navUrls.get(i),
+                                      HtmlUtil.img(getRepository().fileUrl(navIcons[i]),navLabels[i]," border=\"0\"")));
+        }
+        sb.append(HtmlUtil.center(HtmlUtil.b(StringUtil.join(HtmlUtil.space(1),navList))));
+        sb.append(HtmlUtil.center(HtmlUtil.b(headerSdf.format(cal.getTime()))));
         sb.append(
             "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
 

@@ -279,7 +279,7 @@ public class TdsOutputHandler extends OutputHandler {
     public class NcDODSServlet extends opendap.servlet.AbstractServlet {
 
         /** _more_          */
-        public static final int CACHE_LIMIT = 2;
+        public static final int CACHE_LIMIT = 100;
 
         /** _more_ */
         Request repositoryRequest;

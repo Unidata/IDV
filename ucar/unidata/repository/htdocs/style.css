@@ -27,7 +27,7 @@ a:hover {
 
 
 .header {
-  border-bottom : 1px #444466 solid;
+  border-bottom : 1px #666666 solid;
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;
@@ -69,42 +69,46 @@ a.header  {
 .subnav {
    font-size: 10pt;
    padding-left:5;   
-   padding-top:5;   
+   xpadding-top:5;   
    background-color : #cccccc;
    font-weight: bold;
    color: black;
-   border-bottom : 1px #000000 solid;
+   border-bottom : 1px #666666 solid;
+   padding-top:6;   
 }
 
 
 .subnavoncomp  {
-   border-top : 1px #444466 solid;
-   border-left : 1px #444466 solid;   
-   border-right : 1px #444466 solid;
+   border-top : 1px #666666 solid;
+   border-left : 1px #666666 solid;   
+   border-right : 1px #666666 solid;
    border-bottom : 1px #ffffff solid;
    background-color : #ffffff;
    padding-left:6;   
    padding-right:6;   
-   color:#555555;
+   color:#000000;
+   padding-top:1;   
 }
 
 .subnavoffcomp  {
+   color:#000000;
    padding-left:6;   
    padding-right:6;   
    padding-bottom:2;   
+   padding-top:1;   
 }
 
 
 .subnavoffcomp  a {
-   color:#333333;
+   color:#000000;
 }
 
 a.subnavoffcomp  {
-   color:#333333;
+   color:#000000;
 }
 
 .subnavoffcomp a:visited {
-   color:#333333;
+   color:#000000;
 }
 
 
@@ -204,13 +208,12 @@ a.menulink {
    text-decoration: none;
    font-weight: bold;
    font-size: 12pt;
-   color: black;
    margin-bottom:0px;
 }
 
 .breadcrumbs a {
    text-decoration: none;
-   color: black;
+   color: #999999;
 }
 
 .breadcrumbs a:hover {
@@ -228,18 +231,18 @@ a.menulink {
 
 
 .entryname a:hover {
-	color:red;
+   text-decoration: underline;
+   color:red;
 }
 
 .entryname a {
-   color: #9C9C9C;
+   color: #000000;
 }
 
 .entryname {
    padding-left:15px;
    font-weight: bold;
    font-size: 12pt;
-   color: #9C9C9C;
    vertical-align: bottom;
 }
 

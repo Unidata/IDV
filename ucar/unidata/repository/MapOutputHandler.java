@@ -122,7 +122,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForGroup(Request request, Group group,
+    protected void xxxxgetOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
                                           List<Entry> entries,
                                           List<OutputType> types)
@@ -145,7 +145,7 @@ public class MapOutputHandler extends OutputHandler {
                                             List<Entry> entries,
                                             List<OutputType> types)
             throws Exception {
-        if (entries.size() > 0) {
+         if (entries.size() > 0) {
             boolean ok = false;
             for (Entry entry : entries) {
                 if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
@@ -156,8 +156,8 @@ public class MapOutputHandler extends OutputHandler {
             if ( !ok) {
                 return;
             }
+            types.add(new OutputType("Map", OUTPUT_MAP));
         }
-        types.add(new OutputType("Map", OUTPUT_MAP));
     }
 
 
