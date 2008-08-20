@@ -293,6 +293,10 @@ public class MetadataHandler extends RepositoryManager {
             throws Exception {}
 
 
+    public void addToBrowseSearchForm(Request request, StringBuffer sb)
+            throws Exception {}
+
+
     /**
      * _more_
      *

@@ -1394,7 +1394,7 @@ public class UserManager extends RepositoryManager {
             protected void getOutputTypesForEntries(Request request,
                     List<Entry> entries, List<OutputType> types)
                     throws Exception {
-                //                types.add(new OutputType("Cart", OUTPUT_CART));
+                types.add(new OutputType("Cart", OUTPUT_CART));
             }
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,

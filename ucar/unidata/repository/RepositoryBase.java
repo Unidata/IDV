@@ -59,7 +59,17 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final  RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
-                                                 "/entry/searchform");
+                                                                   "/entry/searchform","Advanced Search");
+
+    public final  RequestUrl URL_ENTRY_TEXTSEARCHFORM = new RequestUrl(this,
+                                                                   "/entry/textsearchform","Text Search");
+
+    public final  RequestUrl URL_ENTRY_BROWSESEARCHFORM = new RequestUrl(this,
+                                                                    "/entry/browsesearchform","Browse");
+
+    public  final RequestUrl[] searchUrls = {URL_ENTRY_TEXTSEARCHFORM, 
+                                             URL_ENTRY_SEARCHFORM,
+                                             URL_ENTRY_BROWSESEARCHFORM};
 
     /** _more_ */
     public final  RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
@@ -75,7 +85,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final  RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
-                                             "/entry/search");
+                                                               "/entry/search","Search");
 
     public final  RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(this,
                                              "/entry/xmlcreate");

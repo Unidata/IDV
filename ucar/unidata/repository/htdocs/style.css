@@ -31,7 +31,7 @@ a:hover {
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;
-  padding-top:6px;
+  padding-top:12px;
   padding-left:5px;
   padding-right:5px;
 }
@@ -75,6 +75,12 @@ a.header  {
    color: black;
    border-bottom : 1px #666666 solid;
    padding-top:6;   
+}
+
+
+.scrollablediv {
+   max-height: 350px; 
+   overflow-y: auto;
 }
 
 

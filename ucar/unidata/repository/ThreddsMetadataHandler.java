@@ -342,6 +342,42 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param type _more_
+     * @param doSelect _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToBrowseSearchForm(Request request, StringBuffer sb,
+                                Metadata.Type type, boolean doSelect)
+            throws Exception {
+
+        String url = request.url(getRepository().URL_ENTRY_SEARCH);
+        String[] values = getMetadataManager().getDistinctValues(request,
+                                                                 this, type);
+        if ((values == null) || (values.length == 0)) {
+            return;
+        }
+        sb.append("<p><b>Browse by " +type.getLabel()+"</b>");
+        sb.append("<div style=\"border: 1px #000000 solid; max-height: 150px; overflow-y: auto;\">");
+        for(int i=0;i<values.length;i++) {
+            String browseUrl = HtmlUtil.url(url, 
+                                            ARG_METADATA_TYPE + "." + type,type.toString(),
+                                            ARG_METADATA_ATTR1 + "." + type, values[i]);
+            sb.append(HtmlUtil.href(browseUrl,values[i]));
+            sb.append(HtmlUtil.br());
+        }
+        sb.append("</div>");
+
+    }
+
+
     /**
      * _more_
      *
@@ -358,6 +394,25 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         addToSearchForm(request, sb, TYPE_CREATOR, true);
         addToSearchForm(request, sb, TYPE_CONTRIBUTOR, true);
         addToSearchForm(request, sb, TYPE_PUBLISHER, true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToBrowseSearchForm(Request request, StringBuffer sb)
+            throws Exception {
+        addToBrowseSearchForm(request, sb, TYPE_DOCUMENTATION, false);
+        addToBrowseSearchForm(request, sb, TYPE_KEYWORD, true);
+        addToBrowseSearchForm(request, sb, TYPE_PROJECT, true);
+        addToBrowseSearchForm(request, sb, TYPE_CREATOR, true);
+        addToBrowseSearchForm(request, sb, TYPE_CONTRIBUTOR, true);
+        addToBrowseSearchForm(request, sb, TYPE_PUBLISHER, true);
     }
 
 

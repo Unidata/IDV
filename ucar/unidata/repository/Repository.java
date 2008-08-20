@@ -2702,19 +2702,6 @@ public class Repository extends RepositoryBase implements Tables,
      * _more_
      *
      * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processEntrySearchForm(Request request) throws Exception {
-        return processEntrySearchForm(request, false);
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
      * @param id _more_
      * @param label _more_
      * @param content _more_
@@ -2754,6 +2741,22 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processEntrySearchForm(Request request) throws Exception {
+        return xprocessEntrySearchForm(request, false);
+    }
+
+
+
     /**
      * _more_
      *
@@ -2764,12 +2767,70 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    public Result processEntrySearchForm(Request request,
+    public Result processEntryBrowseSearchForm(Request request)
+            throws Exception {
+
+        StringBuffer sb = new StringBuffer();
+        getMetadataManager().addToBrowseSearchForm(request, sb);
+        return  makeResult(request, msg("Search Form"), sb, searchUrls);
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param typeSpecific _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processEntryTextSearchForm(Request request)
+            throws Exception {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.form(request.url(URL_ENTRY_SEARCH, ARG_NAME,
+                                            WHAT_ENTRIES)," name=\"searchform\" "));
+
+
+        //Put in an empty submit button so when the user presses return 
+        //it acts like a regular submit (not a submit to change the type)
+        sb.append(HtmlUtil.submitImage(getUrlBase() + ICON_BLANK, "submit"));
+        TypeHandler typeHandler = getTypeHandler(request);
+        String output = (String) request.getOutput(BLANK);
+        String buttons = HtmlUtil.submit(msg("Search"), "submit");
+        sb.append("<table width=\"90%\" border=0><tr><td>");
+        typeHandler.addTextSearch(request, sb);
+        sb.append("</table>");
+        sb.append(HtmlUtil.p());
+        sb.append(buttons);
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.formClose());
+        return  makeResult(request, msg("Search Form"), sb, searchUrls);
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param typeSpecific _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result xprocessEntrySearchForm(Request request,
                                          boolean typeSpecific)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-
 
         sb.append(HtmlUtil.form(request.url(URL_ENTRY_SEARCH, ARG_NAME,
                                             WHAT_ENTRIES)," name=\"searchform\" "));
@@ -2785,13 +2846,6 @@ public class Repository extends RepositoryBase implements Tables,
             what = WHAT_ENTRIES;
         }
 
-        List whatList = Misc.toList(new Object[] {
-                            new TwoFacedObject("Entries", WHAT_ENTRIES),
-                            new TwoFacedObject("Data Types", WHAT_TYPE),
-                            new TwoFacedObject("Tags", WHAT_TAG),
-                            new TwoFacedObject("Associations",
-                                WHAT_ASSOCIATION) });
-        whatList.addAll(typeHandler.getListTypes(true));
 
         String output = (String) request.getOutput(BLANK);
         String buttons = buttons(HtmlUtil.submit(msg("Search"), "submit"),
@@ -2810,7 +2864,6 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         typeHandler.addToSearchForm(request, sb, where, true);
-
 
 
         StringBuffer metadataSB = new StringBuffer();
@@ -2858,8 +2911,7 @@ public class Repository extends RepositoryBase implements Tables,
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
 
-        Result result = new Result(msg("Search Form"), sb);
-        return result;
+        return  makeResult(request, msg("Search Form"), sb, searchUrls);
 
     }
 
@@ -3977,15 +4029,19 @@ public class Repository extends RepositoryBase implements Tables,
         StringBuffer sb    = new StringBuffer();
         if (request.defined(ARG_ID)) {
             entry = getEntry(request);
+            /*
             if (entry.isTopGroup()) {
                 sb.append(makeEntryHeader(request, entry));
                 sb.append(note("Cannot edit top-level group"));
                 return makeEntryEditResult(request, entry, "Edit Entry", sb);
-            }
+                }*/
             type  = entry.getTypeHandler().getType();
-            group = findGroup(request, entry.getParentGroupId());
+            if(!entry.isTopGroup()) {
+                group = findGroup(request, entry.getParentGroupId());
+            }
         }
-        if (group == null) {
+
+        if (!entry.isTopGroup() && group == null) {
             group = findGroup(request);
         }
         if (type == null) {
@@ -4038,7 +4094,8 @@ public class Repository extends RepositoryBase implements Tables,
             String metadataButton = HtmlUtil.submit("Edit Metadata",
                                         ARG_EDIT_METADATA);
 
-            String deleteButton = HtmlUtil.submit(msg("Delete"), ARG_DELETE);
+            String deleteButton = (entry.isTopGroup()?"":HtmlUtil.submit(msg("Delete"), ARG_DELETE));
+            
             String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             String buttons      = ((entry != null)
                                    ? buttons(submitButton, deleteButton,
@@ -4638,10 +4695,6 @@ public class Repository extends RepositoryBase implements Tables,
             typeHandler = entry.getTypeHandler();
             newEntry    = false;
 
-            if (entry.isTopGroup()) {
-                return new Result(request.entryUrl(URL_ENTRY_SHOW, entry,
-                        ARG_MESSAGE, "Cannot edit top-level group"));
-            }
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(request.entryUrl(URL_ENTRY_FORM, entry));
@@ -4649,6 +4702,11 @@ public class Repository extends RepositoryBase implements Tables,
 
 
             if (request.exists(ARG_DELETE_CONFIRM)) {
+                if (entry.isTopGroup()) {
+                    return new Result(request.entryUrl(URL_ENTRY_SHOW, entry,
+                                                       ARG_MESSAGE, "Cannot delete top-level group"));
+                }
+
                 List<Entry> entries = new ArrayList<Entry>();
                 entries.add(entry);
                 deleteEntries(request, entries, null);
@@ -4888,8 +4946,8 @@ public class Repository extends RepositoryBase implements Tables,
                 }
             } else {
                 if (entry.isTopGroup()) {
-                    throw new IllegalArgumentException(
-                        "Cannot edit top-level group");
+                    //                    throw new IllegalArgumentException(
+                    //                        "Cannot edit top-level group");
                 }
                 Date[] dateRange = request.getDateRange(ARG_FROMDATE,
                                        ARG_TODATE, new Date());
@@ -4902,13 +4960,15 @@ public class Repository extends RepositoryBase implements Tables,
                         throw new IllegalArgumentException(
                             "Cannot have a '/' in group name:" + newName);
                     }
+                    /**TODO Do we want to not allow 2 or more groups with the same name?
                     Entry existing = findEntryWithName(request,
-                                         entry.getParentGroup(), newName);
+                                                       entry.getParentGroup(), newName);
                     if ((existing != null) && existing.isGroup()
                             && !existing.getId().equals(entry.getId())) {
                         throw new IllegalArgumentException(
                             "A group with the given name already exists");
                     }
+                    */
                 }
 
                 entry.setName(newName);
@@ -6362,7 +6422,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Entry findEntryWithName(Request request, Group parent, String name)
             throws Exception {
-        String groupName = parent.getFullName() + Group.IDDELIMITER + name;
+        String groupName = (parent==null?"":parent.getFullName()) + Group.IDDELIMITER + name;
         Group  group     = groupCache.get(groupName);
         if (group != null) {
             return group;
@@ -6580,9 +6640,12 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected List[] getEntries(Request request) throws Exception {
+        return getEntries(request, new StringBuffer());
+    }
+
+    protected List[] getEntries(Request request, StringBuffer searchCriteriaSB) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
-        //        SqlUtil.debug = true;
-        List<Clause> where   = typeHandler.assembleWhereClause(request);
+        List<Clause> where   = typeHandler.assembleWhereClause(request, searchCriteriaSB);
         int          skipCnt = request.get(ARG_SKIP, 0);
 
         Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,
@@ -6986,13 +7049,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         //        System.err.println("submit:" + request.getString("submit","YYY"));
-        if (request.defined("submit_type.x")) {
-            //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
-            request.remove(ARG_OUTPUT);
-            return processEntrySearchForm(request);
-        }
-        if (request.defined("submit_subset")) {
-            //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
+        if (request.defined("submit_type.x")|| request.defined("submit_subset")) {
             request.remove(ARG_OUTPUT);
             return processEntrySearchForm(request);
         }
@@ -7009,7 +7066,12 @@ public class Repository extends RepositoryBase implements Tables,
             return result;
         }
 
-        List[] pair = getEntries(request);
+        StringBuffer searchCriteriaSB = new StringBuffer();
+        List[] pair = getEntries(request,searchCriteriaSB);
+        String s = searchCriteriaSB.toString();
+        if(s.length()>0) {
+            request.put(ARG_MESSAGE, "Search Criteria<br>"+s);
+        }
         return getOutputHandler(request).outputGroup(request,
                                 getDummyGroup(), (List<Group>) pair[0],
                                 (List<Entry>) pair[1]);

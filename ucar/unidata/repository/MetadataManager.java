@@ -348,6 +348,15 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    public StringBuffer addToBrowseSearchForm(Request request, StringBuffer sb)
+            throws Exception {
+        for (MetadataHandler handler : metadataHandlers) {
+            handler.addToBrowseSearchForm(request, sb);
+        }
+        return sb;
+    }
+
+
 
     /**
      * _more_

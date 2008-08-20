@@ -127,6 +127,13 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    public static void addCriteria(StringBuffer sb, String label, Object value) {
+        sb.append(HtmlUtil.b(label));
+        sb.append(HtmlUtil.space(1));
+        sb.append(value);
+        sb.append(HtmlUtil.br());
+    }
+
     /**
      * _more_
      *

@@ -361,15 +361,19 @@ public class Metadata implements Constants, Tables {
      * @version $Revision: 1.3 $
      */
     public static class Type {
+        public static final String DEFAULT_CATEGORY = "Summary";
 
         /** _more_ */
-        String type;
+        private         String type;
+
+        private String category = DEFAULT_CATEGORY;
+
 
         /** _more_ */
-        String label;
+        private         String label;
 
         /** _more_ */
-        boolean isEnumerated = false;
+        private         boolean isEnumerated = false;
 
         /**
          * _more_
@@ -390,7 +394,11 @@ public class Metadata implements Constants, Tables {
          * @param label _more_
          */
         public Type(String type, String label) {
-            this(type, label, false);
+            this(type,label,DEFAULT_CATEGORY);
+        }
+
+        public Type(String type, String label,String category) {
+            this(type, label, category, false);
         }
 
         /**
@@ -401,8 +409,20 @@ public class Metadata implements Constants, Tables {
          * @param enumerated _more_
          */
         public Type(String type, String label, boolean enumerated) {
+            this(type, label, DEFAULT_CATEGORY, enumerated);
+        }
+
+        /**
+         * _more_
+         *
+         * @param type _more_
+         * @param label _more_
+         * @param enumerated _more_
+         */
+        public Type(String type, String label, String category, boolean enumerated) {
             this.type         = type;
             this.label        = label;
+            this.category = category;
             this.isEnumerated = enumerated;
         }
 
@@ -496,6 +516,24 @@ public class Metadata implements Constants, Tables {
             return isEnumerated;
         }
 
+
+/**
+Set the Category property.
+
+@param value The new value for Category
+**/
+public void setCategory (String value) {
+        category = value;
+}
+
+/**
+Get the Category property.
+
+@return The Category
+**/
+public String getCategory () {
+        return category;
+}
 
 
 

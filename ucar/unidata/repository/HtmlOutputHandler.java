@@ -80,6 +80,13 @@ import java.util.zip.*;
  */
 public class HtmlOutputHandler extends OutputHandler {
 
+    /***
+<metadatabrowse>
+
+</metadatabrowse>
+
+     ***/
+
 
 
     /** _more_ */
@@ -646,6 +653,26 @@ public class HtmlOutputHandler extends OutputHandler {
     public void getMetadataHtml(Request request, Entry entry,
                                 StringBuffer sb, boolean decorate)
             throws Exception {
+        /*
+<div id="metadata" class="yui-navset"> 
+	    <ul class="yui-nav"> 
+	        <li><a href="#tab1"><em>Tab One Label</em></a></li> 
+	        <li class="selected"><a href="#tab2"><em>Tab Two Label</em></a></li> 
+	        <li><a href="#tab3"><em>Tab Three Label</em></a></li> 
+	    </ul>             
+	    <div class="yui-content"> 
+	        <div id="tab1"><p>Tab One Content</p></div> 
+	        <div id="tab2"><p>Tab Two Content</p></div> 
+	        <div id="tab3"><p>Tab Three Content</p></div> 
+	    </div> 
+	</div> 
+
+<script type="text/javascript"> 
+    var tabView = new YAHOO.widget.TabView('metadata'); 
+</script> 
+        */
+
+
         boolean        showMetadata = request.get(ARG_SHOWMETADATA, false);
         List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
         if (metadataList.size() == 0) {
@@ -656,6 +683,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (decorate) {
             detailsSB.append("<table cellspacing=\"5\">\n");
         }
+
 
 
         List<MetadataHandler> metadataHandlers =
@@ -790,6 +818,9 @@ public class HtmlOutputHandler extends OutputHandler {
             }
 
 
+            List<String> tabTitles = new ArrayList<String>();
+            List<String> tabContent = new ArrayList<String>();
+
             if (!showApplet) {
                 getMetadataHtml(request, group, sb, true);
                 getCommentBlock(request, group, sb);
@@ -804,7 +835,7 @@ public class HtmlOutputHandler extends OutputHandler {
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
                 groupsSB.append(
-                    "<ul class=\"folderblock\" style=\"list-style-image : url("
+                    "<div><ul class=\"folderblock\" style=\"list-style-image : url("
                     + getRepository().fileUrl(ICON_BLANK) + ")\">");
                 for (Group subGroup : subGroups) {
                     List<Metadata> metadataList =
@@ -817,9 +848,14 @@ public class HtmlOutputHandler extends OutputHandler {
                         + HtmlUtil.quote("block_" + subGroup.getId())
                         + "></ul>");
                 }
-                groupsSB.append("</ul>");
+                groupsSB.append("</ul></div>");
+
+
                 sb.append(getRepository().makeShowHideBlock(request,
                         "groups", msg("Groups"), groupsSB, true));
+
+                tabTitles.add("Groups");
+                tabContent.add(groupsSB.toString());
 
                 //sb.append("</div>");
             }
@@ -832,7 +868,27 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(getRepository().makeShowHideBlock(request,
                         "entries", msg("Entries") + link, entriesSB, true));
 
+                tabTitles.add("Entries");
+                tabContent.add(entriesSB.toString());
             }
+
+            /****
+            sb.append("<div id=\"entry\" class=\"yui-navset\"><ul class=\"yui-nav\">");
+            for(int i=0;i<tabTitles.size();i++) {
+	        sb.append(HtmlUtil.li(HtmlUtil.href("#tab" + i, tabTitles.get(i)),(i==0?HtmlUtil.attr("class","selected"):"")));
+            }
+            sb.append("</ul>");
+	    sb.append("<div class=\"yui-content\">"); 
+            for(int i=0;i<tabTitles.size();i++) {
+	        sb.append("<div id=\"tab" + i +"\"><div style=\"max-height: 350px; overflow-y: auto;\">" +tabContent.get(i) +"</div></div>\n");
+            }
+            sb.append("</div></div>");
+            sb.append("<script type=\"text/javascript\">\nvar tabView = new YAHOO.widget.TabView('entry');\n</script> ");
+            */
+
+
+
+
         }
 
         Result result = new Result(title, sb, getMimeType(output));

@@ -564,7 +564,7 @@ public class Column implements Tables, Constants {
      *
      * @throws Exception _more_
      */
-    protected void assembleWhereClause(Request request, List<Clause> where)
+    protected void assembleWhereClause(Request request, List<Clause> where, StringBuffer searchCriteria)
             throws Exception {
         String id = getFullName();
         if (type.equals(TYPE_LATLON)) {

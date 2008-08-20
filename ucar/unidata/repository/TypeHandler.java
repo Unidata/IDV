@@ -1097,7 +1097,29 @@ public class TypeHandler extends RepositoryManager {
 
     }
 
+    public void addTextSearch(Request request, StringBuffer sb) {
+        String name = (String) request.getString(ARG_TEXT, "");
+        String searchMetaData = " "
+                                + HtmlUtil.checkbox(ARG_SEARCHMETADATA,
+                                    "true",
+                                    request.get(ARG_SEARCHMETADATA,
+                                        false)) + " "
+                                            + msg("Search metadata");
 
+        String searchExact = " "
+                             + HtmlUtil.checkbox(ARG_EXACT, "true",
+                                 request.get(ARG_EXACT, false)) + " "
+                                     + msg("Match exactly");
+        if (name.trim().length() == 0) {
+            sb.append(HtmlUtil.formEntry(msgLabel("Text"),
+                    HtmlUtil.input(ARG_TEXT) + searchExact + searchMetaData));
+        } else {
+            HtmlUtil.hidden(ARG_TEXT, name);
+            sb.append(HtmlUtil.formEntry(msgLabel("Name"),
+                    name + searchExact + searchMetaData));
+        }
+
+    }
 
 
     /**
@@ -1179,6 +1201,8 @@ public class TypeHandler extends RepositoryManager {
         StringBuffer basicSB    = new StringBuffer(HtmlUtil.formTable());
         StringBuffer advancedSB = new StringBuffer(HtmlUtil.formTable());
 
+        addTextSearch(request, basicSB);
+
 
 
         if (typeHandlers.size() > 1) {
@@ -1242,26 +1266,7 @@ public class TypeHandler extends RepositoryManager {
                                                  "", " size=\"8\" ")));
 
 
-        String name = (String) request.getString(ARG_TEXT, "");
-        String searchMetaData = " "
-                                + HtmlUtil.checkbox(ARG_SEARCHMETADATA,
-                                    "true",
-                                    request.get(ARG_SEARCHMETADATA,
-                                        false)) + " "
-                                            + msg("Search metadata");
 
-        String searchExact = " "
-                             + HtmlUtil.checkbox(ARG_EXACT, "true",
-                                 request.get(ARG_EXACT, false)) + " "
-                                     + msg("Match exactly");
-        if (name.trim().length() == 0) {
-            basicSB.append(HtmlUtil.formEntry(msgLabel("Text"),
-                    HtmlUtil.input(ARG_TEXT) + searchExact + searchMetaData));
-        } else {
-            HtmlUtil.hidden(ARG_TEXT, name);
-            basicSB.append(HtmlUtil.formEntry(msgLabel("Name"),
-                    name + searchExact + searchMetaData));
-        }
 
 
 
@@ -1385,31 +1390,43 @@ public class TypeHandler extends RepositoryManager {
      */
     protected List<Clause> assembleWhereClause(Request request)
             throws Exception {
+        return assembleWhereClause(request, new StringBuffer());
+    }
+
+
+ 
+    protected List<Clause> assembleWhereClause(Request request, StringBuffer searchCriteria)
+        throws Exception {
 
         List<Clause> where = new ArrayList<Clause>();
 
 
         if (request.defined(ARG_RESOURCE)) {
+            addCriteria(searchCriteria,"Resource=", request.getString(ARG_RESOURCE, ""));
             addOrClause(COL_ENTRIES_RESOURCE,
                         request.getString(ARG_RESOURCE, ""), where);
         }
 
         if (request.defined(ARG_DATATYPE)) {
+            addCriteria(searchCriteria,"Datatype=", request.getString(ARG_DATATYPE, ""));
             addOrClause(COL_ENTRIES_DATATYPE,
                         request.getString(ARG_DATATYPE, ""), where);
         }
 
         if (request.defined(ARG_USER_ID)) {
+            addCriteria(searchCriteria,"User=", request.getString(ARG_USER_ID, ""));
             addOrClause(COL_ENTRIES_USER_ID,
                         request.getString(ARG_USER_ID, ""), where);
         }
 
         if (request.defined(ARG_COLLECTION)) {
+            //            searchCriteria.append("Datatype:" + request.getString(ARG_DATATYPE, "")+"<br>");
             addOrClause(COL_ENTRIES_TOP_GROUP_ID,
                         request.getString(ARG_COLLECTION, ""), where);
         }
 
         if (request.defined(ARG_FILESUFFIX)) {
+            addCriteria(searchCriteria, "File Suffix=",request.getString(ARG_FILESUFFIX, ""));
             List<Clause> clauses = new ArrayList<Clause>();
             for (String tok : (List<String>) StringUtil.split(
                     request.getString(ARG_FILESUFFIX, ""), ",", true, true)) {
@@ -1472,16 +1489,19 @@ public class TypeHandler extends RepositoryManager {
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
         if (dateRange[0] != null) {
+            addCriteria(searchCriteria,"From Date>=", dateRange[0]);
             where.add(Clause.ge(COL_ENTRIES_FROMDATE, dateRange[0]));
         }
 
 
         if (dateRange[1] != null) {
+            addCriteria(searchCriteria,"To Date<=", dateRange[1]);
             where.add(Clause.le(COL_ENTRIES_TODATE, dateRange[1]));
         }
 
         Date createDate = request.get(ARG_CREATEDATE, (Date) null);
         if (createDate != null) {
+            addCriteria(searchCriteria,"Create Date<=", createDate);
             where.add(Clause.le(COL_ENTRIES_CREATEDATE, createDate));
         }
 

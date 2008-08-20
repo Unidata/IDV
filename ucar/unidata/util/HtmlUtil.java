@@ -126,6 +126,10 @@ public class HtmlUtil {
         return wrap("b",inner);
     }
 
+    public static String li(String inner, String extra) {
+        return wrap("li",extra, inner);
+    }
+
 
     public static String center(String inner) {
         return wrap("center",inner);
@@ -133,6 +137,13 @@ public class HtmlUtil {
 
     public static String wrap(String tag, String inner) {
         return "<" + tag +">" + inner +"</" + tag +">";
+    }
+
+
+    public static String wrap(String tag, String extra, String inner) {
+        //        System.err.println ("<" + tag +" " + extra +">" + inner +"</" + tag +">");
+
+        return "<" + tag +" " + extra +">" + inner +"</" + tag +">";
     }
 
 
