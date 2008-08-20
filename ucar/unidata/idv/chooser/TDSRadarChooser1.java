@@ -512,7 +512,7 @@ public class TDSRadarChooser1 extends TimesChooser {
             List <TwoFacedObject> productNames = new ArrayList();
             for(Product product: products){
                 if(!product.getID().contains("DPA") && !product.getID().contains("NVW")) {
-                    String lable = product.getName()+ " " + product.getID();
+                    String lable = product.getName()+ " (" + product.getID() + ")";
                     TwoFacedObject twoObj = new TwoFacedObject(lable, product.getID());
                     productNames.add(twoObj);
                 }
