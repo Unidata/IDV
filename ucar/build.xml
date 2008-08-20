@@ -228,7 +228,7 @@ argument -Dfoo=bar) -->
             <param name="jarfile" value="idv"/> 
             <param 
                 name="excludes"
-                value="ucar/unidata/apps/**,ucar/unidata/idv/resources/unidata/**,ucar/nc2/**,ucar/ma2/**,ucar/util/prefs/**,ucar/unidata/idv/release/**,ucar/unidata/io/**,ucar/unidata/geoloc/**"
+                value="ucar/unidata/apps/**,ucar/unidata/idv/resources/unidata/**,ucar/nc2/**,ucar/ma2/**,ucar/util/prefs/**,ucar/unidata/idv/release/**,ucar/unidata/io/**,ucar/unidata/geoloc/**,ucar/unidata/repository/**"
 
             /> 
         </antcall>
@@ -622,6 +622,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <exclude name="ucar/unidata/apps/rico/**"/>
             <exclude name="ucar/unidata/apps/trex/**"/>
             <exclude name="ucar/unidata/apps/workshop/**"/>
+            <exclude name="ucar/unidata/repository/**"/>
             <exclude name="ucar/unidata/gridviewer/**/*.*"/>
             <exclude name="ucar/unidata/grid/**"/>
             <exclude name="ucar/unidata/geoloc/**"/>
