@@ -122,6 +122,19 @@ public class HtmlUtil {
         return "<p>";
     }
 
+    public static String b(String inner) {
+        return wrap("b",inner);
+    }
+
+
+    public static String center(String inner) {
+        return wrap("center",inner);
+    }
+
+    public static String wrap(String tag, String inner) {
+        return "<" + tag +">" + inner +"</" + tag +">";
+    }
+
 
     /**
      * _more_
