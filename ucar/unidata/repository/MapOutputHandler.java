@@ -262,7 +262,7 @@ public class MapOutputHandler extends OutputHandler {
         sb.append(importJS(repository.getUrlBase() + "/mymap.js"));
         sb.append(
                   "<div style=\"width:" + width+"px; height:" +height+"px\" id=\"mapstraction\"></div>\n");
-        sb.append(script("MapInitialize(" + normalControls+");"));
+        sb.append(HtmlUtil.script("MapInitialize(" + normalControls+");"));
         StringBuffer js = new StringBuffer();
         js.append("mapstraction.resizeTo(" + width +"," + height +");\n");
         js.append("var marker;\n");
@@ -304,7 +304,7 @@ public class MapOutputHandler extends OutputHandler {
             }
         }
         js.append("mapstraction.autoCenterAndZoom();\n");
-        sb.append(script(js.toString()));
+        sb.append(HtmlUtil.script(js.toString()));
     }
 
     private static String qt(String  s) {
@@ -329,16 +329,7 @@ public class MapOutputHandler extends OutputHandler {
 
     }
 
-    /**
-     * _more_
-     *
-     * @param s _more_
-     *
-     * @return _more_
-     */
-    private static String script(String s) {
-        return "<script type=\"text/JavaScript\">" + s + "</script>\n";
-    }
+
 
     /**
      * _more_

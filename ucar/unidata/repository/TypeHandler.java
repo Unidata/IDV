@@ -1090,7 +1090,6 @@ public class TypeHandler extends RepositoryManager {
                                        : Double.NaN, ((entry != null)
                                                       && entry.hasWest())
                                        ? entry.getWest() : Double.NaN);
-
             sb.append(HtmlUtil.formEntry("Location:", HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(latLonForm, mapSB.toString())))));
         }
 
@@ -1346,8 +1345,12 @@ public class TypeHandler extends RepositoryManager {
                                                        request.getString(ARG_AREA+"_north",""),
                                                        request.getString(ARG_AREA+"_east",""),
                                                        request.getString(ARG_AREA+"_west",""));
-            areaWidget = "<table>" + HtmlUtil.cols(areaWidget) + "</table>";
+            String mapCanvas = HtmlUtil.div(""," id=\"mapcanvas\" style=\"width:128px;height:128px\" ");
+            areaWidget = "<table><tr valign=top>" + HtmlUtil.cols(areaWidget, mapCanvas) + "</tr></table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(request.url(getRepository().URL_GETMAP),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
+            String mapJS =  HtmlUtil.script("function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n");
+            areaWidget += mapJS;
+
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     areaWidget));
             advancedSB.append("\n");
