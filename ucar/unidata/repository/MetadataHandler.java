@@ -300,6 +300,54 @@ public class MetadataHandler extends RepositoryManager {
     /**
      * _more_
      *
+     * @param request _more_
+     * @param sb _more_
+     * @param type _more_
+     * @param doSelect _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToBrowseSearchForm(Request request, StringBuffer sb,
+                                Metadata.Type type, boolean doSelect)
+            throws Exception {
+
+        String url = request.url(getRepository().URL_ENTRY_SEARCH);
+        String[] values = getMetadataManager().getDistinctValues(request,
+                                                                 this, type);
+        if ((values == null) || (values.length == 0)) {
+            return;
+        }
+        StringBuffer content = new StringBuffer();
+        content.append("<div class=\"browseblock\">");
+        for(int i=0;i<values.length;i++) {
+            String browseUrl = HtmlUtil.url(url, 
+                                            ARG_METADATA_TYPE + "." + type,type.toString(),
+                                            ARG_METADATA_ATTR1 + "." + type, values[i]);
+            content.append(HtmlUtil.href(browseUrl,values[i]));
+            content.append(HtmlUtil.br());
+        }
+        content.append("</div>");
+
+        sb.append(getRepository().makeShowHideBlock(request, type.toString()+".browse", type.getLabel(),
+                                                    content,false));
+
+
+    }
+
+    protected List trimValues(List<String> l) {
+        List values = new ArrayList();
+        for(String s: l) {
+            String label= s;
+            if(label.length()>50) label = label.substring(0,49) +"...";
+            values.add(new TwoFacedObject(label,s));
+        }
+        return values;
+    }
+
+
+    /**
+     * _more_
+     *
      *
      * @param request _more_
      * @param entry _more_

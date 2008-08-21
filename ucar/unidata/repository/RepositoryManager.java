@@ -128,10 +128,14 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
     public static void addCriteria(StringBuffer sb, String label, Object value) {
+        String sv = value.toString();
+        sv = sv.replace("<","&lt;");
+        sv = sv.replace(">","&gt;");
+        sb.append("<tr valign=\"top\"><td align=right>");
         sb.append(HtmlUtil.b(label));
-        sb.append(HtmlUtil.space(1));
-        sb.append(value);
-        sb.append(HtmlUtil.br());
+        sb.append("</td><td>");
+        sb.append(sv);
+        sb.append("</td></tr>");
     }
 
     /**

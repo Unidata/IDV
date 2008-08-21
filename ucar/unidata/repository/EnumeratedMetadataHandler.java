@@ -156,12 +156,12 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      */
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        List l = getValues(request);
+        List<String> l = (List<String>)getValues(request);
         if (l == null) {
             return;
         }
-        l = new ArrayList(l);
-        l.add(0, new TwoFacedObject(msg("None"), ""));
+        List values = trimValues(l);
+        values.add(0, new TwoFacedObject(msg("-all-"), ""));
 
         String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED + "."
                                   + TYPE_ENUM, "true",
@@ -170,11 +170,17 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         inheritedCbx = "";
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + TYPE_ENUM,
                                   TYPE_ENUM.toString()));
+        String argName=ARG_METADATA_ATTR1 + "." + TYPE_ENUM.toString();
+        String value = request.getString(argName,"");
         sb.append(HtmlUtil.formEntry(msgLabel(TYPE_ENUM.getLabel()),
-                                     HtmlUtil.select(ARG_METADATA_ATTR1 + "."
-                                         + TYPE_ENUM.toString(), l, "",
+                                     HtmlUtil.select(argName, values, value,
                                              100) + inheritedCbx));
 
+    }
+
+    public void addToBrowseSearchForm(Request request, StringBuffer sb)
+            throws Exception {
+        addToBrowseSearchForm(request, sb, TYPE_ENUM, true);
     }
 
 

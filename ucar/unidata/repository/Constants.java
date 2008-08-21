@@ -397,6 +397,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
+    public static final String ARG_MESSAGELEFT = "messageleft";
+
     /** _more_ */
     public static final String ARG_INCLUDENONGEO = "includenongeo";
 

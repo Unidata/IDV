@@ -7070,7 +7070,12 @@ public class Repository extends RepositoryBase implements Tables,
         List[] pair = getEntries(request,searchCriteriaSB);
         String s = searchCriteriaSB.toString();
         if(s.length()>0) {
-            request.put(ARG_MESSAGE, "Search Criteria<br>"+s);
+            request.remove("submit");
+            String url  = request.getUrl(URL_ENTRY_SEARCHFORM);
+            s = "<table>" + s +"</table>";
+            String header = HtmlUtil.href(url,HtmlUtil.img(fileUrl(ICON_SEARCH),"Search Again")) +
+                "Search Criteria";
+            request.put(ARG_MESSAGELEFT,HtmlUtil.br(header)+ s);
         }
         return getOutputHandler(request).outputGroup(request,
                                 getDummyGroup(), (List<Group>) pair[0],
@@ -7717,15 +7722,18 @@ public class Repository extends RepositoryBase implements Tables,
             "<DIV ID=\"" + divName+"\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
     }
 
+
+
     public String makeDateInput(Request request, String name, String formName, Date date) {
         String dateHelp =
             "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
         String timeHelp =
             "hh::mm:ss Z, e.g. 20:15:00 MST";
 
-
-        String dateString =  (date==null?"": dateSdf.format(date));
-        String timeString =  (date==null?"": timeSdf.format(date));
+        String dateArg = request.getString(name,"");
+        String timeArg = request.getString(name+".time","");
+        String dateString =  (date==null?dateArg: dateSdf.format(date));
+        String timeString =  (date==null?timeArg: timeSdf.format(date));
 
         return HtmlUtil.input(name, dateString,
                               HtmlUtil.SIZE_8+ " title=\"" + dateHelp + "\"") + 

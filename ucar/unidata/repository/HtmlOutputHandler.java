@@ -788,8 +788,14 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
+            request.remove(ARG_MESSAGE);
         }
 
+        String messageLeft = null;
+        if (request.exists(ARG_MESSAGELEFT)) {
+            messageLeft = request.getUnsafeString(ARG_MESSAGELEFT, "");
+            request.remove(ARG_MESSAGELEFT);
+        }
 
         showNext(request, subGroups, entries, sb);
 
@@ -886,9 +892,12 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<script type=\"text/javascript\">\nvar tabView = new YAHOO.widget.TabView('entry');\n</script> ");
             */
 
+        }
 
-
-
+        if (messageLeft!=null) {
+            sb = new StringBuffer("<table width=\"100%\" border=0><tr valign=\"top\"><td width=\"20%\"><nobr>" + 
+                                  messageLeft +
+                "</nobr></td><td>" + sb +"</td></tr></table>");
         }
 
         Result result = new Result(title, sb, getMimeType(output));

@@ -430,6 +430,10 @@ public class Request implements Constants {
         return getRequestPath() + "?" + getUrlArgs();
     }
 
+    public String getUrl(RequestUrl request) {
+        return url(request)+ "?" + getUrlArgs();
+    }
+
     /**
      * _more_
      *

@@ -1110,9 +1110,9 @@ public class TypeHandler extends RepositoryManager {
                              + HtmlUtil.checkbox(ARG_EXACT, "true",
                                  request.get(ARG_EXACT, false)) + " "
                                      + msg("Match exactly");
-        if (name.trim().length() == 0) {
+        if (true || name.trim().length() == 0) {
             sb.append(HtmlUtil.formEntry(msgLabel("Text"),
-                    HtmlUtil.input(ARG_TEXT) + searchExact + searchMetaData));
+                    HtmlUtil.input(ARG_TEXT,name) + searchExact + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_TEXT, name);
             sb.append(HtmlUtil.formEntry(msgLabel("Name"),
@@ -1194,15 +1194,14 @@ public class TypeHandler extends RepositoryManager {
             }
 */
 
-        minDate = "";
-        maxDate = "";
+        //        minDate = "";
+        //        maxDate = "";
 
 
         StringBuffer basicSB    = new StringBuffer(HtmlUtil.formTable());
         StringBuffer advancedSB = new StringBuffer(HtmlUtil.formTable());
 
         addTextSearch(request, basicSB);
-
 
 
         if (typeHandlers.size() > 1) {
@@ -1337,8 +1336,12 @@ public class TypeHandler extends RepositoryManager {
                 HtmlUtil.checkbox(ARG_INCLUDENONGEO, "true",
                                   request.get(ARG_INCLUDENONGEO,
                                       true)) + " Include non-geographic";
-            String areaWidget = HtmlUtil.makeLatLonBox(ARG_AREA, "", "", "",
-                                    "");
+
+            String areaWidget = HtmlUtil.makeLatLonBox(ARG_AREA, 
+                                                       request.getString(ARG_AREA+"_south",""),
+                                                       request.getString(ARG_AREA+"_north",""),
+                                                       request.getString(ARG_AREA+"_east",""),
+                                                       request.getString(ARG_AREA+"_west",""));
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget) + "</table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(request.url(getRepository().URL_GETMAP),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
@@ -1400,6 +1403,15 @@ public class TypeHandler extends RepositoryManager {
 
         List<Clause> where = new ArrayList<Clause>();
 
+        List typeList = request.get(ARG_TYPE, new ArrayList());
+        typeList.remove(TYPE_ANY);
+        if(typeList.size()>0) {
+            if (request.get(ARG_TYPE_EXCLUDE, false)) {
+                    addCriteria(searchCriteria,"Entry Type!=", StringUtil.join(",",typeList));
+            } else {
+                addCriteria(searchCriteria,"Entry Type=", StringUtil.join(",",typeList));
+            }
+        }
 
         if (request.defined(ARG_RESOURCE)) {
             addCriteria(searchCriteria,"Resource=", request.getString(ARG_RESOURCE, ""));
@@ -1420,7 +1432,12 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (request.defined(ARG_COLLECTION)) {
-            //            searchCriteria.append("Datatype:" + request.getString(ARG_DATATYPE, "")+"<br>");
+            Entry collectionEntry = getRepository().getEntry(request, request.getString(ARG_COLLECTION, ""));
+            if(collectionEntry!=null) {
+                addCriteria(searchCriteria,"Collection=", collectionEntry.getName());
+            } else {
+                addCriteria(searchCriteria,"Collection=", "Unknown");
+            }
             addOrClause(COL_ENTRIES_TOP_GROUP_ID,
                         request.getString(ARG_COLLECTION, ""), where);
         }
@@ -1447,6 +1464,11 @@ public class TypeHandler extends RepositoryManager {
                 groupId = groupId.substring(1);
             }
             if (groupId.endsWith("%")) {
+                System.err.println ("G:" +groupId.substring(0,groupId.length()-1));
+                Group group = getRepository().findGroup(request,groupId.substring(0,groupId.length()-1));
+                if(group!=null) {
+                    addCriteria(searchCriteria, "Group=",group.getName());
+                }
                 where.add(Clause.like(COL_ENTRIES_PARENT_GROUP_ID, groupId));
             } else {
                 Group group = getRepository().findGroup(request);
@@ -1454,6 +1476,7 @@ public class TypeHandler extends RepositoryManager {
                     throw new IllegalArgumentException(
                         msgLabel("Could not find group") + groupId);
                 }
+                addCriteria(searchCriteria, "Group" +(doNot?"!=":"="),group.getName());
                 String searchChildren =
                     (String) request.getString(ARG_GROUP_CHILDREN,
                         (String) null);
@@ -1509,21 +1532,25 @@ public class TypeHandler extends RepositoryManager {
         boolean      includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
         List<Clause> areaExpressions = new ArrayList<Clause>();
         if (request.defined(ARG_AREA + "_south")) {
+            addCriteria(searchCriteria, "South>=",request.getString(ARG_AREA + "_south",""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_SOUTH,
                     new Double(Entry.NONGEO)), Clause.ge(COL_ENTRIES_SOUTH,
                         request.get(ARG_AREA + "_south", 0.0))));
         }
         if (request.defined(ARG_AREA + "_north")) {
+            addCriteria(searchCriteria, "North<=",request.getString(ARG_AREA + "_north",""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_NORTH,
                     new Double(Entry.NONGEO)), Clause.le(COL_ENTRIES_NORTH,
                         request.get(ARG_AREA + "_north", 0.0))));
         }
         if (request.defined(ARG_AREA + "_east")) {
+            addCriteria(searchCriteria, "East<=",request.getString(ARG_AREA + "_east",""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_EAST,
                     new Double(Entry.NONGEO)), Clause.le(COL_ENTRIES_EAST,
                         request.get(ARG_AREA + "_east", 0.0))));
         }
         if (request.defined(ARG_AREA + "_west")) {
+            addCriteria(searchCriteria, "West>=",request.getString(ARG_AREA + "_west",""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_WEST,
                     new Double(Entry.NONGEO)), Clause.ge(COL_ENTRIES_WEST,
                         request.get(ARG_AREA + "_west", 0.0))));
@@ -1593,6 +1620,11 @@ public class TypeHandler extends RepositoryManager {
                                         metadata.getAttr1()),
                                     Clause.eq(subTable + ".type", type) });
 
+                MetadataHandler handler = getRepository().getMetadataManager().findMetadataHandler(type);
+                Metadata.Type metadataType = handler.findType(type);
+                if(metadataType!=null) {
+                    addCriteria(searchCriteria, metadataType.getLabel() + "=",metadata.getAttr1());
+                }
                 /**
                  * *TODO
                  * if (metadata.getInherited()) {
@@ -1644,9 +1676,12 @@ public class TypeHandler extends RepositoryManager {
         if (name.length() > 0) {
             boolean doLike = false;
             if ( !request.get(ARG_EXACT, false)) {
+                addCriteria(searchCriteria,"Text like", name);
                 List tmp = StringUtil.split(name, ",", true, true);
                 name   = "%" + StringUtil.join("%,%", tmp) + "%";
                 doLike = true;
+            } else {
+                addCriteria(searchCriteria,"Text =", name);
             }
             List<Clause> ors       = new ArrayList<Clause>();
             boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);

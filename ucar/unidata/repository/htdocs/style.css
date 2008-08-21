@@ -27,7 +27,7 @@ a:hover {
 
 
 .header {
-  border-bottom : 1px #666666 solid;
+  border-bottom : 1px #444444 solid;
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;
@@ -69,25 +69,16 @@ a.header  {
 .subnav {
    font-size: 10pt;
    padding-left:5;   
-   xpadding-top:5;   
+   padding-top:6;   
    background-color : #cccccc;
    font-weight: bold;
    color: black;
-   border-bottom : 1px #666666 solid;
-   padding-top:6;   
-}
-
-
-.scrollablediv {
-   max-height: 350px; 
-   overflow-y: auto;
+   border-bottom : 1px #444444 solid;
 }
 
 
 .subnavoncomp  {
-   border-top : 1px #666666 solid;
-   border-left : 1px #666666 solid;   
-   border-right : 1px #666666 solid;
+   border : 1px #444444 solid;
    border-bottom : 1px #ffffff solid;
    background-color : #ffffff;
    padding-left:6;   
@@ -129,6 +120,18 @@ a.subnavoffcomp  {
     margin:5;
 }
 
+
+.browseblock {
+   padding:3px;
+   margin-left:20px;
+   border: 2px #8a8a8a solid; 
+   max-height: 150px; overflow-y: auto;
+}
+
+.scrollablediv {
+   max-height: 350px; 
+   overflow-y: auto;
+}
 
 
 td {
