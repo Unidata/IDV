@@ -1404,10 +1404,10 @@ public class SqlUtil {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         clause.addClause(sb);
-        String query = makeSelect(what, tables, sb.toString(), extra);
         if (debug) {
-            System.err.println(query);
+            System.err.println(sb);
         }
+        String query = makeSelect(what, tables, sb.toString(), extra);
         //        System.err.println(query);
         return connection.prepareStatement(query);
     }

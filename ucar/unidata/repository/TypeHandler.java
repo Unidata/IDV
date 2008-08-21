@@ -1161,15 +1161,16 @@ public class TypeHandler extends RepositoryManager {
 
 
         List<TypeHandler> typeHandlers =
-            getRepository().getTypeHandlers(request);
-        //        System.err.println("handlers:" + typeHandlers);
+            getRepository().getTypeHandlers();
+        //        List<TypeHandler> typeHandlers =
+        //            getRepository().getTypeHandlers(request);
 
 
         if (request.defined(ARG_TYPE)) {
             TypeHandler typeHandler = getRepository().getTypeHandler(request);
             if ( !typeHandler.isAnyHandler()) {
-                typeHandlers.clear();
-                typeHandlers.add(typeHandler);
+                //                typeHandlers.clear();
+                //                typeHandlers.add(typeHandler);
             }
         }
 
@@ -1204,7 +1205,7 @@ public class TypeHandler extends RepositoryManager {
         addTextSearch(request, basicSB);
 
 
-        if (typeHandlers.size() > 1) {
+        if (true || typeHandlers.size() > 1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
                 tmp.add(new TwoFacedObject(typeHandler.getLabel(),
@@ -1214,13 +1215,16 @@ public class TypeHandler extends RepositoryManager {
             if ( !tmp.contains(anyTfo)) {
                 tmp.add(0, anyTfo);
             }
-            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp, "",
+            List typeList = request.get(ARG_TYPE, new ArrayList());
+            typeList.remove(TYPE_ANY);
+
+            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp, typeList,
                                     (advancedForm
                                      ? " MULTIPLE SIZE=4 "
                                      : ""));
             String groupCbx = (advancedForm
                                ? HtmlUtil.checkbox(ARG_TYPE_EXCLUDE, "true",
-                                   false) + HtmlUtil.space(1) + msg("Exclude")
+                                                   request.get(ARG_TYPE_EXCLUDE,false)) + HtmlUtil.space(1) + msg("Exclude")
                                : "");
             basicSB.append(
                 HtmlUtil.formEntry(

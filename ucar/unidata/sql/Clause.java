@@ -496,7 +496,11 @@ public class Clause {
                 subClauses[i].addClause(buff);
                 toks.add(buff.toString());
             }
+            if(toks.size()>1) 
+                sb.append("(");
             sb.append(StringUtil.join(" " + expr + " ", toks));
+            if(toks.size()>1) 
+                sb.append(")");
             return sb;
         }
 

@@ -7075,7 +7075,7 @@ public class Repository extends RepositoryBase implements Tables,
             s = "<table>" + s +"</table>";
             String header = HtmlUtil.href(url,HtmlUtil.img(fileUrl(ICON_SEARCH),"Search Again")) +
                 "Search Criteria";
-            request.put(ARG_MESSAGELEFT,HtmlUtil.br(header)+ s);
+            request.setLeftMessage(HtmlUtil.br(header)+ s);
         }
         return getOutputHandler(request).outputGroup(request,
                                 getDummyGroup(), (List<Group>) pair[0],

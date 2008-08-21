@@ -127,6 +127,7 @@ public class Request implements Constants {
     private HttpServlet httpServlet;
 
 
+    private String leftMessage;
 
     /**
      * _more_
@@ -1329,6 +1330,25 @@ public class Request implements Constants {
     public javax.servlet.http.HttpServlet getHttpServlet() {
         return httpServlet;
     }
+
+    /**
+       Set the LeftMessage property.
+
+       @param value The new value for LeftMessage
+    **/
+    public void setLeftMessage (String value) {
+	leftMessage = value;
+    }
+
+    /**
+       Get the LeftMessage property.
+
+       @return The LeftMessage
+    **/
+    public String getLeftMessage () {
+	return leftMessage;
+    }
+
 
 
 }

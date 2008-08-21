@@ -144,8 +144,6 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
 
 
 
-
-
     /**
      * _more_
      *
@@ -156,8 +154,8 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      */
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        List<String> l = (List<String>)getValues(request);
-        if (l == null) {
+        List<String> l = (List<String>)getValues(request,true);
+        if (l == null|| l.size()==0) {
             return;
         }
         List values = trimValues(l);
@@ -229,8 +227,8 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    private List getValues(Request request) throws Exception {
-        if (predefinedValues != null) {
+    private List getValues(Request request, boolean justTheOnesInTheDatabase) throws Exception {
+        if (!justTheOnesInTheDatabase &&predefinedValues != null) {
             return predefinedValues;
         }
         String[] values = getMetadataManager().getDistinctValues(request,
@@ -286,7 +284,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
             //                                             metadata.getAttr1(), 100));
 
         } else {
-            List values = getValues(request);
+            List values = getValues(request,false);
             if (values != null) {
                 values.add(0, new TwoFacedObject("", ""));
                 content = formEntry(new String[] { submit, lbl,

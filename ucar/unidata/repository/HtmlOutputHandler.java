@@ -791,11 +791,7 @@ public class HtmlOutputHandler extends OutputHandler {
             request.remove(ARG_MESSAGE);
         }
 
-        String messageLeft = null;
-        if (request.exists(ARG_MESSAGELEFT)) {
-            messageLeft = request.getUnsafeString(ARG_MESSAGELEFT, "");
-            request.remove(ARG_MESSAGELEFT);
-        }
+
 
         showNext(request, subGroups, entries, sb);
 
@@ -894,6 +890,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         }
 
+        String messageLeft = request.getLeftMessage();
         if (messageLeft!=null) {
             sb = new StringBuffer("<table width=\"100%\" border=0><tr valign=\"top\"><td width=\"20%\"><nobr>" + 
                                   messageLeft +
