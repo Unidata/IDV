@@ -568,12 +568,12 @@ public class HtmlUtil {
                                        String north, String east,
                                        String west) {
         return "<table>" + "<tr><td colspan=\"2\" align=\"center\">"
-               + input(baseName + "_north", north, " size=\"5\"")
+               + input(baseName + "_north", north, " size=\"5\" id=\"" + baseName + "_north\"" )
                + "</td></tr>" + "<tr><td>"
-               + input(baseName + "_west", west, " size=\"5\"") + "</td><td>"
-               + input(baseName + "_east", east, " size=\"5\"") + "</tr>"
+               + input(baseName + "_west", west, " size=\"5\" id=\"" + baseName + "_west\"") + "</td><td>"
+               + input(baseName + "_east", east, " size=\"5\"  id=\"" + baseName + "_east\"") + "</tr>"
                + "<tr><td colspan=\"2\" align=\"center\">"
-               + input(baseName + "_south", south, " size=\"5\"")
+               + input(baseName + "_south", south, " size=\"5\"  id=\"" + baseName + "_south\"")
                + "</table>";
     }
 
@@ -1377,6 +1377,18 @@ public class HtmlUtil {
     public static String jsLink(String events, String content, String extra) {
         return "<a href=\"javascript:noop()\" " + events + " " + extra + ">"
                + content + "</a>";
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String script(String s) {
+        return "<script type=\"text/JavaScript\">" + s + "</script>\n";
     }
 
 }
