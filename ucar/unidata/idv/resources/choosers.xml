@@ -163,8 +163,8 @@ If using the tree panel you can define components that are displayed when a cate
          showdatasourcemenu="false"/>
       <chooser
          id="chooser.tdsradar"
-         title="Level II - Remote"
-         menutitle="TDS Level II Radar"
+         title="NEXRAD - Remote"
+         menutitle="TDS NEXRAD Radar"
          helppath="idv.data.choosers.radarchooser"
          class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
 <!--       <chooser
