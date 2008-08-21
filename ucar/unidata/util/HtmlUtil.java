@@ -104,6 +104,9 @@ public class HtmlUtil {
         return "<br>";
     }
 
+    public static String br(String line) {
+        return line +"<br>";
+    }
     /**
      * _more_
      *
@@ -994,7 +997,7 @@ public class HtmlUtil {
                 label = "..." + label.substring(label.length() - maxLength);
             }
 
-            sb.append("<option " + selectedAttr + "value=\"" + value + "\">"
+            sb.append("<option " + selectedAttr + " title=\"" + value +"\"" + " value=\"" + value + "\">"
                       + label + "</option>\n");
         }
         sb.append("</select>\n");
