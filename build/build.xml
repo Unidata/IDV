@@ -345,30 +345,6 @@ line using: and -Dbasedir=/some/other/dir
             <arg line="conan ${makedir} /content${snapshot_path}/docs/workshop;"/>
         </exec>       
 
-        <scp
-            todir="${user.name}@conan:/content${snapshot_path}/docs"
-            keyfile="${user.home}/.ssh/id_dsa"
-            passphrase=""
-            file="auxdata/docs/.htaccess"/>
-
-        <echo message="Making webstart directory: ${snapshot_path}/webstart"/>
-        <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/webstart;"/>
-        </exec>       
-        <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/webstart/IDV;"/>
-        </exec>       
-
-        <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_path}/webstart;if !(-e java3D) ln -s /content/software/idv/webstart/java3D java3D"/>
-        </exec>       
-
-
-       <antcall target="webstart_release">
-          <param  name="webstart_target" value="${snapshot_path}/webstart"/>
-          <param  name="codebase_path" value="${snapshot_webstart_path}/webstart"/>
-       </antcall>
-
         <echo message="Making download directory: /content${snapshot_download_path}"/>
         <exec executable="ssh">
             <arg line="conan cd /home/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
@@ -390,6 +366,60 @@ line using: and -Dbasedir=/some/other/dir
             <fileset  dir="installers" includes="**/idv_${idv.version.under}_**"/>
         </scp>
 
+        <echo message="Making webstart directory: ${snapshot_path}/webstart"/>
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/webstart;"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/webstart/IDV;"/>
+        </exec>       
+
+<!--  Not needed after 2.6a2
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_path}/webstart;if !(-e java3D) ln -s /content/software/idv/webstart/java3D java3D"/>
+        </exec>       
+-->
+
+       <antcall target="webstart_release">
+          <param  name="webstart_target" value="${snapshot_path}/webstart"/>
+          <param  name="codebase_path" value="${snapshot_webstart_path}/webstart"/>
+       </antcall>
+
+        <scp
+            todir="${user.name}@conan:/content${snapshot_path}/docs"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+            file="auxdata/docs/.htaccess"/>
+
+
+
+        <echo message="Making docs, jars zip, etc."/>
+        <antcall target="ftpdir"/>
+        <scp
+            todir="${user.name}@conan:/content${ftp_path}"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+        >
+            <fileset  dir="${ftpdir}" includes="*.jar,*.zip"/>
+        </scp>
+
+
+
+        <exec dir="docs" executable="scp">
+             <arg line = "-r userguide conan:/content${snapshot_path}/docs"/>
+        </exec>
+
+        <exec dir="docs" executable="scp">
+             <arg line = "-r workshop conan:/content${snapshot_path}/docs"/>
+        </exec>
+
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_path}; if !(-e plugins) ln -s /content/software/idv/plugins plugins"/>
+        </exec>       
+
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_path}; if !(-e resources) ln -s /content/software/idv/resources resources"/>
+        </exec>       
 
         <echo message="Copying index.html file: /content${snapshot_path}"/>
 
@@ -431,36 +461,6 @@ line using: and -Dbasedir=/some/other/dir
             passphrase=""
             file="${ftpdir}/toc.xml"/>
 
-
-
-        <echo message="Making docs, jars zip, etc."/>
-        <antcall target="ftpdir"/>
-        <scp
-            todir="${user.name}@conan:/content${ftp_path}"
-            keyfile="${user.home}/.ssh/id_dsa"
-            passphrase=""
-        >
-            <fileset  dir="${ftpdir}" includes="*.jar,*.zip"/>
-        </scp>
-
-
-
-        <exec dir="docs" executable="scp">
-             <arg line = "-r userguide conan:/content${snapshot_path}/docs"/>
-        </exec>
-
-        <exec dir="docs" executable="scp">
-             <arg line = "-r workshop conan:/content${snapshot_path}/docs"/>
-        </exec>
-
-        <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_path}; if !(-e plugins) ln -s /content/software/idv/plugins plugins"/>
-        </exec>       
-
-        <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_path}; if !(-e resources) ln -s /content/software/idv/resources resources"/>
-        </exec>       
-
         <echo message="Flipping links: ln -s ${snapshot_dir} ${snapshot_name}"/>
         <exec executable="ssh">
             <arg line="conan cd /content${idv_release_path}; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
@@ -495,6 +495,7 @@ line using: and -Dbasedir=/some/other/dir
                 includes="*.jnlp,*.html" />
             <filterset>
                 <filter token="IDV_CODEBASE" value="${webstart_url_root}${codebase_path}/"/>
+                <filter token="IDV_VERSION_SPACE" value="${idv.version.space}"/>
             </filterset>
         </copy>
 
