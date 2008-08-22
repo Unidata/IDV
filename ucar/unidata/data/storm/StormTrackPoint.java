@@ -43,6 +43,9 @@ import java.util.List;
  */
 public class StormTrackPoint implements Comparable {
 
+    private int id=-1;
+    private boolean edited = false;
+
     /** _more_ */
     private EarthLocation location;
 
@@ -214,5 +217,46 @@ public class StormTrackPoint implements Comparable {
         StormTrackPoint other = (StormTrackPoint) o;
         return ((trackPointId.equals(other.trackPointId)));
         }*/
+
+    /**
+       Set the Id property.
+
+       @param value The new value for Id
+    **/
+    public void setId (int value) {
+	id = value;
+    }
+
+    /**
+       Get the Id property.
+
+       @return The Id
+    **/
+    public int getId () {
+	return id;
+    }
+
+    /**
+       Set the Edited property.
+
+       @param value The new value for Edited
+    **/
+    public void setEdited (boolean value) {
+	edited = value;
+    }
+
+    /**
+       Get the Edited property.
+
+       @return The Edited
+    **/
+    public boolean getEdited () {
+	return edited;
+    }
+
+
+    
+
+
 }
 

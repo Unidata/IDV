@@ -341,6 +341,10 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
+    public boolean isEditable() {
+        return true;
+    }
+
 
     /**
      * _more_

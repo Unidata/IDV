@@ -160,6 +160,10 @@ public abstract class StormDataSource extends DataSourceImpl {
     }
 
 
+    public boolean isEditable() {
+        return false;
+    }
+
     public boolean canAddCurrentName(DataChoice dataChoice){
         return false;
     }
