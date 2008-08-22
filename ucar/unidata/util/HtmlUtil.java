@@ -384,6 +384,11 @@ public class HtmlUtil {
         });
     }
 
+    public static String url(String path, List  args) {
+        return url(path,Misc.listToStringArray(args));
+    }
+
+
     /**
      * _more_
      *
