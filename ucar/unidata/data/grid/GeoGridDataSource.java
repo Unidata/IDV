@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.grid;
 
 
@@ -975,7 +974,7 @@ public class GeoGridDataSource extends GridDataSource {
         }
 
         try {
-            file =  convertSourceFile(file);
+            file = convertSourceFile(file);
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (java.io.FileNotFoundException fnfe) {
@@ -1040,7 +1039,8 @@ public class GeoGridDataSource extends GridDataSource {
         if (windFlag != null) {  // found it
             try {
                 Array array = windFlag.read();
-                gridRelativeWind = (array.getInt(array.getIndex()) == 8);
+                gridRelativeWind = !((array.getInt(array.getIndex())
+                                      & 1 << 3) == 0);
             } catch (IOException ioe) {
                 LogUtil.printException(log_, "Couldn't read variable ", ioe);
             }
