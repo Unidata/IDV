@@ -256,7 +256,7 @@ public class WmsDataSource extends DataSourceImpl {
         if (wmsInfo.getLegendIcon() != null) {
             requestProperties.put(PROP_ICONPATH, wmsInfo.getLegendIcon());
         }
-        if (boundsToUse == null) {
+        if (!wmsInfo.getAllowSubsets() || boundsToUse == null) {
             boundsToUse = wmsInfo.getBounds();
         } else {
             boundsToUse.rectify(wmsInfo.getBounds(), 0.0);
@@ -273,21 +273,17 @@ public class WmsDataSource extends DataSourceImpl {
         if (wmsInfo.getFixedWidth() > -1) {
             imageWidth = wmsInfo.getFixedWidth();
         }
-        if (imageHeight < 0) {
-            if (wmsInfo.getFixedHeight() > -1) {
-                imageHeight = wmsInfo.getFixedHeight();
-            } else {
+        if (wmsInfo.getFixedHeight() > -1) {
+            imageHeight = wmsInfo.getFixedHeight();
+        } else {
+            if (imageHeight < 0) {
                 imageHeight = Math.abs((int) (imageWidth
                         * boundsToUse.getDegreesY()
                         / boundsToUse.getDegreesX()));
             }
         }
-
         imageWidth  = Math.min(Math.max(imageWidth, 50), 2056);
         imageHeight = Math.min(Math.max(imageHeight, 50), 2056);
-
-        imageWidth  = 600;
-        imageHeight = 600;
 
 
         double diff = Math.abs(boundsToUse.getMinLon()
