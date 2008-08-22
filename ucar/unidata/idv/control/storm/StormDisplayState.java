@@ -159,6 +159,8 @@ public class StormDisplayState {
         Color.GREEN, Color.BLUE, Color.CYAN, Color.GRAY, Color.LIGHT_GRAY
     };
 
+    private boolean hasBeenEdited = false;
+
     /** _more_ */
     private static int[] nextColor = { 0 };
 
@@ -2123,5 +2125,12 @@ public class StormDisplayState {
     public void setForecastAnimationMode(int value){
         forecastAnimationMode = value;
     }
+
+    public void markHasBeenEdited() {
+        hasBeenEdited = true;
+    }
+
+
+
 }
 

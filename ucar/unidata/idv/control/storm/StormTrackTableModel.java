@@ -166,7 +166,8 @@ public class StormTrackTableModel extends AbstractTableModel {
      * @return _more_
      */
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false;
+        if(columnIndex==0) return false;
+        return stormDisplayState.getStormTrackControl().isEditable();
     }
 
 
@@ -195,7 +196,22 @@ public class StormTrackTableModel extends AbstractTableModel {
      * @param rowIndex _more_
      * @param columnIndex _more_
      */
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {}
+    public void setValueAt(Object aValue, int rowIndex, int column) {
+        StormTrackPoint stp = points.get(rowIndex);
+        if(column==0) {
+            return;
+        } else if(column==1) {
+            //latitude
+        } else if(column==2) {
+            //longitude
+        } else {
+            StormParam param = params.get(column - 3);
+            Real       r     = stp.getAttribute(param);
+            double newValue = new Double(aValue.toString()).doubleValue();
+            //Set the value
+        }
+        stormDisplayState.markHasBeenEdited();
+    }
 
     /**
      * _more_

@@ -258,6 +258,10 @@ public class StormTrackControl extends DisplayControlImpl {
         return basePref + "." + stormDataSource.getId();
     }
 
+    protected boolean isEditable() {
+        return stormDataSource.isEditable();
+    }
+
 
     /**
      * _more_
