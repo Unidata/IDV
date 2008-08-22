@@ -607,12 +607,15 @@ public  class OutputHandler extends RepositoryManager {
         List   items          = new ArrayList();
         String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
+        String l = HtmlUtil.img(getRepository().fileUrl(ICON_LCURVE),"","  class=\"curve\"");
+        String r = HtmlUtil.img(getRepository().fileUrl(ICON_RCURVE),""," class=\"curve\"  ");
+
         String offextra    = " class=\"subnavoffcomp\" ";
         String onextra = " class=\"subnavoncomp\" ";
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, (String) outputType.getId());
             if (outputType.getId().equals(output)) {
-                items.add(HtmlUtil.span(msg(outputType.toString()),onextra));
+                items.add(HtmlUtil.span(l+msg(outputType.toString())+r,onextra));
             } else {
                 String url = outputType.assembleUrl(request);
                 items.add(HtmlUtil.span(HtmlUtil.href(url, msg(outputType.toString())), offextra));

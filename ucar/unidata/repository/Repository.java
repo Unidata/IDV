@@ -2907,14 +2907,19 @@ public class Repository extends RepositoryBase implements Tables,
         String offextra    = " class=\"subnavoffcomp\" ";
         String onextra = " class=\"subnavoncomp\" ";
         String type     = request.getRequestPath();
+
+        String l = HtmlUtil.img(fileUrl(ICON_LCURVE),"","  class=\"curve\"");
+        String r = HtmlUtil.img(fileUrl(ICON_RCURVE),""," class=\"curve\"  ");
+
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
             label = msg(label);
             if (label == null) {
                 label = urls[i].toString();
             }
+
             if (type.endsWith(urls[i].getPath())) {
-                links.add(HtmlUtil.span(label, onextra));
+                links.add(HtmlUtil.span(l+label+r, onextra));
             } else {
                 links.add(HtmlUtil.href(request.url(urls[i]) + arg, label,
                                         offextra));

@@ -840,7 +840,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         String messageLeft = request.getLeftMessage();
         if (messageLeft!=null) {
-            sb = new StringBuffer("<table width=\"100%\" border=0><tr valign=\"top\"><td width=\"20%\"><nobr>" + 
+            sb = new StringBuffer("<table width=\"100%\" border=0><tr valign=\"top\"><td width=\"100\"><nobr>" + 
                                   messageLeft +
                 "</nobr></td><td>" + sb +"</td></tr></table>");
         }

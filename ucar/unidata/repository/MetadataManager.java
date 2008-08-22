@@ -407,8 +407,24 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+
     public Result processMetadataCloud(Request request) throws Exception {
+        boolean doCloud = request.getString(ARG_TYPE,"cloud").equals("cloud");
         StringBuffer sb    = new StringBuffer();
+        String header;
+        if(doCloud) {
+            request.put(ARG_TYPE,"list");
+            header = HtmlUtil.b("Cloud") +
+                HtmlUtil.span("&nbsp;|&nbsp;"," class=\"separator\" " )+
+                HtmlUtil.href(request.getUrl(),"List");
+        } else {
+            request.put(ARG_TYPE,"cloud");
+            header = HtmlUtil.href(request.getUrl(),"Cloud") +
+                HtmlUtil.span("&nbsp;|&nbsp;","class=\"separator\" ") +
+                HtmlUtil.b("List");
+        }
+        sb.append(HtmlUtil.center(HtmlUtil.span(header," class=pagesubheading ")));
+        sb.append(HtmlUtil.hr());
         MetadataHandler handler =  findMetadataHandler(request.getString(ARG_METADATA_TYPE,""));
         Metadata.Type type = handler.findType(request.getString(ARG_METADATA_TYPE,""));
         String[] values = getDistinctValues(request, handler,type);
@@ -435,21 +451,43 @@ public class MetadataManager extends RepositoryManager {
         }
         int    diff         = max - min;
         double distribution = diff / 5.0;
-
-        for (int i = 0; i < values.length; i++) {
-            if(cnt[i]==0) continue;
-            double percent = cnt[i]/distribution;
-            int    bin     = (int) (percent * 5);
-            String css     = "font-size:" + (12 + bin * 2);
-            sb.append("<span style=\"" + css + "\">");
-            String extra = XmlUtil.attrs("alt",
-                                         "Count:" + cnt[i],
-                                         "title",
-                                         "Count:" + cnt[i]);
-            sb.append(
-                      HtmlUtil.href(handler.getSearchUrl(request, type, values[i]), values[i], extra));
-            sb.append("</span>");
-            sb.append(" &nbsp; ");
+        if(!doCloud) {
+            List tuples  = new ArrayList();
+            for (int i = 0; i < values.length; i++) {
+                tuples.add(new Object[]{new Integer(cnt[i]), values[i]});
+            }
+            tuples = Misc.sortTuples(tuples, false);
+            sb.append("<table>");
+            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b("Count"),HtmlUtil.b(type.getLabel()))));
+            for(int i=0;i<tuples.size();i++) {
+                Object []tuple = (Object[]) tuples.get(i);
+                sb.append("<tr><td width=\"1%\" align=right>");
+                sb.append(tuple[0]);
+                sb.append("</td><td>");
+                String value = (String) tuple[1];
+                sb.append(HtmlUtil.href(handler.getSearchUrl(request, type, value), value));
+                sb.append("</td></tr>");
+            }
+            sb.append("</table>");
+        } else {
+            for (int i = 0; i < values.length; i++) {
+                if(cnt[i]==0) continue;
+                double percent = cnt[i]/distribution;
+                int    bin     = (int) (percent * 5);
+                String css     = "font-size:" + (12 + bin * 2);
+                String value = values[i];
+                String ttValue = value.replace("\"","'");
+                if(value.length()>30) value = value.substring(0,29) + "...";
+                sb.append("<span style=\"" + css + "\">");
+                String extra = XmlUtil.attrs("alt",
+                                             "Count:" + cnt[i]+" " + ttValue,
+                                             "title",
+                                             "Count:" + cnt[i] + " " + ttValue);
+                sb.append(
+                          HtmlUtil.href(handler.getSearchUrl(request, type, values[i]), value, extra));
+                sb.append("</span>");
+                sb.append(" &nbsp; ");
+            }
         }
 
 

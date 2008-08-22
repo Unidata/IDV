@@ -70,21 +70,22 @@ a.header  {
    font-size: 10pt;
    padding-left:5;   
    padding-top:6;   
-   background-color : #cccccc;
+   background-color : #c3d9ff;
    font-weight: bold;
    color: black;
-   border-bottom : 1px #444444 solid;
+
+   border-bottom : 2px #666666 solid;
 }
 
 
 .subnavoncomp  {
-   border : 1px #444444 solid;
-   border-bottom : 1px #ffffff solid;
+   xborder : 1px #444444 solid;
+   border-bottom : 2px #ffffff solid;
    background-color : #ffffff;
-   padding-left:6;   
-   padding-right:6;   
+   xpadding-left:6;   
+   xpadding-right:6;   
    color:#000000;
-   padding-top:1;   
+   xpadding-top:1;   
 }
 
 .subnavoffcomp  {
@@ -298,7 +299,9 @@ a.menulink {
    font-size: 12pt;
 }
 
-
+.curve {
+   vertical-align: top;
+}
 
 a.pagesubheadinglink {
    color:black;
