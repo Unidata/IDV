@@ -2885,8 +2885,7 @@ public class Repository extends RepositoryBase implements Tables,
         Result result = new Result(title, sb);
         if(links!=null) {
             result.putProperty(PROP_NAVSUBLINKS,
-                               getRepository().getSubNavLinks(request,
-                                                              links));
+                               getSubNavLinks(request, links));
         }
         return result;
     }
@@ -2914,7 +2913,7 @@ public class Repository extends RepositoryBase implements Tables,
             if (label == null) {
                 label = urls[i].toString();
             }
-            if (urls[i].toString().equals(type)) {
+            if (type.endsWith(urls[i].getPath())) {
                 links.add(HtmlUtil.span(label, onextra));
             } else {
                 links.add(HtmlUtil.href(request.url(urls[i]) + arg, label,

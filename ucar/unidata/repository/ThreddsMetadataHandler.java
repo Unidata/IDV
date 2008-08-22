@@ -136,6 +136,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public ThreddsMetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository, node);
+        TYPE_LINK.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1|Metadata.Type.SEARCHABLE_ATTR2);
+        TYPE_PROPERTY.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1|Metadata.Type.SEARCHABLE_ATTR2);
         addType(TYPE_DOCUMENTATION);
         addType(TYPE_PROPERTY);
         addType(TYPE_LINK);
@@ -257,12 +259,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String[] getHtml(Metadata metadata) {
+    public String[] getHtml(Request request, Metadata metadata) {
         Metadata.Type type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         if (type.equals(TYPE_LINK)) {
-            content = HtmlUtil.href(metadata.getAttr2(), metadata.getAttr1());
+            content = getSearchLink(request, metadata) +HtmlUtil.href(metadata.getAttr2(), metadata.getAttr1());
         } else if (type.equals(TYPE_DOCUMENTATION)) {
             if (metadata.getAttr1().length() > 0) {
                 lbl = msgLabel(getLabel(metadata.getAttr1()));
@@ -270,12 +272,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             content = metadata.getAttr2();
         } else if (type.equals(TYPE_PROPERTY)) {
             lbl     = msgLabel(getLabel(metadata.getAttr1()));
-            content = metadata.getAttr2();
+            content =  getSearchLink(request, metadata) +metadata.getAttr2();
         } else if (type.equals(TYPE_ICON)) {
             lbl     = "";
             content = HtmlUtil.img(metadata.getAttr1());
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
-            content = metadata.getAttr1();
+            content = getSearchLink(request, metadata) +metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
                 content += HtmlUtil.br() + msgLabel("Email")
                            + HtmlUtil.space(1) + metadata.getAttr3();
@@ -286,6 +288,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                            + HtmlUtil.href(metadata.getAttr4(),
                                            metadata.getAttr4());
             }
+             
+        } else if(type.equals(TYPE_PROJECT)) {
+            content = getSearchLink(request, metadata) +metadata.getAttr1();
+        } else if(type.equals(TYPE_KEYWORD)) {
+            content = getSearchLink(request, metadata) +metadata.getAttr1();
         } else {
             content = metadata.getAttr1();
         }

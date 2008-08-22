@@ -136,9 +136,9 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String[] getHtml(Metadata metadata) {
+    public String[] getHtml(Request request,Metadata metadata) {
         String lbl     = msgLabel(TYPE_ENUM.getLabel());
-        String content = metadata.getAttr1();
+        String content = getSearchLink(request, metadata) +metadata.getAttr1();
         return new String[] { lbl, content };
     }
 

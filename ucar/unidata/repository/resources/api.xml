@@ -46,6 +46,7 @@
 
   <method request="/entry/get/*"     method="processEntryGet"      cancache="false"/>
 
+  <method handler="metadatamanager" request="/metadata/cloud"   method="processMetadataCloud"/>
   <method handler="metadatamanager" request="/metadata/form"   method="processMetadataForm" actions="edit"/>
   <method handler="metadatamanager" request="/metadata/addform"   method="processMetadataAddForm" actions="edit"/>
   <method handler="metadatamanager" request="/metadata/add"   method="processMetadataAdd" actions="edit"/>

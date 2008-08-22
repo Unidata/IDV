@@ -126,7 +126,7 @@ public class AdminMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String[] getHtml(Metadata metadata) {
+    public String[] getHtml(Request request, Metadata metadata) {
         Metadata.Type type = getType(metadata.getType());
         String        lbl  = msgLabel(type.getLabel());
         if (type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {

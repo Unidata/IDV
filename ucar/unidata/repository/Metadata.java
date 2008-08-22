@@ -141,8 +141,6 @@ public class Metadata implements Constants, Tables {
     }
 
 
-
-
     /**
      * _more_
      *
@@ -362,6 +360,12 @@ public class Metadata implements Constants, Tables {
      */
     public static class Type {
         public static final String DEFAULT_CATEGORY = "Summary";
+        public static final int SEARCHABLE_ATTR1 = 1<<0;
+        public static final int SEARCHABLE_ATTR2 = 1<<1;
+        public static final int SEARCHABLE_ATTR3 = 1<<3;
+        public static final int SEARCHABLE_ATTR4 = 1<<4;
+
+        public int searchableMask = 0;
 
         /** _more_ */
         private         String type;
@@ -394,7 +398,7 @@ public class Metadata implements Constants, Tables {
          * @param label _more_
          */
         public Type(String type, String label) {
-            this(type,label,DEFAULT_CATEGORY);
+            this(type,label,DEFAULT_CATEGORY,false);
         }
 
         public Type(String type, String label,String category) {
@@ -425,6 +429,33 @@ public class Metadata implements Constants, Tables {
             this.category = category;
             this.isEnumerated = enumerated;
         }
+
+        public void setSearchableMask(int mask) {
+            searchableMask = mask;
+        }
+
+
+        public boolean isSearchable(int mask) {
+            return (searchableMask&mask)!=0;
+        }
+
+        public boolean isAttr1Searchable() {
+            return isSearchable(SEARCHABLE_ATTR1);
+        }
+
+        public boolean isAttr2Searchable() {
+            return isSearchable(SEARCHABLE_ATTR2);
+        }
+
+        public boolean isAttr3Searchable() {
+            return isSearchable(SEARCHABLE_ATTR3);
+        }
+
+        public boolean isAttr4Searchable() {
+            return isSearchable(SEARCHABLE_ATTR4);
+        }
+
+
 
         /**
          * _more_

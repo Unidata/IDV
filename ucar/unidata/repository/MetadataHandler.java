@@ -240,7 +240,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String[] getHtml(Metadata metadata) {
+    public String[] getHtml(Request request,Metadata metadata) {
         return null;
     }
 
@@ -297,6 +297,45 @@ public class MetadataHandler extends RepositoryManager {
             throws Exception {}
 
 
+    public String getSearchUrl(Request request, Metadata metadata) {
+        Metadata.Type type = findType(metadata.getType());
+        List args = new ArrayList();
+        args.add(ARG_METADATA_TYPE + "." + type);
+        args.add(type.toString());
+        args.add(ARG_METADATA_ATTR1 + "." + type);
+        args.add(metadata.getAttr1());
+        if(type.isAttr2Searchable()) {
+            args.add(ARG_METADATA_ATTR2 + "." + type);
+            args.add(metadata.getAttr2());
+        }
+        if(type.isAttr3Searchable()) {
+            args.add(ARG_METADATA_ATTR3 + "." + type);
+            args.add(metadata.getAttr3());
+        }
+        if(type.isAttr4Searchable()) {
+            args.add(ARG_METADATA_ATTR4 + "." + type);
+            args.add(metadata.getAttr4());
+        }
+        return  HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH), args);
+    }
+
+    public String getSearchUrl(Request request, Metadata.Type type, String value) {
+        List args = new ArrayList();
+        args.add(ARG_METADATA_TYPE + "." + type);
+        args.add(type.toString());
+        args.add(ARG_METADATA_ATTR1 + "." + type);
+        args.add(value);
+        return  HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH), args);
+    }
+
+
+
+    public String getSearchLink(Request request, Metadata metadata) {
+        return  HtmlUtil.href(getSearchUrl(request, metadata),
+                              HtmlUtil.img(getRepository().fileUrl(ICON_SEARCH)," border=0 "));
+    }
+
+
     /**
      * _more_
      *
@@ -311,6 +350,9 @@ public class MetadataHandler extends RepositoryManager {
                                 Metadata.Type type, boolean doSelect)
             throws Exception {
 
+        String cloudLink = HtmlUtil.href(request.url(getRepository().getMetadataManager().URL_METADATA_CLOUD,
+                                                     ARG_METADATA_TYPE, type.toString()),
+                                         HtmlUtil.img(getRepository().fileUrl(ICON_CLOUD)));
         String url = request.url(getRepository().URL_ENTRY_SEARCH);
         String[] values = getMetadataManager().getDistinctValues(request,
                                                                  this, type);
@@ -328,7 +370,7 @@ public class MetadataHandler extends RepositoryManager {
         }
         content.append("</div>");
 
-        sb.append(getRepository().makeShowHideBlock(request, type.toString()+".browse", type.getLabel(),
+        sb.append(getRepository().makeShowHideBlock(request, type.toString()+".browse", cloudLink+type.getLabel(),
                                                     content,false));
 
 

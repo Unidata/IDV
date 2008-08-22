@@ -84,12 +84,27 @@
 
     function initMap(canvasName) {
         var canvas = document.getElementById(canvasName);
-	if(!canvas) return;
+	
+	if(!canvas) {
+		alert('no canvas');
+		return;
+        }
         var mm = new MapMaker();
         mx[0] = mm.createMapx('Azimuthal Equal-Area',  90, 0, 0, 0, 0, 1,  90, 0,   0, 90, -180, 180, 15, 30, 0, 0, 0, 0, 1, 6371228.0);
+/*
+new_lat0 new_lon0   new_lat1  new_lon1 new_rotation new_scale
+ new_center_lat   new_center_lon
+                          new_south        (boundary parameters)
+                          new_north        ("        "         )
+                          new_west         ("        "         )
+                          new_east         ("        "         )*/
+
+
         mx[1] = mm.createMapx('Azimuthal Equal-Area', -90, 0, 0, 0, 0, 1, -90, 0, -90,  0, -180, 180, 15, 30, 0, 0, 0, 0, 1, 6371228.0);
-        
-        myCanvas = new WMSMapCanvas(canvas,128,128);
+
+       
+        myCanvas = new WMSMapCanvas(canvas,200,200);
+
 
         var a = new WMSAspect('north', 
                               'http://www.nsidc.org/cgi-bin/nsidc_ogc_north.pl', 
@@ -100,14 +115,7 @@
                               mx[0]);
         myCanvas.addAspect(a);
 
-        var a = new WMSAspect('south',
-                              'http://www.nsidc.org/cgi-bin/nsidc_ogc_south.pl',
-                              'EPSG:3409',
-                              {minx:-9036842.762,miny:-9036842.762,maxx:9036842.762,maxy:9036842.762},
-                              'blue_marble_01_circle,south_pole_geographic',
-                              19, 19,
-                              mx[1]);
-        myCanvas.addAspect(a);
+
 
         myCanvas.addLatLonListener(printit);
         myCanvas.addLatLonPolygonListener(printpoly);

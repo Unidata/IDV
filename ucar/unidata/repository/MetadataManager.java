@@ -112,6 +112,10 @@ public class MetadataManager extends RepositoryManager {
                                               "/metadata/form",
                                               "Edit Metadata");
 
+    public RequestUrl URL_METADATA_CLOUD = new RequestUrl(getRepository(),
+                                              "/metadata/cloud",
+                                              "Metadata Cloud");
+
     /** _more_ */
     public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(getRepository(),
                                                  "/metadata/addform",
@@ -400,6 +404,58 @@ public class MetadataManager extends RepositoryManager {
             return new Result(request.url(URL_METADATA_FORM, ARG_ID,
                                           entry.getId()));
         }
+    }
+
+
+    public Result processMetadataCloud(Request request) throws Exception {
+        StringBuffer sb    = new StringBuffer();
+        MetadataHandler handler =  findMetadataHandler(request.getString(ARG_METADATA_TYPE,""));
+        Metadata.Type type = handler.findType(request.getString(ARG_METADATA_TYPE,""));
+        String[] values = getDistinctValues(request, handler,type);
+        int[]cnt = new int[values.length];
+        int max = -1;
+        int min = 10000;
+        for (int i = 0; i < values.length; i++) {
+            String value = values[i];
+            cnt[i] = 0;
+            Statement stmt = getDatabaseManager().select(
+                                                         SqlUtil.count("*"),
+                                                         TABLE_METADATA,
+                                                         Clause.and(
+                                                         Clause.eq(COL_METADATA_TYPE, type.getType()),
+                                                         Clause.eq(COL_METADATA_ATTR1, value)));                                                         
+            ResultSet results = stmt.getResultSet();
+            if ( !results.next()) {
+                continue;
+            }
+            cnt[i] =  results.getInt(1);
+            max = Math.max(cnt[i],max);            
+            min = Math.min(cnt[i],min);
+            stmt.close();
+        }
+        int    diff         = max - min;
+        double distribution = diff / 5.0;
+
+        for (int i = 0; i < values.length; i++) {
+            if(cnt[i]==0) continue;
+            double percent = cnt[i]/distribution;
+            int    bin     = (int) (percent * 5);
+            String css     = "font-size:" + (12 + bin * 2);
+            sb.append("<span style=\"" + css + "\">");
+            String extra = XmlUtil.attrs("alt",
+                                         "Count:" + cnt[i],
+                                         "title",
+                                         "Count:" + cnt[i]);
+            sb.append(
+                      HtmlUtil.href(handler.getSearchUrl(request, type, values[i]), values[i], extra));
+            sb.append("</span>");
+            sb.append(" &nbsp; ");
+        }
+
+
+
+
+        return  getRepository().makeResult(request, msg(type.getLabel()+" Cloud"), sb, getRepository().searchUrls);
     }
 
 

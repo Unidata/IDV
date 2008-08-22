@@ -639,7 +639,7 @@ public class HtmlOutputHandler extends OutputHandler {
         for (Metadata metadata : metadataList) {
             for (MetadataHandler metadataHandler : metadataHandlers) {
                 if (metadataHandler.canHandle(metadata)) {
-                    String[] html = metadataHandler.getHtml(metadata);
+                    String[] html = metadataHandler.getHtml(request, metadata);
                     if (html != null) {
                         detailsSB.append(HtmlUtil.formEntryTop(html[0],
                                 html[1]));
