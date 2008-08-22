@@ -111,24 +111,6 @@ public class MapOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void xxxxgetOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
-            throws Exception {
-        getOutputTypesForEntries(request, entries, types);
-    }
 
 
     /**
@@ -141,23 +123,21 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
-         if (entries.size() > 0) {
-            boolean ok = false;
-            for (Entry entry : entries) {
-                if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
-                    ok = true;
-                    break;
-                }
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        
+        boolean ok = false;
+        for (Entry entry : state.getAllEntries()) {
+            if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
+                ok = true;
+                break;
             }
-            if ( !ok) {
-                return;
-            }
-            types.add(new OutputType("Map", OUTPUT_MAP));
         }
+        if ( !ok) {
+            return;
+        }
+        types.add(new OutputType("Map", OUTPUT_MAP));
     }
 
 
@@ -170,13 +150,7 @@ public class MapOutputHandler extends OutputHandler {
                               false, "");
         sb.append(crumbs[1]);
         getMap(request, entriesToUse,sb,700,500,true);
-        Result result = new Result("Results", sb);
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, request.getOutput(),
-                getRepository().getOutputTypesForEntry(request, entry)));
-        return result;
+        return makeLinksResult(request, "Results",sb,new State(entry));
     }
 
 
@@ -205,14 +179,7 @@ public class MapOutputHandler extends OutputHandler {
         sb.append(crumbs[1]);
         if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
-            Result result = new Result("Query Results", sb);
-            result.putProperty(
-                PROP_NAVSUBLINKS,
-                getHeader(
-                    request, HtmlOutputHandler.OUTPUT_HTML,
-                    getRepository().getOutputTypesForGroup(
-                        request, group, subGroups, entries)));
-            return result;
+            return makeLinksResult(request,"Results",sb, new State(group, subGroups, entries));
         }
 
         sb.append("<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
@@ -226,17 +193,7 @@ public class MapOutputHandler extends OutputHandler {
             }
         }
         sb.append("</td></tr></table>");
-
-        Result result = new Result("Results", sb);
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, request.getOutput(),
-                getRepository().getOutputTypesForGroup(
-                    request, group, subGroups, entries)));
-
-
-        return result;
+        return makeLinksResult(request,"Results", sb,new State(group, subGroups, entries));
     }
 
 

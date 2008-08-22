@@ -121,9 +121,11 @@ public class IdvWebstartOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        if(state.entry==null) return;
+        Entry entry = state.entry;
         if(entry.getResource().getPath().endsWith(".xidv") ||
            entry.getResource().getPath().endsWith(".zidv")) {
             String suffix = "/"+entry.getId()+".jnlp";

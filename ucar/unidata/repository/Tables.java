@@ -96,40 +96,6 @@ public interface Tables {
 
 
     /** _more_ */
-    public static final String TABLE_BOREHOLE = "borehole";
-
-    /** _more_ */
-    public static final String COL_BOREHOLE_ID = TABLE_BOREHOLE + ".id";
-
-    /** _more_ */
-    public static final String COL_BOREHOLE_MODELGROUP = TABLE_BOREHOLE
-                                                         + ".modelgroup";
-
-    /** _more_ */
-    public static final String COL_BOREHOLE_MODELRUN = TABLE_BOREHOLE
-                                                       + ".modelrun";
-
-    /** _more_ */
-    public static final String[] ARRAY_BOREHOLE = new String[] {
-                                                      COL_BOREHOLE_ID,
-            COL_BOREHOLE_MODELGROUP, COL_BOREHOLE_MODELRUN };
-
-    /** _more_ */
-    public static final String COLUMNS_BOREHOLE =
-        SqlUtil.comma(ARRAY_BOREHOLE);
-
-    /** _more_ */
-    public static final String NODOT_COLUMNS_BOREHOLE =
-        SqlUtil.commaNoDot(ARRAY_BOREHOLE);
-
-    /** _more_ */
-    public static final String INSERT_BOREHOLE =
-        SqlUtil.makeInsert(TABLE_BOREHOLE, NODOT_COLUMNS_BOREHOLE,
-                           SqlUtil.getQuestionMarks(ARRAY_BOREHOLE.length));
-
-
-
-    /** _more_ */
     public static final String TABLE_COMMENTS = "comments";
 
     /** _more_ */

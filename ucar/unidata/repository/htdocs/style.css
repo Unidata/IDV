@@ -121,11 +121,18 @@ a.subnavoffcomp  {
 }
 
 
+.calendarcontents {
+	max-height: 150px; 
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .browseblock {
    padding:3px;
    margin-left:20px;
    border: 2px #8a8a8a solid; 
-   max-height: 150px; overflow-y: auto;
+   max-height: 150px; 
+   overflow-y: auto;
 }
 
 .scrollablediv {

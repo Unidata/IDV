@@ -129,7 +129,7 @@ public class RssOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links)
+                                 List<Link> links,boolean forHeader)
             throws Exception {
         String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
                                       ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
@@ -138,46 +138,6 @@ public class RssOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
-            throws Exception {
-        /*        if (entries.size() == 0&& subGroups.size()==0) {
-            return;
-        }
-        getOutputTypesForEntries(request, entries, types);*/
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
-        //types.add(TFO_FULL);
-        //        types.add(TFO_SUMMARY);
-    }
 
 
     /**

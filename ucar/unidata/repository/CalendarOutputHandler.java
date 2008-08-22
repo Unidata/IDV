@@ -128,28 +128,13 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        if(state.entry!=null) return;
         types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
         types.add(new OutputType("Date Grid", OUTPUT_GRID));
     }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List<OutputType> types)
-            throws Exception {}
 
 
     /**
@@ -180,13 +165,7 @@ public class CalendarOutputHandler extends OutputHandler {
         } else {
             result = outputCalendar(request, group, entries, sb);
         }
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, output,
-                getRepository().getOutputTypesForGroup(
-                    request, group, subGroups, entries)));
-
+        addLinks(request, result, new State(group, subGroups, entries));
         return result;
     }
 
@@ -279,7 +258,7 @@ public class CalendarOutputHandler extends OutputHandler {
                 if (cb == null) {
                     sb.append("<td>" + HtmlUtil.space(1) + "</td>");
                 } else {
-                    sb.append("<td>" + cb + "</td>");
+                    sb.append("<td><div style=\"max-height: 150px; overflow-y: auto;\">" + cb + "</div></td>");
                 }
             }
             sb.append("</tr>");
@@ -537,8 +516,11 @@ public class CalendarOutputHandler extends OutputHandler {
                     bg = " style=\"background-color:lightblue;\"";
                 }
                 String dayContents = "&nbsp;";
-                if(inner!=null)
-                    dayContents =StringUtil.join("<br>",inner);
+                if(inner!=null) {
+                    dayContents ="<div class=\"calendarcontents\">" +
+                        StringUtil.join("<br>",inner) +"</div>";
+
+                }
                 content =
                     "<table border=0 cellspacing=\"0\" cellpadding=\"2\" width=100%><tr valign=top><td>" +dayContents+"</td><td align=right class=calday>"
                     + HtmlUtil.href(dayUrl,""+thisDay) + "<br>&nbsp;</td></tr></table>";

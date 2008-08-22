@@ -118,50 +118,12 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List<OutputType> types)
-            throws Exception {
-        if ( !getRepository().isAppletEnabled(request)) {
-            return;
-        }
-        //        types.add(new OutputType("Graph", OUTPUT_GRAPH));
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
-            throws Exception {
-        //        getOutputTypesForEntry(request, group, types);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
      * @param links _more_
      *
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links)
+                                 List<Link> links,boolean forHeader)
             throws Exception {
         if ( !getRepository().isAppletEnabled(request)) {
             return;
@@ -212,11 +174,7 @@ public class GraphOutputHandler extends OutputHandler {
 
 
         Result result = new Result(msg("Graph View") + title, sb);
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, request.getOutput(),
-                getRepository().getOutputTypesForEntry(request, entry)));
+        addLinks(request, result,new State(entry));
         return result;
 
     }

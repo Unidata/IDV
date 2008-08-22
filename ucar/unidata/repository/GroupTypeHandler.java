@@ -85,9 +85,9 @@ public class GroupTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links, boolean forMenu)
+                                 List<Link> links, boolean forHeader)
             throws Exception {
-        super.getEntryLinks(request, entry, links, forMenu);
+        super.getEntryLinks(request, entry, links, forHeader);
 
         if (getAccessManager().canDoAction(request, entry,
                                            Permission.ACTION_NEW)) {

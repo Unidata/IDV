@@ -141,29 +141,32 @@ public class IdvOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void xxxgetOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries, List<OutputType> types)
-
-            throws Exception {
-        getOutputTypesForEntries(request, entries,types);
-    }
 
 
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries, List<OutputType> types)
-            throws Exception {
-        List<Entry> theEntries = getRadarEntries(entries);
-        if(theEntries.size()>0) {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        List<Entry> theEntries = null;
+        if(state.entry!=null) {
+            DataSourceDescriptor descriptor = getDescriptor(state.entry);
+            if(descriptor!=null) {
+                types.add(new OutputType("Preview " + descriptor.getLabel(), OUTPUT_IDV));
+                return;
+            }
+
+            /*
+              if(state.entry.getResource().getPath().endsWith(".shp")) {
+              types.add(new TwoFacedObject("Preview Shapefile", OUTPUT_IDV));
+              return;
+              }
+            */
+            theEntries = new ArrayList<Entry>();
+            theEntries.add(state.entry);
+        } else {
+            theEntries = getRadarEntries(state.getAllEntries());
+        }
+
+        if(theEntries!=null && theEntries.size()>0) {
             types.add(new OutputType("Preview Radar", OUTPUT_IDV));
         }
     }
@@ -176,26 +179,6 @@ public class IdvOutputHandler extends OutputHandler {
         return idv;
     }
 
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List<OutputType> types)
-            throws Exception {
-
-        DataSourceDescriptor descriptor = getDescriptor(entry);
-        if(descriptor!=null) {
-            types.add(new OutputType("Preview " + descriptor.getLabel(), OUTPUT_IDV));
-            return;
-        }
-
-        /*
-        if(entry.getResource().getPath().endsWith(".shp")) {
-            types.add(new TwoFacedObject("Preview Shapefile", OUTPUT_IDV));
-            return;
-        }
-        */
-        List<Entry> entries = new ArrayList<Entry>();
-        entries.add(entry);
-        getOutputTypesForEntries(request, entries, types);
-    }
 
 
     private List<Entry> getRadarEntries(List<Entry> entries) {
@@ -275,12 +258,7 @@ public class IdvOutputHandler extends OutputHandler {
                 if(dataSource!=null) {
                     sb.append(dataSource.getFullDescription());
                     Result result = new Result("Metadata - " + title, sb);
-                    result.putProperty(
-                                       PROP_NAVSUBLINKS,
-                                       getHeader(
-                                                 request, OUTPUT_IDV,
-                                                 getRepository().getOutputTypesForGroup(
-                                                                                        request, group, subGroups, entries)));
+                    addLinks(request, result,new State(group, subGroups, entries));
                     return result;
                 }
             }
@@ -288,12 +266,7 @@ public class IdvOutputHandler extends OutputHandler {
             sb.append("&nbsp;<p>");
             sb.append(HtmlUtil.img(url));
             Result result = new Result("Preview - " + title, sb);
-            result.putProperty(
-                PROP_NAVSUBLINKS,
-                getHeader(
-                    request, OUTPUT_IDV,
-                    getRepository().getOutputTypesForGroup(
-                                                           request, group, subGroups, entries)));
+            addLinks(request, result,new State(group, subGroups, entries));
             return result;
         }
 

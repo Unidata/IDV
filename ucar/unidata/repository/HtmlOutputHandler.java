@@ -80,14 +80,6 @@ import java.util.zip.*;
  */
 public class HtmlOutputHandler extends OutputHandler {
 
-    /***
-<metadatabrowse>
-
-</metadatabrowse>
-
-     ***/
-
-
 
     /** _more_ */
     public static final String OUTPUT_TIMELINE = "default.timeline";
@@ -150,10 +142,10 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        List<Entry> entries  = state.getAllEntries();
         types.add(new OutputType("Entry", OUTPUT_HTML));
         if (entries.size() > 1) {
             types.add(new OutputType("Timeline", OUTPUT_TIMELINE));
@@ -176,7 +168,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         request.put(ARG_OUTPUT, OUTPUT_HTML);
-        String  links  = getRepository().getEntryLinksHtml(request, entry);
+        String  links  = getRepository().getEntryLinksHtml(request, entry,false);
         boolean didOne = false;
         sb.append("<table>");
         sb.append(HtmlUtil.row(HtmlUtil.colspan("<center>" + links
@@ -230,15 +222,8 @@ public class HtmlOutputHandler extends OutputHandler {
         getMetadataHtml(request, entry, sb, true);
         getCommentBlock(request, entry, sb);
         getAssociationBlock(request, entry, sb);
-        Result result = new Result(msgLabel("Entry") + entry.getLabel(), sb,
-                                   getMimeType(request.getOutput()));
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, request.getOutput(),
-                getRepository().getOutputTypesForEntry(request, entry)));
-        return result;
-
+        return makeLinksResult(request, msgLabel("Entry") + entry.getLabel(), sb,
+                               new State(entry));
     }
 
 
@@ -381,43 +366,6 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param output _more_
-     * @param what _more_
-     * @param sb _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void xappendListHeader(Request request, String output,
-                                     String what, StringBuffer sb)
-            throws Exception {
-        /*
-        List<OutputType> outputTypes =
-            getRepository().xgetOutputTypesFor(request, what);
-        int cnt = 0;
-        sb.append("<b>");
-        String initialOutput = request.getOutput("");
-        for (OutputType tfo : outputTypes) {
-            if (cnt++ > 0) {
-                sb.append("&nbsp;|&nbsp;");
-            }
-            request.put(ARG_OUTPUT, (String) tfo.getId());
-            if (tfo.getId().equals(output)) {
-                sb.append(HtmlUtil.span(tfo.toString(), ""));
-            } else {
-                sb.append(
-                    HtmlUtil.href(
-                        request.getRequestPath() + "?"
-                        + request.getUrlArgs(), tfo.toString()));
-            }
-        }
-        request.put(ARG_OUTPUT, initialOutput);
-        sb.append("</b>");
-        */
-    }
 
 
     /*
@@ -897,15 +845,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 "</nobr></td><td>" + sb +"</td></tr></table>");
         }
 
-        Result result = new Result(title, sb, getMimeType(output));
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, output,
-                getRepository().getOutputTypesForGroup(
-                    request, group, subGroups, entries)));
-
-        return result;
+        return makeLinksResult(request, title, sb,new State(group, subGroups, entries));
 
     }
 

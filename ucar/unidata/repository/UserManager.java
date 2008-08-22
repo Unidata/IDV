@@ -1149,7 +1149,7 @@ public class UserManager extends RepositoryManager {
                 sb.append(msgLabel("As"));
                 sb.append(HtmlUtil.space(1));
                 List outputList =
-                    repository.getOutputTypesForEntries(request, entries);
+                    repository.getOutputTypes(request, new OutputHandler.State(entries));
                 sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             }
             //            sb.append("<br>");
@@ -1372,7 +1372,7 @@ public class UserManager extends RepositoryManager {
     protected void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository()) {
             protected void getEntryLinks(Request request, Entry entry,
-                                         List<Link> links)
+                                         List<Link> links,boolean forHeader)
                     throws Exception {
                 links.add(
                     new Link(
@@ -1387,15 +1387,16 @@ public class UserManager extends RepositoryManager {
             public boolean canHandle(String output) {
                 return output.equals(OUTPUT_CART);
             }
-            protected void getOutputTypesForEntry(Request request,
-                    Entry entry, List<OutputType> types)
-                    throws Exception {}
 
-            protected void getOutputTypesForEntries(Request request,
-                    List<Entry> entries, List<OutputType> types)
-                    throws Exception {
-                types.add(new OutputType("Cart", OUTPUT_CART));
-            }
+
+                protected void addOutputTypes(Request request,
+                                              State state, 
+                                              List<OutputType> types) throws Exception {
+                    if(!state.forHeader()) {
+                        types.add(new OutputType("Cart", OUTPUT_CART));
+                    }
+                }
+
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
                                       List<Entry> entries)

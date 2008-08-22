@@ -109,26 +109,17 @@ public class ZipOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
+
+
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links,boolean forHeader)
             throws Exception {
-        if (entries.size() == 0) {
-            return;
+        if(!entry.isGroup()) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                          ARG_OUTPUT, OUTPUT_ZIP);
+            links.add(new Link(url, getRepository().fileUrl(ICON_ZIP),
+                               "Zip file"));
         }
-        getOutputTypesForEntries(request, entries, types);
     }
 
 
@@ -141,10 +132,11 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        if(state.forWhat == state.FOR_HEADER) return;
+        List<Entry> entries = state.getAllEntries();
         if (entries.size() > 0) {
             boolean ok = false;
             for (Entry entry : entries) {
@@ -156,8 +148,8 @@ public class ZipOutputHandler extends OutputHandler {
             if ( !ok) {
                 return;
             }
+            types.add(new OutputType("Zip File", OUTPUT_ZIP));
         }
-        types.add(new OutputType("Zip File", OUTPUT_ZIP));
     }
 
 

@@ -1379,23 +1379,23 @@ public class Repository extends RepositoryBase implements Tables,
 
         getUserManager().initOutputHandlers();
         OutputHandler outputHandler = new OutputHandler(getRepository()) {
-            public boolean canHandle(String output) {
-                return output.equals(OUTPUT_DELETER);
-            }
-            protected void getOutputTypesForEntry(Request request,
-                    Entry entry, List<OutputType> types)
-                    throws Exception {}
-            protected void getOutputTypesForEntries(Request request,
-                    List<Entry> entries, List<OutputType> types)
-                    throws Exception {
-                for (Entry entry : entries) {
-                    if ( !getAccessManager().canDoAction(request, entry,
-                            Permission.ACTION_DELETE)) {
-                        return;
-                    }
+                public boolean canHandle(String output) {
+                    return output.equals(OUTPUT_DELETER);
                 }
-                types.add(new OutputType("Delete", OUTPUT_DELETER));
-            }
+                protected void addOutputTypes(Request request,
+                                              State state, 
+                                              List<OutputType> types) 
+                    throws Exception {
+                    for (Entry entry : state.getAllEntries()) {
+                        if ( !getAccessManager().canDoAction(request, entry,
+                                                             Permission.ACTION_DELETE)) {
+                            return;
+                        }
+                    }
+                    types.add(new OutputType("Delete", OUTPUT_DELETER));
+                }
+
+
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
                                       List<Entry> entries)
@@ -2202,53 +2202,8 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<OutputType> getOutputTypesForGroup(Request request,
-            Group group, List<Group> subGroups, List<Entry> entries)
-            throws Exception {
-        List<OutputType> types = new ArrayList<OutputType>();
-        for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getOutputTypesForGroup(request, group, subGroups,
-                    entries, types);
-        }
-        return types;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List getOutputTypesForEntry(Request request, Entry entry)
-            throws Exception {
-        List<OutputType> list = new ArrayList<OutputType>();
-        for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getOutputTypesForEntry(request, entry, list);
-        }
-        return list;
-    }
-
-
-
-    /**
+ 
+   /**
      * _more_
      *
      * @param request _more_
@@ -2258,12 +2213,12 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    public List<OutputType> getOutputTypesForEntries(Request request,
-            List<Entry> entries)
+    public List<OutputType> getOutputTypes(Request request,
+                                           OutputHandler.State state) 
             throws Exception {
         List<OutputType> list = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getOutputTypesForEntries(request, entries, list);
+            outputHandler.addOutputTypes(request, state,list);
         }
         return list;
     }
@@ -2565,12 +2520,12 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected List<Link> getEntryLinks(Request request, Entry entry,
-                                       boolean forMenu)
+                                       boolean forHeader)
             throws Exception {
         List<Link> links = new ArrayList<Link>();
-        entry.getTypeHandler().getEntryLinks(request, entry, links, forMenu);
+        entry.getTypeHandler().getEntryLinks(request, entry, links, forHeader);
         for (OutputHandler outputHandler : getOutputHandlers()) {
-            outputHandler.getEntryLinks(request, entry, links);
+            outputHandler.getEntryLinks(request, entry, links,forHeader);
         }
         OutputHandler outputHandler = getOutputHandler(request);
         if ( !entry.isTopGroup()) {
@@ -2591,10 +2546,10 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinksHtml(Request request, Entry entry)
+    protected String getEntryLinksHtml(Request request, Entry entry,boolean forHeader)
             throws Exception {
         return StringUtil.join(HtmlUtil.space(1),
-                               getEntryLinks(request, entry, false));
+                               getEntryLinks(request, entry, forHeader));
     }
 
 
@@ -2876,9 +2831,6 @@ public class Repository extends RepositoryBase implements Tables,
 
         StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
         if (output.length() == 0) {
-            //            outputForm.append(HtmlUtil.formEntry(msgLabel("Type"),
-            //                    HtmlUtil.select(ARG_OUTPUT,
-            //                                    xgetOutputTypesFor(request, what))));
         } else {
             outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output));
         }
@@ -5366,7 +5318,7 @@ public class Repository extends RepositoryBase implements Tables,
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-            List<Link>   links = getEntryLinks(request, entry, true);
+            List<Link>   links = getEntryLinks(request, entry, false);
             StringBuffer menu  = new StringBuffer();
             menu.append("<div id=\"entrylinksmenu\" class=\"menu\"><table cellspacing=\"0\" cellpadding=\"0\">");
             for (Link link : links) {
@@ -5394,7 +5346,7 @@ public class Repository extends RepositoryBase implements Tables,
                                       msg("Show menu"),
                                       " id=\"menubutton\" "));
 
-            String linkHtml = getEntryLinksHtml(request, entry);
+            String linkHtml = getEntryLinksHtml(request, entry,true);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink

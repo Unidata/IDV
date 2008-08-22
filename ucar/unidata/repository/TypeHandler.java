@@ -498,13 +498,12 @@ public class TypeHandler extends RepositoryManager {
      * @param entry _more_
      * @param request _more_
      * @param links _more_
-     * @param forMenu _more_
      *
      *
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links, boolean forMenu)
+                                 List<Link> links, boolean forHeader)
             throws Exception {
 
         if (getAccessManager().canEditEntry(request, entry)) {
@@ -512,7 +511,8 @@ public class TypeHandler extends RepositoryManager {
                 new Link(
                     request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
                     getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
-            if (forMenu) {
+            /*
+            if (!forHeader) {
                 links.add(
                     new Link(
                         request.entryUrl(
@@ -520,10 +520,10 @@ public class TypeHandler extends RepositoryManager {
                             entry), getRepository().fileUrl(ICON_METADATA),
                                     msg("Edit Metadata")));
 
-            }
+                                    }*/
         }
 
-        if (forMenu
+        if (!forHeader
                 && getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_DELETE)) {
             links.add(

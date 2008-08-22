@@ -150,11 +150,11 @@ public class TdsOutputHandler extends OutputHandler {
      *
      * @throws Exception On badness
      */
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List<OutputType> types)
-            throws Exception {
-
-        if (canLoad(request, entry)) {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        if(state.entry==null) return;
+        if (canLoad(request, state.entry)) {
             types.add(new OutputType("TDS", OUTPUT_TDS) {
                 public String assembleUrl(Request request) {
                     return request.getRequestPath() + getSuffix() + "/"

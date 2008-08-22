@@ -329,10 +329,9 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
         types.add(new OutputType("Thredds Catalog", OUTPUT_CATALOG));
     }
 
@@ -475,8 +474,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
         if (tdsOutputHandler == null) {
             tdsOutputHandler =
-                (TdsOutputHandler) getRepository().getOutputHandler(
-                    TdsOutputHandler.OUTPUT_TDS);
+                (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_TDS);
         }
 
         if (tdsOutputHandler.canLoad(request, entry)) {

@@ -119,31 +119,6 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
-            throws Exception {
-        if (entries.size() == 0) {
-            return;
-        }
-        getOutputTypesForEntries(request, entries, types);
-    }
-
-
     /**
      * _more_
      *
@@ -154,10 +129,10 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
+        List<Entry> entries = state.getAllEntries();
         if (entries.size() > 0) {
             boolean ok = false;
             for (Entry entry : entries) {
@@ -196,16 +171,9 @@ public class ImageOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         Result result = makeResult(request, group, entries);
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, request.getOutput(),
-                getRepository().getOutputTypesForGroup(
-                    request, group, subGroups, entries)));
+        addLinks(request, result, new State(group, subGroups, entries));
         return result;
     }
-
-
 
     /**
      * _more_

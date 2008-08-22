@@ -114,44 +114,9 @@ public class CsvOutputHandler extends OutputHandler {
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
-            throws Exception {
-        if (entries.size() == 0) {
-            return;
-        }
-        getOutputTypesForEntries(request, entries, types);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {
+    protected void addOutputTypes(Request request,
+                                  State state, 
+                                  List<OutputType> types) throws Exception {
         types.add(new OutputType("CSV", OUTPUT_CSV));
     }
 

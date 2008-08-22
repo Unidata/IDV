@@ -76,7 +76,7 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler extends RepositoryManager {
+public  class OutputHandler extends RepositoryManager {
 
     /** _more_ */
     public static final String OUTPUT_HTML = "default.html";
@@ -181,6 +181,67 @@ public class OutputHandler extends RepositoryManager {
         return false;
     }
 
+    public static class State {
+        public static final int FOR_UNKNOWN = 0;
+        public static final int FOR_HEADER = 1;
+
+        public int forWhat = FOR_UNKNOWN;
+        public         Entry entry;
+        public         Group group;
+        public         List<Group> subGroups;
+        public         List<Entry> entries;
+        public         List<Entry> allEntries;
+        
+        public State(Entry entry) {
+            this.entry = entry;
+        }
+
+        public State(Group group,       
+                     List<Group> subGroups, 
+                     List<Entry> entries) {
+            this.group = group;
+            this.entries = entries;
+            this.subGroups = subGroups;
+        }
+        
+
+        public State(List<Entry> entries) {
+            this.entries = entries;
+        }
+
+        public boolean forHeader() {
+            return forWhat == FOR_HEADER;
+        }
+        public List<Entry> getAllEntries() {
+            if(allEntries==null) {
+                allEntries= new ArrayList();
+                if(subGroups!=null) 
+                    allEntries.addAll(subGroups);
+                if(entries!=null)
+                    allEntries.addAll(entries);
+                if(entry!=null)
+                    allEntries.add(entry);
+            }
+            return (List<Entry>)allEntries;
+        }
+
+    }
+
+
+    protected Result makeLinksResult(Request request, String title, StringBuffer sb,State state) throws Exception {
+        Result result = new Result(title, sb);
+        addLinks(request, result,state);
+        return result;
+    }
+
+    protected void addLinks(Request request, Result result, State state) throws Exception{
+        state.forWhat = State.FOR_HEADER;
+        result.putProperty(
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, request.getOutput(),
+                getRepository().getOutputTypes(request, state)));
+    }
 
 
     /**
@@ -193,51 +254,21 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,
-                                            List<Entry> entries,
-                                            List<OutputType> types)
-            throws Exception {}
+    protected  void addOutputTypes(Request request, State state, 
+                List<OutputType> types) throws Exception {}
 
     /**
      * _more_
      *
      * @param request _more_
      * @param entry _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void getOutputTypesForEntry(Request request, Entry entry,
-                                          List<OutputType> types)
-            throws Exception {
-        List<Entry> entries = new ArrayList<Entry>();
-        entries.add(entry);
-        getOutputTypesForEntries(request, entries, types);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     * @param types _more_
+     * @param links _more_
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups,
-                                          List<Entry> entries,
-                                          List<OutputType> types)
-            throws Exception {
-        List<Entry> allEntries = new ArrayList<Entry>();
-        allEntries.addAll(subGroups);
-        allEntries.addAll(entries);
-        getOutputTypesForEntries(request, allEntries, types);
-    }
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links, boolean forHeader)
+            throws Exception {}
 
 
     /**
@@ -273,6 +304,27 @@ public class OutputHandler extends RepositoryManager {
     /**
      * _more_
      *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputGroup(Request request, Group group,
+                              List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+        return notImplemented("outputGroup");
+    }
+
+
+
+
+    /**
+     * _more_
+     *
      * @param output _more_
      *
      * @return _more_
@@ -281,18 +333,6 @@ public class OutputHandler extends RepositoryManager {
         return null;
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param links _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links)
-            throws Exception {}
 
 
 
@@ -472,7 +512,7 @@ public class OutputHandler extends RepositoryManager {
                                        "getentries"));
             //            formSB.append(HtmlUtil.space(1));
             List<OutputType> outputList =
-                getRepository().getOutputTypesForEntries(request, entries);
+                getRepository().getOutputTypes(request, new State(entries));
             sb.append("\n");
             formSB.append(HtmlUtil.space(4));
             formSB.append(msgLabel("View As"));
@@ -638,25 +678,6 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGroup(Request request, Group group,
-                              List<Group> subGroups, List<Entry> entries)
-            throws Exception {
-        return notImplemented("outputGroup");
-    }
 
 
 
