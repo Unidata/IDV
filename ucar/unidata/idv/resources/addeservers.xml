@@ -24,7 +24,7 @@ they essentially get it from their container type tag.
   </server>
   <server name="adde.cise-nsf.gov">
     <group
-       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINCOMP,NEXRCOMP,TOPO"
+       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINCOMP,NEXRCOMP,TOPO"
        type="image"/>
     <group
        names="RTGRIDS"
