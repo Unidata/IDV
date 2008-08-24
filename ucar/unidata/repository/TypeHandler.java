@@ -1346,9 +1346,11 @@ public class TypeHandler extends RepositoryManager {
                                                        request.getString(ARG_AREA+"_east",""),
                                                        request.getString(ARG_AREA+"_west",""));
             String mapCanvas = HtmlUtil.div(""," id=\"mapcanvas\" class=\"mapcanvas\"");
+            mapCanvas = "";
             areaWidget = "<table><tr valign=top>" + HtmlUtil.cols(areaWidget, mapCanvas) + "</tr></table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(request.url(getRepository().URL_GETMAP),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
             String mapJS =  HtmlUtil.script("function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n");
+            mapJS = "";
             areaWidget += mapJS;
 
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
