@@ -215,7 +215,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
         StringBuffer infoSB = typeHandler.getEntryContent(entry, request, true);
 
-        boolean tabLayout = request.getString(ARG_LAYOUT,"tab").equals("tab");
         List tabTitles = new ArrayList<String>();
         List tabContent = new ArrayList<String>();
         List<Boolean> treeShown = new ArrayList<Boolean>();
@@ -234,18 +233,13 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getAssociationBlock(request, entry));
         treeShown.add(false);
 
-        if(tabLayout) {
-            sb.append(HtmlUtil.p());
-            sb.append(getRepository().makeTabs(tabTitles, tabContent,true));
-        } else {
-            for(int i=0;i<tabTitles.size();i++) {
-                String tabTitle  = tabTitles.get(i).toString();
-                String content  = tabContent.get(i).toString();
-
-                if(content.length()==0) continue;
-                sb.append(getRepository().makeShowHideBlock(request, 
-                                                            tabTitle, new StringBuffer(content), treeShown.get(i)));
-            } 
+        for(int i=0;i<tabTitles.size();i++) {
+            String tabTitle  = tabTitles.get(i).toString();
+            String content  = tabContent.get(i).toString();
+            
+            if(content.length()==0) continue;
+            sb.append(getRepository().makeShowHideBlock(request, 
+                                                        tabTitle, new StringBuffer(content), treeShown.get(i)));
         }
 
 
@@ -641,7 +635,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     if (html != null) {
                         if(cnt==0) {
                             if (decorate) {
-                                sb.append("<table cellspacing=\"5\">\n");
+                                sb.append("<table cellspacing=\"2\" cellpadding=\"0\">\n");
                             }
                         }
                         cnt++;
@@ -760,7 +754,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
 
-        boolean tabLayout = request.getString(ARG_LAYOUT,"tree").equals("tab");
+
         List tabTitles = new ArrayList<String>();
         List tabContent = new ArrayList<String>();
         List<Boolean> treeShown = new ArrayList<Boolean>();
@@ -786,13 +780,15 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(getTimelineApplet(request, allEntries));
         }
 
-        String tmp = getRepository().makeTabs(tabTitles, tabContent,true);
-        tabTitles = new ArrayList<String>();
-        tabContent = new ArrayList<String>();
-        treeShown = new ArrayList<Boolean>();
-        tabContent.add(HtmlUtil.div(tmp," style=\"margin-left:15px;\" "));
-        tabTitles.add("Information");
-        treeShown.add(true);
+        if (!showApplet) {
+            String tmp = getRepository().makeTabs(tabTitles, tabContent,true,"tabcontent_fixedheight");
+            tabTitles = new ArrayList<String>();
+            tabContent = new ArrayList<String>();
+            treeShown = new ArrayList<Boolean>();
+            tabContent.add(HtmlUtil.div(tmp," style=\"margin-left:15px;\" "));
+            tabTitles.add("Information");
+            treeShown.add(true);
+        }
 
         if (subGroups.size() > 0) {
             StringBuffer groupsSB = new StringBuffer();
@@ -825,18 +821,12 @@ public class HtmlOutputHandler extends OutputHandler {
             treeShown.add(true);
         }
 
-        if(tabLayout) {
-            sb.append(HtmlUtil.p());
-            sb.append(getRepository().makeTabs(tabTitles, tabContent,true));
-        } else {
-            for(int i=0;i<tabTitles.size();i++) {
-                String tabTitle  = tabTitles.get(i).toString();
-                String content  = tabContent.get(i).toString();
-
-                if(content.length()==0) continue;
-                sb.append(getRepository().makeShowHideBlock(request, 
-                                                            tabTitle, new StringBuffer(content), treeShown.get(i)));
-            } 
+        for(int i=0;i<tabTitles.size();i++) {
+            String tabTitle  = tabTitles.get(i).toString();
+            String content  = tabContent.get(i).toString();
+            if(content.length()==0) continue;
+            sb.append(getRepository().makeShowHideBlock(request, 
+                                                        tabTitle, new StringBuffer(content), treeShown.get(i)));
         }
 
         String messageLeft = request.getLeftMessage();

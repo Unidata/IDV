@@ -27,7 +27,7 @@ a:hover {
 
 
 .header {
-  border-bottom : 1px #666666 solid;
+  xxxborder-bottom : 1px #999999 solid;
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;
@@ -174,22 +174,44 @@ ul {
    margin-top:5px;
 }
 
-
-
-
+.tabtitles {
+   border-bottom : 1px #000000 solid;
+}
 
 .tabcontents {
-   border : 1px #cccccc solid;
-   border-top : 3px #cccccc solid;
+   border-left : 1px #000000 solid;
+   border-right : 1px #000000 solid;
+   border-bottom : 1px #000000 solid;
+}
 
+.tabcontent_fixedheight {
+   min-height: 100px;
+   max-height: 200px; 
+   overflow-y: auto;
    padding:2;
 }
 
 
+.tabcontent {
+   min-height: 100px;
+   padding:2;
+}
+
+
+
+.tabtitleon {
+   background-color:red;
+}
+
+.tabtitleoff {
+   background-color:white;
+}
+
 .tabtitle {
-	border: 1px #999999 solid;
+        background-color:#ffffff;
+	border: 1px #000000 solid;
         font-weight: bold;
-	border-bottom: 0px #333399 solid;
+	border-bottom: 0px #ffffff solid;
 	margin:2;
 	margin-bottom:0;
 	padding-top:2;
@@ -283,7 +305,7 @@ a.menulink {
    font-weight: bold;
    font-size: 10pt;
    color: #9C9C9C;
-   border-bottom : 1px #eeeeee solid;
+   border-bottom : 1px #666666 solid;
 }
 
 

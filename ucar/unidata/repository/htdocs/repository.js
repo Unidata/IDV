@@ -555,11 +555,25 @@ function selectDate(div,field,id,fmt) {
 function Tab(ids) {
 	this.ids = ids;
 	this.toggleTab = toggleTab;
+	/*
+	if (document.styleSheets[0].cssRules) {
+		theRules = document.styleSheets[0].cssRules;
+	} else if (document.styleSheets[0].rules) {
+		theRules = document.styleSheets[0].rules;
+	}
+        for(i=0;i<theRules.length;i++) {
+		rule = theRules[i];
+		break;
+	}*/
+
+
         for(i=0;i<ids.length;i++) {
 		var contentId  = 'content_'+ids[i];
 	        var content = util.getDomObject(contentId);
 		var titleId  = 'title_'+ids[i];
 	        var title = util.getDomObject(titleId);
+		if(i==0) this.onStyle = title.style;
+		else  this.offStyle = title.style;
 	}
 	this.toggleTab(this.ids[0]);
 }
@@ -577,11 +591,14 @@ function toggleTab(mainId) {
 	if(contentId==mainContentId) {
 		content.style.visibility="visible";
                 content.style.display = "block";
-		title.style.backgroundColor="#cccccc";
+		title.style.backgroundColor="#ffffff";
+		title.style.borderBottom = "1px #ffffff  solid";
 	} else {
 		content.style.visibility="hidden";
                 content.style.display = "none";
-		title.style.backgroundColor="#ffffff";
+		title.style.backgroundColor="#c3d9ff";
+		title.style.borderBottom = "1px #000000  solid";
+
 	}
     }
 

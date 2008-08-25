@@ -2663,6 +2663,11 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public String makeShowHideBlock(Request request, String label,
                                     StringBuffer content, boolean visible) {
+        return makeShowHideBlock(request, label, content, visible, "class=\"pagesubheading\"");
+    }
+
+    public String makeShowHideBlock(Request request, String label,
+                                    StringBuffer content, boolean visible, String headerExtra) {
         String id = "block_" + (blockCnt++);
         StringBuffer sb      = new StringBuffer();
         String       hideImg = fileUrl(ICON_MINUS);
@@ -2675,11 +2680,11 @@ public class Repository extends RepositoryBase implements Tables,
                                       : showImg, "",
                                           " id='" + id
                                           + "img' ") + HtmlUtil.space(1)
-                                              + label, "class=\"pagesubheadinglink\"");
+                                              + label, HtmlUtil.cssClass("pagesubheadinglink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append("<div class=\"block\">");
-        sb.append(RepositoryManager.subHeader(link));
+        sb.append(HtmlUtil.div(link,headerExtra));
         sb.append("<div class=\"hideshowblock\" id=\"" + id
                   + "\" style=\"display:block;visibility:visible\">");
         if ( !visible) {
@@ -2696,9 +2701,16 @@ public class Repository extends RepositoryBase implements Tables,
 
     static int tabCnt = 0;
     public String makeTabs(List titles, List contents, boolean skipEmpty) {
+        return makeTabs(titles, contents, skipEmpty, "tabcontent");
+    }
+
+    public String makeTabs(List titles, List contents, boolean skipEmpty, String tabContentClass) {
+
         String id = "tab_"+(tabCnt++);
         String ids = "tab_"+(tabCnt++)+"_ids";
         StringBuffer titleSB      = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\"><tr>");
+
+        titleSB      = new StringBuffer("");
         StringBuffer contentSB      = new StringBuffer();
         StringBuffer jsSB      = new StringBuffer("var " + ids+"=[");
         boolean didone = false;
@@ -2708,13 +2720,13 @@ public class Repository extends RepositoryBase implements Tables,
             if(skipEmpty && content.length()==0 ) continue;
             String  tabId = id +"_" + i;
             contentSB.append("\n");
-            contentSB.append(HtmlUtil.div(content,HtmlUtil.cssClass("tabcontents") +
+            contentSB.append(HtmlUtil.div(content,HtmlUtil.cssClass(tabContentClass) +
                                           HtmlUtil.id("content_" +tabId) +
                                           HtmlUtil.style("display:block;visibility:" +(!didone?"visible":"hidden"))));
             String link = HtmlUtil.href("javascript:" + id +".toggleTab(" +HtmlUtil.squote(tabId)+")",title);
-            titleSB.append("<td>\n");
-            titleSB.append(HtmlUtil.div(link,HtmlUtil.cssClass("tabtitle") +HtmlUtil.id("title_" +tabId)));
-            titleSB.append("\n</td>\n");
+            //            titleSB.append("<td>\n");
+            titleSB.append(HtmlUtil.span(link,HtmlUtil.cssClass("tabtitle") +HtmlUtil.id("title_" +tabId)));
+            //            titleSB.append("\n</td>\n");
             if(didone) 
                 jsSB.append(",");
             jsSB.append(HtmlUtil.squote(tabId));
@@ -2722,11 +2734,13 @@ public class Repository extends RepositoryBase implements Tables,
         }
         jsSB.append("];\n");
         
-        titleSB.append("</tr></table>");
+        //        titleSB.append("</tr></table>");
         return HtmlUtil.script(jsSB.toString()) +
-            HtmlUtil.div(titleSB.toString() + contentSB, " class=\"tab\" ") +
+            HtmlUtil.div(titleSB.toString(),HtmlUtil.cssClass("tabtitles")) + 
+            HtmlUtil.div(contentSB.toString(),HtmlUtil.cssClass("tabcontents")) +
             HtmlUtil.script("var " + id +"=new Tab(" + ids +");\n");
     }
+
 
 
 
@@ -4171,6 +4185,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getComments(request, entry);
+
         if (canComment) {
             sb.append(request.form(URL_COMMENTS_ADD, BLANK));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
@@ -4184,30 +4199,38 @@ public class Repository extends RepositoryBase implements Tables,
             sb.append("<br>");
             sb.append(msg("No comments"));
         }
-        sb.append("<table>");
+        //        sb.append("<table>");
         for (Comment comment : comments) {
-            sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
+            //            sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
             //TODO: Check for access
-            String deleteLink = HtmlUtil.href(
+            String deleteLink = (!canEdit?"":HtmlUtil.href(
                                     request.url(
                                         URL_COMMENTS_EDIT, ARG_DELETE,
                                         "true", ARG_ID, entry.getId(),
                                         ARG_COMMENT_ID,
                                         comment.getId()), HtmlUtil.img(
                                             fileUrl(ICON_DELETE),
-                                            msg("Delete comment")));
+                                            msg("Delete comment"))));
             if (canEdit) {
-                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
+                //                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
             }
-            sb.append(HtmlUtil.formEntry("Subject:", comment.getSubject()));
-            sb.append(HtmlUtil.formEntry("By:",
-                                         comment.getUser().getLabel() + " @ "
-                                         + formatDate(request,
-                                             comment.getDate())));
-            sb.append(HtmlUtil.formEntryTop("Comment:",
+            //            sb.append(HtmlUtil.formEntry("Subject:", comment.getSubject()));
+
+
+            StringBuffer content = new StringBuffer();
+            content.append("<table>");
+            String byLine =  "By: "  +comment.getUser().getLabel() + " @ "
+                + formatDate(request,
+                             comment.getDate())+HtmlUtil.space(1) + deleteLink;
+            //            content.append(HtmlUtil.formEntry("By:",
+            //                                         ));
+            content.append(HtmlUtil.formEntryTop("",
                                             comment.getComment()));
+            content.append("</table>");
+            sb.append(makeShowHideBlock(request, 
+                                        "<b>Subject</b>:" +comment.getSubject()+HtmlUtil.space(2) + byLine, content, true,""));
         }
-        sb.append("</table>");
+            //        sb.append("</table>");
         return sb.toString();
     }
 
@@ -5116,7 +5139,7 @@ public class Repository extends RepositoryBase implements Tables,
             throw new IllegalArgumentException("No entry specified");
         }
 
-        //        System.err.println (request);
+        //System.err.println (request);
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
@@ -5510,7 +5533,7 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    protected List<String> getEntryIdsInGroup(Request request, Entry group,
+    protected List<String> getEntryIdsInGroup(Request request, Group group,
             List<Clause> where)
             throws Exception {
         List<String> ids = new ArrayList<String>();
@@ -6372,12 +6395,9 @@ public class Repository extends RepositoryBase implements Tables,
 
         List<Group> groups = readGroups(statement);
         if (groups.size() > 0) {
-            group = groups.get(0);
-        } else {
-            //????
-            return null;
-        }
-        return group;
+            return  groups.get(0);
+        } 
+        return null;
     }
 
 
@@ -7138,7 +7158,6 @@ public class Repository extends RepositoryBase implements Tables,
      * @return _more_
      * @throws Exception _more_
      */
-
     private List<String[]> getDescendents(Request request,
                                           List<Entry> entries,
                                           Connection connection)
