@@ -557,7 +557,7 @@ public  class OutputHandler extends RepositoryManager {
             } else {
                 sb.append(getAjaxLink(request, entry, entry.getLabel(),
                                       true));
-                //                sb.append(getEntryUrl(request, entry));
+                //                sb.append(getEntryLink(request, entry));
             }
             //            sb.append(HtmlUtil.br());
         }
@@ -582,7 +582,7 @@ public  class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String getEntryUrl(Request request, Entry entry) {
+    protected String getEntryLink(Request request, Entry entry) {
         return getAjaxLink(request, entry, entry.getLabel(), false);
     }
 

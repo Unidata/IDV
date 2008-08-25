@@ -1184,7 +1184,7 @@ public class UserManager extends RepositoryManager {
                                         "Create an association"))));
                 }
                 sb.append(HtmlUtil.space(1));
-                sb.append(outputHandler.getEntryUrl(request, entry));
+                sb.append(outputHandler.getEntryLink(request, entry));
             }
             sb.append("</ul>");
             if ( !haveFrom) {

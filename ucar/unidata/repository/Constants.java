@@ -428,6 +428,9 @@ public interface Constants {
     public static final String ARG_AUTH_PASSWORD = "auth.password";
 
 
+    public static final String ARG_SHOW_ASSOCIATIONS = "showassociations";
+
+
     /** _more_ */
     public static final String ARG_USER_ID = "user.id";
 
@@ -561,6 +564,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_LABEL = "label";
+
+    public static final String ARG_LAYOUT = "layout";
 
     /** _more_ */
     public static final String ARG_RELATIVEDATE = "relativedate";

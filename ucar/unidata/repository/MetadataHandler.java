@@ -370,7 +370,7 @@ public class MetadataHandler extends RepositoryManager {
         }
         content.append("</div>");
 
-        sb.append(getRepository().makeShowHideBlock(request, type.toString()+".browse", cloudLink+type.getLabel(),
+        sb.append(getRepository().makeShowHideBlock(request,  cloudLink+type.getLabel(),
                                                     content,false));
 
 

@@ -52,7 +52,7 @@ public class Entry extends Entity {
     Object[] values;
 
     /** _more_ */
-    private Resource resource;
+    private Resource resource = new Resource();
 
     /** _more_ */
     private String dataType;

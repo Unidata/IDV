@@ -27,7 +27,7 @@ a:hover {
 
 
 .header {
-  border-bottom : 1px #444444 solid;
+  border-bottom : 1px #666666 solid;
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;
@@ -69,31 +69,28 @@ a.header  {
 .subnav {
    font-size: 10pt;
    padding-left:5;   
-   padding-top:6;   
+   padding-top:5;   
    background-color : #c3d9ff;
    font-weight: bold;
    color: black;
-
-   border-bottom : 2px #666666 solid;
+   border-bottom : 1px #666666 solid;
 }
 
 
+.curve {
+   vertical-align: top;
+}
+
 .subnavoncomp  {
-   xborder : 1px #444444 solid;
-   border-bottom : 2px #ffffff solid;
+   border-bottom : 1px #ffffff solid;
    background-color : #ffffff;
-   xpadding-left:6;   
-   xpadding-right:6;   
    color:#000000;
-   xpadding-top:1;   
 }
 
 .subnavoffcomp  {
    color:#000000;
-   padding-left:6;   
-   padding-right:6;   
-   padding-bottom:2;   
-   padding-top:1;   
+   padding-left:7;   
+   padding-right:7;   
 }
 
 
@@ -127,7 +124,20 @@ a.subnavoffcomp  {
 	height:200px;
 }
 
-.calendarcontents {
+.calheader {
+   background-color:#c3d9ff;
+   font-weight: bold;
+}
+
+.calday {
+   font-weight: bold;
+   font-size: 8pt;
+}
+
+.calentry {
+}
+
+.calcontents {
 	max-height: 150px; 
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -167,6 +177,30 @@ ul {
 
 
 
+
+.tabcontents {
+   border : 1px #cccccc solid;
+   border-top : 3px #cccccc solid;
+
+   padding:2;
+}
+
+
+.tabtitle {
+	border: 1px #999999 solid;
+        font-weight: bold;
+	border-bottom: 0px #333399 solid;
+	margin:2;
+	margin-bottom:0;
+	padding-top:2;
+	padding-left:6;
+	padding-right:6;
+}
+
+.tabtitle a {
+	color:#000000;
+	text-decoration: none;
+}
 
 
 
@@ -249,7 +283,7 @@ a.menulink {
    font-weight: bold;
    font-size: 10pt;
    color: #9C9C9C;
-   border-bottom : 1px #aabbaa solid;
+   border-bottom : 1px #eeeeee solid;
 }
 
 
@@ -299,9 +333,7 @@ a.menulink {
    font-size: 12pt;
 }
 
-.curve {
-   vertical-align: top;
-}
+
 
 a.pagesubheadinglink {
    color:black;
@@ -359,20 +391,6 @@ form {
 }
 
 
-
-.calheader {
-   background-color : lightblue;
-   font-weight: bold;
-}
-
-.calday {
-   font-weight: bold;
-   font-size: 8pt;
-}
-
-.calentry {
-
-}
 
 
 

@@ -224,6 +224,12 @@ public class Request implements Constants {
         return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1);
     }
 
+
+
+    public String entryUrl(RequestUrl theUrl, Entry entry, List args) {
+        return HtmlUtil.url(entryUrl(theUrl, entry), args);
+    }
+
     /**
      * _more_
      *

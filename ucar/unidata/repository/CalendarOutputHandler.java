@@ -241,10 +241,7 @@ public class CalendarOutputHandler extends OutputHandler {
             //Put the header in every month
             if ( !currentMonth.equals(month)) {
                 currentMonth = month;
-                sb.append(
-                    HtmlUtil.row(
-                        header.toString(),
-                        " style=\"background-color:lightblue;\""));
+                sb.append("<tr class=\"calheader\">" + header +"</tr>");
             }
 
             String day = sdf.format(date);
@@ -517,7 +514,7 @@ public class CalendarOutputHandler extends OutputHandler {
                 }
                 String dayContents = "&nbsp;";
                 if(inner!=null) {
-                    dayContents ="<div class=\"calendarcontents\">" +
+                    dayContents ="<div class=\"calcontents\">" +
                         StringUtil.join("<br>",inner) +"</div>";
 
                 }

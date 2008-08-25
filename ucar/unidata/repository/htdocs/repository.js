@@ -543,7 +543,46 @@ function toggleVisibilityOnObject(obj, display) {
 
 
 
+
+
+
 function selectDate(div,field,id,fmt) {
     var cal = new CalendarPopup(div);
     cal.select(field,id,fmt);
+}
+
+
+function Tab(ids) {
+	this.ids = ids;
+	this.toggleTab = toggleTab;
+        for(i=0;i<ids.length;i++) {
+		var contentId  = 'content_'+ids[i];
+	        var content = util.getDomObject(contentId);
+		var titleId  = 'title_'+ids[i];
+	        var title = util.getDomObject(titleId);
+	}
+	this.toggleTab(this.ids[0]);
+}
+
+function toggleTab(mainId) {
+    var mainContentId = 'content_' + mainId;
+    for(i=0;i<this.ids.length;i++) {
+	var contentId  = 'content_'+this.ids[i];
+        var content = util.getDomObject(contentId);
+	var titleId  = 'title_'+this.ids[i];
+	var title = util.getDomObject(titleId);
+        if(!content) {
+		continue;
+        }
+	if(contentId==mainContentId) {
+		content.style.visibility="visible";
+                content.style.display = "block";
+		title.style.backgroundColor="#cccccc";
+	} else {
+		content.style.visibility="hidden";
+                content.style.display = "none";
+		title.style.backgroundColor="#ffffff";
+	}
+    }
+
 }

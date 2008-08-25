@@ -456,7 +456,7 @@ public class TypeHandler extends RepositoryManager {
                 return new StringBuffer(processDisplayTemplate(request,
                         entry, html));
             }
-            sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
+            sb.append("<table cellspacing=\"0\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
                                            showResource, true));
 
@@ -670,10 +670,12 @@ public class TypeHandler extends RepositoryManager {
                         msgLabel("Description"),
                         getRepository().getEntryText(request, entry, desc)));
             }
-            sb.append(HtmlUtil.formEntry(msgLabel("Created by"),
-                                         entry.getUser().getLabel() + " @ "
-                                         + formatDate(request,
-                                             entry.getCreateDate())));
+            String userSearchLink =  
+                HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH), ARG_USER_ID, entry.getUser().getId()),
+                entry.getUser().getLabel(),"title=\"Search for entries created by " + entry.getUser().getLabel()+"\"");
+                                                          
+            sb.append(HtmlUtil.formEntry(msgLabel("Created by"),userSearchLink+  " @ "
+                                         + formatDate(request, entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();
             if (resourceLink.length() > 0) {
@@ -1371,10 +1373,8 @@ public class TypeHandler extends RepositoryManager {
         advancedSB.append(HtmlUtil.formTableClose());
 
 
-        formBuffer.append(getRepository().makeShowHideBlock(request,
-                "search.basic", msg("Basic"), basicSB, true));
-        formBuffer.append(getRepository().makeShowHideBlock(request,
-                "search.advanced", msg("Advanced"), advancedSB, false));
+        formBuffer.append(getRepository().makeShowHideBlock(request, msg("Basic"), basicSB, true));
+        formBuffer.append(getRepository().makeShowHideBlock(request, msg("Advanced"), advancedSB, false));
     }
 
 
