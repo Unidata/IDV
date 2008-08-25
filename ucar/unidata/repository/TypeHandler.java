@@ -302,9 +302,17 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
     public void initializeEntry(Request request, Entry entry, Element node)
-            throws Exception {
-    }
+            throws Exception {}
 
 
 
@@ -384,7 +392,7 @@ public class TypeHandler extends RepositoryManager {
         Entry  entry = createEntry(id);
         entry.initEntry(
             results.getString(col++), results.getString(col++),
-            getRepository().findGroup(null,results.getString(col++)),
+            getRepository().findGroup(null, results.getString(col++)),
             results.getString(col++),
             getUserManager().findUser(results.getString(col++), true),
             new Resource(results.getString(col++), results.getString(col++)),
@@ -498,6 +506,7 @@ public class TypeHandler extends RepositoryManager {
      * @param entry _more_
      * @param request _more_
      * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -505,6 +514,17 @@ public class TypeHandler extends RepositoryManager {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
+
+        if (entry.isGroup() && getAccessManager().canDoAction(request, entry,
+                                                              Permission.ACTION_NEW)) {
+            links.add(
+                new Link(
+                    request.url(
+                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
+                        entry.getId()), getRepository().fileUrl(ICON_NEW),
+                                        "New Entry or Group"));
+        }
+
 
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(
@@ -523,7 +543,7 @@ public class TypeHandler extends RepositoryManager {
                                     }*/
         }
 
-        if (!forHeader
+        if ( !forHeader
                 && getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_DELETE)) {
             links.add(
@@ -536,6 +556,12 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
+
+
+
+
+
+
         Link downloadLink = getEntryDownloadLink(request, entry);
         if (downloadLink != null) {
             links.add(downloadLink);
@@ -546,7 +572,7 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().fileUrl(ICON_COMMENTS),
                 msg("Add/View Comments")));
 
-        if (!request.getUser().getAnonymous()) {
+        if ( !request.getUser().getAnonymous()) {
             links.add(
                 new Link(
                     request.entryUrl(
@@ -626,6 +652,7 @@ public class TypeHandler extends RepositoryManager {
      * @param output _more_
      * @param showResource _more_
      * @param showMap _more_
+     * @param linkToDownload _more_
      *
      * @return _more_
      *
@@ -648,15 +675,20 @@ public class TypeHandler extends RepositoryManager {
             //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
 
             String nameString = entry.getName();
-            if(linkToDownload) {
+            if (linkToDownload) {
                 if (entry.getResource().isFile()
-                    && getAccessManager().canDownload(request, entry)) {
-                    nameString = HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                                            + entry.getName(), ARG_ID, entry.getId()),nameString);
+                        && getAccessManager().canDownload(request, entry)) {
+                    nameString = HtmlUtil.href(
+                        HtmlUtil.url(
+                            request.url(getRepository().URL_ENTRY_GET) + "/"
+                            + entry.getName(), ARG_ID,
+                                entry.getId()), nameString);
                 }
             } else {
-                    nameString = HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_SHOW), 
-                                                            ARG_ID, entry.getId()),nameString);
+                nameString = HtmlUtil.href(
+                    HtmlUtil.url(
+                        request.url(getRepository().URL_ENTRY_SHOW), ARG_ID,
+                        entry.getId()), nameString);
             }
 
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), nameString));
@@ -670,12 +702,19 @@ public class TypeHandler extends RepositoryManager {
                         msgLabel("Description"),
                         getRepository().getEntryText(request, entry, desc)));
             }
-            String userSearchLink =  
-                HtmlUtil.href(HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH), ARG_USER_ID, entry.getUser().getId()),
-                entry.getUser().getLabel(),"title=\"Search for entries created by " + entry.getUser().getLabel()+"\"");
-                                                          
-            sb.append(HtmlUtil.formEntry(msgLabel("Created by"),userSearchLink+  " @ "
-                                         + formatDate(request, entry.getCreateDate())));
+            String userSearchLink =
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        request.url(getRepository().URL_ENTRY_SEARCH),
+                        ARG_USER_ID,
+                        entry.getUser().getId()), entry.getUser().getLabel(),
+                            "title=\"Search for entries created by "
+                            + entry.getUser().getLabel() + "\"");
+
+            sb.append(HtmlUtil.formEntry(msgLabel("Created by"),
+                                         userSearchLink + " @ "
+                                         + formatDate(request,
+                                             entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();
             if (resourceLink.length() > 0) {
@@ -696,10 +735,16 @@ public class TypeHandler extends RepositoryManager {
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
-                    sb.append(HtmlUtil.formEntry(msgLabel("Date Range"),
-                            formatDate(request, entry.getStartDate()) +
-                                                 HtmlUtil.space(1) +HtmlUtil.img(getRepository().fileUrl(ICON_RANGE)) +HtmlUtil.space(1) 
-                            + formatDate(request, entry.getEndDate())));
+                    sb.append(
+                        HtmlUtil.formEntry(
+                            msgLabel("Date Range"),
+                            formatDate(request, entry.getStartDate())
+                            + HtmlUtil.space(1)
+                            + HtmlUtil.img(
+                                getRepository().fileUrl(
+                                    ICON_RANGE)) + HtmlUtil.space(1)
+                                        + formatDate(
+                                            request, entry.getEndDate())));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
                             formatDate(request, entry.getStartDate())));
@@ -731,7 +776,14 @@ public class TypeHandler extends RepositoryManager {
                             "" + entry.getNorth(), ARG_EAST,
                             "" + entry.getEast()));
                     //                    sb.append(HtmlUtil.formEntry(msgLabel("Area"), img));
-                    String areaHtml = "<table><tr align=center><td>" +entry.getNorth() + "</td></tr><tr align=center><td>" + entry.getWest() + "  " + entry.getSouth() +"</td></tr><tr align=center><td>" + entry.getEast()+"</td></tr></table>";
+                    String areaHtml = "<table><tr align=center><td>"
+                                      + entry.getNorth()
+                                      + "</td></tr><tr align=center><td>"
+                                      + entry.getWest() + "  "
+                                      + entry.getSouth()
+                                      + "</td></tr><tr align=center><td>"
+                                      + entry.getEast()
+                                      + "</td></tr></table>";
                     sb.append(HtmlUtil.formEntry(msgLabel("Area"), areaHtml));
                 }
             }
@@ -1032,26 +1084,36 @@ public class TypeHandler extends RepositoryManager {
                          ? formatDate(request, new Date(entry.getEndDate()))
                          : BLANK);*/
 
-        Date fromDate = (entry != null?
-                         new Date(entry.getStartDate()):null);
-        Date toDate = (entry != null?
-                         new Date(entry.getEndDate()):null);
+        Date fromDate = ((entry != null)
+                         ? new Date(entry.getStartDate())
+                         : null);
+        Date toDate   = ((entry != null)
+                         ? new Date(entry.getEndDate())
+                         : null);
 
 
         if (okToShowInForm(ARG_DATE)) {
             if ( !okToShowInForm(ARG_TODATE)) {
-                sb.append(HtmlUtil.formEntry("Date:",
-                                             getRepository().makeDateInput(request,ARG_FROMDATE, "entryform", fromDate)));
+                sb.append(
+                    HtmlUtil.formEntry(
+                        "Date:",
+                        getRepository().makeDateInput(
+                            request, ARG_FROMDATE, "entryform", fromDate)));
 
             } else {
                 sb.append(
                     HtmlUtil.formEntry(
                         "Date Range:",
-                        getRepository().makeDateInput(request,ARG_FROMDATE, "entryform", fromDate) +
-                        HtmlUtil.space(1)+  HtmlUtil.img(getRepository().fileUrl(ICON_RANGE)) + HtmlUtil.space(1) +
-                        //                        " <b>--</b> " +
-                        getRepository().makeDateInput(request,ARG_TODATE, "entryform", toDate) +
-                        HtmlUtil.space(2)));
+                        getRepository().makeDateInput(
+                            request, ARG_FROMDATE, "entryform",
+                            fromDate) + HtmlUtil.space(1)
+                                      + HtmlUtil.img(
+                                          getRepository().fileUrl(
+                                              ICON_RANGE)) + HtmlUtil.space(
+                                                  1) +
+                //                        " <b>--</b> " +
+                getRepository().makeDateInput(request, ARG_TODATE,
+                        "entryform", toDate) + HtmlUtil.space(2)));
             }
             if (entry == null) {
                 List datePatterns = new ArrayList();
@@ -1073,31 +1135,45 @@ public class TypeHandler extends RepositoryManager {
 
         if (okToShowInForm(ARG_AREA)) {
             StringBuffer mapSB = new StringBuffer();
-            MapOutputHandler mapOutputHandler = (MapOutputHandler) getRepository().getOutputHandler(MapOutputHandler.OUTPUT_MAP);
-            if(mapOutputHandler!=null) {
+            MapOutputHandler mapOutputHandler =
+                (MapOutputHandler) getRepository().getOutputHandler(
+                    MapOutputHandler.OUTPUT_MAP);
+            if (mapOutputHandler != null) {
                 List<Entry> entries = new ArrayList<Entry>();
-                if(entry!=null) entries.add(entry);
+                if (entry != null) {
+                    entries.add(entry);
+                }
                 //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
             }
-            String latLonForm =
-                HtmlUtil.makeLatLonBox(ARG_AREA,
-                                       ((entry != null)
-                                        && entry.hasSouth())
-                                       ? entry.getSouth()
-                                       : Double.NaN, ((entry != null)
-                                                      && entry.hasNorth())
-                                       ? entry.getNorth()
-                                       : Double.NaN, ((entry != null) && entry.hasEast())
-                                       ? entry.getEast()
-                                       : Double.NaN, ((entry != null)
-                                                      && entry.hasWest())
-                                       ? entry.getWest() : Double.NaN);
-            sb.append(HtmlUtil.formEntry("Location:", HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(latLonForm, mapSB.toString())))));
+            String latLonForm = HtmlUtil.makeLatLonBox(ARG_AREA,
+                                    ((entry != null) && entry.hasSouth())
+                                    ? entry.getSouth()
+                                    : Double.NaN, ((entry != null)
+                                        && entry.hasNorth())
+                    ? entry.getNorth()
+                    : Double.NaN, ((entry != null) && entry.hasEast())
+                                  ? entry.getEast()
+                                  : Double.NaN, ((entry != null)
+                                      && entry.hasWest())
+                    ? entry.getWest()
+                    : Double.NaN);
+            sb.append(
+                HtmlUtil.formEntry(
+                    "Location:",
+                    HtmlUtil.table(
+                        HtmlUtil.row(
+                            HtmlUtil.cols(latLonForm, mapSB.toString())))));
         }
 
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     */
     public void addTextSearch(Request request, StringBuffer sb) {
         String name = (String) request.getString(ARG_TEXT, "");
         String searchMetaData = " "
@@ -1111,13 +1187,15 @@ public class TypeHandler extends RepositoryManager {
                              + HtmlUtil.checkbox(ARG_EXACT, "true",
                                  request.get(ARG_EXACT, false)) + " "
                                      + msg("Match exactly");
-        if (true || name.trim().length() == 0) {
+        if (true || (name.trim().length() == 0)) {
             sb.append(HtmlUtil.formEntry(msgLabel("Text"),
-                    HtmlUtil.input(ARG_TEXT,name) + searchExact + searchMetaData));
+                                         HtmlUtil.input(ARG_TEXT, name)
+                                         + searchExact + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_TEXT, name);
             sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                    name + searchExact + searchMetaData));
+                                         name + searchExact
+                                         + searchMetaData));
         }
 
     }
@@ -1161,8 +1239,7 @@ public class TypeHandler extends RepositoryManager {
         //        request.remove(ARG_TODATE);
 
 
-        List<TypeHandler> typeHandlers =
-            getRepository().getTypeHandlers();
+        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         //        List<TypeHandler> typeHandlers =
         //            getRepository().getTypeHandlers(request);
 
@@ -1206,7 +1283,7 @@ public class TypeHandler extends RepositoryManager {
         addTextSearch(request, basicSB);
 
 
-        if (true || typeHandlers.size() > 1) {
+        if (true || (typeHandlers.size() > 1)) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
                 tmp.add(new TwoFacedObject(typeHandler.getLabel(),
@@ -1225,7 +1302,9 @@ public class TypeHandler extends RepositoryManager {
                                      : ""));
             String groupCbx = (advancedForm
                                ? HtmlUtil.checkbox(ARG_TYPE_EXCLUDE, "true",
-                                                   request.get(ARG_TYPE_EXCLUDE,false)) + HtmlUtil.space(1) + msg("Exclude")
+                                   request.get(ARG_TYPE_EXCLUDE,
+                                       false)) + HtmlUtil.space(1)
+                                           + msg("Exclude")
                                : "");
             basicSB.append(
                 HtmlUtil.formEntry(
@@ -1279,10 +1358,15 @@ public class TypeHandler extends RepositoryManager {
         basicSB.append(
             HtmlUtil.formEntry(
                 msgLabel("Date Range"),
-                getRepository().makeDateInput(request,ARG_FROMDATE, "searchform", null) +
-                HtmlUtil.space(1) + HtmlUtil.img(getRepository().fileUrl(ICON_RANGE)) + HtmlUtil.space(1)  +
-                getRepository().makeDateInput(request,ARG_TODATE, "searchform", null) +
-                HtmlUtil.space(4) + msgLabel("Or") + dateSelectInput));
+                getRepository().makeDateInput(
+                    request, ARG_FROMDATE, "searchform",
+                    null) + HtmlUtil.space(1)
+                          + HtmlUtil.img(getRepository().fileUrl(ICON_RANGE))
+                          + HtmlUtil.space(1)
+                          + getRepository().makeDateInput(
+                              request, ARG_TODATE, "searchform",
+                              null) + HtmlUtil.space(4) + msgLabel("Or")
+                                    + dateSelectInput));
 
         if (advancedForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
@@ -1295,7 +1379,7 @@ public class TypeHandler extends RepositoryManager {
                                                 + ")";
             if (groupArg.length() > 0) {
                 advancedSB.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
-                Group group = getRepository().findGroup(request,groupArg);
+                Group group = getRepository().findGroup(request, groupArg);
                 if (group != null) {
                     advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             group.getFullName() + "&nbsp;" + searchChildren));
@@ -1342,17 +1426,27 @@ public class TypeHandler extends RepositoryManager {
                                   request.get(ARG_INCLUDENONGEO,
                                       true)) + " Include non-geographic";
 
-            String areaWidget = HtmlUtil.makeLatLonBox(ARG_AREA, 
-                                                       request.getString(ARG_AREA+"_south",""),
-                                                       request.getString(ARG_AREA+"_north",""),
-                                                       request.getString(ARG_AREA+"_east",""),
-                                                       request.getString(ARG_AREA+"_west",""));
-            String mapCanvas = HtmlUtil.div(""," id=\"mapcanvas\" class=\"mapcanvas\"");
+            String areaWidget = HtmlUtil.makeLatLonBox(
+                                    ARG_AREA,
+                                    request.getString(
+                                        ARG_AREA + "_south",
+                                        ""), request.getString(
+                                            ARG_AREA + "_north",
+                                            ""), request.getString(
+                                                ARG_AREA + "_east",
+                                                ""), request.getString(
+                                                    ARG_AREA + "_west", ""));
+            String mapCanvas =
+                HtmlUtil.div("", " id=\"mapcanvas\" class=\"mapcanvas\"");
             mapCanvas = "";
-            areaWidget = "<table><tr valign=top>" + HtmlUtil.cols(areaWidget, mapCanvas) + "</tr></table>";
+            areaWidget = "<table><tr valign=top>"
+                         + HtmlUtil.cols(areaWidget, mapCanvas)
+                         + "</tr></table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(request.url(getRepository().URL_GETMAP),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
-            String mapJS =  HtmlUtil.script("function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n");
-            mapJS = "";
+            String mapJS =
+                HtmlUtil.script(
+                    "function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n");
+            mapJS      = "";
             areaWidget += mapJS;
 
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
@@ -1373,8 +1467,10 @@ public class TypeHandler extends RepositoryManager {
         advancedSB.append(HtmlUtil.formTableClose());
 
 
-        formBuffer.append(getRepository().makeShowHideBlock(request, msg("Basic"), basicSB, true));
-        formBuffer.append(getRepository().makeShowHideBlock(request, msg("Advanced"), advancedSB, false));
+        formBuffer.append(getRepository().makeShowHideBlock(request,
+                msg("Basic"), basicSB, true));
+        formBuffer.append(getRepository().makeShowHideBlock(request,
+                msg("Advanced"), advancedSB, false));
     }
 
 
@@ -1406,53 +1502,73 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
- 
-    protected List<Clause> assembleWhereClause(Request request, StringBuffer searchCriteria)
-        throws Exception {
 
-        List<Clause> where = new ArrayList<Clause>();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param searchCriteria _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Clause> assembleWhereClause(Request request,
+            StringBuffer searchCriteria)
+            throws Exception {
 
-        List typeList = request.get(ARG_TYPE, new ArrayList());
+        List<Clause> where    = new ArrayList<Clause>();
+
+        List         typeList = request.get(ARG_TYPE, new ArrayList());
         typeList.remove(TYPE_ANY);
-        if(typeList.size()>0) {
+        if (typeList.size() > 0) {
             if (request.get(ARG_TYPE_EXCLUDE, false)) {
-                    addCriteria(searchCriteria,"Entry Type!=", StringUtil.join(",",typeList));
+                addCriteria(searchCriteria, "Entry Type!=",
+                            StringUtil.join(",", typeList));
             } else {
-                addCriteria(searchCriteria,"Entry Type=", StringUtil.join(",",typeList));
+                addCriteria(searchCriteria, "Entry Type=",
+                            StringUtil.join(",", typeList));
             }
         }
 
         if (request.defined(ARG_RESOURCE)) {
-            addCriteria(searchCriteria,"Resource=", request.getString(ARG_RESOURCE, ""));
+            addCriteria(searchCriteria, "Resource=",
+                        request.getString(ARG_RESOURCE, ""));
             addOrClause(COL_ENTRIES_RESOURCE,
                         request.getString(ARG_RESOURCE, ""), where);
         }
 
         if (request.defined(ARG_DATATYPE)) {
-            addCriteria(searchCriteria,"Datatype=", request.getString(ARG_DATATYPE, ""));
+            addCriteria(searchCriteria, "Datatype=",
+                        request.getString(ARG_DATATYPE, ""));
             addOrClause(COL_ENTRIES_DATATYPE,
                         request.getString(ARG_DATATYPE, ""), where);
         }
 
         if (request.defined(ARG_USER_ID)) {
-            addCriteria(searchCriteria,"User=", request.getString(ARG_USER_ID, ""));
+            addCriteria(searchCriteria, "User=",
+                        request.getString(ARG_USER_ID, ""));
             addOrClause(COL_ENTRIES_USER_ID,
                         request.getString(ARG_USER_ID, ""), where);
         }
 
         if (request.defined(ARG_COLLECTION)) {
-            Entry collectionEntry = getRepository().getEntry(request, request.getString(ARG_COLLECTION, ""));
-            if(collectionEntry!=null) {
-                addCriteria(searchCriteria,"Collection=", collectionEntry.getName());
+            Entry collectionEntry = getRepository().getEntry(request,
+                                        request.getString(ARG_COLLECTION,
+                                            ""));
+            if (collectionEntry != null) {
+                addCriteria(searchCriteria, "Collection=",
+                            collectionEntry.getName());
             } else {
-                addCriteria(searchCriteria,"Collection=", "Unknown");
+                addCriteria(searchCriteria, "Collection=", "Unknown");
             }
             addOrClause(COL_ENTRIES_TOP_GROUP_ID,
                         request.getString(ARG_COLLECTION, ""), where);
         }
 
         if (request.defined(ARG_FILESUFFIX)) {
-            addCriteria(searchCriteria, "File Suffix=",request.getString(ARG_FILESUFFIX, ""));
+            addCriteria(searchCriteria, "File Suffix=",
+                        request.getString(ARG_FILESUFFIX, ""));
             List<Clause> clauses = new ArrayList<Clause>();
             for (String tok : (List<String>) StringUtil.split(
                     request.getString(ARG_FILESUFFIX, ""), ",", true, true)) {
@@ -1473,10 +1589,13 @@ public class TypeHandler extends RepositoryManager {
                 groupId = groupId.substring(1);
             }
             if (groupId.endsWith("%")) {
-                System.err.println ("G:" +groupId.substring(0,groupId.length()-1));
-                Group group = getRepository().findGroup(request,groupId.substring(0,groupId.length()-1));
-                if(group!=null) {
-                    addCriteria(searchCriteria, "Group=",group.getName());
+                System.err.println("G:"
+                                   + groupId.substring(0,
+                                       groupId.length() - 1));
+                Group group = getRepository().findGroup(request,
+                                  groupId.substring(0, groupId.length() - 1));
+                if (group != null) {
+                    addCriteria(searchCriteria, "Group=", group.getName());
                 }
                 where.add(Clause.like(COL_ENTRIES_PARENT_GROUP_ID, groupId));
             } else {
@@ -1485,7 +1604,9 @@ public class TypeHandler extends RepositoryManager {
                     throw new IllegalArgumentException(
                         msgLabel("Could not find group") + groupId);
                 }
-                addCriteria(searchCriteria, "Group" +(doNot?"!=":"="),group.getName());
+                addCriteria(searchCriteria, "Group" + (doNot
+                        ? "!="
+                        : "="), group.getName());
                 String searchChildren =
                     (String) request.getString(ARG_GROUP_CHILDREN,
                         (String) null);
@@ -1521,19 +1642,19 @@ public class TypeHandler extends RepositoryManager {
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
         if (dateRange[0] != null) {
-            addCriteria(searchCriteria,"From Date>=", dateRange[0]);
+            addCriteria(searchCriteria, "From Date>=", dateRange[0]);
             where.add(Clause.ge(COL_ENTRIES_FROMDATE, dateRange[0]));
         }
 
 
         if (dateRange[1] != null) {
-            addCriteria(searchCriteria,"To Date<=", dateRange[1]);
+            addCriteria(searchCriteria, "To Date<=", dateRange[1]);
             where.add(Clause.le(COL_ENTRIES_TODATE, dateRange[1]));
         }
 
         Date createDate = request.get(ARG_CREATEDATE, (Date) null);
         if (createDate != null) {
-            addCriteria(searchCriteria,"Create Date<=", createDate);
+            addCriteria(searchCriteria, "Create Date<=", createDate);
             where.add(Clause.le(COL_ENTRIES_CREATEDATE, createDate));
         }
 
@@ -1541,25 +1662,29 @@ public class TypeHandler extends RepositoryManager {
         boolean      includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
         List<Clause> areaExpressions = new ArrayList<Clause>();
         if (request.defined(ARG_AREA + "_south")) {
-            addCriteria(searchCriteria, "South>=",request.getString(ARG_AREA + "_south",""));
+            addCriteria(searchCriteria, "South>=",
+                        request.getString(ARG_AREA + "_south", ""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_SOUTH,
                     new Double(Entry.NONGEO)), Clause.ge(COL_ENTRIES_SOUTH,
                         request.get(ARG_AREA + "_south", 0.0))));
         }
         if (request.defined(ARG_AREA + "_north")) {
-            addCriteria(searchCriteria, "North<=",request.getString(ARG_AREA + "_north",""));
+            addCriteria(searchCriteria, "North<=",
+                        request.getString(ARG_AREA + "_north", ""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_NORTH,
                     new Double(Entry.NONGEO)), Clause.le(COL_ENTRIES_NORTH,
                         request.get(ARG_AREA + "_north", 0.0))));
         }
         if (request.defined(ARG_AREA + "_east")) {
-            addCriteria(searchCriteria, "East<=",request.getString(ARG_AREA + "_east",""));
+            addCriteria(searchCriteria, "East<=",
+                        request.getString(ARG_AREA + "_east", ""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_EAST,
                     new Double(Entry.NONGEO)), Clause.le(COL_ENTRIES_EAST,
                         request.get(ARG_AREA + "_east", 0.0))));
         }
         if (request.defined(ARG_AREA + "_west")) {
-            addCriteria(searchCriteria, "West>=",request.getString(ARG_AREA + "_west",""));
+            addCriteria(searchCriteria, "West>=",
+                        request.getString(ARG_AREA + "_west", ""));
             areaExpressions.add(Clause.and(Clause.neq(COL_ENTRIES_WEST,
                     new Double(Entry.NONGEO)), Clause.ge(COL_ENTRIES_WEST,
                         request.get(ARG_AREA + "_west", 0.0))));
@@ -1629,11 +1754,16 @@ public class TypeHandler extends RepositoryManager {
                                         metadata.getAttr1()),
                                     Clause.eq(subTable + ".type", type) });
 
-                MetadataHandler handler = getRepository().getMetadataManager().findMetadataHandler(type);
+                MetadataHandler handler =
+                    getRepository().getMetadataManager().findMetadataHandler(
+                        type);
                 Metadata.Type metadataType = handler.findType(type);
-                if(metadataType!=null) {
-                    addCriteria(searchCriteria, metadataType.getLabel() + "=",metadata.getAttr1());
+                if (metadataType != null) {
+                    addCriteria(searchCriteria,
+                                metadataType.getLabel() + "=",
+                                metadata.getAttr1());
                 }
+
                 /**
                  * *TODO
                  * if (metadata.getInherited()) {
@@ -1664,7 +1794,7 @@ public class TypeHandler extends RepositoryManager {
                  *               SqlUtil.group(clause),
                  *               SqlUtil.group(inheritedClause))));
                  *   //                clause = SqlUtil.group(inheritedClause);
-                 *   }**
+                 *   }
                  */
                 //                System.err.println(clause);
                 metadataOrs.add(clause);
@@ -1685,12 +1815,12 @@ public class TypeHandler extends RepositoryManager {
         if (name.length() > 0) {
             boolean doLike = false;
             if ( !request.get(ARG_EXACT, false)) {
-                addCriteria(searchCriteria,"Text like", name);
+                addCriteria(searchCriteria, "Text like", name);
                 List tmp = StringUtil.split(name, ",", true, true);
                 name   = "%" + StringUtil.join("%,%", tmp) + "%";
                 doLike = true;
             } else {
-                addCriteria(searchCriteria,"Text =", name);
+                addCriteria(searchCriteria, "Text =", name);
             }
             List<Clause> ors       = new ArrayList<Clause>();
             boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);

@@ -78,6 +78,7 @@ public class Entry extends Entity {
     /** _more_ */
     private double west = NONGEO;
 
+    /** _more_          */
     private boolean isLocalFile = false;
 
 
@@ -87,6 +88,11 @@ public class Entry extends Entity {
     public Entry() {}
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public Entry(String id) {
         setId(id);
     }
@@ -529,23 +535,23 @@ public class Entry extends Entity {
         return dataType;
     }
 
-/**
-Set the IsLocalFile property.
+    /**
+     * Set the IsLocalFile property.
+     *
+     * @param value The new value for IsLocalFile
+     */
+    public void setIsLocalFile(boolean value) {
+        isLocalFile = value;
+    }
 
-@param value The new value for IsLocalFile
-**/
-public void setIsLocalFile (boolean value) {
-	isLocalFile = value;
-}
-
-/**
-Get the IsLocalFile property.
-
-@return The IsLocalFile
-**/
-public boolean getIsLocalFile () {
-	return isLocalFile;
-}
+    /**
+     * Get the IsLocalFile property.
+     *
+     * @return The IsLocalFile
+     */
+    public boolean getIsLocalFile() {
+        return isLocalFile;
+    }
 
 
 

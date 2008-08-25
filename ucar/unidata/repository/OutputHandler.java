@@ -76,7 +76,7 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public  class OutputHandler extends RepositoryManager {
+public class OutputHandler extends RepositoryManager {
 
     /** _more_ */
     public static final String OUTPUT_HTML = "default.html";
@@ -181,66 +181,141 @@ public  class OutputHandler extends RepositoryManager {
         return false;
     }
 
+    /**
+     * Class State _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class State {
+
+        /** _more_          */
         public static final int FOR_UNKNOWN = 0;
+
+        /** _more_          */
         public static final int FOR_HEADER = 1;
 
+        /** _more_          */
         public int forWhat = FOR_UNKNOWN;
-        public         Entry entry;
-        public         Group group;
-        public         List<Group> subGroups;
-        public         List<Entry> entries;
-        public         List<Entry> allEntries;
-        
+
+        /** _more_          */
+        public Entry entry;
+
+        /** _more_          */
+        public Group group;
+
+        /** _more_          */
+        public List<Group> subGroups;
+
+        /** _more_          */
+        public List<Entry> entries;
+
+        /** _more_          */
+        public List<Entry> allEntries;
+
+        /**
+         * _more_
+         *
+         * @param entry _more_
+         */
         public State(Entry entry) {
             this.entry = entry;
         }
 
-        public State(Group group,       
-                     List<Group> subGroups, 
+        /**
+         * _more_
+         *
+         * @param group _more_
+         * @param subGroups _more_
+         * @param entries _more_
+         */
+        public State(Group group, List<Group> subGroups,
                      List<Entry> entries) {
-            this.group = group;
-            this.entries = entries;
+            this.group     = group;
+            this.entries   = entries;
             this.subGroups = subGroups;
         }
-        
 
+
+        /**
+         * _more_
+         *
+         * @param entries _more_
+         */
         public State(List<Entry> entries) {
             this.entries = entries;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean forHeader() {
             return forWhat == FOR_HEADER;
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public List<Entry> getAllEntries() {
-            if(allEntries==null) {
-                allEntries= new ArrayList();
-                if(subGroups!=null) 
+            if (allEntries == null) {
+                allEntries = new ArrayList();
+                if (subGroups != null) {
                     allEntries.addAll(subGroups);
-                if(entries!=null)
+                }
+                if (entries != null) {
                     allEntries.addAll(entries);
-                if(entry!=null)
+                }
+                if (entry != null) {
                     allEntries.add(entry);
+                }
             }
-            return (List<Entry>)allEntries;
+            return (List<Entry>) allEntries;
         }
 
     }
 
 
-    protected Result makeLinksResult(Request request, String title, StringBuffer sb,State state) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param title _more_
+     * @param sb _more_
+     * @param state _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Result makeLinksResult(Request request, String title,
+                                     StringBuffer sb, State state)
+            throws Exception {
         Result result = new Result(title, sb);
-        addLinks(request, result,state);
+        addLinks(request, result, state);
         return result;
     }
 
-    protected void addLinks(Request request, Result result, State state) throws Exception{
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param result _more_
+     * @param state _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void addLinks(Request request, Result result, State state)
+            throws Exception {
         state.forWhat = State.FOR_HEADER;
-        result.putProperty(
-            PROP_NAVSUBLINKS,
-            getHeader(
-                request, request.getOutput(),
-                getRepository().getOutputTypes(request, state)));
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getHeader(request, request.getOutput(),
+                                     getRepository().getOutputTypes(request,
+                                         state)));
     }
 
 
@@ -249,13 +324,15 @@ public  class OutputHandler extends RepositoryManager {
      *
      * @param request _more_
      * @param entries _more_
+     * @param state _more_
      * @param types _more_
      *
      *
      * @throws Exception _more_
      */
-    protected  void addOutputTypes(Request request, State state, 
-                List<OutputType> types) throws Exception {}
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {}
 
     /**
      * _more_
@@ -263,6 +340,7 @@ public  class OutputHandler extends RepositoryManager {
      * @param request _more_
      * @param entry _more_
      * @param links _more_
+     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
@@ -534,7 +612,7 @@ public  class OutputHandler extends RepositoryManager {
                 + getRepository().fileUrl(ICON_BLANK) + ")\">");
         }
         //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
-        int    cnt = 0;
+        int cnt = 0;
         for (Entry entry : (List<Entry>) entries) {
             sb.append("<li>");
             if (doForm) {
@@ -607,18 +685,22 @@ public  class OutputHandler extends RepositoryManager {
         List   items          = new ArrayList();
         String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
-        String l = HtmlUtil.img(getRepository().fileUrl(ICON_LCURVE),"","  class=\"curve\"");
-        String r = HtmlUtil.img(getRepository().fileUrl(ICON_RCURVE),""," class=\"curve\"  ");
+        String l = HtmlUtil.img(getRepository().fileUrl(ICON_LCURVE), "",
+                                "  class=\"curve\"");
+        String r = HtmlUtil.img(getRepository().fileUrl(ICON_RCURVE), "",
+                                " class=\"curve\"  ");
 
-        String offextra    = " class=\"subnavoffcomp\" ";
-        String onextra = " class=\"subnavoncomp\" ";
+        String offextra = " class=\"subnavoffcomp\" ";
+        String onextra  = " class=\"subnavoncomp\" ";
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, (String) outputType.getId());
             if (outputType.getId().equals(output)) {
-                items.add(HtmlUtil.span(l+msg(outputType.toString())+r,onextra));
+                items.add(HtmlUtil.span(l + msg(outputType.toString()) + r,
+                                        onextra));
             } else {
                 String url = outputType.assembleUrl(request);
-                items.add(HtmlUtil.span(HtmlUtil.href(url, msg(outputType.toString())), offextra));
+                items.add(HtmlUtil.span(HtmlUtil.href(url,
+                        msg(outputType.toString())), offextra));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);

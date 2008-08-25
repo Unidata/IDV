@@ -105,7 +105,7 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_BASEGROUP = "basegroup";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MOVETOSTORAGE = "movetostorage";
 
 
@@ -144,7 +144,7 @@ public class PatternHarvester extends Harvester {
     private String baseGroupName = "";
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean moveToStorage = false;
 
     /** _more_ */
@@ -764,8 +764,8 @@ public class PatternHarvester extends Harvester {
             List tags = StringUtil.split(tag, ",", true, true);
             for (int i = 0; i < tags.size(); i++) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
-                                               entry.getId(), EnumeratedMetadataHandler.TYPE_TAG, DFLT_INHERITED,
-                                               (String) tags.get(i), "", "", ""));
+                        entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
+                        DFLT_INHERITED, (String) tags.get(i), "", "", ""));
             }
 
         }

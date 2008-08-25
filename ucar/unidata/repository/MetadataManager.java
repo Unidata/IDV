@@ -112,9 +112,10 @@ public class MetadataManager extends RepositoryManager {
                                               "/metadata/form",
                                               "Edit Metadata");
 
+    /** _more_          */
     public RequestUrl URL_METADATA_CLOUD = new RequestUrl(getRepository(),
-                                              "/metadata/cloud",
-                                              "Metadata Cloud");
+                                               "/metadata/cloud",
+                                               "Metadata Cloud");
 
     /** _more_ */
     public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(getRepository(),
@@ -222,9 +223,9 @@ public class MetadataManager extends RepositoryManager {
                 metadataList.add(
                     handler.makeMetadata(
                         results.getString(col++), results.getString(col++),
-                        results.getString(col++), results.getInt(col++)==1,results.getString(col++),
+                        results.getString(col++), results.getInt(col++) == 1,
                         results.getString(col++), results.getString(col++),
-                        results.getString(col++)));
+                        results.getString(col++), results.getString(col++)));
             }
         }
         entry.setMetadata(metadataList);
@@ -352,7 +353,18 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
-    public StringBuffer addToBrowseSearchForm(Request request, StringBuffer sb)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public StringBuffer addToBrowseSearchForm(Request request,
+            StringBuffer sb)
             throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
             handler.addToBrowseSearchForm(request, sb);
@@ -408,83 +420,106 @@ public class MetadataManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processMetadataCloud(Request request) throws Exception {
-        boolean doCloud = request.getString(ARG_TYPE,"cloud").equals("cloud");
-        StringBuffer sb    = new StringBuffer();
-        String header;
-        if(doCloud) {
-            request.put(ARG_TYPE,"list");
-            header = HtmlUtil.b("Cloud") +
-                HtmlUtil.span("&nbsp;|&nbsp;"," class=\"separator\" " )+
-                HtmlUtil.href(request.getUrl(),"List");
+
+        boolean doCloud = request.getString(ARG_TYPE,
+                                            "cloud").equals("cloud");
+        StringBuffer sb = new StringBuffer();
+        String       header;
+        if (doCloud) {
+            request.put(ARG_TYPE, "list");
+            header =
+                HtmlUtil.b("Cloud")
+                + HtmlUtil.span("&nbsp;|&nbsp;", " class=\"separator\" ")
+                + HtmlUtil.href(request.getUrl(), "List");
         } else {
-            request.put(ARG_TYPE,"cloud");
-            header = HtmlUtil.href(request.getUrl(),"Cloud") +
-                HtmlUtil.span("&nbsp;|&nbsp;","class=\"separator\" ") +
-                HtmlUtil.b("List");
+            request.put(ARG_TYPE, "cloud");
+            header = HtmlUtil.href(request.getUrl(), "Cloud")
+                     + HtmlUtil.span("&nbsp;|&nbsp;", "class=\"separator\" ")
+                     + HtmlUtil.b("List");
         }
-        sb.append(HtmlUtil.center(HtmlUtil.span(header," class=pagesubheading ")));
+        sb.append(HtmlUtil.center(HtmlUtil.span(header,
+                " class=pagesubheading ")));
         sb.append(HtmlUtil.hr());
-        MetadataHandler handler =  findMetadataHandler(request.getString(ARG_METADATA_TYPE,""));
-        Metadata.Type type = handler.findType(request.getString(ARG_METADATA_TYPE,""));
-        String[] values = getDistinctValues(request, handler,type);
-        int[]cnt = new int[values.length];
-        int max = -1;
-        int min = 10000;
+        MetadataHandler handler =
+            findMetadataHandler(request.getString(ARG_METADATA_TYPE, ""));
+        Metadata.Type type =
+            handler.findType(request.getString(ARG_METADATA_TYPE, ""));
+        String[] values = getDistinctValues(request, handler, type);
+        int[]    cnt    = new int[values.length];
+        int      max    = -1;
+        int      min    = 10000;
         for (int i = 0; i < values.length; i++) {
             String value = values[i];
             cnt[i] = 0;
             Statement stmt = getDatabaseManager().select(
-                                                         SqlUtil.count("*"),
-                                                         TABLE_METADATA,
-                                                         Clause.and(
-                                                         Clause.eq(COL_METADATA_TYPE, type.getType()),
-                                                         Clause.eq(COL_METADATA_ATTR1, value)));                                                         
+                                 SqlUtil.count("*"), TABLE_METADATA,
+                                 Clause.and(
+                                     Clause.eq(
+                                         COL_METADATA_TYPE,
+                                         type.getType()), Clause.eq(
+                                             COL_METADATA_ATTR1, value)));
             ResultSet results = stmt.getResultSet();
             if ( !results.next()) {
                 continue;
             }
-            cnt[i] =  results.getInt(1);
-            max = Math.max(cnt[i],max);            
-            min = Math.min(cnt[i],min);
+            cnt[i] = results.getInt(1);
+            max    = Math.max(cnt[i], max);
+            min    = Math.min(cnt[i], min);
             stmt.close();
         }
         int    diff         = max - min;
         double distribution = diff / 5.0;
-        if(!doCloud) {
-            List tuples  = new ArrayList();
+        if ( !doCloud) {
+            List tuples = new ArrayList();
             for (int i = 0; i < values.length; i++) {
-                tuples.add(new Object[]{new Integer(cnt[i]), values[i]});
+                tuples.add(new Object[] { new Integer(cnt[i]), values[i] });
             }
             tuples = Misc.sortTuples(tuples, false);
             sb.append("<table>");
-            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b("Count"),HtmlUtil.b(type.getLabel()))));
-            for(int i=0;i<tuples.size();i++) {
-                Object []tuple = (Object[]) tuples.get(i);
+            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b("Count"),
+                    HtmlUtil.b(type.getLabel()))));
+            for (int i = 0; i < tuples.size(); i++) {
+                Object[] tuple = (Object[]) tuples.get(i);
                 sb.append("<tr><td width=\"1%\" align=right>");
                 sb.append(tuple[0]);
                 sb.append("</td><td>");
                 String value = (String) tuple[1];
-                sb.append(HtmlUtil.href(handler.getSearchUrl(request, type, value), value));
+                sb.append(HtmlUtil.href(handler.getSearchUrl(request, type,
+                        value), value));
                 sb.append("</td></tr>");
             }
             sb.append("</table>");
         } else {
             for (int i = 0; i < values.length; i++) {
-                if(cnt[i]==0) continue;
-                double percent = cnt[i]/distribution;
+                if (cnt[i] == 0) {
+                    continue;
+                }
+                double percent = cnt[i] / distribution;
                 int    bin     = (int) (percent * 5);
                 String css     = "font-size:" + (12 + bin * 2);
-                String value = values[i];
-                String ttValue = value.replace("\"","'");
-                if(value.length()>30) value = value.substring(0,29) + "...";
+                String value   = values[i];
+                String ttValue = value.replace("\"", "'");
+                if (value.length() > 30) {
+                    value = value.substring(0, 29) + "...";
+                }
                 sb.append("<span style=\"" + css + "\">");
                 String extra = XmlUtil.attrs("alt",
-                                             "Count:" + cnt[i]+" " + ttValue,
-                                             "title",
-                                             "Count:" + cnt[i] + " " + ttValue);
-                sb.append(
-                          HtmlUtil.href(handler.getSearchUrl(request, type, values[i]), value, extra));
+                                             "Count:" + cnt[i] + " "
+                                             + ttValue, "title",
+                                                 "Count:" + cnt[i] + " "
+                                                 + ttValue);
+                sb.append(HtmlUtil.href(handler.getSearchUrl(request, type,
+                        values[i]), value, extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
             }
@@ -493,7 +528,10 @@ public class MetadataManager extends RepositoryManager {
 
 
 
-        return  getRepository().makeResult(request, msg(type.getLabel()+" Cloud"), sb, getRepository().searchUrls);
+        return getRepository().makeResult(request,
+                                          msg(type.getLabel() + " Cloud"),
+                                          sb, getRepository().searchUrls);
+
     }
 
 
@@ -699,9 +737,10 @@ public class MetadataManager extends RepositoryManager {
         distinctMap = null;
         getDatabaseManager().executeInsert(INSERT_METADATA, new Object[] {
             metadata.getId(), metadata.getEntryId(), metadata.getType(),
-            new Integer(metadata.getInherited()?1:0),
-            metadata.getAttr1(), metadata.getAttr2(), metadata.getAttr3(),
-            metadata.getAttr4()
+            new Integer(metadata.getInherited()
+                        ? 1
+                        : 0), metadata.getAttr1(), metadata.getAttr2(),
+            metadata.getAttr3(), metadata.getAttr4()
         });
     }
 

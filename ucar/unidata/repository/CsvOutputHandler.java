@@ -114,9 +114,18 @@ public class CsvOutputHandler extends OutputHandler {
     }
 
 
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param state _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {
         types.add(new OutputType("CSV", OUTPUT_CSV));
     }
 

@@ -251,9 +251,17 @@ public class GenericTypeHandler extends TypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
     public void initializeEntry(Request request, Entry entry, Element node)
-            throws Exception {
-    }
+            throws Exception {}
 
 
 
@@ -447,20 +455,23 @@ public class GenericTypeHandler extends TypeHandler {
      * _more_
      *
      * @param request _more_
+     * @param searchCriteria _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected List<Clause> assembleWhereClause(Request request,StringBuffer searchCriteria)
+    protected List<Clause> assembleWhereClause(Request request,
+            StringBuffer searchCriteria)
             throws Exception {
-        List<Clause> where        = super.assembleWhereClause(request,searchCriteria);
-        int          originalSize = where.size();
+        List<Clause> where = super.assembleWhereClause(request,
+                                 searchCriteria);
+        int originalSize = where.size();
         for (Column column : columns) {
             if ( !column.getCanSearch()) {
                 continue;
             }
-            column.assembleWhereClause(request, where,searchCriteria);
+            column.assembleWhereClause(request, where, searchCriteria);
         }
         if ((originalSize != where.size()) && (originalSize > 0)) {
             where.add(Clause.join(COL_ENTRIES_ID, getTableName() + ".id"));
@@ -564,6 +575,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @param output _more_
      * @param showResource _more_
      * @param showMap _more_
+     * @param linkToDownload _more_
      *
      * @return _more_
      *
@@ -706,7 +718,8 @@ public class GenericTypeHandler extends TypeHandler {
             typeSB = new StringBuffer(HtmlUtil.formTable() + typeSB
                                       + HtmlUtil.formTableClose());
             formBuffer.append(HtmlUtil.p());
-            formBuffer.append(getRepository().makeShowHideBlock(request, msg(getLabel()), typeSB, true));
+            formBuffer.append(getRepository().makeShowHideBlock(request,
+                    msg(getLabel()), typeSB, true));
         }
 
 

@@ -246,6 +246,10 @@ ul {
    text-decoration: underline;
 }
 
+a.menulink:hover {
+   text-decoration: underline;
+}
+
 a.menulink {
    text-decoration: none;
    color:black;

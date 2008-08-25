@@ -91,7 +91,7 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_SETTINGS, 
+    protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_SETTINGS,
                                         getRepositoryBase().URL_USER_CART };
 
 
@@ -105,6 +105,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     private List ipUserList = new ArrayList();
 
+    /** _more_          */
     public final User localFileUser = new User("localuser", false);
 
     /**
@@ -149,6 +150,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void checkSession(Request request) throws Exception {
+
         User         user    = request.getUser();
         List<String> cookies = getCookies(request);
 
@@ -165,8 +167,9 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        if(user==null && request.hasParameter(ARG_SESSIONID)) {
-            Session session = sessionMap.get(request.getString(ARG_SESSIONID));
+        if ((user == null) && request.hasParameter(ARG_SESSIONID)) {
+            Session session =
+                sessionMap.get(request.getString(ARG_SESSIONID));
             if (session != null) {
                 session.lastActivity = new Date();
                 user                 = session.user;
@@ -251,6 +254,7 @@ public class UserManager extends RepositoryManager {
         }
 
         request.setUser(user);
+
     }
 
     /**
@@ -404,9 +408,11 @@ public class UserManager extends RepositoryManager {
         String id = request.getString(ARG_USER_ID, "");
         if (getRepository().isSSLEnabled()) {
             //sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
-            sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
+            sb.append(
+                HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
         } else {
-            sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
+            sb.append(
+                HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
         }
         if (request.defined(ARG_REDIRECT)) {
             sb.append(HtmlUtil.hidden(ARG_REDIRECT,
@@ -839,8 +845,9 @@ public class UserManager extends RepositoryManager {
                 makeOrUpdateUser(new User(id, name, email, "", "",
                                           hashPassword(password1), admin,
                                           ""), false);
-                String userEditLink = request.url(getRepositoryBase().URL_USER_EDIT, ARG_USER_ID,
-                                          id);
+                String userEditLink =
+                    request.url(getRepositoryBase().URL_USER_EDIT,
+                                ARG_USER_ID, id);
                 return new Result(userEditLink);
             }
         }
@@ -965,9 +972,10 @@ public class UserManager extends RepositoryManager {
                     HtmlUtil.bold(msg("Admin?")) + HtmlUtil.space(2))));
 
         for (User user : users) {
-            String userEditLink = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_EDIT,
-                                      ARG_USER_ID,
-                                      user.getId()), user.getId());
+            String userEditLink =
+                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_EDIT,
+                                          ARG_USER_ID,
+                                          user.getId()), user.getId());
 
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
@@ -1124,8 +1132,11 @@ public class UserManager extends RepositoryManager {
         if (entries.size() == 0) {
             sb.append(msg("No entries in cart"));
         } else {
-            sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_CART, ARG_ACTION,
-                    ACTION_CLEAR), msg("Clear Cart")));
+            sb.append(
+                HtmlUtil.href(
+                    request.url(
+                        getRepositoryBase().URL_USER_CART, ARG_ACTION,
+                        ACTION_CLEAR), msg("Clear Cart")));
             sb.append(HtmlUtil.p());
             boolean haveFrom = request.defined(ARG_FROM);
             if (haveFrom) {
@@ -1148,8 +1159,8 @@ public class UserManager extends RepositoryManager {
                 sb.append(HtmlUtil.space(1));
                 sb.append(msgLabel("As"));
                 sb.append(HtmlUtil.space(1));
-                List outputList =
-                    repository.getOutputTypes(request, new OutputHandler.State(entries));
+                List outputList = repository.getOutputTypes(request,
+                                      new OutputHandler.State(entries));
                 sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             }
             //            sb.append("<br>");
@@ -1205,8 +1216,10 @@ public class UserManager extends RepositoryManager {
      */
     private Result makeResult(Request request, String title,
                               StringBuffer sb) {
-        return getRepository().makeResult(request, title, sb, 
-                                          (request.getUser().getAnonymous()?null:userUrls));
+        return getRepository().makeResult(request, title, sb,
+                                          (request.getUser().getAnonymous()
+                                           ? null
+                                           : userUrls));
     }
 
 
@@ -1227,17 +1240,20 @@ public class UserManager extends RepositoryManager {
         if (user.getAnonymous()) {
             String redirect =
                 XmlUtil.encodeBase64(request.getUrl().getBytes());
-            userLink = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_LOGIN,
-                    ARG_REDIRECT, redirect), msg("Login"),
-                                             " class=\"navlink\" ");
+            userLink =
+                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_LOGIN,
+                                          ARG_REDIRECT,
+                                          redirect), msg("Login"),
+                                              " class=\"navlink\" ");
         } else {
             userLink = HtmlUtil.href(
-                request.url(getRepositoryBase().URL_USER_LOGOUT), msg("Logout"),
-                " class=\"navlink\" ") + HtmlUtil.space(1) + "|"
-                    + HtmlUtil.space(1)
+                request.url(getRepositoryBase().URL_USER_LOGOUT),
+                msg("Logout"), " class=\"navlink\" ") + HtmlUtil.space(1)
+                    + "|" + HtmlUtil.space(1)
                     + HtmlUtil.href(
-                        request.url(getRepositoryBase().URL_USER_SETTINGS), user.getLabel(),
-                            " class=\"navlink\" ") + HtmlUtil.space(1);
+                        request.url(getRepositoryBase().URL_USER_SETTINGS),
+                        user.getLabel(),
+                        " class=\"navlink\" ") + HtmlUtil.space(1);
         }
         return cartEntry + HtmlUtil.space(2) + userLink;
     }
@@ -1256,8 +1272,10 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb   = new StringBuffer();
         User         user = request.getUser();
         if (user.getAnonymous()) {
-            if(request.getOutput().equals("xml")) {
-                return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),"No user defined"),MIME_XML);
+            if (request.getOutput().equals("xml")) {
+                return new Result(XmlUtil.tag(TAG_RESPONSE,
+                        XmlUtil.attr(ATTR_CODE, "error"),
+                        "No user defined"), MIME_XML);
             }
             String msg = msg("No user defined");
             if (request.exists(ARG_FROMLOGIN)) {
@@ -1271,8 +1289,10 @@ public class UserManager extends RepositoryManager {
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
         }
-        if(request.getOutput().equals("xml")) {
-            return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"ok"),user.getId()),MIME_XML);
+        if (request.getOutput().equals("xml")) {
+            return new Result(XmlUtil.tag(TAG_RESPONSE,
+                                          XmlUtil.attr(ATTR_CODE, "ok"),
+                                          user.getId()), MIME_XML);
         }
         return makeResult(request, "User Home", sb);
     }
@@ -1288,9 +1308,9 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processLogin(Request request) throws Exception {
-        StringBuffer sb   = new StringBuffer();
-        User         user = null;
-        String output = request.getOutput();
+        StringBuffer sb     = new StringBuffer();
+        User         user   = null;
+        String       output = request.getOutput();
         if (request.exists(ARG_USER_ID)) {
             String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD, "");
@@ -1306,8 +1326,10 @@ public class UserManager extends RepositoryManager {
             if (results.next()) {
                 user = getUser(results);
                 setUserSession(request, user);
-                if(output.equals("xml")) {
-                    return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"ok"),request.getSessionId()),MIME_XML);
+                if (output.equals("xml")) {
+                    return new Result(XmlUtil.tag(TAG_RESPONSE,
+                            XmlUtil.attr(ATTR_CODE, "ok"),
+                            request.getSessionId()), MIME_XML);
                 }
                 if (request.exists(ARG_REDIRECT)) {
                     String redirect = new String(
@@ -1317,13 +1339,16 @@ public class UserManager extends RepositoryManager {
                     return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
                             "true", ARG_MESSAGE, msg("You are logged in")));
                 } else {
-                    return new Result(request.url(getRepositoryBase().URL_USER_HOME,
-                            ARG_FROMLOGIN, "true", ARG_MESSAGE,
-                            msg("You are logged in")));
+                    return new Result(
+                        request.url(
+                            getRepositoryBase().URL_USER_HOME, ARG_FROMLOGIN,
+                            "true", ARG_MESSAGE, msg("You are logged in")));
                 }
             } else {
-                if(output.equals("xml")) {
-                    return new Result(XmlUtil.tag(TAG_RESPONSE, XmlUtil.attr(ATTR_CODE,"error"),"Incorrect user name or password"),MIME_XML);
+                if (output.equals("xml")) {
+                    return new Result(XmlUtil.tag(TAG_RESPONSE,
+                            XmlUtil.attr(ATTR_CODE, "error"),
+                            "Incorrect user name or password"), MIME_XML);
                 }
                 sb.append(
                     getRepository().warning(
@@ -1372,15 +1397,12 @@ public class UserManager extends RepositoryManager {
     protected void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository()) {
             protected void getEntryLinks(Request request, Entry entry,
-                                         List<Link> links,boolean forHeader)
+                                         List<Link> links, boolean forHeader)
                     throws Exception {
-                links.add(
-                    new Link(
-                        request.url(
-                            getRepository().URL_USER_CART,
-                            ARG_ACTION, ACTION_ADD, ARG_ID,
-                            entry.getId()), getRepository().fileUrl(
-                                ICON_CART), msg("Add to cart")));
+                links.add(new Link(request.url(getRepository().URL_USER_CART,
+                        ARG_ACTION, ACTION_ADD, ARG_ID,
+                        entry.getId()), getRepository().fileUrl(ICON_CART),
+                                        msg("Add to cart")));
             }
 
 
@@ -1389,13 +1411,13 @@ public class UserManager extends RepositoryManager {
             }
 
 
-                protected void addOutputTypes(Request request,
-                                              State state, 
-                                              List<OutputType> types) throws Exception {
-                    if(!state.forHeader()) {
-                        types.add(new OutputType("Cart", OUTPUT_CART));
-                    }
+            protected void addOutputTypes(Request request, State state,
+                                          List<OutputType> types)
+                    throws Exception {
+                if ( !state.forHeader()) {
+                    types.add(new OutputType("Cart", OUTPUT_CART));
                 }
+            }
 
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
@@ -1455,7 +1477,9 @@ public class UserManager extends RepositoryManager {
                     getRepository().warning(msg("Incorrect passwords")));
             } else {
                 applyState(request, user, false);
-                return new Result(request.url(getRepositoryBase().URL_USER_SETTINGS, ARG_MESSAGE,
+                return new Result(
+                    request.url(
+                        getRepositoryBase().URL_USER_SETTINGS, ARG_MESSAGE,
                         msg("User settings changed")));
             }
         }

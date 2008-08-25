@@ -61,6 +61,7 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_CONTENTTEMPLATE =
         new Metadata.Type("admin.contenttemplate", "Content Template");
 
+    /** _more_          */
     public static Metadata.Type TYPE_LOCALFILE_PATTERN =
         new Metadata.Type("admin.localfile.pattern", "Local File Pattern");
 
@@ -89,19 +90,22 @@ public class AdminMetadataHandler extends MetadataHandler {
     private List<Metadata.Type> dummyTypeList =
         new ArrayList<Metadata.Type>();
 
-    private List<Metadata.Type> nonLocalTypes = new ArrayList<Metadata.Type>();
+    /** _more_          */
+    private List<Metadata.Type> nonLocalTypes =
+        new ArrayList<Metadata.Type>();
 
     /**
      * _more_
      *
      * @param request _more_
+     * @param entry _more_
      *
      * @return _more_
      */
     public List<Metadata.Type> getTypes(Request request, Entry entry) {
         if (request.getUser().getAdmin()) {
-            if(entry.getIsLocalFile()) {
-                return super.getTypes(request,entry);
+            if (entry.getIsLocalFile()) {
+                return super.getTypes(request, entry);
             }
             return nonLocalTypes;
         }
@@ -122,6 +126,8 @@ public class AdminMetadataHandler extends MetadataHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param metadata _more_
      *
      * @return _more_
@@ -166,8 +172,13 @@ public class AdminMetadataHandler extends MetadataHandler {
         if (id.length() > 0) {
             suffix = "." + id;
         }
-        String submit = (forEdit?"":HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl));
-        String cancel = (forEdit?"":HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
+        String submit = (forEdit
+                         ? ""
+                         : HtmlUtil.submit(msg("Add") + HtmlUtil.space(1)
+                                           + lbl));
+        String cancel  = (forEdit
+                          ? ""
+                          : HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
         String arg1    = ARG_ATTR1 + suffix;
         String content = "";
         if (type.equals(TYPE_TEMPLATE)) {
@@ -186,12 +197,14 @@ public class AdminMetadataHandler extends MetadataHandler {
                                      + "<br>" + textarea);
         }
         if (type.equals(TYPE_LOCALFILE_PATTERN)) {
-            if(metadata.getEntry()==null || !metadata.getEntry().getIsLocalFile()) return null;
+            if ((metadata.getEntry() == null)
+                    || !metadata.getEntry().getIsLocalFile()) {
+                return null;
+            }
             String value = metadata.getAttr1();
             String input = HtmlUtil.input(arg1, value);
-            content =
-                HtmlUtil.row(HtmlUtil.colspan(submit, 2))
-                + HtmlUtil.formEntry(lbl,input);
+            content = HtmlUtil.row(HtmlUtil.colspan(submit, 2))
+                      + HtmlUtil.formEntry(lbl, input);
         }
         if ( !forEdit) {
             content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));

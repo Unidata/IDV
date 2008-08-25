@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -88,15 +87,15 @@ public class TdsOutputHandler extends OutputHandler {
                                                             Boolean>();
 
 
-    /** _more_          */
+    /** _more_ */
     private Object CACHE_MUTEX = new Object();
 
-    /** _more_          */
-    private     Hashtable<String, NetcdfFile> cache = new Hashtable<String,
-        NetcdfFile>();
+    /** _more_ */
+    private Hashtable<String, NetcdfFile> cache = new Hashtable<String,
+                                                      NetcdfFile>();
 
-    /** _more_          */
-    private     List<String> cachedFiles = new ArrayList<String>();
+    /** _more_ */
+    private List<String> cachedFiles = new ArrayList<String>();
 
 
 
@@ -146,14 +145,17 @@ public class TdsOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param state _more_
      * @param types _more_
      *
      * @throws Exception On badness
      */
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
-        if(state.entry==null) return;
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {
+        if (state.entry == null) {
+            return;
+        }
         if (canLoad(request, state.entry)) {
             types.add(new OutputType("TDS", OUTPUT_TDS) {
                 public String assembleUrl(Request request) {
@@ -173,21 +175,31 @@ public class TdsOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getTdsUrl(Entry entry) {
-        return "/" + ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_TDS) + "/" + ARG_ID + ":"
-            + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+        return "/" + ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_TDS)
+               + "/" + ARG_ID + ":" + Request.encodeEmbedded(entry.getId())
+               + "/entry.das";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getFullTdsUrl(Entry entry) {
-        return getRepository().URL_ENTRY_SHOW.getFullUrl()+"/" +
-            ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_TDS) + "/" + ARG_ID + ":"
-            + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+        return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
+               + ":" + Request.encodeEmbedded(OUTPUT_TDS) + "/" + ARG_ID
+               + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
 
     /**
      * Can the given entry be served by the tds
      *
+     *
+     * @param request _more_
      * @param entry The entry
      *
      * @return Can the given entry be served by the tds
@@ -234,9 +246,9 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
-        
+
         //        System.err.println ("entry:" + entry);
-        
+
         //TODO: we create a new servlet every time we service a request.
         //any problems with that?
 
@@ -278,7 +290,7 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public class NcDODSServlet extends opendap.servlet.AbstractServlet {
 
-        /** _more_          */
+        /** _more_ */
         public static final int CACHE_LIMIT = 100;
 
         /** _more_ */
@@ -297,7 +309,7 @@ public class TdsOutputHandler extends OutputHandler {
          */
         public NcDODSServlet(Request request, Entry entry) {
             this.repositoryRequest = request;
-            this.entry   = entry;
+            this.entry             = entry;
         }
 
         /**
@@ -320,7 +332,8 @@ public class TdsOutputHandler extends OutputHandler {
             //TODO: Should we be caching the ncFiles? The GuardedDatasets?
             //TODO: Is there problems having multiple GuardedDatasets accessing the same ncfile?
             synchronized (CACHE_MUTEX) {
-                String cacheKey = repositoryRequest.getSessionId()+"_"+ location;
+                String cacheKey = repositoryRequest.getSessionId() + "_"
+                                  + location;
                 ncFile = cache.get(cacheKey);
                 if (ncFile != null) {
                     //Bump it to the end of the list
@@ -330,7 +343,9 @@ public class TdsOutputHandler extends OutputHandler {
                     ncFile = NetcdfDataset.acquireFile(location, null);
                     while (cachedFiles.size() > CACHE_LIMIT) {
                         String firstFile = cachedFiles.get(0);
-                        String firstFileCacheKey = repositoryRequest.getSessionId()+"_"+ firstFile;
+                        String firstFileCacheKey =
+                            repositoryRequest.getSessionId() + "_"
+                            + firstFile;
                         cachedFiles.remove(0);
                         cache.get(firstFileCacheKey).close();
                         cache.remove(firstFileCacheKey);

@@ -278,16 +278,16 @@ public class XmlOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        String       output = request.getOutput();
-        Document doc = XmlUtil.makeDocument();
-        Element root = getGroupTag(request, group, doc, null);
+        String   output = request.getOutput();
+        Document doc    = XmlUtil.makeDocument();
+        Element  root   = getGroupTag(request, group, doc, null);
         for (Group subgroup : subGroups) {
-            getGroupTag(request,subgroup, doc, root);
+            getGroupTag(request, subgroup, doc, root);
         }
         for (Entry entry : entries) {
             getEntryTag(entry, doc, root);
         }
-        StringBuffer sb     = new StringBuffer(XmlUtil.toString(root));
+        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, getMimeType(output));
 
 
@@ -301,21 +301,27 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @param entry _more_
      * @param sb _more_
+     * @param doc _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
      */
-    private Element getEntryTag(Entry entry, Document doc, Element parent) throws Exception {
-        Element node  = XmlUtil.create(doc, TAG_ENTRY, parent, new String[]{
-            ATTR_ID, entry.getId(), 
-            ATTR_NAME,    entry.getName(),
-            ATTR_RESOURCE,   entry.getResource().getPath(),
-            ATTR_RESOURCE_TYPE,    entry.getResource().getType(),
-            ATTR_GROUP, entry.getParentGroupId(),
-            ATTR_TYPE,   entry.getTypeHandler().getType()
+    private Element getEntryTag(Entry entry, Document doc, Element parent)
+            throws Exception {
+        Element node = XmlUtil.create(doc, TAG_ENTRY, parent, new String[] {
+            ATTR_ID, entry.getId(), ATTR_NAME, entry.getName(), ATTR_RESOURCE,
+            entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
+            entry.getResource().getType(), ATTR_GROUP,
+            entry.getParentGroupId(), ATTR_TYPE,
+            entry.getTypeHandler().getType()
         });
 
         if ((entry.getDescription() != null)
                 && (entry.getDescription().length() > 0)) {
             XmlUtil.create(doc, TAG_DESCRIPTION, parent,
-                           entry.getDescription(),null);
+                           entry.getDescription(), null);
         }
         return node;
     }
@@ -324,16 +330,27 @@ public class XmlOutputHandler extends OutputHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param group _more_
      * @param sb _more_
      * @param open _more_
+     * @param doc _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
      */
-    private Element getGroupTag(Request request, Group group, Document doc, Element parent) throws Exception {
-        boolean canDoNew = getAccessManager().canDoAction(request, group, Permission.ACTION_NEW);
-        return XmlUtil.create(doc,TAG_GROUP, parent, new String[]{
-            ATTR_NAME,
-            group.getName(), ATTR_ID,
-            group.getId(), ATTR_CANDONEW, ""+canDoNew});
+    private Element getGroupTag(Request request, Group group, Document doc,
+                                Element parent)
+            throws Exception {
+        boolean canDoNew = getAccessManager().canDoAction(request, group,
+                               Permission.ACTION_NEW);
+        return XmlUtil.create(doc, TAG_GROUP, parent, new String[] {
+            ATTR_NAME, group.getName(), ATTR_ID, group.getId(), ATTR_CANDONEW,
+            "" + canDoNew
+        });
 
     }
 

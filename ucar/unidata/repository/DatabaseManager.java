@@ -214,10 +214,12 @@ public class DatabaseManager extends RepositoryManager {
      * _more_
      *
      * @param os _more_
+     * @param all _more_
      *
      * @throws Exception _more_
      */
-    public void makeDatabaseCopy(OutputStream os, boolean all) throws Exception {
+    public void makeDatabaseCopy(OutputStream os, boolean all)
+            throws Exception {
 
 
 
@@ -239,12 +241,13 @@ public class DatabaseManager extends RepositoryManager {
 
 
             String tn = tableName.toLowerCase();
-            if(!all) {
-                if(tn.equals(TABLE_GLOBALS) ||
-                   tn.equals(TABLE_USERS) ||
-                   tn.equals(TABLE_PERMISSIONS) ||
-                   tn.equals(TABLE_HARVESTERS) ||
-                   tn.equals(TABLE_USERROLES)) continue;
+            if ( !all) {
+                if (tn.equals(TABLE_GLOBALS) || tn.equals(TABLE_USERS)
+                        || tn.equals(TABLE_PERMISSIONS)
+                        || tn.equals(TABLE_HARVESTERS)
+                        || tn.equals(TABLE_USERROLES)) {
+                    continue;
+                }
             }
 
 

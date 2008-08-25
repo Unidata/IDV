@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -92,18 +89,30 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      */
     public InteractiveRepositoryClient(String hostname, int port, String base)
             throws Exception {
-        super(hostname, port,base);
+        super(hostname, port, base);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param error _more_
+     * @param exc _more_
+     */
     public void handleError(String error, Exception exc) {
-        if(exc!=null)
+        if (exc != null) {
             LogUtil.logException(error, exc);
-        else
+        } else {
             LogUtil.userErrorMessage(error);
+        }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
     public void handleMessage(String message) {
         LogUtil.userMessage(message);
     }
@@ -172,7 +181,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      * _more_
      */
     private void doMakeGroupTree() {
-        treeRoot  = new GroupNode("Top", "0",true);
+        treeRoot  = new GroupNode("Top", "0", true);
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
         groupTree.setToolTipText("Right-click to show menu");
@@ -203,7 +212,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                     boolean leaf, int row, boolean hasFocus) {
                 super.getTreeCellRendererComponent(theTree, value, sel,
                         expanded, leaf, row, hasFocus);
-                if(value instanceof GroupNode) {
+                if (value instanceof GroupNode) {
                     GroupNode node = (GroupNode) value;
                     setEnabled(node.canDoNew);
                 }
@@ -259,7 +268,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         String parentId = groupTreeNode.id;
         String name = GuiUtils.getInput("Enter a group name to create",
                                         "Name: ", "");
-        if(super.newGroup(parentId, name)) {
+        if (super.newGroup(parentId, name)) {
             groupTreeNode.removeAllChildren();
             groupTreeNode.haveLoaded = false;
             groupTreeNode.checkExpansion();
@@ -283,6 +292,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         /** _more_ */
         private String id;
 
+        /** _more_          */
         private boolean canDoNew = false;
 
         /**
@@ -290,10 +300,11 @@ public class InteractiveRepositoryClient extends RepositoryClient {
          *
          * @param name _more_
          * @param id _more_
+         * @param canDoNew _more_
          */
         public GroupNode(String name, String id, boolean canDoNew) {
             super(name);
-            this.id = id;
+            this.id       = id;
             this.canDoNew = canDoNew;
         }
 
@@ -317,18 +328,21 @@ public class InteractiveRepositoryClient extends RepositoryClient {
             try {
                 GuiUtils.setCursor(groupTree, GuiUtils.waitCursor);
                 String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),
-                                          new String[] { ARG_ID,id, 
-                                                         ARG_OUTPUT, "xml.xml",
-                                                         ARG_SESSIONID, getSessionId() });
-                String  xml  = IOUtil.readContents(url, getClass());
+                                          new String[] {
+                    ARG_ID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID,
+                    getSessionId()
+                });
+                String xml = IOUtil.readContents(url, getClass());
                 removeAllChildren();
                 Element root = XmlUtil.getRoot(xml);
                 for (Element child : (List<Element>) XmlUtil.findChildren(
                         root, TAG_GROUP)) {
-                    boolean canDoNew = XmlUtil.getAttribute(child,ATTR_CANDONEW,false);
+                    boolean canDoNew = XmlUtil.getAttribute(child,
+                                           ATTR_CANDONEW, false);
                     GroupNode childNode =
                         new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
-                                      XmlUtil.getAttribute(child, ATTR_ID),canDoNew);
+                                      XmlUtil.getAttribute(child, ATTR_ID),
+                                      canDoNew);
                     childNode.add(
                         new DefaultMutableTreeNode("Please wait..."));
                     this.add(childNode);

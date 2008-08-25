@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -115,7 +111,18 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
-    public String[] doPost(RequestUrl url, List<HttpFormEntry> entries) throws Exception {
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] doPost(RequestUrl url, List<HttpFormEntry> entries)
+            throws Exception {
         return HttpFormEntry.doPost(entries, url.getFullUrl());
     }
 

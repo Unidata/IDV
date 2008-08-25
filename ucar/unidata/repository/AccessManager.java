@@ -242,12 +242,16 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
-        if(entry.getIsLocalFile()) {
-            if(action.equals(Permission.ACTION_NEW)) return false;
-            if(action.equals(Permission.ACTION_DELETE)) return false;
+        if (entry.getIsLocalFile()) {
+            if (action.equals(Permission.ACTION_NEW)) {
+                return false;
+            }
+            if (action.equals(Permission.ACTION_DELETE)) {
+                return false;
+            }
         }
 
-        if(request==null) {
+        if (request == null) {
             return false;
         }
 
@@ -258,7 +262,7 @@ public class AccessManager extends RepositoryManager {
             return true;
         }
 
-        if (!user.getAnonymous() && Misc.equals(user,entry.getUser())) {
+        if ( !user.getAnonymous() && Misc.equals(user, entry.getUser())) {
             return true;
         }
 

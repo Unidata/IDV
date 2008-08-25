@@ -124,14 +124,15 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entries _more_
+     * @param state _more_
      * @param types _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {
         List<Entry> entries = state.getAllEntries();
         if (entries.size() > 0) {
             boolean ok = false;
@@ -198,13 +199,15 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param group _more_
      * @param entries _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    private Result makeResult(Request request, Group group, List<Entry> entries)
+    private Result makeResult(Request request, Group group,
+                              List<Entry> entries)
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();
@@ -314,7 +317,7 @@ public class ImageOutputHandler extends OutputHandler {
             sb = new StringBuffer(template);
         }
         String[] crumbs = getRepository().getBreadCrumbs(request, group,
-                                                         false, "");
+                              false, "");
         StringBuffer finalSB = new StringBuffer();
         finalSB.append(crumbs[1]);
         finalSB.append(HtmlUtil.p());

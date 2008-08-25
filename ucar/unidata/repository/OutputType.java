@@ -79,7 +79,7 @@ import java.util.zip.*;
  */
 public class OutputType extends TwoFacedObject {
 
-    /** _more_          */
+    /** _more_ */
     private String suffix = "";
 
 

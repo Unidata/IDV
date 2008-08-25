@@ -79,6 +79,7 @@ import java.util.zip.*;
 public class Metadata implements Constants, Tables {
 
 
+    /** _more_          */
     private Entry entry;
 
     /** _more_ */
@@ -112,7 +113,7 @@ public class Metadata implements Constants, Tables {
      * @param type _more_
      */
     public Metadata(String type) {
-        this("", "", type, false,"", "", "", "");
+        this("", "", type, false, "", "", "", "");
     }
 
 
@@ -147,14 +148,16 @@ public class Metadata implements Constants, Tables {
      * @param id _more_
      * @param entryId _more_
      * @param type _more_
+     * @param inherited _more_
      * @param attr1 _more_
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, Type type, boolean inherited, String attr1,
-                    String attr2, String attr3, String attr4) {
-        this(id, entryId, type.getType(), inherited, attr1, attr2, attr3, attr4);
+    public Metadata(String id, String entryId, Type type, boolean inherited,
+                    String attr1, String attr2, String attr3, String attr4) {
+        this(id, entryId, type.getType(), inherited, attr1, attr2, attr3,
+             attr4);
     }
 
 
@@ -164,21 +167,23 @@ public class Metadata implements Constants, Tables {
      * @param id _more_
      * @param entryId _more_
      * @param type _more_
+     * @param inherited _more_
      * @param attr1 _more_
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, String type, boolean inherited, String attr1,
-                    String attr2, String attr3, String attr4) {
-        this.id      = id;
-        this.entryId = entryId;
-        this.type    = type;
+    public Metadata(String id, String entryId, String type,
+                    boolean inherited, String attr1, String attr2,
+                    String attr3, String attr4) {
+        this.id        = id;
+        this.entryId   = entryId;
+        this.type      = type;
         this.inherited = inherited;
-        this.attr1   = attr1;
-        this.attr2   = attr2;
-        this.attr3   = attr3;
-        this.attr4   = attr4;
+        this.attr1     = attr1;
+        this.attr2     = attr2;
+        this.attr3     = attr3;
+        this.attr4     = attr4;
     }
 
     /**
@@ -359,25 +364,37 @@ public class Metadata implements Constants, Tables {
      * @version $Revision: 1.3 $
      */
     public static class Type {
-        public static final String DEFAULT_CATEGORY = "Summary";
-        public static final int SEARCHABLE_ATTR1 = 1<<0;
-        public static final int SEARCHABLE_ATTR2 = 1<<1;
-        public static final int SEARCHABLE_ATTR3 = 1<<3;
-        public static final int SEARCHABLE_ATTR4 = 1<<4;
 
+        /** _more_          */
+        public static final String DEFAULT_CATEGORY = "Summary";
+
+        /** _more_          */
+        public static final int SEARCHABLE_ATTR1 = 1 << 0;
+
+        /** _more_          */
+        public static final int SEARCHABLE_ATTR2 = 1 << 1;
+
+        /** _more_          */
+        public static final int SEARCHABLE_ATTR3 = 1 << 3;
+
+        /** _more_          */
+        public static final int SEARCHABLE_ATTR4 = 1 << 4;
+
+        /** _more_          */
         public int searchableMask = 0;
 
         /** _more_ */
-        private         String type;
+        private String type;
 
+        /** _more_          */
         private String category = DEFAULT_CATEGORY;
 
 
         /** _more_ */
-        private         String label;
+        private String label;
 
         /** _more_ */
-        private         boolean isEnumerated = false;
+        private boolean isEnumerated = false;
 
         /**
          * _more_
@@ -398,10 +415,17 @@ public class Metadata implements Constants, Tables {
          * @param label _more_
          */
         public Type(String type, String label) {
-            this(type,label,DEFAULT_CATEGORY,false);
+            this(type, label, DEFAULT_CATEGORY, false);
         }
 
-        public Type(String type, String label,String category) {
+        /**
+         * _more_
+         *
+         * @param type _more_
+         * @param label _more_
+         * @param category _more_
+         */
+        public Type(String type, String label, String category) {
             this(type, label, category, false);
         }
 
@@ -421,36 +445,70 @@ public class Metadata implements Constants, Tables {
          *
          * @param type _more_
          * @param label _more_
+         * @param category _more_
          * @param enumerated _more_
          */
-        public Type(String type, String label, String category, boolean enumerated) {
+        public Type(String type, String label, String category,
+                    boolean enumerated) {
             this.type         = type;
             this.label        = label;
-            this.category = category;
+            this.category     = category;
             this.isEnumerated = enumerated;
         }
 
+        /**
+         * _more_
+         *
+         * @param mask _more_
+         */
         public void setSearchableMask(int mask) {
             searchableMask = mask;
         }
 
 
+        /**
+         * _more_
+         *
+         * @param mask _more_
+         *
+         * @return _more_
+         */
         public boolean isSearchable(int mask) {
-            return (searchableMask&mask)!=0;
+            return (searchableMask & mask) != 0;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isAttr1Searchable() {
             return isSearchable(SEARCHABLE_ATTR1);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isAttr2Searchable() {
             return isSearchable(SEARCHABLE_ATTR2);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isAttr3Searchable() {
             return isSearchable(SEARCHABLE_ATTR3);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isAttr4Searchable() {
             return isSearchable(SEARCHABLE_ATTR4);
         }
@@ -548,45 +606,45 @@ public class Metadata implements Constants, Tables {
         }
 
 
-/**
-Set the Category property.
+        /**
+         * Set the Category property.
+         *
+         * @param value The new value for Category
+         */
+        public void setCategory(String value) {
+            category = value;
+        }
 
-@param value The new value for Category
-**/
-public void setCategory (String value) {
-        category = value;
-}
-
-/**
-Get the Category property.
-
-@return The Category
-**/
-public String getCategory () {
-        return category;
-}
+        /**
+         * Get the Category property.
+         *
+         * @return The Category
+         */
+        public String getCategory() {
+            return category;
+        }
 
 
 
     }
 
-/**
-Set the Entry property.
+    /**
+     * Set the Entry property.
+     *
+     * @param value The new value for Entry
+     */
+    public void setEntry(Entry value) {
+        entry = value;
+    }
 
-@param value The new value for Entry
-**/
-public void setEntry (Entry value) {
-	entry = value;
-}
-
-/**
-Get the Entry property.
-
-@return The Entry
-**/
-public Entry getEntry () {
-	return entry;
-}
+    /**
+     * Get the Entry property.
+     *
+     * @return The Entry
+     */
+    public Entry getEntry() {
+        return entry;
+    }
 
 
 

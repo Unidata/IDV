@@ -119,11 +119,12 @@ public class GraphOutputHandler extends OutputHandler {
      * @param request _more_
      * @param entry _more_
      * @param links _more_
+     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links,boolean forHeader)
+                                 List<Link> links, boolean forHeader)
             throws Exception {
         if ( !getRepository().isAppletEnabled(request)) {
             return;
@@ -174,7 +175,7 @@ public class GraphOutputHandler extends OutputHandler {
 
 
         Result result = new Result(msg("Graph View") + title, sb);
-        addLinks(request, result,new State(entry));
+        addLinks(request, result, new State(entry));
         return result;
 
     }

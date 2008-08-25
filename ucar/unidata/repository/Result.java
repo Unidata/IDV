@@ -145,6 +145,12 @@ public class Result {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     * @param mime _more_
+     */
     public Result(String content, String mime) {
         this("", content.getBytes(), mime);
     }

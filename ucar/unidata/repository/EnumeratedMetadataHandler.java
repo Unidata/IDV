@@ -132,13 +132,16 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param metadata _more_
      *
      * @return _more_
      */
-    public String[] getHtml(Request request,Metadata metadata) {
-        String lbl     = msgLabel(TYPE_ENUM.getLabel());
-        String content = getSearchLink(request, metadata) +metadata.getAttr1();
+    public String[] getHtml(Request request, Metadata metadata) {
+        String lbl = msgLabel(TYPE_ENUM.getLabel());
+        String content = getSearchLink(request, metadata)
+                         + metadata.getAttr1();
         return new String[] { lbl, content };
     }
 
@@ -154,8 +157,8 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      */
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        List<String> l = (List<String>)getValues(request,true);
-        if (l == null|| l.size()==0) {
+        List<String> l = (List<String>) getValues(request, true);
+        if ((l == null) || (l.size() == 0)) {
             return;
         }
         List values = trimValues(l);
@@ -168,14 +171,22 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         inheritedCbx = "";
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + TYPE_ENUM,
                                   TYPE_ENUM.toString()));
-        String argName=ARG_METADATA_ATTR1 + "." + TYPE_ENUM.toString();
-        String value = request.getString(argName,"");
+        String argName = ARG_METADATA_ATTR1 + "." + TYPE_ENUM.toString();
+        String value   = request.getString(argName, "");
         sb.append(HtmlUtil.formEntry(msgLabel(TYPE_ENUM.getLabel()),
                                      HtmlUtil.select(argName, values, value,
-                                             100) + inheritedCbx));
+                                         100) + inheritedCbx));
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToBrowseSearchForm(Request request, StringBuffer sb)
             throws Exception {
         addToBrowseSearchForm(request, sb, TYPE_ENUM, true);
@@ -222,13 +233,15 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      * _more_
      *
      * @param request _more_
+     * @param justTheOnesInTheDatabase _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    private List getValues(Request request, boolean justTheOnesInTheDatabase) throws Exception {
-        if (!justTheOnesInTheDatabase &&predefinedValues != null) {
+    private List getValues(Request request, boolean justTheOnesInTheDatabase)
+            throws Exception {
+        if ( !justTheOnesInTheDatabase && (predefinedValues != null)) {
             return predefinedValues;
         }
         String[] values = getMetadataManager().getDistinctValues(request,
@@ -284,7 +297,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
             //                                             metadata.getAttr1(), 100));
 
         } else {
-            List values = getValues(request,false);
+            List values = getValues(request, false);
             if (values != null) {
                 values.add(0, new TwoFacedObject("", ""));
                 content = formEntry(new String[] { submit, lbl,

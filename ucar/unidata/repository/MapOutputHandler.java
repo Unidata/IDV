@@ -118,15 +118,16 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entries _more_
+     * @param state _more_
      * @param types _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
-        
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {
+
         boolean ok = false;
         for (Entry entry : state.getAllEntries()) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
@@ -142,15 +143,25 @@ public class MapOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputEntry(Request request, Entry entry) throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>();
         entriesToUse.add(entry);
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
         sb.append(crumbs[1]);
-        getMap(request, entriesToUse,sb,700,500,true);
-        return makeLinksResult(request, "Results",sb,new State(entry));
+        getMap(request, entriesToUse, sb, 700, 500, true);
+        return makeLinksResult(request, "Results", sb, new State(entry));
     }
 
 
@@ -173,27 +184,32 @@ public class MapOutputHandler extends OutputHandler {
             throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, group,
                               false, "");
         sb.append(crumbs[1]);
         if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
-            return makeLinksResult(request,"Results",sb, new State(group, subGroups, entries));
+            return makeLinksResult(request, "Results", sb,
+                                   new State(group, subGroups, entries));
         }
 
-        sb.append("<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
-        getMap(request, entriesToUse,sb,700,400,true);
+        sb.append(
+            "<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
+        getMap(request, entriesToUse, sb, 700, 400, true);
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 sb.append(HtmlUtil.img(getRepository().getIconUrl(entry)));
                 sb.append(HtmlUtil.space(1));
-                sb.append("<a href=\"javascript:hiliteEntry(mapstraction," + sqt(entry.getId()) +");\">" + entry.getName()+"</a><br>");
+                sb.append("<a href=\"javascript:hiliteEntry(mapstraction,"
+                          + sqt(entry.getId()) + ");\">" + entry.getName()
+                          + "</a><br>");
             }
         }
         sb.append("</td></tr></table>");
-        return makeLinksResult(request,"Results", sb,new State(group, subGroups, entries));
+        return makeLinksResult(request, "Results", sb,
+                               new State(group, subGroups, entries));
     }
 
 
@@ -205,23 +221,30 @@ public class MapOutputHandler extends OutputHandler {
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
+     * @param entriesToUse _more_
+     * @param sb _more_
+     * @param width _more_
+     * @param height _more_
+     * @param normalControls _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public  void getMap(Request request, List<Entry> entriesToUse, StringBuffer sb, int width, int height, boolean normalControls) 
+    public void getMap(Request request, List<Entry> entriesToUse,
+                       StringBuffer sb, int width, int height,
+                       boolean normalControls)
             throws Exception {
         sb.append(
             importJS(
                 "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
         sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
         sb.append(importJS(repository.getUrlBase() + "/mymap.js"));
-        sb.append(
-                  "<div style=\"width:" + width+"px; height:" +height+"px\" id=\"mapstraction\"></div>\n");
-        sb.append(HtmlUtil.script("MapInitialize(" + normalControls+");"));
+        sb.append("<div style=\"width:" + width + "px; height:" + height
+                  + "px\" id=\"mapstraction\"></div>\n");
+        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + ");"));
         StringBuffer js = new StringBuffer();
-        js.append("mapstraction.resizeTo(" + width +"," + height +");\n");
+        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
         js.append("var line;\n");
 
@@ -240,7 +263,7 @@ public class MapOutputHandler extends OutputHandler {
                 js.append(",");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append("]);\n");
-                js.append("initLine(line," + qt(entry.getId())+");\n");
+                js.append("initLine(line," + qt(entry.getId()) + ");\n");
             }
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 String info =
@@ -257,19 +280,33 @@ public class MapOutputHandler extends OutputHandler {
 
                 js.append("marker.setIcon(" + qt(icon) + ");\n");
                 js.append("marker.setInfoBubble(\"" + info + "\");\n");
-                js.append("initMarker(marker," + qt(entry.getId())+");\n");
+                js.append("initMarker(marker," + qt(entry.getId()) + ");\n");
             }
         }
         js.append("mapstraction.autoCenterAndZoom();\n");
         sb.append(HtmlUtil.script(js.toString()));
     }
 
-    private static String qt(String  s) {
-        return "\"" + s +"\"";
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    private static String qt(String s) {
+        return "\"" + s + "\"";
     }
 
-    private static String sqt(String  s) {
-        return "'" + s +"'";
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    private static String sqt(String s) {
+        return "'" + s + "'";
     }
 
 

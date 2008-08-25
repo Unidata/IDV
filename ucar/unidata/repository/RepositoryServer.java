@@ -225,7 +225,7 @@ public class RepositoryServer extends HttpServer implements Constants {
                             result.getInputStream(), result.getMimeType());
                 try {
                     result.getInputStream().close();
-                } catch(Exception exc) {}
+                } catch (Exception exc) {}
             } else {
                 writeResult(result.getResponseCode(), result.getContent(),
                             result.getMimeType());

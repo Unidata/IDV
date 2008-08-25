@@ -75,7 +75,8 @@ public class RequestUrl {
      */
     public String getFullUrl(String suffix) {
         return repositorySource.getRepositoryBase().absoluteUrl(
-            repositorySource.getRepositoryBase().getUrlBase() + path) + suffix;
+            repositorySource.getRepositoryBase().getUrlBase()
+            + path) + suffix;
     }
 
     /**
@@ -87,7 +88,8 @@ public class RequestUrl {
      */
     public String getHttpsUrl(String suffix) {
         return repositorySource.getRepositoryBase().httpsUrl(
-            repositorySource.getRepositoryBase().getUrlBase() + path) + suffix;
+            repositorySource.getRepositoryBase().getUrlBase()
+            + path) + suffix;
     }
 
     /**

@@ -30,10 +30,10 @@ import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
@@ -117,16 +117,17 @@ public class Request implements Constants {
     private Entry collectionEntry;
 
 
-    /** _more_          */
+    /** _more_ */
     private HttpServletRequest httpServletRequest;
 
-    /** _more_          */
+    /** _more_ */
     private HttpServletResponse httpServletResponse;
 
-    /** _more_          */
+    /** _more_ */
     private HttpServlet httpServlet;
 
 
+    /** _more_          */
     private String leftMessage;
 
     /**
@@ -194,7 +195,7 @@ public class Request implements Constants {
             return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
         }
         Group collectionGroup = entry.getCollectionGroup();
-        if(repository.isLocalFileEntry(entry.getId())) {
+        if (repository.isLocalFileEntry(entry.getId())) {
             return url(theUrl, arg, entry.getId());
         }
 
@@ -226,6 +227,15 @@ public class Request implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
     public String entryUrl(RequestUrl theUrl, Entry entry, List args) {
         return HtmlUtil.url(entryUrl(theUrl, entry), args);
     }
@@ -298,10 +308,18 @@ public class Request implements Constants {
      * @return _more_
      */
     public String uploadForm(RequestUrl theUrl) {
-        return uploadForm(theUrl,"");
+        return uploadForm(theUrl, "");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public String uploadForm(RequestUrl theUrl, String extra) {
         return HtmlUtil.uploadForm(url(theUrl), extra);
     }
@@ -437,8 +455,15 @@ public class Request implements Constants {
         return getRequestPath() + "?" + getUrlArgs();
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public String getUrl(RequestUrl request) {
-        return url(request)+ "?" + getUrlArgs();
+        return url(request) + "?" + getUrlArgs();
     }
 
     /**
@@ -538,69 +563,84 @@ public class Request implements Constants {
      */
     public String getPathEmbeddedArgs() {
         try {
-        StringBuffer sb  = new StringBuffer();
-        int          cnt = 0;
-        for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
-            String arg   = (String) keys.nextElement();
-            Object value = parameters.get(arg);
-            if (value instanceof List) {
-                List l = (List) value;
-                if (l.size() == 0) {
-                    continue;
-                }
-                for (int i = 0; i < l.size(); i++) {
-                    String svalue = (String) l.get(i);
-                    if (svalue.length() == 0) {
+            StringBuffer sb  = new StringBuffer();
+            int          cnt = 0;
+            for (Enumeration keys =
+                    parameters.keys(); keys.hasMoreElements(); ) {
+                String arg   = (String) keys.nextElement();
+                Object value = parameters.get(arg);
+                if (value instanceof List) {
+                    List l = (List) value;
+                    if (l.size() == 0) {
                         continue;
                     }
-                    if (cnt++ > 0) {
-                        sb.append("/");
+                    for (int i = 0; i < l.size(); i++) {
+                        String svalue = (String) l.get(i);
+                        if (svalue.length() == 0) {
+                            continue;
+                        }
+                        if (cnt++ > 0) {
+                            sb.append("/");
+                        }
+                        sb.append(arg + ":" + encodeEmbedded(svalue));
                     }
-                    sb.append(arg + ":" + encodeEmbedded(svalue));
+                    continue;
                 }
-                continue;
+                String svalue = (String) value;
+                if (svalue.length() == 0) {
+                    continue;
+                }
+                if (cnt++ > 0) {
+                    sb.append("/");
+                }
+                sb.append(arg + ":" + encodeEmbedded(svalue));
             }
-            String svalue = (String) value;
-            if (svalue.length() == 0) {
-                continue;
-            }
-            if (cnt++ > 0) {
-                sb.append("/");
-            }
-            sb.append(arg + ":" + encodeEmbedded(svalue));
-        }
-        return sb.toString();
-            } catch(Exception exc) {
-                throw new WrapperException(exc);
-            }
-    }
-
-
-    public static String encodeEmbedded(String s)  {
-        try {
-            if(s.indexOf("/")>=0) {
-                s = "b64:"+ XmlUtil.encodeBase64(s.getBytes()).trim();
-            }
-            //            s = java.net.URLEncoder.encode(s, "UTF-8");
-            return s;
-        } catch(Exception exc) {
+            return sb.toString();
+        } catch (Exception exc) {
             throw new WrapperException(exc);
         }
     }
 
 
-    public static String decodeEmbedded(String s)  {
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String encodeEmbedded(String s) {
         try {
-            if(s.startsWith("b64:"))  {
+            if (s.indexOf("/") >= 0) {
+                s = "b64:" + XmlUtil.encodeBase64(s.getBytes()).trim();
+            }
+            //            s = java.net.URLEncoder.encode(s, "UTF-8");
+            return s;
+        } catch (Exception exc) {
+            throw new WrapperException(exc);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String decodeEmbedded(String s) {
+        try {
+            if (s.startsWith("b64:")) {
                 s = s.substring(4);
                 //s = java.net.URLDecoder.decode(s, "UTF-8");     
                 s = new String(XmlUtil.decodeBase64(s));
             }
             return s;
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new WrapperException(exc);
         }
-        
+
     }
 
 
@@ -624,7 +664,7 @@ public class Request implements Constants {
             }
             try {
                 value = decodeEmbedded(value);
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new WrapperException(exc);
             }
             return value;
@@ -993,8 +1033,8 @@ public class Request implements Constants {
         if (v == null) {
             return dflt;
         }
-        if (defined(name+".time")) {
-            v = v + " " +getUnsafeString(name+".time","");
+        if (defined(name + ".time")) {
+            v = v + " " + getUnsafeString(name + ".time", "");
         }
 
         //TODO:Check value
@@ -1338,21 +1378,21 @@ public class Request implements Constants {
     }
 
     /**
-       Set the LeftMessage property.
-
-       @param value The new value for LeftMessage
-    **/
-    public void setLeftMessage (String value) {
-	leftMessage = value;
+     *  Set the LeftMessage property.
+     *
+     *  @param value The new value for LeftMessage
+     */
+    public void setLeftMessage(String value) {
+        leftMessage = value;
     }
 
     /**
-       Get the LeftMessage property.
-
-       @return The LeftMessage
-    **/
-    public String getLeftMessage () {
-	return leftMessage;
+     *  Get the LeftMessage property.
+     *
+     *  @return The LeftMessage
+     */
+    public String getLeftMessage() {
+        return leftMessage;
     }
 
 

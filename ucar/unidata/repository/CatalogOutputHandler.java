@@ -87,7 +87,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_DODS = "DODS";
 
     /** _more_ */
@@ -140,6 +140,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    /** _more_          */
     public static final String ATTR_VALUE = "value";
 
     /** _more_ */
@@ -153,6 +154,8 @@ public class CatalogOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String TAG_SERVICENAME = "serviceName";
+
+    /** _more_          */
     public static final String TAG_PROPERTY = "property";
 
     /** _more_ */
@@ -181,7 +184,7 @@ public class CatalogOutputHandler extends OutputHandler {
     private List<String> tdsNotPrefixes;
 
 
-    /** _more_          */
+    /** _more_ */
     TdsOutputHandler tdsOutputHandler;
 
 
@@ -324,14 +327,15 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entries _more_
+     * @param state _more_
      * @param types _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {
         types.add(new OutputType("Thredds Catalog", OUTPUT_CATALOG));
     }
 
@@ -474,7 +478,8 @@ public class CatalogOutputHandler extends OutputHandler {
 
         if (tdsOutputHandler == null) {
             tdsOutputHandler =
-                (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_TDS);
+                (TdsOutputHandler) getRepository().getOutputHandler(
+                    TdsOutputHandler.OUTPUT_TDS);
         }
 
         if (tdsOutputHandler.canLoad(request, entry)) {
@@ -604,22 +609,21 @@ public class CatalogOutputHandler extends OutputHandler {
                                          parent, new String[] { ATTR_NAME,
                 entry.getName() });
 
-        XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
-                                         dataset, new String[] { ATTR_NAME,
-                                                                 "ramadda.id",
-                                                                 ATTR_VALUE, entry.getId()});
-        XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
-                                         dataset, new String[] { ATTR_NAME,
-                                                                 "ramadda.host",
-                                                                 ATTR_VALUE, getRepository().getHostname()});
+        XmlUtil.create(catalogInfo.doc, TAG_PROPERTY, dataset,
+                       new String[] { ATTR_NAME,
+                                      "ramadda.id", ATTR_VALUE,
+                                      entry.getId() });
+        XmlUtil.create(catalogInfo.doc, TAG_PROPERTY, dataset,
+                       new String[] { ATTR_NAME,
+                                      "ramadda.host", ATTR_VALUE,
+                                      getRepository().getHostname() });
 
-        if(entry.getDataType()!=null) {
+        if (entry.getDataType() != null) {
             String type = entry.getDataType();
-            if(false && type!=null && type.length()>0) {
-                XmlUtil.create(catalogInfo.doc, TAG_PROPERTY,
-                               dataset, new String[] { ATTR_NAME,
-                                                       "idv.datatype",
-                                                       ATTR_VALUE, type});
+            if (false && (type != null) && (type.length() > 0)) {
+                XmlUtil.create(catalogInfo.doc, TAG_PROPERTY, dataset,
+                               new String[] { ATTR_NAME,
+                        "idv.datatype", ATTR_VALUE, type });
             }
 
         }

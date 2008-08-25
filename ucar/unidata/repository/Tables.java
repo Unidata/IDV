@@ -56,11 +56,11 @@ public interface Tables {
     public static final String COL_ASSOCIATIONS_ID = TABLE_ASSOCIATIONS
                                                      + ".id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_ASSOCIATIONS_NAME = TABLE_ASSOCIATIONS
                                                        + ".name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_ASSOCIATIONS_TYPE = TABLE_ASSOCIATIONS
                                                        + ".type";
 
@@ -343,14 +343,15 @@ public interface Tables {
     /** _more_ */
     public static final String COL_METADATA_ATTR4 = TABLE_METADATA + ".attr4";
 
-    public static final String COL_METADATA_INHERITED = TABLE_METADATA + ".inherited";
+    /** _more_          */
+    public static final String COL_METADATA_INHERITED = TABLE_METADATA
+                                                        + ".inherited";
 
     /** _more_ */
     public static final String[] ARRAY_METADATA = new String[] {
         COL_METADATA_ID, COL_METADATA_ENTRY_ID, COL_METADATA_TYPE,
-        COL_METADATA_INHERITED,
-        COL_METADATA_ATTR1, COL_METADATA_ATTR2, COL_METADATA_ATTR3,
-        COL_METADATA_ATTR4,        
+        COL_METADATA_INHERITED, COL_METADATA_ATTR1, COL_METADATA_ATTR2,
+        COL_METADATA_ATTR3, COL_METADATA_ATTR4,
     };
 
     /** _more_ */

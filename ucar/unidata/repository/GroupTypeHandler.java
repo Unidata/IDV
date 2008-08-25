@@ -81,6 +81,7 @@ public class GroupTypeHandler extends TypeHandler {
      * @param entry _more_
      * @param links _more_
      * @param forMenu _more_
+     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
@@ -89,23 +90,14 @@ public class GroupTypeHandler extends TypeHandler {
             throws Exception {
         super.getEntryLinks(request, entry, links, forHeader);
 
-        if (getAccessManager().canDoAction(request, entry,
-                                           Permission.ACTION_NEW)) {
+
+        if ( !entry.getIsLocalFile()) {
             links.add(
                 new Link(
                     request.url(
-                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
-                        entry.getId()), getRepository().fileUrl(ICON_NEW),
-                                        "New Entry or Group"));
-        }
-
-        if(!entry.getIsLocalFile()) {
-            links.add(
-                      new Link(
-                               request.url(
-                                           getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
-                                           entry.getId()), getRepository().fileUrl(ICON_SEARCH),
-                               "Search in Group"));
+                        getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
+                        entry.getId()), getRepository().fileUrl(ICON_SEARCH),
+                                        "Search in Group"));
         }
 
 

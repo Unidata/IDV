@@ -111,12 +111,22 @@ public class ZipOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     * @param forHeader _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links,boolean forHeader)
+                                 List<Link> links, boolean forHeader)
             throws Exception {
-        if(!entry.isGroup()) {
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                          ARG_OUTPUT, OUTPUT_ZIP);
+        if ( !entry.isGroup()) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                          entry, ARG_OUTPUT, OUTPUT_ZIP);
             links.add(new Link(url, getRepository().fileUrl(ICON_ZIP),
                                "Zip file"));
         }
@@ -128,14 +138,17 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entries _more_
+     * @param state _more_
      * @param types _more_
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
-        if(state.forWhat == state.FOR_HEADER) return;
+    protected void addOutputTypes(Request request, State state,
+                                  List<OutputType> types)
+            throws Exception {
+        if (state.forWhat == state.FOR_HEADER) {
+            return;
+        }
         List<Entry> entries = state.getAllEntries();
         if (entries.size() > 0) {
             boolean ok = false;

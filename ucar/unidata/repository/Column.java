@@ -561,10 +561,12 @@ public class Column implements Tables, Constants {
      *
      * @param request _more_
      * @param where _more_
+     * @param searchCriteria _more_
      *
      * @throws Exception _more_
      */
-    protected void assembleWhereClause(Request request, List<Clause> where, StringBuffer searchCriteria)
+    protected void assembleWhereClause(Request request, List<Clause> where,
+                                       StringBuffer searchCriteria)
             throws Exception {
         String id = getFullName();
         if (type.equals(TYPE_LATLON)) {

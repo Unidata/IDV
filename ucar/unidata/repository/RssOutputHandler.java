@@ -125,11 +125,12 @@ public class RssOutputHandler extends OutputHandler {
      * @param request _more_
      * @param entry _more_
      * @param links _more_
+     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links,boolean forHeader)
+                                 List<Link> links, boolean forHeader)
             throws Exception {
         String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
                                       ARG_OUTPUT, OUTPUT_RSS_SUMMARY);

@@ -136,8 +136,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public ThreddsMetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository, node);
-        TYPE_LINK.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1|Metadata.Type.SEARCHABLE_ATTR2);
-        TYPE_PROPERTY.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1|Metadata.Type.SEARCHABLE_ATTR2);
+        TYPE_LINK.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
+                                    | Metadata.Type.SEARCHABLE_ATTR2);
+        TYPE_PROPERTY.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
+                                        | Metadata.Type.SEARCHABLE_ATTR2);
         addType(TYPE_DOCUMENTATION);
         addType(TYPE_PROPERTY);
         addType(TYPE_LINK);
@@ -255,6 +257,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param metadata _more_
      *
      * @return _more_
@@ -264,7 +268,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         if (type.equals(TYPE_LINK)) {
-            content = getSearchLink(request, metadata) +HtmlUtil.href(metadata.getAttr2(), metadata.getAttr1());
+            content = getSearchLink(request, metadata)
+                      + HtmlUtil.href(metadata.getAttr2(),
+                                      metadata.getAttr1());
         } else if (type.equals(TYPE_DOCUMENTATION)) {
             if (metadata.getAttr1().length() > 0) {
                 lbl = msgLabel(getLabel(metadata.getAttr1()));
@@ -272,15 +278,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             content = metadata.getAttr2();
         } else if (type.equals(TYPE_PROPERTY)) {
             lbl     = msgLabel(getLabel(metadata.getAttr1()));
-            content =  getSearchLink(request, metadata) +metadata.getAttr2();
+            content = getSearchLink(request, metadata) + metadata.getAttr2();
         } else if (type.equals(TYPE_ICON)) {
             lbl     = "";
             content = HtmlUtil.img(metadata.getAttr1());
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
-            content = getSearchLink(request, metadata) +metadata.getAttr1();
+            content = getSearchLink(request, metadata) + metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
                 content += HtmlUtil.br() + msgLabel("Email")
-                           + HtmlUtil.space(1) + metadata.getAttr3();
+                    + HtmlUtil.space(1) + HtmlUtil.href("mailto:"+metadata.getAttr3(),metadata.getAttr3());
             }
             if (metadata.getAttr4().length() > 0) {
                 content += HtmlUtil.br() + msgLabel("URL")
@@ -288,11 +294,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                            + HtmlUtil.href(metadata.getAttr4(),
                                            metadata.getAttr4());
             }
-             
-        } else if(type.equals(TYPE_PROJECT)) {
-            content = getSearchLink(request, metadata) +metadata.getAttr1();
-        } else if(type.equals(TYPE_KEYWORD)) {
-            content = getSearchLink(request, metadata) +metadata.getAttr1();
+
+        } else if (type.equals(TYPE_PROJECT)) {
+            content = getSearchLink(request, metadata) + metadata.getAttr1();
+        } else if (type.equals(TYPE_KEYWORD)) {
+            content = getSearchLink(request, metadata) + metadata.getAttr1();
         } else {
             content = metadata.getAttr1();
         }
@@ -332,13 +338,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             if ((values == null) || (values.length == 0)) {
                 return;
             }
-            List l = trimValues((List<String>)Misc.toList(values));
+            List l = trimValues((List<String>) Misc.toList(values));
             l.add(0, new TwoFacedObject(msg("-all-"), ""));
             String argName = ARG_METADATA_ATTR1 + "." + type;
-            String value = request.getString(argName,"");
+            String value   = request.getString(argName, "");
             sb.append(HtmlUtil.formEntry(msgLabel(type.getLabel()),
                                          HtmlUtil.select(argName, l, value,
-                                                 100) + inheritedCbx));
+                                             100) + inheritedCbx));
         } else {
             sb.append(
                 HtmlUtil.formEntry(
@@ -473,14 +479,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             content = formEntry(new String[] { submit, msgLabel("URL"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size) });
         } else if (type.equals(TYPE_DOCUMENTATION)) {
-            List types = Misc.newList(
+            List types = Misc.toList(new Object[]{
                              new TwoFacedObject(msg("Summary"), "summary"),
                              new TwoFacedObject(msg("Funding"), "funding"),
                              new TwoFacedObject(msg("History"), "history"),
+                             new TwoFacedObject(msg("Language"), "language"),
                              new TwoFacedObject(
                                  msg("Processing Level"),
                                  "processing_level"), new TwoFacedObject(
-                                     msg("Rights"), "rights"));
+                                                                         msg("Rights"), "rights")});;
 
             content = formEntry(new String[] { submit, msgLabel("Type"),
                     HtmlUtil.select(arg1, types, metadata.getAttr1()),
@@ -557,19 +564,21 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         if (isTag(tag, TYPE_DOCUMENTATION)) {
             if (XmlUtil.hasAttribute(child, "xlink:href")) {
                 String url = XmlUtil.getAttribute(child, "xlink:href");
-                return new Metadata(getRepository().getGUID(), "", TYPE_LINK, DFLT_INHERITED,
+                return new Metadata(getRepository().getGUID(), "", TYPE_LINK,
+                                    DFLT_INHERITED,
                                     XmlUtil.getAttribute(child,
                                         "xlink:title", url), url, "", "");
             } else {
                 String type = XmlUtil.getAttribute(child, "type", "summary");
                 String text = XmlUtil.getChildText(child).trim();
                 return new Metadata(getRepository().getGUID(), "",
-                                    TYPE_DOCUMENTATION, DFLT_INHERITED,type, text, "", "");
+                                    TYPE_DOCUMENTATION, DFLT_INHERITED, type,
+                                    text, "", "");
             }
         } else if (isTag(tag, TYPE_PROJECT)) {
             String text = XmlUtil.getChildText(child).trim();
-            return new Metadata(getRepository().getGUID(), "", TYPE_PROJECT,DFLT_INHERITED,
-                                text,
+            return new Metadata(getRepository().getGUID(), "", TYPE_PROJECT,
+                                DFLT_INHERITED, text,
                                 XmlUtil.getAttribute(child, ATTR_VOCABULARY,
                                     ""), "", "");
         } else if (isTag(tag, TYPE_CONTRIBUTOR)) {
@@ -593,15 +602,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 url   = XmlUtil.getAttribute(contactNode, ATTR_URL, "");
             }
             return new Metadata(getRepository().getGUID(), "",
-                                getType("thredds." + tag), DFLT_INHERITED, name, vocabulary,
-                                email, url);
+                                getType("thredds." + tag), DFLT_INHERITED,
+                                name, vocabulary, email, url);
         } else if (isTag(tag, TYPE_KEYWORD)) {
             String text = XmlUtil.getChildText(child).trim();
             //Some of the catalogs have new lines in the keyword
             text = text.replace("\r\n", " ");
             text = text.replace("\n", " ");
-            return new Metadata(getRepository().getGUID(), "", TYPE_KEYWORD,DFLT_INHERITED,
-                                text,
+            return new Metadata(getRepository().getGUID(), "", TYPE_KEYWORD,
+                                DFLT_INHERITED, text,
                                 XmlUtil.getAttribute(child, ATTR_VOCABULARY,
                                     ""), "", "");
 
@@ -610,10 +619,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             String text = XmlUtil.getChildText(child).trim();
             text = text.replace("\n", "");
             return new Metadata(getRepository().getGUID(), "",
-                                getType("thredds." + tag), DFLT_INHERITED,text, "", "", "");
+                                getType("thredds." + tag), DFLT_INHERITED,
+                                text, "", "", "");
         } else if (isTag(tag, TYPE_PROPERTY)) {
             return new Metadata(getRepository().getGUID(), "",
-                                getType("thredds." + tag),DFLT_INHERITED,
+                                getType("thredds." + tag), DFLT_INHERITED,
                                 XmlUtil.getAttribute(child, ATTR_NAME),
                                 XmlUtil.getAttribute(child, ATTR_VALUE), "",
                                 "");

@@ -43,10 +43,10 @@ import java.util.List;
  */
 public class Association {
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_ATTACHMENT = "attachment";
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
     /** _more_ */

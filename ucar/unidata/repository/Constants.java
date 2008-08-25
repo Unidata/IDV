@@ -80,21 +80,29 @@ public interface Constants {
     /** _more_ */
 
     public static final String ICON_LCURVE = "/icons/blc.gif";
+
+    /** _more_          */
     public static final String ICON_RCURVE = "/icons/brc.gif";
 
+    /** _more_          */
     public static final String ICON_CART = "/icons/cart.gif";
+
+    /** _more_          */
     public static final String ICON_CLOUD = "/icons/cloud.gif";
 
+    /** _more_          */
     public static final String ICON_RANGE = "/icons/range.gif";
 
+    /** _more_          */
     public static final String ICON_CALENDAR = "/icons/calendar.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_RSS = "/icons/rss.gif";
 
+    /** _more_          */
     public static final String ICON_ZIP = "/icons/zip.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_METADATA = "/icons/metadata.gif";
 
     /** _more_ */
@@ -113,24 +121,25 @@ public interface Constants {
     public static final String ICON_GRAYRECT = "/icons/grayrect.gif";
 
     /** _more_ */
-    public static final String ICON_GRAYRECTARROW = "/icons/grayrectarrow.gif";
+    public static final String ICON_GRAYRECTARROW =
+        "/icons/grayrectarrow.gif";
 
     /** _more_ */
     public static final String ICON_TOOLS = "/icons/tools.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_ERROR = "/icons/error.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_QUESTION = "/icons/question.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_WARNING = "/icons/warning.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_PROGRESS = "/icons/progress.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_INFORMATION = "/icons/information.png";
 
     /** _more_ */
@@ -148,7 +157,10 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FILE = "/icons/file.gif";
 
+    /** _more_          */
     public static final String ICON_IMAGE = "/icons/image.gif";
+
+    /** _more_          */
     public static final String ICON_DATA = "/icons/data.gif";
 
     /** _more_ */
@@ -192,8 +204,10 @@ public interface Constants {
     public static final String ICON_LEFT = "/icons/left.gif";
 
 
+    /** _more_          */
     public static final String ATTR_PARENT = "parent";
 
+    /** _more_          */
     public static final String ATTR_URL = "url";
 
 
@@ -201,12 +215,22 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+    /** _more_          */
     public static final String ATTR_FROMDATE = "fromdate";
+
+    /** _more_          */
     public static final String ATTR_TODATE = "todate";
 
+    /** _more_          */
     public static final String ATTR_NORTH = "north";
+
+    /** _more_          */
     public static final String ATTR_SOUTH = "south";
+
+    /** _more_          */
     public static final String ATTR_EAST = "east";
+
+    /** _more_          */
     public static final String ATTR_WEST = "west";
 
     /** _more_ */
@@ -284,10 +308,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_STEP = "step";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_COLLECTION = "collection";
 
     /** _more_ */
@@ -404,6 +428,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
+    /** _more_          */
     public static final String ARG_MESSAGELEFT = "messageleft";
 
     /** _more_ */
@@ -428,12 +453,14 @@ public interface Constants {
     public static final String ARG_AUTH_PASSWORD = "auth.password";
 
 
+    /** _more_          */
     public static final String ARG_SHOW_ASSOCIATIONS = "showassociations";
 
 
     /** _more_ */
     public static final String ARG_USER_ID = "user.id";
 
+    /** _more_          */
     public static final String ARG_SESSIONID = "sessionid";
 
     /** _more_ */
@@ -553,7 +580,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_QUERY = "query";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SQLFILE = "sqlfile";
 
     /** _more_ */
@@ -565,6 +592,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LABEL = "label";
 
+    /** _more_          */
     public static final String ARG_LAYOUT = "layout";
 
     /** _more_ */
@@ -573,11 +601,14 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FROMDATE = "fromdate";
 
-    public static final String ARG_FROMDATE_TIME = ARG_FROMDATE+".time";
-    public static final String ARG_TODATE_TIME = ARG_TODATE+".time";
-
+    /** _more_          */
+    public static final String ARG_FROMDATE_TIME = ARG_FROMDATE + ".time";
 
     /** _more_          */
+    public static final String ARG_TODATE_TIME = ARG_TODATE + ".time";
+
+
+    /** _more_ */
     public static final String ARG_FILESUFFIX = "filesuffix";
 
     /** _more_ */
@@ -596,6 +627,7 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    /** _more_          */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
 
@@ -629,10 +661,12 @@ public interface Constants {
     public static final String PROP_HTML_FOOTER = "ramadda.html.footer";
 
     /** _more_ */
-    public static final String PROP_REQUEST_PATTERN = "ramadda.request.pattern";
+    public static final String PROP_REQUEST_PATTERN =
+        "ramadda.request.pattern";
 
     /** _more_ */
-    public static final String PROP_REPOSITORY_NAME = "ramadda.repository.name";
+    public static final String PROP_REPOSITORY_NAME =
+        "ramadda.repository.name";
 
 
     /** _more_ */
@@ -734,10 +768,16 @@ public interface Constants {
 
 
 
+    /** _more_          */
     public static final String ATTR_DESCRIPTION = "description";
+
+    /** _more_          */
     public static final String ATTR_FILE = "file";
+
+    /** _more_          */
     public static final String ATTR_CANDONEW = "candonew";
 
+    /** _more_          */
     public static final String TAG_METADATA = "metadata";
 
 
@@ -806,14 +846,20 @@ public interface Constants {
     public static final String ARG_DESCRIPTION = "description";
 
 
-    public static final String ARG_ADMIN_INSTALLNOTICESHOWN = "admin.installnoticeshown";
+    /** _more_          */
+    public static final String ARG_ADMIN_INSTALLNOTICESHOWN =
+        "admin.installnoticeshown";
 
 
     /** _more_ */
     public static final String ARG_ADMIN_LICENSEREAD = "admin.licenseread";
 
+    /** _more_          */
     public static final String ARG_ADMIN_ADMINCREATED = "admin.admincreated";
-    public static final String ARG_ADMIN_INSTALLCOMPLETE = "admin.installcomplete";
+
+    /** _more_          */
+    public static final String ARG_ADMIN_INSTALLCOMPLETE =
+        "admin.installcomplete";
 
 
     /** _more_ */
@@ -841,7 +887,7 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_START = "action.start";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ACTION_CLEARCACHE = "action.clearcache";
 
     /** _more_ */
@@ -870,10 +916,14 @@ public interface Constants {
     public static final String BLANK = "";
 
 
+    /** _more_          */
     public static final String MIME_XML = "text/xml";
 
 
+    /** _more_          */
     public static final String ATTR_CODE = "code";
+
+    /** _more_          */
     public static final String TAG_RESPONSE = "response";
 
 
@@ -904,6 +954,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ROLES = "user.roles";
 
+    /** _more_          */
     public static final String ARG_USER_PASSWORD = "user.password";
 
     /** _more_ */
@@ -963,11 +1014,20 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_TYPE = "type";
+
+    /** _more_          */
     public static final String ATTR_INHERITED = "inherited";
 
+    /** _more_          */
     public static final String ATTR_ATTR1 = "attr1";
+
+    /** _more_          */
     public static final String ATTR_ATTR2 = "attr2";
+
+    /** _more_          */
     public static final String ATTR_ATTR3 = "attr3";
+
+    /** _more_          */
     public static final String ATTR_ATTR4 = "attr4";
 
     /** _more_ */
@@ -979,12 +1039,20 @@ public interface Constants {
 
 
 
+    /** _more_          */
     public static final boolean DFLT_INHERITED = false;
 
-    public  static final String ARG_YEAR = "year";
-    public  static final String ARG_MONTH = "month";
-    public  static final String ARG_DAY = "day";
-    public  static final String ARG_SHOWYEAR = "showyear";
+    /** _more_          */
+    public static final String ARG_YEAR = "year";
+
+    /** _more_          */
+    public static final String ARG_MONTH = "month";
+
+    /** _more_          */
+    public static final String ARG_DAY = "day";
+
+    /** _more_          */
+    public static final String ARG_SHOWYEAR = "showyear";
 
 
 }

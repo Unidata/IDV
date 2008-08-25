@@ -43,8 +43,10 @@ public class Resource {
     /** _more_ */
     public static final String TYPE_FILE = "file";
 
+    /** _more_          */
     public static final String TYPE_LOCAL_DIRECTORY = "localdirectory";
 
+    /** _more_          */
     public static final String TYPE_LOCAL_FILE = "localfile";
 
     /** _more_ */
@@ -147,7 +149,8 @@ public class Resource {
      * @return _more_
      */
     public boolean isFile() {
-        if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE) || type.equals(TYPE_LOCAL_FILE)) {
+        if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE)
+                || type.equals(TYPE_LOCAL_FILE)) {
             return getFile().exists();
         }
         return false;

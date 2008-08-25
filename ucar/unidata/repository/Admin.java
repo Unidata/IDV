@@ -118,8 +118,8 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST, URL_ADMIN_STATS,
-        getHarvesterManager().URL_HARVESTERS_LIST,
+        URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
+        URL_ADMIN_STATS, getHarvesterManager().URL_HARVESTERS_LIST,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
         URL_ADMIN_SQL, URL_ADMIN_CLEANUP
@@ -149,23 +149,48 @@ public class Admin extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param what _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private boolean haveDone(String what) throws Exception {
         return getRepository().getDbProperty(what, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param what _more_
+     *
+     * @throws Exception _more_
+     */
     private void didIt(String what) throws Exception {
         getRepository().writeGlobal(what, "true");
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private StringBuffer getLicenseForm() throws Exception {
         StringBuffer sb = new StringBuffer();
-        String license =  IOUtil.readContents("/ucar/unidata/repository/resources/license.txt",
-                                              getClass());
-        sb.append(HtmlUtil.textArea("",license,20,50));
+        String license =
+            IOUtil.readContents(
+                "/ucar/unidata/repository/resources/license.txt", getClass());
+        sb.append(HtmlUtil.textArea("", license, 20, 50));
         sb.append("<p>");
-        sb.append(HtmlUtil.checkbox("agree","1"));
-        sb.append("I agree to the above terms and conditions of use of the RAMADDA software");
+        sb.append(HtmlUtil.checkbox("agree", "1"));
+        sb.append(
+            "I agree to the above terms and conditions of use of the RAMADDA software");
         sb.append("<p>");
         return sb;
     }
@@ -181,14 +206,15 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     protected Result doInitialization(Request request) throws Exception {
+
         StringBuffer sb    = new StringBuffer();
         String       title = "";
 
-        if(Misc.equals("1", request.getString("agree",""))) {
+        if (Misc.equals("1", request.getString("agree", ""))) {
             didIt(ARG_ADMIN_LICENSEREAD);
         }
 
-        if (!haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
+        if ( !haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
             title = "Installation";
             sb.append(HtmlUtil.formTable());
             sb.append(
@@ -198,24 +224,27 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Next"))));
             sb.append(HtmlUtil.formTableClose());
             didIt(ARG_ADMIN_INSTALLNOTICESHOWN);
-        }  else if (!haveDone(ARG_ADMIN_LICENSEREAD)) {
+        } else if ( !haveDone(ARG_ADMIN_LICENSEREAD)) {
 
             title = "License";
             sb.append(getLicenseForm());
             sb.append(HtmlUtil.submit(msg("Next")));
-        }  else if (!haveDone(ARG_ADMIN_ADMINCREATED)) {
+        } else if ( !haveDone(ARG_ADMIN_ADMINCREATED)) {
             title = "Administrator";
             String  id        = "";
             String  name      = "";
             boolean triedOnce = false;
             if (request.exists(UserManager.ARG_USER_ID)) {
                 triedOnce = true;
-                id        = request.getString(UserManager.ARG_USER_ID, "").trim();
-                name      = request.getString(UserManager.ARG_USER_NAME, name).trim();
-                String password1 = request.getString(UserManager.ARG_USER_PASSWORD1,
-                                       "").trim();
-                String password2 = request.getString(UserManager.ARG_USER_PASSWORD2,
-                                       "").trim();
+                id = request.getString(UserManager.ARG_USER_ID, "").trim();
+                name = request.getString(UserManager.ARG_USER_NAME,
+                                         name).trim();
+                String password1 =
+                    request.getString(UserManager.ARG_USER_PASSWORD1,
+                                      "").trim();
+                String password2 =
+                    request.getString(UserManager.ARG_USER_PASSWORD2,
+                                      "").trim();
                 boolean      okToAdd     = true;
                 StringBuffer errorBuffer = new StringBuffer();
                 if (id.length() == 0) {
@@ -235,8 +264,9 @@ public class Admin extends RepositoryManager {
 
 
                 if (okToAdd) {
-                    getUserManager().makeOrUpdateUser(new User(id, name, "", "", "",
-                                                               getUserManager().hashPassword(password1), true, ""), false);
+                    getUserManager().makeOrUpdateUser(new User(id, name, "",
+                            "", "", getUserManager().hashPassword(password1),
+                            true, ""), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
                     sb.append(msg("Site administrator created"));
@@ -256,11 +286,14 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.p());
             sb.append(request.form(getRepository().URL_DUMMY));
             sb.append(HtmlUtil.formTable());
-            sb.append(HtmlUtil.formEntry(msgLabel("ID"),
-                                         HtmlUtil.input(UserManager.ARG_USER_ID, id)));
-            sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                         HtmlUtil.input(UserManager.ARG_USER_NAME,
-                                             name)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("ID"),
+                    HtmlUtil.input(UserManager.ARG_USER_ID, id)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Name"),
+                    HtmlUtil.input(UserManager.ARG_USER_NAME, name)));
 
             sb.append(
                 HtmlUtil.formEntry(
@@ -283,6 +316,7 @@ public class Admin extends RepositoryManager {
         finalSB.append(sb);
         finalSB.append(HtmlUtil.formClose());
         return new Result(msg(title), finalSB);
+
     }
 
 
@@ -553,7 +587,7 @@ public class Admin extends RepositoryManager {
         File tmp = getStorageManager().getTmpFile(request, "dbdump");
         FileOutputStream     fos = new FileOutputStream(tmp);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
-        getDatabaseManager().makeDatabaseCopy(bos,true);
+        getDatabaseManager().makeDatabaseCopy(bos, true);
         bos.close();
         fos.close();
         FileInputStream is = new FileInputStream(tmp);
@@ -652,11 +686,14 @@ public class Admin extends RepositoryManager {
                             + msg("Require login")));
 
 
-        String fileWidget =   HtmlUtil.textArea(PROP_LOCALFILEPATHS,
-                                                getProperty(PROP_LOCALFILEPATHS,""), 5, 40);
-        String fileLabel = "Enter one server file system directory per line.<br><b>Note:RAMADDA will provide complete access to the file directory trees defined here</b>";
-        sb.append(HtmlUtil.formEntryTop(msgLabel("File system access"), 
-                                        "<table><tr valign=top><td>" + fileWidget+"</td><td>" +fileLabel+"</td></tr></table>"));
+        String fileWidget = HtmlUtil.textArea(PROP_LOCALFILEPATHS,
+                                getProperty(PROP_LOCALFILEPATHS, ""), 5, 40);
+        String fileLabel =
+            "Enter one server file system directory per line.<br><b>Note:RAMADDA will provide complete access to the file directory trees defined here</b>";
+        sb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
+                                        "<table><tr valign=top><td>"
+                                        + fileWidget + "</td><td>"
+                                        + fileLabel + "</td></tr></table>"));
 
 
         StringBuffer handlerSB = new StringBuffer();
@@ -706,9 +743,9 @@ public class Admin extends RepositoryManager {
 
 
         if (request.exists(PROP_LOCALFILEPATHS)) {
-            getRepository().writeGlobal(PROP_LOCALFILEPATHS,
-                                        request.getString(PROP_LOCALFILEPATHS,
-                                            ""));
+            getRepository().writeGlobal(
+                PROP_LOCALFILEPATHS,
+                request.getString(PROP_LOCALFILEPATHS, ""));
             getRepository().setLocalFilePaths();
         }
 
@@ -809,14 +846,15 @@ public class Admin extends RepositoryManager {
         boolean bulkLoad = false;
         String  query    = null;
         String  sqlFile  = request.getUploadedFile(ARG_SQLFILE);
-        if (sqlFile != null && sqlFile.length()>0 && new File(sqlFile).exists()) {
-            query    = IOUtil.readContents(sqlFile, getClass());
+        if ((sqlFile != null) && (sqlFile.length() > 0)
+                && new File(sqlFile).exists()) {
+            query = IOUtil.readContents(sqlFile, getClass());
             System.err.println("query:" + query);
-            if(query!=null && query.trim().length()>0) {
+            if ((query != null) && (query.trim().length() > 0)) {
                 bulkLoad = true;
             }
-        } 
-        if(!bulkLoad) {
+        }
+        if ( !bulkLoad) {
             query = (String) request.getUnsafeString(ARG_QUERY,
                     (String) null);
             if ((query != null) && query.trim().startsWith("file:")) {

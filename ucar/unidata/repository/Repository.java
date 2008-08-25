@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -1379,21 +1377,21 @@ public class Repository extends RepositoryBase implements Tables,
 
         getUserManager().initOutputHandlers();
         OutputHandler outputHandler = new OutputHandler(getRepository()) {
-                public boolean canHandle(String output) {
-                    return output.equals(OUTPUT_DELETER);
-                }
-                protected void addOutputTypes(Request request,
-                                              State state, 
-                                              List<OutputType> types) 
+            public boolean canHandle(String output) {
+                return output.equals(OUTPUT_DELETER);
+            }
+            protected void addOutputTypes(Request request, State state,
+                                          List<OutputType> types)
                     throws Exception {
-                    for (Entry entry : state.getAllEntries()) {
-                        if ( !getAccessManager().canDoAction(request, entry,
-                                                             Permission.ACTION_DELETE)) {
-                            return;
-                        }
+                if(state.group !=null || state.entry!=null) return;
+                for (Entry entry : state.getAllEntries()) {
+                    if ( !getAccessManager().canDoAction(request, entry,
+                            Permission.ACTION_DELETE)) {
+                        return;
                     }
-                    types.add(new OutputType("Delete", OUTPUT_DELETER));
                 }
+                types.add(new OutputType("Delete", OUTPUT_DELETER));
+            }
 
 
             public Result outputGroup(Request request, Group group,
@@ -1902,7 +1900,8 @@ public class Repository extends RepositoryBase implements Tables,
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml = HtmlUtil.space(1);
         if (links != null) {
-            linksHtml = StringUtil.join("<span class=\"separator\">&nbsp;|&nbsp;</span>", links);
+            linksHtml = StringUtil.join(
+                "<span class=\"separator\">&nbsp;|&nbsp;</span>", links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = BLANK;
@@ -2197,23 +2196,24 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
- 
-   /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+
+    /**
+     *  _more_
+     * 
+     *  @param request _more_
+     *  @param entries _more_
+     * @param state _more_
+     * 
+     *  @return _more_
+     * 
+     *  @throws Exception _more_
      */
     public List<OutputType> getOutputTypes(Request request,
-                                           OutputHandler.State state) 
+                                           OutputHandler.State state)
             throws Exception {
         List<OutputType> list = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.addOutputTypes(request, state,list);
+            outputHandler.addOutputTypes(request, state, list);
         }
         return list;
     }
@@ -2244,8 +2244,7 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    public OutputHandler getOutputHandler(Request request)
-            throws Exception {
+    public OutputHandler getOutputHandler(Request request) throws Exception {
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandle(request)) {
                 return outputHandler;
@@ -2509,6 +2508,7 @@ public class Repository extends RepositoryBase implements Tables,
      * @param request _more_
      * @param entry _more_
      * @param forMenu _more_
+     * @param forHeader _more_
      *
      * @return _more_
      *
@@ -2516,18 +2516,40 @@ public class Repository extends RepositoryBase implements Tables,
      */
     protected List<Link> getEntryLinks(Request request, Entry entry,
                                        boolean forHeader)
-            throws Exception {
+        throws Exception {
         List<Link> links = new ArrayList<Link>();
-        entry.getTypeHandler().getEntryLinks(request, entry, links, forHeader);
-        for (OutputHandler outputHandler : getOutputHandlers()) {
-            outputHandler.getEntryLinks(request, entry, links,forHeader);
+        if(!forHeader) {
+            entry.getTypeHandler().getEntryLinks(request, entry, links,
+                                                 forHeader);
+            for (OutputHandler outputHandler : getOutputHandlers()) {
+                outputHandler.getEntryLinks(request, entry, links, forHeader);
+            }
         }
         OutputHandler outputHandler = getOutputHandler(request);
         if ( !entry.isTopGroup()) {
             links.addAll(outputHandler.getNextPrevLinks(request, entry,
-                    request.getOutput()));
+                                                        request.getOutput()));
         }
         return links;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param forHeader _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected String getEntryLinksHtml(Request request, Entry entry,
+                                       boolean forHeader)
+            throws Exception {
+        return StringUtil.join(HtmlUtil.space(1),
+                               getEntryLinks(request, entry, forHeader));
     }
 
 
@@ -2541,14 +2563,8 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinksHtml(Request request, Entry entry,boolean forHeader)
+    protected String getEntryLinksList(Request request, Entry entry)
             throws Exception {
-        return StringUtil.join(HtmlUtil.space(1),
-                               getEntryLinks(request, entry, forHeader));
-    }
-
-
-    protected String getEntryLinksList(Request request, Entry entry) throws Exception {
         List<Link>   links = getEntryLinks(request, entry, false);
         StringBuffer menu  = new StringBuffer();
         menu.append("<table cellspacing=\"0\" cellpadding=\"0\">");
@@ -2667,6 +2683,7 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    /** _more_          */
     static int blockCnt = 0;
 
     /**
@@ -2682,12 +2699,25 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public String makeShowHideBlock(Request request, String label,
                                     StringBuffer content, boolean visible) {
-        return makeShowHideBlock(request, label, content, visible, "class=\"pagesubheading\"");
+        return makeShowHideBlock(request, label, content, visible,
+                                 "class=\"pagesubheading\"");
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     * @param headerExtra _more_
+     *
+     * @return _more_
+     */
     public String makeShowHideBlock(Request request, String label,
-                                    StringBuffer content, boolean visible, String headerExtra) {
-        String id = "block_" + (blockCnt++);
+                                    StringBuffer content, boolean visible,
+                                    String headerExtra) {
+        String       id      = "block_" + (blockCnt++);
         StringBuffer sb      = new StringBuffer();
         String       hideImg = fileUrl(ICON_MINUS);
         String       showImg = fileUrl(ICON_PLUS);
@@ -2699,11 +2729,12 @@ public class Repository extends RepositoryBase implements Tables,
                                       : showImg, "",
                                           " id='" + id
                                           + "img' ") + HtmlUtil.space(1)
-                                              + label, HtmlUtil.cssClass("pagesubheadinglink"));
+                                              + label, HtmlUtil.cssClass(
+                                                  "pagesubheadinglink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append("<div class=\"block\">");
-        sb.append(HtmlUtil.div(link,headerExtra));
+        sb.append(HtmlUtil.div(link, headerExtra));
         sb.append("<div class=\"hideshowblock\" id=\"" + id
                   + "\" style=\"display:block;visibility:visible\">");
         if ( !visible) {
@@ -2718,46 +2749,85 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    /** _more_          */
     static int tabCnt = 0;
+
+    /**
+     * _more_
+     *
+     * @param titles _more_
+     * @param contents _more_
+     * @param skipEmpty _more_
+     *
+     * @return _more_
+     */
     public String makeTabs(List titles, List contents, boolean skipEmpty) {
         return makeTabs(titles, contents, skipEmpty, "tabcontent");
     }
 
-    public String makeTabs(List titles, List contents, boolean skipEmpty, String tabContentClass) {
+    /**
+     * _more_
+     *
+     * @param titles _more_
+     * @param contents _more_
+     * @param skipEmpty _more_
+     * @param tabContentClass _more_
+     *
+     * @return _more_
+     */
+    public String makeTabs(List titles, List contents, boolean skipEmpty,
+                           String tabContentClass) {
 
-        String id = "tab_"+(tabCnt++);
-        String ids = "tab_"+(tabCnt++)+"_ids";
-        StringBuffer titleSB      = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\"><tr>");
+        String id  = "tab_" + (tabCnt++);
+        String ids = "tab_" + (tabCnt++) + "_ids";
+        StringBuffer titleSB =
+            new StringBuffer(
+                "<table cellspacing=\"0\" cellpadding=\"0\"><tr>");
 
-        titleSB      = new StringBuffer("");
-        StringBuffer contentSB      = new StringBuffer();
-        StringBuffer jsSB      = new StringBuffer("var " + ids+"=[");
-        boolean didone = false;
-        for(int i=0;i<titles.size();i++) {
-            String title = titles.get(i).toString();
+        titleSB = new StringBuffer("");
+        StringBuffer contentSB = new StringBuffer();
+        StringBuffer jsSB      = new StringBuffer("var " + ids + "=[");
+        boolean      didone    = false;
+        for (int i = 0; i < titles.size(); i++) {
+            String title   = titles.get(i).toString();
             String content = contents.get(i).toString();
-            if(skipEmpty && content.length()==0 ) continue;
-            String  tabId = id +"_" + i;
+            if (skipEmpty && (content.length() == 0)) {
+                continue;
+            }
+            String tabId = id + "_" + i;
             contentSB.append("\n");
-            contentSB.append(HtmlUtil.div(content,HtmlUtil.cssClass(tabContentClass) +
-                                          HtmlUtil.id("content_" +tabId) +
-                                          HtmlUtil.style("display:block;visibility:" +(!didone?"visible":"hidden"))));
-            String link = HtmlUtil.href("javascript:" + id +".toggleTab(" +HtmlUtil.squote(tabId)+")",title);
+            contentSB.append(
+                HtmlUtil.div(
+                    content,
+                    HtmlUtil.cssClass(tabContentClass)
+                    + HtmlUtil.id("content_" + tabId)
+                    + HtmlUtil.style("display:block;visibility:" + ( !didone
+                    ? "visible"
+                    : "hidden"))));
+            String link = HtmlUtil.href("javascript:" + id + ".toggleTab("
+                                        + HtmlUtil.squote(tabId)
+                                        + ")", title);
             //            titleSB.append("<td>\n");
-            titleSB.append(HtmlUtil.span(link,HtmlUtil.cssClass("tabtitle") +HtmlUtil.id("title_" +tabId)));
+            titleSB.append(HtmlUtil.span(link,
+                                         HtmlUtil.cssClass("tabtitle")
+                                         + HtmlUtil.id("title_" + tabId)));
             //            titleSB.append("\n</td>\n");
-            if(didone) 
+            if (didone) {
                 jsSB.append(",");
+            }
             jsSB.append(HtmlUtil.squote(tabId));
             didone = true;
         }
         jsSB.append("];\n");
-        
+
         //        titleSB.append("</tr></table>");
-        return HtmlUtil.script(jsSB.toString()) +
-            HtmlUtil.div(titleSB.toString(),HtmlUtil.cssClass("tabtitles")) + 
-            HtmlUtil.div(contentSB.toString(),HtmlUtil.cssClass("tabcontents")) +
-            HtmlUtil.script("var " + id +"=new Tab(" + ids +");\n");
+        return HtmlUtil.script(jsSB.toString())
+               + HtmlUtil.div(
+                   titleSB.toString(),
+                   HtmlUtil.cssClass("tabtitles")) + HtmlUtil.div(
+                       contentSB.toString(),
+                       HtmlUtil.cssClass("tabcontents")) + HtmlUtil.script(
+                           "var " + id + "=new Tab(" + ids + ");\n");
     }
 
 
@@ -2793,7 +2863,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         StringBuffer sb = new StringBuffer();
         getMetadataManager().addToBrowseSearchForm(request, sb);
-        return  makeResult(request, msg("Search Form"), sb, searchUrls);
+        return makeResult(request, msg("Search Form"), sb, searchUrls);
     }
 
 
@@ -2814,16 +2884,18 @@ public class Repository extends RepositoryBase implements Tables,
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtil.form(request.url(URL_ENTRY_SEARCH, ARG_NAME,
-                                            WHAT_ENTRIES)," name=\"searchform\" "));
+        sb.append(
+            HtmlUtil.form(
+                request.url(URL_ENTRY_SEARCH, ARG_NAME, WHAT_ENTRIES),
+                " name=\"searchform\" "));
 
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
         sb.append(HtmlUtil.submitImage(getUrlBase() + ICON_BLANK, "submit"));
         TypeHandler typeHandler = getTypeHandler(request);
-        String output = (String) request.getOutput(BLANK);
-        String buttons = HtmlUtil.submit(msg("Search"), "submit");
+        String      output      = (String) request.getOutput(BLANK);
+        String      buttons     = HtmlUtil.submit(msg("Search"), "submit");
         sb.append("<table width=\"90%\" border=0><tr><td>");
         typeHandler.addTextSearch(request, sb);
         sb.append("</table>");
@@ -2831,7 +2903,7 @@ public class Repository extends RepositoryBase implements Tables,
         sb.append(buttons);
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
-        return  makeResult(request, msg("Search Form"), sb, searchUrls);
+        return makeResult(request, msg("Search Form"), sb, searchUrls);
     }
 
 
@@ -2848,13 +2920,15 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     public Result xprocessEntrySearchForm(Request request,
-                                         boolean typeSpecific)
+                                          boolean typeSpecific)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
 
-        sb.append(HtmlUtil.form(request.url(URL_ENTRY_SEARCH, ARG_NAME,
-                                            WHAT_ENTRIES)," name=\"searchform\" "));
+        sb.append(
+            HtmlUtil.form(
+                request.url(URL_ENTRY_SEARCH, ARG_NAME, WHAT_ENTRIES),
+                " name=\"searchform\" "));
 
 
         //Put in an empty submit button so when the user presses return 
@@ -2891,12 +2965,13 @@ public class Repository extends RepositoryBase implements Tables,
         metadataSB.append(HtmlUtil.formTable());
         getMetadataManager().addToSearchForm(request, metadataSB);
         metadataSB.append(HtmlUtil.formTableClose());
-        sb.append(makeShowHideBlock(request,  msg("Metadata"), metadataSB, false));
+        sb.append(makeShowHideBlock(request, msg("Metadata"), metadataSB,
+                                    false));
 
 
         StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
-        if (output.length() == 0) {
-        } else {
+        if (output.length() == 0) {}
+        else {
             outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output));
         }
 
@@ -2920,14 +2995,15 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
-        sb.append(makeShowHideBlock(request, msg("Output"),  outputForm, false));
+        sb.append(makeShowHideBlock(request, msg("Output"), outputForm,
+                                    false));
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
 
-        return  makeResult(request, msg("Search Form"), sb, searchUrls);
+        return makeResult(request, msg("Search Form"), sb, searchUrls);
 
     }
 
@@ -2944,10 +3020,20 @@ public class Repository extends RepositoryBase implements Tables,
         return getSubNavLinks(request, urls, BLANK);
     }
 
-    public Result makeResult(Request request, String title,
-                             StringBuffer sb, RequestUrl []links) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param title _more_
+     * @param sb _more_
+     * @param links _more_
+     *
+     * @return _more_
+     */
+    public Result makeResult(Request request, String title, StringBuffer sb,
+                             RequestUrl[] links) {
         Result result = new Result(title, sb);
-        if(links!=null) {
+        if (links != null) {
             result.putProperty(PROP_NAVSUBLINKS,
                                getSubNavLinks(request, links));
         }
@@ -2968,12 +3054,14 @@ public class Repository extends RepositoryBase implements Tables,
     protected List getSubNavLinks(Request request, RequestUrl[] urls,
                                   String arg) {
         List   links    = new ArrayList();
-        String offextra    = " class=\"subnavoffcomp\" ";
-        String onextra = " class=\"subnavoncomp\" ";
+        String offextra = " class=\"subnavoffcomp\" ";
+        String onextra  = " class=\"subnavoncomp\" ";
         String type     = request.getRequestPath();
 
-        String l = HtmlUtil.img(fileUrl(ICON_LCURVE),"","  class=\"curve\"");
-        String r = HtmlUtil.img(fileUrl(ICON_RCURVE),""," class=\"curve\"  ");
+        String l = HtmlUtil.img(fileUrl(ICON_LCURVE), "",
+                                "  class=\"curve\"");
+        String r = HtmlUtil.img(fileUrl(ICON_RCURVE), "",
+                                " class=\"curve\"  ");
 
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
@@ -2983,7 +3071,7 @@ public class Repository extends RepositoryBase implements Tables,
             }
 
             if (type.endsWith(urls[i].getPath())) {
-                links.add(HtmlUtil.span(l+label+r, onextra));
+                links.add(HtmlUtil.span(l + label + r, onextra));
             } else {
                 links.add(HtmlUtil.href(request.url(urls[i]) + arg, label,
                                         offextra));
@@ -3570,6 +3658,7 @@ public class Repository extends RepositoryBase implements Tables,
     protected Entry getEntry(Request request, String entryId,
                              boolean andFilter, boolean abbreviated)
             throws Exception {
+
         if (entryId == null) {
             return null;
         }
@@ -3602,14 +3691,20 @@ public class Repository extends RepositoryBase implements Tables,
             }
             Metadata patternMetadata =
                 getMetadataManager().findMetadata(parent,
-                                                  AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
+                    AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
             PatternFileFilter filter = null;
-            if(patternMetadata!=null && patternMetadata.getAttr1().trim().length()>0) {
+            if ((patternMetadata != null)
+                    && (patternMetadata.getAttr1().trim().length() > 0)) {
                 try {
-                    filter = new PatternFileFilter(patternMetadata.getAttr1());
-                    if(!filter.accept(f)) return null;
-                } catch(Exception exc) {
-                    throw new IllegalStateException("Bad local files pattern:" + patternMetadata.getAttr1());
+                    filter =
+                        new PatternFileFilter(patternMetadata.getAttr1());
+                    if ( !filter.accept(f)) {
+                        return null;
+                    }
+                } catch (Exception exc) {
+                    throw new IllegalStateException(
+                        "Bad local files pattern:"
+                        + patternMetadata.getAttr1());
                 }
             }
 
@@ -3668,6 +3763,7 @@ public class Repository extends RepositoryBase implements Tables,
             entryCache.put(entryId, entry);
         }
         return entry;
+
     }
 
 
@@ -3989,15 +4085,17 @@ public class Repository extends RepositoryBase implements Tables,
                             new Metadata(
                                 getGUID(), entry.getId(),
                                 XmlUtil.getAttribute(entryChild, ATTR_TYPE),
-                                XmlUtil.getAttribute(entryChild, ATTR_INHERITED,DFLT_INHERITED),
                                 XmlUtil.getAttribute(
-                                    entryChild, ATTR_ATTR1,
-                                    ""), XmlUtil.getAttribute(
-                                        entryChild, ATTR_ATTR2,
+                                    entryChild, ATTR_INHERITED,
+                                    DFLT_INHERITED), XmlUtil.getAttribute(
+                                        entryChild, ATTR_ATTR1,
                                         ""), XmlUtil.getAttribute(
-                                            entryChild, ATTR_ATTR3,
+                                            entryChild, ATTR_ATTR2,
                                             ""), XmlUtil.getAttribute(
-                                                entryChild, ATTR_ATTR4, "")));
+                                                entryChild, ATTR_ATTR3,
+                                                    ""), XmlUtil.getAttribute(
+                                                        entryChild,
+                                                            ATTR_ATTR4, "")));
                     } else {
                         throw new IllegalArgumentException("Unknown tag:"
                                 + node.getTagName());
@@ -4058,15 +4156,15 @@ public class Repository extends RepositoryBase implements Tables,
                 sb.append(note("Cannot edit top-level group"));
                 return makeEntryEditResult(request, entry, "Edit Entry", sb);
                 }*/
-            type  = entry.getTypeHandler().getType();
-            if(!entry.isTopGroup()) {
+            type = entry.getTypeHandler().getType();
+            if ( !entry.isTopGroup()) {
                 group = findGroup(request, entry.getParentGroupId());
             }
         }
-        boolean isEntryTop = (entry!=null && entry.isTopGroup());
+        boolean isEntryTop = ((entry != null) && entry.isTopGroup());
 
 
-        if (!isEntryTop && group == null) {
+        if ( !isEntryTop && (group == null)) {
             group = findGroup(request);
         }
         if (type == null) {
@@ -4088,7 +4186,8 @@ public class Repository extends RepositoryBase implements Tables,
         if (type == null) {
             sb.append(request.form(URL_ENTRY_FORM, " name=\"entryform\" "));
         } else {
-            sb.append(request.uploadForm(URL_ENTRY_CHANGE, " name=\"entryform\" "));
+            sb.append(request.uploadForm(URL_ENTRY_CHANGE,
+                                         " name=\"entryform\" "));
         }
 
         sb.append(HtmlUtil.formTable());
@@ -4119,8 +4218,11 @@ public class Repository extends RepositoryBase implements Tables,
             String metadataButton = HtmlUtil.submit("Edit Metadata",
                                         ARG_EDIT_METADATA);
 
-            String deleteButton = ((entry!=null&&entry.isTopGroup())?"":HtmlUtil.submit(msg("Delete"), ARG_DELETE));
-            
+            String deleteButton = (((entry != null) && entry.isTopGroup())
+                                   ? ""
+                                   : HtmlUtil.submit(msg("Delete"),
+                                       ARG_DELETE));
+
             String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             String buttons      = ((entry != null)
                                    ? buttons(submitButton, deleteButton,
@@ -4222,14 +4324,17 @@ public class Repository extends RepositoryBase implements Tables,
         for (Comment comment : comments) {
             //            sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
             //TODO: Check for access
-            String deleteLink = (!canEdit?"":HtmlUtil.href(
-                                    request.url(
-                                        URL_COMMENTS_EDIT, ARG_DELETE,
-                                        "true", ARG_ID, entry.getId(),
-                                        ARG_COMMENT_ID,
-                                        comment.getId()), HtmlUtil.img(
-                                            fileUrl(ICON_DELETE),
-                                            msg("Delete comment"))));
+            String deleteLink = ( !canEdit
+                                  ? ""
+                                  : HtmlUtil
+                                      .href(request
+                                          .url(URL_COMMENTS_EDIT, ARG_DELETE,
+                                              "true", ARG_ID, entry.getId(),
+                                              ARG_COMMENT_ID,
+                                              comment.getId()), HtmlUtil
+                                                  .img(fileUrl(ICON_DELETE),
+                                                      msg(
+                                                      "Delete comment"))));
             if (canEdit) {
                 //                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
             }
@@ -4238,18 +4343,19 @@ public class Repository extends RepositoryBase implements Tables,
 
             StringBuffer content = new StringBuffer();
             content.append("<table>");
-            String byLine =  "By: "  +comment.getUser().getLabel() + " @ "
-                + formatDate(request,
-                             comment.getDate())+HtmlUtil.space(1) + deleteLink;
+            String byLine = "By: " + comment.getUser().getLabel() + " @ "
+                            + formatDate(request, comment.getDate())
+                            + HtmlUtil.space(1) + deleteLink;
             //            content.append(HtmlUtil.formEntry("By:",
             //                                         ));
-            content.append(HtmlUtil.formEntryTop("",
-                                            comment.getComment()));
+            content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
-            sb.append(makeShowHideBlock(request, 
-                                        "<b>Subject</b>:" +comment.getSubject()+HtmlUtil.space(2) + byLine, content, true,""));
+            sb.append(makeShowHideBlock(request, "<b>Subject</b>:"
+                                        + comment.getSubject()
+                                        + HtmlUtil.space(2)
+                                        + byLine, content, true, ""));
         }
-            //        sb.append("</table>");
+        //        sb.append("</table>");
         return sb.toString();
     }
 
@@ -4738,7 +4844,7 @@ public class Repository extends RepositoryBase implements Tables,
             if (request.exists(ARG_DELETE_CONFIRM)) {
                 if (entry.isTopGroup()) {
                     return new Result(request.entryUrl(URL_ENTRY_SHOW, entry,
-                                                       ARG_MESSAGE, "Cannot delete top-level group"));
+                            ARG_MESSAGE, "Cannot delete top-level group"));
                 }
 
                 List<Entry> entries = new ArrayList<Entry>();
@@ -4994,15 +5100,17 @@ public class Repository extends RepositoryBase implements Tables,
                         throw new IllegalArgumentException(
                             "Cannot have a '/' in group name:" + newName);
                     }
-                    /**TODO Do we want to not allow 2 or more groups with the same name?
-                    Entry existing = findEntryWithName(request,
-                                                       entry.getParentGroup(), newName);
-                    if ((existing != null) && existing.isGroup()
-                            && !existing.getId().equals(entry.getId())) {
-                        throw new IllegalArgumentException(
-                            "A group with the given name already exists");
-                    }
-                    */
+
+                    /**
+                     * TODO Do we want to not allow 2 or more groups with the same name?
+                     * Entry existing = findEntryWithName(request,
+                     *                                  entry.getParentGroup(), newName);
+                     * if ((existing != null) && existing.isGroup()
+                     *       && !existing.getId().equals(entry.getId())) {
+                     *   throw new IllegalArgumentException(
+                     *       "A group with the given name already exists");
+                     * }
+                     */
                 }
 
                 entry.setName(newName);
@@ -5402,7 +5510,7 @@ public class Repository extends RepositoryBase implements Tables,
             nav = StringUtil.join(separator, breadcrumbs);
 
 
-            StringBuffer menu  = new StringBuffer();
+            StringBuffer menu = new StringBuffer();
             menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
             menu.append(getEntryLinksList(request, entry));
             menu.append("</div>");
@@ -5421,8 +5529,8 @@ public class Repository extends RepositoryBase implements Tables,
                                       msg("Show menu"),
                                       " id=\"menubutton\" "));
 
-            String linkHtml = "";
-            //            String linkHtml = getEntryLinksHtml(request, entry,true);
+            //            String linkHtml = "";
+            String linkHtml = getEntryLinksHtml(request, entry,true);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink
@@ -5510,21 +5618,22 @@ public class Repository extends RepositoryBase implements Tables,
         List<Entry>   entries       = new ArrayList<Entry>();
         List<Group>   subGroups     = new ArrayList<Group>();
         try {
-        List<String>  ids = getEntryIdsInGroup(request, group, where);
-        for (String id : ids) {
-            Entry entry = getEntry(request, id);
+            List<String> ids = getEntryIdsInGroup(request, group, where);
+            for (String id : ids) {
+                Entry entry = getEntry(request, id);
 
-            if (entry == null) {
-                continue;
+                if (entry == null) {
+                    continue;
+                }
+                if (entry.isGroup()) {
+                    subGroups.add((Group) entry);
+                } else {
+                    entries.add(entry);
+                }
             }
-            if (entry.isGroup()) {
-                subGroups.add((Group) entry);
-            } else {
-                entries.add(entry);
-            }
-        }
-        } catch(Exception exc) {
-            request.put(ARG_MESSAGE,"Error finding children:" + exc.getMessage());
+        } catch (Exception exc) {
+            request.put(ARG_MESSAGE,
+                        "Error finding children:" + exc.getMessage());
         }
         return outputHandler.outputGroup(request, group, subGroups, entries);
     }
@@ -5553,21 +5662,25 @@ public class Repository extends RepositoryBase implements Tables,
         if (isLocalFileEntry(group.getId())) {
             Metadata patternMetadata =
                 getMetadataManager().findMetadata(group,
-                                                  AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
+                    AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
             PatternFileFilter filter = null;
-            if(patternMetadata!=null && patternMetadata.getAttr1().trim().length()>0) {
+            if ((patternMetadata != null)
+                    && (patternMetadata.getAttr1().trim().length() > 0)) {
                 try {
-                    filter = new PatternFileFilter(patternMetadata.getAttr1());
-                } catch(Exception exc) {
-                    throw new IllegalStateException("Bad local files pattern:" + patternMetadata.getAttr1());
+                    filter =
+                        new PatternFileFilter(patternMetadata.getAttr1());
+                } catch (Exception exc) {
+                    throw new IllegalStateException(
+                        "Bad local files pattern:"
+                        + patternMetadata.getAttr1());
                 }
             }
             File   f     = new File(getFileFromId(group.getId()));
             File[] files = f.listFiles();
             for (int i = 0; i < files.length; i++) {
-                if(files[i].isDirectory()) {
-                } else {
-                    if(filter!=null && !filter.accept(files[i])) {
+                if (files[i].isHidden() || files[i].isDirectory()) {}
+                else {
+                    if ((filter != null) && !filter.accept(files[i])) {
                         continue;
                     }
                 }
@@ -6408,8 +6521,8 @@ public class Repository extends RepositoryBase implements Tables,
 
         List<Group> groups = readGroups(statement);
         if (groups.size() > 0) {
-            return  groups.get(0);
-        } 
+            return groups.get(0);
+        }
         return null;
     }
 
@@ -6447,8 +6560,11 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Entry findEntryWithName(Request request, Group parent, String name)
             throws Exception {
-        String groupName = (parent==null?"":parent.getFullName()) + Group.IDDELIMITER + name;
-        Group  group     = groupCache.get(groupName);
+        String groupName = ((parent == null)
+                            ? ""
+                            : parent.getFullName()) + Group.IDDELIMITER
+                                + name;
+        Group group = groupCache.get(groupName);
         if (group != null) {
             return group;
         }
@@ -6668,10 +6784,23 @@ public class Repository extends RepositoryBase implements Tables,
         return getEntries(request, new StringBuffer());
     }
 
-    protected List[] getEntries(Request request, StringBuffer searchCriteriaSB) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param searchCriteriaSB _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List[] getEntries(Request request,
+                                StringBuffer searchCriteriaSB)
+            throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
-        List<Clause> where   = typeHandler.assembleWhereClause(request, searchCriteriaSB);
-        int          skipCnt = request.get(ARG_SKIP, 0);
+        List<Clause> where = typeHandler.assembleWhereClause(request,
+                                 searchCriteriaSB);
+        int skipCnt = request.get(ARG_SKIP, 0);
 
         Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,
                                   where,
@@ -6850,8 +6979,17 @@ public class Repository extends RepositoryBase implements Tables,
         return getEntryLink(request, entry, new ArrayList());
     }
 
-    protected String getEntryLink(Request request, Entry entry,List args) {
-        return HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, entry,args),
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
+    protected String getEntryLink(Request request, Entry entry, List args) {
+        return HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, entry, args),
                              entry.getLabel());
     }
 
@@ -7078,7 +7216,8 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         //        System.err.println("submit:" + request.getString("submit","YYY"));
-        if (request.defined("submit_type.x")|| request.defined("submit_subset")) {
+        if (request.defined("submit_type.x")
+                || request.defined("submit_subset")) {
             request.remove(ARG_OUTPUT);
             return processEntrySearchForm(request);
         }
@@ -7096,15 +7235,18 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         StringBuffer searchCriteriaSB = new StringBuffer();
-        List[] pair = getEntries(request,searchCriteriaSB);
-        String s = searchCriteriaSB.toString();
-        if(s.length()>0) {
+        List[]       pair             = getEntries(request, searchCriteriaSB);
+        String       s                = searchCriteriaSB.toString();
+        if (s.length() > 0) {
             request.remove("submit");
-            String url  = request.getUrl(URL_ENTRY_SEARCHFORM);
-            s = "<table>" + s +"</table>";
-            String header = HtmlUtil.href(url,HtmlUtil.img(fileUrl(ICON_SEARCH),"Search Again")) +
-                "Search Criteria";
-            request.setLeftMessage(HtmlUtil.br(header)+ s);
+            String url = request.getUrl(URL_ENTRY_SEARCHFORM);
+            s = "<table>" + s + "</table>";
+            String header = HtmlUtil.href(
+                                url,
+                                HtmlUtil.img(
+                                    fileUrl(ICON_SEARCH),
+                                    "Search Again")) + "Search Criteria";
+            request.setLeftMessage(HtmlUtil.br(header) + s);
         }
         return getOutputHandler(request).outputGroup(request,
                                 getDummyGroup(), (List<Group>) pair[0],
@@ -7505,7 +7647,9 @@ public class Repository extends RepositoryBase implements Tables,
                     metadataStmt.setString(col++, metadata.getId());
                     metadataStmt.setString(col++, metadata.getEntryId());
                     metadataStmt.setString(col++, metadata.getType());
-                    metadataStmt.setInt(col++, metadata.getInherited()?1:0);
+                    metadataStmt.setInt(col++, metadata.getInherited()
+                            ? 1
+                            : 0);
                     metadataStmt.setString(col++, metadata.getAttr1());
                     metadataStmt.setString(col++, metadata.getAttr2());
                     metadataStmt.setString(col++, metadata.getAttr3());
@@ -7741,32 +7885,60 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
+    /**
+     * _more_
+     *
+     * @param formName _more_
+     * @param fieldName _more_
+     *
+     * @return _more_
+     */
     public String getCalendarSelector(String formName, String fieldName) {
         String anchorName = "anchor." + fieldName;
-        String divName = "div." + fieldName;
-        return "<A HREF=\"#\"   onClick=\"selectDate('" + divName +"',document.forms['" + formName +"']." + fieldName+",'" + anchorName +"','yyyy-MM-dd'); return false;\"   NAME=\"" + anchorName +"\" ID=\"" + anchorName +"\">"+
-            HtmlUtil.img(fileUrl(ICON_CALENDAR)," Choose date", " border=0")+
-            "</A>" +
-            "<DIV ID=\"" + divName+"\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
+        String divName    = "div." + fieldName;
+        return "<A HREF=\"#\"   onClick=\"selectDate('" + divName
+               + "',document.forms['" + formName + "']." + fieldName + ",'"
+               + anchorName + "','yyyy-MM-dd'); return false;\"   NAME=\""
+               + anchorName + "\" ID=\"" + anchorName + "\">"
+               + HtmlUtil.img(fileUrl(ICON_CALENDAR), " Choose date", " border=0")
+               + "</A>" + "<DIV ID=\"" + divName
+               + "\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
     }
 
 
 
-    public String makeDateInput(Request request, String name, String formName, Date date) {
-        String dateHelp =
-            "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
-        String timeHelp =
-            "hh::mm:ss Z, e.g. 20:15:00 MST";
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param name _more_
+     * @param formName _more_
+     * @param date _more_
+     *
+     * @return _more_
+     */
+    public String makeDateInput(Request request, String name,
+                                String formName, Date date) {
+        String dateHelp   = "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
+        String timeHelp   = "hh::mm:ss Z, e.g. 20:15:00 MST";
 
-        String dateArg = request.getString(name,"");
-        String timeArg = request.getString(name+".time","");
-        String dateString =  (date==null?dateArg: dateSdf.format(date));
-        String timeString =  (date==null?timeArg: timeSdf.format(date));
+        String dateArg    = request.getString(name, "");
+        String timeArg    = request.getString(name + ".time", "");
+        String dateString = ((date == null)
+                             ? dateArg
+                             : dateSdf.format(date));
+        String timeString = ((date == null)
+                             ? timeArg
+                             : timeSdf.format(date));
 
         return HtmlUtil.input(name, dateString,
-                              HtmlUtil.SIZE_8+ " title=\"" + dateHelp + "\"") + 
-            getCalendarSelector(formName, name) + " T:" +
-            HtmlUtil.input(name+".time",timeString,HtmlUtil.SIZE_10+ " title=\"" + timeHelp + "\"");
+                              HtmlUtil.SIZE_8 + " title=\"" + dateHelp
+                              + "\"") + getCalendarSelector(formName, name)
+                                      + " T:"
+                                      + HtmlUtil.input(name + ".time",
+                                          timeString,
+                                          HtmlUtil.SIZE_10 + " title=\""
+                                          + timeHelp + "\"");
     }
 
 

@@ -122,15 +122,28 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public RepositoryBase getRepositoryBase() {
         return repository;
     }
 
 
-    public static void addCriteria(StringBuffer sb, String label, Object value) {
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param label _more_
+     * @param value _more_
+     */
+    public static void addCriteria(StringBuffer sb, String label,
+                                   Object value) {
         String sv = value.toString();
-        sv = sv.replace("<","&lt;");
-        sv = sv.replace(">","&gt;");
+        sv = sv.replace("<", "&lt;");
+        sv = sv.replace(">", "&gt;");
         sb.append("<tr valign=\"top\"><td align=right>");
         sb.append(HtmlUtil.b(label));
         sb.append("</td><td>");

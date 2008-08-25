@@ -112,6 +112,7 @@ public class MetadataHandler extends RepositoryManager {
      * @param id _more_
      * @param entryId _more_
      * @param type _more_
+     * @param inherited _more_
      * @param attr1 _more_
      * @param attr2 _more_
      * @param attr3 _more_
@@ -120,10 +121,10 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public Metadata makeMetadata(String id, String entryId, String type,
-                                 boolean inherited,
-                                 String attr1, String attr2, String attr3,
-                                 String attr4) {
-        return new Metadata(id, entryId, type, inherited, attr1, attr2, attr3, attr4);
+                                 boolean inherited, String attr1,
+                                 String attr2, String attr3, String attr4) {
+        return new Metadata(id, entryId, type, inherited, attr1, attr2,
+                            attr3, attr4);
     }
 
 
@@ -236,11 +237,13 @@ public class MetadataHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param metadata _more_
      *
      * @return _more_
      */
-    public String[] getHtml(Request request,Metadata metadata) {
+    public String[] getHtml(Request request, Metadata metadata) {
         return null;
     }
 
@@ -293,46 +296,83 @@ public class MetadataHandler extends RepositoryManager {
             throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToBrowseSearchForm(Request request, StringBuffer sb)
             throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public String getSearchUrl(Request request, Metadata metadata) {
         Metadata.Type type = findType(metadata.getType());
-        List args = new ArrayList();
+        List          args = new ArrayList();
         args.add(ARG_METADATA_TYPE + "." + type);
         args.add(type.toString());
         args.add(ARG_METADATA_ATTR1 + "." + type);
         args.add(metadata.getAttr1());
-        if(type.isAttr2Searchable()) {
+        if (type.isAttr2Searchable()) {
             args.add(ARG_METADATA_ATTR2 + "." + type);
             args.add(metadata.getAttr2());
         }
-        if(type.isAttr3Searchable()) {
+        if (type.isAttr3Searchable()) {
             args.add(ARG_METADATA_ATTR3 + "." + type);
             args.add(metadata.getAttr3());
         }
-        if(type.isAttr4Searchable()) {
+        if (type.isAttr4Searchable()) {
             args.add(ARG_METADATA_ATTR4 + "." + type);
             args.add(metadata.getAttr4());
         }
-        return  HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH), args);
+        return HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
+                            args);
     }
 
-    public String getSearchUrl(Request request, Metadata.Type type, String value) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param type _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getSearchUrl(Request request, Metadata.Type type,
+                               String value) {
         List args = new ArrayList();
         args.add(ARG_METADATA_TYPE + "." + type);
         args.add(type.toString());
         args.add(ARG_METADATA_ATTR1 + "." + type);
         args.add(value);
-        return  HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH), args);
+        return HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
+                            args);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public String getSearchLink(Request request, Metadata metadata) {
-        return  HtmlUtil.href(getSearchUrl(request, metadata),
-                              HtmlUtil.img(getRepository().fileUrl(ICON_SEARCH)," border=0 "));
+        return HtmlUtil.href(
+            getSearchUrl(request, metadata),
+            HtmlUtil.img(getRepository().fileUrl(ICON_SEARCH), "Search for entries with this metadata"," border=0 "));
     }
 
 
@@ -347,41 +387,55 @@ public class MetadataHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addToBrowseSearchForm(Request request, StringBuffer sb,
-                                Metadata.Type type, boolean doSelect)
+                                      Metadata.Type type, boolean doSelect)
             throws Exception {
 
-        String cloudLink = HtmlUtil.href(request.url(getRepository().getMetadataManager().URL_METADATA_CLOUD,
-                                                     ARG_METADATA_TYPE, type.toString()),
-                                         HtmlUtil.img(getRepository().fileUrl(ICON_CLOUD)));
+        String cloudLink =
+            HtmlUtil.href(
+                request.url(
+                    getRepository().getMetadataManager().URL_METADATA_CLOUD,
+                    ARG_METADATA_TYPE, type.toString()), HtmlUtil.img(
+                        getRepository().fileUrl(ICON_CLOUD)));
         String url = request.url(getRepository().URL_ENTRY_SEARCH);
         String[] values = getMetadataManager().getDistinctValues(request,
-                                                                 this, type);
+                              this, type);
         if ((values == null) || (values.length == 0)) {
             return;
         }
         StringBuffer content = new StringBuffer();
         content.append("<div class=\"browseblock\">");
-        for(int i=0;i<values.length;i++) {
-            String browseUrl = HtmlUtil.url(url, 
-                                            ARG_METADATA_TYPE + "." + type,type.toString(),
-                                            ARG_METADATA_ATTR1 + "." + type, values[i]);
-            content.append(HtmlUtil.href(browseUrl,values[i]));
+        for (int i = 0; i < values.length; i++) {
+            String browseUrl = HtmlUtil.url(url,
+                                            ARG_METADATA_TYPE + "." + type,
+                                            type.toString(),
+                                            ARG_METADATA_ATTR1 + "." + type,
+                                            values[i]);
+            content.append(HtmlUtil.href(browseUrl, values[i]));
             content.append(HtmlUtil.br());
         }
         content.append("</div>");
 
-        sb.append(getRepository().makeShowHideBlock(request,  cloudLink+type.getLabel(),
-                                                    content,false));
+        sb.append(getRepository().makeShowHideBlock(request,
+                cloudLink + type.getLabel(), content, false));
 
 
     }
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     *
+     * @return _more_
+     */
     protected List trimValues(List<String> l) {
         List values = new ArrayList();
-        for(String s: l) {
-            String label= s;
-            if(label.length()>50) label = label.substring(0,49) +"...";
-            values.add(new TwoFacedObject(label,s));
+        for (String s : l) {
+            String label = s;
+            if (label.length() > 50) {
+                label = label.substring(0, 49) + "...";
+            }
+            values.add(new TwoFacedObject(label, s));
         }
         return values;
     }
@@ -404,7 +458,7 @@ public class MetadataHandler extends RepositoryManager {
         if (type == null) {
             return;
         }
-        Metadata metadata =new Metadata(type);
+        Metadata metadata = new Metadata(type);
         metadata.setEntry(entry);
         String[] html = getForm(request, metadata, false);
         if (html == null) {
@@ -438,6 +492,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      *
      * @param request _more_
+     * @param entry _more_
      * @return _more_
      */
     public List<Metadata.Type> getTypes(Request request, Entry entry) {
@@ -479,8 +534,8 @@ public class MetadataHandler extends RepositoryManager {
             return;
         }
         metadataList.add(new Metadata(getRepository().getGUID(),
-                                      entry.getId(), type, DFLT_INHERITED, attr1, attr2,
-                                      attr3, attr4));
+                                      entry.getId(), type, DFLT_INHERITED,
+                                      attr1, attr2, attr3, attr4));
     }
 
 
@@ -525,8 +580,9 @@ public class MetadataHandler extends RepositoryManager {
                 attr1 = request.getString(ARG_ATTR4 + suffix + ".select", "");
             }
 
-            metadataList.add(new Metadata(id, entry.getId(), type, DFLT_INHERITED, attr1,
-                                          attr2, attr3, attr4));
+            metadataList.add(new Metadata(id, entry.getId(), type,
+                                          DFLT_INHERITED, attr1, attr2,
+                                          attr3, attr4));
         }
     }
 
