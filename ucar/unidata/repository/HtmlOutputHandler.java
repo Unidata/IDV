@@ -787,7 +787,7 @@ public class HtmlOutputHandler extends OutputHandler {
             treeShown = new ArrayList<Boolean>();
             tabContent.add(HtmlUtil.div(tmp," style=\"margin-left:15px;\" "));
             tabTitles.add("Information");
-            treeShown.add(true);
+            treeShown.add(false);
         }
 
         if (subGroups.size() > 0) {
