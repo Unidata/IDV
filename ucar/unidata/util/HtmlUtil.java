@@ -210,6 +210,10 @@ public class HtmlUtil {
         return "\"" + s + "\"";
     }
 
+    public static String squote(String s) {
+        return "'" + s + "'";
+    }
+
     /**
      * _more_
      *
@@ -261,6 +265,14 @@ public class HtmlUtil {
      */
     public static String cssClass(String c) {
         return " class=\"" + c + "\" ";
+    }
+
+    public static String id(String c) {
+        return " id=\"" + c +"\" ";
+    }
+
+    public static String style(String c) {
+        return " style=\"" + c +"\" ";
     }
 
     /**
