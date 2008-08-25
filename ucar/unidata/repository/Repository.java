@@ -2548,6 +2548,25 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    protected String getEntryLinksList(Request request, Entry entry) throws Exception {
+        List<Link>   links = getEntryLinks(request, entry, false);
+        StringBuffer menu  = new StringBuffer();
+        menu.append("<table cellspacing=\"0\" cellpadding=\"0\">");
+        for (Link link : links) {
+            menu.append("<tr><td>");
+            menu.append(HtmlUtil.img(link.getIcon()));
+            menu.append(HtmlUtil.space(1));
+            menu.append("</td><td>");
+            menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
+                                      HtmlUtil.cssClass("menulink")));
+            menu.append("</td></tr>");
+        }
+        menu.append("</table>");
+        return menu.toString();
+
+    }
+
+
     /**
      * _more_
      *
@@ -5381,19 +5400,12 @@ public class Repository extends RepositoryBase implements Tables,
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-            List<Link>   links = getEntryLinks(request, entry, false);
+
+
             StringBuffer menu  = new StringBuffer();
-            menu.append("<div id=\"entrylinksmenu\" class=\"menu\"><table cellspacing=\"0\" cellpadding=\"0\">");
-            for (Link link : links) {
-                menu.append("<tr><td>");
-                menu.append(HtmlUtil.img(link.getIcon()));
-                menu.append(HtmlUtil.space(1));
-                menu.append("</td><td>");
-                menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
-                                          HtmlUtil.cssClass("menulink")));
-                menu.append("</td></tr>");
-            }
-            menu.append("</table></div>");
+            menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
+            menu.append(getEntryLinksList(request, entry));
+            menu.append("</div>");
 
             String events = HtmlUtil.onMouseOver(
                                 "setImage('menubutton','"
@@ -5409,7 +5421,8 @@ public class Repository extends RepositoryBase implements Tables,
                                       msg("Show menu"),
                                       " id=\"menubutton\" "));
 
-            String linkHtml = getEntryLinksHtml(request, entry,true);
+            String linkHtml = "";
+            //            String linkHtml = getEntryLinksHtml(request, entry,true);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink

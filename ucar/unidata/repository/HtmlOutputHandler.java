@@ -233,16 +233,12 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getAssociationBlock(request, entry));
         treeShown.add(false);
 
-        for(int i=0;i<tabTitles.size();i++) {
-            String tabTitle  = tabTitles.get(i).toString();
-            String content  = tabContent.get(i).toString();
-            
-            if(content.length()==0) continue;
-            sb.append(getRepository().makeShowHideBlock(request, 
-                                                        tabTitle, new StringBuffer(content), treeShown.get(i)));
-        }
+        tabTitles.add("Actions");
+        tabContent.add(getRepository().getEntryLinksList(request, entry));
+        treeShown.add(false);
 
-
+        sb.append(HtmlUtil.p());
+        sb.append(getRepository().makeTabs(tabTitles, tabContent,true));
         return makeLinksResult(request, msgLabel("Entry") + entry.getLabel(), sb,
                                new State(entry));
     }
@@ -774,6 +770,9 @@ public class HtmlOutputHandler extends OutputHandler {
             tabTitles.add("Associations");
             tabContent.add(getAssociationBlock(request, group));
             treeShown.add(request.get(ARG_SHOW_ASSOCIATIONS, false));
+            tabTitles.add("Actions");
+            tabContent.add(getRepository().getEntryLinksList(request, group));
+            treeShown.add(false);
         } else {
             List allEntries = new ArrayList(entries);
             allEntries.addAll(subGroups);
@@ -781,13 +780,18 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (!showApplet) {
+
+
             String tmp = getRepository().makeTabs(tabTitles, tabContent,true,"tabcontent_fixedheight");
             tabTitles = new ArrayList<String>();
             tabContent = new ArrayList<String>();
             treeShown = new ArrayList<Boolean>();
+
             tabContent.add(HtmlUtil.div(tmp," style=\"margin-left:15px;\" "));
             tabTitles.add("Information");
             treeShown.add(false);
+
+
         }
 
         if (subGroups.size() > 0) {
