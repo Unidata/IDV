@@ -429,9 +429,27 @@ public class StormTrackControl extends DisplayControlImpl {
 
     public List<StormParam> getTrackParams() {
         List<StormParam> params = new ArrayList<StormParam>();
+        
+
         StormDisplayState sds = getCurrentStormDisplayState();
-        for (StormTrack track : sds.getTrackCollection()
-                .getTracks()) {
+        StormTrackCollection stc = sds.getTrackCollection();
+        if(stc == null) {
+            for (int i = stormInfos.size() - 1; i >= 0; i--) {
+                StormInfo stormInfo = stormInfos.get(i);
+                StormDisplayState stormDisplayState =
+                    getStormDisplayState(stormInfo);
+                stc = sds.getTrackCollection();
+                if(stc!=null) {
+                    break;
+                }
+            }
+        }
+
+        if(stc==null) {
+            System.err.println("Unable to find any active storm displays");
+            return params;
+        }
+        for (StormTrack track : stc.getTracks()) {
             if (track == null) {
                 continue;
             }
@@ -444,7 +462,7 @@ public class StormTrackControl extends DisplayControlImpl {
         //If we didn't get any from the forecast track use the obs track
         if (params.size() == 0) {
             StormTrack obsTrack =
-                sds.getTrackCollection().getObsTrack();
+                stc.getObsTrack();
             if (obsTrack != null) {
                 params = obsTrack.getParams();
             }
