@@ -143,13 +143,32 @@ a.subnavoffcomp  {
 	overflow-x: hidden;
 }
 
+.browseblock  a {
+   color:#000000;
+}
+
+.listrow1 {
+   background-color:#cccccc;
+   padding:4px;
+   padding-bottom:0px;
+}
+
+.listrow2 {
+   background-color:#efefef;
+   padding:4px;
+   padding-bottom:0px;
+}
+
+
 .browseblock {
-   padding:3px;
+   xpadding:3px;
    margin-left:20px;
-   border: 2px #8a8a8a solid; 
+   border: 2px #000000 solid; 
+   max-width: 90%; 
    max-height: 150px; 
    overflow-y: auto;
-   overflow-x: hidden;
+   overflow-x: visible;
+
 }
 
 .scrollablediv {

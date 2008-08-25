@@ -404,14 +404,16 @@ public class MetadataHandler extends RepositoryManager {
         }
         StringBuffer content = new StringBuffer();
         content.append("<div class=\"browseblock\">");
+        int rowNum=1;
         for (int i = 0; i < values.length; i++) {
             String browseUrl = HtmlUtil.url(url,
                                             ARG_METADATA_TYPE + "." + type,
                                             type.toString(),
                                             ARG_METADATA_ATTR1 + "." + type,
                                             values[i]);
-            content.append(HtmlUtil.href(browseUrl, values[i]));
-            content.append(HtmlUtil.br());
+            content.append(HtmlUtil.div(HtmlUtil.href(browseUrl, values[i]), HtmlUtil.cssClass("listrow"+ rowNum)));
+            rowNum++;
+            if(rowNum>2) rowNum = 1;
         }
         content.append("</div>");
 

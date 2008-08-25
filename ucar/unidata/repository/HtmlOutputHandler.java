@@ -635,6 +635,7 @@ public class HtmlOutputHandler extends OutputHandler {
         List<MetadataHandler> metadataHandlers =
             getMetadataManager().getMetadataHandlers();
         int cnt = 0;
+        int rowNum = 1;
         for (Metadata metadata : metadataList) {
             for (MetadataHandler metadataHandler : metadataHandlers) {
                 if (metadataHandler.canHandle(metadata)) {
@@ -644,11 +645,19 @@ public class HtmlOutputHandler extends OutputHandler {
                         if (cnt == 0) {
                             if (decorate) {
                                 sb.append(
-                                    "<table cellspacing=\"2\" cellpadding=\"0\">\n");
+                                    "<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"0\">\n");
                             }
                         }
                         cnt++;
-                        sb.append(HtmlUtil.formEntryTop(html[0], html[1]));
+                        String theClass = HtmlUtil.cssClass("listrow" + rowNum);
+                        if(decorate) {
+                            sb.append(HtmlUtil.formEntryTop(HtmlUtil.div(html[0], theClass),
+                                                            HtmlUtil.div(html[1], theClass), theClass,true));
+                        } else {
+                            sb.append(HtmlUtil.formEntryTop(html[0], html[1]));
+                        }
+                        rowNum++;
+                        if(rowNum>2) rowNum=1;
                         break;
                     }
                 }
