@@ -471,8 +471,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         int nowYear =            new GregorianCalendar(DateUtil.TIMEZONE_GMT).get(Calendar.YEAR);
         int stormYear = getYear(stormInfo.getStartTime());
         //If its the current year then its in the aid_public dir
-        String aSubDir = (stormYear  == nowYear?"aid_public/":("archive/" + stormYear)); 
-        String bSubDir = (stormYear  == nowYear?"btk/":("archive/" + stormYear)); 
+        String aSubDir = (stormYear  == nowYear?"aid_public":("archive/" + stormYear)); 
+        String bSubDir = (stormYear  == nowYear?"btk":("archive/" + stormYear)); 
         if (!justObs) {
             trackFile = getFullPath(aSubDir+"/"+
                                     PREFIX_ANALYSIS 
@@ -480,7 +480,11 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                                     + stormInfo.getNumber()
                                     + stormYear
                                     + ".dat.gz");
-            readTracks(stormInfo, tracks, trackFile, waysToUse,true);
+            try {
+                readTracks(stormInfo, tracks, trackFile, waysToUse,true);
+            } catch(BadDataException bde) {
+                //                System.err.println("Failed reading 'A' file for storm:" + stormInfo+" file:" + trackFile);
+            }
         }
         //Now  read the b"est file
         trackFile = getFullPath(bSubDir+"/" + 
@@ -489,7 +493,11 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                                 + stormInfo.getNumber()
                                 + stormYear
                                 + ".dat.gz");
-        readTracks(stormInfo, tracks, trackFile, null,true);
+        try {
+            readTracks(stormInfo, tracks, trackFile, null,true);
+        } catch(BadDataException bde) {
+            //            System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
+        }
         long t2 = System.currentTimeMillis();
         //        System.err.println("time: " + (t2 - t1));
 
