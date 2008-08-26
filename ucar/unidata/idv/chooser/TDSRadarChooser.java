@@ -610,6 +610,11 @@ public class TDSRadarChooser extends TimesChooser {
                 List allTimes =
                     collection.getRadarStationTimes(selectedStation.getID(),
                         pid, fromDate, toDate);
+                if(allTimes.size() == 0){
+                    fromDate = collection.getStartDate();
+                    allTimes = collection.getRadarStationTimes(selectedStation.getID(),
+                        pid, fromDate, toDate);
+                }
                 for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
                     Object timeObj = allTimes.get(timeIdx);
                     Date   date;
