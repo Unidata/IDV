@@ -19,24 +19,27 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.repository;
 
 
 import org.w3c.dom.*;
 
 
-import ucar.visad.quantities.CommonUnits;
-import visad.Unit;
+import ucar.ma2.*;
+
+import ucar.nc2.*;
+import ucar.nc2.dataset.*;
+
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.ProjectionImpl;
+
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
-
-import ucar.ma2.*;
-import ucar.nc2.dataset.*;
-import ucar.nc2.*;
 
 
 
@@ -45,8 +48,14 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.sql.Statement;
+import ucar.visad.quantities.CommonUnits;
+
+import visad.Unit;
+
 import java.io.File;
+
+
+import java.sql.Statement;
 
 
 import java.util.ArrayList;
@@ -63,12 +72,14 @@ import java.util.List;
  */
 public class ThreddsMetadataHandler extends MetadataHandler {
 
+    /** _more_ */
     public static final String TAG_VARIABLES = "variables";
 
 
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+    /** _more_ */
     public static final String ATTR_UNITS = "units";
 
     /** _more_ */
@@ -115,7 +126,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final Metadata.Type TYPE_VARIABLE =
-        new Metadata.Type("thredds.variable", "Variable","Variables");
+        new Metadata.Type("thredds.variable", "Variable", "Variables");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PUBLISHER =
@@ -145,8 +156,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static final Metadata.Type TYPE_ICON =
         new Metadata.Type("thredds.icon", "Icon");
 
+    /** _more_ */
     public static final Metadata.Type TYPE_CDL =
-        new Metadata.Type("thredds.cdl", "CDL","CDL");
+        new Metadata.Type("thredds.cdl", "CDL", "CDL");
 
 
     /**
@@ -182,76 +194,145 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
-    private double[]getRange(Variable var, Array a, Unit toUnit) throws Exception {
+    /**
+     * _more_
+     *
+     * @param var _more_
+     * @param a _more_
+     * @param toUnit _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private double[] getRange(Variable var, Array a, Unit toUnit)
+            throws Exception {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
-        Unit  fromUnit = ucar.visad.Util.parseUnit(var.getUnitsString());
+        Unit fromUnit        =
+            ucar.visad.Util.parseUnit(var.getUnitsString());
         //        System.err.println("minmax:" + minmax.min + " " + minmax.max + " " + fromUnit);
         //        System.err.println("to unit:" + toUnit.toThis(minmax.min, fromUnit) + " " +toUnit.toThis(minmax.min, fromUnit));
         //        System.err.println("to unit:" + new Date((long)(1000*toUnit.toThis(minmax.min, toUnit))));
-        double[]result =  new double[]{toUnit.toThis(minmax.min, fromUnit),
-                            toUnit.toThis(minmax.max, fromUnit)};
+        double[] result = new double[] { toUnit.toThis(minmax.min, fromUnit),
+                                         toUnit.toThis(minmax.max,
+                                             fromUnit) };
         return result;
     }
 
 
-    public void addInitialMetadata(Request request, Entry entry, Hashtable extra) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param extra _more_
+     */
+    public void addInitialMetadata(Request request, Entry entry,
+                                   Hashtable extra) {
+
         try {
-            super.addInitialMetadata(request,  entry,extra);
-            TdsOutputHandler        tdsOutputHandler =
+            super.addInitialMetadata(request, entry, extra);
+            TdsOutputHandler tdsOutputHandler =
                 (TdsOutputHandler) getRepository().getOutputHandler(
-                                                                    TdsOutputHandler.OUTPUT_TDS);
-        
-            if (tdsOutputHandler.canLoad(request, entry)) {
-                File file = entry.getResource().getFile();
-                NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
-                List<Variable> variables =  	dataset.getVariables();
-                for(Variable var: variables) {
-                    if(var instanceof CoordinateAxis) {
-                        CoordinateAxis ca = (CoordinateAxis) var;
-                        //TODO: Check for lat/lon/time
-                        ucar.nc2.constants.AxisType axisType  =ca.getAxisType();
-                        if(axisType.equals(ucar.nc2.constants.AxisType.Lat)) {
-                            //                            double[]minmax = getRange(var, ca.read(), CommonUnits.DEGREE);
-                            //                            extra.put(ARG_MINLAT, minmax[0]);
-                            //                            extra.put(ARG_MAXLAT, minmax[1]);
-                        } else if(axisType.equals(ucar.nc2.constants.AxisType.Lon)) {
-                            //                            double[]minmax = getRange(var, ca.read(), CommonUnits.DEGREE);
-                            //                            extra.put(ARG_MINLON, minmax[0]);
-                            //                            extra.put(ARG_MAXLON, minmax[1]);
-                        } else if(axisType.equals(ucar.nc2.constants.AxisType.Time)) {
-                            double[]minmax = getRange(var, ca.read(), visad.CommonUnit.secondsSinceTheEpoch);
-                            System.err.println("time:" + var.getUnitsString() + " " +minmax[0] + " " + minmax[1]);
-                            extra.put(ARG_FROMDATE, new Date((long)minmax[0]*1000));
-                            extra.put(ARG_TODATE, new Date((long)minmax[1]*1000));
-                        } else {
-                            System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
-                        }
+                    TdsOutputHandler.OUTPUT_TDS);
+
+            if ( !tdsOutputHandler.canLoad(request, entry)) {
+                return;
+            }
+            File file = entry.getResource().getFile();
+            NetcdfDataset dataset =
+                NetcdfDataset.acquireDataset(file.toString(), null);
+            List<Variable>  variables  = dataset.getVariables();
+            boolean         haveBounds = false;
+            List<Attribute> attrs      = dataset.getGlobalAttributes();
+            for (Attribute attr : attrs) {
+                if (attr.getStringValue() == null) {
+                    continue;
+                }
+                if (attr.getName().startsWith("_")) {
+                    continue;
+                }
+                //                System.err.println(attr.getName() +"=" + attr.getStringValue());
+                Metadata metadata = new Metadata(getRepository().getGUID(),
+                                        entry.getId(), TYPE_PROPERTY,
+                                        DFLT_INHERITED, attr.getName(),
+                                        attr.getStringValue(), "", "");
+                entry.addMetadata(metadata);
+
+            }
+
+
+            for (Variable var : variables) {
+                if (var instanceof CoordinateAxis) {
+                    CoordinateAxis              ca = (CoordinateAxis) var;
+                    ucar.nc2.constants.AxisType axisType = ca.getAxisType();
+                    if (axisType.equals(ucar.nc2.constants.AxisType.Lat)) {
+                        double[] minmax = getRange(var, ca.read(),
+                                              CommonUnits.DEGREE);
+                        extra.put(ARG_MINLAT, minmax[0]);
+                        extra.put(ARG_MAXLAT, minmax[1]);
+                        haveBounds = true;
+                    } else if (axisType.equals(
+                            ucar.nc2.constants.AxisType.Lon)) {
+                        double[] minmax = getRange(var, ca.read(),
+                                              CommonUnits.DEGREE);
+                        extra.put(ARG_MINLON, minmax[0]);
+                        extra.put(ARG_MAXLON, minmax[1]);
+                        haveBounds = true;
+                    } else if (axisType.equals(
+                            ucar.nc2.constants.AxisType.Time)) {
+                        double[] minmax =
+                            getRange(var, ca.read(),
+                                     visad.CommonUnit.secondsSinceTheEpoch);
+                        extra.put(ARG_FROMDATE,
+                                  new Date((long) minmax[0] * 1000));
+                        extra.put(ARG_TODATE,
+                                  new Date((long) minmax[1] * 1000));
+                    } else {
+                        //                        System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
+                    }
+                    continue;
+                }
+
+                if (var instanceof VariableDS) {
+                    VariableDS vds = (VariableDS) var;
+                    if (vds.isCoordinateVariable()) {
                         continue;
                     }
-
-                    if(var instanceof VariableDS) {
-                        VariableDS vds = (VariableDS) var;
-                        if(vds.isCoordinateVariable())  {
-                            continue;
-                        }
-                    }
-                    Metadata metadata =  new Metadata(getRepository().getGUID(), entry.getId(), TYPE_VARIABLE,
-                                                      DFLT_INHERITED,
-                                                      var.getShortName(),
-                                                      var.getName(),
-                                                      var.getUnitsString(),
-                                                      "");
-                    entry.addMetadata(metadata);
-                    
-                    //                    System.err.println (var.getClass().getName()+ " " + var.getShortName() + " " + var.getName());
                 }
-                //                System.err.println(dataset.getDetailInfo());
+                Metadata metadata = new Metadata(getRepository().getGUID(),
+                                        entry.getId(), TYPE_VARIABLE,
+                                        DFLT_INHERITED, var.getShortName(),
+                                        var.getName(), var.getUnitsString(),
+                                        "");
+                entry.addMetadata(metadata);
+
             }
-        } catch(Exception exc) {
-            System.err.println ("bad: " + exc);
+
+            //If we didn't have a lat/lon coordinate axis then check projection
+            //We do this here after because I've seen some point files that have an incorrect 360 bbox
+            if ( !haveBounds) {
+                for (CoordinateSystem coordSys : dataset
+                        .getCoordinateSystems()) {
+                    ProjectionImpl proj = coordSys.getProjection();
+                    if (proj == null) {
+                        continue;
+                    }
+                    LatLonRect llr = proj.getDefaultMapAreaLL();
+                    haveBounds = true;
+                    extra.put(ARG_MINLAT, llr.getLatMin());
+                    extra.put(ARG_MAXLAT, llr.getLatMax());
+                    extra.put(ARG_MINLON, llr.getLonMin());
+                    extra.put(ARG_MAXLON, llr.getLonMax());
+                    break;
+                }
+            }
+        } catch (Exception exc) {
+            System.err.println("Error: " + exc);
             exc.printStackTrace();
         }
-            
+
+
     }
 
 
@@ -319,12 +400,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     metadata.getAttr2() });
 
         } else if (type.equals(TYPE_VARIABLE)) {
-            Element variablesNode = XmlUtil.getElement(datasetNode, TAG_VARIABLES);
-            if(variablesNode ==null) {
-                variablesNode = XmlUtil.create(doc, TAG_VARIABLES, datasetNode);
+            Element variablesNode = XmlUtil.getElement(datasetNode,
+                                        TAG_VARIABLES);
+            if (variablesNode == null) {
+                variablesNode = XmlUtil.create(doc, TAG_VARIABLES,
+                        datasetNode);
             }
-            XmlUtil.create(doc, getTag(TYPE_VARIABLE), variablesNode, metadata.getAttr2(),
-                           new String[] { ATTR_NAME, metadata.getAttr1(), ATTR_UNITS, metadata.getAttr3()});
+            XmlUtil.create(doc, getTag(TYPE_VARIABLE), variablesNode,
+                           metadata.getAttr2(), new String[] { ATTR_NAME,
+                    metadata.getAttr1(), ATTR_UNITS, metadata.getAttr3() });
         } else if (type.equals(TYPE_ICON)) {
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            new String[] { "xlink:href",
@@ -391,7 +475,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             content = getSearchLink(request, metadata) + metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
                 content += HtmlUtil.br() + msgLabel("Email")
-                    + HtmlUtil.space(1) + HtmlUtil.href("mailto:"+metadata.getAttr3(),metadata.getAttr3());
+                           + HtmlUtil.space(1)
+                           + HtmlUtil.href("mailto:" + metadata.getAttr3(),
+                                           metadata.getAttr3());
             }
             if (metadata.getAttr4().length() > 0) {
                 content += HtmlUtil.br() + msgLabel("URL")
@@ -401,8 +487,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             }
 
         } else if (type.equals(TYPE_VARIABLE)) {
-            content = getSearchLink(request, metadata) + metadata.getAttr1()+HtmlUtil.space(1) +"(" +metadata.getAttr3()+")"+HtmlUtil.space(2) +
-                metadata.getAttr2();
+            content = getSearchLink(request, metadata) + metadata.getAttr1()
+                      + HtmlUtil.space(1) + "(" + metadata.getAttr3() + ")"
+                      + HtmlUtil.space(2) + metadata.getAttr2();
 
         } else if (type.equals(TYPE_PROJECT)) {
             content = getSearchLink(request, metadata) + metadata.getAttr1();
@@ -590,15 +677,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             content = formEntry(new String[] { submit, msgLabel("URL"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size) });
         } else if (type.equals(TYPE_DOCUMENTATION)) {
-            List types = Misc.toList(new Object[]{
-                             new TwoFacedObject(msg("Summary"), "summary"),
-                             new TwoFacedObject(msg("Funding"), "funding"),
-                             new TwoFacedObject(msg("History"), "history"),
-                             new TwoFacedObject(msg("Language"), "language"),
-                             new TwoFacedObject(
-                                 msg("Processing Level"),
-                                 "processing_level"), new TwoFacedObject(
-                                                                         msg("Rights"), "rights")});;
+            List types = Misc.toList(new Object[] {
+                new TwoFacedObject(msg("Summary"), "summary"),
+                new TwoFacedObject(msg("Funding"), "funding"),
+                new TwoFacedObject(msg("History"), "history"),
+                new TwoFacedObject(msg("Language"), "language"),
+                new TwoFacedObject(msg("Processing Level"),
+                                   "processing_level"),
+                new TwoFacedObject(msg("Rights"), "rights")
+            });;
 
             content = formEntry(new String[] { submit, msgLabel("Type"),
                     HtmlUtil.select(arg1, types, metadata.getAttr1()),
@@ -616,9 +703,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_PROPERTY)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
-                                               HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                                               msgLabel("Value"),
-                                               HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                    msgLabel("Value"),
+                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
         } else if (type.equals(TYPE_KEYWORD)) {
             content = formEntry(new String[] { submit, msgLabel("Value"),

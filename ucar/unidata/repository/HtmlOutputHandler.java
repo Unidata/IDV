@@ -178,7 +178,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 + "</center>", 2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, false, true));
-        for(TwoFacedObject tfo:getMetadataHtml(request, entry, true)) {
+        for(TwoFacedObject tfo:getMetadataHtml(request, entry, false)) {
             sb.append(tfo.getId().toString());
         }
 

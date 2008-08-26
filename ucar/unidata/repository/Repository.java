@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -1383,7 +1384,9 @@ public class Repository extends RepositoryBase implements Tables,
             protected void addOutputTypes(Request request, State state,
                                           List<OutputType> types)
                     throws Exception {
-                if(state.group !=null || state.entry!=null) return;
+                if ((state.group != null) || (state.entry != null)) {
+                    return;
+                }
                 for (Entry entry : state.getAllEntries()) {
                     if ( !getAccessManager().canDoAction(request, entry,
                             Permission.ACTION_DELETE)) {
@@ -2199,13 +2202,13 @@ public class Repository extends RepositoryBase implements Tables,
 
     /**
      *  _more_
-     * 
+     *
      *  @param request _more_
      *  @param entries _more_
      * @param state _more_
-     * 
+     *
      *  @return _more_
-     * 
+     *
      *  @throws Exception _more_
      */
     public List<OutputType> getOutputTypes(Request request,
@@ -2516,11 +2519,11 @@ public class Repository extends RepositoryBase implements Tables,
      */
     protected List<Link> getEntryLinks(Request request, Entry entry,
                                        boolean forHeader)
-        throws Exception {
+            throws Exception {
         List<Link> links = new ArrayList<Link>();
-        if(!forHeader) {
+        if ( !forHeader) {
             entry.getTypeHandler().getEntryLinks(request, entry, links,
-                                                 forHeader);
+                    forHeader);
             for (OutputHandler outputHandler : getOutputHandlers()) {
                 outputHandler.getEntryLinks(request, entry, links, forHeader);
             }
@@ -2528,7 +2531,7 @@ public class Repository extends RepositoryBase implements Tables,
         OutputHandler outputHandler = getOutputHandler(request);
         if ( !entry.isTopGroup()) {
             links.addAll(outputHandler.getNextPrevLinks(request, entry,
-                                                        request.getOutput()));
+                    request.getOutput()));
         }
         return links;
     }
@@ -2683,7 +2686,7 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-    /** _more_          */
+    /** _more_ */
     static int blockCnt = 0;
 
     /**
@@ -2749,7 +2752,7 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-    /** _more_          */
+    /** _more_ */
     static int tabCnt = 0;
 
     /**
@@ -4344,7 +4347,9 @@ public class Repository extends RepositoryBase implements Tables,
 
             String theClass = HtmlUtil.cssClass("listrow" + rowNum);
             rowNum++;
-            if(rowNum>2) rowNum=1;
+            if (rowNum > 2) {
+                rowNum = 1;
+            }
             StringBuffer content = new StringBuffer();
             content.append("<table>");
             String byLine = "By: " + comment.getUser().getLabel() + " @ "
@@ -4354,10 +4359,10 @@ public class Repository extends RepositoryBase implements Tables,
             //                                         ));
             content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
-            sb.append(HtmlUtil.div(makeShowHideBlock(request, "<b>Subject</b>:"
-                                        + comment.getSubject()
-                                        + HtmlUtil.space(2)
-                                        + byLine, content, true, ""),theClass));
+            sb.append(HtmlUtil.div(makeShowHideBlock(request,
+                    "<b>Subject</b>:" + comment.getSubject()
+                    + HtmlUtil.space(2) + byLine, content, true,
+                        ""), theClass));
         }
         //        sb.append("</table>");
         return sb.toString();
@@ -5142,23 +5147,8 @@ public class Repository extends RepositoryBase implements Tables,
                 entries.add(entry);
             }
 
-            if(newEntry && request.get(ARG_ADDMETADATA,false)) {
-                for(Entry theEntry: entries) {
-                    Hashtable extra = new Hashtable();
-                    getMetadataManager().addInitialMetadata(request, theEntry,extra);
-                    if(!entry.hasAreaDefined()&& extra.get(ARG_MINLAT)!=null) {
-                        entry.setSouth(Misc.getProperty(extra,ARG_MINLAT, 0.0));
-                        entry.setNorth(Misc.getProperty(extra,ARG_MAXLAT, 0.0));
-                        entry.setWest(Misc.getProperty(extra,ARG_MINLON, 0.0));
-                        entry.setEast(Misc.getProperty(extra,ARG_MAXLON, 0.0));
-                    }
-                    if(extra.get(ARG_FROMDATE)!=null && (entry.getStartDate() == entry.getCreateDate())) {
-                        entry.setStartDate(((Date) extra.get(ARG_FROMDATE)).getTime());
-                        entry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());
-                        
-                    }
-                }
-
+            if (newEntry && request.get(ARG_ADDMETADATA, false)) {
+                addInitialMetadata(request, entries);
             }
 
             insertEntries(entries, newEntry);
@@ -5175,10 +5165,36 @@ public class Repository extends RepositoryBase implements Tables,
             return new Result(BLANK,
                               new StringBuffer(msg("No entries created")));
         }
-
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     */
+    public void addInitialMetadata(Request request, List<Entry> entries) {
+        for (Entry theEntry : entries) {
+            Hashtable extra = new Hashtable();
+            getMetadataManager().addInitialMetadata(request, theEntry, extra);
+            if ( !theEntry.hasAreaDefined()
+                    && (extra.get(ARG_MINLAT) != null)) {
+                theEntry.setSouth(Misc.getProperty(extra, ARG_MINLAT, 0.0));
+                theEntry.setNorth(Misc.getProperty(extra, ARG_MAXLAT, 0.0));
+                theEntry.setWest(Misc.getProperty(extra, ARG_MINLON, 0.0));
+                theEntry.setEast(Misc.getProperty(extra, ARG_MAXLON, 0.0));
+            }
+            if ((extra.get(ARG_FROMDATE) != null)
+                    && (theEntry.getStartDate()
+                        == theEntry.getCreateDate())) {
+                //                System.err.println ("got dttm:" + extra.get(ARG_FROMDATE));
+                theEntry.setStartDate(
+                    ((Date) extra.get(ARG_FROMDATE)).getTime());
+                theEntry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());
+            }
+        }
+    }
 
     /**
      * _more_
@@ -5554,7 +5570,7 @@ public class Repository extends RepositoryBase implements Tables,
                                       " id=\"menubutton\" "));
 
             //            String linkHtml = "";
-            String linkHtml = getEntryLinksHtml(request, entry,true);
+            String linkHtml = getEntryLinksHtml(request, entry, true);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink

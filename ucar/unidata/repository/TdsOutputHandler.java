@@ -223,7 +223,7 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public boolean canLoad(Request request, Entry entry) {
         //If we aren't in the tomcat world then exit
-        if (request.getHttpServletRequest() == null) {
+        if (request!=null && request.getHttpServletRequest() == null) {
             //return false;
         }
 
