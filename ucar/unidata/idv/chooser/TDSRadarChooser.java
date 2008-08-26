@@ -591,11 +591,14 @@ public class TDSRadarChooser extends TimesChooser {
         setHaveData(false);
         if ((!isLevel3 && selectedStation != null) ||
                 (isLevel3 && selectedStation != null && selectedProduct != null)) {
-            Date toDate = new Date(System.currentTimeMillis()
-                                   + DateUtil.daysToMillis(1));
+            List timeSpan = collection.getRadarTimeSpan();
+            Date fromDate =  DateUnit.getStandardOrISO((String) timeSpan.get(0));
+            Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
+            //new Date(System.currentTimeMillis()
+                           //        + DateUtil.daysToMillis(1));
             //Go back 10 years (or so)
-            Date fromDate = new Date(System.currentTimeMillis()
-                                     - DateUtil.daysToMillis(365 * 10));
+            //Date fromDate = new Date(System.currentTimeMillis()
+            //                         - DateUtil.daysToMillis(365 * 10));
             try {
                 showWaitCursor();
                 setAbsoluteTimes(new ArrayList());
@@ -610,11 +613,15 @@ public class TDSRadarChooser extends TimesChooser {
                 List allTimes =
                     collection.getRadarStationTimes(selectedStation.getID(),
                         pid, fromDate, toDate);
-                if(allTimes.size() == 0){
-                    fromDate = collection.getStartDate();
-                    allTimes = collection.getRadarStationTimes(selectedStation.getID(),
+
+                if(allTimes.size() == 0) {
+                    toDate = new Date(System.currentTimeMillis()
+                             + DateUtil.daysToMillis(1));
+                    allTimes =
+                    collection.getRadarStationTimes(selectedStation.getID(),
                         pid, fromDate, toDate);
                 }
+
                 for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
                     Object timeObj = allTimes.get(timeIdx);
                     Date   date;
