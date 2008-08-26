@@ -588,7 +588,8 @@ public class TDSRadarChooser extends TimesChooser {
     public void stationOrProductChanged() {
         Vector times = new Vector();
         setHaveData(false);
-        if ((selectedStation != null) && (selectedProduct != null)) {
+        if ((!isLevel3 && selectedStation != null) ||
+                (isLevel3 && selectedStation != null && selectedProduct != null)) {
             Date toDate = new Date(System.currentTimeMillis()
                                    + DateUtil.daysToMillis(1));
             //Go back 10 years (or so)
@@ -601,7 +602,9 @@ public class TDSRadarChooser extends TimesChooser {
                           "");
                 //                LogUtil.message("Reading times for station: "
                 //                                + selectedStation);
-                String pid = TwoFacedObject.getIdString(
+                String pid = null;
+                if(isLevel3)
+                    pid = TwoFacedObject.getIdString(
                                  productComboBox.getSelectedItem());
                 List allTimes =
                     collection.getRadarStationTimes(selectedStation.getID(),
