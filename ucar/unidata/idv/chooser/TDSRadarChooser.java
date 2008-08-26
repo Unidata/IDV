@@ -366,6 +366,7 @@ public class TDSRadarChooser extends TimesChooser {
         isLevel3 = false;
         GuiUtils.enableComponents(compsThatNeedServer, true);
         setAbsoluteTimes(new ArrayList());
+        selectedProduct = null;
         selectedStation = null;
         Misc.run(this, "initializeCollection", s);
     }
