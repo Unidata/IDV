@@ -802,6 +802,24 @@ public class Misc {
     }
 
 
+    public static double getProperty(Hashtable props, String prop,
+                                    double dflt) {
+        if (props == null) {
+            return dflt;
+        }
+        Object v = props.get(prop);
+        if (v == null) {
+            return dflt;
+        }
+        try {
+            return Float.parseFloat(v.toString());
+        } catch (NumberFormatException e) {
+            System.err.println("Number format exception: " + prop + " " + v);
+            return dflt;
+        }
+    }
+
+
     /**
      * Read the given property filename, defined in relation to the given Class.
      * If the given Properties object is null create a new one.
