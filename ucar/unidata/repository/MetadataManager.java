@@ -234,6 +234,12 @@ public class MetadataManager extends RepositoryManager {
 
 
 
+    public void addInitialMetadata(Request request, Entry entry, Hashtable extra)  {
+        for(MetadataHandler handler: getMetadataHandlers()) {
+            handler.addInitialMetadata(request, entry,extra);
+        }
+    }
+
 
     /**
      * _more_

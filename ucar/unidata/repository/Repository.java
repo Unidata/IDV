@@ -5141,6 +5141,26 @@ public class Repository extends RepositoryBase implements Tables,
                 setEntryState(request, entry);
                 entries.add(entry);
             }
+
+            if(newEntry && request.get(ARG_ADDMETADATA,false)) {
+                for(Entry theEntry: entries) {
+                    Hashtable extra = new Hashtable();
+                    getMetadataManager().addInitialMetadata(request, theEntry,extra);
+                    if(!entry.hasAreaDefined()&& extra.get(ARG_MINLAT)!=null) {
+                        entry.setSouth(Misc.getProperty(extra,ARG_MINLAT, 0.0));
+                        entry.setNorth(Misc.getProperty(extra,ARG_MAXLAT, 0.0));
+                        entry.setWest(Misc.getProperty(extra,ARG_MINLON, 0.0));
+                        entry.setEast(Misc.getProperty(extra,ARG_MAXLON, 0.0));
+                    }
+                    if(extra.get(ARG_FROMDATE)!=null && (entry.getStartDate() == entry.getCreateDate())) {
+                        entry.setStartDate(((Date) extra.get(ARG_FROMDATE)).getTime());
+                        entry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());
+                        
+                    }
+                }
+
+            }
+
             insertEntries(entries, newEntry);
         }
         if (entries.size() == 1) {

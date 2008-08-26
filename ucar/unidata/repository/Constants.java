@@ -310,6 +310,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_ADDMETADATA = "addmetadata";
     /** _more_ */
     public static final String ARG_STEP = "step";
 
@@ -596,6 +597,12 @@ public interface Constants {
 
     /** _more_          */
     public static final String ARG_LAYOUT = "layout";
+
+    public static final String ARG_MINLAT = "minlat";
+    public static final String ARG_MINLON = "minlon";
+    public static final String ARG_MAXLAT = "maxlat";
+    public static final String ARG_MAXLON = "maxlon";
+
 
     /** _more_ */
     public static final String ARG_RELATIVEDATE = "relativedate";

@@ -84,18 +84,6 @@ public class PatternHarvester extends Harvester {
     public static final String ATTR_TYPE = "type";
 
     /** _more_ */
-    public static final String ATTR_NAMETEMPLATE = "nametemplate";
-
-    /** _more_ */
-    public static final String ATTR_GROUPTEMPLATE = "grouptemplate";
-
-    /** _more_ */
-    public static final String ATTR_TAGTEMPLATE = "tagtemplate";
-
-    /** _more_ */
-    public static final String ATTR_DESCTEMPLATE = "desctemplate";
-
-    /** _more_ */
     public static final String ATTR_DATEFORMAT = "dateformat";
 
     /** _more_ */
@@ -116,17 +104,6 @@ public class PatternHarvester extends Harvester {
     private SimpleDateFormat sdf;
     //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
 
-    /** _more_ */
-    private String groupTemplate = "${dirgroup}";
-
-    /** _more_ */
-    private String tagTemplate = "";
-
-    /** _more_ */
-    private String nameTemplate = "${filename}";
-
-    /** _more_ */
-    private String descTemplate = "";
 
     /** _more_ */
     private List<String> patternNames = new ArrayList<String>();
@@ -221,13 +198,6 @@ public class PatternHarvester extends Harvester {
         filePattern = null;
         sdf         = null;
         init();
-        groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE,
-                                             groupTemplate);
-        tagTemplate = XmlUtil.getAttribute(element, ATTR_TAGTEMPLATE,
-                                           tagTemplate);
-        nameTemplate = XmlUtil.getAttribute(element, ATTR_NAMETEMPLATE,
-                                            nameTemplate);
-        descTemplate = XmlUtil.getAttribute(element, ATTR_DESCTEMPLATE, "");
         dateFormat = XmlUtil.getAttribute(element, ATTR_DATEFORMAT,
                                           dateFormat);
         sdf = null;
@@ -259,12 +229,8 @@ public class PatternHarvester extends Harvester {
         super.applyState(element);
         element.setAttribute(ATTR_FILEPATTERN, filePatternString);
         element.setAttribute(ATTR_MOVETOSTORAGE, "" + moveToStorage);
-        element.setAttribute(ATTR_NAMETEMPLATE, nameTemplate);
-        element.setAttribute(ATTR_GROUPTEMPLATE, groupTemplate);
-        element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
         element.setAttribute(ATTR_BASEGROUP, baseGroupName);
         element.setAttribute(ATTR_DATEFORMAT, dateFormat);
-        element.setAttribute(ATTR_DESCTEMPLATE, descTemplate);
     }
 
 
@@ -287,15 +253,9 @@ public class PatternHarvester extends Harvester {
         filePattern = null;
         sdf         = null;
         init();
-        nameTemplate = request.getUnsafeString(ATTR_NAMETEMPLATE,
-                nameTemplate);
         baseGroupName = request.getUnsafeString(ATTR_BASEGROUP,
                 baseGroupName);
-        groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
-                groupTemplate);
         dateFormat = request.getUnsafeString(ATTR_DATEFORMAT, dateFormat);
-        descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE,
-                descTemplate);
         if (request.exists(ATTR_MOVETOSTORAGE)) {
             moveToStorage = request.get(ATTR_MOVETOSTORAGE, moveToStorage);
         } else {
@@ -367,22 +327,6 @@ public class PatternHarvester extends Harvester {
                                          "true", moveToStorage)));
     }
 
-
-    /**
-     * _more_
-     *
-     * @param element _more_
-     * @param attr _more_
-     *
-     * @return _more_
-     */
-    private List<String> split(Element element, String attr) {
-        if ( !XmlUtil.hasAttribute(element, attr)) {
-            return new ArrayList<String>();
-        }
-        return StringUtil.split(XmlUtil.getAttribute(element, attr), ",",
-                                true, true);
-    }
 
 
 

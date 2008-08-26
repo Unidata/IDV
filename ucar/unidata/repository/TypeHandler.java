@@ -1042,12 +1042,16 @@ public class TypeHandler extends RepositoryManager {
 
         if (okToShowInForm(ARG_RESOURCE)) {
             if (entry == null) {
+                String addMetadata = HtmlUtil.space(2) +
+                    HtmlUtil.checkbox(ARG_ADDMETADATA,"true", false) + 
+                    HtmlUtil.space(1) + msg("Add Metadata");
+
                 sb.append(
                     HtmlUtil.formEntry(
                         msgLabel("File"),
                         HtmlUtil.fileInput(ARG_FILE, size)
                         + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true", false)
-                        + HtmlUtil.space(1) + msg("Unzip archive")));
+                        + HtmlUtil.space(1) + msg("Unzip archive")+addMetadata));
                 String download = HtmlUtil.space(1)
                                   + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD,
                                       "true", false) + HtmlUtil.space(1)

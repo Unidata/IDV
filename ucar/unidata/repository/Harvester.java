@@ -103,6 +103,34 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_SLEEP = "sleep";
 
+
+    /** _more_ */
+    public static final String ATTR_NAMETEMPLATE = "nametemplate";
+
+    /** _more_ */
+    public static final String ATTR_GROUPTEMPLATE = "grouptemplate";
+
+    /** _more_ */
+    public static final String ATTR_TAGTEMPLATE = "tagtemplate";
+
+    /** _more_ */
+    public static final String ATTR_DESCTEMPLATE = "desctemplate";
+
+
+    /** _more_ */
+    protected String groupTemplate = "${dirgroup}";
+
+    /** _more_ */
+    protected String nameTemplate = "${filename}";
+
+    /** _more_ */
+    protected String descTemplate = "";
+
+    /** _more_ */
+    protected String tagTemplate = "";
+
+
+
     /** _more_ */
     protected Harvester parent;
 
@@ -201,6 +229,16 @@ public class Harvester extends RepositoryManager {
             repository.getTypeHandler(XmlUtil.getAttribute(element,
                 ATTR_TYPE, TypeHandler.TYPE_ANY));
 
+        groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE,
+                                             groupTemplate);
+        nameTemplate = XmlUtil.getAttribute(element, ATTR_NAMETEMPLATE,
+                                            nameTemplate);
+        descTemplate = XmlUtil.getAttribute(element, ATTR_DESCTEMPLATE, "");
+        tagTemplate = XmlUtil.getAttribute(element, ATTR_TAGTEMPLATE,
+                                           tagTemplate);
+
+
+
         this.name = XmlUtil.getAttribute(element, ATTR_NAME, "");
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, false);
         this.activeOnStart = this.active = XmlUtil.getAttribute(element,
@@ -223,6 +261,11 @@ public class Harvester extends RepositoryManager {
         activeOnStart = request.get(ATTR_ACTIVE, false);
         monitor       = request.get(ATTR_MONITOR, false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
+        groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
+                groupTemplate);
+        descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE,
+                descTemplate);
+
     }
 
     /**
@@ -287,6 +330,11 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_MONITOR, monitor + "");
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
         element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
+        element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
+        element.setAttribute(ATTR_NAMETEMPLATE, nameTemplate);
+        element.setAttribute(ATTR_GROUPTEMPLATE, groupTemplate);
+        element.setAttribute(ATTR_DESCTEMPLATE, descTemplate);
+
         if (rootDir != null) {
             element.setAttribute(ATTR_ROOTDIR, rootDir.toString());
         }
@@ -534,6 +582,24 @@ public class Harvester extends RepositoryManager {
     public boolean getIsEditable() {
         return isEditable;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param element _more_
+     * @param attr _more_
+     *
+     * @return _more_
+     */
+    public List<String> split(Element element, String attr) {
+        if ( !XmlUtil.hasAttribute(element, attr)) {
+            return new ArrayList<String>();
+        }
+        return StringUtil.split(XmlUtil.getAttribute(element, attr), ",",
+                                true, true);
+    }
+
 
 
 

@@ -366,7 +366,7 @@ public class Metadata implements Constants, Tables {
     public static class Type {
 
         /** _more_          */
-        public static final String DEFAULT_CATEGORY = "Summary";
+        public static final String DEFAULT_CATEGORY = "Metadata";
 
         /** _more_          */
         public static final int SEARCHABLE_ATTR1 = 1 << 0;
