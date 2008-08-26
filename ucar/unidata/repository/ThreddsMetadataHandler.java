@@ -125,6 +125,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static final Metadata.Type TYPE_ICON =
         new Metadata.Type("thredds.icon", "Icon");
 
+    public static final Metadata.Type TYPE_CDL =
+        new Metadata.Type("thredds.cdl", "CDL","CDL");
+
 
     /**
      * _more_

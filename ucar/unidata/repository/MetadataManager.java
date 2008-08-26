@@ -432,20 +432,20 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataCloud(Request request) throws Exception {
 
         boolean doCloud = request.getString(ARG_TYPE,
-                                            "cloud").equals("cloud");
+                                            "list").equals("cloud");
         StringBuffer sb = new StringBuffer();
         String       header;
         if (doCloud) {
             request.put(ARG_TYPE, "list");
             header =
-                HtmlUtil.b("Cloud")
-                + HtmlUtil.span("&nbsp;|&nbsp;", " class=\"separator\" ")
-                + HtmlUtil.href(request.getUrl(), "List");
+                HtmlUtil.href(request.getUrl(), "List") +
+                HtmlUtil.span("&nbsp;|&nbsp;", " class=\"separator\" ") +
+                HtmlUtil.b("Cloud");
         } else {
             request.put(ARG_TYPE, "cloud");
-            header = HtmlUtil.href(request.getUrl(), "Cloud")
-                     + HtmlUtil.span("&nbsp;|&nbsp;", "class=\"separator\" ")
-                     + HtmlUtil.b("List");
+            header = HtmlUtil.b("List")
+                + HtmlUtil.span("&nbsp;|&nbsp;", "class=\"separator\" ")
+                + HtmlUtil.href(request.getUrl(), "Cloud");
         }
         sb.append(HtmlUtil.center(HtmlUtil.span(header,
                 " class=pagesubheading ")));

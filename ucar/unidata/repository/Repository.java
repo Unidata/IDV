@@ -4321,6 +4321,7 @@ public class Repository extends RepositoryBase implements Tables,
             sb.append(msg("No comments"));
         }
         //        sb.append("<table>");
+        int rowNum = 1;
         for (Comment comment : comments) {
             //            sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
             //TODO: Check for access
@@ -4341,6 +4342,9 @@ public class Repository extends RepositoryBase implements Tables,
             //            sb.append(HtmlUtil.formEntry("Subject:", comment.getSubject()));
 
 
+            String theClass = HtmlUtil.cssClass("listrow" + rowNum);
+            rowNum++;
+            if(rowNum>2) rowNum=1;
             StringBuffer content = new StringBuffer();
             content.append("<table>");
             String byLine = "By: " + comment.getUser().getLabel() + " @ "
@@ -4350,10 +4354,10 @@ public class Repository extends RepositoryBase implements Tables,
             //                                         ));
             content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
-            sb.append(makeShowHideBlock(request, "<b>Subject</b>:"
+            sb.append(HtmlUtil.div(makeShowHideBlock(request, "<b>Subject</b>:"
                                         + comment.getSubject()
                                         + HtmlUtil.space(2)
-                                        + byLine, content, true, ""));
+                                        + byLine, content, true, ""),theClass));
         }
         //        sb.append("</table>");
         return sb.toString();

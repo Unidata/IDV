@@ -81,6 +81,8 @@ public class TdsOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_TDS = "tds";
 
+    public static final String OUTPUT_CDL = "cdl";
+
 
     /** _more_ */
     private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
@@ -134,7 +136,7 @@ public class TdsOutputHandler extends OutputHandler {
      * @return Is it tds?
      */
     public boolean canHandle(String output) {
-        return output.equals(OUTPUT_TDS);
+        return output.equals(OUTPUT_TDS) || output.equals(OUTPUT_CDL);
     }
 
 
@@ -157,12 +159,27 @@ public class TdsOutputHandler extends OutputHandler {
             return;
         }
         if (canLoad(request, state.entry)) {
+            //            types.add(new OutputType("CDL", OUTPUT_CDL));
             types.add(new OutputType("TDS", OUTPUT_TDS) {
                 public String assembleUrl(Request request) {
                     return request.getRequestPath() + getSuffix() + "/"
                            + request.getPathEmbeddedArgs() + "/entry.das";
                 }
             });
+        }
+    }
+
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links, boolean forHeader)
+            throws Exception {
+        if (canLoad(request, entry)) {
+            String tdsUrl = request.getRequestPath() +  "/"
+                + request.getPathEmbeddedArgs() + "/entry.das";
+
+            links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),"TDS"));
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                          ARG_OUTPUT, OUTPUT_CDL);
+            links.add(new Link(url, getRepository().fileUrl(ICON_DATA),"CDL"));
         }
     }
 
@@ -207,7 +224,7 @@ public class TdsOutputHandler extends OutputHandler {
     public boolean canLoad(Request request, Entry entry) {
         //If we aren't in the tomcat world then exit
         if (request.getHttpServletRequest() == null) {
-            return false;
+            //return false;
         }
 
         Boolean b = checkedEntries.get(entry.getId());
@@ -234,6 +251,29 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
 
+    public Result outputCdl(final Request request, Entry entry)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
+        File file = entry.getResource().getFile();
+        NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
+        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+                              false, "");
+        sb.append(crumbs[1]);
+
+
+        if(dataset==null) {
+            sb.append("Could not open dataset");
+        } else {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ucar.nc2.NCdump.print(dataset, "", bos, null);
+            sb.append("<pre>" +bos.toString()+"</pre>");
+        }
+        
+        return makeLinksResult(request, "CDL",
+                               sb, new State(entry));
+    }
+
+
     /**
      * Serve up the entry
      *
@@ -246,6 +286,10 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
+
+        if(request.getOutput().equals(OUTPUT_CDL)) {
+            return outputCdl(request, entry);
+        }
 
         //        System.err.println ("entry:" + entry);
 

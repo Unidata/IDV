@@ -90,6 +90,8 @@ public interface Constants {
     /** _more_          */
     public static final String ICON_CLOUD = "/icons/cloud.gif";
 
+    public static final String ICON_LIST = "/icons/list.gif";
+
     /** _more_          */
     public static final String ICON_RANGE = "/icons/range.gif";
 

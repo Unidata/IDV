@@ -395,7 +395,7 @@ public class MetadataHandler extends RepositoryManager {
                 request.url(
                     getRepository().getMetadataManager().URL_METADATA_CLOUD,
                     ARG_METADATA_TYPE, type.toString()), HtmlUtil.img(
-                        getRepository().fileUrl(ICON_CLOUD)));
+                        getRepository().fileUrl(ICON_LIST),"View Listing"));
         String url = request.url(getRepository().URL_ENTRY_SEARCH);
         String[] values = getMetadataManager().getDistinctValues(request,
                               this, type);
@@ -411,14 +411,16 @@ public class MetadataHandler extends RepositoryManager {
                                             type.toString(),
                                             ARG_METADATA_ATTR1 + "." + type,
                                             values[i]);
-            content.append(HtmlUtil.div(HtmlUtil.href(browseUrl, values[i]), HtmlUtil.cssClass("listrow"+ rowNum)));
+            String value = values[i].trim();
+            if(value.length()==0) value = "-blank-";
+            content.append(HtmlUtil.div(HtmlUtil.href(browseUrl, value), HtmlUtil.cssClass("listrow"+ rowNum)));
             rowNum++;
             if(rowNum>2) rowNum = 1;
         }
         content.append("</div>");
 
         sb.append(getRepository().makeShowHideBlock(request,
-                cloudLink + type.getLabel(), content, false));
+                cloudLink + HtmlUtil.space(1) +type.getLabel(), content, false));
 
 
     }

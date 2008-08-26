@@ -267,6 +267,10 @@ public class HtmlUtil {
         return " class=\"" + c + "\" ";
     }
 
+    public static String title(String c) {
+        return " title\"" + c +"\" ";
+    }
+
     public static String id(String c) {
         return " id=\"" + c +"\" ";
     }
