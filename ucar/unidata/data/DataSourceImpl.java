@@ -3608,6 +3608,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return true if successful
      */
     public boolean showPasswordDialog(String title, String label) {
+        if(!LogUtil.getInteractiveMode()) throw new IllegalStateException ("Cannot show dialog in non-interactive mode");
+
         JTextField nameFld     = new JTextField(((this.getUserName() != null)
                 ? this.getUserName()
                 : ""), 10);
