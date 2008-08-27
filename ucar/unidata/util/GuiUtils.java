@@ -1877,6 +1877,8 @@ public class GuiUtils extends LayoutUtil {
                                              Component src,
                                              List actionComponents,
                                              String okLabel) {
+        if(!LogUtil.getInteractiveMode()) 
+            throw new IllegalStateException ("Cannot show dialog in non-interactive mode");
         JDialog              dialog   = createDialog(f, title, true);
         final ObjectListener listener = getCloseDialogListener(dialog);
         JPanel buttons = makeOkCancelButtons(listener, okLabel, CMD_CANCEL);

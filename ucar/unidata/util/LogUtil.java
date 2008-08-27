@@ -227,6 +227,10 @@ public class LogUtil {
         return testMode;
     }
 
+    public static boolean getInteractiveMode() {
+        return !testMode;
+    }
+
 
     /**
      * Set the debug mode
