@@ -347,11 +347,17 @@ public class Metadata implements Constants, Tables {
      * @return _more_
      */
     public String toString() {
-        return "entry:" + entryId + " type:" + type + " attr1:" + attr1;
+        return "entry:" + entryId + " type:" + type + " attr1:" + attr1 + " attr2:" + attr2 + " attr3:" + attr3 + " attr4:" + attr4;
     }
 
 
-
+    public String getAttr(int idx) {
+        if(idx==1) return attr1;
+        if(idx==2) return attr2;
+        if(idx==3) return attr3;
+        if(idx==4) return attr4;
+        throw new IllegalArgumentException ("Bad attr idx:" + idx);
+    }
 
 
 

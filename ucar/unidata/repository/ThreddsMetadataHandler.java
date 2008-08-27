@@ -229,6 +229,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+    public static final String ATTR_MINLAT = "geospatial_lat_min";
+    public static final String ATTR_MAXLAT = "geospatial_lat_max";
+    public static final String ATTR_MINLON = "geospatial_lon_min";
+    public static final String ATTR_MAXLON = "geospatial_lon_max";
+    public static final String ATTR_KEYWORDS = "keywords";
+
+
     /**
      * _more_
      *
@@ -255,17 +262,46 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
             for (Attribute attr : attrs) {
-                if (attr.getStringValue() == null) {
+                String name= attr.getName();
+                String value = attr.getStringValue();
+                if(value == null) {
+                    value = ""+attr.getNumericValue();
+                }
+                if(ATTR_MAXLON.equals(name)) {
+                    extra.put(ARG_MAXLON, new Double(value));
                     continue;
                 }
-                if (attr.getName().startsWith("_")) {
+                if(ATTR_MINLON.equals(name)) {
+                    extra.put(ARG_MINLON, new Double(value));
                     continue;
                 }
-                //                System.err.println(attr.getName() +"=" + attr.getStringValue());
+                if(ATTR_MAXLAT.equals(name)) {
+                    extra.put(ARG_MAXLAT, new Double(value));
+                    continue;
+                }
+                if(ATTR_MINLAT.equals(name)) {
+                    extra.put(ARG_MINLAT, new Double(value));
+                    continue;
+                }
+
+                if(ATTR_KEYWORDS.equals(name)) {
+                    for(String keyword: (List<String>) StringUtil.split(value,";",true,true)) {
+                        Metadata metadata = new Metadata(getRepository().getGUID(),
+                                                         entry.getId(), TYPE_KEYWORD,DFLT_INHERITED,
+                                                         keyword, "",
+                                                         "", "");
+                        entry.addMetadata(metadata);
+                    }
+                    continue;
+                }
+
+                if (name.startsWith("_")) {
+                    continue;
+                }
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_PROPERTY,
-                                        DFLT_INHERITED, attr.getName(),
-                                        attr.getStringValue(), "", "");
+                                        DFLT_INHERITED, name,
+                                        value, "", "");
                 entry.addMetadata(metadata);
 
             }

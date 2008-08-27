@@ -1743,20 +1743,30 @@ public class TypeHandler extends RepositoryManager {
             }
             values.add(metadata);
         }
+
         List<Clause> metadataAnds = new ArrayList<Clause>();
         for (int typeIdx = 0; typeIdx < types.size(); typeIdx++) {
             String       type        = (String) types.get(typeIdx);
             List         values      = (List) typeMap.get(type);
+            System.err.println ("Values:" + values);
             List<Clause> metadataOrs = new ArrayList<Clause>();
             String       subTable    = TABLE_METADATA + "_" + typeIdx;
             for (int i = 0; i < values.size(); i++) {
                 Metadata metadata = (Metadata) values.get(i);
-                Clause clause = Clause.and(new Clause[] {
-                                    Clause.join(subTable + ".entry_id",
-                                        COL_ENTRIES_ID),
-                                    Clause.eq(subTable + ".attr1",
-                                        metadata.getAttr1()),
-                                    Clause.eq(subTable + ".type", type) });
+                List<Clause> subClauses = new ArrayList<Clause>();
+                subClauses.add(Clause.join(subTable + ".entry_id",COL_ENTRIES_ID));
+                subClauses.add(Clause.eq(subTable + ".type", type));
+                String tmp = "";
+                for(int attrIdx=1;attrIdx<=4;attrIdx++) {
+                    String attr = metadata.getAttr(attrIdx);
+                    if(attr.trim().length()>0) {
+                        subClauses.add(Clause.eq(subTable + ".attr" + attrIdx, attr));
+                        tmp=tmp +(tmp.length()==0?"":" &amp; ") + attr;
+                    }
+                }
+                
+                Clause clause = Clause.and(subClauses);
+
 
                 MetadataHandler handler =
                     getRepository().getMetadataManager().findMetadataHandler(
@@ -1765,7 +1775,7 @@ public class TypeHandler extends RepositoryManager {
                 if (metadataType != null) {
                     addCriteria(searchCriteria,
                                 metadataType.getLabel() + "=",
-                                metadata.getAttr1());
+                                tmp);
                 }
 
                 /**
