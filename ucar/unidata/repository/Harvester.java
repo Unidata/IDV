@@ -118,7 +118,7 @@ public class Harvester extends RepositoryManager {
 
 
     /** _more_ */
-    protected String groupTemplate = "${dirgroup}";
+    protected String groupTemplate = "";
 
     /** _more_ */
     protected String nameTemplate = "${filename}";
@@ -171,6 +171,9 @@ public class Harvester extends RepositoryManager {
 
     /** _more_ */
     private String error;
+
+    /** _more_ */
+    protected StringBuffer status = new StringBuffer();
 
 
     /**

@@ -80,6 +80,7 @@ import java.util.regex.*;
  */
 public class WebHarvester extends Harvester {
 
+    public static final String TAG_URLS = "urls";
 
     public static final String ATTR_URLS = "urls";
 
@@ -91,19 +92,10 @@ public class WebHarvester extends Harvester {
     private String urls="";
 
     /** _more_ */
-    private List<FileInfo> dirs;
-
-
-    /** _more_ */
-    private Hashtable dirMap = new Hashtable();
-
-
-    /** _more_ */
     User user;
 
 
-    /** _more_ */
-    private StringBuffer status = new StringBuffer();
+    List<String> statusMessages = new ArrayList<String>();
 
     /** _more_ */
     private int entryCnt = 0;
@@ -151,6 +143,8 @@ public class WebHarvester extends Harvester {
     protected void init(Element element) throws Exception {
         super.init(element);
         rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR, ""));
+        urls = XmlUtil.getGrandChildText(element, TAG_URLS);
+        if(urls==null) urls = "";
     }
 
     /**
@@ -176,6 +170,7 @@ public class WebHarvester extends Harvester {
      */
     public void applyState(Element element) throws Exception {
         super.applyState(element);
+        XmlUtil.create(element.getOwnerDocument(), TAG_URLS, element,urls,null);
     }
 
 
@@ -225,7 +220,6 @@ public class WebHarvester extends Harvester {
 
 
 
-
     /**
      * _more_
      *
@@ -238,62 +232,11 @@ public class WebHarvester extends Harvester {
         if (error != null) {
             return super.getExtraInfo();
         }
-        String dirMsg = "";
-        if (dirs != null) {
-            if (dirs.size() == 0) {
-                dirMsg = "No directories found<br>";
-            } else {
-                dirMsg = "Scanning:" + dirs.size() + " directories<br>";
-            }
-        }
 
-        String entryMsg = "";
-        if (entryCnt > 0) {
-            entryMsg = "Found " + entryCnt + " file" + ((entryCnt == 1)
-                    ? ""
-                    : "s") + "<br>" + "Found " + newEntryCnt + " new file"
-                           + ((newEntryCnt == 1)
-                              ? ""
-                              : "s") + "<br>";
-
-        }
-        return "Directory:" + rootDir + "<br>" + dirMsg + entryMsg + status;
+        return status.toString() + StringUtil.join("",statusMessages);
     }
 
-    /**
-     * _more_
-     *
-     * @param dir _more_
-     */
-    private void removeDir(FileInfo dir) {
-        dirs.remove(dir);
-        dirMap.remove(dir.getFile());
-    }
 
-    /**
-     * _more_
-     *
-     * @param dir _more_
-     *
-     * @return _more_
-     */
-    private FileInfo addDir(File dir) {
-        FileInfo fileInfo = new FileInfo(dir, true);
-        dirs.add(fileInfo);
-        dirMap.put(dir, dir);
-        return fileInfo;
-    }
-
-    /**
-     * _more_
-     *
-     * @param dir _more_
-     *
-     * @return _more_
-     */
-    private boolean hasDir(File dir) {
-        return dirMap.get(dir) != null;
-    }
 
 
     /**
@@ -307,30 +250,16 @@ public class WebHarvester extends Harvester {
         }
         entryCnt    = 0;
         newEntryCnt = 0;
-        status = new StringBuffer("Looking for initial directory listing");
-        long tt1 = System.currentTimeMillis();
-        dirs = new ArrayList<FileInfo>();
-        dirs.add(new FileInfo(rootDir));
-        dirs.addAll(FileInfo.collectDirs(rootDir));
-        long tt2 = System.currentTimeMillis();
-        status = new StringBuffer("");
-        //        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
-        //                           + dirs.size());
-
-        for (FileInfo dir : dirs) {
-            dirMap.put(dir.getFile(), dir);
-        }
-
+        statusMessages = new ArrayList<String>();
+        status = new StringBuffer("Fetching URLS<br>");
         int cnt = 0;
         while (getActive()) {
             long t1 = System.currentTimeMillis();
             collectEntries((cnt == 0));
             long t2 = System.currentTimeMillis();
             cnt++;
-            //            System.err.println("found:" + entries.size() + " files in:"
-            //                               + (t2 - t1) + "ms");
             if ( !getMonitor()) {
-                status.append("Done<br>");
+                status = new StringBuffer("Done<br>");
                 break;
             }
 
@@ -340,7 +269,6 @@ public class WebHarvester extends Harvester {
             status = new StringBuffer();
         }
     }
-
 
 
 
@@ -363,7 +291,12 @@ public class WebHarvester extends Harvester {
             Entry entry = processUrl(url);
             if (entry != null) {
                 entries.add(entry);
-                entryCnt++;
+                if(statusMessages.size()>100)
+                    statusMessages = new ArrayList<String>();
+                statusMessages.add(repository.getBreadCrumbs(null, entry, true, "",
+                                                             null)[1]);
+
+               entryCnt++;
             }
         }
 
@@ -384,11 +317,19 @@ public class WebHarvester extends Harvester {
      */
     private Entry processUrl(String url) throws Exception {
         String fileName = url;
+        String tail = IOUtil.getFileTail(url);
+        File tmpFile = getStorageManager().getTmpFile(null, tail);
+        //        System.err.println ("fetching");
+        IOUtil.writeTo(new URL(url), tmpFile, null);
+        File newFile = getStorageManager().moveToStorage(null,
+                                                         tmpFile,
+                                                         getRepository().getGUID() + "_");
+
+        //        System.err.println ("got it " + newFile);
         String    tag       = tagTemplate;
         String    groupName = groupTemplate;
         String    name      = nameTemplate;
         String    desc      = descTemplate;
-
 
 
         Date createDate = new Date();
@@ -404,7 +345,7 @@ public class WebHarvester extends Harvester {
         groupName = groupName.replace("${todate}",
                                       getRepository().formatDate(toDate));
 
-        name = name.replace("${filename}", IOUtil.getFileTail(url));
+        name = name.replace("${filename}", tail);
         name = name.replace("${fromdate}",
                             getRepository().formatDate(fromDate));
 
@@ -419,9 +360,6 @@ public class WebHarvester extends Harvester {
         Group group = repository.findGroupFromName(groupName, getUser(),
                           true);
         Entry    entry = typeHandler.createEntry(repository.getGUID());
-        File newFile = getStorageManager().moveToStorage(null,
-                                                         new File(fileName),
-                                                         getRepository().getGUID() + "_");
         Resource resource= new Resource(newFile.toString(),
                                         Resource.TYPE_STOREDFILE);
 

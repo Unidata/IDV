@@ -763,7 +763,7 @@ public class TypeHandler extends RepositoryManager {
                                              entry.getDataType()));
             }
 
-            boolean showMap = false;
+            boolean showMap = true;
             if (showMap) {
                 if (entry.hasLocationDefined()) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Location"),
