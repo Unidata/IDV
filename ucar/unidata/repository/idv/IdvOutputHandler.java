@@ -31,8 +31,8 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSourceDescriptor;
 
-
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.IdvServer;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.ui.ImageUtils;
@@ -95,7 +95,7 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String OUTPUT_IDV = "idv.idv";
 
     /** _more_          */
-    IntegratedDataViewer idv;
+    IdvServer idvServer;
 
     /** _more_          */
     int callCnt = 0;
@@ -118,7 +118,7 @@ public class IdvOutputHandler extends OutputHandler {
             java.awt.GraphicsEnvironment e =
                 java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
             e.getDefaultScreenDevice();
-            getIdv();
+            idvServer = new IdvServer();
         } catch (Throwable exc) {
             System.err.println(
                 "To run the IdvOutputHandler a graphics environment is needed");
@@ -173,10 +173,7 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     private IntegratedDataViewer getIdv() throws Exception  {
-        if (idv == null) {
-            idv = new IntegratedDataViewer(false);
-        }
-        return idv;
+        return idvServer.getIdv();
     }
 
 
@@ -280,7 +277,6 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         StringBuffer isl = new StringBuffer();
-        
         isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
         String datasource="";
         if(radarEntries.size()>0) {
@@ -333,36 +329,10 @@ public class IdvOutputHandler extends OutputHandler {
         }
         isl.append("</isl>\n");
         //        System.out.println(isl);
-        executeIsl(request, isl);
+        idvServer.evaluateIsl(isl);
         return new Result("preview.png", new FileInputStream(image),
                           "image/png");
     }
-
-    private void executeIsl(Request request, StringBuffer isl) throws Exception {
-        //        System.err.println(isl);
-        //For now just have one
-        synchronized (IDV_MUTEX) {
-            if (callCnt++ > 100) {
-                idv     = null;
-                callCnt = 0;
-            }
-            /*
-            Trace.addNot(".*Shadow.*");
-            Trace.addNot(".*Azimuth.*");
-            Trace.addNot(".*Set\\(.*");
-            Trace.addNot(".*ProjectionCoord.*");
-            Trace.addNot(".*Display_List.*");
-            Trace.addNot(".*MapProjection.*");
-            Trace.startTrace();
-            Trace.call1("Make image");*/
-            getIdv().getImageGenerator().processScriptFile("xml:" + isl);
-            //            Trace.call2("Make image");
-            getIdv().cleanup();
-            //            ucar.unidata.util.Trace.stopTrace();
-        }
-
-    }
-
 
 
 }
