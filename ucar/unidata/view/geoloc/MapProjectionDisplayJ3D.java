@@ -193,7 +193,7 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
         boolean useStereo = ((mode == MODE_3D)
                              && System.getProperty("idv.enableStereo",
                                  "false").equals("true"));
-        GraphicsConfiguration config = Util.getPreferredConfig(screen, true,
+        GraphicsConfiguration config = ucar.visad.display.DisplayUtil.getPreferredConfig(screen, true,
                                            useStereo);
         DisplayRendererJ3D renderer = (mode == MODE_3D)
                                       ? (DisplayRendererJ3D) new DefaultDisplayRendererJ3D()

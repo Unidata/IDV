@@ -165,7 +165,7 @@ public class GlobeDisplay extends NavigatedDisplay {
                                    : DisplayImplJ3D.JPANEL);
         boolean useStereo = System.getProperty("idv.enableStereo",
                                 "false").equals("true");
-        GraphicsConfiguration config = Util.getPreferredConfig(screen, true,
+        GraphicsConfiguration config = ucar.visad.display.DisplayUtil.getPreferredConfig(screen, true,
                                            useStereo);
         DisplayRendererJ3D renderer = new DefaultDisplayRendererJ3D();
         if (offscreen) {
