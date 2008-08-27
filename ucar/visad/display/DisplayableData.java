@@ -722,9 +722,9 @@ public class DisplayableData extends Displayable {
      * @throws RemoteException  if a Java RMI failure occurs.
      * @see #hasDataObject()
      */
-    public Set getAnimationSet(RealType aniType)
+    public Set getAnimationSet(RealType aniType, boolean force)
             throws VisADException, RemoteException {
-        Set overrideSet = super.getAnimationSet(aniType);
+        Set overrideSet = super.getAnimationSet(aniType,force);
         if (overrideSet != null) {
             return overrideSet;
         }

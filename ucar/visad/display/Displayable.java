@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -217,7 +218,7 @@ public abstract class Displayable {
      */
     public void toFront() throws RemoteException, VisADException {
         //We only remove and then add ourselves when we are not part of a compositedisplayable
-        if (displayMaster != null && parent == null) {
+        if ((displayMaster != null) && (parent == null)) {
             DisplayMaster myMaster = displayMaster;
             myMaster.removeDisplayable(this);
             myMaster.addDisplayable(this);
@@ -550,7 +551,7 @@ public abstract class Displayable {
         }
         //        System.err.println ("addConstantMaps " + getClass().getName() + " " + constantMaps.size());
 
-        
+
 
     }
 
@@ -844,12 +845,12 @@ public abstract class Displayable {
      * @throws RemoteException  Java RMI failure.
      */
     protected void destroy() throws RemoteException, VisADException {
-        parent        = null;
-        displayMaster = null;
+        parent            = null;
+        displayMaster     = null;
         propertyListeners = null;
-        scalarMapSet = null;
-        constantMaps = null;
-        prevScalarMapSet = null;
+        scalarMapSet      = null;
+        constantMaps      = null;
+        prevScalarMapSet  = null;
     }
 
 
@@ -1295,13 +1296,14 @@ public abstract class Displayable {
      * <p>This implementation always returns null.
      *
      * @param  aniType          The type used for animation
+     * @param force _more_
      * @return                  The set of times from all data
      *                          May be <code>null</code>.
      * @throws VisADException   if a VisAD failure occurs.
      * @throws RemoteException  if a Java RMI failure occurs.
      * @see #hasDataObject()
      */
-    public Set getAnimationSet(RealType aniType)
+    public Set getAnimationSet(RealType aniType, boolean force)
             throws VisADException, RemoteException {
         return animationSet;
     }

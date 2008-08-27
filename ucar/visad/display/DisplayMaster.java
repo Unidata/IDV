@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -29,6 +30,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.*;
+
 import visad.*;
 
 import visad.java3d.*;
@@ -184,7 +186,8 @@ abstract public class DisplayMaster {
     private int[][] wheelEventMap = EventMap.IDV_WHEEL_FUNCTIONS;
 
 
-    private  int[][][] mouseFunctionMap;
+    /** _more_          */
+    private int[][][] mouseFunctionMap;
 
     /**
      * Set the mapping between mouse wheel event and function
@@ -749,7 +752,7 @@ abstract public class DisplayMaster {
     public synchronized boolean removeDisplayable(Displayable displayable)
             throws VisADException, RemoteException {
 
-        if(displayable==null) {
+        if (displayable == null) {
             return false;
         }
         checkDestroyed();
@@ -1024,7 +1027,7 @@ abstract public class DisplayMaster {
     public void setProjectionMatrix(double[] newMatrix)
             throws VisADException, RemoteException {
         checkDestroyed();
-        
+
         //        System.err.print ("DisplayMaster.setProjectionMatrix ");
         //        for(int i=0;i<newMatrix.length;i++) 
         //            System.err.print(" " + newMatrix[i]);
@@ -1128,6 +1131,11 @@ abstract public class DisplayMaster {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int[][][] getMouseFunctionMap() {
         return mouseFunctionMap;
     }
@@ -1279,8 +1287,7 @@ abstract public class DisplayMaster {
      */
     public float getDisplayScale() {
         if (display != null) {
-            ProjectionControl pc          =
-                display.getProjectionControl();
+            ProjectionControl pc          = display.getProjectionControl();
             double[]          init_matrix = pc.getSavedProjectionMatrix();
             double[]          rot_a       = new double[3];
             double[]          trans_a     = new double[3];
@@ -1422,7 +1429,7 @@ abstract public class DisplayMaster {
     }
 
     /**
-     * Set the eye position of each eye for a stereo view. Subclasses that 
+     * Set the eye position of each eye for a stereo view. Subclasses that
      * support this should override this method
      *
      * @param position  x position of each eye (left negative, right positive).
@@ -2097,7 +2104,7 @@ abstract public class DisplayMaster {
                     || !displayable.getUseTimesInAnimation()) {
                 continue;
             }
-            Set set = displayable.getAnimationSet(aniType);
+            Set set = displayable.getAnimationSet(aniType, false);
             if (set == null) {
                 continue;
             }
@@ -2589,7 +2596,8 @@ abstract public class DisplayMaster {
          *
          */
         public Displayables(int count) {
-            list = Collections.synchronizedList(new ArrayList<Displayable>(count));
+            list = Collections.synchronizedList(
+                new ArrayList<Displayable>(count));
         }
 
 

@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -72,7 +73,7 @@ public class CompositeDisplayable extends Displayable {
     /** List of data listeners */
     private volatile List listDataListeners;
 
-    /** _more_          */
+    /** _more_ */
     public String label = "LABEL";
 
     /**
@@ -349,7 +350,7 @@ public class CompositeDisplayable extends Displayable {
      * @return            An Iterator over the children of this composite.
      */
     public Iterator iterator() {
-        if(displayables == null) {
+        if (displayables == null) {
             return new ArrayList().iterator();
         }
         return (new ArrayList(displayables)).iterator();
@@ -450,10 +451,10 @@ public class CompositeDisplayable extends Displayable {
         return map;
     }
 
-    /** _more_          */
+    /** _more_ */
     public static int cnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     int mycnt = cnt++;
 
     /**
@@ -803,7 +804,7 @@ public class CompositeDisplayable extends Displayable {
      */
     public void clearDisplayables() throws RemoteException, VisADException {
         for (int i = 0; i < displayables.size(); i++) {
-            removeDisplayable((Displayable)displayables.get(i));
+            removeDisplayable((Displayable) displayables.get(i));
         }
         //removeDataReferences();
         synchronized (MUTEX) {
@@ -869,13 +870,14 @@ public class CompositeDisplayable extends Displayable {
      * instance does not support this type.
      *
      * @param  aniType          The type used for animation
+     * @param force _more_
      * @return                  The set of times from all data
      *                          May be <code>null</code>.
      * @throws VisADException   if a VisAD failure occurs.
      * @throws RemoteException  if a Java RMI failure occurs.
      * @see #hasDataObject()
      */
-    public Set getAnimationSet(RealType aniType)
+    public Set getAnimationSet(RealType aniType, boolean force)
             throws RemoteException, VisADException {
         Set aniSet = null;
         for (Iterator iter = iterator(); iter.hasNext(); ) {
@@ -884,9 +886,10 @@ public class CompositeDisplayable extends Displayable {
             if (displayable == null) {
                 continue;
             }
-
-            if(!displayable.getUseTimesInAnimation()) continue;
-            Set set = displayable.getAnimationSet(aniType);
+            if ( !force && !displayable.getUseTimesInAnimation()) {
+                continue;
+            }
+            Set set = displayable.getAnimationSet(aniType, force);
             if (set != null) {
                 aniSet = (aniSet == null)
                          ? set

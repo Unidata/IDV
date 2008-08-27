@@ -21,17 +21,19 @@
  */
 
 
+
 package ucar.visad.display;
 
 
 import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
-import java.util.List;
 
 
 import visad.*;
 
 import java.rmi.RemoteException;
+
+import java.util.List;
 
 
 /**
@@ -90,9 +92,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    public SelectorPoint(String name,
-                         RealTupleType pointType) throws VisADException,
-                             RemoteException {
+    public SelectorPoint(String name, RealTupleType pointType)
+            throws VisADException, RemoteException {
         this(name, new RealTuple(pointType));
     }
 
@@ -106,9 +107,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    public SelectorPoint(String name,
-                         RealTuple initialValue) throws VisADException,
-                             RemoteException {
+    public SelectorPoint(String name, RealTuple initialValue)
+            throws VisADException, RemoteException {
         this(name, reduce(ShapeUtility.createShape(ShapeUtility.CUBE)[0]),
              initialValue);
     }
@@ -124,8 +124,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws RemoteException  remote error
      */
     public SelectorPoint(String name, String markerText,
-                         RealTuple initialValue) throws VisADException,
-                             RemoteException {
+                         RealTuple initialValue)
+            throws VisADException, RemoteException {
         this(name, ShapeUtility.shapeText(markerText), initialValue);
     }
 
@@ -140,8 +140,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws RemoteException  remote error
      */
     public SelectorPoint(String name, VisADGeometryArray marker,
-                         RealTuple initialValue) throws VisADException,
-                             RemoteException {
+                         RealTuple initialValue)
+            throws VisADException, RemoteException {
 
         super(name);
         setManipulable(true);
@@ -152,12 +152,23 @@ public class SelectorPoint extends LineDrawing {
                       : marker;
         setupShapeMap();
         markerValue = new Real(shapeType, 0);
-        mySetData(thePoint,null);
+        mySetData(thePoint, null);
     }
 
 
-    public Set getAnimationSet(RealType aniType) 
-        throws VisADException, RemoteException {
+    /**
+     * _more_
+     *
+     * @param aniType _more_
+     * @param force _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public Set getAnimationSet(RealType aniType, boolean force)
+            throws VisADException, RemoteException {
         return null;
     }
 
@@ -185,19 +196,28 @@ public class SelectorPoint extends LineDrawing {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    public void setPoint(RealTuple value) throws VisADException,
-            RemoteException {
-        setPointWithTime(value,null);
+    public void setPoint(RealTuple value)
+            throws VisADException, RemoteException {
+        setPointWithTime(value, null);
     }
 
 
-    public void setPointWithTime(RealTuple value,List times) throws VisADException,
-            RemoteException {
+    /**
+     * _more_
+     *
+     * @param value _more_
+     * @param times _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setPointWithTime(RealTuple value, List times)
+            throws VisADException, RemoteException {
         if ( !(this.thePoint.getType().equals(value.getType()))) {
             throw new VisADException("Invalid type for value");
         }
         thePoint = value;
-        mySetData(value,times);
+        mySetData(value, times);
     }
 
     /**
@@ -208,8 +228,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    public SelectorPoint(SelectorPoint that) throws VisADException,
-            RemoteException {
+    public SelectorPoint(SelectorPoint that)
+            throws VisADException, RemoteException {
 
         super(that);
 
@@ -226,8 +246,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public Displayable cloneForDisplay() throws VisADException,
-            RemoteException {
+    public Displayable cloneForDisplay()
+            throws VisADException, RemoteException {
         return new SelectorPoint(this);
     }
 
@@ -248,8 +268,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setMarker(String markerText) throws VisADException,
-            RemoteException {
+    public void setMarker(String markerText)
+            throws VisADException, RemoteException {
         setMarker(ShapeUtility.shapeText(markerText));
     }
 
@@ -261,8 +281,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setMarker(VisADGeometryArray marker) throws VisADException,
-            RemoteException {
+    public void setMarker(VisADGeometryArray marker)
+            throws VisADException, RemoteException {
         if (shapeControl != null) {
             shapeControl.setShape(0, marker);
         }
@@ -277,8 +297,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setPointSize(float newSize) throws VisADException,
-            RemoteException {
+    public void setPointSize(float newSize)
+            throws VisADException, RemoteException {
         if ((shapeControl != null) && (newSize != pointSize)) {
             shapeControl.setScale(newSize);
         }
@@ -312,8 +332,8 @@ public class SelectorPoint extends LineDrawing {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    public void setAutoSize(boolean yesorno) throws VisADException,
-            RemoteException {
+    public void setAutoSize(boolean yesorno)
+            throws VisADException, RemoteException {
         autoSize = yesorno;
         if (shapeControl != null) {
             shapeControl.setAutoScale(autoSize);
@@ -338,12 +358,14 @@ public class SelectorPoint extends LineDrawing {
      */
     protected void dataChange() throws VisADException, RemoteException {
         RealTuple data;
-        Data currentData =getData();
-        if(currentData instanceof RealTuple) {
+        Data      currentData = getData();
+        if (currentData instanceof RealTuple) {
             data = (RealTuple) currentData;
         } else {
             //This is where we have a time field
-            if(true) return;
+            if (true) {
+                return;
+            }
             FieldImpl timeField = (FieldImpl) currentData;
             data = (RealTuple) timeField.getSample(0);
         }
@@ -396,19 +418,20 @@ public class SelectorPoint extends LineDrawing {
      * Called from setData
      *
      * @param value  position value
+     * @param times _more_
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    private void mySetData(RealTuple value,List times) throws VisADException,
-            RemoteException {
+    private void mySetData(RealTuple value, List times)
+            throws VisADException, RemoteException {
         int    size = value.getDimension();
         Real[] data = new Real[size + 1];
         for (int i = 0; i < value.getDimension(); i++) {
             data[i] = (Real) value.getComponent(i);
         }
         data[size] = markerValue;
-        setData(Util.makeTimeRangeField(new RealTuple(data),times));
+        setData(Util.makeTimeRangeField(new RealTuple(data), times));
         //setData(new Tuple( new Data [] {value, new Real(shapeType,0)}));
     }
 
@@ -435,9 +458,8 @@ public class SelectorPoint extends LineDrawing {
         shapeMap  = new ScalarMap(shapeType, Display.Shape);
         shapeMap.addScalarMapListener(new ScalarMapListener() {
 
-            public void controlChanged(
-                    ScalarMapControlEvent event) throws RemoteException,
-                        VisADException {
+            public void controlChanged(ScalarMapControlEvent event)
+                    throws RemoteException, VisADException {
 
                 int id = event.getId();
 
@@ -454,9 +476,8 @@ public class SelectorPoint extends LineDrawing {
                 }
             }
 
-            public void mapChanged(
-                    ScalarMapEvent event) throws RemoteException,
-                        VisADException {}
+            public void mapChanged(ScalarMapEvent event)
+                    throws RemoteException, VisADException {}
         });
         addScalarMap(shapeMap);
     }
