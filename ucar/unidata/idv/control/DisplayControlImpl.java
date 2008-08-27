@@ -1427,7 +1427,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         GraphicsDevice d = getIdv().getIdvUIManager().getScreen(p);
 
-        return Util.getPreferredConfig(d, is3D, useStereo);
+        return ucar.visad.display.DisplayUtil.getPreferredConfig(d, is3D, useStereo);
     }
 
     /**
