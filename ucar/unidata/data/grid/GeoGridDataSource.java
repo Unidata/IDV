@@ -1103,7 +1103,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         //Check if we found any grids
         if (cnt == 0) {
-            if (LogUtil.getInteractiveMode()) && GuiUtils.showOkCancelDialog(
+            if (LogUtil.getInteractiveMode() && GuiUtils.showOkCancelDialog(
                     null, "No Gridded Data",
                     GuiUtils.inset(
                         new JLabel(
