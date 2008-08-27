@@ -216,10 +216,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
         Unit fromUnit        =
             ucar.visad.Util.parseUnit(var.getUnitsString());
+        /*
         System.out.println(var.getName());
         System.out.println("\tminmax:" + minmax.min + " " + minmax.max + " " + fromUnit);
         System.out.println("\tto unit:" + toUnit.toThis(minmax.min, fromUnit) + " " +toUnit.toThis(minmax.min, fromUnit));
         System.out.println("\tto unit:" + new Date((long)(1000*toUnit.toThis(minmax.min, toUnit))));
+        */
         double[] result = new double[] { toUnit.toThis(minmax.min, fromUnit),
                                          toUnit.toThis(minmax.max,
                                              fromUnit) };
@@ -289,6 +291,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     } else if (axisType.equals(
                             AxisType.Time)) {
                         double[] minmax =
+
                             getRange(var, ca.read(),
                                      visad.CommonUnit.secondsSinceTheEpoch);
                         extra.put(ARG_FROMDATE,
