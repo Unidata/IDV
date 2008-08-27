@@ -4824,7 +4824,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 continue;
             }
             RealType aniType = animation.getAnimationRealType();
-            Set set = displayInfo.getDisplayable().getAnimationSet(aniType);
+            Set set = displayInfo.getDisplayable().getAnimationSet(aniType,true);
             if (set == null) {
                 continue;
             }
@@ -5626,10 +5626,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
+
+
+
         if (haveDataTimes()) {
             items.add(GuiUtils.makeCheckboxMenuItem("Use Times In Animation",
                     this, "useTimesInAnimation", null));
-        }
+        } 
 
         if (getDisplayInfos().size() > 0) {
             JMenu dlMenu = new JMenu("Display List");

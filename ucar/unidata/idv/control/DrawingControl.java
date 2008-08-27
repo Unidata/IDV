@@ -488,8 +488,11 @@ public class DrawingControl extends DisplayControlImpl {
         List times = new ArrayList();
         setDisplayInactive();
         NodeList elements = XmlUtil.getElements(root);
-        setUseTimesInAnimation(XmlUtil.getAttribute(root,
-                ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
+        //Only set the usetimesinanimation when we are newly created
+        if(getWasUnPersisted()) {
+            setUseTimesInAnimation(XmlUtil.getAttribute(root,
+                                                        ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
+        }
         frontDisplay = XmlUtil.getAttribute(root, ATTR_FRONTDISPLAY,
                                             frontDisplay);
         if (displayHolder != null) {
@@ -543,6 +546,7 @@ public class DrawingControl extends DisplayControlImpl {
                         }
                     }
                 }
+                if(true)         break;
             }
         }
         if (initialXml && (times.size() > 0)) {
