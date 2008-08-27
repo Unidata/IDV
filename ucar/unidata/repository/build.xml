@@ -71,7 +71,10 @@
     </target>
 
 
-    <target name="compile" depends="init,clean">
+    <target name="compile" depends="init,clean,jc"/>
+
+
+    <target name="jc" depends="init">
         <javac
             classpath="${classpath}"
             debug="true"

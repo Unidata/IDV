@@ -29,8 +29,14 @@ import org.w3c.dom.*;
 
 import ucar.ma2.*;
 
-import ucar.nc2.*;
-import ucar.nc2.dataset.*;
+
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.AxisType;
+import ucar.nc2.dataset.CoordinateSystem;
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.Attribute;
+import ucar.nc2.Variable;
+
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -210,9 +216,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
         Unit fromUnit        =
             ucar.visad.Util.parseUnit(var.getUnitsString());
-        //        System.err.println("minmax:" + minmax.min + " " + minmax.max + " " + fromUnit);
-        //        System.err.println("to unit:" + toUnit.toThis(minmax.min, fromUnit) + " " +toUnit.toThis(minmax.min, fromUnit));
-        //        System.err.println("to unit:" + new Date((long)(1000*toUnit.toThis(minmax.min, toUnit))));
+        System.out.println(var.getName());
+        System.out.println("\tminmax:" + minmax.min + " " + minmax.max + " " + fromUnit);
+        System.out.println("\tto unit:" + toUnit.toThis(minmax.min, fromUnit) + " " +toUnit.toThis(minmax.min, fromUnit));
+        System.out.println("\tto unit:" + new Date((long)(1000*toUnit.toThis(minmax.min, toUnit))));
         double[] result = new double[] { toUnit.toThis(minmax.min, fromUnit),
                                          toUnit.toThis(minmax.max,
                                              fromUnit) };
@@ -265,41 +272,36 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             for (Variable var : variables) {
                 if (var instanceof CoordinateAxis) {
                     CoordinateAxis              ca = (CoordinateAxis) var;
-                    ucar.nc2.constants.AxisType axisType = ca.getAxisType();
-                    if (axisType.equals(ucar.nc2.constants.AxisType.Lat)) {
+                    AxisType axisType = ca.getAxisType();
+                    if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
                         extra.put(ARG_MINLAT, minmax[0]);
                         extra.put(ARG_MAXLAT, minmax[1]);
                         haveBounds = true;
                     } else if (axisType.equals(
-                            ucar.nc2.constants.AxisType.Lon)) {
+                            AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
                         extra.put(ARG_MINLON, minmax[0]);
                         extra.put(ARG_MAXLON, minmax[1]);
                         haveBounds = true;
                     } else if (axisType.equals(
-                            ucar.nc2.constants.AxisType.Time)) {
+                            AxisType.Time)) {
                         double[] minmax =
                             getRange(var, ca.read(),
                                      visad.CommonUnit.secondsSinceTheEpoch);
                         extra.put(ARG_FROMDATE,
-                                  new Date((long) minmax[0] * 1000));
+                                  new Date((long) minmax[0]*1000));
                         extra.put(ARG_TODATE,
-                                  new Date((long) minmax[1] * 1000));
+                                  new Date((long) minmax[1]*1000));
                     } else {
                         //                        System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
                     }
                     continue;
                 }
 
-                if (var instanceof VariableDS) {
-                    VariableDS vds = (VariableDS) var;
-                    if (vds.isCoordinateVariable()) {
-                        continue;
-                    }
-                }
+
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_VARIABLE,
                                         DFLT_INHERITED, var.getShortName(),
@@ -312,7 +314,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
             if ( !haveBounds) {
-                for (CoordinateSystem coordSys : dataset
+                for (CoordinateSystem coordSys : (List<CoordinateSystem>)dataset
                         .getCoordinateSystems()) {
                     ProjectionImpl proj = coordSys.getProjection();
                     if (proj == null) {
