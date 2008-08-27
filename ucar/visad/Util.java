@@ -72,6 +72,8 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+
+
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
@@ -3089,42 +3091,6 @@ public final class Util {
             throws VisADException, RemoteException {
         return DateTime.makeTimeSet(
             (DateTime[]) times.toArray(new DateTime[times.size()]));
-    }
-
-    /**
-     * Get graphics configuration for the screen
-     *
-     * @param d  the GraphicsDevice
-     * @param is3D  true for a Java 3D display
-     * @param useStereo true if a stereo display (is3D must also be true)
-     *
-     * @return the perferred config
-     */
-    public static GraphicsConfiguration getPreferredConfig(GraphicsDevice d,
-            boolean is3D, boolean useStereo) {
-        try {
-            if (d == null) {
-                GraphicsEnvironment e =
-                    GraphicsEnvironment.getLocalGraphicsEnvironment();
-                d = e.getDefaultScreenDevice();
-            }
-            GraphicsConfigTemplate template = null;
-            if (is3D) {
-                template = new GraphicsConfigTemplate3D();
-
-                if (useStereo) {
-                    ((GraphicsConfigTemplate3D) template).setStereo(
-                        GraphicsConfigTemplate3D.PREFERRED);
-                }
-            }
-            if (template == null) {
-                return d.getDefaultConfiguration();
-            } else {
-                return d.getBestConfiguration(template);
-            }
-        } catch (HeadlessException he) {
-            return null;
-        }
     }
 
     /**
