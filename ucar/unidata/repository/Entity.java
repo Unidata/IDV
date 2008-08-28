@@ -332,8 +332,15 @@ public class Entity implements Cloneable {
      * @param value _more_
      */
     public void addMetadata(Metadata value) {
+        addMetadata(value, false);
+    }
+
+    public void addMetadata(Metadata value, boolean checkUnique) {
         if (metadata == null) {
             metadata = new ArrayList<Metadata>();
+        }
+        if(checkUnique && metadata.contains(value)) {
+            return;
         }
         metadata.add(value);
     }

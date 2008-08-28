@@ -5150,7 +5150,6 @@ public class Repository extends RepositoryBase implements Tables,
             if (newEntry && request.get(ARG_ADDMETADATA, false)) {
                 addInitialMetadata(request, entries);
             }
-
             insertEntries(entries, newEntry);
         }
         if (entries.size() == 1) {
@@ -5174,9 +5173,10 @@ public class Repository extends RepositoryBase implements Tables,
      * @param request _more_
      * @param entries _more_
      */
-    public void addInitialMetadata(Request request, List<Entry> entries) {
+    public void addInitialMetadata(Request request, List<Entry> entries) throws Exception {
         for (Entry theEntry : entries) {
             Hashtable extra = new Hashtable();
+            getMetadataManager().getMetadata(theEntry);
             getMetadataManager().addInitialMetadata(request, theEntry, extra);
             if ( !theEntry.hasAreaDefined()
                     && (extra.get(ARG_MINLAT) != null)) {
@@ -5195,6 +5195,7 @@ public class Repository extends RepositoryBase implements Tables,
             }
         }
     }
+
 
     /**
      * _more_
@@ -7681,6 +7682,11 @@ public class Repository extends RepositoryBase implements Tables,
 
             List<Metadata> metadataList = entry.getMetadata();
             if (metadataList != null) {
+                if(!isNew) {
+                    SqlUtil.delete(getConnection(), TABLE_METADATA,
+                                   Clause.eq(COL_METADATA_ENTRY_ID,
+                                             entry.getId()));
+                }
                 for (Metadata metadata : metadataList) {
                     int col = 1;
                     metadataCnt++;

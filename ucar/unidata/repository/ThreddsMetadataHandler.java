@@ -243,14 +243,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @param entry _more_
      * @param extra _more_
      */
-    public void addInitialMetadata(Request request, Entry entry,
+    public void getInitialMetadata(Request request, Entry entry,
+                                   List<Metadata> metadataList,
                                    Hashtable extra) {
 
         try {
-            super.addInitialMetadata(request, entry, extra);
+            super.getInitialMetadata(request, entry, metadataList,extra);
             TdsOutputHandler tdsOutputHandler =
                 (TdsOutputHandler) getRepository().getOutputHandler(
-                    TdsOutputHandler.OUTPUT_TDS);
+                    TdsOutputHandler.OUTPUT_OPENDAP);
 
             if ( !tdsOutputHandler.canLoad(request, entry)) {
                 return;
@@ -290,7 +291,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                                          entry.getId(), TYPE_KEYWORD,DFLT_INHERITED,
                                                          keyword, "",
                                                          "", "");
-                        entry.addMetadata(metadata);
+                        //The true says to ad dit only if its unique
+                        entry.addMetadata(metadata,true);
                     }
                     continue;
                 }
@@ -302,8 +304,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                         entry.getId(), TYPE_PROPERTY,
                                         DFLT_INHERITED, name,
                                         value, "", "");
-                entry.addMetadata(metadata);
-
+                entry.addMetadata(metadata,true);
             }
 
 
@@ -346,8 +347,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                         DFLT_INHERITED, var.getShortName(),
                                         var.getName(), var.getUnitsString(),
                                         "");
-                entry.addMetadata(metadata);
-
+                entry.addMetadata(metadata,true);
             }
 
             //If we didn't have a lat/lon coordinate axis then check projection

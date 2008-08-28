@@ -41,7 +41,9 @@ import ucar.nc2.dataset.NetcdfDataset;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
 
 import java.io.*;
 
@@ -79,9 +81,15 @@ import javax.servlet.http.*;
 public class TdsOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final String OUTPUT_TDS = "tds";
+    public static final String OUTPUT_OPENDAP = "tds.opendap";
 
-    public static final String OUTPUT_CDL = "cdl";
+    public static final String OUTPUT_CDL = "tds.cdl";
+
+    public static final String OUTPUT_WCS = "tds.wcs";
+
+
+
+    public static final String OUTPUT_GRIDSUBSET = "tds.gridsubset";
 
 
     /** _more_ */
@@ -136,7 +144,10 @@ public class TdsOutputHandler extends OutputHandler {
      * @return Is it tds?
      */
     public boolean canHandle(String output) {
-        return output.equals(OUTPUT_TDS) || output.equals(OUTPUT_CDL);
+        return output.equals(OUTPUT_OPENDAP) || 
+            output.equals(OUTPUT_CDL)    || 
+            output.equals(OUTPUT_WCS) ||
+            output.equals(OUTPUT_GRIDSUBSET);
     }
 
 
@@ -160,7 +171,7 @@ public class TdsOutputHandler extends OutputHandler {
         }
         if (canLoad(request, state.entry)) {
             //            types.add(new OutputType("CDL", OUTPUT_CDL));
-            types.add(new OutputType("TDS", OUTPUT_TDS) {
+            types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
                 public String assembleUrl(Request request) {
                     return request.getRequestPath() + getSuffix() + "/"
                            + request.getPathEmbeddedArgs() + "/entry.das";
@@ -172,15 +183,20 @@ public class TdsOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if (canLoad(request, entry)) {
-            String tdsUrl = request.getRequestPath() +  "/"
-                + request.getPathEmbeddedArgs() + "/entry.das";
-
-            links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),"TDS"));
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                          ARG_OUTPUT, OUTPUT_CDL);
-            links.add(new Link(url, getRepository().fileUrl(ICON_DATA),"CDL"));
+        if (!canLoad(request, entry)) {
+            return;
         }
+        String tdsUrl = request.getRequestPath() +  "/"
+            + request.getPathEmbeddedArgs() + "/entry.das";
+        
+        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),"OpenDAP"));
+
+        links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                            ARG_OUTPUT, OUTPUT_CDL), getRepository().fileUrl(ICON_DATA),"CDL"));
+        links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                            ARG_OUTPUT, OUTPUT_GRIDSUBSET), getRepository().fileUrl(ICON_DATA),"Subset"));
+        links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                            ARG_OUTPUT, OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),"WCS"));
     }
 
 
@@ -192,7 +208,7 @@ public class TdsOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getTdsUrl(Entry entry) {
-        return "/" + ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_TDS)
+        return "/" + ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP)
                + "/" + ARG_ID + ":" + Request.encodeEmbedded(entry.getId())
                + "/entry.das";
     }
@@ -207,7 +223,7 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public String getFullTdsUrl(Entry entry) {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
-               + ":" + Request.encodeEmbedded(OUTPUT_TDS) + "/" + ARG_ID
+               + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID
                + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
@@ -253,14 +269,37 @@ public class TdsOutputHandler extends OutputHandler {
 
     public Result outputCdl(final Request request, Entry entry)
             throws Exception {
+
+
         StringBuffer sb = new StringBuffer();
-        File file = entry.getResource().getFile();
-        NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
         sb.append(crumbs[1]);
+        if(request.get(ARG_ADDMETADATA, false)) {
+            if(getRepository().getAccessManager().canDoAction(request, entry,Permission.ACTION_EDIT)) {
+                sb.append(HtmlUtil.p());
+
+                List<Entry> entries = (List<Entry>)Misc.newList(entry);
+                getRepository().addInitialMetadata(request, entries);
+                getRepository().insertEntries(entries, false);
+                sb.append(getRepository().note("Metadata added"));
+                return makeLinksResult(request, "CDL",
+                                       sb, new State(entry));
+            }
+            sb.append("You cannot add metadata");
+            return makeLinksResult(request, "CDL",
+                                   sb, new State(entry));
+        }
 
 
+
+
+        File file = entry.getResource().getFile();
+        NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
+        if(getRepository().getAccessManager().canDoAction(request, entry,Permission.ACTION_EDIT)) {
+            request.put(ARG_ADDMETADATA,"true");
+            sb.append(HtmlUtil.href(request.getUrl(), "Add metadata"));
+        }
         if(dataset==null) {
             sb.append("Could not open dataset");
         } else {
@@ -272,6 +311,18 @@ public class TdsOutputHandler extends OutputHandler {
         return makeLinksResult(request, "CDL",
                                sb, new State(entry));
     }
+
+    public Result outputWcs(Request request, Entry entry) {
+        return new Result("",new StringBuffer("TBD"));
+    }
+
+    public Result outputGridSubset(Request request, Entry entry) {
+        return new Result("",new StringBuffer("TBD"));
+    }
+
+
+
+
 
 
     /**
@@ -290,6 +341,15 @@ public class TdsOutputHandler extends OutputHandler {
         if(request.getOutput().equals(OUTPUT_CDL)) {
             return outputCdl(request, entry);
         }
+        if(request.getOutput().equals(OUTPUT_WCS)) {
+            return outputWcs(request, entry);
+        }
+
+
+        if(request.getOutput().equals(OUTPUT_GRIDSUBSET)) {
+            return outputGridSubset(request, entry);
+        }
+
 
         //        System.err.println ("entry:" + entry);
 

@@ -634,6 +634,29 @@ public class Metadata implements Constants, Tables {
 
     }
 
+    public boolean equals(Object o) {
+        if ( !getClass().equals(o.getClass())) {
+            return false;
+        }
+        Metadata that = (Metadata) o;
+        /*
+        System.err.println(Misc.equals(this.type,  that.type) + " " +
+            Misc.equals(this.attr1, that.attr1) + " " +
+            Misc.equals(this.attr2, that.attr2) + " " +
+            Misc.equals(this.attr3, that.attr3) + " " +
+            Misc.equals(this.attr4, that.attr4) + " " +
+            Misc.equals(this.entryId, that.entryId));*/
+
+        return 
+            Misc.equals(this.type,  that.type) &&
+            Misc.equals(this.attr1, that.attr1) &&
+            Misc.equals(this.attr2, that.attr2) &&
+            Misc.equals(this.attr3, that.attr3) &&
+            Misc.equals(this.attr4, that.attr4) &&
+            Misc.equals(this.entryId, that.entryId);
+    }
+
+
     /**
      * Set the Entry property.
      *
@@ -641,6 +664,7 @@ public class Metadata implements Constants, Tables {
      */
     public void setEntry(Entry value) {
         entry = value;
+        if(value!=null) entryId = value.getId();
     }
 
     /**

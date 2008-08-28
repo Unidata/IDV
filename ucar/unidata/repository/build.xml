@@ -17,11 +17,7 @@
         <property name="ramaddadir" value="${srcdir}/ucar/unidata/repository" />
         <property name="releasedir" value="${libsdir}/ramadda${version}" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="xxxclasspath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/external.jar"/>
-<!--
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
--->
-        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/ramaddalib.jar:${libsdir}/tdsrepository.jar:${libsdir}/jython.jar"/>
+        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/tdsrepository.jar:${libsdir}/extra.jar:${libsdir}/ramaddalib.jar:${libsdir}/jython.jar"/>
     </target>
 
     <target name="clean" depends="init" >

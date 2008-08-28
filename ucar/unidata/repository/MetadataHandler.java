@@ -167,7 +167,8 @@ public class MetadataHandler extends RepositoryManager {
     }
 
 
-    public void addInitialMetadata(Request request, Entry entry, Hashtable extra) {
+    public void getInitialMetadata(Request request, Entry entry,                                    
+                                   List<Metadata> metadataList,Hashtable extra) {
     }
 
 

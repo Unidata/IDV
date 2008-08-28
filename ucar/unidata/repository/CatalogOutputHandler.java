@@ -479,7 +479,7 @@ public class CatalogOutputHandler extends OutputHandler {
         if (tdsOutputHandler == null) {
             tdsOutputHandler =
                 (TdsOutputHandler) getRepository().getOutputHandler(
-                    TdsOutputHandler.OUTPUT_TDS);
+                    TdsOutputHandler.OUTPUT_OPENDAP);
         }
 
         if (tdsOutputHandler.canLoad(request, entry)) {

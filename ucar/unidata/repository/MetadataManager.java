@@ -234,9 +234,19 @@ public class MetadataManager extends RepositoryManager {
 
 
 
-    public void addInitialMetadata(Request request, Entry entry, Hashtable extra)  {
+    public List<Metadata> getInitialMetadata(Request request, Entry entry, Hashtable extra)  {
+        List<Metadata> metadataList = new ArrayList<Metadata>();
         for(MetadataHandler handler: getMetadataHandlers()) {
-            handler.addInitialMetadata(request, entry,extra);
+            handler.getInitialMetadata(request, entry,metadataList,extra);
+        }
+        return metadataList;
+    }
+
+
+    public void addInitialMetadata(Request request, Entry entry, Hashtable extra)  {
+        System.err.println("metadata:" + entry.getMetadata());
+        for(Metadata metadata: getInitialMetadata(request, entry, extra)) {
+            entry.addMetadata(metadata,true);
         }
     }
 
