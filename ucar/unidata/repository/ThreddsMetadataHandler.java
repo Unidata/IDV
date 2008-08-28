@@ -49,6 +49,7 @@ import ucar.unidata.util.Misc;
 
 
 
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
@@ -211,7 +212,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    private double[] getRange(Variable var, Array a, Unit toUnit)
+    private static double[] getRange(Variable var, Array a, Unit toUnit)
             throws Exception {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
         Unit fromUnit        =
@@ -227,6 +228,17 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                              fromUnit) };
         return result;
     }
+
+
+    public static Date[]getMinMaxDates(Variable var,CoordinateAxis ca) throws Exception {
+        double[] minmax =
+            getRange(var, ca.read(),
+                     visad.CommonUnit.secondsSinceTheEpoch);
+        return new Date[]{
+            new Date((long) minmax[0]*1000),
+            new Date((long) minmax[1]*1000)};
+    }
+
 
 
     public static final String ATTR_MINLAT = "geospatial_lat_min";
@@ -259,7 +271,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             File file = entry.getResource().getFile();
             NetcdfDataset dataset =
                 NetcdfDataset.acquireDataset(file.toString(), null);
-            List<Variable>  variables  = dataset.getVariables();
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
             for (Attribute attr : attrs) {
@@ -308,6 +319,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             }
 
 
+            List<Variable>  variables  = dataset.getVariables();
             for (Variable var : variables) {
                 if (var instanceof CoordinateAxis) {
                     CoordinateAxis              ca = (CoordinateAxis) var;
@@ -327,14 +339,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         haveBounds = true;
                     } else if (axisType.equals(
                             AxisType.Time)) {
-                        double[] minmax =
-
-                            getRange(var, ca.read(),
-                                     visad.CommonUnit.secondsSinceTheEpoch);
-                        extra.put(ARG_FROMDATE,
-                                  new Date((long) minmax[0]*1000));
-                        extra.put(ARG_TODATE,
-                                  new Date((long) minmax[1]*1000));
+                        Date[]dates = getMinMaxDates(var,ca);
+                        extra.put(ARG_FROMDATE,dates[0]);
+                        extra.put(ARG_TODATE,dates[1]);
                     } else {
                         //                        System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
                     }

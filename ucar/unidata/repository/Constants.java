@@ -310,6 +310,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_VARIABLE = "variable";
+
     public static final String ARG_ADDMETADATA = "addmetadata";
 
     /** _more_ */
@@ -355,6 +357,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_SUBJECT = "subject";
+
+    public static final String ARG_SUBMIT = "submit";
 
 
 

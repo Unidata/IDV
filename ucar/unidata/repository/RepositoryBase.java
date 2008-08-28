@@ -290,7 +290,15 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    public Date parseDate(String dttm) throws java.text.ParseException {
+        if (sdf == null) {
+            sdf = new SimpleDateFormat();
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            sdf.applyPattern(DEFAULT_TIME_FORMAT);
+        }
 
+        return    sdf.parse(dttm);
+    }
 
     /**
      * _more_

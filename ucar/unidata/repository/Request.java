@@ -1114,6 +1114,12 @@ public class Request implements Constants {
         return DateUtil.parse(result);
     }
 
+    public Date getDate(String from,  Date dflt) throws Exception {
+        if(!defined(from)) return dflt;
+        return repository.parseDate(getUnsafeString(from,""));
+    }
+
+
     /**
      * _more_
      *
