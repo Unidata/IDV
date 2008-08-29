@@ -30,8 +30,9 @@ import org.w3c.dom.*;
 import ucar.ma2.*;
 
 
+import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dataset.AxisType;
+
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.Attribute;
@@ -230,6 +231,38 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+    public static List<Date> getDates(Variable var,CoordinateAxis ca) throws Exception {
+        Unit fromUnit = ucar.visad.Util.parseUnit(var.getUnitsString());
+        Unit toUnit =  visad.CommonUnit.secondsSinceTheEpoch;
+        List<Date> dates = new ArrayList<Date>();
+        Array a = ca.read();
+        IndexIterator iter = a.getIndexIteratorFast();
+        while (iter.hasNext()) {
+            double val = iter.getDoubleNext();
+            if (val!=val) continue;
+            dates.add(new Date((long)(1000*toUnit.toThis(val, fromUnit))));
+            
+        }
+        return dates;
+    }
+
+    public static List<Date> getDates(NetcdfDataset dataset)  throws Exception {
+        List<Variable>  variables  = dataset.getVariables();
+        for (Variable var : variables) {
+            if (var instanceof CoordinateAxis) {
+                CoordinateAxis              ca = (CoordinateAxis) var;
+                AxisType axisType = ca.getAxisType();
+                if(axisType.equals(AxisType.Time)) {
+                    return getDates(var, ca);
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+
     public static Date[]getMinMaxDates(Variable var,CoordinateAxis ca) throws Exception {
         double[] minmax =
             getRange(var, ca.read(),
@@ -347,6 +380,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     }
                     continue;
                 }
+
 
 
                 Metadata metadata = new Metadata(getRepository().getGUID(),

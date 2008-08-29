@@ -4141,57 +4141,34 @@ public class Misc {
      * @param args  args
      */
     public static void main(String[] args) {
-        for (int i = 0; i < 50; i++) {
-            //      String s = new String(new byte[]{(byte)i});
-            //      System.err.println ("test:"+ s+":");
-        }
-        if (true) {
-            return;
-        }
-
-
-        Trace.startTrace();
-        float[] f = new float[7600000];
-
-        for (int j = 0; j < 10; j++) {
-            Trace.call1("time");
-            for (int i = 0; i < f.length; i++) {}
-            Trace.call2("time");
-        }
-
-
-        if (true) {
-            return;
-        }
-
-
-
-        float[][] tuple_values = new float[4][2500000];
-        for (int index = 0; index < 4; index++) {
-            for (int j = 0; j < tuple_values[index].length; j++) {
-                tuple_values[index][j] = Float.NaN;
+        double d1 = 0;
+        double d2 = Double.NaN;
+        boolean f;
+        for( int j=0;j<10;j++) {
+        long t1 = System.currentTimeMillis();
+        for(int i=0;i<10000000;i++) {
+            if(d2!=d2) {
+                f=true;
+            }
+            if(d1!=d1) {
+                f=true;
             }
         }
 
-
-        long t1    = System.currentTimeMillis();
-        int  count = 0;
-        for (int index = 0; index < 4; index++) {
-            int     len                = tuple_values[index].length;
-            float[] tuple_values_index = tuple_values[index];
-            float   tuple_single_value = 7.0f;
-            float   inv_count          = 2.0f;
-            for (int j = 0; j < len; j++) {
-                if (tuple_values_index[j] == tuple_values_index[j]) {
-                    tuple_values_index[j] = inv_count
-                                            * (tuple_values_index[j]
-                                                + tuple_single_value);
-                }
-                count++;
-            }
-        }
         long t2 = System.currentTimeMillis();
-        System.err.println("Time:" + (t2 - t1) + " count " + count);
+        for(int i=0;i<10000000;i++) {
+            if(Double.isNaN(d2)) {
+                f=true;
+            }
+            if(Double.isNaN(d1)) {
+                f=true;
+            }
+        }
+
+
+        long t3 = System.currentTimeMillis();
+        System.err.println((t2-t1) + "  " + (t3-t2));
+        }
     }
 
     /**

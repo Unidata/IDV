@@ -4943,12 +4943,19 @@ public class Repository extends RepositoryBase implements Tables,
                                 msg("Downloading") + " " + length + " "
                                 + msg("bytes"));
                     }
-                    if (IOUtil.writeTo(fromStream,
-                                       new FileOutputStream(newFile),
-                                       actionId, length) < 0) {
-                        System.err.println("got cancel");
-                        return new Result(request.entryUrl(URL_ENTRY_SHOW,
-                                parentGroup));
+                    FileOutputStream toStream = new FileOutputStream(newFile);
+                    try {
+                        if (IOUtil.writeTo(fromStream,
+                                           toStream,
+                                           actionId, length) < 0) {
+                            return new Result(request.entryUrl(URL_ENTRY_SHOW,
+                                                               parentGroup));
+                        }
+                    } finally {
+                        try {
+                            toStream.close();
+                            fromStream.close();
+                        } catch(Exception exc){}
                     }
                 }
 

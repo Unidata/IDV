@@ -42,6 +42,9 @@ import java.util.List;
 
 public class HtmlUtil {
 
+    public static final String SIZE_3 = "  size=\"3\" ";
+
+
     public static final String SIZE_5 = "  size=\"5\" ";
 
     public static final String SIZE_8 = "  size=\"8\" ";
@@ -51,6 +54,9 @@ public class HtmlUtil {
 
     /** _more_ */
     public static final String SIZE_20 = "  size=\"20\" ";
+
+    /** _more_ */
+    public static final String SIZE_25 = "  size=\"25\" ";
 
     /** _more_ */
     public static final String SIZE_30 = "  size=\"30\" ";

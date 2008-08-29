@@ -39,7 +39,7 @@ import ucar.nc2.dt.grid.*;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.dataset.NetcdfDataset;
 
-import ucar.nc2.dataset.AxisType;
+import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.Attribute;
@@ -394,13 +394,15 @@ public class TdsOutputHandler extends OutputHandler {
             int timeStride = 1;
             Date[] dates = new Date[]{request.get(ARG_SUBSETTIME,false)?request.getDate(ARG_FROMDATE, null):null,
                                       request.get(ARG_SUBSETTIME,false)?request.getDate(ARG_TODATE, null):null};
-            if(varNames.size()==0) {
+            if(dates[0]!=null && dates[1]!=null && dates[0].getTime()> dates[1].getTime()) {
+                sb.append(getRepository().warning("From date is after to date"));
+            } else if(varNames.size()==0) {
                 sb.append(getRepository().warning("No variables selected"));
             } else {
                 NetcdfCFWriter writer = new NetcdfCFWriter();
                 File f = getRepository().getStorageManager().getTmpFile(request, "subset.nc");
                 GridDataset gds = GridDataset.open(file.toString());
-                writer.makeFile(f.toString(), gds, varNames, llr, (dates[0]==null?null:new thredds.datatype.DateRange(dates[0],dates[1])),
+                writer.makeFile(f.toString(), gds, varNames, llr, (dates[0]==null?null:new ucar.nc2.units.DateRange(dates[0],dates[1])),
                                 includeLatLon, hStride, zStride, timeStride);
                 return new Result("subset.nc", new FileInputStream(f),"application/x-netcdf");
             }
@@ -422,40 +424,57 @@ public class TdsOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.formTable());
 
         sb.append(HtmlUtil.formEntry(msgLabel("Horizontal Stride"),
-                                     HtmlUtil.input(ARG_HSTRIDE,request.getString(ARG_HSTRIDE,"1"),HtmlUtil.SIZE_5)));
+                                     HtmlUtil.input(ARG_HSTRIDE,request.getString(ARG_HSTRIDE,"1"),HtmlUtil.SIZE_3)));
 
 
-        Date[]dates = null;
+        Date[]dateRange = null;
+        List<Date> dates = null;
 
+        List tuples = new ArrayList();
+        for (Variable var : variables) {
+            tuples.add(new Object[]{var.getShortName().toLowerCase(), var});
+        }
+        tuples = Misc.sortTuples(tuples,true);
 
         StringBuffer varSB = new StringBuffer();
-        for (Variable var : variables) {
+        for (Object[]tuple: (List<Object[]>) tuples) {
+            Variable var = (Variable) tuple[1];
+            if(var.getShortName().equals("grid_name")) {
+                System.err.println("var:"  + var.getClass().getName());
+            }
+            if(var.getShortName().equals("T")) {
+                System.err.println("var:"  + var.getClass().getName());
+            }
             if (var instanceof CoordinateAxis) {
                 CoordinateAxis              ca = (CoordinateAxis) var;
                 AxisType axisType = ca.getAxisType();
                 if(axisType.equals(AxisType.Time)) {
-                    dates = ThreddsMetadataHandler.getMinMaxDates(var,ca);
+                    dateRange = ThreddsMetadataHandler.getMinMaxDates(var,ca);
+                    dates = (List<Date>) Misc.sort(ThreddsMetadataHandler.getDates(var,ca));
                 }
                 continue;
             }
 
-            varSB.append(HtmlUtil.checkbox(ARG_VARIABLE+"." + var.getShortName(),"true",false));
-            varSB.append(HtmlUtil.space(1));
-            varSB.append(var.getName());
-            varSB.append(HtmlUtil.space(1));
-            if(var.getUnitsString()!=null) {
-                varSB.append("(" + var.getUnitsString() +")");
-            }
+            varSB.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.checkbox(ARG_VARIABLE+"." + var.getShortName(),"true",false) +
+                                       HtmlUtil.space(1) +
+                                       var.getName() +
+                                       HtmlUtil.space(1) + 
+                                       (var.getUnitsString()!=null?
+                                        "(" + var.getUnitsString() +")":""),
+                                       "<i>" +var.getDescription()+"</i>")));
 
-            varSB.append(HtmlUtil.br());
         }
 
-        if(dates!=null) {
-            sb.append(HtmlUtil.formEntry(HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, false)) +
-                                         msgLabel("Subset Times"),
-                                         HtmlUtil.input(ARG_FROMDATE,getRepository().formatDate(request,dates[0])) +
-                                         HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)) +
-                                         HtmlUtil.input(ARG_TODATE,getRepository().formatDate(request,dates[1]))));
+        if(dateRange!=null) {
+            List formattedDates = new ArrayList();
+            for(Date date: dates) {
+                formattedDates.add(getRepository().formatDate(request, date));
+            }
+            sb.append(HtmlUtil.formEntry( msgLabel("Subset Times"),
+                                          HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, false)) + HtmlUtil.space(1) +
+                                          HtmlUtil.select(ARG_FROMDATE,formattedDates,getRepository().formatDate(request,dateRange[0])) +
+                                          HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)) +
+                                          HtmlUtil.select(ARG_TODATE,formattedDates,getRepository().formatDate(request,dateRange[1]))));
         }
 
 
@@ -466,21 +485,25 @@ public class TdsOutputHandler extends OutputHandler {
                 continue;
             }
             LatLonRect llr = proj.getDefaultMapAreaLL();
-            sb.append(HtmlUtil.formEntryTop(HtmlUtil.checkbox(ARG_SUBSETAREA, "true", request.get(ARG_SUBSETAREA, false))+
-                                  msgLabel("Subset Spatially"),
-                                            HtmlUtil.makeLatLonBox(ARG_AREA, llr.getLatMin(), llr.getLatMax(),llr.getLonMax(), llr.getLonMin())));
+            sb.append(HtmlUtil.formEntryTop(msgLabel("Subset Spatially"),
+                                            "<table cellpadding=0 cellspacing=0><tr valign=top><td>" + 
+                                            HtmlUtil.checkbox(ARG_SUBSETAREA, "true", request.get(ARG_SUBSETAREA, false)) + 
+                                            "</td><td>" +
+                                            HtmlUtil.makeLatLonBox(ARG_AREA, llr.getLatMin(), llr.getLatMax(),llr.getLonMax(), llr.getLonMin()) +
+                                            "</table>"));
             break;
         }
 
 
-        sb.append(HtmlUtil.formEntry(HtmlUtil.checkbox(ARG_ADDLATLON,"true",request.get(ARG_ADDLATLON,false)) +
-                                     "Add Lat/Lon Variables",""));
+        sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),HtmlUtil.checkbox(ARG_ADDLATLON,"true",request.get(ARG_ADDLATLON,false))));
 
         sb.append("</table>");
 
         sb.append("<hr>");
         sb.append("Select Variables:<ul>");
+        sb.append("<table>");
         sb.append(varSB);
+        sb.append("</table>");
         sb.append("</ul>");
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid"));
