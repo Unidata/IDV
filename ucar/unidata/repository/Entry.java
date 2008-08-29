@@ -390,6 +390,11 @@ public class Entry extends Entity {
         return false;
     }
 
+    public void clearArea() {
+        south = north = east = west  = NONGEO;
+    }
+
+
     /**
      * _more_
      *

@@ -326,6 +326,11 @@ public class Entity implements Cloneable {
 
 
 
+    public void clearMetadata() {
+        metadata= null;
+    }
+
+
     /**
      * _more_
      *

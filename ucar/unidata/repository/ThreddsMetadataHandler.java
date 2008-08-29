@@ -361,6 +361,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
+                        System.err.println("lat range:" + minmax[0] + " " + minmax[1]);
                         extra.put(ARG_MINLAT, minmax[0]);
                         extra.put(ARG_MAXLAT, minmax[1]);
                         haveBounds = true;
@@ -368,6 +369,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
+                        System.err.println("lon range:" + minmax[0] + " " + minmax[1]);
                         extra.put(ARG_MINLON, minmax[0]);
                         extra.put(ARG_MAXLON, minmax[1]);
                         haveBounds = true;

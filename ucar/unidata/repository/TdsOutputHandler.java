@@ -98,6 +98,7 @@ import javax.servlet.http.*;
 public class TdsOutputHandler extends OutputHandler {
 
     public static final String ARG_ADDLATLON = "addlatlon";
+    public static final String ARG_ADDTOREPOSITORY = "addtorepository";
 
     public static final String ARG_SUBSETAREA = "subsetarea";
     public static final String ARG_SUBSETTIME = "subsettime";
@@ -336,7 +337,6 @@ public class TdsOutputHandler extends OutputHandler {
         if(request.get(ARG_ADDMETADATA, false)) {
             if(getRepository().getAccessManager().canDoAction(request, entry,Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
-
                 List<Entry> entries = (List<Entry>)Misc.newList(entry);
                 getRepository().addInitialMetadata(request, entries);
                 getRepository().insertEntries(entries, false);
@@ -375,6 +375,11 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
     public Result outputGridSubset(Request request, Entry entry) throws Exception {
+
+        boolean canAdd = 
+            entry.getParentGroup()!=null &&
+            getRepository().getAccessManager().canDoAction(request, entry.getParentGroup(),Permission.ACTION_NEW);
+
         File file = entry.getResource().getFile();
         StringBuffer sb = new StringBuffer();
         String prefix =  ARG_VARIABLE+".";
@@ -392,10 +397,11 @@ public class TdsOutputHandler extends OutputHandler {
             //            System.err.println(varNames);
             LatLonRect   llr           = null;
             if(request.get(ARG_SUBSETAREA,false)) {
-                llr = new LatLonRect(new LatLonPointImpl(request.get(ARG_AREA+"_north", 90),
-                                                         request.get(ARG_AREA+"_west", -180)),
-                                     new LatLonPointImpl(request.get(ARG_AREA+"_sourh", 0),
-                                                         request.get(ARG_AREA+"_east", 180)));
+                llr = new LatLonRect(new LatLonPointImpl(request.get(ARG_AREA_NORTH, 90.0),
+                                                         request.get(ARG_AREA_WEST, -180.0)),
+                                     new LatLonPointImpl(request.get(ARG_AREA_SOUTH, 0.0),
+                                                         request.get(ARG_AREA_EAST, 180.0)));
+                System.err.println("llr:" + llr);
             }
             int hStride = request.get(ARG_HSTRIDE,1);
             int zStride = 1;
@@ -413,7 +419,31 @@ public class TdsOutputHandler extends OutputHandler {
                 GridDataset gds = GridDataset.open(file.toString());
                 writer.makeFile(f.toString(), gds, varNames, llr, (dates[0]==null?null:new ucar.nc2.units.DateRange(dates[0],dates[1])),
                                 includeLatLon, hStride, zStride, timeStride);
-                return new Result(entry.getName()+".nc", new FileInputStream(f),"application/x-netcdf");
+
+                if(request.get(ARG_ADDTOREPOSITORY,false)) {
+                    if(!canAdd) {
+                        sb.append("Cannot add to repository");
+                    } else {
+                        Entry newEntry = (Entry)entry.clone();
+                        File  newFile = getRepository().getStorageManager().moveToStorage(request, f);
+                        newEntry.setResource(new Resource(newFile, Resource.TYPE_STOREDFILE));
+                        newEntry.setId(getRepository().getGUID());
+                        newEntry.setName("subset_" + newEntry.getName());
+                        newEntry.clearMetadata();
+                        newEntry.setUser(request.getUser());
+                        newEntry.addAssociation(new Association(getRepository().getGUID(), "","subset from",entry.getId(), newEntry.getId()));
+                        if(request.get(ARG_ADDMETADATA,false)) {
+                            System.err.println ("adding metadata");
+                            newEntry.clearArea();
+                            List<Entry> entries = (List<Entry>)Misc.newList(newEntry);
+                            getRepository().addInitialMetadata(request, entries);
+                        }
+                        getRepository().insertEntries(Misc.newList(newEntry), true);
+                        return new Result(request.entryUrl(getRepository().URL_ENTRY_FORM, newEntry));
+                    }
+                } else {
+                    return new Result(entry.getName()+".nc", new FileInputStream(f),"application/x-netcdf");
+                }
             }
         }
 
@@ -428,7 +458,17 @@ public class TdsOutputHandler extends OutputHandler {
 
         sb.append(HtmlUtil.form(formUrl+"/" +fileName));
         sb.append(HtmlUtil.br());
+
+        String submitExtra = "";
+        if(canAdd) {
+            submitExtra = HtmlUtil.space(1) + HtmlUtil.checkbox(ARG_ADDTOREPOSITORY,"true",request.get(ARG_ADDTOREPOSITORY,false)) + msg("Add to Repository") +
+                HtmlUtil.checkbox(ARG_ADDMETADATA,"true",request.get(ARG_ADDMETADATA,false)) + msg("Add metadata");
+
+        }
+
+
         sb.append(HtmlUtil.submit("Subset Grid", ARG_SUBMIT));
+        sb.append(submitExtra);
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.hidden(ARG_OUTPUT, OUTPUT_GRIDSUBSET));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
@@ -436,6 +476,10 @@ public class TdsOutputHandler extends OutputHandler {
 
         sb.append(HtmlUtil.formEntry(msgLabel("Horizontal Stride"),
                                      HtmlUtil.input(ARG_HSTRIDE,request.getString(ARG_HSTRIDE,"1"),HtmlUtil.SIZE_3)));
+
+
+
+
 
 
         Date[]dateRange = null;
@@ -452,6 +496,7 @@ public class TdsOutputHandler extends OutputHandler {
             if (var instanceof CoordinateAxis) {
                 CoordinateAxis              ca = (CoordinateAxis) var;
                 AxisType axisType = ca.getAxisType();
+                if(axisType==null) continue;
                 if(axisType.equals(AxisType.Time)) {
                     dates = (List<Date>) Misc.sort(ThreddsMetadataHandler.getDates(var,ca));
                 }
@@ -483,7 +528,7 @@ public class TdsOutputHandler extends OutputHandler {
             String fromDate = request.getUnsafeString(ARG_FROMDATE,getRepository().formatDate(request,dates.get(0)));
             String toDate = request.getUnsafeString(ARG_TODATE,getRepository().formatDate(request,dates.get(dates.size()-1)));
             sb.append(HtmlUtil.formEntry( msgLabel("Time Range"),
-                                          HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, false)) + 
+                                          HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, true)) + 
                                           HtmlUtil.space(1) +
                                           HtmlUtil.select(ARG_FROMDATE,formattedDates,fromDate) +
                                           HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)) +
@@ -512,7 +557,7 @@ public class TdsOutputHandler extends OutputHandler {
         }
 
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),HtmlUtil.checkbox(ARG_ADDLATLON,"true",request.get(ARG_ADDLATLON,false))));
+        sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),HtmlUtil.checkbox(ARG_ADDLATLON,"true",request.get(ARG_ADDLATLON,true))));
 
         sb.append("</table>");
 

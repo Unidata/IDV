@@ -392,6 +392,12 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
+    public static final String ARG_AREA_SOUTH = ARG_AREA+"_south";
+    public static final String ARG_AREA_NORTH = ARG_AREA+"_north";
+    public static final String ARG_AREA_EAST = ARG_AREA+"_east";
+    public static final String ARG_AREA_WEST= ARG_AREA+"_west";
+
+
     /** _more_ */
     public static final String ARG_DATE = "date";
 

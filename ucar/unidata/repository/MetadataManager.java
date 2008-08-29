@@ -244,7 +244,6 @@ public class MetadataManager extends RepositoryManager {
 
 
     public void addInitialMetadata(Request request, Entry entry, Hashtable extra)  {
-        System.err.println("metadata:" + entry.getMetadata());
         for(Metadata metadata: getInitialMetadata(request, entry, extra)) {
             entry.addMetadata(metadata,true);
         }
