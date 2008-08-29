@@ -5556,26 +5556,23 @@ public class Repository extends RepositoryBase implements Tables,
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-
-
             StringBuffer menu = new StringBuffer();
-            menu.append("<div id=\"entrylinksmenu\" class=\"menu\">");
-            menu.append(getEntryLinksList(request, entry));
-            menu.append("</div>");
-
+            menu.append(HtmlUtil.div(getEntryLinksList(request, entry),HtmlUtil.id("entrylinksmenu" + entry.getId()) + HtmlUtil.cssClass("menu")));
+            String compId = "menubutton" + entry.getId();
             String events = HtmlUtil.onMouseOver(
-                                "setImage('menubutton','"
+                                "setImage(" + HtmlUtil.squote(compId)+",'"
                                 + fileUrl(ICON_GRAYRECTARROW)
                                 + "')") + HtmlUtil.onMouseOut(
-                                    "setImage('menubutton','"
+                                    "setImage(" +HtmlUtil.squote(compId)+",'"
                                     + fileUrl(ICON_GRAYRECT)
                                     + "')") + HtmlUtil.onMouseClick(
-                                        "showMenu(event, 'menubutton', 'entrylinksmenu')");
+                                        "showMenu(event, " + HtmlUtil.squote(compId)+", " + 
+                                        HtmlUtil.squote("entrylinksmenu"+ entry.getId()) +")");
             String menuLink = HtmlUtil.space(1)
                               + HtmlUtil.jsLink(events,
                                   HtmlUtil.img(fileUrl(ICON_GRAYRECT),
                                       msg("Show menu"),
-                                      " id=\"menubutton\" "));
+                                      HtmlUtil.id(compId)));
 
             //            String linkHtml = "";
             String linkHtml = getEntryLinksHtml(request, entry, true);

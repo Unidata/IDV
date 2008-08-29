@@ -30,6 +30,7 @@ import org.w3c.dom.*;
 import ucar.ma2.*;
 
 
+import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.NetcdfDataset;
 
@@ -213,7 +214,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    private static double[] getRange(Variable var, Array a, Unit toUnit)
+    private static double[] getRange(VariableSimpleIF var, Array a, Unit toUnit)
             throws Exception {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
         Unit fromUnit        =
@@ -231,7 +232,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
-    public static List<Date> getDates(Variable var,CoordinateAxis ca) throws Exception {
+    public static List<Date> getDates(VariableSimpleIF var,CoordinateAxis ca) throws Exception {
         Unit fromUnit = ucar.visad.Util.parseUnit(var.getUnitsString());
         Unit toUnit =  visad.CommonUnit.secondsSinceTheEpoch;
         List<Date> dates = new ArrayList<Date>();
@@ -263,7 +264,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
-    public static Date[]getMinMaxDates(Variable var,CoordinateAxis ca) throws Exception {
+    public static Date[]getMinMaxDates(VariableSimpleIF var,CoordinateAxis ca) throws Exception {
         double[] minmax =
             getRange(var, ca.read(),
                      visad.CommonUnit.secondsSinceTheEpoch);

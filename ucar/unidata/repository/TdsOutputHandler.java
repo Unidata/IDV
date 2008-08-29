@@ -35,7 +35,13 @@ import org.w3c.dom.*;
 
 import thredds.server.opendap.GuardedDatasetImpl;
 
-import ucar.nc2.dt.grid.*;
+
+
+import ucar.nc2.dt.GridDatatype;
+import ucar.nc2.dt.grid.NetcdfCFWriter;
+
+import ucar.nc2.dt.grid.GridDataset;
+
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.dataset.NetcdfDataset;
 
@@ -44,6 +50,9 @@ import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
+import ucar.nc2.dataset.VariableDS;
+import ucar.nc2.dataset.VariableEnhanced;
+import ucar.nc2.VariableSimpleIF;
 
 import ucar.unidata.geoloc.*;
 
@@ -281,7 +290,7 @@ public class TdsOutputHandler extends OutputHandler {
                     //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
                     //Use openFile
                     NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
-                    System.err.println ("nc:" + dataset.getClass().getName());
+                    //                    System.err.println ("nc:" + dataset.getClass().getName());
                     ok = true;
                 } catch (Exception ignoreThis) {}
             }
@@ -380,7 +389,7 @@ public class TdsOutputHandler extends OutputHandler {
                     varNames.add(arg.substring(prefix.length()));
                 }
             }
-            System.err.println(varNames);
+            //            System.err.println(varNames);
             LatLonRect   llr           = null;
             if(request.get(ARG_SUBSETAREA,false)) {
                 llr = new LatLonRect(new LatLonPointImpl(request.get(ARG_AREA+"_north", 90),
@@ -404,18 +413,20 @@ public class TdsOutputHandler extends OutputHandler {
                 GridDataset gds = GridDataset.open(file.toString());
                 writer.makeFile(f.toString(), gds, varNames, llr, (dates[0]==null?null:new ucar.nc2.units.DateRange(dates[0],dates[1])),
                                 includeLatLon, hStride, zStride, timeStride);
-                return new Result("subset.nc", new FileInputStream(f),"application/x-netcdf");
+                return new Result(entry.getName()+".nc", new FileInputStream(f),"application/x-netcdf");
             }
         }
 
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
-        NetcdfDataset dataset =
-            NetcdfDataset.acquireDataset(file.toString(), null);
+        GridDataset dataset = GridDataset.open(file.toString());
+        //        NetcdfDataset dataset =
+        //            NetcdfDataset.acquireDataset(file.toString(), null);
         sb.append(crumbs[1]);
-        List<Variable>  variables  = dataset.getVariables();
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
-        sb.append(HtmlUtil.form(formUrl+"/subset.nc"));
+        String fileName = IOUtil.stripExtension(entry.getName()) +"_subset.nc";
+
+        sb.append(HtmlUtil.form(formUrl+"/" +fileName));
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid", ARG_SUBMIT));
         sb.append(HtmlUtil.br());
@@ -431,30 +442,29 @@ public class TdsOutputHandler extends OutputHandler {
         List<Date> dates = null;
 
         List tuples = new ArrayList();
-        for (Variable var : variables) {
-            tuples.add(new Object[]{var.getShortName().toLowerCase(), var});
+        for(GridDatatype grid: dataset.getGrids()) {
+            VariableEnhanced var = grid.getVariable();
+            tuples.add(new Object[]{var.getShortName().toLowerCase(), grid});
         }
         tuples = Misc.sortTuples(tuples,true);
 
-        StringBuffer varSB = new StringBuffer();
-        for (Object[]tuple: (List<Object[]>) tuples) {
-            Variable var = (Variable) tuple[1];
-            if(var.getShortName().equals("grid_name")) {
-                System.err.println("var:"  + var.getClass().getName());
-            }
-            if(var.getShortName().equals("T")) {
-                System.err.println("var:"  + var.getClass().getName());
-            }
+        for (VariableSimpleIF var: dataset.getDataVariables()) {
             if (var instanceof CoordinateAxis) {
                 CoordinateAxis              ca = (CoordinateAxis) var;
                 AxisType axisType = ca.getAxisType();
                 if(axisType.equals(AxisType.Time)) {
-                    dateRange = ThreddsMetadataHandler.getMinMaxDates(var,ca);
                     dates = (List<Date>) Misc.sort(ThreddsMetadataHandler.getDates(var,ca));
                 }
                 continue;
-            }
+                }
+        }
 
+
+
+        StringBuffer varSB = new StringBuffer();
+        for (Object[]tuple: (List<Object[]>) tuples) {
+            GridDatatype grid = (GridDatatype)tuple[1];
+            VariableEnhanced var = grid.getVariable();
             varSB.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.checkbox(ARG_VARIABLE+"." + var.getShortName(),"true",false) +
                                        HtmlUtil.space(1) +
                                        var.getName() +
@@ -465,33 +475,40 @@ public class TdsOutputHandler extends OutputHandler {
 
         }
 
-        if(dateRange!=null) {
+        if(dates!=null && dates.size()>0) {
             List formattedDates = new ArrayList();
             for(Date date: dates) {
                 formattedDates.add(getRepository().formatDate(request, date));
             }
-            sb.append(HtmlUtil.formEntry( msgLabel("Subset Times"),
-                                          HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, false)) + HtmlUtil.space(1) +
-                                          HtmlUtil.select(ARG_FROMDATE,formattedDates,getRepository().formatDate(request,dateRange[0])) +
+            String fromDate = request.getUnsafeString(ARG_FROMDATE,getRepository().formatDate(request,dates.get(0)));
+            String toDate = request.getUnsafeString(ARG_TODATE,getRepository().formatDate(request,dates.get(dates.size()-1)));
+            sb.append(HtmlUtil.formEntry( msgLabel("Time Range"),
+                                          HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, false)) + 
+                                          HtmlUtil.space(1) +
+                                          HtmlUtil.select(ARG_FROMDATE,formattedDates,fromDate) +
                                           HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)) +
-                                          HtmlUtil.select(ARG_TODATE,formattedDates,getRepository().formatDate(request,dateRange[1]))));
+                                          HtmlUtil.select(ARG_TODATE,formattedDates,toDate)));
         }
 
 
+        /*
         for (CoordinateSystem coordSys : (List<CoordinateSystem>)dataset
                  .getCoordinateSystems()) {
             ProjectionImpl proj = coordSys.getProjection();
             if (proj == null) {
                 continue;
             }
-            LatLonRect llr = proj.getDefaultMapAreaLL();
+            break;
+        }
+        */
+        LatLonRect llr = dataset.getBoundingBox();
+        if(llr!=null) {
             sb.append(HtmlUtil.formEntryTop(msgLabel("Subset Spatially"),
                                             "<table cellpadding=0 cellspacing=0><tr valign=top><td>" + 
                                             HtmlUtil.checkbox(ARG_SUBSETAREA, "true", request.get(ARG_SUBSETAREA, false)) + 
                                             "</td><td>" +
                                             HtmlUtil.makeLatLonBox(ARG_AREA, llr.getLatMin(), llr.getLatMax(),llr.getLonMax(), llr.getLonMin()) +
                                             "</table>"));
-            break;
         }
 
 
