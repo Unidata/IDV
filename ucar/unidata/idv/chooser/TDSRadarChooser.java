@@ -593,9 +593,9 @@ public class TDSRadarChooser extends TimesChooser {
                 (isLevel3 && selectedStation != null && selectedProduct != null)) {
             List timeSpan = collection.getRadarTimeSpan();
             Date fromDate =  DateUnit.getStandardOrISO((String) timeSpan.get(0));
-            Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
-            //new Date(System.currentTimeMillis()
-                           //        + DateUtil.daysToMillis(1));
+            //Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
+            Date toDate = new Date(System.currentTimeMillis()
+                                   + DateUtil.daysToMillis(1));
             //Go back 10 years (or so)
             //Date fromDate = new Date(System.currentTimeMillis()
             //                         - DateUtil.daysToMillis(365 * 10));
@@ -614,13 +614,13 @@ public class TDSRadarChooser extends TimesChooser {
                     collection.getRadarStationTimes(selectedStation.getID(),
                         pid, fromDate, toDate);
 
-                if(allTimes.size() == 0) {
-                    toDate = new Date(System.currentTimeMillis()
-                             + DateUtil.daysToMillis(1));
-                    allTimes =
-                    collection.getRadarStationTimes(selectedStation.getID(),
-                        pid, fromDate, toDate);
-                }
+             //   if(allTimes.size() == 0) {
+             //       toDate = new Date(System.currentTimeMillis()
+             //                + DateUtil.daysToMillis(1));
+             //       allTimes =
+             //       collection.getRadarStationTimes(selectedStation.getID(),
+             //           pid, fromDate, toDate);
+             //   }
 
                 for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
                     Object timeObj = allTimes.get(timeIdx);
