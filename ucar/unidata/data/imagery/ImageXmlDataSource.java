@@ -36,6 +36,7 @@ import ucar.unidata.data.gis.KmlDataSource;
 
 
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 
@@ -59,6 +60,7 @@ import visad.util.DataUtility;
 import visad.util.ImageHelper;
 
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 
@@ -606,7 +608,8 @@ public class ImageXmlDataSource extends FilesDataSource {
                     }
                     //                    GIFForm form = new GIFForm();
                     //FlatField   ff     = (FlatField) family.open(ii.getUrl());
-                    FlatField   ff = (FlatField) DataUtility.makeField(image);
+                    //                    FlatField   ff = (FlatField) DataUtility.makeField(image,true);
+                    FlatField   ff = (FlatField) ucar.visad.Util.makeField(image,true);
                     Linear2DSet domain = (Linear2DSet) ff.getDomainSet();
                     SampledSet  newDomain;
                     int         width  = domain.getX().getLength();
