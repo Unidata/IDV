@@ -560,7 +560,7 @@ public class ThreddsHandler extends XmlHandler {
 
         if (doc == null) {
             LogUtil.userMessage("Could not find the documentation");
-            System.err.println(XmlUtil.toString(node));
+            //System.err.println(XmlUtil.toString(node));
             return;
         }
 
@@ -1004,7 +1004,7 @@ public class ThreddsHandler extends XmlHandler {
                     }
                 }
             }
-            System.err.println("Absolute url:" + url);
+            //System.err.println("Absolute url:" + url);
             urlPaths.add(new XmlChooser.PropertiedAction(url, properties));
         } else {
             //For now don't deal with container dataset nodes
