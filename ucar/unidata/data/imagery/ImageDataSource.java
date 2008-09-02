@@ -54,6 +54,7 @@ import visad.meteorology.ImageSequence;
 import visad.meteorology.ImageSequenceManager;
 import visad.meteorology.SingleBandedImage;
 
+import java.text.SimpleDateFormat;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -70,7 +71,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -126,6 +126,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     /** _more_ */
     private AreaDirectory[][] currentDirs;
 
+    private Hashtable timeMap = new Hashtable();
 
     /**
      *  The parameterless constructor for unpersisting.
@@ -211,9 +212,22 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     public List getDataPaths() {
         List paths = new ArrayList();
-        for (int i = 0; i < imageList.size(); i++) {
-            AddeImageDescriptor aid = getDescriptor(imageList.get(i));
-            paths.add(aid.getSource());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd'T'HH_mm_ss_Z");
+        try {
+            for (int i = 0; i < imageList.size(); i++) {
+                AddeImageDescriptor aid = getDescriptor(imageList.get(i));
+                String path = aid.getSource();
+                DateTime dttm = (DateTime)   timeMap.get(path);
+                if(dttm!=null) {
+                    System.err.println("path:" + path);
+                    String dateString = sdf.format(ucar.visad.Util.makeDate(dttm));
+                    paths.add(new Object[]{path,path+dateString});
+                } else {
+                    paths.add(path);
+                }
+            } 
+        } catch(Exception exc) {
+            throw new ucar.unidata.util.WrapperException(exc);
         }
         return paths;
     }
@@ -298,11 +312,21 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                        boolean changeLinks)
             throws Exception {
         List urls = new ArrayList();
+        List suffixes = new ArrayList();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd'T'HH_mm_ss_Z");
         for (int i = 0; i < imageList.size(); i++) {
             AddeImageDescriptor aid = getDescriptor(imageList.get(i));
-            urls.add(aid.getSource());
+            String url = aid.getSource();
+            DateTime dttm = (DateTime)   timeMap.get(url);
+            if(dttm!=null) {
+                suffixes.add("area"+sdf.format(ucar.visad.Util.makeDate(dttm)));
+            } else {
+                suffixes.add("area"+i);
+            }
+            urls.add(url);
         }
-        List newFiles = IOUtil.writeTo(urls, prefix, "area", loadId);
+        List newFiles = IOUtil.writeTo(urls, prefix, suffixes, loadId);
+        System.err.println ("files:" + newFiles);
         if (newFiles == null) {
             return null;
         }
@@ -454,6 +478,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
         return new AddeImageDescriptor(object.toString());
     }
+
+
+
+
 
     /**
      * This is used when we are unbundled and we may have different times than when we were saved.
@@ -1104,6 +1132,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
             } else {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
+                timeMap.put(aid.getSource(), aa.getImageStartTime());
                 result = aa.getImage();
             }
             putCache(source, result);

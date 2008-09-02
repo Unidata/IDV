@@ -405,6 +405,8 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
     }
 
 
+
+
     /**
      * Get the time of the image
      * @return  nominal time of the image (may be null)
