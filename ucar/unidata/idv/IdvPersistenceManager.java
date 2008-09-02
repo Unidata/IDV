@@ -107,7 +107,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     public static final String PROP_BUNDLEPATH = "idv.bundlepath";
 
 
-    /** The macro for the zidv path in data paths */
+   /** The macro for the zidv path in data paths */
     public static final String PROP_ZIDVPATH = "idv.zidvpath";
 
 
@@ -2238,10 +2238,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                         : dataSource.getDataPaths());
             List       relativeFiles = new ArrayList();
             for (int fileIdx = 0; fileIdx < files.size(); fileIdx++) {
-                String file = (String) files.get(fileIdx);
+                Object o = files.get(fileIdx);
+                String file=null;
+                String newFile = null;
+                if(o instanceof String) {
+                    newFile = file = (String) o;
+                } else {
+                    file  = ((Object[])o)[0].toString();
+                    newFile  = ((Object[])o)[1].toString();
+                }
                 //Check if it exists
                 filesToEmbed.add(file);
-                file = "%" + PROP_ZIDVPATH + "%/" + IOUtil.getFileTail(file);
+                file = "%" + PROP_ZIDVPATH + "%/" + IOUtil.getFileTail(newFile);
                 relativeFiles.add(file);
             }
             dataSource.setTmpPaths(relativeFiles);
