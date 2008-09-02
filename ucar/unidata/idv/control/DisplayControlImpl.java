@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -1358,6 +1356,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return true if there is a time macro
      */
     protected boolean hasTimeMacro(String t) {
+        if(t==null) return false;
         return UtcDate.containsTimeMacro(t) || (t.indexOf(MACRO_FHOUR) >= 0);
 
     }
@@ -1370,7 +1369,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected boolean shouldAddAnimationListener() {
         return hasTimeMacro(getLegendLabelTemplate())
-               || hasTimeMacro(getExtraLabelTemplate());
+               || hasTimeMacro(getExtraLabelTemplate()) ||
+            hasTimeMacro(getDisplayListTemplate());
     }
 
 
@@ -3416,6 +3416,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             String template = applyMacrosToTemplate(getDisplayListTemplate(),
                                   false);
+            if (firstTime == null) {
+                checkTimestampLabel(null);
+            }
             Set      s  = getDataTimeSet();
             TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
             if (s != null) {
@@ -3649,7 +3652,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List values   = new ArrayList();
         addLabelMacros(template, patterns, values);
         if (timeOk && hasTimeMacro(template)) {
-            if (currentTime == null) {
+            if (firstTime == null || currentTime == null) {
                 checkTimestampLabel(null);
             }
             if (UtcDate.containsTimeMacro(template)) {
@@ -5472,7 +5475,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         setLegendLabelTemplate(legendLabelTemplateFld.getText());
         if (hasTimeMacro(legendLabelTemplate)
-                || hasTimeMacro(extraLabelTemplate)) {
+            || hasTimeMacro(extraLabelTemplate) ||
+            hasTimeMacro(getDisplayListTemplate())) {
             try {
                 if (animation == null) {
                     getAnimation();
@@ -7445,7 +7449,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !getHaveInitialized() || !getActive()) {
             return;
         }
-
         if (checkTimestampLabel(time)) {
             updateLegendLabel();
         }
