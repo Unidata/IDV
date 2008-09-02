@@ -679,13 +679,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         boolean prevMakeDataRelative = makeDataRelative;
         makeDataRelative = makeDataRelativeCbx.isSelected();
-        doSave(filename);
-        getPublishManager().publishContent(filename,null,publishCbx);
+        if(doSave(filename)) {
+            getPublishManager().publishContent(filename,null,publishCbx);
+            getIdv().addToHistoryList(filename);
+        }
         makeDataEditable = prevMakeDataEditable;
         makeDataRelative = prevMakeDataRelative;
-        getIdv().addToHistoryList(filename);
-
-
 
     }
 
@@ -1376,6 +1375,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
 
             if (doZidv) {
+                GuiUtils.ProgressDialog dialog = new GuiUtils.ProgressDialog("Writing ZIDV",true);
+                dialog.setText("Writing ZIDV");
                 String tail =
                     IOUtil.stripExtension(IOUtil.getFileTail(filename));
                 ZipOutputStream zos =
@@ -1389,11 +1390,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     String   file     = (String) zidvFiles.get(i);
                     ZipEntry zipEntry =
                         new ZipEntry(IOUtil.getFileTail(file));
+                    dialog.setText("Writing " + zipEntry.getName());
                     zos.putNextEntry(zipEntry);
                     IOUtil.writeTo(IOUtil.getInputStream(file, getClass()),
                                    zos);
                     zos.closeEntry();
+                    if(dialog.isCancelled()) {
+                        dialog.dispose();
+                        zos.close();
+                        return false;
+                    }
                 }
+                dialog.dispose();
                 zos.close();
                 return true;
             }
@@ -2139,7 +2147,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     notSavedLabels.add(new JLabel(dataSourceName));
                     continue;
                 }
-                if ( !new File(files.get(0).toString()).exists()) {
+                Object sampleFile = files.get(0);
+                if(sampleFile.getClass().isArray()) {
+                    sampleFile = ((Object[])sampleFile)[0];
+                }
+                if ( !new File(sampleFile.toString()).exists()) {
                     notSavedLabels.add(new JLabel(dataSourceName));
                     continue;
                 }
@@ -2241,12 +2253,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 Object o = files.get(fileIdx);
                 String file=null;
                 String newFile = null;
-                if(o instanceof String) {
-                    newFile = file = (String) o;
-                } else {
+                if(o.getClass().isArray()) {
                     file  = ((Object[])o)[0].toString();
                     newFile  = ((Object[])o)[1].toString();
-                }
+                } else {
+                    newFile = file = (String) o;
+                } 
                 //Check if it exists
                 filesToEmbed.add(file);
                 file = "%" + PROP_ZIDVPATH + "%/" + IOUtil.getFileTail(newFile);
