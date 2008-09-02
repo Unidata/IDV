@@ -455,7 +455,7 @@ example:
      label="Topography"
      icon="/ucar/unidata/idv/images/surface.png"
      displaycategory="3D Surface"
-     properties="displayName=Topography;smoothed=true;">
+     properties="displayName=Topography;smoothed=true;isRaster=true">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 
