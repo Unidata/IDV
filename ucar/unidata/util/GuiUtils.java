@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -75,7 +76,8 @@ import javax.swing.tree.*;
  */
 public class GuiUtils extends LayoutUtil {
 
-    public static String MISSING_IMAGE  = "/ucar/undiata/util/scream.gif";
+    /** _more_          */
+    public static String MISSING_IMAGE = "/ucar/undiata/util/scream.gif";
 
 
     /** xml attribute name */
@@ -229,21 +231,48 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /** _more_          */
     private static int dfltIconSize = -1;
+
+    /**
+     * _more_
+     *
+     * @param size _more_
+     */
     public static void setDefaultIconSize(int size) {
         dfltIconSize = size;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static int getDefaultIconSize() {
         return dfltIconSize;
     }
 
+    /** _more_          */
     private static Font dfltFont;
+
+    /**
+     * _more_
+     *
+     * @param font _more_
+     */
     public static void setDefaultFont(Font font) {
         dfltFont = font;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static Font getDefaultFont() {
-        if(dfltFont!=null) return dfltFont;
+        if (dfltFont != null) {
+            return dfltFont;
+        }
         return null;
     }
 
@@ -499,8 +528,15 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param height _more_
+     *
+     * @return _more_
+     */
     public static boolean checkHeight(int height) {
-        if(height>100) {
+        if (height > 100) {
             //            LogUtil.printMessage("Got large height when setting preferred size:" + height);
             //            LogUtil.printMessage(LogUtil.getStackTrace());
             return false;
@@ -509,13 +545,19 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     * @param width _more_
+     */
     public static void setPreferredWidth(JComponent comp, int width) {
         int height = comp.getPreferredSize().height;
-        if(!checkHeight(height)) {
+        if ( !checkHeight(height)) {
             //For now just set the height to some reasonable amount and use that
             height = 24;
         }
-        comp.setPreferredSize(new Dimension(width,height));
+        comp.setPreferredSize(new Dimension(width, height));
     }
 
     /**
@@ -527,6 +569,7 @@ public class GuiUtils extends LayoutUtil {
      */
     public static class ColorSwatch extends JPanel {
 
+        /** _more_          */
         boolean doAlpha = false;
 
         /** color of the swatch */
@@ -551,10 +594,17 @@ public class GuiUtils extends LayoutUtil {
             this(c, dialogLabel, false);
         }
 
-        public ColorSwatch(Color c, String dialogLabel,boolean alphaOk) {
+        /**
+         * _more_
+         *
+         * @param c _more_
+         * @param dialogLabel _more_
+         * @param alphaOk _more_
+         */
+        public ColorSwatch(Color c, String dialogLabel, boolean alphaOk) {
             this.doAlpha = alphaOk;
-            this.color = c;
-            this.label = dialogLabel;
+            this.color   = c;
+            this.label   = dialogLabel;
             setMinimumSize(new Dimension(40, 10));
             setPreferredSize(new Dimension(40, 10));
             setToolTipText("Click to change color");
@@ -579,21 +629,30 @@ public class GuiUtils extends LayoutUtil {
 
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    Color oldColor = ColorSwatch.this.getBackground();
-                    int alpha =  oldColor.getAlpha();
-                    JColorChooser chooser = new JColorChooser(oldColor);
-                    JSlider alphaSlider = new JSlider(0,255,alpha);
-                    JComponent contents;
-                    if(doAlpha) 
-                        contents = centerBottom(chooser, inset(hbox(new JLabel("Transparency:"), alphaSlider), new Insets(5,5,5,5)));
-                    else contents = chooser;
-                    if(!showOkCancelDialog(null,label, contents, null)) return;
+                    Color         oldColor = ColorSwatch.this.getBackground();
+                    int           alpha       = oldColor.getAlpha();
+                    JColorChooser chooser     = new JColorChooser(oldColor);
+                    JSlider       alphaSlider = new JSlider(0, 255, alpha);
+                    JComponent    contents;
+                    if (doAlpha) {
+                        contents = centerBottom(chooser,
+                                inset(hbox(new JLabel("Transparency:"),
+                                           alphaSlider), new Insets(5, 5, 5,
+                                               5)));
+                    } else {
+                        contents = chooser;
+                    }
+                    if ( !showOkCancelDialog(null, label, contents, null)) {
+                        return;
+                    }
                     alpha = alphaSlider.getValue();
                     //                    Color newColor = JColorChooser.showDialog(null, label,
                     //                                                              oldColor);
                     Color newColor = chooser.getColor();
                     if (newColor != null) {
-                        newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alpha);
+                        newColor = new Color(newColor.getRed(),
+                                             newColor.getGreen(),
+                                             newColor.getBlue(), alpha);
                         ColorSwatch.this.setBackground(newColor);
                     }
                 }
@@ -657,8 +716,8 @@ public class GuiUtils extends LayoutUtil {
             Rectangle b = getBounds();
             if (color != null) {
                 g.setColor(Color.black);
-                for(int x=0;x<b.width;x+=4) {
-                    g.fillRect(x,0,2,b.height);
+                for (int x = 0; x < b.width; x += 4) {
+                    g.fillRect(x, 0, 2, b.height);
                 }
             }
 
@@ -811,7 +870,9 @@ public class GuiUtils extends LayoutUtil {
 
     public static ImageIcon getImageIcon(String file, Class c,
                                          boolean cache) {
-        if(c==null) c = GuiUtils.class;
+        if (c == null) {
+            c = GuiUtils.class;
+        }
         Image image = getImage(file, c, cache);
         if (image == null) {
             return null;
@@ -820,19 +881,28 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param c _more_
+     * @param cache _more_
+     *
+     * @return _more_
+     */
     public static ImageIcon getScaledImageIcon(String file, Class c,
-                                               boolean cache) {
+            boolean cache) {
         ImageIcon icon = getImageIcon(file, c, cache);
         if (icon == null) {
             return null;
         }
         int w = icon.getIconWidth();
         //        System.err.println (file + " " + w);
-        if(w>0 && w<dfltIconSize) {
+        if ((w > 0) && (w < dfltIconSize)) {
             Image image = icon.getImage();
-            int h = image.getHeight(null);
-            h = (int)(h*(dfltIconSize/(double)w));
-            image = image.getScaledInstance(dfltIconSize, h,0);
+            int   h     = image.getHeight(null);
+            h     = (int) (h * (dfltIconSize / (double) w));
+            image = image.getScaledInstance(dfltIconSize, h, 0);
             icon.setImage(image);
         }
         return icon;
@@ -1644,7 +1714,7 @@ public class GuiUtils extends LayoutUtil {
      */
     public static int showYesNoCancelDialog(Window frame, String message,
                                             String title) {
-        return showYesNoCancelDialog(frame, message,title, CMD_YES);
+        return showYesNoCancelDialog(frame, message, title, CMD_YES);
     }
 
     /**
@@ -1666,7 +1736,7 @@ public class GuiUtils extends LayoutUtil {
         }
         int result = JOptionPane.showOptionDialog(component, message, title,
                          JOptionPane.YES_NO_CANCEL_OPTION,
-                         JOptionPane.QUESTION_MESSAGE, null, options, 
+                         JOptionPane.QUESTION_MESSAGE, null, options,
                          defaultCmd);
 
         return result;
@@ -1877,8 +1947,10 @@ public class GuiUtils extends LayoutUtil {
                                              Component src,
                                              List actionComponents,
                                              String okLabel) {
-        if(!LogUtil.getInteractiveMode()) 
-            throw new IllegalStateException ("Cannot show dialog in non-interactive mode");
+        if ( !LogUtil.getInteractiveMode()) {
+            throw new IllegalStateException(
+                "Cannot show dialog in non-interactive mode");
+        }
         JDialog              dialog   = createDialog(f, title, true);
         final ObjectListener listener = getCloseDialogListener(dialog);
         JPanel buttons = makeOkCancelButtons(listener, okLabel, CMD_CANCEL);
@@ -1988,8 +2060,7 @@ public class GuiUtils extends LayoutUtil {
         };
         String[]  labels = {
             "all", "every other one", "every third one", "every fourth one",
-            "every fifth one", "every tenth one", 
-            "every twentieth one"
+            "every fifth one", "every tenth one", "every twentieth one"
         };
         List  items     = new ArrayList();
         JMenu rangeMenu = new JMenu("Select Range");
@@ -2013,37 +2084,40 @@ public class GuiUtils extends LayoutUtil {
 
         JMenuItem selectStrideMenuItem = new JMenuItem("Choose Interval");
         selectStrideMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    JTextField stepFld = new JTextField("1",4);
-                    JTextField startFld = new JTextField("1",4);
-                    tmpInsets = INSETS_5; 
-                    JComponent contents = doLayout(new Component[]{rLabel("Start Index:"),
-                                                                   startFld,
-                                                                   rLabel("Interval:"),
-                                                                   stepFld},
-                                                   2,
-                                                   WT_NN,
-                                                   WT_N);
-                    contents = vbox(new JLabel("Choose Selection Interval"),
-                                    contents);
-                    contents = inset(contents, 5);
+            public void actionPerformed(ActionEvent ae) {
+                JTextField stepFld  = new JTextField("1", 4);
+                JTextField startFld = new JTextField("1", 4);
+                tmpInsets = INSETS_5;
+                JComponent contents = doLayout(new Component[] {
+                                          rLabel("Start Index:"),
+                                          startFld, rLabel("Interval:"),
+                                          stepFld }, 2, WT_NN, WT_N);
+                contents = vbox(new JLabel("Choose Selection Interval"),
+                                contents);
+                contents = inset(contents, 5);
 
-                    while(true) {
-                        if(!showOkCancelDialog(null, "Selection Interval", contents, list)) return;
-                        try {
-                            int start = new Integer(startFld.getText().trim()).intValue()-1;
-                            int step = new Integer(stepFld.getText().trim()).intValue();
-                            list.clearSelection();
-                            for (int idx = start; idx < size; idx += step) {
-                                list.addSelectionInterval(idx, idx);
-                            }
-                            return;
-                        } catch(NumberFormatException nfe) {
-                            LogUtil.userErrorMessage("Bad input value");
+                while (true) {
+                    if ( !showOkCancelDialog(null, "Selection Interval",
+                                             contents, list)) {
+                        return;
+                    }
+                    try {
+                        int start =
+                            new Integer(startFld.getText().trim()).intValue()
+                            - 1;
+                        int step =
+                            new Integer(stepFld.getText().trim()).intValue();
+                        list.clearSelection();
+                        for (int idx = start; idx < size; idx += step) {
+                            list.addSelectionInterval(idx, idx);
                         }
+                        return;
+                    } catch (NumberFormatException nfe) {
+                        LogUtil.userErrorMessage("Bad input value");
                     }
                 }
-            });
+            }
+        });
         items.add(MENU_SEPARATOR);
         items.add(selectStrideMenuItem);
         items.add(MENU_SEPARATOR);
@@ -2353,9 +2427,20 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param icon _more_
+     * @param origin _more_
+     * @param hInset _more_
+     * @param vInset _more_
+     *
+     * @return _more_
+     */
     public static JButton getScaledImageButton(String icon, Class origin,
-                                         int hInset, int vInset) {
-        return getImageButton(getScaledImageIcon(icon, origin, true), hInset, vInset);
+            int hInset, int vInset) {
+        return getImageButton(getScaledImageIcon(icon, origin, true), hInset,
+                              vInset);
     }
 
     /**
@@ -3163,8 +3248,7 @@ public class GuiUtils extends LayoutUtil {
         NamedNodeMap attrs    = node.getAttributes();
         String       label    = Msg.msg(getAttribute(attrs, "label"));
         JMenuItem    menuItem = new JMenuItem(label);
-        String mnemonic = getAttribute(node, "mnemonic",
-                              (String) null);
+        String       mnemonic = getAttribute(node, "mnemonic", (String) null);
         if (mnemonic != null) {
             int keyCode =
                 charToKeyCode(mnemonic.trim().toUpperCase().charAt(0));
@@ -3173,17 +3257,15 @@ public class GuiUtils extends LayoutUtil {
             }
         }
 
-        String tooltip = getAttribute(attrs, ATTR_TOOLTIP,
-                             (String) null);
+        String tooltip = getAttribute(attrs, ATTR_TOOLTIP, (String) null);
         if (tooltip != null) {
             menuItem.setToolTipText(tooltip);
         }
 
 
-        String action = getAttribute(attrs, ATTR_ACTION,
-                                             (String) null);
-        String id   = getAttribute(attrs, ATTR_ID, (String) null);
-        String icon = getAttribute(attrs, ATTR_ICON, (String) null);
+        String action = getAttribute(attrs, ATTR_ACTION, (String) null);
+        String id     = getAttribute(attrs, ATTR_ID, (String) null);
+        String icon   = getAttribute(attrs, ATTR_ICON, (String) null);
         menuItem.addActionListener(listener);
         if (action != null) {
             menuItem.setActionCommand(action);
@@ -3315,12 +3397,12 @@ public class GuiUtils extends LayoutUtil {
                                        Hashtable menuItems)
             throws Exception {
         NamedNodeMap attrs    = menuNode.getAttributes();
-        String       id = getAttribute(attrs, "id", (String) null);
+        String       id       = getAttribute(attrs, "id", (String) null);
         NodeList     children = menuNode.getChildNodes();
         String       label    = Msg.msg(getAttribute(attrs, "label"));
         JMenu        menu     = new JMenu(label);
         String mnemonic = getAttribute(menuNode.getAttributes(), "mnemonic",
-                              (String) null);
+                                       (String) null);
         if (mnemonic != null) {
             int keyCode =
                 charToKeyCode(mnemonic.trim().toUpperCase().charAt(0));
@@ -3338,7 +3420,8 @@ public class GuiUtils extends LayoutUtil {
             } else {
                 menuToReturn = null;
                 menu         = existing;
-                if (getAttribute(menuNode.getAttributes(), "replace", false)) {
+                if (getAttribute(menuNode.getAttributes(), "replace",
+                                 false)) {
                     menu.removeAll();
                 }
             }
@@ -4408,7 +4491,7 @@ public class GuiUtils extends LayoutUtil {
         if (editable) {
             Dimension preferred = box.getPreferredSize();
             box.setEditable(true);
-            if(checkHeight(preferred.height)) {
+            if (checkHeight(preferred.height)) {
                 box.setPreferredSize(preferred);
             }
         }
@@ -5099,23 +5182,29 @@ public class GuiUtils extends LayoutUtil {
 
 
 
-    public static void positionAndFitToScreen(Window window, Rectangle bounds) {
-        Dimension screenSize =
-            Toolkit.getDefaultToolkit().getScreenSize();
-        int diff;
-        diff = (bounds.x+bounds.width)-screenSize.width ;
-        if(diff>0) {
-            bounds.x -=  Math.min(diff, bounds.x);
-            diff = screenSize.width-(bounds.x+bounds.width);
-            if(diff>0) {
+    /**
+     * _more_
+     *
+     * @param window _more_
+     * @param bounds _more_
+     */
+    public static void positionAndFitToScreen(Window window,
+            Rectangle bounds) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int       diff;
+        diff = (bounds.x + bounds.width) - screenSize.width;
+        if (diff > 0) {
+            bounds.x -= Math.min(diff, bounds.x);
+            diff     = screenSize.width - (bounds.x + bounds.width);
+            if (diff > 0) {
                 bounds.width -= diff;
             }
         }
-        diff = (bounds.y+bounds.height)-screenSize.height;
-        if(diff>0) {
-            bounds.y -=  Math.min(diff, bounds.y);
-            diff = screenSize.height-(bounds.y+bounds.height);
-            if(diff>0) {
+        diff = (bounds.y + bounds.height) - screenSize.height;
+        if (diff > 0) {
+            bounds.y -= Math.min(diff, bounds.y);
+            diff     = screenSize.height - (bounds.y + bounds.height);
+            if (diff > 0) {
                 bounds.height -= diff;
             }
         }
@@ -5412,6 +5501,8 @@ public class GuiUtils extends LayoutUtil {
      * Italicize the font on the given component
      *
      * @param comp The component
+     *
+     * @return _more_
      */
     public static Component italicizeFont(Component comp) {
         if (comp != null) {
@@ -5877,10 +5968,51 @@ public class GuiUtils extends LayoutUtil {
         return found;
     }
 
+    public static class ProgressDialog extends JDialog {
+
+        private JLabel statusLbl;
+        private boolean cancelPressed = false;
+
+        public ProgressDialog(String title) {
+            this(title, false);
+        }
+
+        public ProgressDialog(String title, boolean doCancel) {
+            super((JFrame)null, title, false);
+            statusLbl = new JLabel(" ");
+            statusLbl.setMinimumSize(new Dimension(350, 20));
+            statusLbl.setPreferredSize(new Dimension(350, 20));
+            JLabel         waitLbl        = new JLabel(getImageIcon("/ucar/unidata/util/wait.gif"));
+            JComponent contents = GuiUtils.inset(GuiUtils.centerRight(statusLbl, waitLbl),5);
+            if(doCancel) {
+                JButton btn = new JButton("Cancel");
+                btn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            cancelPressed = true;
+                            setText("Cancelling");
+                        }
+                    });
+                contents = GuiUtils.centerBottom(contents, GuiUtils.inset(GuiUtils.wrap(btn),5));
+            }
+            this.getContentPane().add(contents);
+            this.pack();
+            this.setLocation(200,200);
+            this.show();
+        }
+
+        public void setText(String lbl) {
+            statusLbl.setText(lbl);
+        }
+
+        public boolean isCancelled() {
+            return cancelPressed;
+        }
+    }
 
 
 
 }
+
 
 
 
