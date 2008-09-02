@@ -270,5 +270,15 @@ public abstract class BaseImageControl extends GridDisplayControl {
     protected boolean showSkipFactorSlider() {
         return checkFlag(FLAG_SKIPFACTOR);
     }
+
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 

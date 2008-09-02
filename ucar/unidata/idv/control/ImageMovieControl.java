@@ -1749,6 +1749,11 @@ public class ImageMovieControl extends DisplayControlImpl  {
     }
 
 
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
     public boolean getIsRaster() {
         return true;
     }
