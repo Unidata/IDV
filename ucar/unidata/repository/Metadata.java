@@ -79,7 +79,7 @@ import java.util.zip.*;
 public class Metadata implements Constants, Tables {
 
 
-    /** _more_          */
+    /** _more_ */
     private Entry entry;
 
     /** _more_ */
@@ -347,16 +347,32 @@ public class Metadata implements Constants, Tables {
      * @return _more_
      */
     public String toString() {
-        return "entry:" + entryId + " type:" + type + " attr1:" + attr1 + " attr2:" + attr2 + " attr3:" + attr3 + " attr4:" + attr4;
+        return "entry:" + entryId + " type:" + type + " attr1:" + attr1
+               + " attr2:" + attr2 + " attr3:" + attr3 + " attr4:" + attr4;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param idx _more_
+     *
+     * @return _more_
+     */
     public String getAttr(int idx) {
-        if(idx==1) return attr1;
-        if(idx==2) return attr2;
-        if(idx==3) return attr3;
-        if(idx==4) return attr4;
-        throw new IllegalArgumentException ("Bad attr idx:" + idx);
+        if (idx == 1) {
+            return attr1;
+        }
+        if (idx == 2) {
+            return attr2;
+        }
+        if (idx == 3) {
+            return attr3;
+        }
+        if (idx == 4) {
+            return attr4;
+        }
+        throw new IllegalArgumentException("Bad attr idx:" + idx);
     }
 
 
@@ -371,28 +387,28 @@ public class Metadata implements Constants, Tables {
      */
     public static class Type {
 
-        /** _more_          */
+        /** _more_ */
         public static final String DEFAULT_CATEGORY = "Metadata";
 
-        /** _more_          */
+        /** _more_ */
         public static final int SEARCHABLE_ATTR1 = 1 << 0;
 
-        /** _more_          */
+        /** _more_ */
         public static final int SEARCHABLE_ATTR2 = 1 << 1;
 
-        /** _more_          */
+        /** _more_ */
         public static final int SEARCHABLE_ATTR3 = 1 << 3;
 
-        /** _more_          */
+        /** _more_ */
         public static final int SEARCHABLE_ATTR4 = 1 << 4;
 
-        /** _more_          */
+        /** _more_ */
         public int searchableMask = 0;
 
         /** _more_ */
         private String type;
 
-        /** _more_          */
+        /** _more_ */
         private String category = DEFAULT_CATEGORY;
 
 
@@ -634,6 +650,13 @@ public class Metadata implements Constants, Tables {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
         if ( !getClass().equals(o.getClass())) {
             return false;
@@ -647,13 +670,12 @@ public class Metadata implements Constants, Tables {
             Misc.equals(this.attr4, that.attr4) + " " +
             Misc.equals(this.entryId, that.entryId));*/
 
-        return 
-            Misc.equals(this.type,  that.type) &&
-            Misc.equals(this.attr1, that.attr1) &&
-            Misc.equals(this.attr2, that.attr2) &&
-            Misc.equals(this.attr3, that.attr3) &&
-            Misc.equals(this.attr4, that.attr4) &&
-            Misc.equals(this.entryId, that.entryId);
+        return Misc.equals(this.type, that.type)
+               && Misc.equals(this.attr1, that.attr1)
+               && Misc.equals(this.attr2, that.attr2)
+               && Misc.equals(this.attr3, that.attr3)
+               && Misc.equals(this.attr4, that.attr4)
+               && Misc.equals(this.entryId, that.entryId);
     }
 
 
@@ -664,7 +686,9 @@ public class Metadata implements Constants, Tables {
      */
     public void setEntry(Entry value) {
         entry = value;
-        if(value!=null) entryId = value.getId();
+        if (value != null) {
+            entryId = value.getId();
+        }
     }
 
     /**

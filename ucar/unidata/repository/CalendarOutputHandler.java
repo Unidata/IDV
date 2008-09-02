@@ -328,13 +328,13 @@ public class CalendarOutputHandler extends OutputHandler {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private static final int IDX_DAY = 0;
 
-    /** _more_          */
+    /** _more_ */
     private static final int IDX_MONTH = 1;
 
-    /** _more_          */
+    /** _more_ */
     private static final int IDX_YEAR = 2;
 
 

@@ -140,7 +140,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
     /** _more_ */
@@ -155,7 +155,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_SERVICENAME = "serviceName";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PROPERTY = "property";
 
     /** _more_ */

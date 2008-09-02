@@ -35,24 +35,25 @@ import org.w3c.dom.*;
 
 import thredds.server.opendap.GuardedDatasetImpl;
 
+import ucar.nc2.Attribute;
+
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
+import ucar.nc2.VariableSimpleIF;
+
+import ucar.nc2.constants.AxisType;
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateSystem;
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.VariableDS;
+import ucar.nc2.dataset.VariableEnhanced;
+
 
 
 import ucar.nc2.dt.GridDatatype;
-import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 import ucar.nc2.dt.grid.GridDataset;
-
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.dataset.NetcdfDataset;
-
-import ucar.nc2.constants.AxisType;
-import ucar.nc2.dataset.CoordinateSystem;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.Attribute;
-import ucar.nc2.Variable;
-import ucar.nc2.dataset.VariableDS;
-import ucar.nc2.dataset.VariableEnhanced;
-import ucar.nc2.VariableSimpleIF;
+import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 import ucar.unidata.geoloc.*;
 
@@ -97,24 +98,36 @@ import javax.servlet.http.*;
  */
 public class TdsOutputHandler extends OutputHandler {
 
+    /** _more_          */
     public static final String ARG_ADDLATLON = "addlatlon";
+
+    /** _more_          */
     public static final String ARG_ADDTOREPOSITORY = "addtorepository";
 
+    /** _more_          */
     public static final String ARG_SUBSETAREA = "subsetarea";
+
+    /** _more_          */
     public static final String ARG_SUBSETTIME = "subsettime";
 
+    /** _more_          */
     public static final String ARG_HSTRIDE = "hstride";
 
     /** _more_ */
     public static final String OUTPUT_OPENDAP = "tds.opendap";
 
+    /** _more_          */
     public static final String OUTPUT_CDL = "tds.cdl";
 
+    /** _more_          */
     public static final String OUTPUT_WCS = "tds.wcs";
 
 
 
+    /** _more_          */
     public static final String OUTPUT_GRIDSUBSET_FORM = "tds.gridsubset.form";
+
+    /** _more_          */
     public static final String OUTPUT_GRIDSUBSET = "tds.gridsubset";
 
 
@@ -122,8 +135,9 @@ public class TdsOutputHandler extends OutputHandler {
     private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
                                                             Boolean>();
 
+    /** _more_          */
     private Hashtable<String, Boolean> gridEntries = new Hashtable<String,
-                                                            Boolean>();
+                                                         Boolean>();
 
 
     /** _more_ */
@@ -173,11 +187,10 @@ public class TdsOutputHandler extends OutputHandler {
      * @return Is it tds?
      */
     public boolean canHandle(String output) {
-        return output.equals(OUTPUT_OPENDAP) || 
-            output.equals(OUTPUT_CDL)    || 
-            output.equals(OUTPUT_WCS) ||
-            output.equals(OUTPUT_GRIDSUBSET)||
-            output.equals(OUTPUT_GRIDSUBSET_FORM);
+        return output.equals(OUTPUT_OPENDAP) || output.equals(OUTPUT_CDL)
+               || output.equals(OUTPUT_WCS)
+               || output.equals(OUTPUT_GRIDSUBSET)
+               || output.equals(OUTPUT_GRIDSUBSET_FORM);
     }
 
 
@@ -210,26 +223,48 @@ public class TdsOutputHandler extends OutputHandler {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     * @param forHeader _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if (!canLoad(request, entry)) {
+        if ( !canLoad(request, entry)) {
             return;
         }
-        String tdsUrl = request.getRequestPath() +  "/"
-            + request.getPathEmbeddedArgs() + "/entry.das";
-        
-        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),"OpenDAP"));
+        String tdsUrl = request.getRequestPath() + "/"
+                        + request.getPathEmbeddedArgs() + "/entry.das";
 
-        links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                            ARG_OUTPUT, OUTPUT_CDL), getRepository().fileUrl(ICON_DATA),"CDL"));
+        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),
+                           "OpenDAP"));
 
-        if(canLoadAsGrid(entry)) {
-            links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                                ARG_OUTPUT, OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(ICON_DATA),"Subset"));
+        links.add(
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
 
-            links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                                ARG_OUTPUT, OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),"WCS"));
+        if (canLoadAsGrid(entry)) {
+            links.add(
+                new Link(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                        OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
+                            ICON_DATA), "Subset"));
+
+            links.add(
+                new Link(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                        OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),
+                                     "WCS"));
         }
     }
 
@@ -243,9 +278,9 @@ public class TdsOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getTdsUrl(Entry entry) {
-        return "/" + ARG_OUTPUT + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP)
-               + "/" + ARG_ID + ":" + Request.encodeEmbedded(entry.getId())
-               + "/entry.das";
+        return "/" + ARG_OUTPUT + ":"
+               + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID + ":"
+               + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
 
@@ -274,7 +309,7 @@ public class TdsOutputHandler extends OutputHandler {
      */
     public boolean canLoad(Request request, Entry entry) {
         //If we aren't in the tomcat world then exit
-        if (request!=null && request.getHttpServletRequest() == null) {
+        if ((request != null) && (request.getHttpServletRequest() == null)) {
             //return false;
         }
 
@@ -290,7 +325,8 @@ public class TdsOutputHandler extends OutputHandler {
                     File file = entry.getResource().getFile();
                     //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
                     //Use openFile
-                    NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
+                    NetcdfDataset dataset =
+                        NetcdfDataset.acquireDataset(file.toString(), null);
                     //                    System.err.println ("nc:" + dataset.getClass().getName());
                     ok = true;
                 } catch (Exception ignoreThis) {}
@@ -302,6 +338,13 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public boolean canLoadAsGrid(Entry entry) {
         Boolean b = gridEntries.get(entry.getId());
         if (b == null) {
@@ -326,6 +369,16 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputCdl(final Request request, Entry entry)
             throws Exception {
 
@@ -334,115 +387,161 @@ public class TdsOutputHandler extends OutputHandler {
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
         sb.append(crumbs[1]);
-        if(request.get(ARG_ADDMETADATA, false)) {
-            if(getRepository().getAccessManager().canDoAction(request, entry,Permission.ACTION_EDIT)) {
+        if (request.get(ARG_ADDMETADATA, false)) {
+            if (getRepository().getAccessManager().canDoAction(request,
+                    entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
-                List<Entry> entries = (List<Entry>)Misc.newList(entry);
+                List<Entry> entries = (List<Entry>) Misc.newList(entry);
                 getRepository().addInitialMetadata(request, entries);
                 getRepository().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
-                return makeLinksResult(request, "CDL",
-                                       sb, new State(entry));
+                return makeLinksResult(request, "CDL", sb, new State(entry));
             }
             sb.append("You cannot add metadata");
-            return makeLinksResult(request, "CDL",
-                                   sb, new State(entry));
+            return makeLinksResult(request, "CDL", sb, new State(entry));
         }
 
 
 
 
         File file = entry.getResource().getFile();
-        NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(), null);
-        if(getRepository().getAccessManager().canDoAction(request, entry,Permission.ACTION_EDIT)) {
-            request.put(ARG_ADDMETADATA,"true");
+        NetcdfDataset dataset = NetcdfDataset.acquireDataset(file.toString(),
+                                    null);
+        if (getRepository().getAccessManager().canDoAction(request, entry,
+                Permission.ACTION_EDIT)) {
+            request.put(ARG_ADDMETADATA, "true");
             sb.append(HtmlUtil.href(request.getUrl(), "Add metadata"));
         }
-        if(dataset==null) {
+        if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ucar.nc2.NCdump.print(dataset, "", bos, null);
-            sb.append("<pre>" +bos.toString()+"</pre>");
+            sb.append("<pre>" + bos.toString() + "</pre>");
         }
-        
-        return makeLinksResult(request, "CDL",
-                               sb, new State(entry));
+
+        return makeLinksResult(request, "CDL", sb, new State(entry));
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public Result outputWcs(Request request, Entry entry) {
-        return new Result("",new StringBuffer("TBD"));
+        return new Result("", new StringBuffer("TBD"));
     }
 
-    public Result outputGridSubset(Request request, Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputGridSubset(Request request, Entry entry)
+            throws Exception {
 
-        boolean canAdd = 
-            entry.getParentGroup()!=null &&
-            getRepository().getAccessManager().canDoAction(request, entry.getParentGroup(),Permission.ACTION_NEW);
+        boolean canAdd =
+            (entry.getParentGroup() != null)
+            && getRepository().getAccessManager().canDoAction(request,
+                entry.getParentGroup(), Permission.ACTION_NEW);
 
-        File file = entry.getResource().getFile();
-        StringBuffer sb = new StringBuffer();
-        String prefix =  ARG_VARIABLE+".";
-        String output = request.getOutput();
-        if(output.equals(OUTPUT_GRIDSUBSET)) {
-            List varNames = new ArrayList();
-            Hashtable args = request.getArgs();
-            for (Enumeration keys =
-                     args.keys(); keys.hasMoreElements(); ) {
+        File         file   = entry.getResource().getFile();
+        StringBuffer sb     = new StringBuffer();
+        String       prefix = ARG_VARIABLE + ".";
+        String       output = request.getOutput();
+        if (output.equals(OUTPUT_GRIDSUBSET)) {
+            List      varNames = new ArrayList();
+            Hashtable args     = request.getArgs();
+            for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
                 String arg = (String) keys.nextElement();
-                if(arg.startsWith(prefix) && request.get(arg,false)) {
+                if (arg.startsWith(prefix) && request.get(arg, false)) {
                     varNames.add(arg.substring(prefix.length()));
                 }
             }
             //            System.err.println(varNames);
-            LatLonRect   llr           = null;
-            if(request.get(ARG_SUBSETAREA,false)) {
-                llr = new LatLonRect(new LatLonPointImpl(request.get(ARG_AREA_NORTH, 90.0),
-                                                         request.get(ARG_AREA_WEST, -180.0)),
-                                     new LatLonPointImpl(request.get(ARG_AREA_SOUTH, 0.0),
-                                                         request.get(ARG_AREA_EAST, 180.0)));
+            LatLonRect llr = null;
+            if (request.get(ARG_SUBSETAREA, false)) {
+                llr = new LatLonRect(
+                    new LatLonPointImpl(
+                        request.get(ARG_AREA_NORTH, 90.0), request.get(
+                            ARG_AREA_WEST, -180.0)), new LatLonPointImpl(
+                                request.get(ARG_AREA_SOUTH, 0.0), request.get(
+                                    ARG_AREA_EAST, 180.0)));
                 System.err.println("llr:" + llr);
             }
-            int hStride = request.get(ARG_HSTRIDE,1);
-            int zStride = 1;
-            boolean includeLatLon=request.get(ARG_ADDLATLON,false);
-            int timeStride = 1;
-            Date[] dates = new Date[]{request.get(ARG_SUBSETTIME,false)?request.getDate(ARG_FROMDATE, null):null,
-                                      request.get(ARG_SUBSETTIME,false)?request.getDate(ARG_TODATE, null):null};
-            if(dates[0]!=null && dates[1]!=null && dates[0].getTime()> dates[1].getTime()) {
-                sb.append(getRepository().warning("From date is after to date"));
-            } else if(varNames.size()==0) {
+            int     hStride       = request.get(ARG_HSTRIDE, 1);
+            int     zStride       = 1;
+            boolean includeLatLon = request.get(ARG_ADDLATLON, false);
+            int     timeStride    = 1;
+            Date[]  dates = new Date[] { request.get(ARG_SUBSETTIME, false)
+                                         ? request.getDate(ARG_FROMDATE, null)
+                                         : null, request.get(ARG_SUBSETTIME,
+                                             false)
+                    ? request.getDate(ARG_TODATE, null)
+                    : null };
+            if ((dates[0] != null) && (dates[1] != null)
+                    && (dates[0].getTime() > dates[1].getTime())) {
+                sb.append(
+                    getRepository().warning("From date is after to date"));
+            } else if (varNames.size() == 0) {
                 sb.append(getRepository().warning("No variables selected"));
             } else {
                 NetcdfCFWriter writer = new NetcdfCFWriter();
-                File f = getRepository().getStorageManager().getTmpFile(request, "subset.nc");
+                File f =
+                    getRepository().getStorageManager().getTmpFile(request,
+                        "subset.nc");
                 GridDataset gds = GridDataset.open(file.toString());
-                writer.makeFile(f.toString(), gds, varNames, llr, (dates[0]==null?null:new ucar.nc2.units.DateRange(dates[0],dates[1])),
-                                includeLatLon, hStride, zStride, timeStride);
+                writer.makeFile(f.toString(), gds, varNames, llr,
+                                ((dates[0] == null)
+                                 ? null
+                                 : new ucar.nc2.units.DateRange(dates[0],
+                                 dates[1])), includeLatLon, hStride, zStride,
+                                             timeStride);
 
-                if(request.get(ARG_ADDTOREPOSITORY,false)) {
-                    if(!canAdd) {
+                if (request.get(ARG_ADDTOREPOSITORY, false)) {
+                    if ( !canAdd) {
                         sb.append("Cannot add to repository");
                     } else {
-                        Entry newEntry = (Entry)entry.clone();
-                        File  newFile = getRepository().getStorageManager().moveToStorage(request, f);
-                        newEntry.setResource(new Resource(newFile, Resource.TYPE_STOREDFILE));
+                        Entry newEntry = (Entry) entry.clone();
+                        File newFile =
+                            getRepository().getStorageManager().moveToStorage(
+                                request, f);
+                        newEntry.setResource(new Resource(newFile,
+                                Resource.TYPE_STOREDFILE));
                         newEntry.setId(getRepository().getGUID());
                         newEntry.setName("subset_" + newEntry.getName());
                         newEntry.clearMetadata();
                         newEntry.setUser(request.getUser());
-                        newEntry.addAssociation(new Association(getRepository().getGUID(), "","subset from",entry.getId(), newEntry.getId()));
-                        if(request.get(ARG_ADDMETADATA,false)) {
-                            System.err.println ("adding metadata");
+                        newEntry.addAssociation(
+                            new Association(
+                                getRepository().getGUID(), "", "subset from",
+                                entry.getId(), newEntry.getId()));
+                        if (request.get(ARG_ADDMETADATA, false)) {
+                            System.err.println("adding metadata");
                             newEntry.clearArea();
-                            List<Entry> entries = (List<Entry>)Misc.newList(newEntry);
-                            getRepository().addInitialMetadata(request, entries);
+                            List<Entry> entries =
+                                (List<Entry>) Misc.newList(newEntry);
+                            getRepository().addInitialMetadata(request,
+                                    entries);
                         }
-                        getRepository().insertEntries(Misc.newList(newEntry), true);
-                        return new Result(request.entryUrl(getRepository().URL_ENTRY_FORM, newEntry));
+                        getRepository().insertEntries(Misc.newList(newEntry),
+                                true);
+                        return new Result(
+                            request.entryUrl(
+                                getRepository().URL_ENTRY_FORM, newEntry));
                     }
                 } else {
-                    return new Result(entry.getName()+".nc", new FileInputStream(f),"application/x-netcdf");
+                    return new Result(entry.getName() + ".nc",
+                                      new FileInputStream(f),
+                                      "application/x-netcdf");
                 }
             }
         }
@@ -454,15 +553,22 @@ public class TdsOutputHandler extends OutputHandler {
         //            NetcdfDataset.acquireDataset(file.toString(), null);
         sb.append(crumbs[1]);
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
-        String fileName = IOUtil.stripExtension(entry.getName()) +"_subset.nc";
+        String fileName = IOUtil.stripExtension(entry.getName())
+                          + "_subset.nc";
 
-        sb.append(HtmlUtil.form(formUrl+"/" +fileName));
+        sb.append(HtmlUtil.form(formUrl + "/" + fileName));
         sb.append(HtmlUtil.br());
 
         String submitExtra = "";
-        if(canAdd) {
-            submitExtra = HtmlUtil.space(1) + HtmlUtil.checkbox(ARG_ADDTOREPOSITORY,"true",request.get(ARG_ADDTOREPOSITORY,false)) + msg("Add to Repository") +
-                HtmlUtil.checkbox(ARG_ADDMETADATA,"true",request.get(ARG_ADDMETADATA,false)) + msg("Add metadata");
+        if (canAdd) {
+            submitExtra = HtmlUtil.space(1)
+                          + HtmlUtil.checkbox(
+                              ARG_ADDTOREPOSITORY, "true",
+                              request.get(ARG_ADDTOREPOSITORY, false)) + msg(
+                                  "Add to Repository") + HtmlUtil.checkbox(
+                                  ARG_ADDMETADATA, "true",
+                                  request.get(ARG_ADDMETADATA, false)) + msg(
+                                      "Add metadata");
 
         }
 
@@ -475,64 +581,84 @@ public class TdsOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.formTable());
 
         sb.append(HtmlUtil.formEntry(msgLabel("Horizontal Stride"),
-                                     HtmlUtil.input(ARG_HSTRIDE,request.getString(ARG_HSTRIDE,"1"),HtmlUtil.SIZE_3)));
+                                     HtmlUtil.input(ARG_HSTRIDE,
+                                         request.getString(ARG_HSTRIDE, "1"),
+                                         HtmlUtil.SIZE_3)));
 
 
 
 
 
 
-        Date[]dateRange = null;
-        List<Date> dates = null;
+        Date[]     dateRange = null;
+        List<Date> dates     = null;
 
-        List tuples = new ArrayList();
-        for(GridDatatype grid: dataset.getGrids()) {
+        List       tuples    = new ArrayList();
+        for (GridDatatype grid : dataset.getGrids()) {
             VariableEnhanced var = grid.getVariable();
-            tuples.add(new Object[]{var.getShortName().toLowerCase(), grid});
+            tuples.add(new Object[] { var.getShortName().toLowerCase(),
+                                      grid });
         }
-        tuples = Misc.sortTuples(tuples,true);
+        tuples = Misc.sortTuples(tuples, true);
 
-        for (VariableSimpleIF var: dataset.getDataVariables()) {
+        for (VariableSimpleIF var : dataset.getDataVariables()) {
             if (var instanceof CoordinateAxis) {
-                CoordinateAxis              ca = (CoordinateAxis) var;
-                AxisType axisType = ca.getAxisType();
-                if(axisType==null) continue;
-                if(axisType.equals(AxisType.Time)) {
-                    dates = (List<Date>) Misc.sort(ThreddsMetadataHandler.getDates(var,ca));
+                CoordinateAxis ca       = (CoordinateAxis) var;
+                AxisType       axisType = ca.getAxisType();
+                if (axisType == null) {
+                    continue;
+                }
+                if (axisType.equals(AxisType.Time)) {
+                    dates = (List<Date>) Misc.sort(
+                        ThreddsMetadataHandler.getDates(var, ca));
                 }
                 continue;
-                }
+            }
         }
 
 
 
         StringBuffer varSB = new StringBuffer();
-        for (Object[]tuple: (List<Object[]>) tuples) {
-            GridDatatype grid = (GridDatatype)tuple[1];
-            VariableEnhanced var = grid.getVariable();
-            varSB.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.checkbox(ARG_VARIABLE+"." + var.getShortName(),"true",false) +
-                                       HtmlUtil.space(1) +
-                                       var.getName() +
-                                       HtmlUtil.space(1) + 
-                                       (var.getUnitsString()!=null?
-                                        "(" + var.getUnitsString() +")":""),
-                                       "<i>" +var.getDescription()+"</i>")));
+        for (Object[] tuple : (List<Object[]>) tuples) {
+            GridDatatype     grid = (GridDatatype) tuple[1];
+            VariableEnhanced var  = grid.getVariable();
+            varSB.append(
+                HtmlUtil.row(
+                    HtmlUtil.cols(
+                        HtmlUtil.checkbox(
+                            ARG_VARIABLE + "." + var.getShortName(), "true",
+                            false) + HtmlUtil.space(1) + var.getName()
+                                   + HtmlUtil.space(1)
+                                   + ((var.getUnitsString() != null)
+                                      ? "(" + var.getUnitsString() + ")"
+                                      : ""), "<i>" + var.getDescription()
+                                             + "</i>")));
 
         }
 
-        if(dates!=null && dates.size()>0) {
+        if ((dates != null) && (dates.size() > 0)) {
             List formattedDates = new ArrayList();
-            for(Date date: dates) {
+            for (Date date : dates) {
                 formattedDates.add(getRepository().formatDate(request, date));
             }
-            String fromDate = request.getUnsafeString(ARG_FROMDATE,getRepository().formatDate(request,dates.get(0)));
-            String toDate = request.getUnsafeString(ARG_TODATE,getRepository().formatDate(request,dates.get(dates.size()-1)));
-            sb.append(HtmlUtil.formEntry( msgLabel("Time Range"),
-                                          HtmlUtil.checkbox(ARG_SUBSETTIME, "true", request.get(ARG_SUBSETTIME, true)) + 
-                                          HtmlUtil.space(1) +
-                                          HtmlUtil.select(ARG_FROMDATE,formattedDates,fromDate) +
-                                          HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)) +
-                                          HtmlUtil.select(ARG_TODATE,formattedDates,toDate)));
+            String fromDate = request.getUnsafeString(ARG_FROMDATE,
+                                  getRepository().formatDate(request,
+                                      dates.get(0)));
+            String toDate = request.getUnsafeString(ARG_TODATE,
+                                getRepository().formatDate(request,
+                                    dates.get(dates.size() - 1)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Time Range"),
+                    HtmlUtil.checkbox(
+                        ARG_SUBSETTIME, "true",
+                        request.get(ARG_SUBSETTIME, true)) + HtmlUtil.space(
+                            1) + HtmlUtil.select(
+                            ARG_FROMDATE, formattedDates,
+                            fromDate) + HtmlUtil.img(
+                                getRepository().fileUrl(
+                                    ICON_ARROW)) + HtmlUtil.select(
+                                        ARG_TODATE, formattedDates, toDate)));
         }
 
 
@@ -547,17 +673,24 @@ public class TdsOutputHandler extends OutputHandler {
         }
         */
         LatLonRect llr = dataset.getBoundingBox();
-        if(llr!=null) {
-            sb.append(HtmlUtil.formEntryTop(msgLabel("Subset Spatially"),
-                                            "<table cellpadding=0 cellspacing=0><tr valign=top><td>" + 
-                                            HtmlUtil.checkbox(ARG_SUBSETAREA, "true", request.get(ARG_SUBSETAREA, false)) + 
-                                            "</td><td>" +
-                                            HtmlUtil.makeLatLonBox(ARG_AREA, llr.getLatMin(), llr.getLatMax(),llr.getLonMax(), llr.getLonMin()) +
-                                            "</table>"));
+        if (llr != null) {
+            sb.append(
+                HtmlUtil.formEntryTop(
+                    msgLabel("Subset Spatially"),
+                    "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
+                    + HtmlUtil.checkbox(
+                        ARG_SUBSETAREA, "true",
+                        request.get(ARG_SUBSETAREA, false)) + "</td><td>"
+                            + HtmlUtil.makeLatLonBox(
+                                ARG_AREA, llr.getLatMin(), llr.getLatMax(),
+                                llr.getLonMax(),
+                                llr.getLonMin()) + "</table>"));
         }
 
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),HtmlUtil.checkbox(ARG_ADDLATLON,"true",request.get(ARG_ADDLATLON,true))));
+        sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),
+                                     HtmlUtil.checkbox(ARG_ADDLATLON, "true",
+                                         request.get(ARG_ADDLATLON, true))));
 
         sb.append("</table>");
 
@@ -570,7 +703,7 @@ public class TdsOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid"));
         sb.append(HtmlUtil.formClose());
-        return new Result("Grid Subset",sb);
+        return new Result("Grid Subset", sb);
     }
 
 
@@ -592,15 +725,16 @@ public class TdsOutputHandler extends OutputHandler {
             throws Exception {
 
         String output = request.getOutput();
-        if(output.equals(OUTPUT_CDL)) {
+        if (output.equals(OUTPUT_CDL)) {
             return outputCdl(request, entry);
         }
-        if(output.equals(OUTPUT_WCS)) {
+        if (output.equals(OUTPUT_WCS)) {
             return outputWcs(request, entry);
         }
 
 
-        if(output.equals(OUTPUT_GRIDSUBSET) || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
+        if (output.equals(OUTPUT_GRIDSUBSET)
+                || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
             return outputGridSubset(request, entry);
         }
 

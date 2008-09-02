@@ -292,7 +292,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         /** _more_ */
         private String id;
 
-        /** _more_          */
+        /** _more_ */
         private boolean canDoNew = false;
 
         /**

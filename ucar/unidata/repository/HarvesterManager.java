@@ -77,6 +77,7 @@ public class HarvesterManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_HARVESTER_ID = "harvester.id";
 
+    /** _more_          */
     public static final String ARG_HARVESTER_CLASS = "harvester.class";
 
     /** _more_ */
@@ -248,13 +249,13 @@ public class HarvesterManager extends RepositoryManager {
 
         if (request.exists(ARG_NAME)) {
             String id = getRepository().getGUID();
-            Class  c= Misc.findClass(request.getString(ARG_HARVESTER_CLASS));
+            Class c = Misc.findClass(request.getString(ARG_HARVESTER_CLASS));
             Constructor ctor = Misc.findConstructor(c,
-                                                    new Class[] { Repository.class,
-                                                                  String.class });
-            Harvester harvester =  (Harvester) ctor.newInstance(new Object[] {
-                    getRepository(),
-                    id });
+                                   new Class[] { Repository.class,
+                    String.class });
+            Harvester harvester = (Harvester) ctor.newInstance(new Object[] {
+                                      getRepository(),
+                                      id });
             harvester.setName(request.getString(ARG_NAME, ""));
             harvesters.add(harvester);
             harvesterMap.put(id, harvester);
@@ -271,9 +272,15 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ARG_NAME, "",
                                          HtmlUtil.SIZE_40)));
-        String typeInput =HtmlUtil.select(ARG_HARVESTER_CLASS,Misc.newList(new TwoFacedObject("Local Files", "ucar.unidata.repository.PatternHarvester"),
-                                                                          new TwoFacedObject("URL", "ucar.unidata.repository.WebHarvester")));
-        sb.append(HtmlUtil.formEntry(msgLabel("Type"),typeInput));
+        String typeInput =
+            HtmlUtil.select(
+                ARG_HARVESTER_CLASS,
+                Misc.newList(
+                    new TwoFacedObject(
+                        "Local Files",
+                        "ucar.unidata.repository.PatternHarvester"), new TwoFacedObject(
+                            "URL", "ucar.unidata.repository.WebHarvester")));
+        sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeInput));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit(msg("Create"))
                                      + HtmlUtil.space(1)

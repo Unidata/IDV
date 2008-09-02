@@ -127,7 +127,7 @@ public class Request implements Constants {
     private HttpServlet httpServlet;
 
 
-    /** _more_          */
+    /** _more_ */
     private String leftMessage;
 
     /**
@@ -1117,9 +1117,21 @@ public class Request implements Constants {
         return DateUtil.parse(result);
     }
 
-    public Date getDate(String from,  Date dflt) throws Exception {
-        if(!defined(from)) return dflt;
-        return repository.parseDate(getUnsafeString(from,""));
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Date getDate(String from, Date dflt) throws Exception {
+        if ( !defined(from)) {
+            return dflt;
+        }
+        return repository.parseDate(getUnsafeString(from, ""));
     }
 
 

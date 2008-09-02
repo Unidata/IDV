@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -76,7 +75,6 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -86,6 +84,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+
+import java.util.UUID;
 
 import java.util.regex.*;
 import java.util.zip.*;
@@ -291,8 +291,12 @@ public class Repository extends RepositoryBase implements Tables,
 
     /** _more_ */
     public static final String ID_PREFIX_LOCAL_FILE = "file:";
-    public static final String ID_PREFIX_CATALOG = "catalog:";    
-    public static final String ID_PREFIX_GENERATED = "generated:";    
+
+    /** _more_          */
+    public static final String ID_PREFIX_CATALOG = "catalog:";
+
+    /** _more_          */
+    public static final String ID_PREFIX_GENERATED = "generated:";
 
 
     /**
@@ -984,12 +988,9 @@ public class Repository extends RepositoryBase implements Tables,
             }
         }
 
-        sdf = new SimpleDateFormat();
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        sdf.applyPattern(getProperty(PROP_DATEFORMAT, DEFAULT_TIME_FORMAT));
+        sdf = makeDateFormat(getProperty(PROP_DATEFORMAT,
+                                         DEFAULT_TIME_FORMAT));
         TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
-
-
 
 
         //This will end up being from the properties
@@ -2320,15 +2321,22 @@ public class Repository extends RepositoryBase implements Tables,
      * @return _more_
      */
     protected String getGUID() {
-        return  UUID.randomUUID().toString();
+        return UUID.randomUUID().toString();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getEntryResourceUrl(Request request, Entry entry) {
         String fileTail = getStorageManager().getFileTail(entry);
-        return HtmlUtil
-            .url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                 + fileTail, ARG_ID, entry.getId());
+        return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                            + fileTail, ARG_ID, entry.getId());
     }
 
     /**
@@ -3742,30 +3750,32 @@ public class Repository extends RepositoryBase implements Tables,
                                                          f.lastModified(),
                                                              null);
         } else if (isCatalogEntry(entryId)) {
-            String url = getCatalogFromId(entryId);
-            Group parent = null;
+            String url    = getCatalogFromId(entryId);
+            Group  parent = null;
             if (parent == null) {
                 parent = topGroup;
             }
-            TypeHandler handler =  getTypeHandler(TypeHandler.TYPE_GROUP);
+            TypeHandler handler = getTypeHandler(TypeHandler.TYPE_GROUP);
             entry = new Group(entryId, handler);
             String name = IOUtil.getFileTail(url);
             entry.setIsLocalFile(true);
             Date now = new Date();
             entry.initEntry(name, "", parent, "",
                             getUserManager().localFileUser,
-                            new Resource(url, Resource.TYPE_URL),
-                            "",
-                            now.getTime(),
-                            now.getTime(),
-                            now.getTime(),
+                            new Resource(url, Resource.TYPE_URL), "",
+                            now.getTime(), now.getTime(), now.getTime(),
                             null);
-        } else if(isGeneratedEntry(entryId)) {
-            String[]ids = getGeneratedIdPair(entryId);
-            if(ids.length!=2) throw new IllegalArgumentException("Bad generated id:" +entryId);
-            Entry parentEntry =  getEntry(request, ids[0]);
-            if(parentEntry==null) return null;
-            entry  = parentEntry.createGeneratedEntry(request,ids[1]);
+        } else if (isGeneratedEntry(entryId)) {
+            String[] ids = getGeneratedIdPair(entryId);
+            if (ids.length != 2) {
+                throw new IllegalArgumentException("Bad generated id:"
+                        + entryId);
+            }
+            Entry parentEntry = getEntry(request, ids[0]);
+            if (parentEntry == null) {
+                return null;
+            }
+            entry = parentEntry.createGeneratedEntry(request, ids[1]);
         } else {
             Statement entryStmt =
                 getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
@@ -3945,11 +3955,11 @@ public class Repository extends RepositoryBase implements Tables,
         Date fromDate   = createDate;
         //        System.err.println("node:" + XmlUtil.toString(node));
         if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
-            fromDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_FROMDATE));
+            fromDate = parseDate(XmlUtil.getAttribute(node, ATTR_FROMDATE));
         }
         Date toDate = fromDate;
         if (XmlUtil.hasAttribute(node, ATTR_TODATE)) {
-            toDate = sdf.parse(XmlUtil.getAttribute(node, ATTR_TODATE));
+            toDate = parseDate(XmlUtil.getAttribute(node, ATTR_TODATE));
         }
 
         Entry entry = typeHandler.createEntry(id);
@@ -4132,6 +4142,11 @@ public class Repository extends RepositoryBase implements Tables,
                         throw new IllegalArgumentException("Unknown tag:"
                                 + node.getTagName());
                     }
+                }
+                if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
+                    List<Entry> tmpEntries =
+                        (List<Entry>) Misc.newList(entry);
+                    addInitialMetadata(request, tmpEntries);
                 }
 
             } else if (node.getTagName().equals(TAG_ASSOCIATION)) {
@@ -4974,17 +4989,17 @@ public class Repository extends RepositoryBase implements Tables,
                     }
                     FileOutputStream toStream = new FileOutputStream(newFile);
                     try {
-                        if (IOUtil.writeTo(fromStream,
-                                           toStream,
-                                           actionId, length) < 0) {
-                            return new Result(request.entryUrl(URL_ENTRY_SHOW,
-                                                               parentGroup));
+                        if (IOUtil.writeTo(fromStream, toStream, actionId,
+                                           length) < 0) {
+                            return new Result(
+                                request.entryUrl(
+                                    URL_ENTRY_SHOW, parentGroup));
                         }
                     } finally {
                         try {
                             toStream.close();
                             fromStream.close();
-                        } catch(Exception exc){}
+                        } catch (Exception exc) {}
                     }
                 }
 
@@ -5092,9 +5107,8 @@ public class Repository extends RepositoryBase implements Tables,
                             Matcher matcher = datePattern.matcher(origName);
                             if (matcher.find()) {
                                 String dateString = matcher.group(0);
-                                SimpleDateFormat sdf =
-                                    new SimpleDateFormat(format);
-                                Date dttm = sdf.parse(dateString);
+                                Date dttm =
+                                    makeDateFormat(format).parse(dateString);
                                 theDateRange[0] = dttm;
                                 theDateRange[1] = dttm;
                                 //                            System.err.println("got it");
@@ -5208,8 +5222,11 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @param request _more_
      * @param entries _more_
+     *
+     * @throws Exception _more_
      */
-    public void addInitialMetadata(Request request, List<Entry> entries) throws Exception {
+    public void addInitialMetadata(Request request, List<Entry> entries)
+            throws Exception {
         for (Entry theEntry : entries) {
             Hashtable extra = new Hashtable();
             getMetadataManager().getMetadata(theEntry);
@@ -5586,22 +5603,28 @@ public class Repository extends RepositoryBase implements Tables,
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
             StringBuffer menu = new StringBuffer();
-            menu.append(HtmlUtil.div(getEntryLinksList(request, entry),HtmlUtil.id("entrylinksmenu" + entry.getId()) + HtmlUtil.cssClass("menu")));
+            menu.append(
+                HtmlUtil.div(
+                    getEntryLinksList(request, entry),
+                    HtmlUtil.id("entrylinksmenu" + entry.getId())
+                    + HtmlUtil.cssClass("menu")));
             String compId = "menubutton" + entry.getId();
             String events = HtmlUtil.onMouseOver(
-                                "setImage(" + HtmlUtil.squote(compId)+",'"
+                                "setImage(" + HtmlUtil.squote(compId) + ",'"
                                 + fileUrl(ICON_GRAYRECTARROW)
                                 + "')") + HtmlUtil.onMouseOut(
-                                    "setImage(" +HtmlUtil.squote(compId)+",'"
-                                    + fileUrl(ICON_GRAYRECT)
+                                    "setImage(" + HtmlUtil.squote(compId)
+                                    + ",'" + fileUrl(ICON_GRAYRECT)
                                     + "')") + HtmlUtil.onMouseClick(
-                                        "showMenu(event, " + HtmlUtil.squote(compId)+", " + 
-                                        HtmlUtil.squote("entrylinksmenu"+ entry.getId()) +")");
+                                        "showMenu(event, "
+                                        + HtmlUtil.squote(compId) + ", "
+                                        + HtmlUtil.squote(
+                                            "entrylinksmenu"
+                                            + entry.getId()) + ")");
             String menuLink = HtmlUtil.space(1)
                               + HtmlUtil.jsLink(events,
                                   HtmlUtil.img(fileUrl(ICON_GRAYRECT),
-                                      msg("Show menu"),
-                                      HtmlUtil.id(compId)));
+                                      msg("Show menu"), HtmlUtil.id(compId)));
 
             //            String linkHtml = "";
             String linkHtml = getEntryLinksHtml(request, entry, true);
@@ -5913,7 +5936,7 @@ public class Repository extends RepositoryBase implements Tables,
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, entryId,
                                      ATTR_TITLE, name);
         if (ImageUtils.isImage(file)) {
-            String imageUrl = 
+            String imageUrl =
                 HtmlUtil.url(URL_ENTRY_GET + entryId
                              + IOUtil.getFileExtension(file), ARG_ID,
                                  entryId, ARG_IMAGEWIDTH, "75");
@@ -6520,6 +6543,13 @@ public class Repository extends RepositoryBase implements Tables,
         return id.substring(ID_PREFIX_LOCAL_FILE.length());
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public String getCatalogFromId(String id) {
         return id.substring(ID_PREFIX_CATALOG.length());
     }
@@ -6548,17 +6578,38 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public String getIdFromCatalog(String url) {
         return ID_PREFIX_CATALOG + url;
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public boolean isGeneratedEntry(String id) {
         return id.startsWith(ID_PREFIX_GENERATED);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public String[] getGeneratedIdPair(String id) {
-        id =  id.substring(ID_PREFIX_GENERATED.length());
-        return  StringUtil.split(id,";",2);
+        id = id.substring(ID_PREFIX_GENERATED.length());
+        return StringUtil.split(id, ";", 2);
     }
 
 
@@ -6583,6 +6634,13 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public boolean isCatalogEntry(String id) {
         if (id.startsWith(ID_PREFIX_CATALOG)) {
             return true;
@@ -7749,7 +7807,7 @@ public class Repository extends RepositoryBase implements Tables,
 
             List<Metadata> metadataList = entry.getMetadata();
             if (metadataList != null) {
-                if(!isNew) {
+                if ( !isNew) {
                     SqlUtil.delete(getConnection(), TABLE_METADATA,
                                    Clause.eq(COL_METADATA_ENTRY_ID,
                                              entry.getId()));
@@ -8033,7 +8091,7 @@ public class Repository extends RepositoryBase implements Tables,
     public String makeDateInput(Request request, String name,
                                 String formName, Date date) {
         String dateHelp   = "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
-        String timeHelp   = "hh::mm:ss Z, e.g. 20:15:00 MST";
+        String timeHelp   = "hh:mm:ss Z, e.g. 20:15:00 MST";
 
         String dateArg    = request.getString(name, "");
         String timeArg    = request.getString(name + ".time", "");
@@ -8045,12 +8103,12 @@ public class Repository extends RepositoryBase implements Tables,
                              : timeSdf.format(date));
 
         return HtmlUtil.input(name, dateString,
-                              HtmlUtil.SIZE_8 + " title=\"" + dateHelp
+                              HtmlUtil.SIZE_10 + " title=\"" + dateHelp
                               + "\"") + getCalendarSelector(formName, name)
                                       + " T:"
                                       + HtmlUtil.input(name + ".time",
                                           timeString,
-                                          HtmlUtil.SIZE_10 + " title=\""
+                                          HtmlUtil.SIZE_15 + " title=\""
                                           + timeHelp + "\"");
     }
 

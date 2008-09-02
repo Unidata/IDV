@@ -343,7 +343,7 @@ public interface Tables {
     /** _more_ */
     public static final String COL_METADATA_ATTR4 = TABLE_METADATA + ".attr4";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_METADATA_INHERITED = TABLE_METADATA
                                                         + ".inherited";
 

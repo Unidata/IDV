@@ -56,6 +56,9 @@ public class HtmlUtil {
     public static final String SIZE_20 = "  size=\"20\" ";
 
     /** _more_ */
+    public static final String SIZE_15 = "  size=\"15\" ";
+
+    /** _more_ */
     public static final String SIZE_25 = "  size=\"25\" ";
 
     /** _more_ */

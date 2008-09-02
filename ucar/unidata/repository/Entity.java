@@ -326,8 +326,11 @@ public class Entity implements Cloneable {
 
 
 
+    /**
+     * _more_
+     */
     public void clearMetadata() {
-        metadata= null;
+        metadata = null;
     }
 
 
@@ -340,11 +343,17 @@ public class Entity implements Cloneable {
         addMetadata(value, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     * @param checkUnique _more_
+     */
     public void addMetadata(Metadata value, boolean checkUnique) {
         if (metadata == null) {
             metadata = new ArrayList<Metadata>();
         }
-        if(checkUnique && metadata.contains(value)) {
+        if (checkUnique && metadata.contains(value)) {
             return;
         }
         metadata.add(value);

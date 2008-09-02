@@ -80,8 +80,10 @@ import java.util.regex.*;
  */
 public class WebHarvester extends Harvester {
 
+    /** _more_          */
     public static final String TAG_URLS = "urls";
 
+    /** _more_          */
     public static final String ATTR_URLS = "urls";
 
 
@@ -89,12 +91,14 @@ public class WebHarvester extends Harvester {
     private List<String> patternNames = new ArrayList<String>();
 
 
-    private String urls="";
+    /** _more_          */
+    private String urls = "";
 
     /** _more_ */
     User user;
 
 
+    /** _more_          */
     List<String> statusMessages = new ArrayList<String>();
 
     /** _more_ */
@@ -112,8 +116,7 @@ public class WebHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public WebHarvester(Repository repository, String id)
-            throws Exception {
+    public WebHarvester(Repository repository, String id) throws Exception {
         super(repository, id);
     }
 
@@ -143,8 +146,10 @@ public class WebHarvester extends Harvester {
     protected void init(Element element) throws Exception {
         super.init(element);
         rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR, ""));
-        urls = XmlUtil.getGrandChildText(element, TAG_URLS);
-        if(urls==null) urls = "";
+        urls    = XmlUtil.getGrandChildText(element, TAG_URLS);
+        if (urls == null) {
+            urls = "";
+        }
     }
 
     /**
@@ -170,7 +175,8 @@ public class WebHarvester extends Harvester {
      */
     public void applyState(Element element) throws Exception {
         super.applyState(element);
-        XmlUtil.create(element.getOwnerDocument(), TAG_URLS, element,urls,null);
+        XmlUtil.create(element.getOwnerDocument(), TAG_URLS, element, urls,
+                       null);
     }
 
 
@@ -184,7 +190,7 @@ public class WebHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
-        urls = request.getUnsafeString(ATTR_URLS,"").trim();
+        urls = request.getUnsafeString(ATTR_URLS, "").trim();
     }
 
 
@@ -201,7 +207,8 @@ public class WebHarvester extends Harvester {
             throws Exception {
         super.createEditForm(request, sb);
         sb.append(HtmlUtil.formEntry(msgLabel("Fetch URLS"),
-                                     HtmlUtil.textArea(ATTR_URLS,urls,5,40)));
+                                     HtmlUtil.textArea(ATTR_URLS, urls, 5,
+                                         40)));
         sb.append(
             RepositoryManager.tableSubHeader("Then create an entry with"));
 
@@ -233,7 +240,7 @@ public class WebHarvester extends Harvester {
             return super.getExtraInfo();
         }
 
-        return status.toString() + StringUtil.join("",statusMessages);
+        return status.toString() + StringUtil.join("", statusMessages);
     }
 
 
@@ -248,10 +255,10 @@ public class WebHarvester extends Harvester {
         if ( !getActive()) {
             return;
         }
-        entryCnt    = 0;
-        newEntryCnt = 0;
+        entryCnt       = 0;
+        newEntryCnt    = 0;
         statusMessages = new ArrayList<String>();
-        status = new StringBuffer("Fetching URLS<br>");
+        status         = new StringBuffer("Fetching URLS<br>");
         int cnt = 0;
         while (getActive()) {
             long t1 = System.currentTimeMillis();
@@ -283,20 +290,22 @@ public class WebHarvester extends Harvester {
      */
     public void collectEntries(boolean firstTime) throws Exception {
 
-        List<Entry>    entries   = new ArrayList<Entry>();
-        for(String url: (List<String>)StringUtil.split(urls,"\n",true,true)) {
+        List<Entry> entries = new ArrayList<Entry>();
+        for (String url : (List<String>) StringUtil.split(urls, "\n", true,
+                true)) {
             if ( !getActive()) {
                 return;
             }
             Entry entry = processUrl(url);
             if (entry != null) {
                 entries.add(entry);
-                if(statusMessages.size()>100)
+                if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
-                statusMessages.add(repository.getBreadCrumbs(null, entry, true, "",
-                                                             null)[1]);
+                }
+                statusMessages.add(repository.getBreadCrumbs(null, entry,
+                        true, "", null)[1]);
 
-               entryCnt++;
+                entryCnt++;
             }
         }
 
@@ -311,32 +320,33 @@ public class WebHarvester extends Harvester {
      *
      * @param f _more_
      *
+     * @param url _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
      */
     private Entry processUrl(String url) throws Exception {
         String fileName = url;
-        String tail = IOUtil.getFileTail(url);
-        File tmpFile = getStorageManager().getTmpFile(null, tail);
+        String tail     = IOUtil.getFileTail(url);
+        File   tmpFile  = getStorageManager().getTmpFile(null, tail);
         //        System.err.println ("fetching");
         IOUtil.writeTo(new URL(url), tmpFile, null);
-        File newFile = getStorageManager().moveToStorage(null,
-                                                         tmpFile,
-                                                         getRepository().getGUID() + "_");
+        File newFile = getStorageManager().moveToStorage(null, tmpFile,
+                           getRepository().getGUID() + "_");
 
         //        System.err.println ("got it " + newFile);
-        String    tag       = tagTemplate;
-        String    groupName = groupTemplate;
-        String    name      = nameTemplate;
-        String    desc      = descTemplate;
+        String tag        = tagTemplate;
+        String groupName  = groupTemplate;
+        String name       = nameTemplate;
+        String desc       = descTemplate;
 
 
-        Date createDate = new Date();
-        Date fromDate = createDate;
-        Date toDate = createDate;
-        String ext      = IOUtil.getFileExtension(url);
-        tag       = tag.replace("${extension}", ext);
+        Date   createDate = new Date();
+        Date   fromDate   = createDate;
+        Date   toDate     = createDate;
+        String ext        = IOUtil.getFileExtension(url);
+        tag = tag.replace("${extension}", ext);
 
         //        groupName = groupName.replace("${dirgroup}", dirGroup);
 
@@ -359,9 +369,9 @@ public class WebHarvester extends Harvester {
 
         Group group = repository.findGroupFromName(groupName, getUser(),
                           true);
-        Entry    entry = typeHandler.createEntry(repository.getGUID());
-        Resource resource= new Resource(newFile.toString(),
-                                        Resource.TYPE_STOREDFILE);
+        Entry entry = typeHandler.createEntry(repository.getGUID());
+        Resource resource = new Resource(newFile.toString(),
+                                         Resource.TYPE_STOREDFILE);
 
         entry.initEntry(name, desc, group, group.getCollectionGroupId(),
                         getUser(), resource, "", createDate.getTime(),

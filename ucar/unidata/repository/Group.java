@@ -94,6 +94,11 @@ public class Group extends Entry {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param ids _more_
+     */
     protected void addChildrenIds(List<String> ids) {}
 
 

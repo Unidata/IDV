@@ -19,8 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -29,15 +27,16 @@ import org.w3c.dom.*;
 
 import ucar.ma2.*;
 
+import ucar.nc2.Attribute;
+import ucar.nc2.Variable;
+
 
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.constants.AxisType;
-import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.CoordinateAxis;
 
 import ucar.nc2.dataset.CoordinateSystem;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.Attribute;
-import ucar.nc2.Variable;
+import ucar.nc2.dataset.NetcdfDataset;
 
 
 import ucar.unidata.geoloc.LatLonRect;
@@ -214,7 +213,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    private static double[] getRange(VariableSimpleIF var, Array a, Unit toUnit)
+    private static double[] getRange(VariableSimpleIF var, Array a,
+                                     Unit toUnit)
             throws Exception {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
         Unit fromUnit        =
@@ -232,28 +232,52 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
-    public static List<Date> getDates(VariableSimpleIF var,CoordinateAxis ca) throws Exception {
-        Unit fromUnit = ucar.visad.Util.parseUnit(var.getUnitsString());
-        Unit toUnit =  visad.CommonUnit.secondsSinceTheEpoch;
-        List<Date> dates = new ArrayList<Date>();
-        Array a = ca.read();
-        IndexIterator iter = a.getIndexIteratorFast();
+    /**
+     * _more_
+     *
+     * @param var _more_
+     * @param ca _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<Date> getDates(VariableSimpleIF var, CoordinateAxis ca)
+            throws Exception {
+        Unit fromUnit        =
+            ucar.visad.Util.parseUnit(var.getUnitsString());
+        Unit          toUnit = visad.CommonUnit.secondsSinceTheEpoch;
+        List<Date>    dates  = new ArrayList<Date>();
+        Array         a      = ca.read();
+        IndexIterator iter   = a.getIndexIteratorFast();
         while (iter.hasNext()) {
             double val = iter.getDoubleNext();
-            if (val!=val) continue;
-            dates.add(new Date((long)(1000*toUnit.toThis(val, fromUnit))));
-            
+            if (val != val) {
+                continue;
+            }
+            dates.add(new Date((long) (1000 * toUnit.toThis(val, fromUnit))));
+
         }
         return dates;
     }
 
-    public static List<Date> getDates(NetcdfDataset dataset)  throws Exception {
-        List<Variable>  variables  = dataset.getVariables();
+    /**
+     * _more_
+     *
+     * @param dataset _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<Date> getDates(NetcdfDataset dataset)
+            throws Exception {
+        List<Variable> variables = dataset.getVariables();
         for (Variable var : variables) {
             if (var instanceof CoordinateAxis) {
-                CoordinateAxis              ca = (CoordinateAxis) var;
-                AxisType axisType = ca.getAxisType();
-                if(axisType.equals(AxisType.Time)) {
+                CoordinateAxis ca       = (CoordinateAxis) var;
+                AxisType       axisType = ca.getAxisType();
+                if (axisType.equals(AxisType.Time)) {
                     return getDates(var, ca);
                 }
             }
@@ -264,21 +288,40 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
-    public static Date[]getMinMaxDates(VariableSimpleIF var,CoordinateAxis ca) throws Exception {
-        double[] minmax =
-            getRange(var, ca.read(),
-                     visad.CommonUnit.secondsSinceTheEpoch);
-        return new Date[]{
-            new Date((long) minmax[0]*1000),
-            new Date((long) minmax[1]*1000)};
+    /**
+     * _more_
+     *
+     * @param var _more_
+     * @param ca _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Date[] getMinMaxDates(VariableSimpleIF var,
+                                        CoordinateAxis ca)
+            throws Exception {
+        double[] minmax = getRange(var, ca.read(),
+                                   visad.CommonUnit.secondsSinceTheEpoch);
+        return new Date[] { new Date((long) minmax[0] * 1000),
+                            new Date((long) minmax[1] * 1000) };
     }
 
 
 
+    /** _more_          */
     public static final String ATTR_MINLAT = "geospatial_lat_min";
+
+    /** _more_          */
     public static final String ATTR_MAXLAT = "geospatial_lat_max";
+
+    /** _more_          */
     public static final String ATTR_MINLON = "geospatial_lon_min";
+
+    /** _more_          */
     public static final String ATTR_MAXLON = "geospatial_lon_max";
+
+    /** _more_          */
     public static final String ATTR_KEYWORDS = "keywords";
 
 
@@ -287,6 +330,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param metadataList _more_
      * @param extra _more_
      */
     public void getInitialMetadata(Request request, Entry entry,
@@ -294,7 +338,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    Hashtable extra) {
 
         try {
-            super.getInitialMetadata(request, entry, metadataList,extra);
+            super.getInitialMetadata(request, entry, metadataList, extra);
             TdsOutputHandler tdsOutputHandler =
                 (TdsOutputHandler) getRepository().getOutputHandler(
                     TdsOutputHandler.OUTPUT_OPENDAP);
@@ -308,36 +352,37 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
             for (Attribute attr : attrs) {
-                String name= attr.getName();
+                String name  = attr.getName();
                 String value = attr.getStringValue();
-                if(value == null) {
-                    value = ""+attr.getNumericValue();
+                if (value == null) {
+                    value = "" + attr.getNumericValue();
                 }
-                if(ATTR_MAXLON.equals(name)) {
+                if (ATTR_MAXLON.equals(name)) {
                     extra.put(ARG_MAXLON, new Double(value));
                     continue;
                 }
-                if(ATTR_MINLON.equals(name)) {
+                if (ATTR_MINLON.equals(name)) {
                     extra.put(ARG_MINLON, new Double(value));
                     continue;
                 }
-                if(ATTR_MAXLAT.equals(name)) {
+                if (ATTR_MAXLAT.equals(name)) {
                     extra.put(ARG_MAXLAT, new Double(value));
                     continue;
                 }
-                if(ATTR_MINLAT.equals(name)) {
+                if (ATTR_MINLAT.equals(name)) {
                     extra.put(ARG_MINLAT, new Double(value));
                     continue;
                 }
 
-                if(ATTR_KEYWORDS.equals(name)) {
-                    for(String keyword: (List<String>) StringUtil.split(value,";",true,true)) {
-                        Metadata metadata = new Metadata(getRepository().getGUID(),
-                                                         entry.getId(), TYPE_KEYWORD,DFLT_INHERITED,
-                                                         keyword, "",
-                                                         "", "");
+                if (ATTR_KEYWORDS.equals(name)) {
+                    for (String keyword : (List<String>) StringUtil.split(
+                            value, ";", true, true)) {
+                        Metadata metadata =
+                            new Metadata(getRepository().getGUID(),
+                                         entry.getId(), TYPE_KEYWORD,
+                                         DFLT_INHERITED, keyword, "", "", "");
                         //The true says to ad dit only if its unique
-                        entry.addMetadata(metadata,true);
+                        entry.addMetadata(metadata, true);
                     }
                     continue;
                 }
@@ -347,37 +392,34 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_PROPERTY,
-                                        DFLT_INHERITED, name,
-                                        value, "", "");
-                entry.addMetadata(metadata,true);
+                                        DFLT_INHERITED, name, value, "", "");
+                entry.addMetadata(metadata, true);
             }
 
 
-            List<Variable>  variables  = dataset.getVariables();
+            List<Variable> variables = dataset.getVariables();
             for (Variable var : variables) {
                 if (var instanceof CoordinateAxis) {
-                    CoordinateAxis              ca = (CoordinateAxis) var;
-                    AxisType axisType = ca.getAxisType();
+                    CoordinateAxis ca       = (CoordinateAxis) var;
+                    AxisType       axisType = ca.getAxisType();
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
-                                                   CommonUnits.DEGREE);
-                        System.err.println("lat range:" + minmax[0] + " " + minmax[1]);
+                                              CommonUnits.DEGREE);
+                        //                        System.err.println("lat range:" + minmax[0] + " " + minmax[1]);
                         extra.put(ARG_MINLAT, minmax[0]);
                         extra.put(ARG_MAXLAT, minmax[1]);
                         haveBounds = true;
-                    } else if (axisType.equals(
-                            AxisType.Lon)) {
+                    } else if (axisType.equals(AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
-                        System.err.println("lon range:" + minmax[0] + " " + minmax[1]);
+                        //                        System.err.println("lon range:" + minmax[0] + " " + minmax[1]);
                         extra.put(ARG_MINLON, minmax[0]);
                         extra.put(ARG_MAXLON, minmax[1]);
                         haveBounds = true;
-                    } else if (axisType.equals(
-                            AxisType.Time)) {
-                        Date[]dates = getMinMaxDates(var,ca);
-                        extra.put(ARG_FROMDATE,dates[0]);
-                        extra.put(ARG_TODATE,dates[1]);
+                    } else if (axisType.equals(AxisType.Time)) {
+                        Date[] dates = getMinMaxDates(var, ca);
+                        extra.put(ARG_FROMDATE, dates[0]);
+                        extra.put(ARG_TODATE, dates[1]);
                     } else {
                         //                        System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
                     }
@@ -391,21 +433,20 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                         DFLT_INHERITED, var.getShortName(),
                                         var.getName(), var.getUnitsString(),
                                         "");
-                entry.addMetadata(metadata,true);
+                entry.addMetadata(metadata, true);
             }
 
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
-            if ( true || !haveBounds) {
-                System.err.println("no bounds - looking for coordsystem");
-                for (CoordinateSystem coordSys : (List<CoordinateSystem>)dataset
+            if ( !haveBounds) {
+                for (CoordinateSystem coordSys : (List<CoordinateSystem>) dataset
                         .getCoordinateSystems()) {
                     ProjectionImpl proj = coordSys.getProjection();
                     if (proj == null) {
                         continue;
                     }
                     LatLonRect llr = proj.getDefaultMapAreaLL();
-                    System.err.println("bounds from cs:" + llr);
+                    //                    System.err.println("bounds from cs:" + llr);
                     haveBounds = true;
                     extra.put(ARG_MINLAT, llr.getLatMin());
                     extra.put(ARG_MAXLAT, llr.getLatMax());

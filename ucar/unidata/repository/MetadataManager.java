@@ -112,7 +112,7 @@ public class MetadataManager extends RepositoryManager {
                                               "/metadata/form",
                                               "Edit Metadata");
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_METADATA_CLOUD = new RequestUrl(getRepository(),
                                                "/metadata/cloud",
                                                "Metadata Cloud");
@@ -234,18 +234,36 @@ public class MetadataManager extends RepositoryManager {
 
 
 
-    public List<Metadata> getInitialMetadata(Request request, Entry entry, Hashtable extra)  {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public List<Metadata> getInitialMetadata(Request request, Entry entry,
+                                             Hashtable extra) {
         List<Metadata> metadataList = new ArrayList<Metadata>();
-        for(MetadataHandler handler: getMetadataHandlers()) {
-            handler.getInitialMetadata(request, entry,metadataList,extra);
+        for (MetadataHandler handler : getMetadataHandlers()) {
+            handler.getInitialMetadata(request, entry, metadataList, extra);
         }
         return metadataList;
     }
 
 
-    public void addInitialMetadata(Request request, Entry entry, Hashtable extra)  {
-        for(Metadata metadata: getInitialMetadata(request, entry, extra)) {
-            entry.addMetadata(metadata,true);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param extra _more_
+     */
+    public void addInitialMetadata(Request request, Entry entry,
+                                   Hashtable extra) {
+        for (Metadata metadata : getInitialMetadata(request, entry, extra)) {
+            entry.addMetadata(metadata, true);
         }
     }
 
@@ -446,21 +464,20 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataCloud(Request request) throws Exception {
 
-        boolean doCloud = request.getString(ARG_TYPE,
-                                            "list").equals("cloud");
+        boolean doCloud = request.getString(ARG_TYPE, "list").equals("cloud");
         StringBuffer sb = new StringBuffer();
         String       header;
         if (doCloud) {
             request.put(ARG_TYPE, "list");
             header =
-                HtmlUtil.href(request.getUrl(), "List") +
-                HtmlUtil.span("&nbsp;|&nbsp;", " class=\"separator\" ") +
-                HtmlUtil.b("Cloud");
+                HtmlUtil.href(request.getUrl(), "List")
+                + HtmlUtil.span("&nbsp;|&nbsp;", " class=\"separator\" ")
+                + HtmlUtil.b("Cloud");
         } else {
             request.put(ARG_TYPE, "cloud");
             header = HtmlUtil.b("List")
-                + HtmlUtil.span("&nbsp;|&nbsp;", "class=\"separator\" ")
-                + HtmlUtil.href(request.getUrl(), "Cloud");
+                     + HtmlUtil.span("&nbsp;|&nbsp;", "class=\"separator\" ")
+                     + HtmlUtil.href(request.getUrl(), "Cloud");
         }
         sb.append(HtmlUtil.center(HtmlUtil.span(header,
                 " class=pagesubheading ")));

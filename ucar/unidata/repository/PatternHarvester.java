@@ -155,7 +155,9 @@ public class PatternHarvester extends Harvester {
     public PatternHarvester(Repository repository, String id)
             throws Exception {
         super(repository, id);
-        if(groupTemplate.length()==0) groupTemplate  = "${dirgroup}";
+        if (groupTemplate.length() == 0) {
+            groupTemplate = "${dirgroup}";
+        }
     }
 
     /**
@@ -169,7 +171,9 @@ public class PatternHarvester extends Harvester {
     public PatternHarvester(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        if(groupTemplate.length()==0) groupTemplate  = "${dirgroup}";
+        if (groupTemplate.length() == 0) {
+            groupTemplate = "${dirgroup}";
+        }
         init();
     }
 

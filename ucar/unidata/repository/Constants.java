@@ -81,27 +81,28 @@ public interface Constants {
 
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_RCURVE = "/icons/brc.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_CART = "/icons/cart.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_CLOUD = "/icons/cloud.gif";
 
+    /** _more_          */
     public static final String ICON_LIST = "/icons/list.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_RANGE = "/icons/range.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_CALENDAR = "/icons/calendar.gif";
 
     /** _more_ */
     public static final String ICON_RSS = "/icons/rss.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_ZIP = "/icons/zip.png";
 
     /** _more_ */
@@ -159,10 +160,10 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FILE = "/icons/file.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_IMAGE = "/icons/image.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_DATA = "/icons/data.gif";
 
     /** _more_ */
@@ -206,10 +207,10 @@ public interface Constants {
     public static final String ICON_LEFT = "/icons/left.gif";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_PARENT = "parent";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_URL = "url";
 
 
@@ -217,22 +218,22 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FROMDATE = "fromdate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NORTH = "north";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SOUTH = "south";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_EAST = "east";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_WEST = "west";
 
     /** _more_ */
@@ -310,9 +311,14 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_VARIABLE = "variable";
 
+    /** _more_          */
     public static final String ARG_ADDMETADATA = "addmetadata";
+
+    /** _more_          */
+    public static final String ATTR_ADDMETADATA = "addmetadata";
 
     /** _more_ */
     public static final String ARG_STEP = "step";
@@ -358,6 +364,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SUBJECT = "subject";
 
+    /** _more_          */
     public static final String ARG_SUBMIT = "submit";
 
 
@@ -392,10 +399,17 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
-    public static final String ARG_AREA_SOUTH = ARG_AREA+"_south";
-    public static final String ARG_AREA_NORTH = ARG_AREA+"_north";
-    public static final String ARG_AREA_EAST = ARG_AREA+"_east";
-    public static final String ARG_AREA_WEST= ARG_AREA+"_west";
+    /** _more_          */
+    public static final String ARG_AREA_SOUTH = ARG_AREA + "_south";
+
+    /** _more_          */
+    public static final String ARG_AREA_NORTH = ARG_AREA + "_north";
+
+    /** _more_          */
+    public static final String ARG_AREA_EAST = ARG_AREA + "_east";
+
+    /** _more_          */
+    public static final String ARG_AREA_WEST = ARG_AREA + "_west";
 
 
     /** _more_ */
@@ -442,7 +456,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MESSAGELEFT = "messageleft";
 
     /** _more_ */
@@ -467,14 +481,14 @@ public interface Constants {
     public static final String ARG_AUTH_PASSWORD = "auth.password";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SHOW_ASSOCIATIONS = "showassociations";
 
 
     /** _more_ */
     public static final String ARG_USER_ID = "user.id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SESSIONID = "sessionid";
 
     /** _more_ */
@@ -606,12 +620,19 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LABEL = "label";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_LAYOUT = "layout";
 
+    /** _more_          */
     public static final String ARG_MINLAT = "minlat";
+
+    /** _more_          */
     public static final String ARG_MINLON = "minlon";
+
+    /** _more_          */
     public static final String ARG_MAXLAT = "maxlat";
+
+    /** _more_          */
     public static final String ARG_MAXLON = "maxlon";
 
 
@@ -621,10 +642,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FROMDATE = "fromdate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_FROMDATE_TIME = ARG_FROMDATE + ".time";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TODATE_TIME = ARG_TODATE + ".time";
 
 
@@ -647,7 +668,7 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
 
@@ -788,16 +809,16 @@ public interface Constants {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DESCRIPTION = "description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CANDONEW = "candonew";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATA = "metadata";
 
 
@@ -866,7 +887,7 @@ public interface Constants {
     public static final String ARG_DESCRIPTION = "description";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADMIN_INSTALLNOTICESHOWN =
         "admin.installnoticeshown";
 
@@ -874,10 +895,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ADMIN_LICENSEREAD = "admin.licenseread";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADMIN_ADMINCREATED = "admin.admincreated";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADMIN_INSTALLCOMPLETE =
         "admin.installcomplete";
 
@@ -936,14 +957,14 @@ public interface Constants {
     public static final String BLANK = "";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String MIME_XML = "text/xml";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CODE = "code";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RESPONSE = "response";
 
 
@@ -974,7 +995,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ROLES = "user.roles";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_USER_PASSWORD = "user.password";
 
     /** _more_ */
@@ -1035,19 +1056,19 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_INHERITED = "inherited";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ATTR1 = "attr1";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ATTR2 = "attr2";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ATTR3 = "attr3";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ATTR4 = "attr4";
 
     /** _more_ */
@@ -1059,19 +1080,19 @@ public interface Constants {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final boolean DFLT_INHERITED = false;
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_YEAR = "year";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MONTH = "month";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DAY = "day";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SHOWYEAR = "showyear";
 
 

@@ -167,9 +167,17 @@ public class MetadataHandler extends RepositoryManager {
     }
 
 
-    public void getInitialMetadata(Request request, Entry entry,                                    
-                                   List<Metadata> metadataList,Hashtable extra) {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadataList _more_
+     * @param extra _more_
+     */
+    public void getInitialMetadata(Request request, Entry entry,
+                                   List<Metadata> metadataList,
+                                   Hashtable extra) {}
 
 
     /**
@@ -377,7 +385,9 @@ public class MetadataHandler extends RepositoryManager {
     public String getSearchLink(Request request, Metadata metadata) {
         return HtmlUtil.href(
             getSearchUrl(request, metadata),
-            HtmlUtil.img(getRepository().fileUrl(ICON_SEARCH), "Search for entries with this metadata"," border=0 "));
+            HtmlUtil.img(
+                getRepository().fileUrl(ICON_SEARCH),
+                "Search for entries with this metadata", " border=0 "));
     }
 
 
@@ -400,7 +410,7 @@ public class MetadataHandler extends RepositoryManager {
                 request.url(
                     getRepository().getMetadataManager().URL_METADATA_CLOUD,
                     ARG_METADATA_TYPE, type.toString()), HtmlUtil.img(
-                        getRepository().fileUrl(ICON_LIST),"View Listing"));
+                        getRepository().fileUrl(ICON_LIST), "View Listing"));
         String url = request.url(getRepository().URL_ENTRY_SEARCH);
         String[] values = getMetadataManager().getDistinctValues(request,
                               this, type);
@@ -409,7 +419,7 @@ public class MetadataHandler extends RepositoryManager {
         }
         StringBuffer content = new StringBuffer();
         content.append("<div class=\"browseblock\">");
-        int rowNum=1;
+        int rowNum = 1;
         for (int i = 0; i < values.length; i++) {
             String browseUrl = HtmlUtil.url(url,
                                             ARG_METADATA_TYPE + "." + type,
@@ -417,15 +427,22 @@ public class MetadataHandler extends RepositoryManager {
                                             ARG_METADATA_ATTR1 + "." + type,
                                             values[i]);
             String value = values[i].trim();
-            if(value.length()==0) value = "-blank-";
-            content.append(HtmlUtil.div(HtmlUtil.href(browseUrl, value), HtmlUtil.cssClass("listrow"+ rowNum)));
+            if (value.length() == 0) {
+                value = "-blank-";
+            }
+            content.append(HtmlUtil.div(HtmlUtil.href(browseUrl, value),
+                                        HtmlUtil.cssClass("listrow"
+                                            + rowNum)));
             rowNum++;
-            if(rowNum>2) rowNum = 1;
+            if (rowNum > 2) {
+                rowNum = 1;
+            }
         }
         content.append("</div>");
 
         sb.append(getRepository().makeShowHideBlock(request,
-                cloudLink + HtmlUtil.space(1) +type.getLabel(), content, false));
+                cloudLink + HtmlUtil.space(1) + type.getLabel(), content,
+                false));
 
 
     }

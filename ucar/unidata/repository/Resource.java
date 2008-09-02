@@ -43,10 +43,10 @@ public class Resource {
     /** _more_ */
     public static final String TYPE_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_LOCAL_DIRECTORY = "localdirectory";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_LOCAL_FILE = "localfile";
 
     /** _more_ */

@@ -190,28 +190,28 @@ public class OutputHandler extends RepositoryManager {
      */
     public static class State {
 
-        /** _more_          */
+        /** _more_ */
         public static final int FOR_UNKNOWN = 0;
 
-        /** _more_          */
+        /** _more_ */
         public static final int FOR_HEADER = 1;
 
-        /** _more_          */
+        /** _more_ */
         public int forWhat = FOR_UNKNOWN;
 
-        /** _more_          */
+        /** _more_ */
         public Entry entry;
 
-        /** _more_          */
+        /** _more_ */
         public Group group;
 
-        /** _more_          */
+        /** _more_ */
         public List<Group> subGroups;
 
-        /** _more_          */
+        /** _more_ */
         public List<Entry> entries;
 
-        /** _more_          */
+        /** _more_ */
         public List<Entry> allEntries;
 
         /**

@@ -61,7 +61,7 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_CONTENTTEMPLATE =
         new Metadata.Type("admin.contenttemplate", "Content Template");
 
-    /** _more_          */
+    /** _more_ */
     public static Metadata.Type TYPE_LOCALFILE_PATTERN =
         new Metadata.Type("admin.localfile.pattern", "Local File Pattern");
 
@@ -90,7 +90,7 @@ public class AdminMetadataHandler extends MetadataHandler {
     private List<Metadata.Type> dummyTypeList =
         new ArrayList<Metadata.Type>();
 
-    /** _more_          */
+    /** _more_ */
     private List<Metadata.Type> nonLocalTypes =
         new ArrayList<Metadata.Type>();
 

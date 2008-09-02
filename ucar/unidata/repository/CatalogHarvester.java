@@ -189,26 +189,32 @@ public class CatalogHarvester extends Harvester {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param metadataList _more_
+     */
     private void insertMetadata(Entry entry, List<Metadata> metadataList) {
-            for (Metadata metadata : metadataList) {
-                metadata.setEntryId(entry.getId());
-                try {
-                    if (metadata.getAttr1().length() > 10000) {
-                        repository.log("Too long metadata:"
-                                       + metadata.getAttr1().substring(0,
-                                           100) + "...");
-                        continue;
-                    }
-                    getMetadataManager().insertMetadata(metadata);
-                } catch (Exception exc) {
-                    repository.log("Bad metadata", exc);
-                    System.err.println("metadata attr1" + metadata.getAttr1());
-                    System.err.println("metadata attr2" + metadata.getAttr2());
-                    System.err.println("metadata attr3" + metadata.getAttr3());
-                    System.err.println("metadata attr4" + metadata.getAttr4());
-                    
+        for (Metadata metadata : metadataList) {
+            metadata.setEntryId(entry.getId());
+            try {
+                if (metadata.getAttr1().length() > 10000) {
+                    repository.log("Too long metadata:"
+                                   + metadata.getAttr1().substring(0, 100)
+                                   + "...");
+                    continue;
                 }
+                getMetadataManager().insertMetadata(metadata);
+            } catch (Exception exc) {
+                repository.log("Bad metadata", exc);
+                System.err.println("metadata attr1" + metadata.getAttr1());
+                System.err.println("metadata attr2" + metadata.getAttr2());
+                System.err.println("metadata attr3" + metadata.getAttr3());
+                System.err.println("metadata attr4" + metadata.getAttr4());
+
             }
+        }
 
     }
 
@@ -219,6 +225,7 @@ public class CatalogHarvester extends Harvester {
      * @param parent _more_
      * @param catalogUrl _more_
      * @param depth _more_
+     * @param catalogUrlPath _more_
      * @param xmlDepth _more_
      * @param recurseDepth _more_
      *
@@ -271,10 +278,11 @@ public class CatalogHarvester extends Harvester {
                                       false, null);
             if (serviceNode != null) {
                 String path = XmlUtil.getAttribute(serviceNode, "base");
-                if(path.startsWith("/")) {
-                    path  = catalogUrl.getProtocol() + "://" +catalogUrl.getHost()
-                              + ":" + catalogUrl.getPort() + path;
-                } 
+                if (path.startsWith("/")) {
+                    path = catalogUrl.getProtocol() + "://"
+                           + catalogUrl.getHost() + ":"
+                           + catalogUrl.getPort() + path;
+                }
                 //TODO: handle the base when it does not start with '/'
                 urlPath = path + urlPath;
             }
@@ -309,7 +317,7 @@ public class CatalogHarvester extends Harvester {
                                           DFLT_INHERITED,
                                           "Imported from catalog",
                                           catalogUrlPath, "", ""));
-            for(Metadata metadata: metadataList) {
+            for (Metadata metadata : metadataList) {
                 entry.addMetadata(metadata);
             }
 
@@ -362,8 +370,9 @@ public class CatalogHarvester extends Harvester {
                 String url = XmlUtil.getAttribute(child, "xlink:href");
                 if ( !url.startsWith("http")) {
                     if (url.startsWith("/")) {
-                        url = catalogUrl.getProtocol() + "://" +catalogUrl.getHost()
-                              + ":" + catalogUrl.getPort() + url;
+                        url = catalogUrl.getProtocol() + "://"
+                              + catalogUrl.getHost() + ":"
+                              + catalogUrl.getPort() + url;
                     } else {
                         url = IOUtil.getFileRoot(catalogUrlPath) + "/" + url;
                     }

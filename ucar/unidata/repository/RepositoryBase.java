@@ -64,15 +64,15 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                        "/entry/searchform",
                                                        "Advanced Search");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_ENTRY_TEXTSEARCHFORM =
         new RequestUrl(this, "/entry/textsearchform", "Text Search");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_ENTRY_BROWSESEARCHFORM =
         new RequestUrl(this, "/entry/browsesearchform", "Browse");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl[] searchUrls = { URL_ENTRY_TEXTSEARCHFORM,
                                              URL_ENTRY_SEARCHFORM,
                                              URL_ENTRY_BROWSESEARCHFORM };
@@ -93,7 +93,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
                                                    "/entry/search", "Search");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(this,
                                                       "/entry/xmlcreate");
 
@@ -236,15 +236,13 @@ public class RepositoryBase implements Constants, RepositorySource {
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
     /** _more_ */
-    protected static SimpleDateFormat sdf;
+    protected SimpleDateFormat sdf;
 
-    /** _more_          */
-    protected static SimpleDateFormat dateSdf =
-        new SimpleDateFormat("yyyy-MM-dd");
+    /** _more_ */
+    protected SimpleDateFormat dateSdf = makeDateFormat("yyyy-MM-dd");
 
-    /** _more_          */
-    protected static SimpleDateFormat timeSdf =
-        new SimpleDateFormat("HH:mm:ss z");
+    /** _more_ */
+    protected SimpleDateFormat timeSdf = makeDateFormat("HH:mm:ss z");
 
 
 
@@ -272,6 +270,21 @@ public class RepositoryBase implements Constants, RepositorySource {
     /**
      * _more_
      *
+     * @param formatString _more_
+     *
+     * @return _more_
+     */
+    protected SimpleDateFormat makeDateFormat(String formatString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat();
+        dateFormat.setTimeZone(DateUtil.TIMEZONE_GMT);
+        dateFormat.applyPattern(formatString);
+        return dateFormat;
+    }
+
+
+    /**
+     * _more_
+     *
      * @param d _more_
      *
      * @return _more_
@@ -290,6 +303,15 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dttm _more_
+     *
+     * @return _more_
+     *
+     * @throws java.text.ParseException _more_
+     */
     public Date parseDate(String dttm) throws java.text.ParseException {
         if (sdf == null) {
             sdf = new SimpleDateFormat();
@@ -297,7 +319,7 @@ public class RepositoryBase implements Constants, RepositorySource {
             sdf.applyPattern(DEFAULT_TIME_FORMAT);
         }
 
-        return    sdf.parse(dttm);
+        return sdf.parse(dttm);
     }
 
     /**

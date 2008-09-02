@@ -515,8 +515,9 @@ public class TypeHandler extends RepositoryManager {
                                  List<Link> links, boolean forHeader)
             throws Exception {
 
-        if (entry.isGroup() && getAccessManager().canDoAction(request, entry,
-                                                              Permission.ACTION_NEW)) {
+        if (entry.isGroup()
+                && getAccessManager().canDoAction(request, entry,
+                    Permission.ACTION_NEW)) {
             links.add(
                 new Link(
                     request.url(
@@ -635,8 +636,9 @@ public class TypeHandler extends RepositoryManager {
                             "Download file" + size);
         } else {
             String fileTail = getStorageManager().getFileTail(entry);
-            return new Link(getRepository().getEntryResourceUrl(request, entry),
-                            getRepository().fileUrl(ICON_FETCH), "Download file" + size);
+            return new Link(getRepository().getEntryResourceUrl(request,
+                    entry), getRepository().fileUrl(ICON_FETCH),
+                            "Download file" + size);
         }
     }
 
@@ -677,8 +679,8 @@ public class TypeHandler extends RepositoryManager {
                 if (entry.getResource().isFile()
                         && getAccessManager().canDownload(request, entry)) {
                     nameString = HtmlUtil.href(
-                                               getRepository().getEntryResourceUrl(request, entry),
-                                               nameString);
+                        getRepository().getEntryResourceUrl(request, entry),
+                        nameString);
                 }
             } else {
                 nameString = HtmlUtil.href(
@@ -790,9 +792,9 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(
                         HtmlUtil.formEntryTop(
                             msgLabel("Image"),
-                            HtmlUtil.img(getRepository().getEntryResourceUrl(request, entry),
-                                         "",
-                                         "width=600")));
+                            HtmlUtil.img(
+                                getRepository().getEntryResourceUrl(
+                                    request, entry), "", "width=600")));
 
 
                 } else if (entry.getResource().isUrl()) {
@@ -1035,16 +1037,18 @@ public class TypeHandler extends RepositoryManager {
 
         if (okToShowInForm(ARG_RESOURCE)) {
             if (entry == null) {
-                String addMetadata = HtmlUtil.space(2) +
-                    HtmlUtil.checkbox(ARG_ADDMETADATA,"true", false) + 
-                    HtmlUtil.space(1) + msg("Add Metadata");
+                String addMetadata = HtmlUtil.space(2)
+                                     + HtmlUtil.checkbox(ARG_ADDMETADATA,
+                                         "true", false) + HtmlUtil.space(1)
+                                             + msg("Add Metadata");
 
                 sb.append(
                     HtmlUtil.formEntry(
                         msgLabel("File"),
                         HtmlUtil.fileInput(ARG_FILE, size)
                         + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true", false)
-                        + HtmlUtil.space(1) + msg("Unzip archive")+addMetadata));
+                        + HtmlUtil.space(1) + msg("Unzip archive")
+                        + addMetadata));
                 String download = HtmlUtil.space(1)
                                   + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD,
                                       "true", false) + HtmlUtil.space(1)
@@ -1741,23 +1745,26 @@ public class TypeHandler extends RepositoryManager {
         for (int typeIdx = 0; typeIdx < types.size(); typeIdx++) {
             String       type        = (String) types.get(typeIdx);
             List         values      = (List) typeMap.get(type);
-            System.err.println ("Values:" + values);
             List<Clause> metadataOrs = new ArrayList<Clause>();
             String       subTable    = TABLE_METADATA + "_" + typeIdx;
             for (int i = 0; i < values.size(); i++) {
-                Metadata metadata = (Metadata) values.get(i);
+                Metadata     metadata   = (Metadata) values.get(i);
                 List<Clause> subClauses = new ArrayList<Clause>();
-                subClauses.add(Clause.join(subTable + ".entry_id",COL_ENTRIES_ID));
+                subClauses.add(Clause.join(subTable + ".entry_id",
+                                           COL_ENTRIES_ID));
                 subClauses.add(Clause.eq(subTable + ".type", type));
                 String tmp = "";
-                for(int attrIdx=1;attrIdx<=4;attrIdx++) {
+                for (int attrIdx = 1; attrIdx <= 4; attrIdx++) {
                     String attr = metadata.getAttr(attrIdx);
-                    if(attr.trim().length()>0) {
-                        subClauses.add(Clause.eq(subTable + ".attr" + attrIdx, attr));
-                        tmp=tmp +(tmp.length()==0?"":" &amp; ") + attr;
+                    if (attr.trim().length() > 0) {
+                        subClauses.add(Clause.eq(subTable + ".attr"
+                                + attrIdx, attr));
+                        tmp = tmp + ((tmp.length() == 0)
+                                     ? ""
+                                     : " &amp; ") + attr;
                     }
                 }
-                
+
                 Clause clause = Clause.and(subClauses);
 
 
@@ -1767,8 +1774,7 @@ public class TypeHandler extends RepositoryManager {
                 Metadata.Type metadataType = handler.findType(type);
                 if (metadataType != null) {
                     addCriteria(searchCriteria,
-                                metadataType.getLabel() + "=",
-                                tmp);
+                                metadataType.getLabel() + "=", tmp);
                 }
 
                 /**

@@ -28,7 +28,6 @@ import org.w3c.dom.*;
 import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -36,6 +35,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -178,7 +178,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 + "</center>", 2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, false, true));
-        for(TwoFacedObject tfo:getMetadataHtml(request, entry, false)) {
+        for (TwoFacedObject tfo : getMetadataHtml(request, entry, false)) {
             sb.append(tfo.getId().toString());
         }
 
@@ -234,7 +234,7 @@ public class HtmlOutputHandler extends OutputHandler {
         treeShown.add(true);
 
 
-        for(TwoFacedObject tfo:getMetadataHtml(request, entry, true)) {
+        for (TwoFacedObject tfo : getMetadataHtml(request, entry, true)) {
             tabTitles.add(tfo.toString());
             tabContent.add(tfo.getId());
             treeShown.add(false);
@@ -634,69 +634,80 @@ public class HtmlOutputHandler extends OutputHandler {
      * @return _more_
      * @throws Exception _more_
      */
-    private List<TwoFacedObject> getMetadataHtml(Request request, Entry entry,
-                                         boolean decorate)
+    private List<TwoFacedObject> getMetadataHtml(Request request,
+            Entry entry, boolean decorate)
             throws Exception {
         List<TwoFacedObject> result = new ArrayList<TwoFacedObject>();
-        boolean        showMetadata = request.get(ARG_SHOWMETADATA, false);
+        boolean showMetadata        = request.get(ARG_SHOWMETADATA, false);
         List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
         if (metadataList.size() == 0) {
             return result;
         }
 
 
-        Hashtable catMap = new Hashtable();
-        List<String> cats = new ArrayList<String>();
+        Hashtable    catMap = new Hashtable();
+        List<String> cats   = new ArrayList<String>();
         List<MetadataHandler> metadataHandlers =
             getMetadataManager().getMetadataHandlers();
-        
+
         for (Metadata metadata : metadataList) {
             for (MetadataHandler metadataHandler : metadataHandlers) {
-                if (!metadataHandler.canHandle(metadata)) {
+                if ( !metadataHandler.canHandle(metadata)) {
                     continue;
                 }
-                String[] html = metadataHandler.getHtml(request,
-                                                        metadata);
+                String[] html = metadataHandler.getHtml(request, metadata);
                 if (html == null) {
                     continue;
                 }
-                Metadata.Type type = metadataHandler.findType(metadata.getType());
+                Metadata.Type type =
+                    metadataHandler.findType(metadata.getType());
                 String cat = type.getCategory();
-                if(!decorate) cat = "Metadata";
-                Object[]blob = (Object[]) catMap.get(cat);
-                boolean firstOne = false;
-                if(blob == null) {
+                if ( !decorate) {
+                    cat = "Metadata";
+                }
+                Object[] blob     = (Object[]) catMap.get(cat);
+                boolean  firstOne = false;
+                if (blob == null) {
                     firstOne = true;
-                    blob = new Object[]{new StringBuffer(), new Integer(1)};
-                    catMap.put(cat,blob);
+                    blob = new Object[] { new StringBuffer(),
+                                          new Integer(1) };
+                    catMap.put(cat, blob);
                     cats.add(cat);
                 }
-                StringBuffer sb = (StringBuffer) blob[0];
-                int rowNum = ((Integer)blob[1]).intValue();
+                StringBuffer sb     = (StringBuffer) blob[0];
+                int          rowNum = ((Integer) blob[1]).intValue();
 
                 if (firstOne) {
                     if (decorate) {
-                        sb.append("<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"3\">\n");
+                        sb.append(
+                            "<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"3\">\n");
                     }
                 }
                 String theClass = HtmlUtil.cssClass("listrow" + rowNum);
-                if(decorate) {
-                    String row =  " <tr  " + theClass+" valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
-                        + html[0] + "</nobr></td><td>" + html[1] + "</td></tr>";
+                if (decorate) {
+                    String row =
+                        " <tr  " + theClass
+                        + " valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
+                        + html[0] + "</nobr></td><td>" + html[1]
+                        + "</td></tr>";
                     sb.append(row);
                 } else {
-                    String row =  " <tr  valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
-                        + html[0] + "</nobr></td><td>" + html[1] + "</td></tr>";
+                    String row =
+                        " <tr  valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
+                        + html[0] + "</nobr></td><td>" + html[1]
+                        + "</td></tr>";
                     sb.append(row);
                 }
-                if(++rowNum>2) rowNum=1;
+                if (++rowNum > 2) {
+                    rowNum = 1;
+                }
                 blob[1] = new Integer(rowNum);
             }
         }
 
-        for(String cat: cats) {
-            Object[]blob = (Object[]) catMap.get(cat);
-            StringBuffer sb = (StringBuffer) blob[0];
+        for (String cat : cats) {
+            Object[]     blob = (Object[]) catMap.get(cat);
+            StringBuffer sb   = (StringBuffer) blob[0];
             if (decorate) {
                 sb.append("</table>\n");
             }
@@ -811,7 +822,7 @@ public class HtmlOutputHandler extends OutputHandler {
         List          tabTitles  = new ArrayList<String>();
         List          tabContent = new ArrayList<String>();
         List<Boolean> treeShown  = new ArrayList<Boolean>();
-        if (!group.isDummy()) {
+        if ( !group.isDummy()) {
             tabTitles.add("Basic");
             tabContent.add(group.getTypeHandler().getEntryContent(group,
                     request, true));
@@ -819,21 +830,23 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if ( !showApplet) {
-            if (!group.isDummy()) {
-                for(TwoFacedObject tfo:getMetadataHtml(request, group, true)) {
+            if ( !group.isDummy()) {
+                for (TwoFacedObject tfo : getMetadataHtml(request, group,
+                        true)) {
                     tabTitles.add(tfo.toString());
                     tabContent.add(tfo.getId());
                     treeShown.add(false);
                 }
-            tabTitles.add("Comments");
-            tabContent.add(getCommentBlock(request, group));
-            treeShown.add(false);
-            tabTitles.add("Associations");
-            tabContent.add(getAssociationBlock(request, group));
-            treeShown.add(request.get(ARG_SHOW_ASSOCIATIONS, false));
-            tabTitles.add("Actions");
-            tabContent.add(getRepository().getEntryLinksList(request, group));
-            treeShown.add(false);
+                tabTitles.add("Comments");
+                tabContent.add(getCommentBlock(request, group));
+                treeShown.add(false);
+                tabTitles.add("Associations");
+                tabContent.add(getAssociationBlock(request, group));
+                treeShown.add(request.get(ARG_SHOW_ASSOCIATIONS, false));
+                tabTitles.add("Actions");
+                tabContent.add(getRepository().getEntryLinksList(request,
+                        group));
+                treeShown.add(false);
             }
         } else {
             List allEntries = new ArrayList(entries);
@@ -850,11 +863,12 @@ public class HtmlOutputHandler extends OutputHandler {
             tabContent = new ArrayList<String>();
             treeShown  = new ArrayList<Boolean>();
 
-            if (!group.isDummy()) {
+            if ( !group.isDummy()) {
                 tabContent.add(HtmlUtil.div(tmp,
                                             " style=\"margin-left:15px;\" "));
                 tabTitles.add("Information");
-                treeShown.add(!(subGroups.size()>0 || entries.size()>0));
+                treeShown.add( !((subGroups.size() > 0)
+                                 || (entries.size() > 0)));
             }
         }
 

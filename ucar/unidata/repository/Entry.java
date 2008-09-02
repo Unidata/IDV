@@ -78,7 +78,7 @@ public class Entry extends Entity {
     /** _more_ */
     private double west = NONGEO;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isLocalFile = false;
 
 
@@ -98,6 +98,14 @@ public class Entry extends Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public Entry createGeneratedEntry(Request request, String id) {
         return null;
     }
@@ -284,7 +292,9 @@ public class Entry extends Entity {
      * @return _more_
      */
     public String getCollectionGroupId() {
-        if(getIsLocalFile()) return null;
+        if (getIsLocalFile()) {
+            return null;
+        }
         if (isCollectionGroup()) {
             return getId();
         }
@@ -395,8 +405,11 @@ public class Entry extends Entity {
         return false;
     }
 
+    /**
+     * _more_
+     */
     public void clearArea() {
-        south = north = east = west  = NONGEO;
+        south = north = east = west = NONGEO;
     }
 
 
