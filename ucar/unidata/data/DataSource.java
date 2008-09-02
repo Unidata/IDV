@@ -113,6 +113,9 @@ public interface DataSource {
     public static final String MOST_RECENT = "datasource.mostrecent";
 
 
+    public static final String DATAPATH_DATE_FORMAT = "yyyy_MM_dd_HH_mm_ss_z";
+    public static final String DATAPATH_DATE_PATTERN = "\\d\\d\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_[^._]+";
+
     /**
      * Return the List of {@link DataChoice} objects
      *
