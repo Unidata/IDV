@@ -60,6 +60,7 @@ import visad.DateTime;
 
 
 
+import java.text.SimpleDateFormat;
 import java.awt.*;
 
 import java.awt.geom.Rectangle2D;
@@ -441,15 +442,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     }
                 }
 
-                JLabel statusLbl = new JLabel(" ");
-                RovingProgress progress = new RovingProgress();
-                progress.setMinimumSize(new Dimension(150,20));
-                progress.start();
-                JDialog dialog = GuiUtils.createDialog(null,"Publishing to RAMADDA",false);
-                dialog.getContentPane().add(GuiUtils.vbox(progress,statusLbl));
-                dialog.pack();
-                dialog.setLocation(200,200);
-                dialog.show();
+                GuiUtils.ProgressDialog dialog = new GuiUtils.ProgressDialog("Publishing to RAMADDA");
 
                 String bundleFile = null;
                 if (isBundle) {
@@ -500,6 +493,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 Element root = XmlUtil.create(doc, TAG_ENTRIES);
                 List tags = StringUtil.split(tagFld.getText().trim(),",",true,true);
 
+
                 String mainId    = (cnt++) + "";
                 String contentId = (cnt++) + "";
                 String mainFile;
@@ -511,41 +505,43 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     contentId   = mainId;
                 }
 
+
                 String zidvFile = (isZidv?bundleFile:null);
+                if(isZidv && !uploadZidvBundleCbx.isSelected()) {
+                    bundleFile = null;
+                    mainFile = null;
+                }
 
                 List attrs;
                 Element node;
 
 
-                //Create entry attributes
-                attrs = Misc.toList(new String[] {
-                    ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
-                    ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
-                    nameFld.getText().trim(), ATTR_DESCRIPTION,
-                    descFld.getText().trim(), ATTR_FROMDATE, fromDate,
-                    ATTR_TODATE, toDate
-                });
+                if(mainFile!=null) {
+                    attrs = Misc.toList(new String[] {
+                            ATTR_ID, mainId, ATTR_FILE, IOUtil.getFileTail(mainFile),
+                            ATTR_PARENT, parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
+                            nameFld.getText().trim(), ATTR_DESCRIPTION,
+                            descFld.getText().trim(), ATTR_FROMDATE, fromDate,
+                            ATTR_TODATE, toDate
+                        });
 
 
-                checkAndAdd(attrs, ATTR_NORTH, northFld);
-                checkAndAdd(attrs, ATTR_SOUTH, southFld);
-                checkAndAdd(attrs, ATTR_EAST, eastFld);
-                checkAndAdd(attrs, ATTR_WEST, westFld);
+                    checkAndAdd(attrs, ATTR_NORTH, northFld);
+                    checkAndAdd(attrs, ATTR_SOUTH, southFld);
+                    checkAndAdd(attrs, ATTR_EAST, eastFld);
+                    checkAndAdd(attrs, ATTR_WEST, westFld);
 
 
-                //Create the entry node
-                node = XmlUtil.create(TAG_ENTRY, root,attrs);
-                repositoryClient.addTags(node,tags);
+                    //Create the entry node
+                    node = XmlUtil.create(TAG_ENTRY, root,attrs);
+                    repositoryClient.addTags(node,tags);
 
-                for (int i = 0; i < myDataSourcesCbx.size(); i++) {
-                    if (((JCheckBox) myDataSourcesCbx.get(i)).isSelected()) {
-                        String id = (String) myDataSourcesIds.get(i);
-                        repositoryClient.addAssociation(root,id,mainId, "uses data");
+                    for (int i = 0; i < myDataSourcesCbx.size(); i++) {
+                        if (((JCheckBox) myDataSourcesCbx.get(i)).isSelected()) {
+                            String id = (String) myDataSourcesIds.get(i);
+                            repositoryClient.addAssociation(root,id,mainId, "uses data");
+                        }
                     }
-                }
-
-                if(isZidv && !uploadZidvBundleCbx.isSelected()) {
-                    bundleFile = null;
                 }
 
                 if (contentFile != null) {
@@ -580,12 +576,18 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 if(zidvFile!=null && isZidv && uploadZidvDataCbx.isSelected()) {
                     ZipInputStream zin  = new ZipInputStream(new FileInputStream(new File(zidvFile)));
                     ZipEntry ze;
+                    SimpleDateFormat sdf = new SimpleDateFormat(DataSource.DATAPATH_DATE_FORMAT);
                     while ((ze = zin.getNextEntry())!=null) {
                         String entryName = ze.getName();
+                        String dateString = StringUtil.findPattern(entryName,"(" +DataSource.DATAPATH_DATE_PATTERN+")");
+                        Date dttm  = null;
+                        if(dateString!=null) {
+                            dttm = sdf.parse(dateString);
+                        }
                         if(getIdv().getArgsManager().isBundleFile(entryName)) {
                             continue;
                         }
-                        statusLbl.setText("Adding " + entryName);
+                       dialog.setText("Adding " + entryName);
                         zos.putNextEntry(new ZipEntry(entryName));
                         byte[] bytes =
                             IOUtil.readBytes(zin,null, false);
@@ -597,6 +599,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                             entryName, ATTR_PARENT,
                             parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
                             entryName});
+                        if(dttm!=null) {
+                            attrs.addAll(Misc.newList(ATTR_FROMDATE, repositoryClient.formatDate(dttm),
+                                                      ATTR_TODATE, repositoryClient.formatDate(dttm)));
+                        }
                         node = XmlUtil.create(TAG_ENTRY, root,attrs);
                     }
                 }
@@ -626,7 +632,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                         bos.toByteArray()));
                
 
-                statusLbl.setText("Posting to RAMADDA");
+                dialog.setText("Posting to RAMADDA");
                 String[] result =repositoryClient.doPost(repositoryClient.URL_ENTRY_XMLCREATE,  entries);
                 dialog.dispose();
                 if (result[0] != null) {
