@@ -98,6 +98,10 @@ public class Entry extends Entity {
     }
 
 
+    public Entry createGeneratedEntry(Request request, String id) {
+        return null;
+    }
+
     /**
      * _more_
      *
@@ -280,6 +284,7 @@ public class Entry extends Entity {
      * @return _more_
      */
     public String getCollectionGroupId() {
+        if(getIsLocalFile()) return null;
         if (isCollectionGroup()) {
             return getId();
         }

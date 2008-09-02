@@ -194,6 +194,9 @@ public class Request implements Constants {
         if (entry.isTopGroup()) {
             return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
         }
+        if (entry.getIsLocalFile()) {
+            return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
+        }
         Group collectionGroup = entry.getCollectionGroup();
         if (repository.isLocalFileEntry(entry.getId())) {
             return url(theUrl, arg, entry.getId());

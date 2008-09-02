@@ -306,6 +306,17 @@ public class StorageManager extends RepositoryManager {
         return newFile;
     }
 
+    public File getUploadFilePath(String fileName) {
+        return new File(IOUtil.joinDir(getUploadDir(),
+                                       repository.getGUID() + "_" + fileName));
+    }
+
+    public String getFileTail(Entry entry) {
+        String fileName = entry.getResource().getPath();
+        int idx = fileName.indexOf("_");
+        if(idx>=0) return fileName.substring(idx+1);
+        return fileName;
+    }
 
     /**
      * _more_

@@ -55,6 +55,7 @@ public class Group extends Entry {
 
 
 
+
     /**
      * _more_
      *
@@ -91,6 +92,9 @@ public class Group extends Entry {
     public Group(String id, TypeHandler typeHandler) {
         super(id, typeHandler);
     }
+
+
+    protected void addChildrenIds(List<String> ids) {}
 
 
     /**

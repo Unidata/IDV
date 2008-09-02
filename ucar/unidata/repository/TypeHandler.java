@@ -634,11 +634,9 @@ public class TypeHandler extends RepositoryManager {
                             getRepository().fileUrl(ICON_FETCH),
                             "Download file" + size);
         } else {
-            return new Link(HtmlUtil
-                .url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                     + entry.getName(), ARG_ID, entry
-                         .getId()), getRepository()
-                             .fileUrl(ICON_FETCH), "Download file" + size);
+            String fileTail = getStorageManager().getFileTail(entry);
+            return new Link(getRepository().getEntryResourceUrl(request, entry),
+                            getRepository().fileUrl(ICON_FETCH), "Download file" + size);
         }
     }
 
@@ -679,10 +677,8 @@ public class TypeHandler extends RepositoryManager {
                 if (entry.getResource().isFile()
                         && getAccessManager().canDownload(request, entry)) {
                     nameString = HtmlUtil.href(
-                        HtmlUtil.url(
-                            request.url(getRepository().URL_ENTRY_GET) + "/"
-                            + entry.getName(), ARG_ID,
-                                entry.getId()), nameString);
+                                               getRepository().getEntryResourceUrl(request, entry),
+                                               nameString);
                 }
             } else {
                 nameString = HtmlUtil.href(
@@ -794,13 +790,10 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(
                         HtmlUtil.formEntryTop(
                             msgLabel("Image"),
-                            HtmlUtil.img(
-                                HtmlUtil.url(
-                                    request.url(
-                                        getRepository().URL_ENTRY_GET) + "/"
-                                            + entry.getName(), ARG_ID,
-                                                entry.getId()), "",
-                                                    "width=600")));
+                            HtmlUtil.img(getRepository().getEntryResourceUrl(request, entry),
+                                         "",
+                                         "width=600")));
+
 
                 } else if (entry.getResource().isUrl()) {
                     sb.append(HtmlUtil.formEntryTop(msgLabel("Image"),

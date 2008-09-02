@@ -76,6 +76,7 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -289,7 +290,10 @@ public class Repository extends RepositoryBase implements Tables,
     private List<String> localFilePaths = new ArrayList<String>();
 
     /** _more_ */
-    public static final String LOCAL_FILE_ID_PREFIX = "file:";
+    public static final String ID_PREFIX_LOCAL_FILE = "file:";
+    public static final String ID_PREFIX_CATALOG = "catalog:";    
+    public static final String ID_PREFIX_GENERATED = "generated:";    
+
 
     /**
      * _more_
@@ -2316,16 +2320,16 @@ public class Repository extends RepositoryBase implements Tables,
      * @return _more_
      */
     protected String getGUID() {
-        synchronized (MUTEX_KEY) {
-            int key = keyCnt++;
-            return baseTime + "_" + Math.random() + "_" + key;
-        }
+        return  UUID.randomUUID().toString();
     }
 
 
-
-
-
+    public String getEntryResourceUrl(Request request, Entry entry) {
+        String fileTail = getStorageManager().getFileTail(entry);
+        return HtmlUtil
+            .url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                 + fileTail, ARG_ID, entry.getId());
+    }
 
     /**
      * _more_
@@ -3737,6 +3741,31 @@ public class Repository extends RepositoryBase implements Tables,
                                                      f.lastModified(),
                                                          f.lastModified(),
                                                              null);
+        } else if (isCatalogEntry(entryId)) {
+            String url = getCatalogFromId(entryId);
+            Group parent = null;
+            if (parent == null) {
+                parent = topGroup;
+            }
+            TypeHandler handler =  getTypeHandler(TypeHandler.TYPE_GROUP);
+            entry = new Group(entryId, handler);
+            String name = IOUtil.getFileTail(url);
+            entry.setIsLocalFile(true);
+            Date now = new Date();
+            entry.initEntry(name, "", parent, "",
+                            getUserManager().localFileUser,
+                            new Resource(url, Resource.TYPE_URL),
+                            "",
+                            now.getTime(),
+                            now.getTime(),
+                            now.getTime(),
+                            null);
+        } else if(isGeneratedEntry(entryId)) {
+            String[]ids = getGeneratedIdPair(entryId);
+            if(ids.length!=2) throw new IllegalArgumentException("Bad generated id:" +entryId);
+            Entry parentEntry =  getEntry(request, ids[0]);
+            if(parentEntry==null) return null;
+            entry  = parentEntry.createGeneratedEntry(request,ids[1]);
         } else {
             Statement entryStmt =
                 getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
@@ -5762,6 +5791,9 @@ public class Repository extends RepositoryBase implements Tables,
             }
         }
 
+        group.addChildrenIds(ids);
+
+
         return ids;
     }
 
@@ -5881,7 +5913,7 @@ public class Repository extends RepositoryBase implements Tables,
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, entryId,
                                      ATTR_TITLE, name);
         if (ImageUtils.isImage(file)) {
-            String imageUrl =
+            String imageUrl = 
                 HtmlUtil.url(URL_ENTRY_GET + entryId
                              + IOUtil.getFileExtension(file), ARG_ID,
                                  entryId, ARG_IMAGEWIDTH, "75");
@@ -6485,7 +6517,11 @@ public class Repository extends RepositoryBase implements Tables,
      * @return _more_
      */
     public String getFileFromId(String id) {
-        return id.substring(LOCAL_FILE_ID_PREFIX.length());
+        return id.substring(ID_PREFIX_LOCAL_FILE.length());
+    }
+
+    public String getCatalogFromId(String id) {
+        return id.substring(ID_PREFIX_CATALOG.length());
     }
 
     /**
@@ -6508,8 +6544,23 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public String getIdFromFile(String file) {
         file = file.replace("\\", "/");
-        return LOCAL_FILE_ID_PREFIX + file;
+        return ID_PREFIX_LOCAL_FILE + file;
     }
+
+
+    public String getIdFromCatalog(String url) {
+        return ID_PREFIX_CATALOG + url;
+    }
+
+    public boolean isGeneratedEntry(String id) {
+        return id.startsWith(ID_PREFIX_GENERATED);
+    }
+
+    public String[] getGeneratedIdPair(String id) {
+        id =  id.substring(ID_PREFIX_GENERATED.length());
+        return  StringUtil.split(id,";",2);
+    }
+
 
     /**
      * _more_
@@ -6519,14 +6570,22 @@ public class Repository extends RepositoryBase implements Tables,
      * @return _more_
      */
     public boolean isLocalFileEntry(String id) {
-        if (id.startsWith(LOCAL_FILE_ID_PREFIX)) {
-            id = id.substring(LOCAL_FILE_ID_PREFIX.length());
+        if (id.startsWith(ID_PREFIX_LOCAL_FILE)) {
+            id = id.substring(ID_PREFIX_LOCAL_FILE.length());
             for (String path : localFilePaths) {
                 if (id.startsWith(path)) {
                     checkFilePath(id);
                     return true;
                 }
             }
+        }
+        return false;
+    }
+
+
+    public boolean isCatalogEntry(String id) {
+        if (id.startsWith(ID_PREFIX_CATALOG)) {
+            return true;
         }
         return false;
     }
@@ -6556,6 +6615,10 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         if (isLocalFileEntry(id)) {
+            return (Group) getEntry(request, id);
+        }
+
+        if (isCatalogEntry(id)) {
             return (Group) getEntry(request, id);
         }
 

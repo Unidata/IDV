@@ -22,10 +22,7 @@
 
 
 
-
-
 package ucar.unidata.repository.idv;
-
 
 
 
@@ -79,13 +76,61 @@ import java.util.zip.*;
 
 
 import javax.swing.*;
-
+import ucar.unidata.ui.RovingProgress;
 
 /**
  * @author IDV development team
  */
 public class RamaddaPublisher extends ucar.unidata.idv.publish
     .IdvPublisher implements ucar.unidata.repository.Constants {
+
+
+    /** _more_          */
+    private DateTimePicker fromDateFld;
+
+    /** _more_          */
+    private DateTimePicker toDateFld;
+
+
+    /** _more_ */
+    private JTextField nameFld;
+
+    private JTextField tagFld;
+
+    /** _more_ */
+    private JTextArea descFld;
+
+    /** _more_ */
+    private JTextField contentsNameFld;
+
+    /** _more_ */
+    private JTextArea contentsDescFld;
+
+    /** _more_ */
+    private JTextField northFld;
+
+    /** _more_ */
+    private JTextField southFld;
+
+    /** _more_ */
+    private JTextField eastFld;
+
+    /** _more_ */
+    private JTextField westFld;
+
+    /** _more_          */
+    private JCheckBox doBundleCbx = new JCheckBox("Include bundle", true);
+
+    private JCheckBox uploadZidvDataCbx = new JCheckBox("Upload ZIDV Data", false);
+    private JCheckBox uploadZidvBundleCbx = new JCheckBox("Upload ZIDV Bundle", true);
+
+    /** _more_          */
+    private JCheckBox myAddAssociationCbx = new JCheckBox("", false);
+
+
+    /** _more_          */
+    private List comps;
+
 
     /** _more_ */
     private InteractiveRepositoryClient repositoryClient;
@@ -171,48 +216,6 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
 
 
-    /** _more_          */
-    private DateTimePicker fromDateFld;
-
-    /** _more_          */
-    private DateTimePicker toDateFld;
-
-
-    /** _more_ */
-    private JTextField nameFld;
-
-    private JTextField tagFld;
-
-    /** _more_ */
-    private JTextArea descFld;
-
-    /** _more_ */
-    private JTextField contentsNameFld;
-
-    /** _more_ */
-    private JTextArea contentsDescFld;
-
-    /** _more_ */
-    private JTextField northFld;
-
-    /** _more_ */
-    private JTextField southFld;
-
-    /** _more_ */
-    private JTextField eastFld;
-
-    /** _more_ */
-    private JTextField westFld;
-
-    /** _more_          */
-    private JCheckBox doBundleCbx = new JCheckBox("Include bundle", true);
-
-    /** _more_          */
-    private JCheckBox myAddAssociationCbx = new JCheckBox("", false);
-
-
-    /** _more_          */
-    private List comps;
 
     /**
      * _more_
@@ -292,17 +295,19 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             return;
         }
 
-
-
         try {
             boolean isBundle = ((contentFile == null)
                                 ? false
                                 : getIdv().getArgsManager().isBundleFile(
                                     contentFile));
 
+            boolean isZidv = ((contentFile == null)
+                                ? false
+                                : getIdv().getArgsManager().isZidvFile(
+                                    contentFile));
+
             doMakeContents();
             List      myComps            = new ArrayList(comps);
-
 
             JCheckBox addAssociationCbx  = null;
             List      topComps           = new ArrayList();
@@ -351,6 +356,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     topComps.add(GuiUtils.filler());
                     topComps.add(addAssociationCbx);
                 }
+            }
+
+
+            if(isZidv) {
+                topComps.add(GuiUtils.filler());
+                topComps.add(GuiUtils.left(GuiUtils.hbox(uploadZidvDataCbx,uploadZidvBundleCbx)));
             }
 
 
@@ -430,6 +441,16 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     }
                 }
 
+                JLabel statusLbl = new JLabel(" ");
+                RovingProgress progress = new RovingProgress();
+                progress.setMinimumSize(new Dimension(150,20));
+                progress.start();
+                JDialog dialog = GuiUtils.createDialog(null,"Publishing to RAMADDA",false);
+                dialog.getContentPane().add(GuiUtils.vbox(progress,statusLbl));
+                dialog.pack();
+                dialog.setLocation(200,200);
+                dialog.show();
+
                 String bundleFile = null;
                 if (isBundle) {
                     bundleFile  = contentFile;
@@ -456,6 +477,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     zos.write(bytes, 0, bytes.length);
                     zos.closeEntry();
                 }
+
 
                 if (bundleFile != null) {
                     zos.putNextEntry(
@@ -489,6 +511,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     contentId   = mainId;
                 }
 
+                String zidvFile = (isZidv?bundleFile:null);
+
                 List attrs;
                 Element node;
 
@@ -520,6 +544,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     }
                 }
 
+                if(isZidv && !uploadZidvBundleCbx.isSelected()) {
+                    bundleFile = null;
+                }
 
                 if (contentFile != null) {
                     attrs = Misc.toList(new String[] {
@@ -550,6 +577,32 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
                 }
 
+                if(zidvFile!=null && isZidv && uploadZidvDataCbx.isSelected()) {
+                    ZipInputStream zin  = new ZipInputStream(new FileInputStream(new File(zidvFile)));
+                    ZipEntry ze;
+                    while ((ze = zin.getNextEntry())!=null) {
+                        String entryName = ze.getName();
+                        if(getIdv().getArgsManager().isBundleFile(entryName)) {
+                            continue;
+                        }
+                        statusLbl.setText("Adding " + entryName);
+                        zos.putNextEntry(new ZipEntry(entryName));
+                        byte[] bytes =
+                            IOUtil.readBytes(zin,null, false);
+                        zos.write(bytes, 0, bytes.length);
+                        zos.closeEntry();
+                        String id = (cnt++) + "";
+                        attrs = Misc.toList(new String[] {
+                            ATTR_ID, id, ATTR_FILE,
+                            entryName, ATTR_PARENT,
+                            parentId, ATTR_TYPE, TYPE_FILE, ATTR_NAME,
+                            entryName});
+                        node = XmlUtil.create(TAG_ENTRY, root,attrs);
+                    }
+                }
+
+
+
                 if ((addAssociationCbx != null)
                         && addAssociationCbx.isSelected()) {
                     repositoryClient.addAssociation(root,lastBundleId,contentId,"generated product");
@@ -571,7 +624,11 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 repositoryClient.addUrlArgs(entries);
                 entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
                         bos.toByteArray()));
+               
+
+                statusLbl.setText("Posting to RAMADDA");
                 String[] result =repositoryClient.doPost(repositoryClient.URL_ENTRY_XMLCREATE,  entries);
+                dialog.dispose();
                 if (result[0] != null) {
                     LogUtil.userErrorMessage("Error publishing:\n"
                                              + result[0]);

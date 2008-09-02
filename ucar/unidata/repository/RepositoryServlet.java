@@ -363,11 +363,7 @@ public class RepositoryServlet extends HttpServlet {
                 return;
             }
             String contentType = item.getContentType();
-            File uploadedFile =
-                new File(
-                    IOUtil.joinDir(
-                        repository.getStorageManager().getUploadDir(),
-                        repository.getGUID() + "_" + fileName));
+            File uploadedFile = repository.getStorageManager().getUploadFilePath(fileName);
             try {
                 item.write(uploadedFile);
             } catch (Exception e) {

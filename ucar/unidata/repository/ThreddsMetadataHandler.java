@@ -360,7 +360,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     AxisType axisType = ca.getAxisType();
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
-                                              CommonUnits.DEGREE);
+                                                   CommonUnits.DEGREE);
                         System.err.println("lat range:" + minmax[0] + " " + minmax[1]);
                         extra.put(ARG_MINLAT, minmax[0]);
                         extra.put(ARG_MAXLAT, minmax[1]);
@@ -396,7 +396,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
-            if ( !haveBounds) {
+            if ( true || !haveBounds) {
+                System.err.println("no bounds - looking for coordsystem");
                 for (CoordinateSystem coordSys : (List<CoordinateSystem>)dataset
                         .getCoordinateSystems()) {
                     ProjectionImpl proj = coordSys.getProjection();
@@ -404,6 +405,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         continue;
                     }
                     LatLonRect llr = proj.getDefaultMapAreaLL();
+                    System.err.println("bounds from cs:" + llr);
                     haveBounds = true;
                     extra.put(ARG_MINLAT, llr.getLatMin());
                     extra.put(ARG_MAXLAT, llr.getLatMax());
