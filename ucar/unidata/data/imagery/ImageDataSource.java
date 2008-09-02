@@ -212,19 +212,22 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     public List getDataPaths() {
         List paths = new ArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd'T'HH_mm_ss_Z");
+        SimpleDateFormat sdf = new SimpleDateFormat("_" + DATAPATH_DATE_FORMAT);
         try {
             for (int i = 0; i < imageList.size(); i++) {
                 AddeImageDescriptor aid = getDescriptor(imageList.get(i));
                 String path = aid.getSource();
                 DateTime dttm = (DateTime)   timeMap.get(path);
-                if(dttm!=null) {
-                    System.err.println("path:" + path);
+                /*                if(dttm!=null) {
                     String dateString = sdf.format(ucar.visad.Util.makeDate(dttm));
+                    if(path.indexOf(".area")>=0 && path.indexOf(dateString)==-1) {
+                        path = path.replace(".area", dateString+".area");
+                    } 
+                    System.err.println("path:" + path);
                     paths.add(new Object[]{path,path+dateString});
-                } else {
+                    } else {*/
                     paths.add(path);
-                }
+                    //                }
             } 
         } catch(Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
@@ -313,15 +316,15 @@ public abstract class ImageDataSource extends DataSourceImpl {
             throws Exception {
         List urls = new ArrayList();
         List suffixes = new ArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd'T'HH_mm_ss_Z");
+        SimpleDateFormat sdf = new SimpleDateFormat("_" + DATAPATH_DATE_FORMAT);
         for (int i = 0; i < imageList.size(); i++) {
             AddeImageDescriptor aid = getDescriptor(imageList.get(i));
             String url = aid.getSource();
             DateTime dttm = (DateTime)   timeMap.get(url);
             if(dttm!=null) {
-                suffixes.add("area"+sdf.format(ucar.visad.Util.makeDate(dttm)));
+                suffixes.add(sdf.format(ucar.visad.Util.makeDate(dttm))+".area");
             } else {
-                suffixes.add("area"+i);
+                suffixes.add(i+".area");
             }
             urls.add(url);
         }
