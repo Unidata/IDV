@@ -437,20 +437,35 @@ public class IOUtil {
     public static List writeTo(List urls, String prefix, String suffix,
                                Object loadId)
             throws IOException {
+        List suffixes = new ArrayList();
         if ( !suffix.startsWith(".")) {
             suffix = "." + suffix;
         }
+        if (urls.size() == 1) {
+            suffixes.add(suffix);
+        }  else {
+            for (int i = 0; i < urls.size(); i++) {
+                suffixes.add(i+suffix);
+            }
+        }
+        return writeTo(urls, prefix, suffixes, loadId);
+    }
+
+
+    public static List writeTo(List urls, String prefix, List suffixes,
+                               Object loadId)
+            throws IOException {
         List files  = new ArrayList();
         int  total  = 0;
         List exists = new ArrayList();
         if (urls.size() == 1) {
-            String path = prefix + "" + suffix;
+            String path = prefix + "" + suffixes.get(0);
             if ((new File(path)).exists()) {
                 exists.add(path);
             }
         } else {
             for (int i = 0; i < urls.size(); i++) {
-                String path = prefix + i + "" + suffix;
+                String path = prefix + suffixes.get(i);
                 if ((new File(path)).exists()) {
                     exists.add(path);
                 }
@@ -472,9 +487,7 @@ public class IOUtil {
         }
 
         for (int i = 0; i < urls.size(); i++) {
-            String      path = ((urls.size() == 1)
-                                ? prefix + suffix
-                                : prefix + i + "" + suffix);
+            String      path =  prefix + suffixes.get(i);
             InputStream from;
             Object      obj = urls.get(i);
             JobManager.getManager().setDialogLabel1(loadId,
