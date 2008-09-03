@@ -361,7 +361,8 @@ a.menulink {
 }
 
 .folderblock li {
-   margin-top:1px;
+   margin:0px;
+   padding:0px;   
 }
 
 .pagesubheading {
