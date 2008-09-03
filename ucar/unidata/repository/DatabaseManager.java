@@ -201,6 +201,29 @@ public class DatabaseManager extends RepositoryManager {
     /**
      * _more_
      *
+     * @param table _more_
+     * @param clause _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public int getCount(String table, Clause clause) throws Exception {
+        Statement statement = select("count(*)", table,  clause);
+
+        ResultSet results = statement.getResultSet();
+        if ( !results.next()) {
+            return 0;
+        }
+        return results.getInt(1);
+    }
+
+
+
+
+    /**
+     * _more_
+     *
      * @param sb _more_
      */
     protected void addInfo(StringBuffer sb) {

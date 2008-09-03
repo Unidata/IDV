@@ -1,5 +1,4 @@
 /**
- * $Id: TrackDataSource.java,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
  *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -85,7 +84,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import java.util.UUID;
+
 
 import java.util.regex.*;
 import java.util.zip.*;
@@ -235,7 +234,7 @@ public class Repository extends RepositoryBase implements Tables,
     private OutputStream logFOS;
 
     /** _more_ */
-    protected boolean debug = false;
+    protected boolean debug = true;
 
     /** _more_ */
     private UserManager userManager;
@@ -386,6 +385,17 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void close() throws Exception {
+        getDatabaseManager().closeConnection();
+    }
+
+
+
 
     /**
      * _more_
@@ -408,6 +418,7 @@ public class Repository extends RepositoryBase implements Tables,
     public Repository getRepository() {
         return this;
     }
+
 
     /**
      * _more_
@@ -1758,16 +1769,6 @@ public class Repository extends RepositoryBase implements Tables,
         return result;
     }
 
-    /**
-     * _more_
-     *
-     * @param path _more_
-     */
-    public static void checkFilePath(String path) {
-        if (path.indexOf("..") >= 0) {
-            throw new IllegalArgumentException("bad file path:" + path);
-        }
-    }
 
 
     /**
@@ -2182,27 +2183,6 @@ public class Repository extends RepositoryBase implements Tables,
         properties.put(name, value);
     }
 
-    /**
-     * _more_
-     *
-     * @param table _more_
-     * @param clause _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public int getCount(String table, Clause clause) throws Exception {
-        Statement statement = getDatabaseManager().select("count(*)", table,
-                                  clause);
-
-        ResultSet results = statement.getResultSet();
-        if ( !results.next()) {
-            return 0;
-        }
-        return results.getInt(1);
-    }
-
 
 
     /**
@@ -2236,11 +2216,6 @@ public class Repository extends RepositoryBase implements Tables,
     protected List<OutputHandler> getOutputHandlers() {
         return outputHandlers;
     }
-
-
-
-
-
 
 
     /**
@@ -2315,14 +2290,6 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected String getGUID() {
-        return UUID.randomUUID().toString();
-    }
 
 
     /**
@@ -2485,9 +2452,6 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
-
-
-
     /**
      * _more_
      *
@@ -2597,48 +2561,6 @@ public class Repository extends RepositoryBase implements Tables,
 
     }
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processListHome(Request request) throws Exception {
-        StringBuffer         sb           = new StringBuffer();
-        List                 links = getListLinks(request, BLANK, false);
-        TypeHandler          typeHandler  = getTypeHandler(request);
-        List<TwoFacedObject> typeList     = new ArrayList<TwoFacedObject>();
-        List<TwoFacedObject> specialTypes = typeHandler.getListTypes(false);
-        if (specialTypes.size() > 0) {
-            sb.append(HtmlUtil.bold(typeHandler.getDescription() + ":"));
-        }
-        typeList.addAll(specialTypes);
-        /*
-          if(typeList.size()>0) {
-          sb.append("<ul>");
-          for(TwoFacedObject tfo: typeList) {
-          sb.append("<li>");
-          sb.append(HtmlUtil.href(request.url(URL_LIST_SHOW,ARG_WHAT, tfo.getId(),ARG_TYPE,,typeHandler.getType()) , tfo.toString())));
-          sb.append("\n");
-          }
-          sb.append("</ul>");
-          }
-          sb.append("<p><b>Basic:</b><ul><li>");
-        */
-        sb.append("<ul><li>");
-        sb.append(StringUtil.join("<li>", links));
-        sb.append("</ul>");
-
-
-        Result result = new Result("Lists", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getListLinks(request, BLANK, true));
-        return result;
-    }
 
 
 
@@ -3261,6 +3183,50 @@ public class Repository extends RepositoryBase implements Tables,
         return request.get(ARG_MAX, MAX_ROWS);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processListHome(Request request) throws Exception {
+        StringBuffer         sb           = new StringBuffer();
+        List                 links = getListLinks(request, BLANK, false);
+        TypeHandler          typeHandler  = getTypeHandler(request);
+        List<TwoFacedObject> typeList     = new ArrayList<TwoFacedObject>();
+        List<TwoFacedObject> specialTypes = typeHandler.getListTypes(false);
+        if (specialTypes.size() > 0) {
+            sb.append(HtmlUtil.bold(typeHandler.getDescription() + ":"));
+        }
+        typeList.addAll(specialTypes);
+        /*
+          if(typeList.size()>0) {
+          sb.append("<ul>");
+          for(TwoFacedObject tfo: typeList) {
+          sb.append("<li>");
+          sb.append(HtmlUtil.href(request.url(URL_LIST_SHOW,ARG_WHAT, tfo.getId(),ARG_TYPE,,typeHandler.getType()) , tfo.toString())));
+          sb.append("\n");
+          }
+          sb.append("</ul>");
+          }
+          sb.append("<p><b>Basic:</b><ul><li>");
+        */
+        sb.append("<ul><li>");
+        sb.append(StringUtil.join("<li>", links));
+        sb.append("</ul>");
+
+
+        Result result = new Result("Lists", sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getListLinks(request, BLANK, true));
+        return result;
+    }
+
+
     /**
      * _more_
      *
@@ -3809,17 +3775,6 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void close() throws Exception {
-        getDatabaseManager().closeConnection();
-    }
-
-
-
 
 
     /**
@@ -3840,13 +3795,14 @@ public class Repository extends RepositoryBase implements Tables,
                 request.form(
                     getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getId()));
+            sb.append(HtmlUtil.submit(msg("Import a catalog:")));
+            sb.append(HtmlUtil.space(1));
             sb.append(HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
                       + HtmlUtil.space(1)
                       + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
                       + " Recurse");
 
-            sb.append(HtmlUtil.p());
-            sb.append(HtmlUtil.submit(msg("Import catalog")));
+
             sb.append(HtmlUtil.formClose());
         }
         return sb.toString();
@@ -3870,17 +3826,19 @@ public class Repository extends RepositoryBase implements Tables,
         sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
         sb.append(request.form(URL_ENTRY_FORM));
-        sb.append(makeTypeSelect(request, false));
+        sb.append(HtmlUtil.submit("Create a:"));
         sb.append(HtmlUtil.space(1));
-        sb.append(HtmlUtil.submit("Create new entry"));
+        sb.append(makeTypeSelect(request, false));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
 
+        /*
         sb.append(request.uploadForm(URL_ENTRY_XMLCREATE));
         sb.append("File:" + HtmlUtil.fileInput(ARG_FILE, ""));
         sb.append("<br>" + HtmlUtil.submit("Submit"));
         sb.append(HtmlUtil.formClose());
+        */
 
 
         return new Result("New Form", sb, Result.TYPE_HTML);

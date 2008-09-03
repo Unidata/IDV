@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.UUID;
 
 
 /**
@@ -263,6 +264,29 @@ public class RepositoryBase implements Constants, RepositorySource {
     public RepositoryBase(String hostname, int port) throws Exception {
         this.hostname = hostname;
         this.port     = port;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected String getGUID() {
+        return UUID.randomUUID().toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param path _more_
+     */
+    public static void checkFilePath(String path) {
+        if (path.indexOf("..") >= 0) {
+            throw new IllegalArgumentException("bad file path:" + path);
+        }
     }
 
 

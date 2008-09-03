@@ -1437,17 +1437,23 @@ public class TypeHandler extends RepositoryManager {
                                                 ARG_AREA + "_east",
                                                 ""), request.getString(
                                                     ARG_AREA + "_west", ""));
-            String mapCanvas =
-                HtmlUtil.div("", " id=\"mapcanvas\" class=\"mapcanvas\"");
-            mapCanvas = "";
+
+            boolean doMap  = false;
+
+            StringBuffer scriptSB = new StringBuffer();
+            if(doMap) {
+                scriptSB.append("<script type=\"text/javascript\" src=\"${root}/geo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
+                scriptSB.append("<script type=\"text/javascript\" src=\"${root}/dojo/dojo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
+                scriptSB.append("<script type=\"text/javascript\" src=\"${root}/JazLibrary.js\"></script>\n");
+            }
+
+            String mapCanvas = (doMap? HtmlUtil.div("", " id=\"mapcanvas\" class=\"mapcanvas\""):"");
             areaWidget = "<table><tr valign=top>"
                          + HtmlUtil.cols(areaWidget, mapCanvas)
                          + "</tr></table>";
-            //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(request.url(getRepository().URL_GETMAP),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
-            String mapJS =
+            String mapJS = (doMap?
                 HtmlUtil.script(
-                    "function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n");
-            mapJS      = "";
+                                "function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n"):"");
             areaWidget += mapJS;
 
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),

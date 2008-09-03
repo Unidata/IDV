@@ -369,7 +369,7 @@ public class Admin extends RepositoryManager {
 
             int cnt = 0;
             if (tableName.toLowerCase().indexOf("_index_") < 0) {
-                cnt = getRepository().getCount(tableName, new Clause());
+                cnt = getDatabaseManager().getCount(tableName, new Clause());
             }
             String tableVar  = null;
             String TABLENAME = tableName.toUpperCase();
@@ -795,7 +795,7 @@ public class Admin extends RepositoryManager {
         String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS, TABLE_METADATA };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
-                    + getRepository().getCount(tables[i].toLowerCase(),
+                    + getDatabaseManager().getCount(tables[i].toLowerCase(),
                         new Clause()), names[i])));
         }
 
@@ -807,13 +807,13 @@ public class Admin extends RepositoryManager {
         sb.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
-                    "" + getRepository().getCount(
+                    "" + getDatabaseManager().getCount(
                         TABLE_ENTRIES, new Clause()), msg("Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
             }
-            int cnt = getRepository().getCount(TABLE_ENTRIES,
+            int cnt = getDatabaseManager().getCount(TABLE_ENTRIES,
                           Clause.eq("type", typeHandler.getType()));
 
             String url =

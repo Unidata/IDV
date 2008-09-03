@@ -103,16 +103,28 @@ new_lat0 new_lon0   new_lat1  new_lon1 new_rotation new_scale
         mx[1] = mm.createMapx('Azimuthal Equal-Area', -90, 0, 0, 0, 0, 1, -90, 0, -90,  0, -180, 180, 15, 30, 0, 0, 0, 0, 1, 6371228.0);
 
        
+	 mx[1] = mm.createMapx('Cylindrical Equidistant',0, 0, 0, 0, 0, 1,   0, 0, -90, 90, -180, 180, 15, 30, 0, 0, 0, 0, 1, 57.295779513);
+
         myCanvas = new WMSMapCanvas(canvas,200,200);
+	var a;
 
 
-        var a = new WMSAspect('north', 
+	/*a = new WMSAspect('north', 
                               'http://www.nsidc.org/cgi-bin/nsidc_ogc_north.pl', 
                               'EPSG:3408', 
                               {minx:-9036842.762,miny:-9036842.762,maxx:9036842.762,maxy:9036842.762},
                               'blue_marble_07_circle,north_pole_geographic',
                               19, 19, 
                               mx[0]);
+        myCanvas.addAspect(a);*/
+
+	a = new WMSAspect('global',
+                              'http://www.nsidc.org/cgi-bin/nsidc_ogc_global.pl',
+                              'EPSG:4326',
+                              {minx:-180,miny:-90,maxx:180,maxy:90},
+                              'blue_marble_01',
+                              19,38,
+                              mx[1]);
         myCanvas.addAspect(a);
 
 

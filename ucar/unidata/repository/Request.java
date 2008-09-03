@@ -1273,7 +1273,11 @@ public class Request implements Constants {
      * @return _more_
      */
     public String toString() {
-        return type + "url args:" + getUrlArgs();  // + "\n\theader args:"               + httpHeaderArgs;
+        String args = getUrlArgs();
+        if(args.trim().length()>0) 
+            return type + " url args:" + args; 
+        else
+            return type;
     }
 
     /** _more_ */
