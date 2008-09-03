@@ -298,6 +298,8 @@ public class TDSRadarChooser extends TimesChooser {
         contents = GuiUtils.inset(contents, 5);
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
+        productLabel.setVisible(false);
+        productComboBox.setVisible(false);
         //  Misc.run(this, "initializeCollection");
         outerContents =
             GuiUtils.center(GuiUtils.topCenterBottom(getStatusComponent(),
@@ -363,6 +365,8 @@ public class TDSRadarChooser extends TimesChooser {
      */
     private void setCollection(String s) {
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
+        productComboBox.setVisible(false);
+        productLabel.setVisible(false);
         isLevel3 = false;
         GuiUtils.enableComponents(compsThatNeedServer, true);
         setAbsoluteTimes(new ArrayList());
@@ -379,6 +383,8 @@ public class TDSRadarChooser extends TimesChooser {
     private void setLevel3Collection(String s) {
         isLevel3 = true;
         GuiUtils.enableComponents(level3CompsThatNeedServer, true);
+        productComboBox.setVisible(true);
+        productLabel.setVisible(true);
         GuiUtils.enableComponents(compsThatNeedServer, true);
         setAbsoluteTimes(new ArrayList());
         selectedProduct = null;
