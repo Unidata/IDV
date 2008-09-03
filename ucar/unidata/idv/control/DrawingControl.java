@@ -546,7 +546,6 @@ public class DrawingControl extends DisplayControlImpl {
                         }
                     }
                 }
-                if(true)         break;
             }
         }
         if (initialXml && (times.size() > 0)) {
