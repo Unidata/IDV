@@ -446,7 +446,7 @@ public class CatalogOutputHandler extends OutputHandler {
             toCatalogInner(request, group, entries, catalogInfo, topDataset);
             if (!group.isDummy() && catalogInfo.serviceMap.get(SERVICE_OPENDAP) != null) {
                 String urlPath = HtmlUtil.url("/latest", ARG_ID,
-                                              group.getId(),ARG_LATESTOPENDAP,"true");
+                                              group.getId(),ARG_LATESTOPENDAP,"true",ARG_OUTPUT,OUTPUT_CATALOG);
                 addService(catalogInfo, SERVICE_LATEST,
                            getRepository().URL_ENTRY_SHOW.getFullUrl(), "Resolver");
 
