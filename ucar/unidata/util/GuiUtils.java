@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -76,7 +77,7 @@ import javax.swing.tree.*;
  */
 public class GuiUtils extends LayoutUtil {
 
-    /** _more_          */
+    /** _more_ */
     public static String MISSING_IMAGE = "/ucar/undiata/util/scream.gif";
 
 
@@ -231,7 +232,7 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private static int dfltIconSize = -1;
 
     /**
@@ -252,7 +253,7 @@ public class GuiUtils extends LayoutUtil {
         return dfltIconSize;
     }
 
-    /** _more_          */
+    /** _more_ */
     private static Font dfltFont;
 
     /**
@@ -569,7 +570,7 @@ public class GuiUtils extends LayoutUtil {
      */
     public static class ColorSwatch extends JPanel {
 
-        /** _more_          */
+        /** _more_ */
         boolean doAlpha = false;
 
         /** color of the swatch */
@@ -5755,6 +5756,25 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    public static void setSelectedItems(JList list, List selected) {
+        List items = getItems(list);
+        int cnt = 0;
+        int[]indices = new int[items.size()];
+        for(int i=0;i<selected.size();i++) {
+            int idx = items.indexOf(selected.get(i));
+            if(idx<0) continue;
+            indices[cnt++] = idx;
+        }
+        if(cnt>0) {
+            int []realIndices = new int[cnt];
+            for(int i=0;i<cnt;i++) {
+                realIndices[i] = indices[i];
+            }
+            list.setSelectedIndices(realIndices);
+        }
+    }
+
+
     public static List getItems(JList list) {
         List items = new ArrayList();
         ListModel model = list.getModel();
@@ -6012,6 +6032,7 @@ public class GuiUtils extends LayoutUtil {
 
 
 }
+
 
 
 

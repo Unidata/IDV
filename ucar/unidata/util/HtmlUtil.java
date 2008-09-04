@@ -134,6 +134,11 @@ public class HtmlUtil {
         return "<p>";
     }
 
+    public static String nobr(String inner) {
+        return wrap("nobr",inner);
+    }
+
+
     public static String b(String inner) {
         return wrap("b",inner);
     }
