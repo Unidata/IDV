@@ -335,7 +335,15 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param control The control
      * @param forceShow If true then show the component in the window no matter what
      */
-    private void addControlTab(DisplayControl control, boolean forceShow) {
+    private void addControlTab(final DisplayControl control, final boolean forceShow) {
+        SwingUtilities.invokeLater(new Runnable(){
+                public void run() {
+                    addControlTabInThread(control, forceShow);
+                }});
+    }
+
+
+    private void addControlTabInThread(final DisplayControl control, final boolean forceShow) {
         if ( !control.canBeDocked() || !control.shouldBeDocked()) {
             return;
         }
@@ -408,13 +416,13 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         JComponent inner =
             (JComponent) ((DisplayControlImpl) control).getOuterContents();
         inner = GuiUtils.centerBottom(inner, buttonPanel);
-        JComponent outer = GuiUtils.top(inner);
+        final JComponent outer = GuiUtils.top(inner);
         outer.setBorder(BorderFactory.createEmptyBorder(2, 1, 0, 0));
         controlInfo =
             new ControlInfo(control, expandBtn, outer, inner,
                             getVMInfo(control.getDefaultViewManager()));
         controlToInfo.put(control, controlInfo);
-        GuiUtils.toggleHeavyWeightComponents(outer, false);
+        boolean didToggle  = false;
         if ( !getStateManager().getProperty(IdvConstants.PROP_LOADINGXML,
                                             false)) {
             if (forceShow || true
@@ -422,10 +430,14 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                         .shouldWindowBeVisible()) {
                 //A hack for now
                 if ( !(control instanceof MapDisplayControl)) {
+                    didToggle = true;
                     GuiUtils.toggleHeavyWeightComponents(outer, true);
                     GuiUtils.showComponentInTabs(outer);
                 }
             }
+        }
+        if(!didToggle) {
+            GuiUtils.toggleHeavyWeightComponents(outer, false);
         }
     }
 
@@ -499,10 +511,22 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
 
     /**
      * Remove the control from the control tab if we are doing control tabs
+     * This calls removeControlTabInThread in the Swing thread
+     * @param control The control
+     */
+    public void removeControlTab(final DisplayControl control) {
+        SwingUtilities.invokeLater(new Runnable(){
+                public void run() {
+                    removeControlTabInThread(control);
+                }});
+    }
+
+    /**
+     * Remove the control from the control tab if we are doing control tabs
      *
      * @param control The control
      */
-    public void removeControlTab(DisplayControl control) {
+    private void removeControlTabInThread(DisplayControl control) {
         ControlInfo tabInfo = (ControlInfo) controlToInfo.remove(control);
         if (tabInfo != null) {
             tabInfo.removeDisplayControl();
