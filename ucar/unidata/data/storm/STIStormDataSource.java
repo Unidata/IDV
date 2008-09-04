@@ -489,12 +489,12 @@ public class STIStormDataSource extends StormDataSource {
             Class.forName("com.mysql.jdbc.Driver");
             if ( !initConnection()) {
                 setInError(true, true,
-                           "Unable to initialize database connection");
+                           "Unable to initialize database connection:" + dbUrl);
             } else {
                 stormInfos = getAllStormInfos();
             }
         } catch (Exception exc) {
-            logException("Error initializing STI database", exc);
+            logException("Error initializing STI database: " + dbUrl, exc);
         }
     }
 
