@@ -310,6 +310,7 @@ public class TdsOutputHandler extends OutputHandler {
     public boolean canLoad(Request request, Entry entry) {
         //If we aren't in the tomcat world then exit
         if ((request != null) && (request.getHttpServletRequest() == null)) {
+            //TEST FOR NOW:
             //return false;
         }
 
@@ -475,7 +476,7 @@ public class TdsOutputHandler extends OutputHandler {
                             ARG_AREA_WEST, -180.0)), new LatLonPointImpl(
                                 request.get(ARG_AREA_SOUTH, 0.0), request.get(
                                     ARG_AREA_EAST, 180.0)));
-                System.err.println("llr:" + llr);
+                //                System.err.println("llr:" + llr);
             }
             int     hStride       = request.get(ARG_HSTRIDE, 1);
             int     zStride       = 1;
@@ -525,7 +526,7 @@ public class TdsOutputHandler extends OutputHandler {
                                 getRepository().getGUID(), "", "subset from",
                                 entry.getId(), newEntry.getId()));
                         if (request.get(ARG_ADDMETADATA, false)) {
-                            System.err.println("adding metadata");
+                            //                            System.err.println("adding metadata");
                             newEntry.clearArea();
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);

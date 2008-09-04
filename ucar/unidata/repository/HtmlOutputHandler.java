@@ -895,8 +895,10 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (entries.size() > 0) {
             StringBuffer entriesSB = new StringBuffer();
+
+
             String link = getEntryHtml(entriesSB, entries, request, true,
-                                       false, false);
+                                       false, group.isDummy());
             tabTitles.add("Entries" + link);
             tabContent.add(entriesSB.toString());
             treeShown.add(true);

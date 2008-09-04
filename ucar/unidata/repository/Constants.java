@@ -620,6 +620,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LABEL = "label";
 
+    public static final String ARG_LATEST = "latest";
+
+    public static final String ARG_LATESTOPENDAP = "latestopendap";
+
     /** _more_ */
     public static final String ARG_LAYOUT = "layout";
 

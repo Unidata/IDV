@@ -94,6 +94,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_MONITOR = "monitor";
 
+    public static final String ATTR_ADDMETADATA = "addmetadata";
+
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
@@ -159,6 +161,7 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private double sleepMinutes = 5;
 
+    private boolean addMetadata = false;
 
     /** _more_ */
     private String id;
@@ -243,7 +246,8 @@ public class Harvester extends RepositoryManager {
 
 
         this.name = XmlUtil.getAttribute(element, ATTR_NAME, "");
-        this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, false);
+        this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, monitor);
+        this.addMetadata = XmlUtil.getAttribute(element,ATTR_ADDMETADATA, addMetadata);
         this.activeOnStart = this.active = XmlUtil.getAttribute(element,
                 ATTR_ACTIVE, false);
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
@@ -263,6 +267,7 @@ public class Harvester extends RepositoryManager {
                 ""));
         activeOnStart = request.get(ATTR_ACTIVE, false);
         monitor       = request.get(ATTR_MONITOR, false);
+        addMetadata = request.get(ATTR_ADDMETADATA,false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
                 groupTemplate);
@@ -331,6 +336,7 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_NAME, name);
         element.setAttribute(ATTR_ACTIVE, activeOnStart + "");
         element.setAttribute(ATTR_MONITOR, monitor + "");
+        element.setAttribute(ATTR_ADDMETADATA, addMetadata + "");
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
         element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
         element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
@@ -531,6 +537,25 @@ public class Harvester extends RepositoryManager {
     public boolean getMonitor() {
         return monitor;
     }
+
+    /**
+       Set the AddMetadata property.
+
+       @param value The new value for AddMetadata
+    **/
+    public void setAddMetadata (boolean value) {
+	addMetadata = value;
+    }
+
+    /**
+       Get the AddMetadata property.
+
+       @return The AddMetadata
+    **/
+    public boolean getAddMetadata () {
+	return addMetadata;
+    }
+
 
     /**
      * Set the SleepMinutes property.

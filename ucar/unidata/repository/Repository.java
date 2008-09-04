@@ -75,6 +75,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -5354,7 +5356,6 @@ public class Repository extends RepositoryBase implements Tables,
             }
         }
 
-
         if (entry.isGroup()) {
             return processGroupShow(request, (Group) entry);
         }
@@ -5665,7 +5666,12 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Result processGroupShow(Request request, Group group)
             throws Exception {
+        boolean doLatest = request.get(ARG_LATEST, false);
+
+
         OutputHandler outputHandler = getOutputHandler(request);
+
+
         TypeHandler   typeHandler   = getTypeHandler(request);
         List<Clause>  where         =
             typeHandler.assembleWhereClause(request);
@@ -5690,10 +5696,37 @@ public class Repository extends RepositoryBase implements Tables,
             request.put(ARG_MESSAGE,
                         "Error finding children:" + exc.getMessage());
         }
+
+        if(doLatest) {
+            if(entries.size()>0) {
+                entries = sortEntriesOnDate(entries,true);
+                return outputHandler.outputEntry(request, entries.get(0));
+            }
+        }
+
+
         return outputHandler.outputGroup(request, group, subGroups, entries);
     }
 
 
+
+    protected List<Entry> sortEntriesOnDate(List<Entry> entries, final boolean descending) {
+        Comparator comp = new Comparator() {
+            public int compare(Object o1, Object o2) {
+                Entry e1 = (Entry) o1;
+                Entry e2 = (Entry) o2;
+                if(e1.getStartDate()<e2.getStartDate()) return (descending?1:-1);
+                if(e1.getStartDate()>e2.getStartDate()) return (descending?-1:1);
+                return 0;
+            }
+            public boolean equals(Object obj) {
+                return obj ==this;
+            }
+            };
+        Object[] array = entries.toArray();
+        Arrays.sort(array, comp);
+        return (List<Entry>) Misc.toList(array);
+    }
 
 
 
@@ -7410,12 +7443,24 @@ public class Repository extends RepositoryBase implements Tables,
         statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()),
                                calendar);
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
-        statement.setTimestamp(col++,
-                               new java.sql.Timestamp(entry.getStartDate()),
-                               calendar);
-        statement.setTimestamp(col++,
-                               new java.sql.Timestamp(entry.getEndDate()),
-                               calendar);
+        try {
+            statement.setTimestamp(col,
+                                   new java.sql.Timestamp(entry.getStartDate()),
+                                   calendar);
+            statement.setTimestamp(col+1,
+                                   new java.sql.Timestamp(entry.getEndDate()),
+                                   calendar);
+
+        } catch(Exception exc) {
+            System.err.println("Error: Bad date " + entry.getResource() + " " + new Date(entry.getStartDate()));
+            statement.setTimestamp(col,
+                                   new java.sql.Timestamp(new Date().getTime()),
+                                   calendar);
+            statement.setTimestamp(col+1,
+                                   new java.sql.Timestamp(new Date().getTime()),
+                                   calendar);
+        }
+        col+=2;
         statement.setDouble(col++, entry.getSouth());
         statement.setDouble(col++, entry.getNorth());
         statement.setDouble(col++, entry.getEast());

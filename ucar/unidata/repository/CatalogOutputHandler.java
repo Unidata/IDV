@@ -87,8 +87,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
-    /** _more_ */
-    public static final String SERVICE_DODS = "DODS";
+    public static final String SERVICE_LATEST = "latest";
 
     /** _more_ */
     public static final String CATALOG_ATTRS =
@@ -401,7 +400,10 @@ public class CatalogOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        String   title = group.getFullName();
+        boolean justOneEntry  = group.isDummy() && entries.size()==1 && subGroups.size()==0;
+
+
+        String   title = (justOneEntry?entries.get(0).getName():group.getFullName());
         Document doc   = XmlUtil.makeDocument();
         Element  root  = XmlUtil.create(doc, TAG_CATALOG, null, new String[] {
             "xmlns",
@@ -418,15 +420,50 @@ public class CatalogOutputHandler extends OutputHandler {
 
         Hashtable serviceMap = new Hashtable();
 
+        Element topDataset = null;
 
-        Element dataset = XmlUtil.create(doc, TAG_DATASET, root,
-                                         new String[] { ATTR_NAME,
-                title });
+        CatalogInfo catalogInfo = new CatalogInfo(doc, root, serviceMap);
+        boolean doingLatest = request.get(ARG_LATESTOPENDAP, false);
+        if(doingLatest) {
+            topDataset = root;
+            boolean didone = false;
+            entries = getRepository().sortEntriesOnDate(entries,true);
+            for(Entry entry: entries) {
+                if (canTdsLoad(request, entry)) {
+                    outputEntry(entry, request, catalogInfo, root);
+                    didone = true;
+                    break;
+                }
+            }
+        } else if(justOneEntry) {
+            outputEntry(entries.get(0), request, catalogInfo, root);
+        } else {
+            topDataset = XmlUtil.create(doc, TAG_DATASET, root,
+                                        new String[] { ATTR_NAME,
+                                                       title });
+            addMetadata(request, group, catalogInfo, topDataset);
+            toCatalogInner(request, group, subGroups, catalogInfo, topDataset);
+            toCatalogInner(request, group, entries, catalogInfo, topDataset);
+            if (!group.isDummy() && catalogInfo.serviceMap.get(SERVICE_OPENDAP) != null) {
+                String urlPath = HtmlUtil.url("/latest", ARG_ID,
+                                              group.getId(),ARG_LATESTOPENDAP,"true");
+                addService(catalogInfo, SERVICE_LATEST,
+                           getRepository().URL_ENTRY_SHOW.getFullUrl(), "Resolver");
 
-        CatalogInfo ci = new CatalogInfo(doc, root, serviceMap);
-        addMetadata(request, group, ci, dataset);
-        toCatalogInner(request, subGroups, ci, dataset);
-        toCatalogInner(request, entries, ci, dataset);
+
+                Node firstChild = topDataset.getFirstChild();
+                Element latestDataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
+                                                       null, new String[] { ATTR_NAME,
+                                                                                  "Latest"});
+                topDataset.insertBefore(latestDataset, firstChild);
+                Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
+                                                 latestDataset,
+                                                 new String[] { ATTR_SERVICENAME,
+                                                                SERVICE_LATEST, ATTR_URLPATH, urlPath });
+            }
+        }
+
+
         StringBuffer sb = new StringBuffer(XmlUtil.XML_HEADER);
         sb.append(XmlUtil.toString(root));
         return new Result(title, sb, "text/xml");
@@ -442,21 +479,40 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private void addService(CatalogInfo catalogInfo, String service,
-                            String base)
+    private boolean addService(CatalogInfo catalogInfo, String service,
+                            String base) 
             throws Exception {
-        if (catalogInfo.serviceMap.get(service) != null) {
-            return;
-        }
-
-        Element serviceNode = XmlUtil.create(catalogInfo.doc, TAG_SERVICE,
-                                             catalogInfo.root, new String[] {
-            ATTR_NAME, service, ATTR_SERVICETYPE, service, ATTR_BASE, base
-        });
-
-        catalogInfo.serviceMap.put(service, serviceNode);
+        return addService(catalogInfo, service, base, service);
     }
 
+
+    private boolean addService(CatalogInfo catalogInfo, String service,
+                            String base, String type)
+            throws Exception {
+        if (catalogInfo.serviceMap.get(service) != null) {
+            return false;
+        }
+
+        List attrs = Misc.toList(new String[] {ATTR_NAME, service, ATTR_SERVICETYPE, type, ATTR_BASE, base});
+
+
+        Element serviceNode = XmlUtil.create(catalogInfo.doc, TAG_SERVICE,
+                                             catalogInfo.root, attrs);
+
+        catalogInfo.serviceMap.put(service, serviceNode);
+        return true;
+    }
+
+
+    private boolean canTdsLoad(Request request, Entry entry) 
+            throws Exception {
+        if (tdsOutputHandler == null) {
+            tdsOutputHandler =
+                (TdsOutputHandler) getRepository().getOutputHandler(
+                    TdsOutputHandler.OUTPUT_OPENDAP);
+        }
+        return tdsOutputHandler.canLoad(request, entry);
+    }
 
     /**
      * _more_
@@ -476,23 +532,16 @@ public class CatalogOutputHandler extends OutputHandler {
         path = path.replace("\\", "/");
 
 
-        if (tdsOutputHandler == null) {
-            tdsOutputHandler =
-                (TdsOutputHandler) getRepository().getOutputHandler(
-                    TdsOutputHandler.OUTPUT_OPENDAP);
-        }
-
-        if (tdsOutputHandler.canLoad(request, entry)) {
+        if (canTdsLoad(request, entry)) {
             String urlPath = tdsOutputHandler.getTdsUrl(entry);
-            addService(catalogInfo, SERVICE_DODS,
+            addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
+
             Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
                                              dataset,
                                              new String[] { ATTR_SERVICENAME,
-                    SERVICE_DODS, ATTR_URLPATH, urlPath });
+                    SERVICE_OPENDAP, ATTR_URLPATH, urlPath });
         }
-
-
 
 
         if (entry.getTypeHandler().canDownload(request, entry)) {
@@ -576,12 +625,13 @@ public class CatalogOutputHandler extends OutputHandler {
             return;
         }
 
+        /*
         addService(catalogInfo, SERVICE_OPENDAP, "");
         String urlPath = path.substring(goodPrefix.length());
         XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
                        new String[] { ATTR_SERVICENAME,
                                       SERVICE_OPENDAP, ATTR_URLPATH,
-                                      urlPath });
+                                      urlPath });*/
     }
 
 
@@ -629,6 +679,7 @@ public class CatalogOutputHandler extends OutputHandler {
         }
 
 
+
         addServices(entry, request, catalogInfo, dataset);
 
         addMetadata(request, entry, catalogInfo, dataset);
@@ -669,7 +720,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void toCatalogInner(Request request, List entryList,
+    protected void toCatalogInner(Request request, Group parentGroup, List entryList,
                                   CatalogInfo catalogInfo, Element parent)
             throws Exception {
 
@@ -727,7 +778,7 @@ public class CatalogOutputHandler extends OutputHandler {
             Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
                                              datasetNode,
                                              new String[] { ATTR_NAME,
-                    group.key.toString() });
+                                                            group.key.toString() });
 
             for (int j = 0; j < group.children.size(); j++) {
                 Object child = group.children.get(j);
