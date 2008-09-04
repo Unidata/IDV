@@ -151,7 +151,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         if (groupTree == null) {
             doMakeGroupTree();
         }
-        Dimension defaultDimension = new Dimension(200, 100);
+        Dimension defaultDimension = new Dimension(200, 150);
         JScrollPane scroller = GuiUtils.makeScrollPane(groupTree,
                                    (int) defaultDimension.getWidth(),
                                    (int) defaultDimension.getHeight());
