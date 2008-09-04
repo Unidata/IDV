@@ -450,11 +450,10 @@ public class CatalogOutputHandler extends OutputHandler {
                 addService(catalogInfo, SERVICE_LATEST,
                            getRepository().URL_ENTRY_SHOW.getFullUrl(), "Resolver");
 
-
                 Node firstChild = topDataset.getFirstChild();
                 Element latestDataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
                                                        null, new String[] { ATTR_NAME,
-                                                                                  "Latest"});
+                                                                                  "Latest OpenDAP Data"});
                 topDataset.insertBefore(latestDataset, firstChild);
                 Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
                                                  latestDataset,
