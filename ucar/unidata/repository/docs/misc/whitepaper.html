@@ -1,0 +1,168 @@
+<html>
+<head>
+<title>TDS & RAMADDA</title>
+<style>
+body {
+      font-family: SansSerif, Arial, Helvetica, sans-serif;       
+      font-size: 12pt;
+}
+h2 {
+  font-size: 14pt;
+  margin-bottom:2px;
+}
+
+h3 {
+  margin-bottom:2px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+</style>
+</head>
+<body>
+
+This paper is intended to give an overview of the major functional and design aspects of 
+the <a href="http://www.unidata.ucar.edu/Projects/THREDDS/tech/TDS.html">Thredds Data Server (TDS)</a>
+and <a href="http://www.unidata.ucar.edu/software/ramadda/">RAMADDA</a> systems.
+
+<h2>TDS</h2>
+The TDS is composed of a set of services that provide access to remote data and  is centered around 
+the <a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/InvCatalogSpec.html">Thredds catalog</a>.
+Catalogs provide a simple hierarchical structure for organizing a collection of datasets, a means of 
+accessing each dataset, a human understandable name for each dataset, and a structure on which further 
+descriptive information can be placed. The catalog provides both the underlying information 
+model on which the TDS is built as well as the primary way of presenting that information to users and clients.
+<p> 
+The major features of the TDS include:
+
+<ul>
+<li> Dynamically scan file systems and generate THREDDS Catalogs listing the available data sets and the 
+set of available services. The scanning is configured by a server administrator editing catalog templates that 
+contain directives to control the scanning and have hard-coded metadata information. 
+
+<li> Generate an HTML representation of these catalogs.
+
+<li> An OpenDAP service for remote access to the data.
+
+<li> A grid subset service that allows users to subset a grid based on time, space and parameters. 
+This creates a new NetCDF file and returns it to the user.
+
+<li> Grid aggregation. Provide the ability to aggregate a set of data files as a synthetic data set - e.g., creating a dataset 
+that is the Nth hour forecast from a set of files.
+
+<li> Web Coverage Service (WCS)  for gridded files.
+
+<li> Miscellaneous collection services - the radar collection service has embedded logic of where radar files are stored and 
+will extract information  by looking at directory and file names of the radar files. This can answer questions 
+like "what times are available for a particular  station"
+</ul>
+
+
+
+<p>
+
+The Thredds Data Repository (TDR) was a first attempt at providing the ability to upload data to a TDS. 
+This exploratory effort
+demonstrated  the usefulness of such a service and helped Unidata staff gain an understanding of the fundamental requirements
+within this (for us) new domain area.
+The effort also made clear the need to go beyond file 
+system and catalog XML file based storage mechanisms for content management. The TDR provided a mechanism for
+end users or client applications to create new datasets through an HTTP upload interface. 
+The metadata information required to define
+these entities was stored within separate catalog XML files on disk. Every time new content was added, changed or deleted
+the system had to open an XML file, make the appropriate change and then write out the XML file to disk.
+<p>
+This approach enabled a loose coupling with the TDS in that the TDS could just read those XML catalog files when providing
+its services.  However, at heart the TDR was a content management system and needed to provide basic 
+<a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD (Create, Read, Update, Delete)</a> services. 
+It became clear as development of the TDR progressed  that this file based approach  was awkward and did not scale
+to large repositories.  This led Unidata staff to begin investigating a relational database approach.
+
+
+<h2>RAMADDA</h2>
+The approach  taken in the development of RAMADDA is to view this problem space as one of content management.
+RAMADDA is a content management framework that 
+can be configured to manage different types of data and information and  provides 
+different ways of viewing and accessing this content. 
+Some of the underlying  design philosophies include:
+
+<ul>
+<li> Focus on 3 major functions - content creation, organization and access.
+<li> Underlying relational database as storage mechanism.  This provides sophisticated 
+information  management capabilities  and enables search and query mechanisms.  
+<li> Separate content from presentation. The core underlying model used within RAMADDA is quite similar
+to that which can be expressed within Thredds catalogs. However, it has been recognized that ends users and 
+client applications require a wide range of mechanisms to view and access this content.
+<li> Agnosticism. The core part of RAMADDA makes very few assumptions about the types of content it handles and
+how that content is accessed. There is however an understanding that the content can be geo-spatial and temporal 
+in nature.
+<li> Extensibility. RAMADDA is a framework and supports the inclusion  of new types of data, metadata and views 
+of the information.
+<li> A range of use contexts -  case studies, user created content (e.g., "youtube of data"), 
+field project catalogs, large real-time archives (e.g., the IDD).
+</ul>
+
+
+
+
+<h3>Content Creation</h3>
+RAMADDA supports a variety of ways of creating content:
+<ul> 
+ <li> HTML file upload. The end user can upload data files (or other information) through a web browser.
+ <li> Web service for client upload. An XML based description of data coupled with the actual data files can be uploaded.
+      This is used by the IDV to publish generated products directly into RAMADDA.
+ <li> File system harvester. Monitors areas of the server file system and automatically ingests new data files into the database.
+ <li> URL based harvester. Download URL based resources (e.g., web cam images) on a scheduled basis.
+ <li> THREDDS catalog harvester. Scan remote catalogs and add their information to the database.
+ <li> An LDM notification mechanism. This connects an LDM feed into RAMADDA and triggers the application of the file harvesters.
+ <li> File system interface. RAMADDA can be configured to provide services for data files on a file system. 
+ One can specify top-level server file paths and RAMADDA will provide dynamic access to the files in those trees. This is provided to both 
+ make it extremely easy for  RAMADDA  to be configured and can also provide RAMADDA services to very large data 
+ collections (e.g., the 100 million file LEAD archive) without the performance hit of scanning and ingesting into the database 
+ the full collection.
+</ul>
+
+
+<h3>Content Organization</h3>
+
+The core of RAMADDA is an extensible data model centered around entries, groups and associated metadata. 
+RAMADDA takes an agnostic approach as to what these components represent. An entry may be a file on disk 
+(e.g., a model file), a url or some other bit of information (e.g., a blog post). A group is simply an 
+entry that can hold a number of children entries. Groups provide 
+a hierarchical organization. An entry has a single parent group. A group may have any number of children 
+entries and groups. The hierarchy allows for overall organization of the information (e.g., models, 
+radar, case studies, etc) and facilitates browse based navigation.
+
+<p>
+Entries have some common descriptive information - name, description, time range, lat/lon bounding box, 
+creator, etc. There is also an extensible metadata model that allows for a variety of metadata to be 
+attached to an entry. For example, RAMADDA supports the set of 
+THREDDS metadata - keyword, property, contributor, project, etc.
+
+
+<h3>Content Viewing and Access</h3>
+RAMADDA is based on a Model/View/Control framework. Instances of the model are created by the central Repository. 
+The information typically comes from the  underlying database but it can also come from dynamically scanning the 
+file system or by processing external Catalogs on the fly. 
+The model instance is then passed to any number of Output Handlers (the Views). These include a variety of 
+HTML views, a Thredds Catalog view, an RSS feed, zip file, OpenDAP and grid subset handlers.
+
+
+<h2>TDS and RAMADDA Integration</h2>
+As the development and use of RAMADDA has evolved it has begun to incorporate some of the key
+TDS data services - OpenDAP and grid subsetting. We plan to continue this  process.
+The integration of these services was relatively straight
+forward. The TDS server as an active server is not used. Rather, the underlying TDS code base was used.
+RAMADDA simply provided bridge code between its information space and the TDS space and routed these
+service requests through to the TDS code. RAMADDA simply  recontextualized the TDS code.
+<p>
+This evolution  of RAMADDA and its adoption of the TDS services brings up the question of whether Unidata should 
+fully integrate these systems (e.g., Next Generation TDS).  The TDS brings a long history of providing robust
+and sophisticated access to data. RAMADDA provides a suite of complementary data ingest, management, and access services
+as well as an integrated web application framework. While the full suite of issues that would arise from this integration 
+needs to be determined the use of RAMADDA as the framework for future TDS development holds great promise.
+
+
+
+
+</body>
