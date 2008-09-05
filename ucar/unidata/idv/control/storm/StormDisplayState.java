@@ -893,7 +893,7 @@ public class StormDisplayState {
             public void actionPerformed(ActionEvent ae) {
                 forecastAnimationMode = timeModeBox.getSelectedIndex();
                 try {
-                    //                    reload(); 
+                    //                    reload();
                     updateDisplays();
                 } catch (Exception exc) {
                     stormTrackControl.logException("change forecast animation mode", exc);
