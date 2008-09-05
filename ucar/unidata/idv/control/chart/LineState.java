@@ -142,7 +142,6 @@ public class LineState {
 
 
 
-
     /** Stroke type */
     public static final int STROKE_SOLID = 0;
 
@@ -307,6 +306,8 @@ public class LineState {
 
     /** display unit */
     protected Unit unit;
+
+    private boolean visibleInLegend = true;
 
     /**
      * Default ctor
@@ -1109,6 +1110,24 @@ public class LineState {
         return axisLabel;
     }
 
+
+    /**
+       Set the VisibleInLegend property.
+
+       @param value The new value for VisibleInLegend
+    **/
+    public void setVisibleInLegend (boolean value) {
+	visibleInLegend = value;
+    }
+
+    /**
+       Get the VisibleInLegend property.
+
+       @return The VisibleInLegend
+    **/
+    public boolean getVisibleInLegend () {
+	return visibleInLegend;
+    }
 
 
 }

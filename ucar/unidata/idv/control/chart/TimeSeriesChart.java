@@ -421,6 +421,7 @@ public class TimeSeriesChart extends XYChartManager {
         rangeAxis.setLabelPaint(Color.black);
         renderer.setSeriesPaint(0, c);
         renderer.setSeriesStroke(0, lineState.getStroke());
+        renderer.setSeriesVisibleInLegend(0,lineState.getVisibleInLegend());
 
         if ( !lineState.getAxisVisible()) {
             rangeAxis.setVisible(false);
