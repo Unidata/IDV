@@ -22,12 +22,13 @@ h3 {
 <body>
 
 This paper is intended to give an overview of the major functional and design aspects of 
-the <a href="http://www.unidata.ucar.edu/Projects/THREDDS/tech/TDS.html">Thredds Data Server (TDS)</a>
-and <a href="http://www.unidata.ucar.edu/software/ramadda/">RAMADDA</a> systems.
+the <a href="http://www.unidata.ucar.edu/Projects/THREDDS/tech/TDS.html">THREDDS Data Server (TDS)</a>,
+the THREDDS Data Repository (TDR) 
+and the <a href="http://www.unidata.ucar.edu/software/ramadda/">RAMADDA</a> systems.
 
 <h2>TDS</h2>
 The TDS is composed of a set of services that provide access to remote data and  is centered around 
-the <a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/InvCatalogSpec.html">Thredds catalog</a>.
+the <a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/InvCatalogSpec.html">THREDDS catalog</a>.
 Catalogs provide a simple hierarchical structure for organizing a collection of datasets, a means of 
 accessing each dataset, a human understandable name for each dataset, and a structure on which further 
 descriptive information can be placed. The catalog provides both the underlying information 
@@ -59,9 +60,10 @@ like "what times are available for a particular  station"
 
 
 
-<p>
+<h2>TDR</h2>
 
-The Thredds Data Repository (TDR) was a first attempt at providing the ability to upload data to a TDS. 
+
+The THREDDS Data Repository (TDR) was a first attempt at providing the ability to upload data to a TDS. 
 This exploratory effort
 demonstrated  the usefulness of such a service and helped Unidata staff gain an understanding of the fundamental requirements
 within this (for us) new domain area.
@@ -91,7 +93,7 @@ Some of the underlying  design philosophies include:
 <li> Underlying relational database as storage mechanism.  This provides sophisticated 
 information  management capabilities  and enables search and query mechanisms.  
 <li> Separate content from presentation. The core underlying model used within RAMADDA is quite similar
-to that which can be expressed within Thredds catalogs. However, it has been recognized that ends users and 
+to that which can be expressed within THREDDS catalogs. However, it has been recognized that ends users and 
 client applications require a wide range of mechanisms to view and access this content.
 <li> Agnosticism. The core part of RAMADDA makes very few assumptions about the types of content it handles and
 how that content is accessed. There is however an understanding that the content can be geo-spatial and temporal 
@@ -145,7 +147,9 @@ RAMADDA is based on a Model/View/Control framework. Instances of the model are c
 The information typically comes from the  underlying database but it can also come from dynamically scanning the 
 file system or by processing external Catalogs on the fly. 
 The model instance is then passed to any number of Output Handlers (the Views). These include a variety of 
-HTML views, a Thredds Catalog view, an RSS feed, zip file, OpenDAP and grid subset handlers.
+HTML views, a THREDDS Catalog view, an RSS feed, zip file, OpenDAP and grid subset handlers.
+We are also exploring the integration of  IDV based product generation within RAMADDA. 
+
 
 
 <h2>TDS and RAMADDA Integration</h2>
@@ -154,15 +158,18 @@ TDS data services - OpenDAP and grid subsetting. We plan to continue this  proce
 The integration of these services was relatively straight
 forward. The TDS server as an active server is not used. Rather, the underlying TDS code base was used.
 RAMADDA simply provided bridge code between its information space and the TDS space and routed these
-service requests through to the TDS code. RAMADDA simply  recontextualized the TDS code.
+service requests through to the TDS code. RAMADDA simply  re-contextualized the TDS code.
 <p>
 This evolution  of RAMADDA and its adoption of the TDS services brings up the question of whether Unidata should 
 fully integrate these systems (e.g., Next Generation TDS).  The TDS brings a long history of providing robust
 and sophisticated access to data. RAMADDA provides a suite of complementary data ingest, management, and access services
-as well as an integrated web application framework. While the full suite of issues that would arise from this integration 
+as well as an integrated web application framework. Furthermore,  the development of the next generation LDM could provide
+the ability to integrate LDM data streams directly into RAMADDA.
+<p>
+While the full range of issues that would arise from this overall technology integration 
 needs to be determined the use of RAMADDA as the framework for future TDS development holds great promise.
-
-
+We believe that RAMADDA holds the potential to be the long discussed &quot;Unidata in a box&quot;, i.e., a 
+turn-key system that supports the full spectrum of data ingest,  management, access and product generation services.
 
 
 </body>
