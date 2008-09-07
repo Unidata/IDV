@@ -1431,5 +1431,21 @@ public class HtmlUtil {
         return "<script type=\"text/JavaScript\">" + s + "</script>\n";
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param jsUrl _more_
+     *
+     * @return _more_
+     */
+    public static String importJS(String jsUrl) {
+        return "<script src=\"" + jsUrl + "\"></script>\n";
+    }
+
+
+
+
 }
 
