@@ -632,12 +632,12 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             BUTTON_BORDER     = BorderFactory.createEmptyBorder(2, 6, 2, 0);
             BUTTON_FONT       = new Font("Dialog", Font.PLAIN, 11);
             CATEGORY_FONT     = new Font("Dialog", Font.BOLD, 11);
-            BUTTON_FG_COLOR   = Color.black;
             BUTTON_LINE_COLOR = Color.gray;
             CATEGORY_OPEN_ICON =
                 GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryOpen.gif");
             CATEGORY_CLOSED_ICON =
                 GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryClosed.gif");
+            BUTTON_FG_COLOR   = Color.black;
         }
 
     }
