@@ -343,7 +343,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 (TdsOutputHandler) getRepository().getOutputHandler(
                     TdsOutputHandler.OUTPUT_OPENDAP);
 
-            if ( !tdsOutputHandler.canLoad(request, entry)) {
+            if ( !tdsOutputHandler.canLoad(entry)) {
                 return;
             }
             File file = entry.getResource().getFile();

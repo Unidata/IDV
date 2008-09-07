@@ -50,7 +50,13 @@ import ucar.nc2.dataset.VariableEnhanced;
 
 
 
+import ucar.ma2.DataType;
+import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
 import ucar.nc2.dt.GridDatatype;
+import ucar.nc2.dt.PointObsDataset;
+import ucar.nc2.dt.PointObsDatatype;
+import ucar.nc2.dt.TypedDatasetFactory;
 
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
@@ -82,6 +88,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -122,6 +129,9 @@ public class TdsOutputHandler extends OutputHandler {
     /** _more_          */
     public static final String OUTPUT_WCS = "tds.wcs";
 
+    /** _more_          */
+    public static final String OUTPUT_POINT = "tds.point";
+
 
 
     /** _more_          */
@@ -137,6 +147,9 @@ public class TdsOutputHandler extends OutputHandler {
 
     /** _more_          */
     private Hashtable<String, Boolean> gridEntries = new Hashtable<String,
+                                                         Boolean>();
+
+    private Hashtable<String, Boolean> pointEntries = new Hashtable<String,
                                                          Boolean>();
 
 
@@ -189,6 +202,7 @@ public class TdsOutputHandler extends OutputHandler {
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_OPENDAP) || output.equals(OUTPUT_CDL)
                || output.equals(OUTPUT_WCS)
+               || output.equals(OUTPUT_POINT)
                || output.equals(OUTPUT_GRIDSUBSET)
                || output.equals(OUTPUT_GRIDSUBSET_FORM);
     }
@@ -212,8 +226,7 @@ public class TdsOutputHandler extends OutputHandler {
         if (state.entry == null) {
             return;
         }
-        if (canLoad(request, state.entry)) {
-            //            types.add(new OutputType("CDL", OUTPUT_CDL));
+        if (canLoad(state.entry) &&         (request.getHttpServletRequest() == null)) {
             types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
                 public String assembleUrl(Request request) {
                     return request.getRequestPath() + getSuffix() + "/"
@@ -236,7 +249,7 @@ public class TdsOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if ( !canLoad(request, entry)) {
+        if ( !canLoad(entry)) {
             return;
         }
         String tdsUrl = request.getRequestPath() + "/"
@@ -251,7 +264,14 @@ public class TdsOutputHandler extends OutputHandler {
                     getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                     OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
 
-        if (canLoadAsGrid(entry)) {
+        if (canLoadAsPoint(entry)) {
+            links.add(
+                new Link(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                        OUTPUT_POINT), getRepository().fileUrl(
+                            ICON_MAP), "Map Point Data"));
+        } else if (canLoadAsGrid(entry)) {
             links.add(
                 new Link(
                     request.entryUrl(
@@ -307,13 +327,7 @@ public class TdsOutputHandler extends OutputHandler {
      *
      * @return Can the given entry be served by the tds
      */
-    public boolean canLoad(Request request, Entry entry) {
-        //If we aren't in the tomcat world then exit
-        if ((request != null) && (request.getHttpServletRequest() == null)) {
-            //TEST FOR NOW:
-            //return false;
-        }
-
+    public boolean canLoad(Entry entry) {
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -328,12 +342,34 @@ public class TdsOutputHandler extends OutputHandler {
                     //Use openFile
                     NetcdfDataset dataset =
                         NetcdfDataset.acquireDataset(file.toString(), null);
-                    //                    System.err.println ("nc:" + dataset.getClass().getName());
                     ok = true;
                 } catch (Exception ignoreThis) {}
             }
             b = new Boolean(ok);
             checkedEntries.put(entry.getId(), b);
+        }
+        return b.booleanValue();
+    }
+
+
+    public boolean canLoadAsPoint(Entry entry) {
+        Boolean b = pointEntries.get(entry.getId());
+        if (b == null) {
+            boolean ok = false;
+            if (entry.isGroup()) {
+                ok = false;
+            } else if ( !entry.getResource().isFile()) {
+                ok = false;
+            } else {
+                try {
+                    StringBuilder    buf     = new StringBuilder();
+                    File file = entry.getResource().getFile();
+                    TypedDatasetFactory.open(
+                                             ucar.nc2.constants.FeatureType.POINT, file.toString(), null, buf);
+                    ok = true;
+                } catch (Exception ignoreThis) {}
+            }
+            pointEntries.put(entry.getId(), b = new Boolean(ok));
         }
         return b.booleanValue();
     }
@@ -347,6 +383,7 @@ public class TdsOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsGrid(Entry entry) {
+        if(!canLoad(entry)) return false;
         Boolean b = gridEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -708,7 +745,85 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
 
+    public Result outputPoint(Request request, Entry entry)
+            throws Exception {
+        File file = entry.getResource().getFile();
+        PointObsDataset pod  = (PointObsDataset)TypedDatasetFactory.open(
+                                                        ucar.nc2.constants.FeatureType.POINT, file.toString(), null, new StringBuilder());
 
+
+
+        StringBuffer sb = new StringBuffer();
+
+        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+                              false, "");
+        sb.append(crumbs[1]);
+
+
+        List    vars    = pod.getDataVariables();
+        List    varNames    = new ArrayList();
+        for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+            varNames.add(var.getShortName());
+        }
+
+        getRepository().initMap(sb,600,400,true);
+
+        StringBuffer js = new StringBuffer();
+        js.append("var marker;\n");
+
+        Iterator  dataIterator = pod.getDataIterator(16384);
+        int cnt =0 ;
+        String icon = getRepository().fileUrl("/icons/pointdata.gif");
+        double maxlat=-90,minlat=90,maxlon=-180,minlon=180;
+        while (dataIterator.hasNext()) {
+            PointObsDatatype po = (PointObsDatatype) dataIterator.next();
+            ucar.nc2.dt.EarthLocation el = po.getLocation();
+            StructureData structure = po.getData();
+            if (el == null) {
+                continue;
+            }
+            cnt++;
+            
+            double lat = el.getLatitude();
+            double lon = el.getLongitude();
+            if(lat<-90 || lat>90 || lon<-180 || lon>180) continue;
+            minlat = Math.min(minlat,lat);
+            maxlat = Math.max(maxlat,lat);
+            minlon = Math.min(minlon,lon);
+            maxlon = Math.max(maxlon,lon);
+            js.append("marker = new Marker("
+                      + llp(el.getLatitude(), el.getLongitude()) + ");\n");
+
+            js.append("marker.setIcon(" + HtmlUtil.quote(icon) + ");\n");
+            StringBuffer info = new StringBuffer("");
+            info.append("Date: " +  po.getNominalTimeAsDate() +"<br>");
+            for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                StructureMembers.Member member = structure.findMember(var.getShortName());
+                if(var.getDataType() == DataType.STRING
+                    || var.getDataType() == DataType.CHAR) {
+                    info.append("<b>" + var.getName() +": </b>"+                        
+                                structure.getScalarString(member) +"</br>");
+                } else {
+                    info.append("<b>" + var.getName() +": </b>"+                        
+                                structure.convertScalarFloat(member) +"</br>");
+
+                }
+            }
+            js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
+            js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
+        }
+        js.append("mapstraction.autoCenterAndZoom();\n");
+        sb.append(HtmlUtil.script(js.toString()));
+        return new Result("Point Data", sb);
+    }
+
+    private static String llp(double lat, double lon) {
+        return "new LatLonPoint(" + lat + "," + lon + ")";
+    }
+
+
+    //    public Result outputPointCsv(Request request, PointObsDataset pod) throws Exception {
+    //    }
 
 
 
@@ -737,6 +852,11 @@ public class TdsOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_GRIDSUBSET)
                 || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
             return outputGridSubset(request, entry);
+        }
+
+
+        if (output.equals(OUTPUT_POINT)) {
+            return outputPoint(request, entry);
         }
 
 

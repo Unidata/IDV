@@ -8115,6 +8115,19 @@ public class Repository extends RepositoryBase implements Tables,
                                           + timeHelp + "\"");
     }
 
+    public void initMap(StringBuffer sb, int width, int height, boolean normalControls) {
+        sb.append(
+                  HtmlUtil.importJS(
+                "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
+        sb.append(HtmlUtil.importJS(fileUrl("/mapstraction.js")));
+        sb.append(HtmlUtil.importJS(fileUrl("/mymap.js")));
+        sb.append("<div style=\"width:" + width + "px; height:" + height
+                  + "px\" id=\"mapstraction\"></div>\n");
+        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + ");"));
+
+    }
+
+
 
 }
 

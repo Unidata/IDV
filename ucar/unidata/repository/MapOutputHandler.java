@@ -235,14 +235,7 @@ public class MapOutputHandler extends OutputHandler {
                        StringBuffer sb, int width, int height,
                        boolean normalControls)
             throws Exception {
-        sb.append(
-            importJS(
-                "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
-        sb.append(importJS(repository.getUrlBase() + "/mapstraction.js"));
-        sb.append(importJS(repository.getUrlBase() + "/mymap.js"));
-        sb.append("<div style=\"width:" + width + "px; height:" + height
-                  + "px\" id=\"mapstraction\"></div>\n");
-        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + ");"));
+        getRepository().initMap(sb,width,height,normalControls);
         StringBuffer js = new StringBuffer();
         js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
@@ -323,18 +316,6 @@ public class MapOutputHandler extends OutputHandler {
 
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param jsUrl _more_
-     *
-     * @return _more_
-     */
-    private static String importJS(String jsUrl) {
-        return "<script src=\"" + jsUrl + "\"></script>\n";
-    }
 
 
 }

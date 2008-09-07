@@ -510,7 +510,7 @@ public class CatalogOutputHandler extends OutputHandler {
                 (TdsOutputHandler) getRepository().getOutputHandler(
                     TdsOutputHandler.OUTPUT_OPENDAP);
         }
-        return tdsOutputHandler.canLoad(request, entry);
+        return tdsOutputHandler.canLoad(entry);
     }
 
     /**
