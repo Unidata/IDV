@@ -812,7 +812,7 @@ public class TdsOutputHandler extends OutputHandler {
             js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
             js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
         }
-        js.append("mapstraction.autoCenterAndZoom();\n");
+        js.append("setTimeout(\"mapstraction.autoCenterAndZoom()\",1000);\n");
         sb.append(HtmlUtil.script(js.toString()));
         return new Result("Point Data", sb);
     }
