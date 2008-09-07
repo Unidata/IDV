@@ -2796,9 +2796,27 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void addNewData(List newChoices)
             throws VisADException, RemoteException {
+        boolean needToInstantiateAttributes = true;
+        if(newChoices.size()==myDataChoices.size()) {
+            boolean allOk = true;
+            for(int i=0;i<newChoices.size();i++) {
+                DataChoice newDataChoice = (DataChoice)newChoices.get(i);
+                DataChoice oldDataChoice = (DataChoice)myDataChoices.get(i);
+                if(!newDataChoice.basicallyEquals(oldDataChoice) && !Misc.equals(newDataChoice.getName(), oldDataChoice.getName())) {
+                    allOk = false;
+                    break;
+                } else {
+                }
+            }
+            if(allOk) needToInstantiateAttributes = false;
+        }
+
         setDataChoices(newChoices);
         setData(myDataChoices);
-        instantiateAttributes();
+       
+        if(needToInstantiateAttributes) {
+            instantiateAttributes();
+        }
         updateLegendAndList();
         setProjectionInView(true);
     }
