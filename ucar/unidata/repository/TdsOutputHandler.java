@@ -786,6 +786,7 @@ public class TdsOutputHandler extends OutputHandler {
             
             double lat = el.getLatitude();
             double lon = el.getLongitude();
+            if(lat!=lat || lon!=lon) continue;
             if(lat<-90 || lat>90 || lon<-180 || lon>180) continue;
             minlat = Math.min(minlat,lat);
             maxlat = Math.max(maxlat,lat);
@@ -812,7 +813,9 @@ public class TdsOutputHandler extends OutputHandler {
             js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
             js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
         }
-        js.append("setTimeout(\"mapstraction.autoCenterAndZoom()\",1000);\n");
+        //        js.append("setTimeout(\"mapstraction.autoCenterAndZoom()\",1000);\n");
+        //        js.append("alert('before');\n");
+        js.append("mapstraction.autoCenterAndZoom();\n");
         sb.append(HtmlUtil.script(js.toString()));
         return new Result("Point Data", sb);
     }
