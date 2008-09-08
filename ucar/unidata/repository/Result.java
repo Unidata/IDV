@@ -94,6 +94,8 @@ public class Result {
     private boolean needToWrite = true;
 
 
+    public String bottomHtml = "";
+
     /**
      * _more_
      *
@@ -476,6 +478,24 @@ public class Result {
     public void addCookie(String name, String value) {
         addHttpHeader("Set-Cookie", name + "=" + value);
     }
+
+/**
+Set the BottomHtml property.
+
+@param value The new value for BottomHtml
+**/
+public void setBottomHtml (String value) {
+	bottomHtml = value;
+}
+
+/**
+Get the BottomHtml property.
+
+@return The BottomHtml
+**/
+public String getBottomHtml () {
+	return bottomHtml;
+}
 
 
 

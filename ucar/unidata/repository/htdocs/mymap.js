@@ -6,28 +6,42 @@ var lines = new Object();
 var markers = new Object();
 
 var mapstraction;
-function MapInitialize(addControls)
+function MapInitialize(addControls,mapProvider)
 {
 	// Create a map object
 //	mapstraction = new Mapstraction('mapstraction', 'google');
 //	mapstraction = new Mapstraction('mapstraction', 'yahoo');
-	mapstraction = new Mapstraction('mapstraction', 'microsoft');
+	mapstraction = new Mapstraction('mapstraction', mapProvider);
 	if(!addControls) {
-		vemap = mapstraction.maps[mapstraction.api];
-		vemap.SetDashboardSize(VEDashboardSize.Tiny);
+//		vemap = mapstraction.maps[mapstraction.api];
+//		vemap.SetDashboardSize(VEDashboardSize.Tiny);
 //		vemap.SetDashboardSize(VEDashboardSize.Small);
-		vemap.LoadMap();
+//		vemap.LoadMap();
+//	        mapstraction.addSmallControls();
 	} else {
-	        mapstraction.addSmallControls();
+//	        mapstraction.addSmallControls();
 	} 
+//	mapstraction.addLargeControls();
+
+	if(mapProvider=='google') {
+		mapstraction.setCenterAndZoom(new LatLonPoint(0,0), 1);
+	}	
+
+
+	mapstraction.addControls({
+                pan: true, 
+                zoom: 'small',
+                map_type: true 
+            });
+
 }
 
 
-//<div style="width:400px; height:400px" id="mapstraction"></div>a
-
-
 function initMarker(marker,id) {
+	marker.iconSize = [16,16];
+	marker.iconShadowUrl = "${urlroot}/icons/blank.gif";
 	markers[id]=marker;
+
 	mapstraction.addMarker(marker);
 }
 
@@ -36,7 +50,6 @@ function initLine(line,id) {
 	line.setWidth(3);
 	lines[id]=line;
 	mapstraction.addPolyline(line);
-
 }
 
 function hiliteEntry(map,id) {

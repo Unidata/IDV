@@ -678,6 +678,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
+    public static final String PROP_GOOGLEAPIKEYS = "ramadda.googleapikeys";
 
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "ramadda.download.ok";

@@ -1907,6 +1907,9 @@ public class Repository extends RepositoryBase implements Tables,
         html = StringUtil.replace(html, "${title}", result.getTitle());
         html = StringUtil.replace(html, "${root}", getUrlBase());
 
+        html = StringUtil.replace(html, "${bottom}",result.getBottomHtml());
+        
+
 
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml = HtmlUtil.space(1);
@@ -8115,16 +8118,57 @@ public class Repository extends RepositoryBase implements Tables,
                                           + timeHelp + "\"");
     }
 
-    public void initMap(StringBuffer sb, int width, int height, boolean normalControls) {
-        sb.append(
-                  HtmlUtil.importJS(
-                "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"));
+    private static final String MAP_JS_MICROSOFT = 
+        "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1";
+    private static final String MAP_ID_MICROSOFT = 
+        "microsoft";
+    private static final String MAP_JS_YAHOO = 
+        "http://api.maps.yahoo.com/ajaxymap?v=3.8&appid=idvunidata";
+    private static final String MAP_ID_YAHOO = 
+        "yahoo";
+
+    public String initMap(Request request,StringBuffer sb, int width, int height, boolean normalControls) {
+        String userAgent = request.getHeaderArg("User-Agent");
+        String host  = request.getHeaderArg("Host");
+        if(host==null) host = "localhost";
+        host = (String)StringUtil.split(host,":",true,true).get(0);
+        String googleMapsKey =null;
+        
+        if(userAgent == null) userAgent = "Mozilla";
+        //        System.err.println ("agent:" + userAgent);
+        String mapProvider = MAP_ID_MICROSOFT;
+        String mapJS = MAP_JS_MICROSOFT;
+        //        googleMapsKey = "ABQIAAAA-JXA0-ozvUKU42oQp1aOZxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSig5NmAvzXxoX1Ly0QJZMRxtiLIg";        
+        String googleKeys = getProperty(PROP_GOOGLEAPIKEYS,"");
+        googleMapsKey = null;
+        for(String line: (List<String>) StringUtil.split(googleKeys,"\n",true,true)) {
+            String[] toks = StringUtil.split(line,":",2);
+            if(toks.length!=2) continue;
+            if(toks[0].equals(host)) {
+                googleMapsKey = toks[1];
+                break;
+            }
+        }
+        
+        
+        if(userAgent.indexOf("MSIE")>=0) {
+            mapProvider = MAP_ID_YAHOO;
+            mapJS =MAP_JS_YAHOO;
+        }
+        
+        if(googleMapsKey!=null) {
+            mapJS = "http://maps.google.com/maps?file=api&v=2&key=" + googleMapsKey;
+            mapProvider = "google";
+        }
+
+
+        sb.append(HtmlUtil.importJS(mapJS));
         sb.append(HtmlUtil.importJS(fileUrl("/mapstraction.js")));
         sb.append(HtmlUtil.importJS(fileUrl("/mymap.js")));
         sb.append("<div style=\"width:" + width + "px; height:" + height
                   + "px\" id=\"mapstraction\"></div>\n");
-        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + ");"));
-
+        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + "," + HtmlUtil.squote(mapProvider)+");"));
+        return "";
     }
 
 

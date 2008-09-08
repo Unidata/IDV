@@ -364,9 +364,10 @@ public class TdsOutputHandler extends OutputHandler {
                 try {
                     StringBuilder    buf     = new StringBuilder();
                     File file = entry.getResource().getFile();
-                    TypedDatasetFactory.open(
-                                             ucar.nc2.constants.FeatureType.POINT, file.toString(), null, buf);
-                    ok = true;
+                    if(TypedDatasetFactory.open(
+                                                ucar.nc2.constants.FeatureType.POINT, file.toString(), null, buf)!=null) {
+                        ok = true;
+                    }
                 } catch (Exception ignoreThis) {}
             }
             pointEntries.put(entry.getId(), b = new Boolean(ok));
@@ -759,18 +760,11 @@ public class TdsOutputHandler extends OutputHandler {
                               false, "");
         sb.append(crumbs[1]);
 
-
         List    vars    = pod.getDataVariables();
-        List    varNames    = new ArrayList();
-        for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
-            varNames.add(var.getShortName());
-        }
-
-        getRepository().initMap(sb,600,400,true);
+        getRepository().initMap(request, sb,600,400,true);
 
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
-
         Iterator  dataIterator = pod.getDataIterator(16384);
         int cnt =0 ;
         String icon = getRepository().fileUrl("/icons/pointdata.gif");
@@ -812,11 +806,13 @@ public class TdsOutputHandler extends OutputHandler {
             }
             js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
             js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
+            if(cnt>100) break;
         }
-        //        js.append("setTimeout(\"mapstraction.autoCenterAndZoom()\",1000);\n");
-        //        js.append("alert('before');\n");
+        
         js.append("mapstraction.autoCenterAndZoom();\n");
         sb.append(HtmlUtil.script(js.toString()));
+
+
         return new Result("Point Data", sb);
     }
 

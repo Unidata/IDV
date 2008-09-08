@@ -658,6 +658,9 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.formTable());
         sb.append(request.form(URL_ADMIN_SETTINGS_DO));
         String size = " size=\"40\" ";
+        sb.append(
+            HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
+
         sb.append(tableSubHeader(msg("Display")));
         sb.append(HtmlUtil.formEntry(msgLabel("Title"),
                                      HtmlUtil.input(PROP_REPOSITORY_NAME,
@@ -667,6 +670,13 @@ public class Admin extends RepositoryManager {
                                         HtmlUtil.textArea(PROP_HTML_FOOTER,
                                             getProperty(PROP_HTML_FOOTER,
                                                 ""), 5, 40)));
+
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"),
+                                        "<table><tr valign=top><td>" +
+                                        HtmlUtil.textArea(PROP_GOOGLEAPIKEYS,
+                                            getProperty(PROP_GOOGLEAPIKEYS,
+                                                        ""), 5, 80) +
+                                        "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
 
 
         sb.append(tableSubHeader(msg("Access")));
@@ -738,6 +748,12 @@ public class Admin extends RepositoryManager {
         if (request.exists(PROP_HTML_FOOTER)) {
             getRepository().writeGlobal(PROP_HTML_FOOTER,
                                         request.getString(PROP_HTML_FOOTER,
+                                            ""));
+        }
+
+        if (request.exists(PROP_GOOGLEAPIKEYS)) {
+            getRepository().writeGlobal(PROP_GOOGLEAPIKEYS,
+                                        request.getString(PROP_GOOGLEAPIKEYS,
                                             ""));
         }
 

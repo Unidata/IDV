@@ -304,9 +304,7 @@ Mapstraction.prototype.addAPI = function(element,api) {
       break;
     case 'microsoft':
       if (VEMap) {
-
         element.style.position='relative';
-
         var msft_width = parseFloat(getStyle($m(element),'width'));
         var msft_height = parseFloat(getStyle($m(element),'height'));
         /* Hack so the VE works with FF2 */
@@ -327,7 +325,7 @@ Mapstraction.prototype.addAPI = function(element,api) {
 //        this.maps[api].AttachEvent("onchangeview", function(e) {me.moveendHandler(me);});
 
         //Source of our trouble with Mapufacture?
-        this.resizeTo(msft_width, msft_height);
+//jeffmc        this.resizeTo(msft_width, msft_height);
         this.loaded[api] = true;
       }
       else {
@@ -3251,12 +3249,15 @@ Marker.prototype.toYahoo = function() {
   return ymarker;
 };
 
+
+
 /**
  * toGoogle returns a Google Maps compatible marker pin
  * @returns Google Maps compatible marker
  */
 Marker.prototype.toGoogle = function() {
 	var options = {};
+
 	if(this.labelText){
 		options.title =  this.labelText;
 	}
@@ -3274,6 +3275,7 @@ Marker.prototype.toGoogle = function() {
       }
       icon.iconAnchor = anchor;
     }
+
     if(this.iconShadowUrl) {
       icon.shadow = this.iconShadowUrl;
       if(this.iconShadowSize) {
@@ -3282,11 +3284,12 @@ Marker.prototype.toGoogle = function() {
     }
     options.icon = icon;
   }
+
   if(this.draggable){
     options.draggable = this.draggable;
   }
   var gmarker = new GMarker( this.location.toGoogle(),options);
-	
+
   if(this.infoBubble){
     var theInfo = this.infoBubble;
     var event_action;

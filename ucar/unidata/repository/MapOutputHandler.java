@@ -196,7 +196,7 @@ public class MapOutputHandler extends OutputHandler {
 
         sb.append(
             "<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
-        getMap(request, entriesToUse, sb, 700, 400, true);
+        getMap(request, entriesToUse, sb, 700, 500, true);
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
@@ -235,12 +235,11 @@ public class MapOutputHandler extends OutputHandler {
                        StringBuffer sb, int width, int height,
                        boolean normalControls)
             throws Exception {
-        getRepository().initMap(sb,width,height,normalControls);
         StringBuffer js = new StringBuffer();
-        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
+        getRepository().initMap(request,sb,width,height,normalControls);
+        //        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
         js.append("var line;\n");
-
 
         for (Entry entry : entriesToUse) {
             String idBase = entry.getId();
@@ -312,6 +311,10 @@ public class MapOutputHandler extends OutputHandler {
      * @return _more_
      */
     private static String llp(double lat, double lon) {
+        if(lat<-90) lat = -90;
+        if(lat>90) lat = 90;
+        if(lon<-180) lon = -180;
+        if(lon>180) lon = 180;
         return "new LatLonPoint(" + lat + "," + lon + ")";
 
     }
