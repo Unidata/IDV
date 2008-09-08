@@ -61,6 +61,10 @@ import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 
+import ucar.unidata.data.gis.KmlUtil;
+import org.w3c.dom.Element;
+import ucar.unidata.xml.XmlUtil;
+
 import ucar.unidata.geoloc.*;
 
 
@@ -134,6 +138,8 @@ public class DataOutputHandler extends OutputHandler {
 
     public static final String OUTPUT_POINT_CSV = "data.point.csv";
 
+    public static final String OUTPUT_POINT_KML = "data.point.kml";
+
 
 
     /** _more_          */
@@ -206,6 +212,7 @@ public class DataOutputHandler extends OutputHandler {
                || output.equals(OUTPUT_WCS)
                || output.equals(OUTPUT_POINT_MAP)
                || output.equals(OUTPUT_POINT_CSV)
+               || output.equals(OUTPUT_POINT_KML)
                || output.equals(OUTPUT_GRIDSUBSET)
                || output.equals(OUTPUT_GRIDSUBSET_FORM);
     }
@@ -274,6 +281,17 @@ public class DataOutputHandler extends OutputHandler {
                                       OUTPUT_POINT_CSV)), getRepository().fileUrl(
                                                                                  ICON_CSV), "Point Data as CSV"));
 
+            links.add(
+                new Link(
+                         HtmlUtil.url(
+                                      request.getRequestPath()+"/" +IOUtil.stripExtension(entry.getName())+".kml", Misc.newList(
+                                                                                                                                ARG_ID, entry.getId(),
+                                                                                                                                ARG_OUTPUT,
+                                      OUTPUT_POINT_KML)), getRepository().fileUrl(
+                                                                                 ICON_KML), "Point Data as KML"));
+
+
+
         } else if (canLoadAsGrid(entry)) {
             links.add(
                 new Link(
@@ -292,7 +310,7 @@ public class DataOutputHandler extends OutputHandler {
             */
         }
 
-        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),
+        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_OPENDAP),
                            "OpenDAP"));
 
         links.add(
@@ -940,6 +958,50 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+    public Result outputPointKml(Request request, Entry entry)
+            throws Exception {
+        File file = entry.getResource().getFile();
+        PointObsDataset pod  = (PointObsDataset)TypedDatasetFactory.open(
+                                                        ucar.nc2.constants.FeatureType.POINT, file.toString(), null, new StringBuilder());
+
+        Element root =KmlUtil.kml(entry.getName());
+        Element docNode =KmlUtil.document(root,entry.getName());
+        List    vars    = pod.getDataVariables();
+        Iterator  dataIterator = pod.getDataIterator(16384);
+        while (dataIterator.hasNext()) {
+            PointObsDatatype po = (PointObsDatatype) dataIterator.next();
+            ucar.nc2.dt.EarthLocation el = po.getLocation();
+            if (el == null) {
+                continue;
+            }
+            double lat = el.getLatitude();
+            double lon = el.getLongitude();
+            double alt = 0;
+            if(lat!=lat || lon!=lon) continue;
+
+            StructureData structure = po.getData();
+            StringBuffer info = new StringBuffer("");
+            info.append("<b>Date:</b> " +  po.getNominalTimeAsDate() +"<br>");
+            for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                StructureMembers.Member member = structure.findMember(var.getShortName());
+                if(var.getDataType() == DataType.STRING
+                    || var.getDataType() == DataType.CHAR) {
+                    info.append("<b>" + var.getName() +": </b>"+                        
+                                structure.getScalarString(member) +"<br>");
+                } else {
+                    info.append("<b>" + var.getName() +": </b>"+                        
+                                structure.convertScalarFloat(member) +"<br>");
+
+                }
+            }
+            KmlUtil.placemark(docNode, ""+po.getNominalTimeAsDate(), info.toString(), lat,lon,alt,null);
+        }
+        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+        return new Result("Point Data", sb,getRepository().getMimeTypeFromSuffix(".kml"));
+    }
+
+
+
     /**
      * Serve up the entry
      *
@@ -973,6 +1035,10 @@ public class DataOutputHandler extends OutputHandler {
         }
         if (output.equals(OUTPUT_POINT_CSV)) {
             return outputPointCsv(request, entry);
+        }
+
+        if (output.equals(OUTPUT_POINT_KML)) {
+            return outputPointKml(request, entry);
         }
 
 

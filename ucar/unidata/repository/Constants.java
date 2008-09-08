@@ -87,7 +87,10 @@ public interface Constants {
 
     public static final String ICON_MAP = "/icons/map.gif";
 
+
     public static final String ICON_CSV = "/icons/xls.png";
+    public static final String ICON_KML = "/icons/kml.png";
+    public static final String ICON_OPENDAP = "/icons/opendap.gif";
 
     /** _more_ */
     public static final String ICON_CART = "/icons/cart.gif";
