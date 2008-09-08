@@ -21,10 +21,31 @@ h3 {
 </head>
 <body>
 
-This paper is intended to give an overview of the major functional and design aspects of 
-the <a href="http://www.unidata.ucar.edu/Projects/THREDDS/tech/TDS.html">THREDDS Data Server (TDS)</a>,
-the THREDDS Data Repository (TDR) 
-and the <a href="http://www.unidata.ucar.edu/software/ramadda/">RAMADDA</a> systems.
+
+One of the Unidata Program Center's core strengths has centered around data management - 
+developing and supporting  technologies to store and access data on disk (e.g., NetCDF, CDM), 
+transfer streams  of data (LDM) and serve that data remotely (e.g., TDS, ADDE). 
+The <a href="http://www.unidata.ucar.edu/Projects/THREDDS/tech/TDS.html">THREDDS Data Server (TDS)</a>
+has been one of the key components of this suite. In order to augment
+the TDS  Unidata has been  exploring the development of services  to provide richer mechanisms for managing data collections
+and enabling end users to create and share data. The initial prototype effort 
+was the THREDDS Data Repository (TDR)  - a web based application that supported the upload and
+cataloging of data from end users and client applications. In the past year another effort,
+<a href="http://www.unidata.ucar.edu/software/ramadda/">RAMADDA</a>, has begun to provide
+a much wider range of data management services than initially envisioned for the TDR. 
+<p>
+RAMADDA  is a &quot;content management system&quot; for geoscience data. 
+A major impetus for this work is the rapid evolution of  the Web as an information publishing  and access medium.
+Much of the design and development of RAMADDA is inspired by the numerous examples of web-based systems that support information creation, 
+management and sharing. These <a href="http://en.wikipedia.org/wiki/Web_2.0">Web 2.0</a> systems,
+such as <a href="http://www.flickr.com">Flickr</a>, <a href="http://www.youtube.com">YouTube</a>, 
+<a href="http://en.wikipedia.org/wiki/Wiki">wikis</a> and <a href="http://en.wikipedia.org/wiki/Blog">blogs</a>,
+have had a fundamental impact on how people create, share, find and access information.
+<p>
+The evolution of RAMADDA has brought us to the realization that it may be the technology framework that integrates
+much of Unidata's data management technology suite. This paper is intended to give an overview of the major 
+functional and design aspects of  the TDS, TDR and RAMADDA and to suggest some possible  paths for their future integration.
+
 
 <h2>TDS</h2>
 The TDS is composed of a set of services that provide access to remote data and  is centered around 
