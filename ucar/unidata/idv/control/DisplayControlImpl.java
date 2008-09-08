@@ -59,6 +59,7 @@ import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.ui.DataSelector;
+import ucar.unidata.idv.ui.DataSelectionWidget;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.IdvUIManager;
@@ -798,6 +799,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** geoselection panel */
     private GeoSelectionPanel geoSelectionPanel;
+
+    private DataSelectionWidget dataSelectionWidget;
 
     /** The color scale dialog used in the properties dialog */
     private ColorScaleDialog csd;
@@ -5212,10 +5215,30 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         GeoSelection geoSelection = null;
-
+        List selectedTimes=null;
         if (dataSelection != null) {
             geoSelection = dataSelection.getGeoSelection(true);
+            if(dataSelection.hasTimes()) {
+                selectedTimes = dataSelection.getTimes();
+            }
         }
+
+        
+        dataSelectionWidget = null;
+        if(/*selectedTimes!=null && */myDataChoices.size()==1) {
+            DataChoice dataChoice = (DataChoice) myDataChoices.get(0);
+            List allTimes = dataChoice.getAllDateTimes();
+            if(allTimes!=null&& allTimes.size()>0) {
+                dataSelectionWidget = new DataSelectionWidget(getIdv());
+                jtp.add("Times", dataSelectionWidget.getTimesList());
+                dataSelectionWidget.setTimes(allTimes, selectedTimes);
+                if(selectedTimes!=null) {
+                    dataSelectionWidget.setUseAllTimes(false);
+                }
+            }
+        }
+
+
 
         List dataSources = Misc.makeUnique(getDataSources());
         geoSelectionPanel = null;
@@ -5228,6 +5251,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 jtp.add("Spatial Subset", geoSelectionPanel);
             }
         }
+
+
+
+
 
     }
 
@@ -5454,6 +5481,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if ( !doApplyProperties()) {
                 return false;
             }
+            boolean needToReloadData = false;
             if (geoSelectionPanel != null) {
                 GeoSelection newGeoSelection = (geoSelectionPanel.getEnabled()
                         ? geoSelectionPanel.getGeoSelection()
@@ -5462,9 +5490,21 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     getDataSelection().getGeoSelection(true);
                 if ( !Misc.equals(newGeoSelection, oldGeoSelection)) {
                     getDataSelection().setGeoSelection(newGeoSelection);
-                    reloadDataSourceInThread();
+                    needToReloadData = true;
                 }
             }
+            if(dataSelectionWidget!=null) {
+                List oldSelectedTimes  = getDataSelection().getTimes();
+                List selectedTimes = dataSelectionWidget.getSelectedDateTimes();
+                if(!Misc.equals(oldSelectedTimes, selectedTimes)) {
+                    getDataSelection().setTimes(selectedTimes);
+                    needToReloadData = true;
+                } 
+            }
+            if(needToReloadData) {
+                reloadDataSourceInThread();
+            }
+
 
         } catch (Exception exc) {
             logException("Applying properties", exc);
