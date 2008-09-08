@@ -121,24 +121,26 @@ public class TdsOutputHandler extends OutputHandler {
     public static final String ARG_HSTRIDE = "hstride";
 
     /** _more_ */
-    public static final String OUTPUT_OPENDAP = "tds.opendap";
+    public static final String OUTPUT_OPENDAP = "data.opendap";
 
     /** _more_          */
-    public static final String OUTPUT_CDL = "tds.cdl";
+    public static final String OUTPUT_CDL = "data.cdl";
 
     /** _more_          */
-    public static final String OUTPUT_WCS = "tds.wcs";
+    public static final String OUTPUT_WCS = "data.wcs";
 
     /** _more_          */
-    public static final String OUTPUT_POINT = "tds.point";
+    public static final String OUTPUT_POINT_MAP = "data.point.map";
+
+    public static final String OUTPUT_POINT_CSV = "data.point.csv";
 
 
 
     /** _more_          */
-    public static final String OUTPUT_GRIDSUBSET_FORM = "tds.gridsubset.form";
+    public static final String OUTPUT_GRIDSUBSET_FORM = "data.gridsubset.form";
 
     /** _more_          */
-    public static final String OUTPUT_GRIDSUBSET = "tds.gridsubset";
+    public static final String OUTPUT_GRIDSUBSET = "data.gridsubset";
 
 
     /** _more_ */
@@ -202,7 +204,8 @@ public class TdsOutputHandler extends OutputHandler {
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_OPENDAP) || output.equals(OUTPUT_CDL)
                || output.equals(OUTPUT_WCS)
-               || output.equals(OUTPUT_POINT)
+               || output.equals(OUTPUT_POINT_MAP)
+               || output.equals(OUTPUT_POINT_CSV)
                || output.equals(OUTPUT_GRIDSUBSET)
                || output.equals(OUTPUT_GRIDSUBSET_FORM);
     }
@@ -269,8 +272,17 @@ public class TdsOutputHandler extends OutputHandler {
                 new Link(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                        OUTPUT_POINT), getRepository().fileUrl(
+                        OUTPUT_POINT_MAP), getRepository().fileUrl(
                             ICON_MAP), "Map Point Data"));
+            links.add(
+                new Link(
+                         HtmlUtil.url(
+                                      request.getRequestPath()+"/" +IOUtil.stripExtension(entry.getName())+".csv", Misc.newList(
+                                                                                                                                ARG_ID, entry.getId(),
+                                                                                                                                ARG_OUTPUT,
+                                      OUTPUT_POINT_CSV)), getRepository().fileUrl(
+                                                                                 ICON_CSV), "Point Data as CSV"));
+
         } else if (canLoadAsGrid(entry)) {
             links.add(
                 new Link(
@@ -746,7 +758,7 @@ public class TdsOutputHandler extends OutputHandler {
     }
 
 
-    public Result outputPoint(Request request, Entry entry)
+    public Result outputPointMap(Request request, Entry entry)
             throws Exception {
         File file = entry.getResource().getFile();
         PointObsDataset pod  = (PointObsDataset)TypedDatasetFactory.open(
@@ -763,29 +775,31 @@ public class TdsOutputHandler extends OutputHandler {
         List    vars    = pod.getDataVariables();
         getRepository().initMap(request, sb,600,400,true);
 
+        int skip = request.get(ARG_SKIP,0);
+        int max = request.get(ARG_MAX,500);
+
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
         Iterator  dataIterator = pod.getDataIterator(16384);
         int cnt =0 ;
+        int total =0 ;
         String icon = getRepository().fileUrl("/icons/pointdata.gif");
-        double maxlat=-90,minlat=90,maxlon=-180,minlon=180;
+
         while (dataIterator.hasNext()) {
             PointObsDatatype po = (PointObsDatatype) dataIterator.next();
             ucar.nc2.dt.EarthLocation el = po.getLocation();
-            StructureData structure = po.getData();
             if (el == null) {
                 continue;
             }
-            cnt++;
-            
             double lat = el.getLatitude();
             double lon = el.getLongitude();
             if(lat!=lat || lon!=lon) continue;
             if(lat<-90 || lat>90 || lon<-180 || lon>180) continue;
-            minlat = Math.min(minlat,lat);
-            maxlat = Math.max(maxlat,lat);
-            minlon = Math.min(minlon,lon);
-            maxlon = Math.max(maxlon,lon);
+            total++;
+            if(total<skip) continue;
+            if(total>max+skip) continue;
+            cnt++;
+            StructureData structure = po.getData();
             js.append("marker = new Marker("
                       + llp(el.getLatitude(), el.getLongitude()) + ");\n");
 
@@ -806,13 +820,12 @@ public class TdsOutputHandler extends OutputHandler {
             }
             js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
             js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
-            if(cnt>100) break;
         }
         
         js.append("mapstraction.autoCenterAndZoom();\n");
+
+        //        System.err.println(cnt + " " + skip + " " + total + " " +max);
         sb.append(HtmlUtil.script(js.toString()));
-
-
         return new Result("Point Data", sb);
     }
 
@@ -820,9 +833,66 @@ public class TdsOutputHandler extends OutputHandler {
         return "new LatLonPoint(" + lat + "," + lon + ")";
     }
 
+    public Result outputPointCsv(Request request, Entry entry)
+            throws Exception {
+        File file = entry.getResource().getFile();
+        PointObsDataset pod  = (PointObsDataset)TypedDatasetFactory.open(
+                                                        ucar.nc2.constants.FeatureType.POINT, file.toString(), null, new StringBuilder());
 
-    //    public Result outputPointCsv(Request request, PointObsDataset pod) throws Exception {
-    //    }
+        StringBuffer sb = new StringBuffer();
+        List    vars    = pod.getDataVariables();
+        Iterator  dataIterator = pod.getDataIterator(16384);
+        int cnt =0;
+        while (dataIterator.hasNext()) {
+            PointObsDatatype po = (PointObsDatatype) dataIterator.next();
+            ucar.nc2.dt.EarthLocation el = po.getLocation();
+            if (el == null) {
+                continue;
+            }
+            cnt++;
+
+            double lat = el.getLatitude();
+            double lon = el.getLongitude();
+            StructureData structure = po.getData();
+
+            if(cnt==1) {
+                sb.append(HtmlUtil.quote("Time"));
+                sb.append(",");
+                sb.append(HtmlUtil.quote("Latitude"));
+                sb.append(",");
+                sb.append(HtmlUtil.quote("Longitude"));
+                for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                    sb.append(",");
+                    String unit = var.getUnitsString();
+                    if(unit!=null) {
+                        sb.append(HtmlUtil.quote(var.getShortName()+" (" + unit+")"));
+                    } else {
+                        sb.append(HtmlUtil.quote(var.getShortName()));
+                    }
+                }
+                sb.append("\n");
+            }
+
+            sb.append(HtmlUtil.quote(""+po.getNominalTimeAsDate()));
+            sb.append(",");
+            sb.append(el.getLatitude());
+            sb.append(",");
+            sb.append(el.getLongitude());
+
+            for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                StructureMembers.Member member = structure.findMember(var.getShortName());
+                sb.append(",");
+                if(var.getDataType() == DataType.STRING
+                    || var.getDataType() == DataType.CHAR) {
+                    sb.append(HtmlUtil.quote(structure.getScalarString(member)));
+                } else {
+                    sb.append(structure.convertScalarFloat(member));
+                }
+            }
+            sb.append("\n");
+        }
+        return new Result("Point Data", sb,getRepository().getMimeTypeFromSuffix(".csv"));
+    }
 
 
 
@@ -854,8 +924,11 @@ public class TdsOutputHandler extends OutputHandler {
         }
 
 
-        if (output.equals(OUTPUT_POINT)) {
-            return outputPoint(request, entry);
+        if (output.equals(OUTPUT_POINT_MAP)) {
+            return outputPointMap(request, entry);
+        }
+        if (output.equals(OUTPUT_POINT_CSV)) {
+            return outputPointCsv(request, entry);
         }
 
 
