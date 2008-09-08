@@ -733,16 +733,27 @@ public class TypeHandler extends RepositoryManager {
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
+                    String startDate = formatDate(request, entry.getStartDate());
+                    String endDate = formatDate(request, entry.getEndDate());
+                    String searchUrl =  HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
+                                                     Misc.newList(ARG_FROMDATE, startDate,
+                                                                  ARG_TODATE, endDate));
+                    String searchLink =  HtmlUtil.href(
+                                                       searchUrl,
+                                                       HtmlUtil.img(
+                                                                    getRepository().fileUrl(ICON_SEARCH),
+                                                                    "Search for entries with this date range", " border=0 "));
                     sb.append(
                         HtmlUtil.formEntry(
                             msgLabel("Date Range"),
-                            formatDate(request, entry.getStartDate())
+                            searchLink
+                            + HtmlUtil.space(1) +
+                            startDate
                             + HtmlUtil.space(1)
                             + HtmlUtil.img(
                                 getRepository().fileUrl(
                                     ICON_RANGE)) + HtmlUtil.space(1)
-                                        + formatDate(
-                                            request, entry.getEndDate())));
+                            + endDate));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
                             formatDate(request, entry.getStartDate())));

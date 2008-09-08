@@ -1039,6 +1039,22 @@ public class ImageUtils {
      */
     public static void main(String[] args) throws Exception {
         /*
+        com.drew.metadata.Metadata metadata = com.drew.imaging.jpeg.JpegMetadataReader.readMetadata(new File(args[0]));
+        Iterator directories = metadata.getDirectoryIterator(); 
+        while (directories.hasNext()) { 
+            com.drew.metadata.Directory directory = (com.drew.metadata.Directory)directories.next(); 
+            // iterate through tags and print to System.out  
+            Iterator tags = directory.getTagIterator(); 
+            while (tags.hasNext()) { 
+                com.drew.metadata.Tag tag = (com.drew.metadata.Tag)tags.next(); 
+                // use Tag.toString()  
+                System.out.println(tag); 
+            } 
+        }
+        if(true) return;
+        */
+
+        /*
 
         JButton b = new JButton("hello");
         JFrame  f = new JFrame();

@@ -237,7 +237,7 @@ public class MapOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer js = new StringBuffer();
         getRepository().initMap(request,sb,width,height,normalControls);
-        //        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
+        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
         js.append("var line;\n");
 

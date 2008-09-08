@@ -72,6 +72,7 @@ import ucar.unidata.repository.*;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 import java.io.*;
 
@@ -808,6 +809,7 @@ public class DataOutputHandler extends OutputHandler {
         int total =0 ;
         String icon = getRepository().fileUrl("/icons/pointdata.gif");
 
+        List columnDataList = new ArrayList();
         while (dataIterator.hasNext()) {
             PointObsDatatype po = (PointObsDatatype) dataIterator.next();
             ucar.nc2.dt.EarthLocation el = po.getLocation();
@@ -822,6 +824,7 @@ public class DataOutputHandler extends OutputHandler {
             if(total<=skip) continue;
             if(total>(max+skip)) continue;
             cnt++;
+            List  columnData = new ArrayList();
             StructureData structure = po.getData();
             js.append("marker = new Marker("
                       + llp(el.getLatitude(), el.getLongitude()) + ");\n");
@@ -830,23 +833,57 @@ public class DataOutputHandler extends OutputHandler {
             StringBuffer info = new StringBuffer("");
             info.append("<b>Date:</b> " +  po.getNominalTimeAsDate() +"<br>");
             for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                //{name:\"Ashley\",breed:\"German Shepherd\",age:12}
                 StructureMembers.Member member = structure.findMember(var.getShortName());
                 if(var.getDataType() == DataType.STRING
                     || var.getDataType() == DataType.CHAR) {
+                    String value = structure.getScalarString(member);
+                    columnData.add(var.getShortName()+":" + HtmlUtil.quote(value));
                     info.append("<b>" + var.getName() +": </b>"+                        
-                                structure.getScalarString(member) +"</br>");
-                } else {
-                    info.append("<b>" + var.getName() +": </b>"+                        
-                                structure.convertScalarFloat(member) +"</br>");
+                                value +"</br>");
 
+                } else {
+                    float value = structure.convertScalarFloat(member);
+                    info.append("<b>" + var.getName() +": </b>"+                        
+                                value +"</br>");
+
+                    columnData.add(var.getShortName()+":" +value);
                 }
             }
+            columnDataList.add("{" + StringUtil.join(",", columnData)+"}\n");
             js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
             js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
         }
         
         js.append("mapstraction.autoCenterAndZoom();\n");
+        //        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
 
+        StringBuffer yui  = new StringBuffer();
+
+        List  columnDefs = new ArrayList();
+        List columnNames = new ArrayList();
+        for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+            columnNames.add(HtmlUtil.quote(var.getShortName()));
+            String label = var.getDescription();
+            //            if(label.trim().length()==0)
+                label =var.getName();
+            columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName()) +"," +
+                           "sortable:true," +
+                           "label:" + HtmlUtil.quote(label) +
+                           "}");
+        }
+        
+
+
+        /*
+        yui.append("YAHOO.example.data = [" + StringUtil.join(",", columnDataList)+"]\n");
+        yui.append("var myDataSource = new YAHOO.util.DataSource(YAHOO.example.data);\n");
+        yui.append("myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;\n");
+        yui.append("myDataSource.responseSchema = {\n    fields: [" + StringUtil.join(",", columnNames) +"]};\n");
+        yui.append("var myColumnDefs = [\n  " + StringUtil.join(",",columnDefs) + "\n];\n");
+        yui.append("var myDataTable = new YAHOO.widget.DataTable(\"datatable\", myColumnDefs, myDataSource);\n");
+        */
+  
         if(total>max) {
             sb.append((skip+1) +"-" + (skip+cnt) + " of " + total +" ");
         } else {
@@ -886,7 +923,16 @@ public class DataOutputHandler extends OutputHandler {
 
             }
         }
-        getRepository().initMap(request, sb,600,400,true);
+        //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
+        getRepository().initMap(request, sb,800,500,true);
+        /*        sb.append("</td><td>");
+        sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
+        sb.append("</td></tr></table>");
+        sb.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/fonts/fonts-min.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/datatable/assets/skins/sam/datatable.css\" />\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/yahoo-dom-event/yahoo-dom-event.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/dragdrop/dragdrop-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/element/element-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datasource/datasource-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datatable/datatable-beta-min.js\"></script>\n");
+        
+        sb.append(HtmlUtil.script(yui.toString()));
+        */
+
         sb.append(HtmlUtil.script(js.toString()));
         return new Result("Point Data", sb);
     }

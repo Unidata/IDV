@@ -148,13 +148,14 @@ a.subnavoffcomp  {
 }
 
 .listrow1 {
-   background-color:#cccccc;
+   xbackground-color:#cccccc;
    padding:4px;
    padding-bottom:0px;
 }
 
 .listrow2 {
-   background-color:#efefef;
+   xbackground-color:#efefef;
+   background-color:#edf5ff;
    padding:4px;
    padding-bottom:0px;
 }

@@ -24,7 +24,7 @@ function MapInitialize(addControls,mapProvider)
 //	mapstraction.addLargeControls();
 
 	if(mapProvider=='google') {
-		mapstraction.setCenterAndZoom(new LatLonPoint(0,0), 1);
+            mapstraction.setCenterAndZoom(new LatLonPoint(0,0), 1);
 	}	
 
 
