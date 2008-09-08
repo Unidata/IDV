@@ -760,7 +760,12 @@ public class DataSelectionWidget {
     }
 
 
-
+    public void setUseAllTimes(boolean useAllTimes) {
+        if(allTimesButton!=null) {
+            allTimesButton.setSelected(useAllTimes);
+            timesList.setEnabled( !allTimesButton.isSelected());
+        }
+    }
 
 
     /**

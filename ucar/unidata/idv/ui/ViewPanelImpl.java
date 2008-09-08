@@ -184,8 +184,9 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         rightPanel = new GuiUtils.CardLayoutPanel() {
             public void show(Component comp) {
                 super.show(comp);
-                for (int vmIdx = 0; vmIdx < vmInfos.size(); vmIdx++) {
-                    VMInfo vmInfo = (VMInfo) vmInfos.get(vmIdx);
+                List localVMInfos = new ArrayList(vmInfos);
+                for (int vmIdx = 0; vmIdx < localVMInfos.size(); vmIdx++) {
+                    VMInfo vmInfo = (VMInfo) localVMInfos.get(vmIdx);
                     for (int i = 0; i < vmInfo.controlInfos.size(); i++) {
                         ControlInfo controlInfo =
                             (ControlInfo) vmInfo.controlInfos.get(i);
@@ -214,8 +215,9 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         boolean gotit  = false;
         VMInfo  select = null;
         int     index  = 0;
-        for (int vmIdx = 0; !gotit && (vmIdx < vmInfos.size()); vmIdx++) {
-            VMInfo vmInfo = (VMInfo) vmInfos.get(vmIdx);
+        List localVMInfos = new ArrayList(vmInfos);
+        for (int vmIdx = 0; !gotit && (vmIdx < localVMInfos.size()); vmIdx++) {
+            VMInfo vmInfo = (VMInfo) localVMInfos.get(vmIdx);
             List   cis    = vmInfo.controlInfos;
             for (int i = 0; i < cis.size(); i++) {
                 ControlInfo ci = (ControlInfo) cis.get(i);
@@ -229,7 +231,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                     } else {
                         vmIdx--;
                         while (vmIdx >= 0) {
-                            VMInfo prev = (VMInfo) vmInfos.get(vmIdx--);
+                            VMInfo prev = (VMInfo)localVMInfos.get(vmIdx--);
                             if (prev.getCatOpen()
                                     && (prev.controlInfos.size() > 0)) {
                                 select = prev;
@@ -244,8 +246,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                         index  = i + 1;
                     } else {
                         vmIdx++;
-                        while (vmIdx < vmInfos.size()) {
-                            VMInfo next = (VMInfo) vmInfos.get(vmIdx++);
+                        while (vmIdx < localVMInfos.size()) {
+                            VMInfo next = (VMInfo) localVMInfos.get(vmIdx++);
                             if (next.getCatOpen()
                                     && (next.controlInfos.size() > 0)) {
                                 select = next;
@@ -306,10 +308,12 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param viewManager The ViewManager that was destroyed
      */
     public void viewManagerDestroyed(ViewManager viewManager) {
-        VMInfo vmInfo = findVMInfo(viewManager);
-        if (vmInfo != null) {
-            vmInfos.remove(vmInfo);
-            vmInfo.viewManagerDestroyed();
+        synchronized(VM_MUTEX) {
+            VMInfo vmInfo = findVMInfo(viewManager);
+            if (vmInfo != null) {
+                vmInfos.remove(vmInfo);
+                vmInfo.viewManagerDestroyed();
+            }
         }
     }
 
@@ -457,6 +461,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
 
 
 
+    private Object VM_MUTEX = new Object();
 
     /**
      * Create, if needed, a new tab for the given VM. Note this can also be null.
@@ -470,13 +475,14 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         if (vm == null) {
             vm = "No View";
         }
-
-        VMInfo vmInfo = findVMInfo(vm);
-        if (vmInfo == null) {
-            vmInfo = new VMInfo(vm);
-            vmInfos.add(vmInfo);
+        synchronized(VM_MUTEX) {
+            VMInfo vmInfo = findVMInfo(vm);
+            if (vmInfo == null) {
+                vmInfo = new VMInfo(vm);
+                vmInfos.add(vmInfo);
+            }
+            return vmInfo;
         }
-        return vmInfo;
     }
 
 
@@ -488,8 +494,9 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @return The VMInfo or null
      */
     private VMInfo findVMInfo(Object vm) {
-        for (int i = 0; i < vmInfos.size(); i++) {
-            VMInfo vmInfo = (VMInfo) vmInfos.get(i);
+        List localVMInfos = new ArrayList(vmInfos);
+        for (int i = 0; i < localVMInfos.size(); i++) {
+            VMInfo vmInfo = (VMInfo) localVMInfos.get(i);
             if (vmInfo.holds(vm)) {
                 return vmInfo;
             }
@@ -617,29 +624,31 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         addControlTab(control, true);
     }
 
+    private static final Object BUTTONSTATE_MUTEX = new Object();
     /**
      * Initialize the button state
      *
      * @param idv the idv
      */
     protected static void initButtonState(IntegratedDataViewer idv) {
-        if (BUTTON_FG_COLOR == null) {
-            BUTTON_SHOWPOPUP = idv.getProperty("idv.ui.viewpanel.showpopup",
-                    false);
-            BUTTON_SHOWCATEGORIES =
-                idv.getProperty("idv.ui.viewpanel.showcategories", false);
+        synchronized(BUTTONSTATE_MUTEX) {
+            if (BUTTON_FG_COLOR == null) {
+                BUTTON_SHOWPOPUP = idv.getProperty("idv.ui.viewpanel.showpopup",
+                                                   false);
+                BUTTON_SHOWCATEGORIES =
+                    idv.getProperty("idv.ui.viewpanel.showcategories", false);
 
-            BUTTON_BORDER     = BorderFactory.createEmptyBorder(2, 6, 2, 0);
-            BUTTON_FONT       = new Font("Dialog", Font.PLAIN, 11);
-            CATEGORY_FONT     = new Font("Dialog", Font.BOLD, 11);
-            BUTTON_LINE_COLOR = Color.gray;
-            CATEGORY_OPEN_ICON =
-                GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryOpen.gif");
-            CATEGORY_CLOSED_ICON =
-                GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryClosed.gif");
-            BUTTON_FG_COLOR   = Color.black;
+                BUTTON_BORDER     = BorderFactory.createEmptyBorder(2, 6, 2, 0);
+                BUTTON_FONT       = new Font("Dialog", Font.PLAIN, 11);
+                CATEGORY_FONT     = new Font("Dialog", Font.BOLD, 11);
+                BUTTON_LINE_COLOR = Color.gray;
+                CATEGORY_OPEN_ICON =
+                    GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryOpen.gif");
+                CATEGORY_CLOSED_ICON =
+                    GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryClosed.gif");
+                BUTTON_FG_COLOR   = Color.black;
+            }
         }
-
     }
 
 
@@ -913,8 +922,9 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                 buttonGroup.remove(controlInfo.button);
                 ignore = false;
                 if (controlInfos.size() == 0) {
-                    for (int vmIdx = 0; vmIdx < vmInfos.size(); vmIdx++) {
-                        VMInfo vmInfo = (VMInfo) vmInfos.get(vmIdx);
+                    List localVMInfos = new ArrayList(vmInfos);
+                    for (int vmIdx = 0; vmIdx < localVMInfos.size(); vmIdx++) {
+                        VMInfo vmInfo = (VMInfo) localVMInfos.get(vmIdx);
                         if (vmInfo.controlInfos.size() > 0) {
                             ControlInfo ci =
                                 (ControlInfo) vmInfo.controlInfos.get(0);
@@ -1155,9 +1165,10 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             if (viewManager != null) {
                 String name = viewManager.getName();
                 if ((name == null) || (name.trim().length() == 0)) {
-                    int idx = vmInfos.indexOf(this);
+                    List localVMInfos = new ArrayList(vmInfos);
+                    int idx = localVMInfos.indexOf(this);
                     if (idx == -1) {
-                        idx = vmInfos.size();
+                        idx = localVMInfos.size();
                     }
                     name = "View " + (idx + 1);
                 }
