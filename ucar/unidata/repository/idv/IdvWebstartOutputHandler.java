@@ -131,9 +131,9 @@ public class IdvWebstartOutputHandler extends OutputHandler {
             String suffix = "/"+entry.getId()+".jnlp";
             types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
         } else {
-            TdsOutputHandler tds = (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_OPENDAP);
-            if(tds !=null) {
-                if(tds.canLoad(entry)) {
+            DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
+            if(data !=null) {
+                if(data.canLoad(entry)) {
                     String suffix = "/"+entry.getId()+".jnlp";
                     types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
                 }
@@ -156,14 +156,14 @@ public class IdvWebstartOutputHandler extends OutputHandler {
             jnlp = jnlp.replace("%ARG%","-bundle");
             jnlp = jnlp.replace("%URL%",url);
         } else {
-            TdsOutputHandler tds = (TdsOutputHandler) getRepository().getOutputHandler(TdsOutputHandler.OUTPUT_OPENDAP);
-            if(tds !=null && tds.canLoad(entry)) {
+            DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
+            if(data !=null && data.canLoad(entry)) {
                 jnlp = jnlp.replace("%ARG%","-data");
                 String type = "OPENDAP.GRID";
                 if(entry.getDataType()!=null) {
                     if(entry.getDataType().equals("point")) type = "NetCDF.POINT";
                 }
-                jnlp = jnlp.replace("%URL%","type:"+type+":"+tds.getFullTdsUrl(entry));
+                jnlp = jnlp.replace("%URL%","type:"+type+":"+data.getFullTdsUrl(entry));
             }
         }
 

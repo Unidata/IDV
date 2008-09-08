@@ -176,15 +176,9 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 
-    /** _more_ */
-    private List<String> tdsPrefixes;
 
     /** _more_ */
-    private List<String> tdsNotPrefixes;
-
-
-    /** _more_ */
-    TdsOutputHandler tdsOutputHandler;
+    DataOutputHandler dataOutputHandler;
 
 
 
@@ -198,51 +192,6 @@ public class CatalogOutputHandler extends OutputHandler {
     public CatalogOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-    }
-
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List<String> getTdsPrefixes() {
-        if (tdsPrefixes == null) {
-            String       props  = getRepository().getProperty(ARG_PATHS, "");
-            List         tokens = StringUtil.split(props, "\n", true, true);
-            List<String> tmp    = new ArrayList<String>();
-            for (int i = 0; i < tokens.size(); i++) {
-                String prefix = (String) tokens.get(i);
-                if ( !prefix.startsWith("!")) {
-                    tmp.add(prefix);
-                }
-            }
-            tdsPrefixes = tmp;
-        }
-        return tdsPrefixes;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List<String> getTdsNotPrefixes() {
-        if (tdsNotPrefixes == null) {
-            String       props  = getRepository().getProperty(ARG_PATHS, "");
-            List         tokens = StringUtil.split(props, "\n", true, true);
-            List<String> tmp    = new ArrayList<String>();
-            for (int i = 0; i < tokens.size(); i++) {
-                String prefix = (String) tokens.get(i);
-                if (prefix.startsWith("!")) {
-                    tmp.add(prefix.substring(1));
-                }
-            }
-            tdsNotPrefixes = tmp;
-        }
-        return tdsNotPrefixes;
     }
 
 
@@ -429,7 +378,7 @@ public class CatalogOutputHandler extends OutputHandler {
             boolean didone = false;
             entries = getRepository().sortEntriesOnDate(entries,true);
             for(Entry entry: entries) {
-                if (canTdsLoad(request, entry)) {
+                if (canDataLoad(request, entry)) {
                     outputEntry(entry, request, catalogInfo, root);
                     didone = true;
                     break;
@@ -503,14 +452,14 @@ public class CatalogOutputHandler extends OutputHandler {
     }
 
 
-    private boolean canTdsLoad(Request request, Entry entry) 
+    private boolean canDataLoad(Request request, Entry entry) 
             throws Exception {
-        if (tdsOutputHandler == null) {
-            tdsOutputHandler =
-                (TdsOutputHandler) getRepository().getOutputHandler(
-                    TdsOutputHandler.OUTPUT_OPENDAP);
+        if (dataOutputHandler == null) {
+            dataOutputHandler =
+                (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP);
         }
-        return tdsOutputHandler.canLoad(entry);
+        return dataOutputHandler.canLoad(entry);
     }
 
     /**
@@ -531,8 +480,8 @@ public class CatalogOutputHandler extends OutputHandler {
         path = path.replace("\\", "/");
 
 
-        if (canTdsLoad(request, entry)) {
-            String urlPath = tdsOutputHandler.getTdsUrl(entry);
+        if (canDataLoad(request, entry)) {
+            String urlPath = dataOutputHandler.getTdsUrl(entry);
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 
@@ -572,66 +521,10 @@ public class CatalogOutputHandler extends OutputHandler {
             //For now
             //            }
         }
-
-        if (entry.getResource().isFile()) {
-            addTdsServices(entry, request, catalogInfo, dataset);
-        }
     }
 
 
 
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     * @param request _more_
-     * @param catalogInfo _more_
-     * @param dataset _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addTdsServices(Entry entry, Request request,
-                               CatalogInfo catalogInfo, Element dataset)
-            throws Exception {
-        File   f    = entry.getResource().getFile();
-        String path = f.toString();
-        path = path.replace("\\", "/");
-
-        boolean ok         = false;
-        String  goodPrefix = null;
-        //            System.err.println ("path:" + path);
-        for (String prefix : getTdsPrefixes()) {
-            //                System.err.println ("   prefix:" + prefix);
-            if (path.startsWith(prefix)) {
-                //                    System.err.println ("   OK");
-                goodPrefix = prefix;
-                ok         = true;
-                break;
-            }
-        }
-        if ( !ok) {
-            return;
-        }
-        for (String prefix : getTdsNotPrefixes()) {
-            if (path.startsWith(prefix)) {
-                ok = false;
-                break;
-            }
-        }
-
-        if ( !ok) {
-            return;
-        }
-
-        /*
-        addService(catalogInfo, SERVICE_OPENDAP, "");
-        String urlPath = path.substring(goodPrefix.length());
-        XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
-                       new String[] { ATTR_SERVICENAME,
-                                      SERVICE_OPENDAP, ATTR_URLPATH,
-                                      urlPath });*/
-    }
 
 
 

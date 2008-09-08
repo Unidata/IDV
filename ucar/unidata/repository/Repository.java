@@ -2505,9 +2505,13 @@ public class Repository extends RepositoryBase implements Tables,
         if ( !forHeader) {
             entry.getTypeHandler().getEntryLinks(request, entry, links,
                     forHeader);
+            //            if(!forHeader)
+            //                links.add(new Link(true));
             for (OutputHandler outputHandler : getOutputHandlers()) {
                 outputHandler.getEntryLinks(request, entry, links, forHeader);
             }
+            //            if(!forHeader)
+            //                links.add(new Link(true));
         }
         OutputHandler outputHandler = getOutputHandler(request);
         if ( !entry.isTopGroup()) {
@@ -2553,12 +2557,16 @@ public class Repository extends RepositoryBase implements Tables,
         StringBuffer menu  = new StringBuffer();
         menu.append("<table cellspacing=\"0\" cellpadding=\"0\">");
         for (Link link : links) {
+            if(link.hr) {
+                menu.append("<tr><td colspan=2><hr class=menuseparator>");
+            } else {
             menu.append("<tr><td>");
             menu.append(HtmlUtil.img(link.getIcon()));
             menu.append(HtmlUtil.space(1));
             menu.append("</td><td>");
             menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
                                       HtmlUtil.cssClass("menulink")));
+            }
             menu.append("</td></tr>");
         }
         menu.append("</table>");

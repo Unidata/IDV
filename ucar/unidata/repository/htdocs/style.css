@@ -433,7 +433,10 @@ form {
 .notetext {
 }
 
-
+.menuseparator {
+	margin:2px;
+	padding:0px;
+}
 
 
 

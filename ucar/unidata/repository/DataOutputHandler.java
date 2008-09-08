@@ -103,7 +103,7 @@ import javax.servlet.http.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class TdsOutputHandler extends OutputHandler {
+public class DataOutputHandler extends OutputHandler {
 
     /** _more_          */
     public static final String ARG_ADDLATLON = "addlatlon";
@@ -174,7 +174,7 @@ public class TdsOutputHandler extends OutputHandler {
      *     @param element _more_
      *     @throws Exception On badness
      */
-    public TdsOutputHandler(Repository repository, Element element)
+    public DataOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
 
@@ -258,15 +258,6 @@ public class TdsOutputHandler extends OutputHandler {
         String tdsUrl = request.getRequestPath() + "/"
                         + request.getPathEmbeddedArgs() + "/entry.das";
 
-        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),
-                           "OpenDAP"));
-
-        links.add(
-            new Link(
-                request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
-
         if (canLoadAsPoint(entry)) {
             links.add(
                 new Link(
@@ -291,13 +282,27 @@ public class TdsOutputHandler extends OutputHandler {
                         OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
                             ICON_DATA), "Subset"));
 
+            /*
             links.add(
                 new Link(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                         OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),
                                      "WCS"));
+            */
         }
+
+        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_DATA),
+                           "OpenDAP"));
+
+        links.add(
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
+
+
+
     }
 
 
@@ -773,10 +778,10 @@ public class TdsOutputHandler extends OutputHandler {
         sb.append(crumbs[1]);
 
         List    vars    = pod.getDataVariables();
-        getRepository().initMap(request, sb,600,400,true);
+
 
         int skip = request.get(ARG_SKIP,0);
-        int max = request.get(ARG_MAX,500);
+        int max = request.get(ARG_MAX,200);
 
         StringBuffer js = new StringBuffer();
         js.append("var marker;\n");
@@ -796,8 +801,8 @@ public class TdsOutputHandler extends OutputHandler {
             if(lat!=lat || lon!=lon) continue;
             if(lat<-90 || lat>90 || lon<-180 || lon>180) continue;
             total++;
-            if(total<skip) continue;
-            if(total>max+skip) continue;
+            if(total<=skip) continue;
+            if(total>(max+skip)) continue;
             cnt++;
             StructureData structure = po.getData();
             js.append("marker = new Marker("
@@ -805,7 +810,7 @@ public class TdsOutputHandler extends OutputHandler {
 
             js.append("marker.setIcon(" + HtmlUtil.quote(icon) + ");\n");
             StringBuffer info = new StringBuffer("");
-            info.append("Date: " +  po.getNominalTimeAsDate() +"<br>");
+            info.append("<b>Date:</b> " +  po.getNominalTimeAsDate() +"<br>");
             for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
                 StructureMembers.Member member = structure.findMember(var.getShortName());
                 if(var.getDataType() == DataType.STRING
@@ -824,7 +829,46 @@ public class TdsOutputHandler extends OutputHandler {
         
         js.append("mapstraction.autoCenterAndZoom();\n");
 
-        //        System.err.println(cnt + " " + skip + " " + total + " " +max);
+        if(total>max) {
+            sb.append((skip+1) +"-" + (skip+cnt) + " of " + total +" ");
+        } else {
+            sb.append((skip+1) +"-" + (skip+cnt));
+        }
+        if(total>max) {
+            boolean didone =false;
+            if (skip > 0) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(HtmlUtil.href(HtmlUtil.url(request.getRequestPath(),
+                                                     new String[]{
+                                                         ARG_OUTPUT, request.getOutput(),
+                                                         ARG_ID, entry.getId(),
+                                                         ARG_SKIP,""+(skip - max),
+                                                         ARG_MAX, ""+max}), msg("Previous")));
+                didone = true;
+            }
+            if (total > (skip+cnt)) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(HtmlUtil.href(HtmlUtil.url(request.getRequestPath(),
+                                                     new String[]{
+                                                         ARG_OUTPUT, request.getOutput(),
+                                                         ARG_ID, entry.getId(),
+                                                         ARG_SKIP,""+(skip + max),
+                                                         ARG_MAX, ""+max}), msg("Next")));
+                didone=true;
+            }
+            //Just come up with some max number
+            if(didone && total<2000) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(HtmlUtil.href(HtmlUtil.url(request.getRequestPath(),
+                                                     new String[]{
+                                                         ARG_OUTPUT, request.getOutput(),
+                                                         ARG_ID, entry.getId(),
+                                                         ARG_SKIP,""+0,
+                                                         ARG_MAX, ""+total}), msg("All")));
+
+            }
+        }
+        getRepository().initMap(request, sb,600,400,true);
         sb.append(HtmlUtil.script(js.toString()));
         return new Result("Point Data", sb);
     }

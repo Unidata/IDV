@@ -6,8 +6,10 @@
 
 
 
-  <outputhandler class="ucar.unidata.repository.RssOutputHandler"/>
+
   <outputhandler class="ucar.unidata.repository.CatalogOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.DataOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.RssOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.XmlOutputHandler"/>
 
 <!--
@@ -16,6 +18,5 @@
   <outputhandler class="ucar.unidata.repository.ZipOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.GraphOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false"/>
-  <outputhandler class="ucar.unidata.repository.TdsOutputHandler"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler" />
 </outputhandlers>
