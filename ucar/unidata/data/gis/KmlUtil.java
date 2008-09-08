@@ -251,10 +251,6 @@ public class KmlUtil {
     }
 
 
-
-
-
-
     public static Element folder(Element parent, String name) {
         return folder(parent, name, false);
     }
@@ -279,15 +275,25 @@ public class KmlUtil {
 
 
     public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) {
+        return placemark(parent, name, description, el.getLatitude().getValue(),
+                         el.getLongitude().getValue(),
+                         (el.getAltitude()!=null?el.getAltitude().getValue():0), style);
+    }
+
+    public static Element placemark(Element parent, String name, String description, double lat, double lon, double alt, String style) {
         Element placemark = placemark(parent, name, description);
-        makeText(placemark, TAG_STYLEURL, style);
+        if(style!=null) {
+            makeText(placemark, TAG_STYLEURL, style);
+        }
         visible(placemark, true);
         Element point = makeElement(placemark, TAG_POINT);
-        makeText(point, TAG_COORDINATES, el.getLongitude().getValue() +"," +
-                 el.getLatitude().getValue() +"," +
-                 el.getAltitude().getValue() +" ");
+        makeText(point, TAG_COORDINATES, lon +"," +
+                 lat +"," +
+                 alt +" ");
         return placemark;
     }
+
+
 
 
     public static Element placemark(Element parent, String name, String description, float[][]coords, Color color, int width) {
