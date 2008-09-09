@@ -173,6 +173,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ICON_DATA = "/icons/data.gif";
+
     public static final String ICON_SUBSET = "/icons/subset.gif";
 
     /** _more_ */

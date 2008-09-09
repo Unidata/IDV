@@ -339,11 +339,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
         try {
             super.getInitialMetadata(request, entry, metadataList, extra);
-            DataOutputHandler dataOutputHandler =
-                (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP);
-
-            if ( !dataOutputHandler.canLoad(entry)) {
+            if ( !getDataOutputHandler().canLoad(entry)) {
                 return;
             }
             File file = entry.getResource().getFile();

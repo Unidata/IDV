@@ -151,15 +151,6 @@ public class IdvOutputHandler extends OutputHandler {
     }
 
 
-    private DataOutputHandler dataOutputHandler;
-
-    private  DataOutputHandler getDataOutputHandler() throws Exception {
-        if( dataOutputHandler ==null) {
-            dataOutputHandler  = (DataOutputHandler) getRepository().getOutputHandler(
-                                                                                      DataOutputHandler.OUTPUT_OPENDAP);
-        }
-        return dataOutputHandler;
-    }
 
     protected void addOutputTypes(Request request,
                                   State state, 

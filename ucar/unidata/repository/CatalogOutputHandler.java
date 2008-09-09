@@ -175,13 +175,6 @@ public class CatalogOutputHandler extends OutputHandler {
     public static final String ARG_PATHS = "catalogoutputhandler.paths";
 
 
-
-
-    /** _more_ */
-    DataOutputHandler dataOutputHandler;
-
-
-
     /**
      * _more_
      *
@@ -454,12 +447,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
     private boolean canDataLoad(Request request, Entry entry) 
             throws Exception {
-        if (dataOutputHandler == null) {
-            dataOutputHandler =
-                (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP);
-        }
-        return dataOutputHandler.canLoad(entry);
+        return getDataOutputHandler().canLoad(entry);
     }
 
     /**
@@ -481,7 +469,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (canDataLoad(request, entry)) {
-            String urlPath = dataOutputHandler.getTdsUrl(entry);
+            String urlPath = getDataOutputHandler().getTdsUrl(entry);
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 
