@@ -76,6 +76,9 @@ public class HtmlUtil {
     /** _more_ */
     public static final String SIZE_70 = "  size=\"70\" ";
 
+    public static final String SIZE_80 = "  size=\"80\" ";
+    public static final String SIZE_90 = "  size=\"90\" ";
+
 
     /**
      * _more_
@@ -282,7 +285,7 @@ public class HtmlUtil {
     }
 
     public static String title(String c) {
-        return " title\"" + c +"\" ";
+        return " title=" + quote(c) +" " ;
     }
 
     public static String id(String c) {

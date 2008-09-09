@@ -267,7 +267,7 @@ public class HarvesterManager extends RepositoryManager {
             return new Result(request.url(URL_HARVESTERS_EDIT,
                                           ARG_HARVESTER_ID, id));
         }
-        sb.append(request.form(URL_HARVESTERS_NEW));
+        sb.append(request.formPost(URL_HARVESTERS_NEW));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ARG_NAME, "",
@@ -312,7 +312,7 @@ public class HarvesterManager extends RepositoryManager {
             throw new IllegalArgumentException("Cannot edit harvester");
         }
         sb.append(header(msgLabel("Harvester") + harvester.getName()));
-        sb.append(request.form(URL_HARVESTERS_EDIT));
+        sb.append(request.formPost(URL_HARVESTERS_EDIT));
         sb.append(HtmlUtil.hidden(ARG_HARVESTER_ID, harvester.getId()));
         if (request.exists(ARG_CANCEL)) {
             return new Result(request.url(URL_HARVESTERS_LIST));
@@ -391,7 +391,7 @@ public class HarvesterManager extends RepositoryManager {
 
 
         sb.append(msgHeader("Harvesters"));
-        sb.append(request.form(URL_HARVESTERS_NEW));
+        sb.append(request.formPost(URL_HARVESTERS_NEW));
         sb.append(HtmlUtil.submit(msg("New Harvester")));
         sb.append(HtmlUtil.formClose());
         sb.append(HtmlUtil.p());

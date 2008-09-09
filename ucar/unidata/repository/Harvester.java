@@ -263,12 +263,14 @@ public class Harvester extends RepositoryManager {
      */
     public void applyEditForm(Request request) throws Exception {
         name = request.getString(ARG_NAME, name);
+
         typeHandler = repository.getTypeHandler(request.getString(ATTR_TYPE,
                 ""));
         activeOnStart = request.get(ATTR_ACTIVE, false);
         monitor       = request.get(ATTR_MONITOR, false);
-        addMetadata = request.get(ATTR_ADDMETADATA,false);
+        addMetadata   = request.get(ATTR_ADDMETADATA,false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
+        nameTemplate  = request.getString(ATTR_NAMETEMPLATE, nameTemplate);
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
                 groupTemplate);
         descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE,

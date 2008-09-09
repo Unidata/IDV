@@ -291,6 +291,11 @@ public class Request implements Constants {
         return HtmlUtil.form(url(theUrl));
     }
 
+
+    public String formPost(RequestUrl theUrl) {
+        return HtmlUtil.formPost(url(theUrl));
+    }
+
     /**
      * _more_
      *
@@ -553,6 +558,9 @@ public class Request implements Constants {
             if (cnt++ > 0) {
                 sb.append("&");
             }
+            try {
+                svalue = java.net.URLEncoder.encode(svalue, "UTF-8");
+            } catch(Exception exc) {/*noop*/}
             sb.append(arg + "=" + svalue);
         }
         return sb.toString();

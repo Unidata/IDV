@@ -1840,6 +1840,7 @@ public class Repository extends RepositoryBase implements Tables,
         String name = entry.getName();
         name = name.toLowerCase();
         name = name.replace(" ", "_");
+        name = name.replace(">", "_");
         return name;
     }
 
