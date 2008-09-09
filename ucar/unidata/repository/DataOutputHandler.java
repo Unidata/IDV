@@ -299,7 +299,7 @@ public class DataOutputHandler extends OutputHandler {
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                         OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
-                            ICON_DATA), "Subset"));
+                            ICON_SUBSET), "Subset"));
 
             /*
             links.add(
@@ -510,6 +510,11 @@ public class DataOutputHandler extends OutputHandler {
         return new Result("", new StringBuffer("TBD"));
     }
 
+    public GridDataset getGridDataset(File file) throws Exception {
+        return  GridDataset.open(file.toString());
+    }
+
+
     /**
      * _more_
      *
@@ -573,13 +578,15 @@ public class DataOutputHandler extends OutputHandler {
                 File f =
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
-                GridDataset gds = GridDataset.open(file.toString());
-                writer.makeFile(f.toString(), gds, varNames, llr,
-                                ((dates[0] == null)
-                                 ? null
-                                 : new ucar.nc2.units.DateRange(dates[0],
-                                 dates[1])), includeLatLon, hStride, zStride,
-                                             timeStride);
+                GridDataset gds = getGridDataset(file);
+                synchronized(gds) {
+                    writer.makeFile(f.toString(), gds, varNames, llr,
+                                    ((dates[0] == null)
+                                     ? null
+                                     : new ucar.nc2.units.DateRange(dates[0],
+                                                                    dates[1])), includeLatLon, hStride, zStride,
+                                    timeStride);
+                }
 
                 if (request.get(ARG_ADDTOREPOSITORY, false)) {
                     if ( !canAdd) {
@@ -623,7 +630,7 @@ public class DataOutputHandler extends OutputHandler {
 
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
-        GridDataset dataset = GridDataset.open(file.toString());
+
         //        NetcdfDataset dataset =
         //            NetcdfDataset.acquireDataset(file.toString(), null);
         sb.append(crumbs[1]);
@@ -668,14 +675,10 @@ public class DataOutputHandler extends OutputHandler {
         Date[]     dateRange = null;
         List<Date> dates     = null;
 
-        List       tuples    = new ArrayList();
-        for (GridDatatype grid : dataset.getGrids()) {
-            VariableEnhanced var = grid.getVariable();
-            tuples.add(new Object[] { var.getShortName().toLowerCase(),
-                                      grid });
-        }
-        tuples = Misc.sortTuples(tuples, true);
 
+        GridDataset dataset = getGridDataset(file);
+        StringBuffer varSB = new StringBuffer();
+        synchronized(dataset) {
         for (VariableSimpleIF var : dataset.getDataVariables()) {
             if (var instanceof CoordinateAxis) {
                 CoordinateAxis ca       = (CoordinateAxis) var;
@@ -690,12 +693,7 @@ public class DataOutputHandler extends OutputHandler {
                 continue;
             }
         }
-
-
-
-        StringBuffer varSB = new StringBuffer();
-        for (Object[] tuple : (List<Object[]>) tuples) {
-            GridDatatype     grid = (GridDatatype) tuple[1];
+        for (GridDatatype     grid: sortGrids(dataset)) {
             VariableEnhanced var  = grid.getVariable();
             varSB.append(
                 HtmlUtil.row(
@@ -767,6 +765,7 @@ public class DataOutputHandler extends OutputHandler {
                                      HtmlUtil.checkbox(ARG_ADDLATLON, "true",
                                          request.get(ARG_ADDLATLON, true))));
 
+        }
         sb.append("</table>");
 
         sb.append("<hr>");
@@ -779,6 +778,22 @@ public class DataOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.submit("Subset Grid"));
         sb.append(HtmlUtil.formClose());
         return new Result("Grid Subset", sb);
+    }
+
+
+    public List<GridDatatype> sortGrids(GridDataset dataset) {
+        List       tuples    = new ArrayList();
+        for (GridDatatype grid : dataset.getGrids()) {
+            VariableEnhanced var = grid.getVariable();
+            tuples.add(new Object[] { var.getShortName().toLowerCase(),
+                                      grid });
+        }
+        tuples = Misc.sortTuples(tuples, true);
+        List<GridDatatype> result = new ArrayList<GridDatatype>();
+        for (Object[] tuple : (List<Object[]>) tuples) {
+            result.add((GridDatatype) tuple[1]);
+        }
+        return result;
     }
 
 

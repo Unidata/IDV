@@ -164,7 +164,7 @@ public class CalendarOutputHandler extends OutputHandler {
                               false, "");
         sb.append(crumbs[1]);
         if (output.equals(OUTPUT_GRID)) {
-            result = outputGrid(request, group, entries, sb);
+            result = outputDateGrid(request, group, entries, sb);
         } else {
             result = outputCalendar(request, group, entries, sb);
         }
@@ -187,7 +187,7 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private Result outputGrid(Request request, Group group,
+    private Result outputDateGrid(Request request, Group group,
                               List<Entry> entries, StringBuffer sb)
             throws Exception {
         String           title    = group.getFullName();
@@ -230,7 +230,7 @@ public class CalendarOutputHandler extends OutputHandler {
                 colSB = new StringBuffer();
                 contents.put(key, colSB);
             }
-            colSB.append(getAjaxLink(request, entry, time, false));
+            colSB.append(getAjaxLink(request, entry, time, true));
             colSB.append(HtmlUtil.br());
         }
 

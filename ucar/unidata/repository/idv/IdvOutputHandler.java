@@ -67,19 +67,29 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
 import java.text.SimpleDateFormat;
+
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
+
+
+import ucar.ma2.DataType;
+import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
+import ucar.nc2.dataset.VariableEnhanced;
+
+import ucar.nc2.dt.GridDatatype;
+import ucar.nc2.dt.PointObsDataset;
+import ucar.nc2.dt.PointObsDatatype;
+import ucar.nc2.dt.TypedDatasetFactory;
+
+import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 
 /**
- * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
@@ -92,7 +102,8 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_IDV = "idv.idv";
+    public static final String OUTPUT_IDV_GRID = "idv.grid";
+
 
     /** _more_          */
     IdvServer idvServer;
@@ -125,7 +136,6 @@ public class IdvOutputHandler extends OutputHandler {
             throw new IllegalStateException(
                 "To run the IdvOutputHandler a graphics environment is needed");
         }
-
     }
 
     /**
@@ -137,38 +147,36 @@ public class IdvOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canHandle(String output) {
-        return output.equals(OUTPUT_IDV);
+        return output.equals(OUTPUT_IDV_GRID);
     }
 
 
+    private DataOutputHandler dataOutputHandler;
 
+    private  DataOutputHandler getDataOutputHandler() throws Exception {
+        if( dataOutputHandler ==null) {
+            dataOutputHandler  = (DataOutputHandler) getRepository().getOutputHandler(
+                                                                                      DataOutputHandler.OUTPUT_OPENDAP);
+        }
+        return dataOutputHandler;
+    }
 
     protected void addOutputTypes(Request request,
                                   State state, 
                                   List<OutputType> types) throws Exception {
         List<Entry> theEntries = null;
         if(state.entry!=null) {
-            DataSourceDescriptor descriptor = getDescriptor(state.entry);
-            if(descriptor!=null) {
-                types.add(new OutputType("Preview " + descriptor.getLabel(), OUTPUT_IDV));
+            if ( !getDataOutputHandler().canLoadAsGrid(state.entry)) {
                 return;
             }
-
-            /*
-              if(state.entry.getResource().getPath().endsWith(".shp")) {
-              types.add(new TwoFacedObject("Preview Shapefile", OUTPUT_IDV));
-              return;
-              }
-            */
-            theEntries = new ArrayList<Entry>();
-            theEntries.add(state.entry);
+            types.add(new OutputType("Preview Grid", OUTPUT_IDV_GRID));
         } else {
-            theEntries = getRadarEntries(state.getAllEntries());
+            //            theEntries = getRadarEntries(state.getAllEntries());
         }
 
-        if(theEntries!=null && theEntries.size()>0) {
+        /*        if(theEntries!=null && theEntries.size()>0) {
             types.add(new OutputType("Preview Radar", OUTPUT_IDV));
-        }
+            }*/
     }
 
 
@@ -213,8 +221,46 @@ public class IdvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
-                              List<Group> subGroups, List<Entry> entries)
+    public Result outputEntry(final Request request, Entry entry)
+            throws Exception {
+
+        String output = request.getOutput();
+        if (output.equals(OUTPUT_IDV_GRID)) {
+            return outputGrid(request, entry);
+        }
+        return super.outputEntry(request,entry);
+    }
+
+
+    public Result outputGridForm(final Request request, Entry entry) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        File         file   = entry.getResource().getFile();
+        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+                                                         false, "");
+        sb.append(crumbs[1]);
+        GridDataset dataset = getDataOutputHandler().getGridDataset(file);
+        synchronized(dataset) {
+            for (GridDatatype     grid: getDataOutputHandler().sortGrids(dataset)) {
+                VariableEnhanced var  = grid.getVariable();
+                sb.append(var.getName());
+                sb.append(HtmlUtil.br());
+            }
+        }
+        return new Result("Grid Preview", sb);
+    }
+
+
+    public Result outputGrid(final Request request, Entry entry)
+        throws Exception {
+
+        if (!request.exists("doimage")) {
+            return outputGridForm(request, entry);
+        }
+        return new Result("", new StringBuffer(""));
+    }
+
+    public Result xxxoutputGroup(Request request, Group group,
+                                 List<Group> subGroups, List<Entry> entries)
             throws Exception {
         
         final List<Entry> radarEntries = getRadarEntries(entries);
@@ -229,15 +275,12 @@ public class IdvOutputHandler extends OutputHandler {
 
         StringBuffer sb = new StringBuffer();
 
-
-
         if (!request.exists("doimage")) {
-
             //TODO: the id is wrong if we are a search result
             String url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW
                                       + "/" + theEntry.getId() +"_preview.gif", ARG_ID,
                                       id, ARG_OUTPUT,
-                                          OUTPUT_IDV, "doimage", "true");
+                                          OUTPUT_IDV_GRID, "doimage", "true");
 
             request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
             String title="";
