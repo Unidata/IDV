@@ -7403,7 +7403,17 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         StringBuffer searchCriteriaSB = new StringBuffer();
+
+        Group theGroup = null;
         List[]       pair             = getEntries(request, searchCriteriaSB);
+        if (request.defined(ARG_GROUP)) {
+            String  groupId = (String) request.getString(ARG_GROUP,
+                                  "").trim();
+            //            System.err.println("group:" + groupId);
+            theGroup = getRepository().findGroup(request,groupId);
+        }
+        
+
         String       s                = searchCriteriaSB.toString();
         if (s.length() > 0) {
             request.remove("submit");
@@ -7416,8 +7426,11 @@ public class Repository extends RepositoryBase implements Tables,
                                     "Search Again")) + "Search Criteria";
             request.setLeftMessage(HtmlUtil.br(header) + s);
         }
+        if(theGroup == null) {
+            theGroup = getDummyGroup();
+        }
         return getOutputHandler(request).outputGroup(request,
-                                getDummyGroup(), (List<Group>) pair[0],
+                                theGroup, (List<Group>) pair[0],
                                 (List<Entry>) pair[1]);
     }
 
