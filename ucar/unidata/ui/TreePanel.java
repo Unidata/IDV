@@ -386,5 +386,17 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         showPath(panel.getVisibleComponent());
     }
 
+
+    /**
+     * Close all paths
+     */
+    public void closeAll() {
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.collapsePath(tree.getPathForRow(i));
+        }
+        showPath(panel.getVisibleComponent());
+    }
+
+
 }
 
