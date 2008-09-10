@@ -348,8 +348,10 @@ public class CatalogHarvester extends Harvester {
                                           catalogUrlPath, "", ""));
 
             insertMetadata(group, metadataList);
-            groups.add(repository.getBreadCrumbs(null, group, true, "",
-                    topGroup)[1]);
+            String crumbs = repository.getBreadCrumbs(null, group, true, "",
+                                                      topGroup)[1];
+            crumbs = crumbs.replace("class=", "xclass=");
+            groups.add(crumbs);
             groupCnt++;
             if (groups.size() > 100) {
                 groups = new ArrayList();
@@ -386,7 +388,6 @@ public class CatalogHarvester extends Harvester {
                 }
             }
         }
-
     }
 
 
@@ -402,13 +403,17 @@ public class CatalogHarvester extends Harvester {
         sb.append("Catalog: " + topUrl + "<br>");
         sb.append("Loaded " + catalogCnt + " catalogs<br>");
         sb.append("Created " + entryCnt + " entries<br>");
-        sb.append("Created " + groupCnt + " groups<ul>");
+        sb.append("Created " + groupCnt + " groups");
+
+        StringBuffer groupSB = new StringBuffer();
+        groupSB.append("<div class=\"scrollablediv\"><ul>");
         for (int i = 0; i < groups.size(); i++) {
             String groupLine = (String) groups.get(i);
-            sb.append("<li>");
-            sb.append(groupLine);
+            groupSB.append("<li>");
+            groupSB.append(groupLine);
         }
-        sb.append("</ul>");
+        groupSB.append("</ul></div>");
+        sb.append(getRepository().makeShowHideBlock(null, "Entries", groupSB, false));
         return sb.toString();
     }
 

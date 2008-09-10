@@ -94,7 +94,7 @@ public class WebHarvester extends Harvester {
 
 
     /** _more_          */
-    private List<UrlEntry> urlEntries = new ArrayList<UrlEntry>();
+    private List<HarvesterEntry> urlEntries = new ArrayList<HarvesterEntry>();
 
     /** _more_ */
     User user;
@@ -151,10 +151,10 @@ public class WebHarvester extends Harvester {
 
         List            children   = XmlUtil.findChildren(element,
                                          TAG_URLENTRY);
-        urlEntries = new ArrayList<UrlEntry>();
+        urlEntries = new ArrayList<HarvesterEntry>();
         for (int i = 0; i < children.size(); i++) {
             Element node = (Element) children.get(i);
-            urlEntries.add(new UrlEntry(node));
+            urlEntries.add(new HarvesterEntry(node));
         }
     }
 
@@ -182,7 +182,7 @@ public class WebHarvester extends Harvester {
      */
     public void applyState(Element element) throws Exception {
         super.applyState(element);
-        for(UrlEntry urlEntry: urlEntries) {
+        for(HarvesterEntry urlEntry: urlEntries) {
             Element node =     XmlUtil.create(element.getOwnerDocument(), TAG_URLENTRY, element,
                                               new String[]{
                                                   ATTR_URL, urlEntry.url,
@@ -207,7 +207,7 @@ public class WebHarvester extends Harvester {
         super.applyEditForm(request);
         StringBuffer sb = new StringBuffer();
         int cnt=1;
-        urlEntries = new ArrayList<UrlEntry>();
+        urlEntries = new ArrayList<HarvesterEntry>();
         while(true) {
             if(!request.exists(ATTR_URL+cnt)) {
                 break;
@@ -219,7 +219,7 @@ public class WebHarvester extends Harvester {
             String group = request.getUnsafeString(ATTR_GROUP+cnt,"");
             group = group.replace(" > ","/");
             group = group.replace(">","/");
-            urlEntries.add(new UrlEntry(request.getUnsafeString(ATTR_URL+cnt,""),
+            urlEntries.add(new HarvesterEntry(request.getUnsafeString(ATTR_URL+cnt,""),
                                         request.getUnsafeString(ATTR_NAME+cnt,""),
                                         request.getUnsafeString(ATTR_DESCRIPTION+cnt,""),
                                         group));
@@ -247,7 +247,7 @@ public class WebHarvester extends Harvester {
 
         int cnt = 1;
         String templateHelp ="Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
-        for(UrlEntry urlEntry: urlEntries) {
+        for(HarvesterEntry urlEntry: urlEntries) {
             sb.append(
                       RepositoryManager.tableSubHeader("URL #" + cnt));
             sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
@@ -292,9 +292,9 @@ public class WebHarvester extends Harvester {
             return super.getExtraInfo();
         }
 
-        return status.toString() + StringUtil.join("", statusMessages);
+        String messages = StringUtil.join("", statusMessages);
+        return status.toString() + getRepository().makeShowHideBlock(null, "Entries", new StringBuffer(messages), false);
     }
-
 
 
 
@@ -342,7 +342,7 @@ public class WebHarvester extends Harvester {
      */
     public void collectEntries(boolean firstTime) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        for(UrlEntry urlEntry: urlEntries) {
+        for(HarvesterEntry urlEntry: urlEntries) {
             if ( !getActive()) {
                 return;
             }
@@ -352,9 +352,10 @@ public class WebHarvester extends Harvester {
                 if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
                 }
-                statusMessages.add(repository.getBreadCrumbs(null, entry,
-                        true, "", null)[1]);
-
+                String crumbs =repository.getBreadCrumbs(null, entry,
+                                                         true, "", null)[1];
+                crumbs = crumbs.replace("class=", "xclass=");
+                statusMessages.add(crumbs);
                 entryCnt++;
             }
         }
@@ -412,7 +413,6 @@ public class WebHarvester extends Harvester {
         desc = desc.replace("${todate}", getRepository().formatDate(toDate));
         desc = desc.replace("${name}", name);
 
-
         Group group = repository.findGroupFromName(groupName, getUser(),
                           true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
@@ -436,30 +436,6 @@ public class WebHarvester extends Harvester {
 
     }
 
-    public static class UrlEntry {
-        String url;
-        String name;
-        String description;
-        String group;
-        public UrlEntry(String url,  String name,   String description,        String group) {
-            this.url=url;
-            this.name=name;
-            this.description=description;
-            this.group=group;
-            
-        }
-        public UrlEntry(Element node) {
-            this.url=XmlUtil.getAttribute(node,ATTR_URL,"");
-            this.name=XmlUtil.getAttribute(node,ATTR_NAME,"");
-            this.description=XmlUtil.getAttribute(node,ATTR_DESCRIPTION,"");
-            this.group=XmlUtil.getAttribute(node,ATTR_GROUP,"");
-        }
-        public String toString() {
-            return url;
-        }
-
-
-    }
 
 
 }

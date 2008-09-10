@@ -403,9 +403,12 @@ public class HarvesterManager extends RepositoryManager {
 
         int cnt = 0;
         for (Harvester harvester : harvesters) {
-            String remove = HtmlUtil.href(request.url(URL_HARVESTERS_LIST,
+            String removeLink = HtmlUtil.href(request.url(URL_HARVESTERS_LIST,
                                 ARG_ACTION, ACTION_REMOVE, ARG_HARVESTER_ID,
                                 harvester.getId()), msg("Remove"));
+            if (harvester.getIsEditable()) {
+                removeLink = "";
+            }
             String run;
             if (harvester.getActive()) {
                 run = HtmlUtil.href(request.url(URL_HARVESTERS_LIST,
@@ -431,7 +434,7 @@ public class HarvesterManager extends RepositoryManager {
                     harvester.getName(), (harvester.getActive()
                                           ? msg("Active")
                                           : msg("Stopped")) + HtmlUtil.space(
-                                          2), run, remove,
+                                          2), run, removeLink,
                                               harvester.getExtraInfo())));
         }
         sb.append(HtmlUtil.formTableClose());

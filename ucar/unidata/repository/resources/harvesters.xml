@@ -7,7 +7,7 @@
                 monitor="false"
 		sleep="3"/>
 
-
+<!--
 
   <harvester    name="Source Files"
 		grouptemplate = "${dirgroup}"
@@ -100,7 +100,7 @@
 		sleep="3"/>
 
 
-
+-->
 
 </harvesters>
 		

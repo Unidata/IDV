@@ -631,6 +631,30 @@ public class Harvester extends RepositoryManager {
     }
 
 
+    public static class HarvesterEntry {
+        String url;
+        String name;
+        String description;
+        String group;
+        public HarvesterEntry(String url,  String name,   String description,        String group) {
+            this.url=url;
+            this.name=name;
+            this.description=description;
+            this.group=group;
+            
+        }
+        public HarvesterEntry(Element node) {
+            this.url=XmlUtil.getAttribute(node,ATTR_URL,"");
+            this.name=XmlUtil.getAttribute(node,ATTR_NAME,"");
+            this.description=XmlUtil.getAttribute(node,ATTR_DESCRIPTION,"");
+            this.group=XmlUtil.getAttribute(node,ATTR_GROUP,"");
+        }
+        public String toString() {
+            return url;
+        }
+
+
+    }
 
 
 }
