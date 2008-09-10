@@ -984,6 +984,32 @@ public class Admin extends RepositoryManager {
 
     }
 
+    public Result adminScan(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        Statement stmt = getDatabaseManager().execute("select " +Tables.COL_ENTRIES_ID+"," + Tables.COL_ENTRIES_PARENT_GROUP_ID+" from " + Tables.TABLE_ENTRIES, 10000000,
+                                 0);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        int cnt = 0;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String id =  results.getString(1);
+                String parent =  results.getString(2);
+                cnt++;
+                if(parent!=null) {
+                    Group group = getRepository().findGroup(request, parent);
+                    Entry entry = getRepository().getEntry(request, id);
+                    if(group==null ) {
+                        sb.append("bad parent:" + entry.getName() + " parent id=" + parent +"<br>");
+                    }
+                }
+            }
+        }
+        sb.append("Scanned " + cnt +" entries");
+        return makeResult(request, msg("Scan"), sb);
+    }
+
+
     /**
      * _more_
      *

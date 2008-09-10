@@ -94,6 +94,7 @@
   <method handler="admin"  request="/admin/actions"       method="adminActions"  />
   <method handler="admin"  request="/admin/stats"        method="adminStats"     />
   <method handler="admin"  request="/admin/cleanup"        method="adminCleanup" />
+  <method handler="admin"  request="/admin/scan"           method="adminScan" />
 
 
 

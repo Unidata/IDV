@@ -169,6 +169,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         new Metadata.Type("thredds.cdl", "CDL", "CDL");
 
 
+    public static final String NCATTR_STANDARD_NAME ="standard_name";
+
+
     /**
      * _more_
      *
@@ -423,10 +426,17 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
 
 
+                String varName = var.getShortName();
+                ucar.nc2.Attribute att =var.findAttribute(NCATTR_STANDARD_NAME);
+                if(att!=null) {
+                    varName = att.getStringValue() ;
+                } 
+
+
 
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_VARIABLE,
-                                        DFLT_INHERITED, var.getShortName(),
+                                        DFLT_INHERITED, varName,
                                         var.getName(), var.getUnitsString(),
                                         "");
                 entry.addMetadata(metadata, true);

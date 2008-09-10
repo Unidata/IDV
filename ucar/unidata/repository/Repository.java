@@ -7513,6 +7513,7 @@ public class Repository extends RepositoryBase implements Tables,
             throws Exception {
 
         List<String[]> children = new ArrayList();
+        List<Entry> groupChildren = new ArrayList();
         for (Entry entry : entries) {
             Statement stmt = SqlUtil.select(connection,
                                             SqlUtil.comma(new String[] {
@@ -7527,8 +7528,10 @@ public class Repository extends RepositoryBase implements Tables,
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     int col = 1;
+                    String type = results.getString(2);
+                    if(type.equals(groupChildren
                     children.add(new String[] { results.getString(col++),
-                            results.getString(col++),
+                                                type,
                             results.getString(col++),
                             results.getString(col++) });
                 }
@@ -7597,8 +7600,6 @@ public class Repository extends RepositoryBase implements Tables,
 
         List<String[]> found = getDescendents(request, entries, connection);
         String         query;
-
-
         query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
                                    SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID, "?"));
 
@@ -7681,6 +7682,7 @@ public class Repository extends RepositoryBase implements Tables,
                 commentsStmt.executeBatch();
                 assocStmt.executeBatch();
                 entriesStmt.executeBatch();
+                deleteCnt=0;
             }
         }
 
