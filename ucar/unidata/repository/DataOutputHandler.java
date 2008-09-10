@@ -241,7 +241,7 @@ public class DataOutputHandler extends OutputHandler {
             types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
                     public String assembleUrl(Request request) {
                         return request.getRequestPath() + getSuffix() + "/"
-                            + request.getPathEmbeddedArgs() + "output:" + OUTPUT_OPENDAP+"/entry.das";
+                            + request.getPathEmbeddedArgs() + "/"+ ARG_OUTPUT+":" + OUTPUT_OPENDAP+"/entry.das";
                     }
                 });
         }
@@ -263,8 +263,7 @@ public class DataOutputHandler extends OutputHandler {
         if ( !canLoad(entry)) {
             return;
         }
-        String tdsUrl = request.getRequestPath() + "/"
-            + request.getPathEmbeddedArgs() + "/entry.das";
+
 
         if (canLoadAsPoint(entry)) {
             links.add(
@@ -311,7 +310,9 @@ public class DataOutputHandler extends OutputHandler {
             */
         }
 
-        links.add(new Link(tdsUrl, getRepository().fileUrl(ICON_OPENDAP),
+        String opendapUrl = request.getRequestPath() + "/"
+            + request.getPathEmbeddedArgs()  + "/" + ARG_OUTPUT+":" + OUTPUT_OPENDAP + "/entry.das";
+        links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
                            "OpenDAP"));
 
         links.add(
