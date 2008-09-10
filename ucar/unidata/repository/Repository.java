@@ -7529,7 +7529,9 @@ public class Repository extends RepositoryBase implements Tables,
                 while (results.next()) {
                     int col = 1;
                     String type = results.getString(2);
-                    if(type.equals(groupChildren
+                    if(type.equals(TYPE_GROUP)) {
+                        //                        groupChildren.add(
+                    }
                     children.add(new String[] { results.getString(col++),
                                                 type,
                             results.getString(col++),
