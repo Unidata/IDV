@@ -241,7 +241,7 @@ public class DataOutputHandler extends OutputHandler {
             types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
                     public String assembleUrl(Request request) {
                         return request.getRequestPath() + getSuffix() + "/"
-                            + request.getPathEmbeddedArgs() + "/entry.das";
+                            + request.getPathEmbeddedArgs() + "output:" + OUTPUT_OPENDAP+"/entry.das";
                     }
                 });
         }

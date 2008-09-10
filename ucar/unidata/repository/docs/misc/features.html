@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>RAMADDA Features</title>
+<style>
+body {
+      font-family: SansSerif, Arial, Helvetica, sans-serif;       
+      font-size: 12pt;
+}
+li {
+margin-top:5px;
+}
+h2 {
+  font-size: 14pt;
+  margin-bottom:2px;
+}
+
+h3 {
+  margin-bottom:2px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+</style>
+</head>
+<body>
+
+Here is a partial listing of some of the end-user features provided by RAMADDA.
+
+<ul>
+<li>Extensive use of DHTML and AJAX for end user usability. </dt>
+<ul>
+
+<li> Click on the folder icons 
+<a  href="http://www.unidata.ucar.edu/repository">here</a> to navigate through the group hierarchy. 
+
+<li> Mouse over the group and entry links to show detailed metadata in a popup. 
+
+<li> On this <a href="http://www.unidata.ucar.edu/repository/weather/entry/show?id=0/3/2/4/2" >page</a> click on the right arrow icon 
+<img src="http://www.unidata.ucar.edu/repository/icons/rightarrow.gif"> 
+next to the <b>Entries</b> to show a selection form.
+
+<li> View information in <a href="http://www.unidata.ucar.edu/repository/examples/entry/show?id=e92a34ce-e111-4288-a5e3-099a7870ca99">tabs</a>.
+
+<li> If you were logged in and had the appropriate access you can drag and drop an entry icon onto a group to move the entry.
+</ul>
+
+
+
+<p>
+<li>Search facilities
+<ul>
+<li>
+Simple <a  href="http://www.unidata.ucar.edu/repository/examples/entry/textsearchform">text search</a>. 
+For example, <a  href="http://www.unidata.ucar.edu/repository/examples/entry/search?submit.x=0&submit.y=0&text=hurricane">here</a> is a search on &quot;hurricane&quot;.
+Note the search results show the search criteria. You can go to the advanced search form with the 
+<img src="http://www.unidata.ucar.edu/repository/icons/search.gif"> icon.
+
+<li>
+More  <a  href="http://www.unidata.ucar.edu/repository/examples/entry/searchform">advanced search</a>
+
+<li> In general we've tried to integrate search capabilities in the display context.
+For example, clicking on the &quot;Created by: Jeff McWhirter&quot; link 
+<a href="http://www.unidata.ucar.edu/repository/examples/entry/show?id=e92a34ce-e111-4288-a5e3-099a7870ca99">here</a> will search for entries created by that user.
+In the Metadata tab the <img src="http://www.unidata.ucar.edu/repository/icons/search.gif"> search icon
+allows you to search for other entries with the same metadata.
+
+
+<li>
+You can also <a  href="http://www.unidata.ucar.edu/repository/examples/entry/browsesearchform">browse</a> metadata.
+<ul>
+<li>
+Click on the <img src="http://www.unidata.ucar.edu/repository/icons/plus.gif"> icon to open a section. Click on the metadata entry to search.  e.g., <a  href="http://www.unidata.ucar.edu/repository/examples/entry/search?metadatatype.enum_tag=enum_tag&metadata.attr1.enum_tag=ike">here</a> is a 
+search on the Tag &quot;ike&quot;. 
+<li>
+Click on the list icon <img src="http://www.unidata.ucar.edu/repository/icons/list.gif"> to show an ordered <a  href="http://www.unidata.ucar.edu/repository/examples/metadata/cloud?metadatatype=thredds.contributor">list</a> of the metadata items.   The 
+<a  href="http://www.unidata.ucar.edu/repository/examples/metadata/cloud?type=cloud&metadatatype=thredds.contributor">Cloud</a> link shows a &quot;tag cloud&quot; representation.
+</ul>
+</ul>
+
+<li> Multiple HTML views.
+<ul>
+
+<li> A <a href="http://www.unidata.ucar.edu/repository/examples/entry/show?output=map.map&id=0%2F4">map view</a>.
+
+<li> A <a href="http://www.unidata.ucar.edu/repository/entry/show?output=default.timeline&id=0">Java applet timeline</a>.
+
+<li> A <a href="http://www.unidata.ucar.edu/repository/weather/entry/show?output=calendar.calendar&id=0%2F3%2F2%2F3">Calendar</a> as well as a detailed 
+<a href="http://www.unidata.ucar.edu/repository/weather/entry/show?day=6&output=calendar.calendar&year=2008&month=5&id=0%2F3%2F2%2F3">Day view</a>.
+
+<li> A <a href="http://www.unidata.ucar.edu/repository/weather/entry/show?output=calendar.grid&id=0%2F3%2F2%2F3">Date grid/timeline</a>.
+
+<li> A number of ways of displaying imagery - 
+<a href="http://www.unidata.ucar.edu/repository/weather/entry/show?output=image.slideshow&id=0%2F3%2F2%2F3">slideshow</a>,
+<a href="http://www.unidata.ucar.edu/repository/weather/entry/show?output=image.gallery&id=0%2F3%2F2%2F3">simple gallery</a> and an animated 
+<a href="http://www.unidata.ucar.edu/repository/weather/entry/show?output=image.player&id=0%2F3%2F2%2F4%2F2%2F3">image player</a>.
+
+<li> As an interactive <a href="http://www.unidata.ucar.edu/repository/weather/entry/show?id=0/3/2&output=graph.graph">Graph applet</a>.
+
+<li> <a href="http://www.unidata.ucar.edu/repository/examples/comments/show?id=0/4">Comments</a> can
+be added to entries.
+
+</ul>
+
+<li> Non-html views.
+<ul>
+<li> A <a href="http://www.unidata.ucar.edu/repository/examples/entry/show?output=thredds.catalog&id=0%2F4">THREDDS Catalog</a> view. This provides http and opendap access to the data including
+facilities for the &quot;latest&quot; data.
+<li> An <a href="http://www.unidata.ucar.edu/repository/weather/entry/search?output=rss.summary&group=0%2F3%2F2%2F4&group_children=true">RSS</a> feed. Note, this is the result of a search on all entries
+contained by the Hurricane Ike group. In general all of the available views can be applied
+to search results. For example <a href="http://www.unidata.ucar.edu/repository/weather/entry/search?output=thredds.catalog&filesuffix=nc">here</a> is a search for all entries that have a file ending in 
+&quot;nc&quot; shown as a THREDDS Catalog.
+
+<li> An <a href="http://www.unidata.ucar.edu/repository/examples/entry/show?output=xml.xml&id=0%2F4"> XML</a> view for client application access.
+</ul>
+
+</ul>
+<li> Data oriented views. 
+<ul>
+<li> Under the &quot;Actions&quot; tab 
+<a href="http://www.unidata.ucar.edu/repository/examples/entry/show?id=e92a34ce-e111-4288-a5e3-099a7870ca99">here</a> there are a number of data oriented actions.
+Since this entry is a grid you can
+<a href="http://www.unidata.ucar.edu/repository/examples/entry/show?id=e92a34ce-e111-4288-a5e3-099a7870ca99&output=data.gridsubset.form">subset</a> it, returning  a new netCDF file. If you were logged in you can also save the subset file back into the repository.
+<p>
+You can access the grid via <a href="http://www.unidata.ucar.edu/repository/examples/entry/show/id:e92a34ce-e111-4288-a5e3-099a7870ca99/output:data.opendap/entry.das">OpenDAP</a>.
+<p>
+You can also view a NetCDF <a href="http://www.unidata.ucar.edu/repository/examples/entry/show?id=e92a34ce-e111-4288-a5e3-099a7870ca99&output=data.cdl">CDL</a> of the data.
+<li> Point data can be shown in a 
+<a href="http://www.unidata.ucar.edu/repository/examples/entry/show?id=46d283c8-b852-4a6f-a6e6-055b7ac19fe9&output=data.point.map"> Map</a>,
+as a Google Earth <a href="http://www.unidata.ucar.edu/repository/examples/entry/show/pam.kml?id=46d283c8-b852-4a6f-a6e6-055b7ac19fe9&output=data.point.kml">KML</a> and as a <a href="http://www.unidata.ucar.edu/repository/examples/entry/show/pam.csv?id=46d283c8-b852-4a6f-a6e6-055b7ac19fe9&output=data.point.csv">CSV</a> file for import into spreadsheets.
+
+</ul>
+
+
+
+
+</ul>
+
+
+
+</ul>
+
+
+
+
+
+
+
+</body>
