@@ -835,7 +835,7 @@ public class Admin extends RepositoryManager {
             String url =
                 HtmlUtil.href(
                     request.url(
-                        getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
+                        getRepository().URL_SEARCH_FORM, ARG_TYPE,
                         typeHandler.getType()), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
         }
@@ -984,28 +984,35 @@ public class Admin extends RepositoryManager {
 
     }
 
-    public Result adminScan(Request request) throws Exception {
+    public Result adminScanForBadParents(Request request) throws Exception {
+        boolean delete = request.get("delete", false);
         StringBuffer sb = new StringBuffer();
         Statement stmt = getDatabaseManager().execute("select " +Tables.COL_ENTRIES_ID+"," + Tables.COL_ENTRIES_PARENT_GROUP_ID+" from " + Tables.TABLE_ENTRIES, 10000000,
                                  0);
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
         int cnt = 0;
+        List<Entry> badEntries = new ArrayList<Entry>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String id =  results.getString(1);
-                String parent =  results.getString(2);
+                String parentId =  results.getString(2);
                 cnt++;
-                if(parent!=null) {
-                    Group group = getRepository().findGroup(request, parent);
-                    Entry entry = getRepository().getEntry(request, id);
+                if(parentId!=null) {
+                    Group group = getRepository().findGroup(request, parentId);
                     if(group==null ) {
-                        sb.append("bad parent:" + entry.getName() + " parent id=" + parent +"<br>");
+                        Entry entry = getRepository().getEntry(request, id);
+                        sb.append("bad parent:" + entry.getName() + " parent id=" + parentId +"<br>");
+                        badEntries.add(entry);
                     }
                 }
             }
         }
         sb.append("Scanned " + cnt +" entries");
+        if(delete) {
+            getRepository().deleteEntries(request, badEntries, null);
+            return makeResult(request, msg("Scan"), new StringBuffer("Deleted"));
+        }
         return makeResult(request, msg("Scan"), sb);
     }
 

@@ -108,11 +108,11 @@ public class LdmListener {
 
     /** _more_ */
     private String fileUrlTemplate =
-        "http://localhost:8080/repository/processfile?file=${file}&type=${type}";
+        "http://localhost:8080/repository/harvester/processfile?file=${file}&type=${type}";
 
     /** _more_ */
     private String bufferUrlTemplate =
-        "http://localhost:8080/repository/processfile?tocfile=${file}";
+        "http://localhost:8080/repository/harvester/processfile?tocfile=${file}";
 
     /**
      * _more_

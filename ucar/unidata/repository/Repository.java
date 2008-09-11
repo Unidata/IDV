@@ -1204,7 +1204,7 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected void addRequest(Element node, Hashtable props,
-                              Hashtable handlers)
+                              Hashtable handlers, String defaultHandler)
             throws Exception {
         String request    = XmlUtil.getAttribute(node,
                                 ApiMethod.ATTR_REQUEST);
@@ -1223,7 +1223,7 @@ public class Repository extends RepositoryBase implements Tables,
         String handlerName = XmlUtil.getAttribute(node,
                                  ApiMethod.ATTR_HANDLER,
                                  Misc.getProperty(props,
-                                     ApiMethod.ATTR_HANDLER, "repository"));
+                                     ApiMethod.ATTR_HANDLER, defaultHandler));
 
 
         RequestHandler handler = (RequestHandler) handlers.get(handlerName);
@@ -1322,35 +1322,39 @@ public class Repository extends RepositoryBase implements Tables,
         for (String file : apiDefFiles) {
             file = getStorageManager().localizePath(file);
             Element apiRoot = XmlUtil.getRoot(file, getClass());
-            if (apiRoot == null) {
-                continue;
-            }
-
-            NodeList  children = XmlUtil.getElements(apiRoot);
             Hashtable props    = new Hashtable();
-            for (int i = 0; i < children.getLength(); i++) {
-                Element node = (Element) children.item(i);
-                String  tag  = node.getTagName();
-                if (tag.equals(ApiMethod.TAG_PROPERTY)) {
-                    props.put(XmlUtil.getAttribute(node,
-                            ApiMethod.ATTR_NAME), XmlUtil.getAttribute(node,
-                                ApiMethod.ATTR_VALUE));
-                } else if (tag.equals(ApiMethod.TAG_METHOD)) {
-                    addRequest(node, props, handlers);
-                } else {
-                    throw new IllegalArgumentException("Unknown api.xml tag:"
-                            + tag);
-                }
-            }
+            processApiNode(apiRoot,handlers, props,"repository");
         }
         for (ApiMethod apiMethod : apiMethods) {
             if (apiMethod.getIsTopLevel()) {
                 topLevelMethods.add(apiMethod);
             }
         }
-
-
     }
+
+    private void processApiNode(Element apiRoot,Hashtable handlers, Hashtable props, String defaultHandler) throws Exception {
+        if (apiRoot == null) {
+            return;
+        }
+        NodeList  children = XmlUtil.getElements(apiRoot);
+        for (int i = 0; i < children.getLength(); i++) {
+            Element node = (Element) children.item(i);
+            String  tag  = node.getTagName();
+            if (tag.equals(ApiMethod.TAG_PROPERTY)) {
+                props.put(XmlUtil.getAttribute(node,
+                                               ApiMethod.ATTR_NAME), XmlUtil.getAttribute(node,
+                                                                                          ApiMethod.ATTR_VALUE));
+            } else if (tag.equals(ApiMethod.TAG_API)) {
+                addRequest(node, props, handlers,defaultHandler);
+            } else if (tag.equals(ApiMethod.TAG_GROUP)) {
+                processApiNode(node, handlers, props, XmlUtil.getAttribute(node, ApiMethod.ATTR_HANDLER,defaultHandler));
+            } else {
+                throw new IllegalArgumentException("Unknown api.xml tag:"
+                                                   + tag);
+            }
+        }
+    }
+
 
 
     /**
@@ -3061,7 +3065,7 @@ public class Repository extends RepositoryBase implements Tables,
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
-                item = HtmlUtil.href(request.url(URL_ENTRY_SEARCHFORM,
+                item = HtmlUtil.href(request.url(URL_SEARCH_FORM,
                         ARG_WHAT, whats[i], ARG_FORM_TYPE,
                         formType), names[i], extra2);
             }
@@ -3077,7 +3081,7 @@ public class Repository extends RepositoryBase implements Tables,
             if (tfo.getId().equals(what)) {
                 links.add(HtmlUtil.span(tfo.toString(), extra1));
             } else {
-                links.add(HtmlUtil.href(request.url(URL_ENTRY_SEARCHFORM,
+                links.add(HtmlUtil.href(request.url(URL_SEARCH_FORM,
                         ARG_WHAT, BLANK + tfo.getId(), ARG_TYPE,
                         typeHandler.getType()), tfo.toString(), extra2));
             }
@@ -7331,7 +7335,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
         String search = HtmlUtil.href(
                             request.url(
-                                URL_ENTRY_SEARCHFORM, ARG_ASSOCIATION,
+                                URL_SEARCH_FORM, ARG_ASSOCIATION,
                                 encode(association)), HtmlUtil.img(
                                     fileUrl(ICON_SEARCH),
                                     msg("Search in association")));
@@ -7418,7 +7422,7 @@ public class Repository extends RepositoryBase implements Tables,
         String       s                = searchCriteriaSB.toString();
         if (s.length() > 0) {
             request.remove("submit");
-            String url = request.getUrl(URL_ENTRY_SEARCHFORM);
+            String url = request.getUrl(URL_SEARCH_FORM);
             s = "<table>" + s + "</table>";
             String header = HtmlUtil.href(
                                 url,

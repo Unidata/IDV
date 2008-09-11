@@ -408,7 +408,7 @@ public class MetadataHandler extends RepositoryManager {
         String cloudLink =
             HtmlUtil.href(
                 request.url(
-                    getRepository().getMetadataManager().URL_METADATA_CLOUD,
+                    getRepository().getMetadataManager().URL_METADATA_LIST,
                     ARG_METADATA_TYPE, type.toString()), HtmlUtil.img(
                         getRepository().fileUrl(ICON_LIST), "View Listing"));
         String url = request.url(getRepository().URL_ENTRY_SEARCH);

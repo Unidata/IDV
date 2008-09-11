@@ -61,38 +61,39 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
     /** _more_ */
-    public final RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
-                                                       "/entry/searchform",
+    public final RequestUrl URL_SEARCH_FORM = new RequestUrl(this,
+                                                       "/search/form",
                                                        "Advanced Search");
 
     /** _more_ */
-    public final RequestUrl URL_ENTRY_TEXTSEARCHFORM =
-        new RequestUrl(this, "/entry/textsearchform", "Text Search");
+    public final RequestUrl URL_SEARCH_TEXTFORM =
+        new RequestUrl(this, "/search/textform", "Text Search");
 
     /** _more_ */
-    public final RequestUrl URL_ENTRY_BROWSESEARCHFORM =
-        new RequestUrl(this, "/entry/browsesearchform", "Browse");
-
-    /** _more_ */
-    public final RequestUrl[] searchUrls = { URL_ENTRY_TEXTSEARCHFORM,
-                                             URL_ENTRY_SEARCHFORM,
-                                             URL_ENTRY_BROWSESEARCHFORM };
-
-    /** _more_ */
-    public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
-                                                    "/comments/show");
-
-    /** _more_ */
-    public final RequestUrl URL_COMMENTS_ADD = new RequestUrl(this,
-                                                   "/comments/add");
-
-    /** _more_ */
-    public final RequestUrl URL_COMMENTS_EDIT = new RequestUrl(this,
-                                                    "/comments/edit");
+    public final RequestUrl URL_SEARCH_BROWSE =
+        new RequestUrl(this, "/search/browse", "Browse");
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
-                                                   "/entry/search", "Search");
+                                                   "/search/do", "Search");
+
+    /** _more_ */
+    public final RequestUrl[] searchUrls = { URL_SEARCH_TEXTFORM,
+                                             URL_SEARCH_FORM,
+                                             URL_SEARCH_BROWSE };
+
+    /** _more_ */
+    public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
+                                                    "/entry/comments/show");
+
+    /** _more_ */
+    public final RequestUrl URL_COMMENTS_ADD = new RequestUrl(this,
+                                                   "/entry/comments/add");
+
+    /** _more_ */
+    public final RequestUrl URL_COMMENTS_EDIT = new RequestUrl(this,
+                                                    "/entry/comments/edit");
+
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(this,
@@ -165,8 +166,8 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
     /** _more_ */
-    public final RequestUrl URL_GETENTRIES = new RequestUrl(this,
-                                                 "/getentries");
+    public final RequestUrl URL_ENTRY_GETENTRIES = new RequestUrl(this,
+                                                 "/entry/getentries");
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_GET = new RequestUrl(this,

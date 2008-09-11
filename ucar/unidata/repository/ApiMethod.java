@@ -35,7 +35,9 @@ import java.util.List;
 public class ApiMethod {
 
     /** _more_ */
-    public static final String TAG_METHOD = "method";
+    public static final String TAG_API = "api";
+
+    public static final String TAG_GROUP = "group";
 
     /** _more_ */
     public static final String TAG_PROPERTY = "property";

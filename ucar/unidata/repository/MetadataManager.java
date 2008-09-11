@@ -113,9 +113,9 @@ public class MetadataManager extends RepositoryManager {
                                               "Edit Metadata");
 
     /** _more_ */
-    public RequestUrl URL_METADATA_CLOUD = new RequestUrl(getRepository(),
-                                               "/metadata/cloud",
-                                               "Metadata Cloud");
+    public RequestUrl URL_METADATA_LIST = new RequestUrl(getRepository(),
+                                               "/metadata/list",
+                                               "Metadata Listing");
 
     /** _more_ */
     public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(getRepository(),
@@ -462,7 +462,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Result processMetadataCloud(Request request) throws Exception {
+    public Result processMetadataList(Request request) throws Exception {
 
         boolean doCloud = request.getString(ARG_TYPE, "list").equals("cloud");
         StringBuffer sb = new StringBuffer();

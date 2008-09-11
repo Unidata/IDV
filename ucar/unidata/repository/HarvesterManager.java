@@ -82,21 +82,21 @@ public class HarvesterManager extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_HARVESTERS_IMPORTCATALOG =
-        new RequestUrl(this, "/harvesters/importcatalog", "Import Catalog");
+        new RequestUrl(this, "/harvester/importcatalog", "Import Catalog");
 
     /** _more_ */
     public RequestUrl URL_HARVESTERS_LIST = new RequestUrl(this,
-                                                "/harvesters/list",
+                                                "/harvester/list",
                                                 "Harvesters");
 
     /** _more_ */
     public RequestUrl URL_HARVESTERS_NEW = new RequestUrl(this,
-                                               "/harvesters/new");
+                                               "/harvester/new");
 
 
     /** _more_ */
     public RequestUrl URL_HARVESTERS_EDIT = new RequestUrl(this,
-                                                "/harvesters/edit");
+                                                "/harvester/edit");
 
 
 
@@ -491,7 +491,6 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processFile(Request request) throws Exception {
-        System.err.println("mem:" + Misc.usedMemory());
         List<Harvester> harvesters  = getHarvesters();
         TypeHandler     typeHandler = getRepository().getTypeHandler(request);
         String          filepath    = request.getUnsafeString(ARG_FILE,

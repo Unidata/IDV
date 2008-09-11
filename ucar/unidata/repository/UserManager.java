@@ -1151,7 +1151,7 @@ public class UserManager extends RepositoryManager {
             if ( !haveFrom) {
                 sb.append(
                     request.form(
-                        repository.URL_GETENTRIES,
+                        repository.URL_ENTRY_GETENTRIES,
                         "name=\"getentries\" method=\"post\""));
                 sb.append(HtmlUtil.submit(msg("Get selected"),
                                           "getselected"));

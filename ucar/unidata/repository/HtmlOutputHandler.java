@@ -380,7 +380,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         request.url(
-                            getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
+                            getRepository().URL_SEARCH_FORM, ARG_TYPE,
                             theTypeHandler.getType()), HtmlUtil.img(
                                 getRepository().fileUrl(ICON_SEARCH),
                                 msg("Search in Group"))));
@@ -958,7 +958,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                  StringUtil.join(",", labels));
         tmp = StringUtil.replace(tmp, "%ids%", StringUtil.join(",", ids));
         tmp = StringUtil.replace(tmp, "%loadurl%",
-                                 request.url(getRepository().URL_GETENTRIES,
+                                 request.url(getRepository().URL_ENTRY_GETENTRIES,
                                              ARG_IDS, "%ids%", ARG_OUTPUT,
                                              OUTPUT_HTML));
         return tmp;

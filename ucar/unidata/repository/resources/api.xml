@@ -4,105 +4,85 @@
   <property name="cancache" value="true"/>
 
 
+  <group handler="repository">
+      <api request="/entry/show"             method="processEntryShow"    name="Home" toplevel="true" ishome="true"/>
+      <api request="/entry/show/*"           method="processEntryShow"/>
 
-  <method request="/entry/show"      method="processEntryShow"  name="Home" toplevel="true" ishome="true"/>
+      <api request="/search/textform"        method="processEntryTextSearchForm"     name="Search" toplevel="true"/>
+      <api request="/search/form"            method="processEntrySearchForm"         name="Search"/>
+      <api request="/search/browse"          method="processEntryBrowseSearchForm"   name="Search"/>
+      <api request="/search/do"              method="processEntrySearch"/>
 
-  <method request="/entry/show/*"      method="processEntryShow"/>
+      <api request="/entry/copy"             method="processEntryCopy"/>
+      <api request="/entry/form"             method="processEntryForm"       actions="edit"/>
+      <api request="/entry/change"           method="processEntryChange"     actions="edit"/>
+      <api request="/entry/delete"           method="processEntryDelete"     actions="edit"/>
+      <api request="/entry/deletelist"       method="processEntryListDelete" actions="edit"/>
+      <api request="/entry/new"              method="processEntryNew"        actions="new"/>
+      <api request="/entry/xmlcreate"        method="processEntryXmlCreate"/>
+      <api request="/entry/comments/show"    method="processCommentsShow"/>
+      <api request="/entry/comments/add"     method="processCommentsAdd"      actions="comment"/>
+      <api request="/entry/comments/edit"    method="processCommentsEdit"     actions="edit"/>
+      <api request="/entry/delete"           method="processEntryDelete"      actions="edit"/>
+      <api request="/entry/get/*"            method="processEntryGet"      cancache="false"/>
+      <api request="/entry/getentries"       method="processGetEntries" />
 
+      <api request="/association/add"        method="processAssociationAdd"/>
+      <api request="/association/delete"     method="processAssociationDelete"   actions="edit"/>
+      <api request="/getmap"                 method="processMap"       cancache="false"/>
+      <api request="/graph/get"              method="processGraphGet"/>
+      <api request="/message"                method="processMessage"    cancache="false" />
+      <api request="/dummy"                  method="processDummy"/>
+  </group>
 
-  <method request="/entry/textsearchform"  method="processEntryTextSearchForm"   name="Search" toplevel="true"/>
-  <method request="/entry/searchform"  method="processEntrySearchForm"   name="Search"/>
-  <method request="/entry/browsesearchform"  method="processEntryBrowseSearchForm"   name="Search"/>
-
-  <method request="/entry/search"  method="processEntrySearch"     />
-<!--
-  <method request="/list/home"   method="processListHome"      name="List" toplevel="true"/>
--->
-  <method request="/list/show"   method="processListShow"/>
-  <method request="/graph/get"   method="processGraphGet"/>
-
-
-  <method request="/entry/copy"      method="processEntryCopy"      />
-
-
-  <method request="/entry/form"      method="processEntryForm"      actions="edit"/>
-  <method request="/entry/change"    method="processEntryChange"    actions="edit"/>
-  <method request="/entry/delete"    method="processEntryDelete"    actions="edit"/>
-  <method request="/entry/deletelist"    method="processEntryListDelete"    actions="edit"/>
-
-  <method request="/entry/new"       method="processEntryNew"       actions="new"/>
-
-  <method request="/entry/xmlcreate"       method="processEntryXmlCreate"/>
-
-  <method request="/comments/show"   method="processCommentsShow"/>
-  <method request="/comments/add"   method="processCommentsAdd"     actions="comment"/>
-  <method request="/comments/edit"   method="processCommentsEdit"   actions="edit"/>
-
-  <method request="/entry/delete"    method="processEntryDelete"    actions="edit"/>
-
-  <method handler="accessmanager" request="/access/form"    method="processAccessForm"    actions="edit"/>
-  <method handler="accessmanager"  request="/access/change"    method="processAccessChange"    actions="edit"/>
-<!--  <method handler="accessmanager"  request="/access/list"    method="processAccessList"    actions="edit"/> -->
-
-  <method request="/entry/get/*"     method="processEntryGet"      cancache="false"/>
-
-  <method handler="metadatamanager" request="/metadata/cloud"   method="processMetadataCloud"/>
-  <method handler="metadatamanager" request="/metadata/form"   method="processMetadataForm" actions="edit"/>
-  <method handler="metadatamanager" request="/metadata/addform"   method="processMetadataAddForm" actions="edit"/>
-  <method handler="metadatamanager" request="/metadata/add"   method="processMetadataAdd" actions="edit"/>
-  <method handler="metadatamanager" request="/metadata/change"   method="processMetadataChange" actions="edit"/>
+  <group handler="accessmanager">
+      <api request="/access/form"       method="processAccessForm"      actions="edit"/>
+      <api request="/access/change"     method="processAccessChange"    actions="edit"/>
+  </group>
 
 
-  <method request="/association/add"   method="processAssociationAdd"/>
-  <method request="/association/delete"   method="processAssociationDelete" actions="edit"/>
+  <group handler="metadatamanager">
+      <api request="/metadata/list"       method="processMetadataList"/>
+      <api request="/metadata/form"       method="processMetadataForm"       actions="edit"/>
+      <api request="/metadata/addform"    method="processMetadataAddForm"    actions="edit"/>
+      <api request="/metadata/add"        method="processMetadataAdd"        actions="edit"/>
+      <api request="/metadata/change"     method="processMetadataChange"     actions="edit"/>
+  </group>
  
-  <method request="/getentries"        method="processGetEntries" />
 
-  <method request="/getmap"            method="processMap"       cancache="false"/>
-  <method  request="/message"      method="processMessage"    cancache="false" />
-  <method request="/dummy"      method="processDummy"/>
+  <api  handler="actionmanager" request="/status"      method="processStatus"    cancache="false" />
 
-  <method  handler="actionmanager" request="/status"      method="processStatus"    cancache="false" />
-
-
-
-  <!-- Note: the admin property below gets applied to all following methods  that do not have the admin attribute -->
-  <property name="admin" value="true"/>
   <property name="cancache" value="false"/>
 
+  <group handler="usermanager">
+      <api request="/user/login"    method="processLogin"    admin="false"/>
+      <api request="/user/logout"   method="processLogout"   admin="false"/>
+      <api request="/user/home"     method="processHome"     admin="false"/>
+      <api request="/user/settings" method="processSettings" admin="false"/>
+      <api request="/user/cart"     method="processCart"     admin="false"/>
+      <api request="/user/list"     method="adminUserList"   admin="true"/>
+      <api request="/user/edit"     method="adminUserEdit"   admin="true"/>
+      <api request="/user/new"      method="adminUserNew"    admin="true"/>
+  </group>
 
+  <group handler="admin">
+      <api request="/admin/sql"          method="adminSql"           admin="true"/>
+      <api request="/admin/startstop"    method="adminDbStartStop"   admin="true"/>
+      <api request="/admin/settings"     method="adminSettings"      admin="true" name="Admin" toplevel="true"/>
+      <api request="/admin/settings/do"  method="adminSettingsDo"    admin="true"/>
+      <api request="/admin/tables"       method="adminDbTables"      admin="true"/>
+      <api request="/admin/dumpdb"       method="adminDbDump"        admin="true"/>
+      <api request="/admin/actions"      method="adminActions"       admin="true"/>
+      <api request="/admin/stats"        method="adminStats"         admin="true"/>
+      <api request="/admin/cleanup"      method="adminCleanup"       admin="true"/>
+      <api request="/admin/scan"         method="adminScanForBadParents" admin="true"/>
+  </group>
 
-  <method handler="usermanager"   request="/user/login"    method="processLogin" admin="false"/>
-  <method handler="usermanager"   request="/user/logout"   method="processLogout" admin="false"/>
-  <method handler="usermanager"   request="/user/home"     method="processHome" admin="false"/>
-  <method handler="usermanager"   request="/user/settings" method="processSettings" admin="false"/>
-  <method handler="usermanager"   request="/user/cart"     method="processCart" admin="false"/>
-  <method handler="usermanager"   request="/user/list"     method="adminUserList" />
-  <method handler="usermanager"   request="/user/edit"     method="adminUserEdit" />
-  <method handler="usermanager"   request="/user/new"      method="adminUserNew"/>
-
-
-
-
-
-  <method handler="admin"  request="/admin/sql"          method="adminSql"       />
-  <method handler="admin"  request="/admin/startstop"    method="adminDbStartStop" />
-  <method handler="admin"  request="/admin/settings"    method="adminSettings"   name="Admin" toplevel="true"/>
-  <method handler="admin"  request="/admin/settings/do"    method="adminSettingsDo"/>
-  <method handler="admin"  request="/admin/tables"       method="adminDbTables"  />
-  <method handler="admin"  request="/admin/dumpdb"       method="adminDbDump"  />
-  <method handler="admin"  request="/admin/actions"       method="adminActions"  />
-  <method handler="admin"  request="/admin/stats"        method="adminStats"     />
-  <method handler="admin"  request="/admin/cleanup"        method="adminCleanup" />
-  <method handler="admin"  request="/admin/scan"           method="adminScan" />
-
-
-
-  <method handler="harvestermanager" request="/processfile"    method="processFile"        cancache="false"/>
-  <method handler="harvestermanager"  request="/harvesters/list"   method="processList"/>
-  <method  handler="harvestermanager"  request="/harvesters/importcatalog"       method="processImportCatalog"  />
-
-  <method  handler="harvestermanager"  request="/harvesters/new"       method="processNew"  />
-  <method  handler="harvestermanager"  request="/harvesters/edit"       method="processEdit"  />
-
+  <group handler="harvestermanager">
+      <api request="/harvester/processfile"    method="processFile"           admin="true" cancache="false"/>
+      <api request="/harvester/list"           method="processList"           admin="true" />
+      <api request="/harvester/importcatalog"  method="processImportCatalog"  admin="true" />
+      <api request="/harvester/new"            method="processNew"            admin="true" />
+      <api request="/harvester/edit"           method="processEdit"           admin="true" />
+  </group>
 </api>
