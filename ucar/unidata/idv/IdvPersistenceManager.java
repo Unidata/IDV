@@ -2958,6 +2958,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                           IOUtil.getFileRoot(xmlFile));
         }
 
+        if(getIdv().getArgsManager().getIsOffScreen()) {
+            System.err.println ("loading bundle");
+        }
         getStateManager().putProperty(PROP_LOADINGXML, true);
         try {
             xml = applyPropertiesToBundle(xml);
@@ -3007,6 +3010,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         if ( !fromCollab) {
             showNormalCursor();
         }
+
+        if(getIdv().getArgsManager().getIsOffScreen()) {
+            System.err.println ("done loading bundle");
+        }
+
         getStateManager().putProperty(PROP_BUNDLEPATH, "");
         getStateManager().putProperty(PROP_ZIDVPATH, "");
         getStateManager().putProperty(PROP_LOADINGXML, false);
@@ -3373,6 +3381,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             if (newViewManagers != null) {
                 //This just does basic initialization
+                if(getIdv().getArgsManager().getIsOffScreen()) {
+                    System.err.println ("unpersisting viewmanagers");
+                }
                 getVMManager().unpersistViewManagers(newViewManagers);
                 for (ViewManager viewManager: (List<ViewManager>)newViewManagers) {
                     //                    System.err.println ("vm:"+viewManager);
@@ -3474,6 +3485,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             if (loadDialog.okToRun()) {
                 if (newControls != null) {
+                if(getIdv().getArgsManager().getIsOffScreen()) {
+                    System.err.println ("initializing displays");
+                }
                     //Here we might want to first collect the displaycontrols
                     //that need to have data bound to them (i.e., those that
                     //were saved without data). Then popup one gui.
@@ -3522,6 +3536,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         } finally {
             getVMManager().setDisplayMastersActive();
         }
+
         loadDialog.setMessage("Activating displays");
         Trace.msg("Decode.end");
 

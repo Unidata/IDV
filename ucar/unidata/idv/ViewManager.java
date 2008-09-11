@@ -1466,6 +1466,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         if (that.initMatrix != null) {
+            if(getIdv().getArgsManager().getIsOffScreen()) {
+                StringBuffer sb  = new StringBuffer();
+                for(int i=0;i<that.initMatrix.length;i++) {
+                    sb.append(that.initMatrix[i]+" ");
+                }
+                System.err.println("Setting view matrix:" + sb);
+            }
             setDisplayMatrix(that.initMatrix);
         }
 
@@ -1489,6 +1496,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
         }
     }
+
+
 
     /**
      * This gets called when the initial guis (windows, etc) have been created and shown
@@ -2063,6 +2072,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                       true));
 
     }
+
 
 
     /**
@@ -5790,6 +5800,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         double[] displayMatrix = getProjectionControl().getMatrix();
         if (displayMatrix.length != newMatrix.length) {
             initMatrix = ProjectionControl.matrixDConvert(newMatrix);
+        }
+        if(getIdv().getArgsManager().getIsOffScreen()) {
+            System.err.println("Setting projection matrix");
         }
         getMaster().setProjectionMatrix(initMatrix);
     }
