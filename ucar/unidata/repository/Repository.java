@@ -7509,39 +7509,46 @@ public class Repository extends RepositoryBase implements Tables,
      */
     private List<String[]> getDescendents(Request request,
                                           List<Entry> entries,
-                                          Connection connection)
+                                          Connection connection, boolean firstCall)
             throws Exception {
-
         List<String[]> children = new ArrayList();
-        List<Entry> groupChildren = new ArrayList();
         for (Entry entry : entries) {
+            if(firstCall) {
+                children.add(new String[] { entry.getId(),
+                                            entry.getTypeHandler().getType(),
+                                            entry.getResource().getPath(),
+                                            entry.getResource().getType() });
+            }
+            if(!entry.isGroup()) {
+                continue;
+            }
             Statement stmt = SqlUtil.select(connection,
                                             SqlUtil.comma(new String[] {
                                                 COL_ENTRIES_ID,
-                    COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
-                    COL_ENTRIES_RESOURCE_TYPE }), Misc.newList(
-                        TABLE_ENTRIES), Clause.like(
-                        COL_ENTRIES_PARENT_GROUP_ID, entry.getId() + "%"));
-
+                                                COL_ENTRIES_TYPE, 
+                                                COL_ENTRIES_RESOURCE,
+                                                COL_ENTRIES_RESOURCE_TYPE }),
+                                            Misc.newList(TABLE_ENTRIES), 
+                                            Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, entry.getId()));
+            
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     int col = 1;
-                    String type = results.getString(2);
-                    if(type.equals(TYPE_GROUP)) {
-                        //                        groupChildren.add(
+                    String childId = results.getString(col++);
+                    String childType = results.getString(col++);
+                    String resource =  results.getString(col++);
+                    String resourceType =  results.getString(col++);
+                    children.add(new String[] { childId,
+                                                childType,
+                                                resource,
+                                                resourceType});
+                    if(childType.equals(TYPE_GROUP)) {
+                        children.addAll(getDescendents(request, (List<Entry>)Misc.newList(findGroup(request, childId)),connection,false));
                     }
-                    children.add(new String[] { results.getString(col++),
-                                                type,
-                            results.getString(col++),
-                            results.getString(col++) });
                 }
             }
-            children.add(new String[] { entry.getId(),
-                                        entry.getTypeHandler().getType(),
-                                        entry.getResource().getPath(),
-                                        entry.getResource().getType() });
         }
         return children;
     }
@@ -7600,7 +7607,7 @@ public class Repository extends RepositoryBase implements Tables,
                                     Connection connection, Object actionId)
             throws Exception {
 
-        List<String[]> found = getDescendents(request, entries, connection);
+        List<String[]> found = getDescendents(request, entries, connection,true);
         String         query;
         query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
                                    SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID, "?"));
@@ -7631,13 +7638,12 @@ public class Repository extends RepositoryBase implements Tables,
 
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
-
         int       deleteCnt = 0;
-
-        for (int i = 0; i < found.size(); i++) {
+        //Go backwards so we go up the tree and hit the children first
+        for (int i =  found.size()-1; i>=0;i--) {
             String[] tuple = found.get(i);
             String   id    = tuple[0];
-
+            //            System.err.println ("id:" + id + " type:" + tuple[1] +" resource:" +tuple[2]);
             deleteCnt++;
             if ((actionId != null)
                     && !getActionManager().getActionOk(actionId)) {
