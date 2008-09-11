@@ -127,7 +127,6 @@ import javax.swing.*;
 public class GeoGridDataSource extends GridDataSource {
 
 
-
     /** The prefix we hack onto the u and v  variables */
     private static final String PREFIX_GRIDRELATIVE = "GridRelative_";
 
@@ -806,8 +805,18 @@ public class GeoGridDataSource extends GridDataSource {
             setNewFiles(newFiles);
         }
         return newFiles;
-
     }
+
+    /**
+     *  Overwrite setNewFiles so we clear out the resolverurl
+     *
+     * @param files The list of new files to use
+     */
+    public void setNewFiles(List files) {
+        getProperties().remove(PROP_RESOLVERURL);
+        super.setNewFiles(files);
+    }
+
 
     /**
      * Get the local directory

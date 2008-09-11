@@ -131,6 +131,9 @@ public abstract class GridDataSource extends FilesDataSource {
         threeDCategories = DataCategory.parseCategories("3D grid;GRID-3D;");
     }
 
+
+
+
     /**
      * Get the 2D data categories
      * @return   list of categories
