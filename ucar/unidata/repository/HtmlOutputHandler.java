@@ -957,10 +957,11 @@ public class HtmlOutputHandler extends OutputHandler {
         tmp = StringUtil.replace(tmp, "%labels%",
                                  StringUtil.join(",", labels));
         tmp = StringUtil.replace(tmp, "%ids%", StringUtil.join(",", ids));
-        tmp = StringUtil.replace(tmp, "%loadurl%",
-                                 request.url(getRepository().URL_ENTRY_GETENTRIES,
-                                             ARG_IDS, "%ids%", ARG_OUTPUT,
-                                             OUTPUT_HTML));
+        tmp = StringUtil.replace(
+            tmp, "%loadurl%",
+            request.url(
+                getRepository().URL_ENTRY_GETENTRIES, ARG_IDS, "%ids%",
+                ARG_OUTPUT, OUTPUT_HTML));
         return tmp;
 
     }

@@ -62,16 +62,18 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_FORM = new RequestUrl(this,
-                                                       "/search/form",
-                                                       "Advanced Search");
+                                                  "/search/form",
+                                                  "Advanced Search");
 
     /** _more_ */
-    public final RequestUrl URL_SEARCH_TEXTFORM =
-        new RequestUrl(this, "/search/textform", "Text Search");
+    public final RequestUrl URL_SEARCH_TEXTFORM = new RequestUrl(this,
+                                                      "/search/textform",
+                                                      "Text Search");
 
     /** _more_ */
-    public final RequestUrl URL_SEARCH_BROWSE =
-        new RequestUrl(this, "/search/browse", "Browse");
+    public final RequestUrl URL_SEARCH_BROWSE = new RequestUrl(this,
+                                                    "/search/browse",
+                                                    "Browse");
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
@@ -167,7 +169,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_GETENTRIES = new RequestUrl(this,
-                                                 "/entry/getentries");
+                                                       "/entry/getentries");
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_GET = new RequestUrl(this,

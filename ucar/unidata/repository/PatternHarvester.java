@@ -330,7 +330,9 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.checkbox(ATTR_MOVETOSTORAGE,
                                          "true", moveToStorage)));
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Add Metadata"),HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", getAddMetadata())));
+        sb.append(HtmlUtil.formEntry(msgLabel("Add Metadata"),
+                                     HtmlUtil.checkbox(ATTR_ADDMETADATA,
+                                         "true", getAddMetadata())));
 
     }
 
@@ -561,8 +563,8 @@ public class PatternHarvester extends Harvester {
                     entries = new ArrayList();
                 }
                 if (needToAdd.size() > 1000) {
-                    if(getAddMetadata()) {
-                        getRepository().addInitialMetadata(null,needToAdd);
+                    if (getAddMetadata()) {
+                        getRepository().addInitialMetadata(null, needToAdd);
                     }
                     repository.insertEntries(needToAdd, true, true);
                     needToAdd = new ArrayList<Entry>();
@@ -577,8 +579,8 @@ public class PatternHarvester extends Harvester {
 
         needToAdd.addAll(repository.getUniqueEntries(entries));
         if (needToAdd.size() > 0) {
-            if(getAddMetadata()) {
-                getRepository().addInitialMetadata(null,needToAdd);
+            if (getAddMetadata()) {
+                getRepository().addInitialMetadata(null, needToAdd);
             }
             repository.insertEntries(needToAdd, true, true);
         }

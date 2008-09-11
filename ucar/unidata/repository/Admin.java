@@ -671,12 +671,9 @@ public class Admin extends RepositoryManager {
                                             getProperty(PROP_HTML_FOOTER,
                                                 ""), 5, 40)));
 
-        sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"),
-                                        "<table><tr valign=top><td>" +
-                                        HtmlUtil.textArea(PROP_GOOGLEAPIKEYS,
-                                            getProperty(PROP_GOOGLEAPIKEYS,
-                                                        ""), 5, 80) +
-                                        "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
+                + HtmlUtil.textArea(PROP_GOOGLEAPIKEYS, getProperty(PROP_GOOGLEAPIKEYS, ""), 5, 80)
+                + "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
 
 
         sb.append(tableSubHeader(msg("Access")));
@@ -984,34 +981,48 @@ public class Admin extends RepositoryManager {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminScanForBadParents(Request request) throws Exception {
-        boolean delete = request.get("delete", false);
-        StringBuffer sb = new StringBuffer();
-        Statement stmt = getDatabaseManager().execute("select " +Tables.COL_ENTRIES_ID+"," + Tables.COL_ENTRIES_PARENT_GROUP_ID+" from " + Tables.TABLE_ENTRIES, 10000000,
-                                 0);
+        boolean      delete = request.get("delete", false);
+        StringBuffer sb     = new StringBuffer();
+        Statement stmt = getDatabaseManager().execute("select "
+                             + Tables.COL_ENTRIES_ID + ","
+                             + Tables.COL_ENTRIES_PARENT_GROUP_ID + " from "
+                             + Tables.TABLE_ENTRIES, 10000000, 0);
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
-        int cnt = 0;
-        List<Entry> badEntries = new ArrayList<Entry>();
+        int              cnt        = 0;
+        List<Entry>      badEntries = new ArrayList<Entry>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                String id =  results.getString(1);
-                String parentId =  results.getString(2);
+                String id       = results.getString(1);
+                String parentId = results.getString(2);
                 cnt++;
-                if(parentId!=null) {
-                    Group group = getRepository().findGroup(request, parentId);
-                    if(group==null ) {
+                if (parentId != null) {
+                    Group group = getRepository().findGroup(request,
+                                      parentId);
+                    if (group == null) {
                         Entry entry = getRepository().getEntry(request, id);
-                        sb.append("bad parent:" + entry.getName() + " parent id=" + parentId +"<br>");
+                        sb.append("bad parent:" + entry.getName()
+                                  + " parent id=" + parentId + "<br>");
                         badEntries.add(entry);
                     }
                 }
             }
         }
-        sb.append("Scanned " + cnt +" entries");
-        if(delete) {
+        sb.append("Scanned " + cnt + " entries");
+        if (delete) {
             getRepository().deleteEntries(request, badEntries, null);
-            return makeResult(request, msg("Scan"), new StringBuffer("Deleted"));
+            return makeResult(request, msg("Scan"),
+                              new StringBuffer("Deleted"));
         }
         return makeResult(request, msg("Scan"), sb);
     }

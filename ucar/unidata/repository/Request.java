@@ -292,6 +292,13 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     *
+     * @return _more_
+     */
     public String formPost(RequestUrl theUrl) {
         return HtmlUtil.formPost(url(theUrl));
     }
@@ -560,7 +567,8 @@ public class Request implements Constants {
             }
             try {
                 svalue = java.net.URLEncoder.encode(svalue, "UTF-8");
-            } catch(Exception exc) {/*noop*/}
+            } catch (Exception exc) { /*noop*/
+            }
             sb.append(arg + "=" + svalue);
         }
         return sb.toString();
@@ -1282,10 +1290,11 @@ public class Request implements Constants {
      */
     public String toString() {
         String args = getUrlArgs();
-        if(args.trim().length()>0) 
-            return type + " url args:" + args; 
-        else
+        if (args.trim().length() > 0) {
+            return type + " url args:" + args;
+        } else {
             return type;
+        }
     }
 
     /** _more_ */

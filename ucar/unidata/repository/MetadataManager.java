@@ -114,8 +114,8 @@ public class MetadataManager extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_METADATA_LIST = new RequestUrl(getRepository(),
-                                               "/metadata/list",
-                                               "Metadata Listing");
+                                              "/metadata/list",
+                                              "Metadata Listing");
 
     /** _more_ */
     public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(getRepository(),

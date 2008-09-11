@@ -80,12 +80,13 @@ import java.util.regex.*;
  */
 public class WebHarvester extends Harvester {
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_URLS = "urls";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_URLS = "urls";
 
+    /** _more_          */
     public static final String TAG_URLENTRY = "urlentry";
 
 
@@ -93,14 +94,14 @@ public class WebHarvester extends Harvester {
     private List<String> patternNames = new ArrayList<String>();
 
 
-    /** _more_          */
+    /** _more_ */
     private List<HarvesterEntry> urlEntries = new ArrayList<HarvesterEntry>();
 
     /** _more_ */
     User user;
 
 
-    /** _more_          */
+    /** _more_ */
     List<String> statusMessages = new ArrayList<String>();
 
     /** _more_ */
@@ -149,8 +150,7 @@ public class WebHarvester extends Harvester {
         super.init(element);
         rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR, ""));
 
-        List            children   = XmlUtil.findChildren(element,
-                                         TAG_URLENTRY);
+        List children = XmlUtil.findChildren(element, TAG_URLENTRY);
         urlEntries = new ArrayList<HarvesterEntry>();
         for (int i = 0; i < children.size(); i++) {
             Element node = (Element) children.get(i);
@@ -182,14 +182,14 @@ public class WebHarvester extends Harvester {
      */
     public void applyState(Element element) throws Exception {
         super.applyState(element);
-        for(HarvesterEntry urlEntry: urlEntries) {
-            Element node =     XmlUtil.create(element.getOwnerDocument(), TAG_URLENTRY, element,
-                                              new String[]{
-                                                  ATTR_URL, urlEntry.url,
-                                                  ATTR_NAME, urlEntry.name,
-                                                  ATTR_DESCRIPTION, urlEntry.description,
-                                                  ATTR_GROUP, urlEntry.group
-                                              });
+        for (HarvesterEntry urlEntry : urlEntries) {
+            Element node = XmlUtil.create(element.getOwnerDocument(),
+                                          TAG_URLENTRY, element,
+                                          new String[] {
+                ATTR_URL, urlEntry.url, ATTR_NAME, urlEntry.name,
+                ATTR_DESCRIPTION, urlEntry.description, ATTR_GROUP,
+                urlEntry.group
+            });
         }
 
     }
@@ -205,24 +205,26 @@ public class WebHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
-        StringBuffer sb = new StringBuffer();
-        int cnt=1;
+        StringBuffer sb  = new StringBuffer();
+        int          cnt = 1;
         urlEntries = new ArrayList<HarvesterEntry>();
-        while(true) {
-            if(!request.exists(ATTR_URL+cnt)) {
+        while (true) {
+            if ( !request.exists(ATTR_URL + cnt)) {
                 break;
             }
-            if(!request.defined(ATTR_URL+cnt)) {
+            if ( !request.defined(ATTR_URL + cnt)) {
                 cnt++;
                 continue;
             }
-            String group = request.getUnsafeString(ATTR_GROUP+cnt,"");
-            group = group.replace(" > ","/");
-            group = group.replace(">","/");
-            urlEntries.add(new HarvesterEntry(request.getUnsafeString(ATTR_URL+cnt,""),
-                                        request.getUnsafeString(ATTR_NAME+cnt,""),
-                                        request.getUnsafeString(ATTR_DESCRIPTION+cnt,""),
-                                        group));
+            String group = request.getUnsafeString(ATTR_GROUP + cnt, "");
+            group = group.replace(" > ", "/");
+            group = group.replace(">", "/");
+            urlEntries.add(
+                new HarvesterEntry(
+                    request.getUnsafeString(ATTR_URL + cnt, ""),
+                    request.getUnsafeString(ATTR_NAME + cnt, ""),
+                    request.getUnsafeString(ATTR_DESCRIPTION + cnt, ""),
+                    group));
             cnt++;
         }
 
@@ -242,38 +244,61 @@ public class WebHarvester extends Harvester {
             throws Exception {
         super.createEditForm(request, sb);
         sb.append(
-            RepositoryManager.tableSubHeader("Enter urls and the groups to add them to."));
+            RepositoryManager.tableSubHeader(
+                "Enter urls and the groups to add them to."));
 
 
         int cnt = 1;
-        String templateHelp ="Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
-        for(HarvesterEntry urlEntry: urlEntries) {
-            sb.append(
-                      RepositoryManager.tableSubHeader("URL #" + cnt));
+        String templateHelp =
+            "Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
+        for (HarvesterEntry urlEntry : urlEntries) {
+            sb.append(RepositoryManager.tableSubHeader("URL #" + cnt));
             sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
-                                         HtmlUtil.input(ATTR_URL+cnt, urlEntry.url, HtmlUtil.SIZE_90)));
+                                         HtmlUtil.input(ATTR_URL + cnt,
+                                             urlEntry.url,
+                                             HtmlUtil.SIZE_90)));
             sb.append(
-                      RepositoryManager.tableSubHeader("Then create an entry with"));
-            sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                         HtmlUtil.input(ATTR_NAME+cnt, urlEntry.name, HtmlUtil.SIZE_90+ HtmlUtil.title(templateHelp))));
-            sb.append(HtmlUtil.formEntry(msgLabel("Description"),
-                                         HtmlUtil.input(ATTR_DESCRIPTION+cnt, urlEntry.description, HtmlUtil.SIZE_90+ HtmlUtil.title(templateHelp))));
-            sb.append(HtmlUtil.formEntry(msgLabel("Group"),
-                                         HtmlUtil.input(ATTR_GROUP+cnt, urlEntry.group, HtmlUtil.SIZE_90+ HtmlUtil.title(templateHelp))));
+                RepositoryManager.tableSubHeader(
+                    "Then create an entry with"));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Name"),
+                    HtmlUtil.input(
+                        ATTR_NAME + cnt, urlEntry.name,
+                        HtmlUtil.SIZE_90 + HtmlUtil.title(templateHelp))));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Description"),
+                    HtmlUtil.input(
+                        ATTR_DESCRIPTION + cnt, urlEntry.description,
+                        HtmlUtil.SIZE_90 + HtmlUtil.title(templateHelp))));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Group"),
+                    HtmlUtil.input(
+                        ATTR_GROUP + cnt, urlEntry.group,
+                        HtmlUtil.SIZE_90 + HtmlUtil.title(templateHelp))));
             cnt++;
         }
-        sb.append(
-                  RepositoryManager.tableSubHeader("URL #" + cnt));
+        sb.append(RepositoryManager.tableSubHeader("URL #" + cnt));
         sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
-                                     HtmlUtil.input(ATTR_URL+cnt, "", HtmlUtil.SIZE_90)));
+                                     HtmlUtil.input(ATTR_URL + cnt, "",
+                                         HtmlUtil.SIZE_90)));
         sb.append(
-                  RepositoryManager.tableSubHeader("Then create an entry with"));
+            RepositoryManager.tableSubHeader("Then create an entry with"));
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                     HtmlUtil.input(ATTR_NAME+cnt, "", HtmlUtil.SIZE_90+ HtmlUtil.title(templateHelp))));
+                                     HtmlUtil.input(ATTR_NAME + cnt, "",
+                                         HtmlUtil.SIZE_90
+                                         + HtmlUtil.title(templateHelp))));
         sb.append(HtmlUtil.formEntry(msgLabel("Description"),
-                                     HtmlUtil.input(ATTR_DESCRIPTION+cnt, "", HtmlUtil.SIZE_90+ HtmlUtil.title(templateHelp))));
+                                     HtmlUtil.input(ATTR_DESCRIPTION + cnt,
+                                         "",
+                                         HtmlUtil.SIZE_90
+                                         + HtmlUtil.title(templateHelp))));
         sb.append(HtmlUtil.formEntry(msgLabel("Group"),
-                                     HtmlUtil.input(ATTR_GROUP+cnt, "", HtmlUtil.SIZE_90+ HtmlUtil.title(templateHelp))));
+                                     HtmlUtil.input(ATTR_GROUP + cnt, "",
+                                         HtmlUtil.SIZE_90
+                                         + HtmlUtil.title(templateHelp))));
     }
 
 
@@ -293,7 +318,9 @@ public class WebHarvester extends Harvester {
         }
 
         String messages = StringUtil.join("", statusMessages);
-        return status.toString() + getRepository().makeShowHideBlock(null, "Entries", new StringBuffer(messages), false);
+        return status.toString()
+               + getRepository().makeShowHideBlock(null, "Entries",
+                   new StringBuffer(messages), false);
     }
 
 
@@ -342,18 +369,19 @@ public class WebHarvester extends Harvester {
      */
     public void collectEntries(boolean firstTime) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        for(HarvesterEntry urlEntry: urlEntries) {
+        for (HarvesterEntry urlEntry : urlEntries) {
             if ( !getActive()) {
                 return;
             }
-            Entry entry = processUrl(urlEntry.url,urlEntry.name,urlEntry.description,urlEntry.group);
+            Entry entry = processUrl(urlEntry.url, urlEntry.name,
+                                     urlEntry.description, urlEntry.group);
             if (entry != null) {
                 entries.add(entry);
                 if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
                 }
-                String crumbs =repository.getBreadCrumbs(null, entry,
-                                                         true, "", null)[1];
+                String crumbs = repository.getBreadCrumbs(null, entry, true,
+                                    "", null)[1];
                 crumbs = crumbs.replace("class=", "xclass=");
                 statusMessages.add(crumbs);
                 entryCnt++;
@@ -370,6 +398,9 @@ public class WebHarvester extends Harvester {
      * _more_
      *
      * @param f _more_
+     * @param name _more_
+     * @param desc _more_
+     * @param groupName _more_
      *
      * @param url _more_
      *
@@ -377,7 +408,9 @@ public class WebHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    private Entry processUrl(String url, String name,  String desc, String groupName) throws Exception {
+    private Entry processUrl(String url, String name, String desc,
+                             String groupName)
+            throws Exception {
         String fileName = url;
         String tail     = IOUtil.getFileTail(url);
         File   tmpFile  = getStorageManager().getTmpFile(null, tail);

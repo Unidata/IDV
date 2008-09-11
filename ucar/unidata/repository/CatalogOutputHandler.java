@@ -87,6 +87,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
+    /** _more_          */
     public static final String SERVICE_LATEST = "latest";
 
     /** _more_ */
@@ -342,10 +343,13 @@ public class CatalogOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        boolean justOneEntry  = group.isDummy() && entries.size()==1 && subGroups.size()==0;
+        boolean justOneEntry = group.isDummy() && (entries.size() == 1)
+                               && (subGroups.size() == 0);
 
 
-        String   title = (justOneEntry?entries.get(0).getName():group.getFullName());
+        String   title = (justOneEntry
+                          ? entries.get(0).getName()
+                          : group.getFullName());
         Document doc   = XmlUtil.makeDocument();
         Element  root  = XmlUtil.create(doc, TAG_CATALOG, null, new String[] {
             "xmlns",
@@ -360,47 +364,53 @@ public class CatalogOutputHandler extends OutputHandler {
             ATTR_BASE,""});*/
 
 
-        Hashtable serviceMap = new Hashtable();
+        Hashtable   serviceMap  = new Hashtable();
 
-        Element topDataset = null;
+        Element     topDataset  = null;
 
         CatalogInfo catalogInfo = new CatalogInfo(doc, root, serviceMap);
-        boolean doingLatest = request.get(ARG_LATESTOPENDAP, false);
-        if(doingLatest) {
+        boolean     doingLatest = request.get(ARG_LATESTOPENDAP, false);
+        if (doingLatest) {
             topDataset = root;
             boolean didone = false;
-            entries = getRepository().sortEntriesOnDate(entries,true);
-            for(Entry entry: entries) {
+            entries = getRepository().sortEntriesOnDate(entries, true);
+            for (Entry entry : entries) {
                 if (canDataLoad(request, entry)) {
                     outputEntry(entry, request, catalogInfo, root);
                     didone = true;
                     break;
                 }
             }
-        } else if(justOneEntry) {
+        } else if (justOneEntry) {
             outputEntry(entries.get(0), request, catalogInfo, root);
         } else {
             topDataset = XmlUtil.create(doc, TAG_DATASET, root,
                                         new String[] { ATTR_NAME,
-                                                       title });
+                    title });
             addMetadata(request, group, catalogInfo, topDataset);
-            toCatalogInner(request, group, subGroups, catalogInfo, topDataset);
+            toCatalogInner(request, group, subGroups, catalogInfo,
+                           topDataset);
             toCatalogInner(request, group, entries, catalogInfo, topDataset);
-            if (!group.isDummy() && catalogInfo.serviceMap.get(SERVICE_OPENDAP) != null) {
+            if ( !group.isDummy()
+                    && (catalogInfo.serviceMap.get(SERVICE_OPENDAP)
+                        != null)) {
                 String urlPath = HtmlUtil.url("/latest", ARG_ID,
-                                              group.getId(),ARG_LATESTOPENDAP,"true",ARG_OUTPUT,OUTPUT_CATALOG);
+                                     group.getId(), ARG_LATESTOPENDAP,
+                                     "true", ARG_OUTPUT, OUTPUT_CATALOG);
                 addService(catalogInfo, SERVICE_LATEST,
-                           getRepository().URL_ENTRY_SHOW.getFullUrl(), "Resolver");
+                           getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                           "Resolver");
 
                 Node firstChild = topDataset.getFirstChild();
-                Element latestDataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
-                                                       null, new String[] { ATTR_NAME,
-                                                                                  "Latest OpenDAP Data"});
+                Element latestDataset = XmlUtil.create(catalogInfo.doc,
+                                            TAG_DATASET, null,
+                                            new String[] { ATTR_NAME,
+                        "Latest OpenDAP Data" });
                 topDataset.insertBefore(latestDataset, firstChild);
                 Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
-                                                 latestDataset,
-                                                 new String[] { ATTR_SERVICENAME,
-                                                                SERVICE_LATEST, ATTR_URLPATH, urlPath });
+                                      latestDataset,
+                                      new String[] { ATTR_SERVICENAME,
+                        SERVICE_LATEST, ATTR_URLPATH, urlPath });
             }
         }
 
@@ -418,23 +428,39 @@ public class CatalogOutputHandler extends OutputHandler {
      * @param service _more_
      * @param base _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
     private boolean addService(CatalogInfo catalogInfo, String service,
-                            String base) 
+                               String base)
             throws Exception {
         return addService(catalogInfo, service, base, service);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param catalogInfo _more_
+     * @param service _more_
+     * @param base _more_
+     * @param type _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private boolean addService(CatalogInfo catalogInfo, String service,
-                            String base, String type)
+                               String base, String type)
             throws Exception {
         if (catalogInfo.serviceMap.get(service) != null) {
             return false;
         }
 
-        List attrs = Misc.toList(new String[] {ATTR_NAME, service, ATTR_SERVICETYPE, type, ATTR_BASE, base});
+        List attrs = Misc.toList(new String[] {
+            ATTR_NAME, service, ATTR_SERVICETYPE, type, ATTR_BASE, base
+        });
 
 
         Element serviceNode = XmlUtil.create(catalogInfo.doc, TAG_SERVICE,
@@ -445,7 +471,17 @@ public class CatalogOutputHandler extends OutputHandler {
     }
 
 
-    private boolean canDataLoad(Request request, Entry entry) 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean canDataLoad(Request request, Entry entry)
             throws Exception {
         return getDataOutputHandler().canLoad(entry);
     }
@@ -481,7 +517,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (entry.getTypeHandler().canDownload(request, entry)) {
-            String urlPath = HtmlUtil.url("/" + entry.getName(), ARG_ID,
+            String urlPath = HtmlUtil.url("/" + getStorageManager().getFileTail(entry), ARG_ID,
                                           entry.getId());
             addService(catalogInfo, SERVICE_HTTP,
                        getRepository().URL_ENTRY_GET.getFullUrl());
@@ -593,6 +629,7 @@ public class CatalogOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param parentGroup _more_
      * @param entryList _more_
      * @param catalogInfo _more_
      * @param parent _more_
@@ -600,8 +637,9 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void toCatalogInner(Request request, Group parentGroup, List entryList,
-                                  CatalogInfo catalogInfo, Element parent)
+    protected void toCatalogInner(Request request, Group parentGroup,
+                                  List entryList, CatalogInfo catalogInfo,
+                                  Element parent)
             throws Exception {
 
         List<Entry> entries = new ArrayList();
@@ -658,7 +696,7 @@ public class CatalogOutputHandler extends OutputHandler {
             Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
                                              datasetNode,
                                              new String[] { ATTR_NAME,
-                                                            group.key.toString() });
+                    group.key.toString() });
 
             for (int j = 0; j < group.children.size(); j++) {
                 Object child = group.children.get(j);

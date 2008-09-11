@@ -85,11 +85,17 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_RCURVE = "/icons/brc.gif";
 
+    /** _more_          */
     public static final String ICON_MAP = "/icons/map.gif";
 
 
+    /** _more_          */
     public static final String ICON_CSV = "/icons/xls.png";
+
+    /** _more_          */
     public static final String ICON_KML = "/icons/kml.png";
+
+    /** _more_          */
     public static final String ICON_OPENDAP = "/icons/opendap.gif";
 
     /** _more_ */
@@ -98,7 +104,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CLOUD = "/icons/cloud.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_LIST = "/icons/list.gif";
 
     /** _more_ */
@@ -174,6 +180,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_DATA = "/icons/data.gif";
 
+    /** _more_          */
     public static final String ICON_SUBSET = "/icons/subset.gif";
 
     /** _more_ */
@@ -321,13 +328,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VARIABLE = "variable";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADDMETADATA = "addmetadata";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
     /** _more_ */
@@ -374,7 +381,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SUBJECT = "subject";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SUBMIT = "submit";
 
 
@@ -409,16 +416,16 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_AREA_SOUTH = ARG_AREA + "_south";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_AREA_NORTH = ARG_AREA + "_north";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_AREA_EAST = ARG_AREA + "_east";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_AREA_WEST = ARG_AREA + "_west";
 
 
@@ -630,23 +637,25 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LABEL = "label";
 
+    /** _more_          */
     public static final String ARG_LATEST = "latest";
 
+    /** _more_          */
     public static final String ARG_LATESTOPENDAP = "latestopendap";
 
     /** _more_ */
     public static final String ARG_LAYOUT = "layout";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MINLAT = "minlat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MINLON = "minlon";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MAXLAT = "maxlat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MAXLON = "maxlon";
 
 
@@ -685,6 +694,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
+    /** _more_          */
     public static final String PROP_GOOGLEAPIKEYS = "ramadda.googleapikeys";
 
     /** _more_ */

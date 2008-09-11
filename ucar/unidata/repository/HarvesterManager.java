@@ -77,7 +77,7 @@ public class HarvesterManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_HARVESTER_ID = "harvester.id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_HARVESTER_CLASS = "harvester.class";
 
     /** _more_ */
@@ -403,9 +403,10 @@ public class HarvesterManager extends RepositoryManager {
 
         int cnt = 0;
         for (Harvester harvester : harvesters) {
-            String removeLink = HtmlUtil.href(request.url(URL_HARVESTERS_LIST,
-                                ARG_ACTION, ACTION_REMOVE, ARG_HARVESTER_ID,
-                                harvester.getId()), msg("Remove"));
+            String removeLink =
+                HtmlUtil.href(request.url(URL_HARVESTERS_LIST, ARG_ACTION,
+                                          ACTION_REMOVE, ARG_HARVESTER_ID,
+                                          harvester.getId()), msg("Remove"));
             if (harvester.getIsEditable()) {
                 removeLink = "";
             }

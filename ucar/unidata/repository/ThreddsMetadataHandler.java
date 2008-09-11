@@ -169,7 +169,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         new Metadata.Type("thredds.cdl", "CDL", "CDL");
 
 
-    public static final String NCATTR_STANDARD_NAME ="standard_name";
+    /** _more_          */
+    public static final String NCATTR_STANDARD_NAME = "standard_name";
 
 
     /**
@@ -312,19 +313,19 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MINLAT = "geospatial_lat_min";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MAXLAT = "geospatial_lat_max";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MINLON = "geospatial_lon_min";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MAXLON = "geospatial_lon_max";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_KEYWORDS = "keywords";
 
 
@@ -427,10 +428,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
                 String varName = var.getShortName();
-                ucar.nc2.Attribute att =var.findAttribute(NCATTR_STANDARD_NAME);
-                if(att!=null) {
-                    varName = att.getStringValue() ;
-                } 
+                ucar.nc2.Attribute att =
+                    var.findAttribute(NCATTR_STANDARD_NAME);
+                if (att != null) {
+                    varName = att.getStringValue();
+                }
 
 
 

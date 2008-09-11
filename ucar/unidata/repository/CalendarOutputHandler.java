@@ -188,7 +188,7 @@ public class CalendarOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private Result outputDateGrid(Request request, Group group,
-                              List<Entry> entries, StringBuffer sb)
+                                  List<Entry> entries, StringBuffer sb)
             throws Exception {
         String           title    = group.getFullName();
         List             types    = new ArrayList();
@@ -370,7 +370,7 @@ public class CalendarOutputHandler extends OutputHandler {
 
         boolean doDay = request.defined(ARG_DAY);
 
-        int[] prev  = (doDay
+        int[]   prev  = (doDay
                          ? getDayMonthYear(add(getCalendar(selected),
                              Calendar.DAY_OF_MONTH, -1))
                          : getDayMonthYear(add(getCalendar(selected),
@@ -415,10 +415,11 @@ public class CalendarOutputHandler extends OutputHandler {
                         continue;
                     }
                 } else {
-                    if (!(entryDay[IDX_YEAR] == selected[IDX_YEAR] 
-                          && entryDay[IDX_MONTH] == selected[IDX_MONTH])) {
+                    if ( !((entryDay[IDX_YEAR] == selected[IDX_YEAR])
+                            && (entryDay[IDX_MONTH]
+                                == selected[IDX_MONTH]))) {
                         continue;
-                    } 
+                    }
                 }
 
                 String key = entryDay[IDX_YEAR] + "/" + entryDay[IDX_MONTH]
@@ -434,7 +435,8 @@ public class CalendarOutputHandler extends OutputHandler {
                     if (label.length() > 20) {
                         label = label.substring(0, 19) + "...";
                     }
-                    dayList.add(HtmlUtil.nobr(getAjaxLink(request, entry, label, true)));
+                    dayList.add(HtmlUtil.nobr(getAjaxLink(request, entry,
+                            label, true)));
                 }
                 didone = true;
             }

@@ -32,8 +32,15 @@ import opendap.servlet.GuardedDataset;
 import opendap.servlet.ReqState;
 
 import org.w3c.dom.*;
+import org.w3c.dom.Element;
 
 import thredds.server.opendap.GuardedDatasetImpl;
+
+
+
+import ucar.ma2.DataType;
+import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
 
 import ucar.nc2.Attribute;
 
@@ -47,12 +54,6 @@ import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.dataset.VariableEnhanced;
-
-
-
-import ucar.ma2.DataType;
-import ucar.ma2.StructureData;
-import ucar.ma2.StructureMembers;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
@@ -62,8 +63,6 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 import ucar.unidata.data.gis.KmlUtil;
-import org.w3c.dom.Element;
-import ucar.unidata.xml.XmlUtil;
 
 import ucar.unidata.geoloc.*;
 
@@ -73,6 +72,7 @@ import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
 
@@ -110,56 +110,60 @@ import javax.servlet.http.*;
  */
 public class DataOutputHandler extends OutputHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADDLATLON = "addlatlon";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADDTOREPOSITORY = "addtorepository";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SUBSETAREA = "subsetarea";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SUBSETTIME = "subsettime";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_HSTRIDE = "hstride";
 
     /** _more_ */
     public static final String OUTPUT_OPENDAP = "data.opendap";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_CDL = "data.cdl";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_WCS = "data.wcs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_POINT_MAP = "data.point.map";
 
+    /** _more_          */
     public static final String OUTPUT_POINT_CSV = "data.point.csv";
 
+    /** _more_          */
     public static final String OUTPUT_POINT_KML = "data.point.kml";
 
 
 
-    /** _more_          */
-    public static final String OUTPUT_GRIDSUBSET_FORM = "data.gridsubset.form";
+    /** _more_ */
+    public static final String OUTPUT_GRIDSUBSET_FORM =
+        "data.gridsubset.form";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_GRIDSUBSET = "data.gridsubset";
 
 
     /** _more_ */
     private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
-                                                                      Boolean>();
+                                                            Boolean>();
+
+    /** _more_ */
+    private Hashtable<String, Boolean> gridEntries = new Hashtable<String,
+                                                         Boolean>();
 
     /** _more_          */
-    private Hashtable<String, Boolean> gridEntries = new Hashtable<String,
-                                                                   Boolean>();
-
     private Hashtable<String, Boolean> pointEntries = new Hashtable<String,
-                                                                    Boolean>();
+                                                          Boolean>();
 
 
     /** _more_ */
@@ -167,7 +171,7 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     private Hashtable<String, NetcdfFile> cache = new Hashtable<String,
-                                                                NetcdfFile>();
+                                                      NetcdfFile>();
 
     /** _more_ */
     private List<String> cachedFiles = new ArrayList<String>();
@@ -182,7 +186,7 @@ public class DataOutputHandler extends OutputHandler {
      *     @throws Exception On badness
      */
     public DataOutputHandler(Repository repository, Element element)
-        throws Exception {
+            throws Exception {
         super(repository, element);
 
         //TODO: what other global configuration should be done?
@@ -210,12 +214,12 @@ public class DataOutputHandler extends OutputHandler {
      */
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_OPENDAP) || output.equals(OUTPUT_CDL)
-            || output.equals(OUTPUT_WCS)
-            || output.equals(OUTPUT_POINT_MAP)
-            || output.equals(OUTPUT_POINT_CSV)
-            || output.equals(OUTPUT_POINT_KML)
-            || output.equals(OUTPUT_GRIDSUBSET)
-            || output.equals(OUTPUT_GRIDSUBSET_FORM);
+               || output.equals(OUTPUT_WCS)
+               || output.equals(OUTPUT_POINT_MAP)
+               || output.equals(OUTPUT_POINT_CSV)
+               || output.equals(OUTPUT_POINT_KML)
+               || output.equals(OUTPUT_GRIDSUBSET)
+               || output.equals(OUTPUT_GRIDSUBSET_FORM);
     }
 
 
@@ -233,17 +237,19 @@ public class DataOutputHandler extends OutputHandler {
      */
     protected void addOutputTypes(Request request, State state,
                                   List<OutputType> types)
-        throws Exception {
+            throws Exception {
         if (state.entry == null) {
             return;
         }
-        if (canLoad(state.entry) &&         (request.getHttpServletRequest() == null)) {
+        if (canLoad(state.entry)
+                && (request.getHttpServletRequest() == null)) {
             types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
-                    public String assembleUrl(Request request) {
-                        return request.getRequestPath() + getSuffix() + "/"
-                            + request.getPathEmbeddedArgs() + "/"+ ARG_OUTPUT+":" + OUTPUT_OPENDAP+"/entry.das";
-                    }
-                });
+                public String assembleUrl(Request request) {
+                    return request.getRequestPath() + getSuffix() + "/"
+                           + request.getPathEmbeddedArgs() + "/" + ARG_OUTPUT
+                           + ":" + OUTPUT_OPENDAP + "/entry.das";
+                }
+            });
         }
     }
 
@@ -259,7 +265,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
-        throws Exception {
+            throws Exception {
         if ( !canLoad(entry)) {
             return;
         }
@@ -267,38 +273,44 @@ public class DataOutputHandler extends OutputHandler {
 
         if (canLoadAsPoint(entry)) {
             links.add(
-                      new Link(
-                               request.entryUrl(
-                                                getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                                                OUTPUT_POINT_MAP), getRepository().fileUrl(
-                                                                                           ICON_MAP), "Map Point Data"));
+                new Link(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                        OUTPUT_POINT_MAP), getRepository().fileUrl(ICON_MAP),
+                                           "Map Point Data"));
             links.add(
-                      new Link(
-                               HtmlUtil.url(
-                                            request.getRequestPath()+"/" +IOUtil.stripExtension(entry.getName())+".csv", Misc.newList(
-                                                                                                                                      ARG_ID, entry.getId(),
-                                                                                                                                      ARG_OUTPUT,
-                                                                                                                                      OUTPUT_POINT_CSV)), getRepository().fileUrl(
-                                                                                                                                                                                  ICON_CSV), "Point Data as CSV"));
+                new Link(
+                    HtmlUtil
+                        .url(request.getRequestPath() + "/"
+                             + IOUtil.stripExtension(entry.getName())
+                             + ".csv", Misc
+                                 .newList(
+                                     ARG_ID, entry.getId(), ARG_OUTPUT,
+                                     OUTPUT_POINT_CSV)), getRepository()
+                                         .fileUrl(
+                                             ICON_CSV), "Point Data as CSV"));
 
             links.add(
-                      new Link(
-                               HtmlUtil.url(
-                                            request.getRequestPath()+"/" +IOUtil.stripExtension(entry.getName())+".kml", Misc.newList(
-                                                                                                                                      ARG_ID, entry.getId(),
-                                                                                                                                      ARG_OUTPUT,
-                                                                                                                                      OUTPUT_POINT_KML)), getRepository().fileUrl(
-                                                                                                                                                                                  ICON_KML), "Point Data as KML"));
+                new Link(
+                    HtmlUtil
+                        .url(request.getRequestPath() + "/"
+                             + IOUtil.stripExtension(entry.getName())
+                             + ".kml", Misc
+                                 .newList(
+                                     ARG_ID, entry.getId(), ARG_OUTPUT,
+                                     OUTPUT_POINT_KML)), getRepository()
+                                         .fileUrl(
+                                             ICON_KML), "Point Data as KML"));
 
 
 
         } else if (canLoadAsGrid(entry)) {
             links.add(
-                      new Link(
-                               request.entryUrl(
-                                                getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                                                OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
-                                                                                                 ICON_SUBSET), "Subset"));
+                new Link(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                        OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
+                            ICON_SUBSET), "Subset"));
 
             /*
               links.add(
@@ -311,15 +323,17 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         String opendapUrl = request.getRequestPath() + "/"
-            + request.getPathEmbeddedArgs()  + "/" + ARG_OUTPUT+":" + OUTPUT_OPENDAP + "/entry.das";
+                            + request.getPathEmbeddedArgs() + "/"
+                            + ARG_OUTPUT + ":" + OUTPUT_OPENDAP
+                            + "/entry.das";
         links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
                            "OpenDAP"));
 
         links.add(
-                  new Link(
-                           request.entryUrl(
-                                            getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                                            OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
 
 
 
@@ -336,8 +350,8 @@ public class DataOutputHandler extends OutputHandler {
      */
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
-            + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID + ":"
-            + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+               + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID + ":"
+               + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
 
@@ -350,8 +364,8 @@ public class DataOutputHandler extends OutputHandler {
      */
     public String getFullTdsUrl(Entry entry) {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
-            + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID
-            + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+               + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID
+               + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
 
@@ -389,6 +403,13 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public boolean canLoadAsPoint(Entry entry) {
         Boolean b = pointEntries.get(entry.getId());
         if (b == null) {
@@ -399,9 +420,9 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    StringBuilder    buf     = new StringBuilder();
-                    File file = entry.getResource().getFile();
-                    if(getPointDataset(file)!=null) {
+                    StringBuilder buf  = new StringBuilder();
+                    File          file = entry.getResource().getFile();
+                    if (getPointDataset(file) != null) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -420,7 +441,9 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsGrid(Entry entry) {
-        if(!canLoad(entry)) return false;
+        if ( !canLoad(entry)) {
+            return false;
+        }
         Boolean b = gridEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -455,16 +478,16 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputCdl(final Request request, Entry entry)
-        throws Exception {
+            throws Exception {
 
 
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                         false, "");
+                              false, "");
         sb.append(crumbs[1]);
         if (request.get(ARG_ADDMETADATA, false)) {
             if (getRepository().getAccessManager().canDoAction(request,
-                                                               entry, Permission.ACTION_EDIT)) {
+                    entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
                 List<Entry> entries = (List<Entry>) Misc.newList(entry);
                 getRepository().addInitialMetadata(request, entries);
@@ -479,10 +502,10 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-        File file = entry.getResource().getFile();
+        File          file    = entry.getResource().getFile();
         NetcdfDataset dataset = NetcdfDataset.openDataset(file.toString());
         if (getRepository().getAccessManager().canDoAction(request, entry,
-                                                           Permission.ACTION_EDIT)) {
+                Permission.ACTION_EDIT)) {
             request.put(ARG_ADDMETADATA, "true");
             sb.append(HtmlUtil.href(request.getUrl(), "Add metadata"));
         }
@@ -509,13 +532,32 @@ public class DataOutputHandler extends OutputHandler {
         return new Result("", new StringBuffer("TBD"));
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public PointObsDataset getPointDataset(File file) throws Exception {
-        return (PointObsDataset)TypedDatasetFactory.open(
-                                                         ucar.nc2.constants.FeatureType.POINT, file.toString(), null, new StringBuilder());
+        return (PointObsDataset) TypedDatasetFactory.open(
+            ucar.nc2.constants.FeatureType.POINT, file.toString(), null,
+            new StringBuilder());
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public GridDataset getGridDataset(File file) throws Exception {
-        return  GridDataset.open(file.toString());
+        return GridDataset.open(file.toString());
     }
 
 
@@ -530,12 +572,12 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputGridSubset(Request request, Entry entry)
-        throws Exception {
+            throws Exception {
 
         boolean canAdd =
             (entry.getParentGroup() != null)
             && getRepository().getAccessManager().canDoAction(request,
-                                                              entry.getParentGroup(), Permission.ACTION_NEW);
+                entry.getParentGroup(), Permission.ACTION_NEW);
 
         File         file   = entry.getResource().getFile();
         StringBuffer sb     = new StringBuffer();
@@ -554,11 +596,11 @@ public class DataOutputHandler extends OutputHandler {
             LatLonRect llr = null;
             if (request.get(ARG_SUBSETAREA, false)) {
                 llr = new LatLonRect(
-                                     new LatLonPointImpl(
-                                                         request.get(ARG_AREA_NORTH, 90.0), request.get(
-                                                                                                        ARG_AREA_WEST, -180.0)), new LatLonPointImpl(
-                                                                                                                                                     request.get(ARG_AREA_SOUTH, 0.0), request.get(
-                                                                                                                                                                                                   ARG_AREA_EAST, 180.0)));
+                    new LatLonPointImpl(
+                        request.get(ARG_AREA_NORTH, 90.0), request.get(
+                            ARG_AREA_WEST, -180.0)), new LatLonPointImpl(
+                                request.get(ARG_AREA_SOUTH, 0.0), request.get(
+                                    ARG_AREA_EAST, 180.0)));
                 //                System.err.println("llr:" + llr);
             }
             int     hStride       = request.get(ARG_HSTRIDE, 1);
@@ -568,28 +610,28 @@ public class DataOutputHandler extends OutputHandler {
             Date[]  dates = new Date[] { request.get(ARG_SUBSETTIME, false)
                                          ? request.getDate(ARG_FROMDATE, null)
                                          : null, request.get(ARG_SUBSETTIME,
-                                                             false)
-                                         ? request.getDate(ARG_TODATE, null)
-                                         : null };
+                                             false)
+                    ? request.getDate(ARG_TODATE, null)
+                    : null };
             if ((dates[0] != null) && (dates[1] != null)
-                && (dates[0].getTime() > dates[1].getTime())) {
+                    && (dates[0].getTime() > dates[1].getTime())) {
                 sb.append(
-                          getRepository().warning("From date is after to date"));
+                    getRepository().warning("From date is after to date"));
             } else if (varNames.size() == 0) {
                 sb.append(getRepository().warning("No variables selected"));
             } else {
                 NetcdfCFWriter writer = new NetcdfCFWriter();
                 File f =
                     getRepository().getStorageManager().getTmpFile(request,
-                                                                   "subset.nc");
+                        "subset.nc");
                 GridDataset gds = getGridDataset(file);
-                synchronized(gds) {
+                synchronized (gds) {
                     writer.makeFile(f.toString(), gds, varNames, llr,
                                     ((dates[0] == null)
                                      ? null
                                      : new ucar.nc2.units.DateRange(dates[0],
-                                                                    dates[1])), includeLatLon, hStride, zStride,
-                                    timeStride);
+                                     dates[1])), includeLatLon, hStride,
+                                         zStride, timeStride);
                 }
 
                 if (request.get(ARG_ADDTOREPOSITORY, false)) {
@@ -599,30 +641,30 @@ public class DataOutputHandler extends OutputHandler {
                         Entry newEntry = (Entry) entry.clone();
                         File newFile =
                             getRepository().getStorageManager().moveToStorage(
-                                                                              request, f);
+                                request, f);
                         newEntry.setResource(new Resource(newFile,
-                                                          Resource.TYPE_STOREDFILE));
+                                Resource.TYPE_STOREDFILE));
                         newEntry.setId(getRepository().getGUID());
                         newEntry.setName("subset_" + newEntry.getName());
                         newEntry.clearMetadata();
                         newEntry.setUser(request.getUser());
                         newEntry.addAssociation(
-                                                new Association(
-                                                                getRepository().getGUID(), "", "subset from",
-                                                                entry.getId(), newEntry.getId()));
+                            new Association(
+                                getRepository().getGUID(), "", "subset from",
+                                entry.getId(), newEntry.getId()));
                         if (request.get(ARG_ADDMETADATA, false)) {
                             //                            System.err.println("adding metadata");
                             newEntry.clearArea();
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
                             getRepository().addInitialMetadata(request,
-                                                               entries);
+                                    entries);
                         }
                         getRepository().insertEntries(Misc.newList(newEntry),
-                                                      true);
+                                true);
                         return new Result(
-                                          request.entryUrl(
-                                                           getRepository().URL_ENTRY_FORM, newEntry));
+                            request.entryUrl(
+                                getRepository().URL_ENTRY_FORM, newEntry));
                     }
                 } else {
                     return new Result(entry.getName() + ".nc",
@@ -633,14 +675,14 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                         false, "");
+                              false, "");
 
         //        NetcdfDataset dataset =
         //            NetcdfDataset.openDataset(file.toString());
         sb.append(crumbs[1]);
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
         String fileName = IOUtil.stripExtension(entry.getName())
-            + "_subset.nc";
+                          + "_subset.nc";
 
         sb.append(HtmlUtil.form(formUrl + "/" + fileName));
         sb.append(HtmlUtil.br());
@@ -648,13 +690,13 @@ public class DataOutputHandler extends OutputHandler {
         String submitExtra = "";
         if (canAdd) {
             submitExtra = HtmlUtil.space(1)
-                + HtmlUtil.checkbox(
-                                    ARG_ADDTOREPOSITORY, "true",
-                                    request.get(ARG_ADDTOREPOSITORY, false)) + msg(
-                                                                                   "Add to Repository") + HtmlUtil.checkbox(
-                                                                                                                            ARG_ADDMETADATA, "true",
-                                                                                                                            request.get(ARG_ADDMETADATA, false)) + msg(
-                                                                                                                                                                       "Add metadata");
+                          + HtmlUtil.checkbox(
+                              ARG_ADDTOREPOSITORY, "true",
+                              request.get(ARG_ADDTOREPOSITORY, false)) + msg(
+                                  "Add to Repository") + HtmlUtil.checkbox(
+                                  ARG_ADDMETADATA, "true",
+                                  request.get(ARG_ADDMETADATA, false)) + msg(
+                                      "Add metadata");
 
         }
 
@@ -668,21 +710,21 @@ public class DataOutputHandler extends OutputHandler {
 
         sb.append(HtmlUtil.formEntry(msgLabel("Horizontal Stride"),
                                      HtmlUtil.input(ARG_HSTRIDE,
-                                                    request.getString(ARG_HSTRIDE, "1"),
-                                                    HtmlUtil.SIZE_3)));
+                                         request.getString(ARG_HSTRIDE, "1"),
+                                         HtmlUtil.SIZE_3)));
 
 
 
 
 
 
-        Date[]     dateRange = null;
-        List<Date> dates     = null;
+        Date[]       dateRange = null;
+        List<Date>   dates     = null;
 
 
-        GridDataset dataset = getGridDataset(file);
-        StringBuffer varSB = new StringBuffer();
-        synchronized(dataset) {
+        GridDataset  dataset   = getGridDataset(file);
+        StringBuffer varSB     = new StringBuffer();
+        synchronized (dataset) {
             for (VariableSimpleIF var : dataset.getDataVariables()) {
                 if (var instanceof CoordinateAxis) {
                     CoordinateAxis ca       = (CoordinateAxis) var;
@@ -692,50 +734,54 @@ public class DataOutputHandler extends OutputHandler {
                     }
                     if (axisType.equals(AxisType.Time)) {
                         dates = (List<Date>) Misc.sort(
-                                                       ThreddsMetadataHandler.getDates(var, ca));
+                            ThreddsMetadataHandler.getDates(var, ca));
                     }
                     continue;
                 }
             }
-            for (GridDatatype     grid: sortGrids(dataset)) {
-                VariableEnhanced var  = grid.getVariable();
+            for (GridDatatype grid : sortGrids(dataset)) {
+                VariableEnhanced var = grid.getVariable();
                 varSB.append(
-                             HtmlUtil.row(
-                                          HtmlUtil.cols(
-                                                        HtmlUtil.checkbox(
-                                                                          ARG_VARIABLE + "." + var.getShortName(), "true",
-                                                                          false) + HtmlUtil.space(1) + var.getName()
-                                                        + HtmlUtil.space(1)
-                                                        + ((var.getUnitsString() != null)
-                                                           ? "(" + var.getUnitsString() + ")"
-                                                           : ""), "<i>" + var.getDescription()
-                                                        + "</i>")));
+                    HtmlUtil.row(
+                        HtmlUtil.cols(
+                            HtmlUtil.checkbox(
+                                ARG_VARIABLE + "." + var.getShortName(),
+                                "true", false) + HtmlUtil.space(1)
+                                    + var.getName() + HtmlUtil.space(1)
+                                    + ((var.getUnitsString() != null)
+                                       ? "(" + var.getUnitsString() + ")"
+                                       : ""), "<i>" + var.getDescription()
+                                       + "</i>")));
 
             }
 
             if ((dates != null) && (dates.size() > 0)) {
                 List formattedDates = new ArrayList();
                 for (Date date : dates) {
-                    formattedDates.add(getRepository().formatDate(request, date));
+                    formattedDates.add(getRepository().formatDate(request,
+                            date));
                 }
                 String fromDate = request.getUnsafeString(ARG_FROMDATE,
-                                                          getRepository().formatDate(request,
-                                                                                     dates.get(0)));
+                                      getRepository().formatDate(request,
+                                          dates.get(0)));
                 String toDate = request.getUnsafeString(ARG_TODATE,
-                                                        getRepository().formatDate(request,
-                                                                                   dates.get(dates.size() - 1)));
+                                    getRepository().formatDate(request,
+                                        dates.get(dates.size() - 1)));
                 sb.append(
-                          HtmlUtil.formEntry(
-                                             msgLabel("Time Range"),
-                                             HtmlUtil.checkbox(
-                                                               ARG_SUBSETTIME, "true",
-                                                               request.get(ARG_SUBSETTIME, true)) + HtmlUtil.space(
-                                                                                                                   1) + HtmlUtil.select(
-                                                                                                                                        ARG_FROMDATE, formattedDates,
-                                                                                                                                        fromDate) + HtmlUtil.img(
-                                                                                                                                                                 getRepository().fileUrl(
-                                                                                                                                                                                         ICON_ARROW)) + HtmlUtil.select(
-                                                                                                                                                                                                                        ARG_TODATE, formattedDates, toDate)));
+                    HtmlUtil.formEntry(
+                        msgLabel("Time Range"),
+                        HtmlUtil.checkbox(
+                            ARG_SUBSETTIME, "true",
+                            request.get(
+                                ARG_SUBSETTIME, true)) + HtmlUtil.space(1)
+                                    + HtmlUtil.select(
+                                        ARG_FROMDATE, formattedDates,
+                                        fromDate) + HtmlUtil.img(
+                                            getRepository().fileUrl(
+                                                ICON_ARROW)) + HtmlUtil.select(
+                                                    ARG_TODATE,
+                                                        formattedDates,
+                                                            toDate)));
             }
 
 
@@ -752,22 +798,24 @@ public class DataOutputHandler extends OutputHandler {
             LatLonRect llr = dataset.getBoundingBox();
             if (llr != null) {
                 sb.append(
-                          HtmlUtil.formEntryTop(
-                                                msgLabel("Subset Spatially"),
-                                                "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
-                                                + HtmlUtil.checkbox(
-                                                                    ARG_SUBSETAREA, "true",
-                                                                    request.get(ARG_SUBSETAREA, false)) + "</td><td>"
-                                                + HtmlUtil.makeLatLonBox(
-                                                                         ARG_AREA, llr.getLatMin(), llr.getLatMax(),
-                                                                         llr.getLonMax(),
-                                                                         llr.getLonMin()) + "</table>"));
+                    HtmlUtil.formEntryTop(
+                        msgLabel("Subset Spatially"),
+                        "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
+                        + HtmlUtil.checkbox(
+                            ARG_SUBSETAREA, "true",
+                            request.get(ARG_SUBSETAREA, false)) + "</td><td>"
+                                + HtmlUtil.makeLatLonBox(
+                                    ARG_AREA, llr.getLatMin(),
+                                    llr.getLatMax(), llr.getLonMax(),
+                                    llr.getLonMin()) + "</table>"));
             }
 
 
             sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),
-                                         HtmlUtil.checkbox(ARG_ADDLATLON, "true",
-                                                           request.get(ARG_ADDLATLON, true))));
+                                         HtmlUtil.checkbox(ARG_ADDLATLON,
+                                             "true",
+                                             request.get(ARG_ADDLATLON,
+                                                 true))));
 
         }
         sb.append("</table>");
@@ -784,8 +832,15 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dataset _more_
+     *
+     * @return _more_
+     */
     public List<GridDatatype> sortGrids(GridDataset dataset) {
-        List       tuples    = new ArrayList();
+        List tuples = new ArrayList();
         for (GridDatatype grid : dataset.getGrids()) {
             VariableEnhanced var = grid.getVariable();
             tuples.add(new Object[] { var.getShortName().toLowerCase(),
@@ -800,28 +855,39 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputPointMap(Request request, Entry entry)
-        throws Exception {
-        File file = entry.getResource().getFile();
+            throws Exception {
+
+        File            file = entry.getResource().getFile();
         PointObsDataset pod  = getPointDataset(file);
-        StringBuffer sb = new StringBuffer();
+        StringBuffer    sb   = new StringBuffer();
 
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                         false, "");
+                              false, "");
         sb.append(crumbs[1]);
-        synchronized(pod) {
-            List    vars    = pod.getDataVariables();
-            int skip = request.get(ARG_SKIP,0);
-            int max = request.get(ARG_MAX,200);
+        synchronized (pod) {
+            List         vars = pod.getDataVariables();
+            int          skip = request.get(ARG_SKIP, 0);
+            int          max  = request.get(ARG_MAX, 200);
 
-            StringBuffer js = new StringBuffer();
+            StringBuffer js   = new StringBuffer();
             js.append("var marker;\n");
-            Iterator  dataIterator = pod.getDataIterator(16384);
-            int cnt =0 ;
-            int total =0 ;
-            String icon = getRepository().fileUrl("/icons/pointdata.gif");
+            Iterator dataIterator   = pod.getDataIterator(16384);
+            int      cnt            = 0;
+            int      total          = 0;
+            String   icon = getRepository().fileUrl("/icons/pointdata.gif");
 
-            List columnDataList = new ArrayList();
+            List     columnDataList = new ArrayList();
             while (dataIterator.hasNext()) {
                 PointObsDatatype po = (PointObsDatatype) dataIterator.next();
                 ucar.nc2.dt.EarthLocation el = po.getLocation();
@@ -830,61 +896,76 @@ public class DataOutputHandler extends OutputHandler {
                 }
                 double lat = el.getLatitude();
                 double lon = el.getLongitude();
-                if(lat!=lat || lon!=lon) continue;
-                if(lat<-90 || lat>90 || lon<-180 || lon>180) continue;
+                if ((lat != lat) || (lon != lon)) {
+                    continue;
+                }
+                if ((lat < -90) || (lat > 90) || (lon < -180)
+                        || (lon > 180)) {
+                    continue;
+                }
                 total++;
-                if(total<=skip) continue;
-                if(total>(max+skip)) continue;
+                if (total <= skip) {
+                    continue;
+                }
+                if (total > (max + skip)) {
+                    continue;
+                }
                 cnt++;
-                List  columnData = new ArrayList();
-                StructureData structure = po.getData();
+                List          columnData = new ArrayList();
+                StructureData structure  = po.getData();
                 js.append("marker = new Marker("
-                          + llp(el.getLatitude(), el.getLongitude()) + ");\n");
+                          + llp(el.getLatitude(), el.getLongitude())
+                          + ");\n");
 
                 js.append("marker.setIcon(" + HtmlUtil.quote(icon) + ");\n");
                 StringBuffer info = new StringBuffer("");
-                info.append("<b>Date:</b> " +  po.getNominalTimeAsDate() +"<br>");
-                for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                info.append("<b>Date:</b> " + po.getNominalTimeAsDate()
+                            + "<br>");
+                for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
                     //{name:\"Ashley\",breed:\"German Shepherd\",age:12}
-                    StructureMembers.Member member = structure.findMember(var.getShortName());
-                    if(var.getDataType() == DataType.STRING
-                       || var.getDataType() == DataType.CHAR) {
+                    StructureMembers.Member member =
+                        structure.findMember(var.getShortName());
+                    if ((var.getDataType() == DataType.STRING)
+                            || (var.getDataType() == DataType.CHAR)) {
                         String value = structure.getScalarString(member);
-                        columnData.add(var.getShortName()+":" + HtmlUtil.quote(value));
-                        info.append("<b>" + var.getName() +": </b>"+                        
-                                    value +"</br>");
+                        columnData.add(var.getShortName() + ":"
+                                       + HtmlUtil.quote(value));
+                        info.append("<b>" + var.getName() + ": </b>" + value
+                                    + "</br>");
 
                     } else {
                         float value = structure.convertScalarFloat(member);
-                        info.append("<b>" + var.getName() +": </b>"+                        
-                                    value +"</br>");
+                        info.append("<b>" + var.getName() + ": </b>" + value
+                                    + "</br>");
 
-                        columnData.add(var.getShortName()+":" +value);
+                        columnData.add(var.getShortName() + ":" + value);
                     }
                 }
-                columnDataList.add("{" + StringUtil.join(",", columnData)+"}\n");
-                js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
-                js.append("initMarker(marker," + HtmlUtil.quote(""+cnt) + ");\n");
+                columnDataList.add("{" + StringUtil.join(",", columnData)
+                                   + "}\n");
+                js.append("marker.setInfoBubble(\"" + info.toString()
+                          + "\");\n");
+                js.append("initMarker(marker," + HtmlUtil.quote("" + cnt)
+                          + ");\n");
             }
-        
+
             js.append("mapstraction.autoCenterAndZoom();\n");
             //        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
 
-            StringBuffer yui  = new StringBuffer();
+            StringBuffer yui         = new StringBuffer();
 
-            List  columnDefs = new ArrayList();
-            List columnNames = new ArrayList();
-            for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+            List         columnDefs  = new ArrayList();
+            List         columnNames = new ArrayList();
+            for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
                 columnNames.add(HtmlUtil.quote(var.getShortName()));
                 String label = var.getDescription();
                 //            if(label.trim().length()==0)
-                label =var.getName();
-                columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName()) +"," +
-                               "sortable:true," +
-                               "label:" + HtmlUtil.quote(label) +
-                               "}");
+                label = var.getName();
+                columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName())
+                               + "," + "sortable:true," + "label:"
+                               + HtmlUtil.quote(label) + "}");
             }
-        
+
 
 
             /*
@@ -895,75 +976,100 @@ public class DataOutputHandler extends OutputHandler {
               yui.append("var myColumnDefs = [\n  " + StringUtil.join(",",columnDefs) + "\n];\n");
               yui.append("var myDataTable = new YAHOO.widget.DataTable(\"datatable\", myColumnDefs, myDataSource);\n");
             */
-  
-            if(total>max) {
-                sb.append((skip+1) +"-" + (skip+cnt) + " of " + total +" ");
+
+            if (total > max) {
+                sb.append((skip + 1) + "-" + (skip + cnt) + " of " + total
+                          + " ");
             } else {
-                sb.append((skip+1) +"-" + (skip+cnt));
+                sb.append((skip + 1) + "-" + (skip + cnt));
             }
-            if(total>max) {
-                boolean didone =false;
+            if (total > max) {
+                boolean didone = false;
                 if (skip > 0) {
                     sb.append(HtmlUtil.space(2));
-                    sb.append(HtmlUtil.href(HtmlUtil.url(request.getRequestPath(),
-                                                         new String[]{
-                                                             ARG_OUTPUT, request.getOutput(),
-                                                             ARG_ID, entry.getId(),
-                                                             ARG_SKIP,""+(skip - max),
-                                                             ARG_MAX, ""+max}), msg("Previous")));
+                    sb.append(
+                        HtmlUtil.href(
+                            HtmlUtil.url(
+                                request.getRequestPath(), new String[] {
+                        ARG_OUTPUT, request.getOutput(), ARG_ID,
+                        entry.getId(), ARG_SKIP, "" + (skip - max), ARG_MAX,
+                        "" + max
+                    }), msg("Previous")));
                     didone = true;
                 }
-                if (total > (skip+cnt)) {
+                if (total > (skip + cnt)) {
                     sb.append(HtmlUtil.space(2));
-                    sb.append(HtmlUtil.href(HtmlUtil.url(request.getRequestPath(),
-                                                         new String[]{
-                                                             ARG_OUTPUT, request.getOutput(),
-                                                             ARG_ID, entry.getId(),
-                                                             ARG_SKIP,""+(skip + max),
-                                                             ARG_MAX, ""+max}), msg("Next")));
-                    didone=true;
+                    sb.append(
+                        HtmlUtil.href(
+                            HtmlUtil.url(
+                                request.getRequestPath(), new String[] {
+                        ARG_OUTPUT, request.getOutput(), ARG_ID,
+                        entry.getId(), ARG_SKIP, "" + (skip + max), ARG_MAX,
+                        "" + max
+                    }), msg("Next")));
+                    didone = true;
                 }
                 //Just come up with some max number
-                if(didone && total<2000) {
+                if (didone && (total < 2000)) {
                     sb.append(HtmlUtil.space(2));
-                    sb.append(HtmlUtil.href(HtmlUtil.url(request.getRequestPath(),
-                                                         new String[]{
-                                                             ARG_OUTPUT, request.getOutput(),
-                                                             ARG_ID, entry.getId(),
-                                                             ARG_SKIP,""+0,
-                                                             ARG_MAX, ""+total}), msg("All")));
+                    sb.append(
+                        HtmlUtil.href(
+                            HtmlUtil.url(
+                                request.getRequestPath(), new String[] {
+                        ARG_OUTPUT, request.getOutput(), ARG_ID,
+                        entry.getId(), ARG_SKIP, "" + 0, ARG_MAX, "" + total
+                    }), msg("All")));
 
                 }
             }
             //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
-            getRepository().initMap(request, sb,800,500,true);
+            getRepository().initMap(request, sb, 800, 500, true);
             /*        sb.append("</td><td>");
                       sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
                       sb.append("</td></tr></table>");
                       sb.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/fonts/fonts-min.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/datatable/assets/skins/sam/datatable.css\" />\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/yahoo-dom-event/yahoo-dom-event.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/dragdrop/dragdrop-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/element/element-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datasource/datasource-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datatable/datatable-beta-min.js\"></script>\n");
-        
+
                       sb.append(HtmlUtil.script(yui.toString()));
             */
 
             sb.append(HtmlUtil.script(js.toString()));
             return new Result("Point Data", sb);
         }
+
     }
 
+    /**
+     * _more_
+     *
+     * @param lat _more_
+     * @param lon _more_
+     *
+     * @return _more_
+     */
     private static String llp(double lat, double lon) {
         return "new LatLonPoint(" + lat + "," + lon + ")";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputPointCsv(Request request, Entry entry)
-        throws Exception {
-        File file = entry.getResource().getFile();
+            throws Exception {
+        File            file = entry.getResource().getFile();
         PointObsDataset pod  = getPointDataset(file);
-        StringBuffer sb = new StringBuffer();
-        synchronized(pod) {
-            List    vars    = pod.getDataVariables();
-            Iterator  dataIterator = pod.getDataIterator(16384);
-            int cnt =0;
+        StringBuffer    sb   = new StringBuffer();
+        synchronized (pod) {
+            List     vars         = pod.getDataVariables();
+            Iterator dataIterator = pod.getDataIterator(16384);
+            int      cnt          = 0;
             while (dataIterator.hasNext()) {
                 PointObsDatatype po = (PointObsDatatype) dataIterator.next();
                 ucar.nc2.dt.EarthLocation el = po.getLocation();
@@ -972,21 +1078,22 @@ public class DataOutputHandler extends OutputHandler {
                 }
                 cnt++;
 
-                double lat = el.getLatitude();
-                double lon = el.getLongitude();
+                double        lat       = el.getLatitude();
+                double        lon       = el.getLongitude();
                 StructureData structure = po.getData();
 
-                if(cnt==1) {
+                if (cnt == 1) {
                     sb.append(HtmlUtil.quote("Time"));
                     sb.append(",");
                     sb.append(HtmlUtil.quote("Latitude"));
                     sb.append(",");
                     sb.append(HtmlUtil.quote("Longitude"));
-                    for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
+                    for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
                         sb.append(",");
                         String unit = var.getUnitsString();
-                        if(unit!=null) {
-                            sb.append(HtmlUtil.quote(var.getShortName()+" (" + unit+")"));
+                        if (unit != null) {
+                            sb.append(HtmlUtil.quote(var.getShortName()
+                                    + " (" + unit + ")"));
                         } else {
                             sb.append(HtmlUtil.quote(var.getShortName()));
                         }
@@ -994,39 +1101,53 @@ public class DataOutputHandler extends OutputHandler {
                     sb.append("\n");
                 }
 
-                sb.append(HtmlUtil.quote(""+po.getNominalTimeAsDate()));
+                sb.append(HtmlUtil.quote("" + po.getNominalTimeAsDate()));
                 sb.append(",");
                 sb.append(el.getLatitude());
                 sb.append(",");
                 sb.append(el.getLongitude());
 
-                for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
-                    StructureMembers.Member member = structure.findMember(var.getShortName());
+                for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
+                    StructureMembers.Member member =
+                        structure.findMember(var.getShortName());
                     sb.append(",");
-                    if(var.getDataType() == DataType.STRING
-                       || var.getDataType() == DataType.CHAR) {
-                        sb.append(HtmlUtil.quote(structure.getScalarString(member)));
+                    if ((var.getDataType() == DataType.STRING)
+                            || (var.getDataType() == DataType.CHAR)) {
+                        sb.append(
+                            HtmlUtil.quote(
+                                structure.getScalarString(member)));
                     } else {
                         sb.append(structure.convertScalarFloat(member));
                     }
                 }
                 sb.append("\n");
             }
-            return new Result("Point Data", sb,getRepository().getMimeTypeFromSuffix(".csv"));
+            return new Result("Point Data", sb,
+                              getRepository().getMimeTypeFromSuffix(".csv"));
         }
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputPointKml(Request request, Entry entry)
-        throws Exception {
-        File file = entry.getResource().getFile();
+            throws Exception {
+        File            file = entry.getResource().getFile();
         PointObsDataset pod  = getPointDataset(file);
-        synchronized(pod) {
-            Element root =KmlUtil.kml(entry.getName());
-            Element docNode =KmlUtil.document(root,entry.getName());
-            List    vars    = pod.getDataVariables();
-            Iterator  dataIterator = pod.getDataIterator(16384);
+        synchronized (pod) {
+            Element  root         = KmlUtil.kml(entry.getName());
+            Element  docNode      = KmlUtil.document(root, entry.getName());
+            List     vars         = pod.getDataVariables();
+            Iterator dataIterator = pod.getDataIterator(16384);
             while (dataIterator.hasNext()) {
                 PointObsDatatype po = (PointObsDatatype) dataIterator.next();
                 ucar.nc2.dt.EarthLocation el = po.getLocation();
@@ -1036,27 +1157,35 @@ public class DataOutputHandler extends OutputHandler {
                 double lat = el.getLatitude();
                 double lon = el.getLongitude();
                 double alt = 0;
-                if(lat!=lat || lon!=lon) continue;
+                if ((lat != lat) || (lon != lon)) {
+                    continue;
+                }
 
                 StructureData structure = po.getData();
-                StringBuffer info = new StringBuffer("");
-                info.append("<b>Date:</b> " +  po.getNominalTimeAsDate() +"<br>");
-                for(VariableSimpleIF var: (List<VariableSimpleIF>)vars) {
-                    StructureMembers.Member member = structure.findMember(var.getShortName());
-                    if(var.getDataType() == DataType.STRING
-                       || var.getDataType() == DataType.CHAR) {
-                        info.append("<b>" + var.getName() +": </b>"+                        
-                                    structure.getScalarString(member) +"<br>");
+                StringBuffer  info      = new StringBuffer("");
+                info.append("<b>Date:</b> " + po.getNominalTimeAsDate()
+                            + "<br>");
+                for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
+                    StructureMembers.Member member =
+                        structure.findMember(var.getShortName());
+                    if ((var.getDataType() == DataType.STRING)
+                            || (var.getDataType() == DataType.CHAR)) {
+                        info.append("<b>" + var.getName() + ": </b>"
+                                    + structure.getScalarString(member)
+                                    + "<br>");
                     } else {
-                        info.append("<b>" + var.getName() +": </b>"+                        
-                                    structure.convertScalarFloat(member) +"<br>");
+                        info.append("<b>" + var.getName() + ": </b>"
+                                    + structure.convertScalarFloat(member)
+                                    + "<br>");
 
                     }
                 }
-                KmlUtil.placemark(docNode, ""+po.getNominalTimeAsDate(), info.toString(), lat,lon,alt,null);
+                KmlUtil.placemark(docNode, "" + po.getNominalTimeAsDate(),
+                                  info.toString(), lat, lon, alt, null);
             }
             StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
-            return new Result("Point Data", sb,getRepository().getMimeTypeFromSuffix(".kml"));
+            return new Result("Point Data", sb,
+                              getRepository().getMimeTypeFromSuffix(".kml"));
         }
     }
 
@@ -1073,7 +1202,7 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception On badness
      */
     public Result outputEntry(final Request request, Entry entry)
-        throws Exception {
+            throws Exception {
 
         String output = request.getOutput();
         if (output.equals(OUTPUT_CDL)) {
@@ -1085,7 +1214,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
         if (output.equals(OUTPUT_GRIDSUBSET)
-            || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
+                || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
             return outputGridSubset(request, entry);
         }
 
@@ -1109,19 +1238,19 @@ public class DataOutputHandler extends OutputHandler {
 
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry) {
-                public ServletConfig getServletConfig() {
-                    return request.getHttpServlet().getServletConfig();
-                }
-                public ServletContext getServletContext() {
-                    return request.getHttpServlet().getServletContext();
-                }
-                public String getServletInfo() {
-                    return request.getHttpServlet().getServletInfo();
-                }
-                public Enumeration getInitParameterNames() {
-                    return request.getHttpServlet().getInitParameterNames();
-                }
-            };
+            public ServletConfig getServletConfig() {
+                return request.getHttpServlet().getServletConfig();
+            }
+            public ServletContext getServletContext() {
+                return request.getHttpServlet().getServletContext();
+            }
+            public String getServletInfo() {
+                return request.getHttpServlet().getServletInfo();
+            }
+            public Enumeration getInitParameterNames() {
+                return request.getHttpServlet().getInitParameterNames();
+            }
+        };
 
         servlet.init(request.getHttpServlet().getServletConfig());
 
@@ -1179,7 +1308,7 @@ public class DataOutputHandler extends OutputHandler {
          * @throws ParseException On badness
          */
         protected GuardedDataset getDataset(ReqState preq)
-            throws DAP2Exception, IOException, ParseException {
+                throws DAP2Exception, IOException, ParseException {
             HttpServletRequest request = preq.getRequest();
             String             reqPath = entry.getName();
             String location = entry.getResource().getFile().toString();
@@ -1187,7 +1316,7 @@ public class DataOutputHandler extends OutputHandler {
             //TODO: Should we be caching the ncFiles? The GuardedDatasets?
             synchronized (CACHE_MUTEX) {
                 String cacheKey = repositoryRequest.getSessionId() + "_"
-                    + location;
+                                  + location;
                 ncFile = cache.get(cacheKey);
                 if (ncFile != null) {
                     //Bump it to the end of the list

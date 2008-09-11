@@ -236,7 +236,7 @@ public class MapOutputHandler extends OutputHandler {
                        boolean normalControls)
             throws Exception {
         StringBuffer js = new StringBuffer();
-        getRepository().initMap(request,sb,width,height,normalControls);
+        getRepository().initMap(request, sb, width, height, normalControls);
         js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
         js.append("var line;\n");
@@ -311,10 +311,18 @@ public class MapOutputHandler extends OutputHandler {
      * @return _more_
      */
     private static String llp(double lat, double lon) {
-        if(lat<-90) lat = -90;
-        if(lat>90) lat = 90;
-        if(lon<-180) lon = -180;
-        if(lon>180) lon = 180;
+        if (lat < -90) {
+            lat = -90;
+        }
+        if (lat > 90) {
+            lat = 90;
+        }
+        if (lon < -180) {
+            lon = -180;
+        }
+        if (lon > 180) {
+            lon = 180;
+        }
         return "new LatLonPoint(" + lat + "," + lon + ")";
 
     }

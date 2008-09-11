@@ -209,9 +209,9 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public int getCount(String table, Clause clause) throws Exception {
-        Statement statement = select("count(*)", table,  clause);
+        Statement statement = select("count(*)", table, clause);
 
-        ResultSet results = statement.getResultSet();
+        ResultSet results   = statement.getResultSet();
         if ( !results.next()) {
             return 0;
         }

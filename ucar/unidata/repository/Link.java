@@ -53,9 +53,15 @@ public class Link {
     /** _more_ */
     String icon;
 
+    /** _more_          */
     protected boolean hr = false;
 
 
+    /**
+     * _more_
+     *
+     * @param hr _more_
+     */
     public Link(boolean hr) {
         this.hr = true;
     }
@@ -81,8 +87,9 @@ public class Link {
      * @return _more_
      */
     public String toString() {
-        if(hr) 
+        if (hr) {
             return "<hr>";
+        }
         return HtmlUtil.href(url, HtmlUtil.img(icon, label));
     }
 

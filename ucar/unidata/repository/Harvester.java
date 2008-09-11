@@ -94,6 +94,7 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_MONITOR = "monitor";
 
+    /** _more_          */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
     /** _more_ */
@@ -161,6 +162,7 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private double sleepMinutes = 5;
 
+    /** _more_          */
     private boolean addMetadata = false;
 
     /** _more_ */
@@ -247,7 +249,8 @@ public class Harvester extends RepositoryManager {
 
         this.name = XmlUtil.getAttribute(element, ATTR_NAME, "");
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, monitor);
-        this.addMetadata = XmlUtil.getAttribute(element,ATTR_ADDMETADATA, addMetadata);
+        this.addMetadata = XmlUtil.getAttribute(element, ATTR_ADDMETADATA,
+                addMetadata);
         this.activeOnStart = this.active = XmlUtil.getAttribute(element,
                 ATTR_ACTIVE, false);
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
@@ -268,7 +271,7 @@ public class Harvester extends RepositoryManager {
                 ""));
         activeOnStart = request.get(ATTR_ACTIVE, false);
         monitor       = request.get(ATTR_MONITOR, false);
-        addMetadata   = request.get(ATTR_ADDMETADATA,false);
+        addMetadata   = request.get(ATTR_ADDMETADATA, false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
         nameTemplate  = request.getString(ATTR_NAMETEMPLATE, nameTemplate);
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
@@ -541,21 +544,21 @@ public class Harvester extends RepositoryManager {
     }
 
     /**
-       Set the AddMetadata property.
-
-       @param value The new value for AddMetadata
-    **/
-    public void setAddMetadata (boolean value) {
-	addMetadata = value;
+     *  Set the AddMetadata property.
+     *
+     *  @param value The new value for AddMetadata
+     */
+    public void setAddMetadata(boolean value) {
+        addMetadata = value;
     }
 
     /**
-       Get the AddMetadata property.
-
-       @return The AddMetadata
-    **/
-    public boolean getAddMetadata () {
-	return addMetadata;
+     *  Get the AddMetadata property.
+     *
+     *  @return The AddMetadata
+     */
+    public boolean getAddMetadata() {
+        return addMetadata;
     }
 
 
@@ -631,24 +634,62 @@ public class Harvester extends RepositoryManager {
     }
 
 
+    /**
+     * Class HarvesterEntry _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class HarvesterEntry {
+
+        /** _more_          */
         String url;
+
+        /** _more_          */
         String name;
+
+        /** _more_          */
         String description;
+
+        /** _more_          */
         String group;
-        public HarvesterEntry(String url,  String name,   String description,        String group) {
-            this.url=url;
-            this.name=name;
-            this.description=description;
-            this.group=group;
-            
+
+        /**
+         * _more_
+         *
+         * @param url _more_
+         * @param name _more_
+         * @param description _more_
+         * @param group _more_
+         */
+        public HarvesterEntry(String url, String name, String description,
+                              String group) {
+            this.url         = url;
+            this.name        = name;
+            this.description = description;
+            this.group       = group;
+
         }
+
+        /**
+         * _more_
+         *
+         * @param node _more_
+         */
         public HarvesterEntry(Element node) {
-            this.url=XmlUtil.getAttribute(node,ATTR_URL,"");
-            this.name=XmlUtil.getAttribute(node,ATTR_NAME,"");
-            this.description=XmlUtil.getAttribute(node,ATTR_DESCRIPTION,"");
-            this.group=XmlUtil.getAttribute(node,ATTR_GROUP,"");
+            this.url  = XmlUtil.getAttribute(node, ATTR_URL, "");
+            this.name = XmlUtil.getAttribute(node, ATTR_NAME, "");
+            this.description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION,
+                    "");
+            this.group = XmlUtil.getAttribute(node, ATTR_GROUP, "");
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String toString() {
             return url;
         }

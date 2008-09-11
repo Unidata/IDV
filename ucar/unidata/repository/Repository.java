@@ -293,10 +293,10 @@ public class Repository extends RepositoryBase implements Tables,
     /** _more_ */
     public static final String ID_PREFIX_LOCAL_FILE = "file:";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ID_PREFIX_CATALOG = "catalog:";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ID_PREFIX_GENERATED = "generated:";
 
 
@@ -1200,6 +1200,7 @@ public class Repository extends RepositoryBase implements Tables,
      * @param node _more_
      * @param props _more_
      * @param handlers _more_
+     * @param defaultHandler _more_
      *
      * @throws Exception _more_
      */
@@ -1321,9 +1322,9 @@ public class Repository extends RepositoryBase implements Tables,
 
         for (String file : apiDefFiles) {
             file = getStorageManager().localizePath(file);
-            Element apiRoot = XmlUtil.getRoot(file, getClass());
-            Hashtable props    = new Hashtable();
-            processApiNode(apiRoot,handlers, props,"repository");
+            Element   apiRoot = XmlUtil.getRoot(file, getClass());
+            Hashtable props   = new Hashtable();
+            processApiNode(apiRoot, handlers, props, "repository");
         }
         for (ApiMethod apiMethod : apiMethods) {
             if (apiMethod.getIsTopLevel()) {
@@ -1332,25 +1333,38 @@ public class Repository extends RepositoryBase implements Tables,
         }
     }
 
-    private void processApiNode(Element apiRoot,Hashtable handlers, Hashtable props, String defaultHandler) throws Exception {
+    /**
+     * _more_
+     *
+     * @param apiRoot _more_
+     * @param handlers _more_
+     * @param props _more_
+     * @param defaultHandler _more_
+     *
+     * @throws Exception _more_
+     */
+    private void processApiNode(Element apiRoot, Hashtable handlers,
+                                Hashtable props, String defaultHandler)
+            throws Exception {
         if (apiRoot == null) {
             return;
         }
-        NodeList  children = XmlUtil.getElements(apiRoot);
+        NodeList children = XmlUtil.getElements(apiRoot);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             String  tag  = node.getTagName();
             if (tag.equals(ApiMethod.TAG_PROPERTY)) {
-                props.put(XmlUtil.getAttribute(node,
-                                               ApiMethod.ATTR_NAME), XmlUtil.getAttribute(node,
-                                                                                          ApiMethod.ATTR_VALUE));
+                props.put(XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME),
+                          XmlUtil.getAttribute(node, ApiMethod.ATTR_VALUE));
             } else if (tag.equals(ApiMethod.TAG_API)) {
-                addRequest(node, props, handlers,defaultHandler);
+                addRequest(node, props, handlers, defaultHandler);
             } else if (tag.equals(ApiMethod.TAG_GROUP)) {
-                processApiNode(node, handlers, props, XmlUtil.getAttribute(node, ApiMethod.ATTR_HANDLER,defaultHandler));
+                processApiNode(node, handlers, props,
+                               XmlUtil.getAttribute(node,
+                                   ApiMethod.ATTR_HANDLER, defaultHandler));
             } else {
                 throw new IllegalArgumentException("Unknown api.xml tag:"
-                                                   + tag);
+                        + tag);
             }
         }
     }
@@ -1825,7 +1839,11 @@ public class Repository extends RepositoryBase implements Tables,
                 //noop
             }
         }
-        log(request, "Unknown request:" + path);
+        String userAgent = request.getHeaderArg("User-Agent");
+        if(userAgent==null)
+            userAgent = "Unknown";
+
+        log(request, "Unknown request:" + request.getUrl() + " user-agent:" + userAgent +" ip:" + request.getIp());
         Result result =
             new Result(msg("Error"),
                        new StringBuffer(msgLabel("Unknown request") + path));
@@ -1912,8 +1930,8 @@ public class Repository extends RepositoryBase implements Tables,
         html = StringUtil.replace(html, "${title}", result.getTitle());
         html = StringUtil.replace(html, "${root}", getUrlBase());
 
-        html = StringUtil.replace(html, "${bottom}",result.getBottomHtml());
-        
+        html = StringUtil.replace(html, "${bottom}", result.getBottomHtml());
+
 
 
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
@@ -2562,15 +2580,15 @@ public class Repository extends RepositoryBase implements Tables,
         StringBuffer menu  = new StringBuffer();
         menu.append("<table cellspacing=\"0\" cellpadding=\"0\">");
         for (Link link : links) {
-            if(link.hr) {
+            if (link.hr) {
                 menu.append("<tr><td colspan=2><hr class=menuseparator>");
             } else {
-            menu.append("<tr><td>");
-            menu.append(HtmlUtil.img(link.getIcon()));
-            menu.append(HtmlUtil.space(1));
-            menu.append("</td><td>");
-            menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
-                                      HtmlUtil.cssClass("menulink")));
+                menu.append("<tr><td>");
+                menu.append(HtmlUtil.img(link.getIcon()));
+                menu.append(HtmlUtil.space(1));
+                menu.append("</td><td>");
+                menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
+                                          HtmlUtil.cssClass("menulink")));
             }
             menu.append("</td></tr>");
         }
@@ -3065,9 +3083,8 @@ public class Repository extends RepositoryBase implements Tables,
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
-                item = HtmlUtil.href(request.url(URL_SEARCH_FORM,
-                        ARG_WHAT, whats[i], ARG_FORM_TYPE,
-                        formType), names[i], extra2);
+                item = HtmlUtil.href(request.url(URL_SEARCH_FORM, ARG_WHAT,
+                        whats[i], ARG_FORM_TYPE, formType), names[i], extra2);
             }
             if (i == 0) {
                 item = "<span " + extra1
@@ -5682,7 +5699,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Result processGroupShow(Request request, Group group)
             throws Exception {
-        boolean doLatest = request.get(ARG_LATEST, false);
+        boolean       doLatest      = request.get(ARG_LATEST, false);
 
 
         OutputHandler outputHandler = getOutputHandler(request);
@@ -5713,9 +5730,9 @@ public class Repository extends RepositoryBase implements Tables,
                         "Error finding children:" + exc.getMessage());
         }
 
-        if(doLatest) {
-            if(entries.size()>0) {
-                entries = sortEntriesOnDate(entries,true);
+        if (doLatest) {
+            if (entries.size() > 0) {
+                entries = sortEntriesOnDate(entries, true);
                 return outputHandler.outputEntry(request, entries.get(0));
             }
         }
@@ -5726,19 +5743,36 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
-    protected List<Entry> sortEntriesOnDate(List<Entry> entries, final boolean descending) {
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     * @param descending _more_
+     *
+     * @return _more_
+     */
+    protected List<Entry> sortEntriesOnDate(List<Entry> entries,
+                                            final boolean descending) {
         Comparator comp = new Comparator() {
             public int compare(Object o1, Object o2) {
                 Entry e1 = (Entry) o1;
                 Entry e2 = (Entry) o2;
-                if(e1.getStartDate()<e2.getStartDate()) return (descending?1:-1);
-                if(e1.getStartDate()>e2.getStartDate()) return (descending?-1:1);
+                if (e1.getStartDate() < e2.getStartDate()) {
+                    return (descending
+                            ? 1
+                            : -1);
+                }
+                if (e1.getStartDate() > e2.getStartDate()) {
+                    return (descending
+                            ? -1
+                            : 1);
+                }
                 return 0;
             }
             public boolean equals(Object obj) {
-                return obj ==this;
+                return obj == this;
             }
-            };
+        };
         Object[] array = entries.toArray();
         Arrays.sort(array, comp);
         return (List<Entry>) Misc.toList(array);
@@ -7409,17 +7443,16 @@ public class Repository extends RepositoryBase implements Tables,
 
         StringBuffer searchCriteriaSB = new StringBuffer();
 
-        Group theGroup = null;
+        Group        theGroup         = null;
         List[]       pair             = getEntries(request, searchCriteriaSB);
         if (request.defined(ARG_GROUP)) {
-            String  groupId = (String) request.getString(ARG_GROUP,
-                                  "").trim();
+            String groupId = (String) request.getString(ARG_GROUP, "").trim();
             //            System.err.println("group:" + groupId);
-            theGroup = getRepository().findGroup(request,groupId);
+            theGroup = getRepository().findGroup(request, groupId);
         }
-        
 
-        String       s                = searchCriteriaSB.toString();
+
+        String s = searchCriteriaSB.toString();
         if (s.length() > 0) {
             request.remove("submit");
             String url = request.getUrl(URL_SEARCH_FORM);
@@ -7431,12 +7464,11 @@ public class Repository extends RepositoryBase implements Tables,
                                     "Search Again")) + "Search Criteria";
             request.setLeftMessage(HtmlUtil.br(header) + s);
         }
-        if(theGroup == null) {
+        if (theGroup == null) {
             theGroup = getDummyGroup();
         }
-        return getOutputHandler(request).outputGroup(request,
-                                theGroup, (List<Group>) pair[0],
-                                (List<Entry>) pair[1]);
+        return getOutputHandler(request).outputGroup(request, theGroup,
+                                (List<Group>) pair[0], (List<Entry>) pair[1]);
     }
 
 
@@ -7473,23 +7505,22 @@ public class Repository extends RepositoryBase implements Tables,
                                calendar);
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
         try {
-            statement.setTimestamp(col,
-                                   new java.sql.Timestamp(entry.getStartDate()),
-                                   calendar);
-            statement.setTimestamp(col+1,
-                                   new java.sql.Timestamp(entry.getEndDate()),
-                                   calendar);
+            statement.setTimestamp(
+                col, new java.sql.Timestamp(entry.getStartDate()), calendar);
+            statement.setTimestamp(
+                col + 1, new java.sql.Timestamp(entry.getEndDate()),
+                calendar);
 
-        } catch(Exception exc) {
-            System.err.println("Error: Bad date " + entry.getResource() + " " + new Date(entry.getStartDate()));
-            statement.setTimestamp(col,
-                                   new java.sql.Timestamp(new Date().getTime()),
-                                   calendar);
-            statement.setTimestamp(col+1,
-                                   new java.sql.Timestamp(new Date().getTime()),
-                                   calendar);
+        } catch (Exception exc) {
+            System.err.println("Error: Bad date " + entry.getResource() + " "
+                               + new Date(entry.getStartDate()));
+            statement.setTimestamp(
+                col, new java.sql.Timestamp(new Date().getTime()), calendar);
+            statement.setTimestamp(
+                col + 1, new java.sql.Timestamp(new Date().getTime()),
+                calendar);
         }
-        col+=2;
+        col += 2;
         statement.setDouble(col++, entry.getSouth());
         statement.setDouble(col++, entry.getNorth());
         statement.setDouble(col++, entry.getEast());
@@ -7507,49 +7538,50 @@ public class Repository extends RepositoryBase implements Tables,
      * @param request _more_
      * @param entries _more_
      * @param connection _more_
+     * @param firstCall _more_
      *
      * @return _more_
      * @throws Exception _more_
      */
     private List<String[]> getDescendents(Request request,
                                           List<Entry> entries,
-                                          Connection connection, boolean firstCall)
+                                          Connection connection,
+                                          boolean firstCall)
             throws Exception {
         List<String[]> children = new ArrayList();
         for (Entry entry : entries) {
-            if(firstCall) {
+            if (firstCall) {
                 children.add(new String[] { entry.getId(),
                                             entry.getTypeHandler().getType(),
                                             entry.getResource().getPath(),
                                             entry.getResource().getType() });
             }
-            if(!entry.isGroup()) {
+            if ( !entry.isGroup()) {
                 continue;
             }
             Statement stmt = SqlUtil.select(connection,
                                             SqlUtil.comma(new String[] {
                                                 COL_ENTRIES_ID,
-                                                COL_ENTRIES_TYPE, 
-                                                COL_ENTRIES_RESOURCE,
-                                                COL_ENTRIES_RESOURCE_TYPE }),
-                                            Misc.newList(TABLE_ENTRIES), 
-                                            Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, entry.getId()));
-            
+                    COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
+                    COL_ENTRIES_RESOURCE_TYPE }), Misc.newList(
+                        TABLE_ENTRIES), Clause.eq(
+                        COL_ENTRIES_PARENT_GROUP_ID, entry.getId()));
+
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    int col = 1;
-                    String childId = results.getString(col++);
-                    String childType = results.getString(col++);
-                    String resource =  results.getString(col++);
-                    String resourceType =  results.getString(col++);
-                    children.add(new String[] { childId,
-                                                childType,
-                                                resource,
-                                                resourceType});
-                    if(childType.equals(TYPE_GROUP)) {
-                        children.addAll(getDescendents(request, (List<Entry>)Misc.newList(findGroup(request, childId)),connection,false));
+                    int    col          = 1;
+                    String childId      = results.getString(col++);
+                    String childType    = results.getString(col++);
+                    String resource     = results.getString(col++);
+                    String resourceType = results.getString(col++);
+                    children.add(new String[] { childId, childType, resource,
+                            resourceType });
+                    if (childType.equals(TYPE_GROUP)) {
+                        children.addAll(getDescendents(request,
+                                (List<Entry>) Misc.newList(findGroup(request,
+                                    childId)), connection, false));
                     }
                 }
             }
@@ -7611,8 +7643,9 @@ public class Repository extends RepositoryBase implements Tables,
                                     Connection connection, Object actionId)
             throws Exception {
 
-        List<String[]> found = getDescendents(request, entries, connection,true);
-        String         query;
+        List<String[]> found = getDescendents(request, entries, connection,
+                                   true);
+        String query;
         query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
                                    SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID, "?"));
 
@@ -7643,12 +7676,14 @@ public class Repository extends RepositoryBase implements Tables,
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
         int       deleteCnt = 0;
+        int       totalDeleteCnt = 0;
         //Go backwards so we go up the tree and hit the children first
-        for (int i =  found.size()-1; i>=0;i--) {
+        for (int i = found.size() - 1; i >= 0; i--) {
             String[] tuple = found.get(i);
             String   id    = tuple[0];
             //            System.err.println ("id:" + id + " type:" + tuple[1] +" resource:" +tuple[2]);
             deleteCnt++;
+            totalDeleteCnt++;
             if ((actionId != null)
                     && !getActionManager().getActionOk(actionId)) {
                 getActionManager().setActionMessage(actionId,
@@ -7662,8 +7697,8 @@ public class Repository extends RepositoryBase implements Tables,
                 return;
             }
             getActionManager().setActionMessage(actionId,
-                    "Deleted:" + deleteCnt + "/" + found.size() + " entries");
-            if (deleteCnt % 100 == 0) {
+                    "Deleted:" + totalDeleteCnt + "/" + found.size() + " entries");
+            if (totalDeleteCnt % 100 == 0) {
                 System.err.println("Deleted:" + deleteCnt);
             }
             getStorageManager().removeFile(new Resource(new File(tuple[2]),
@@ -7694,7 +7729,7 @@ public class Repository extends RepositoryBase implements Tables,
                 commentsStmt.executeBatch();
                 assocStmt.executeBatch();
                 entriesStmt.executeBatch();
-                deleteCnt=0;
+                deleteCnt = 0;
             }
         }
 
@@ -8154,46 +8189,71 @@ public class Repository extends RepositoryBase implements Tables,
                                           + timeHelp + "\"");
     }
 
-    private static final String MAP_JS_MICROSOFT = 
+    /** _more_          */
+    private static final String MAP_JS_MICROSOFT =
         "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1";
-    private static final String MAP_ID_MICROSOFT = 
-        "microsoft";
-    private static final String MAP_JS_YAHOO = 
-        "http://api.maps.yahoo.com/ajaxymap?v=3.8&appid=idvunidata";
-    private static final String MAP_ID_YAHOO = 
-        "yahoo";
 
-    public String initMap(Request request,StringBuffer sb, int width, int height, boolean normalControls) {
+    /** _more_          */
+    private static final String MAP_ID_MICROSOFT = "microsoft";
+
+    /** _more_          */
+    private static final String MAP_JS_YAHOO =
+        "http://api.maps.yahoo.com/ajaxymap?v=3.8&appid=idvunidata";
+
+    /** _more_          */
+    private static final String MAP_ID_YAHOO = "yahoo";
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param width _more_
+     * @param height _more_
+     * @param normalControls _more_
+     *
+     * @return _more_
+     */
+    public String initMap(Request request, StringBuffer sb, int width,
+                          int height, boolean normalControls) {
         String userAgent = request.getHeaderArg("User-Agent");
-        String host  = request.getHeaderArg("Host");
-        if(host==null) host = "localhost";
-        host = (String)StringUtil.split(host,":",true,true).get(0);
-        String googleMapsKey =null;
-        
-        if(userAgent == null) userAgent = "Mozilla";
+        String host      = request.getHeaderArg("Host");
+        if (host == null) {
+            host = "localhost";
+        }
+        host = (String) StringUtil.split(host, ":", true, true).get(0);
+        String googleMapsKey = null;
+
+        if (userAgent == null) {
+            userAgent = "Mozilla";
+        }
         //        System.err.println ("agent:" + userAgent);
         String mapProvider = MAP_ID_MICROSOFT;
-        String mapJS = MAP_JS_MICROSOFT;
+        String mapJS       = MAP_JS_MICROSOFT;
         //        googleMapsKey = "ABQIAAAA-JXA0-ozvUKU42oQp1aOZxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSig5NmAvzXxoX1Ly0QJZMRxtiLIg";        
-        String googleKeys = getProperty(PROP_GOOGLEAPIKEYS,"");
+        String googleKeys = getProperty(PROP_GOOGLEAPIKEYS, "");
         googleMapsKey = null;
-        for(String line: (List<String>) StringUtil.split(googleKeys,"\n",true,true)) {
-            String[] toks = StringUtil.split(line,":",2);
-            if(toks.length!=2) continue;
-            if(toks[0].equals(host)) {
+        for (String line : (List<String>) StringUtil.split(googleKeys, "\n",
+                true, true)) {
+            String[] toks = StringUtil.split(line, ":", 2);
+            if (toks.length != 2) {
+                continue;
+            }
+            if (toks[0].equals(host)) {
                 googleMapsKey = toks[1];
                 break;
             }
         }
-        
-        
-        if(userAgent.indexOf("MSIE")>=0) {
+
+
+        if (userAgent.indexOf("MSIE") >= 0) {
             mapProvider = MAP_ID_YAHOO;
-            mapJS =MAP_JS_YAHOO;
+            mapJS       = MAP_JS_YAHOO;
         }
-        
-        if(googleMapsKey!=null) {
-            mapJS = "http://maps.google.com/maps?file=api&v=2&key=" + googleMapsKey;
+
+        if (googleMapsKey != null) {
+            mapJS = "http://maps.google.com/maps?file=api&v=2&key="
+                    + googleMapsKey;
             mapProvider = "google";
         }
 
@@ -8203,7 +8263,8 @@ public class Repository extends RepositoryBase implements Tables,
         sb.append(HtmlUtil.importJS(fileUrl("/mymap.js")));
         sb.append("<div style=\"width:" + width + "px; height:" + height
                   + "px\" id=\"mapstraction\"></div>\n");
-        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + "," + HtmlUtil.squote(mapProvider)+");"));
+        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + ","
+                                  + HtmlUtil.squote(mapProvider) + ");"));
         return "";
     }
 

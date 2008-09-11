@@ -349,7 +349,7 @@ public class CatalogHarvester extends Harvester {
 
             insertMetadata(group, metadataList);
             String crumbs = repository.getBreadCrumbs(null, group, true, "",
-                                                      topGroup)[1];
+                                topGroup)[1];
             crumbs = crumbs.replace("class=", "xclass=");
             groups.add(crumbs);
             groupCnt++;
@@ -413,7 +413,8 @@ public class CatalogHarvester extends Harvester {
             groupSB.append(groupLine);
         }
         groupSB.append("</ul></div>");
-        sb.append(getRepository().makeShowHideBlock(null, "Entries", groupSB, false));
+        sb.append(getRepository().makeShowHideBlock(null, "Entries", groupSB,
+                false));
         return sb.toString();
     }
 

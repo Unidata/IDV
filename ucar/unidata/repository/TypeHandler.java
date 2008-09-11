@@ -733,27 +733,31 @@ public class TypeHandler extends RepositoryManager {
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
-                    String startDate = formatDate(request, entry.getStartDate());
+                    String startDate = formatDate(request,
+                                           entry.getStartDate());
                     String endDate = formatDate(request, entry.getEndDate());
-                    String searchUrl =  HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
-                                                     Misc.newList(ARG_FROMDATE, startDate,
-                                                                  ARG_TODATE, endDate));
-                    String searchLink =  HtmlUtil.href(
-                                                       searchUrl,
-                                                       HtmlUtil.img(
-                                                                    getRepository().fileUrl(ICON_SEARCH),
-                                                                    "Search for entries with this date range", " border=0 "));
+                    String searchUrl =
+                        HtmlUtil.url(
+                            request.url(getRepository().URL_ENTRY_SEARCH),
+                            Misc.newList(
+                                ARG_FROMDATE, startDate, ARG_TODATE,
+                                endDate));
+                    String searchLink =
+                        HtmlUtil.href(
+                            searchUrl,
+                            HtmlUtil.img(
+                                getRepository().fileUrl(ICON_SEARCH),
+                                "Search for entries with this date range",
+                                " border=0 "));
                     sb.append(
                         HtmlUtil.formEntry(
                             msgLabel("Date Range"),
-                            searchLink
-                            + HtmlUtil.space(1) +
-                            startDate
+                            searchLink + HtmlUtil.space(1) + startDate
                             + HtmlUtil.space(1)
                             + HtmlUtil.img(
                                 getRepository().fileUrl(
                                     ICON_RANGE)) + HtmlUtil.space(1)
-                            + endDate));
+                                        + endDate));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
                             formatDate(request, entry.getStartDate())));
@@ -1449,22 +1453,29 @@ public class TypeHandler extends RepositoryManager {
                                                 ""), request.getString(
                                                     ARG_AREA + "_west", ""));
 
-            boolean doMap  = false;
+            boolean      doMap    = false;
 
             StringBuffer scriptSB = new StringBuffer();
-            if(doMap) {
-                scriptSB.append("<script type=\"text/javascript\" src=\"${root}/geo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
-                scriptSB.append("<script type=\"text/javascript\" src=\"${root}/dojo/dojo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
-                scriptSB.append("<script type=\"text/javascript\" src=\"${root}/JazLibrary.js\"></script>\n");
+            if (doMap) {
+                scriptSB.append(
+                    "<script type=\"text/javascript\" src=\"${root}/geo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
+                scriptSB.append(
+                    "<script type=\"text/javascript\" src=\"${root}/dojo/dojo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
+                scriptSB.append(
+                    "<script type=\"text/javascript\" src=\"${root}/JazLibrary.js\"></script>\n");
             }
 
-            String mapCanvas = (doMap? HtmlUtil.div("", " id=\"mapcanvas\" class=\"mapcanvas\""):"");
+            String mapCanvas = (doMap
+                                ? HtmlUtil.div("",
+                                    " id=\"mapcanvas\" class=\"mapcanvas\"")
+                                : "");
             areaWidget = "<table><tr valign=top>"
                          + HtmlUtil.cols(areaWidget, mapCanvas)
                          + "</tr></table>";
-            String mapJS = (doMap?
-                HtmlUtil.script(
-                                "function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n"):"");
+            String mapJS = (doMap
+                            ? HtmlUtil.script(
+                                "function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n")
+                            : "");
             areaWidget += mapJS;
 
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),

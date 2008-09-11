@@ -37,6 +37,7 @@ public class ApiMethod {
     /** _more_ */
     public static final String TAG_API = "api";
 
+    /** _more_          */
     public static final String TAG_GROUP = "group";
 
     /** _more_ */
