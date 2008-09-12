@@ -4623,6 +4623,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Use the images
      */
     public void useImages() {
+        if(true)return;
         if (usingImagePanel) {
             return;
         }
@@ -4643,6 +4644,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param andShow true to show
      */
     public void useImages(List images, boolean andShow) {
+        if(true)return;
         if (imagePanel == null) {
             imagePanel = new ImagePanel();
         }
