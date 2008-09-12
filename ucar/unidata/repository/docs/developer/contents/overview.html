@@ -1,0 +1,85 @@
+<html>
+<head>
+  <title>RAMADDA Overview</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+RAMADDA is organized around a central class 
+[class ucar.unidata.repository.Repository]. This class is responsible for
+system initialization, receipt and dispatch of incoming http
+requests and orchestration of the various manager components.
+<p> 
+A key design goal of RAMADDA is to limit dependendcies 
+from any particular web or database environment.
+In the future  we don't know the contexts in which it might run. If we 
+design it with core dependencies on a particular database or a particular
+web environment it will be very difficult to change. Furthermore,
+RAMADDA implements a framework, a domain specific framework for
+geoscience oriented content management. 
+<p>
+The design of RAMADDA is similar to the Tomcat servlet framework in that 
+incoming requests are defined with a [class Request] object and the
+results are captured in a [class Result] object. However, RAMADDA explicitly 
+does not have dependencies on Tomcat or any other framework. This has been
+done so that it can run in a wide variety of contexts. It can run stand-alone
+with its own built in http server or it can run within Tomcat in a servlet 
+context. The [class RepsitoryServer] class (~300 LOC) is the wrapper used 
+when running with the stand alone [class ucar.unidata.util.HttpServer] class.
+The [class RepositoryServlet] (~400 LOC) class is the wrapper when running
+in the Tomcat environment. The only functional difference is that some services
+(e.g., OpenDAP) only are available under Tomcat because of their dependencies
+on that framework.
+
+<p>
+There are a set of [class RepositoryManager] classes that are responsible
+for different functional areas:
+<ul>
+<li> [class DatabaseManager] 
+Handles access to the database.
+<li> [class AccessManager] 
+Manages the access control to entries.
+<li> [class HarvesterManager]  
+Manages  the set of <a href="#harvester"> [class Harvester] objects</a>.
+<li> [class MetadataManager] 
+Manages  the set of <a href="#metadatahandler"> [class MetadataHandler] objects</a>.
+<li> [class StorageManager] Manages storing data files to disk.
+<li> [class UserManager] Manages the users.
+<li> [class ActionManager] Used to provide asynchronous 
+actions to browser based clients.
+</ul>
+
+
+<h3>Initialization</h3>
+The API into RAMADDA is declaratively defined with one or more
+api.xml files:
+[importxml api.xml]
+
+This file can be organized as a set of group tags that define
+a <i>handler</i> and contain a set of <i>api</i>. The api tag
+can also define a handler. The handlers are one of: 
+usermanager, admin, harvestermanager, actionmanager, accessmanager, metadatamanager, repository.
+<p>
+External classes can be used as handlers by providing the full
+class name. These handlers need to implement [class RequestHandler]
+and need to have a public constructor that takes as argument the
+Repository object and the xml api Element.
+<p>
+The api tag contains a <i>path</i> attribute which is used the 
+the url path. e.g., the main way to view an entry is the &quot;/entry/show&quot; path. The url ends up looking like:<br> 
+&lt;repository suffix&gt;/entry/show?id=&lt;entry id&gt;
+</br>
+The <i>method</i> attribute is the method name on the handler that is called.
+These methods have the signature:
+<pre>
+public Result processEntryShow(Request request) throws Exception {
+    ...
+}</pre>
+
+They take a [class Request] object and return a [class Result] object.
+
+
+
+
+</body>

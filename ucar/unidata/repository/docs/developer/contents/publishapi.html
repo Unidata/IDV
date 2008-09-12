@@ -50,11 +50,11 @@ Subsequent posts to RAMADDA just require an extra argument:
 You can also use   RepositoryClient code:
 <pre>
   RepositoryClient client = new RepositoryClient(server, 80, "/repository", userId,password);
-  String[] msg = { "" };
+  String\[\] msg = { "" };
   if (client.isValidSession(true, msg)) {
        System.err.println("Valid session");
    } else {
-        System.err.println("Invalid session:" + msg[0]);
+        System.err.println("Invalid session:" + msg\[0\]);
    }
 </pre>
 
