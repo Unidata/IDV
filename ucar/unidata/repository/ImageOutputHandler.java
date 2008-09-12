@@ -133,6 +133,8 @@ public class ImageOutputHandler extends OutputHandler {
     protected void addOutputTypes(Request request, State state,
                                   List<OutputType> types)
             throws Exception {
+        //If its a single entry then punt
+        if(state.entry!=null) return;
         List<Entry> entries = state.getAllEntries();
         if (entries.size() > 0) {
             boolean ok = false;

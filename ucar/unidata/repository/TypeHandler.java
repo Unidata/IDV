@@ -1006,9 +1006,9 @@ public class TypeHandler extends RepositoryManager {
         }
 
         //        System.err.println("tables:" + tables);
-        return SqlUtil.select(getConnection(), what, tables,
-                              Clause.and(clauses), extra,
-                              getRepository().getMax(request));
+        return getDatabaseManager().select(what, tables,
+                                           Clause.and(clauses), extra,
+                                           getRepository().getMax(request));
     }
 
 

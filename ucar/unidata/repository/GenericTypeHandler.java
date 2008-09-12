@@ -131,8 +131,7 @@ public class GenericTypeHandler extends TypeHandler {
         }
 
 
-        Statement statement =
-            getRepository().getConnection().createStatement();
+        Statement statement = getDatabaseManager().createStatement();
         colNames.add(COL_ID);
         StringBuffer tableDef = new StringBuffer("CREATE TABLE "
                                     + getTableName() + " (\n");
@@ -172,6 +171,7 @@ public class GenericTypeHandler extends TypeHandler {
             colNames.addAll(column.getColumnNames());
             column.createTable(statement);
         }
+        statement.close();
 
         //TODO: Run through the table and delete any columns and indices that aren't defined anymore
 

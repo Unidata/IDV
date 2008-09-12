@@ -527,7 +527,7 @@ public class UserManager extends RepositoryManager {
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            SqlUtil.update(getConnection(), TABLE_USERS, COL_USERS_ID,
+            getDatabaseManager().update(TABLE_USERS, COL_USERS_ID,
                            user.getId(), new String[] {
                 COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
                 COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN,

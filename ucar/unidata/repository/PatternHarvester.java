@@ -551,10 +551,8 @@ public class PatternHarvester extends Harvester {
                     continue;
                 }
                 Entry entry = processFile(f);
-                if (entry != null) {
-                    entries.add(entry);
-                }
-
+                if(entry == null) continue;
+                entries.add(entry);
                 entryCnt++;
                 if (entries.size() > 1000) {
                     List uniqueEntries = repository.getUniqueEntries(entries);
@@ -730,11 +728,14 @@ public class PatternHarvester extends Harvester {
 
         }
         typeHandler.initializeNewEntry(entry);
-
-
         return entry;
-
     }
+
+
+    public void  clearCache() {
+        super.clearCache();
+    }
+
 
     /**
      * _more_

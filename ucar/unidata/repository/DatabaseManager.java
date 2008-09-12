@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -91,7 +92,6 @@ import javax.swing.*;
 
 
 /**
- * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
@@ -105,8 +105,10 @@ public class DatabaseManager extends RepositoryManager {
     /** _more_ */
     private Connection theConnection;
 
+    /** _more_          */
     private int connectionCnt = 0;
 
+    /** _more_          */
     private Object CONNECTION_MUTEX = new Object();
 
 
@@ -137,6 +139,15 @@ public class DatabaseManager extends RepositoryManager {
     /**
      * _more_
      *
+     * @throws Exception _more_
+     */
+    public void init() throws Exception {
+        releaseConnection(getConnection());
+    }
+
+    /**
+     * _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
@@ -146,6 +157,13 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Connection getNewConnection() throws Exception {
         return getConnection(true);
     }
@@ -153,6 +171,105 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+
+    /** _more_          */
+    private List<ConnectionWrapper> connectionsToClose =
+        new ArrayList<ConnectionWrapper>();
+
+    /**
+     * Class ConnectionWrapper _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
+    private static class ConnectionWrapper {
+
+        /** _more_          */
+        long now = System.currentTimeMillis();
+
+        /** _more_          */
+        Connection connection;
+
+        /**
+         * _more_
+         *
+         * @param connection _more_
+         */
+        ConnectionWrapper(Connection connection) {
+            this.connection = connection;
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement createStatement() throws Exception {
+        Connection connection = getConnection();
+        Statement  stmt       = connection.createStatement();
+        releaseConnection(connection);
+        return stmt;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param query _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public PreparedStatement getPreparedStatement(String query)
+            throws Exception {
+        Connection        connection = getConnection();
+        PreparedStatement stmt       = connection.prepareStatement(query);
+        releaseConnection(connection);
+        return stmt;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param colId _more_
+     * @param id _more_
+     * @param names _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
+    public void update(String table, String colId, String id, String[] names,
+                       Object[] values)
+            throws Exception {
+        Connection        connection = getConnection();
+        String            query      = SqlUtil.makeUpdate(table, colId,
+                                           names);
+        PreparedStatement stmt       = connection.prepareStatement(query);
+        for (int i = 0; i < values.length; i++) {
+            SqlUtil.setValue(stmt, values[i], i + 1);
+        }
+        stmt.setString(values.length + 1, id);
+        stmt.execute();
+        stmt.close();
+        releaseConnection(connection);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     */
+    public void releaseConnection(Connection connection) {}
 
     /**
      * _more_
@@ -164,15 +281,14 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     private Connection getConnection(boolean makeNewOne) throws Exception {
-
-
         if (makeNewOne) {
-            return makeConnection();
+            Connection connection = makeConnection();
+            return connection;
         }
-        synchronized(CONNECTION_MUTEX) {
-            if(connectionCnt++>100) {
-                closeConnection();
-                connectionCnt = 0;
+        synchronized (CONNECTION_MUTEX) {
+            if (connectionCnt++ > 100) {
+                //                closeConnection();
+                //                connectionCnt = 0;
             }
             if (theConnection == null) {
                 theConnection = makeConnection();
@@ -192,8 +308,18 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param clause _more_
+     *
+     * @throws Exception _more_
+     */
     public void delete(String table, Clause clause) throws Exception {
-        SqlUtil.delete(getConnection(), table, clause);
+        Connection connection = getConnection();
+        SqlUtil.delete(connection, table, clause);
+        releaseConnection(connection);
     }
 
 
@@ -213,9 +339,14 @@ public class DatabaseManager extends RepositoryManager {
      * _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public boolean hasConnection() throws Exception {
-        return getConnection() != null;
+        Connection connection = getConnection();
+        boolean    connected  = connection != null;
+        releaseConnection(connection);
+        return connected;
     }
 
 
@@ -255,9 +386,16 @@ public class DatabaseManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("JDBC URL:", dbUrl));
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public DatabaseMetaData getMetadata() throws Exception {
-        Connection connection = getNewConnection();
-        DatabaseMetaData dbmd = connection.getMetaData();
+        Connection       connection = getNewConnection();
+        DatabaseMetaData dbmd       = connection.getMetaData();
         connection.close();
         return dbmd;
     }
@@ -276,7 +414,7 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-        DatabaseMetaData dbmd = getMetadata();
+        DatabaseMetaData dbmd     = getMetadata();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
@@ -465,7 +603,10 @@ public class DatabaseManager extends RepositoryManager {
      */
     protected Statement execute(String sql, int max, int timeout)
             throws Exception {
-        return execute(getConnection(), sql, max, timeout);
+        Connection connection = getConnection();
+        Statement  stmt       = execute(connection, sql, max, timeout);
+        releaseConnection(connection);
+        return stmt;
     }
 
 
@@ -527,7 +668,7 @@ public class DatabaseManager extends RepositoryManager {
      */
     protected void executeInsert(String insert, Object[] values)
             throws Exception {
-        PreparedStatement pstmt = getConnection().prepareStatement(insert);
+        PreparedStatement pstmt = getPreparedStatement(insert);
         for (int i = 0; i < values.length; i++) {
             //Assume null is a string
             if (values[i] == null) {
@@ -665,8 +806,36 @@ public class DatabaseManager extends RepositoryManager {
     public Statement select(String what, String table, Clause clause,
                             String extra)
             throws Exception {
-        return SqlUtil.select(getConnection(), what, Misc.newList(table),
-                              new Clause[] { clause }, extra);
+        Connection connection = getConnection();
+        Statement stmt = SqlUtil.select(connection, what,
+                                        Misc.newList(table),
+                                        new Clause[] { clause }, extra);
+        releaseConnection(connection);
+        return stmt;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param tables _more_
+     * @param clause _more_
+     * @param extra _more_
+     * @param max _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Statement select(String what, List tables, Clause clause,
+                            String extra, int max)
+            throws Exception {
+        Connection connection = getConnection();
+        Statement stmt = SqlUtil.select(connection, what, tables, clause,
+                                        extra, max);
+        releaseConnection(connection);
+        return stmt;
     }
 
 
@@ -720,6 +889,7 @@ public class DatabaseManager extends RepositoryManager {
         return select(what, Misc.newList(table), Clause.toArray(clauses));
     }
 
+
     /**
      * _more_
      *
@@ -733,7 +903,10 @@ public class DatabaseManager extends RepositoryManager {
      */
     public Statement select(String what, List tables, Clause[] clauses)
             throws Exception {
-        return SqlUtil.select(getConnection(), what, tables, clauses);
+        Connection connection = getConnection();
+        Statement  stmt = SqlUtil.select(connection, what, tables, clauses);
+        releaseConnection(connection);
+        return stmt;
     }
 
 

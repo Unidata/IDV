@@ -472,6 +472,10 @@ public class Harvester extends RepositoryManager {
         setActive(false);
     }
 
+    public void  clearCache() {
+        
+    }
+
 
     /**
      * _more_

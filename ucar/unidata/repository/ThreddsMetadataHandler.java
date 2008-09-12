@@ -402,6 +402,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (var instanceof CoordinateAxis) {
                     CoordinateAxis ca       = (CoordinateAxis) var;
                     AxisType       axisType = ca.getAxisType();
+                    if(axisType == null) continue;
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
@@ -428,20 +429,29 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
                 String varName = var.getShortName();
-                ucar.nc2.Attribute att =
-                    var.findAttribute(NCATTR_STANDARD_NAME);
-                if (att != null) {
-                    varName = att.getStringValue();
-                }
-
-
-
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_VARIABLE,
                                         DFLT_INHERITED, varName,
                                         var.getName(), var.getUnitsString(),
                                         "");
                 entry.addMetadata(metadata, true);
+
+                //Also add in the standard name
+                ucar.nc2.Attribute att =
+                    var.findAttribute(NCATTR_STANDARD_NAME);
+
+                if (att != null) {
+                    varName = att.getStringValue();
+                    metadata = new Metadata(getRepository().getGUID(),
+                                            entry.getId(), TYPE_VARIABLE,
+                                            DFLT_INHERITED, varName,
+                                            var.getName(), var.getUnitsString(),
+                                            "");
+                    entry.addMetadata(metadata, true);
+                }
+
+
+
             }
 
             //If we didn't have a lat/lon coordinate axis then check projection

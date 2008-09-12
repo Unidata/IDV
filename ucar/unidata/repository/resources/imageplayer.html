@@ -1,4 +1,21 @@
 
+
+<style>
+.imageblock {
+        height: 750px; 
+	max-height: 750px; 
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+
+.imageplayer {
+    background-color:#cccccc;
+}
+
+</style>
+
+
 <SCRIPT LANGUAGE="JavaScript">
 focus()
 // <!--
@@ -442,21 +459,18 @@ This requires Javascript for an animation of the imagery.
 </NOSCRIPT>
 
 
-<TABLE BORDER="1" CELLPADDING="0" CELLSPACING="0">
+<TABLE BORDER="1" CELLPADDING="0" CELLSPACING="0" width="100%" class="imageplayer">
     <TR>
-        <TD width="150" align="center" valign="center" BGCOLOR="#999999"> 
-
-
-
-
+    <TD width="10%" align="center" valign="center" > 
 <A HREF="JavaScript: noop()" onClick="setImage(0,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/Rewind24.gif" ALT="Got to first frame" title="Go to first frame"></A>
 <A HREF="JavaScript: noop()" onClick="setImage(current_image-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/StepBack24.gif" ALT="One step back" TITLE="One step back"></A>
 <A HREF="JavaScript: noop()" onClick="startStop()"><IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/Play24.gif" ALT="Start/Stop" TITLE="Start/Stop"></A>
 <A HREF="JavaScript: noop()" onClick="setImage(current_image+1,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/StepForward24.gif" ALT="One step forward" TITLE="One step forward"></A>
 <A HREF="JavaScript: noop()" onClick="setImage(numImages-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/FastForward24.gif" ALT="Go to last frame" TITLE="Go to last frame"></A></TD>
-    <TD WIDTH=600 BGCOLOR="#999999" valign="bottom">
-<table width="100%"><tr valign="bottom">
-<td><div style="margin-bottom:2" id="hideboxes">&nbsp;</div>
+    <TD WIDTH=600 valign="bottom">
+<table  width="100%"><tr valign="bottom">
+<td>
+<div style="margin-bottom:2" id="hideboxes">&nbsp;</div>
 <div id="boxes">&nbsp;</div>
 </td>
 <FORM METHOD="POST" NAME="control_form" action="javascript:goToImage(document.control_form.frameNumber.value)">
@@ -466,9 +480,10 @@ This requires Javascript for an animation of the imagery.
 </table>
 </TD>
 </FORM>
-    </TR>
-    <TR VALIGN="top" >
-      <TD BGCOLOR="#999999">
+</TR>
+
+<TR VALIGN="top" >
+<TD width=10%>
 <p>
 <table>
 <tr><td align="right">Loop Mode:</td>
@@ -502,9 +517,11 @@ This requires Javascript for an animation of the imagery.
 </table>
 
 </TD>
-<TD BGCOLOR="#999999" ALIGN=CENTER VALIGN=top>
-   <div id="header" style="margin:2">&nbsp;</div>
+<TD VALIGN=top>
+   <div  id="header" style="margin:2">&nbsp;</div>
+   <div class="imageblock">
   <IMG NAME="animation" BORDER=0 WIDTH=600  SRC="${firstimage}" ALT="image">
+   </div>
 </TD>
 </TR>
 </TABLE>

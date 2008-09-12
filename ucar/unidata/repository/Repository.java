@@ -290,6 +290,8 @@ public class Repository extends RepositoryBase implements Tables,
     /** _more_ */
     private List<String> localFilePaths = new ArrayList<String>();
 
+    public static final String ID_PREFIX_SYNTH = "synth:";
+
     /** _more_ */
     public static final String ID_PREFIX_LOCAL_FILE = "file:";
 
@@ -742,7 +744,7 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected void initServer() throws Exception {
-        getConnection();
+        getDatabaseManager().init();
         initTypeHandlers();
         initSchema();
 
@@ -1117,11 +1119,14 @@ public class Repository extends RepositoryBase implements Tables,
      * @param exc _more_
      */
     protected void log(String message, Throwable exc) {
-        System.err.println(message);
+        System.err.println("Error:" + message);
         Throwable thr = null;
         if (exc != null) {
+            exc.printStackTrace();
             thr = LogUtil.getInnerException(exc);
-            thr.printStackTrace();
+            if(thr!=null) {
+                thr.printStackTrace();
+            }
         }
         try {
             String line = new Date() + " -- " + message;
@@ -1468,8 +1473,7 @@ public class Repository extends RepositoryBase implements Tables,
                                           ",", true, true)) {
             Entry entry = getEntry(request, id, false);
             if (entry == null) {
-                throw new IllegalArgumentException("Could not find entry:"
-                        + id);
+                throw new MissingEntryException("Could not find entry:"  + id);
             }
             if (entry.isTopGroup()) {
                 StringBuffer sb = new StringBuffer();
@@ -1621,7 +1625,10 @@ public class Repository extends RepositoryBase implements Tables,
                 //                result.addHttpHeader("WWW-Authenticate","Basic realm=\"repository\"");
             } else {
                 result.setResponseCode(Result.RESPONSE_INTERNALERROR);
-                log("Error handling request:" + request, exc);
+                String userAgent = request.getHeaderArg("User-Agent");
+                if(userAgent==null)
+                    userAgent = "Unknown";
+                log("Error handling request:" + request + " user-agent:" + userAgent +" ip:" + request.getIp(), exc);
             }
         }
 
@@ -1735,6 +1742,11 @@ public class Repository extends RepositoryBase implements Tables,
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }
+
+        String userAgent = request.getHeaderArg("User-Agent");
+        if(userAgent==null)
+            userAgent = "Unknown";
+        System.err.println(request + " user-agent:" + userAgent +" ip:" + request.getIp());
 
         if ( !getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
             return getAdmin().doInitialization(request);
@@ -2102,17 +2114,6 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Connection getConnection() throws Exception {
-        return getDatabaseManager().getConnection();
-    }
-
 
 
     /**
@@ -2123,12 +2124,12 @@ public class Repository extends RepositoryBase implements Tables,
      */
     protected void initSchema() throws Exception {
         //Force a connection
-        getConnection();
+        getDatabaseManager().init();
         String sql = IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
                                          getClass());
         sql = getDatabaseManager().convertSql(sql);
 
-        Statement statement = getConnection().createStatement();
+        Statement statement = getDatabaseManager().createStatement();
         SqlUtil.loadSql(sql, statement, true);
 
         for (String file : typeDefinitionFiles) {
@@ -3334,7 +3335,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
         Entry fromEntry = getEntry(request, fromId);
         if (fromEntry == null) {
-            throw new IllegalArgumentException("Could not find entry "
+            throw new MissingEntryException("Could not find entry "
                     + fromId);
         }
 
@@ -3391,7 +3392,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         Entry toEntry = getEntry(request, toId);
         if (toEntry == null) {
-            throw new IllegalArgumentException("Could not find entry "
+            throw new MissingEntryException("Could not find entry "
                     + toId);
         }
         if ( !toEntry.isGroup()) {
@@ -3537,7 +3538,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
         Entry entry = getEntry(request, entryId);
         if (entry == null) {
-            throw new IllegalArgumentException(
+            throw new MissingEntryException(
                 "Could not find entry with id:" + entryId);
         }
 
@@ -3635,7 +3636,7 @@ public class Repository extends RepositoryBase implements Tables,
                 throw new AccessException(
                     "You do not have access to this entry");
             }
-            throw new IllegalArgumentException("Could not find entry:"
+            throw new MissingEntryException("Could not find entry:"
                     + request.getString(ARG_ID, BLANK));
         }
         return entry;
@@ -3902,7 +3903,7 @@ public class Repository extends RepositoryBase implements Tables,
         if (parentGroup == null) {
             parentGroup = (Group) getEntry(request, parentId);
             if (parentGroup == null) {
-                throw new IllegalArgumentException("Could not find parent:"
+                throw new MissingEntryException("Could not find parent:"
                         + parentId);
             }
         }
@@ -3914,7 +3915,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         TypeHandler typeHandler = getTypeHandler(type);
         if (typeHandler == null) {
-            throw new IllegalArgumentException("Could not find type:" + type);
+            throw new MissingEntryException("Could not find type:" + type);
         }
         String   id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
                        ? getGroupId(parentGroup)
@@ -3987,14 +3988,14 @@ public class Repository extends RepositoryBase implements Tables,
         if (fromEntry == null) {
             fromEntry = getEntry(request, fromId);
             if (fromEntry == null) {
-                throw new IllegalArgumentException(
+                throw new MissingEntryException(
                     "Could not find from entry:" + fromId);
             }
         }
         if (toEntry == null) {
             toEntry = getEntry(request, toId);
             if (toEntry == null) {
-                throw new IllegalArgumentException("Could not find to entry:"
+                throw new MissingEntryException("Could not find to entry:"
                         + toId);
             }
         }
@@ -4508,8 +4509,7 @@ public class Repository extends RepositoryBase implements Tables,
         if (comment.length() == 0) {
             sb.append(warning(msg("Please enter a comment")));
         } else {
-            PreparedStatement insert =
-                getConnection().prepareStatement(INSERT_COMMENTS);
+            PreparedStatement insert = getDatabaseManager().getPreparedStatement(INSERT_COMMENTS);
             int col = 1;
             insert.setString(col++, getGUID());
             insert.setString(col++, entry.getId());
@@ -4577,8 +4577,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
 
-        PreparedStatement assocInsert =
-            getConnection().prepareStatement(INSERT_ASSOCIATIONS);
+        PreparedStatement assocInsert = getDatabaseManager().getPreparedStatement(INSERT_ASSOCIATIONS);
         int    col = 1;
         String id  = getGUID();
         assocInsert.setString(col++, id);
@@ -4608,11 +4607,11 @@ public class Repository extends RepositoryBase implements Tables,
                                    request.getString(ARG_FROM, BLANK));
         Entry toEntry = getEntry(request, request.getString(ARG_TO, BLANK));
         if (fromEntry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
+            throw new MissingEntryException("Could not find entry:"
                     + request.getString(ARG_FROM, BLANK));
         }
         if (toEntry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
+            throw new MissingEntryException("Could not find entry:"
                     + request.getString(ARG_TO, BLANK));
         }
         String name = request.getString(ARG_NAME, (String) null);
@@ -5473,7 +5472,7 @@ public class Repository extends RepositoryBase implements Tables,
             }
             return (Group) entry;
         }
-        throw new IllegalArgumentException("Could not find group:"
+        throw new MissingEntryException("Could not find group:"
                                            + groupNameOrId);
     }
 
@@ -6060,7 +6059,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         Group group = findGroup(request, id);
         if (group == null) {
-            throw new IllegalArgumentException("Could not find group:" + id);
+            throw new MissingEntryException("Could not find group:" + id);
         }
         sb.append(
             XmlUtil.tag(
@@ -7988,6 +7987,11 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
+    public void clearSeenResources() {
+        seenResources = new Hashtable();
+    }
+
+
 
 
     /** _more_ */
@@ -8039,9 +8043,10 @@ public class Repository extends RepositoryBase implements Tables,
             if (seenResources.size() > 50000) {
                 seenResources = new Hashtable();
             }
-            PreparedStatement select =
+            Connection connection = getDatabaseManager().getConnection();
+            PreparedStatement select = 
                 SqlUtil.getSelectStatement(
-                    getConnection(), "count(" + COL_ENTRIES_ID + ")",
+                                           connection, "count(" + COL_ENTRIES_ID + ")",
                     Misc.newList(TABLE_ENTRIES),
                     Clause.and(
                         Clause.eq(COL_ENTRIES_RESOURCE, ""),
@@ -8066,6 +8071,7 @@ public class Repository extends RepositoryBase implements Tables,
                 }
             }
             select.close();
+            getDatabaseManager().releaseConnection(connection);
             long t2 = System.currentTimeMillis();
             //            System.err.println("Took:" + (t2 - t1) + "ms to check: "
             //                               + entries.size() + " entries");
@@ -8254,6 +8260,11 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    public static class MissingEntryException extends Exception {
+        public MissingEntryException (String msg) {
+            super(msg);
+        }
+    }
 
 }
 

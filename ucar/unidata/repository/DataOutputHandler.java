@@ -68,10 +68,12 @@ import ucar.unidata.geoloc.*;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.util.Cache;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
@@ -166,15 +168,32 @@ public class DataOutputHandler extends OutputHandler {
                                                           Boolean>();
 
 
-    /** _more_ */
-    private Object CACHE_MUTEX = new Object();
 
-    /** _more_ */
-    private Hashtable<String, NetcdfFile> cache = new Hashtable<String,
-                                                      NetcdfFile>();
+    private Cache ncFileCache = new Cache(100) {
+            protected void removeValue(Object key, Object value) {
+                try {
+                    ((NetcdfFile)value).close();
+                }catch(Exception exc) {}
+            }
+        };
 
-    /** _more_ */
-    private List<String> cachedFiles = new ArrayList<String>();
+
+    private Cache gridCache = new Cache(100) {
+            protected void removeValue(Object key, Object value) {
+                try {
+                    ((NetcdfFile)value).close();
+                }catch(Exception exc) {}
+            }
+        };
+
+
+    private Cache pointCache = new Cache(100) {
+            protected void removeValue(Object key, Object value) {
+                try {
+                    ((NetcdfFile)value).close();
+                }catch(Exception exc) {}
+            }
+        };
 
 
 
@@ -502,13 +521,12 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-        File          file    = entry.getResource().getFile();
-        NetcdfDataset dataset = NetcdfDataset.openDataset(file.toString());
         if (getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_EDIT)) {
             request.put(ARG_ADDMETADATA, "true");
             sb.append(HtmlUtil.href(request.getUrl(), "Add metadata"));
         }
+        NetcdfDataset dataset = getNetcdfDataset(entry.getResource().getFile());
         if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
@@ -542,10 +560,17 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public PointObsDataset getPointDataset(File file) throws Exception {
-        return (PointObsDataset) TypedDatasetFactory.open(
-            ucar.nc2.constants.FeatureType.POINT, file.toString(), null,
-            new StringBuilder());
+        String path = file.toString();
+        PointObsDataset pds = (PointObsDataset) pointCache.get(path);
+        if(pds == null) {
+            pds =  (PointObsDataset) TypedDatasetFactory.open(
+                                                              ucar.nc2.constants.FeatureType.POINT, path, null,
+                new StringBuilder());
+            pointCache.put(path, pds);
+        }
+        return pds;
     }
+
 
     /**
      * _more_
@@ -557,8 +582,26 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public GridDataset getGridDataset(File file) throws Exception {
-        return GridDataset.open(file.toString());
+        String path = file.toString();
+        GridDataset gds =(GridDataset) gridCache.get(path);
+        if(gds == null) {
+            gridCache.put(path, gds =  GridDataset.open(path));
+        }
+        return gds;
     }
+
+
+
+    public NetcdfDataset getNetcdfDataset(File file) throws Exception {
+        String path = file.toString();
+        NetcdfDataset dataset = (NetcdfDataset)ncFileCache.get(path);
+        if(dataset==null) {
+            dataset = NetcdfDataset.openDataset(path);
+            ncFileCache.put(path, dataset);
+        } 
+        return dataset;
+    }
+
 
 
     /**
@@ -677,8 +720,6 @@ public class DataOutputHandler extends OutputHandler {
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
                               false, "");
 
-        //        NetcdfDataset dataset =
-        //            NetcdfDataset.openDataset(file.toString());
         sb.append(crumbs[1]);
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
         String fileName = IOUtil.stripExtension(entry.getName())
@@ -1274,8 +1315,6 @@ public class DataOutputHandler extends OutputHandler {
      */
     public class NcDODSServlet extends opendap.servlet.AbstractServlet {
 
-        /** _more_ */
-        public static final int CACHE_LIMIT = 100;
 
         /** _more_ */
         Request repositoryRequest;
@@ -1312,35 +1351,15 @@ public class DataOutputHandler extends OutputHandler {
             HttpServletRequest request = preq.getRequest();
             String             reqPath = entry.getName();
             String location = entry.getResource().getFile().toString();
-            NetcdfFile         ncFile  = null;
-            //TODO: Should we be caching the ncFiles? The GuardedDatasets?
-            synchronized (CACHE_MUTEX) {
-                String cacheKey = repositoryRequest.getSessionId() + "_"
-                                  + location;
-                ncFile = cache.get(cacheKey);
-                if (ncFile != null) {
-                    //Bump it to the end of the list
-                    cachedFiles.remove(location);
-                    cachedFiles.add(location);
-                } else {
-                    ncFile = NetcdfDataset.acquireFile(location, null);
-                    while (cachedFiles.size() > CACHE_LIMIT) {
-                        String firstFile = cachedFiles.get(0);
-                        String firstFileCacheKey =
-                            repositoryRequest.getSessionId() + "_"
-                            + firstFile;
-                        cachedFiles.remove(0);
-                        cache.get(firstFileCacheKey).close();
-                        cache.remove(firstFileCacheKey);
-                    }
-                    cachedFiles.add(location);
-                    cache.put(cacheKey, ncFile);
-                }
-            }
 
-            GuardedDatasetImpl guardedDataset =
-                new GuardedDatasetImpl(reqPath, ncFile, true);
-            return guardedDataset;
+            try {
+                NetcdfFile         ncFile  =  getNetcdfDataset(entry.getResource().getFile());
+                GuardedDatasetImpl guardedDataset =
+                    new GuardedDatasetImpl(reqPath, ncFile, true);
+                return guardedDataset;
+            } catch(Exception exc) {
+                throw new WrapperException(exc);
+            }
         }
 
         /**

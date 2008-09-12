@@ -303,16 +303,6 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getDatabaseManager();
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Connection getConnection() throws Exception {
-        return getDatabaseManager().getConnection();
-    }
 
     /**
      * _more_
