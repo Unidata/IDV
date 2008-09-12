@@ -1,0 +1,20 @@
+<api>
+  <property name="admin" value="false"/>
+  <property name="cancache" value="true"/>
+  <group handler="repository">
+      <api request="/entry/show"             method="processEntryShow"    name="Home" toplevel="true" ishome="true"/>
+      <api request="/entry/show/*"           method="processEntryShow"/>
+...
+  </group>
+  <group handler="metadatamanager">
+      <api request="/metadata/list"       method="processMetadataList"/>
+      <api request="/metadata/form"       method="processMetadataForm"       actions="edit"/>
+...
+  </group>
+  <group handler="admin">
+      <api request="/admin/sql"          method="adminSql"           admin="true"/>
+      <api request="/admin/startstop"    method="adminDbStartStop"   admin="true"/>
+...
+  </group>
+
+</api>
