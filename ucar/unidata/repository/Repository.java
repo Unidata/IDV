@@ -747,15 +747,14 @@ public class Repository extends RepositoryBase implements Tables,
         initSchema();
 
         for (String sqlFile : (List<String>) loadFiles) {
-            System.err.println("loading");
             String     sql        = IOUtil.readContents(sqlFile, getClass());
-            Connection connection = getConnection();
+            Connection connection = getDatabaseManager().getNewConnection();
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
             SqlUtil.loadSql(sql, statement, false, true);
             connection.commit();
             connection.setAutoCommit(true);
-            System.err.println("done");
+            connection.close();
         }
         readGlobals();
 
@@ -2111,22 +2110,8 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     public Connection getConnection() throws Exception {
-        return getConnection(false);
+        return getDatabaseManager().getConnection();
     }
-
-    /**
-     * _more_
-     *
-     * @param makeNewOne _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Connection getConnection(boolean makeNewOne) throws Exception {
-        return getDatabaseManager().getConnection(makeNewOne);
-    }
-
 
 
 
@@ -2202,8 +2187,8 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected void writeGlobal(String name, String value) throws Exception {
-        SqlUtil.delete(getConnection(), TABLE_GLOBALS,
-                       Clause.eq(COL_GLOBALS_NAME, name));
+        getDatabaseManager().delete(TABLE_GLOBALS,
+                                    Clause.eq(COL_GLOBALS_NAME, name));
         getDatabaseManager().executeInsert(INSERT_GLOBALS,
                                            new Object[] { name,
                 value });
@@ -3465,7 +3450,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
 
-        Connection connection = getConnection(true);
+        Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
         try {
@@ -4481,7 +4466,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Result processCommentsEdit(Request request) throws Exception {
         Entry entry = getEntry(request);
-        SqlUtil.delete(getConnection(), TABLE_COMMENTS,
+        getDatabaseManager().delete(TABLE_COMMENTS,
                        Clause.eq(COL_COMMENTS_ID,
                                  request.getUnsafeString(ARG_COMMENT_ID,
                                      BLANK)));
@@ -4683,7 +4668,7 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
-            SqlUtil.delete(getConnection(), TABLE_ASSOCIATIONS, clause);
+            getDatabaseManager().delete(TABLE_ASSOCIATIONS, clause);
             fromEntry.setAssociations(null);
             toEntry.setAssociations(null);
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
@@ -7610,7 +7595,7 @@ public class Repository extends RepositoryBase implements Tables,
             return;
         }
         delCnt = 0;
-        Connection connection = getConnection(true);
+        Connection connection = getDatabaseManager().getNewConnection();
         try {
             deleteEntriesInner(request, entries, connection, asynchId);
         } finally {
@@ -7806,7 +7791,7 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         //We have our own connection
-        Connection connection = getConnection(true);
+        Connection connection = getDatabaseManager().getNewConnection();
         try {
             insertEntriesInner(entries, connection, isNew, canBeBatched);
         } finally {
@@ -7885,7 +7870,7 @@ public class Repository extends RepositoryBase implements Tables,
             List<Metadata> metadataList = entry.getMetadata();
             if (metadataList != null) {
                 if ( !isNew) {
-                    SqlUtil.delete(getConnection(), TABLE_METADATA,
+                    getDatabaseManager().delete(TABLE_METADATA,
                                    Clause.eq(COL_METADATA_ENTRY_ID,
                                              entry.getId()));
                 }

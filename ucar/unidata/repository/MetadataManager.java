@@ -428,9 +428,9 @@ public class MetadataManager extends RepositoryManager {
                     if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
                         continue;
                     }
-                    SqlUtil.delete(getConnection(), TABLE_METADATA,
-                                   Clause.eq(COL_METADATA_ID,
-                                             request.getString(arg, BLANK)));
+                    getDatabaseManager().delete(TABLE_METADATA,
+                                                Clause.eq(COL_METADATA_ID,
+                                                          request.getString(arg, BLANK)));
                 }
             } else {
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
@@ -439,9 +439,9 @@ public class MetadataManager extends RepositoryManager {
                 }
 
                 for (Metadata metadata : newMetadata) {
-                    SqlUtil.delete(getConnection(), TABLE_METADATA,
-                                   Clause.eq(COL_METADATA_ID,
-                                             metadata.getId()));
+                    getDatabaseManager().delete(TABLE_METADATA,
+                                          Clause.eq(COL_METADATA_ID,
+                                                    metadata.getId()));
                     insertMetadata(metadata);
                 }
             }

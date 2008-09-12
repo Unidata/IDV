@@ -336,7 +336,7 @@ public class Admin extends RepositoryManager {
             throws Exception {
 
         StringBuffer     sb       = new StringBuffer();
-        DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
+        DatabaseMetaData dbmd = getDatabaseManager().getMetadata();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
@@ -495,14 +495,14 @@ public class Admin extends RepositoryManager {
         sb.append(header("Database Administration"));
         String what = request.getString(ARG_ADMIN_WHAT, "nothing");
         if (what.equals("shutdown")) {
-            if (getRepository().getConnection() == null) {
+            if (!getDatabaseManager().hasConnection()) {
                 sb.append("Not connected to database");
             } else {
                 getRepository().getDatabaseManager().closeConnection();
                 sb.append("Database is shut down");
             }
         } else if (what.equals("restart")) {
-            if (getRepository().getConnection() != null) {
+            if (getDatabaseManager().hasConnection()) {
                 sb.append("Already connected to database");
             } else {
                 getRepository().getDatabaseManager().makeConnection();
@@ -511,7 +511,7 @@ public class Admin extends RepositoryManager {
         }
         sb.append("<p>");
         sb.append(request.form(URL_ADMIN_STARTSTOP, " name=\"admin\""));
-        if (repository.getConnection() == null) {
+        if (!getDatabaseManager().hasConnection()) {
             sb.append(HtmlUtil.hidden(ARG_ADMIN_WHAT, "restart"));
             sb.append(HtmlUtil.submit("Restart Database"));
         } else {
@@ -906,12 +906,13 @@ public class Admin extends RepositoryManager {
         long t1 = System.currentTimeMillis();
 
         if (bulkLoad) {
-            Connection connection = getConnection();
+            Connection connection = getDatabaseManager().getNewConnection();
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
             SqlUtil.loadSql(query, statement, false, true);
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
             return makeResult(request, msg("SQL"),
                               new StringBuffer("Executed SQL" + "<P>"
                                   + HtmlUtil.space(1) + sb.toString()));

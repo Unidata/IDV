@@ -463,7 +463,7 @@ public class AccessManager extends RepositoryManager {
                                      List<Permission> permissions)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            SqlUtil.delete(getConnection(), TABLE_PERMISSIONS,
+            getDatabaseManager().delete(TABLE_PERMISSIONS,
                            Clause.eq(COL_PERMISSIONS_ENTRY_ID,
                                      entry.getId()));
 

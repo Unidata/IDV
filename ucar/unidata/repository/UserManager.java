@@ -565,6 +565,7 @@ public class UserManager extends RepositoryManager {
         }
     }
 
+
     /**
      * _more_
      *
@@ -574,8 +575,8 @@ public class UserManager extends RepositoryManager {
      */
     protected void deleteUser(User user) throws Exception {
         deleteRoles(user);
-        SqlUtil.delete(getConnection(), TABLE_USERS,
-                       Clause.eq(COL_USERS_ID, user.getId()));
+        getDatabaseManager().delete(TABLE_USERS,
+                                    Clause.eq(COL_USERS_ID, user.getId()));
     }
 
     /**
@@ -586,8 +587,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteRoles(User user) throws Exception {
-        SqlUtil.delete(getConnection(), TABLE_USERROLES,
-                       Clause.eq(COL_USERROLES_USER_ID, user.getId()));
+        getDatabaseManager().delete(TABLE_USERROLES,
+                                    Clause.eq(COL_USERROLES_USER_ID, user.getId()));
     }
 
 

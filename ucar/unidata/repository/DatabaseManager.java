@@ -105,6 +105,9 @@ public class DatabaseManager extends RepositoryManager {
     /** _more_ */
     private Connection theConnection;
 
+    private int connectionCnt = 0;
+
+    private Object CONNECTION_MUTEX = new Object();
 
 
     /** _more_ */
@@ -143,6 +146,14 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
+    public Connection getNewConnection() throws Exception {
+        return getConnection(true);
+    }
+
+
+
+
+
     /**
      * _more_
      *
@@ -152,26 +163,37 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Connection getConnection(boolean makeNewOne) throws Exception {
+    private Connection getConnection(boolean makeNewOne) throws Exception {
+
 
         if (makeNewOne) {
             return makeConnection();
         }
-        if (theConnection == null) {
-            theConnection = makeConnection();
-        }
-
-        try {
-            Statement statement = theConnection.createStatement();
-            statement.execute("select * from dummy");
-        } catch (Exception exc) {
-            try {
+        synchronized(CONNECTION_MUTEX) {
+            if(connectionCnt++>100) {
                 closeConnection();
-            } catch (Exception ignore) {}
-            theConnection = makeConnection();
-        }
+                connectionCnt = 0;
+            }
+            if (theConnection == null) {
+                theConnection = makeConnection();
+            }
+            try {
+                Statement statement = theConnection.createStatement();
+                statement.execute("select * from dummy");
+            } catch (Exception exc) {
+                try {
+                    closeConnection();
+                } catch (Exception ignore) {}
+                theConnection = makeConnection();
+            }
 
-        return theConnection;
+            return theConnection;
+        }
+    }
+
+
+    public void delete(String table, Clause clause) throws Exception {
+        SqlUtil.delete(getConnection(), table, clause);
     }
 
 
@@ -192,8 +214,8 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public boolean hasConnection() {
-        return theConnection != null;
+    public boolean hasConnection() throws Exception {
+        return getConnection() != null;
     }
 
 
@@ -233,6 +255,14 @@ public class DatabaseManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("JDBC URL:", dbUrl));
     }
 
+    public DatabaseMetaData getMetadata() throws Exception {
+        Connection connection = getNewConnection();
+        DatabaseMetaData dbmd = connection.getMetaData();
+        connection.close();
+        return dbmd;
+    }
+
+
     /**
      * _more_
      *
@@ -246,9 +276,7 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-
-
-        DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
+        DatabaseMetaData dbmd = getMetadata();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });

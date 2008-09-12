@@ -321,8 +321,8 @@ public class HarvesterManager extends RepositoryManager {
         if (request.exists(ARG_DELETE_CONFIRM)) {
             harvesterMap.remove(harvester.getId());
             harvesters.remove(harvester);
-            SqlUtil.delete(getConnection(), TABLE_HARVESTERS,
-                           Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
+            getDatabaseManager().delete(TABLE_HARVESTERS,
+                                        Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
             return new Result(request.url(URL_HARVESTERS_LIST));
         } else if (request.exists(ARG_DELETE)) {
             sb.append(
@@ -334,9 +334,8 @@ public class HarvesterManager extends RepositoryManager {
         } else {
             if (request.exists(ARG_CHANGE)) {
                 harvester.applyEditForm(request);
-                SqlUtil.delete(getConnection(), TABLE_HARVESTERS,
-                               Clause.eq(COL_HARVESTERS_ID,
-                                         harvester.getId()));
+                getDatabaseManager().delete(TABLE_HARVESTERS,
+                                            Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
                 getDatabaseManager().executeInsert(INSERT_HARVESTERS,
                         new Object[] { harvester.getId(),
                                        harvester.getClass().getName(),
