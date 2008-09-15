@@ -454,14 +454,12 @@ public class OutputHandler extends RepositoryManager {
 
             if (okToMove) {
                 event += (entry.isGroup()
-                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,'"
-                          + entryId + "')")
+                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event," + HtmlUtil.squote(entryId)+")")
                           : "") + HtmlUtil.onMouseOut(
-                              "mouseOutOnEntry(event,'" + entryId
-                              + "')") + HtmlUtil.onMouseDown(
-                                  "mouseDownOnEntry(event,'" + entryId
-                                  + "','" + entry.getLabel().replace("'", "")
-                                  + "');") + (entry.isGroup()
+                                                      "mouseOutOnEntry(event," + 
+                                                      HtmlUtil.squote(entryId)+ ")") + 
+                    HtmlUtil.onMouseDown("mouseDownOnEntry(event," + HtmlUtil.squote(entryId)    + "," + 
+                                         HtmlUtil.squote(entry.getLabel().replace("'", ""))  + ");") + (entry.isGroup()
                         ? dropEvent
                         : "");
             }
@@ -483,15 +481,16 @@ public class OutputHandler extends RepositoryManager {
         }
 
         String elementId = entry.getId();
+        System.err.println("ID:" + elementId +":");
         sb.append(
             HtmlUtil.href(
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
                 linkText,
                 " id=" + HtmlUtil.quote(elementId) + " "
                 + HtmlUtil.onMouseOver(
-                    "tooltip.show(event,'" + elementId
-                    + "');") + HtmlUtil.onMouseOut(
-                        "tooltip.hide(event,'" + elementId + "');")));
+                                       "tooltip.show(event," + HtmlUtil.squote(elementId)
+                                       + ");") + HtmlUtil.onMouseOut(
+                                                                     "tooltip.hide(event," + HtmlUtil.squote(elementId)+ ");")));
 
         return HtmlUtil.span(sb.toString(),
                              " id="

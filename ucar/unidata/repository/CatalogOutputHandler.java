@@ -595,7 +595,6 @@ public class CatalogOutputHandler extends OutputHandler {
         }
 
 
-
         addServices(entry, request, catalogInfo, dataset);
 
         addMetadata(request, entry, catalogInfo, dataset);
@@ -692,12 +691,12 @@ public class CatalogOutputHandler extends OutputHandler {
         for (int i = 0; i < parent.keys().size(); i++) {
             Object     key   = parent.keys().get(i);
             EntryGroup group = (EntryGroup) parent.map.get(key);
-
-            Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
+            /*            Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
                                              datasetNode,
                                              new String[] { ATTR_NAME,
                     group.key.toString() });
-
+            */
+            Element dataset = datasetNode;
             for (int j = 0; j < group.children.size(); j++) {
                 Object child = group.children.get(j);
                 if (child instanceof EntryGroup) {
