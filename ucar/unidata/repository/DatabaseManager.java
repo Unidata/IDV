@@ -169,9 +169,6 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-
-
-
     /** _more_          */
     private List<ConnectionWrapper> connectionsToClose =
         new ArrayList<ConnectionWrapper>();
@@ -294,6 +291,7 @@ public class DatabaseManager extends RepositoryManager {
                 theConnection = makeConnection();
             }
             try {
+                //check if the connection is OK
                 Statement statement = theConnection.createStatement();
                 statement.execute("select * from dummy");
             } catch (Exception exc) {
@@ -302,7 +300,6 @@ public class DatabaseManager extends RepositoryManager {
                 } catch (Exception ignore) {}
                 theConnection = makeConnection();
             }
-
             return theConnection;
         }
     }

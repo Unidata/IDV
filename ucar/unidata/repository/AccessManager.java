@@ -161,6 +161,7 @@ public class AccessManager extends RepositoryManager {
     public boolean canDoAction(Request request, String action)
             throws Exception {
 
+
         User user = request.getUser();
         //The admin can do anything
 
@@ -286,13 +287,13 @@ public class AccessManager extends RepositoryManager {
                 }
                 break;
             }
+            
             entry = repository.getEntry(request, entry.getParentGroupId());
         }
-
         return false;
     }
 
-
+    Hashtable seen = new Hashtable();
 
     /**
      * _more_

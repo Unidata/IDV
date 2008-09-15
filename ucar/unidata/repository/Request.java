@@ -198,7 +198,7 @@ public class Request implements Constants {
             return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
         }
         Group collectionGroup = entry.getCollectionGroup();
-        if (repository.isLocalFileEntry(entry.getId())) {
+        if (repository.isSynthEntry(entry.getId())) {
             return url(theUrl, arg, entry.getId());
         }
 

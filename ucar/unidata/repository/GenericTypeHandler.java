@@ -593,6 +593,7 @@ public class GenericTypeHandler extends TypeHandler {
             Object[] values   = entry.getValues();
             if (values != null) {
                 for (Column column : columns) {
+                    if(!column.getCanShow()) continue;
                     StringBuffer tmpSb = new StringBuffer();
                     valueIdx = column.formatValue(tmpSb, output, values,
                             valueIdx);

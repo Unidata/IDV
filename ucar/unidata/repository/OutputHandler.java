@@ -441,6 +441,7 @@ public class OutputHandler extends RepositoryManager {
     protected String getAjaxLink(Request request, Entry entry,
                                  String linkText, boolean includeIcon) {
         StringBuffer sb = new StringBuffer();
+        String entryId = entry.getId();
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
             String  icon     = getRepository().getIconUrl(entry);
@@ -448,17 +449,17 @@ public class OutputHandler extends RepositoryManager {
                                    + entry.getId() + "')");
             String event = (entry.isGroup()
                             ? HtmlUtil.onMouseClick("folderClick('"
-                                + entry.getId() + "')")
+                                + entryId + "')")
                             : "");
 
             if (okToMove) {
                 event += (entry.isGroup()
                           ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,'"
-                          + entry.getId() + "')")
+                          + entryId + "')")
                           : "") + HtmlUtil.onMouseOut(
-                              "mouseOutOnEntry(event,'" + entry.getId()
+                              "mouseOutOnEntry(event,'" + entryId
                               + "')") + HtmlUtil.onMouseDown(
-                                  "mouseDownOnEntry(event,'" + entry.getId()
+                                  "mouseDownOnEntry(event,'" + entryId
                                   + "','" + entry.getLabel().replace("'", "")
                                   + "');") + (entry.isGroup()
                         ? dropEvent
@@ -470,7 +471,7 @@ public class OutputHandler extends RepositoryManager {
                                              ? "Click to open group; "
                                              : "") + (okToMove
                     ? "Drag to move"
-                    : ""), " id=" + HtmlUtil.quote("img_" + entry.getId())
+                    : ""), " id=" + HtmlUtil.quote("img_" + entryId)
                            + event);
             if (entry.isGroup()) {
                 //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
@@ -480,6 +481,7 @@ public class OutputHandler extends RepositoryManager {
             }
             sb.append(HtmlUtil.space(1));
         }
+
         String elementId = entry.getId();
         sb.append(
             HtmlUtil.href(

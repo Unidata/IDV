@@ -760,6 +760,7 @@ public class Admin extends RepositoryManager {
                 PROP_LOCALFILEPATHS,
                 request.getString(PROP_LOCALFILEPATHS, ""));
             getRepository().setLocalFilePaths();
+            getRepository().clearCache();
         }
 
         List<OutputHandler> outputHandlers =

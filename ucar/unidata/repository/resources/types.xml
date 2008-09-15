@@ -1,5 +1,17 @@
 <types>
 
+  <type name="localfiles"  description="Local File View" handler="ucar.unidata.repository.LocalFileTypeHandler">
+     <property name="form.show.resource" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.date" value="false"/>
+     <column name="localfilepath" group="Look for files here" type="string"     label="Local file path" columns="80"  showinhtml="false"/>
+     <column name="timedelay" type="double"  label="Age" suffix="Find files that haven't changed in this time (minutes)"  showinhtml="false"/>
+     <column name="includepattern" group="Find files or directories" type="string"     label="Match files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
+     <column name="excludepattern" type="string"     label="Exclude files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
+     <column name="naming"  group="Attributes"       type="string"     label="Naming" rows="5" suffix="pattern:replacement"  showinhtml="false"/>
+ </type>
+
+
   <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" group="Level 3 Things" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 
                 properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>

@@ -296,7 +296,7 @@ public class Harvester extends RepositoryManager {
                                          HtmlUtil.SIZE_40)));
         sb.append(HtmlUtil.formEntry(msgLabel("Create entries of type"),
                                      repository.makeTypeSelect(request,
-                                         false, typeHandler.getType())));
+                                         false, typeHandler.getType(),false)));
         sb.append(
             HtmlUtil.formEntry(
                 msgLabel("Run"),

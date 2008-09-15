@@ -159,6 +159,8 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_SEARCHTYPE = "searchtype";
 
+    private static final String ATTR_SHOWINHTML = "showinhtml";
+
 
     /** _more_ */
     private TypeHandler typeHandler;
@@ -177,6 +179,7 @@ public class Column implements Tables, Constants {
 
     /** _more_ */
     private String description;
+
 
     /** _more_ */
     private String type;
@@ -217,6 +220,8 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private int offset;
 
+    private boolean canShow  =true;
+
 
     /**
      * _more_
@@ -247,6 +252,7 @@ public class Column implements Tables, Constants {
         dflt        = XmlUtil.getAttribute(element, ATTR_DEFAULT, "");
         isIndex     = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
         canSearch   = XmlUtil.getAttribute(element, ATTR_CANSEARCH, false);
+        canShow     = XmlUtil.getAttribute(element, ATTR_SHOWINHTML, canShow);
         canList     = XmlUtil.getAttribute(element, ATTR_CANLIST, false);
         size        = XmlUtil.getAttribute(element, ATTR_SIZE, size);
         rows        = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
@@ -687,8 +693,8 @@ public class Column implements Tables, Constants {
             state.put(group, group);
         }
 
-        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
-                                             HtmlUtil.hbox(widget, suffix)));
+        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",widget));
+        //xxxx                                             HtmlUtil.hbox(widget, suffix)));
         formBuffer.append("\n");
     }
 
@@ -1051,6 +1057,27 @@ public class Column implements Tables, Constants {
     public boolean getIsIndex() {
         return isIndex;
     }
+
+
+
+    /**
+       Set the CanShow property.
+
+       @param value The new value for CanShow
+    **/
+    public void setCanShow (boolean value) {
+	canShow = value;
+    }
+
+    /**
+       Get the CanShow property.
+
+       @return The CanShow
+    **/
+    public boolean getCanShow () {
+	return canShow;
+    }
+
 
 
     /**

@@ -181,6 +181,26 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public boolean canBeCreatedBy(Request request) {
+        return true;
+    }
+
+
+    public boolean adminOnly() {
+        return false;
+    }
+
+    public boolean isSynthType() {
+        return false;
+    }
+    public List<String> getSynthIds(Request request, Group group, String synthId) throws Exception {
+        throw new IllegalArgumentException("getSynthIds  not implemented");
+    }
+
+    public Entry makeSynthEntry(Request request,Entry parentEntry, String id) throws Exception {
+        throw new IllegalArgumentException("makeSynthEntry  not implemented");
+    }
+
 
     /**
      * _more_

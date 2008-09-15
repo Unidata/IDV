@@ -280,6 +280,8 @@ public class Repository extends RepositoryBase implements Tables,
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
 
+    private Object  MUTEX_ENTRY = new Object();
+
     /** _more_ */
     private List dataTypeList = null;
 
@@ -288,18 +290,9 @@ public class Repository extends RepositoryBase implements Tables,
 
 
     /** _more_ */
-    private List<String> localFilePaths = new ArrayList<String>();
+    private List<File> localFilePaths = new ArrayList<File>();
 
     public static final String ID_PREFIX_SYNTH = "synth:";
-
-    /** _more_ */
-    public static final String ID_PREFIX_LOCAL_FILE = "file:";
-
-    /** _more_ */
-    public static final String ID_PREFIX_CATALOG = "catalog:";
-
-    /** _more_ */
-    public static final String ID_PREFIX_GENERATED = "generated:";
 
 
     /**
@@ -1067,11 +1060,13 @@ public class Repository extends RepositoryBase implements Tables,
      */
     protected void clearCache(Entry entry) {
         //        System.err.println ("Clear cache " + entry.getId());
+        synchronized(MUTEX_ENTRY) {
         entryCache.remove(entry.getId());
         if (entry.isGroup()) {
             Group group = (Group) entry;
             groupCache.remove(group.getId());
             groupCache.remove(group.getFullName());
+        }
         }
     }
 
@@ -1122,7 +1117,7 @@ public class Repository extends RepositoryBase implements Tables,
         System.err.println("Error:" + message);
         Throwable thr = null;
         if (exc != null) {
-            exc.printStackTrace();
+            //            exc.printStackTrace();
             thr = LogUtil.getInnerException(exc);
             if(thr!=null) {
                 thr.printStackTrace();
@@ -1746,7 +1741,7 @@ public class Repository extends RepositoryBase implements Tables,
         String userAgent = request.getHeaderArg("User-Agent");
         if(userAgent==null)
             userAgent = "Unknown";
-        System.err.println(request + " user-agent:" + userAgent +" ip:" + request.getIp());
+        //        System.err.println(request + " user-agent:" + userAgent +" ip:" + request.getIp());
 
         if ( !getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
             return getAdmin().doInitialization(request);
@@ -3486,10 +3481,12 @@ public class Repository extends RepositoryBase implements Tables,
                     }
 
                     //TODO: we also cache the group full names
+                    synchronized(MUTEX_ENTRY) {
                     entryCache.remove(oldId);
                     entryCache.put(fromEntry.getId(), fromEntry);
                     groupCache.remove(fromEntry.getId());
                     groupCache.put(fromEntry.getId(), (Group) fromEntry);
+                    }
                 }
 
                 //Change the parent
@@ -3645,6 +3642,7 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
+
     /**
      * _more_
      *
@@ -3661,6 +3659,7 @@ public class Repository extends RepositoryBase implements Tables,
                              boolean andFilter, boolean abbreviated)
             throws Exception {
 
+
         if (entryId == null) {
             return null;
         }
@@ -3668,6 +3667,7 @@ public class Repository extends RepositoryBase implements Tables,
             return topGroup;
         }
 
+        synchronized(MUTEX_ENTRY) {
         Entry entry = (Entry) entryCache.get(entryId);
         if (entry != null) {
             if ( !andFilter) {
@@ -3676,93 +3676,14 @@ public class Repository extends RepositoryBase implements Tables,
             return getAccessManager().filterEntry(request, entry);
         }
 
-        if (isLocalFileEntry(entryId)) {
-            File f          = new File(getFileFromId(entryId));
-            File parentFile = f.getParentFile();
-            if ((parentFile != null)
-                    && (parentFile.getParentFile() == null)) {
-                parentFile = null;
-            }
-            Group parent = (Group) ((parentFile != null)
-                                    ? getEntry(request,
-                                        getIdFromFile(parentFile), andFilter,
-                                        abbreviated)
-                                    : null);
-            if (parent == null) {
-                parent = topGroup;
-            }
-            Metadata patternMetadata =
-                getMetadataManager().findMetadata(parent,
-                    AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
-            PatternFileFilter filter = null;
-            if ((patternMetadata != null)
-                    && (patternMetadata.getAttr1().trim().length() > 0)) {
-                try {
-                    filter =
-                        new PatternFileFilter(patternMetadata.getAttr1());
-                    if ( !filter.accept(f)) {
-                        return null;
-                    }
-                } catch (Exception exc) {
-                    throw new IllegalStateException(
-                        "Bad local files pattern:"
-                        + patternMetadata.getAttr1());
-                }
-            }
-
-
-            TypeHandler handler = (f.isDirectory()
-                                   ? getTypeHandler(TypeHandler.TYPE_GROUP)
-                                   : getTypeHandler(TypeHandler.TYPE_FILE));
-            if ( !f.exists()) {
-                return null;
-            }
-            entry = (f.isDirectory()
-                     ? (Entry) new Group(entryId, handler)
-                     : new Entry(entryId, handler));
-            String name = f.toString();
-
-            if ( !localFilePaths.contains(name.replace("\\", "/"))) {
-                name = IOUtil.getFileTail(name);
-            }
-            entry.setIsLocalFile(true);
-            entry.initEntry(name, "", parent, "",
-                            getUserManager().localFileUser,
-                            new Resource(f, (f.isDirectory()
-                                             ? Resource.TYPE_LOCAL_DIRECTORY
-                                             : Resource
-                                             .TYPE_LOCAL_FILE)), "",
-                                                 f.lastModified(),
-                                                     f.lastModified(),
-                                                         f.lastModified(),
-                                                             null);
-        } else if (isCatalogEntry(entryId)) {
-            String url    = getCatalogFromId(entryId);
-            Group  parent = null;
-            if (parent == null) {
-                parent = topGroup;
-            }
-            TypeHandler handler = getTypeHandler(TypeHandler.TYPE_GROUP);
-            entry = new Group(entryId, handler);
-            String name = IOUtil.getFileTail(url);
-            entry.setIsLocalFile(true);
-            Date now = new Date();
-            entry.initEntry(name, "", parent, "",
-                            getUserManager().localFileUser,
-                            new Resource(url, Resource.TYPE_URL), "",
-                            now.getTime(), now.getTime(), now.getTime(),
-                            null);
-        } else if (isGeneratedEntry(entryId)) {
-            String[] ids = getGeneratedIdPair(entryId);
-            if (ids.length != 2) {
-                throw new IllegalArgumentException("Bad generated id:"
-                        + entryId);
-            }
-            Entry parentEntry = getEntry(request, ids[0]);
-            if (parentEntry == null) {
-                return null;
-            }
-            entry = parentEntry.createGeneratedEntry(request, ids[1]);
+        if (isSynthEntry(entryId)) {
+            String[] pair = getSynthId(entryId);
+            String parentEntryId = pair[0];
+            Entry parentEntry = getEntry(request, parentEntryId, andFilter, abbreviated);
+            if(parentEntry == null) return null;
+            TypeHandler typeHandler = parentEntry.getTypeHandler();
+            entry =typeHandler.makeSynthEntry(request, parentEntry, pair[1]);
+            if(entry == null) return null;
         } else {
             Statement entryStmt =
                 getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
@@ -3780,18 +3701,19 @@ public class Repository extends RepositoryBase implements Tables,
             entryStmt.close();
 
         }
-        if (andFilter) {
-            entry = getAccessManager().filterEntry(request, entry);
-        }
-
         if ( !abbreviated && (entry != null)) {
             if (entryCache.size() > ENTRY_CACHE_LIMIT) {
                 entryCache = new Hashtable();
             }
-            //            System.err.println ("caching " + entryId);
             entryCache.put(entryId, entry);
         }
+
+        if (andFilter) {
+            entry = getAccessManager().filterEntry(request, entry);
+        }
+
         return entry;
+        }
 
     }
 
@@ -3849,7 +3771,7 @@ public class Repository extends RepositoryBase implements Tables,
         sb.append(request.form(URL_ENTRY_FORM));
         sb.append(HtmlUtil.submit("Create a:"));
         sb.append(HtmlUtil.space(1));
-        sb.append(makeTypeSelect(request, false));
+        sb.append(makeTypeSelect(request, false,"",true));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
@@ -3941,6 +3863,9 @@ public class Repository extends RepositoryBase implements Tables,
             toDate = parseDate(XmlUtil.getAttribute(node, ATTR_TODATE));
         }
 
+        if(!typeHandler.canBeCreatedBy(request)) {
+            throw new IllegalArgumentException("Cannot create an entry of type " + typeHandler.getDescription());
+        }
         Entry entry = typeHandler.createEntry(id);
         entry.initEntry(name, description, parentGroup, "",
                         request.getUser(), resource, dataType,
@@ -4221,7 +4146,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         if (type == null) {
             sb.append(HtmlUtil.formEntry("Type:",
-                                         makeTypeSelect(request, false)));
+                                         makeTypeSelect(request, false,"",true)));
 
             sb.append(
                 HtmlUtil.formEntry(
@@ -5110,6 +5035,10 @@ public class Repository extends RepositoryBase implements Tables,
 
                     }
 
+                    if(!typeHandler.canBeCreatedBy(request)) {
+                        throw new IllegalArgumentException("Cannot create an entry of type " + typeHandler.getDescription());
+                    }
+
                     entry = typeHandler.createEntry(id);
                     entry.initEntry(name, description, parentGroup, "",
                                     request.getUser(),
@@ -5342,7 +5271,7 @@ public class Repository extends RepositoryBase implements Tables,
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
             List<String> ids =
-                getEntryIdsInGroup(
+                getChildIds(
                     request, findGroup(request, entry.getParentGroupId()),
                     new ArrayList<Clause>());
             String nextId = null;
@@ -5696,7 +5625,7 @@ public class Repository extends RepositoryBase implements Tables,
         List<Entry>   entries       = new ArrayList<Entry>();
         List<Group>   subGroups     = new ArrayList<Group>();
         try {
-            List<String> ids = getEntryIdsInGroup(request, group, where);
+            List<String> ids = getChildIds(request, group, where);
             for (String id : ids) {
                 Entry entry = getEntry(request, id);
 
@@ -5777,39 +5706,21 @@ public class Repository extends RepositoryBase implements Tables,
      *
      * @throws Exception _more_
      */
-    protected List<String> getEntryIdsInGroup(Request request, Group group,
+    protected List<String> getChildIds(Request request, Group group,
             List<Clause> where)
             throws Exception {
         List<String> ids = new ArrayList<String>();
-        if (isLocalFileEntry(group.getId())) {
-            Metadata patternMetadata =
-                getMetadataManager().findMetadata(group,
-                    AdminMetadataHandler.TYPE_LOCALFILE_PATTERN, true);
-            PatternFileFilter filter = null;
-            if ((patternMetadata != null)
-                    && (patternMetadata.getAttr1().trim().length() > 0)) {
-                try {
-                    filter =
-                        new PatternFileFilter(patternMetadata.getAttr1());
-                } catch (Exception exc) {
-                    throw new IllegalStateException(
-                        "Bad local files pattern:"
-                        + patternMetadata.getAttr1());
-                }
-            }
-            File   f     = new File(getFileFromId(group.getId()));
-            File[] files = f.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isHidden() || files[i].isDirectory()) {}
-                else {
-                    if ((filter != null) && !filter.accept(files[i])) {
-                        continue;
-                    }
-                }
-                ids.add(getIdFromFile(files[i]));
-            }
-            ids = Misc.sort(ids);
-            return ids;
+        boolean isSynthEntry = isSynthEntry(group.getId());
+        if (group.getTypeHandler().isSynthType() || isSynthEntry) {
+            String synthId =null;
+            if(isSynthEntry) {
+                String[] pair = getSynthId(group.getId());
+                String entryId = pair[0];
+                synthId = pair[1];
+                group = (Group)getEntry(request, entryId, false, false);
+                if(group == null) return ids; 
+            } 
+            return group.getTypeHandler().getSynthIds(request, group, synthId);
         }
 
 
@@ -5832,16 +5743,7 @@ public class Repository extends RepositoryBase implements Tables,
             }
         }
 
-        //Add in any local file directories
-        if (topGroup.equals(group)) {
-            for (String path : localFilePaths) {
-                ids.add(getIdFromFile(path));
-            }
-        }
-
         group.addChildrenIds(ids);
-
-
         return ids;
     }
 
@@ -6233,7 +6135,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public String makeTypeSelect(Request request, boolean includeAny)
             throws Exception {
-        return makeTypeSelect(request, includeAny, "");
+        return makeTypeSelect(request, includeAny, "",false);
     }
 
     /**
@@ -6248,12 +6150,15 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     public String makeTypeSelect(Request request, boolean includeAny,
-                                 String selected)
+                                 String selected, boolean checkAddOk)
             throws Exception {
         List<TypeHandler> typeHandlers = getTypeHandlers();
         List              tmp          = new ArrayList();
         for (TypeHandler typeHandler : typeHandlers) {
             if (typeHandler.isAnyHandler() && !includeAny) {
+                continue;
+            }
+            if(checkAddOk && !typeHandler.canBeCreatedBy(request)) {
                 continue;
             }
             tmp.add(new TwoFacedObject(typeHandler.getLabel(),
@@ -6552,126 +6457,29 @@ public class Repository extends RepositoryBase implements Tables,
      * _more_
      */
     public void setLocalFilePaths() {
-        localFilePaths =
+        localFilePaths = (List<File>)Misc.toList(IOUtil.toFiles(
             (List<String>) StringUtil.split(getProperty(PROP_LOCALFILEPATHS,
-                ""), "\n", true, true);
+                ""), "\n", true, true)));
     }
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public String getFileFromId(String id) {
-        return id.substring(ID_PREFIX_LOCAL_FILE.length());
-    }
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public String getCatalogFromId(String id) {
-        return id.substring(ID_PREFIX_CATALOG.length());
-    }
-
-    /**
-     * _more_
-     *
-     * @param file _more_
-     *
-     * @return _more_
-     */
-    public String getIdFromFile(File file) {
-        return getIdFromFile(file.toString());
-    }
-
-    /**
-     * _more_
-     *
-     * @param file _more_
-     *
-     * @return _more_
-     */
-    public String getIdFromFile(String file) {
-        file = file.replace("\\", "/");
-        return ID_PREFIX_LOCAL_FILE + file;
+    public List<File> getLocalFilePaths() {
+        return localFilePaths;
     }
 
 
-    /**
-     * _more_
-     *
-     * @param url _more_
-     *
-     * @return _more_
-     */
-    public String getIdFromCatalog(String url) {
-        return ID_PREFIX_CATALOG + url;
+    public boolean isSynthEntry(String id) {
+        return id.startsWith(ID_PREFIX_SYNTH);
     }
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public boolean isGeneratedEntry(String id) {
-        return id.startsWith(ID_PREFIX_GENERATED);
-    }
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public String[] getGeneratedIdPair(String id) {
-        id = id.substring(ID_PREFIX_GENERATED.length());
-        return StringUtil.split(id, ";", 2);
+    public String[] getSynthId(String id) {
+        id = id.substring(ID_PREFIX_SYNTH.length());
+        String[]pair = StringUtil.split(id, ":", 2);
+        if(pair == null) return new String[]{id,null};
+        return pair;
     }
 
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public boolean isLocalFileEntry(String id) {
-        if (id.startsWith(ID_PREFIX_LOCAL_FILE)) {
-            id = id.substring(ID_PREFIX_LOCAL_FILE.length());
-            for (String path : localFilePaths) {
-                if (id.startsWith(path)) {
-                    checkFilePath(id);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public boolean isCatalogEntry(String id) {
-        if (id.startsWith(ID_PREFIX_CATALOG)) {
-            return true;
-        }
-        return false;
-    }
 
 
     /**
@@ -6697,11 +6505,7 @@ public class Repository extends RepositoryBase implements Tables,
             return group;
         }
 
-        if (isLocalFileEntry(id)) {
-            return (Group) getEntry(request, id);
-        }
-
-        if (isCatalogEntry(id)) {
+        if (isSynthEntry(id)) {
             return (Group) getEntry(request, id);
         }
 
