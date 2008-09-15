@@ -3652,7 +3652,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void getLegendLabels(List labels, int legendType) {
         labels.add(applyMacrosToTemplate(getLegendLabelTemplate(), true));
-        if (extraLabelTemplate.length() > 0) {
+        if (extraLabelTemplate!=null && extraLabelTemplate.length() > 0) {
             labels.addAll(
                 StringUtil.split(
                     applyMacrosToTemplate(extraLabelTemplate, true), "\n",
