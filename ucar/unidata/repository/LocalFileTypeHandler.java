@@ -221,14 +221,29 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         Entry entry = (targetFile.isDirectory()
                         ? (Entry) new Group(synthId, handler)
                         : new Entry(synthId, handler));
-        String name = IOUtil.getFileTail(targetFile.toString());
+        String name = null;
         List<String> names = get(values,COL_NAMES);
         for(String pair: names) {
+            boolean doPath = false;
+            if(pair.startsWith("path:")) {
+                pair  = pair.substring("path:".length());
+                doPath = true;
+            } else  if(pair.startsWith("name:")) {
+                pair  = pair.substring("name:".length());
+                doPath = false;
+            }
+            if(name == null) {
+                if(doPath) {
+                    name = targetFile.toString();
+                } else {
+                    name = IOUtil.getFileTail(targetFile.toString());
+                }
+            }
             String []tuple = StringUtil.split(pair,":",2);
             if(tuple==null || tuple.length!=2) continue;
-            //TODO: Allow for regsub here
-            name  = name.replace(tuple[0],tuple[1]);
+            name  = name.replaceAll(".*" +tuple[0]+".*",tuple[1]);
         }
+        if(name == null) name = IOUtil.getFileTail(targetFile.toString());
         entry.setIsLocalFile(true);
         Group parent;
         if(targetFile.getParentFile().equals(rootDir)) {

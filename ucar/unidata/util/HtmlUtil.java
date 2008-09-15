@@ -1025,6 +1025,10 @@ public class HtmlUtil {
 
 
 
+    public static String inset(String html, int space) {
+        return div(html,style("margin:" + space +"px;"));
+    }
+
     public static String select(String name, List values, List<String> selected,
                                 String extra, int maxLength) {
         StringBuffer sb = new StringBuffer();

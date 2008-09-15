@@ -1049,7 +1049,7 @@ public class TypeHandler extends RepositoryManager {
 
         String size = HtmlUtil.SIZE_70;
         if (okToShowInForm(ARG_NAME)) {
-            sb.append(HtmlUtil.formEntry("Name:",
+            sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                          HtmlUtil.input(ARG_NAME,
                                              ((entry != null)
                     ? entry.getName()
@@ -1064,10 +1064,10 @@ public class TypeHandler extends RepositoryManager {
         if (okToShowInForm(ARG_DESCRIPTION)) {
             sb.append(
                 HtmlUtil.formEntryTop(
-                    "Description:",
+                                      msgLabel("Description"),
                     HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
                     ? entry.getDescription()
-                    : BLANK), rows, 50)));
+                    : BLANK), rows, 60)));
         }
 
         if (okToShowInForm(ARG_RESOURCE)) {

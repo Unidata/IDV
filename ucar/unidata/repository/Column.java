@@ -692,7 +692,6 @@ public class Column implements Tables, Constants {
                         2)));
             state.put(group, group);
         }
-
         formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",widget));
         //xxxx                                             HtmlUtil.hbox(widget, suffix)));
         formBuffer.append("\n");
@@ -784,7 +783,7 @@ public class Column implements Tables, Constants {
                                         "size=\"" + columns + "\"");
             }
         }
-        return HtmlUtil.hbox(widget, suffix);
+        return HtmlUtil.hbox(widget, HtmlUtil.inset(suffix,5));
     }
 
 

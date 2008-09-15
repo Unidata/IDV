@@ -2148,7 +2148,17 @@ public class StringUtil {
      *
      * @throws Exception some problem
      */
-    public static void main(String[] args) throws Exception {}
+    public static void main(String[] args) throws Exception {
+        String  pattern = ".*([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{2})([0-9]{2}).*";
+        String with = "NCEP GFS 191km Alaska $1-$2-$3 $4:$5:00 GMT";
+        String value ="GFS_Alaska_191km_20051011_0000.grib1";
+        System.err.println (value);
+        System.err.println (pattern);
+        System.err.println (with);
+        System.err.println (value.replaceAll(pattern, with));
+
+
+    }
 
 
 

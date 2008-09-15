@@ -8,7 +8,7 @@
      <column name="timedelay" type="double"  label="Age" suffix="Find files that haven't changed in this time (minutes)"  showinhtml="false"/>
      <column name="includepattern" group="Find files or directories" type="string"     label="Match files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
      <column name="excludepattern" type="string"     label="Exclude files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
-     <column name="naming"  group="Attributes"       type="string"     label="Naming" rows="5" suffix="pattern:replacement"  showinhtml="false"/>
+     <column name="naming"  group="Attributes"       type="string"     label="Naming" rows="5" suffix="pattern:replacement e.g.&lt;br&gt;&lt;i&gt;NAM:North American Model&lt;br&gt;path:GFS:Global Forecast Model&lt;br&gt;&lt;i&gt;"  showinhtml="false"/>
  </type>
 
 
