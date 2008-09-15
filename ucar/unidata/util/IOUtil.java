@@ -1112,6 +1112,14 @@ public class IOUtil {
 
 
 
+    public static boolean isADescendent(File parent, File child) {
+        if(child == null) return false;
+        if(parent.equals(child)) return true;
+        File newParent = child.getParentFile();
+        return isADescendent(parent, newParent);
+    }
+
+
     /**
      * Return the String contents of the specified contentName.
      * If the read fails (for whatever reason) then return the dflt parameter
