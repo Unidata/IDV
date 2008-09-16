@@ -26,7 +26,7 @@ def setDebug(debug=1):
 
 # You can provide a python 'dictionary' of datasource:pattern pairs
 # which provide the 'setfiles' functionality in the bundle isl tag
-def loadBundle(bundleFile, setFilesDict=None):
+def loadBundle(bundleFile, setFilesDict=None, width=-1, height=-1):
     if (setFilesDict != None):
       setFiles = ArrayList()
       keys = setFilesDict.keys()
@@ -37,7 +37,7 @@ def loadBundle(bundleFile, setFilesDict=None):
     else:
       setFiles = None
       
-    islInterpreter.loadBundle(bundleFile,setFiles);
+    islInterpreter.loadBundle(bundleFile,setFiles,width,height);
       
 # If you want to modify the image, add in the isl-defined parameters
 # in the form:  params="resize width=300 height=400;matte bottom=30"

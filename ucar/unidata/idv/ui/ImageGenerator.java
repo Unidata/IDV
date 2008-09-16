@@ -3066,6 +3066,12 @@ public class ImageGenerator extends IdvManager {
      */
     public void loadBundle(String bundleFile, List setFiles)
             throws Throwable {
+        loadBundle(bundleFile, setFiles, -1,-1);
+    }
+
+    public void loadBundle(String bundleFile, List setFiles, int width, int height)
+            throws Throwable {
+        System.err.println ("width: " + width + " " + height);
         StringBuffer extra = new StringBuffer();
         if (setFiles != null) {
             for (int i = 0; i < setFiles.size(); i += 2) {
@@ -3079,8 +3085,21 @@ public class ImageGenerator extends IdvManager {
                 extra.append("\n");
             }
         }
-        String xml = "<bundle file=\"" + bundleFile + "\">" + extra
+        StringBuffer attrs = new StringBuffer();
+        attrs.append(" ");            
+        attrs.append(ATTR_FILE +"=" + quote(bundleFile));
+        attrs.append(" ");            
+        if(width>0 && height>0) {
+            attrs.append(" ");
+            attrs.append(ATTR_WIDTH +"=" + quote(""+width));
+            attrs.append(" ");
+            attrs.append(ATTR_HEIGHT +"=" + quote(""+height));
+            attrs.append(" ");            
+        }
+
+        String xml = "<bundle " +attrs +">" + extra
                      + "</bundle>";
+        System.err.println(xml);
         processTagBundle(makeElement(xml));
     }
 
@@ -3160,6 +3179,10 @@ public class ImageGenerator extends IdvManager {
         }
 
         return sb.toString();
+    }
+
+    private static String quote(String s) {
+        return "\"" + s +"\"";
     }
 
     /**
