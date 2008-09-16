@@ -22,12 +22,16 @@
 
 
 
+
 package ucar.unidata.data.text;
-import ucar.unidata.util.StringUtil;
+
+
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Holds a named group of products
@@ -35,72 +39,119 @@ import java.util.List;
  * @author IDV development team
  * @version $Revision: 1.15 $
  */
-public   class ProductGroup {
+public class ProductGroup {
+
+    /** _more_          */
     private String name;
+
+    /** _more_          */
     private List<Product> products = new ArrayList<Product>();
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     */
     public ProductGroup(String name) {
-        this.name  = name;
+        this.name = name;
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @throws Exception _more_
+     */
     public static void parse(String file) throws Exception {
-        String contents  = IOUtil.readContents(file, StringUtil.class);
-        contents = contents.replace("{","\n{\n");
-        contents = contents.replace("}","\n}\n");
-        List<String> lines = (List<String>)StringUtil.split(contents,"\n",true,true);
-        List products  = new ArrayList();
-        ProductGroup productGroup =null;
-        boolean inProduct = false;
-        for(int i=0;i<lines.size();i++) {
+        String contents = IOUtil.readContents(file, StringUtil.class);
+        contents = contents.replace("{", "\n{\n");
+        contents = contents.replace("}", "\n}\n");
+        List<String> lines = (List<String>) StringUtil.split(contents, "\n",
+                                 true, true);
+        List         products     = new ArrayList();
+        ProductGroup productGroup = null;
+        boolean      inProduct    = false;
+        for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
-            if(productGroup!=null) {
-                if(line.equals("}")) {
+            if (productGroup != null) {
+                if (line.equals("}")) {
                     productGroup = null;
-                } else  if(line.equals("{")) {
+                } else if (line.equals("{")) {
                     //NOOP
-                }  else {
-                    String[] toks = StringUtil.split(line,"|",2);
-                    if(toks == null || toks.length!=2)
-                        throw new IllegalArgumentException("Bad line:" + line);
-                    if(toks[0].startsWith("(")) continue;
-                    productGroup.addProduct(new Product(toks[0].replace("_"," "),toks[1]));
+                } else {
+                    String[] toks = StringUtil.split(line, "|", 2);
+                    if ((toks == null) || (toks.length != 2)) {
+                        throw new IllegalArgumentException("Bad line:"
+                                + line);
+                    }
+                    if (toks[0].startsWith("(")) {
+                        continue;
+                    }
+                    productGroup.addProduct(new Product(toks[0].replace("_",
+                            " "), toks[1]));
                 }
-            } else if(line.equals("{")) {
+            } else if (line.equals("{")) {
                 productGroup = null;
             } else {
                 productGroup = new ProductGroup(line);
                 products.add(productGroup);
             }
         }
-        System.err.println (products);
+        System.err.println(products);
     }
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
     public static void main(String[] args) throws Exception {
         parse(args[0]);
     }
 
-        /*
+    /*
 
 Observed_Data
 {
-	Surface_Hourlies|SFC_HRLY
-	Sounding_Data|SND_DATA
-	Synoptic_Data|SYN_DATA
-	Agriculture_Obs|AGRI_OBS
-	TAFs_Decoded|TAFS_DEC
-	RADAT|FZL_LVL
+    Surface_Hourlies|SFC_HRLY
+    Sounding_Data|SND_DATA
+    Synoptic_Data|SYN_DATA
+    Agriculture_Obs|AGRI_OBS
+    TAFs_Decoded|TAFS_DEC
+    RADAT|FZL_LVL
 }*/
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param product _more_
+     */
     public void addProduct(Product product) {
         products.add(product);
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Product> getProducts() {
         return products;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return name + " products:" + products;
     }
 }
+

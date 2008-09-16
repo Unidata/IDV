@@ -22,10 +22,13 @@
 
 
 
+
 package ucar.unidata.data.text;
+
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Holds a named product
@@ -35,53 +38,69 @@ import java.util.List;
  */
 
 public class Product {
+
+    /** _more_          */
     private String name;
+
+    /** _more_          */
     private String id;
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param id _more_
+     */
     public Product(String name, String id) {
-        this.name  = name;
-        this.id = id;
+        this.name = name;
+        this.id   = id;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
         name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
         return name;
     }
 
     /**
-       Set the Id property.
-
-       @param value The new value for Id
-    **/
-    public void setId (String value) {
+     *  Set the Id property.
+     *
+     *  @param value The new value for Id
+     */
+    public void setId(String value) {
         id = value;
     }
 
     /**
-       Get the Id property.
-
-       @return The Id
-    **/
-    public String getId () {
+     *  Get the Id property.
+     *
+     *  @return The Id
+     */
+    public String getId() {
         return id;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return name;
     }
 
 }
+
