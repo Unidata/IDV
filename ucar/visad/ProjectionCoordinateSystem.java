@@ -43,7 +43,6 @@ import visad.georef.MapProjection;
  *
  * @see ucar.unidata.geoloc.Projection
  * @see visad.georef.MapProjection
- * @author Stuart Wier
  * @author Don Murray
  * @version $Revision: 1.25 $ $Date: 2006/08/18 17:28:41 $
  */
@@ -73,9 +72,26 @@ public class ProjectionCoordinateSystem extends MapProjection
     public ProjectionCoordinateSystem(ProjectionImpl projection)
             throws VisADException {
 
-        super(RealTupleType.LatitudeLongitudeTuple,
+        this(projection, 
               new Unit[]{ CommonUnit.meter.scale(1000.0),
                           CommonUnit.meter.scale(1000.0) });
+    }
+
+    /**
+     * Constructs an instance from the supplied Projection. The
+     * reference coordinate system is RealTupleType.LatitudeLongitudeTuple;
+     * the incoming units are assumed to be km (1000 m).
+     *
+     * @param projection  projection to adapt
+     *
+     * @throws NullPointerException if the argument is <code>null</code>.
+     *
+     * @throws VisADException
+     */
+    public ProjectionCoordinateSystem(ProjectionImpl projection, Unit[] units)
+            throws VisADException {
+
+        super(RealTupleType.LatitudeLongitudeTuple, units);
 
         if (projection == null) {
             throw new NullPointerException();
@@ -219,6 +235,7 @@ public class ProjectionCoordinateSystem extends MapProjection
     public Element createElement(XmlEncoder encoder) {
         ArrayList args = new ArrayList(1);
         args.add(projection);
+        args.add(getCoordinateSystemUnits());
         Element result      = encoder.createObjectElement(getClass());
         Element ctorElement = encoder.createConstructorElement(args);
         result.appendChild(ctorElement);

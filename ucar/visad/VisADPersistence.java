@@ -55,6 +55,8 @@ import visad.georef.*;
 
 import visad.meteorology.*;
 
+import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
+
 import java.io.ByteArrayInputStream;
 
 import java.io.ByteArrayOutputStream;
@@ -475,6 +477,17 @@ public class VisADPersistence {
                 DateTime r     = (DateTime) o;
                 List     args  = Misc.newList(new Double(r.getValue()));
                 List     types = Misc.newList(Double.TYPE);
+                return e.createObjectConstructorElement(o, args, types);
+            }
+        });
+
+        addDelegate(McIDASAreaProjection.class, new XmlDelegateImpl() {
+            public Element createElement(XmlEncoder e, Object o) {
+                McIDASAreaProjection ac  = (McIDASAreaProjection) o;
+                int[]                dir = ac.getDirBlock();
+                List args = Misc.newList(dir, ac.getNavBlock(),
+                                         ac.getAuxBlock());
+                List types = Misc.newList(null, null, dir.getClass());
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
