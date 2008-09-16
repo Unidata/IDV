@@ -559,9 +559,12 @@ public class StationLocationControl extends StationModelControl {
                 }
                 if ( !selectionList.contains(closest)) {
                     selectionList.add(closest);
-                    tabbedPane.setSelectedIndex(1);
+                    if(tabbedPane!=null) {
+                        //                        tabbedPane.setSelectedIndex(1);
+                    }
                 }
             }
+            selectedStationsChanged(selectionList);
             showSelectedInReadout();
 
             if (centerOnClick) {
@@ -573,6 +576,10 @@ public class StationLocationControl extends StationModelControl {
             logException("Finding closest location", excp);
         }
     }
+
+    protected void     selectedStationsChanged(List selectionList) {
+    }
+
 
     /**
      * Clean up html
@@ -641,9 +648,11 @@ public class StationLocationControl extends StationModelControl {
             sb.append(entrySB);
         }
 
-        readoutText.setText("<html>" + getStationTableDescription()
-                            + sb.toString() + "</html>");
-        GuiUtils.scrollToTop(readoutText);
+        if(readoutText!=null&& sb!=null) {
+            readoutText.setText("<html>" + getStationTableDescription()
+                                + sb.toString() + "</html>");
+            GuiUtils.scrollToTop(readoutText);
+        }
     }
 
 
@@ -773,6 +782,7 @@ public class StationLocationControl extends StationModelControl {
      * @return  filtered list
      */
     private List filter(List stations) {
+        if(stations == null) return new ArrayList();
         initFilters();
         if ( !getFiltersEnabled()) {
             return stations;
@@ -1178,7 +1188,11 @@ public class StationLocationControl extends StationModelControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
+        return doMakeTabs(true,true);
+    }
 
+    protected JTabbedPane doMakeTabs(boolean showDataSets, boolean showFilters)
+            throws VisADException, RemoteException {
         readoutLegendHolder = new JPanel(new BorderLayout());
         readoutGuiHolder    = new JPanel(new BorderLayout());
 
@@ -1193,9 +1207,6 @@ public class StationLocationControl extends StationModelControl {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         readoutComp.add(BorderLayout.CENTER, readoutSP);
         readoutGuiHolder.add(BorderLayout.CENTER, readoutComp);
-
-
-
 
         tabbedPane = GuiUtils.getNestedTabbedPane();
 
@@ -1239,8 +1250,10 @@ public class StationLocationControl extends StationModelControl {
         //        locationComp.setOneTouchExpandable(true);
         tabbedPane.add("Display", doMakeDisplayPanel());
         tabbedPane.add("Locations", locationComp);
-        tabbedPane.add("Data Sets", doMakeStationListPanel());
-        tabbedPane.add("Filters", doMakeFilterGui(true));
+        if(showDataSets)
+            tabbedPane.add("Data Sets", doMakeStationListPanel());
+        if(showFilters)
+            tabbedPane.add("Filters", doMakeFilterGui(true));
         return tabbedPane;
     }
 
@@ -1388,10 +1401,11 @@ public class StationLocationControl extends StationModelControl {
          *
          * @param station station
          */
-        private void stationSelected(NamedStationImpl station) {
+        protected void stationSelected(NamedStationImpl station) {
             if ( !selectionList.contains(station)) {
                 selectionList.clear();
                 selectionList.add(station);
+                selectedStationsChanged(selectionList);
                 showSelectedInReadout();
             }
         }
@@ -1467,7 +1481,7 @@ public class StationLocationControl extends StationModelControl {
             this.locations = locations;
             attributes     = new ArrayList();
             List tmp = getStationList();
-            if (tmp.size() > 0) {
+            if (tmp!=null && tmp.size() > 0) {
                 NamedStationImpl station    = (NamedStationImpl) tmp.get(0);
                 Hashtable        properties = station.getProperties();
                 Enumeration      keys       = properties.keys();
