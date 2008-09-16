@@ -590,6 +590,14 @@ public class HtmlUtil {
                + cols(s6);
     }
 
+    public static String cols(Object[]columns) {
+        StringBuffer sb  = new StringBuffer();
+        for(int i=0;i<columns.length;i++) {
+            sb.append(cols(columns[i].toString()));
+        }
+        return sb.toString();
+    }
+
 
     /**
      * _more_
@@ -1116,6 +1124,11 @@ public class HtmlUtil {
      */
     public static String table(String contents) {
         return "<table cellpadding=\"5\" cellspacing=\"0\">\n" + contents
+               + "</table>";
+    }
+
+    public static String table(Object[]columns) {
+        return "<table cellpadding=\"5\" cellspacing=\"0\">\n" + row(cols(columns)," valign=\"top\" ")
                + "</table>";
     }
 

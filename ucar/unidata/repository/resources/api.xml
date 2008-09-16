@@ -83,6 +83,6 @@
       <api request="/harvester/list"           method="processList"           admin="true" />
       <api request="/harvester/importcatalog"  method="processImportCatalog"  admin="true" />
       <api request="/harvester/new"            method="processNew"            admin="true" />
-      <api request="/harvester/edit"           method="processEdit"           admin="true" />
+      <api request="/harvester/edit/*"           method="processEdit"           admin="true" />
   </group>
 </api>

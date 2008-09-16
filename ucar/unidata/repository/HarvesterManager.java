@@ -73,13 +73,6 @@ import java.util.Properties;
  */
 public class HarvesterManager extends RepositoryManager {
 
-
-    /** _more_ */
-    public static final String ARG_HARVESTER_ID = "harvester.id";
-
-    /** _more_ */
-    public static final String ARG_HARVESTER_CLASS = "harvester.class";
-
     /** _more_ */
     public RequestUrl URL_HARVESTERS_IMPORTCATALOG =
         new RequestUrl(this, "/harvester/importcatalog", "Import Catalog");
@@ -97,7 +90,6 @@ public class HarvesterManager extends RepositoryManager {
     /** _more_ */
     public RequestUrl URL_HARVESTERS_EDIT = new RequestUrl(this,
                                                 "/harvester/edit");
-
 
 
     /** _more_ */
@@ -247,26 +239,49 @@ public class HarvesterManager extends RepositoryManager {
             return new Result(request.url(URL_HARVESTERS_LIST));
         }
 
-        if (request.exists(ARG_NAME)) {
+        Harvester harvester = null;
+        if(request.exists(ARG_HARVESTER_XMLFILE)) {
+            String file = request.getUploadedFile(ARG_HARVESTER_XMLFILE);
+            if(file == null || !new File(file).exists()) {
+                return getAdmin().makeResult(request, msg("New Harvester"), new StringBuffer("You must specify a file"));
+            }
+            String xml  = IOUtil.readContents(file, getClass());
+            List<Harvester> harvesters = Harvester.createHarvesters(getRepository(),
+                                                                    XmlUtil.getRoot(xml));
+            if(harvesters.size()==0) {
+                return getAdmin().makeResult(request, msg("New Harvester"), new StringBuffer("No harvesters defined"));
+            }
+            harvester = harvesters.get(0);
+            harvester.setId(getRepository().getGUID());
+            
+        } else if (request.exists(ARG_NAME)) {
             String id = getRepository().getGUID();
             Class c = Misc.findClass(request.getString(ARG_HARVESTER_CLASS));
             Constructor ctor = Misc.findConstructor(c,
                                    new Class[] { Repository.class,
                     String.class });
-            Harvester harvester = (Harvester) ctor.newInstance(new Object[] {
+            harvester = (Harvester) ctor.newInstance(new Object[] {
                                       getRepository(),
                                       id });
             harvester.setName(request.getString(ARG_NAME, ""));
+        }
+
+        if(harvester!=null) {
+            harvester.setIsEditable(true);
             harvesters.add(harvester);
-            harvesterMap.put(id, harvester);
+            harvesterMap.put(harvester.getId(), harvester);
 
             getDatabaseManager().executeInsert(INSERT_HARVESTERS,
-                    new Object[] { id,
+                    new Object[] { harvester.getId(),
                                    harvester.getClass().getName(),
                                    harvester.getContent() });
             return new Result(request.url(URL_HARVESTERS_EDIT,
-                                          ARG_HARVESTER_ID, id));
+                                          ARG_HARVESTER_ID, harvester.getId()));
         }
+
+
+        sb.append(Repository.header("Create new harvester"));
+
         sb.append(request.formPost(URL_HARVESTERS_NEW));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
@@ -287,8 +302,21 @@ public class HarvesterManager extends RepositoryManager {
                                      + HtmlUtil.submit(msg("Cancel"),
                                          ARG_CANCEL)));
 
-        sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
+
+        sb.append(HtmlUtil.formEntry(HtmlUtil.p(),""));
+        sb.append(HtmlUtil.uploadForm(URL_HARVESTERS_NEW.toString(),""));
+        
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.b("Or upload xml file"),2)));
+        sb.append(HtmlUtil.formEntry(msgLabel("File"),
+                                     HtmlUtil.fileInput(ARG_HARVESTER_XMLFILE,HtmlUtil.SIZE_70)));
+
+        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Upload"))+
+                                     HtmlUtil.space(1) +
+                                     HtmlUtil.submit(msg("Cancel"),ARG_CANCEL)));
+        sb.append(HtmlUtil.formClose());
+        sb.append(HtmlUtil.formTableClose());
+
         return getAdmin().makeResult(request, msg("New Harvester"), sb);
     }
 
@@ -302,12 +330,21 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEdit(Request request) throws Exception {
+
+
+
         StringBuffer sb = new StringBuffer();
         Harvester harvester =
             findHarvester(request.getString(ARG_HARVESTER_ID));
         if (harvester == null) {
             throw new IllegalArgumentException("Could not find harvester");
         }
+        if(request.get(ARG_HARVESTER_GETXML,false)) {
+            String xml  = harvester.getContent();
+            xml = XmlUtil.tag(Harvester.TAG_HARVESTERS, "",xml);
+            return new Result("",new StringBuffer(XmlUtil.getHeader()+"\n"+xml),"text/xml");
+        }
+
         if ( !harvester.getIsEditable()) {
             throw new IllegalArgumentException("Cannot edit harvester");
         }
@@ -342,17 +379,29 @@ public class HarvesterManager extends RepositoryManager {
                                        harvester.getContent() });
 
             }
-            sb.append(HtmlUtil.formTable());
+            String xmlLink = HtmlUtil.href(HtmlUtil.url(URL_HARVESTERS_EDIT.toString()+"/harvester.xml",
+                                                       ARG_HARVESTER_GETXML, "true", ARG_HARVESTER_ID,
+                                                       harvester.getId()), msg("Download"));
+
             String buttons = HtmlUtil.submit(msg("Change"), ARG_CHANGE)
                              + HtmlUtil.space(1)
                              + HtmlUtil.submit(msg("Delete"), ARG_DELETE)
                              + HtmlUtil.space(1)
                              + HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
 
-            sb.append(HtmlUtil.formEntry("", buttons));
-            harvester.createEditForm(request, sb);
-            sb.append(HtmlUtil.formEntry("", buttons));
-            sb.append(HtmlUtil.formTableClose());
+
+
+            sb.append(buttons);
+            sb.append(HtmlUtil.space(2));
+            sb.append(xmlLink);
+            StringBuffer formSB  = new StringBuffer();
+            formSB.append(HtmlUtil.formTable());
+            harvester.createEditForm(request, formSB);
+            formSB.append(HtmlUtil.formTableClose()); 
+
+
+            sb.append(HtmlUtil.table(new Object[]{formSB, HtmlUtil.br()+harvester.getRunLink(request,true) +HtmlUtil.br() +harvester.getExtraInfo()}));
+            sb.append(buttons);
         }
         sb.append(HtmlUtil.formClose());
         return getAdmin().makeResult(request, msg("Edit Harvester"), sb);
@@ -387,6 +436,9 @@ public class HarvesterManager extends RepositoryManager {
                     Misc.run(harvester, "run");
                 }
             }
+            if(request.get(ARG_HARVESTER_REDIRECTTOEDIT,false)) {
+                return new Result(request.url(URL_HARVESTERS_EDIT,ARG_HARVESTER_ID,harvester.getId()));
+            }
             return new Result(request.url(URL_HARVESTERS_LIST));
         }
 
@@ -411,16 +463,6 @@ public class HarvesterManager extends RepositoryManager {
             if (harvester.getIsEditable()) {
                 removeLink = "";
             }
-            String run;
-            if (harvester.getActive()) {
-                run = HtmlUtil.href(request.url(URL_HARVESTERS_LIST,
-                        ARG_ACTION, ACTION_STOP, ARG_HARVESTER_ID,
-                        harvester.getId()), msg("Stop"));
-            } else {
-                run = HtmlUtil.href(request.url(URL_HARVESTERS_LIST,
-                        ARG_ACTION, ACTION_START, ARG_HARVESTER_ID,
-                        harvester.getId()), msg("Start"));
-            }
 
             String edit = "&nbsp;";
             if (harvester.getIsEditable()) {
@@ -436,7 +478,7 @@ public class HarvesterManager extends RepositoryManager {
                     harvester.getName(), (harvester.getActive()
                                           ? msg("Active")
                                           : msg("Stopped")) + HtmlUtil.space(
-                                          2), run, removeLink,
+                                          2), harvester.getRunLink(request,false), removeLink,
                                               harvester.getExtraInfo())));
         }
         sb.append(HtmlUtil.formTableClose());

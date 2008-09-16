@@ -481,7 +481,6 @@ public class OutputHandler extends RepositoryManager {
         }
 
         String elementId = entry.getId();
-        System.err.println("ID:" + elementId +":");
         sb.append(
             HtmlUtil.href(
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),

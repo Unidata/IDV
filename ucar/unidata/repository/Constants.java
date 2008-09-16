@@ -1121,5 +1121,17 @@ public interface Constants {
     public static final String ARG_SHOWYEAR = "showyear";
 
 
+    /** _more_ */
+    public static final String ARG_HARVESTER_ID = "harvester.id";
+
+    /** _more_ */
+    public static final String ARG_HARVESTER_CLASS = "harvester.class";
+
+    public static final String ARG_HARVESTER_REDIRECTTOEDIT = "harvester.redirecttoedit";
+    public static final String ARG_HARVESTER_GETXML = "harvester.getxml";
+    public static final String ARG_HARVESTER_XMLFILE = "harvester.xmlfile";
+
+
+
 }
 

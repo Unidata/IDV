@@ -83,7 +83,9 @@ import java.util.regex.*;
 public class Harvester extends RepositoryManager {
 
     /** _more_ */
+
     public static final String TAG_HARVESTER = "harvester";
+    public static final String TAG_HARVESTERS = "harvesters";
 
     /** _more_ */
     public static final String ATTR_CLASS = "class";
@@ -204,7 +206,6 @@ public class Harvester extends RepositoryManager {
         this.id          = id;
         this.isEditable  = true;
         this.typeHandler = repository.getTypeHandler(TypeHandler.TYPE_FILE);
-
     }
 
 
@@ -256,6 +257,20 @@ public class Harvester extends RepositoryManager {
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
     }
+
+    public String getRunLink(Request request, boolean redirectToEdit) {
+        if (getActive()) {
+            return  HtmlUtil.href(request.url(getRepository().getHarvesterManager().URL_HARVESTERS_LIST,
+                                              ARG_ACTION, ACTION_STOP, ARG_HARVESTER_ID,
+                                              getId(), ARG_HARVESTER_REDIRECTTOEDIT,""+redirectToEdit), msg("Stop"));
+        } else {
+            return  HtmlUtil.href(request.url(getRepository().getHarvesterManager().URL_HARVESTERS_LIST,
+                                              ARG_ACTION, ACTION_START, ARG_HARVESTER_ID,
+                                              getId(), ARG_HARVESTER_REDIRECTTOEDIT,""+redirectToEdit), msg("Start"));
+        }
+    }
+
+
 
     /**
      * _more_
@@ -410,6 +425,9 @@ public class Harvester extends RepositoryManager {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
 
     /**
