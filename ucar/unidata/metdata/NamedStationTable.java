@@ -993,8 +993,8 @@ public class NamedStationTable extends StationTableImpl {
         // List toks = StringUtil.parseLineWords(tbl, indices, lengths,"\n", "!", true);
 
         /*
-        STID    STNM   NAME                             ST CO   LAT    LON  ELV (PRI) (EXTRA)
-        (4 or 8) (6)   (32)                            (2)(2)   (5)    (6)   (5)(2) (rest)
+          STID    STNM   NAME                             ST CO   LAT    LON  ELV (PRI) (EXTRA)
+          (4 or 8) (6)   (32)                            (2)(2)   (5)    (6)   (5)(2) (rest)
         */
 
         //ICAO code,Airport Name,Latitude,Longitude
@@ -1018,7 +1018,7 @@ public class NamedStationTable extends StationTableImpl {
             if ( !readOne) {
                 String station = line.substring(0, 8);
                 if (station.substring(4, 8).equals("    ")
-                        || !station.substring(4, 5).equals(" ")) {
+                    || !station.substring(4, 5).equals(" ")) {
                     // System.out.println("new format");
                 } else {
                     // System.out.println("old format");
@@ -1035,7 +1035,7 @@ public class NamedStationTable extends StationTableImpl {
             try {
                 for (int idx = 0; idx < indices.length; idx++) {
                     words[idx] = line.substring(indices[idx],
-                            indices[idx] + lengths[idx]);
+                                                indices[idx] + lengths[idx]);
                     if (true) {  // always trim?
                         words[idx] = words[idx].trim();
                     }
@@ -1044,7 +1044,7 @@ public class NamedStationTable extends StationTableImpl {
                 // get the priority and extra stuff if it exists
                 if (line.length() > lastRead) {
                     String rest = line.substring(lastRead,
-                                      line.length()).trim();
+                                                 line.length()).trim();
                     int end = Math.min(2, rest.length());
                     // get the priority if it exists
                     if ( !rest.equals("")) {
@@ -1054,29 +1054,31 @@ public class NamedStationTable extends StationTableImpl {
                         words[numToks] = rest.substring(2, rest.length());
                     }
                 }
+
+                String id   = words[idIndex];
+                String name = words[nameIndex];
+                double lat = Misc.parseDouble(words[latIndex]) / 100.;
+                double lon = Misc.parseDouble(words[lonIndex]) / 100.;
+                double alt = Misc.parseDouble(words[altIndex]) / 100.;
+                NamedStationImpl station = new NamedStationImpl(id, name, lat,
+                                                                lon, alt, CommonUnit.meter);
+                station.addProperty("STNM", words[idnIndex]);
+                station.addProperty("ST", words[stIndex]);
+                station.addProperty("CO", words[coIndex]);
+                if (words[priIndex] != null) {
+                    station.addProperty("PRI", words[priIndex]);
+                }
+                if (words[extraIndex] != null) {
+                    station.addProperty("EXTRA", words[extraIndex]);
+                }
+                this.add(station, true);
             } catch (Exception e) {
-                System.out.println("Unable to parst station [" + i
+                System.out.println("Unable to parse station [" + i
                                    + "] for:\n" + line);
+                System.err.println ("error:" + e);
                 continue;
             }
 
-            String id   = words[idIndex];
-            String name = words[nameIndex];
-            double lat = Misc.parseDouble(words[latIndex]) / 100.;
-            double lon = Misc.parseDouble(words[lonIndex]) / 100.;
-            double alt = Misc.parseDouble(words[altIndex]) / 100.;
-            NamedStationImpl station = new NamedStationImpl(id, name, lat,
-                                           lon, alt, CommonUnit.meter);
-            station.addProperty("STNM", words[idnIndex]);
-            station.addProperty("ST", words[stIndex]);
-            station.addProperty("CO", words[coIndex]);
-            if (words[priIndex] != null) {
-                station.addProperty("PRI", words[priIndex]);
-            }
-            if (words[extraIndex] != null) {
-                station.addProperty("EXTRA", words[extraIndex]);
-            }
-            this.add(station, true);
         }
 
     }
