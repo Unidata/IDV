@@ -25,6 +25,7 @@
 
 package ucar.unidata.data.text;
 
+import ucar.unidata.util.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,9 @@ public class Product {
     /** _more_          */
     private String id;
 
+    public Product() {
+    }
+
     /**
      * _more_
      *
@@ -55,6 +59,12 @@ public class Product {
         this.name = name;
         this.id   = id;
     }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Product)) return false;
+        return Misc.equals(id, ((Product)o).id);
+    }
+
 
     /**
      *  Set the Name property.

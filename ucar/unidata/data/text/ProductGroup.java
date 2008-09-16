@@ -27,6 +27,7 @@ package ucar.unidata.data.text;
 
 
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import java.util.ArrayList;
@@ -47,6 +48,9 @@ public class ProductGroup {
     /** _more_          */
     private List<Product> products = new ArrayList<Product>();
 
+    public ProductGroup() {
+    }
+
     /**
      * _more_
      *
@@ -56,6 +60,11 @@ public class ProductGroup {
         this.name = name;
     }
 
+    public boolean equals(Object o) {
+        if(!(o instanceof ProductGroup)) return false;
+        return Misc.equals(name, ((ProductGroup)o).name);
+    }
+
     /**
      * _more_
      *
@@ -63,13 +72,13 @@ public class ProductGroup {
      *
      * @throws Exception _more_
      */
-    public static void parse(String file) throws Exception {
+    public static List<ProductGroup> parse(String file) throws Exception {
         String contents = IOUtil.readContents(file, StringUtil.class);
         contents = contents.replace("{", "\n{\n");
         contents = contents.replace("}", "\n}\n");
         List<String> lines = (List<String>) StringUtil.split(contents, "\n",
                                  true, true);
-        List         products     = new ArrayList();
+        List<ProductGroup>   products     = new ArrayList<ProductGroup>();
         ProductGroup productGroup = null;
         boolean      inProduct    = false;
         for (int i = 0; i < lines.size(); i++) {
@@ -88,17 +97,20 @@ public class ProductGroup {
                     if (toks[0].startsWith("(")) {
                         continue;
                     }
+                    if (toks[0].startsWith("!")) {
+                        continue;
+                    }
                     productGroup.addProduct(new Product(toks[0].replace("_",
                             " "), toks[1]));
                 }
             } else if (line.equals("{")) {
                 productGroup = null;
             } else {
-                productGroup = new ProductGroup(line);
+                productGroup = new ProductGroup(line.replace("_"," "));
                 products.add(productGroup);
             }
         }
-        System.err.println(products);
+        return products;
     }
 
     /**
@@ -151,7 +163,7 @@ Observed_Data
      * @return _more_
      */
     public String toString() {
-        return name + " products:" + products;
+        return name;
     }
 }
 
