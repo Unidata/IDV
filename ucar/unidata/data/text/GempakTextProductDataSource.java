@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -44,30 +45,31 @@ import ucar.unidata.idv.control.DrawingControl;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.FrontGlyph;
 import ucar.unidata.idv.control.drawing.HighLowGlyph;
+import ucar.unidata.metdata.NamedStationImpl;
+import ucar.unidata.metdata.NamedStationTable;
 
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
 
 import ucar.visad.display.FrontDrawer;
-import ucar.unidata.metdata.NamedStationImpl;
-import ucar.unidata.metdata.NamedStationTable;
 
 
 
 import visad.*;
 
+import java.io.ByteArrayInputStream;
+
 
 
 import java.io.File;
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 
 import java.rmi.RemoteException;
@@ -96,28 +98,31 @@ import javax.swing.event.*;
  */
 public class GempakTextProductDataSource extends FilesDataSource {
 
+    /** _more_          */
     private Hashtable tableMap = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private String tablePath;
 
-    /** _more_          */
+    /** _more_ */
     private String textDataPath;
 
+    /** _more_          */
     private String gemDataPath;
 
-    /** _more_          */
+    /** _more_ */
     private static final String PROP_GEMTBL = "GEMTBL";
 
-    /** _more_          */
+    /** _more_ */
     private static final String PROP_TEXT_DATA = "TEXT_DATA";
 
-    /** _more_          */
+    /** _more_ */
     private static final String PROP_GEMDATA = "GEMDATA";
 
-    /** _more_          */
+    /** _more_ */
     private List<TableInfo> tables = new ArrayList<TableInfo>();
 
+    /** _more_          */
     private List<ProductGroup> productGroups;
 
     /**
@@ -152,10 +157,19 @@ public class GempakTextProductDataSource extends FilesDataSource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param product _more_
+     *
+     * @return _more_
+     */
     public TableInfo getTable(Product product) {
-        if(product==null) return null;
-        for (TableInfo tableInfo: tables) {
-            if(tableInfo.type.equals(product.getId())) {
+        if (product == null) {
+            return null;
+        }
+        for (TableInfo tableInfo : tables) {
+            if (tableInfo.type.equals(product.getId())) {
                 return tableInfo;
             }
         }
@@ -163,33 +177,54 @@ public class GempakTextProductDataSource extends FilesDataSource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param product _more_
+     *
+     * @return _more_
+     */
     public String readProduct(Product product) {
-        TableInfo tableInfo  =getTable(product);
-        if(tableInfo!=null) {
+        TableInfo tableInfo = getTable(product);
+        if (tableInfo != null) {
             return readProduct(tableInfo);
         }
         return "Could not find text";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param product _more_
+     *
+     * @return _more_
+     */
     public NamedStationTable getStations(Product product) {
-        TableInfo tableInfo  =getTable(product);
-        if(tableInfo!=null) {
+        TableInfo tableInfo = getTable(product);
+        if (tableInfo != null) {
             return getStations(tableInfo);
         }
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param tableInfo _more_
+     *
+     * @return _more_
+     */
     public NamedStationTable getStations(TableInfo tableInfo) {
         String file = IOUtil.joinDir(tablePath,
                                      "nwx/" + tableInfo.locationFile);
 
-        if(!new File(file).exists()) {
+        if ( !new File(file).exists()) {
             file = IOUtil.joinDir(tablePath,
                                   "stns/" + tableInfo.locationFile);
         }
         //        System.err.println (new File(file).exists() + " " + file);
-        if(!new File(file).exists()) {
+        if ( !new File(file).exists()) {
             return null;
         }
 
@@ -197,9 +232,11 @@ public class GempakTextProductDataSource extends FilesDataSource {
 
         try {
             NamedStationTable table = (NamedStationTable) tableMap.get(file);
-            if(table==null) {
-                table = new NamedStationTable("Stations for " + tableInfo.type);
-                table.createStationTableFromGempak(IOUtil.readContents(file, getClass()));
+            if (table == null) {
+                table = new NamedStationTable("Stations for "
+                        + tableInfo.type);
+                table.createStationTableFromGempak(IOUtil.readContents(file,
+                        getClass()));
                 tableMap.put(file, table);
             }
             return table;
@@ -210,25 +247,41 @@ public class GempakTextProductDataSource extends FilesDataSource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tableInfo _more_
+     *
+     * @return _more_
+     */
     public String readProduct(TableInfo tableInfo) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
         File dir = new File(path);
-        File[]files = dir.listFiles((java.io.FileFilter)new PatternFileFilter(".*\\." +tableInfo.fileExtension));
-        if(files==null || files.length==0) return "No text products found";
+        File[] files =
+            dir.listFiles((java.io.FileFilter) new PatternFileFilter(".*\\."
+                + tableInfo.fileExtension));
+        if ((files == null) || (files.length == 0)) {
+            return "No text products found";
+        }
         files = IOUtil.sortFilesOnAge(files, true);
-        for(int i=0;i<files.length;i++) {
+        for (int i = 0; i < files.length; i++) {
             System.err.println("file:" + files[i]);
         }
-        try  {
+        try {
             return IOUtil.readContents(files[0].toString(), getClass());
-        } catch(Exception exc) {
-            return "Error reading text product file:" +exc; 
+        } catch (Exception exc) {
+            return "Error reading text product file:" + exc;
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<ProductGroup> getProductGroups() {
         return productGroups;
     }
@@ -238,10 +291,11 @@ public class GempakTextProductDataSource extends FilesDataSource {
      * _more_
      */
     protected void initAfter() {
-        tablePath = System.getenv(PROP_GEMTBL);
-        textDataPath  = System.getenv(PROP_TEXT_DATA);
+        tablePath    = System.getenv(PROP_GEMTBL);
+        textDataPath = System.getenv(PROP_TEXT_DATA);
         gemDataPath  = System.getenv(PROP_GEMDATA);
-        if ((tablePath == null) || (textDataPath == null) || (gemDataPath == null)) {
+        if ((tablePath == null) || (textDataPath == null)
+                || (gemDataPath == null)) {
             setInError(true,
                        "You must have the GEMPAK environment variables "
                        + PROP_GEMTBL + " and " + PROP_TEXT_DATA + " defined");
@@ -255,19 +309,19 @@ public class GempakTextProductDataSource extends FilesDataSource {
             //SFC_HRLY     sfstns.tbl   O $GEMDATA/surface                         _sao.gem
 
             List<String[]> tableInfo = StringUtil.parseLineWords(masterTable,
-                                           new int[] { 0, 13, 26, 28, 69 }, 
-                                           new int[] { 12, 12, 1, 40, 8 }, 
-                                                                 "\n", "!", true);
+                                           new int[] { 0,
+                    13, 26, 28, 69 }, new int[] { 12, 12, 1, 40, 8 }, "\n",
+                                      "!", true);
 
             for (String[] tuple : tableInfo) {
                 tables.add(new TableInfo(tuple[0], tuple[1], tuple[2],
                                          tuple[3], tuple[4]));
                 System.err.println(new TableInfo(tuple[0], tuple[1],
-                                                 tuple[2], tuple[3], tuple[4]));
+                        tuple[2], tuple[3], tuple[4]));
             }
 
             productGroups = ProductGroup.parse(IOUtil.joinDir(tablePath,
-                                                              "nwx/guidata.tbl"));
+                    "nwx/guidata.tbl"));
 
         } catch (Exception exc) {
             logException("Error initializing GEMPAK products", exc);
@@ -300,45 +354,60 @@ public class GempakTextProductDataSource extends FilesDataSource {
     private static class TableInfo {
 
         /**
-!	B - Regular bulletin type ('^A'... text ... '^C'), 
-!		use combination of WMO header & stn ID for search,
-!		use LOC_TBL to plot station location markers,
-!		display entire bulletin.
-!	S - Same as B type except use stn ID only for search.
-!	W - Watch/Warning, same as B type except search data first to 
-!		get station IDs for marker plotting.  
-!       R - Record type ('^^/^A' ... text ... '^^/^C'), 
-!		search for "stnID".
-!       M - Same as R type except search for "^^stnID ".
-!       F - Same as R type except "stnID" is formatted to be a left-
-!		justified 6-character ( not including NULL ) string.
-!	Z - Plot data (contours or markers), e.g. UVI, QPF discussion.
-!	O - Observed data.**/
+         * !       B - Regular bulletin type ('^A'... text ... '^C'),
+         * !               use combination of WMO header & stn ID for search,
+         * !               use LOC_TBL to plot station location markers,
+         * !               display entire bulletin.
+         * !       S - Same as B type except use stn ID only for search.
+         * !       W - Watch/Warning, same as B type except search data first to
+         * !               get station IDs for marker plotting.
+         * !       R - Record type ('^^/^A' ... text ... '^^/^C'),
+         * !               search for "stnID".
+         * !       M - Same as R type except search for "^^stnID ".
+         * !       F - Same as R type except "stnID" is formatted to be a left-
+         * !               justified 6-character ( not including NULL ) string.
+         * !       Z - Plot data (contours or markers), e.g. UVI, QPF discussion.
+         * !       O - Observed data.*
+         */
 
 
         public static final String TYPE_B = "B";
+
+        /** _more_          */
         public static final String TYPE_S = "S";
+
+        /** _more_          */
         public static final String TYPE_W = "W";
+
+        /** _more_          */
         public static final String TYPE_R = "R";
+
+        /** _more_          */
         public static final String TYPE_M = "M";
+
+        /** _more_          */
         public static final String TYPE_F = "F";
+
+        /** _more_          */
         public static final String TYPE_Z = "Z";
+
+        /** _more_          */
         public static final String TYPE_O = "O";
 
 
-        /** _more_          */
+        /** _more_ */
         String type;
 
-        /** _more_          */
+        /** _more_ */
         String locationFile;
 
-        /** _more_          */
+        /** _more_ */
         String flag;
 
-        /** _more_          */
+        /** _more_ */
         String dataDir;
 
-        /** _more_          */
+        /** _more_ */
         String fileExtension;
 
         /**
@@ -359,6 +428,11 @@ public class GempakTextProductDataSource extends FilesDataSource {
             this.fileExtension = fileExtension;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean useStationTable() {
             return !type.equals(TYPE_W);
         }

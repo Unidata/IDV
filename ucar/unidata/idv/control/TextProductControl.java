@@ -20,20 +20,21 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
 import org.w3c.dom.Element;
-
-import ucar.unidata.data.text.GempakTextProductDataSource;
-import ucar.unidata.data.text.ProductGroup;
-import ucar.unidata.data.text.Product;
 
 
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+
+import ucar.unidata.data.text.GempakTextProductDataSource;
+import ucar.unidata.data.text.Product;
+import ucar.unidata.data.text.ProductGroup;
 
 import ucar.unidata.geoloc.Bearing;
 
@@ -114,19 +115,34 @@ import javax.swing.border.*;
 
 public class TextProductControl extends StationLocationControl {
 
+    /** _more_          */
     private GempakTextProductDataSource dataSource;
 
+    /** _more_          */
     private List<ProductGroup> productGroups;
 
+    /** _more_          */
     private JComboBox productGroupCbx;
+
+    /** _more_          */
     private JComboBox productCbx;
+
+    /** _more_          */
     private ProductGroup productGroup;
+
+    /** _more_          */
     private Product product;
+
+    /** _more_          */
     private JTextArea textArea;
+
+    /** _more_          */
     private JLabel stationLabel;
 
+    /** _more_          */
     private boolean ignoreEvents = false;
 
+    /** _more_          */
     private NamedStationTable stationTable;
 
     /**
@@ -145,95 +161,119 @@ public class TextProductControl extends StationLocationControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
-        JTabbedPane tabs = doMakeTabs(false,false);
+        JTabbedPane tabs = doMakeTabs(false, false);
 
         setCenterOnClick(false);
         //        setDeclutter(false);
         JComponent contents = null;
-        textArea = new JTextArea("",30,80);
+        textArea        = new JTextArea("", 30, 80);
         productGroupCbx = new JComboBox(new Vector(productGroups));
 
 
 
-        if(productGroup!=null) {
+        if (productGroup != null) {
             productGroupCbx.setSelectedItem(productGroup);
         } else {
-            productGroup = (ProductGroup)productGroupCbx.getSelectedItem();
+            productGroup = (ProductGroup) productGroupCbx.getSelectedItem();
         }
-        productCbx = new JComboBox();
+        productCbx         = new JComboBox();
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        JComponent productComp = GuiUtils.doLayout(new Component[]{
-                GuiUtils.rLabel("Group:"),
-                GuiUtils.left(productGroupCbx),
-                GuiUtils.rLabel("Product:"),
-                GuiUtils.left(productCbx),
-                GuiUtils.rLabel("Station:"),
-                stationLabel = new JLabel(" ")
-            },2, GuiUtils.WT_NY, GuiUtils.WT_N);
-        contents = GuiUtils.topCenter(productComp,GuiUtils.makeScrollPane(textArea,200,400));
+        JComponent productComp = GuiUtils.doLayout(new Component[] {
+            GuiUtils.rLabel("Group:"), GuiUtils.left(productGroupCbx),
+            GuiUtils.rLabel("Product:"), GuiUtils.left(productCbx),
+            GuiUtils.rLabel("Station:"), stationLabel = new JLabel(" ")
+        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        contents = GuiUtils.topCenter(productComp,
+                                      GuiUtils.makeScrollPane(textArea, 200,
+                                          400));
         updateProducts();
-        if(product!=null) {
+        if (product != null) {
             productCbx.setSelectedItem(product);
         } else {
-            product = (Product)productCbx.getSelectedItem();
+            product = (Product) productCbx.getSelectedItem();
         }
         productGroupCbx.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                if(ignoreEvents) return;
-                productGroup = (ProductGroup)productGroupCbx.getSelectedItem();
+                if (ignoreEvents) {
+                    return;
+                }
+                productGroup =
+                    (ProductGroup) productGroupCbx.getSelectedItem();
                 updateProducts();
             }
-            });
+        });
 
 
         productCbx.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                if(ignoreEvents) return;
-                Product selectedProduct  =(Product)productCbx.getSelectedItem(); 
-                if(!Misc.equals(product, selectedProduct)) {
+                if (ignoreEvents) {
+                    return;
+                }
+                Product selectedProduct =
+                    (Product) productCbx.getSelectedItem();
+                if ( !Misc.equals(product, selectedProduct)) {
                     product = selectedProduct;
                     updateText();
                 }
             }
-            });
+        });
 
 
         updateText();
-        tabs.insertTab("Products", null, contents,"",0);
+        tabs.insertTab("Products", null, contents, "", 0);
         tabs.setSelectedIndex(0);
         return tabs;
     }
 
 
 
+    /** _more_          */
     private NamedStationTable currentTable;
-    private     List stationList = new ArrayList();
 
+    /** _more_          */
+    private List stationList = new ArrayList();
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected List getStationList() {
         return stationList;
     }
 
 
+    /** _more_          */
     NamedStationImpl selectedStation;
-    protected void     selectedStationsChanged(List selectionList) {
-        if(selectionList.size()==0) {
+
+    /**
+     * _more_
+     *
+     * @param selectionList _more_
+     */
+    protected void selectedStationsChanged(List selectionList) {
+        if (selectionList.size() == 0) {
             selectedStation = null;
         } else {
             selectedStation = (NamedStationImpl) selectionList.get(0);
         }
 
-        if(selectedStation!=null) {
-            stationLabel.setText(selectedStation.getID() + ":" +selectedStation.getName());
+        if (selectedStation != null) {
+            stationLabel.setText(selectedStation.getID() + ":"
+                                 + selectedStation.getName());
         }
     }
 
+    /**
+     * _more_
+     */
     public void updateText() {
-        String text = "";
+        String            text     = "";
         NamedStationTable newTable = dataSource.getStations(product);
 
-        if(newTable!=currentTable) {
-            if(newTable!=null) {
+        if (newTable != currentTable) {
+            if (newTable != null) {
                 stationList = new ArrayList(newTable.values());
             } else {
                 stationList = new ArrayList();
@@ -246,19 +286,23 @@ public class TextProductControl extends StationLocationControl {
         }
 
 
-        if(product!=null) {
+        if (product != null) {
             //            text = dataSource.readProduct(product);
         }
         textArea.setText(text);
     }
 
 
+    /**
+     * _more_
+     */
     public void updateProducts() {
         ignoreEvents = true;
         try {
-            if(productGroup!=null) {
-                GuiUtils.setListData(productCbx, productGroup.getProducts().toArray());
-                product = (Product)productCbx.getSelectedItem();
+            if (productGroup != null) {
+                GuiUtils.setListData(productCbx,
+                                     productGroup.getProducts().toArray());
+                product = (Product) productCbx.getSelectedItem();
                 updateText();
             }
         } finally {
@@ -289,14 +333,15 @@ public class TextProductControl extends StationLocationControl {
             return false;
         }
 
-        dataSource = (GempakTextProductDataSource)dataSources.get(0);
+        dataSource    = (GempakTextProductDataSource) dataSources.get(0);
         productGroups = dataSource.getProductGroups();
-        if(productGroup!=null) {
+        if (productGroup != null) {
             int idx = productGroups.indexOf(productGroup);
-            if(idx>=0)
+            if (idx >= 0) {
                 productGroup = productGroups.get(idx);
-            else 
+            } else {
                 productGroup = null;
+            }
         }
         return super.init(dataChoice);
     }
@@ -304,39 +349,39 @@ public class TextProductControl extends StationLocationControl {
 
 
     /**
-       Set the ProductGroup property.
-
-       @param value The new value for ProductGroup
-    **/
-    public void setTextProductGroup (ProductGroup value) {
-	productGroup = value;
+     *  Set the ProductGroup property.
+     *
+     *  @param value The new value for ProductGroup
+     */
+    public void setTextProductGroup(ProductGroup value) {
+        productGroup = value;
     }
 
     /**
-       Get the ProductGroup property.
-
-       @return The ProductGroup
-    **/
-    public ProductGroup getTextProductGroup () {
-	return productGroup;
+     *  Get the ProductGroup property.
+     *
+     *  @return The ProductGroup
+     */
+    public ProductGroup getTextProductGroup() {
+        return productGroup;
     }
 
     /**
-       Set the Product property.
-
-       @param value The new value for Product
-    **/
-    public void setTextProduct (Product value) {
-	product = value;
+     *  Set the Product property.
+     *
+     *  @param value The new value for Product
+     */
+    public void setTextProduct(Product value) {
+        product = value;
     }
 
     /**
-       Get the Product property.
-
-       @return The Product
-    **/
-    public Product getTextProduct () {
-	return product;
+     *  Get the Product property.
+     *
+     *  @return The Product
+     */
+    public Product getTextProduct() {
+        return product;
     }
 
 
