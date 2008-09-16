@@ -873,6 +873,18 @@ example:
      displaycategory="General"
      properties="displayName=Drawing Control;windowVisible=true;showInTabs=false;showFronts=true;"/>
 
+
+
+  <control
+     id="textproductcontrol"
+     categories="textproducts"
+     class="ucar.unidata.idv.control.TextProductControl"
+     description="Text product display"
+     label="Text product display"
+     displaycategory="General"
+     properties="displayName=Text Product Display;windowVisible=true;showInTabs=false"/>
+
+
   <control
      id="frontdrawingcontrol"
      categories="fronts"

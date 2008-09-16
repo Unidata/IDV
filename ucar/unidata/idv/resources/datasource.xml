@@ -239,6 +239,17 @@
      label="DEM files"/>
 
   <datasource
+     id="PRODUCT.GEMPAK"
+     factory="ucar.unidata.data.text.GempakTextProductDataSource"
+     fileselection="true"
+     label="GEMPAK Text Products">
+    <property
+       name="default_display"
+       value="textproductcontrol"/>
+  </datasource>
+
+
+  <datasource
      id="FILE.TEXT"
      factory="ucar.unidata.data.text.TextDataSource"
      patterns="\.htm$,\.html$,\.txt$,\.text$,\.php$,\/$"
@@ -251,6 +262,7 @@
        name="default_display"
        value="textdisplay"/>
   </datasource>
+
 
   <datasource
      id="FILE.POINTTEXT"
