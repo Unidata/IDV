@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.metdata;
 
 
@@ -32,12 +33,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ucar.unidata.data.DataUtil;
+
 import ucar.unidata.gis.WorldWindReader;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
@@ -55,6 +56,8 @@ import visad.VisADException;
 
 import java.awt.event.*;
 
+import java.io.*;
+
 import java.lang.Double;
 
 import java.rmi.RemoteException;
@@ -64,7 +67,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.*;
-import java.io.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -78,6 +80,7 @@ import javax.swing.event.*;
  */
 public class NamedStationTable extends StationTableImpl {
 
+    /** _more_          */
     private boolean valid = true;
 
 
@@ -365,8 +368,16 @@ public class NamedStationTable extends StationTableImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @return _more_
+     */
     private static boolean isKml(String filename) {
-        return (filename.toLowerCase().endsWith(".kml") || filename.toLowerCase().endsWith(".kmz"));
+        return (filename.toLowerCase().endsWith(".kml")
+                || filename.toLowerCase().endsWith(".kmz"));
     }
 
     /**
@@ -412,13 +423,14 @@ public class NamedStationTable extends StationTableImpl {
 
             if (isKml(name)) {
                 try {
-                    NamedStationTable table = createStationTableFromFile(xrc.get(i).toString());
-                    if(table!=null && table.valid) {
+                    NamedStationTable table =
+                        createStationTableFromFile(xrc.get(i).toString());
+                    if ((table != null) && table.valid) {
                         tables.add(table);
                         table.setType(type);
                         table.setCategory(category);
                     }
-                } catch(Exception exc){
+                } catch (Exception exc) {
                     exc.printStackTrace();
                 }
                 continue;
@@ -812,56 +824,73 @@ public class NamedStationTable extends StationTableImpl {
      * }
      */
 
-    public void createStationTableFromKmlFile(String filename) throws Exception {
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @throws Exception _more_
+     */
+    public void createStationTableFromKmlFile(String filename)
+            throws Exception {
         String kml = null;
-        if(filename.toLowerCase().endsWith(".kmz")) {
+        if (filename.toLowerCase().endsWith(".kmz")) {
             InputStream is = IOUtil.getInputStream(filename);
-            if(is == null) {
+            if (is == null) {
                 valid = false;
                 return;
             }
-            BufferedInputStream bin =   new BufferedInputStream(is);
-            ZipInputStream zin = new ZipInputStream(bin);
-            ZipEntry ze;
+            BufferedInputStream bin = new BufferedInputStream(is);
+            ZipInputStream      zin = new ZipInputStream(bin);
+            ZipEntry            ze;
             while ((ze = zin.getNextEntry()) != null) {
                 String name = ze.getName().toLowerCase();
                 if (name.toLowerCase().endsWith(".kml")) {
-                    kml  = new String(IOUtil.readBytes(zin, null, false));
+                    kml = new String(IOUtil.readBytes(zin, null, false));
                     break;
                 }
             }
         } else {
-            kml =IOUtil.readContents(filename, NamedStationTable.class);
+            kml = IOUtil.readContents(filename, NamedStationTable.class);
         }
-        if(kml == null) {
+        if (kml == null) {
             valid = false;
             return;
         }
-        Element root = XmlUtil.getRoot("xml:" +kml,
-                                       NamedStationTable.class);
-        if(root == null) return;
+        Element root = XmlUtil.getRoot("xml:" + kml, NamedStationTable.class);
+        if (root == null) {
+            return;
+        }
 
-        List nodes = XmlUtil.findDescendants(root,"Placemark");
-        for(int i=0;i<nodes.size();i++) {
-            Element node  = (Element) nodes.get(i);
+        List nodes = XmlUtil.findDescendants(root, "Placemark");
+        for (int i = 0; i < nodes.size(); i++) {
+            Element node       = (Element) nodes.get(i);
             Element coordsNode = XmlUtil.findDescendant(node, "coordinates");
-            if(coordsNode ==null) continue;
-            String coords =  XmlUtil.getChildText(coordsNode);
-            if(coords ==null) continue;
-            String name = XmlUtil.getGrandChildText(node,"name");
-            if(name ==null) continue;
-            List toks = StringUtil.split(coords,",",true,true);
-            if(toks.size()<=1) continue;
-            double lon =
-                Misc.decodeLatLon(toks.get(0).toString());
-            double lat =
-                Misc.decodeLatLon(toks.get(1).toString());
-            double altitude = (toks.size()>=3?Misc.parseDouble(toks.get(2).toString()):0);
-            String desc = XmlUtil.getGrandChildText(node,"description");
-            NamedStationImpl station = new NamedStationImpl(name, name,
-                                           lat, lon, altitude, CommonUnit.meter);
+            if (coordsNode == null) {
+                continue;
+            }
+            String coords = XmlUtil.getChildText(coordsNode);
+            if (coords == null) {
+                continue;
+            }
+            String name = XmlUtil.getGrandChildText(node, "name");
+            if (name == null) {
+                continue;
+            }
+            List toks = StringUtil.split(coords, ",", true, true);
+            if (toks.size() <= 1) {
+                continue;
+            }
+            double lon = Misc.decodeLatLon(toks.get(0).toString());
+            double lat = Misc.decodeLatLon(toks.get(1).toString());
+            double altitude = ((toks.size() >= 3)
+                               ? Misc.parseDouble(toks.get(2).toString())
+                               : 0);
+            String desc = XmlUtil.getGrandChildText(node, "description");
+            NamedStationImpl station = new NamedStationImpl(name, name, lat,
+                                           lon, altitude, CommonUnit.meter);
             this.add(station, true);
-            if(desc!=null) {
+            if (desc != null) {
                 station.addProperty("description", desc);
             }
 
@@ -932,16 +961,18 @@ public class NamedStationTable extends StationTableImpl {
 
         //ICAO code,Airport Name,Latitude,Longitude
         for (int i = 1; i < lines.size(); i++) {
-            String line =  lines.get(i).toString().trim();
-            if(line.length()==0) continue;
-            List toks = StringUtil.split(line, ",", true,
-                                         false);
+            String line = lines.get(i).toString().trim();
+            if (line.length() == 0) {
+                continue;
+            }
+            List toks = StringUtil.split(line, ",", true, false);
             if (toks.size() == 0) {
                 continue;
             }
             if (toks.size() != names.size()) {
                 throw new IllegalStateException("CSV line: " + lines.get(i)
-                                                + " does not have correct number of elements. Has:" + toks.size() + " looking for:" + names.size());
+                        + " does not have correct number of elements. Has:"
+                        + toks.size() + " looking for:" + names.size());
             }
             double lat      = Misc.decodeLatLon((String) toks.get(latIndex));
             double lon      = Misc.decodeLatLon((String) toks.get(lonIndex));
@@ -980,6 +1011,7 @@ public class NamedStationTable extends StationTableImpl {
      * @throws Exception problem creating table from file
      */
     public void createStationTableFromGempak(String tbl) throws Exception {
+
         List lines = StringUtil.split(tbl, "\n", false, true);
         if (lines.size() == 0) {
             return;
@@ -1018,7 +1050,7 @@ public class NamedStationTable extends StationTableImpl {
             if ( !readOne) {
                 String station = line.substring(0, 8);
                 if (station.substring(4, 8).equals("    ")
-                    || !station.substring(4, 5).equals(" ")) {
+                        || !station.substring(4, 5).equals(" ")) {
                     // System.out.println("new format");
                 } else {
                     // System.out.println("old format");
@@ -1035,7 +1067,7 @@ public class NamedStationTable extends StationTableImpl {
             try {
                 for (int idx = 0; idx < indices.length; idx++) {
                     words[idx] = line.substring(indices[idx],
-                                                indices[idx] + lengths[idx]);
+                            indices[idx] + lengths[idx]);
                     if (true) {  // always trim?
                         words[idx] = words[idx].trim();
                     }
@@ -1044,7 +1076,7 @@ public class NamedStationTable extends StationTableImpl {
                 // get the priority and extra stuff if it exists
                 if (line.length() > lastRead) {
                     String rest = line.substring(lastRead,
-                                                 line.length()).trim();
+                                      line.length()).trim();
                     int end = Math.min(2, rest.length());
                     // get the priority if it exists
                     if ( !rest.equals("")) {
@@ -1060,8 +1092,9 @@ public class NamedStationTable extends StationTableImpl {
                 double lat = Misc.parseDouble(words[latIndex]) / 100.;
                 double lon = Misc.parseDouble(words[lonIndex]) / 100.;
                 double alt = Misc.parseDouble(words[altIndex]) / 100.;
-                NamedStationImpl station = new NamedStationImpl(id, name, lat,
-                                                                lon, alt, CommonUnit.meter);
+                NamedStationImpl station = new NamedStationImpl(id, name,
+                                               lat, lon, alt,
+                                               CommonUnit.meter);
                 station.addProperty("STNM", words[idnIndex]);
                 station.addProperty("ST", words[stIndex]);
                 station.addProperty("CO", words[coIndex]);
@@ -1075,11 +1108,12 @@ public class NamedStationTable extends StationTableImpl {
             } catch (Exception e) {
                 System.out.println("Unable to parse station [" + i
                                    + "] for:\n" + line);
-                System.err.println ("error:" + e);
+                System.err.println("error:" + e);
                 continue;
             }
 
         }
+
 
     }
 
@@ -1238,12 +1272,12 @@ public class NamedStationTable extends StationTableImpl {
                             href = base + href;
                         }
                     }
-                    
-                    if(isKml(href)) {
+
+                    if (isKml(href)) {
                         try {
                             this.createStationTableFromKmlFile(href);
                             return super.getMap();
-                        }  catch(Exception exc) {
+                        } catch (Exception exc) {
                             return null;
                         }
                     }
