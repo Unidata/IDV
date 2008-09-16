@@ -605,7 +605,7 @@ public class GeoGridAdapter {
             ProjectionImpl project = gcs.getProjection();
             CoordinateSystem pCS = new CachingCoordinateSystem(
                                        new ProjectionCoordinateSystem(
-                                           project));
+                                           project, new Unit[] {xUnit, yUnit}));
             // make the proper RealTypes
             xType = makeRealType(xAxis.getName(), xUnit);
             yType = makeRealType(yAxis.getName(), yUnit);
