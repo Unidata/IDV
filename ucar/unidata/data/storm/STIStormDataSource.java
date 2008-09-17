@@ -179,6 +179,9 @@ public class STIStormDataSource extends StormDataSource {
     public static StormParam PARAM_PROBABILITY90RADIUS;
 
     /** _more_ */
+    public static StormParam PARAM_DISTANCE_ERROR;
+
+    /** _more_ */
     public static StormParam PARAM_PROBABILITY100RADIUS;
 
     /** _more_ */
@@ -299,7 +302,7 @@ public class STIStormDataSource extends StormDataSource {
     private static final String COL_PROBILITY_P100 = "p100";
 
     /** _more_ */
-    private static final String COL_PROBILITY_ERROR = "error";
+    private static final String COL_DISTANCE_ERROR = "error";
 
     /** _more_ */
     private static final String COL_PROBILITY_REMARK = "remark";
@@ -422,6 +425,11 @@ public class STIStormDataSource extends StormDataSource {
                                             "Probability_100%_Radius",
                                             Util.parseUnit("km")), true,
                                                 false, false);
+            PARAM_DISTANCE_ERROR =
+                new StormParam(makeRealType("meanDistanceError",
+                                            "Mean_Distance_Error",
+                                            Util.parseUnit("km")), true,
+                                                false, false);
 
             obsParams = new StormParam[] {
                 PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
@@ -432,12 +440,13 @@ public class STIStormDataSource extends StormDataSource {
             forecastParams = new StormParam[] {
                 PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
                 PARAM_RADIUSMODERATEGALE, PARAM_RADIUSWHOLEGALE,
-                PARAM_MOVEDIRECTION, PARAM_MOVESPEED, PARAM_DISTANCEERROR,
+                PARAM_MOVEDIRECTION, PARAM_MOVESPEED, //PARAM_DISTANCEERROR,
                 PARAM_PROBABILITY10RADIUS, PARAM_PROBABILITY20RADIUS,
                 PARAM_PROBABILITY30RADIUS, PARAM_PROBABILITY40RADIUS,
                 PARAM_PROBABILITY50RADIUS, PARAM_PROBABILITY60RADIUS,
                 PARAM_PROBABILITY70RADIUS, PARAM_PROBABILITY80RADIUS,
-                PARAM_PROBABILITY90RADIUS, PARAM_PROBABILITY100RADIUS
+                PARAM_PROBABILITY90RADIUS, PARAM_PROBABILITY100RADIUS,
+                PARAM_DISTANCE_ERROR
             };
         }
     }
@@ -550,9 +559,9 @@ public class STIStormDataSource extends StormDataSource {
         //                                         (Way) forecastWays.get(0));
         if (obsTrack != null) {
             List<StormTrack> tracks = trackCollection.getTracks();
-            for (StormTrack stk : tracks) {
-                addDistanceError(obsTrack, stk);
-            }
+          //  for (StormTrack stk : tracks) {
+          //      addDistanceError(obsTrack, stk);
+          //  }
             long t2 = System.currentTimeMillis();
             //        System.err.println("time:" + (t2 - t1));
             trackCollection.addTrack(obsTrack);
@@ -837,6 +846,7 @@ public class STIStormDataSource extends StormDataSource {
             attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
             attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
             attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
+            attrs.add(PARAM_DISTANCE_ERROR.getReal(radiuses[10]));
         } else {
             attrs.add(PARAM_PROBABILITY10RADIUS.getReal(Float.NaN));
             attrs.add(PARAM_PROBABILITY20RADIUS.getReal(Float.NaN));
@@ -848,6 +858,8 @@ public class STIStormDataSource extends StormDataSource {
             attrs.add(PARAM_PROBABILITY80RADIUS.getReal(Float.NaN));
             attrs.add(PARAM_PROBABILITY90RADIUS.getReal(Float.NaN));
             attrs.add(PARAM_PROBABILITY100RADIUS.getReal(Float.NaN));
+            attrs.add(PARAM_DISTANCE_ERROR.getReal(Float.NaN));
+
         }
     }
 
@@ -962,7 +974,8 @@ public class STIStormDataSource extends StormDataSource {
             COL_PROBILITY_WAYNAME, COL_PROBILITY_FHOUR, COL_PROBILITY_P10,
             COL_PROBILITY_P20, COL_PROBILITY_P30, COL_PROBILITY_P40,
             COL_PROBILITY_P50, COL_PROBILITY_P60, COL_PROBILITY_P70,
-            COL_PROBILITY_P80, COL_PROBILITY_P90, COL_PROBILITY_P100
+            COL_PROBILITY_P80, COL_PROBILITY_P90, COL_PROBILITY_P100,
+            COL_DISTANCE_ERROR
         });
 
         List whereList = new ArrayList();
@@ -977,7 +990,7 @@ public class STIStormDataSource extends StormDataSource {
         while ((results = iter.next()) != null) {
 
             while (results.next()) {
-                float[] wp      = new float[10];
+                float[] wp      = new float[11];
                 int     col     = 1;
                 String  wayName = results.getString(col++);
                 int     fhour   = results.getInt(col++);
@@ -991,6 +1004,7 @@ public class STIStormDataSource extends StormDataSource {
                 wp[7] = results.getFloat(col++);
                 wp[8] = results.getFloat(col++);
                 wp[9] = results.getFloat(col++);
+                wp[10] = results.getFloat(col++);
                 putProbabilityRadius(new Way(wayName), fhour, wp);
             }
         }

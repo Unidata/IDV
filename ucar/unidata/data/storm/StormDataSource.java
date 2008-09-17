@@ -101,7 +101,7 @@ public abstract class StormDataSource extends DataSourceImpl {
     public static final int CATEGORY_XX = 15;  // - unknown.
 
     /** _more_ */
-    public static StormParam PARAM_DISTANCEERROR;
+   // public static StormParam PARAM_DISTANCEERROR;
 
     /** _more_ */
     public static StormParam PARAM_MINPRESSURE;
@@ -222,10 +222,10 @@ public abstract class StormDataSource extends DataSourceImpl {
                     "Storm_Category", null));
             PARAM_MINPRESSURE = new StormParam(makeRealType("minpressure",
                     "Min_Pressure", Util.parseUnit("mb")));
-            PARAM_DISTANCEERROR =
-                new StormParam(Util.makeRealType("forecastlocationerror",
-                    "Mean_Distance_Error", Util.parseUnit("km")), true,
-                        false);
+          //  PARAM_DISTANCEERROR =
+          //      new StormParam(Util.makeRealType("forecastlocationerror",
+         //           "Distance_Error", Util.parseUnit("km")), true,
+          //              false);
             PARAM_MAXWINDSPEED_KTS =
                 new StormParam(makeRealType("maxwindspeedkts",
                                             "Max_Windspeed",
@@ -451,9 +451,9 @@ public abstract class StormDataSource extends DataSourceImpl {
 
         for (StormTrackPoint stp : fctTrackPoints) {
             DateTime        dt     = stp.getTime();
-            StormTrackPoint stpObs = getClosestPoint(obsTrackPoints, dt);
-            double          der    = getDistance(stpObs, stp);
-            stp.addAttribute(PARAM_DISTANCEERROR.getReal(der));
+          //  StormTrackPoint stpObs = getClosestPoint(obsTrackPoints, dt);
+          //  double          der    = getDistance(stpObs, stp);
+          //  stp.addAttribute(PARAM_DISTANCEERROR.getReal(der));
         }
 
     }
