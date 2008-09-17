@@ -46,7 +46,7 @@ public class ProductGroup {
     private String name;
 
     /** _more_          */
-    private List<Product> products = new ArrayList<Product>();
+    private List<ProductType> productTypes = new ArrayList<ProductType>();
 
     public ProductGroup() {
     }
@@ -100,7 +100,7 @@ public class ProductGroup {
                     if (toks[0].startsWith("!")) {
                         continue;
                     }
-                    productGroup.addProduct(new Product(toks[0].replace("_",
+                    productGroup.addProduct(new ProductType(toks[0].replace("_",
                             " "), toks[1]));
                 }
             } else if (line.equals("{")) {
@@ -144,8 +144,8 @@ Observed_Data
      *
      * @param product _more_
      */
-    public void addProduct(Product product) {
-        products.add(product);
+    public void addProduct(ProductType product) {
+        productTypes.add(product);
     }
 
     /**
@@ -153,8 +153,8 @@ Observed_Data
      *
      * @return _more_
      */
-    public List<Product> getProducts() {
-        return products;
+    public List<ProductType> getProductTypes() {
+        return productTypes;
     }
 
     /**

@@ -164,12 +164,12 @@ public class GempakTextProductDataSource extends FilesDataSource {
      *
      * @return _more_
      */
-    public TableInfo getTable(Product product) {
-        if (product == null) {
+    public TableInfo getTable(ProductType productType) {
+        if (productType == null) {
             return null;
         }
         for (TableInfo tableInfo : tables) {
-            if (tableInfo.type.equals(product.getId())) {
+            if (tableInfo.type.equals(productType.getId())) {
                 return tableInfo;
             }
         }
@@ -180,12 +180,12 @@ public class GempakTextProductDataSource extends FilesDataSource {
     /**
      * _more_
      *
-     * @param product _more_
+     * @param productType _more_
      *
      * @return _more_
      */
-    public String readProduct(Product product) {
-        TableInfo tableInfo = getTable(product);
+    public String readProduct(ProductType productType) {
+        TableInfo tableInfo = getTable(productType);
         if (tableInfo != null) {
             return readProduct(tableInfo);
         }
@@ -200,8 +200,8 @@ public class GempakTextProductDataSource extends FilesDataSource {
      *
      * @return _more_
      */
-    public NamedStationTable getStations(Product product) {
-        TableInfo tableInfo = getTable(product);
+    public NamedStationTable getStations(ProductType productType) {
+        TableInfo tableInfo = getTable(productType);
         if (tableInfo != null) {
             return getStations(tableInfo);
         }
@@ -450,6 +450,64 @@ public class GempakTextProductDataSource extends FilesDataSource {
 
 
     }
+    public static List<Product> parseProduct(String path, boolean recordType) throws Exception {
+        List<Product> products = new ArrayList<Product>();
+        String contents  = IOUtil.readContents(path, GempakTextProductDataSource.class);
+        String prefix =(recordType? "":"");
+        String suffix = (recordType?"":"");
+        int idx=0;
+        while(true) {
+            int idx1 = contents.indexOf(prefix,idx);
+            if(idx1<0) break;
+            int idx2 = contents.indexOf(suffix,idx1);
+            if(idx2<0) break;
+            idx=idx2+1;
+            String product = contents.substring(idx1+1,idx2-1);
+            int lineCnt = 0;
+            int startLineIdx=0;
+            String stationLine=null;
+            while(true) {
+                int endLineIdx =product.indexOf("\n",startLineIdx);
+                if(endLineIdx<0) break;
+                String line = product.substring(startLineIdx,endLineIdx);
+                if(line.trim().length()>0) {
+                    lineCnt++;
+                    if(lineCnt==2) {
+                        stationLine = line;
+                        break;
+                    }
+                }
+                startLineIdx=endLineIdx+1;
+            }
+            if(stationLine==null) continue;
+            List toks = StringUtil.split(stationLine," ",true,true);
+            if(toks.size()<2) continue;
+            String station = (String)toks.get(1);
+            products.add(new Product(station,product));
+            //            System.out.println("************");
+            //            if(true) break;
+        }
+        return products;
+    }
+
+
+
+
+    public static void main(String[]args) throws Exception {
+        long tt1 = System.currentTimeMillis();
+        for(int i=0;i<args.length;i++) {
+            long t1 = System.currentTimeMillis();
+            List<Product> products = parseProduct(args[i],true);
+            System.err.println(args[i]+ " " + products);
+            //            System.err.println("");
+            long t2 = System.currentTimeMillis();
+            //            if(true) break;
+            //            System.err.println ("time:" + (t2-t1));
+        }
+        long tt2 = System.currentTimeMillis();
+        System.err.println ("total:" + args.length + " " + (tt2-tt1)+"ms");
+    }
+
 
 
 }

@@ -38,57 +38,79 @@ import java.util.List;
  * @version $Revision: 1.15 $
  */
 
-public class Product {
+public class ProductType {
 
-    private String content;
-    private String station;
+    /** _more_          */
+    private String name;
 
-    public Product(String station, String content) {
-        this.station = station;
-        this.content = content;
+    /** _more_          */
+    private String id;
+
+    public ProductType() {
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param id _more_
+     */
+    public ProductType(String name, String id) {
+        this.name = name;
+        this.id   = id;
+    }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof ProductType)) return false;
+        return Misc.equals(id, ((ProductType)o).id);
     }
 
 
+    /**
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
+
+    /**
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     *  Set the Id property.
+     *
+     *  @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
+    }
+
+    /**
+     *  Get the Id property.
+     *
+     *  @return The Id
+     */
+    public String getId() {
+        return id;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        return station;
+        return name;
     }
-
-/**
-Set the Content property.
-
-@param value The new value for Content
-**/
-public void setContent (String value) {
-	content = value;
-}
-
-/**
-Get the Content property.
-
-@return The Content
-**/
-public String getContent () {
-	return content;
-}
-
-/**
-Set the Station property.
-
-@param value The new value for Station
-**/
-public void setStation (String value) {
-	station = value;
-}
-
-/**
-Get the Station property.
-
-@return The Station
-**/
-public String getStation () {
-	return station;
-}
-
 
 }
 
