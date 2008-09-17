@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -344,10 +345,12 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
         }
 
         int dfltCurvedSize = curvedSize;
+        /*
         if (getDisplay() != null) {
             dfltCurvedSize =
                 getDisplay().getGraphicsModeControl().getCurvedSize();
         }
+        */
 
         float dataSize = (float) GridUtil.getSpatialDomain(fi).getLength();
         ConstantMapSet maps = new ConstantMapSet();
@@ -381,6 +384,11 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
      */
     public void setCurvedSize(int size) {
         curvedSize = size;
+        try {
+            setTextureProperties(null);
+        } catch (Exception e) {
+            System.err.println("couldn't set curved size");
+        }
     }
 
     /**
