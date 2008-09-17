@@ -22,6 +22,7 @@ http://www.unidata.ucar.edu/software/netcdf-java/reference/RuntimeLoading.html
 <!--
 <ioServiceProvider  class="ucar.nc2.iosp.gempak.GempakGridServiceProvider"/>
 -->
+<ioServiceProvider  class="ucar.nc2.iosp.mcidas.AreaServiceProvider"/>
 <ioServiceProvider  class="ucar.nc2.iosp.mcidas.McIDASGridServiceProvider"/>
 <typedDatasetFactory datatype="Trajectory" class="ucar.unidata.data.sounding.CosmicTrajectoryObsDataset"/>
 </nj22Config>
