@@ -43,6 +43,7 @@ import ucar.nc2.dt.grid.*;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
@@ -407,6 +408,7 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         JTextArea dumpText = new JTextArea();
+        TextSearcher searcher = new TextSearcher(dumpText);
         dumpText.setFont(Font.decode("monospaced"));
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -419,7 +421,7 @@ public class GeoGridDataSource extends GridDataSource {
                                    height);
         scroller.setPreferredSize(new Dimension(width, height));
         scroller.setMinimumSize(new Dimension(width, height));
-        tabbedPane.add("Metadata", GuiUtils.inset(scroller, 5));
+        tabbedPane.add("Metadata", GuiUtils.inset(GuiUtils.centerBottom(scroller,searcher), 5));
     }
 
 
