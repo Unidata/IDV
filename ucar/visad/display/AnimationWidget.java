@@ -261,6 +261,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void setBaseTimes(Set times)
             throws VisADException, RemoteException {
         getAnimationSetInfo().setBaseTimes(times);
+        if(times!=null) {
         if (anime != null) {
             if (getAnimationSetInfo().getActive()) {
                 Set newSet = getAnimationSetInfo().makeTimeSet(null);
@@ -269,6 +270,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                 anime.setSet(times);
             }
             updateIndicator(anime.getSet());
+        } 
+        } else {
+            updateIndicator(null);
         }
     }
 
@@ -850,7 +854,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /**
      * Go to the end of the animation sequence.
      */
-    protected void gotoEnd() {
+    public void gotoEnd() {
         if (anime != null) {
             visad.Set aset = anime.getSet();
             if (aset != null) {
