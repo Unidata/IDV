@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.metdata;
 
 
@@ -80,7 +81,7 @@ import javax.swing.event.*;
  */
 public class NamedStationTable extends StationTableImpl {
 
-    /** _more_          */
+    /** _more_ */
     private boolean valid = true;
 
 
@@ -1096,6 +1097,107 @@ public class NamedStationTable extends StationTableImpl {
                                                lat, lon, alt,
                                                CommonUnit.meter);
                 station.addProperty("STNM", words[idnIndex]);
+                station.addProperty("ST", words[stIndex]);
+                station.addProperty("CO", words[coIndex]);
+                if (words[priIndex] != null) {
+                    station.addProperty("PRI", words[priIndex]);
+                }
+                if (words[extraIndex] != null) {
+                    station.addProperty("EXTRA", words[extraIndex]);
+                }
+                this.add(station, true);
+            } catch (Exception e) {
+                System.out.println("Unable to parse station [" + i
+                                   + "] for:\n" + line);
+                System.err.println("error:" + e);
+                continue;
+            }
+
+        }
+
+
+    }
+
+
+
+
+    /**
+     * Create a station table from a Gempak table
+     *
+     *
+     * @param tbl The actual Gempak table as text
+     *
+     * @throws Exception problem creating table from file
+     */
+    public void createStationTableFromBulletin(String tbl) throws Exception {
+        /*
+!BULL  KSTN     NAME                             ST CO   LAT    LON  ELEV
+!(6)   (8)      (32)                            (2)(2)   (5)    (6)   (5)
+FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
+        */
+
+        List lines = StringUtil.split(tbl, "\n", false, true);
+        if (lines.size() == 0) {
+            return;
+        }
+        int[] indices = {
+            0, 7, 16, 49, 52, 55, 61, 68
+        };
+        int[] lengths = {
+            8, 6, 32, 2, 2, 5, 6, 5
+        };
+
+        //ICAO code,Airport Name,Latitude,Longitude
+        boolean readOne    = false;
+        int     idIndex    = 1;
+        int     bullIndex  = 0;
+        int     nameIndex  = 2;
+        int     stIndex    = 3;
+        int     coIndex    = 4;
+        int     latIndex   = 5;
+        int     lonIndex   = 6;
+        int     altIndex   = 7;
+        int     priIndex   = 8;
+        int     extraIndex = 9;
+        int     numToks    = indices.length;
+        for (int i = 0; i < lines.size(); i++) {
+            String line = (String) lines.get(i);
+            if (line.startsWith("!")) {
+                continue;  // comment
+            }
+            String[] words = new String[numToks + 2];
+            try {
+                for (int idx = 0; idx < indices.length; idx++) {
+                    words[idx] = line.substring(indices[idx],
+                            indices[idx] + lengths[idx]);
+                    if (true) {  // always trim?
+                        words[idx] = words[idx].trim();
+                    }
+                }
+                int lastRead = indices[numToks - 1] + lengths[numToks - 1];
+                // get the priority and extra stuff if it exists
+                if (line.length() > lastRead) {
+                    String rest = line.substring(lastRead,
+                                      line.length()).trim();
+                    int end = Math.min(2, rest.length());
+                    // get the priority if it exists
+                    if ( !rest.equals("")) {
+                        words[priIndex] = rest.substring(0, end);
+                    }
+                    if (rest.length() > 2) {
+                        words[numToks] = rest.substring(2, rest.length());
+                    }
+                }
+
+                String id   = words[idIndex];
+                String name = words[nameIndex];
+                double lat = Misc.parseDouble(words[latIndex]) / 100.;
+                double lon = Misc.parseDouble(words[lonIndex]) / 100.;
+                double alt = Misc.parseDouble(words[altIndex]) / 100.;
+                NamedStationImpl station = new NamedStationImpl(id, name,
+                                               lat, lon, alt,
+                                               CommonUnit.meter);
+                station.addProperty("BULLETIN", words[bullIndex]);
                 station.addProperty("ST", words[stIndex]);
                 station.addProperty("CO", words[coIndex]);
                 if (words[priIndex] != null) {
