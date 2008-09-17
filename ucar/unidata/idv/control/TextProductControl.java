@@ -32,7 +32,7 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 
-import ucar.unidata.data.text.GempakTextProductDataSource;
+import ucar.unidata.data.text.TextProductDataSource;
 import ucar.unidata.data.text.ProductType;
 import ucar.unidata.data.text.ProductGroup;
 
@@ -116,7 +116,7 @@ import javax.swing.border.*;
 public class TextProductControl extends StationLocationControl {
 
     /** _more_          */
-    private GempakTextProductDataSource dataSource;
+    private TextProductDataSource dataSource;
 
     /** _more_          */
     private List<ProductGroup> productGroups;
@@ -328,12 +328,12 @@ public class TextProductControl extends StationLocationControl {
             return false;
         }
 
-        if ( !(dataSources.get(0) instanceof GempakTextProductDataSource)) {
+        if ( !(dataSources.get(0) instanceof TextProductDataSource)) {
             userMessage("Could not find Text Product  Data Source");
             return false;
         }
 
-        dataSource    = (GempakTextProductDataSource) dataSources.get(0);
+        dataSource    = (TextProductDataSource) dataSources.get(0);
         productGroups = dataSource.getProductGroups();
         if (productGroup != null) {
             int idx = productGroups.indexOf(productGroup);
