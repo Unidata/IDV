@@ -28,6 +28,7 @@ package ucar.unidata.data.text;
 import ucar.unidata.util.Misc;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -40,18 +41,40 @@ import java.util.List;
 
 public class Product {
 
+    private Date date;
     private String content;
     private String station;
 
-    public Product(String station, String content) {
+    public Product(String station, String content,Date date) {
         this.station = station;
         this.content = content;
+        this.date = date;
     }
 
 
     public String toString() {
         return station;
     }
+
+/**
+Set the Date property.
+
+@param value The new value for Date
+**/
+public void setDate (Date value) {
+	date = value;
+}
+
+/**
+Get the Date property.
+
+@return The Date
+**/
+public Date getDate () {
+	return date;
+}
+
+
 
 /**
 Set the Content property.

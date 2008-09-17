@@ -29,6 +29,8 @@ package ucar.unidata.data.text;
 
 import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
+import java.text.SimpleDateFormat;
+
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
@@ -76,6 +78,7 @@ import java.rmi.RemoteException;
 
 
 
+import java.util.regex.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -96,7 +99,7 @@ import javax.swing.event.*;
  * @author IDV development team
  * @version $Revision: 1.15 $
  */
-public class GempakTextProductDataSource extends FilesDataSource {
+public class GempakTextProductDataSource extends TextProductDataSource {
 
     /** _more_          */
     private Hashtable tableMap = new Hashtable();
@@ -124,6 +127,7 @@ public class GempakTextProductDataSource extends FilesDataSource {
 
     /** _more_          */
     private List<ProductGroup> productGroups;
+
 
     /**
      * Default bean constructor; does nothing.
@@ -200,13 +204,28 @@ public class GempakTextProductDataSource extends FilesDataSource {
      *
      * @return _more_
      */
-    public NamedStationTable getStations(ProductType productType) {
+    public NamedStationTable getStations(ProductType productType) throws Exception {
         TableInfo tableInfo = getTable(productType);
         if (tableInfo != null) {
             return getStations(tableInfo);
         }
         return null;
     }
+
+
+    private String readTableFile(String file) throws Exception {
+        String contents =
+                IOUtil.readContents(IOUtil.joinDir(tablePath,
+                    "nwx/" + file), getClass(),null);
+        if(contents == null) {
+            contents =
+                IOUtil.readContents(IOUtil.joinDir(tablePath,
+                                                   "stns/" + file), getClass(),null);
+        }
+        return contents;
+    }
+
+
 
     /**
      * _more_
@@ -215,29 +234,16 @@ public class GempakTextProductDataSource extends FilesDataSource {
      *
      * @return _more_
      */
-    public NamedStationTable getStations(TableInfo tableInfo) {
-        String file = IOUtil.joinDir(tablePath,
-                                     "nwx/" + tableInfo.locationFile);
-
-        if ( !new File(file).exists()) {
-            file = IOUtil.joinDir(tablePath,
-                                  "stns/" + tableInfo.locationFile);
-        }
-        //        System.err.println (new File(file).exists() + " " + file);
-        if ( !new File(file).exists()) {
-            return null;
-        }
-
-
-
+    public NamedStationTable getStations(TableInfo tableInfo) throws Exception {
+        String contents = readTableFile(tableInfo.locationFile);
+        if(contents == null) return null;
         try {
-            NamedStationTable table = (NamedStationTable) tableMap.get(file);
+            NamedStationTable table = (NamedStationTable) tableMap.get(tableInfo.locationFile);
             if (table == null) {
                 table = new NamedStationTable("Stations for "
                         + tableInfo.type);
-                table.createStationTableFromGempak(IOUtil.readContents(file,
-                        getClass()));
-                tableMap.put(file, table);
+                table.createStationTableFromGempak(contents);
+                tableMap.put(tableInfo.locationFile, table);
             }
             return table;
         } catch (Exception exc) {
@@ -302,9 +308,8 @@ public class GempakTextProductDataSource extends FilesDataSource {
             return;
         }
         try {
-            String masterTable =
-                IOUtil.readContents(IOUtil.joinDir(tablePath,
-                    "nwx/master.tbl"), getClass());
+            String masterTable = readTableFile("master.tbl");
+            if(masterTable==null) throw new BadDataException("Unable to read master.tbl");
             //!(12)        (12)       (1) (40)                                     (8)
             //SFC_HRLY     sfstns.tbl   O $GEMDATA/surface                         _sao.gem
 
@@ -320,9 +325,9 @@ public class GempakTextProductDataSource extends FilesDataSource {
                         tuple[2], tuple[3], tuple[4]));
             }
 
-            productGroups = ProductGroup.parse(IOUtil.joinDir(tablePath,
-                    "nwx/guidata.tbl"));
-
+            String gui = readTableFile("guidata.tbl");
+            if(gui==null) throw new BadDataException("Unable to read guidata.tbl");
+            productGroups = parseProductGroups(gui);
         } catch (Exception exc) {
             logException("Error initializing GEMPAK products", exc);
             setInError(true, "Error initializing GEMPAK products");
@@ -332,15 +337,53 @@ public class GempakTextProductDataSource extends FilesDataSource {
 
     /**
      * _more_
+     *
+     * @param file _more_
+     *
+     * @throws Exception _more_
      */
-    protected void doMakeDataChoices() {
-        String category = "textproducts";
-        String docName  = getName();
-        addDataChoice(
-            new DirectDataChoice(
-                this, docName, docName, docName,
-                DataCategory.parseCategories(category, false)));
+    public static List<ProductGroup> parseProductGroups(String contents) throws Exception {
+
+        contents = contents.replace("{", "\n{\n");
+        contents = contents.replace("}", "\n}\n");
+        List<String> lines = (List<String>) StringUtil.split(contents, "\n",
+                                 true, true);
+        List<ProductGroup>   products     = new ArrayList<ProductGroup>();
+        ProductGroup productGroup = null;
+        boolean      inProduct    = false;
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (productGroup != null) {
+                if (line.equals("}")) {
+                    productGroup = null;
+                } else if (line.equals("{")) {
+                    //NOOP
+                } else {
+                    String[] toks = StringUtil.split(line, "|", 2);
+                    if ((toks == null) || (toks.length != 2)) {
+                        throw new IllegalArgumentException("Bad line:"
+                                + line);
+                    }
+                    if (toks[0].startsWith("(")) {
+                        continue;
+                    }
+                    if (toks[0].startsWith("!")) {
+                        continue;
+                    }
+                    productGroup.addProduct(new ProductType(toks[0].replace("_",
+                            " "), toks[1]));
+                }
+            } else if (line.equals("{")) {
+                productGroup = null;
+            } else {
+                productGroup = new ProductGroup(line.replace("_"," "));
+                products.add(productGroup);
+            }
+        }
+        return products;
     }
+
+
 
 
 
@@ -352,7 +395,6 @@ public class GempakTextProductDataSource extends FilesDataSource {
      * @version $Revision: 1.3 $
      */
     private static class TableInfo {
-
         /**
          * !       B - Regular bulletin type ('^A'... text ... '^C'),
          * !               use combination of WMO header & stn ID for search,
@@ -450,12 +492,14 @@ public class GempakTextProductDataSource extends FilesDataSource {
 
 
     }
+
     public static List<Product> parseProduct(String path, boolean recordType) throws Exception {
         List<Product> products = new ArrayList<Product>();
         String contents  = IOUtil.readContents(path, GempakTextProductDataSource.class);
         String prefix =(recordType? "":"");
         String suffix = (recordType?"":"");
         int idx=0;
+        //        System.err.println ("contents:" + contents);
         while(true) {
             int idx1 = contents.indexOf(prefix,idx);
             if(idx1<0) break;
@@ -466,24 +510,74 @@ public class GempakTextProductDataSource extends FilesDataSource {
             int lineCnt = 0;
             int startLineIdx=0;
             String stationLine=null;
+            boolean seenNonBlankLine = false;
+            Date date = null;
+
+
+            SimpleDateFormat sdf1 = new SimpleDateFormat("hhm a z EEE MMM d yyyy");
+            SimpleDateFormat sdfNoAmPm = new SimpleDateFormat("hhm z EEE MMM d yyyy");
+            List lines = new ArrayList(); 
             while(true) {
                 int endLineIdx =product.indexOf("\n",startLineIdx);
-                if(endLineIdx<0) break;
+                if(endLineIdx<0) {
+                    break;
+                }
                 String line = product.substring(startLineIdx,endLineIdx);
-                if(line.trim().length()>0) {
+                startLineIdx=endLineIdx+1;
+                lines.add(line);
+                String tline = line.trim();
+                if(seenNonBlankLine || tline.length()>0) {
+                    seenNonBlankLine = true;
                     lineCnt++;
                     if(lineCnt==2) {
                         stationLine = line;
-                        break;
+                        //                        break;
+                    } else  if(lineCnt>2) {
+                        if(tline.length()>10) { 
+                            String[]toks = StringUtil.split(tline," ",2);
+                            if(toks == null || toks.length!=2) continue;
+                            String hhmm = toks[0];
+                            try {
+                                new Integer(hhmm);
+                            } catch(Exception exc) {
+                                continue;
+                            }
+                            if(hhmm.length()==3)
+                                hhmm = "0" + hhmm;
+                            else if(hhmm.length()==1)
+                                hhmm="0" + hhmm+"00";
+
+                            String dttm = hhmm+" " + toks[1];
+
+                            try {
+                                date = sdf1.parse(dttm);
+                            } catch(Exception exc){}
+                            if(date==null) {
+                                try {
+                                    date = sdfNoAmPm.parse(dttm);
+                                } catch(Exception exc){
+                                    System.err.println ("BAD:" +dttm);
+                                }
+                            }
+                            //                            System.err.println (tline + " : " + date);
+                            if(date!=null) {
+                                break;
+                            } 
+                        }
                     }
                 }
-                startLineIdx=endLineIdx+1;
+                if(lineCnt>10) {
+                    break;
+                }
             }
             if(stationLine==null) continue;
+            if(date==null) {
+                System.err.println("no date:\n" + path +"\n\t"+StringUtil.join("\n\t", lines));
+            }
             List toks = StringUtil.split(stationLine," ",true,true);
             if(toks.size()<2) continue;
             String station = (String)toks.get(1);
-            products.add(new Product(station,product));
+            products.add(new Product(station,product,date));
             //            System.out.println("************");
             //            if(true) break;
         }
@@ -491,18 +585,24 @@ public class GempakTextProductDataSource extends FilesDataSource {
     }
 
 
-
-
     public static void main(String[]args) throws Exception {
+        /*
+        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:MM a z EEE MMM d yyyy");
+        String test = "3:00 AM MDT WED SEP 10 2008";
+        if(args.length>0)test = args[0];
+        System.err.println(sdf1.parse(test));
+        if(true) return;
+        */
+
         long tt1 = System.currentTimeMillis();
         for(int i=0;i<args.length;i++) {
             long t1 = System.currentTimeMillis();
             List<Product> products = parseProduct(args[i],true);
-            //            System.err.println(args[i]+ " " + products);
             //            System.err.println("");
             long t2 = System.currentTimeMillis();
             //            if(true) break;
-            System.err.println (args[i] +" " + products.size() + " " +(t2-t1)+"ms");
+            //            System.err.println (args[i] +" " + products.size() + " " +(t2-t1)+"ms");
+            //            if(true) break;
         }
         long tt2 = System.currentTimeMillis();
         System.err.println ("total:" + args.length + " " + (tt2-tt1)+"ms");

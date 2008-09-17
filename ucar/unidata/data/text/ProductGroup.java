@@ -65,53 +65,6 @@ public class ProductGroup {
         return Misc.equals(name, ((ProductGroup)o).name);
     }
 
-    /**
-     * _more_
-     *
-     * @param file _more_
-     *
-     * @throws Exception _more_
-     */
-    public static List<ProductGroup> parse(String file) throws Exception {
-        String contents = IOUtil.readContents(file, StringUtil.class);
-        contents = contents.replace("{", "\n{\n");
-        contents = contents.replace("}", "\n}\n");
-        List<String> lines = (List<String>) StringUtil.split(contents, "\n",
-                                 true, true);
-        List<ProductGroup>   products     = new ArrayList<ProductGroup>();
-        ProductGroup productGroup = null;
-        boolean      inProduct    = false;
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            if (productGroup != null) {
-                if (line.equals("}")) {
-                    productGroup = null;
-                } else if (line.equals("{")) {
-                    //NOOP
-                } else {
-                    String[] toks = StringUtil.split(line, "|", 2);
-                    if ((toks == null) || (toks.length != 2)) {
-                        throw new IllegalArgumentException("Bad line:"
-                                + line);
-                    }
-                    if (toks[0].startsWith("(")) {
-                        continue;
-                    }
-                    if (toks[0].startsWith("!")) {
-                        continue;
-                    }
-                    productGroup.addProduct(new ProductType(toks[0].replace("_",
-                            " "), toks[1]));
-                }
-            } else if (line.equals("{")) {
-                productGroup = null;
-            } else {
-                productGroup = new ProductGroup(line.replace("_"," "));
-                products.add(productGroup);
-            }
-        }
-        return products;
-    }
 
     /**
      * _more_
@@ -121,7 +74,7 @@ public class ProductGroup {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        parse(args[0]);
+        //        parse(args[0]);
     }
 
     /*
