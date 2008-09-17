@@ -188,12 +188,12 @@ public class GempakTextProductDataSource extends TextProductDataSource {
      *
      * @return _more_
      */
-    public String readProduct(ProductType productType) {
+    public List<Product> readProducts(ProductType productType,NamedStationImpl station) {
         TableInfo tableInfo = getTable(productType);
         if (tableInfo != null) {
-            return readProduct(tableInfo);
+            return readProducts(tableInfo,station);
         }
-        return "Could not find text";
+        return new ArrayList<Product>();
     }
 
 
@@ -238,11 +238,22 @@ public class GempakTextProductDataSource extends TextProductDataSource {
         String contents = readTableFile(tableInfo.locationFile);
         if(contents == null) return null;
         try {
+            //            System.err.println (tableInfo.locationFile + " " +tableInfo.flag);
             NamedStationTable table = (NamedStationTable) tableMap.get(tableInfo.locationFile);
+
             if (table == null) {
                 table = new NamedStationTable("Stations for "
                         + tableInfo.type);
-                table.createStationTableFromGempak(contents);
+                if(tableInfo.flag.equals(TableInfo.TYPE_B) ||
+                   tableInfo.flag.equals(TableInfo.TYPE_S) ||
+                   tableInfo.flag.equals(TableInfo.TYPE_W)) {
+                    table.createStationTableFromBulletin(contents);
+                } else {
+                    table.createStationTableFromGempak(contents);
+
+                }
+
+
                 tableMap.put(tableInfo.locationFile, table);
             }
             return table;
@@ -260,7 +271,7 @@ public class GempakTextProductDataSource extends TextProductDataSource {
      *
      * @return _more_
      */
-    public String readProduct(TableInfo tableInfo) {
+    public List<Product> readProducts(TableInfo tableInfo,NamedStationImpl station) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
@@ -268,18 +279,19 @@ public class GempakTextProductDataSource extends TextProductDataSource {
         File[] files =
             dir.listFiles((java.io.FileFilter) new PatternFileFilter(".*\\."
                 + tableInfo.fileExtension));
+        List<Product> products = new ArrayList<Product>();
         if ((files == null) || (files.length == 0)) {
-            return "No text products found";
+            return products;
         }
         files = IOUtil.sortFilesOnAge(files, true);
         for (int i = 0; i < files.length; i++) {
-            System.err.println("file:" + files[i]);
+            try {
+                products.addAll(parseProduct(files[i].toString(),true, station));
+            } catch (Exception exc) {
+                //                return "Error reading text product file:" + exc;
+            }
         }
-        try {
-            return IOUtil.readContents(files[0].toString(), getClass());
-        } catch (Exception exc) {
-            return "Error reading text product file:" + exc;
-        }
+        return products;
     }
 
 
@@ -321,8 +333,6 @@ public class GempakTextProductDataSource extends TextProductDataSource {
             for (String[] tuple : tableInfo) {
                 tables.add(new TableInfo(tuple[0], tuple[1], tuple[2],
                                          tuple[3], tuple[4]));
-                System.err.println(new TableInfo(tuple[0], tuple[1],
-                        tuple[2], tuple[3], tuple[4]));
             }
 
             String gui = readTableFile("guidata.tbl");
@@ -493,12 +503,23 @@ public class GempakTextProductDataSource extends TextProductDataSource {
 
     }
 
-    public static List<Product> parseProduct(String path, boolean recordType) throws Exception {
+    public static List<Product> parseProduct(String path, boolean recordType, NamedStationImpl station) throws Exception {
         List<Product> products = new ArrayList<Product>();
         String contents  = IOUtil.readContents(path, GempakTextProductDataSource.class);
         String prefix =(recordType? "":"");
         String suffix = (recordType?"":"");
         int idx=0;
+        Date fileDate = null;
+        String id = (station!=null?station.getID():null);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyymmddh");
+        try {
+            String tmp = IOUtil.getFileTail(IOUtil.stripExtension(path));
+            fileDate = sdf.parse(tmp);
+            
+        } catch(Exception exc) {
+            System.err.println ("no file date:" + path);
+        }
+
         //        System.err.println ("contents:" + contents);
         while(true) {
             int idx1 = contents.indexOf(prefix,idx);
@@ -556,7 +577,7 @@ public class GempakTextProductDataSource extends TextProductDataSource {
                                 try {
                                     date = sdfNoAmPm.parse(dttm);
                                 } catch(Exception exc){
-                                    System.err.println ("BAD:" +dttm);
+                                    //                                    System.err.println ("BAD:" +dttm);
                                 }
                             }
                             //                            System.err.println (tline + " : " + date);
@@ -566,18 +587,21 @@ public class GempakTextProductDataSource extends TextProductDataSource {
                         }
                     }
                 }
-                if(lineCnt>10) {
+                if(lineCnt>8) {
                     break;
                 }
             }
             if(stationLine==null) continue;
             if(date==null) {
-                System.err.println("no date:\n" + path +"\n\t"+StringUtil.join("\n\t", lines));
+                date = fileDate;
             }
             List toks = StringUtil.split(stationLine," ",true,true);
             if(toks.size()<2) continue;
-            String station = (String)toks.get(1);
-            products.add(new Product(station,product,date));
+            String stationString = (String)toks.get(1);
+            //            System.err.println("ID:"+ id +":" + stationString+" line:" + stationLine);
+            if(id==null || Misc.equals(stationString, id)) {
+                products.add(new Product(stationString,product,date));
+            }
             //            System.out.println("************");
             //            if(true) break;
         }
@@ -595,14 +619,16 @@ public class GempakTextProductDataSource extends TextProductDataSource {
         */
 
         long tt1 = System.currentTimeMillis();
+        
         for(int i=0;i<args.length;i++) {
             long t1 = System.currentTimeMillis();
-            List<Product> products = parseProduct(args[i],true);
+            List<Product> products = parseProduct(args[i],true,null);
             //            System.err.println("");
             long t2 = System.currentTimeMillis();
             //            if(true) break;
             //            System.err.println (args[i] +" " + products.size() + " " +(t2-t1)+"ms");
             //            if(true) break;
+            if((i%100)==0) System.err.println(""+i);
         }
         long tt2 = System.currentTimeMillis();
         System.err.println ("total:" + args.length + " " + (tt2-tt1)+"ms");

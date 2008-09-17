@@ -158,7 +158,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
      *
      * @return _more_
      */
-    public abstract String readProduct(ProductType productType);
+    public abstract  List<Product> readProducts(ProductType productType,NamedStationImpl station);
 
     /**
      * _more_

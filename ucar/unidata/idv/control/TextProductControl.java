@@ -33,6 +33,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 
 import ucar.unidata.data.text.TextProductDataSource;
+import ucar.unidata.data.text.Product;
 import ucar.unidata.data.text.ProductType;
 import ucar.unidata.data.text.ProductGroup;
 
@@ -48,6 +49,7 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.symbol.*;
+import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.util.FileManager;
 
@@ -100,6 +102,8 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.tree.*;
 import javax.swing.border.*;
 
 
@@ -121,11 +125,10 @@ public class TextProductControl extends StationLocationControl {
     /** _more_          */
     private List<ProductGroup> productGroups;
 
-    /** _more_          */
-    private JComboBox productGroupCbx;
+    JTree productTree;
 
-    /** _more_          */
-    private JComboBox productCbx;
+
+    private boolean ignoreTimeChanges = false;
 
     /** _more_          */
     private ProductGroup productGroup;
@@ -133,14 +136,13 @@ public class TextProductControl extends StationLocationControl {
     /** _more_          */
     private ProductType productType;
 
+    private List<Product> products;
+
     /** _more_          */
     private JTextArea textArea;
 
     /** _more_          */
     private JLabel stationLabel;
-
-    /** _more_          */
-    private boolean ignoreEvents = false;
 
     /** _more_          */
     private NamedStationTable stationTable;
@@ -165,59 +167,52 @@ public class TextProductControl extends StationLocationControl {
 
         setCenterOnClick(false);
         //        setDeclutter(false);
-        JComponent contents = null;
-        textArea        = new JTextArea("", 30, 80);
-        productGroupCbx = new JComboBox(new Vector(productGroups));
+
+        textArea        = new JTextArea("", 30, 60);
+        TextSearcher textSearcher = new TextSearcher(textArea);
 
 
-
-        if (productGroup != null) {
-            productGroupCbx.setSelectedItem(productGroup);
-        } else {
-            productGroup = (ProductGroup) productGroupCbx.getSelectedItem();
-        }
-        productCbx         = new JComboBox();
-
-        GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        JComponent productComp = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Group:"), GuiUtils.left(productGroupCbx),
-            GuiUtils.rLabel("Product:"), GuiUtils.left(productCbx),
-            GuiUtils.rLabel("Station:"), stationLabel = new JLabel(" ")
-        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
-        contents = GuiUtils.topCenter(productComp,
-                                      GuiUtils.makeScrollPane(textArea, 200,
-                                          400));
-        updateProducts();
-        if (productType != null) {
-            productCbx.setSelectedItem(productType);
-        } else {
-            productType = (ProductType) productCbx.getSelectedItem();
-        }
-        productGroupCbx.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (ignoreEvents) {
-                    return;
-                }
-                productGroup =
-                    (ProductGroup) productGroupCbx.getSelectedItem();
-                updateProducts();
+        DefaultMutableTreeNode treeRoot  = new DefaultMutableTreeNode("Product Groups");
+        for(ProductGroup productGroup: productGroups) {
+            DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(productGroup);
+            treeRoot.add(groupNode);
+            for(ProductType productType: productGroup.getProductTypes()) {
+                DefaultMutableTreeNode typeNode = new DefaultMutableTreeNode(productType);
+                groupNode.add(typeNode);
             }
-        });
+        }
 
-
-        productCbx.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (ignoreEvents) {
-                    return;
-                }
-                ProductType selectedProductType =
-                    (ProductType) productCbx.getSelectedItem();
-                if ( !Misc.equals(productType, selectedProductType)) {
-                    productType = selectedProductType;
+        DefaultTreeModel treeModel = new DefaultTreeModel(treeRoot);
+        productTree = new JTree(treeModel);
+        productTree.setRootVisible(false);
+        productTree.setShowsRootHandles(true);
+        productTree.addTreeSelectionListener(new TreeSelectionListener() {
+                public void 	valueChanged(TreeSelectionEvent e) {
+                    productType = getSelectedProductType();
                     updateText();
                 }
-            }
-        });
+            }); 
+
+
+
+        JScrollPane treeScroller =  GuiUtils.makeScrollPane(productTree, 200,100);
+        JComponent treeComp = GuiUtils.topCenter(new JLabel("Products:"), treeScroller);
+
+        stationLabel = new JLabel("LBL");
+        JComponent topComp = GuiUtils.leftRight(GuiUtils.bottom(stationLabel), getAnimationWidget().getContents());
+        JScrollPane textScroller  = new JScrollPane(textArea);
+        textScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        GuiUtils.tmpInsets = GuiUtils.INSETS_2;
+        JComponent contents = GuiUtils.doLayout(new Component[]{
+                GuiUtils.bottom(new JLabel("Products")),
+                topComp,
+                treeScroller,
+                GuiUtils.centerBottom(textScroller,textSearcher)},
+            2,
+            new double[]{0.25,0.75},
+            GuiUtils.WT_NY);
+
+
 
 
         updateText();
@@ -233,6 +228,30 @@ public class TextProductControl extends StationLocationControl {
 
     /** _more_          */
     private List stationList = new ArrayList();
+
+
+    private ProductType getSelectedProductType() {
+        TreePath[] paths = productTree.getSelectionModel().getSelectionPaths();
+        if (paths == null) {
+            return null;
+        }
+        for (int i = 0; i < paths.length; i++) {
+            Object last = paths[i].getLastPathComponent();
+            if (last == null) {
+                continue;
+            }
+            if ( !(last instanceof DefaultMutableTreeNode)) {
+                continue;
+            }
+            DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) last;
+            Object userObject = dmtn.getUserObject();
+            if(userObject instanceof ProductType) {
+                return (ProductType) userObject;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * _more_
@@ -253,16 +272,29 @@ public class TextProductControl extends StationLocationControl {
      * @param selectionList _more_
      */
     protected void selectedStationsChanged(List selectionList) {
+        NamedStationImpl newStation=null;
         if (selectionList.size() == 0) {
             selectedStation = null;
         } else {
-            selectedStation = (NamedStationImpl) selectionList.get(0);
+            newStation= (NamedStationImpl) selectionList.get(0);
         }
+        if(Misc.equals(newStation, selectedStation)) {
+            updateStationLabel();
+            return;
+        }
+        selectedStation = newStation;
+        updateStationLabel();
+        updateText();
+    }
 
+    private  void updateStationLabel() {
         if (selectedStation != null) {
-            stationLabel.setText(selectedStation.getID() + ":"
-                                 + selectedStation.getName());
+            String state= (String)selectedStation.getProperty("ST","");
+            stationLabel.setText(selectedStation.getName()+" " + state);
+        } else {
+            stationLabel.setText(" ");
         }
+        
     }
 
     /**
@@ -270,49 +302,92 @@ public class TextProductControl extends StationLocationControl {
      */
     public void updateText() {
         try {
-        String            text     = "";
-        NamedStationTable newTable = dataSource.getStations(productType);
-
-        if (newTable != currentTable) {
-            if (newTable != null) {
-                stationList = new ArrayList(newTable.values());
-            } else {
-                stationList = new ArrayList();
+            String            text     = "";
+            NamedStationTable newTable = dataSource.getStations(productType);
+            if (newTable != currentTable) {
+                if (newTable != null) {
+                    stationList = new ArrayList(newTable.values());
+                } else {
+                    stationList = new ArrayList();
+                }
+                if(selectedStation!=null && !stationList.contains(selectedStation)) {
+                    if(productType!=null) {
+                        selectedStation = null;
+                        updateStationLabel();
+                    }
+                }
+                loadData();
+                currentTable = newTable;
             }
-            selectedStation = null;
-            stationLabel.setText("");
-            loadData();
-            currentTable = newTable;
-            textArea.setText("");
-        }
+
+            if (productType != null && selectedStation!=null) {
+                products =  dataSource.readProducts(productType,selectedStation);
+            } else {
+                products =  new ArrayList<Product>();
+            }
+            products = (List<Product>)Misc.sort(products);
+
+            List dateTimes = new ArrayList();
+            for(Product product: products) {
+                if(product.getDate()!=null) {
+                    dateTimes.add(new DateTime(product.getDate()));
+                }
+            }
 
 
-        if (productType != null) {
-            //            text = dataSource.readProduct(productType);
-        }
-        textArea.setText(text);
+            ignoreTimeChanges = true;
+            if(dateTimes.size()>0) {
+                getAnimationWidget().setBaseTimes(ucar.visad.Util.makeTimeSet(dateTimes));
+                getAnimationWidget().gotoEnd();
+            } else {
+                getAnimationWidget().setBaseTimes(null);
+            }
+            ignoreTimeChanges = false;
+
+            if(products.size()==0)  {
+                setText("No products found");
+            } else {
+                setText(products.get(products.size()-1).getContent());
+            }
         } catch(Exception exc) {
             logException("Error updating product text", exc);
         }
     }
 
 
-    /**
-     * _more_
-     */
-    public void updateProducts() {
-        ignoreEvents = true;
+
+    protected void setText(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if(productType==null) {
+                        textArea.setText("Please select a product");
+                    } else if(selectedStation==null){
+                        textArea.setText("Please select a station");
+                    } else {
+                        textArea.setText(text);
+                    }
+                    textArea.setCaretPosition(0);
+                    textArea.scrollRectToVisible(new Rectangle(0,0,1,1));
+                }
+            });
+
+    }
+
+    protected void timeChanged(Real time) {
         try {
-            if (productGroup != null) {
-                GuiUtils.setListData(productCbx,
-                                     productGroup.getProductTypes().toArray());
-                productType = (ProductType) productCbx.getSelectedItem();
-                updateText();
+            if(ignoreTimeChanges) return;
+            int idx = getAnimation().getCurrent();
+            if(idx>=0 && idx<products.size()) {
+                setText(products.get(idx).getContent());
+            } else {
+                setText("");
             }
-        } finally {
-            ignoreEvents = false;
+        } catch(Exception exc) {
+            logException("Error setting time", exc);
         }
     }
+
+
 
     /**
      * @param dataChoice    the DataChoice of the moment -

@@ -39,7 +39,7 @@ import java.util.List;
  * @version $Revision: 1.15 $
  */
 
-public class Product {
+public class Product implements Comparable {
 
     private Date date;
     private String content;
@@ -51,6 +51,16 @@ public class Product {
         this.date = date;
     }
 
+
+    public int 	compareTo(Object o) {
+        Product that = (Product)o;
+        if(date == null) {
+            if(that.date==null) return 0;
+            return -1;
+        }
+        if(that.date==null) return 1;
+        return (date.compareTo(that.date));
+    }
 
     public String toString() {
         return station;

@@ -710,8 +710,10 @@ public class StationModelControl extends ObsDisplayControl {
      * disable the table
      */
     private void disableTable() {
-        table.setBackground(tableDisableColor);
-        table.repaint();
+        if(table!=null) {
+            table.setBackground(tableDisableColor);
+            table.repaint();
+        }
     }
 
     /**
