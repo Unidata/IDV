@@ -498,11 +498,11 @@ public class GempakTextProductDataSource extends FilesDataSource {
         for(int i=0;i<args.length;i++) {
             long t1 = System.currentTimeMillis();
             List<Product> products = parseProduct(args[i],true);
-            System.err.println(args[i]+ " " + products);
+            //            System.err.println(args[i]+ " " + products);
             //            System.err.println("");
             long t2 = System.currentTimeMillis();
             //            if(true) break;
-            //            System.err.println ("time:" + (t2-t1));
+            System.err.println (args[i] +" " + products.size() + " " +(t2-t1)+"ms");
         }
         long tt2 = System.currentTimeMillis();
         System.err.println ("total:" + args.length + " " + (tt2-tt1)+"ms");
