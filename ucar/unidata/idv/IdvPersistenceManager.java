@@ -3311,8 +3311,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 localFileMapping = new ArrayList(fileMapping);
             }
 
-
-
             for (int i = 0; i < dataSources.size(); i++) {
                 DataSource dataSource = (DataSource) dataSources.get(i);
                 loadDialog.setMessage1("Loading data source " + (i + 1)
@@ -3325,11 +3323,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                             mappingIdx < localFileMapping.size();
                             mappingIdx++) {
                         ObjectPair pair =
-                            (ObjectPair) fileMapping.get(mappingIdx);
+                            (ObjectPair) localFileMapping.get(mappingIdx);
                         String identifier = (String) pair.getObject1();
                         List   files      = (List) pair.getObject2();
                         if (dataSource.identifiedByName(identifier)) {
-                            localFileMapping.remove(i);
+                            //Remove this data source's local files
+                            localFileMapping.remove(mappingIdx);
                             dataSource.setNewFiles(files);
                             break;
                         }
