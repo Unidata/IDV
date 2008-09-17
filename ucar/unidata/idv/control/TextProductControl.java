@@ -33,7 +33,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 
 import ucar.unidata.data.text.GempakTextProductDataSource;
-import ucar.unidata.data.text.Product;
+import ucar.unidata.data.text.ProductType;
 import ucar.unidata.data.text.ProductGroup;
 
 import ucar.unidata.geoloc.Bearing;
@@ -131,7 +131,7 @@ public class TextProductControl extends StationLocationControl {
     private ProductGroup productGroup;
 
     /** _more_          */
-    private Product product;
+    private ProductType productType;
 
     /** _more_          */
     private JTextArea textArea;
@@ -188,10 +188,10 @@ public class TextProductControl extends StationLocationControl {
                                       GuiUtils.makeScrollPane(textArea, 200,
                                           400));
         updateProducts();
-        if (product != null) {
-            productCbx.setSelectedItem(product);
+        if (productType != null) {
+            productCbx.setSelectedItem(productType);
         } else {
-            product = (Product) productCbx.getSelectedItem();
+            productType = (ProductType) productCbx.getSelectedItem();
         }
         productGroupCbx.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -210,10 +210,10 @@ public class TextProductControl extends StationLocationControl {
                 if (ignoreEvents) {
                     return;
                 }
-                Product selectedProduct =
-                    (Product) productCbx.getSelectedItem();
-                if ( !Misc.equals(product, selectedProduct)) {
-                    product = selectedProduct;
+                ProductType selectedProductType =
+                    (ProductType) productCbx.getSelectedItem();
+                if ( !Misc.equals(productType, selectedProductType)) {
+                    productType = selectedProductType;
                     updateText();
                 }
             }
@@ -270,7 +270,7 @@ public class TextProductControl extends StationLocationControl {
      */
     public void updateText() {
         String            text     = "";
-        NamedStationTable newTable = dataSource.getStations(product);
+        NamedStationTable newTable = dataSource.getStations(productType);
 
         if (newTable != currentTable) {
             if (newTable != null) {
@@ -286,8 +286,8 @@ public class TextProductControl extends StationLocationControl {
         }
 
 
-        if (product != null) {
-            //            text = dataSource.readProduct(product);
+        if (productType != null) {
+            //            text = dataSource.readProduct(productType);
         }
         textArea.setText(text);
     }
@@ -301,8 +301,8 @@ public class TextProductControl extends StationLocationControl {
         try {
             if (productGroup != null) {
                 GuiUtils.setListData(productCbx,
-                                     productGroup.getProducts().toArray());
-                product = (Product) productCbx.getSelectedItem();
+                                     productGroup.getProductTypes().toArray());
+                productType = (ProductType) productCbx.getSelectedItem();
                 updateText();
             }
         } finally {
@@ -353,7 +353,7 @@ public class TextProductControl extends StationLocationControl {
      *
      *  @param value The new value for ProductGroup
      */
-    public void setTextProductGroup(ProductGroup value) {
+    public void setProductGroup(ProductGroup value) {
         productGroup = value;
     }
 
@@ -362,7 +362,7 @@ public class TextProductControl extends StationLocationControl {
      *
      *  @return The ProductGroup
      */
-    public ProductGroup getTextProductGroup() {
+    public ProductGroup getProductGroup() {
         return productGroup;
     }
 
@@ -371,8 +371,8 @@ public class TextProductControl extends StationLocationControl {
      *
      *  @param value The new value for Product
      */
-    public void setTextProduct(Product value) {
-        product = value;
+    public void setProductType(ProductType value) {
+        productType = value;
     }
 
     /**
@@ -380,8 +380,8 @@ public class TextProductControl extends StationLocationControl {
      *
      *  @return The Product
      */
-    public Product getTextProduct() {
-        return product;
+    public ProductType getProductType() {
+        return productType;
     }
 
 
