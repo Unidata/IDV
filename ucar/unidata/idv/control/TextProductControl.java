@@ -269,6 +269,7 @@ public class TextProductControl extends StationLocationControl {
      * _more_
      */
     public void updateText() {
+        try {
         String            text     = "";
         NamedStationTable newTable = dataSource.getStations(productType);
 
@@ -290,6 +291,9 @@ public class TextProductControl extends StationLocationControl {
             //            text = dataSource.readProduct(productType);
         }
         textArea.setText(text);
+        } catch(Exception exc) {
+            logException("Error updating product text", exc);
+        }
     }
 
 
