@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -85,6 +87,17 @@ public class RadarSweepControl extends ColorPlanViewControl {
      *  Do we request 3d or 2d data.
      */
     private boolean use3D = true;
+
+    /**
+     * the texture quality  (1= best, 10= moderate)
+     */
+    private int textureQuality = 10;
+
+    /**
+     * quality slider
+     */
+    private JSlider textureSlider = null;
+
 
     /**
      * Default constructor.
@@ -177,7 +190,7 @@ public class RadarSweepControl extends ColorPlanViewControl {
             throws VisADException, RemoteException {
         Grid2DDisplayable gridDisplay =
             (Grid2DDisplayable) super.createPlanDisplay();
-        gridDisplay.setCurvedSize(1);
+        gridDisplay.setCurvedSize(textureQuality);
         return gridDisplay;
     }
 
@@ -193,8 +206,30 @@ public class RadarSweepControl extends ColorPlanViewControl {
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
         controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Quality:"),
+                                             doMakeTextureSlider()));
+        controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Station:"),
                                              stationLabel));
+    }
+
+    /**
+     * Make a slider for the texture quality
+     *
+     * @return the slider
+     */
+    private JSlider doMakeTextureSlider() {
+        if (textureSlider == null) {
+            textureSlider = GuiUtils.makeSlider(1, 21, textureQuality, this,
+                    "setTextureQuality");
+            Hashtable labels = new Hashtable();
+            labels.put(new Integer(1), GuiUtils.lLabel("High"));
+            labels.put(new Integer(10), GuiUtils.cLabel("Medium"));
+            labels.put(new Integer(21), GuiUtils.rLabel("Low"));
+            textureSlider.setLabelTable(labels);
+            textureSlider.setPaintLabels(true);
+        }
+        return textureSlider;
     }
 
     /**
@@ -203,7 +238,6 @@ public class RadarSweepControl extends ColorPlanViewControl {
      * @param newAngle   new sweep angle
      */
     private void applyNewAngle(double newAngle) {
-        Misc.printStack("new angle " + newAngle, 7);
 
         if (newAngle != currentAngle) {
             currentAngle = newAngle;
@@ -376,5 +410,25 @@ public class RadarSweepControl extends ColorPlanViewControl {
         return "Use Radar Projection";
     }
 
+    /**
+     * Set the texture quality
+     *
+     * @param quality  1=high, &gt; 1 lower
+     */
+    public void setTextureQuality(int quality) {
+        textureQuality = quality;
+        if (getGridDisplay() != null) {
+            getGridDisplay().setCurvedSize(quality);
+        }
+    }
+
+    /**
+     * Get the texture quality
+     *
+     * @return the  texture quality
+     */
+    public int getTextureQuality() {
+        return textureQuality;
+    }
 }
 
