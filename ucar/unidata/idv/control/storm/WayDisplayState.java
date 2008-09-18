@@ -814,6 +814,7 @@ public class WayDisplayState {
         if (conesHolder == null) {
             conesHolder = new CompositeDisplayable("cone_"
                     + stormDisplayState.getStormInfo().getStormId());
+            conesHolder.setVisible(true);
             conesHolder.setUseTimesInAnimation(false);
             addDisplayable(conesHolder);
         }
@@ -1212,7 +1213,7 @@ public class WayDisplayState {
         Calendar cal = Calendar.getInstance();
 
         cal.setTime(dt);
-        int m = cal.get(Calendar.MONTH);
+        int m = cal.get(Calendar.MONTH) + 1;  // 0 base, ie 0 for Jan
         int d = cal.get(Calendar.DAY_OF_MONTH);
         int h = cal.get(Calendar.HOUR_OF_DAY);
 
