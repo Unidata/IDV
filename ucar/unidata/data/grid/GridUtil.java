@@ -3743,26 +3743,42 @@ public class GridUtil {
     public static int[][] findContainedIndices(float[][] latlon, UnionSet map)
             throws VisADException {
         long t1 = System.currentTimeMillis();
-        int[][]indices = xfindContainedIndices(latlon, map);
+        int[][]indices = findContainedIndices(latlon, map,true);
         long t2 = System.currentTimeMillis();
         System.err.println("indices time:" + (t2-t1));
         return indices;
     }
 
-    static long time;
-    public static void startTime() {
-        time = System.currentTimeMillis();
+
+    public static int[][] findNotContainedIndices(GriddedSet domain,
+            UnionSet map)
+            throws VisADException {
+        return findNotContainedIndices(getLatLon(domain), map);
     }
 
-    public static void time(String msg) {
+    /**
+     * Find the indices of the latlon values contained in the map
+     *
+     * @param latlon  set of lat/lon values
+     * @param map  the map lines containing bounding polygons
+     *
+     * @return indices in the domain
+     *
+     * @throws VisADException  problem sampling
+     */
+    public static int[][] findNotContainedIndices(float[][] latlon, UnionSet map)
+            throws VisADException {
         long t1 = System.currentTimeMillis();
-        System.err.println(msg +" " + (t1-time));
-        time  = t1;
+        int[][]indices = findContainedIndices(latlon, map,false);
+        long t2 = System.currentTimeMillis();
+        System.err.println("indices time:" + (t2-t1));
+        return indices;
     }
 
 
 
-    public static int[][] xfindContainedIndices(float[][] latlon, UnionSet map)
+
+    private static int[][] findContainedIndices(float[][] latlon, UnionSet map, boolean inside)
             throws VisADException {
         int numPoints = latlon[0].length;
         if(map==null) {
@@ -3811,17 +3827,30 @@ public class GridUtil {
                 continue;
             }
             for (int mapIdx = 0; mapIdx < sets.length; mapIdx++) {
-                if ((lon < lonLow[mapIdx]) || (lon > lonHi[mapIdx])
+                if(inside) {
+                    if ((lon < lonLow[mapIdx]) || (lon > lonHi[mapIdx])
                         || (lat < latLow[mapIdx]) || (lat > latHi[mapIdx])) {
-                    continue;
+                        continue;
+                    }
+                } else {
+                    if ((lon >= lonLow[mapIdx]) && (lon <= lonHi[mapIdx])
+                        && (lat >= latLow[mapIdx]) && (lat <= latHi[mapIdx])) {
+                        //                        System.out.println("Inside " + lon +  " " + lat);
+                        continue;
+                    } else {
+                        //                        System.out.println("Not  inside " + lon +  " " + lat + " (" + lonLow[mapIdx]+" "+lonHi[mapIdx] +") ( "+
+                        //                                           latLow[mapIdx]+" "+latHi[mapIdx]+")");
+                    }
                 }
-                if (DelaunayCustom.inside((float[][]) pts.get(mapIdx),
+                    
+                boolean pointInside = DelaunayCustom.inside((float[][]) pts.get(mapIdx),
                                           (latLonOrder
                                            ? lat
                                            : lon), (latLonOrder
                         ? lon
-                        : lat))) {
-
+                                                    : lat));
+                boolean ok =(inside?pointInside:!pointInside);
+                if (ok) {
                     if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList();
                     }

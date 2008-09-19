@@ -58,14 +58,14 @@ def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,
 
 
 
-def  mapsApplyToField(function, field, mapSets):
+def  mapsApplyToField(function, field, mapSets,inside):
     """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
     by each polygon with the average value within that area
     """
     if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
-            rangeObject = mapsApplyToRange(function, field.getSample(timeStep), timeStep, mapSets);
+            rangeObject = mapsApplyToRange(function, field.getSample(timeStep), timeStep, mapSets,inside);
             newData.setSample(timeStep,rangeObject)
         return newData
     else:   
@@ -73,12 +73,15 @@ def  mapsApplyToField(function, field, mapSets):
 
 
 
-def  mapsApplyToRange(function, range, timeStep, mapSets):
+def  mapsApplyToRange(function, range, timeStep, mapSets,inside):
     """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
     by each polygon with the average value within that area
     """
-    rangeObject = range.clone()
-    indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+    rangeObject = range.clone();
+    if(inside):
+	    indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+    else:
+	    indices = GridUtil.findNotContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
     newValues = cloneArray(originalValues);
 

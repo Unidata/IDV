@@ -112,7 +112,7 @@ public class RadarEditor extends DrawingControl {
     private     JTextField thresholdLevelFld;
 
     private JComboBox regionModeCbx;
-
+    private JComboBox insideCbx;
     private JTextArea commandsTextArea;
 
     /**
@@ -180,11 +180,14 @@ public class RadarEditor extends DrawingControl {
             throws VisADException, RemoteException {
         commandsTextArea = new JTextArea("",5,40);
         regionModeCbx = new JComboBox(new String[]{"Selected Region","All Regions","Entire Field"});
+        insideCbx =  new JComboBox(new String[]{"Inside Region","Outside Region"});
         JTabbedPane tabbedPane = new JTabbedPane();
         thresholdLevelFld= new JTextField("0",5);
 
+        JComponent regionComp  = GuiUtils.hbox(GuiUtils.label("Apply to: ",regionModeCbx),
+                                               insideCbx,5);
         List commands = new ArrayList();
-        commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.label("Apply to: ",regionModeCbx)),2));
+        commands.add(GuiUtils.inset(GuiUtils.left(regionComp),2));
         commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.makeButton("Average", this,"doAverage")),2));
         commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.makeButton("Absolute value", this,"doAbsoluteValue")),2));
         commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.hbox(GuiUtils.makeButton("Threshold selected regions", this,"doThreshold"),
@@ -235,7 +238,8 @@ public class RadarEditor extends DrawingControl {
             getInterpreter().set("slice", slice);
             long t1 = System.currentTimeMillis();
             appendCommand(func+"\n");
-            getInterpreter().exec("newSlice = mapsApplyToField('" +func+"',slice,mapLines)");
+            getInterpreter().exec("newSlice = mapsApplyToField('" +func+"',slice,mapLines," +
+                                  (insideCbx.getSelectedIndex()==0?"1":"0")+")");
             long t2 = System.currentTimeMillis();
             System.err.println("Time:" + (t2-t1));
             PyObject    obj     = interpreter.get("newSlice");
