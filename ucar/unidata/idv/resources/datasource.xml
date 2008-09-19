@@ -240,9 +240,19 @@
 
   <datasource
      id="PRODUCT.GEMPAK"
-     factory="ucar.unidata.data.text.GempakTextProductDataSource"
+     factory="ucar.unidata.data.text.NwxTextProductDataSource"
      fileselection="true"
-     label="GEMPAK Text Products">
+     label="NWX Text Products">
+    <property
+       name="default_display"
+       value="textproductcontrol"/>
+  </datasource>
+
+  <datasource
+     id="PRODUCT.ADDE"
+     factory="ucar.unidata.data.text.AddeTextProductDataSource"
+     fileselection="true"
+     label="ADDE Text Products">
     <property
        name="default_display"
        value="textproductcontrol"/>
