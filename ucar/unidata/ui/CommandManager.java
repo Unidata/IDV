@@ -89,8 +89,16 @@ public class CommandManager {
      * @return _more_
      */
     public JPanel getContents() {
-        return GuiUtils.hbox(new JLabel("History: "), getBackButton(),
-                             getForwardButton());
+        return getContents(true);
+    }
+
+    public JPanel getContents(boolean includeHistory) {
+        if(includeHistory)
+            return GuiUtils.hbox(new JLabel("History: "), getBackButton(),
+                                 getForwardButton());
+        else
+            return GuiUtils.hbox(getBackButton(),
+                                 getForwardButton());
     }
 
     /**
