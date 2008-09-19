@@ -91,6 +91,7 @@ def  mapsApplyToRange(function, range, timeStep, mapSets,inside):
     rangeObject.setSamples(newValues)
     return rangeObject;
 
+    
 
 def  mapsAverage(originalValues, newValues, indexArray):
     DataUtil.average(originalValues, newValues, indexArray);
@@ -98,11 +99,14 @@ def  mapsAverage(originalValues, newValues, indexArray):
 def mapsAbsoluteValue(originalValues, newValues, indexArray):
  	DataUtil.absoluteValue(originalValues, newValues, indexArray);
 
-def mapsThresholdUpper(originalValues, newValues, indexArray, threshold):
- 	DataUtil.thresholdUpper(originalValues, newValues, indexArray,threshold);
+def mapsMax(originalValues, newValues, indexArray, value):
+ 	DataUtil.max(originalValues, newValues, indexArray,value);
 
-def mapsThresholdLower(originalValues, newValues, indexArray, threshold):
- 	DataUtil.thresholdLower(originalValues, newValues, indexArray,threshold);
+def mapsMin(originalValues, newValues, indexArray, value):
+ 	DataUtil.min(originalValues, newValues, indexArray,value);
+
+def mapsSetValue(originalValues, newValues, indexArray, value):
+ 	DataUtil.setValue(originalValues, newValues, indexArray,value);
 	
 
 

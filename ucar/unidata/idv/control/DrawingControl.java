@@ -217,7 +217,7 @@ public class DrawingControl extends DisplayControlImpl {
     private boolean filled = false;
 
     /** Filled mode */
-    private JCheckBox straightCbx;
+    protected JCheckBox straightCbx;
 
     /** Is filled turned on */
     private boolean straight = false;

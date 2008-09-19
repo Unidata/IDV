@@ -327,21 +327,30 @@ public class DataUtil {
     }
 
 
-    public static void thresholdUpper(float[][]originalValues,
-                                     float[][]newValues,
-                                     int[]indexArray, float threshold) {
+    public static void max(float[][]originalValues,
+                           float[][]newValues,
+                           int[]indexArray, float value) {
         for(int j=0;j<indexArray.length;j++) {
-            if(originalValues[0][indexArray[j]]>threshold)
-                newValues[0][indexArray[j]] = threshold;
+            if(originalValues[0][indexArray[j]]>value)
+                newValues[0][indexArray[j]] = value;
         }
     }
 
-    public static void thresholdLower(float[][]originalValues,
-                                     float[][]newValues,
-                                     int[]indexArray, float threshold) {
+
+    public static void setValue(float[][]originalValues,
+                           float[][]newValues,
+                           int[]indexArray, float value) {
         for(int j=0;j<indexArray.length;j++) {
-            if(originalValues[0][indexArray[j]]<threshold)
-                newValues[0][indexArray[j]] = threshold;
+            newValues[0][indexArray[j]] = value;
+        }
+    }
+
+    public static void min(float[][]originalValues,
+                           float[][]newValues,
+                           int[]indexArray, float value) {
+        for(int j=0;j<indexArray.length;j++) {
+            if(originalValues[0][indexArray[j]]<value)
+                newValues[0][indexArray[j]] = value;
         }
     }
 

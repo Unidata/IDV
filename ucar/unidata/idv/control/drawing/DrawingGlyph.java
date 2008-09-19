@@ -321,6 +321,8 @@ public abstract class DrawingGlyph {
     private GuiUtils.ColorSwatch colorSwatch;
 
 
+
+
     /**
      * Ctor
      */
@@ -1944,6 +1946,8 @@ public abstract class DrawingGlyph {
         }
         return pts;
     }
+
+
 
     public MapSet makeMapSet() throws Exception {
         float[][] latLons = getLatLons(points);
