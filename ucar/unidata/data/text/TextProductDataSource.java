@@ -1,6 +1,4 @@
 /*
- * $Id: FrontDataSource.java,v 1.15 2007/04/17 22:22:52 jeffmc Exp $
- *
  * Copyright 1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -21,13 +19,8 @@
  */
 
 
-
-
-
 package ucar.unidata.data.text;
 
-
-import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataCategory;
@@ -35,16 +28,9 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataSourceImpl;
-
 import ucar.unidata.data.DirectDataChoice;
-
-
 import ucar.unidata.data.FilesDataSource;
 
-import ucar.unidata.idv.control.DrawingControl;
-import ucar.unidata.idv.control.drawing.DrawingGlyph;
-import ucar.unidata.idv.control.drawing.FrontGlyph;
-import ucar.unidata.idv.control.drawing.HighLowGlyph;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 
@@ -58,23 +44,12 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
-
-import ucar.visad.display.FrontDrawer;
-
-
-
 import visad.*;
-
-import java.io.ByteArrayInputStream;
-
-
 
 import java.io.File;
 import java.io.FileInputStream;
 
 import java.rmi.RemoteException;
-
-
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -113,8 +88,9 @@ public abstract class TextProductDataSource extends FilesDataSource {
      * @param description The long name
      * @param properties properties
      */
-    public TextProductDataSource(DataSourceDescriptor descriptor, String name,
-                           String description, Hashtable properties) {
+    public TextProductDataSource(DataSourceDescriptor descriptor,
+                                 String name, String description,
+                                 Hashtable properties) {
         super(descriptor, name, description, properties);
     }
 
@@ -127,8 +103,9 @@ public abstract class TextProductDataSource extends FilesDataSource {
      * @param description The long name
      * @param properties properties
      */
-    public TextProductDataSource(DataSourceDescriptor descriptor, List newSources,
-                           String description, Hashtable properties) {
+    public TextProductDataSource(DataSourceDescriptor descriptor,
+                                 List newSources, String description,
+                                 Hashtable properties) {
         super(descriptor, newSources, description, properties);
     }
 
@@ -142,9 +119,9 @@ public abstract class TextProductDataSource extends FilesDataSource {
      * @param description   description of the data
      * @param properties    extra properties for initialization
      */
-    public TextProductDataSource(DataSourceDescriptor descriptor, List newSources,
-                           String name, String description,
-                           Hashtable properties) {
+    public TextProductDataSource(DataSourceDescriptor descriptor,
+                                 List newSources, String name,
+                                 String description, Hashtable properties) {
         super(descriptor, newSources, name, description, properties);
     }
 
@@ -152,35 +129,39 @@ public abstract class TextProductDataSource extends FilesDataSource {
 
 
     /**
-     * _more_
+     * Read the products for the product type and station
      *
-     * @param productType _more_
+     * @param productType the product type
+     * @param station the station
      *
-     * @return _more_
+     * @return the list of products
      */
-    public abstract  List<Product> readProducts(ProductType productType,NamedStationImpl station);
+    public abstract List<Product> readProducts(ProductType productType,
+            NamedStationImpl station);
 
     /**
-     * _more_
+     * Get the stations for a productType
      *
-     * @param product _more_
+     * @param productType  the product type
      *
-     * @return _more_
+     * @return  the list of stations
+     *
+     * @throws Exception problem getting the stations
      */
-    public abstract NamedStationTable getStations(ProductType productType) throws Exception;
-
+    public abstract NamedStationTable getStations(ProductType productType)
+     throws Exception;
 
 
     /**
-     * _more_
+     * Get the list of product groups
      *
-     * @return _more_
+     * @return  the list of product groups
      */
     public abstract List<ProductGroup> getProductGroups();
 
 
     /**
-     * _more_
+     * Make the data choices
      */
     protected void doMakeDataChoices() {
         String category = "textproducts";
