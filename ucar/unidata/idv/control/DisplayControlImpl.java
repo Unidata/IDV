@@ -914,15 +914,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                            Hashtable properties, DataSelection dataSelection)
             throws VisADException, RemoteException {
 
-
-
-
-
-
         if (haveInitialized) {
             return;
         }
-
 
 
 
@@ -985,7 +979,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !init(myDataChoices)) {
             displayControlFailed();
             if (getProperty("control.ignoreerrors", false)) {
-                controlContext.addDisplayControl(this);
+                addToControlContext();
             }
             return;
         }
@@ -1009,9 +1003,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-        //Add this control to the main controlContext
-        controlContext.addDisplayControl(this);
-
+        addToControlContext();
 
 
 
@@ -1116,6 +1108,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     }
 
+
+    protected void addToControlContext() {
+        //Add this control to the main controlContext
+        controlContext.addDisplayControl(this);
+    }
 
     /**
      * Initialize as a template

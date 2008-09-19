@@ -89,6 +89,7 @@ public class PolyGlyph extends LineGlyph {
     /** Xml attribute name */
     public static final String ATTR_EXTRUDE = "extrude";
 
+
     /** Not sure what we do with this */
     private boolean extrude = false;
 
@@ -97,6 +98,9 @@ public class PolyGlyph extends LineGlyph {
 
     /** Last point */
     private Object lastPoint = null;
+
+    private boolean closed = false;
+
 
     /**
      * Ctor
@@ -345,6 +349,18 @@ public class PolyGlyph extends LineGlyph {
         return this;
     }
 
+    public DrawingGlyph handleMouseReleased(DisplayEvent event)
+            throws VisADException, RemoteException {
+        if(closed && points.size()>0) {
+            points.add(points.get(0));
+            updateLocation();
+        }
+        return super.handleMouseReleased(event);
+    }
+
+    public void doneBeingCreated() {
+        super.doneBeingCreated();
+    }
 
 
     /**
@@ -429,6 +445,24 @@ public class PolyGlyph extends LineGlyph {
     }
 
 
+
+/**
+Set the Closed property.
+
+@param value The new value for Closed
+**/
+public void setClosed (boolean value) {
+	closed = value;
+}
+
+/**
+Get the Closed property.
+
+@return The Closed
+**/
+public boolean getClosed () {
+	return closed;
+}
 
 
 

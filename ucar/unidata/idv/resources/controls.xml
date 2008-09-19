@@ -150,6 +150,21 @@ example:
      xxxicon="/ucar/unidata/idv/images/planview.png"
      displaycategory="Radar Views"
      properties="displayName=CAPPI;smoothed=false;allowSmoothing=false"/>
+
+  <control
+     id="radareditor"
+     categories="SWEEP-*-*;RADAR-*"
+     class="ucar.unidata.idv.control.RadarEditor"
+     doeslevels="true"
+     description="Radar Editor"
+     label="Radar Editor"
+     displaycategory="Radar Views"
+     properties="displayName=Radar Editor;windowVisible=true;">
+    </control>
+
+
+
+
 <!--
   <control
     id="level2VADWP" 
@@ -915,6 +930,8 @@ example:
      properties="displayName=Transect Drawing Control;windowVisible=true;showInTabs=false;">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+
 
   <control
      id="locationindicatorcontrol"

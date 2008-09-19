@@ -352,6 +352,14 @@ public class DrawingControl extends DisplayControlImpl {
      */
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
+        setColor(Color.red);
+        if (deleteCursor == null) {
+            deleteCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                GuiUtils.getImage("/auxdata/ui/icons/Cut16.gif"),
+                new Point(0, 0), "Custom Delete");
+        }
+
+
         if (getDisplayUnit() == null) {
             setDisplayUnit(getDefaultDistanceUnit());
         }
@@ -1475,6 +1483,22 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
 
+    protected JComponent doMakeShapesPanel() {
+        JComponent contents = GuiUtils.inset(doMakeTablePanel(), 4);
+        if (displayOnly) {
+            zPositionPanel = GuiUtils.hgrid(doMakeZPositionSlider(),
+                                            GuiUtils.filler());
+            contents = GuiUtils.centerBottom(contents,
+                                             GuiUtils.label("Z Position: ",
+                                                 zPositionPanel));
+            return GuiUtils.centerBottom(contents, msgLabel);
+        }
+
+        return contents;
+
+    }
+
+
     /**
      * Make the gui
      *
@@ -1485,33 +1509,10 @@ public class DrawingControl extends DisplayControlImpl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
-
-        if (deleteCursor == null) {
-            deleteCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                GuiUtils.getImage("/auxdata/ui/icons/Cut16.gif"),
-                new Point(0, 0), "Custom Delete");
-        }
-
-        setColor(Color.red);
-
-        if (false && displayOnly) {
-            return new JLabel(" ");
-        }
-
-
-        JComponent contents = GuiUtils.inset(doMakeTablePanel(), 4);
-        if (displayOnly) {
-            zPositionPanel = GuiUtils.hgrid(doMakeZPositionSlider(),
-                                            GuiUtils.filler());
-            contents = GuiUtils.centerBottom(contents,
-                                             GuiUtils.label("Z Position: ",
-                                                 zPositionPanel));
-            return GuiUtils.centerBottom(contents, msgLabel);
-        }
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
         tabbedPane.add("Style", GuiUtils.top(doMakeStylePanel()));
-        tabbedPane.add("Shapes", contents);
+        tabbedPane.add("Shapes", doMakeShapesPanel());
         return GuiUtils.centerBottom(tabbedPane, msgLabel);
     }
 
