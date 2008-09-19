@@ -28,6 +28,7 @@ package ucar.unidata.data.text;
 
 
 import edu.wisc.ssec.mcidas.adde.AddeTextReader;
+import edu.wisc.ssec.mcidas.adde.WxTextProduct;
 
 import java.text.SimpleDateFormat;
 
@@ -80,6 +81,7 @@ import java.rmi.RemoteException;
 
 import java.util.regex.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -191,12 +193,14 @@ public class AddeTextProductDataSource extends TextProductDataSource {
     public List<Product> readProducts(ProductType productType,NamedStationImpl station) {
         List<Product> products = new ArrayList<Product>();
         if (station == null) return products;
-        String url = "adde://adde.ucar.edu/wxtext?debug=true&num=3&"+ getSearch(productType, station);
+        String url = "adde://adde.ucar.edu/wxtext?debug=true&num=20&"+ getSearch(productType, station);
         try {
         AddeTextReader atr      = new AddeTextReader(url);
-        System.out.println("url = " + url);
-        String text = atr.getText();
-        products.add(new Product(station.getID(),text, new  Date()));
+        List<WxTextProduct> prods = atr.getWxTextProducts();
+        for (Iterator itera = prods.iterator(); itera.hasNext();) {
+            WxTextProduct wtp = (WxTextProduct) itera.next();
+            products.add(new Product(wtp.getWstn(), wtp.getText(), wtp.getDate()));
+        }
         } catch (Exception e) {
            System.out.println(e.getMessage());
         }
