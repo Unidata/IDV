@@ -70,7 +70,7 @@ import java.util.regex.*;
  * @author IDV development team
  * @version $Revision: 1.15 $
  */
-public abstract class NwxTextProductDataSource extends TextProductDataSource {
+public class NwxTextProductDataSource extends TextProductDataSource {
 
     /** the table map */
     private Hashtable tableMap = new Hashtable();
