@@ -1144,7 +1144,7 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
             0, 7, 16, 49, 52, 55, 61, 68
         };
         int[] lengths = {
-            8, 6, 32, 2, 2, 5, 6, 5
+            6, 4, 32, 2, 2, 5, 6, 5
         };
 
         //ICAO code,Airport Name,Latitude,Longitude
