@@ -2496,8 +2496,8 @@ public class JythonManager extends IdvManager implements ActionListener {
 
                 PyStringMap seq   = (PyStringMap) interpreter.getLocals();
                 PyList      items = seq.items();
-                for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
-                    PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
+                for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) { 
+                   PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
                     if ( !(pair.__finditem__(1) instanceof PyFunction)) {
                         continue;
                     }

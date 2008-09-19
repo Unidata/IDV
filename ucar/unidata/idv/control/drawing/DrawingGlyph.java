@@ -45,6 +45,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.*;
+import ucar.visad.data.MapSet;
 import ucar.visad.display.*;
 
 
@@ -1942,6 +1943,16 @@ public abstract class DrawingGlyph {
             }
         }
         return pts;
+    }
+
+    public MapSet makeMapSet() throws Exception {
+        float[][] latLons = getLatLons(points);
+        float[][] lonLats = new float[][]{latLons[IDX_LON],latLons[IDX_LAT]};
+        RealTupleType coordMathType =
+            new RealTupleType(RealType.Longitude,RealType.Latitude);
+        return  new MapSet(coordMathType, lonLats, lonLats[0].length,
+                           (CoordinateSystem) null, (Unit[]) null,
+                           (ErrorEstimate[]) null, false);  
     }
 
     /**

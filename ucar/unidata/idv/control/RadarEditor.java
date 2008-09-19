@@ -62,6 +62,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.display.*;
+import ucar.visad.data.MapSet;
 
 
 import visad.*;
@@ -106,6 +107,13 @@ public class RadarEditor extends DrawingControl {
 
     private RadarSweepControl radarSweepControl;
 
+    private  PythonInterpreter interpreter;
+
+    private     JTextField thresholdLevelFld;
+
+    private JComboBox regionModeCbx;
+
+    private JTextArea commandsTextArea;
 
     /**
      * Create a new Drawing Control; set attributes.
@@ -142,6 +150,23 @@ public class RadarEditor extends DrawingControl {
         return true;
     }
 
+    private  PythonInterpreter  getInterpreter() {
+        if(interpreter ==null)
+            interpreter =   getControlContext().getJythonManager().createInterpreter();
+        return interpreter;
+    }
+
+    protected void appendCommand(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    commandsTextArea.append(text);
+                }
+            });
+
+    }
+
+
+
 
     /**
      * Make the gui
@@ -153,14 +178,87 @@ public class RadarEditor extends DrawingControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
+        commandsTextArea = new JTextArea("",5,40);
+        regionModeCbx = new JComboBox(new String[]{"Selected Region","All Regions","Entire Field"});
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
-        tabbedPane.add("Regions", doMakeShapesPanel());
+        thresholdLevelFld= new JTextField("0",5);
+
+        List commands = new ArrayList();
+        commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.label("Apply to: ",regionModeCbx)),2));
+        commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.makeButton("Average", this,"doAverage")),2));
+        commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.makeButton("Absolute value", this,"doAbsoluteValue")),2));
+        commands.add(GuiUtils.inset(GuiUtils.left(GuiUtils.hbox(GuiUtils.makeButton("Threshold selected regions", this,"doThreshold"),
+                                                 GuiUtils.label("Threshold:",thresholdLevelFld))),2)); 
+        JComponent buttons = GuiUtils.vbox(commands);
+        //        JComponent commandsPanel  = GuiUtils.topCenter(buttons, new JScrollPane(commandsTextArea));
+        JComponent commandsPanel  = GuiUtils.topCenter(buttons, new JLabel(""));
+
+        tabbedPane.add("Commands", commandsPanel);
+        tabbedPane.add("Regions", GuiUtils.topCenter(doMakeControlsPanel(),doMakeShapesPanel()));
         tabbedPane.add("Radar Display", radarSweepControl.doMakeContents());
-        return GuiUtils.centerBottom(tabbedPane, msgLabel);
+        return tabbedPane;
+        //        return GuiUtils.centerBottom(tabbedPane, msgLabel);
+    }
+
+    private UnionSet getMapLines() throws Exception {
+        if(regionModeCbx.getSelectedIndex()==2) return null;
+        List glyphsToUse = regionModeCbx.getSelectedIndex()==0?selectedGlyphs:glyphs;
+        if(glyphsToUse.size()==0) {
+            return null;
+        }
+
+        Gridded2DSet[] latLonLines = new Gridded2DSet[glyphsToUse.size()];
+        int cnt=0;
+        for(DrawingGlyph glyph: (List<DrawingGlyph>) glyphsToUse) {
+            latLonLines[cnt++] = glyph.makeMapSet();
+        }
+        RealTupleType coordMathType =
+            new RealTupleType(RealType.Longitude,RealType.Latitude);
+        UnionSet maplines = new UnionSet(coordMathType, latLonLines,
+                                         (CoordinateSystem) null,
+                                         (Unit[]) null,
+                                         (ErrorEstimate[]) null, false);  
+
+        return maplines;
     }
 
 
+    public void applyFunction (String func) {
+        try {
+            UnionSet mapLines = getMapLines();
+            if(mapLines==null && regionModeCbx.getSelectedIndex()!=2){
+                userMessage("No regions");
+                return;
+            }
+            FieldImpl slice = radarSweepControl.getCurrentSlice();
+            getInterpreter().set("mapLines", mapLines);
+            getInterpreter().set("slice", slice);
+            long t1 = System.currentTimeMillis();
+            appendCommand(func+"\n");
+            getInterpreter().exec("newSlice = mapsApplyToField('" +func+"',slice,mapLines)");
+            long t2 = System.currentTimeMillis();
+            System.err.println("Time:" + (t2-t1));
+            PyObject    obj     = interpreter.get("newSlice");
+            slice = (FieldImpl) obj.__tojava__(Data.class);
+            radarSweepControl.getGridDisplayable().loadData((FieldImpl)slice);
+            radarSweepControl.setCurrentSlice(slice);
+        } catch(Exception exc) {
+            logException("Error", exc);
+        }
+    }
+
+
+    public void doAverage () {
+        applyFunction("mapsAverage(originalValues, newValues, indexArray)");
+    }
+
+    public void doAbsoluteValue () {
+        applyFunction("mapsAbsoluteValue(originalValues, newValues, indexArray)");
+    }
+
+    public void doThreshold () {
+        applyFunction("mapsThresholdUpper(originalValues, newValues, indexArray," + thresholdLevelFld.getText()+")");
+    }
 
 
     /**

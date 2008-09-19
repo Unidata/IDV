@@ -56,46 +56,51 @@ def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,
 
 
 
-def  averageFromMap(field, mapSets):
+
+
+def  mapsApplyToField(function, field, mapSets):
     """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
     by each polygon with the average value within that area
     """
     if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
-            rangeObject = averageRangeFromMap(field.getSample(timeStep), timeStep, mapSets);
+            rangeObject = mapsApplyToRange(function, field.getSample(timeStep), timeStep, mapSets);
             newData.setSample(timeStep,rangeObject)
         return newData
     else:   
-        averageRangeFromMap(field,0, mapSets);        
+	return mapsApplyToRange(function, field, 0, mapSets);
 
 
-def  averageRangeFromMap(range, timeStep, mapSets):
+
+def  mapsApplyToRange(function, range, timeStep, mapSets):
     """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
     by each polygon with the average value within that area
     """
     rangeObject = range.clone()
     indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
-    newValues = makeFloatArray(len(originalValues), len(originalValues[0]), java.lang.Float.NaN);
-    totals = {};
-    for mapIdx in xrange(len(indices)):
-        indexArray = indices[mapIdx]
-        total = 0;
-        for j in xrange(len(indexArray)):
-            total=total+ originalValues[0][indexArray[j]];
-        totals.update({mapIdx:total})
+    newValues = cloneArray(originalValues);
 
     for mapIdx in xrange(len(indices)):
         indexArray = indices[mapIdx]
-        if(len(indexArray)==0):
-            continue;
-        avg = totals[mapIdx]/len(indexArray)
-        for j in xrange(len(indexArray)):            
-            newValues[0][indexArray[j]] = avg
+	eval(function);
     rangeObject.setSamples(newValues)
     return rangeObject;
 
+
+def  mapsAverage(originalValues, newValues, indexArray):
+    DataUtil.average(originalValues, newValues, indexArray);
+
+def mapsAbsoluteValue(originalValues, newValues, indexArray):
+ 	DataUtil.absoluteValue(originalValues, newValues, indexArray);
+
+def mapsThresholdUpper(originalValues, newValues, indexArray, threshold):
+ 	DataUtil.thresholdUpper(originalValues, newValues, indexArray,threshold);
+
+def mapsThresholdLower(originalValues, newValues, indexArray, threshold):
+ 	DataUtil.thresholdLower(originalValues, newValues, indexArray,threshold);
+	
 
 
 def getMapProperty(polygon, propName):

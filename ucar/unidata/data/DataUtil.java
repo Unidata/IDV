@@ -307,6 +307,61 @@ public class DataUtil {
         return values;
     }
 
+    public static float[][] cloneArray(float[][]a) {
+        float[][] values = new float[a.length][a[0].length];
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                values[i][j] = a[i][j];
+            }
+        }
+        return values;
+    }
+
+    public static void absoluteValue(float[][]originalValues,
+                                     float[][]newValues,
+                                     int[]indexArray) {
+        for(int j=0;j<indexArray.length;j++) {
+            if(originalValues[0][indexArray[j]]<0)
+                newValues[0][indexArray[j]] = -originalValues[0][indexArray[j]];
+        }
+    }
+
+
+    public static void thresholdUpper(float[][]originalValues,
+                                     float[][]newValues,
+                                     int[]indexArray, float threshold) {
+        for(int j=0;j<indexArray.length;j++) {
+            if(originalValues[0][indexArray[j]]>threshold)
+                newValues[0][indexArray[j]] = threshold;
+        }
+    }
+
+    public static void thresholdLower(float[][]originalValues,
+                                     float[][]newValues,
+                                     int[]indexArray, float threshold) {
+        for(int j=0;j<indexArray.length;j++) {
+            if(originalValues[0][indexArray[j]]<threshold)
+                newValues[0][indexArray[j]] = threshold;
+        }
+    }
+
+
+    public static void average(float[][]originalValues,
+                               float[][]newValues,
+                               int[]indexArray) {
+        if (indexArray.length==0) return;
+        float total=0;
+
+        for(int j=0;j<indexArray.length;j++) {
+            total +=originalValues[0][indexArray[j]];
+        }
+        for(int j=0;j<indexArray.length;j++) {
+            newValues[0][indexArray[j]] = total/indexArray.length;
+        }
+    }
+
+
+
     /**
      * This method find the flat field somewhere in the given data
      *

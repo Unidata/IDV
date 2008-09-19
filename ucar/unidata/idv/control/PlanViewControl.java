@@ -184,6 +184,14 @@ public abstract class PlanViewControl extends GridDisplayControl {
         return currentSlice;
     }
 
+    protected void setCurrentSlice(FieldImpl slice) throws Exception {
+        currentSlice = slice;
+    }
+
+    protected FieldImpl getCurrentSlice() throws Exception {
+        return currentSlice;
+    }
+
     /**
      * _more_
      *

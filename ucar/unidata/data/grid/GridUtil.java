@@ -3742,6 +3742,37 @@ public class GridUtil {
      */
     public static int[][] findContainedIndices(float[][] latlon, UnionSet map)
             throws VisADException {
+        long t1 = System.currentTimeMillis();
+        int[][]indices = xfindContainedIndices(latlon, map);
+        long t2 = System.currentTimeMillis();
+        System.err.println("indices time:" + (t2-t1));
+        return indices;
+    }
+
+    static long time;
+    public static void startTime() {
+        time = System.currentTimeMillis();
+    }
+
+    public static void time(String msg) {
+        long t1 = System.currentTimeMillis();
+        System.err.println(msg +" " + (t1-time));
+        time  = t1;
+    }
+
+
+
+    public static int[][] xfindContainedIndices(float[][] latlon, UnionSet map)
+            throws VisADException {
+        int numPoints = latlon[0].length;
+        if(map==null) {
+            int[][] indices = new int[1][numPoints];
+            for(int i=0;i<numPoints;i++) {
+                indices[0][i] = i;
+            }
+            return indices;
+        }
+
         long         t1          = System.currentTimeMillis();
         SampledSet[] sets        = map.getSets();
         List[]       indexLists  = new List[sets.length];
@@ -3771,7 +3802,7 @@ public class GridUtil {
             pts.add(g.getSamples(false));
 
         }
-        int numPoints = latlon[0].length;
+
 
         for (int i = 0; i < numPoints; i++) {
             float lat = latlon[0][i];
@@ -3780,18 +3811,10 @@ public class GridUtil {
                 continue;
             }
             for (int mapIdx = 0; mapIdx < sets.length; mapIdx++) {
-                Gridded2DSet g = (Gridded2DSet) sets[mapIdx];
-                /*                if (i < 10) {
-                     System.err.println(latLonOrder + " " + lonLow[mapIdx] + " - "
-                                       + lon + " - " + lonHi[mapIdx] + "       "
-                                       + latLow[mapIdx] + " - " + lat + " - "
-                                       + latHi[mapIdx]);
-                                       }*/
                 if ((lon < lonLow[mapIdx]) || (lon > lonHi[mapIdx])
                         || (lat < latLow[mapIdx]) || (lat > latHi[mapIdx])) {
                     continue;
                 }
-
                 if (DelaunayCustom.inside((float[][]) pts.get(mapIdx),
                                           (latLonOrder
                                            ? lat
