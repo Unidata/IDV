@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -39,6 +40,7 @@ import visad.*;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -82,22 +84,41 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
               properties);
     }
 
+    /**
+     * Read products for the station
+     *
+     * @param tableInfo  the table information
+     * @param station  the station
+     *
+     * @return  the list of products 
+     */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                       NamedStationImpl station) {
+                                         NamedStationImpl station) {
         List<Product> products = new ArrayList<Product>();
+        if ( !canHandleType(tableInfo)) {
+            return products;
+        }
         if (station == null) {
             return products;
         }
-        String url = "adde://adde.ucar.edu/wxtext?num=100&"
-                     + getSearch(tableInfo, station);
+        String url = "adde://adde.ucar.edu/" + getRequest(tableInfo, station);
+        //System.out.println("ti = " + tableInfo);
+        //System.out.println("url = " + url);
         try {
-            AddeTextReader      atr   = new AddeTextReader(url);
-            List<WxTextProduct> prods = atr.getWxTextProducts();
-            for (Iterator itera = prods.iterator(); itera.hasNext(); ) {
-                WxTextProduct wtp = (WxTextProduct) itera.next();
-                products.add(new Product(wtp.getWstn(), wtp.getText(),
-                                         wtp.getDate()));
+            AddeTextReader atr = new AddeTextReader(url);
+            if (url.indexOf("wxtext") > 0) {
+                List<WxTextProduct> prods = atr.getWxTextProducts();
+                for (Iterator itera = prods.iterator(); itera.hasNext(); ) {
+                    WxTextProduct wtp = (WxTextProduct) itera.next();
+                    products.add(new Product(wtp.getWstn(), wtp.getText(),
+                                             wtp.getDate()));
+                }
+            } else {
+                String obs = atr.getText();
+                products.add(new Product(station.getID(), atr.getText(),
+                                         new Date()));
             }
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -107,21 +128,78 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     /**
      * Get the search string
      *
-     * @param pt   product type
+     * @param ti  table info
      * @param station  station
      *
      * @return the search string
      */
-    private String getSearch(TableInfo ti, NamedStationImpl station) {
+    private String getRequest(TableInfo ti, NamedStationImpl station) {
+
         if (station == null) {
             return "";
         }
-        StringBuilder buf = new StringBuilder("WMO=");
-        buf.append(station.getProperty("BULLETIN", ""));
+        if (ti.flag.equals(ti.FLAG_O)) {
+            return getObTextRequest(ti, station);
+        } else {
+            return getWxTextRequest(ti, station);
+        }
+    }
+
+    /**
+     * Get the weather text request
+     *
+     * @param ti  table info
+     * @param station  station
+     *
+     * @return the request string
+     */
+    private String getWxTextRequest(TableInfo ti, NamedStationImpl station) {
+        StringBuilder buf = new StringBuilder("wxtext?");
+        buf.append("WMO=");
+        buf.append(station.getProperty("BULLETIN", "NONE"));
         buf.append("&WSTN=");
         buf.append(station.getID());
         return buf.toString();
     }
+
+
+    /**
+     * Get the ob text request
+     *
+     * @param ti  table info
+     * @param station  station
+     *
+     * @return  the request string
+     */
+    private String getObTextRequest(TableInfo ti, NamedStationImpl station) {
+        String id  = station.getID();
+        String idn = (String) station.getProperty("STNM", "");
+        if ( !idn.equals("")) {
+            idn = idn.substring(0, 5);
+        }
+        StringBuilder buf = new StringBuilder("obtext?");
+        buf.append("&descriptor=");
+        if (ti.type.equals("SND_DATA")) {
+            buf.append("UPPERAIR");
+            id = idn;
+        } else if (ti.type.equals("SYN_DATA")) {
+            buf.append("SYNOPTIC");
+            id = idn;
+        } else if (ti.type.equals("TAFS_DEC")) {
+            buf.append("TERMFCST");
+        } else {  // (ti.type.equals("SFC_HRLY")) {
+            buf.append("SFCHOURLY");
+            // uses 3 letter ids
+            if (id.length() < 4) {
+                id = "K" + id;
+            }
+        }
+        buf.append("&ID=");
+        buf.append(id);
+        buf.append("&num=3");
+        return buf.toString();
+    }
+
 
     /**
      * Get the table path
@@ -145,6 +223,18 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      */
     public String getAdditionalResourcesError() {
         return "";
+    }
+
+    /**
+     * Can we handle this type of data?
+     *
+     * @param ti  the table info
+     *
+     * @return true if we can handle it.
+     */
+    protected boolean canHandleType(TableInfo ti) {
+        return ti.flag.equals(TableInfo.FLAG_B)
+               || ti.flag.equals(TableInfo.FLAG_O);
     }
 
 }
