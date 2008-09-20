@@ -396,14 +396,15 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     }
 
     /**
-     * Read the products for defined by the table info
+     * Read the products for defined by the table info.  Subclasses need
+     * to override this method for their particular stuff
      *
      * @param tableInfo the table info
      * @param station  the station
      *
      * @return the products
      */
-    private List<Product> readProducts(TableInfo tableInfo,
+    protected List<Product> readProducts(TableInfo tableInfo,
                                        NamedStationImpl station) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);

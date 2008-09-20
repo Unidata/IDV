@@ -82,22 +82,14 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
               properties);
     }
 
-    /**
-     * Read products
-     *
-     * @param productType  the product type
-     * @param station  the station
-     *
-     * @return  list of products
-     */
-    public List<Product> readProducts(ProductType productType,
-                                      NamedStationImpl station) {
+    protected List<Product> readProducts(TableInfo tableInfo,
+                                       NamedStationImpl station) {
         List<Product> products = new ArrayList<Product>();
         if (station == null) {
             return products;
         }
         String url = "adde://adde.ucar.edu/wxtext?num=100&"
-                     + getSearch(productType, station);
+                     + getSearch(tableInfo, station);
         try {
             AddeTextReader      atr   = new AddeTextReader(url);
             List<WxTextProduct> prods = atr.getWxTextProducts();
@@ -120,7 +112,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @return the search string
      */
-    private String getSearch(ProductType pt, NamedStationImpl station) {
+    private String getSearch(TableInfo ti, NamedStationImpl station) {
         if (station == null) {
             return "";
         }
