@@ -19,8 +19,6 @@
  */
 
 
-
-
 package ucar.unidata.data.text;
 
 
@@ -159,7 +157,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @return  the table or null if one can't be found
      */
-    public TableInfo getTable(ProductType productType) {
+    public TableInfo getTableInfo(ProductType productType) {
         if (productType == null) {
             return null;
         }
@@ -183,7 +181,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     public NamedStationTable getStations(ProductType productType)
             throws Exception {
-        TableInfo tableInfo = getTable(productType);
+        TableInfo tableInfo = getTableInfo(productType);
         if (tableInfo != null) {
             return getStations(tableInfo);
         }
@@ -200,8 +198,8 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     public List<Product> readProducts(ProductType productType,
                                       NamedStationImpl station) {
-        TableInfo tableInfo = getTable(productType);
-        if (tableInfo != null) {
+        TableInfo tableInfo = getTableInfo(productType);
+        if ((tableInfo != null) && canHandleType(tableInfo)) {
             return readProducts(tableInfo, station);
         }
         return new ArrayList<Product>();
@@ -246,9 +244,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             if (table == null) {
                 table = new NamedStationTable("Stations for "
                         + tableInfo.type);
-                if (tableInfo.flag.equals(TableInfo.TYPE_B)
-                        || tableInfo.flag.equals(TableInfo.TYPE_S)
-                        || tableInfo.flag.equals(TableInfo.TYPE_W)) {
+                if (tableInfo.flag.equals(TableInfo.FLAG_B)
+                        || tableInfo.flag.equals(TableInfo.FLAG_S)
+                        || tableInfo.flag.equals(TableInfo.FLAG_W)) {
                     table.createStationTableFromBulletin(contents);
                 } else {
                     table.createStationTableFromGempak(contents);
@@ -353,7 +351,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the list of ProductGroup-s
      * @throws Exception  problem parsing
      */
-    private static List<ProductGroup> parseProductGroups(String contents)
+    private List<ProductGroup> parseProductGroups(String contents)
             throws Exception {
 
         contents = contents.replace("{", "\n{\n");
@@ -366,7 +364,10 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             if (productGroup != null) {
-                if (line.equals("}")) {
+                if (line.equals("}")) {  // we're done with this group
+                    if ( !productGroup.getProductTypes().isEmpty()) {
+                        products.add(productGroup);
+                    }
                     productGroup = null;
                 } else if (line.equals("{")) {
                     //NOOP
@@ -382,14 +383,17 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                     if (toks[0].startsWith("!")) {
                         continue;
                     }
-                    productGroup.addProduct(
-                        new ProductType(toks[0].replace("_", " "), toks[1]));
+                    ProductType pt = new ProductType(toks[0].replace("_",
+                                         " "), toks[1]);
+                    TableInfo ti = getTableInfo(pt);
+                    if ((ti != null) && canHandleType(ti)) {
+                        productGroup.addProduct(pt);
+                    }
                 }
             } else if (line.equals("{")) {
                 productGroup = null;
             } else {
                 productGroup = new ProductGroup(line.replace("_", " "));
-                products.add(productGroup);
             }
         }
         return products;
@@ -405,7 +409,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the products
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                       NamedStationImpl station) {
+                                         NamedStationImpl station) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
@@ -570,6 +574,16 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param ti _more_
+     *
+     * @return _more_
+     */
+    protected boolean canHandleType(TableInfo ti) {
+        return ti.flag.equals(TableInfo.FLAG_B);
+    }
 
     /**
      * Class to hold the table information
@@ -578,7 +592,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    protected static class TableInfo {
+    protected class TableInfo {
         /*
          * !       B - Regular bulletin type ('^A'... text ... '^C'),
          * !               use combination of WMO header & stn ID for search,
@@ -598,28 +612,28 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
 
         /** B type products */
-        public static final String TYPE_B = "B";
+        public static final String FLAG_B = "B";
 
         /** S type products */
-        public static final String TYPE_S = "S";
+        public static final String FLAG_S = "S";
 
         /** W type products */
-        public static final String TYPE_W = "W";
+        public static final String FLAG_W = "W";
 
         /** R type products */
-        public static final String TYPE_R = "R";
+        public static final String FLAG_R = "R";
 
         /** M type products */
-        public static final String TYPE_M = "M";
+        public static final String FLAG_M = "M";
 
         /** F type products */
-        public static final String TYPE_F = "F";
+        public static final String FLAG_F = "F";
 
         /** Z type products */
-        public static final String TYPE_Z = "Z";
+        public static final String FLAG_Z = "Z";
 
         /** O type products */
-        public static final String TYPE_O = "O";
+        public static final String FLAG_O = "O";
 
 
         /** type */
@@ -661,7 +675,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
          * @return  true for the type
          */
         public boolean useStationTable() {
-            return !type.equals(TYPE_W);
+            return !flag.equals(FLAG_W);
         }
 
 
