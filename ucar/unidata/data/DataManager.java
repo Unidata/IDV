@@ -157,6 +157,7 @@ public class DataManager {
 
     /** The XML attribute for allowing multiple data choices */
     public static final String ATTR_DOESMULTIPLES = "doesmultiples";
+    public static final String ATTR_STANDALONE = "standalone";
 
     public static final String ATTR_NCMLTEMPLATE = "ncmltemplate";
 
@@ -211,6 +212,7 @@ public class DataManager {
      */
     protected ArrayList descriptors = new ArrayList();
 
+    private List<DataSourceDescriptor> standaloneDescriptors = new ArrayList<DataSourceDescriptor>();
 
     /**
      * A mapping from datasource_id (String) to {@link DataSourceDescriptor}
@@ -649,6 +651,9 @@ public class DataManager {
                                              Misc.findClass(factory),
                                              patterns, fileSelection,
                                              doesMultiples, properties);
+                descriptor.setStandalone(XmlUtil.getAttribute(datasourceNode,ATTR_STANDALONE, false));
+                if(descriptor.getStandalone())
+                    standaloneDescriptors.add(descriptor);
                 if(XmlUtil.hasAttribute(datasourceNode,ATTR_NCMLTEMPLATE)) {
                     descriptor.setNcmlTemplate(XmlUtil.getAttribute(datasourceNode,ATTR_NCMLTEMPLATE));
                 }
@@ -663,6 +668,10 @@ public class DataManager {
 
     public List<DataSourceDescriptor> getDescriptors() {
         return descriptors;
+    }
+
+    public  List<DataSourceDescriptor> getStandaloneDescriptors() {
+        return standaloneDescriptors;
     }
 
 
@@ -696,6 +705,8 @@ public class DataManager {
     public ArrayList getDataSources() {
         return dataSources;
     }
+
+
 
     /**
      * Is the given {@link  DataSource} currently in the list of active

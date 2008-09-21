@@ -28,8 +28,6 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 
-import ucar.unidata.xml.XmlUtil;
-
 
 import visad.VisADException;
 
@@ -95,6 +93,8 @@ public class DataSourceDescriptor {
     private FileFilter patternFilter;
 
     private String ncmlTemplate;
+
+    private boolean standalone = false;
 
 
     /**
@@ -372,6 +372,24 @@ public class DataSourceDescriptor {
     **/
     public String getNcmlTemplate () {
 	return ncmlTemplate;
+    }
+
+    /**
+       Set the Standalone property.
+
+       @param value The new value for Standalone
+    **/
+    public void setStandalone (boolean value) {
+	standalone = value;
+    }
+
+    /**
+       Get the Standalone property.
+
+       @return The Standalone
+    **/
+    public boolean getStandalone () {
+	return standalone;
     }
 
 
