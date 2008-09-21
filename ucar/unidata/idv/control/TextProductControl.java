@@ -84,6 +84,8 @@ import visad.georef.NamedLocation;
 import visad.georef.NamedLocationTuple;
 
 
+import java.net.URL;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -93,6 +95,7 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
+import java.util.regex.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -102,6 +105,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.text.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 import javax.swing.border.*;
@@ -117,7 +121,11 @@ import javax.swing.border.*;
  */
 
 
-public class TextProductControl extends StationLocationControl {
+public class TextProductControl extends StationLocationControl implements HyperlinkListener {
+
+    private static List<String> glossaryWords;
+    private static List<String> glossaryReplace;
+    private static List<Pattern> glossaryPatterns;
 
     /** _more_          */
     private TextProductDataSource dataSource;
@@ -139,7 +147,10 @@ public class TextProductControl extends StationLocationControl {
     private List<Product> products;
 
     /** _more_          */
-    private JTextArea textArea;
+    private JTextComponent textComp;
+
+    private JEditorPane htmlComp;
+
 
     /** _more_          */
     private JLabel stationLabel;
@@ -147,10 +158,50 @@ public class TextProductControl extends StationLocationControl {
     /** _more_          */
     private NamedStationTable stationTable;
 
+    /** _more_          */
+    private NamedStationImpl selectedStation;
+
+    private String selectedStationId;
+
     /**
      * Default cstr;
      */
     public TextProductControl() {}
+
+    
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        URL tmp = e.getURL();
+        String url = (tmp!=null?tmp.toString():e.getDescription());
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            try {
+                String content = IOUtil.readContents("http://www.crh.noaa.gov/glossary.php?word=" + url, getClass());
+                int idx = content.indexOf("<html");
+                if(idx>=0) 
+                    content = content.substring(idx);
+                idx = content.indexOf("<hr");
+                if(idx>=0) 
+                    content = content.substring(0,idx);
+                content = content.replaceAll("<!--.*-->","");
+                content = content.replaceAll("<dt>","");
+                content = content.replaceAll("</dt><dd>","<br>");
+                JEditorPane pane = new JEditorPane();
+                pane.setEditable(false);
+                pane.setContentType("text/html");
+                pane.setText(content);
+                pane.setPreferredSize(new Dimension(250,150));
+                JLabel lbl = new JLabel(content);
+                GuiUtils.showOkCancelDialog(null,"Definition:" + url, pane,null);
+
+            } catch(Exception exc) {
+                logException ("Could not fetch definition", exc);
+            }
+        } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+            //            System.err.println ("entered:" + url);
+        } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+            //            System.err.println ("exited:" + url);
+        }
+    }
+
 
 
     /**
@@ -168,17 +219,26 @@ public class TextProductControl extends StationLocationControl {
         setCenterOnClick(false);
         //        setDeclutter(false);
 
-        textArea        = new JTextArea("", 30, 60);
-        TextSearcher textSearcher = new TextSearcher(textArea);
+        htmlComp = new JEditorPane();
+        htmlComp.addHyperlinkListener(this);
+        htmlComp.setEditable(false);
+        htmlComp.setContentType("text/html");
+        textComp        = new JTextArea("", 30, 60);
+        textComp.setEditable(false);
+        TextSearcher textSearcher = new TextSearcher(textComp);
 
 
         DefaultMutableTreeNode treeRoot  = new DefaultMutableTreeNode("Product Groups");
+        DefaultMutableTreeNode selectedNode = null;
         for(ProductGroup productGroup: productGroups) {
             DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(productGroup);
             treeRoot.add(groupNode);
-            for(ProductType productType: productGroup.getProductTypes()) {
-                DefaultMutableTreeNode typeNode = new DefaultMutableTreeNode(productType);
+            for(ProductType type: productGroup.getProductTypes()) {
+                DefaultMutableTreeNode typeNode = new DefaultMutableTreeNode(type);
                 groupNode.add(typeNode);
+                if(Misc.equals(type,productType)) {
+                    selectedNode = typeNode;
+                }
             }
         }
 
@@ -193,27 +253,35 @@ public class TextProductControl extends StationLocationControl {
                 }
             }); 
 
-
+        if(selectedNode!=null) {
+            TreeNode[] path = treeModel.getPathToRoot(selectedNode);
+            productTree.setSelectionPath(new TreePath(path));
+            productTree.expandPath(new TreePath(path));
+        }
 
         JScrollPane treeScroller =  GuiUtils.makeScrollPane(productTree, 200,100);
         JComponent treeComp = GuiUtils.topCenter(new JLabel("Products:"), treeScroller);
 
-        stationLabel = new JLabel("LBL");
+        stationLabel = new JLabel(" ");
         JComponent topComp = GuiUtils.leftRight(GuiUtils.bottom(stationLabel), getAnimationWidget().getContents());
-        JScrollPane textScroller  = new JScrollPane(textArea);
+        JScrollPane textScroller  = new JScrollPane(textComp);
+        JScrollPane htmlScroller  = new JScrollPane(htmlComp);
         textScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        htmlScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        JComponent textHolder = GuiUtils.centerBottom(textScroller,textSearcher);
+        JTabbedPane textTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+        textTabbedPane.addTab("Text", textHolder);
+        textTabbedPane.addTab("Html", htmlScroller);
         GuiUtils.tmpInsets = GuiUtils.INSETS_2;
         JComponent contents = GuiUtils.doLayout(new Component[]{
                 GuiUtils.bottom(new JLabel("Products")),
                 topComp,
                 treeScroller,
-                GuiUtils.centerBottom(textScroller,textSearcher)},
+                textTabbedPane
+                },
             2,
             new double[]{0.25,0.75},
             GuiUtils.WT_NY);
-
-
-
 
         updateText();
         tabs.insertTab("Products", null, contents, "", 0);
@@ -263,8 +331,7 @@ public class TextProductControl extends StationLocationControl {
     }
 
 
-    /** _more_          */
-    NamedStationImpl selectedStation;
+
 
     /**
      * _more_
@@ -300,9 +367,28 @@ public class TextProductControl extends StationLocationControl {
     /**
      * _more_
      */
-    public void updateText() {
+    public  void updateText() {
+        Misc.run(new Runnable() {
+                public void run() {
+                    showWaitCursor();
+                    try {
+                        setText("Loading...");
+                        updateTextInner();
+                    } catch(Exception exc) {
+                        setText("Error:" + exc);
+                    } finally {
+                        showNormalCursor();
+                    }
+                }
+            });
+    }
+
+    protected void addSelectedToList(List listOfStations) {
+        //NOOP
+    }
+
+    private void updateTextInner() {
         try {
-            String            text     = "";
             NamedStationTable newTable = dataSource.getStations(productType);
             if (newTable != currentTable) {
                 if (newTable != null) {
@@ -310,6 +396,18 @@ public class TextProductControl extends StationLocationControl {
                 } else {
                     stationList = new ArrayList();
                 }
+                if(selectedStationId!=null) {
+                    for(NamedStationImpl station: (List<NamedStationImpl>) stationList) {
+                        if(selectedStationId.equals(station.getID())) {
+                            selectedStation  = station;
+                            break;
+                        }
+                    }
+                    selectedStationId = null;
+                    updateStationLabel();
+                }
+
+
                 if(selectedStation!=null && !stationList.contains(selectedStation)) {
                     if(productType!=null) {
                         selectedStation = null;
@@ -356,20 +454,98 @@ public class TextProductControl extends StationLocationControl {
 
 
 
-    protected void setText(final String text) {
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if(productType==null) {
-                        textArea.setText("Please select a product");
-                    } else if(selectedStation==null){
-                        textArea.setText("Please select a station");
-                    } else {
-                        textArea.setText(text);
-                    }
-                    textArea.setCaretPosition(0);
-                    textArea.scrollRectToVisible(new Rectangle(0,0,1,1));
+    private String convertToHtml(String text) {
+        if(glossaryWords==null) {
+            try {
+            List<String> tmp = (List<String>)StringUtil.split(IOUtil.readContents("/ucar/unidata/idv/control/nwsglossary.txt",getClass()),"\n",true,true);
+            glossaryWords = new ArrayList<String>();
+            glossaryReplace = new ArrayList<String>();
+            glossaryPatterns = new ArrayList<Pattern>();
+            for(String word: tmp) {
+                if(word.length()<=3) continue;
+                word = word.toUpperCase();
+                glossaryWords.add(word);
+                word = word.replace("(","\\(");
+                word = word.replace(")","\\)");
+                word = word.replace("+","\\+");
+                word = word.replace(".","\\.");
+                word = word.replace("*","\\*");
+                glossaryPatterns.add( Pattern.compile("([ ]+)" +word+"([\\. ]+)"));
+                glossaryReplace.add("$1<a href=\"" +word+"\">" + word +"</a>$2");
+            }
+            } catch(Exception exc) {
+                logException("Reading glossary", exc);
+            }
+        }
+        if(selectedStation!=null) {
+            text = text.replace(" " + selectedStation.getID()+" "," <b>"+
+                                selectedStation.getID() +"</b> ");
+        }
+
+        StringBuffer sb = new StringBuffer();
+        List<String> lines = (List<String>)StringUtil.split(text,"\n",false,false);
+        int lineCnt=0;
+        for(String line: lines) {
+            lineCnt++;
+            line = line.trim();
+            if(line.startsWith(".")) {
+                int idx = line.indexOf("...");
+                if(idx>1) {
+                    String header = line.substring(1,idx);
+                    line = "<p><b>" + header +"</b><br>" +line.substring(idx+3);
+                } else if(line.equals(".")) {
+                    line = "<p>";
                 }
-            });
+            } else if(line.equals("=")) {
+                line = "<hr>";
+            } else if(line.equals("$$")) {
+                continue;
+            } else {
+                line = line.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$","<i>$1</i>"); 
+            }
+            if(lineCnt<5) line = line+"<br>";
+            sb.append(line);
+            sb.append("\n");
+        }
+        text = sb.toString();        
+        String[]icons = {"partlycloudy.png", "cloudy.png","partlysunny.png","sunny.png","rainy.png"};
+        String[]patterns = {"PARTLY CLOUDY", "MOSTLY CLOUDY","PARTLY SUNNY","SUNNY","RAIN SHOWERS"};
+        for(int i=0;i<icons.length;i++) {
+            text = text.replace(patterns[i],"PATTERN" + i +"<img src=idvresource:/ucar/unidata/idv/control/images/" + icons[i]+">");
+        }
+        for(int i=0;i<icons.length;i++) {
+            text = text.replace("PATTERN" + i,patterns[i]);
+        }
+
+
+        for(int i=0;i<glossaryWords.size();i++) {
+            String word = glossaryWords.get(i);
+            text= glossaryPatterns.get(i).matcher(text).replaceAll(glossaryReplace.get(i) );
+        }
+        text = text.replace("\n\n","<p>");
+        text = text.replace("\n","<br>");
+        return "<html>" + text +"</html>";
+    }
+
+    protected void setText(final String text) {
+        //        SwingUtilities.invokeLater(new Runnable() {
+        //                public void run() {
+                    if(productType==null) {
+                        textComp.setText("Please select a product");
+                        htmlComp.setText("Please select a product");
+                    } else if(selectedStation==null){
+                        textComp.setText("Please select a station");
+                        htmlComp.setText("Please select a station");
+                    } else {
+                        textComp.setText(text);
+                        htmlComp.setText(convertToHtml(text));
+                    }
+                    textComp.setCaretPosition(0);
+                    textComp.scrollRectToVisible(new Rectangle(0,0,1,1));
+                    htmlComp.setCaretPosition(0);
+                    htmlComp.scrollRectToVisible(new Rectangle(0,0,1,1));
+                    //                }
+    //            });
 
     }
 
@@ -462,6 +638,28 @@ public class TextProductControl extends StationLocationControl {
     public ProductType getProductType() {
         return productType;
     }
+
+/**
+Set the SelectedStationId property.
+
+@param value The new value for SelectedStationId
+**/
+public void setSelectedStationId (String value) {
+	selectedStationId = value;
+}
+
+/**
+Get the SelectedStationId property.
+
+@return The SelectedStationId
+**/
+public String getSelectedStationId () {
+    if(selectedStation!=null) {
+	return selectedStation.getID();
+    }
+    return null;
+}
+
 
 
 }

@@ -835,7 +835,9 @@ public class StationLocationControl extends StationModelControl {
     private List subsetStations(List stations)
             throws VisADException, RemoteException {
         Rectangle2D     rbounds = calculateRectangle();
+        if(rbounds==null) return new ArrayList();
         LinearLatLonSet bounds  = calculateLatLonBounds(rbounds);
+        if(bounds==null) return new ArrayList();
         Unit[]          units   = bounds.getSetUnits();
         int latIndex =
             (((RealType) ((SetType) bounds.getType()).getDomain()
@@ -918,12 +920,9 @@ public class StationLocationControl extends StationModelControl {
                 }
             }
 
-            for (int i = 0; i < selectionList.size(); i++) {
-                Object selectedLocation = selectionList.get(i);
-                if ( !listOfStations.contains(selectedLocation)) {
-                    listOfStations.add(selectedLocation);
-                }
-            }
+
+            addSelectedToList(listOfStations);
+
 
             if (locationsTable != null) {
                 if ((locationsTable.lastClicked != null)
@@ -1016,6 +1015,15 @@ public class StationLocationControl extends StationModelControl {
             logException("loading data ", excp);
         }
 
+    }
+
+    protected void addSelectedToList(List listOfStations) {
+        for (int i = 0; i < selectionList.size(); i++) {
+            Object selectedLocation = selectionList.get(i);
+            if ( !listOfStations.contains(selectedLocation)) {
+                listOfStations.add(selectedLocation);
+            }
+        }
     }
 
     /**
