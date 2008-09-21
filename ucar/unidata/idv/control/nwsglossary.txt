@@ -1,0 +1,3098 @@
+A AMS
+A Index
+AAAS
+AAWU
+Ablation
+ABNDT
+Absolutely Stable Air
+Absolutely Unstable Air
+Absorption
+ABT
+Abutment
+Abutment Seeping
+ABV
+AC
+ACCAS
+Accessory Cloud
+Accretion
+ACCUMS
+Accuracy
+Acid Precipitation
+Acid Rain
+ACLD
+ACPY
+Acre-foot
+ACRS
+Action Stage
+Active
+Active Conservation Storage
+Active Dark Filament (ADF)
+Active Longitude
+Active Prominence
+Active Prominence Region (APR)
+Active Region (AR)
+Active Storage Capacity
+Active Surge Region (ASR)
+ACTV
+ACYC
+ADAPTATION (ADAPTABLE) PARAMETER
+ADAS
+Additive Data
+ADDS
+Adiabat
+Adiabatic
+Adiabatic Lapse Rate
+Adiabatic Process
+Adirondack Type Snow Sampling Set
+ADJ
+ADPC
+ADVCTN
+Advection
+Advection Fog
+ADVIS
+Advisory
+ADVN
+ADVY
+Aeration Zone
+Aeroallergens
+Aerosol
+AFB
+AFCT
+AFD
+AFOS
+AFRED
+AFSS
+AFT
+Afterbay
+AFTN
+AFTR
+AFWA
+AGC
+AGDISP
+AGFS
+Agglomerate
+AGL
+AGL
+AGN
+AHD
+AHOS
+AHOS-S
+AHOS-T
+Air
+Air Mass
+Air Mass Thunderstorm
+Air Pollutant
+Air Pollution Potential
+Air Quality Model
+Air Stagnation
+Air Stagnation Advisory
+Air Toxin
+Air Transportable Mobile Unit
+Airborne Snow Survey Program
+AIRMET
+AIV
+Alaska Current
+Albedo
+Alberta Clipper
+ALERT
+Alert Stage
+Aleutian Current
+Aleutian Low
+ALF
+ALG
+Algorithm
+ALIASING
+Alluvium
+Along-slope Wind System
+ALQDS
+ALTHO
+Altimeter
+Altimeter Setting
+Altocumulus
+Altostratus
+Ambient
+AMD
+AMOS
+Amplifier
+Amplitude
+AMS
+AMT
+AMVER
+AMVER/SEAS
+Anabranch
+Analog
+Analog Signal
+ANBURS
+Anchor Ice
+Anchor Ice Dam
+Anemometer
+Aneroid Barometer
+Angels
+Angle of Reflection
+Angstrom
+Annual Flood
+ANOMALOUS PROPAGATION (AP)
+Anomaly
+Antedecent Precipitation Index
+ANTENNA GAIN
+Anthelion
+Anthropogenic Source
+Anti-wind
+Anticyclogenesis
+Anticyclone
+Anticyclonic Rotation
+Antilles Current
+Anvil
+Anvil Crawler
+Anvil Dome
+Anvil Rollover
+Anvil Zits
+AO
+AOA
+AOB
+AOPA
+AP
+AP Index
+APD
+Aphelion
+API Method
+Apogee
+Apparent Temperature
+Apparent Wind
+APRCH
+APRCHG
+APRNT
+APST
+Aquiclude
+Aquifer
+Aquifuge
+ARAM
+Arch Dam
+Arch Filament System (AFS)
+Arctic
+Arctic front
+Arctic Oscillation
+Arctic Sea Smoke
+Arcus
+Area Forecast Discussion
+Area of Influence
+Area Source
+Area Wide Hydrologic Prediction System
+Area-Capacity Curve
+Arid
+ARINC
+ARND
+ARR
+Arroyo
+ARSI
+ART
+ARTCC
+Artesian Well
+Artificial Control
+AS
+ASAP
+ASAPTRAN
+ASB
+ASL
+ASOS
+ASOS
+ASR-9
+ASSOCIATED PRINCIPAL USER
+Astronomical Dawn
+Astronomical Dusk
+Astronomical Unit
+ATC
+ATDTDCS
+Atmosphere
+Atmospheric Boundary Layer
+Atmospheric Circulation Model
+Atmospheric Pressure
+Atmospheric Radiation
+ATMP
+Attenuation
+ATTENUATION
+ATTM
+Augmented report
+Aurora
+Aurora Australis
+Aurora Borealis
+Auroral Oval
+Automated Event Reporting Gage
+Automated Report
+Automated Surface Observing System
+AUTOMATIC GAIN CONTROL
+Autumn
+Autumnal Equinox
+Avalanche
+Avalanche Advisory
+AVBL
+AVG
+AVHRR
+AVN
+AVP
+AWC
+AWHPS
+AWIPS
+AWOS
+Azimuth
+Azimuth Angle
+Azores Current
+Azores High
+Back Door Cold Front
+Back-building Thunderstorm
+Back-sheared Anvil
+Backfire
+Backflow
+Backing
+Backing Winds
+Backscatter
+Backsight
+Backwater Curve
+Backwater Effect
+Backwater Flooding
+BAM
+BANDPASS FILTER
+Bandwidth
+Bank
+Bank Storage
+Bankfull
+Bankfull Stage
+Banner Cloud
+BAPSU
+Bar
+Barber Pole
+Baroclinic leaf shield
+Baroclinic Zone
+Baroclinity
+Barogram
+Barograph
+Barometer
+Barometric Pressure
+Barotropic System
+Barotropy
+Barrage
+Barrier Jet
+Bartel's Rotation Number
+BASE DATA
+Base Flood
+BASE PRODUCTS
+Base Reflectivity
+Base Station
+Base Width
+Baseflow
+Basin
+Basin Boundary
+Basin Lag
+Basin Recharge
+Bathymetry
+BCKG
+BCM
+BCMNG
+BD
+Beach Erosion
+BEAM FILLING
+BEAM WIDTH
+Bear's Cage
+Beaufort Scale
+Beaver('s) Tail
+Bed Load
+Beginning of Freezup
+Beginning of the Breakup
+Benchmark
+Bergeron Process
+Bergy Bit
+Bermuda High
+Best Track
+BFR
+BGN
+BHND
+BIAS
+Billow Cloud
+BIN
+BINOVC
+BKN
+BL
+Black Ice
+Blackbody
+Blackbody Radiation
+BLD
+BLDUP
+Blizzard
+Blizzard Warning
+BLO
+Blocked Flow
+Blowing
+Blowing Dust or Sand
+Blowing Snow
+Blowing Snow Advisory
+Blue Watch or Blue Box
+Blustery
+BLV
+BLZD
+BN
+BNDRY
+Bomb
+Bora
+Border Ice
+Boundary Layer
+Bounded Weak Echo Region (BWER)
+BOVC
+Bow Echo
+Bowen Ratio
+Box Model
+BR
+Brackish Ice
+Braided Stream
+Brash Ice
+BRD
+Breach
+Breakers
+Breakup
+Breakup Date
+Breakup Jam
+Breakup Period
+Breezy
+BRF
+Bright Band
+Bright Band
+Bright Surge on the Disk (BSD)
+Bright Surge on the Limb (BSL)
+Brightness
+Brisk
+Brisk Wind Advisory
+BRK
+BRN
+Broadband
+Brocken Specter
+Broken Level
+BS
+BTR
+BTWN
+Bubble High
+Bubbler Gage
+BUFKIT
+Bulk Richardson Number
+Buoyancy
+Burst
+Bust
+Buttress Dam
+BWER
+BYD
+C
+C AMS
+CA
+CAA
+CAD
+CADAS
+Calibration
+Calm
+Canyon Wind
+Cap
+Cap Cloud
+CAPE
+Capillarity
+Capillary Fringe
+Capillary Waves
+Capillary Zone
+Capping
+Capping Inversion
+CAPS
+Carbon Dioxide
+Carrington Longitude
+Catalina Eddy
+Catchment Area
+Categorical
+CAVU
+Cb
+CBMAM
+CC
+CCITT
+CCL
+CD
+CDB
+CDC
+CDD
+CDFNT
+CDT
+Ceiling
+Ceilometer
+Cell
+Celsius
+CEM
+Center
+Centimeter Burst
+Central Meridian Passage (CMP)
+CENTROID
+CFC
+CFP
+CFS
+Cfs-Day
+CG
+Chance
+Channel
+Channel Inflow
+Channel Lead
+Channel Routing
+Channeled High Winds
+Channelization
+CHC
+Chemistry Model
+CHG
+CHGS
+Chinook
+Chinook Arch
+Chlorofluorocarbons
+Chromosphere
+Chromospheric Events
+CI
+CIG
+CIN
+CIO
+Circulation
+Cirriform
+Cirrocumulus
+Cirrostratus
+Cirrus
+Civil Dawn
+Civil Dusk
+Civil Emergency Message
+CL
+Class I Areas
+CLD
+Clear Air Turbulence
+Clear Ice
+Clear Slot
+Client Agency
+Climate
+Climate Change
+Climate Diagnostics Bulletin
+Climate Diagnostics Center
+Climate Model
+Climate Outlook
+Climate Prediction Center
+Climate System
+Climatological Outlook
+Climatology
+CLIMO
+Climometer
+Closed Basin
+Closed Basin Lake Flooding
+Closed Low
+Cloud
+Cloud Ceiling
+Cloud Condensation Nuclei
+Cloud Layer
+Cloud Movement
+Cloud Streets
+Cloud Tags
+Cloudy
+CLR
+CLRG
+Clutter
+cm
+CM
+CMPLT
+CMPLX
+CNIF
+CNTR
+CNTRL
+CNVG
+CNVTV
+Coalescence
+Coastal Waters
+Coastal Waters Forecast (CWF)
+Coastal/Lakeshore Flood Advisory
+Coastal/Lakeshore Flood Warning
+Coastal/Lakeshore Flood Watch
+Coastal/Lakeshore Flooding
+COE
+Coherent Radar
+Cold Advection
+Cold Air Avalanche
+Cold Air Dam
+Cold Air Damming (CAD)
+Cold Air Funnel
+Cold Front
+Cold Occlusion
+Cold Pool
+Collar Cloud
+Collection Efficiency
+Colorado Low
+Columnar Ice
+Combined Seas
+Comma Cloud
+Comma Echo
+Complex Gale/Storm
+Complex Terrain
+Composite
+Composite Hydrograph
+Comprehensive Flare Index (CFI)
+Concentric Rings
+COND
+Condensation
+Condensation Funnel
+Conditionally Unstable Air
+Conduction
+Cone of Depression
+Cone of Influence
+Confined Ground Water
+Confluence
+Congestus
+Congressional Organic Act of 1890
+Coning
+Conjugate Points
+Conservation Storage
+Consolidated Ice Cover
+Constant Pressure Chart
+CONT
+Contents
+Continental Air Mass
+Continental Shelf
+Continuum Storm (CTM)
+Control Points
+CONTS
+CONUS
+Convection
+Convective Boundary Layer
+Convective Clouds
+Convective Condensation Level
+Convective Inhibition
+Convective Outlook
+Convective Overdevelopment
+Convective Temperature
+Convergence
+Conveyance Loss
+Cooling Degree Days
+Cooperative Observer
+Coordinated Universal Time (UTC)
+COR
+Core Punch
+Coriolis Force
+Corn Snow Ice
+Corner Effects
+Corona
+Coronal Hole
+Coronal Rain
+Coronal Transients
+Correlated Shear
+Correlation
+Cosmic Ray
+County Warning and Forecast Area
+County Warning Area
+Coupled Atmosphere-Ocean Model
+Coupled Model
+Couplet
+CPC
+Creek
+Crepuscular Rays
+Crest
+Crest Gage
+Crest Width
+Critical Depth
+Critical Flow
+Critical Rainfall Probability
+CRN
+Crochet
+Crop Moisture Index
+Cross-Valley Wind System
+Crown Fire
+Crowning
+CRP
+CRS
+Cryology
+CSDRBL
+CSI
+CST
+CSTL
+CTY
+CU
+Cubic Feet per Second
+CUFRA
+Cumuliform
+Cumuliform Anvil
+Cumulus
+Cumulus Buildups
+Cumulus Congestus
+Current
+Current Meter
+Curtain Drain
+Cutoff
+Cutoff Low
+CVR
+CWA
+CWFA
+CYC
+CYCLGN
+Cyclic Storm
+Cyclogenesis
+Cyclone
+Cyclonic Circulation
+D
+D Region
+Daily Climatological Report
+Daily Flood Peak
+DALR
+Dam
+Dam Failure
+DAMBRK
+DAPM
+Dark Surge on Disk (DSD)
+Dart Leader
+Data Point
+DATACOL
+DATANET
+Dawn
+Day Length
+dBZ
+DCP
+DDS
+Dead Storage
+Debris Cloud
+Decadal
+Declination
+Deep Percolation Loss
+Deep Seepage
+Deep well
+Deepening
+Deformation Zone
+Deformed Ice
+Degradation
+Degree Day
+Delta
+Delta T
+Dendrites
+Dendritic
+Dense Fog Advisory
+Density Current
+Density of Snow
+DEP
+Depletion Curve
+Depression
+Depression Storage
+Depth of Runoff
+Derecho
+Derived Products
+Desertification
+Design Criteria
+Detention Basins
+Detention Storage
+Detritus
+Developing Gale/Storm
+Dew
+Dew Point
+Dew Point Depression
+Dew Point Front
+DEWP
+DFUS
+Diabatic
+Diablo Wind
+Diagnostic Model
+Diamond Dust
+Differential Motion
+Differential Rotation
+Diffuse Ice
+Difluence
+DIR
+Direct Flood Damage
+Direct Hit
+Direct Runoff
+Direct Solar Radiation
+Directional Shear
+Disappearing Solar Filament (DSF)
+Discharge
+Discharge Curve
+Discharge Table
+Disdrometer
+Disk
+Dispersion
+Distribution (Hydro)Graph
+Diurnal
+Diurnal Cycles
+Diurnal Temperature Range
+Divergence
+Diversion
+Divide
+Dividing Streamline
+Dividing Streamline Height
+DMNT
+DMSH
+DNR
+DNS
+DNSTRM
+Dobson Unit
+DOC
+DOH
+Doldrums
+Domain
+Domestic Consumption
+Domestic Use of water
+Doppler Radar
+Down-Valley Wind
+Downburst
+Downdraft
+Downslope Flow
+Downstream
+Downstream Slope
+Downwash
+Downwelling Radiation
+DP
+DPD
+DPNG
+DPTH
+DPTR
+DPVA
+DR
+Drainage Area
+Drainage Basin
+Drainage Density
+Drainage Divide
+Drainer
+Drains (Relief Wells)
+Drawdown
+DRCTN
+Dredging
+DRFT
+Drifting Ice
+Drifting Snow
+Drizzle
+Drop-size Distribution
+Drought
+Drought Assessments
+Drought Index
+Dry Adiabat
+Dry Adiabatic Lapse Rate
+Dry Crack
+Dry Floodproofing
+Dry Line
+Dry Line Bulge
+Dry Line Storm
+Dry Microburst
+Dry Punch
+Dry Slot
+Dry Thunderstorm
+Dry Weather Flow
+Dry-adiabatic
+DSA
+DSIPT
+Dst Index
+DTRT
+Duration Curve
+Duration of Ice Cover
+Duration of Sunshine
+DURG
+DURN
+Dusk
+Dust Devil
+Dust Plume
+Dust Storm
+Dust Whirl
+DVLP
+DVV
+DWNDFT
+DWNSLP
+DWPT
+Dynamic Ice
+Dynamic Lifting
+Dynamic Wave Routing Model (DWOPER)
+Dynamics
+DZ
+E
+E REGION
+E-19, Report on River Gage Station
+E-19a, Abridged Report on River Gage Sta
+E-3, Flood Stage Report
+E-5, Monthly Report of River and Flood c
+E-7, Flood Damage Report
+Easterlies
+Ebb Current
+EBND
+EBS
+Eccentricity
+Echo
+Echo Tops
+ECMF
+ECMWF
+Eddy
+EDT
+EFCT
+Effective Porosity
+Effective Precipitation
+Effective Terrestrial Radiation
+Effective Topography
+Effluent Seepage
+Effluent Stream
+El Niño
+Element
+ELEV
+Elevated Convection
+ELSW
+ELY
+Embankment
+EMBDD
+EMC
+Emergency Action Plan
+Emergency Services
+Emerging Flux Region (EFR)
+Emissivity
+EML
+ENDG
+Energy Dissipator
+Energy Helicity Index
+Engineer's Level
+Enhanced V
+Enhanced Wording
+ENHNCD
+ENSEMBLE
+Ensemble Forecast
+Ensemble Hydrologic Forecasting
+Ensembles
+ENSO
+ENSO Diagnostic Discussion
+ENTR
+Entrainment Zone
+Entrance Region
+Entropy
+Environment Canada
+Environmental Lapse Rate
+Environmental Temperature Sounding
+EPA
+EPCTG
+EPV
+Equi-Potential Line
+Equilibrium Drawdown
+Equilibrium Level
+Equilibrium Surface Discharge
+Equilibrium Time
+Equinox
+Equivalent Potential Temperature
+ERLY
+ERN
+Erosion
+Eruptive
+Eruptive Prominence on Limb (EPL)
+ESP
+EST
+Estuary
+Esturine waters
+Esturine Zone
+ETA
+Eta Model
+Evaporation
+Evaporation Pan
+Evaporation Rate
+Evaporation-mixing Fog
+Evaporimeter
+Evapotranspiration
+EVE
+EWD
+EWW
+Excess Rain
+Excessive Heat
+Excessive Heat Outlook
+Excessive Heat Warning
+Excessive Heat Watch
+EXCLD
+Exclusive Flood Control Storage Capacity
+Exit Region
+Exosphere
+Experimental Product
+Explosive Deepening
+EXTD
+Extended Forecast Discussion
+Extraterrestrial Radiation
+Extratropical
+Extratropical Cyclone
+Extratropical Low
+Extreme Ultraviolet (EUV)
+Extreme Wind Warning
+Extremely Low Frequency (ELF)
+EXTRM
+EXTSV
+Eye
+Eye Wall
+F
+F Corona
+F Region
+F Scale
+FA
+FAA
+Face
+Facula
+Fahrenheit
+Fair
+Fall
+Fall Line
+Fall Wind
+Fallstreak
+FAN
+Fanning
+FASTST
+Fathom
+FAWS
+FBO
+FCST
+Federal Snow Sampler
+Feeder Bands
+FEMA
+Ferrel Cell
+Fetch
+Few
+Few Clouds
+FFG
+FG
+Fibril
+Field (Moisture) Capacity
+Field Moisture Deficiency
+Filament
+Filament Channel
+Fill Dam
+Filling
+Fire Wind
+Firebrand
+Firn (Snow)
+Firn Line
+First Law of Thermodynamics
+Flanking Line
+Flare
+Flash
+Flash Flood
+Flash Flood Guidance
+Flash Flood Statement
+Flash Flood Table
+Flash Flood Warning
+Flash Flood Watch
+Flash Multiplicity
+Flashboards
+FLG
+Float Recording Precipitation gage
+Floc
+Floe
+Flood
+Flood Categories
+Flood Control Storage
+Flood Crest
+Flood Frequency Curve
+Flood Loss Reduction Measures
+Flood of Record
+Flood Plain
+Flood Potential Outlook
+Flood Prevention
+Flood Problems
+Flood Profile
+Flood Routing
+Flood Stage
+Flood Statement (FLS)
+Flood Warning
+Flood Watch
+Flood Wave
+Flooded Ice
+Floodproofing
+Floodwall
+Floodway
+Flow
+Flow Duration Curve
+Flow Separation
+Flow Splitting
+Flowing Well
+FLRY
+FLS
+Fluence
+Fluid
+Flurries
+Flux
+FLW
+FM
+fMin
+FNT
+FNTGNS
+FNTLYS
+Foehn
+Foehn Pause
+foEs
+foF2
+Fog
+Fogbow
+Forced Channeling
+Forebay
+Forecast
+Forecast Crest
+Forecast Guidance
+Forecast Issuance Stage
+Forecast Periods
+Forecast Point
+Forecast valid for
+Foresight
+Forward Flank Downdraft
+Fountainhead
+FOUS
+FPO
+FPS
+FQT
+Fractocumulus
+Fractostratus
+Fracture
+Fracture Zone
+Fracturing
+Fractus
+Frazil Ice
+Frazil Slush
+Freak Wave
+Free Atmosphere
+Free Ground Water
+Freeboard
+Freeze
+Freeze Warning
+Freezeup date
+Freezing Drizzle
+Freezing Drizzle Advisory
+Freezing Fog
+Freezing Level
+Freezing Rain
+Freezing Rain Advisory
+Freezing Spray
+Freezing Spray Advisory
+Freezup jam
+French Drain
+Freshet
+Friction
+Friction Head
+Friction Layer
+FRMG
+Front
+Frontal Inversion
+Frontogenesis
+FROPA
+FROSFC
+Frost
+Frost Advisory
+Frost Point
+Frostbite
+Frozen Dew
+FRST
+FRZ
+FRZN
+FSCBG
+FT
+FTHR
+FTPMAIL
+Fugitive Dust
+Fujita Scale
+Fujiwhara Effect
+Full-Physics Numerical Model
+Fumigation
+Funnel Cloud
+Funnelling
+FVT
+FWC
+FWD
+FZRA
+G
+G/KG
+Gage
+Gage Datum
+Gaging Station
+Gale
+Gale Warning
+Gallery
+Gamma
+Gamma Ray
+Gap Winds
+Gas Laws
+Gate
+Gauss
+Gaussian Plume Model
+Gaussian Puff Model
+GDR
+GEMPAK
+GEN
+General Circulation
+General Circulation Models
+General Wind
+Geohydrology
+Geomagnetic Elements
+Geomagnetic Field
+Geomagnetic Storm
+Geophysical Events
+Geophysics
+Geopotential Height
+Geostationary Satellite
+Geostrophic Wind
+Geosynchronous
+GF
+GFS
+GIS
+Glaciation
+Glacier
+Glacier Dammed Lake
+Glacier Wind
+Glaze
+GLF
+Global Forecast System
+Global Temperature Change
+Global Warming
+Glory
+GLS
+GMDSS
+GMN
+GMT
+GND
+GNRL
+GOES
+GoMoos
+GPS
+GRAD
+Gradient
+Gradient High Winds
+Gradual Commencement
+Granulation
+Graupel
+Gravity Dam
+Gravity Wave
+Graybody
+GRDL
+Great Circle Track
+Great Lakes Faxback
+Great Lakes Freeze-Up/Break-Up Outlook
+Great Lakes Marine Forecast (MAFOR)
+Great Lakes Storm Summary
+Great Lakes Weather Broadcast
+Green Line
+Greenhouse Effect
+Greenhouse Gases
+GRIB
+Grids
+Ground Blizzard Warning
+Ground Clutter
+Ground Fog
+Ground Heat Flux
+Ground receive sites
+Ground Stroke
+Ground Water
+Ground Water Divide
+Ground Water Flow
+Ground Water Hydrology
+Ground Water Outflow
+Ground Water Overdraft
+Ground Water Runoff
+Grounded ice
+Group Velocity
+Grout Curtain
+Growing Degree Day
+Growing Season
+Growler
+GRT
+GRTST
+GSP
+GST
+GSTY
+GTR
+Gulf Stream
+Gunge
+Gust
+Gust Front
+Gustnado
+Gyres
+H-Alpha
+H-component of the Geomagnetic Field
+H0
+H5
+H7
+H8
+Hague Line
+Hail
+Hail Contamination
+Hail Index
+Hail Size
+Hail Spike
+Haines Index
+Halo
+Hanging (ice) dam
+Hazardous Weather Outlook
+Hazards Assessment
+Haze
+HDD
+HDRAIN
+Head
+Head Loss
+Head Race
+Headward Erosion
+Headwater Basin
+Headwaters
+Heat Advisory
+Heat Exhaustion
+Heat Index
+Heat Lightning
+Heat Stroke
+Heat Wave
+Heating Degree Days
+Heavy Freezing Spray
+Heavy Freezing Spray Warning
+Heavy Snow
+Heavy Snow Warning
+Heavy Surf Advisory
+Hectopascal
+Height
+Helicity
+Hertz
+HI
+HIC
+High
+High Clouds
+High Energy Event
+High Frequency (HF)
+High Latitudes
+High Risk (of severe thunderstorms)
+High Seas Forecast
+High Surf
+High Surf Advisory
+High Surf Warning
+High Wind
+High Wind Advisory
+High Wind Warning
+High Wind Watch
+High-Speed Stream
+Hinge Crack
+HLS
+HMD
+HND
+Hoar Frost
+Hodograph
+Homologous Flares
+Hook Echo
+Horizon
+Hourly Precipitation Data (HPD)
+HP Storm
+hPa
+HPC
+HR
+HRS
+HSA (Hydrologic Service Area)
+Humidity
+Humidity Recovery
+Hummock
+Hummocked Ice
+Hurricane
+Hurricane Force Wind Warning
+Hurricane Local Statement
+Hurricane Season
+Hurricane Warning
+Hurricane Watch
+HV
+HVY
+HWVR
+Hyder Flare
+Hydraulic Fill Dam
+Hydraulic Flow
+Hydraulic Grade Line
+Hydraulic Head
+Hydraulic Jump
+Hydraulic Permeability
+Hydrograph
+Hydrograph Separation
+Hydrographic Survey
+Hydrologic Budget
+Hydrologic Cycle
+Hydrologic Equation
+Hydrologic Model
+Hydrologic Service Area
+Hydrology
+Hydrometeor
+Hydrometeorologists
+Hydrometeorology
+Hydrostatic Head
+Hydro­meteorology
+Hyetograph
+Hygrometer
+Hygroscopic
+Hypothermia
+HZ
+Ice Age
+Ice Boom
+Ice Bridge
+Ice Crystals
+Ice Fog
+Ice Gorge
+Ice Jam
+Ice Nucleus
+Ice Pellets
+Ice Push
+Ice Run
+Ice Shove
+Ice Storm
+Ice Storm Warning
+Ice Twitch
+Iceberg
+Icelandic Low
+Icing
+Ideal Gas Laws
+IFR
+Impermeable
+Impervious
+IMPL
+Import
+IMPT
+Impulse
+in Hg
+In-Cloud Lightning
+Inactive Storage Capacity
+Inch-Degrees
+Inches of Mercury
+Inches of Runoff
+INCR
+INDC
+Index of Wetness
+Indian Summer
+Indirect Hit
+Industrial Consumption
+Infiltration
+Infiltration Capacity
+Infiltration Index
+Infiltration Rate
+Inflow Bands
+Inflow Jets
+Inflow Notch
+Inflow Stinger
+Influent Seepage
+Influent Stream
+Infrared Satellite Imagery
+Initial Detention
+Inland freshwater wetlands
+Inland Hurricane Warning
+Inland Hurricane Watch
+Inland Tropical Storm Warning
+Inland Tropical Storm Watch
+INLD
+Insolation
+Instability
+INSTBY
+Instrument Flight Rules
+Instrument Shelter
+Intangible Flood Damage
+Interbasin Transfer
+Interception
+Interception Storage Requirements
+Interflow
+Intermediate Synoptic Times
+Intermittent Stream
+International Date Line
+Interplanetary Magnetic Field
+Interpolate
+Intertropical Convergence Zone
+Intraseasonal Oscillation
+INTS
+INTSFY
+INTST
+Inversion
+INVOF
+INVRN
+Ionosphere
+Ionospheric Storm
+IPV
+IR
+Iridescence
+Iridescent Clouds
+Irrigation
+Irrigation Requirement
+Isallobar
+Isentropic Analysis
+Isentropic Lift
+Isentropic Surface
+Isobar
+Isobaric Chart
+Isobaric Process
+Isobath
+Isochrone
+Isodop
+Isodrosotherm
+Isoheight
+Isohel
+Isohyet
+ISOL
+Isolated
+ISOLD
+Isopleth
+Isotach
+Isotherm
+Isotropic
+Issuance Time
+ITCZ
+ITWAS
+J/kg
+January Thaw
+Jet
+Jet Max
+Jet Streak
+Jet Stream
+Jet Stream Cirrus
+Jet Wind Speed Profile
+Jetty
+JMA
+Jokulhlaup
+JSTR
+Juvenile Water
+K
+K AMS
+K Corona
+K-Index
+Katabatic Wind
+Katafront
+Keetch-Byrum Drought Index
+Kelvin Temperature Scale
+Kelvin Waves
+Kelvin-Helmholtz Waves
+Kilopascal
+Kinetic Energy
+Klystron
+Knot
+Knuckles
+Kp Index
+KT
+KTS
+La Niña
+Lag
+Lake Breeze
+Lake Effect Snow
+Lake Effect Snow Advisory
+Lake Effect Snow Squall
+Lake Effect Snow Warning
+Lake Effect Storm
+Lakeshore Flood Advisory
+Lakeshore Flood Watch
+Lakeshore Flooding
+LALs
+Laminar
+Laminar Flow
+Land Breeze
+Landfall
+Landspout
+Lapse Rate
+Large Scale
+Last Update
+LAT
+Latent Heat
+Latent Heat Flux
+Latitude
+LAWEB
+Layer Composite Reflectivity Average
+Layer Composite Reflectivity Maximum
+Layered Haze
+LCD (Local Climatological Data)
+LCL
+LDS
+LDT
+Leader
+Leader Spot
+Lee
+Lee Wave
+Leeside Low
+Leeward
+Left Exit Region
+Left Front Quadrant
+Left Mover
+Length
+Lentic System
+Lenticular Cloud
+Levee
+Level of Free Convection
+LEWP
+LFC
+LFT
+LGT
+LGWV
+LI
+Lid
+Lid
+LIFR
+Lifted Index
+Lifting Condensation Level
+Light Bridge
+Lightning
+Lightning Channel
+Lightning Discharge
+Lightning Stroke
+Likely
+Limb
+Limb Flare
+Limnology
+Line Echo Wave Pattern
+Line Source
+Liquid Water Equivalent
+Lithometeor
+Lithosphere
+Littoral Zone
+Live Capacity
+LIVV
+LKLY
+LLJ
+LLWS
+LMTD
+LN
+Loaded Gun (Sounding)
+Local Convective Wind
+Lofting
+Long Term Retention
+Longitude
+Longwave Radiation
+Longwave Trough
+Loop Prominence System
+Looping
+LOPRES
+Loran
+Lotic System
+Low
+Low Frequency
+Low Level Jet
+Low Pressure System
+Lowland Flooding
+LP Storm
+LPS
+LRG
+LSR
+LST
+LTD
+LTL
+LTLCG
+LTNG
+LTR
+LTST
+LVL
+LVLS
+LWR
+Lysimeter
+M 3000
+M2/S2
+Mackeral Sky
+Macroburst
+Macroscale
+Madden-Julian Oscillation
+MAFOR
+Magflare
+Magnetic Bay
+Magnetogram
+Magnetopause
+Magnetosphere
+Main Stem
+Main Synoptic Times
+MAINT
+Major Flare
+Major Flooding
+Major Hurricane
+MALR
+Mammatus Clouds
+MAP
+Mare's Trail
+MAREP
+Marginal Visual Flight Rules
+Marine Inversion
+Marine Push
+Marine Small Craft Thunderstorm Advisory
+Marine Small Craft Wind Warning
+Marine Weather Statement
+Marine Zone
+Maritime Air Mass
+Maritime Polar Air Mass
+Maritime Tropical Air Mass
+MAROB
+MARS
+Massif
+MAV
+MAX
+Max Parcel Level (MPL)
+Maximum Spillway Discharge
+Maximum Sustained Surface Wind
+Maximum Temperature
+Maximum Unambiguous Range
+Maximum Unambiguous Velocity
+MAXT
+MB
+MCC
+MCS
+MD
+MDFY
+MDLS
+MDNGT
+MDT
+Mean
+Mean Annual Temperature
+Mean Areal Precipitation
+Mean Daily Temperature
+Mean Depth
+Mean Doppler Velocity
+Mean Low Water
+Mean Lower Low Water
+Mean Sea Level
+Meander
+Meander Belt
+Measured Ceiling
+Medium Frequency
+Medium Range
+MEGG
+Melting Level
+Melting Point
+Meniscus
+Mercury Barometer
+Meridian
+Meridional Flow
+MESO
+Mesoclimate
+Mesocyclone
+Mesohigh
+Mesolow
+Mesonet
+Mesopause
+Mesoscale
+Mesoscale Convective Complex
+Mesoscale Convective System
+Mesoscale Discussion
+Mesoscale High Winds
+Mesosphere
+MET
+METAR
+Meteogram
+Meteoric Water
+Meteorologist
+Meteorology
+METRO
+MeV
+MEX
+MI
+MIC
+Microbarograph
+Microburst
+Microclimate
+Micron
+Microscale
+Microwave
+Microwave Burst
+MID
+Mid-Flame Wind
+Mid-Latitude Areas
+Mid-level Cooling
+Middle Clouds
+Middle Latitudes
+Mie Scattering
+Millibar
+MIN
+Minimum Discernible Signal
+Minimum Temperature
+Minor Flooding
+Minor Tidal Overflow
+MINT
+MISC
+MISG
+Misoscale
+Mist
+Mixed Layer
+Mixed Precipitation
+Mixing Depth
+Mixing Heights
+Mixing Ratio
+MJO
+MLCAPE
+MLLI
+MLLW
+MLW
+MNLY
+MOBY
+Model Output Statistics
+Moderate Flooding
+Moderate Risk (of severe thunderstorms)
+Moist Adiabat
+Moist Adiabatic Lapse Rate
+Moist-adiabatic
+Moisture
+Moisture Advection
+Moisture Convergence
+Moisture Equivalent
+Moisture Ridge
+Molecule
+Monitor Stage
+Monostatic Radar
+Monsoon
+Monthly Climatological Report
+Morning Glory
+MOS
+Mostly Clear
+Mostly Cloudy
+Mostly Sunny
+Mount Wilson Magnetic Classifications
+Mountain Wave
+Mountain Wind System
+Mountain-Plain Wind System
+Mountainado
+MOV
+Movable Bed
+MOVG
+MR
+MRF
+MRGL
+MRNG
+MSG
+MSL
+MSL
+MSLP
+MST
+MSTLY
+MSTR
+MT
+MTN
+MTNS
+MTS
+Mud Slide
+Muggy
+MULI
+Multicell Thunderstorm
+Multiple Doppler Analysis
+Multiple Vortex Tornado
+Multipurpose Reservoir
+Municipal Use of Water
+Mushroom
+MVFR
+MVS
+MWD
+MWS
+N
+Nacreous Clouds
+Nadir
+NAM
+Nanotesla (nT)
+NAO
+NAO Index
+National Ambient Air Quality Standards
+National Climatic Data Center
+National Digital Forecast Database
+National Fire Danger Rating System
+National Flood Summary
+National Hurricane Center
+National Hurricane Operations Plan
+National Severe Storms Laboratory
+National Weather and Crop Summary
+Natural Control
+Nautical Dawn
+Nautical Dusk
+Nautical Mile
+Nautical Twilight
+Navigation Methods
+NAVTEX
+NAVTEX Forecast
+NBND
+NC
+NCAR
+NCCF
+NCDC
+NCEP
+NDBC
+NDFD
+NE
+Neap Tide
+Nearshore Forecast
+NEC
+NEG
+Negative Vorticity Advection
+Negative-tilt Trough
+NELY
+NERN
+NESDIS
+Net All-Wave Radiation
+Net Rainfall
+Neutral Line
+Neutral Stability
+NEWD
+NEXRAD
+NGM
+NGT
+NHC
+NHOP
+Nieve Penitente
+Night
+NIL
+Nimbostratus
+NLY
+NM
+NMBR
+NMC
+NML
+NMRS
+NOAA
+NOAA Weather Radio
+NOAA Weather Wire
+Noctilucent Clouds
+Nocturnal
+Nocturnal Inversion
+Nocturnal Jet
+Nocturnal Thunderstorms
+NOGAPS
+NOHRSC
+Non-Uniform Sky Condition
+Non-Uniform Visibility
+Nonattainment Area
+Normal
+Normal Water Surface Elevation
+Normal Year
+North Atlantic Oscillation
+North Pacific High
+North Wall
+Northern Lights
+Nor\'easter
+Nowcast
+NR
+NRN
+NRW
+NS
+NSSFC
+NSSL
+Numerical Forecasting
+Numerical Weather Prediction
+Numerous
+NVA
+NW
+NWD
+NWLY
+NWP
+NWR
+NWRD
+NWRN
+NWS
+NWSH
+NWSO
+NXT
+OBS
+OBSC
+Obscuration
+Obscuring Phenomena
+Observation Well
+Occluded Front
+Occluded Mesocyclone
+Oceanography
+OCFNT
+OCNL
+OEODM
+Office of Global Programs
+Offshore Breeze
+Offshore Flow
+Offshore Waters
+Offshore Waters Forecast
+OFSHR
+OH
+OHD
+Okta
+OLR
+Omega
+Omega High
+Onshore Breeze
+Onshore Flow
+Opaque
+OPC
+Open Lakes Forecast
+Operational Products
+Orifice
+ORIG
+Orographic
+Orographic Lifting
+Orographic Precipitation
+Orographic Uplift
+Orographic Waves
+Orphan Anvil
+Oscillation
+OTLK
+OTR
+OTRW
+Outer Convective Band
+Outflow
+Outflow Boundary
+Outflow Channel
+Outgoing Longwave Radiation
+Outlet
+Outlet Discharge Structure
+Outlook
+Outlook
+OVC
+Overcast
+Overhang
+Overland Flow
+Overrunning
+Overshooting Top
+OVNGT
+OVR
+OVRN
+OVRNGT
+Ozone
+Ozone Action Day
+Ozone Advisory
+Ozone Hole
+Ozone Layer
+PAC
+Pacific Decadal Oscillation
+Palmer Drought Severity Index
+Pan Pan
+Pancake Ice
+Panhandle Hook
+Parameter
+Parapet Wall
+Parcel
+Parhelion
+Partial Beam Filling
+Partial-Duration Flood Series
+Particle Trajectory Model
+Partly Cloudy
+Partly Sunny
+Pascal
+PAT
+PBL
+PC-GRIDDS
+PCPN
+PCT
+PD
+PDI
+PDMT
+PDO
+PDS
+PDS Watch
+PDSI
+PDT
+Peak Discharge
+Peak Gust
+Peak Pulse
+Peak Wind Speed
+Pendant Echo
+Penetrating Top
+Penumbra
+Perched Groundwater
+Percolation
+Percolation Path
+Perennial Stream
+Perigee
+Perihelion
+Permafrost
+Permeability
+Permeability Coefficient
+Permeameter
+Persistence
+Persistence Forecast
+Perturbation Model
+Pervious Zone
+PFD
+Phenomenological Model
+Phiezometer
+Photochemical Smog
+Photosphere
+Phreatic water
+PIBAL
+Pilot Balloon
+Pilot Report
+Pingo
+PIREP
+Pitot Tube
+PIX
+PK
+PL
+PL
+Plage
+Plage Corridor
+Plagenil
+Plan Position Indicator
+Planetary Boundary Layer
+Plasma
+Platform
+Plow Wind
+Plume Blight
+Plume Impingement
+Plume-dominated Fire
+Pluvial
+PMD
+PMO
+PNA
+PNHDL
+PNS
+POH
+Point Precipitation
+Point Source
+Polar Cap Absorption (PCA)
+Polar Front
+Polar Jet
+Polar Jet Stream
+Polar Orbiting Satellite
+Polarization Radar
+Pollutant
+Pondage
+Ponding
+Pool
+Pool Height
+POP
+Popcorn Convection
+POPS
+Porosity
+POS
+Positive Area
+Positive Cloud to Ground Lightning
+Positive Vorticity Advection
+Positive-tilt Trough
+Post-Flare Loops
+Post-storm Report
+Potential Temperature
+Potential Vorticity
+Powder Snow
+Power
+PPI
+PPINE
+PQPF
+PRBLTY
+PRBLY
+PRCP
+Pre-Frontal Squall Line
+Pre-Frontal Trough
+Pre-Hurricane Squall Line
+PRECD
+Precipitable Water
+Precipitation
+Precipitation Attenuation
+Precipitation Mode
+Precipitation Processing System
+Precision
+Predominant Wind
+Preliminary Report
+PRES
+Prescribed Fire
+Present Movement
+Present Weather
+Pressure
+Pressure Altimeter
+Pressure Altitude
+Pressure Change
+Pressure Characteristic
+Pressure Couplet
+Pressure Falling Rapidly
+Pressure Gage
+Pressure Gradient
+Pressure Gradient Force
+Pressure Head
+Pressure Ice
+Pressure Induced Wave
+Pressure Jump
+Pressure Rising Rapidly
+Pressure Tendency
+Pressure Unsteady
+Pressure-driven Channeling
+Prevailing Visibility
+Prevailing Westerlies
+Prevailing Winds
+Prevention of Significant Deterioration
+PRIM
+Primary Ambient Air Quality Standards
+Primary Control Tide Station
+Primary Pollutant
+Primary Swell Direction
+PRIN
+Probability
+Probability Forecast
+Probability of Hail
+Probability of Precipitation
+Probability of Thunderstorms
+Probability of Tropical Cyclone Conditio
+Product Resolution
+Profiler
+PROG
+PROGGED
+Prognostic Discussion
+Progressive Derecho
+Prominence
+PROPA
+Propagation
+Property Protection
+Proton
+Proton Event
+Proton Flare
+PRST
+PRVD
+PSBL
+PSBLY
+Pseudo-Cold Front
+Pseudo-Warm Front
+PSG
+PST
+Psychrometer
+PTCHY
+PTCLDY
+PTDY
+PTLY
+PTN
+PTTN
+PTWC
+PTYPE
+Public Information Statement
+Public Severe Weather Outlook
+Puddle
+Puget Sound Convergence Zone
+Pulse
+Pulse Duration
+Pulse Length
+Pulse Radar
+Pulse Repetition Frequency (PRF)
+Pulse Repetition Time (PRT)
+Pulse Resolution Volume
+Pulse Severe Thunderstorms
+Pulse Storm
+Pulse Width
+Pulse-Pair Processing
+PVA
+PVL
+PW
+PWAT
+PWO
+QG
+QN
+QPF
+QPF Discussion
+QPFERD
+QPFHSD
+QPFPFD
+QSTNRY
+QTR
+QUAD
+Quadrature
+Quality of Snow
+Quantitative Precipitation Forecast
+Quasi-stationary
+Quasi-stationary Front
+Quiescent Prominence (Filament)
+Quiet
+R
+RA
+RADAP II
+RADAR
+Radar Beam
+Radar Coded Message
+Radar Cross Section
+Radar Data Acquisition
+Radar Meteorology
+Radar Mosaic
+Radar Product Generator (RPG)
+Radar Range
+Radar Reflectivity
+Radar Reflectivity Factor (z)
+Radial Velocity
+Radiance
+Radiation
+Radiation Fog
+Radiation Laws
+Radiational Cooling
+Radiational Inversion
+Radio Emission
+Radio Event
+Radiofacsimile
+Radiofax
+Radioisotope Snow Gage
+Radiosonde
+Radius of Maximum Winds
+RAFC
+RAFS
+Rain
+Rain Foot
+Rain Forest
+Rain Gauge
+Rain Induced Fog
+Rain Shadow
+Rain Shield
+Rain-free Base
+Rainbow
+Rainfall
+Rainfall Estimates
+Range
+Range Folding
+Range Gate
+Range Height Indicator
+Range Normalization
+Range Resolution
+Range Unfolding
+Rankine Vortex
+RAOB
+Rapid Deepening
+Rapidly Intensifying
+Rawinsonde
+Rawinsonde Observation
+RAWS
+Rayleigh Scattering
+RCKY
+RCMD
+RCV
+RDG
+RDS
+Reach
+Reach
+Real-Time
+Rear Flank Downdraft
+Receiver
+Reconnaissance Code
+Record Event Report
+Recreation Report
+Recurrence
+Red Flag
+Red Flag Warning
+Red Watch or Red Box
+REF
+Reference Mark
+Reflection
+Reflectivity
+Reflectivity Cross Section
+Reflectivity Factor
+Refraction
+Refractive Index
+Refractivity
+Regional Haze
+Relative Humidity
+Relative Vorticity
+Relative Wind
+RELBL
+Relocated
+Remote Observing System Automation
+REP
+Report
+Reservoir
+Residual Layer
+Residual Moisture
+Resonance
+Response Time
+Retrogression
+Return Flow
+Return Stroke
+Rex Block
+RFC
+RGD
+RGN
+RH
+RHI
+Ribbon Lightning
+Ridge
+Ridge Ice
+Right Ascension
+Right Entrance Region
+Right Mover
+Right Rear Quadrant
+Rime Ice
+RIOGD
+Riometer
+Rip Current
+Rip Tide
+Riparian Zone
+River Basin
+River Flood Statement
+River Flood Warning
+River Flooding
+River Forecast
+River Forecast Center
+River Gage
+River Gage Datum
+River Ice Statement
+River Observing Station
+River Recreation Statement
+River Statement
+River System
+RLS
+RLTV
+RMN
+RMTN
+RMV
+RNFL
+Rocketsonde
+Rockfill Dam
+Rogue Wave
+Roll Cloud
+Rolled Filled Dam
+Rope
+Rope Cloud
+Rope Stage
+ROSA
+Rossby Waves
+Rotation
+ROTG
+Rotor Cloud
+Rotten Ice
+Rough Seas
+Routing
+RPD
+RPLC
+RPRT
+RQR
+RRQ
+RSG
+RSN
+RTE
+RTRD
+RTRN
+RTVS
+RUC
+Runoff
+Runway Visual Range
+RVA
+RVF
+RVI
+RVR
+RVS
+RW
+S
+S-Band Radar
+S/W
+S/WV
+SafetyNET
+Saffir-Simpson Scale
+Salinity (SAL)
+SAME
+SAMEX
+Sampling Frequency
+Sandstorm
+Santa Ana Wind
+Sastrugi
+SAT
+Satellite Hydrology Program
+SATL
+Saturation Vapor Pressure
+SAWRS
+SBCAPE
+SBND
+SBSD
+SC
+SCA
+Scattered
+Scattering
+SCT
+Scud
+SE
+Sea Breeze
+Sea Breeze Convergence Zone
+Sea Breeze Front
+Sea Fog
+Sea Ice
+Sea Level Pressure
+Sea Surface Temperatures
+Seas
+Second-Day Feet
+Secondary Ambient Air Quality Standards
+Secondary Pollutant
+Sector Boundary
+Sector Visibility
+Sectorized Hybrid Scan
+Securite
+Sediment Storage Capacity
+Seepage
+Seiche
+SEL
+SELS
+SELY
+Sensible Heat Flux
+Separation Eddy
+Serial Derecho
+SERN
+Service Hydrologist
+Servo Loop
+Set
+Set-up
+Severe Icing
+Severe Local Storm
+Severe Local Storm Watch
+Severe Thunderstorm
+Severe Thunderstorm Warning
+Severe Thunderstorm Watch
+Severe Weather Analysis
+Severe Weather Potential Statement
+Severe Weather Probability
+Severe Weather Statement
+SEWD
+SFC
+Sferic
+SG
+SGFNT
+Shallow Fog
+SHARS
+Shear
+Sheet Flow
+Sheet ice
+Shelf Cloud
+SHFT
+SHLW
+Shore ice
+Short Term Forecast
+Short Wave Fade (SWF)
+Short-Fuse Warning
+Shortwave
+Shortwave Radiation
+Shortwave Trough
+Showalter Index
+Shower
+SHRA
+SHRAS
+SHRT
+SHRTWV
+SHSN
+SHWR
+Sidelobe
+SIGMET
+Signal-to-Noise Ratio
+Significant Wave Height
+Significant Weather Outlook
+SIGWX
+Single Cell Thunderstorm
+SITOR
+Sky Condition
+SKYWARN
+SL
+SLD
+Sleet
+Sleet Warning
+SLGT
+Slight Chance
+Slight Risk
+Sling Psychrometer
+SLO
+SLOSH
+SLP
+SLT
+SLY
+SM
+SMA
+Small Craft
+Small Craft Advisory
+Small Craft Advisory for Hazardous Seas
+Small Craft Advisory for Rough Bar
+Small Craft Advisory for Winds
+Small Craft Should Exercise Caution
+Small Hail
+Small Stream Flooding
+Smog
+Smoke
+Smoke Dispersal
+Smoke Management
+Smoothed Sunspot Number
+SMW
+SN
+Snotel
+Snow
+Snow Accumulation and Ablation Model
+Snow Advisory
+Snow Core
+Snow Cornice
+Snow Density
+Snow Depth
+Snow Flurries
+Snow Grains
+Snow Pack
+Snow Pellets
+Snow Pillow
+Snow Shower
+Snow Squall
+Snow Stake
+Snow Stick
+Snow Water Equivalent
+Snowboard
+Snowcover
+Snowflake
+Snowmelt Flooding
+Snowpack
+SNR
+SNW
+SNW
+SNWFL
+SOI
+Soil Moisture
+Solar Coordinates
+Solar Cycle
+Solar Maximum
+Solar Minimum
+Solar Noon
+Solar Sector Boundary (SSB)
+Solar Wind
+SOLN
+SOLNS
+Solstice
+SOO
+Sounding
+Southern Oscillation
+Southern Oscillation Index
+Space Environment Center
+SPC
+SPCLY
+SPD
+Spearhead Echo
+Special Avalanche Warning
+Special Fire Weather
+Special Marine Warning
+Special Tropical Disturbance Statement
+Specific Gravity
+Specific Humidity
+Specific Yield
+Spectral Density
+Spectral Wave Density
+Spectral Wave Direction
+Spectrum Width
+Spectrum Width Cross Section
+Speed Shear
+SPENES
+Sphere Calibration
+Spillway
+Spillway Crest
+Spin-Up
+SPKL
+Split Flow
+Splitting Storm
+SPLNS
+Sporadic E
+SPOTNIL
+Spotting
+Spray
+SPRD
+Spring
+Spring Tide
+SPS
+SQLN
+Squall
+Squall Line
+SRF
+SRH
+SRN
+SS
+SSHS
+SST
+ST
+St Lawrence Freeze-Up Outlook
+St. Elmo's Fire
+Stability
+Stability Index
+Stable
+Stable Boundary Layer
+Stable Core
+Staccato Lightning
+Stage
+Stair Stepping
+Standard Atmosphere
+Standard Synoptic Times
+State Forecast Product
+State Weather Roundup
+Station ID
+Station Model
+Station Pressure
+Stationary Front
+STBL
+Steam Fog
+Steepness
+Steering Currents
+Steering Winds
+Stepped Leader
+STFR
+STG
+Stilling basin
+STJ
+STLT
+STM
+STNRY
+Stoplogs
+Storm
+Storm Data
+Storm Motion
+Storm Relative
+Storm Relative Mean Radial Velocity Map
+Storm Relative Mean Radial Velocity Regi
+Storm Scale
+Storm Surge
+Storm Tide
+Storm Total Precipitation
+Storm Tracking Information
+Storm Warning
+Stormwater Discharge
+Straight-Line Hodograph
+Straight-line Winds
+Stratiform
+Stratiform Rings and Bands
+Stratocumulus
+Stratopause
+Stratosphere
+Stratospheric Ozone
+Stratus
+Stream line
+Streamflow
+STRFM
+Striations
+Strike
+Sub-synoptic Low
+Sublimation
+Sublimation of ice
+Subrefraction
+Subsidence
+Subsidence Inversion
+Substation
+Subsurface Storm Flow
+Subtle Heavy Rainfall Signature
+Subtropical Cyclone
+Subtropical Depression
+Subtropical Jet
+Subtropical Storm
+Suction Vortex
+Sudden Commencement (SC)
+Sudden Impulse (SI+ or SI-)
+Sudden Ionospheric Disturbance (SID)
+SUF
+Summation Principle
+Summer
+Summer Solstice
+Sun Dog
+Sun Pillar
+Sun Pointing
+Sunny
+Sunrise
+Sunset
+Sunspot
+Sunspot Group Classification
+Sunspot Number
+Super Typhoon
+Supercell
+Supercell Thunderstorm
+Supercool
+Supercooled Liquid Water
+Superrefraction
+Surcharge Capacity
+Surf Zone
+Surf Zone Forecast
+Surface Energy Budget
+Surface impoundment
+Surface Runoff
+Surface Water
+Surface Weather Chart
+Surface-based Convection
+Surge
+Sustained Overdraft
+Sustained Wind
+SVR
+SVRL
+SW
+SWD
+SWE
+SWEAT
+Swell
+Swell Direction
+SWH
+SWLY
+SWODY1
+SWODY2
+SWP
+SWRN
+SWS
+SWWD
+SX
+SXN
+Symmetric Double Eye
+Synchronous Detection
+SYNOP
+Synopsis
+Synoptic Code
+Synoptic Scale
+Synoptic Track
+Synoptic Weather
+SYNS
+SYS
+Syzygy
+T
+T Rolls
+TAF
+TAFB
+Tail Cloud
+Tail-End Charlie
+Tailwater Height
+Target
+TCU
+TD
+TDA
+TDWR
+Teleconnection
+TEMP
+Temperature
+Temperature Inversion
+Temperature Recovery
+TEMPS
+Terminal Aerodrome Forecast
+Terrain Forced Flow
+Texas Hooker
+Thalweg
+Theodolite
+Thermal
+Thermal Belt
+Thermal High
+Thermal Low
+Thermal Wind
+Thermally Driven Circulation
+Thermistor
+Thermocline
+Thermodynamic Chart
+Thermodynamic Diagram
+Thermodynamics
+Thermograph
+Thermometer
+Thermosphere
+Theta-e
+Theta-e Ridge
+THETAE
+Thin Line Echo
+THK
+THN
+Three-Hour Rainfall Rate
+Threshold Runoff
+THRFTR
+THRU
+THRUT
+THSD
+Thunder
+Thunderstorm
+Tidal Cycle
+Tidal Piling
+Tidal Wave
+TIDE
+Tide Anomaly
+Tide Prediction
+Tides
+TIL
+Tilt
+Tilt Sequence
+Tilted Storm
+Tilted Updraft
+Tipping-Bucket Rain Gage
+TKE
+TMW
+TNDCY
+TNGT
+Toe of Dam
+TOP
+Topography
+TOR
+Tornado
+Tornado Family
+Tornado Vortex Signature
+Tornado Warning
+Tornado Watch
+Total-Totals Index
+Towering Cumulus
+TPC
+Trace
+Track
+Trade Winds
+Training
+Transmitter
+Transpiration
+Transport Wind
+Transverse Bands
+Transverse Rolls
+Trapper
+Travel Time
+Triple Doppler
+Triple Point
+TROF
+TROP
+Tropical Advisory
+Tropical Analysis and Forecast Branch
+Tropical Cyclone
+Tropical Cyclone Associated High Winds
+Tropical Cyclone Plan of the Day
+Tropical Cyclone Position Estimate
+Tropical Cyclone Update
+Tropical Depression
+Tropical Disturbance
+Tropical Storm
+Tropical Storm Summary
+Tropical Storm Warning
+Tropical Storm Watch
+Tropical Wave
+Tropical Weather Discussion
+Tropical Weather Outlook
+Tropical Weather Summary
+Tropics
+Tropopause
+Tropopause Jet
+Troposphere
+Trough
+TROWAL
+TRPCL
+TRRN
+True Wind
+TS
+TSRA
+TSTM
+Tsunami
+Tsunami Advisory
+Tsunami Information Statement
+Tsunami Warning
+Tsunami Watch
+Tule Fog
+Turbidity
+Turbulence
+Turkey Tower
+Turning Point
+TVL
+TVS
+TWD
+TWEB
+Twilight
+Twister
+Two-Ribbon Flare
+Type I, II, III, IV
+Typhoon
+Typhoon Season
+U Burst
+U.S. Geological Survey
+UCP
+UGC
+UKMET
+ULJ
+Ultra High Frequency (UHF)
+Ultraviolet Index
+Ultraviolet Radiation
+Umbra
+Undercurrent
+Underflow
+Undersun
+Undertow
+Unimodal
+Unit Control Position
+Unit Hydrograph
+Universal Geographic Code
+Universal Time (UT)
+UNSBL
+Unsettled
+Unstable Air
+UNSTBL
+Up-valley Wind
+Updraft
+Upper Level
+Upper Level Disturbance
+Upper Level System
+Upper-air Weather Chart
+UPR
+Upslope Flow
+Upslope Fog
+UPSLP
+Upstream
+Upstream Slope
+UPSTRM
+Upwelling
+Urban and Small Stream Flood Advisory
+Urban and Small Stream Flooding
+Urban Flash Flood Guidance
+Urban Flooding
+Urban Heat Island
+UTC
+UV Index
+UVM
+UVV
+UWNDS
+V Notch
+VAAC
+VAD
+VAD Wind Profile
+Vadose Zone
+VALDRIFT
+Valid Time
+Valid Time Event Code
+Valley Exit Jet
+Valley Volume Effect
+Valve
+Vapor Pressure
+Variable Wind
+Variable Wind Direction
+Variance
+VCNTY
+VCP
+Veering
+Veering Winds
+Velocity Azimuth Display
+Velocity Cross Section
+Velocity Zones
+Ventilation Index
+Venturi Effect
+Ver High Frequency (VHF)
+Vertical Velocity
+Vertical Wind Shear
+Vertically Stacked System
+Very Low Frequency (VLF)
+Very Windy
+VFR
+VIL
+VIP
+Virga
+Virtual Potential Temperature
+Virtual Temperature
+VIS
+Visibility
+Visibility Protection Program
+Visible Satellite Imagery
+Visual Spectrum
+VLCTY
+VLY
+VMD
+Volcanic Ash
+Volume Scan
+Volume Velocity Processing
+Voluntary Observing Ship Program
+Vort Max
+Vortex
+Vorticity
+VOS
+VOT
+VR
+VRT MOTN
+VSB
+VSBY
+VTEC
+VVP
+VVSTORM
+VWP
+W
+WAA
+Wake
+Wall Cloud
+Warm Advection
+Warm Core Low
+Warm Front
+Warm Occlusion
+Warm Sector
+Warning
+Wasatch Wind
+Watch
+Watch Box
+Watch Cancellation
+Watch Redefining Statement
+Watch Status Reports
+Water Equivalent
+Water Pollution
+Water Supply Outlook
+Water Table
+Water Vapor Plume
+Water Year
+Watercourse
+Watershed
+Waterspout
+Watt
+Wave Crest
+Wave Height
+Wave Period
+Wave Spectrum
+Wave Steepness
+Wave Trough
+Wavelength
+WAVEWATCH III
+WBND
+WBZ
+WC/ATWC
+WCM
+WDIR
+WDLY
+WDSPRD
+Weak Echo Region
+Weather
+Weather Forecast Office
+Weatherfax
+Wedge Tornado
+WEFAX
+Weighing-Type Precipitation Gage
+Weir
+WER
+West African Disturbance Line
+West Wall
+Westerlies
+Wet Bulb Zero
+Wet Floodproofing
+Wet Microburst
+Wet-Bulb Temperature
+Wetland
+WFO
+WFP
+Whirlwind
+White Light (WL)
+White Light Flare
+Whitecap
+Widespread
+Wildfire
+Wildlands
+Willy-Willy
+Wind
+Wind Advisory
+Wind Chill
+Wind Chill Advisory
+Wind Chill Factor
+Wind Chill Warning
+Wind Couplet
+Wind Direction
+Wind Field
+Wind Gust
+Wind Radii
+Wind Rose
+Wind Shear
+Wind Shear Profile
+Wind Shift
+Wind Shift Line
+Wind Sock
+Wind Speed
+Wind Waves
+Windward
+Windy
+WINT
+Winter
+Winter Pool
+Winter Solstice
+Winter Storm Warning
+Winter Storm Watch
+Winter Weather Advisory
+Wire Weight Gage
+WK
+WKN
+WL
+WLY
+WMC
+WMO
+WND
+Wolf Number
+Wrapping Gust Front
+WRCC
+WRM
+WRMFNT
+WRN
+WRNG
+WSFO
+WSHFT
+WSPD
+WSR-57
+WSR-74
+WSR-88D
+WSR-88D System
+WSW
+WTMP
+WTR
+WV
+WVHT
+WW
+WWH
+WWP
+WWV
+WWVH
+WX
+X-Band
+X-Ray Background
+X-Ray Burst
+X-Ray Flare Class
+X-Rays
+XBT
+XCITED
+XCPT
+XPC
+XSEC
+YDA
+Year
+Yellow Snow
+Z
+Zero Datum
+ZFP
+ZL
+ZNS
+Zonal Flow
+Zone of Aeration
+Zone of Saturation
+Zoned Embankment Dam
+ZR
+Zulu (Z) Time
+Zurich Sunspot Classification
+Z/R Relationship
+</tags>
