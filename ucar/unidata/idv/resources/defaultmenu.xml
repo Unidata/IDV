@@ -168,8 +168,11 @@
      label="Data"
      mnemonic="A">
     <menu
-       label="New Data Source"
+       label="Choose Data"
        id="data.newdata"/>
+    <menu
+       label="Load Data"
+       id="data.loaddata"/>
     <separator/>
   </menu>
   <menu

@@ -67,6 +67,7 @@
   <datasource
      id="STORM.ATCF"
      fileselection="true"
+     standalone="true"
      factory="ucar.unidata.data.storm.AtcfStormDataSource"
      label="ATCF Storm Data"/>
 
@@ -242,6 +243,7 @@
      id="PRODUCT.GEMPAK"
      factory="ucar.unidata.data.text.NwxTextProductDataSource"
      fileselection="true"
+     standalone="true"
      label="NWX Text Products">
     <property
        name="default_display"
@@ -251,6 +253,7 @@
   <datasource
      id="PRODUCT.ADDE"
      factory="ucar.unidata.data.text.AddeTextProductDataSource"
+     standalone="true"
      fileselection="true"
      label="ADDE Text Products">
     <property
