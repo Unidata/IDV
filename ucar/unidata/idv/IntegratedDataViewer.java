@@ -1687,6 +1687,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         return makeDataSource(definingObject, dataType, properties, true);
     }
 
+    public void makeDataSource(DataSourceDescriptor descriptor) {
+        makeDataSource("",descriptor.getId(),new Hashtable());
+    }
 
     /**
      *  Create the datasource, identified by the given dataType if non-null,
