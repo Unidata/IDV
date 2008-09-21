@@ -1061,7 +1061,7 @@ public class Repository extends RepositoryBase implements Tables,
     protected void clearCache(Entry entry) {
         //        System.err.println ("Clear cache " + entry.getId());
         synchronized(MUTEX_ENTRY) {
-        entryCache.remove(entry.getId());
+            entryCache.remove(entry.getId());
         if (entry.isGroup()) {
             Group group = (Group) entry;
             groupCache.remove(group.getId());
@@ -3452,7 +3452,6 @@ public class Repository extends RepositoryBase implements Tables,
         try {
             if (action.equals(ACTION_MOVE)) {
                 fromEntry.setParentGroup(toGroup);
-
                 String oldId = fromEntry.getId();
                 String newId = oldId;
                 //TODO: critical section around new group id
@@ -3481,12 +3480,12 @@ public class Repository extends RepositoryBase implements Tables,
                     }
 
                     //TODO: we also cache the group full names
-                    synchronized(MUTEX_ENTRY) {
-                    entryCache.remove(oldId);
-                    entryCache.put(fromEntry.getId(), fromEntry);
-                    groupCache.remove(fromEntry.getId());
-                    groupCache.put(fromEntry.getId(), (Group) fromEntry);
-                    }
+                    /*                    synchronized(MUTEX_ENTRY) {
+                        entryCache.remove(oldId);
+                        entryCache.put(fromEntry.getId(), fromEntry);
+                        groupCache.remove(fromEntry.getId());
+                        groupCache.put(fromEntry.getId(), (Group) fromEntry);
+                        }*/
                 }
 
                 //Change the parent
@@ -3500,6 +3499,7 @@ public class Repository extends RepositoryBase implements Tables,
                 statement.execute(sql);
                 connection.commit();
                 connection.setAutoCommit(true);
+                clearCache();
                 return new Result(request.url(URL_ENTRY_SHOW, ARG_ID,
                         fromEntry.getId()));
             }
@@ -7466,9 +7466,11 @@ public class Repository extends RepositoryBase implements Tables,
         int       deleteCnt = 0;
         int       totalDeleteCnt = 0;
         //Go backwards so we go up the tree and hit the children first
+        List allIds = new ArrayList();
         for (int i = found.size() - 1; i >= 0; i--) {
             String[] tuple = found.get(i);
             String   id    = tuple[0];
+            allIds.add(id);
             //            System.err.println ("id:" + id + " type:" + tuple[1] +" resource:" +tuple[2]);
             deleteCnt++;
             totalDeleteCnt++;
@@ -7529,6 +7531,10 @@ public class Repository extends RepositoryBase implements Tables,
 
         connection.commit();
         connection.setAutoCommit(true);
+
+        for(int i=0;i<allIds.size();i++) {
+            getStorageManager().deleteEntryDir((String) allIds.get(i));
+        }
 
         permissionsStmt.close();
         metadataStmt.close();

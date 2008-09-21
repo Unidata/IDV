@@ -80,7 +80,7 @@ public class MetadataHandler extends RepositoryManager {
 
 
     /** _more_ */
-    private Hashtable typeMap = new Hashtable();
+    protected Hashtable typeMap = new Hashtable();
 
     /** _more_ */
     private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
@@ -96,6 +96,39 @@ public class MetadataHandler extends RepositoryManager {
             throws Exception {
         super(repository);
     }
+
+    public Result processView(Request request, Entry entry, Metadata metadata) throws Exception {
+        return new Result("","Cannot process view");
+    }
+
+    protected String formEntry(String[] cols) {
+        if (cols.length == 2) {
+            //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])+"<td colspan=2>" + cols[1] +"</td>");
+            //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])
+            //                                   + "<td xxcolspan=2>" + cols[1] + "</td>");
+        }
+        StringBuffer sb = new StringBuffer();
+
+        sb.append(HtmlUtil.rowTop("<td colspan=2>" + cols[0] + "</td>"));
+        for (int i = 1; i < cols.length; i += 2) {
+            if (false && (i == 1)) {
+                sb.append(
+                    HtmlUtil.rowTop(
+                        HtmlUtil.cols(cols[0])
+                        + "<td class=\"formlabel\" align=right>" + cols[i]
+                        + "</td>" + "<td>" + cols[i + 1]));
+            } else {
+                //                sb.append(HtmlUtil.rowTop("<td></td><td class=\"formlabel\" align=right>" + cols[i] +"</td>" +
+                //                                          "<td>" + cols[i+1]));
+                sb.append(
+                    HtmlUtil.rowTop(
+                        "<td class=\"formlabel\" align=right>" + cols[i]
+                        + "</td>" + "<td>" + cols[i + 1]));
+            }
+        }
+        return sb.toString();
+    }
+
 
     /**
      * _more_
@@ -490,7 +523,7 @@ public class MetadataHandler extends RepositoryManager {
         if (html == null) {
             return;
         }
-        sb.append(request.form(getMetadataManager().URL_METADATA_ADD));
+        sb.append(request.uploadForm(getMetadataManager().URL_METADATA_ADD,""));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(html[1]);
         sb.append(HtmlUtil.formClose());
@@ -534,34 +567,9 @@ public class MetadataHandler extends RepositoryManager {
      * @param metadataList _more_
      */
     public void handleAddSubmit(Request request, Entry entry,
-                                List<Metadata> metadataList) {
-        String type = request.getString(ARG_TYPE, "");
-        if ( !canHandle(type)) {
-            return;
-        }
-        String attr1 = request.getString(ARG_ATTR1, "");
-        if (request.defined(ARG_ATTR1 + ".select")) {
-            attr1 = request.getString(ARG_ATTR1 + ".select", "");
-        }
-        String attr2 = request.getString(ARG_ATTR2, "");
-        if (request.defined(ARG_ATTR2 + ".select")) {
-            attr1 = request.getString(ARG_ATTR2 + ".select", "");
-        }
-        String attr3 = request.getString(ARG_ATTR3, "");
-        if (request.defined(ARG_ATTR3 + ".select")) {
-            attr1 = request.getString(ARG_ATTR3 + ".select", "");
-        }
-        String attr4 = request.getString(ARG_ATTR4, "");
-        if (request.defined(ARG_ATTR4 + ".select")) {
-            attr1 = request.getString(ARG_ATTR4 + ".select", "");
-        }
-        if ((attr1.length() == 0) && (attr2.length() == 0)
-                && (attr3.length() == 0) && (attr4.length() == 0)) {
-            return;
-        }
-        metadataList.add(new Metadata(getRepository().getGUID(),
-                                      entry.getId(), type, DFLT_INHERITED,
-                                      attr1, attr2, attr3, attr4));
+                                List<Metadata> metadataList) throws Exception  {
+        String id = getRepository().getGUID();
+        handleForm(request, entry, id, "", metadataList, true);
     }
 
 
@@ -573,7 +581,7 @@ public class MetadataHandler extends RepositoryManager {
      * @param metadataList _more_
      */
     public void handleFormSubmit(Request request, Entry entry,
-                                 List<Metadata> metadataList) {
+                                 List<Metadata> metadataList) throws Exception  {
         Hashtable args = request.getArgs();
         for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
             String arg = (String) keys.nextElement();
@@ -581,11 +589,25 @@ public class MetadataHandler extends RepositoryManager {
                 continue;
             }
             String id   = request.getString(arg, "");
-            String type = request.getString(ARG_TYPE + "." + id, "");
-            if ( !canHandle(type)) {
-                continue;
-            }
             String suffix = "." + id;
+            handleForm(request, entry, id, suffix, metadataList,false);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadataList _more_
+     */
+    public void handleForm(Request request, Entry entry, String id, String suffix,
+                                 List<Metadata> metadataList, boolean newMetadata) throws Exception  {
+            String type = request.getString(ARG_TYPE + suffix, "");
+            if ( !canHandle(type)) {
+                return;
+            }
             String attr1  = request.getString(ARG_ATTR1 + suffix, "");
             if (request.defined(ARG_ATTR1 + suffix + ".select")) {
                 attr1 = request.getString(ARG_ATTR1 + suffix + ".select", "");
@@ -593,24 +615,35 @@ public class MetadataHandler extends RepositoryManager {
 
             String attr2 = request.getString(ARG_ATTR2 + suffix, "");
             if (request.defined(ARG_ATTR2 + suffix + ".select")) {
-                attr1 = request.getString(ARG_ATTR2 + suffix + ".select", "");
+                attr2 = request.getString(ARG_ATTR2 + suffix + ".select", "");
             }
 
             String attr3 = request.getString(ARG_ATTR3 + suffix, "");
             if (request.defined(ARG_ATTR3 + suffix + ".select")) {
-                attr1 = request.getString(ARG_ATTR3 + suffix + ".select", "");
+                attr3 = request.getString(ARG_ATTR3 + suffix + ".select", "");
             }
 
             String attr4 = request.getString(ARG_ATTR4 + suffix, "");
             if (request.defined(ARG_ATTR4 + suffix + ".select")) {
-                attr1 = request.getString(ARG_ATTR4 + suffix + ".select", "");
+                attr4 = request.getString(ARG_ATTR4 + suffix + ".select", "");
             }
-
-            metadataList.add(new Metadata(id, entry.getId(), type,
+            Metadata metadata  = makeMetadata(request, id, entry, type,
                                           DFLT_INHERITED, attr1, attr2,
-                                          attr3, attr4));
-        }
+                                          attr3, attr4,newMetadata);
+            if(metadata!=null) {
+                metadataList.add( metadata);
+            }
     }
+
+
+    protected Metadata makeMetadata(Request request, String id, Entry entry,  String type,
+                                    boolean inherited, String attr1,String attr2,String attr3,String attr4, boolean newMetadata) {
+        return new Metadata(id, entry.getId(), type,
+                            inherited, attr1, attr2,
+                            attr3, attr4);
+    }
+
+
 
     /**
      * _more_

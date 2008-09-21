@@ -193,41 +193,6 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param cols _more_
-     *
-     * @return _more_
-     */
-    private String formEntry(String[] cols) {
-        if (cols.length == 2) {
-            //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])+"<td colspan=2>" + cols[1] +"</td>");
-            //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])
-            //                                   + "<td xxcolspan=2>" + cols[1] + "</td>");
-        }
-        StringBuffer sb = new StringBuffer();
-
-        sb.append(HtmlUtil.rowTop("<td colspan=2>" + cols[0] + "</td>"));
-        for (int i = 1; i < cols.length; i += 2) {
-            if (false && (i == 1)) {
-                sb.append(
-                    HtmlUtil.rowTop(
-                        HtmlUtil.cols(cols[0])
-                        + "<td class=\"formlabel\" align=right>" + cols[i]
-                        + "</td>" + "<td>" + cols[i + 1]));
-            } else {
-                //                sb.append(HtmlUtil.rowTop("<td></td><td class=\"formlabel\" align=right>" + cols[i] +"</td>" +
-                //                                          "<td>" + cols[i+1]));
-                sb.append(
-                    HtmlUtil.rowTop(
-                        "<td class=\"formlabel\" align=right>" + cols[i]
-                        + "</td>" + "<td>" + cols[i + 1]));
-            }
-        }
-        return sb.toString();
-    }
-
 
     /**
      * _more_

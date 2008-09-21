@@ -43,6 +43,7 @@
 
   <group handler="metadatamanager">
       <api request="/metadata/list"       method="processMetadataList"/>
+      <api request="/metadata/view"       method="processMetadataView"/>
       <api request="/metadata/form"       method="processMetadataForm"       actions="edit"/>
       <api request="/metadata/addform"    method="processMetadataAddForm"    actions="edit"/>
       <api request="/metadata/add"        method="processMetadataAdd"        actions="edit"/>

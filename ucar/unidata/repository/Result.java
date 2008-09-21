@@ -124,7 +124,7 @@ public class Result {
      * @param title _more_
      * @param content _more_
      */
-    public Result(String title, byte[] content) {
+    public Result(String title, byte[] content,boolean foo) {
         this(title, content, TYPE_HTML);
     }
 

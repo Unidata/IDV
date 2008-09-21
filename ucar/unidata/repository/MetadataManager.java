@@ -118,6 +118,11 @@ public class MetadataManager extends RepositoryManager {
                                               "Metadata Listing");
 
     /** _more_ */
+    public RequestUrl URL_METADATA_VIEW = new RequestUrl(getRepository(),
+                                              "/metadata/view",
+                                              "Metadata View");
+
+    /** _more_ */
     public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(getRepository(),
                                                  "/metadata/addform",
                                                  "Add Metadata");
@@ -183,6 +188,20 @@ public class MetadataManager extends RepositoryManager {
         }
         if (checkInherited) {
             return findMetadata(entry.getParentGroup(), type, checkInherited);
+        }
+        return null;
+    }
+
+
+    public Metadata findMetadata(Entry entry, String id) 
+            throws Exception {
+        if (entry == null) {
+            return null;
+        }
+        for (Metadata metadata : getMetadata(entry)) {
+            if (metadata.getId().equals(id)) {
+                return metadata;
+            }
         }
         return null;
     }
@@ -567,6 +586,19 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    public Result processMetadataView(Request request) throws Exception {
+        Entry        entry = getRepository().getEntry(request);
+        List<Metadata> metadataList = getMetadata(entry);
+        Metadata metadata = findMetadata(entry, request.getString(ARG_METADATA_ID,""));
+        if(metadata==null) {
+            return new Result("","Could not find metadata");
+        }
+        MetadataHandler handler = findMetadataHandler(metadata.getType());
+        return handler.processView(request,entry,metadata);
+    }
+
+
+
     /**
      * _more_
      *
@@ -588,7 +620,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(
                 getRepository().note(msg("No metadata defined for entry")));
         } else {
-            sb.append(HtmlUtil.formPost(request.url(URL_METADATA_CHANGE)));
+            sb.append(HtmlUtil.uploadForm(request.url(URL_METADATA_CHANGE),""));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
@@ -655,7 +687,7 @@ public class MetadataManager extends RepositoryManager {
                             groups.add(name);
                         }
                     }
-                    groupSB.append(request.form(URL_METADATA_ADDFORM));
+                    groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
                     groupSB.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
                     groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
                     groupSB.append(HtmlUtil.submit(msg("Add")));

@@ -26,7 +26,6 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
-
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
@@ -120,6 +119,8 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String uploadDir;
 
+    private String entriesDir;
+
     /** _more_ */
     private String storageDir;
 
@@ -193,6 +194,9 @@ public class StorageManager extends RepositoryManager {
     public String getSystemResourcePath() {
         return "/ucar/unidata/repository/resources";
     }
+
+
+
 
     /**
      * _more_
@@ -285,6 +289,50 @@ public class StorageManager extends RepositoryManager {
     public File moveToStorage(Request request, File original)
             throws Exception {
         return moveToStorage(request, original, "");
+    }
+
+
+
+    private String cleanEntryId(String id) {
+        return IOUtil.cleanFileName(id);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public File getEntryDir(String id, boolean createIfNeeded) {
+        id = cleanEntryId(id);
+        if (entriesDir == null) {
+            entriesDir = IOUtil.joinDir(getRepositoryDir(), "entries");
+            IOUtil.makeDirRecursive(new File(entriesDir));
+        }
+        File  entryDir =  new File(IOUtil.joinDir(entriesDir,id));
+        if(createIfNeeded) {
+            IOUtil.makeDirRecursive(entryDir);
+        }
+        return entryDir;
+    }
+
+
+
+    public void deleteEntryDir(final String id) {
+        Misc.run(new Runnable() {
+                public void run() {
+                    File dir = getEntryDir(id,false);
+                    if(dir.exists()) {
+                        IOUtil.deleteDirectory(dir);
+                    }}});
+    }
+
+
+    public File moveToEntryDir(Entry entry, File original)
+            throws Exception {
+        File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),true),
+                                               original.getName()));
+        IOUtil.moveFile(original, newFile);
+        return newFile;
     }
 
     /**

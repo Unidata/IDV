@@ -1638,9 +1638,6 @@ public class TypeHandler extends RepositoryManager {
                 groupId = groupId.substring(1);
             }
             if (groupId.endsWith("%")) {
-                System.err.println("G:"
-                                   + groupId.substring(0,
-                                       groupId.length() - 1));
                 Group group = getRepository().findGroup(request,
                                   groupId.substring(0, groupId.length() - 1));
                 if (group != null) {
