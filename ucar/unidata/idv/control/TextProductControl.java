@@ -123,9 +123,10 @@ import javax.swing.border.*;
 
 public class TextProductControl extends StationLocationControl implements HyperlinkListener {
 
-    private static List<String> glossaryWords;
-    private static List<String> glossaryReplace;
-    private static List<Pattern> glossaryPatterns;
+
+    private JCheckBox showGlossaryCbx;
+
+    private String currentText = "";
 
     /** _more_          */
     private TextProductDataSource dataSource;
@@ -190,7 +191,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 pane.setText(content);
                 pane.setPreferredSize(new Dimension(250,150));
                 JLabel lbl = new JLabel(content);
-                GuiUtils.showOkCancelDialog(null,"Definition:" + url, pane,null);
+                GuiUtils.showOkDialog(null,"Definition:" + url, pane,null);
 
             } catch(Exception exc) {
                 logException ("Could not fetch definition", exc);
@@ -214,6 +215,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
+        if(productGroups==null) {
+            return new JLabel("Could not load product data");
+        }
         JTabbedPane tabs = doMakeTabs(false, false);
 
         setCenterOnClick(false);
@@ -271,7 +275,13 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         JComponent textHolder = GuiUtils.centerBottom(textScroller,textSearcher);
         JTabbedPane textTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
         textTabbedPane.addTab("Text", textHolder);
-        textTabbedPane.addTab("Html", htmlScroller);
+        showGlossaryCbx=new JCheckBox("Show Glossary", false);
+        showGlossaryCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    setText(currentText);
+                }
+                });
+        textTabbedPane.addTab("Html", GuiUtils.centerBottom(htmlScroller, GuiUtils.right(showGlossaryCbx)));
         GuiUtils.tmpInsets = GuiUtils.INSETS_2;
         JComponent contents = GuiUtils.doLayout(new Component[]{
                 GuiUtils.bottom(new JLabel("Products")),
@@ -454,25 +464,25 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
 
 
+    private Pattern allPattern = null;
     private String convertToHtml(String text) {
-        if(glossaryWords==null) {
+        if(allPattern == null) {
             try {
             List<String> tmp = (List<String>)StringUtil.split(IOUtil.readContents("/ucar/unidata/idv/control/nwsglossary.txt",getClass()),"\n",true,true);
-            glossaryWords = new ArrayList<String>();
-            glossaryReplace = new ArrayList<String>();
-            glossaryPatterns = new ArrayList<Pattern>();
+            StringBuffer pattern = new StringBuffer("([ ]+)(");
             for(String word: tmp) {
                 if(word.length()<=3) continue;
                 word = word.toUpperCase();
-                glossaryWords.add(word);
                 word = word.replace("(","\\(");
                 word = word.replace(")","\\)");
                 word = word.replace("+","\\+");
                 word = word.replace(".","\\.");
                 word = word.replace("*","\\*");
-                glossaryPatterns.add( Pattern.compile("([ ]+)" +word+"([\\. ]+)"));
-                glossaryReplace.add("$1<a href=\"" +word+"\">" + word +"</a>$2");
+                pattern.append(word);
+                pattern.append("|");
             }
+            pattern.append(")([\\. ]+)");
+            allPattern = Pattern.compile(pattern.toString());
             } catch(Exception exc) {
                 logException("Reading glossary", exc);
             }
@@ -494,7 +504,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                     String header = line.substring(1,idx);
                     line = "<p><b>" + header +"</b><br>" +line.substring(idx+3);
                 } else if(line.equals(".")) {
-                    line = "<p>";
+                    line = "\n";
                 }
             } else if(line.equals("=")) {
                 line = "<hr>";
@@ -503,11 +513,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             } else {
                 line = line.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$","<i>$1</i>"); 
             }
-            if(lineCnt<5) line = line+"<br>";
+            //            if(lineCnt<5) line = line+"<br>";
             sb.append(line);
             sb.append("\n");
         }
         text = sb.toString();        
+        /*
         String[]icons = {"partlycloudy.png", "cloudy.png","partlysunny.png","sunny.png","rainy.png"};
         String[]patterns = {"PARTLY CLOUDY", "MOSTLY CLOUDY","PARTLY SUNNY","SUNNY","RAIN SHOWERS"};
         for(int i=0;i<icons.length;i++) {
@@ -516,30 +527,35 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         for(int i=0;i<icons.length;i++) {
             text = text.replace("PATTERN" + i,patterns[i]);
         }
+        */
 
-
-        for(int i=0;i<glossaryWords.size();i++) {
-            String word = glossaryWords.get(i);
-            text= glossaryPatterns.get(i).matcher(text).replaceAll(glossaryReplace.get(i) );
+        if(showGlossaryCbx.isSelected()) {
+            text= allPattern.matcher(text).replaceAll("$1<a href=\"$2\">$2</a>$3");
         }
         text = text.replace("\n\n","<p>");
         text = text.replace("\n","<br>");
         return "<html>" + text +"</html>";
     }
 
-    protected void setText(final String text) {
+    protected void setText(final String theText) {
+        currentText = theText;
         //        SwingUtilities.invokeLater(new Runnable() {
         //                public void run() {
+        String html = "";
+        String text = "";
                     if(productType==null) {
-                        textComp.setText("Please select a product");
-                        htmlComp.setText("Please select a product");
+                        html = text = "Please select a product";
                     } else if(selectedStation==null){
-                        textComp.setText("Please select a station");
-                        htmlComp.setText("Please select a station");
+                        html = text = "Please select a station";
                     } else {
-                        textComp.setText(text);
-                        htmlComp.setText(convertToHtml(text));
+                        text = theText;
+                        long t1 = System.currentTimeMillis();
+                        html = convertToHtml(theText);
+                        long t2 = System.currentTimeMillis();
+                        System.err.println ("Time:" + (t2-t1));
                     }
+                    textComp.setText(text);
+                    htmlComp.setText(html);
                     textComp.setCaretPosition(0);
                     textComp.scrollRectToVisible(new Rectangle(0,0,1,1));
                     htmlComp.setCaretPosition(0);
