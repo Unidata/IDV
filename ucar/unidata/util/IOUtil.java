@@ -759,9 +759,11 @@ public class IOUtil {
         if (to.isDirectory()) {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
-
-        String contents = readContents(from.toString(), IOUtil.class);
-        writeFile(to, contents);
+        FileInputStream fis = new FileInputStream(from);
+        FileOutputStream fos = new FileOutputStream(to);
+        writeTo(fis,fos);
+        fis.close();
+        fos.close();
     }
 
 
