@@ -846,7 +846,7 @@ public class STIStormDataSource extends StormDataSource {
             attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
             attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
             attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
-            attrs.add(PARAM_DISTANCE_ERROR.getReal(radiuses[10]));
+            attrs.add(PARAM_DISTANCE_ERROR.getReal(getLatLonValue(radiuses[10])));
         } else {
             attrs.add(PARAM_PROBABILITY10RADIUS.getReal(Float.NaN));
             attrs.add(PARAM_PROBABILITY20RADIUS.getReal(Float.NaN));
