@@ -4365,22 +4365,27 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param window The control's window
      */
-    public void initWindow(IdvWindow window) {
-        window.setTitle(getTitle());
-        window.setContents(outerContents);
-        if (windowSize != null) {
-            window.setWindowBounds(new Rectangle(windowX, windowY,
-                    windowSize.width, windowSize.height));
-        } else {
-            window.setLocation(windowX, windowY);
-        }
+    public void initWindow(final IdvWindow window) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {        
+                    window.setTitle(getTitle());
+                    window.setContents(outerContents);
+                    if (windowSize != null) {
+                        window.setWindowBounds(new Rectangle(windowX, windowY,
+                                                             windowSize.width, windowSize.height));
+                    } else {
+                        window.setLocation(windowX, windowY);
+                    }
 
-        if (myWindowVisible) {
-            show();
-        } else {
-            hide();
-        }
+                    if (myWindowVisible) {
+                        show();
+                    } else {
+                        hide();
+                    }
+                }
+            });
     }
+
 
     /**
      * Is the window currently visible
