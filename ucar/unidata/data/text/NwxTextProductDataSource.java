@@ -34,6 +34,9 @@ import ucar.unidata.data.FilesDataSource;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.DatedObject;
+import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -179,7 +182,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @throws Exception problem reading the stations
      */
-    public NamedStationTable getStations(ProductType productType)
+    public NamedStationTable getStations(ProductType productType,DateSelection dateSelection)
             throws Exception {
         TableInfo tableInfo = getTableInfo(productType);
         if (tableInfo != null) {
@@ -197,10 +200,10 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the list of products
      */
     public List<Product> readProducts(ProductType productType,
-                                      NamedStationImpl station) {
+                                      NamedStationImpl station,DateSelection dateSelection) {
         TableInfo tableInfo = getTableInfo(productType);
         if ((tableInfo != null) && canHandleType(tableInfo)) {
-            return readProducts(tableInfo, station);
+            return readProducts(tableInfo, station, dateSelection);
         }
         return new ArrayList<Product>();
     }
@@ -409,7 +412,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the products
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                         NamedStationImpl station) {
+                                         NamedStationImpl station,DateSelection dateSelection) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
@@ -421,18 +424,71 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         if ((files == null) || (files.length == 0)) {
             return products;
         }
-        files = IOUtil.sortFilesOnAge(files, true);
+        Date[] dateRange = (dateSelection==null?null:dateSelection.getRange());
+        int maxCount = (dateSelection==null?Integer.MAX_VALUE: dateSelection.getCount());
+
+        List<DatedObject> datedObjects = new ArrayList();
         for (int i = 0; i < files.length; i++) {
+            File f= files[i];
+            Date  fileDate = getDateFromFileName(f.toString());
+            if(fileDate==null) {
+                fileDate = new Date(f.lastModified());
+            }
+            datedObjects.add(new DatedObject(fileDate,f));
+        }
+        datedObjects = (List<DatedObject>)DatedObject.sort(datedObjects, false);
+                
+
+        files = IOUtil.sortFilesOnAge(files, true);
+        int count = 0;
+        boolean ok = true;
+        for (DatedObject datedObject: datedObjects) {
+            if(!ok) break;
             try {
-                products.addAll(parseProduct(files[i].toString(), true,
-                                             station));
+                Date fileDate = datedObject.getDate();
+                File f= (File)datedObject.getObject();
+                if(dateRange!=null) {
+                    if(!(dateRange[0].getTime()<=fileDate.getTime() && fileDate.getTime()<=dateRange[1].getTime())) {
+                        //                        System.err.println ("\tskipping file:" + f + " " + fileDate + " " + dateRange[0] +" " + dateRange[1]);
+                        continue;
+                    }
+                }
+                List<Product> productsInFile = parseProduct(f.toString(), true,
+                                                   station);
+                for(Product product: productsInFile) {
+                    products.add(product);
+                    count++;
+                    if(count>=maxCount) {
+                        ok = false;
+                        break;
+                    }
+                }
             } catch (Exception exc) {
                 //                return "Error reading text product file:" + exc;
             }
+
         }
         return products;
     }
 
+
+    private static SimpleDateFormat sdf;
+
+    private static Date getDateFromFileName(String path)  {
+        if(sdf==null) {
+            sdf      = new SimpleDateFormat("yyyyMMddkk");
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        }
+        String tmp = IOUtil.getFileTail(IOUtil.stripExtension(path));
+        try {
+            synchronized(sdf) {
+                return  sdf.parse(tmp);
+            }
+        } catch (Exception exc) {
+            System.err.println("no file date:" + tmp + ": " + exc);
+        }
+        return null;
+    }
 
     /**
      * Parse the product from the files
@@ -459,19 +515,10 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                                      ? ""
                                      : "");
         int              idx      = 0;
-        Date             fileDate = null;
         String           id       = ((station != null)
                                      ? station.getID()
                                      : null);
-        SimpleDateFormat sdf      = new SimpleDateFormat("yyyymmddh");
-        try {
-            String tmp = IOUtil.getFileTail(IOUtil.stripExtension(path));
-            fileDate = sdf.parse(tmp);
-
-        } catch (Exception exc) {
-            System.err.println("no file date:" + path);
-        }
-
+        Date             fileDate = getDateFromFileName(path);
         //        System.err.println ("contents:" + contents);
         while (true) {
             int idx1 = contents.indexOf(prefix, idx);

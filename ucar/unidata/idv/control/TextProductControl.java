@@ -51,6 +51,8 @@ import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.symbol.*;
 import ucar.unidata.ui.TextSearcher;
 
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.FileManager;
 
 import ucar.unidata.util.GuiUtils;
@@ -95,9 +97,11 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
+
 import java.util.regex.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -124,7 +128,14 @@ import javax.swing.border.*;
 public class TextProductControl extends StationLocationControl implements HyperlinkListener {
 
 
+    private int hours = -1;
+
+    private JComboBox dateSelectionCbx;
+
+
     private JCheckBox showGlossaryCbx;
+
+    private boolean showGlossary  = false;
 
     private String currentText = "";
 
@@ -263,8 +274,31 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             productTree.expandPath(new TreePath(path));
         }
 
+
+        Object[]dateSelectionItems = new Object[]{
+            new TwoFacedObject("Latest Product", -1),
+            new TwoFacedObject("Last 3 Hours", 3),
+            new TwoFacedObject("Last 6 Hours", 6),
+            new TwoFacedObject("Last 12 Hours", 12),
+            new TwoFacedObject("Last 24 Hours", 24),
+            new TwoFacedObject("Last 36 Hours", 36),
+            new TwoFacedObject("Last 48 Hours", 48),
+            new TwoFacedObject("All", 0)
+
+        };
+        TwoFacedObject selectedTfo  = TwoFacedObject.findId(new Integer(hours), Misc.toList(dateSelectionItems));
+         dateSelectionCbx= new JComboBox(dateSelectionItems);
+        if(selectedTfo!=null) {
+            dateSelectionCbx.setSelectedItem(selectedTfo);
+        }
+        dateSelectionCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    updateText();
+                }
+            });
+
         JScrollPane treeScroller =  GuiUtils.makeScrollPane(productTree, 200,100);
-        JComponent treeComp = GuiUtils.topCenter(new JLabel("Products:"), treeScroller);
+        JComponent treeComp = GuiUtils.centerBottom(treeScroller, GuiUtils.inset(GuiUtils.vbox(new JLabel("Date Range:"),dateSelectionCbx),5));
 
         stationLabel = new JLabel(" ");
         JComponent topComp = GuiUtils.leftRight(GuiUtils.bottom(stationLabel), getAnimationWidget().getContents());
@@ -274,19 +308,20 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         htmlScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         JComponent textHolder = GuiUtils.centerBottom(textScroller,textSearcher);
         JTabbedPane textTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
-        textTabbedPane.addTab("Text", textHolder);
-        showGlossaryCbx=new JCheckBox("Show Glossary", false);
+
+        showGlossaryCbx=new JCheckBox("Show Glossary", showGlossary);
         showGlossaryCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     setText(currentText);
                 }
                 });
-        textTabbedPane.addTab("Html", GuiUtils.centerBottom(htmlScroller, GuiUtils.right(showGlossaryCbx)));
+        textTabbedPane.addTab("HTML", GuiUtils.centerBottom(htmlScroller, GuiUtils.right(showGlossaryCbx)));
+        textTabbedPane.addTab("Text", textHolder);
         GuiUtils.tmpInsets = GuiUtils.INSETS_2;
         JComponent contents = GuiUtils.doLayout(new Component[]{
                 GuiUtils.bottom(new JLabel("Products")),
                 topComp,
-                treeScroller,
+                treeComp,
                 textTabbedPane
                 },
             2,
@@ -365,11 +400,14 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     }
 
     private  void updateStationLabel() {
-        if (selectedStation != null) {
-            String state= (String)selectedStation.getProperty("ST","");
-            stationLabel.setText(selectedStation.getName()+" " + state);
-        } else {
-            stationLabel.setText(" ");
+        if(stationLabel!=null) {
+            NamedStationImpl station = selectedStation;
+            if (station != null) {
+                String state= (String)station.getProperty("ST","");
+                stationLabel.setText(station.getName()+" " + state);
+            } else {
+                stationLabel.setText(" ");
+            }
         }
         
     }
@@ -399,7 +437,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
     private void updateTextInner() {
         try {
-            NamedStationTable newTable = dataSource.getStations(productType);
+            NamedStationTable newTable = dataSource.getStations(productType,getDateSelection());
             if (newTable != currentTable) {
                 if (newTable != null) {
                     stationList = new ArrayList(newTable.values());
@@ -429,7 +467,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
 
             if (productType != null && selectedStation!=null) {
-                products =  dataSource.readProducts(productType,selectedStation);
+                products =  dataSource.readProducts(productType,selectedStation, getDateSelection());
             } else {
                 products =  new ArrayList<Product>();
             }
@@ -463,6 +501,22 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     }
 
 
+    private DateSelection getDateSelection() {
+        long hours = (long)getHours();
+        if(hours == 0) return null;
+        int count = Integer.MAX_VALUE;
+        if(hours ==-1)  {
+            count = 1;
+            hours = 24*365*20;
+        }
+
+
+        Date now = DateUtil.roundByDay(new Date(System.currentTimeMillis()), 1);
+        Date then = new Date(System.currentTimeMillis()-DateUtil.hoursToMillis(hours));
+        DateSelection dateSelection  = new DateSelection(then, now);
+        dateSelection.setCount(count);
+        return dateSelection;
+    }
 
     private Pattern allPattern = null;
     private String convertToHtml(String text) {
@@ -492,6 +546,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                                 selectedStation.getID() +"</b> ");
         }
 
+        text = text.replaceAll("\\.\\.\\.\n++","...\n");
+        text = text.trim();
         StringBuffer sb = new StringBuffer();
         List<String> lines = (List<String>)StringUtil.split(text,"\n",false,false);
         int lineCnt=0;
@@ -502,7 +558,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 int idx = line.indexOf("...");
                 if(idx>1) {
                     String header = line.substring(1,idx);
-                    line = "<p><b>" + header +"</b><br>" +line.substring(idx+3);
+                    line = "<div style=\"background-color:#c3d9ff; font-weight: bold; padding-left:2px; padding-top:2px;margin-top:7px;\">" + header +"</div>" +line.substring(idx+3);
                 } else if(line.equals(".")) {
                     line = "\n";
                 }
@@ -518,7 +574,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             sb.append("\n");
         }
         text = sb.toString();        
-        /*
         String[]icons = {"partlycloudy.png", "cloudy.png","partlysunny.png","sunny.png","rainy.png"};
         String[]patterns = {"PARTLY CLOUDY", "MOSTLY CLOUDY","PARTLY SUNNY","SUNNY","RAIN SHOWERS"};
         for(int i=0;i<icons.length;i++) {
@@ -527,7 +582,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         for(int i=0;i<icons.length;i++) {
             text = text.replace("PATTERN" + i,patterns[i]);
         }
-        */
+
 
         if(showGlossaryCbx.isSelected()) {
             text= allPattern.matcher(text).replaceAll("$1<a href=\"$2\">$2</a>$3");
@@ -539,10 +594,10 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
     protected void setText(final String theText) {
         currentText = theText;
-        //        SwingUtilities.invokeLater(new Runnable() {
-        //                public void run() {
-        String html = "";
-        String text = "";
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    String html = "";
+                    String text = "";
                     if(productType==null) {
                         html = text = "Please select a product";
                     } else if(selectedStation==null){
@@ -552,7 +607,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                         long t1 = System.currentTimeMillis();
                         html = convertToHtml(theText);
                         long t2 = System.currentTimeMillis();
-                        System.err.println ("Time:" + (t2-t1));
+                        //                        System.err.println ("Time:" + (t2-t1));
+
                     }
                     textComp.setText(text);
                     htmlComp.setText(html);
@@ -560,8 +616,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                     textComp.scrollRectToVisible(new Rectangle(0,0,1,1));
                     htmlComp.setCaretPosition(0);
                     htmlComp.scrollRectToVisible(new Rectangle(0,0,1,1));
-                    //                }
-    //            });
+                }
+            });
 
     }
 
@@ -676,6 +732,51 @@ public String getSelectedStationId () {
     return null;
 }
 
+
+/**
+Set the Hours property.
+
+@param value The new value for Hours
+**/
+public void setHours (int value) {
+	hours = value;
+}
+
+/**
+Get the Hours property.
+
+@return The Hours
+**/
+public int getHours () {
+    if(dateSelectionCbx!=null) {
+        TwoFacedObject tfo = (TwoFacedObject)dateSelectionCbx.getSelectedItem();
+        if(tfo!=null) {
+            hours = new Integer(tfo.getId().toString()).intValue();
+        }
+    }
+    return hours;
+}
+
+
+/**
+Set the ShowGlossary property.
+
+@param value The new value for ShowGlossary
+**/
+public void setShowGlossary (boolean value) {
+	showGlossary = value;
+}
+
+/**
+Get the ShowGlossary property.
+
+@return The ShowGlossary
+**/
+public boolean getShowGlossary () {
+    if(showGlossaryCbx!=null)
+        showGlossary = showGlossaryCbx.isSelected();
+	return showGlossary;
+}
 
 
 }

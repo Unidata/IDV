@@ -34,6 +34,7 @@ import ucar.unidata.data.FilesDataSource;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 
+import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 
@@ -137,7 +138,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
      * @return the list of products
      */
     public abstract List<Product> readProducts(ProductType productType,
-            NamedStationImpl station);
+                                               NamedStationImpl station,DateSelection dateSelection);
 
     /**
      * Get the stations for a productType
@@ -148,7 +149,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
      *
      * @throws Exception problem getting the stations
      */
-    public abstract NamedStationTable getStations(ProductType productType)
+    public abstract NamedStationTable getStations(ProductType productType,DateSelection dateSelection)
      throws Exception;
 
 

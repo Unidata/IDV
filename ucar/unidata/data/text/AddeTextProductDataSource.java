@@ -32,6 +32,7 @@ import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 
+import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
@@ -93,7 +94,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      * @return  the list of products 
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                         NamedStationImpl station) {
+                                         NamedStationImpl station,DateSelection dateSelection) {
         List<Product> products = new ArrayList<Product>();
         if ( !canHandleType(tableInfo)) {
             return products;
@@ -101,6 +102,10 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         if (station == null) {
             return products;
         }
+        Date[] dateRange = (dateSelection==null?null:dateSelection.getRange());
+        int maxCount = (dateSelection==null?Integer.MAX_VALUE: dateSelection.getCount());
+
+
         String url = "adde://adde.ucar.edu/" + getRequest(tableInfo, station);
         //System.out.println("ti = " + tableInfo);
         //System.out.println("url = " + url);
