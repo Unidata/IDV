@@ -133,6 +133,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         String rootDirPath = rootDir.toString();
         File childPath = getFileFromId(synthId,rootDir);
         File[] files = childPath.listFiles();
+        files = IOUtil.sortFilesOnName(files);
         List<String> includes = get(values,COL_INCLUDES);
         List<String> excludes = get(values,COL_EXCLUDES);
         long age = (long)(1000*(((Double)values[COL_AGE]).doubleValue()*60));
@@ -223,10 +224,6 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                         : new Entry(synthId, handler));
 
         Entry templateEntry = getRepository().getTemplateEntry(targetFile);
-        if(templateEntry!=null) {
-            entry.initWith(templateEntry);
-        }
-
         String name = null;
         List<String> names = get(values,COL_NAMES);
         for(String pair: names) {
@@ -269,6 +266,11 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                                                      targetFile.lastModified(),
                                                          targetFile.lastModified(),
                                                              null);
+
+        if(templateEntry!=null) {
+            entry.initWith(templateEntry);
+        }
+
         return entry;
     }
 

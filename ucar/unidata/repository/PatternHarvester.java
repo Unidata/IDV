@@ -503,6 +503,7 @@ public class PatternHarvester extends Harvester {
                 continue;
 
             }
+            files = IOUtil.sortFilesOnName(files);
 
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 File f = files[fileIdx];
@@ -550,18 +551,23 @@ public class PatternHarvester extends Harvester {
     }
 
 
-    private String getDirNames(File parentFile, List<String> dirToks) throws Exception {
-        if(dirToks.size()==0) return parentFile.toString();
+    private String getDirNames(File parentFile, Group parentGroup, List<String> dirToks, boolean makeGroup) throws Exception {
+        //        if(dirToks.size()==0) return parentFile.toString();
         List names = new ArrayList();
         for(int i=0;i<dirToks.size();i++) {
-            String fileName = (String)dirToks.get(i);
-            File file = new File(parentFile+"/"+fileName);
+            String filename = (String)dirToks.get(i);
+            File file = new File(parentFile+"/"+filename);
             Entry template = repository.getTemplateEntry(file);
-            if(template!=null) {
-                names.add(template.getName());
-            } else {
-                names.add(fileName);
-            }
+            String name = (template!=null?template.getName():filename);
+            if(makeGroup && parentGroup!=null) {
+                Group group =    repository.findGroupFromName(parentGroup.getFullName()+Group.PATHDELIMITER+name, getUser(),
+                                                              false);
+                if(group == null) {
+                    group = repository.makeNewGroup(parentGroup, name, getUser(), template);
+                }
+                parentGroup = group;
+            } 
+            names.add(name);
             parentFile  = file;
         }
         return StringUtil.join(Group.PATHDELIMITER, names);
@@ -589,13 +595,23 @@ public class PatternHarvester extends Harvester {
         dirPath = dirPath.substring(rootDir.toString().length());
         dirPath = dirPath.replace("\\","/");
         List   dirToks  = (List<String>)StringUtil.split(dirPath, "/", true, true);
-        String dirGroup = getDirNames(rootDir, dirToks);
-        //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
-        dirGroup = SqlUtil.cleanUp(dirPath);
-        dirGroup = dirGroup.replace("\\", "/");
-        System.err.println("dir group:" + dirGroup);
-        if(true) return null;
+        //        System.err.println ("file:" +fileName + " " + dirPath +" " + dirToks);
 
+        Group baseGroup =null;
+        if ((baseGroupName != null) && (baseGroupName.length() > 0)) {
+            baseGroup =    repository.findGroupFromName(baseGroupName, getUser(),
+                                                        true);
+        } else {
+            //            baseGroup =  repository.findGroupFromName(GROUP_TOP,
+            //                                                      getUser(),
+            //                                                      false);
+        }
+
+        String dirGroup = getDirNames(rootDir, baseGroup, dirToks, groupTemplate.indexOf("${dirgroup}")>=0);
+        //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
+        dirGroup = SqlUtil.cleanUp(dirGroup);
+        dirGroup = dirGroup.replace("\\", "/");
+        //        System.err.println("dir group:" + dirGroup);
         init();
 
         Matcher matcher = filePattern.matcher(fileName);
@@ -682,8 +698,8 @@ public class PatternHarvester extends Harvester {
         desc = desc.replace("${name}", name);
 
 
-        if ((baseGroupName != null) && (baseGroupName.length() > 0)) {
-            groupName = baseGroupName + "/" + groupName;
+        if(baseGroup!=null) {
+            groupName = baseGroup.getFullName()+Group.PATHDELIMITER + groupName;
         }
         Group group = repository.findGroupFromName(groupName, getUser(),
                           true);

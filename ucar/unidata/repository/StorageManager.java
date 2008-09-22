@@ -337,7 +337,6 @@ public class StorageManager extends RepositoryManager {
 
     public File copyToEntryDir(Entry entry, File original)
             throws Exception {
-        System.err.println("dir:" +getEntryDir(entry.getId(),true));
         File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),true),
                                                original.getName()));
         IOUtil.copyFile(original, newFile);
