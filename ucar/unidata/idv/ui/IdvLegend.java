@@ -249,6 +249,16 @@ public abstract class IdvLegend {
      *  It simply is a wrapper around fillLegendSafely, synchronizing on a MUTEX lock.
      */
     public final void fillLegend() {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    fillLegendInner();
+                }
+            });
+
+    }
+
+
+    private final void fillLegendInner() {
         synchronized (MUTEX) {
             fillLegendSafely();
             if (contents != null) {
