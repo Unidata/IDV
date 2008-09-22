@@ -156,9 +156,10 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     private String getWxTextRequest(TableInfo ti, NamedStationImpl station) {
         StringBuilder buf = new StringBuilder("wxtext?");
         buf.append("WMO=");
-        buf.append(station.getProperty("BULLETIN", "NONE"));
+        buf.append(station.getProperty(NamedStationTable.KEY_BULLETIN, "NONE"));
         buf.append("&WSTN=");
         buf.append(station.getID());
+        buf.append("&num=10");
         return buf.toString();
     }
 
