@@ -164,6 +164,14 @@ public class MetadataManager extends RepositoryManager {
     MetadataHandler dfltMetadataHandler;
 
 
+    public void decorateEntry(Request request, Entry entry, StringBuffer sb,boolean forLink) throws Exception {
+        for(Metadata metadata: getMetadata(entry)) {
+            MetadataHandler handler = findMetadataHandler(metadata.getType());
+            handler.decorateEntry(request, entry, sb, metadata,forLink);
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -422,6 +430,21 @@ public class MetadataManager extends RepositoryManager {
             handler.addToBrowseSearchForm(request, sb);
         }
         return sb;
+    }
+
+
+
+    public void processMetadataXml(Entry entry, Element entryChild) throws Exception {
+        String type =  XmlUtil.getAttribute(entryChild, ATTR_TYPE);
+        MetadataHandler handler =   findMetadataHandler(type);
+        handler.processMetadataXml(entry, entryChild);
+    }
+
+    public void newEntry(Entry entry) throws Exception {
+        for(Metadata metadata: getMetadata(entry)) {
+            MetadataHandler handler =   findMetadataHandler(metadata.getType());
+            handler.newEntry(metadata,entry);
+        }
     }
 
 

@@ -137,6 +137,26 @@ public class Entry extends Entity {
     }
 
 
+    public void initWith(Entry template) {
+        setName(template.getName());
+        setDescription(template.getDescription());
+        if(template.getMetadata()!=null) {
+            List<Metadata> thisMetadata = new ArrayList<Metadata>();
+            for(Metadata metadata: template.getMetadata()) {
+                metadata.setEntryId(getId());
+                thisMetadata.add(metadata);
+            }
+            setMetadata(thisMetadata);
+        }
+        setCreateDate(template.getCreateDate());
+        setStartDate(template.getStartDate());
+        setEndDate(template.getEndDate());
+        setNorth(template.getNorth());
+        setSouth(template.getSouth());
+        setEast(template.getEast());
+        setWest(template.getWest());
+    }
+
     /**
      * _more_
      *

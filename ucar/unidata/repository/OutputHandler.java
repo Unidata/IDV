@@ -424,7 +424,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String getAjaxLink(Request request, Entry entry) {
+    protected String getAjaxLink(Request request, Entry entry) throws Exception {
         return getAjaxLink(request, entry, entry.getLabel(), true);
     }
 
@@ -439,7 +439,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     protected String getAjaxLink(Request request, Entry entry,
-                                 String linkText, boolean includeIcon) {
+                                 String linkText, boolean includeIcon) throws Exception {
         StringBuffer sb = new StringBuffer();
         String entryId = entry.getId();
         if (includeIcon) {
@@ -478,6 +478,7 @@ public class OutputHandler extends RepositoryManager {
                 sb.append(img);
             }
             sb.append(HtmlUtil.space(1));
+            getMetadataManager().decorateEntry(request, entry, sb,true);
         }
 
         String elementId = entry.getId();
@@ -490,6 +491,11 @@ public class OutputHandler extends RepositoryManager {
                                        "tooltip.show(event," + HtmlUtil.squote(elementId)
                                        + ");") + HtmlUtil.onMouseOut(
                                                                      "tooltip.hide(event," + HtmlUtil.squote(elementId)+ ");")));
+
+        if (includeIcon) {
+            //            getMetadataManager().decorateEntry(request, entry, sb,true);
+        }
+
 
         return HtmlUtil.span(sb.toString(),
                              " id="
@@ -660,7 +666,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String getEntryLink(Request request, Entry entry) {
+    protected String getEntryLink(Request request, Entry entry) throws Exception {
         return getAjaxLink(request, entry, entry.getLabel(), false);
     }
 

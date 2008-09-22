@@ -320,6 +320,15 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
+    public void closeConnection(Connection connection) {
+        try {
+            connection.close();
+        } catch(Exception  exc) {
+            //NOOP
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -383,19 +392,6 @@ public class DatabaseManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("JDBC URL:", dbUrl));
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public DatabaseMetaData getMetadata() throws Exception {
-        Connection       connection = getNewConnection();
-        DatabaseMetaData dbmd       = connection.getMetaData();
-        connection.close();
-        return dbmd;
-    }
 
 
     /**
@@ -408,10 +404,9 @@ public class DatabaseManager extends RepositoryManager {
      */
     public void makeDatabaseCopy(OutputStream os, boolean all)
             throws Exception {
-
-
-
-        DatabaseMetaData dbmd     = getMetadata();
+        Connection       connection = getNewConnection();
+        try {
+        DatabaseMetaData dbmd       = connection.getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
@@ -531,7 +526,9 @@ public class DatabaseManager extends RepositoryManager {
             }
             System.err.println("\twrote:" + rowCnt + " rows");
         }
-
+        } finally {
+            closeConnection(connection);
+        }
     }
 
 

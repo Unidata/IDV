@@ -97,6 +97,29 @@ public class MetadataHandler extends RepositoryManager {
         super(repository);
     }
 
+    public void processMetadataXml(Entry entry, Element node) throws Exception {
+        String type =  XmlUtil.getAttribute(node, ATTR_TYPE);
+        Metadata metadata = 
+            new Metadata(
+                         getRepository().getGUID(), entry.getId(),
+                         type,
+                         XmlUtil.getAttribute(node, ATTR_INHERITED,DFLT_INHERITED), 
+                         XmlUtil.getAttribute(node, ATTR_ATTR1,""), 
+                         XmlUtil.getAttribute(node, ATTR_ATTR2,""), 
+                         XmlUtil.getAttribute(node, ATTR_ATTR3,""), 
+                         XmlUtil.getAttribute(node, ATTR_ATTR4, ""));
+        entry.addMetadata(metadata);
+    }
+
+    public void newEntry(Metadata metadata, Entry entry) throws Exception {
+    }
+
+
+
+
+    public void decorateEntry(Request request, Entry entry, StringBuffer sb, Metadata metadata,boolean forLink) throws Exception { 
+    }
+
     public Result processView(Request request, Entry entry, Metadata metadata) throws Exception {
         return new Result("","Cannot process view");
     }

@@ -472,6 +472,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public StringBuffer getEntryContent(Entry entry, Request request,
+                                        boolean showDescription,
                                         boolean showResource)
             throws Exception {
 
@@ -486,6 +487,7 @@ public class TypeHandler extends RepositoryManager {
             }
             sb.append("<table cellspacing=\"0\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
+                                           showDescription,
                                            showResource, true));
 
 
@@ -680,6 +682,7 @@ public class TypeHandler extends RepositoryManager {
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
                                              String output,
+                                             boolean showDescription,
                                              boolean showResource,
                                              boolean linkToDownload)
             throws Exception {
@@ -694,31 +697,22 @@ public class TypeHandler extends RepositoryManager {
             //            sb.append(HtmlUtil.formEntry("", nextPrev));
             //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
 
+            if(showDescription) {
             String nameString = entry.getName();
-            if (linkToDownload) {
-                if (entry.getResource().isFile()
-                        && getAccessManager().canDownload(request, entry)) {
-                    nameString = HtmlUtil.href(
-                        getRepository().getEntryResourceUrl(request, entry),
-                        nameString);
-                }
-            } else {
-                nameString = HtmlUtil.href(
-                    HtmlUtil.url(
-                        request.url(getRepository().URL_ENTRY_SHOW), ARG_ID,
-                        entry.getId()), nameString);
-            }
-
+            nameString = HtmlUtil.href(
+                                       HtmlUtil.url(
+                                                    request.url(getRepository().URL_ENTRY_SHOW), ARG_ID,
+                                                    entry.getId()), nameString);
+            
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), nameString));
 
-
-
-            String desc = entry.getDescription();
-            if ((desc != null) && (desc.length() > 0)) {
-                sb.append(
-                    HtmlUtil.formEntry(
-                        msgLabel("Description"),
-                        getRepository().getEntryText(request, entry, desc)));
+                String desc = entry.getDescription();
+                if ((desc != null) && (desc.length() > 0)) {
+                    sb.append(
+                              HtmlUtil.formEntry(
+                                                 msgLabel("Description"),
+                                                 getRepository().getEntryText(request, entry, desc)));
+                }
             }
             String userSearchLink =
                 HtmlUtil.href(
@@ -739,14 +733,29 @@ public class TypeHandler extends RepositoryManager {
                 if (entry.getResource().isUrl()) {
                     resourceLink = "<a href=\"" + resourceLink + "\">"
                                    + resourceLink + "</a>";
+                } else if(entry.getResource().isFile()){
+                    int idx=  resourceLink.indexOf("_");
+                    if(idx>=0) {
+                        resourceLink =  resourceLink.substring(idx+1);
+                    }
+                    if(getAccessManager().canDownload(request, entry)) {
+                        resourceLink = HtmlUtil.href(
+                                                     getRepository().getEntryResourceUrl(request, entry),
+                                                     resourceLink);
+                        
+                        resourceLink = resourceLink +HtmlUtil.space(2) +
+                            entry.getResource().getFile().length()
+                            + HtmlUtil.space(1) + msg("bytes");
+
+                    }
                 }
                 sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                                              resourceLink));
 
                 if (entry.isFile()) {
-                    sb.append(HtmlUtil.formEntry(msgLabel("Size"),
-                            entry.getResource().getFile().length()
-                            + HtmlUtil.space(1) + msg("bytes")));
+                    //                    sb.append(HtmlUtil.formEntry(msgLabel("Size"),
+                    //                            entry.getResource().getFile().length()
+                    //                            + HtmlUtil.space(1) + msg("bytes")));
                 }
             }
 

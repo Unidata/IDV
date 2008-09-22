@@ -130,6 +130,12 @@ public class Request implements Constants {
     /** _more_ */
     private String leftMessage;
 
+    public Request(Repository repository, User user) {
+        this.repository         = repository;
+        this.user = user;
+    }
+
+
     /**
      * _more_
      *
@@ -204,10 +210,12 @@ public class Request implements Constants {
 
         //This should always be true (?)
         if (collectionGroup != null) {
+            return url(theUrl, arg, entry.getId());
+            /*
             String collectionPath =
                 repository.getPathFromEntry(collectionGroup);
             return HtmlUtil.url(theUrl.getUrl(collectionPath), arg,
-                                entry.getId());
+            entry.getId());*/
         }
 
         return url(theUrl, arg, entry.getId());

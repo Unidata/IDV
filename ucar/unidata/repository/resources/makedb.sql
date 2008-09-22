@@ -13,7 +13,7 @@ CREATE TABLE  globals (name varchar(500),
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
 	           name varchar(200),
-                   description varchar(2000),
+                   description varchar(10000),
                    parent_group_id varchar(200),
                    top_group_id varchar(200),
    		   user_id varchar(200),
@@ -27,6 +27,12 @@ CREATE TABLE entries (id varchar(200),
 	           north float8,
 	           east float8,
 	           west float8); 
+
+
+#for mysql
+alter table entries modify column description varchar(10000);
+#for derby
+alter table entries alter column description set data type varchar(10000);
 
 alter table entries add column  datatype varchar(200);
 alter table entries add column  top_group_id varchar(200) default '0';
@@ -51,7 +57,7 @@ CREATE TABLE  metadata (id varchar(200),
                         attr3 varchar(10000),
                         attr4 varchar(10000)
 			);
-
+p
 alter table metadata add column  inherited int;
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);

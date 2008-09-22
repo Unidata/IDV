@@ -121,6 +121,11 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_DESCTEMPLATE = "desctemplate";
 
+    /** _more_ */
+    public static final String ATTR_BASEGROUP = "basegroup";
+
+    /** _more_ */
+    protected String baseGroupName = "";
 
     /** _more_ */
     protected String groupTemplate = "";
@@ -182,6 +187,10 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     protected StringBuffer status = new StringBuffer();
 
+    /** _more_ */
+    User user;
+
+
 
     /**
      * _more_
@@ -226,6 +235,22 @@ public class Harvester extends RepositoryManager {
         }
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected User getUser() throws Exception {
+        if (user == null) {
+            user = repository.getUserManager().getDefaultUser();
+        }
+        return user;
+    }
+
+
     /**
      * _more_
      *
@@ -234,12 +259,17 @@ public class Harvester extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void init(Element element) throws Exception {
+        rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR, ""));
+
         this.typeHandler =
             repository.getTypeHandler(XmlUtil.getAttribute(element,
                 ATTR_TYPE, TypeHandler.TYPE_ANY));
 
         groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE,
                                              groupTemplate);
+        this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
+                "");
+
         nameTemplate = XmlUtil.getAttribute(element, ATTR_NAMETEMPLATE,
                                             nameTemplate);
         descTemplate = XmlUtil.getAttribute(element, ATTR_DESCTEMPLATE, "");
@@ -280,6 +310,11 @@ public class Harvester extends RepositoryManager {
      * @throws Exception _more_
      */
     public void applyEditForm(Request request) throws Exception {
+        rootDir = new File(request.getUnsafeString(ATTR_ROOTDIR,
+                (rootDir != null)
+                ? rootDir.toString()
+                : ""));
+
         name = request.getString(ARG_NAME, name);
 
         typeHandler = repository.getTypeHandler(request.getString(ATTR_TYPE,
@@ -291,6 +326,9 @@ public class Harvester extends RepositoryManager {
         nameTemplate  = request.getString(ATTR_NAMETEMPLATE, nameTemplate);
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
                 groupTemplate);
+        baseGroupName = request.getUnsafeString(ATTR_BASEGROUP,
+                baseGroupName);
+
         descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE,
                 descTemplate);
 
@@ -362,6 +400,7 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
         element.setAttribute(ATTR_NAMETEMPLATE, nameTemplate);
         element.setAttribute(ATTR_GROUPTEMPLATE, groupTemplate);
+        element.setAttribute(ATTR_BASEGROUP, baseGroupName);
         element.setAttribute(ATTR_DESCTEMPLATE, descTemplate);
 
         if (rootDir != null) {
@@ -718,6 +757,26 @@ public class Harvester extends RepositoryManager {
 
 
     }
+
+/**
+Set the ActiveOnStart property.
+
+@param value The new value for ActiveOnStart
+**/
+public void setActiveOnStart (boolean value) {
+	activeOnStart = value;
+}
+
+/**
+Get the ActiveOnStart property.
+
+@return The ActiveOnStart
+**/
+public boolean getActiveOnStart () {
+	return activeOnStart;
+}
+
+
 
 
 }

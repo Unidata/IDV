@@ -583,11 +583,13 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
                                              String output,
+                                             boolean showDescription,
                                              boolean showResource,
                                              boolean linkToDownload)
             throws Exception {
         StringBuffer sb = super.getInnerEntryContent(entry, request, output,
-                              showResource, linkToDownload);
+                                                     showDescription,
+                                                     showResource, linkToDownload);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int      valueIdx = 0;
             Object[] values   = entry.getValues();

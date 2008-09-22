@@ -47,6 +47,7 @@ public class Group extends Entry {
 
     /** _more_ */
     public static final String IDDELIMITER = ":";
+    public static final String PATHDELIMITER = "/";
 
 
     /** _more_ */

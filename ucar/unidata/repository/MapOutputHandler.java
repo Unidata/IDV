@@ -261,7 +261,7 @@ public class MapOutputHandler extends OutputHandler {
                 String info =
                     "<table>"
                     + entry.getTypeHandler().getInnerEntryContent(entry,
-                        request, OutputHandler.OUTPUT_HTML, false,
+                        request, OutputHandler.OUTPUT_HTML, true, false,
                         false) + "</table>";
                 info = info.replace("\r", " ");
                 info = info.replace("\n", " ");

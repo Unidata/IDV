@@ -89,10 +89,6 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_FILEPATTERN = "filepattern";
 
-
-    /** _more_ */
-    public static final String ATTR_BASEGROUP = "basegroup";
-
     /** _more_ */
     public static final String ATTR_MOVETOSTORAGE = "movetostorage";
 
@@ -118,10 +114,6 @@ public class PatternHarvester extends Harvester {
 
 
     /** _more_ */
-    private String baseGroupName = "";
-
-
-    /** _more_ */
     private boolean moveToStorage = false;
 
     /** _more_ */
@@ -131,9 +123,6 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     private Hashtable dirMap = new Hashtable();
 
-
-    /** _more_ */
-    User user;
 
 
 
@@ -189,15 +178,12 @@ public class PatternHarvester extends Harvester {
      */
     protected void init(Element element) throws Exception {
         super.init(element);
-        rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR, ""));
 
         moveToStorage = XmlUtil.getAttribute(element, ATTR_MOVETOSTORAGE,
                                              moveToStorage);
         filePatternString = XmlUtil.getAttribute(element, ATTR_FILEPATTERN,
                 filePatternString);
 
-        this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
-                "");
 
         filePattern = null;
         sdf         = null;
@@ -208,19 +194,6 @@ public class PatternHarvester extends Harvester {
 
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected User getUser() throws Exception {
-        if (user == null) {
-            user = repository.getUserManager().getDefaultUser();
-        }
-        return user;
-    }
 
     /**
      * _more_
@@ -233,7 +206,6 @@ public class PatternHarvester extends Harvester {
         super.applyState(element);
         element.setAttribute(ATTR_FILEPATTERN, filePatternString);
         element.setAttribute(ATTR_MOVETOSTORAGE, "" + moveToStorage);
-        element.setAttribute(ATTR_BASEGROUP, baseGroupName);
         element.setAttribute(ATTR_DATEFORMAT, dateFormat);
     }
 
@@ -248,17 +220,11 @@ public class PatternHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
-        rootDir = new File(request.getUnsafeString(ATTR_ROOTDIR,
-                (rootDir != null)
-                ? rootDir.toString()
-                : ""));
         filePatternString = request.getUnsafeString(ATTR_FILEPATTERN,
                 filePatternString);
         filePattern = null;
         sdf         = null;
         init();
-        baseGroupName = request.getUnsafeString(ATTR_BASEGROUP,
-                baseGroupName);
         dateFormat = request.getUnsafeString(ATTR_DATEFORMAT, dateFormat);
         if (request.exists(ATTR_MOVETOSTORAGE)) {
             moveToStorage = request.get(ATTR_MOVETOSTORAGE, moveToStorage);
@@ -311,12 +277,11 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.input(ATTR_DESCTEMPLATE,
                                          descTemplate, HtmlUtil.SIZE_60)));
 
-        if (baseGroupName.length() > 0) {
-            sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
-                                         HtmlUtil.input(ATTR_BASEGROUP,
-                                             baseGroupName,
-                                             HtmlUtil.SIZE_60)));
-        }
+        sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
+                                     HtmlUtil.input(ATTR_BASEGROUP,
+                                                    baseGroupName,
+                                                    HtmlUtil.SIZE_60)));
+
         sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,
                                          groupTemplate, HtmlUtil.SIZE_60)));
@@ -585,6 +550,22 @@ public class PatternHarvester extends Harvester {
     }
 
 
+    private String getDirNames(File parentFile, List<String> dirToks) throws Exception {
+        if(dirToks.size()==0) return parentFile.toString();
+        List names = new ArrayList();
+        for(int i=0;i<dirToks.size();i++) {
+            String fileName = (String)dirToks.get(i);
+            File file = new File(parentFile+"/"+fileName);
+            Entry template = repository.getTemplateEntry(file);
+            if(template!=null) {
+                names.add(template.getName());
+            } else {
+                names.add(fileName);
+            }
+            parentFile  = file;
+        }
+        return StringUtil.join(Group.PATHDELIMITER, names);
+    }
 
     /**
      * _more_
@@ -605,12 +586,15 @@ public class PatternHarvester extends Harvester {
         String fileName = f.toString();
         fileName = fileName.replace("\\", "/");
         String dirPath    = f.getParent().toString();
-        int    rootStrLen = rootDir.toString().length();
-        //        System.err.println("root:" + rootDir + " " + rootStrLen);
-        dirPath = dirPath.substring(rootStrLen);
-        dirPath = SqlUtil.cleanUp(dirPath);
-        dirPath = dirPath.replace("\\", "/");
-
+        dirPath = dirPath.substring(rootDir.toString().length());
+        dirPath = dirPath.replace("\\","/");
+        List   dirToks  = (List<String>)StringUtil.split(dirPath, "/", true, true);
+        String dirGroup = getDirNames(rootDir, dirToks);
+        //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
+        dirGroup = SqlUtil.cleanUp(dirPath);
+        dirGroup = dirGroup.replace("\\", "/");
+        System.err.println("dir group:" + dirGroup);
+        if(true) return null;
 
         init();
 
@@ -670,8 +654,7 @@ public class PatternHarvester extends Harvester {
         }
 
 
-        List   dirToks  = StringUtil.split(dirPath, "/", true, true);
-        String dirGroup = StringUtil.join("/", dirToks);
+
 
 
         String ext      = IOUtil.getFileExtension(fileName);

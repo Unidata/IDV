@@ -216,7 +216,7 @@ public class RssOutputHandler extends OutputHandler {
                 XmlUtil.appendCdata(
                     sb,
                     entry.getTypeHandler().getEntryContent(
-                        entry, request, false).toString());
+                        entry, request, true, false).toString());
             } else {
                 XmlUtil.appendCdata(sb, entry.getDescription());
             }

@@ -177,7 +177,7 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.row(HtmlUtil.colspan("<center>" + links
                 + "</center>", 2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
-                OutputHandler.OUTPUT_HTML, false, true));
+                OutputHandler.OUTPUT_HTML, true,false, true));
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, false)) {
             sb.append(tfo.getId().toString());
         }
@@ -221,7 +221,7 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer();
         sb.append(crumbs[1]);
 
-        StringBuffer infoSB = typeHandler.getEntryContent(entry, request,
+        StringBuffer infoSB = typeHandler.getEntryContent(entry, request, false,
                                   true);
 
         List          tabTitles  = new ArrayList<String>();
@@ -252,7 +252,9 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getRepository().getEntryLinksList(request, entry));
         treeShown.add(false);
 
-        sb.append(HtmlUtil.p());
+        sb.append(entry.getDescription());
+        getMetadataManager().decorateEntry(request, entry, sb,false);
+        sb.append(HtmlUtil.br());
         sb.append(getRepository().makeTabs(tabTitles, tabContent, true));
         return makeLinksResult(request, msgLabel("Entry") + entry.getLabel(),
                                sb, new State(entry));
@@ -811,10 +813,14 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-        if (group.getDescription().length() > 0) {
-            sb.append(HtmlUtil.br());
-            sb.append(group.getDescription());
-            sb.append(HtmlUtil.br());
+        if(!showApplet) {
+            if (group.getDescription().length() > 0) {
+                StringBuffer descSB = new StringBuffer();
+                descSB.append(group.getDescription());
+                getMetadataManager().decorateEntry(request, group, descSB, false);
+                sb.append(getRepository().makeShowHideBlock(request, "Description",
+                                                            descSB,true));
+            }
         }
 
 
@@ -825,7 +831,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if ( !group.isDummy()) {
             tabTitles.add("Basic");
             tabContent.add(group.getTypeHandler().getEntryContent(group,
-                    request, true));
+                    request, false,true));
             treeShown.add(false);
         }
 
@@ -855,8 +861,6 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if ( !showApplet) {
-
-
             String tmp = getRepository().makeTabs(tabTitles, tabContent,
                              true, "tabcontent_fixedheight");
             tabTitles  = new ArrayList<String>();
@@ -896,13 +900,13 @@ public class HtmlOutputHandler extends OutputHandler {
         if (entries.size() > 0) {
             StringBuffer entriesSB = new StringBuffer();
 
-
             String link = getEntryHtml(entriesSB, entries, request, true,
                                        false, group.isDummy());
             tabTitles.add("Entries" + link);
             tabContent.add(entriesSB.toString());
             treeShown.add(true);
         }
+
 
         for (int i = 0; i < tabTitles.size(); i++) {
             String tabTitle = tabTitles.get(i).toString();

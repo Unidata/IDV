@@ -836,6 +836,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_DESCRIPTION = "description";
+    public static final String TAG_DESCRIPTION = "description";
 
     /** _more_ */
     public static final String ATTR_FILE = "file";
@@ -1067,9 +1068,6 @@ public interface Constants {
 
     /** _more_ */
     public static final String TAG_ENTRIES = "entries";
-
-    /** _more_ */
-    public static final String TAG_DESCRIPTION = "description";
 
 
     /** _more_ */

@@ -248,7 +248,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     protected SimpleDateFormat timeSdf = makeDateFormat("HH:mm:ss z");
 
-
+    protected List<SimpleDateFormat> formats;
 
     /**
      * _more_
@@ -309,6 +309,13 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    private SimpleDateFormat makeSDF(String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.applyPattern(format);
+        return sdf;
+    }
+
     /**
      * _more_
      *
@@ -318,11 +325,8 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public String formatDate(Date d) {
         if (sdf == null) {
-            sdf = new SimpleDateFormat();
-            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-            sdf.applyPattern(DEFAULT_TIME_FORMAT);
+            sdf = makeSDF(DEFAULT_TIME_FORMAT);
         }
-
         if (d == null) {
             return BLANK;
         }
@@ -340,13 +344,21 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @throws java.text.ParseException _more_
      */
     public Date parseDate(String dttm) throws java.text.ParseException {
-        if (sdf == null) {
-            sdf = new SimpleDateFormat();
-            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-            sdf.applyPattern(DEFAULT_TIME_FORMAT);
+        if(formats==null) {
+            formats = new ArrayList<SimpleDateFormat>();
+            formats.add(makeSDF("yyyy-MM-dd HH:mm:ss z"));
+            formats.add(makeSDF("yyyy-MM-dd HH:mm:ss"));
+            formats.add(makeSDF("yyyy-MM-dd HH:mm"));
+            formats.add(makeSDF("yyyy-MM-dd"));
         }
 
-        return sdf.parse(dttm);
+
+        for(SimpleDateFormat fmt: formats) {
+            try {
+                return fmt.parse(dttm);
+            } catch(Exception noop){}
+        }
+        throw new IllegalArgumentException("Unable to parse date:" +dttm);
     }
 
     /**

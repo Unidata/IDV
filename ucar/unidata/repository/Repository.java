@@ -3789,6 +3789,25 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
+    public Entry parseEntryXml(File xmlFile) throws Exception {
+        Element   root       = XmlUtil.getRoot(IOUtil.readContents(xmlFile));
+        return processEntryXml(new Request(this, getUserManager().getDefaultUser()), root,new Hashtable(), new Hashtable(),false);
+    }
+
+    public  Entry getTemplateEntry(File file) throws Exception {
+        File xmlFile = new File(IOUtil.joinDir(file.getParentFile(),"." + file.getName() +".ramadda"));
+        Entry fileInfoEntry = null;
+        if(xmlFile.exists()) {
+            fileInfoEntry = parseEntryXml(xmlFile);
+            if(fileInfoEntry.getName().length()==0) {
+                fileInfoEntry.setName(file.getName());
+            }
+        }
+        return fileInfoEntry;
+    }
+
+
+
 
     /**
      * _more_
@@ -3803,13 +3822,19 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     private Entry processEntryXml(Request request, Element node,
-                                  Hashtable entries, Hashtable files)
+                                  Hashtable entries, Hashtable files, boolean checkAccess)
             throws Exception {
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE,
                                            TypeHandler.TYPE_FILE);
         String dataType    = XmlUtil.getAttribute(node, ATTR_DATATYPE, "");
-        String description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, "");
+        String description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, (String) null);
+        if(description==null) {
+            description = XmlUtil.getGrandChildText(node, TAG_DESCRIPTION);
+        }
+        if(description==null) {
+            description="";
+        }
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
             String tmp = (String) files.get(file);
@@ -3829,10 +3854,12 @@ public class Repository extends RepositoryBase implements Tables,
                         + parentId);
             }
         }
-        if ( !getAccessManager().canDoAction(request, parentGroup,
-                                             Permission.ACTION_NEW)) {
-            throw new IllegalArgumentException("Cannot add to parent group:"
-                    + parentId);
+        if(checkAccess) {
+            if ( !getAccessManager().canDoAction(request, parentGroup,
+                                                 Permission.ACTION_NEW)) {
+                throw new IllegalArgumentException("Cannot add to parent group:"
+                                                   + parentId);
+            }
         }
 
         TypeHandler typeHandler = getTypeHandler(type);
@@ -3879,7 +3906,17 @@ public class Repository extends RepositoryBase implements Tables,
                                             entry.getSouth()));
         entry.setEast(XmlUtil.getAttribute(node, ATTR_EAST, entry.getEast()));
         entry.setWest(XmlUtil.getAttribute(node, ATTR_WEST, entry.getWest()));
-
+        NodeList entryChildren = XmlUtil.getElements(node);
+        for (Element entryChild : (List<Element>) entryChildren) {
+            String tag  = entryChild.getTagName();
+            if (tag.equals(TAG_METADATA)) {
+                getMetadataManager().processMetadataXml(entry, entryChild);
+            } else if(tag.equals(TAG_DESCRIPTION)) {
+            } else {
+                throw new IllegalArgumentException("Unknown tag:"
+                                                   + node.getTagName());
+            }
+        }
         entry.getTypeHandler().initializeEntry(request, entry, node);
 
 
@@ -4019,34 +4056,11 @@ public class Repository extends RepositoryBase implements Tables,
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
                 Entry entry = processEntryXml(request, node, entries,
-                                  origFileToStorage);
+                                  origFileToStorage,true);
                 XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
                                new String[] { ATTR_ID,
                         entry.getId() });
                 newEntries.add(entry);
-                NodeList entryChildren = XmlUtil.getElements(node);
-                for (Element entryChild : (List<Element>) entryChildren) {
-                    if (entryChild.getTagName().equals(TAG_METADATA)) {
-                        entry.addMetadata(
-                            new Metadata(
-                                getGUID(), entry.getId(),
-                                XmlUtil.getAttribute(entryChild, ATTR_TYPE),
-                                XmlUtil.getAttribute(
-                                    entryChild, ATTR_INHERITED,
-                                    DFLT_INHERITED), XmlUtil.getAttribute(
-                                        entryChild, ATTR_ATTR1,
-                                        ""), XmlUtil.getAttribute(
-                                            entryChild, ATTR_ATTR2,
-                                            ""), XmlUtil.getAttribute(
-                                                entryChild, ATTR_ATTR3,
-                                                    ""), XmlUtil.getAttribute(
-                                                        entryChild,
-                                                            ATTR_ATTR4, "")));
-                    } else {
-                        throw new IllegalArgumentException("Unknown tag:"
-                                + node.getTagName());
-                    }
-                }
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
@@ -6596,8 +6610,8 @@ public class Repository extends RepositoryBase implements Tables,
             throws Exception {
         synchronized (MUTEX_GROUP) {
             if ( !name.equals(GROUP_TOP)
-                    && !name.startsWith(GROUP_TOP + Group.IDDELIMITER)) {
-                name = GROUP_TOP + Group.IDDELIMITER + name;
+                    && !name.startsWith(GROUP_TOP + Group.PATHDELIMITER)) {
+                name = GROUP_TOP + Group.PATHDELIMITER + name;
             }
             Group group = groupCache.get(name);
             if (group != null) {
@@ -6606,7 +6620,7 @@ public class Repository extends RepositoryBase implements Tables,
             //            System.err.println("Looking for:" + name);
 
             List<String> toks = (List<String>) StringUtil.split(name,
-                                    Group.IDDELIMITER, true, true);
+                                    Group.PATHDELIMITER, true, true);
             Group  parent = null;
             String lastName;
             if ((toks.size() == 0) || (toks.size() == 1)) {
@@ -6614,7 +6628,7 @@ public class Repository extends RepositoryBase implements Tables,
             } else {
                 lastName = toks.get(toks.size() - 1);
                 toks.remove(toks.size() - 1);
-                parent = findGroupFromName(StringUtil.join(Group.IDDELIMITER,
+                parent = findGroupFromName(StringUtil.join(Group.PATHDELIMITER,
                         toks), user, createIfNeeded);
                 if (parent == null) {
                     if ( !isTop) {
@@ -6665,13 +6679,25 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Group makeNewGroup(Group parent, String name, User user)
             throws Exception {
+        return makeNewGroup(parent, name, user,null);
+    }
+
+
+
+    public Group makeNewGroup(Group parent, String name, User user, Entry template)
+            throws Exception {
         synchronized (MUTEX_GROUP) {
             TypeHandler typeHandler = getTypeHandler(TypeHandler.TYPE_GROUP);
             Group       group = new Group(getGroupId(parent), typeHandler);
-            group.setName(name);
+            if(template!=null) {
+                group.initWith(template);
+                getRepository().getMetadataManager().newEntry(group);
+            } else {
+                group.setName(name);
+                group.setDate(new Date().getTime());
+            }
             group.setParentGroup(parent);
             group.setUser(user);
-            group.setDate(new Date().getTime());
             addNewEntry(group);
             groupCache.put(group.getId(), group);
             groupCache.put(group.getFullName(), group);
@@ -8075,6 +8101,10 @@ public class Repository extends RepositoryBase implements Tables,
             super(msg);
         }
     }
+
+
+
+
 
 }
 

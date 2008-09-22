@@ -335,6 +335,15 @@ public class StorageManager extends RepositoryManager {
         return newFile;
     }
 
+    public File copyToEntryDir(Entry entry, File original)
+            throws Exception {
+        System.err.println("dir:" +getEntryDir(entry.getId(),true));
+        File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),true),
+                                               original.getName()));
+        IOUtil.copyFile(original, newFile);
+        return newFile;
+    }
+
     /**
      * _more_
      *
@@ -375,7 +384,10 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getFileTail(Entry entry) {
-        String fileName = entry.getResource().getPath();
+        return getFileTail(entry.getResource().getPath());
+    }
+
+    public String getFileTail(String fileName) {
         int    idx      = fileName.indexOf("_");
         if (idx >= 0) {
             return fileName.substring(idx + 1);

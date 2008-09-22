@@ -335,8 +335,10 @@ public class Admin extends RepositoryManager {
     protected StringBuffer getDbMetaData(boolean generateJava)
             throws Exception {
 
+        Connection       connection = getDatabaseManager().getNewConnection();
+        try {
         StringBuffer     sb       = new StringBuffer();
-        DatabaseMetaData dbmd = getDatabaseManager().getMetadata();
+        DatabaseMetaData dbmd       = connection.getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
@@ -382,8 +384,10 @@ public class Admin extends RepositoryManager {
                 sb.append("<ul>");
             }
             List colVars = new ArrayList();
+
             while (columns.next()) {
                 String colName = columns.getString("COLUMN_NAME");
+                String colSize = columns.getString("COLUMN_SIZE");
                 if (generateJava) {
                     colName = colName.toLowerCase();
                     String colVar = "COL_" + TABLENAME + "_"
@@ -391,11 +395,13 @@ public class Admin extends RepositoryManager {
                     colVars.add(colVar);
                     sb.append("public static final String " + colVar + " = "
                               + tableVar + "+\"." + colName + "\";\n");
+                    sb.append("public static final String " + colVar+"_SIZE" + " = "
+                              + colSize + ";\n");
 
                 } else {
                     sb.append("<li>");
                     sb.append(colName + " (" + columns.getString("TYPE_NAME")
-                              + ")");
+                              + " " + colSize+")");
                 }
             }
 
@@ -473,6 +479,9 @@ public class Admin extends RepositoryManager {
 
 
         return sb;
+        } finally {
+            getDatabaseManager().closeConnection(connection);
+        }
 
     }
 

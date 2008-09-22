@@ -293,7 +293,11 @@ public class HarvesterManager extends RepositoryManager {
                 Misc.newList(
                     new TwoFacedObject(
                         "Local Files",
-                        "ucar.unidata.repository.PatternHarvester"), new TwoFacedObject(
+                        "ucar.unidata.repository.PatternHarvester"), 
+                    new TwoFacedObject(
+                        "Make groups from directory tree",
+                        "ucar.unidata.repository.DirectoryHarvester"), 
+                    new TwoFacedObject(
                             "URL", "ucar.unidata.repository.WebHarvester")));
         sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeInput));
         sb.append(HtmlUtil.formEntry("",
