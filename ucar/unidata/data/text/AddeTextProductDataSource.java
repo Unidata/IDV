@@ -103,12 +103,27 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
             return products;
         }
         Date[] dateRange = (dateSelection==null?null:dateSelection.getRange());
-        int maxCount = (dateSelection==null?Integer.MAX_VALUE: dateSelection.getCount());
+        Misc.printArray("dates", dateRange);
+        int maxCount = (dateSelection==null ? 100: dateSelection.getCount());
+        maxCount = Math.min(maxCount, 100);
+        int dtime = 24;
+        if (dateRange != null) {
+            int hours = (int) (Math.abs(dateRange[1].getTime()-dateRange[0].getTime())/(1000*3600));
+            if (hours < 1) hours = 1;
+            dtime = hours;
+        }
 
+        StringBuilder builder = new StringBuilder("adde://");
+        builder.append(getDataContext().getIdv().getProperty("textserver", "adde.ucar.edu"));
+        builder.append("/");
+        builder.append(getRequest(tableInfo, station, dateSelection));
+        builder.append("&num=");
+        builder.append(maxCount);
+        builder.append("&dtime=");
+        builder.append(dtime);
 
-        String url = "adde://adde.ucar.edu/" + getRequest(tableInfo, station);
-        //System.out.println("ti = " + tableInfo);
-        //System.out.println("url = " + url);
+        String url = builder.toString();
+        System.out.println("url = " + url);
         try {
             AddeTextReader atr = new AddeTextReader(url);
             if (url.indexOf("wxtext") > 0) {
@@ -138,7 +153,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @return the search string
      */
-    private String getRequest(TableInfo ti, NamedStationImpl station) {
+    private String getRequest(TableInfo ti, NamedStationImpl station, DateSelection dateSelection) {
 
         if (station == null) {
             return "";
@@ -164,7 +179,6 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         buf.append(station.getProperty(NamedStationTable.KEY_BULLETIN, "NONE"));
         buf.append("&WSTN=");
         buf.append(station.getID());
-        buf.append("&num=10");
         return buf.toString();
     }
 
@@ -179,7 +193,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      */
     private String getObTextRequest(TableInfo ti, NamedStationImpl station) {
         String id  = station.getID();
-        String idn = (String) station.getProperty("STNM", "");
+        String idn = (String) station.getProperty(NamedStationTable.KEY_IDNUMBER, "");
         if ( !idn.equals("")) {
             idn = idn.substring(0, 5);
         }
@@ -201,8 +215,6 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
             }
         }
         buf.append("&ID=");
-        buf.append(id);
-        buf.append("&num=3");
         return buf.toString();
     }
 
