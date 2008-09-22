@@ -1987,6 +1987,29 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    public static void showOkDialog(Window f, String title,
+                                       Component contents,
+                                       Component src) {
+        if ( !LogUtil.getInteractiveMode()) {
+            throw new IllegalStateException(
+                "Cannot show dialog in non-interactive mode");
+        }
+        JDialog              dialog   = createDialog(f, title, true);
+        final ObjectListener listener = getCloseDialogListener(dialog);
+        JPanel buttons =  makeButtons(listener, new String[] { CMD_OK},
+                                      new String[] { CMD_OK});
+        packDialog(dialog, centerBottom(contents, buttons));
+        setDefaultButton(buttons, dialog.getRootPane());
+        if (src != null) {
+            dialog.setLocation(getLocation(src));
+            dialog.setVisible(true);
+        } else {
+            showInCenter(dialog);
+        }
+    }
+
+
+
 
 
     /**
