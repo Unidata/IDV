@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.metdata;
 
 
@@ -209,6 +210,23 @@ public class NamedStationTable extends StationTableImpl {
     /** Should we keep loading more xml */
     private static final String ATTR_LOADMORE = "loadmore";
 
+    /** Key for Station number in properties */
+    public static final String KEY_IDNUMBER = "idn";
+
+    /** Key for state in properties */
+    public static final String KEY_STATE = "st";
+
+    /** Key for country in properties */
+    public static final String KEY_COUNTRY = "co";
+
+    /** Key for bulletin id in properties */
+    public static final String KEY_BULLETIN = "bull";
+
+    /** Key for priority properties */
+    public static final String KEY_PRIORITY = "pri";
+
+    /** Key for priority properties */
+    public static final String KEY_EXTRA = "extra";
 
     /** The resource id */
     private String id;
@@ -1096,14 +1114,14 @@ public class NamedStationTable extends StationTableImpl {
                 NamedStationImpl station = new NamedStationImpl(id, name,
                                                lat, lon, alt,
                                                CommonUnit.meter);
-                station.addProperty("STNM", words[idnIndex]);
-                station.addProperty("ST", words[stIndex]);
-                station.addProperty("CO", words[coIndex]);
+                station.addProperty(KEY_IDNUMBER, words[idnIndex]);
+                station.addProperty(KEY_STATE, words[stIndex]);
+                station.addProperty(KEY_COUNTRY, words[coIndex]);
                 if (words[priIndex] != null) {
-                    station.addProperty("PRI", words[priIndex]);
+                    station.addProperty(KEY_PRIORITY, words[priIndex]);
                 }
                 if (words[extraIndex] != null) {
-                    station.addProperty("EXTRA", words[extraIndex]);
+                    station.addProperty(KEY_EXTRA, words[extraIndex]);
                 }
                 this.add(station, true);
             } catch (Exception e) {
@@ -1122,10 +1140,10 @@ public class NamedStationTable extends StationTableImpl {
 
 
     /**
-     * Create a station table from a Gempak table
+     * Create a station table from a Gempak bulletin table
      *
      *
-     * @param tbl The actual Gempak table as text
+     * @param tbl The actual Gempak bulletin table as text
      *
      * @throws Exception problem creating table from file
      */
@@ -1140,53 +1158,38 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
         if (lines.size() == 0) {
             return;
         }
+        /* need to parse these on white space since they  are not consistent
         int[] indices = {
-            0, 7, 16, 49, 52, 55, 61, 68
+            0, 7, 15, 48, 52, 55, 61, 68
         };
         int[] lengths = {
-            6, 4, 32, 2, 2, 5, 6, 5
+            6, 8, 32, 2, 2, 5, 6, 5
         };
+        */
 
         //ICAO code,Airport Name,Latitude,Longitude
-        boolean readOne    = false;
-        int     idIndex    = 1;
-        int     bullIndex  = 0;
-        int     nameIndex  = 2;
-        int     stIndex    = 3;
-        int     coIndex    = 4;
-        int     latIndex   = 5;
-        int     lonIndex   = 6;
-        int     altIndex   = 7;
-        int     priIndex   = 8;
-        int     extraIndex = 9;
-        int     numToks    = indices.length;
+        int bullIndex  = 0;
+        int idIndex    = 1;
+        int nameIndex  = 2;
+        int stIndex    = 3;
+        int coIndex    = 4;
+        int latIndex   = 5;
+        int lonIndex   = 6;
+        int altIndex   = 7;
+        int priIndex   = 8;
+        int extraIndex = 9;
+        int numToks    = 8;  // change this if use pri and extra
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
             if (line.startsWith("!")) {
                 continue;  // comment
             }
-            String[] words = new String[numToks + 2];
+            String[] words = null;
             try {
-                for (int idx = 0; idx < indices.length; idx++) {
-                    words[idx] = line.substring(indices[idx],
-                            indices[idx] + lengths[idx]);
-                    if (true) {  // always trim?
-                        words[idx] = words[idx].trim();
-                    }
-                }
-                int lastRead = indices[numToks - 1] + lengths[numToks - 1];
-                // get the priority and extra stuff if it exists
-                if (line.length() > lastRead) {
-                    String rest = line.substring(lastRead,
-                                      line.length()).trim();
-                    int end = Math.min(2, rest.length());
-                    // get the priority if it exists
-                    if ( !rest.equals("")) {
-                        words[priIndex] = rest.substring(0, end);
-                    }
-                    if (rest.length() > 2) {
-                        words[numToks] = rest.substring(2, rest.length());
-                    }
+                words = line.split("\\s++", numToks);
+                if (words.length < numToks) {
+                    System.err.println("invalid line: " + line);
+                    continue;
                 }
 
                 String id   = words[idIndex];
@@ -1197,15 +1200,17 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
                 NamedStationImpl station = new NamedStationImpl(id, name,
                                                lat, lon, alt,
                                                CommonUnit.meter);
-                station.addProperty("BULLETIN", words[bullIndex]);
-                station.addProperty("ST", words[stIndex]);
-                station.addProperty("CO", words[coIndex]);
-                if (words[priIndex] != null) {
-                    station.addProperty("PRI", words[priIndex]);
+                station.addProperty(KEY_BULLETIN, words[bullIndex]);
+                station.addProperty(KEY_STATE, words[stIndex]);
+                station.addProperty(KEY_COUNTRY, words[coIndex]);
+                /* Bulletins don't have this
+                if (words.length > priIndex && words[priIndex] != null) {
+                    station.addProperty(KEY_PRIORITY, words[priIndex]);
                 }
-                if (words[extraIndex] != null) {
-                    station.addProperty("EXTRA", words[extraIndex]);
+                if (words.length > extraIndex && words[extraIndex] != null) {
+                    station.addProperty(KEY_EXTRA, words[extraIndex]);
                 }
+                */
                 this.add(station, true);
             } catch (Exception e) {
                 System.out.println("Unable to parse station [" + i
