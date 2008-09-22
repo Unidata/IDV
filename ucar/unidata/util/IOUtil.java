@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -239,6 +240,31 @@ public class IOUtil {
 
 
     /**
+     * _more_
+     *
+     * @param files _more_
+     *
+     * @return _more_
+     */
+    public static File[] sortFilesOnName(File[] files) {
+        List tuples = new ArrayList();
+        for (int i = 0; i < files.length; i++) {
+            tuples.add(new Object[] { files[i].getName(), files[i] });
+        }
+        tuples = Misc.sortTuples(tuples, true);
+
+        files  = new File[tuples.size()];
+        for (int i = 0; i < tuples.size(); i++) {
+            Object[] tuple = (Object[]) tuples.get(i);
+            files[i] = (File) tuple[1];
+        }
+        return files;
+    }
+
+
+
+
+    /**
      * Convert the toString value of the objects in the given files list
      * to an array of File-s
      *
@@ -443,15 +469,27 @@ public class IOUtil {
         }
         if (urls.size() == 1) {
             suffixes.add(suffix);
-        }  else {
+        } else {
             for (int i = 0; i < urls.size(); i++) {
-                suffixes.add(i+suffix);
+                suffixes.add(i + suffix);
             }
         }
         return writeTo(urls, prefix, suffixes, loadId);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param urls _more_
+     * @param prefix _more_
+     * @param suffixes _more_
+     * @param loadId _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public static List writeTo(List urls, String prefix, List suffixes,
                                Object loadId)
             throws IOException {
@@ -487,7 +525,7 @@ public class IOUtil {
         }
 
         for (int i = 0; i < urls.size(); i++) {
-            String      path =  prefix + suffixes.get(i);
+            String      path = prefix + suffixes.get(i);
             InputStream from;
             Object      obj = urls.get(i);
             JobManager.getManager().setDialogLabel1(loadId,
@@ -759,9 +797,9 @@ public class IOUtil {
         if (to.isDirectory()) {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
-        FileInputStream fis = new FileInputStream(from);
+        FileInputStream  fis = new FileInputStream(from);
         FileOutputStream fos = new FileOutputStream(to);
-        writeTo(fis,fos);
+        writeTo(fis, fos);
         fis.close();
         fos.close();
     }
@@ -1114,9 +1152,21 @@ public class IOUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param child _more_
+     *
+     * @return _more_
+     */
     public static boolean isADescendent(File parent, File child) {
-        if(child == null) return false;
-        if(parent.equals(child)) return true;
+        if (child == null) {
+            return false;
+        }
+        if (parent.equals(child)) {
+            return true;
+        }
         File newParent = child.getParentFile();
         return isADescendent(parent, newParent);
     }
