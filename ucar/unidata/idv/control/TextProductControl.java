@@ -510,8 +510,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             hours = 24*365*20;
         }
 
-
-        Date now = DateUtil.roundByDay(new Date(System.currentTimeMillis()), 1);
+        Date now = new Date(System.currentTimeMillis());
+        //        Date now = DateUtil.roundByDay(new Date(System.currentTimeMillis()), 1);
         Date then = new Date(System.currentTimeMillis()-DateUtil.hoursToMillis(hours));
         DateSelection dateSelection  = new DateSelection(then, now);
         dateSelection.setCount(count);
