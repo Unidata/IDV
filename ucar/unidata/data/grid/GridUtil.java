@@ -3879,6 +3879,42 @@ public class GridUtil {
 
     }
 
+    public static int[][] findIndicesInsideRange(float[][] values, float min, float max)
+            throws VisADException {
+        return findIndicesInRange(values,min,max,true);
+    }
+
+
+    public static int[][] findIndicesOutsideRange(float[][] values, float min, float max)
+            throws VisADException {
+        return findIndicesInRange(values,min,max,false);
+    }
+
+
+    private static int[][] findIndicesInRange(float[][] values, float min, float max, boolean inside)
+            throws VisADException {
+        int numPoints = values[0].length;
+        int cnt=0;
+        int[]indices = new int[1000];
+        for (int i = 0; i < numPoints; i++) {
+            float value = values[0][i];
+            boolean ok = (inside?(value>=min && value<=max):(value<min || value>max));
+            if(ok) {
+                cnt++;
+                if(cnt>=indices.length) {
+                    int[]tmp = indices;
+                    indices = new int[tmp.length*2];
+                    System.arraycopy(tmp,0,indices,0,cnt);
+                }
+                indices[cnt] = i;
+            }
+        }
+        int[]tmp = indices;
+        indices = new int[cnt];
+        System.arraycopy(tmp,0,indices,0,cnt);
+        return new int[][]{indices};
+    }
+
     /**
      * Convert the domain to the reference earth located points.
      * If the domain is not in lat/lon order then reset the order so
