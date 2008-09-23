@@ -54,7 +54,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetadataHandler extends RepositoryManager {
+public  class MetadataHandler extends RepositoryManager {
 
 
     /** _more_ */
@@ -312,7 +312,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String[] getHtml(Request request, Metadata metadata) {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata)      {
         return null;
     }
 
@@ -328,9 +328,8 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public String[] getForm(Request request, Metadata metadata,
-                            boolean forEdit)
-            throws Exception {
+    public  String[] getForm(Request request, Entry entry, Metadata metadata,
+                             boolean forEdit) throws Exception {
         return null;
     }
 
@@ -542,7 +541,7 @@ public class MetadataHandler extends RepositoryManager {
         }
         Metadata metadata = new Metadata(type);
         metadata.setEntry(entry);
-        String[] html = getForm(request, metadata, false);
+        String[] html = getForm(request,entry,  metadata, false);
         if (html == null) {
             return;
         }

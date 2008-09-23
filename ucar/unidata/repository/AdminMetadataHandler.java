@@ -132,7 +132,7 @@ public class AdminMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String[] getHtml(Request request, Metadata metadata) {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
         Metadata.Type type = getType(metadata.getType());
         String        lbl  = msgLabel(type.getLabel());
         if (type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {
@@ -162,7 +162,7 @@ public class AdminMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    public String[] getForm(Request request, Metadata metadata,
+    public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
         Metadata.Type type   = getType(metadata.getType());

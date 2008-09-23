@@ -138,7 +138,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String[] getHtml(Request request, Metadata metadata) {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
         String lbl = msgLabel(TYPE_ENUM.getLabel());
         String content = getSearchLink(request, metadata)
                          + metadata.getAttr1();
@@ -225,11 +225,11 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      * @param metadata _more_
      * @param forEdit _more_
      *
-     * @return _more_
+     * @return _more_ 
      *
      * @throws Exception _more_
      */
-    public String[] getForm(Request request, Metadata metadata,
+    public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
         Metadata.Type type   = TYPE_ENUM;

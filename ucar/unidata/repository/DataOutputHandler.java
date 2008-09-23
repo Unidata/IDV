@@ -401,19 +401,15 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            System.err.println ("can load: " + entry.getName());
             if (entry.isGroup()) {
-                System.err.println ("\tis group");
                 ok = false;
             } else if ( !entry.getResource().isFile()) {
-                System.err.println ("\tisn't a file");
                 ok = false;
             } else {
                 try {
                     File file = entry.getResource().getFile();
                     //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
                     //Use openFile
-                    System.err.println ("\ttyring " + file);
                     NetcdfDataset dataset =
                         NetcdfDataset.openDataset(file.toString());
 

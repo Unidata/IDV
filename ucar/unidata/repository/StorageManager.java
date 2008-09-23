@@ -383,6 +383,9 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getFileTail(Entry entry) {
+        if(entry.getIsLocalFile()) {
+            return IOUtil.getFileTail(entry.getResource().getPath());
+        }
         return getFileTail(entry.getResource().getPath());
     }
 

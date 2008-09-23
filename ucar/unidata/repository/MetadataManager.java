@@ -656,7 +656,7 @@ public class MetadataManager extends RepositoryManager {
                 if (metadataHandler == null) {
                     continue;
                 }
-                String[] html = metadataHandler.getForm(request, metadata,
+                String[] html = metadataHandler.getForm(request, entry, metadata,
                                     true);
                 if (html == null) {
                     continue;

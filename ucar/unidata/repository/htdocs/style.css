@@ -161,6 +161,11 @@ a.subnavoffcomp  {
 }
 
 
+.description {
+   margin-left:20px;
+}
+
+
 .browseblock {
    margin-left:20px;
    border: 2px #999999 solid; 

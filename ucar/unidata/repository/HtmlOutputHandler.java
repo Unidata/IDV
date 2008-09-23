@@ -657,7 +657,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 if ( !metadataHandler.canHandle(metadata)) {
                     continue;
                 }
-                String[] html = metadataHandler.getHtml(request, metadata);
+                String[] html = metadataHandler.getHtml(request, entry, metadata);
                 if (html == null) {
                     continue;
                 }
@@ -815,9 +815,10 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if(!showApplet) {
             if (group.getDescription().length() > 0) {
-                StringBuffer descSB = new StringBuffer();
+                StringBuffer descSB = new StringBuffer("<div class=\"description\"\n");
                 descSB.append(group.getDescription());
                 getMetadataManager().decorateEntry(request, group, descSB, false);
+                descSB.append("</div>\n");
                 sb.append(getRepository().makeShowHideBlock(request, "Description",
                                                             descSB,true));
             }
