@@ -21,98 +21,57 @@
  */
 
 
+
+
 package ucar.unidata.idv.control;
 
-
-import org.w3c.dom.Element;
 
 
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
 
-import ucar.unidata.data.text.TextProductDataSource;
 import ucar.unidata.data.text.Product;
-import ucar.unidata.data.text.ProductType;
 import ucar.unidata.data.text.ProductGroup;
-
-import ucar.unidata.geoloc.Bearing;
-
-import ucar.unidata.gis.SpatialGrid;
-import ucar.unidata.gis.WorldWindReader;
-
+import ucar.unidata.data.text.ProductType;
+import ucar.unidata.data.text.TextProductDataSource;
 
 import ucar.unidata.idv.DisplayConventions;
 
-
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
-import ucar.unidata.ui.symbol.*;
 import ucar.unidata.ui.TextSearcher;
 
-import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.DateSelection;
-import ucar.unidata.util.FileManager;
-
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
-import ucar.unidata.xml.XmlUtil;
-
-import ucar.visad.display.*;
-
-import ucar.visad.display.CompositeDisplayable;
-import ucar.visad.display.StationLocationDisplayable;
-import ucar.visad.display.StationModelDisplayable;
-
 
 import visad.*;
 
-
-import visad.georef.*;
-
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
-import visad.georef.NamedLocation;
-import visad.georef.NamedLocationTuple;
-
+import java.awt.*;
+import java.awt.event.*;
 
 import java.net.URL;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
-
-
-import java.io.File;
-
 import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
 
 
 import java.util.regex.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import javax.swing.event.*;
+import javax.swing.text.*;
 import javax.swing.tree.*;
-import javax.swing.border.*;
 
 
 
@@ -128,84 +87,113 @@ import javax.swing.border.*;
 public class TextProductControl extends StationLocationControl implements HyperlinkListener {
 
 
+    /** hours */
     private int hours = -1;
 
+    /** date selection combo */
     private JComboBox dateSelectionCbx;
 
 
+    /** show glossary checkbox */
     private JCheckBox showGlossaryCbx;
 
-    private boolean showGlossary  = false;
+    /** flag for showing glossary */
+    private boolean showGlossary = false;
 
+    /** current text */
     private String currentText = "";
 
-    /** _more_          */
+    /** data srouce */
     private TextProductDataSource dataSource;
 
-    /** _more_          */
+    /** list of product groups */
     private List<ProductGroup> productGroups;
 
+    /** product tree */
     JTree productTree;
 
-
+    /** ignore time changes flag */
     private boolean ignoreTimeChanges = false;
 
-    /** _more_          */
+    /** selected product group */
     private ProductGroup productGroup;
 
-    /** _more_          */
+    /** selected product type */
     private ProductType productType;
 
+    /** list of products */
     private List<Product> products;
 
-    /** _more_          */
+    /** text component */
     private JTextComponent textComp;
 
+    /** html editor */
     private JEditorPane htmlComp;
 
-
-    /** _more_          */
+    /** station label */
     private JLabel stationLabel;
 
-    /** _more_          */
+    /** current table */
     private NamedStationTable stationTable;
 
-    /** _more_          */
+    /** selected station */
     private NamedStationImpl selectedStation;
 
+    /** selected station id (for persistence) */
     private String selectedStationId;
+
+    /** the patthen */
+    private Pattern allPattern = null;
+
+    /** current table */
+    private NamedStationTable currentTable;
+
+    /** station list */
+    private List stationList = new ArrayList();
 
     /**
      * Default cstr;
      */
     public TextProductControl() {}
 
-    
+
+    /**
+     * Handle a hyperlink update
+     *
+     * @param e  Hyperlink event.
+     */
     public void hyperlinkUpdate(HyperlinkEvent e) {
-        URL tmp = e.getURL();
-        String url = (tmp!=null?tmp.toString():e.getDescription());
+        URL    tmp = e.getURL();
+        String url = ((tmp != null)
+                      ? tmp.toString()
+                      : e.getDescription());
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             try {
-                String content = IOUtil.readContents("http://www.crh.noaa.gov/glossary.php?word=" + url, getClass());
+                String content =
+                    IOUtil.readContents(
+                        "http://www.crh.noaa.gov/glossary.php?word=" + url,
+                        getClass());
                 int idx = content.indexOf("<html");
-                if(idx>=0) 
+                if (idx >= 0) {
                     content = content.substring(idx);
+                }
                 idx = content.indexOf("<hr");
-                if(idx>=0) 
-                    content = content.substring(0,idx);
-                content = content.replaceAll("<!--.*-->","");
-                content = content.replaceAll("<dt>","");
-                content = content.replaceAll("</dt><dd>","<br>");
+                if (idx >= 0) {
+                    content = content.substring(0, idx);
+                }
+                content = content.replaceAll("<!--.*-->", "");
+                content = content.replaceAll("<dt>", "");
+                content = content.replaceAll("</dt><dd>", "<br>");
                 JEditorPane pane = new JEditorPane();
                 pane.setEditable(false);
                 pane.setContentType("text/html");
                 pane.setText(content);
-                pane.setPreferredSize(new Dimension(250,150));
+                pane.setPreferredSize(new Dimension(250, 150));
                 JLabel lbl = new JLabel(content);
-                GuiUtils.showOkDialog(null,"Definition:" + url, pane,null);
+                GuiUtils.showOkDialog(null, "Definition:" + url, pane, null);
 
-            } catch(Exception exc) {
-                logException ("Could not fetch definition", exc);
+            } catch (Exception exc) {
+                logException("Could not fetch definition", exc);
             }
         } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
             //            System.err.println ("entered:" + url);
@@ -226,7 +214,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
-        if(productGroups==null) {
+
+        if (productGroups == null) {
             return new JLabel("Could not load product data");
         }
         JTabbedPane tabs = doMakeTabs(false, false);
@@ -238,20 +227,23 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         htmlComp.addHyperlinkListener(this);
         htmlComp.setEditable(false);
         htmlComp.setContentType("text/html");
-        textComp        = new JTextArea("", 30, 60);
+        textComp = new JTextArea("", 30, 60);
         textComp.setEditable(false);
         TextSearcher textSearcher = new TextSearcher(textComp);
 
 
-        DefaultMutableTreeNode treeRoot  = new DefaultMutableTreeNode("Product Groups");
+        DefaultMutableTreeNode treeRoot =
+            new DefaultMutableTreeNode("Product Groups");
         DefaultMutableTreeNode selectedNode = null;
-        for(ProductGroup productGroup: productGroups) {
-            DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(productGroup);
+        for (ProductGroup productGroup : productGroups) {
+            DefaultMutableTreeNode groupNode =
+                new DefaultMutableTreeNode(productGroup);
             treeRoot.add(groupNode);
-            for(ProductType type: productGroup.getProductTypes()) {
-                DefaultMutableTreeNode typeNode = new DefaultMutableTreeNode(type);
+            for (ProductType type : productGroup.getProductTypes()) {
+                DefaultMutableTreeNode typeNode =
+                    new DefaultMutableTreeNode(type);
                 groupNode.add(typeNode);
-                if(Misc.equals(type,productType)) {
+                if (Misc.equals(type, productType)) {
                     selectedNode = typeNode;
                 }
             }
@@ -262,20 +254,20 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         productTree.setRootVisible(false);
         productTree.setShowsRootHandles(true);
         productTree.addTreeSelectionListener(new TreeSelectionListener() {
-                public void 	valueChanged(TreeSelectionEvent e) {
-                    productType = getSelectedProductType();
-                    updateText();
-                }
-            }); 
+            public void valueChanged(TreeSelectionEvent e) {
+                productType = getSelectedProductType();
+                updateText();
+            }
+        });
 
-        if(selectedNode!=null) {
+        if (selectedNode != null) {
             TreeNode[] path = treeModel.getPathToRoot(selectedNode);
             productTree.setSelectionPath(new TreePath(path));
             productTree.expandPath(new TreePath(path));
         }
 
 
-        Object[]dateSelectionItems = new Object[]{
+        Object[] dateSelectionItems = new Object[] {
             new TwoFacedObject("Latest Product", -1),
             new TwoFacedObject("Last 3 Hours", 3),
             new TwoFacedObject("Last 6 Hours", 6),
@@ -284,67 +276,78 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             new TwoFacedObject("Last 36 Hours", 36),
             new TwoFacedObject("Last 48 Hours", 48),
             new TwoFacedObject("All", 0)
-
         };
-        TwoFacedObject selectedTfo  = TwoFacedObject.findId(new Integer(hours), Misc.toList(dateSelectionItems));
-         dateSelectionCbx= new JComboBox(dateSelectionItems);
-        if(selectedTfo!=null) {
+        TwoFacedObject selectedTfo =
+            TwoFacedObject.findId(new Integer(hours),
+                                  Misc.toList(dateSelectionItems));
+        dateSelectionCbx = new JComboBox(dateSelectionItems);
+        if (selectedTfo != null) {
             dateSelectionCbx.setSelectedItem(selectedTfo);
         }
         dateSelectionCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    updateText();
-                }
-            });
+            public void actionPerformed(ActionEvent ae) {
+                updateText();
+            }
+        });
 
-        JScrollPane treeScroller =  GuiUtils.makeScrollPane(productTree, 200,100);
-        JComponent treeComp = GuiUtils.centerBottom(treeScroller, GuiUtils.inset(GuiUtils.vbox(new JLabel("Date Range:"),dateSelectionCbx),5));
+        JScrollPane treeScroller = GuiUtils.makeScrollPane(productTree, 200,
+                                       100);
+        JComponent treeComp = GuiUtils.centerBottom(
+                                  treeScroller,
+                                  GuiUtils.inset(
+                                      GuiUtils.vbox(
+                                          new JLabel("Date Range:"),
+                                          dateSelectionCbx), 5));
 
         stationLabel = new JLabel(" ");
-        JComponent topComp = GuiUtils.leftRight(GuiUtils.bottom(stationLabel), getAnimationWidget().getContents());
-        JScrollPane textScroller  = new JScrollPane(textComp);
-        JScrollPane htmlScroller  = new JScrollPane(htmlComp);
-        textScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        htmlScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        JComponent textHolder = GuiUtils.centerBottom(textScroller,textSearcher);
+        JComponent topComp =
+            GuiUtils.leftRight(GuiUtils.bottom(stationLabel),
+                               getAnimationWidget().getContents());
+        JScrollPane textScroller = new JScrollPane(textComp);
+        JScrollPane htmlScroller = new JScrollPane(htmlComp);
+        textScroller.setVerticalScrollBarPolicy(
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        htmlScroller.setVerticalScrollBarPolicy(
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        JComponent textHolder = GuiUtils.centerBottom(textScroller,
+                                    textSearcher);
         JTabbedPane textTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
 
-        showGlossaryCbx=new JCheckBox("Show Glossary", showGlossary);
+        showGlossaryCbx = new JCheckBox("Show Glossary", showGlossary);
         showGlossaryCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    setText(currentText);
-                }
-                });
-        textTabbedPane.addTab("HTML", GuiUtils.centerBottom(htmlScroller, GuiUtils.right(showGlossaryCbx)));
+            public void actionPerformed(ActionEvent ae) {
+                setText(currentText);
+            }
+        });
+        textTabbedPane.addTab("HTML",
+                              GuiUtils.centerBottom(htmlScroller,
+                                  GuiUtils.right(showGlossaryCbx)));
         textTabbedPane.addTab("Text", textHolder);
         GuiUtils.tmpInsets = GuiUtils.INSETS_2;
-        JComponent contents = GuiUtils.doLayout(new Component[]{
-                GuiUtils.bottom(new JLabel("Products")),
-                topComp,
-                treeComp,
-                textTabbedPane
-                },
-            2,
-            new double[]{0.25,0.75},
-            GuiUtils.WT_NY);
+        JComponent contents = GuiUtils.doLayout(new Component[] {
+                                  GuiUtils.bottom(new JLabel("Products")),
+                                  topComp, treeComp, textTabbedPane }, 2,
+                                      new double[] { 0.25,
+                0.75 }, GuiUtils.WT_NY);
 
         updateText();
         tabs.insertTab("Products", null, contents, "", 0);
         tabs.setSelectedIndex(0);
         return tabs;
+
     }
 
 
 
-    /** _more_          */
-    private NamedStationTable currentTable;
 
-    /** _more_          */
-    private List stationList = new ArrayList();
-
-
+    /**
+     * Get the selected product type
+     *
+     * @return  the type or null
+     */
     private ProductType getSelectedProductType() {
-        TreePath[] paths = productTree.getSelectionModel().getSelectionPaths();
+        TreePath[] paths =
+            productTree.getSelectionModel().getSelectionPaths();
         if (paths == null) {
             return null;
         }
@@ -356,9 +359,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             if ( !(last instanceof DefaultMutableTreeNode)) {
                 continue;
             }
-            DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) last;
-            Object userObject = dmtn.getUserObject();
-            if(userObject instanceof ProductType) {
+            DefaultMutableTreeNode dmtn       = (DefaultMutableTreeNode) last;
+            Object                 userObject = dmtn.getUserObject();
+            if (userObject instanceof ProductType) {
                 return (ProductType) userObject;
             }
         }
@@ -367,30 +370,28 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
 
     /**
-     * _more_
+     * Get the station list
      *
-     * @return _more_
+     * @return  the list
      */
     protected List getStationList() {
         return stationList;
     }
 
 
-
-
     /**
-     * _more_
+     * Handle a change to the selected stations
      *
-     * @param selectionList _more_
+     * @param selectionList  list of stations
      */
     protected void selectedStationsChanged(List selectionList) {
-        NamedStationImpl newStation=null;
+        NamedStationImpl newStation = null;
         if (selectionList.size() == 0) {
             selectedStation = null;
         } else {
-            newStation= (NamedStationImpl) selectionList.get(0);
+            newStation = (NamedStationImpl) selectionList.get(0);
         }
-        if(Misc.equals(newStation, selectedStation)) {
+        if (Misc.equals(newStation, selectedStation)) {
             updateStationLabel();
             return;
         }
@@ -399,55 +400,72 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         updateText();
     }
 
-    private  void updateStationLabel() {
-        if(stationLabel!=null) {
+    /**
+     * Update the station label
+     */
+    private void updateStationLabel() {
+        if (stationLabel != null) {
             NamedStationImpl station = selectedStation;
             if (station != null) {
-                String state= (String)station.getProperty("ST","");
-                stationLabel.setText(station.getName()+" " + state);
+                String state =
+                    (String) station.getProperty(NamedStationTable.KEY_STATE,
+                        "");
+                stationLabel.setText(station.getName() + (state.equals("")
+                        ? " "
+                        : ", ") + state);
             } else {
                 stationLabel.setText(" ");
             }
         }
-        
+
     }
 
     /**
-     * _more_
+     * Update the text.
      */
-    public  void updateText() {
+    public void updateText() {
         Misc.run(new Runnable() {
-                public void run() {
-                    showWaitCursor();
-                    try {
-                        setText("Loading...");
-                        updateTextInner();
-                    } catch(Exception exc) {
-                        setText("Error:" + exc);
-                    } finally {
-                        showNormalCursor();
-                    }
+            public void run() {
+                showWaitCursor();
+                try {
+                    setText("Loading...");
+                    updateTextInner();
+                } catch (Exception exc) {
+                    setText("Error:" + exc);
+                } finally {
+                    showNormalCursor();
                 }
-            });
+            }
+        });
     }
 
+    /**
+     * Add selected to list
+     *
+     * @param listOfStations list of stations
+     */
     protected void addSelectedToList(List listOfStations) {
         //NOOP
     }
 
+    /**
+     * Update the text for real
+     */
     private void updateTextInner() {
         try {
-            NamedStationTable newTable = dataSource.getStations(productType,getDateSelection());
+            NamedStationTable newTable = dataSource.getStations(productType,
+                                             getDateSelection());
             if (newTable != currentTable) {
                 if (newTable != null) {
                     stationList = new ArrayList(newTable.values());
                 } else {
                     stationList = new ArrayList();
                 }
-                if(selectedStationId!=null) {
-                    for(NamedStationImpl station: (List<NamedStationImpl>) stationList) {
-                        if(selectedStationId.equals(station.getID())) {
-                            selectedStation  = station;
+                // in case we are unpersisting
+                if (selectedStationId != null) {
+                    for (NamedStationImpl station : (List<NamedStationImpl>) stationList) {
+                        if (selectedStationId.equals(station.getID())) {
+                            selectedStation = station;
                             break;
                         }
                     }
@@ -456,181 +474,230 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 }
 
 
-                if(selectedStation!=null && !stationList.contains(selectedStation)) {
-                    if(productType!=null) {
-                        selectedStation = null;
-                        updateStationLabel();
+                if (selectedStation != null) {
+                    if ( !stationList.contains(selectedStation)) {
+                        if (productType != null) {
+                            selectedStation = null;
+                            updateStationLabel();
+                        }
+                    } else {
+                        selectedStation = (NamedStationImpl) stationList.get(
+                            stationList.indexOf(selectedStation));
                     }
                 }
                 loadData();
                 currentTable = newTable;
             }
 
-            if (productType != null && selectedStation!=null) {
-                products =  dataSource.readProducts(productType,selectedStation, getDateSelection());
+            if ((productType != null) && (selectedStation != null)) {
+                products = dataSource.readProducts(productType,
+                        selectedStation, getDateSelection());
             } else {
-                products =  new ArrayList<Product>();
+                products = new ArrayList<Product>();
             }
-            products = (List<Product>)Misc.sort(products);
+            products = (List<Product>) Misc.sort(products);
 
             List dateTimes = new ArrayList();
-            for(Product product: products) {
-                if(product.getDate()!=null) {
+            for (Product product : products) {
+                if (product.getDate() != null) {
                     dateTimes.add(new DateTime(product.getDate()));
                 }
             }
 
 
             ignoreTimeChanges = true;
-            if(dateTimes.size()>0) {
-                getAnimationWidget().setBaseTimes(ucar.visad.Util.makeTimeSet(dateTimes));
+            if (dateTimes.size() > 0) {
+                getAnimationWidget().setBaseTimes(
+                    ucar.visad.Util.makeTimeSet(dateTimes));
                 getAnimationWidget().gotoEnd();
             } else {
                 getAnimationWidget().setBaseTimes(null);
             }
             ignoreTimeChanges = false;
 
-            if(products.size()==0)  {
+            if (products.size() == 0) {
                 setText("No products found");
             } else {
-                setText(products.get(products.size()-1).getContent());
+                setText(products.get(products.size() - 1).getContent());
             }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             logException("Error updating product text", exc);
         }
     }
 
 
+    /**
+     * Get the date selection
+     *
+     * @return the DateSelection (or null)
+     */
     private DateSelection getDateSelection() {
-        long hours = (long)getHours();
-        if(hours == 0) return null;
+        long hours = (long) getHours();
+        if (hours == 0) {
+            return null;
+        }
         int count = Integer.MAX_VALUE;
-        if(hours ==-1)  {
+        if (hours == -1) {
             count = 1;
-            hours = 24*365*20;
+            hours = 24 * 365 * 20;
         }
 
         Date now = new Date(System.currentTimeMillis());
         //        Date now = DateUtil.roundByDay(new Date(System.currentTimeMillis()), 1);
-        Date then = new Date(System.currentTimeMillis()-DateUtil.hoursToMillis(hours));
-        DateSelection dateSelection  = new DateSelection(then, now);
+        Date then = new Date(System.currentTimeMillis()
+                             - DateUtil.hoursToMillis(hours));
+        DateSelection dateSelection = new DateSelection(then, now);
         dateSelection.setCount(count);
         return dateSelection;
     }
 
-    private Pattern allPattern = null;
+    /**
+     * Convert the text to HTML
+     *
+     * @param text  the text
+     *
+     * @return the text converted to HTML
+     */
     private String convertToHtml(String text) {
-        if(allPattern == null) {
+        if (allPattern == null) {
             try {
-            List<String> tmp = (List<String>)StringUtil.split(IOUtil.readContents("/ucar/unidata/idv/control/nwsglossary.txt",getClass()),"\n",true,true);
-            StringBuffer pattern = new StringBuffer("([ ]+)(");
-            for(String word: tmp) {
-                if(word.length()<=3) continue;
-                word = word.toUpperCase();
-                word = word.replace("(","\\(");
-                word = word.replace(")","\\)");
-                word = word.replace("+","\\+");
-                word = word.replace(".","\\.");
-                word = word.replace("*","\\*");
-                pattern.append(word);
-                pattern.append("|");
-            }
-            pattern.append(")([\\. ]+)");
-            allPattern = Pattern.compile(pattern.toString());
-            } catch(Exception exc) {
+                List<String> tmp =
+                    (List<String>) StringUtil.split(
+                        IOUtil.readContents(
+                            "/ucar/unidata/idv/control/nwsglossary.txt",
+                            getClass()), "\n", true, true);
+                StringBuffer pattern = new StringBuffer("([ ]+)(");
+                for (String word : tmp) {
+                    if (word.length() <= 3) {
+                        continue;
+                    }
+                    word = word.toUpperCase();
+                    word = word.replace("(", "\\(");
+                    word = word.replace(")", "\\)");
+                    word = word.replace("+", "\\+");
+                    word = word.replace(".", "\\.");
+                    word = word.replace("*", "\\*");
+                    pattern.append(word);
+                    pattern.append("|");
+                }
+                pattern.append(")([\\. ]+)");
+                allPattern = Pattern.compile(pattern.toString());
+            } catch (Exception exc) {
                 logException("Reading glossary", exc);
             }
         }
-        if(selectedStation!=null) {
-            text = text.replace(" " + selectedStation.getID()+" "," <b>"+
-                                selectedStation.getID() +"</b> ");
+        if (selectedStation != null) {
+            text = text.replace(" " + selectedStation.getID() + " ",
+                                " <b>" + selectedStation.getID() + "</b> ");
         }
 
-        text = text.replaceAll("\\.\\.\\.\n++","...\n");
+        text = text.replaceAll("\\.\\.\\.\n++", "...\n");
         text = text.trim();
         StringBuffer sb = new StringBuffer();
-        List<String> lines = (List<String>)StringUtil.split(text,"\n",false,false);
-        int lineCnt=0;
-        for(String line: lines) {
+        List<String> lines = (List<String>) StringUtil.split(text, "\n",
+                                 false, false);
+        int lineCnt = 0;
+        for (String line : lines) {
             lineCnt++;
             line = line.trim();
-            if(line.startsWith(".")) {
+            if (line.startsWith(".")) {
                 int idx = line.indexOf("...");
-                if(idx>1) {
-                    String header = line.substring(1,idx);
-                    line = "<div style=\"background-color:#c3d9ff; font-weight: bold; padding-left:2px; padding-top:2px;margin-top:7px;\">" + header +"</div>" +line.substring(idx+3);
-                } else if(line.equals(".")) {
+                if (idx > 1) {
+                    String header = line.substring(1, idx);
+                    line = "<div style=\"background-color:#c3d9ff; font-weight: bold; padding-left:2px; padding-top:2px;margin-top:7px;\">"
+                           + header + "</div>" + line.substring(idx + 3);
+                } else if (line.equals(".")) {
                     line = "\n";
                 }
-            } else if(line.equals("=")) {
+            } else if (line.equals("=")) {
                 line = "<hr>";
-            } else if(line.equals("$$")) {
+            } else if (line.equals("$$")) {
                 continue;
             } else {
-                line = line.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$","<i>$1</i>"); 
+                line = line.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$",
+                                       "<i>$1</i>");
             }
             //            if(lineCnt<5) line = line+"<br>";
             sb.append(line);
             sb.append("\n");
         }
-        text = sb.toString();        
-        String[]icons = {"partlycloudy.png", "cloudy.png","partlysunny.png","sunny.png","rainy.png"};
-        String[]patterns = {"PARTLY CLOUDY", "MOSTLY CLOUDY","PARTLY SUNNY","SUNNY","RAIN SHOWERS"};
-        for(int i=0;i<icons.length;i++) {
-            text = text.replace(patterns[i],"PATTERN" + i +"<img src=idvresource:/ucar/unidata/idv/control/images/" + icons[i]+">");
+        text = sb.toString();
+        String[] icons = { "partlycloudy.png", "cloudy.png",
+                           "partlysunny.png", "sunny.png", "rainy.png" };
+        String[] patterns = { "PARTLY CLOUDY", "MOSTLY CLOUDY",
+                              "PARTLY SUNNY", "SUNNY", "RAIN SHOWERS" };
+        for (int i = 0; i < icons.length; i++) {
+            text = text.replace(
+                patterns[i],
+                "PATTERN" + i
+                + "<img src=idvresource:/ucar/unidata/idv/control/images/"
+                + icons[i] + ">");
         }
-        for(int i=0;i<icons.length;i++) {
-            text = text.replace("PATTERN" + i,patterns[i]);
+        for (int i = 0; i < icons.length; i++) {
+            text = text.replace("PATTERN" + i, patterns[i]);
         }
 
 
-        if(showGlossaryCbx.isSelected()) {
-            text= allPattern.matcher(text).replaceAll("$1<a href=\"$2\">$2</a>$3");
+        if (showGlossaryCbx.isSelected()) {
+            text = allPattern.matcher(text).replaceAll(
+                "$1<a href=\"$2\">$2</a>$3");
         }
-        text = text.replace("\n\n","<p>");
-        text = text.replace("\n","<br>");
-        return "<html>" + text +"</html>";
+        text = text.replace("\n\n", "<p>");
+        text = text.replace("\n", "<br>");
+        return "<html>" + text + "</html>";
     }
 
+    /**
+     * Set the text
+     *
+     * @param theText the text
+     */
     protected void setText(final String theText) {
         currentText = theText;
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    String html = "";
-                    String text = "";
-                    if(productType==null) {
-                        html = text = "Please select a product";
-                    } else if(selectedStation==null){
-                        html = text = "Please select a station";
-                    } else {
-                        text = theText;
-                        long t1 = System.currentTimeMillis();
-                        html = convertToHtml(theText);
-                        long t2 = System.currentTimeMillis();
-                        //                        System.err.println ("Time:" + (t2-t1));
+            public void run() {
+                String html = "";
+                String text = "";
+                if (productType == null) {
+                    html = text = "Please select a product";
+                } else if (selectedStation == null) {
+                    html = text = "Please select a station";
+                } else {
+                    text = theText;
+                    long t1 = System.currentTimeMillis();
+                    html = convertToHtml(theText);
+                    long t2 = System.currentTimeMillis();
+                    //                        System.err.println ("Time:" + (t2-t1));
 
-                    }
-                    textComp.setText(text);
-                    htmlComp.setText(html);
-                    textComp.setCaretPosition(0);
-                    textComp.scrollRectToVisible(new Rectangle(0,0,1,1));
-                    htmlComp.setCaretPosition(0);
-                    htmlComp.scrollRectToVisible(new Rectangle(0,0,1,1));
                 }
-            });
+                textComp.setText(text);
+                htmlComp.setText(html);
+                textComp.setCaretPosition(0);
+                textComp.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+                htmlComp.setCaretPosition(0);
+                htmlComp.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+            }
+        });
 
     }
 
+    /**
+     * Handle the time changed
+     *
+     * @param time  the time to set
+     */
     protected void timeChanged(Real time) {
         try {
-            if(ignoreTimeChanges) return;
+            if (ignoreTimeChanges) {
+                return;
+            }
             int idx = getAnimation().getCurrent();
-            if(idx>=0 && idx<products.size()) {
+            if ((idx >= 0) && (idx < products.size())) {
                 setText(products.get(idx).getContent());
             } else {
                 setText("");
             }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             logException("Error setting time", exc);
         }
     }
@@ -711,72 +778,74 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         return productType;
     }
 
-/**
-Set the SelectedStationId property.
-
-@param value The new value for SelectedStationId
-**/
-public void setSelectedStationId (String value) {
-	selectedStationId = value;
-}
-
-/**
-Get the SelectedStationId property.
-
-@return The SelectedStationId
-**/
-public String getSelectedStationId () {
-    if(selectedStation!=null) {
-	return selectedStation.getID();
+    /**
+     * Set the SelectedStationId property.
+     *
+     * @param value The new value for SelectedStationId
+     */
+    public void setSelectedStationId(String value) {
+        selectedStationId = value;
     }
-    return null;
-}
 
-
-/**
-Set the Hours property.
-
-@param value The new value for Hours
-**/
-public void setHours (int value) {
-	hours = value;
-}
-
-/**
-Get the Hours property.
-
-@return The Hours
-**/
-public int getHours () {
-    if(dateSelectionCbx!=null) {
-        TwoFacedObject tfo = (TwoFacedObject)dateSelectionCbx.getSelectedItem();
-        if(tfo!=null) {
-            hours = new Integer(tfo.getId().toString()).intValue();
+    /**
+     * Get the SelectedStationId property.
+     *
+     * @return The SelectedStationId
+     */
+    public String getSelectedStationId() {
+        if (selectedStation != null) {
+            return selectedStation.getID();
         }
+        return null;
     }
-    return hours;
-}
 
 
-/**
-Set the ShowGlossary property.
+    /**
+     * Set the Hours property.
+     *
+     * @param value The new value for Hours
+     */
+    public void setHours(int value) {
+        hours = value;
+    }
 
-@param value The new value for ShowGlossary
-**/
-public void setShowGlossary (boolean value) {
-	showGlossary = value;
-}
+    /**
+     * Get the Hours property.
+     *
+     * @return The Hours
+     */
+    public int getHours() {
+        if (dateSelectionCbx != null) {
+            TwoFacedObject tfo =
+                (TwoFacedObject) dateSelectionCbx.getSelectedItem();
+            if (tfo != null) {
+                hours = new Integer(tfo.getId().toString()).intValue();
+            }
+        }
+        return hours;
+    }
 
-/**
-Get the ShowGlossary property.
 
-@return The ShowGlossary
-**/
-public boolean getShowGlossary () {
-    if(showGlossaryCbx!=null)
-        showGlossary = showGlossaryCbx.isSelected();
-	return showGlossary;
-}
+    /**
+     * Set the ShowGlossary property.
+     *
+     * @param value The new value for ShowGlossary
+     */
+    public void setShowGlossary(boolean value) {
+        showGlossary = value;
+    }
+
+    /**
+     * Get the ShowGlossary property.
+     *
+     * @return The ShowGlossary
+     */
+    public boolean getShowGlossary() {
+        if (showGlossaryCbx != null) {
+            showGlossary = showGlossaryCbx.isSelected();
+        }
+        return showGlossary;
+    }
 
 
 }
