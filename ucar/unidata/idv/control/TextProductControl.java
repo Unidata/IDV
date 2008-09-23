@@ -410,7 +410,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 String state =
                     (String) station.getProperty(NamedStationTable.KEY_STATE,
                         "");
-                stationLabel.setText(station.getName() + (state.equals("")
+                String name = station.getName();
+                name = name.replace("_", " ");
+                stationLabel.setText(name + (state.equals("")
                         ? " "
                         : ", ") + state);
             } else {
