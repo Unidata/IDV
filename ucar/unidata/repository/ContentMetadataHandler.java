@@ -130,22 +130,18 @@ public class ContentMetadataHandler extends MetadataHandler {
         if (type.equals(TYPE_THUMBNAIL)) {
             String html = getHtml(request, entry, metadata,forLink);
             if(html!=null) {
-                if(forLink)
-                    sb.append(HtmlUtil.space(1));
-                else
-                    sb.append(HtmlUtil.br());
+                sb.append(HtmlUtil.space(1));
                 sb.append(html);
+                sb.append(HtmlUtil.space(1));
             }
         }
 
         if (!forLink && type.equals(TYPE_ATTACHMENT)) {
             String html = getHtml(request, entry, metadata,false);
             if(html!=null) {
-                if(forLink)
-                    sb.append(HtmlUtil.space(1));
-                else
-                    sb.append(HtmlUtil.br());
+                sb.append(HtmlUtil.space(1));
                 sb.append(html);
+                sb.append(HtmlUtil.space(1));
             }
         }
     }
@@ -186,6 +182,7 @@ public class ContentMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry,Metadata metadata) {
+        if(true) return null;
         Metadata.Type type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;

@@ -448,7 +448,11 @@ public class HtmlUtil {
             if (addAmpersand) {
                 url = url + "&";
             }
-            url          = url + args[i] + "=" + args[i + 1];
+            try {
+                url          = url + args[i] + "=" + java.net.URLEncoder.encode(args[i + 1], "UTF-8");
+            } catch(Exception exc) {
+                System.err.println("error encoding arg:" + args[i+1] + " " + exc);
+            }
             addAmpersand = true;
         }
         return url;

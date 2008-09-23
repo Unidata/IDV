@@ -422,7 +422,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     protected List<Product> readProducts(TableInfo tableInfo,
                                          NamedStationImpl station,
-                                         DateSelection dateSelection) {
+                                         DateSelection dateSelection, boolean justStations) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
@@ -454,7 +454,6 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                 false);
 
 
-        files = IOUtil.sortFilesOnAge(files, true);
         int     count = 0;
         boolean ok    = true;
         for (DatedObject datedObject : datedObjects) {

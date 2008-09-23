@@ -817,10 +817,23 @@ public class HtmlOutputHandler extends OutputHandler {
             if (group.getDescription().length() > 0) {
                 StringBuffer descSB = new StringBuffer("<div class=\"description\"\n");
                 descSB.append(group.getDescription());
-                getMetadataManager().decorateEntry(request, group, descSB, false);
+                StringBuffer metadataSB = new StringBuffer();
+                getMetadataManager().decorateEntry(request, group, metadataSB, false);
+                String metataDataHtml = metadataSB.toString();
+                if(metataDataHtml.length()>0) {
+                    //                    descSB.append(getRepository().makeShowHideBlock(request, "Attachments",
+                    //                                                            metadataSB,true));
+                    //                    descSB.append(metataDataHtml);
+                }
                 descSB.append("</div>\n");
                 sb.append(getRepository().makeShowHideBlock(request, "Description",
                                                             descSB,true));
+                if(metataDataHtml.length()>0) {
+                    
+                    sb.append(getRepository().makeShowHideBlock(request, "Attachments",
+                                                                new StringBuffer("<div class=\"description\">" +metadataSB+"</div>"),true));
+                    //                    descSB.append(metataDataHtml);
+                }
             }
         }
 

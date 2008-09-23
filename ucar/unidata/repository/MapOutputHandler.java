@@ -241,6 +241,14 @@ public class MapOutputHandler extends OutputHandler {
         js.append("var marker;\n");
         js.append("var line;\n");
 
+        int cnt = 0;
+        for (Entry entry : entriesToUse) {
+            if (entry.hasAreaDefined()) {
+                cnt++;
+            }
+        }
+
+        boolean makeRectangles = cnt<=20;
         for (Entry entry : entriesToUse) {
             String idBase = entry.getId();
             if (entry.hasAreaDefined()) {
@@ -255,7 +263,11 @@ public class MapOutputHandler extends OutputHandler {
                 js.append(",");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append("]);\n");
-                js.append("initLine(line," + qt(entry.getId()) + ");\n");
+                js.append("initLine(line," + qt(entry.getId()) + ","+(makeRectangles?"1":"0")+");\n");
+                
+
+
+
             }
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 String info =
@@ -267,8 +279,11 @@ public class MapOutputHandler extends OutputHandler {
                 info = info.replace("\n", " ");
                 info = info.replace("\"", "\\\"");
                 String icon = getRepository().getIconUrl(entry);
-                js.append("marker = new Marker("
-                          + llp(entry.getSouth(), entry.getEast()) + ");\n");
+                if(makeRectangles || !entry.hasAreaDefined()) {
+                    js.append("marker = new Marker(" + llp(entry.getSouth(), entry.getEast()) + ");\n");
+                } else {
+                    js.append("marker = new Marker(" + llp(entry.getSouth()+(entry.getNorth()-entry.getSouth())/2, entry.getWest()+(entry.getEast()-entry.getWest())/2) + ");\n");
+                }
 
                 js.append("marker.setIcon(" + qt(icon) + ");\n");
                 js.append("marker.setInfoBubble(\"" + info + "\");\n");

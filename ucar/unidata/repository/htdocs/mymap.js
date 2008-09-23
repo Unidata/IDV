@@ -3,6 +3,7 @@ var lineColor="#00FF00";
 var lastLine;
 
 var lines = new Object();
+var addedToMap = new Object();
 var markers = new Object();
 
 var mapstraction;
@@ -45,11 +46,15 @@ function initMarker(marker,id) {
 	mapstraction.addMarker(marker);
 }
 
-function initLine(line,id) {
+function initLine(line,id,addItToMap) {
  	line.setColor(lineColor);
 	line.setWidth(3);
 	lines[id]=line;
-	mapstraction.addPolyline(line);
+	addedToMap[id]=addItToMap;
+        
+        if (addItToMap) {
+            mapstraction.addPolyline(line);
+        }
 }
 
 function hiliteEntry(map,id) {
@@ -60,7 +65,9 @@ function hiliteEntry(map,id) {
 	if(lastLine) {
 		lastLine.setColor(lineColor);
 		map.removePolyline(lastLine);
-		map.addPolyline(lastLine);
+                if(addedToMap[id]) {
+                    map.addPolyline(lastLine);
+                }
 	}
 	lastLine = lines[id];
 	if(lastLine) {

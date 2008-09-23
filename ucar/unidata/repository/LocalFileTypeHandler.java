@@ -223,7 +223,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                         ? (Entry) new Group(synthId, handler)
                         : new Entry(synthId, handler));
 
-        Entry templateEntry = getRepository().getTemplateEntry(targetFile);
+        Entry templateEntry =  getRepository().getTemplateEntry(targetFile);
         String name = null;
         List<String> names = get(values,COL_NAMES);
         for(String pair: names) {
