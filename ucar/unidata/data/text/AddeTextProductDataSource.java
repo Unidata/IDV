@@ -19,8 +19,6 @@
  */
 
 
-
-
 package ucar.unidata.data.text;
 
 
@@ -113,7 +111,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
 
 
         String url = builder.toString();
-        // System.out.println("url = " + url);
+        //System.out.println("url = " + url);
         try {
             AddeTextReader atr = new AddeTextReader(url);
             if (url.indexOf("wxtext") > 0) {
@@ -191,11 +189,20 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         }
 
         StringBuilder buf = new StringBuilder("wxtext?");
-        buf.append("WMO=");
-        buf.append(station.getProperty(NamedStationTable.KEY_BULLETIN,
-                                       "NONE"));
-        buf.append("&WSTN=");
-        buf.append(station.getID());
+        if (ti.flag.equals(ti.FLAG_F)) {
+            String afos = station.getID();
+            if (afos == null || afos.equals("")) return "";
+            buf.append("APRO=");
+            buf.append(afos.substring(0,3));
+            buf.append("&ASTN=");
+            buf.append(afos.substring(3));
+        } else {
+            buf.append("WMO=");
+            buf.append(station.getProperty(NamedStationTable.KEY_BULLETIN,
+                                           "NONE"));
+            buf.append("&WSTN=");
+            buf.append(station.getID());
+        }
         buf.append("&dtime=");
         buf.append(dtime);
         buf.append("&num=");
@@ -227,9 +234,10 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
                            ? null
                            : dateRange[1];
         int    maxCount  = ((dateSelection == null)
-                            ? 10
+                            ? 999
                             : dateSelection.getCount());
-        maxCount = Math.min(maxCount, 10);
+        maxCount = Math.min(maxCount, 999);
+        int hourMod = 1;
 
         String id = station.getID();
         String idn =
@@ -242,9 +250,11 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         if (ti.type.equals("SND_DATA")) {
             buf.append("UPPERAIR");
             id = idn;
+            hourMod = 3;
         } else if (ti.type.equals("SYN_DATA")) {
             buf.append("SYNOPTIC");
             id = idn;
+            hourMod = 3;
         } else if (ti.type.equals("TAFS_DEC")) {
             buf.append("TERMFCST");
         } else {  // (ti.type.equals("SFC_HRLY")) {
@@ -258,25 +268,25 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         buf.append(id);
         // set the times
         // TODO:  this needs some work
-        if (end != null) {
-            int[] endDT = McIDASUtil.mcSecsToDayTime(start.getTime());
+        // contrary to the docs, the time in newest/oldest is HH not HHMMSS
+        if (dateRange != null) {
+            int[] endDT = McIDASUtil.mcSecsToDayTime(end.getTime()/1000);
+            int endHour = endDT[1]/10000;
+            endHour = endHour - endHour%hourMod;
             buf.append("&newest=");
             buf.append(endDT[0]);
             buf.append(" ");
-            buf.append(endDT[1]);
-        } else {
-            buf.append("&num=1");
-        }
-        if (start != null) {
-            int[] startDT = McIDASUtil.mcSecsToDayTime(start.getTime());
+            buf.append(endHour);
+            int[] startDT = McIDASUtil.mcSecsToDayTime(start.getTime()/1000);
+            int startHour = startDT[1]/10000;
+            startHour = startHour - startHour%hourMod;
             buf.append("&oldest=");
             buf.append(startDT[0]);
             buf.append(" ");
-            buf.append(startDT[1]);
-            if (end != null) {
-                buf.append("&num=9999");
-            }
+            buf.append(startHour);
         }
+        buf.append("&num=");
+        buf.append(maxCount);
 
         return buf.toString();
     }
@@ -287,7 +297,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      * @return the base path of the data.
      */
     protected String getTablePath() {
-        return "http://www.unidata.ucar.edu/software/idv/resources";
+        return getDataContext().getIdv().getProperty("tablepath", "http://www.unidata.ucar.edu/software/idv/resources");
     }
 
     /**
@@ -315,6 +325,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      */
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
+               || ti.flag.equals(TableInfo.FLAG_F)
                || ti.flag.equals(TableInfo.FLAG_O);
     }
 

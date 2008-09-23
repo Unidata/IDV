@@ -653,7 +653,8 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return true if we can handle it.
      */
     protected boolean canHandleType(TableInfo ti) {
-        return ti.flag.equals(TableInfo.FLAG_B);
+        return ti.flag.equals(TableInfo.FLAG_B) ||
+               ti.flag.equals(TableInfo.FLAG_F);
     }
 
     /**
