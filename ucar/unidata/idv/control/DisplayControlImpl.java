@@ -4366,8 +4366,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param window The control's window
      */
     public void initWindow(final IdvWindow window) {
-        SwingUtilities.invokeLater(new Runnable() {
+        /*        SwingUtilities.invokeLater(new Runnable() {
                 public void run() {        
+                    System.err.println("Invoking");
+                    try {*/
                     window.setTitle(getTitle());
                     window.setContents(outerContents);
                     if (windowSize != null) {
@@ -4382,8 +4384,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     } else {
                         hide();
                     }
+                    /*                    System.err.println("OK");
+                    } catch(Exception exc) {
+                        System.err.println ("oops: " + exc);
+                        exc.printStackTrace();
+                    }
                 }
-            });
+                });*/
     }
 
 

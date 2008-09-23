@@ -1949,14 +1949,10 @@ public abstract class DrawingGlyph {
 
 
 
-    public MapSet makeMapSet() throws Exception {
-        float[][] latLons = getLatLons(points);
-        float[][] lonLats = new float[][]{latLons[IDX_LON],latLons[IDX_LAT]};
-        RealTupleType coordMathType =
-            new RealTupleType(RealType.Longitude,RealType.Latitude);
-        return  new MapSet(coordMathType, lonLats, lonLats[0].length,
-                           (CoordinateSystem) null, (Unit[]) null,
-                           (ErrorEstimate[]) null, false);  
+    public float[][] getLatLons() throws Exception {
+        return  getLatLons(((actualPoints != null)
+                            ? actualPoints
+                            : points));
     }
 
     /**

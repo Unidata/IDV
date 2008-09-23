@@ -21,8 +21,10 @@
  */
 
 
-package ucar.unidata.idv.control;
+package ucar.unidata.idv.control.editor;
 
+import ucar.unidata.idv.control.DrawingControl;
+import ucar.unidata.idv.control.RadarSweepControl;
 
 import org.python.core.*;
 import org.python.util.*;
@@ -109,7 +111,7 @@ public class RadarEditor extends DrawingControl {
 
 
     /** _more_          */
-    private RadarSweepControl radarSweepControl;
+    private MyRadarSweepControl radarSweepControl;
 
     /** _more_          */
     private PythonInterpreter interpreter;
@@ -157,7 +159,6 @@ public class RadarEditor extends DrawingControl {
      * @version $Revision: 1.3 $
      */
     public static class MyRadarSweepControl extends RadarSweepControl {
-
         /**
          * _more_
          */
@@ -171,6 +172,15 @@ public class RadarEditor extends DrawingControl {
         public boolean getShowInLegend() {
             return false;
         }
+
+        protected void setCurrentSlice(FieldImpl slice) throws Exception {
+            super.setCurrentSlice(slice);
+        }
+        
+        protected FieldImpl getCurrentSlice() throws Exception {
+            return super.getCurrentSlice();
+        }
+
 
     }
 
@@ -186,6 +196,13 @@ public class RadarEditor extends DrawingControl {
         }
         super.doRemove();
     }
+
+
+    protected void setField(FieldImpl field) throws Exception {
+        radarSweepControl.getGridDisplayable().loadData(field);
+        radarSweepControl.setCurrentSlice(field);
+    }
+
 
     /**
      * _more_
@@ -464,7 +481,7 @@ public class RadarEditor extends DrawingControl {
                 applyAction(action);
             }
             FieldImpl newSlice = radarSweepControl.getCurrentSlice();
-            commandManager.add(new EditCommand(this, oldSlice, newSlice),
+            commandManager.add(new FieldCommand(this, oldSlice, newSlice),
                                true);
             radarSweepControl.getGridDisplayable().loadData(
                 (FieldImpl) newSlice);
@@ -494,9 +511,8 @@ public class RadarEditor extends DrawingControl {
             long t1 = System.currentTimeMillis();
             FieldImpl oldSlice = radarSweepControl.getCurrentSlice();
             StringBuffer sb = new StringBuffer();
-            getMapLinesJython(action.getSelector(),  sb);
-            getInterpreter().exec(sb.toString());
-
+            //            getMapLinesJython(action.getSelector(),  sb);
+            //            getInterpreter().exec(sb.toString());
 
 
             getInterpreter().set("field", oldSlice);
@@ -507,7 +523,7 @@ public class RadarEditor extends DrawingControl {
             if(action.getSelector().isRegion()) {
                 getInterpreter().set("mapLines", mapLines);
                 getInterpreter().exec("newField = mapsApplyToField('"
-                                      + action.function + "'field,mapLines,"
+                                      + action.getFunction() + "',field,mapLines,"
                                       + (action.getSelector().getInside()
                                          ? "1"
                                          : "0") + ")");
@@ -689,7 +705,7 @@ public class RadarEditor extends DrawingControl {
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    public static class EditCommand extends ucar.unidata.ui.Command {
+    public static class FieldCommand extends ucar.unidata.ui.Command {
 
         /** _more_          */
         RadarEditor editor;
@@ -707,7 +723,7 @@ public class RadarEditor extends DrawingControl {
          * @param oldSlice _more_
          * @param newSlice _more_
          */
-        public EditCommand(RadarEditor editor, FieldImpl oldSlice,
+        public FieldCommand(RadarEditor editor, FieldImpl oldSlice,
                            FieldImpl newSlice) {
             this.editor   = editor;
             this.oldSlice = oldSlice;
@@ -745,297 +761,7 @@ public class RadarEditor extends DrawingControl {
     }
 
 
-    /**
-     * Class Selector _more_
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
-     */
-    public static class Selector {
-        /** _more_          */
-        public static final String TYPE_FIELD = "field";
-        
-        /** _more_          */
-        public static final String TYPE_REGION_ALL = "region.all";
-        
-        /** _more_          */
-        public static final String TYPE_REGION_SELECTED = "region.selected";
 
-
-        /** _more_          */
-        public static final String TYPE_RANGE = "range";
-
-
-        private String type;
-
-        private boolean inside=true;
-
-        private float min=0;
-        private float max=0;
-
-        public Selector() {
-        }
-
-        public Selector(String type, boolean inside) {
-            this.type = type;
-            this.inside =  inside;
-        }
-
-
-
-        public boolean isRegion() {
-            return isRegion(type);
-        }
-
-
-        public static boolean isRegion(String type) {
-            return type.equals(TYPE_REGION_SELECTED) || type.equals(TYPE_REGION_ALL);
-        }
-
-        public boolean isRange() {
-            return return isRange(type);
-        }
-
-
-        public static boolean isRange(String type) {
-            return type.equals(TYPE_RANGE);
-        }
-
-        
-        public String toString() {
-            if(type.equals(TYPE_FIELD))
-                return  "entire field";
-            if(type.equals(TYPE_REGION_ALL))
-                return "all regions";
-            if(type.equals(TYPE_REGION_SELECTED))
-                return "selected regions";
-            if(type.equals(TYPE_RANGE)) {
-                return "within range (" + min +","+max+")";
-            return "???";
-        }
-
-
-
-
-
-        /**
-         *  Set the Type property.
-         *
-         *  @param value The new value for Type
-         */
-        public void setType(String value) {
-            type = value;
-        }
-
-        /**
-         *  Get the Type property.
-         *
-         *  @return The Type
-         */
-        public String getType() {
-            return type;
-        }
-
-        /**
-         *  Set the Inside property.
-         *
-         *  @param value The new value for Inside
-         */
-        public void setInside(boolean value) {
-            inside = value;
-        }
-
-        /**
-         *  Get the Inside property.
-         *
-         *  @return The Inside
-         */
-        public boolean getInside() {
-            return inside;
-        }
-
-
-/**
-Set the Min property.
-
-@param value The new value for Min
-**/
-public void setMin (float value) {
-	min = value;
-}
-
-/**
-Get the Min property.
-
-@return The Min
-**/
-public float getMin () {
-	return min;
-}
-
-/**
-Set the Max property.
-
-@param value The new value for Max
-**/
-public void setMax (float value) {
-	max = value;
-}
-
-/**
-Get the Max property.
-
-@return The Max
-**/
-public float getMax () {
-	return max;
-}
-
-
-
-
-    }
-
-
-
-    /**
-     * Class Action _more_
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
-     */
-    public static class Action {
-
-        /** _more_          */
-        private String name;
-
-        /** _more_          */
-        private String function;
-
-
-        /** _more_          */
-        private String jython;
-
-        /** _more_          */
-        private Selector selector;
-
-
-        /**
-         * _more_
-         */
-        public Action() {}
-
-        /**
-         * _more_
-         *
-         * @param name _more_
-         * @param function _more_
-         * @param inside _more_
-         */
-        public Action(String name, String function, Selector selector) {
-            this(name, function,null, selector);
-        }
-
-        public Action(String name, String function, String jython, Selector selector) {
-            this.name       = name;
-            this.function   = function;
-            this.jython = jython;
-            this.selector = selector;
-        }
-
-/**
-Set the Selector property.
-
-@param value The new value for Selector
-**/
-public void setSelector (Selector value) {
-	selector = value;
-}
-
-/**
-Get the Selector property.
-
-@return The Selector
-**/
-public Selector getSelector () {
-	return selector;
-}
-
-
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public String toString() {
-            String region = selector.toString();
-            return name + " applied to " + region;
-        }
-
-
-
-        /**
-         *  Set the Name property.
-         *
-         *  @param value The new value for Name
-         */
-        public void setName(String value) {
-            name = value;
-        }
-
-        /**
-         *  Get the Name property.
-         *
-         *  @return The Name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         *  Set the Function property.
-         *
-         *  @param value The new value for Function
-         */
-        public void setFunction(String value) {
-            function = value;
-        }
-
-        /**
-         *  Get the Function property.
-         *
-         *  @return The Function
-         */
-        public String getFunction() {
-            return function;
-        }
-
-        /**
-           Set the Jython property.
-
-           @param value The new value for Jython
-        **/
-        public void setJython (String value) {
-            jython = value;
-        }
-
-        /**
-           Get the Jython property.
-
-           @return The Jython
-        **/
-        public String getJython () {
-            return jython;
-        }
-
-
-
-
-
-    }
 
 
 }
