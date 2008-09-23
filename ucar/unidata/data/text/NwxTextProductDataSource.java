@@ -422,7 +422,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     protected List<Product> readProducts(TableInfo tableInfo,
                                          NamedStationImpl station,
-                                         DateSelection dateSelection, boolean justStations) {
+                                         DateSelection dateSelection) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
