@@ -21,10 +21,10 @@
 
 
 
-
 package ucar.unidata.data.text;
 
 
+import edu.wisc.ssec.mcidas.McIDASUtil;
 import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 import edu.wisc.ssec.mcidas.adde.WxTextProduct;
 
@@ -90,11 +90,13 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @param tableInfo  the table information
      * @param station  the station
+     * @param dateSelection the date selection
      *
-     * @return  the list of products 
+     * @return  the list of products
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                         NamedStationImpl station,DateSelection dateSelection) {
+                                         NamedStationImpl station,
+                                         DateSelection dateSelection) {
         List<Product> products = new ArrayList<Product>();
         if ( !canHandleType(tableInfo)) {
             return products;
@@ -102,28 +104,16 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         if (station == null) {
             return products;
         }
-        Date[] dateRange = (dateSelection==null?null:dateSelection.getRange());
-        Misc.printArray("dates", dateRange);
-        int maxCount = (dateSelection==null ? 100: dateSelection.getCount());
-        maxCount = Math.min(maxCount, 100);
-        int dtime = 24;
-        if (dateRange != null) {
-            int hours = (int) (Math.abs(dateRange[1].getTime()-dateRange[0].getTime())/(1000*3600));
-            if (hours < 1) hours = 1;
-            dtime = hours;
-        }
 
         StringBuilder builder = new StringBuilder("adde://");
-        builder.append(getDataContext().getIdv().getProperty("textserver", "adde.ucar.edu"));
+        builder.append(getDataContext().getIdv().getProperty("textserver",
+                "adde.ucar.edu"));
         builder.append("/");
         builder.append(getRequest(tableInfo, station, dateSelection));
-        builder.append("&num=");
-        builder.append(maxCount);
-        builder.append("&dtime=");
-        builder.append(dtime);
+
 
         String url = builder.toString();
-        System.out.println("url = " + url);
+        // System.out.println("url = " + url);
         try {
             AddeTextReader atr = new AddeTextReader(url);
             if (url.indexOf("wxtext") > 0) {
@@ -150,18 +140,20 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @param ti  table info
      * @param station  station
+     * @param dateSelection the date selection
      *
      * @return the search string
      */
-    private String getRequest(TableInfo ti, NamedStationImpl station, DateSelection dateSelection) {
+    private String getRequest(TableInfo ti, NamedStationImpl station,
+                              DateSelection dateSelection) {
 
         if (station == null) {
             return "";
         }
         if (ti.flag.equals(ti.FLAG_O)) {
-            return getObTextRequest(ti, station);
+            return getObTextRequest(ti, station, dateSelection);
         } else {
-            return getWxTextRequest(ti, station);
+            return getWxTextRequest(ti, station, dateSelection);
         }
     }
 
@@ -170,15 +162,46 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @param ti  table info
      * @param station  station
+     * @param dateSelection the date selection
      *
      * @return the request string
      */
-    private String getWxTextRequest(TableInfo ti, NamedStationImpl station) {
+    private String getWxTextRequest(TableInfo ti, NamedStationImpl station,
+                                    DateSelection dateSelection) {
+        Date[] dateRange = ((dateSelection == null)
+                            ? null
+                            : dateSelection.getRange());
+        Date   endTime   = (dateRange == null)
+                           ? new Date()
+                           : dateRange[1];
+        int[]  endDT = McIDASUtil.mcSecsToDayTime(endTime.getTime() / 1000);
+        int    maxCount  = ((dateSelection == null)
+                            ? 100
+                            : dateSelection.getCount());
+        maxCount = Math.min(maxCount, 100);
+        int dtime = 200;
+        if (dateRange != null) {
+            int hours = (int) (Math.abs(dateRange[1].getTime()
+                                        - dateRange[0].getTime()) / (1000
+                                            * 3600));
+            if (hours < 1) {
+                hours = 1;
+            }
+            dtime = hours;
+        }
+
         StringBuilder buf = new StringBuilder("wxtext?");
         buf.append("WMO=");
-        buf.append(station.getProperty(NamedStationTable.KEY_BULLETIN, "NONE"));
+        buf.append(station.getProperty(NamedStationTable.KEY_BULLETIN,
+                                       "NONE"));
         buf.append("&WSTN=");
         buf.append(station.getID());
+        buf.append("&dtime=");
+        buf.append(dtime);
+        buf.append("&num=");
+        buf.append(maxCount);
+        buf.append("&day=");
+        buf.append(endDT[0]);
         return buf.toString();
     }
 
@@ -188,12 +211,29 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @param ti  table info
      * @param station  station
+     * @param dateSelection the date selection
      *
      * @return  the request string
      */
-    private String getObTextRequest(TableInfo ti, NamedStationImpl station) {
-        String id  = station.getID();
-        String idn = (String) station.getProperty(NamedStationTable.KEY_IDNUMBER, "");
+    private String getObTextRequest(TableInfo ti, NamedStationImpl station,
+                                    DateSelection dateSelection) {
+        Date[] dateRange = ((dateSelection == null)
+                            ? null
+                            : dateSelection.getRange());
+        Date   start     = (dateRange == null)
+                           ? null
+                           : dateRange[0];
+        Date   end       = (dateRange == null)
+                           ? null
+                           : dateRange[1];
+        int    maxCount  = ((dateSelection == null)
+                            ? 10
+                            : dateSelection.getCount());
+        maxCount = Math.min(maxCount, 10);
+
+        String id = station.getID();
+        String idn =
+            (String) station.getProperty(NamedStationTable.KEY_IDNUMBER, "");
         if ( !idn.equals("")) {
             idn = idn.substring(0, 5);
         }
@@ -215,6 +255,29 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
             }
         }
         buf.append("&ID=");
+        buf.append(id);
+        // set the times
+        // TODO:  this needs some work
+        if (end != null) {
+            int[] endDT = McIDASUtil.mcSecsToDayTime(start.getTime());
+            buf.append("&newest=");
+            buf.append(endDT[0]);
+            buf.append(" ");
+            buf.append(endDT[1]);
+        } else {
+            buf.append("&num=1");
+        }
+        if (start != null) {
+            int[] startDT = McIDASUtil.mcSecsToDayTime(start.getTime());
+            buf.append("&oldest=");
+            buf.append(startDT[0]);
+            buf.append(" ");
+            buf.append(startDT[1]);
+            if (end != null) {
+                buf.append("&num=9999");
+            }
+        }
+
         return buf.toString();
     }
 

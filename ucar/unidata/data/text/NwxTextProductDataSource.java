@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -33,10 +34,10 @@ import ucar.unidata.data.FilesDataSource;
 
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
+import ucar.unidata.util.DateSelection;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.DatedObject;
-import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -105,6 +106,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
     /** the gui table */
     protected static String GUI_TABLE = "guidata.tbl";
+
+    /** date format parser */
+    private static SimpleDateFormat sdf;
 
     /**
      * Default bean constructor; does nothing.
@@ -177,12 +181,14 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * Get the stations for a productType
      *
      * @param productType  the product type
+     * @param dateSelection  the date selection
      *
      * @return  the list of stations
      *
      * @throws Exception problem reading the stations
      */
-    public NamedStationTable getStations(ProductType productType,DateSelection dateSelection)
+    public NamedStationTable getStations(ProductType productType,
+                                         DateSelection dateSelection)
             throws Exception {
         TableInfo tableInfo = getTableInfo(productType);
         if (tableInfo != null) {
@@ -196,11 +202,13 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @param productType  the product type
      * @param station  the station
+     * @param dateSelection  the date selection
      *
      * @return the list of products
      */
     public List<Product> readProducts(ProductType productType,
-                                      NamedStationImpl station,DateSelection dateSelection) {
+                                      NamedStationImpl station,
+                                      DateSelection dateSelection) {
         TableInfo tableInfo = getTableInfo(productType);
         if ((tableInfo != null) && canHandleType(tableInfo)) {
             return readProducts(tableInfo, station, dateSelection);
@@ -408,11 +416,13 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @param tableInfo the table info
      * @param station  the station
+     * @param dateSelection  the date selection
      *
      * @return the products
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                         NamedStationImpl station,DateSelection dateSelection) {
+                                         NamedStationImpl station,
+                                         DateSelection dateSelection) {
         String path = tableInfo.dataDir;
         path = path.replace("$TEXT_DATA", textDataPath);
         path = path.replace("$GEMDATA", gemDataPath);
@@ -424,41 +434,50 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         if ((files == null) || (files.length == 0)) {
             return products;
         }
-        Date[] dateRange = (dateSelection==null?null:dateSelection.getRange());
-        int maxCount = (dateSelection==null?Integer.MAX_VALUE: dateSelection.getCount());
+        Date[]            dateRange    = ((dateSelection == null)
+                                          ? null
+                                          : dateSelection.getRange());
+        int               maxCount     = ((dateSelection == null)
+                                          ? Integer.MAX_VALUE
+                                          : dateSelection.getCount());
 
         List<DatedObject> datedObjects = new ArrayList();
         for (int i = 0; i < files.length; i++) {
-            File f= files[i];
-            Date  fileDate = getDateFromFileName(f.toString());
-            if(fileDate==null) {
+            File f        = files[i];
+            Date fileDate = getDateFromFileName(f.toString());
+            if (fileDate == null) {
                 fileDate = new Date(f.lastModified());
             }
-            datedObjects.add(new DatedObject(fileDate,f));
+            datedObjects.add(new DatedObject(fileDate, f));
         }
-        datedObjects = (List<DatedObject>)DatedObject.sort(datedObjects, false);
-                
+        datedObjects = (List<DatedObject>) DatedObject.sort(datedObjects,
+                false);
+
 
         files = IOUtil.sortFilesOnAge(files, true);
-        int count = 0;
-        boolean ok = true;
-        for (DatedObject datedObject: datedObjects) {
-            if(!ok) break;
+        int     count = 0;
+        boolean ok    = true;
+        for (DatedObject datedObject : datedObjects) {
+            if ( !ok) {
+                break;
+            }
             try {
                 Date fileDate = datedObject.getDate();
-                File f= (File)datedObject.getObject();
-                if(dateRange!=null) {
-                    if(!(dateRange[0].getTime()<=fileDate.getTime() && fileDate.getTime()<=dateRange[1].getTime())) {
+                File f        = (File) datedObject.getObject();
+                if (dateRange != null) {
+                    if ( !((dateRange[0].getTime() <= fileDate.getTime())
+                            && (fileDate.getTime()
+                                <= dateRange[1].getTime()))) {
                         //                        System.err.println ("\tskipping file:" + f + " " + fileDate + " " + dateRange[0] +" " + dateRange[1]);
                         continue;
                     }
                 }
-                List<Product> productsInFile = parseProduct(f.toString(), true,
-                                                   station);
-                for(Product product: productsInFile) {
+                List<Product> productsInFile = parseProduct(f.toString(),
+                                                   true, station);
+                for (Product product : productsInFile) {
                     products.add(product);
                     count++;
-                    if(count>=maxCount) {
+                    if (count >= maxCount) {
                         ok = false;
                         break;
                     }
@@ -472,17 +491,22 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     }
 
 
-    private static SimpleDateFormat sdf;
-
-    private static Date getDateFromFileName(String path)  {
-        if(sdf==null) {
-            sdf      = new SimpleDateFormat("yyyyMMddkk");
+    /**
+     * Get the Date from the file name
+     *
+     * @param path  file path
+     *
+     * @return  the date or null
+     */
+    private static Date getDateFromFileName(String path) {
+        if (sdf == null) {
+            sdf = new SimpleDateFormat("yyyyMMddkk");
             sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         }
         String tmp = IOUtil.getFileTail(IOUtil.stripExtension(path));
         try {
-            synchronized(sdf) {
-                return  sdf.parse(tmp);
+            synchronized (sdf) {
+                return sdf.parse(tmp);
             }
         } catch (Exception exc) {
             System.err.println("no file date:" + tmp + ": " + exc);
@@ -508,17 +532,17 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         List<Product> products = new ArrayList<Product>();
         String contents = IOUtil.readContents(path,
                               NwxTextProductDataSource.class);
-        String           prefix   = (recordType
-                                     ? ""
-                                     : "");
-        String           suffix   = (recordType
-                                     ? ""
-                                     : "");
-        int              idx      = 0;
-        String           id       = ((station != null)
-                                     ? station.getID()
-                                     : null);
-        Date             fileDate = getDateFromFileName(path);
+        String prefix   = (recordType
+                           ? ""
+                           : "");
+        String suffix   = (recordType
+                           ? ""
+                           : "");
+        int    idx      = 0;
+        String id       = ((station != null)
+                           ? station.getID()
+                           : null);
+        Date   fileDate = getDateFromFileName(path);
         //        System.err.println ("contents:" + contents);
         while (true) {
             int idx1 = contents.indexOf(prefix, idx);
@@ -622,11 +646,11 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     }
 
     /**
-     * _more_
+     * Can we handle this type of data?
      *
-     * @param ti _more_
+     * @param ti  the table info
      *
-     * @return _more_
+     * @return true if we can handle it.
      */
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B);

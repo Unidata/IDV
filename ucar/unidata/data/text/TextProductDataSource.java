@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -67,7 +68,7 @@ import javax.swing.event.*;
 
 
 /**
- * A class for handling text (and HTML) classes
+ * A class for handling text products (e.g. weather bulletins)
  *
  * @author IDV development team
  * @version $Revision: 1.15 $
@@ -134,22 +135,25 @@ public abstract class TextProductDataSource extends FilesDataSource {
      *
      * @param productType the product type
      * @param station the station
+     * @param dateSelection  the date selection
      *
      * @return the list of products
      */
     public abstract List<Product> readProducts(ProductType productType,
-                                               NamedStationImpl station,DateSelection dateSelection);
+            NamedStationImpl station, DateSelection dateSelection);
 
     /**
      * Get the stations for a productType
      *
      * @param productType  the product type
+     * @param dateSelection  the date selection
      *
      * @return  the list of stations
      *
      * @throws Exception problem getting the stations
      */
-    public abstract NamedStationTable getStations(ProductType productType,DateSelection dateSelection)
+    public abstract NamedStationTable getStations(ProductType productType,
+            DateSelection dateSelection)
      throws Exception;
 
 
