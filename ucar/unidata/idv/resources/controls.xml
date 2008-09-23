@@ -154,7 +154,7 @@ example:
   <control
      id="radareditor"
      categories="SWEEP-*-*;RADAR-*"
-     class="ucar.unidata.idv.control.RadarEditor"
+     class="ucar.unidata.idv.control.editor.RadarEditor"
      doeslevels="true"
      description="Radar Editor"
      label="Radar Editor"

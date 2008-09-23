@@ -4,6 +4,9 @@
 ####################################################################################
 
 
+from jarray import array
+
+from ucar.unidata.data.gis import MapMaker
 
 def make3DMap(map, topo):
   """Make a 3d map. map -  map line data - topo - topography dataset
@@ -72,24 +75,48 @@ def  mapsApplyToField(function, field, mapSets,inside):
 	return mapsApplyToRange(function, field, 0, mapSets);
 
 
-
 def  mapsApplyToRange(function, range, timeStep, mapSets,inside):
-    """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
-    by each polygon with the average value within that area
-    """
-    rangeObject = range.clone();
     if(inside):
-	    indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+	    indices = GridUtil.findContainedIndices(range.getDomainSet(), mapSets);
     else:
-	    indices = GridUtil.findNotContainedIndices(rangeObject.getDomainSet(), mapSets);
+	    indices = GridUtil.findNotContainedIndices(range.getDomainSet(), mapSets);
+    return applyToIndices(function, range, timeStep,indices);
+
+
+
+def  applyFunctionToValuesInField(function, field, min,max,inside):
+    if (GridUtil.isTimeSequence(field)):
+        newData = field.clone()
+        for timeStep in range(field.getDomainSet().getLength()):
+            rangeObject = applyFunctionToValuesInRange(function, field.getSample(timeStep), timeStep, min, max,inside);
+            newData.setSample(timeStep,rangeObject)
+        return newData
+    else:   
+	return applyFunctionToValuesInRange(function, field, 0, mapSets);
+
+
+def  applyFunctionToValuesInRange(function, range, timeStep, min,max,inside):
+    values = range.getFloats(0)
+    if(inside):
+	    indices = GridUtil.findIndicesInsideRange(values, min,max);
+    else:
+	    indices = GridUtil.findIndicesOutsideRange(values, min,max);
+    return applyToIndices(function, range, timeStep,indices);
+
+
+
+def  applyToIndices(function, range, timeStep, indices):
+    rangeObject = range.clone();
     originalValues = rangeObject.getFloats(0)
     newValues = cloneArray(originalValues);
-
     for mapIdx in xrange(len(indices)):
         indexArray = indices[mapIdx]
 	eval(function);
     rangeObject.setSamples(newValues)
     return rangeObject;
+
+
+
 
     
 
