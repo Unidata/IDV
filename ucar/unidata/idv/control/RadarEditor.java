@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.gis.Transect;
@@ -361,6 +362,7 @@ public class RadarEditor extends DrawingControl {
         if (!selector.isRegion()) {
             return null;
         }
+
         List glyphsToUse = (selector.getType().equals(Selector.TYPE_REGION_ALL)
                             ? glyphs
                             : selectedGlyphs);
@@ -368,19 +370,45 @@ public class RadarEditor extends DrawingControl {
             return null;
         }
 
-        Gridded2DSet[] latLonLines = new Gridded2DSet[glyphsToUse.size()];
-        int            cnt         = 0;
-        for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphsToUse) {
-            latLonLines[cnt++] = glyph.makeMapSet();
-        }
-        RealTupleType coordMathType = new RealTupleType(RealType.Longitude,
-                                          RealType.Latitude);
-        UnionSet maplines = new UnionSet(coordMathType, latLonLines,
-                                         (CoordinateSystem) null,
-                                         (Unit[]) null,
-                                         (ErrorEstimate[]) null, false);
 
-        return maplines;
+        MapMaker mapMaker = new MapMaker();
+        for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphsToUse) {
+            mapMaker.addMap(glyph.getLatLons());
+        }
+        return mapMaker.getMaps();
+    }
+
+
+    private String getMapLinesJython(Selector selector, StringBuffer sb) throws Exception {
+        String var = "regions_" + (exprCnt++);
+        if (!selector.isRegion()) {
+            sb.append (var +"=None;\n"); 
+            return var;
+        }
+
+        List glyphsToUse = (selector.getType().equals(Selector.TYPE_REGION_ALL)
+                            ? glyphs
+                            : selectedGlyphs);
+        if (glyphsToUse.size() == 0) {
+            sb.append (var +"=None;\n"); 
+            return var;
+        }
+
+        sb.append (var +"=MapMaker();\n"); 
+        MapMaker mapMaker = new MapMaker();
+        for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphsToUse) {
+            float[][]latLons = glyph.getLatLons();
+            sb.append(var+".addMap(array([");
+            for(int i=0;i<latLons[0].length;i++) {
+                if(i>0)
+                    sb.append(",");
+                sb.append(latLons[0][i]);
+                sb.append(",");
+                sb.append(latLons[1][i]);
+            }
+            sb.append("],'f'));\n");
+        }
+        return var;
     }
 
 
@@ -462,21 +490,31 @@ public class RadarEditor extends DrawingControl {
                 userMessage("No regions defined");
                 return;
             }
-            FieldImpl oldSlice = radarSweepControl.getCurrentSlice();
-            getInterpreter().set("mapLines", mapLines);
-            getInterpreter().set("slice", oldSlice);
+
             long t1 = System.currentTimeMillis();
+            FieldImpl oldSlice = radarSweepControl.getCurrentSlice();
+            StringBuffer sb = new StringBuffer();
+            getMapLinesJython(action.getSelector(),  sb);
+            getInterpreter().exec(sb.toString());
+
+
+
+            getInterpreter().set("field", oldSlice);
             if(action.getJython()!=null) {
                 getInterpreter().exec(action.getJython());
             }
-            getInterpreter().exec("newSlice = mapsApplyToField('"
-                                  + action.function + "',slice,mapLines,"
-                                  + (action.getSelector().getInside()
-                                     ? "1"
-                                     : "0") + ")");
+
+            if(action.getSelector().isRegion()) {
+                getInterpreter().set("mapLines", mapLines);
+                getInterpreter().exec("newField = mapsApplyToField('"
+                                      + action.function + "'field,mapLines,"
+                                      + (action.getSelector().getInside()
+                                         ? "1"
+                                         : "0") + ")");
+            } 
             long t2 = System.currentTimeMillis();
             System.err.println("Time:" + (t2 - t1));
-            PyObject  obj      = interpreter.get("newSlice");
+            PyObject  obj      = interpreter.get("newField");
             FieldImpl newSlice = (FieldImpl) obj.__tojava__(Data.class);
             radarSweepControl.setCurrentSlice(newSlice);
         } catch (Exception exc) {
@@ -719,15 +757,22 @@ public class RadarEditor extends DrawingControl {
         public static final String TYPE_FIELD = "field";
         
         /** _more_          */
-        public static final String TYPE_REGION_ALL = "all";
+        public static final String TYPE_REGION_ALL = "region.all";
         
         /** _more_          */
-        public static final String TYPE_REGION_SELECTED = "selected";
+        public static final String TYPE_REGION_SELECTED = "region.selected";
+
+
+        /** _more_          */
+        public static final String TYPE_RANGE = "range";
 
 
         private String type;
 
         private boolean inside=true;
+
+        private float min=0;
+        private float max=0;
 
         public Selector() {
         }
@@ -737,13 +782,24 @@ public class RadarEditor extends DrawingControl {
             this.inside =  inside;
         }
 
+
+
         public boolean isRegion() {
-            return type.equals(TYPE_REGION_SELECTED) || type.equals(TYPE_REGION_ALL);
+            return isRegion(type);
         }
 
 
         public static boolean isRegion(String type) {
             return type.equals(TYPE_REGION_SELECTED) || type.equals(TYPE_REGION_ALL);
+        }
+
+        public boolean isRange() {
+            return return isRange(type);
+        }
+
+
+        public static boolean isRange(String type) {
+            return type.equals(TYPE_RANGE);
         }
 
         
@@ -752,7 +808,11 @@ public class RadarEditor extends DrawingControl {
                 return  "entire field";
             if(type.equals(TYPE_REGION_ALL))
                 return "all regions";
-            return "selected regions";
+            if(type.equals(TYPE_REGION_SELECTED))
+                return "selected regions";
+            if(type.equals(TYPE_RANGE)) {
+                return "within range (" + min +","+max+")";
+            return "???";
         }
 
 
@@ -794,6 +854,43 @@ public class RadarEditor extends DrawingControl {
         public boolean getInside() {
             return inside;
         }
+
+
+/**
+Set the Min property.
+
+@param value The new value for Min
+**/
+public void setMin (float value) {
+	min = value;
+}
+
+/**
+Get the Min property.
+
+@return The Min
+**/
+public float getMin () {
+	return min;
+}
+
+/**
+Set the Max property.
+
+@param value The new value for Max
+**/
+public void setMax (float value) {
+	max = value;
+}
+
+/**
+Get the Max property.
+
+@return The Max
+**/
+public float getMax () {
+	return max;
+}
 
 
 
