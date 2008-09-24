@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.text;
 
 
@@ -75,7 +74,7 @@ import java.util.regex.*;
 public class NwxTextProductDataSource extends TextProductDataSource {
 
     /** the table map */
-    private Hashtable tableMap = new Hashtable();
+    private Hashtable<String, NamedStationTable> tableMap = new Hashtable<String, NamedStationTable>();
 
     /** the path to the tables */
     private String tablePath;
@@ -192,9 +191,29 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             throws Exception {
         TableInfo tableInfo = getTableInfo(productType);
         if (tableInfo != null) {
-            return getStations(tableInfo);
+            NamedStationTable stations = getStations(tableInfo);
+            if (tableInfo.type.equals(tableInfo.FLAG_W)) {
+                // search bulletins for products
+                stations = getAvailableStations(stations, tableInfo,
+                        dateSelection);
+            }
+            return stations;
         }
         return null;
+    }
+
+    /**
+     * Get the stations for a productType
+     *
+     * @param all    all the possible station
+     * @param tableInfo  table info for the product
+     * @param dateSelection  the date selection
+     *
+     * @return  the list of stations with reports
+     */
+    protected NamedStationTable getAvailableStations(NamedStationTable all,
+            TableInfo tableInfo, DateSelection dateSelection) {
+        return all;
     }
 
     /**
@@ -241,7 +260,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @throws Exception problem getting the stations
      */
-    public NamedStationTable getStations(TableInfo tableInfo)
+    private NamedStationTable getStations(TableInfo tableInfo)
             throws Exception {
         String contents = readTableFile(tableInfo.locationFile);
         if (contents == null) {
@@ -423,39 +442,18 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     protected List<Product> readProducts(TableInfo tableInfo,
                                          NamedStationImpl station,
                                          DateSelection dateSelection) {
-        String path = tableInfo.dataDir;
-        path = path.replace("$TEXT_DATA", textDataPath);
-        path = path.replace("$GEMDATA", gemDataPath);
-        File dir = new File(path);
-        File[] files =
-            dir.listFiles((java.io.FileFilter) new PatternFileFilter(".*\\."
-                + tableInfo.fileExtension));
+        List<DatedObject> datedObjects = new ArrayList<DatedObject>();
+        datedObjects = getFiles(tableInfo, dateSelection);
         List<Product> products = new ArrayList<Product>();
-        if ((files == null) || (files.length == 0)) {
+        if ((datedObjects == null) || datedObjects.isEmpty()) {
             return products;
         }
-        Date[]            dateRange    = ((dateSelection == null)
-                                          ? null
-                                          : dateSelection.getRange());
-        int               maxCount     = ((dateSelection == null)
-                                          ? Integer.MAX_VALUE
-                                          : dateSelection.getCount());
+        int     maxCount = ((dateSelection == null)
+                            ? Integer.MAX_VALUE
+                            : dateSelection.getCount());
 
-        List<DatedObject> datedObjects = new ArrayList();
-        for (int i = 0; i < files.length; i++) {
-            File f        = files[i];
-            Date fileDate = getDateFromFileName(f.toString());
-            if (fileDate == null) {
-                fileDate = new Date(f.lastModified());
-            }
-            datedObjects.add(new DatedObject(fileDate, f));
-        }
-        datedObjects = (List<DatedObject>) DatedObject.sort(datedObjects,
-                false);
-
-
-        int     count = 0;
-        boolean ok    = true;
+        int     count    = 0;
+        boolean ok       = true;
         for (DatedObject datedObject : datedObjects) {
             if ( !ok) {
                 break;
@@ -463,14 +461,6 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             try {
                 Date fileDate = datedObject.getDate();
                 File f        = (File) datedObject.getObject();
-                if (dateRange != null) {
-                    if ( !((dateRange[0].getTime() <= fileDate.getTime())
-                            && (fileDate.getTime()
-                                <= dateRange[1].getTime()))) {
-                        //                        System.err.println ("\tskipping file:" + f + " " + fileDate + " " + dateRange[0] +" " + dateRange[1]);
-                        continue;
-                    }
-                }
                 List<Product> productsInFile = parseProduct(f.toString(),
                                                    true, station);
                 for (Product product : productsInFile) {
@@ -489,6 +479,58 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         return products;
     }
 
+    /**
+     * Get the files for the selection criteria
+     * @param tableInfo the table info
+     * @param dateSelection  the date selection
+     * @return the files that match the selection criteria
+     */
+    private List<DatedObject> getFiles(TableInfo tableInfo,
+                                       DateSelection dateSelection) {
+
+        String path = tableInfo.dataDir;
+        path = path.replace("$TEXT_DATA", textDataPath);
+        path = path.replace("$GEMDATA", gemDataPath);
+        File dir = new File(path);
+        File[] files =
+            dir.listFiles((java.io.FileFilter) new PatternFileFilter(".*\\."
+                + tableInfo.fileExtension));
+        if ((files == null) || (files.length == 0)) {
+            return null;
+        }
+        Date[]            dateRange    = ((dateSelection == null)
+                                          ? null
+                                          : dateSelection.getRange());
+
+        List<DatedObject> datedObjects = new ArrayList<DatedObject>();
+        for (int i = 0; i < files.length; i++) {
+            File f        = files[i];
+            Date fileDate = getDateFromFileName(f.toString());
+            if (fileDate == null) {
+                fileDate = new Date(f.lastModified());
+            }
+            datedObjects.add(new DatedObject(fileDate, f));
+        }
+        datedObjects = (List<DatedObject>) DatedObject.sort(datedObjects,
+                false);
+        if (dateRange == null) {
+            return datedObjects;
+        }
+
+        List<DatedObject> validFiles = new ArrayList<DatedObject>();
+        for (DatedObject datedObject : datedObjects) {
+            Date fileDate = datedObject.getDate();
+            if (((dateRange[0].getTime() <= fileDate.getTime())
+                    && (fileDate.getTime() <= dateRange[1].getTime()))) {
+                validFiles.add(datedObject);
+            }
+            //else {
+            //   System.err.println ("\tskipping file:" + f + " " + fileDate + " " + dateRange[0] +" " + dateRange[1]);
+            //}
+
+        }
+        return validFiles;
+    }
 
     /**
      * Get the Date from the file name
@@ -497,18 +539,30 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @return  the date or null
      */
-    private static Date getDateFromFileName(String path) {
+    public static Date getDateFromFileName(String path) {
         if (sdf == null) {
-            sdf = new SimpleDateFormat("yyyyMMddkk");
+            sdf = new SimpleDateFormat();
             sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         }
-        String tmp = IOUtil.getFileTail(IOUtil.stripExtension(path));
-        try {
-            synchronized (sdf) {
-                return sdf.parse(tmp);
+        // have to do this in case there is a date in the path
+        String tmp = IOUtil.getFileTail(path);
+        //TODO:  handle more than yyyyMMddhh and yyMMddhh
+        String pattern    = "yyyyMMddhh";
+        String regex      = "(\\d{8,10})";
+        String dateString = StringUtil.findPattern(tmp, regex);
+        if (dateString != null) {
+            if (dateString.length() == 8) {
+                pattern = "yyMMddhh";
             }
-        } catch (Exception exc) {
-            System.err.println("no file date:" + tmp + ": " + exc);
+            try {
+                synchronized (sdf) {
+                    sdf.applyPattern(pattern);
+                    return sdf.parse(dateString);
+                }
+            } catch (Exception exc) {
+                System.err.println("no date in file name: " + path + ": "
+                                   + exc);
+            }
         }
         return null;
     }
@@ -559,13 +613,16 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             String  stationLine      = null;
             boolean seenNonBlankLine = false;
             Date    date             = null;
+            String  afosPil          = "";
+            String  wmoID            = "";
 
-
+            /*
             SimpleDateFormat sdf1 =
                 new SimpleDateFormat("hhm a z EEE MMM d yyyy");
             SimpleDateFormat sdfNoAmPm =
                 new SimpleDateFormat("hhm z EEE MMM d yyyy");
-            List lines = new ArrayList();
+            */
+            //List lines = new ArrayList();
             while (true) {
                 int endLineIdx = product.indexOf("\n", startLineIdx);
                 if (endLineIdx < 0) {
@@ -573,7 +630,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                 }
                 String line = product.substring(startLineIdx, endLineIdx);
                 startLineIdx = endLineIdx + 1;
-                lines.add(line);
+                //lines.add(line);
                 String tline = line.trim();
                 if (seenNonBlankLine || (tline.length() > 0)) {
                     seenNonBlankLine = true;
@@ -581,7 +638,11 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                     if (lineCnt == 2) {
                         stationLine = line;
                         //                        break;
-                    } else if (lineCnt > 2) {
+                    } else if (lineCnt == 3) {
+                        afosPil = line;
+                    }
+                    /*
+                    else if (lineCnt > 2) {
                         if (tline.length() > 10) {
                             String[] toks = StringUtil.split(tline, " ", 2);
                             if ((toks == null) || (toks.length != 2)) {
@@ -617,6 +678,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                             }
                         }
                     }
+                    */
                 }
                 if (lineCnt > 8) {
                     break;
@@ -625,15 +687,24 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             if (stationLine == null) {
                 continue;
             }
+            List toks = StringUtil.split(stationLine, " ", true, true);
+            if (toks.size() < 3) {
+                continue;
+            }
+            wmoID = (String) toks.get(0);
+            String stationString = (String) toks.get(1);
+            String dateString    = (String) toks.get(2);
+            date = DateUtil.decodeWMODate(dateString, fileDate);
+            /*
+            System.err.println("line: " + stationLine);
+            System.err.println("WMO: "+ wmoID + "ID: "+ id +":" + stationString);
+            System.err.println("Date: "+ date);
+            System.err.println("AFOS: "+ afosPil);
+            */
+
             if (date == null) {
                 date = fileDate;
             }
-            List toks = StringUtil.split(stationLine, " ", true, true);
-            if (toks.size() < 2) {
-                continue;
-            }
-            String stationString = (String) toks.get(1);
-            //            System.err.println("ID:"+ id +":" + stationString+" line:" + stationLine);
             if ((id == null) || Misc.equals(stationString, id)) {
                 products.add(new Product(stationString, product, date));
             }
@@ -652,8 +723,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return true if we can handle it.
      */
     protected boolean canHandleType(TableInfo ti) {
-        return ti.flag.equals(TableInfo.FLAG_B) ||
-               ti.flag.equals(TableInfo.FLAG_F);
+        return ti.flag.equals(TableInfo.FLAG_B)
+               //|| ti.flag.equals(TableInfo.FLAG_W)
+               || ti.flag.equals(TableInfo.FLAG_F);
     }
 
     /**
@@ -762,6 +834,20 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
 
     }
+
+    /**
+     * Test this
+     *
+     * @param args  input
+     */
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("need to supply a file name");
+            System.exit(1);
+        }
+        System.out.println(getDateFromFileName(args[0]));
+    }
+
 
 }
 

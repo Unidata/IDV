@@ -326,6 +326,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
                || ti.flag.equals(TableInfo.FLAG_F)
+               //|| ti.flag.equals(TableInfo.FLAG_W)
                || ti.flag.equals(TableInfo.FLAG_O);
     }
 
