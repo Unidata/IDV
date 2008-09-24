@@ -997,11 +997,11 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void updateIndicator(final Set timeSet) {
         //Call the updateIndicatorInner insode a thread to
         //prevent possible deadlock around the Swing component tree
-        Misc.run(new Runnable() {
-            public void run() {
-                updateIndicatorInner(timeSet, false);
-            }
-        });
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {        
+                    updateIndicatorInner(timeSet, false);
+                }
+            });
     }
 
 
