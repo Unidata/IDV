@@ -409,8 +409,7 @@ public class DataOutputHandler extends OutputHandler {
                     String  file = entry.getResource().getFile().toString();
                     //Exclude zip files becase canOpen tries to unzip them (?)
                     if(!(file.endsWith(".zip"))) {
-                        NetcdfDataset.canOpen(file);
-                        ok = true;
+                        ok  = NetcdfDataset.canOpen(file);
                     }
                 } catch (Exception ignoreThis) {
                 }
