@@ -522,10 +522,18 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param control The control
      */
     public void removeControlTab(final DisplayControl control) {
-        SwingUtilities.invokeLater(new Runnable(){
-                public void run() {
-                    removeControlTabInThread(control);
-                }});
+        removeControlTab(control, true);
+    }
+
+    public void removeControlTab(final DisplayControl control, boolean inSwingThread) {
+        if(inSwingThread) {
+            SwingUtilities.invokeLater(new Runnable(){
+                    public void run() {
+                        removeControlTabInThread(control);
+                    }});
+        } else {
+            removeControlTabInThread(control);
+        }
     }
 
     /**
@@ -607,11 +615,14 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      *
      * @param control The control
      */
-    public void undockControl(DisplayControl control) {
-        removeControlTab(control);
-        control.setShowInTabs(false);
-        ((DisplayControlImpl) control).setMakeWindow(true);
-        ((DisplayControlImpl) control).popup(null);
+    public void undockControl(final DisplayControl control) {
+        SwingUtilities.invokeLater(new Runnable(){
+                public void run() {
+                    removeControlTab(control,false);
+                    control.setShowInTabs(false);
+                    ((DisplayControlImpl) control).setMakeWindow(true);
+                    ((DisplayControlImpl) control).popup(null);
+                }});
     }
 
     /**

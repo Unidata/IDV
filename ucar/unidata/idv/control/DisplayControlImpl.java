@@ -1049,6 +1049,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             myWindow = createIdvWindow();
             if (myWindow != null) {
                 initWindow(myWindow);
+                //                controlContext.showWindow(this, myWindow);
             }
         }
 
@@ -4366,31 +4367,31 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param window The control's window
      */
     public void initWindow(final IdvWindow window) {
-        /*        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
                 public void run() {        
-                    System.err.println("Invoking");
-                    try {*/
-                    window.setTitle(getTitle());
-                    window.setContents(outerContents);
-                    if (windowSize != null) {
-                        window.setWindowBounds(new Rectangle(windowX, windowY,
-                                                             windowSize.width, windowSize.height));
-                    } else {
-                        window.setLocation(windowX, windowY);
-                    }
-
-                    if (myWindowVisible) {
-                        show();
-                    } else {
-                        hide();
-                    }
-                    /*                    System.err.println("OK");
+                    try {
+                        window.setTitle(getTitle());
+                        window.setContents(outerContents);
+                        if (windowSize != null) {
+                            window.setWindowBounds(new Rectangle(windowX, windowY,
+                                                                 windowSize.width, windowSize.height));
+                        } else {
+                            window.setLocation(windowX, windowY);
+                        }
+                        controlContext.showWindow(DisplayControlImpl.this, window);
+                        if (myWindowVisible) {
+                            //                            System.err.println("calling show");
+                            //                            show();
+                        } else {
+                            //System.err.println("calling hide");
+                            //                            hide();
+                        }
                     } catch(Exception exc) {
                         System.err.println ("oops: " + exc);
                         exc.printStackTrace();
                     }
-                }
-                });*/
+                  }
+            });
     }
 
 
@@ -8764,6 +8765,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void popup(Component src) {
         Window f = GuiUtils.getWindow(contents);
+        System.err.println ((f!=null) + " " + makeWindow);
         if ((f != null) && !makeWindow) {
             GuiUtils.showComponentInTabs(contents);
             //            if (f != null) {
