@@ -260,7 +260,7 @@ public class DataOutputHandler extends OutputHandler {
         if (state.entry == null) {
             return;
         }
-        if (canLoad(state.entry)
+        if (canLoadAsCdm(state.entry)
                 && (request.getHttpServletRequest() == null)) {
             types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
                 public String assembleUrl(Request request) {
@@ -285,10 +285,9 @@ public class DataOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if ( !canLoad(entry)) {
+        if ( !canLoadAsCdm(entry)) {
             return;
         }
-
 
         if (canLoadAsPoint(entry)) {
             links.add(
@@ -397,7 +396,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return Can the given entry be served by the tds
      */
-    public boolean canLoad(Entry entry) {
+    public boolean canLoadAsCdm(Entry entry) {
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -407,15 +406,13 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    File file = entry.getResource().getFile();
-                    //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
-                    //Use openFile
-                    NetcdfDataset dataset =
-                        NetcdfDataset.openDataset(file.toString());
-
-                    ok = true;
+                    String  file = entry.getResource().getFile().toString();
+                    //Exclude zip files becase canOpen tries to unzip them (?)
+                    if(!(file.endsWith(".zip"))) {
+                        NetcdfDataset.canOpen(file);
+                        ok = true;
+                    }
                 } catch (Exception ignoreThis) {
-                    System.err.println ("\terror " + ignoreThis);
                 }
             }
             b = new Boolean(ok);
@@ -463,7 +460,7 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsGrid(Entry entry) {
-        if ( !canLoad(entry)) {
+        if ( !canLoadAsCdm(entry)) {
             return false;
         }
         Boolean b = gridEntries.get(entry.getId());

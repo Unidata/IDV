@@ -483,7 +483,7 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     private boolean canDataLoad(Request request, Entry entry)
             throws Exception {
-        return getDataOutputHandler().canLoad(entry);
+        return getDataOutputHandler().canLoadAsCdm(entry);
     }
 
     /**

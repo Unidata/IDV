@@ -343,12 +343,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
         try {
             super.getInitialMetadata(request, entry, metadataList, extra);
-            if ( !getDataOutputHandler().canLoad(entry)) {
+            if ( !getDataOutputHandler().canLoadAsCdm(entry)) {
                 return;
             }
             File file = entry.getResource().getFile();
             NetcdfDataset dataset =
-                NetcdfDataset.acquireDataset(file.toString(), null);
+                NetcdfDataset.openDataset(file.toString());
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
             for (Attribute attr : attrs) {
