@@ -1411,7 +1411,17 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String onMouseClick(String call) {
-        return " onclick=" + quote(call) + " ";
+        return " onClick=" + quote(call) + " ";
+    }
+
+
+    public static String mouseClickHref(String call, String label) {
+        return mouseClickHref(call,label,"");
+    }
+
+    public static String mouseClickHref(String call, String label, String extra) {
+        //        return "<a href=\"javascript:void(0)\" " +onMouseClick(call) +">" +label +"</a>";
+        return "<a href=\"javascript:void(0);\" " +onMouseClick(call) +extra+">" +label +"</a>";
     }
 
 
