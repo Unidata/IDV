@@ -464,14 +464,15 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                     stationList = new ArrayList();
                 }
                 // in case we are unpersisting
-                if (selectedStationId != null) {
+                String tmpId = selectedStationId;
+                if (tmpId != null) {
+                    selectedStationId = null;
                     for (NamedStationImpl station : (List<NamedStationImpl>) stationList) {
-                        if (selectedStationId.equals(station.getID())) {
+                        if (Misc.equals(tmpId,station.getID())) {
                             selectedStation = station;
                             break;
                         }
                     }
-                    selectedStationId = null;
                     updateStationLabel();
                 }
                 if (stationList.size() == 1) {
