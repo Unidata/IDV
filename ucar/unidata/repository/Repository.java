@@ -1911,6 +1911,7 @@ public class Repository extends RepositoryBase implements Tables,
         String jsContent =
             HtmlUtil.div("", " id=\"tooltipdiv\" class=\"tooltip\" ")
             + HtmlUtil.div("", " id=\"output\"")
+            + HtmlUtil.div("", " id=\"selectdiv\" class=\"selectdiv\" ")
             + HtmlUtil.div("", " id=\"floatdiv\" class=\"floatdiv\" ");
 
 

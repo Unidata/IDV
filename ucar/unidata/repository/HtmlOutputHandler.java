@@ -97,6 +97,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String OUTPUT_GROUPXML = "groupxml";
+    public static final String OUTPUT_SELECTXML = "selectxml";
+
 
     /** _more_ */
     public static final String OUTPUT_METADATAXML = "metadataxml";
@@ -128,6 +130,7 @@ public class HtmlOutputHandler extends OutputHandler {
                || output.equals(OUTPUT_TIMELINE_DATA)
                || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD)
                || output.equals(OUTPUT_GROUPXML)
+               || output.equals(OUTPUT_SELECTXML)
                || output.equals(OUTPUT_METADATAXML);
     }
 
@@ -763,6 +766,38 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
+    public Result getSelectXml(Request request, List<Group> subGroups,
+                                 List<Entry> entries)
+            throws Exception {
+        String target = request.getString(ATTR_TARGET,"");
+        StringBuffer sb     = new StringBuffer();
+        String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
+        for (Group subGroup : subGroups) {
+            //            sb.append("<li>");
+            String groupLink = getSelectLink(request, subGroup,target);
+            sb.append(groupLink);
+            sb.append("<br>");
+            sb.append(
+                "<div style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
+                + HtmlUtil.quote("block_" + subGroup.getId()) + "></div>");
+        }
+
+        for (Entry entry : entries) {
+            //            sb.append("<li>");
+            //            sb.append(getSelectLink(request, entry));
+        }
+
+
+        StringBuffer xml = new StringBuffer("<content>\n");
+        XmlUtil.appendCdata(xml,
+                            getRepository().translate(request,
+                                sb.toString()));
+        xml.append("\n</content>");
+        //        System.err.println(xml);
+        return new Result("", xml, "text/xml");
+    }
+
+
 
 
     /**
@@ -785,6 +820,11 @@ public class HtmlOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_GROUPXML)) {
             return getChildrenXml(request, subGroups, entries);
         }
+
+        if (output.equals(OUTPUT_SELECTXML)) {
+            return getSelectXml(request, subGroups, entries);
+        }
+
         if (output.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, group);
         }

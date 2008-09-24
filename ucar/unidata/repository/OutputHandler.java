@@ -503,6 +503,38 @@ public class OutputHandler extends RepositoryManager {
     }
 
 
+    protected static String getGroupSelect(Request request,String elementId) throws Exception {
+        String event = "selectInitialClick(event," +HtmlUtil.squote(elementId) +")";
+        return HtmlUtil.mouseClickHref(event,"Select",HtmlUtil.id(elementId+".selectlink"));
+    }
+
+    protected String getSelectLink(Request request, Group group, String target) throws Exception {
+        String linkText = group.getLabel();
+        StringBuffer sb = new StringBuffer();
+        String entryId = group.getId();
+        String  icon     = getRepository().getIconUrl(group);
+        String event = (group.isGroup()
+                        ? HtmlUtil.onMouseClick("folderClick(" + HtmlUtil.squote(entryId) + 
+                                                ",'selectxml'," + HtmlUtil.squote(ATTR_TARGET+"=" + target)+")")
+                        : "");
+        String img = HtmlUtil.img(icon, (group.isGroup()
+                                         ? "Click to open group; "
+                                         : ""), " id=" + HtmlUtil.quote("img_" + entryId)
+                                  + event);
+        sb.append(img);
+        sb.append(HtmlUtil.space(1));
+
+        String elementId = group.getId();
+        String value = group.getFullName();
+        sb.append(
+                  HtmlUtil.mouseClickHref("selectClick(" + HtmlUtil.squote(target) +"," + HtmlUtil.squote(value)+")",
+                                          linkText));
+        return sb.toString();
+    }
+
+
+
+
 
     /**
      * _more_

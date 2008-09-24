@@ -434,7 +434,10 @@ function  handleFolderList(request, id) {
 
 }
 
-function folderClick(id) {
+function folderClick(id, output,args) {
+    if (!output) output = "groupxml";
+    if(!args) args ="";
+    else args = "&" + args;
     var block = util.getDomObject("block_" + id);
     if(!block) return;
     var img = util.getDomObject("img_" +id);
@@ -442,7 +445,7 @@ function folderClick(id) {
         block.obj.isOpen = 1;
         showObject(block);
         if(img) img.obj.src = "${urlroot}/icons/progress.gif";
-        url = "${urlroot}/entry/show?id=" + id +"&output=groupxml";
+        url = "${urlroot}/entry/show?id=" + id +"&output=" + output+args;
 	util.loadXML( url, handleFolderList,id);
     } else {
         if(img) img.obj.src = "${urlroot}/icons/folderclosed.gif";
@@ -452,7 +455,52 @@ function folderClick(id) {
 }
 
 
+function selectClick(id,value) {
+	var comp = util.getDomObject(id);
+  	if(!comp)return;
+	comp.obj.value =value;
+	selectCancel();
+}
 
+function selectCancel() {
+	var div = util.getDomObject('selectdiv');
+  	if(!div)return false;
+	hideObject(div);
+}
+
+function selectInitialClick(event, id) {
+        event = util.getEvent(event);
+	x = util.getEventX(event);
+	y = util.getEventY(event);
+	var comp = util.getDomObject(id);
+  	if(!comp)return false;
+
+        var link = util.getDomObject(id+'.selectlink');
+  	if(!link)return false;
+	var div = util.getDomObject('selectdiv');
+  	if(!div)return false;
+
+        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
+            x= util.getLeft(link.obj);
+            y = link.obj.offsetHeight+util.getTop(link.obj) + 2;
+        } else {
+            x+=20;
+        }
+
+        util.setPosition(div, x+10,y);
+	showObject(div);
+        url = "${urlroot}/entry/show?output=selectxml&target=" +id;;
+	util.loadXML( url, handleSelect,div);
+	return false;
+    }
+
+
+    function handleSelect(request, obj) {
+        var xmlDoc=request.responseXML.documentElement;
+        text = getChildText(xmlDoc);
+        var close = "<a href=\"javascript:selectCancel();\"><img border=0 src=${urlroot}/icons/close.gif></a>";
+        obj.obj.innerHTML = "<table width=100%><tr><td align=right>" + close +"</table>" +text;
+    }
 
 
 

@@ -334,9 +334,6 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEdit(Request request) throws Exception {
-
-
-
         StringBuffer sb = new StringBuffer();
         Harvester harvester =
             findHarvester(request.getString(ARG_HARVESTER_ID));

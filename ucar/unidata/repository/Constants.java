@@ -241,6 +241,9 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
+    public static final String ATTR_TARGET = "target";
+    public static final String ATTR_INPUTID = "inputid";
+
     /** _more_ */
     public static final String ATTR_NORTH = "north";
 

@@ -277,10 +277,13 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.input(ATTR_DESCTEMPLATE,
                                          descTemplate, HtmlUtil.SIZE_60)));
 
+        String elementId = "harvester.edit." + ATTR_BASEGROUP;
+        String select = OutputHandler.getGroupSelect(request, elementId);
+
         sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
                                      HtmlUtil.input(ATTR_BASEGROUP,
                                                     baseGroupName,
-                                                    HtmlUtil.SIZE_60)));
+                                                    HtmlUtil.SIZE_60+HtmlUtil.id(elementId))+select));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,

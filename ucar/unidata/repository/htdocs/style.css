@@ -296,6 +296,14 @@ a.menulink {
    color: gray;
 }
 
+.selectdiv {
+   position: absolute; 
+   visibility: hidden; 
+   z-index: 1;
+   border: 1px #666666 solid;   
+   background-color : #FFFFCC;
+}
+
 
 
 
