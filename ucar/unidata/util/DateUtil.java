@@ -596,11 +596,11 @@ public class DateUtil {
         } else {
             wmoDate = StringUtil.padLeft(wmoDate, 6, "0");
         }
-        Calendar cal = Calendar.getInstance(DateUtil.TIMEZONE_GMT);
+        Calendar cal = Calendar.getInstance(TIMEZONE_GMT);
         cal.setTimeInMillis(baseDate.getTime());
-        int day    = (int) Misc.parseDouble(wmoDate.substring(0, 2));
-        int hour   = (int) Misc.parseDouble(wmoDate.substring(2, 4));
-        int min    = (int) Misc.parseDouble(wmoDate.substring(4));
+        int day    = Integer.parseInt(wmoDate.substring(0, 2));
+        int hour   = Integer.parseInt(wmoDate.substring(2, 4));
+        int min    = Integer.parseInt(wmoDate.substring(4));
         int calDay = cal.get(cal.DAY_OF_MONTH);
         if ((calDay - day) > 26) {
             cal.add(cal.MONTH, 1);

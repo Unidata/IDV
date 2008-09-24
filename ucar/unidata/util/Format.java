@@ -18,7 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// $Id: Format.java,v 1.9 2006/08/24 20:22:39 jeffmc Exp $
+// $Id: Format.java 64 2006-07-12 22:30:50Z edavis $
 
 package ucar.unidata.util;
 
@@ -26,7 +26,6 @@ package ucar.unidata.util;
 /**
  * static formatting utilities. Replace with standard java library when possible.
  * @author John Caron
- * @version $Id: Format.java,v 1.9 2006/08/24 20:22:39 jeffmc Exp $
  */
 public class Format {
 
@@ -36,8 +35,7 @@ public class Format {
      * @param tabStop pad out to here
      * @param alwaysOne true if you want to guarentee at least one space.
      */
-    public static void tab(StringBuffer sbuff, int tabStop,
-                           boolean alwaysOne) {
+    public static void tab(StringBuffer sbuff, int tabStop, boolean alwaysOne) {
         int len = sbuff.length();
         if (tabStop > len) {
             sbuff.setLength(tabStop);
@@ -50,7 +48,7 @@ public class Format {
         }
     }
 
-    /**
+      /**
      * Blank fill sbuff with blanks, until position tabStop.
      * @param sbuff StringBuilder to manipulate
      * @param tabStop pad out to here
@@ -96,7 +94,7 @@ public class Format {
             return s;
         }
         StringBuilder sbuff = new StringBuilder(width);
-        int           need  = width - s.length();
+        int          need  = width - s.length();
         sbuff.setLength(need);
         for (int i = 0; i < need; i++) {
             sbuff.setCharAt(i, ' ');
@@ -241,7 +239,7 @@ public class Format {
 
         // deal with decimal point
         StringBuilder number, fraction;
-        int           dotInd = mantissa.indexOf('.');
+        int          dotInd = mantissa.indexOf('.');
         if (dotInd == -1) {
             number   = new StringBuilder(mantissa);
             fraction = new StringBuilder("");
@@ -433,6 +431,60 @@ public class Format {
 
 }
 
+/*
+ *  Change History:
+ *  $Log: Format.java,v $
+ *  Revision 1.8  2006/05/05 19:19:34  jeffmc
+ *  Refactor some of the tabbedpane border methods.
+ *  Also, since I ran jindent on everything to test may as well caheck it all in
+ *
+ *  Revision 1.7  2005/08/11 16:51:16  jeffmc
+ *  jindent
+ *
+ *  Revision 1.6  2005/07/29 00:30:06  caron
+ *  add formatByteSize() to make nice print of size in bytes
+ *
+ *  Revision 1.5  2005/03/10 18:40:06  jeffmc
+ *  jindent and javadoc
+ *
+ *  Revision 1.4  2005/01/12 15:29:44  dmurray
+ *  jindent and javadoc
+ *
+ *  Revision 1.3  2004/12/22 13:28:16  dmurray
+ *  Jindent.  somebody else should fix the _more_'s.
+ *
+ *  Revision 1.2  2004/09/25 00:09:45  caron
+ *  add images, thredds tab
+ *
+ *  Revision 1.1  2004/09/22 13:55:16  caron
+ *  move to ucar.unidata.util
+ *
+ *  Revision 1.3  2004/07/12 23:40:19  caron
+ *  2.2 alpha 1.0 checkin
+ *
+ *  Revision 1.2  2004/07/06 19:28:13  caron
+ *  pre-alpha checkin
+ *
+ *  Revision 1.1.1.1  2003/12/04 21:05:28  caron
+ *  checkin 2.2
+ *
+ *  Revision 1.3  2003/07/12 23:08:57  caron
+ *  add cvs headers, trailers
+ *
+ *  Revision 1.2  2003/04/08 19:03:41  caron
+ *  add header
+ *
+ *  Revision 1.1  2003/04/08 15:06:34  caron
+ *  nc2 version 2.1
+ *
+ *  Revision 1.1.1.1  2002/11/23 17:49:48  caron
+ *  thredds reorg
+ *
+ *  Revision 1.1.1.1  2002/02/15 00:01:49  caron
+ *  import sources
+ *
+ */
+
 /**
  * Double value formatting.
  *  @param d the number to format.
@@ -478,4 +530,46 @@ public class Format {
 //
 // Visit the ACME Labs Java page for up-to-date versions of this and other
 // fine Java utilities: http://www.acme.com/java/
+
+/*
+ *  Change History:
+ *  $Log: Format.java,v $
+ *  Revision 1.8  2006/05/05 19:19:34  jeffmc
+ *  Refactor some of the tabbedpane border methods.
+ *  Also, since I ran jindent on everything to test may as well caheck it all in
+ *
+ *  Revision 1.7  2005/08/11 16:51:16  jeffmc
+ *  jindent
+ *
+ *  Revision 1.6  2005/07/29 00:30:06  caron
+ *  add formatByteSize() to make nice print of size in bytes
+ *
+ *  Revision 1.5  2005/03/10 18:40:06  jeffmc
+ *  jindent and javadoc
+ *
+ *  Revision 1.4  2005/01/12 15:29:44  dmurray
+ *  jindent and javadoc
+ *
+ *  Revision 1.3  2004/12/22 13:28:16  dmurray
+ *  Jindent.  somebody else should fix the _more_'s.
+ *
+ *  Revision 1.2  2004/09/25 00:09:45  caron
+ *  add images, thredds tab
+ *
+ *  Revision 1.1  2004/09/22 13:55:16  caron
+ *  move to ucar.unidata.util
+ *
+ *  Revision 1.3  2004/07/12 23:40:19  caron
+ *  2.2 alpha 1.0 checkin
+ *
+ *  Revision 1.2  2004/07/06 19:28:13  caron
+ *  pre-alpha checkin
+ *
+ *  Revision 1.1.1.1  2003/12/04 21:05:28  caron
+ *  checkin 2.2
+ *
+ *  Revision 1.3  2003/07/12 23:08:57  caron
+ *  add cvs headers, trailers
+ *
+ */
 
