@@ -5183,13 +5183,28 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         // display list properties
         displayListTemplateFld = new JTextField(displayListTemplate, width);
+        // color swatch  changer
+        JPanel colorSwatch = GuiUtils.wrap(new JLabel("     "));
+        colorSwatch.setBackground(getDisplayListColor());
+        colorSwatch.setToolTipText("Click to change display list color");
+        final JComponent theColorSwatch = colorSwatch;
+        colorSwatch.addMouseListener(new ObjectListener(null) {
+            public void mouseClicked(MouseEvent me) {
+                popupDisplayListColorMenu(theColorSwatch);
+                theColorSwatch.setBackground(getDisplayListColor());
+                theColorSwatch.invalidate();
+                if (theColorSwatch.getParent() != null) {
+                    theColorSwatch.getParent().validate();
+                }
+            }
+        });
         displayListTemplateFld.setToolTipText(
             "Enter your own display list label");
         popupBtn = makeMacroPopup(displayListTemplateFld,
                                   PREF_DISPLAYLIST_TEMPLATE,
                                   "displayListTemplate");
         comps.add(GuiUtils.rLabel("Display Label:"));
-        comps.add(displayListTemplateFld);
+        comps.add(GuiUtils.centerRight(displayListTemplateFld, colorSwatch));
         comps.add(popupBtn);
 
 
@@ -7896,6 +7911,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private void popupColorMenu(JComponent comp) {
         JPopupMenu popup = GuiUtils.makePopupMenu(makeChangeColorMenuItems());
+        popup.show(comp, 0, comp.getHeight());
+    }
+
+    /**
+     * Popup a color setting menu wrt the given component
+     *
+     * @param comp The component to popup near
+     */
+    private void popupDisplayListColorMenu(JComponent comp) {
+        JPopupMenu popup = GuiUtils.makePopupMenu(makeChangeColorMenuItems("setDisplayListColor", getDisplayListColor()));
         popup.show(comp, 0, comp.getHeight());
     }
 
