@@ -476,6 +476,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 }
                 if (stationList.size() == 1) {
                     selectedStation = (NamedStationImpl) stationList.get(0);
+                    updateStationLabel();
                 }
 
 
