@@ -133,7 +133,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
         } else {
             DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
             if(data !=null) {
-                if(data.canLoad(entry)) {
+                if(data.canLoadAsCdm(entry)) {
                     String suffix = "/"+entry.getId()+".jnlp";
                     types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
                 }
@@ -157,7 +157,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
             jnlp = jnlp.replace("%URL%",url);
         } else {
             DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
-            if(data !=null && data.canLoad(entry)) {
+            if(data !=null && data.canLoadAsCdm(entry)) {
                 jnlp = jnlp.replace("%ARG%","-data");
                 String type = "OPENDAP.GRID";
                 if(entry.getDataType()!=null) {
