@@ -21,14 +21,6 @@
  */
 
 
-
-
-
-
-
-
-
-
 package ucar.unidata.util;
 
 
@@ -124,11 +116,31 @@ public class DateSelection {
     /** This can hold a set of absolute times. If non-null then these times override any of the query information */
     private List times;
 
+    private boolean doLatest = false;
+
+    private Date nowTime;
 
     /**
      * ctor
      */
     public DateSelection() {}
+
+    /**
+     * ctor
+     * @param doLatest Do the count latest ones
+     * @param count the count
+     */
+    public DateSelection(boolean doLatest, int count) {
+        this.doLatest = doLatest;
+        this.count = count;
+    }
+
+    public DateSelection(int startMode, double startOffset, int endMode, double endOffset) {
+        this.startMode = startMode;
+        this.startOffset  = startOffset;
+        this.endMode = endMode;
+        this.endOffset = endOffset;
+    }
 
     /**
      * ctor
@@ -161,6 +173,9 @@ public class DateSelection {
 
         this.startFixedTime = that.startFixedTime;
         this.endFixedTime   = that.endFixedTime;
+
+        this.doLatest       = that.doLatest;
+        this.nowTime        = that.nowTime;
 
         this.startOffset    = that.startOffset;
         this.endOffset      = that.endOffset;
@@ -425,7 +440,7 @@ public class DateSelection {
      * @return time range
      */
     public Date[] getRange() {
-        double now   = (double) (System.currentTimeMillis());
+        double now   = (double) ((nowTime!=null?nowTime.getTime():System.currentTimeMillis()));
         double start = 0;
         double end   = 0;
 
@@ -1066,6 +1081,46 @@ public class DateSelection {
     }
 
     /**
+       Set the DoLatest property.
+
+       @param value The new value for DoLatest
+    **/
+    public void setDoLatest (boolean value) {
+	doLatest = value;
+    }
+
+    /**
+       Get the DoLatest property.
+
+       @return The DoLatest
+    **/
+    public boolean getDoLatest () {
+	return doLatest;
+    }
+
+    /**
+       Set the NowTime property.
+
+       @param value The new value for NowTime
+    **/
+    public void setNowTime (Date value) {
+	nowTime = value;
+    }
+
+    /**
+       Get the NowTime property.
+
+       @return The NowTime
+    **/
+    public Date getNowTime () {
+	return nowTime;
+    }
+
+
+
+
+
+    /**
      * test main
      *
      * @param args cmd line args
@@ -1076,7 +1131,7 @@ public class DateSelection {
         long          now           = System.currentTimeMillis();
         for (int i = 0; i < 20; i++) {
             dates.add(new DatedObject(new Date(now
-                    + DateUtil.minutesToMillis(20) - i * 10 * 60 * 1000)));
+                                               + DateUtil.minutesToMillis(20) - i * 10 * 60 * 1000)));
         }
 
         dateSelection.setEndMode(TIMEMODE_FIXED);
@@ -1109,15 +1164,15 @@ public class DateSelection {
      */
     public String toString() {
         return " startMode      =" + startMode + "\n" + " endMode        ="
-               + this.endMode + "\n" + " startFixedTime ="
-               + this.startFixedTime + "\n" + " endFixedTime   ="
-               + this.endFixedTime + "\n" + " startOffset    ="
-               + this.startOffset + "\n" + " endOffset      ="
-               + this.endOffset + "\n" + " postRange      =" + this.postRange
-               + "\n" + " preRange       =" + this.preRange + "\n"
-               + " interval       =" + this.interval + "\n"
-               + " roundTo        =" + this.roundTo + "\n"
-               + " count          =" + count + "\n";
+            + this.endMode + "\n" + " startFixedTime ="
+            + this.startFixedTime + "\n" + " endFixedTime   ="
+            + this.endFixedTime + "\n" + " startOffset    ="
+            + this.startOffset + "\n" + " endOffset      ="
+            + this.endOffset + "\n" + " postRange      =" + this.postRange
+            + "\n" + " preRange       =" + this.preRange + "\n"
+            + " interval       =" + this.interval + "\n"
+            + " roundTo        =" + this.roundTo + "\n"
+            + " count          =" + count + "\n";
 
     }
 
