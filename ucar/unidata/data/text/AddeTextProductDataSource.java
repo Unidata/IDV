@@ -159,7 +159,6 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
                         ? new Date()
                         : dateRange[1];
         int[] endDT   = McIDASUtil.mcSecsToDayTime(endTime.getTime() / 1000);
-        System.out.println(dateSelection);
         int maxCount = (((dateSelection == null) || dateSelection.isLatest())
                         ? 1
                         : dateSelection.getCount());
