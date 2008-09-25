@@ -466,9 +466,11 @@ public class DateSelection {
     /**
      * Construct and return the start and end time range
      *
-     * @return time range
+     * @return time range. If in doLatest or doAll mode this returns null
      */
     public Date[] getRange() {
+        if(doLatest) return null;
+        if(doAll) return null;
         double now   = (double) (((nowTime != null)
                                   ? nowTime.getTime()
                                   : System.currentTimeMillis()));
