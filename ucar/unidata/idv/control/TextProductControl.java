@@ -547,7 +547,13 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             return null;
         }
         if (hours == -1) {
+            //do latest
             return new DateSelection(true, 1);
+        }
+
+        if (hours == 0) {
+            //do all
+            return new DateSelection(true);
         }
 
         int count = Integer.MAX_VALUE;
@@ -618,6 +624,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         text = text.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$", "<i>$1</i>");
 
 
+        //Clean up the extra newlines and p tags around the divs
         text = text.replaceAll("\n+<", "<");
         text = text.replaceAll(">\n+", ">");
         text = text.replaceAll("<p><div", "<div");
