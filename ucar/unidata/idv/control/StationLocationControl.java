@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -119,6 +120,7 @@ public class StationLocationControl extends StationModelControl {
     /** The displayable */
     private StationLocationDisplayable locationDisplayable;
 
+    /** _more_          */
     private StationLocationDisplayable selectedDisplayable;
 
     /** Shows any lines */
@@ -476,12 +478,14 @@ public class StationLocationControl extends StationModelControl {
 
 
         selectedDisplayable = new StationLocationDisplayable(
-                                                             "selected displayable", getControlContext().getJythonManager());
+            "selected displayable", getControlContext().getJythonManager());
         selectedDisplayable.setShouldUseAltitude(false);
         addDisplayable(selectedDisplayable, FLAG_COLOR | FLAG_ZPOSITION);
 
-        StationModel sm = getControlContext().getStationModelManager().getSelectedStationModel();
-        if(sm!=null) {
+        StationModel sm =
+            getControlContext().getStationModelManager()
+                .getSelectedStationModel();
+        if (sm != null) {
             selectedDisplayable.setStationModel(sm);
         }
         updateSelectedDisplayable();
@@ -577,9 +581,11 @@ public class StationLocationControl extends StationModelControl {
                 }
                 if ( !selectionList.contains(closest)) {
                     selectionList.add(closest);
-                    if(tabbedPane!=null) {
+                    if (tabbedPane != null) {
                         //                        tabbedPane.setSelectedIndex(1);
                     }
+                } else if (inputEvent.isControlDown()) {
+                    selectionList.remove(closest);
                 }
             }
             selectedStationsChanged(selectionList);
@@ -595,27 +601,62 @@ public class StationLocationControl extends StationModelControl {
         }
     }
 
-    protected void     selectedStationsChanged(List selectionList) throws VisADException, RemoteException {
+    /**
+     * _more_
+     *
+     * @param selectionList _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void selectedStationsChanged(List selectionList)
+            throws VisADException, RemoteException {
         updateSelectedDisplayable();
     }
 
 
-    protected void setSelectedStations(List<NamedStationImpl> stations) throws VisADException, RemoteException {
-        selectionList  = new ArrayList(stations);
+    /**
+     * _more_
+     *
+     * @param stations _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void setSelectedStations(List<NamedStationImpl> stations)
+            throws VisADException, RemoteException {
+        selectionList = new ArrayList(stations);
         updateSelectedDisplayable();
     }
 
     /**
      * updates the displayable when anything changes.
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    private void updateSelectedDisplayable() throws VisADException, RemoteException  {
+    private void updateSelectedDisplayable()
+            throws VisADException, RemoteException {
         if (selectedDisplayable == null) {
             return;
         }
+        StationModel sm =
+            getControlContext().getStationModelManager()
+                .getSelectedStationModel();
+        if (sm != null) {
+            selectedDisplayable.setStationModel(sm);
+        }
         selectedDisplayable.setStations(selectionList);
-        //        selectedDisplayable.updateDisplayable();
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     protected void setScaleOnDisplayable(float f)
             throws RemoteException, VisADException {
         super.setScaleOnDisplayable(f);
@@ -694,7 +735,7 @@ public class StationLocationControl extends StationModelControl {
             sb.append(entrySB);
         }
 
-        if(readoutText!=null&& sb!=null) {
+        if ((readoutText != null) && (sb != null)) {
             readoutText.setText("<html>" + getStationTableDescription()
                                 + sb.toString() + "</html>");
             GuiUtils.scrollToTop(readoutText);
@@ -828,7 +869,9 @@ public class StationLocationControl extends StationModelControl {
      * @return  filtered list
      */
     private List filter(List stations) {
-        if(stations == null) return new ArrayList();
+        if (stations == null) {
+            return new ArrayList();
+        }
         initFilters();
         if ( !getFiltersEnabled()) {
             return stations;
@@ -880,11 +923,15 @@ public class StationLocationControl extends StationModelControl {
      */
     private List subsetStations(List stations)
             throws VisADException, RemoteException {
-        Rectangle2D     rbounds = calculateRectangle();
-        if(rbounds==null) return new ArrayList();
-        LinearLatLonSet bounds  = calculateLatLonBounds(rbounds);
-        if(bounds==null) return new ArrayList();
-        Unit[]          units   = bounds.getSetUnits();
+        Rectangle2D rbounds = calculateRectangle();
+        if (rbounds == null) {
+            return new ArrayList();
+        }
+        LinearLatLonSet bounds = calculateLatLonBounds(rbounds);
+        if (bounds == null) {
+            return new ArrayList();
+        }
+        Unit[] units = bounds.getSetUnits();
         int latIndex =
             (((RealType) ((SetType) bounds.getType()).getDomain()
                 .getComponent(0)).equals(RealType.Latitude) == true)
@@ -988,7 +1035,7 @@ public class StationLocationControl extends StationModelControl {
             if (listOfStations != null) {
                 synchronized (DISPLAYABLE_MUTEX) {
                     displayedStations = listOfStations;
-                    if(selectedDisplayable!=null) {
+                    if (selectedDisplayable != null) {
                         //                        selectedDisplayable.setStations(listOfStations);
                     }
 
@@ -1067,6 +1114,11 @@ public class StationLocationControl extends StationModelControl {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param listOfStations _more_
+     */
     protected void addSelectedToList(List listOfStations) {
         for (int i = 0; i < selectionList.size(); i++) {
             Object selectedLocation = selectionList.get(i);
@@ -1246,10 +1298,22 @@ public class StationLocationControl extends StationModelControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
-        return doMakeTabs(true,true);
+        return doMakeTabs(true, true);
     }
 
-    protected JTabbedPane doMakeTabs(boolean showDataSets, boolean showFilters)
+    /**
+     * _more_
+     *
+     * @param showDataSets _more_
+     * @param showFilters _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected JTabbedPane doMakeTabs(boolean showDataSets,
+                                     boolean showFilters)
             throws VisADException, RemoteException {
         readoutLegendHolder = new JPanel(new BorderLayout());
         readoutGuiHolder    = new JPanel(new BorderLayout());
@@ -1297,21 +1361,24 @@ public class StationLocationControl extends StationModelControl {
         JTabbedPane locationTab = GuiUtils.getNestedTabbedPane();
         locationTab.add("All Locations", allLocationsTable.getScroller());
         locationTab.add("Displayed Locations", locationsTable.getScroller());
-        locationTab.setPreferredSize(new Dimension(200,250));
-        readoutContents.setPreferredSize(new Dimension(200,250));
+        locationTab.setPreferredSize(new Dimension(200, 250));
+        readoutContents.setPreferredSize(new Dimension(200, 250));
         //        JSplitPane locationComp = GuiUtils.vsplit(
         //                                      locationTab,
         //                                      readoutContents,200,0.5);
-        JComponent locationComp = GuiUtils.doLayout(new Component[]{
-            locationTab,
-            readoutContents},1,GuiUtils.WT_Y, new double[]{1.0,3.0});
+        JComponent locationComp = GuiUtils.doLayout(new Component[] {
+                                      locationTab,
+                                      readoutContents }, 1, GuiUtils.WT_Y,
+                                          new double[] { 1.0, 3.0 });
         //        locationComp.setOneTouchExpandable(true);
         tabbedPane.add("Display", doMakeDisplayPanel());
         tabbedPane.add("Locations", locationComp);
-        if(showDataSets)
+        if (showDataSets) {
             tabbedPane.add("Data Sets", doMakeStationListPanel());
-        if(showFilters)
+        }
+        if (showFilters) {
             tabbedPane.add("Filters", doMakeFilterGui(true));
+        }
         return tabbedPane;
     }
 
@@ -1458,14 +1525,31 @@ public class StationLocationControl extends StationModelControl {
          * Select the station
          *
          * @param station station
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
          */
-        protected void stationSelected(NamedStationImpl station) throws VisADException, RemoteException {
+        protected void stationSelected(NamedStationImpl station)
+                throws VisADException, RemoteException {
             if ( !selectionList.contains(station)) {
                 selectionList.clear();
                 selectionList.add(station);
                 selectedStationsChanged(selectionList);
                 showSelectedInReadout();
             }
+        }
+
+        /**
+         * _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        protected void clearSelectedStations()
+                throws VisADException, RemoteException {
+            selectionList.clear();
+            selectedStationsChanged(selectionList);
+            showSelectedInReadout();
         }
 
         /**
@@ -1539,7 +1623,7 @@ public class StationLocationControl extends StationModelControl {
             this.locations = locations;
             attributes     = new ArrayList();
             List tmp = getStationList();
-            if (tmp!=null && tmp.size() > 0) {
+            if ((tmp != null) && (tmp.size() > 0)) {
                 NamedStationImpl station    = (NamedStationImpl) tmp.get(0);
                 Hashtable        properties = station.getProperties();
                 Enumeration      keys       = properties.keys();
@@ -1620,9 +1704,9 @@ public class StationLocationControl extends StationModelControl {
                 int index = column - 1;
                 if ((index >= 0) && (index < attributes.size())) {
                     Object key = attributes.get(index);
-                    Object o = station.getProperties().get(key);
-                    if(o!=null) {
-                        o =  StringUtil.stripTags(o.toString());
+                    Object o   = station.getProperties().get(key);
+                    if (o != null) {
+                        o = StringUtil.stripTags(o.toString());
                     }
                     return o;
                 }
@@ -1711,7 +1795,8 @@ public class StationLocationControl extends StationModelControl {
 
 
         //        stationModelPanel = makeStationModelWidget();
-        stationModelPanel = layoutModelWidget=new LayoutModelWidget(this,this,"setStationModelFromWidget",getStationModel());
+        stationModelPanel = layoutModelWidget = new LayoutModelWidget(this,
+                this, "setStationModelFromWidget", getStationModel());
         JRadioButton[] displayRbs =
             GuiUtils.makeRadioButtons(Misc.newList("Predefined:",
                 "Layout Model:"), (useStationModel
@@ -1745,8 +1830,9 @@ public class StationLocationControl extends StationModelControl {
         JPanel displayPanel = GuiUtils.doLayout(new Component[] {
                                   displayRbs[0],
                                   displayRbs[1], symbolPanel,
-                                 GuiUtils.top(GuiUtils.left(stationModelPanel)) }, 2, GuiUtils.WT_N,
-                                      GuiUtils.WT_N);
+                                  GuiUtils.top(
+                                      GuiUtils.left(stationModelPanel)) }, 2,
+                                          GuiUtils.WT_N, GuiUtils.WT_N);
 
 
         comps.add(GuiUtils.top(GuiUtils.rLabel("Display:")));
@@ -1948,21 +2034,14 @@ public class StationLocationControl extends StationModelControl {
      */
     private void updateDisplayable() {
         try {
-            if(selectedDisplayable!=null) {
-                StationModel sm = getControlContext().getStationModelManager().getSelectedStationModel();
-                if(sm!=null) {
-                    selectedDisplayable.setStationModel(sm);
-                }
-            }
-
-
             if (locationDisplayable != null) {
                 if (useStationModel) {
-                    locationDisplayable.setStationModel(super.getStationModel());
+                    locationDisplayable.setStationModel(
+                        super.getStationModel());
                     locationDisplayable.updateDisplayable();
                 } else {
-                    locationDisplayable.setDisplayState(symbolType, showSymbol,
-                                                        idType, showId);
+                    locationDisplayable.setDisplayState(symbolType,
+                            showSymbol, idType, showId);
                 }
             }
         } catch (Exception exc) {

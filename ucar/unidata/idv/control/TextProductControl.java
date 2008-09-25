@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -191,7 +192,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 pane.setEditable(false);
                 pane.setContentType("text/html");
                 pane.setText(content);
-                pane.setPreferredSize(new Dimension(250, 150));
+                pane.setPreferredSize(new Dimension(100, 150));
                 JLabel lbl = new JLabel(content);
                 GuiUtils.showOkDialog(null, "Definition:" + url, pane, null);
 
@@ -222,6 +223,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             return new JLabel("Could not load product data");
         }
         JTabbedPane tabs = doMakeTabs(false, false);
+        tabs = new JTabbedPane();
 
         setCenterOnClick(false);
         //        setDeclutter(false);
@@ -230,7 +232,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         htmlComp.addHyperlinkListener(this);
         htmlComp.setEditable(false);
         htmlComp.setContentType("text/html");
-        textComp = new JTextArea("", 30, 80);
+
+        textComp = new JTextArea("", 40, 80);
+        GuiUtils.setFixedWidthFont(textComp);
         textComp.setEditable(false);
         TextSearcher textSearcher = new TextSearcher(textComp);
 
@@ -275,9 +279,14 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             new TwoFacedObject("1 Hour", 1), new TwoFacedObject("3 Hours", 3),
             new TwoFacedObject("6 Hours", 6),
             new TwoFacedObject("12 Hours", 12),
-            new TwoFacedObject("24 Hours", 24),
-            new TwoFacedObject("36 Hours", 36),
-            new TwoFacedObject("48 Hours", 48), new TwoFacedObject("All", 0)
+            new TwoFacedObject("1 Day", 24),
+            new TwoFacedObject("1.5 Days", 36),
+            new TwoFacedObject("2 Days", 24 * 2),
+            new TwoFacedObject("3 Days", 24 * 3),
+            new TwoFacedObject("4 Days", 24 * 4),
+            new TwoFacedObject("5 Days", 24 * 5),
+            new TwoFacedObject("6 Days", 24 * 6),
+            new TwoFacedObject("1 Week", 24 * 7), new TwoFacedObject("All", 0)
         };
         TwoFacedObject selectedTfo =
             TwoFacedObject.findId(new Integer(hours),
@@ -292,8 +301,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
         });
 
-        JScrollPane treeScroller = GuiUtils.makeScrollPane(productTree, 200,
+        productTree.setPreferredSize(new Dimension(250, 100));
+
+        JScrollPane treeScroller = GuiUtils.makeScrollPane(productTree, 250,
                                        100);
+        treeScroller.setMinimumSize(new Dimension(250, 100));
+
         JComponent treeComp = GuiUtils.centerBottom(
                                   treeScroller,
                                   GuiUtils.inset(
@@ -302,9 +315,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                                           dateSelectionCbx), 5));
 
         stationLabel = new JLabel(" ");
-        JComponent topComp =
-            GuiUtils.leftRight(GuiUtils.bottom(stationLabel),
-                               getAnimationWidget().getContents());
+
         JScrollPane textScroller = new JScrollPane(textComp);
         JScrollPane htmlScroller = new JScrollPane(htmlComp);
         textScroller.setVerticalScrollBarPolicy(
@@ -327,12 +338,15 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                                   GuiUtils.right(showGlossaryCbx)));
         textTabbedPane.addTab("Text", textHolder);
         GuiUtils.tmpInsets = GuiUtils.INSETS_2;
+        JComponent topComp =
+            GuiUtils.leftRight(GuiUtils.bottom(stationLabel),
+                               getAnimationWidget().getContents());
+
         JComponent contents = GuiUtils.doLayout(new Component[] {
                                   GuiUtils.bottom(new JLabel("Products")),
                                   topComp, treeComp, textTabbedPane }, 2,
-                                      new double[] { 0.25,
-                0.75 }, GuiUtils.WT_NY);
-
+                                      new double[] { 0.0,
+                1.0 }, GuiUtils.WT_NY);
         updateText();
         tabs.insertTab("Products", null, contents, "", 0);
         tabs.setSelectedIndex(0);
@@ -386,8 +400,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      * Handle a change to the selected stations
      *
      * @param selectionList  list of stations
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    protected void selectedStationsChanged(List selectionList) throws VisADException, RemoteException {
+    protected void selectedStationsChanged(List selectionList)
+            throws VisADException, RemoteException {
         super.selectedStationsChanged(selectionList);
         if (selectionList.equals(selectedStations)) {
             updateStationLabel();
@@ -417,8 +435,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 sb.append(";");
             }
             String label = sb.toString();
-            if(label.length()>50) {
-                label = label.substring(0,49)+"...";
+            if (label.length() > 50) {
+                label = label.substring(0, 49) + "...";
             }
             stationLabel.setText(label);
             stationLabel.setToolTipText(sb.toString());
@@ -482,8 +500,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                             selectedStations.add(station);
                         }
                     }
-                    setSelectedStations(selectedStations);
-                    updateStationLabel();
                 }
 
                 if (stationList.size() == 1) {
@@ -503,10 +519,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                             (NamedStationImpl) stationList.get(idx));
                     }
                 }
+                setSelectedStations(selectedStations);
                 updateStationLabel();
                 loadData();
                 currentTable = newTable;
             }
+
 
             if ((productType != null) && (haveSelectedStations())) {
                 products = dataSource.readProducts(productType,
@@ -573,6 +591,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         return dateSelection;
     }
 
+    /** _more_          */
     private Cache htmlCache = new Cache(10);
 
     /**
@@ -626,6 +645,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         text = text.replaceAll("\n+\\&\\&[\\s]*\n", "\n\n");
         //Change == to <hr>
         text = text.replaceAll("\n\\=\\=[\\s]*\n", "<hr>");
+        text = text.replaceAll("\n\\=[\\s]*\n", "\n");
         //Change $$ to blank
         text = text.replaceAll("\n\\$\\$[\\s]*\n", "<hr>");
         //Line ends with a "." replace with a <p>
@@ -700,26 +720,31 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     /**
      * Set the text
      *
-     * @param theText the text
+     *
+     * @param newText _more_
      */
     protected void setText(String newText) {
-
         currentText = newText;
         String html = "";
         String text = "";
         if (productType == null) {
             html = text = "Please select a product";
         } else if ( !haveSelectedStations()) {
-            html = text = "Please select a station";
+            if ((selectedStationIds != null)
+                    && (selectedStationIds.size() > 0)) {
+                html = text = "";
+            } else {
+                html = text = "Please select a station";
+            }
         } else {
             text = newText;
-            html = (String)htmlCache.get(newText);
-            if(html==null) {
+            html = (String) htmlCache.get(newText);
+            if (html == null) {
                 long t1 = System.currentTimeMillis();
                 html = convertToHtml(newText);
                 long t2 = System.currentTimeMillis();
-                System.err.println ("to html time:" + (t2-t1));
-                htmlCache.put(newText,html);
+                //                System.err.println ("to html time:" + (t2-t1));
+                htmlCache.put(newText, html);
             }
         }
 
@@ -752,10 +777,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
             int idx = getAnimation().getCurrent();
             if ((idx >= 0) && (idx < products.size())) {
-                System.err.println("setText from time changed");
                 setText(products.get(idx).getContent());
             } else {
-                System.err.println("setText blank");
                 setText("");
             }
         } catch (Exception exc) {
