@@ -137,10 +137,10 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     private NamedStationTable stationTable;
 
     /** selected station */
-    private NamedStationImpl selectedStation;
+    private List<NamedStationImpl> selectedStations = new ArrayList<NamedStationImpl>();
 
     /** selected station id (for persistence) */
-    private String selectedStationId;
+    private List<String> selectedStationIds;
 
     /** the patthen */
     private Pattern allPattern = null;
@@ -269,6 +269,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
         Object[] dateSelectionItems = new Object[] {
             new TwoFacedObject("Latest Product", -1),
+            new TwoFacedObject("1 Hour", 1),
             new TwoFacedObject("Last 3 Hours", 3),
             new TwoFacedObject("Last 6 Hours", 6),
             new TwoFacedObject("Last 12 Hours", 12),
@@ -385,17 +386,11 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      * @param selectionList  list of stations
      */
     protected void selectedStationsChanged(List selectionList) {
-        NamedStationImpl newStation = null;
-        if (selectionList.size() == 0) {
-            selectedStation = null;
-        } else {
-            newStation = (NamedStationImpl) selectionList.get(0);
-        }
-        if (Misc.equals(newStation, selectedStation)) {
+        if(selectionList.equals(selectedStations)) {
             updateStationLabel();
             return;
         }
-        selectedStation = newStation;
+        selectedStations = (List<NamedStationImpl>)new ArrayList(selectionList);
         updateStationLabel();
         updateText();
     }
@@ -405,19 +400,19 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      */
     private void updateStationLabel() {
         if (stationLabel != null) {
-            NamedStationImpl station = selectedStation;
-            if (station != null) {
+            StringBuffer sb = new StringBuffer();
+            for(NamedStationImpl station: selectedStations) {
                 String state =
                     (String) station.getProperty(NamedStationTable.KEY_STATE,
                         "");
                 String name = station.getName();
                 name = name.replace("_", " ");
-                stationLabel.setText(name + (state.equals("")
+                sb.append(name + (state.equals("")
                         ? " "
                         : ", ") + state);
-            } else {
-                stationLabel.setText(" ");
+                sb.append(";");
             }
+            stationLabel.setText(sb.toString());
         }
 
     }
@@ -464,41 +459,46 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                     stationList = new ArrayList();
                 }
                 // in case we are unpersisting
-                String tmpId = selectedStationId;
-                if (tmpId != null) {
-                    selectedStationId = null;
+                List<String> tmpIds = selectedStationIds;
+                selectedStationIds = null;
+                if (tmpIds != null) {
+                    selectedStations = new ArrayList<NamedStationImpl>();
+                    Hashtable map = new Hashtable();
+                    for(String id:tmpIds) {
+                        map.put(id,id);
+                    }
                     for (NamedStationImpl station : (List<NamedStationImpl>) stationList) {
-                        if (Misc.equals(tmpId,station.getID())) {
-                            selectedStation = station;
-                            break;
+                        if (map.get(station.getID())!=null) {
+                            selectedStations.add(station);
                         }
                     }
+                    setSelectedStations(selectedStations);
                     updateStationLabel();
                 }
+
                 if (stationList.size() == 1) {
-                    selectedStation = (NamedStationImpl) stationList.get(0);
+                    selectedStations.clear();
+                    selectedStations.add((NamedStationImpl) stationList.get(0));
                     updateStationLabel();
                 }
 
 
-                if (selectedStation != null) {
-                    if ( !stationList.contains(selectedStation)) {
-                        if (productType != null) {
-                            selectedStation = null;
-                            updateStationLabel();
-                        }
-                    } else {
-                        selectedStation = (NamedStationImpl) stationList.get(
-                            stationList.indexOf(selectedStation));
+                List<NamedStationImpl> tmp = selectedStations;
+                selectedStations = new ArrayList<NamedStationImpl>();
+                for(NamedStationImpl station: tmp) {
+                    int idx = stationList.indexOf(station);
+                    if(idx>=0) {
+                        selectedStations.add((NamedStationImpl) stationList.get(idx));
                     }
                 }
+                updateStationLabel();
                 loadData();
                 currentTable = newTable;
             }
 
-            if ((productType != null) && (selectedStation != null)) {
+            if ((productType != null) && (haveSelectedStations())) {
                 products = dataSource.readProducts(productType,
-                        selectedStation, getDateSelection());
+                        selectedStations, getDateSelection());
             } else {
                 products = new ArrayList<Product>();
             }
@@ -543,18 +543,16 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         if (hours == 0) {
             return null;
         }
-        int count = Integer.MAX_VALUE;
         if (hours == -1) {
-            count = 1;
-            hours = 24 * 365 * 20;
+            return  new DateSelection(true, 1);
         }
 
-        Date now = new Date(System.currentTimeMillis());
-        //        Date now = DateUtil.roundByDay(new Date(System.currentTimeMillis()), 1);
-        Date then = new Date(System.currentTimeMillis()
-                             - DateUtil.hoursToMillis(hours));
-        DateSelection dateSelection = new DateSelection(then, now);
-        dateSelection.setCount(count);
+        int count = Integer.MAX_VALUE;
+        DateSelection dateSelection = new DateSelection(DateSelection.TIMEMODE_RELATIVE,
+                                                        -DateUtil.hoursToMillis(hours),
+                                                        DateSelection.TIMEMODE_CURRENT,
+                                                        0);
+        dateSelection.setNowTime(new Date());
         return dateSelection;
     }
 
@@ -593,42 +591,34 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 logException("Reading glossary", exc);
             }
         }
-        if (selectedStation != null) {
-            text = text.replace(" " + selectedStation.getID() + " ",
-                                " <b>" + selectedStation.getID() + "</b> ");
+        for(NamedStationImpl station: selectedStations) {
+            text = text.replace(" " + station.getID() + " ",
+                                " <b>" + station.getID() + "</b> ");
         }
 
-        text = text.replaceAll("\\.\\.\\.\n++", "...\n");
-        text = text.trim();
-        StringBuffer sb = new StringBuffer();
-        List<String> lines = (List<String>) StringUtil.split(text, "\n",
-                                 false, false);
-        int lineCnt = 0;
-        for (String line : lines) {
-            lineCnt++;
-            line = line.trim();
-            if (line.startsWith(".")) {
-                int idx = line.indexOf("...");
-                if (idx > 1) {
-                    String header = line.substring(1, idx);
-                    line = "<div style=\"background-color:#c3d9ff; font-weight: bold; padding-left:2px; padding-top:2px;margin-top:7px;\">"
-                           + header + "</div>" + line.substring(idx + 3);
-                } else if (line.equals(".")) {
-                    line = "\n";
-                }
-            } else if (line.equals("=")) {
-                line = "<hr>";
-            } else if (line.equals("$$")) {
-                continue;
-            } else {
-                line = line.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$",
-                                       "<i>$1</i>");
-            }
-            //            if(lineCnt<5) line = line+"<br>";
-            sb.append(line);
-            sb.append("\n");
-        }
-        text = sb.toString();
+        text = text.replaceAll("\r","");
+
+        //.header... to <div>header</div>
+        text = text.replaceAll("[\n]+\\.([^\\.\n]+)\\.\\.\\.[\\s]*",  "\n<div style=\"background-color:#c3d9ff; font-weight: bold; padding-left:2px; padding-top:2px;margin-top:15px;\">$1</div>\n");
+
+        //Change && to <p>
+        text = text.replaceAll("\n+\\&\\&[\\s]*\n","\n\n");
+        //Change == to <hr>
+        text = text.replaceAll("\n\\=\\=[\\s]*\n","<hr>");
+        //Change $$ to blank
+        text = text.replaceAll("\n\\$\\$[\\s]*\n","\n");
+        //Line ends with a "." replace with a <p>
+        text = text.replaceAll("([^\\.]+)\\.[ ]+\n","$1.<p>");
+        //italicize dates
+        text = text.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$",
+                               "<i>$1</i>");
+
+
+        text = text.replaceAll("\n+<","<");
+        text = text.replaceAll(">\n+",">");
+        text = text.replaceAll("<p><div","<div");
+        //        System.out.println(text);
+
         String[] icons = { "partlycloudy.png", "cloudy.png",
                            "partlysunny.png", "sunny.png", "rainy.png" };
         String[] patterns = { "PARTLY CLOUDY", "MOSTLY CLOUDY",
@@ -644,15 +634,29 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             text = text.replace("PATTERN" + i, patterns[i]);
         }
 
-
         if (showGlossaryCbx.isSelected()) {
             text = allPattern.matcher(text).replaceAll(
                 "$1<a href=\"$2\">$2</a>$3");
         }
-        text = text.replace("\n\n", "<p>");
+        text = text.replace("\\s+\n", "<p>");
         text = text.replace("\n", "<br>");
         return "<html>" + text + "</html>";
     }
+
+    public static void main(String []args) throws Exception {
+        String text= IOUtil.readContents(args[0],TextProductControl.class);
+        text = text.replaceAll("\r","");
+        //        text = text.replaceAll("[\n]+\\.([^\\.\n]+)\\.\\.\\.[ \n]+",  "<div style=\"background-color:#c3d9ff; font-weight: bold; padding-left:2px; padding-top:2px;margin-top:7px;\">$1</div>");
+        //        text = text.replaceAll("[\n]+\\.([^\\.\n]+)\\.\\.\\.[ \n]+",  "xxx");
+        //        text = text.replaceAll("([^\\.\n]+)\n+", "$1 ");
+        //        text = text.replaceAll("\\.\\.\\.\n++", "...\n");
+        System.out.println (text);
+    }
+
+    private boolean haveSelectedStations() {
+        return selectedStations.size()>0;
+    }
+
 
     /**
      * Set the text
@@ -667,7 +671,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 String text = "";
                 if (productType == null) {
                     html = text = "Please select a product";
-                } else if (selectedStation == null) {
+                } else if (!haveSelectedStations()) {
                     html = text = "Please select a station";
                 } else {
                     text = theText;
@@ -790,8 +794,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      * @param value The new value for SelectedStationId
      */
-    public void setSelectedStationId(String value) {
-        selectedStationId = value;
+    public void setSelectedStationIds(List<String> value) {
+        selectedStationIds = value;
     }
 
     /**
@@ -799,11 +803,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      * @return The SelectedStationId
      */
-    public String getSelectedStationId() {
-        if (selectedStation != null) {
-            return selectedStation.getID();
+    public List<String> getSelectedStationIds() {
+        List<String> ids = new ArrayList<String>();
+        for(NamedStationImpl station: selectedStations) {
+            ids.add(station.getID());
         }
-        return null;
+        return ids;
     }
 
 

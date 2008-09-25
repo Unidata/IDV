@@ -580,6 +580,9 @@ public class StationLocationControl extends StationModelControl {
     protected void     selectedStationsChanged(List selectionList) {
     }
 
+    protected void setSelectedStations(List<NamedStationImpl> stations) {
+        selectionList  = new ArrayList(stations);
+    }
 
     /**
      * Clean up html
