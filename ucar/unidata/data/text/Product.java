@@ -23,7 +23,9 @@
 
 
 
+
 package ucar.unidata.data.text;
+
 
 import ucar.unidata.util.Misc;
 
@@ -41,86 +43,114 @@ import java.util.List;
 
 public class Product implements Comparable {
 
+    /** the product date */
     private Date date;
+
+    /** the content */
     private String content;
+
+    /** the station identifier */
     private String station;
 
-    public Product(String station, String content,Date date) {
+    /**
+     * Create a product
+     *
+     * @param station  station
+     * @param content  content
+     * @param date  the date
+     */
+    public Product(String station, String content, Date date) {
         this.station = station;
         this.content = content;
-        this.date = date;
+        this.date    = date;
     }
 
 
-    public int 	compareTo(Object o) {
-        Product that = (Product)o;
-        if(date == null) {
-            if(that.date==null) return 0;
+    /**
+     * Compare this to o
+     *
+     * @param o the object to compare to
+     *
+     * @return the comparison
+     */
+    public int compareTo(Object o) {
+        Product that = (Product) o;
+        if (date == null) {
+            if (that.date == null) {
+                return 0;
+            }
             return -1;
         }
-        if(that.date==null) return 1;
+        if (that.date == null) {
+            return 1;
+        }
         return (date.compareTo(that.date));
     }
 
+    /**
+     * Get a string representation
+     *
+     * @return a string representation
+     */
     public String toString() {
         return station;
     }
 
-/**
-Set the Date property.
+    /**
+     * Set the Date property.
+     *
+     * @param value The new value for Date
+     */
+    public void setDate(Date value) {
+        date = value;
+    }
 
-@param value The new value for Date
-**/
-public void setDate (Date value) {
-	date = value;
-}
-
-/**
-Get the Date property.
-
-@return The Date
-**/
-public Date getDate () {
-	return date;
-}
+    /**
+     * Get the Date property.
+     *
+     * @return The Date
+     */
+    public Date getDate() {
+        return date;
+    }
 
 
 
-/**
-Set the Content property.
+    /**
+     * Set the Content property.
+     *
+     * @param value The new value for Content
+     */
+    public void setContent(String value) {
+        content = value;
+    }
 
-@param value The new value for Content
-**/
-public void setContent (String value) {
-	content = value;
-}
+    /**
+     * Get the Content property.
+     *
+     * @return The Content
+     */
+    public String getContent() {
+        return content;
+    }
 
-/**
-Get the Content property.
+    /**
+     * Set the Station property.
+     *
+     * @param value The new value for Station
+     */
+    public void setStation(String value) {
+        station = value;
+    }
 
-@return The Content
-**/
-public String getContent () {
-	return content;
-}
-
-/**
-Set the Station property.
-
-@param value The new value for Station
-**/
-public void setStation (String value) {
-	station = value;
-}
-
-/**
-Get the Station property.
-
-@return The Station
-**/
-public String getStation () {
-	return station;
-}
+    /**
+     * Get the Station property.
+     *
+     * @return The Station
+     */
+    public String getStation() {
+        return station;
+    }
 
 
 }

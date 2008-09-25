@@ -161,7 +161,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
         Hashtable ids = new Hashtable();
         if(stations!=null && stations.size()>0) {
             for(NamedStationImpl station: stations) {
-                ids.put(station.getID(),"");
+                ids.put(station.getID(),new Integer(0));
             }
         }
         return ids;

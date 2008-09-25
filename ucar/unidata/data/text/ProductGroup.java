@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.data.text;
 
 
@@ -42,36 +41,47 @@ import java.util.List;
  */
 public class ProductGroup {
 
-    /** _more_          */
+    /** the name */
     private String name;
 
-    /** _more_          */
+    /** a list of names */
     private List<ProductType> productTypes = new ArrayList<ProductType>();
 
-    public ProductGroup() {
-    }
+    /**
+     * The default ctor
+     */
+    public ProductGroup() {}
 
     /**
-     * _more_
+     * Create a new product group
      *
-     * @param name _more_
+     * @param name the name of the group
      */
     public ProductGroup(String name) {
         this.name = name;
     }
 
+    /**
+     * See if this equals another
+     *
+     * @param o  the other
+     *
+     * @return  true if they are equal
+     */
     public boolean equals(Object o) {
-        if(!(o instanceof ProductGroup)) return false;
-        return Misc.equals(name, ((ProductGroup)o).name);
+        if ( !(o instanceof ProductGroup)) {
+            return false;
+        }
+        return Misc.equals(name, ((ProductGroup) o).name);
     }
 
 
     /**
-     * _more_
+     * Test this
      *
-     * @param args _more_
+     * @param args  the file
      *
-     * @throws Exception _more_
+     * @throws Exception problem
      */
     public static void main(String[] args) throws Exception {
         //        parse(args[0]);
@@ -93,27 +103,27 @@ Observed_Data
 
 
     /**
-     * _more_
+     * Add a product to the group
      *
-     * @param product _more_
+     * @param product  the product to add
      */
     public void addProduct(ProductType product) {
         productTypes.add(product);
     }
 
     /**
-     * _more_
+     * Get the list of products in this group
      *
-     * @return _more_
+     * @return the list of products in this group
      */
     public List<ProductType> getProductTypes() {
         return productTypes;
     }
 
     /**
-     * _more_
+     * Get a String representation
      *
-     * @return _more_
+     * @return a String representation
      */
     public String toString() {
         return name;

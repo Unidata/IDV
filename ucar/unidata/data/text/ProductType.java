@@ -23,7 +23,9 @@
 
 
 
+
 package ucar.unidata.data.text;
+
 
 import ucar.unidata.util.Misc;
 
@@ -40,29 +42,40 @@ import java.util.List;
 
 public class ProductType {
 
-    /** _more_          */
+    /** the name */
     private String name;
 
-    /** _more_          */
+    /** the id */
     private String id;
 
-    public ProductType() {
-    }
+    /**
+     * Create a new product type
+     */
+    public ProductType() {}
 
     /**
-     * _more_
+     * Create a new ProductType
      *
-     * @param name _more_
-     * @param id _more_
+     * @param name  the name
+     * @param id    the id
      */
     public ProductType(String name, String id) {
         this.name = name;
         this.id   = id;
     }
 
+    /**
+     * See if this equals o
+     *
+     * @param o  Object to check
+     *
+     * @return  true if they are equal
+     */
     public boolean equals(Object o) {
-        if(!(o instanceof ProductType)) return false;
-        return Misc.equals(id, ((ProductType)o).id);
+        if ( !(o instanceof ProductType)) {
+            return false;
+        }
+        return Misc.equals(id, ((ProductType) o).id);
     }
 
 
@@ -104,9 +117,9 @@ public class ProductType {
 
 
     /**
-     * _more_
+     * Get a String representation
      *
-     * @return _more_
+     * @return a String representation
      */
     public String toString() {
         return name;

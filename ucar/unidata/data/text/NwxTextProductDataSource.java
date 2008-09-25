@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -74,7 +75,8 @@ import java.util.regex.*;
 public class NwxTextProductDataSource extends TextProductDataSource {
 
     /** the table map */
-    private Hashtable<String, NamedStationTable> tableMap = new Hashtable<String, NamedStationTable>();
+    private Hashtable<String, NamedStationTable> tableMap =
+        new Hashtable<String, NamedStationTable>();
 
     /** the path to the tables */
     private String tablePath;
@@ -220,7 +222,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * Read products
      *
      * @param productType  the product type
-     * @param station  the station
+     * @param stations  the stations
      * @param dateSelection  the date selection
      *
      * @return the list of products
@@ -434,7 +436,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * to override this method for their particular stuff
      *
      * @param tableInfo the table info
-     * @param station  the station
+     * @param stations the stations
      * @param dateSelection  the date selection
      *
      * @return the products
@@ -448,21 +450,24 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         if ((datedObjects == null) || datedObjects.isEmpty()) {
             return products;
         }
-        int     maxCount = ((dateSelection == null)
-                            ? Integer.MAX_VALUE
-                            : dateSelection.getCount());
+        int maxCount = ((dateSelection == null)
+                        ? Integer.MAX_VALUE
+                        : dateSelection.getCount());
+        if (stations != null) {
+            maxCount = Math.min(stations.size() * maxCount,
+                                Integer.MAX_VALUE);
+        }
 
-        int     count    = 0;
-        boolean ok       = true;
+        int     count = 0;
+        boolean ok    = true;
         for (DatedObject datedObject : datedObjects) {
             if ( !ok) {
                 break;
             }
             try {
-                Date fileDate = datedObject.getDate();
-                File f        = (File) datedObject.getObject();
+                File f = (File) datedObject.getObject();
                 List<Product> productsInFile = parseProduct(f.toString(),
-                                                   true, stations);
+                                                   true, stations, maxCount);
                 for (Product product : productsInFile) {
                     products.add(product);
                     count++;
@@ -519,7 +524,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
         List<DatedObject> validFiles = new ArrayList<DatedObject>();
         for (DatedObject datedObject : datedObjects) {
-            if(dateSelection.isLatest() || dateSelection.isAll()) {
+            if (dateSelection.isLatest() || dateSelection.isAll()) {
                 validFiles.add(datedObject);
                 continue;
             }
@@ -576,28 +581,29 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      * @param path  path to the files
      * @param recordType  the record type
-     * @param station  the station to search for
+     * @param stations  the stations to search for
+     * @param maxCount maximum number for each station
      *
      * @return the list of products
      *
      * @throws Exception problem reading or parsing
      */
     private static List<Product> parseProduct(String path,
-            boolean recordType, List<NamedStationImpl> stations)
+            boolean recordType, List<NamedStationImpl> stations, int maxCount)
             throws Exception {
 
         List<Product> products = new ArrayList<Product>();
         String contents = IOUtil.readContents(path,
                               NwxTextProductDataSource.class);
-        String prefix   = (recordType
-                           ? ""
-                           : "");
-        String suffix   = (recordType
-                           ? ""
-                           : "");
-        int    idx      = 0;
-        Hashtable ids = makeStationMap(stations);
-        Date   fileDate = getDateFromFileName(path);
+        String    prefix   = (recordType
+                              ? ""
+                              : "");
+        String    suffix   = (recordType
+                              ? ""
+                              : "");
+        int       idx      = 0;
+        Hashtable ids      = makeStationMap(stations);
+        Date      fileDate = getDateFromFileName(path);
         //        System.err.println ("contents:" + contents);
         while (true) {
             int idx1 = contents.indexOf(prefix, idx);
@@ -618,13 +624,6 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             String  afosPil          = "";
             String  wmoID            = "";
 
-            /*
-            SimpleDateFormat sdf1 =
-                new SimpleDateFormat("hhm a z EEE MMM d yyyy");
-            SimpleDateFormat sdfNoAmPm =
-                new SimpleDateFormat("hhm z EEE MMM d yyyy");
-            */
-            //List lines = new ArrayList();
             while (true) {
                 int endLineIdx = product.indexOf("\n", startLineIdx);
                 if (endLineIdx < 0) {
@@ -643,44 +642,6 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                     } else if (lineCnt == 3) {
                         afosPil = line;
                     }
-                    /*
-                    else if (lineCnt > 2) {
-                        if (tline.length() > 10) {
-                            String[] toks = StringUtil.split(tline, " ", 2);
-                            if ((toks == null) || (toks.length != 2)) {
-                                continue;
-                            }
-                            String hhmm = toks[0];
-                            try {
-                                new Integer(hhmm);
-                            } catch (Exception exc) {
-                                continue;
-                            }
-                            if (hhmm.length() == 3) {
-                                hhmm = "0" + hhmm;
-                            } else if (hhmm.length() == 1) {
-                                hhmm = "0" + hhmm + "00";
-                            }
-
-                            String dttm = hhmm + " " + toks[1];
-
-                            try {
-                                date = sdf1.parse(dttm);
-                            } catch (Exception exc) {}
-                            if (date == null) {
-                                try {
-                                    date = sdfNoAmPm.parse(dttm);
-                                } catch (Exception exc) {
-                                    //                                    System.err.println ("BAD:" +dttm);
-                                }
-                            }
-                            //                            System.err.println (tline + " : " + date);
-                            if (date != null) {
-                                break;
-                            }
-                        }
-                    }
-                    */
                 }
                 if (lineCnt > 8) {
                     break;
@@ -707,11 +668,15 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             if (date == null) {
                 date = fileDate;
             }
-            if ((ids == null) || ids.get(stationString)!=null) {
+            if ((ids == null)) {
                 products.add(new Product(stationString, product, date));
+            } else if (ids.get(stationString) != null) {
+                int num = ((Integer) ids.get(stationString)).intValue();
+                if (num < maxCount) {
+                    products.add(new Product(stationString, product, date));
+                    ids.put(stationString, new Integer(num++));
+                }
             }
-            //            System.out.println("************");
-            //            if(true) break;
         }
         return products;
 
@@ -726,8 +691,8 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
-               //|| ti.flag.equals(TableInfo.FLAG_W)
-               || ti.flag.equals(TableInfo.FLAG_F);
+        //|| ti.flag.equals(TableInfo.FLAG_W)
+        || ti.flag.equals(TableInfo.FLAG_F);
     }
 
     /**
