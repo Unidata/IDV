@@ -43,6 +43,7 @@ import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.TextSearcher;
 
+import ucar.unidata.util.Cache;
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
@@ -229,7 +230,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         htmlComp.addHyperlinkListener(this);
         htmlComp.setEditable(false);
         htmlComp.setContentType("text/html");
-        textComp = new JTextArea("", 30, 60);
+        textComp = new JTextArea("", 30, 80);
         textComp.setEditable(false);
         TextSearcher textSearcher = new TextSearcher(textComp);
 
@@ -255,6 +256,11 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         productTree = new JTree(treeModel);
         productTree.setRootVisible(false);
         productTree.setShowsRootHandles(true);
+        if (selectedNode != null) {
+            TreeNode[] path = treeModel.getPathToRoot(selectedNode);
+            productTree.setSelectionPath(new TreePath(path));
+            productTree.expandPath(new TreePath(path));
+        }
         productTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 productType = getSelectedProductType();
@@ -262,11 +268,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
         });
 
-        if (selectedNode != null) {
-            TreeNode[] path = treeModel.getPathToRoot(selectedNode);
-            productTree.setSelectionPath(new TreePath(path));
-            productTree.expandPath(new TreePath(path));
-        }
 
 
         Object[] dateSelectionItems = new Object[] {
@@ -317,6 +318,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         showGlossaryCbx = new JCheckBox("Show Glossary", showGlossary);
         showGlossaryCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
+                System.err.println("setText glossary");
                 setText(currentText);
             }
         });
@@ -385,7 +387,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      * @param selectionList  list of stations
      */
-    protected void selectedStationsChanged(List selectionList) {
+    protected void selectedStationsChanged(List selectionList) throws VisADException, RemoteException {
+        super.selectedStationsChanged(selectionList);
         if (selectionList.equals(selectedStations)) {
             updateStationLabel();
             return;
@@ -413,7 +416,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                                   : ", ") + state);
                 sb.append(";");
             }
-            stationLabel.setText(sb.toString());
+            String label = sb.toString();
+            if(label.length()>50) {
+                label = label.substring(0,49)+"...";
+            }
+            stationLabel.setText(label);
+            stationLabel.setToolTipText(sb.toString());
         }
 
     }
@@ -442,7 +450,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      * @param listOfStations list of stations
      */
-    protected void addSelectedToList(List listOfStations) {
+    protected void xxxaddSelectedToList(List listOfStations) {
         //NOOP
     }
 
@@ -459,6 +467,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 } else {
                     stationList = new ArrayList();
                 }
+
                 // in case we are unpersisting
                 List<String> tmpIds = selectedStationIds;
                 selectedStationIds = null;
@@ -528,6 +537,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             if (products.size() == 0) {
                 setText("No products found");
             } else {
+                //                System.err.println("setText products");
+                //                Misc.printStack("in updateTextInner",10,null);
                 setText(products.get(products.size() - 1).getContent());
             }
         } catch (Exception exc) {
@@ -543,9 +554,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      */
     private DateSelection getDateSelection() {
         long hours = (long) getHours();
-        if (hours == 0) {
-            return null;
-        }
         if (hours == -1) {
             //do latest
             return new DateSelection(true, 1);
@@ -564,6 +572,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         dateSelection.setNowTime(new Date());
         return dateSelection;
     }
+
+    private Cache htmlCache = new Cache(10);
 
     /**
      * Convert the text to HTML
@@ -656,7 +666,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         }
         text = text.replace("\\s+\n", "<p>");
         text = text.replace("\n", "<br>");
-        return "<html>" + text + "</html>";
+        text = "<text>" + text + "</html>";
+        return text;
     }
 
     /**
@@ -691,26 +702,35 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      * @param theText the text
      */
-    protected void setText(final String theText) {
-        currentText = theText;
+    protected void setText(String newText) {
+
+        currentText = newText;
+        String html = "";
+        String text = "";
+        if (productType == null) {
+            html = text = "Please select a product";
+        } else if ( !haveSelectedStations()) {
+            html = text = "Please select a station";
+        } else {
+            text = newText;
+            html = (String)htmlCache.get(newText);
+            if(html==null) {
+                long t1 = System.currentTimeMillis();
+                html = convertToHtml(newText);
+                long t2 = System.currentTimeMillis();
+                System.err.println ("to html time:" + (t2-t1));
+                htmlCache.put(newText,html);
+            }
+        }
+
+        final String finalText = text;
+        final String finalHtml = html;
+
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                String html = "";
-                String text = "";
-                if (productType == null) {
-                    html = text = "Please select a product";
-                } else if ( !haveSelectedStations()) {
-                    html = text = "Please select a station";
-                } else {
-                    text = theText;
-                    long t1 = System.currentTimeMillis();
-                    html = convertToHtml(theText);
-                    long t2 = System.currentTimeMillis();
-                    //                        System.err.println ("Time:" + (t2-t1));
-
-                }
-                textComp.setText(text);
-                htmlComp.setText(html);
+                textComp.setText(finalText);
+                htmlComp.setText(finalHtml);
                 textComp.setCaretPosition(0);
                 textComp.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
                 htmlComp.setCaretPosition(0);
@@ -732,8 +752,10 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
             int idx = getAnimation().getCurrent();
             if ((idx >= 0) && (idx < products.size())) {
+                System.err.println("setText from time changed");
                 setText(products.get(idx).getContent());
             } else {
+                System.err.println("setText blank");
                 setText("");
             }
         } catch (Exception exc) {

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui.symbol;
 
 
@@ -242,6 +243,16 @@ public class StationModelManager extends ResourceManager {
 
 
     /**
+     * Get the station model to use for selected locations
+     *
+     * @return selected station model
+     */
+    public StationModel getSelectedStationModel() {
+        return getStationModel("Selected");
+    }
+
+
+    /**
      * Get the named station model
      *
      * @param name station model name
@@ -251,14 +262,14 @@ public class StationModelManager extends ResourceManager {
         if (name == null) {
             return null;
         }
-        StationModel stationModel  = (StationModel) getObject(name);
+        StationModel stationModel = (StationModel) getObject(name);
         //Check for old station models
-        if(stationModel == null && name.indexOf(">")<0) {
-            name = ">"+name;
+        if ((stationModel == null) && (name.indexOf(">") < 0)) {
+            name = ">" + name;
             for (int i = 0; i < resources.size(); i++) {
-                String modelName  = resources.get(i).toString();
-                if(modelName.endsWith(name)) {
-                    return (StationModel)resources.get(i);
+                String modelName = resources.get(i).toString();
+                if (modelName.endsWith(name)) {
+                    return (StationModel) resources.get(i);
                 }
             }
         }

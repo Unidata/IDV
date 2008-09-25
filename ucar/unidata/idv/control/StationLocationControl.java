@@ -119,6 +119,8 @@ public class StationLocationControl extends StationModelControl {
     /** The displayable */
     private StationLocationDisplayable locationDisplayable;
 
+    private StationLocationDisplayable selectedDisplayable;
+
     /** Shows any lines */
     private LineDrawing coordDisplayable;
 
@@ -465,12 +467,28 @@ public class StationLocationControl extends StationModelControl {
      */
     protected StationModelDisplayable createStationModelDisplayable()
             throws VisADException, RemoteException {
+
         locationDisplayable = new StationLocationDisplayable(
             "location displayable", getControlContext().getJythonManager());
         locationDisplayable.setShouldUseAltitude(false);
         addDisplayable(locationDisplayable, FLAG_COLOR | FLAG_ZPOSITION);
+
+
+
+        selectedDisplayable = new StationLocationDisplayable(
+                                                             "selected displayable", getControlContext().getJythonManager());
+        selectedDisplayable.setShouldUseAltitude(false);
+        addDisplayable(selectedDisplayable, FLAG_COLOR | FLAG_ZPOSITION);
+
+        StationModel sm = getControlContext().getStationModelManager().getSelectedStationModel();
+        if(sm!=null) {
+            selectedDisplayable.setStationModel(sm);
+        }
+        updateSelectedDisplayable();
+
         return locationDisplayable;
     }
+
 
     /**
      * Override the superclass method since currently, the DataChoice
@@ -577,12 +595,37 @@ public class StationLocationControl extends StationModelControl {
         }
     }
 
-    protected void     selectedStationsChanged(List selectionList) {
+    protected void     selectedStationsChanged(List selectionList) throws VisADException, RemoteException {
+        updateSelectedDisplayable();
     }
 
-    protected void setSelectedStations(List<NamedStationImpl> stations) {
+
+    protected void setSelectedStations(List<NamedStationImpl> stations) throws VisADException, RemoteException {
         selectionList  = new ArrayList(stations);
+        updateSelectedDisplayable();
     }
+
+    /**
+     * updates the displayable when anything changes.
+     */
+    private void updateSelectedDisplayable() throws VisADException, RemoteException  {
+        if (selectedDisplayable == null) {
+            return;
+        }
+        selectedDisplayable.setStations(selectionList);
+        //        selectedDisplayable.updateDisplayable();
+    }
+
+    protected void setScaleOnDisplayable(float f)
+            throws RemoteException, VisADException {
+        super.setScaleOnDisplayable(f);
+        if (selectedDisplayable != null) {
+            selectedDisplayable.setScale(f);
+        }
+    }
+
+
+
 
     /**
      * Clean up html
@@ -945,6 +988,10 @@ public class StationLocationControl extends StationModelControl {
             if (listOfStations != null) {
                 synchronized (DISPLAYABLE_MUTEX) {
                     displayedStations = listOfStations;
+                    if(selectedDisplayable!=null) {
+                        //                        selectedDisplayable.setStations(listOfStations);
+                    }
+
                     if (locationDisplayable != null) {
                         Trace.call1("setStations");
                         locationDisplayable.setStations(listOfStations);
@@ -1412,7 +1459,7 @@ public class StationLocationControl extends StationModelControl {
          *
          * @param station station
          */
-        protected void stationSelected(NamedStationImpl station) {
+        protected void stationSelected(NamedStationImpl station) throws VisADException, RemoteException {
             if ( !selectionList.contains(station)) {
                 selectionList.clear();
                 selectionList.add(station);
@@ -1895,20 +1942,28 @@ public class StationLocationControl extends StationModelControl {
         }
     }
 
+
     /**
      * updates the displayable when anything changes.
      */
     private void updateDisplayable() {
-        if (locationDisplayable == null) {
-            return;
-        }
         try {
-            if (useStationModel) {
-                locationDisplayable.setStationModel(super.getStationModel());
-                locationDisplayable.updateDisplayable();
-            } else {
-                locationDisplayable.setDisplayState(symbolType, showSymbol,
-                        idType, showId);
+            if(selectedDisplayable!=null) {
+                StationModel sm = getControlContext().getStationModelManager().getSelectedStationModel();
+                if(sm!=null) {
+                    selectedDisplayable.setStationModel(sm);
+                }
+            }
+
+
+            if (locationDisplayable != null) {
+                if (useStationModel) {
+                    locationDisplayable.setStationModel(super.getStationModel());
+                    locationDisplayable.updateDisplayable();
+                } else {
+                    locationDisplayable.setDisplayState(symbolType, showSymbol,
+                                                        idType, showId);
+                }
             }
         } catch (Exception exc) {
             logException("Updating displayable", exc);
