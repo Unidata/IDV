@@ -140,7 +140,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
      * @return the list of products
      */
     public abstract List<Product> readProducts(ProductType productType,
-            NamedStationImpl station, DateSelection dateSelection);
+                                               List<NamedStationImpl> stations, DateSelection dateSelection);
 
     /**
      * Get the stations for a productType
@@ -155,6 +155,17 @@ public abstract class TextProductDataSource extends FilesDataSource {
     public abstract NamedStationTable getStations(ProductType productType,
             DateSelection dateSelection)
      throws Exception;
+
+
+    protected static Hashtable makeStationMap(List<NamedStationImpl> stations) {
+        Hashtable ids = null;
+        if(stations!=null && stations.size()>0) {
+            for(NamedStationImpl station: stations) {
+                ids.put(station.getID(),"");
+            }
+        }
+        return ids;
+    }
 
 
     /**

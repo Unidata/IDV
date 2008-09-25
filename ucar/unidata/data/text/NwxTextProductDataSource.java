@@ -226,11 +226,11 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the list of products
      */
     public List<Product> readProducts(ProductType productType,
-                                      NamedStationImpl station,
+                                      List<NamedStationImpl> stations,
                                       DateSelection dateSelection) {
         TableInfo tableInfo = getTableInfo(productType);
         if ((tableInfo != null) && canHandleType(tableInfo)) {
-            return readProducts(tableInfo, station, dateSelection);
+            return readProducts(tableInfo, stations, dateSelection);
         }
         return new ArrayList<Product>();
     }
@@ -440,7 +440,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the products
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                         NamedStationImpl station,
+                                         List<NamedStationImpl> stations,
                                          DateSelection dateSelection) {
         List<DatedObject> datedObjects = new ArrayList<DatedObject>();
         datedObjects = getFiles(tableInfo, dateSelection);
@@ -462,7 +462,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                 Date fileDate = datedObject.getDate();
                 File f        = (File) datedObject.getObject();
                 List<Product> productsInFile = parseProduct(f.toString(),
-                                                   true, station);
+                                                   true, stations);
                 for (Product product : productsInFile) {
                     products.add(product);
                     count++;
@@ -519,6 +519,10 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
         List<DatedObject> validFiles = new ArrayList<DatedObject>();
         for (DatedObject datedObject : datedObjects) {
+            if(dateSelection.getDoLatest()) {
+                validFiles.add(datedObject);
+                break;
+            }
             Date fileDate = datedObject.getDate();
             if (((dateRange[0].getTime() <= fileDate.getTime())
                     && (fileDate.getTime() <= dateRange[1].getTime()))) {
@@ -579,7 +583,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @throws Exception problem reading or parsing
      */
     private static List<Product> parseProduct(String path,
-            boolean recordType, NamedStationImpl station)
+            boolean recordType, List<NamedStationImpl> stations)
             throws Exception {
 
         List<Product> products = new ArrayList<Product>();
@@ -592,9 +596,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                            ? ""
                            : "");
         int    idx      = 0;
-        String id       = ((station != null)
-                           ? station.getID()
-                           : null);
+        Hashtable ids = makeStationMap(stations);
         Date   fileDate = getDateFromFileName(path);
         //        System.err.println ("contents:" + contents);
         while (true) {
@@ -705,7 +707,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             if (date == null) {
                 date = fileDate;
             }
-            if ((id == null) || Misc.equals(stationString, id)) {
+            if ((ids == null) || ids.get(stationString)!=null) {
                 products.add(new Product(stationString, product, date));
             }
             //            System.out.println("************");

@@ -93,16 +93,17 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      * @return  the list of products
      */
     protected List<Product> readProducts(TableInfo tableInfo,
-                                         NamedStationImpl station,
+                                         List<NamedStationImpl> stations,
                                          DateSelection dateSelection) {
         List<Product> products = new ArrayList<Product>();
         if ( !canHandleType(tableInfo)) {
             return products;
         }
-        if (station == null) {
+        if (stations == null || stations.size()==0) {
             return products;
         }
 
+        for(NamedStationImpl station: stations) {
         StringBuilder builder = new StringBuilder("adde://");
         builder.append(getDataContext().getIdv().getProperty("textserver",
                 "adde.ucar.edu"));
@@ -129,6 +130,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
         }
         return products;
     }
@@ -169,6 +171,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         Date[] dateRange = ((dateSelection == null)
                             ? null
                             : dateSelection.getRange());
+
         Date   endTime   = (dateRange == null)
                            ? new Date()
                            : dateRange[1];
