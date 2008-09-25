@@ -472,7 +472,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                     }
                 }
             } catch (Exception exc) {
-                //                return "Error reading text product file:" + exc;
+                // System.err.println("Error reading text product file:" + exc);
             }
 
         }
@@ -519,9 +519,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
         List<DatedObject> validFiles = new ArrayList<DatedObject>();
         for (DatedObject datedObject : datedObjects) {
-            if(dateSelection.getDoLatest()) {
+            if(dateSelection.isLatest() || dateSelection.isAll()) {
                 validFiles.add(datedObject);
-                break;
+                continue;
             }
             Date fileDate = datedObject.getDate();
             if (((dateRange[0].getTime() <= fileDate.getTime())

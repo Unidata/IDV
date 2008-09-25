@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -86,75 +87,54 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     /**
      * Read products for the station
      *
-     * @param tableInfo  the table information
-     * @param station  the station
+     * @param ti  the table information
+     * @param stations list of stations
      * @param dateSelection the date selection
      *
      * @return  the list of products
      */
-    protected List<Product> readProducts(TableInfo tableInfo,
+    protected List<Product> readProducts(TableInfo ti,
                                          List<NamedStationImpl> stations,
                                          DateSelection dateSelection) {
         List<Product> products = new ArrayList<Product>();
-        if ( !canHandleType(tableInfo)) {
+        if ( !canHandleType(ti)) {
             return products;
         }
-        if (stations == null || stations.size()==0) {
+        if ((stations == null) || (stations.size() == 0)) {
             return products;
         }
 
-        for(NamedStationImpl station: stations) {
-        StringBuilder builder = new StringBuilder("adde://");
-        builder.append(getDataContext().getIdv().getProperty("textserver",
-                "adde.ucar.edu"));
-        builder.append("/");
-        builder.append(getRequest(tableInfo, station, dateSelection));
+        String base = "adde://"+
+                      getDataContext().getIdv().getProperty(
+                          "textserver", "adde.ucar.edu") + "/";
 
-
-        String url = builder.toString();
-        //System.out.println("url = " + url);
         try {
-            AddeTextReader atr = new AddeTextReader(url);
-            if (url.indexOf("wxtext") > 0) {
-                List<WxTextProduct> prods = atr.getWxTextProducts();
-                for (Iterator itera = prods.iterator(); itera.hasNext(); ) {
-                    WxTextProduct wtp = (WxTextProduct) itera.next();
-                    products.add(new Product(wtp.getWstn(), wtp.getText(),
-                                             wtp.getDate()));
+            if (!ti.flag.equals(ti.FLAG_O)) {
+                for (NamedStationImpl station : stations) {
+                    String url = base + getWxTextRequest(ti, station, dateSelection);
+                    //System.out.println("url = " + url);
+                    AddeTextReader atr = new AddeTextReader(url);
+                    List<WxTextProduct> prods = atr.getWxTextProducts();
+                    for (Iterator itera =
+                            prods.iterator(); itera.hasNext(); ) {
+                        WxTextProduct wtp = (WxTextProduct) itera.next();
+                        products.add(new Product(wtp.getWstn(),
+                                wtp.getText(), wtp.getDate()));
+                    }
                 }
             } else {
+                String url = base + getObTextRequest(ti, stations, dateSelection);
+                //System.out.println("url = " + url);
+                AddeTextReader atr = new AddeTextReader(url);
                 String obs = atr.getText();
-                products.add(new Product(station.getID(), atr.getText(),
-                                         new Date()));
+                products.add(new Product(stations.toString(), atr.getText(),
+                             new Date()));
             }
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        }
         return products;
-    }
-
-    /**
-     * Get the search string
-     *
-     * @param ti  table info
-     * @param station  station
-     * @param dateSelection the date selection
-     *
-     * @return the search string
-     */
-    private String getRequest(TableInfo ti, NamedStationImpl station,
-                              DateSelection dateSelection) {
-
-        if (station == null) {
-            return "";
-        }
-        if (ti.flag.equals(ti.FLAG_O)) {
-            return getObTextRequest(ti, station, dateSelection);
-        } else {
-            return getWxTextRequest(ti, station, dateSelection);
-        }
     }
 
     /**
@@ -166,21 +146,24 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @return the request string
      */
-    private String getWxTextRequest(TableInfo ti, NamedStationImpl station,
+    private String getWxTextRequest(TableInfo ti, 
+                                    NamedStationImpl station,
                                     DateSelection dateSelection) {
-        Date[] dateRange = ((dateSelection == null)
+        Date[] dateRange = (((dateSelection == null)
+                             || dateSelection.isLatest()
+                             || dateSelection.isAll())
                             ? null
                             : dateSelection.getRange());
 
-        Date   endTime   = (dateRange == null)
-                           ? new Date()
-                           : dateRange[1];
-        int[]  endDT = McIDASUtil.mcSecsToDayTime(endTime.getTime() / 1000);
-        int    maxCount  = ((dateSelection == null)
-                            ? 100
-                            : dateSelection.getCount());
-        maxCount = Math.min(maxCount, 100);
-        int dtime = 200;
+        Date  endTime = (dateRange == null)
+                        ? new Date()
+                        : dateRange[1];
+        int[] endDT   = McIDASUtil.mcSecsToDayTime(endTime.getTime() / 1000);
+        System.out.println(dateSelection);
+        int maxCount = (((dateSelection == null) || dateSelection.isLatest())
+                        ? 1
+                        : dateSelection.getCount());
+        int   dtime   = 720;
         if (dateRange != null) {
             int hours = (int) (Math.abs(dateRange[1].getTime()
                                         - dateRange[0].getTime()) / (1000
@@ -194,9 +177,11 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         StringBuilder buf = new StringBuilder("wxtext?");
         if (ti.flag.equals(ti.FLAG_F)) {
             String afos = station.getID();
-            if (afos == null || afos.equals("")) return "";
+            if ((afos == null) || afos.equals("")) {
+                return "";
+            }
             buf.append("APRO=");
-            buf.append(afos.substring(0,3));
+            buf.append(afos.substring(0, 3));
             buf.append("&ASTN=");
             buf.append(afos.substring(3));
         } else {
@@ -220,69 +205,80 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      * Get the ob text request
      *
      * @param ti  table info
-     * @param station  station
+     * @param stations  stations
      * @param dateSelection the date selection
      *
      * @return  the request string
      */
-    private String getObTextRequest(TableInfo ti, NamedStationImpl station,
+    private String getObTextRequest(TableInfo ti, 
+                                    List<NamedStationImpl> stations,
                                     DateSelection dateSelection) {
-        Date[] dateRange = ((dateSelection == null)
+        Date[] dateRange = (((dateSelection == null)
+                             || dateSelection.isLatest()
+                             || dateSelection.isAll())
                             ? null
                             : dateSelection.getRange());
-        Date   start     = (dateRange == null)
-                           ? null
-                           : dateRange[0];
-        Date   end       = (dateRange == null)
-                           ? null
-                           : dateRange[1];
-        int    maxCount  = ((dateSelection == null)
-                            ? 999
-                            : dateSelection.getCount());
-        maxCount = Math.min(maxCount, 999);
-        int hourMod = 1;
+        Date   start   = (dateRange == null)
+                         ? null
+                         : dateRange[0];
+        Date   end     = (dateRange == null)
+                         ? null
+                         : dateRange[1];
+        int maxCount = (((dateSelection == null) || dateSelection.isLatest())
+                        ? 1
+                        : dateSelection.getCount());
 
-        String id = station.getID();
-        String idn =
-            (String) station.getProperty(NamedStationTable.KEY_IDNUMBER, "");
-        if ( !idn.equals("")) {
-            idn = idn.substring(0, 5);
-        }
         StringBuilder buf = new StringBuilder("obtext?");
+        buf.append("&ID=");
+        for (NamedStationImpl  station : stations) {
+            String id      = station.getID();
+            String idn =
+            (String) station.getProperty(NamedStationTable.KEY_IDNUMBER, "");
+            if ( !idn.equals("")) {
+                idn = idn.substring(0, 5);
+            }
+            if (ti.type.equals("SND_DATA")) {
+                id      = idn;
+            } else if (ti.type.equals("SYN_DATA")) {
+                id      = idn;
+            } else {  // (ti.type.equals("SFC_HRLY")) 
+                // uses 3 letter ids
+                if (id.length() < 4) {
+                    id = "K" + id;
+                }
+            }
+            buf.append(id);
+            buf.append(" ");
+        }
+
+        int    hourMod = 1;
         buf.append("&descriptor=");
         if (ti.type.equals("SND_DATA")) {
             buf.append("UPPERAIR");
-            id = idn;
             hourMod = 3;
         } else if (ti.type.equals("SYN_DATA")) {
             buf.append("SYNOPTIC");
-            id = idn;
             hourMod = 3;
         } else if (ti.type.equals("TAFS_DEC")) {
             buf.append("TERMFCST");
         } else {  // (ti.type.equals("SFC_HRLY")) {
             buf.append("SFCHOURLY");
-            // uses 3 letter ids
-            if (id.length() < 4) {
-                id = "K" + id;
-            }
         }
-        buf.append("&ID=");
-        buf.append(id);
         // set the times
         // TODO:  this needs some work
         // contrary to the docs, the time in newest/oldest is HH not HHMMSS
         if (dateRange != null) {
-            int[] endDT = McIDASUtil.mcSecsToDayTime(end.getTime()/1000);
-            int endHour = endDT[1]/10000;
-            endHour = endHour - endHour%hourMod;
+            int[] endDT   = McIDASUtil.mcSecsToDayTime(end.getTime() / 1000);
+            int   endHour = endDT[1] / 10000;
+            endHour = endHour - endHour % hourMod;
             buf.append("&newest=");
             buf.append(endDT[0]);
             buf.append(" ");
             buf.append(endHour);
-            int[] startDT = McIDASUtil.mcSecsToDayTime(start.getTime()/1000);
-            int startHour = startDT[1]/10000;
-            startHour = startHour - startHour%hourMod;
+            int[] startDT = McIDASUtil.mcSecsToDayTime(start.getTime()
+                                / 1000);
+            int startHour = startDT[1] / 10000;
+            startHour = startHour - startHour % hourMod;
             buf.append("&oldest=");
             buf.append(startDT[0]);
             buf.append(" ");
@@ -300,7 +296,8 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      * @return the base path of the data.
      */
     protected String getTablePath() {
-        return getDataContext().getIdv().getProperty("tablepath", "http://www.unidata.ucar.edu/software/idv/resources");
+        return getDataContext().getIdv().getProperty("tablepath",
+                "http://www.unidata.ucar.edu/software/idv/resources");
     }
 
     /**
@@ -329,8 +326,8 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
                || ti.flag.equals(TableInfo.FLAG_F)
-               //|| ti.flag.equals(TableInfo.FLAG_W)
-               || ti.flag.equals(TableInfo.FLAG_O);
+        //|| ti.flag.equals(TableInfo.FLAG_W)
+        || ti.flag.equals(TableInfo.FLAG_O);
     }
 
 }

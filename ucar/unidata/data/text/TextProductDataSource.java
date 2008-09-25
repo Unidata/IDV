@@ -158,7 +158,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
 
 
     protected static Hashtable makeStationMap(List<NamedStationImpl> stations) {
-        Hashtable ids = null;
+        Hashtable ids = new Hashtable();
         if(stations!=null && stations.size()>0) {
             for(NamedStationImpl station: stations) {
                 ids.put(station.getID(),"");
