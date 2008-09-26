@@ -208,7 +208,6 @@ public class HarvesterManager extends RepositoryManager {
         }
 
 
-
         for (Harvester harvester : harvesters) {
             File rootDir = harvester.getRootDir();
             if (rootDir != null) {
@@ -217,7 +216,7 @@ public class HarvesterManager extends RepositoryManager {
             }
             if ( !okToStart) {
                 harvester.setActive(false);
-            } else if (harvester.getActive()) {
+            } else if (harvester.getActiveOnStart()) {
                 Misc.run(harvester, "run");
             }
         }

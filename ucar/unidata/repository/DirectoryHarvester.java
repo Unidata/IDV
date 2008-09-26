@@ -135,7 +135,7 @@ public class DirectoryHarvester extends Harvester  {
         sb.append(
             HtmlUtil.formEntry(
                 msgLabel("Run"),
-                HtmlUtil.checkbox(ATTR_ACTIVE, "true", getActiveOnStart())
+                HtmlUtil.checkbox(ATTR_ACTIVEONSTART, "true", getActiveOnStart())
                 + HtmlUtil.space(1) + msg("Active on startup")
                 + HtmlUtil.space(3)
                 + HtmlUtil.checkbox(ATTR_MONITOR, "true", getMonitor())
@@ -175,9 +175,9 @@ public class DirectoryHarvester extends Harvester  {
             return;
         }
         if(baseGroupName.length()==0) {
-            baseGroupName  = repository.GROUP_TOP;
+            baseGroupName  = getRepository().GROUP_TOP;
         }
-        Group group = repository.findGroupFromName(baseGroupName, getUser(),
+        Group group = getRepository().findGroupFromName(baseGroupName, getUser(),
                                                    true);
         walkTree(rootDir, group);
     }
@@ -186,10 +186,10 @@ public class DirectoryHarvester extends Harvester  {
    protected void walkTree(File dir, Group parentGroup) throws Exception {
         String name  =dir.getName();
         File xmlFile = new File(IOUtil.joinDir(dir.getParentFile(),"." + name +".ramadda"));
-        Entry fileInfoEntry = repository.getTemplateEntry(dir);
-        Group group = repository.findGroupFromName(parentGroup.getFullName()+"/"+name, getUser(),false);
+        Entry fileInfoEntry = getRepository().getTemplateEntry(dir);
+        Group group = getRepository().findGroupFromName(parentGroup.getFullName()+"/"+name, getUser(),false);
         if(group == null) {
-            group = repository.makeNewGroup(parentGroup,name,getUser(),fileInfoEntry);
+            group = getRepository().makeNewGroup(parentGroup,name,getUser(),fileInfoEntry);
         }
         File[]files  = dir.listFiles();
         for(int i=0;i<files.length;i++) {

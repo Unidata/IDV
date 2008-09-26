@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -278,12 +279,13 @@ public class PatternHarvester extends Harvester {
                                          descTemplate, HtmlUtil.SIZE_60)));
 
         String elementId = "harvester.edit." + ATTR_BASEGROUP;
-        String select = OutputHandler.getGroupSelect(request, elementId);
+        String select    = OutputHandler.getGroupSelect(request, elementId);
 
         sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
                                      HtmlUtil.input(ATTR_BASEGROUP,
-                                                    baseGroupName,
-                                                    HtmlUtil.SIZE_60+HtmlUtil.id(elementId))+select));
+                                         baseGroupName,
+                                         HtmlUtil.SIZE_60
+                                         + HtmlUtil.id(elementId)) + select));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,
@@ -352,10 +354,18 @@ public class PatternHarvester extends Harvester {
                 tmp = tmp.substring(idx2 + 1);
             }
             filePattern = Pattern.compile(pattern.toString());
-            //            System.err.println("pattern:" + this + "  " + filePatternString);
-            //            System.err.println("pattern names:" + patternNames);
+            if (getTestMode()) {
+                System.err.println("orig pattern:" + "  "
+                                   + filePatternString);
+                System.err.println("pattern:" + "  " + pattern);
+                System.err.println("pattern names:" + patternNames);
+            }
         }
     }
+
+
+
+
 
     /**
      * _more_
@@ -443,6 +453,8 @@ public class PatternHarvester extends Harvester {
         dirs = new ArrayList<FileInfo>();
         dirs.add(new FileInfo(rootDir));
         dirs.addAll(FileInfo.collectDirs(rootDir));
+
+
         long tt2 = System.currentTimeMillis();
         status = new StringBuffer("");
         //        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
@@ -520,23 +532,33 @@ public class PatternHarvester extends Harvester {
                     continue;
                 }
                 Entry entry = processFile(f);
-                if(entry == null) continue;
+                if (entry == null) {
+                    continue;
+                }
                 entries.add(entry);
                 entryCnt++;
-                if (entries.size() > 1000) {
-                    List uniqueEntries = repository.getUniqueEntries(entries);
-                    newEntryCnt += uniqueEntries.size();
-                    needToAdd.addAll(uniqueEntries);
-                    entries = new ArrayList();
+                if(getTestMode() && entryCnt>=getTestCount()) {
+                    return;
                 }
-                if (needToAdd.size() > 1000) {
-                    if (getAddMetadata()) {
-                        getRepository().addInitialMetadata(null, needToAdd);
+                if(!getTestMode()) {
+                    if (entries.size() > 1000) {
+                        List uniqueEntries =
+                            getRepository().getUniqueEntries(entries);
+                        newEntryCnt += uniqueEntries.size();
+                        needToAdd.addAll(uniqueEntries);
+                        entries = new ArrayList();
                     }
-                    repository.insertEntries(needToAdd, true, true);
-                    needToAdd = new ArrayList<Entry>();
+                    if (needToAdd.size() > 1000) {
+                        if ( !getTestMode()) {
+                            if (getAddMetadata()) {
+                                getRepository().addInitialMetadata(null,
+                                                                   needToAdd);
+                            }
+                            getRepository().insertEntries(needToAdd, true, true);
+                        }
+                        needToAdd = new ArrayList<Entry>();
+                    }
                 }
-
                 //                if(true) break;
                 if ( !getActive()) {
                     return;
@@ -544,34 +566,55 @@ public class PatternHarvester extends Harvester {
             }
         }
 
-        needToAdd.addAll(repository.getUniqueEntries(entries));
-        if (needToAdd.size() > 0) {
-            if (getAddMetadata()) {
-                getRepository().addInitialMetadata(null, needToAdd);
+        if ( !getTestMode()) {
+            needToAdd.addAll(getRepository().getUniqueEntries(entries));
+            if (needToAdd.size() > 0) {
+                if (getAddMetadata()) {
+                    getRepository().addInitialMetadata(null, needToAdd);
+                }
+                getRepository().insertEntries(needToAdd, true, true);
             }
-            repository.insertEntries(needToAdd, true, true);
         }
     }
 
 
-    private String getDirNames(File parentFile, Group parentGroup, List<String> dirToks, boolean makeGroup) throws Exception {
+    /**
+     * _more_
+     *
+     * @param parentFile _more_
+     * @param parentGroup _more_
+     * @param dirToks _more_
+     * @param makeGroup _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getDirNames(File parentFile, Group parentGroup,
+                               List<String> dirToks, boolean makeGroup)
+            throws Exception {
         //        if(dirToks.size()==0) return parentFile.toString();
         List names = new ArrayList();
-        for(int i=0;i<dirToks.size();i++) {
-            String filename = (String)dirToks.get(i);
-            File file = new File(parentFile+"/"+filename);
-            Entry template = repository.getTemplateEntry(file);
-            String name = (template!=null?template.getName():filename);
-            if(makeGroup && parentGroup!=null) {
-                Group group =    repository.findGroupFromName(parentGroup.getFullName()+Group.PATHDELIMITER+name, getUser(),
-                                                              false);
-                if(group == null) {
-                    group = repository.makeNewGroup(parentGroup, name, getUser(), template);
+        for (int i = 0; i < dirToks.size(); i++) {
+            String filename = (String) dirToks.get(i);
+            File   file     = new File(parentFile + "/" + filename);
+            Entry  template = getRepository().getTemplateEntry(file);
+            String name     = ((template != null)
+                               ? template.getName()
+                               : filename);
+            if (makeGroup && (parentGroup != null)) {
+                Group group = getRepository().findGroupFromName(
+                                  parentGroup.getFullName()
+                                  + Group.PATHDELIMITER + name, getUser(),
+                                      false);
+                if (group == null) {
+                    group = getRepository().makeNewGroup(parentGroup, name,
+                            getUser(), template);
                 }
                 parentGroup = group;
-            } 
+            }
             names.add(name);
-            parentFile  = file;
+            parentFile = file;
         }
         return StringUtil.join(Group.PATHDELIMITER, names);
     }
@@ -594,34 +637,41 @@ public class PatternHarvester extends Harvester {
 
         String fileName = f.toString();
         fileName = fileName.replace("\\", "/");
-        String dirPath    = f.getParent().toString();
-        dirPath = dirPath.substring(rootDir.toString().length());
-        dirPath = dirPath.replace("\\","/");
-        List   dirToks  = (List<String>)StringUtil.split(dirPath, "/", true, true);
-        //        System.err.println ("file:" +fileName + " " + dirPath +" " + dirToks);
-
-        Group baseGroup =null;
-        if ((baseGroupName != null) && (baseGroupName.length() > 0)) {
-            baseGroup =    repository.findGroupFromName(baseGroupName, getUser(),
-                                                        true);
-        } else {
-            //            baseGroup =  repository.findGroupFromName(GROUP_TOP,
-            //                                                      getUser(),
-            //                                                      false);
-        }
-
-        String dirGroup = getDirNames(rootDir, baseGroup, dirToks, groupTemplate.indexOf("${dirgroup}")>=0);
-        //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
-        dirGroup = SqlUtil.cleanUp(dirGroup);
-        dirGroup = dirGroup.replace("\\", "/");
         //        System.err.println("dir group:" + dirGroup);
         init();
 
         Matcher matcher = filePattern.matcher(fileName);
-        //        System.err.println("file:" + fileName + " " +matcher.find());
+
         if ( !matcher.find()) {
+            debug("file:<i>" + fileName + "</i> does not match pattern");
             return null;
         }
+        debug("file:<i>" + fileName + "</i> matches pattern");
+        String dirPath = f.getParent().toString();
+        dirPath = dirPath.substring(rootDir.toString().length());
+        dirPath = dirPath.replace("\\", "/");
+        List dirToks = (List<String>) StringUtil.split(dirPath, "/", true,
+                           true);
+        //        System.err.println ("file:" +fileName + " " + dirPath +" " + dirToks);
+
+        Group baseGroup = null;
+        if ((baseGroupName != null) && (baseGroupName.length() > 0)) {
+            baseGroup = getRepository().findGroupFromName(baseGroupName,
+                    getUser(), true);
+        } else {
+            //            baseGroup =  getRepository().findGroupFromName(GROUP_TOP,
+            //                                                      getUser(),
+            //                                                      false);
+        }
+
+        String dirGroup = getDirNames(rootDir, baseGroup, dirToks,
+                                      groupTemplate.indexOf("${dirgroup}")
+                                      >= 0);
+        //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
+        dirGroup = SqlUtil.cleanUp(dirGroup);
+        dirGroup = dirGroup.replace("\\", "/");
+
+
 
 
         Hashtable map       = new Hashtable();
@@ -653,11 +703,6 @@ public class PatternHarvester extends Harvester {
         //        System.err.println("values:");
         //        System.err.println("map:" + map);
         Object[] values = typeHandler.makeValues(map);
-        //        for(int i=0;i<values.length;i++) {
-        //            System.err.println("   value[" + i +"] = " + values[i]);
-        //        }
-
-        //        System.err.println(fileName + " " + toDate);
         Date createDate = new Date();
         if (fromDate == null) {
             fromDate = toDate;
@@ -673,10 +718,7 @@ public class PatternHarvester extends Harvester {
         }
 
 
-
-
-
-        String ext      = IOUtil.getFileExtension(fileName);
+        String ext = IOUtil.getFileExtension(fileName);
         if (ext.startsWith(".")) {
             ext = ext.substring(1);
         }
@@ -695,18 +737,30 @@ public class PatternHarvester extends Harvester {
 
         name = name.replace("${todate}", getRepository().formatDate(toDate));
 
+        
         desc = desc.replace("${fromdate}",
                             getRepository().formatDate(fromDate));
         desc = desc.replace("${todate}", getRepository().formatDate(toDate));
         desc = desc.replace("${name}", name);
 
 
-        if(baseGroup!=null) {
-            groupName = baseGroup.getFullName()+Group.PATHDELIMITER + groupName;
+
+        if (baseGroup != null) {
+            groupName = baseGroup.getFullName() + Group.PATHDELIMITER
+                        + groupName;
         }
-        Group group = repository.findGroupFromName(groupName, getUser(),
+        Group group = getRepository().findGroupFromName(groupName, getUser(),
                           true);
-        Entry    entry = typeHandler.createEntry(repository.getGUID());
+        if(getTestMode()) {
+            debug("\tname: " + name + "\n\tgroup:" + group.getFullName()+ "\n\tfromdate:" + getRepository().formatDate(fromDate));
+            if(values!=null) {
+                for(int i=0;i<values.length;i++) {
+                    debug("\tvalue: " + values[i]);
+                }
+            }
+        }
+
+        Entry    entry = typeHandler.createEntry(getRepository().getGUID());
         Resource resource;
         if (moveToStorage) {
             File newFile = getStorageManager().moveToStorage(null,
@@ -723,7 +777,7 @@ public class PatternHarvester extends Harvester {
         if (tag.length() > 0) {
             List tags = StringUtil.split(tag, ",", true, true);
             for (int i = 0; i < tags.size(); i++) {
-                entry.addMetadata(new Metadata(repository.getGUID(),
+                entry.addMetadata(new Metadata(getRepository().getGUID(),
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
                         DFLT_INHERITED, (String) tags.get(i), "", "", ""));
             }
@@ -734,7 +788,10 @@ public class PatternHarvester extends Harvester {
     }
 
 
-    public void  clearCache() {
+    /**
+     * _more_
+     */
+    public void clearCache() {
         super.clearCache();
     }
 

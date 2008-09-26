@@ -2014,6 +2014,10 @@ public class TypeHandler extends RepositoryManager {
         return null;
     }
 
+    public String[] getValueNames() {
+        return null;
+    }
+
     /**
      * _more_
      *

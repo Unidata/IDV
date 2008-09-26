@@ -341,13 +341,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    List<Metadata> metadataList,
                                    Hashtable extra) {
 
+        NetcdfDataset dataset = null;
+        File file = entry.getResource().getFile();
         try {
             super.getInitialMetadata(request, entry, metadataList, extra);
             if ( !getDataOutputHandler().canLoadAsCdm(entry)) {
                 return;
             }
-            File file = entry.getResource().getFile();
-            NetcdfDataset dataset =
+            dataset =
                 NetcdfDataset.openDataset(file.toString());
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
@@ -474,11 +475,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
             }
         } catch (Exception exc) {
-            System.err.println("Error: " + exc);
-            exc.printStackTrace();
+            System.out.println("Error reading metadata:" + file);
+            System.out.println("Error:" + exc);
+            //            exc.printStackTrace();
+        } finally {
+            try {
+                if(dataset!=null) {
+                    dataset.close();
+                }
+            } catch(Exception ignore){}
         }
-
-
     }
 
 

@@ -169,7 +169,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-    private Cache ncFileCache = new Cache(100) {
+    private Cache ncFileCache = new Cache(10) {
             protected void removeValue(Object key, Object value) {
                 try {
                     ((NetcdfFile)value).close();
@@ -178,7 +178,7 @@ public class DataOutputHandler extends OutputHandler {
         };
 
 
-    private Cache gridCache = new Cache(100) {
+    private Cache gridCache = new Cache(10) {
             protected void removeValue(Object key, Object value) {
                 try {
                     ((NetcdfFile)value).close();
@@ -187,7 +187,7 @@ public class DataOutputHandler extends OutputHandler {
         };
 
 
-    private Cache pointCache = new Cache(100) {
+    private Cache pointCache = new Cache(10) {
             protected void removeValue(Object key, Object value) {
                 try {
                     ((NetcdfFile)value).close();

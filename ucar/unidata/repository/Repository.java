@@ -7877,7 +7877,7 @@ public class Repository extends RepositoryBase implements Tables,
             if (entries.size() == 0) {
                 return needToAdd;
             }
-            if (seenResources.size() > 50000) {
+            if (seenResources.size() > 10000) {
                 seenResources = new Hashtable();
             }
             Connection connection = getDatabaseManager().getConnection();

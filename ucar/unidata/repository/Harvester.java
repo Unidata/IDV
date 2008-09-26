@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -85,6 +86,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
 
     public static final String TAG_HARVESTER = "harvester";
+
+    /** _more_          */
     public static final String TAG_HARVESTERS = "harvesters";
 
     /** _more_ */
@@ -96,14 +99,20 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_MONITOR = "monitor";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
     /** _more_ */
-    public static final String ATTR_ACTIVE = "active";
+    public static final String ATTR_ACTIVEONSTART = "activeonstart";
+
+    /** _more_          */
+    public static final String ATTR_TESTCOUNT = "testcount";
+
+    /** _more_          */
+    public static final String ATTR_TESTMODE = "testmode";
 
     /** _more_ */
     public static final String ATTR_SLEEP = "sleep";
@@ -166,10 +175,13 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private boolean activeOnStart = false;
 
+
+
+
     /** _more_ */
     private double sleepMinutes = 5;
 
-    /** _more_          */
+    /** _more_ */
     private boolean addMetadata = false;
 
     /** _more_ */
@@ -190,6 +202,11 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     User user;
 
+    /** _more_          */
+    private boolean testMode = false;
+
+    /** _more_          */
+    private int testCount = 100;
 
 
     /**
@@ -282,21 +299,41 @@ public class Harvester extends RepositoryManager {
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, monitor);
         this.addMetadata = XmlUtil.getAttribute(element, ATTR_ADDMETADATA,
                 addMetadata);
-        this.activeOnStart = this.active = XmlUtil.getAttribute(element,
-                ATTR_ACTIVE, false);
+        this.activeOnStart = XmlUtil.getAttribute(element,
+                ATTR_ACTIVEONSTART, activeOnStart);
+        this.testCount = XmlUtil.getAttribute(element, ATTR_TESTCOUNT,
+                testCount);
+        this.testMode = XmlUtil.getAttribute(element, ATTR_TESTMODE,
+                                             testMode);
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param redirectToEdit _more_
+     *
+     * @return _more_
+     */
     public String getRunLink(Request request, boolean redirectToEdit) {
         if (getActive()) {
-            return  HtmlUtil.href(request.url(getRepository().getHarvesterManager().URL_HARVESTERS_LIST,
-                                              ARG_ACTION, ACTION_STOP, ARG_HARVESTER_ID,
-                                              getId(), ARG_HARVESTER_REDIRECTTOEDIT,""+redirectToEdit), msg("Stop"));
+            return HtmlUtil
+                .href(request
+                    .url(getRepository().getHarvesterManager()
+                        .URL_HARVESTERS_LIST, ARG_ACTION, ACTION_STOP,
+                            ARG_HARVESTER_ID, getId(),
+                            ARG_HARVESTER_REDIRECTTOEDIT,
+                            "" + redirectToEdit), msg("Stop"));
         } else {
-            return  HtmlUtil.href(request.url(getRepository().getHarvesterManager().URL_HARVESTERS_LIST,
-                                              ARG_ACTION, ACTION_START, ARG_HARVESTER_ID,
-                                              getId(), ARG_HARVESTER_REDIRECTTOEDIT,""+redirectToEdit), msg("Start"));
+            return HtmlUtil
+                .href(request
+                    .url(getRepository().getHarvesterManager()
+                        .URL_HARVESTERS_LIST, ARG_ACTION, ACTION_START,
+                            ARG_HARVESTER_ID, getId(),
+                            ARG_HARVESTER_REDIRECTTOEDIT,
+                            "" + redirectToEdit), msg("Start"));
         }
     }
 
@@ -319,7 +356,9 @@ public class Harvester extends RepositoryManager {
 
         typeHandler = repository.getTypeHandler(request.getString(ATTR_TYPE,
                 ""));
-        activeOnStart = request.get(ATTR_ACTIVE, false);
+        activeOnStart = request.get(ATTR_ACTIVEONSTART, false);
+        testCount     = request.get(ATTR_TESTCOUNT, testCount);
+        testMode      = request.get(ATTR_TESTMODE, false);
         monitor       = request.get(ATTR_MONITOR, false);
         addMetadata   = request.get(ATTR_ADDMETADATA, false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
@@ -349,20 +388,21 @@ public class Harvester extends RepositoryManager {
                                          HtmlUtil.SIZE_40)));
         sb.append(HtmlUtil.formEntry(msgLabel("Create entries of type"),
                                      repository.makeTypeSelect(request,
-                                         false, typeHandler.getType(),false)));
+                                         false, typeHandler.getType(),
+                                         false)));
+        //J-
         sb.append(
             HtmlUtil.formEntry(
-                msgLabel("Run"),
-                HtmlUtil.checkbox(ATTR_ACTIVE, "true", activeOnStart)
-                + HtmlUtil.space(1) + msg("Active on startup")
-                + HtmlUtil.space(3)
-                + HtmlUtil.checkbox(ATTR_MONITOR, "true", monitor)
-                + HtmlUtil.space(1) + msg("Monitor") + HtmlUtil.space(3)
-                + msgLabel("Sleep") + HtmlUtil.space(1)
-                + HtmlUtil.input(
-                    ATTR_SLEEP, "" + sleepMinutes,
-                    HtmlUtil.SIZE_5) + HtmlUtil.space(1) + msg("(minutes)")));
-
+                msgLabel("Run"), 
+                HtmlUtil.checkbox(ATTR_TESTMODE, "true", testMode) + HtmlUtil.space(1) + msg("Test mode") +
+                HtmlUtil.space(3) +  msgLabel("Count") + HtmlUtil.input(ATTR_TESTCOUNT, "" + testCount, HtmlUtil.SIZE_5) +
+                HtmlUtil.br()    +
+                HtmlUtil.checkbox(ATTR_ACTIVEONSTART, "true", activeOnStart) + HtmlUtil.space(1) + msg("Active on startup") +
+                HtmlUtil.space(3) + 
+                HtmlUtil.checkbox(ATTR_MONITOR, "true", monitor) + HtmlUtil.space(1) + msg("Monitor") +
+                HtmlUtil.space(3) +
+                msgLabel("Sleep") + HtmlUtil.space(1) + HtmlUtil.input(ATTR_SLEEP, ""+ sleepMinutes, HtmlUtil.SIZE_5) + HtmlUtil.space(1) + msg("(minutes)")));
+        //J+
     }
 
 
@@ -392,7 +432,9 @@ public class Harvester extends RepositoryManager {
     public void applyState(Element element) throws Exception {
         element.setAttribute(ATTR_CLASS, getClass().getName());
         element.setAttribute(ATTR_NAME, name);
-        element.setAttribute(ATTR_ACTIVE, activeOnStart + "");
+        element.setAttribute(ATTR_ACTIVEONSTART, activeOnStart + "");
+        element.setAttribute(ATTR_TESTMODE, testMode + "");
+        element.setAttribute(ATTR_TESTCOUNT, testCount + "");
         element.setAttribute(ATTR_MONITOR, monitor + "");
         element.setAttribute(ATTR_ADDMETADATA, addMetadata + "");
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
@@ -464,6 +506,11 @@ public class Harvester extends RepositoryManager {
         return id;
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public void setId(String id) {
         this.id = id;
     }
@@ -529,9 +576,10 @@ public class Harvester extends RepositoryManager {
         setActive(false);
     }
 
-    public void  clearCache() {
-        
-    }
+    /**
+     * _more_
+     */
+    public void clearCache() {}
 
 
     /**
@@ -704,16 +752,16 @@ public class Harvester extends RepositoryManager {
      */
     public static class HarvesterEntry {
 
-        /** _more_          */
+        /** _more_ */
         String url;
 
-        /** _more_          */
+        /** _more_ */
         String name;
 
-        /** _more_          */
+        /** _more_ */
         String description;
 
-        /** _more_          */
+        /** _more_ */
         String group;
 
         /**
@@ -758,24 +806,77 @@ public class Harvester extends RepositoryManager {
 
     }
 
-/**
-Set the ActiveOnStart property.
+    /**
+     * Set the ActiveOnStart property.
+     *
+     * @param value The new value for ActiveOnStart
+     */
+    public void setActiveOnStart(boolean value) {
+        activeOnStart = value;
+    }
 
-@param value The new value for ActiveOnStart
-**/
-public void setActiveOnStart (boolean value) {
-	activeOnStart = value;
-}
+    /**
+     * Get the ActiveOnStart property.
+     *
+     * @return The ActiveOnStart
+     */
+    public boolean getActiveOnStart() {
+        return activeOnStart;
+    }
 
-/**
-Get the ActiveOnStart property.
 
-@return The ActiveOnStart
-**/
-public boolean getActiveOnStart () {
-	return activeOnStart;
-}
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
+    public void debug(String msg) {
+        if (getTestMode()) {
+            System.err.println(msg);
+            msg = msg.replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            msg = msg.replace("\n","<br>");
+            status.append(msg);
+            status.append(HtmlUtil.br());
+        }
+    }
 
+
+    /**
+     * Set the TestMode property.
+     *
+     * @param value The new value for TestMode
+     */
+    public void setTestMode(boolean value) {
+        testMode = value;
+    }
+
+    /**
+     * Get the TestMode property.
+     *
+     * @return The TestMode
+     */
+    public boolean getTestMode() {
+        return testMode;
+    }
+
+
+    /**
+     * Set the TestCount property.
+     *
+     * @param value The new value for TestCount
+     */
+    public void setTestCount(int value) {
+        testCount = value;
+    }
+
+    /**
+     * Get the TestCount property.
+     *
+     * @return The TestCount
+     */
+    public int getTestCount() {
+        return testCount;
+    }
 
 
 
