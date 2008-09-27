@@ -192,7 +192,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 pane.setEditable(false);
                 pane.setContentType("text/html");
                 pane.setText(content);
-                pane.setPreferredSize(new Dimension(100, 150));
+                pane.setPreferredSize(new Dimension(200, 150));
                 JLabel lbl = new JLabel(content);
                 GuiUtils.showOkDialog(null, "Definition:" + url, pane, null);
 
@@ -233,7 +233,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         htmlComp.setEditable(false);
         htmlComp.setContentType("text/html");
 
-        textComp = new JTextArea("", 40, 80);
+        textComp = new JTextArea("", 30, 80);
         GuiUtils.setFixedWidthFont(textComp);
         textComp.setEditable(false);
         TextSearcher textSearcher = new TextSearcher(textComp);
@@ -329,7 +329,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         showGlossaryCbx = new JCheckBox("Show Glossary", showGlossary);
         showGlossaryCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                System.err.println("setText glossary");
                 setText(currentText);
             }
         });
@@ -659,6 +658,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         text = text.replaceAll(">\n+", ">");
         text = text.replaceAll("<p><div", "<div");
         //        System.out.println(text);
+       
 
         String[] icons = {
             "partlycloudy.png", "partlycloudy.png", "cloudy.png",
@@ -679,11 +679,11 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         for (int i = 0; i < icons.length; i++) {
             text = text.replace("PATTERN" + i, patterns[i]);
         }
-
-        if (showGlossaryCbx.isSelected()) {
+        if (getShowGlossary()) {
             text = allPattern.matcher(text).replaceAll(
                 "$1<a href=\"$2\">$2</a>$3");
         }
+
         text = text.replace("\\s+\n", "<p>");
         text = text.replace("\n", "<br>");
         text = "<text>" + text + "</html>";
@@ -738,13 +738,14 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
         } else {
             text = newText;
-            html = (String) htmlCache.get(newText);
+            String key = getShowGlossary()+"_"+newText;
+            html = (String) htmlCache.get(key);
             if (html == null) {
                 long t1 = System.currentTimeMillis();
                 html = convertToHtml(newText);
                 long t2 = System.currentTimeMillis();
                 //                System.err.println ("to html time:" + (t2-t1));
-                htmlCache.put(newText, html);
+                htmlCache.put(key,html);
             }
         }
 
