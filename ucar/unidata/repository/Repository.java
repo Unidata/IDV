@@ -7923,6 +7923,7 @@ public class Repository extends RepositoryBase implements Tables,
                 String path = entry.getResource().getPath();
                 String key  = entry.getParentGroup().getId() + "_" + path;
                 if (seenResources.get(key) != null) {
+                    //                    System.out.println("seen resource:" + path);
                     continue;
                 }
                 seenResources.put(key, key);
@@ -7934,6 +7935,8 @@ public class Repository extends RepositoryBase implements Tables,
                     int found = results.getInt(1);
                     if (found == 0) {
                         needToAdd.add(entry);
+                    } else {
+                        //                        System.out.println("in db:" + path + " " + entry.getParentGroup().getId());
                     }
                 }
             }

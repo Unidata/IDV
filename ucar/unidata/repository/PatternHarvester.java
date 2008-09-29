@@ -134,6 +134,8 @@ public class PatternHarvester extends Harvester {
     private int newEntryCnt = 0;
 
 
+    private long lastRunTime = 0;
+
     /**
      * _more_
      *
@@ -211,7 +213,6 @@ public class PatternHarvester extends Harvester {
     }
 
 
-
     /**
      * _more_
      *
@@ -221,6 +222,7 @@ public class PatternHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
+        lastRunTime= 0;
         filePatternString = request.getUnsafeString(ATTR_FILEPATTERN,
                 filePatternString);
         filePattern = null;
@@ -437,6 +439,8 @@ public class PatternHarvester extends Harvester {
     }
 
 
+
+
     /**
      * _more_
      *
@@ -468,6 +472,7 @@ public class PatternHarvester extends Harvester {
         while (getActive()) {
             long t1 = System.currentTimeMillis();
             collectEntries((cnt == 0));
+            lastRunTime = System.currentTimeMillis();
             long t2 = System.currentTimeMillis();
             cnt++;
             //            System.err.println("found:" + entries.size() + " files in:"
@@ -531,6 +536,11 @@ public class PatternHarvester extends Harvester {
                     }
                     continue;
                 }
+                long fileTime =  f.lastModified();
+                if((fileTime-lastRunTime)<1000)  {
+                    debug("We've seen this file:"  + f);
+                    continue;
+                }
                 Entry entry = processFile(f);
                 if (entry == null) {
                     continue;
@@ -565,9 +575,11 @@ public class PatternHarvester extends Harvester {
                 }
             }
         }
-
         if ( !getTestMode()) {
-            needToAdd.addAll(getRepository().getUniqueEntries(entries));
+            List uniqueEntries =
+                getRepository().getUniqueEntries(entries);
+            newEntryCnt += uniqueEntries.size();
+            needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
                 if (getAddMetadata()) {
                     getRepository().addInitialMetadata(null, needToAdd);
@@ -576,6 +588,8 @@ public class PatternHarvester extends Harvester {
             }
         }
     }
+
+
 
 
     /**
