@@ -88,7 +88,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String hidden(String name, String value) {
+    public static String hidden(String name, Object value) {
         return "<input type=\"hidden\" name=\"" + name + "\" value=\""
                + value + "\">";
     }
@@ -353,8 +353,8 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(String path, String n1, String v1) {
-        return url(path, new String[] { n1, v1 });
+    public static String url(String path, String n1, Object v1) {
+        return url(path, new String[] { n1, v1.toString() });
     }
 
 
@@ -369,9 +369,9 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(String path, String n1, String v1, String n2,
-                             String v2) {
-        return url(path, new String[] { n1, v1, n2, v2 });
+    public static String url(String path, String n1, Object v1, String n2,
+                             Object v2) {
+        return url(path, new String[] { n1, v1.toString(), n2, v2.toString() });
     }
 
     /**
@@ -387,10 +387,10 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(String path, String n1, String v1, String n2,
-                             String v2, String n3, String v3) {
+    public static String url(String path, String n1, Object v1, String n2,
+                             Object v2, String n3, Object v3) {
         return url(path, new String[] {
-            n1, v1, n2, v2, n3, v3
+            n1, v1.toString(), n2, v2.toString(), n3, v3.toString()
         });
     }
 
@@ -409,11 +409,11 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String url(String path, String n1, String v1, String n2,
-                             String v2, String n3, String v3, String n4,
-                             String v4) {
+    public static String url(String path, String n1, Object v1, String n2,
+                             Object v2, String n3, Object v3, String n4,
+                             Object v4) {
         return url(path, new String[] {
-            n1, v1, n2, v2, n3, v3, n4, v4
+            n1, v1.toString(), n2, v2.toString(), n3, v3.toString(), n4, v4.toString()
         });
     }
 
