@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -38,6 +39,7 @@ import ucar.unidata.util.DateSelection;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.DatedObject;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -86,6 +88,11 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
     /** gemdata path */
     private String gemDataPath;
+
+    /** This keeps around the gempak directory paths that the user selects when the gem environment variables are not set  */
+    private Hashtable paths = new Hashtable();
+
+
 
     /** GEMTBL property */
     private static final String PROP_GEMTBL = "GEMTBL";
@@ -305,12 +312,41 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     }
 
 
+
+
+    /**
+     * This looks in the paths map for the given property. If not found it
+     * checks the environment variables. If still not found it prompts the user
+     * for a directory
+     *
+     * @param prop property id
+     * @param title title for the file chooser
+     *
+     * @return The path or null
+     */
+    protected String getPath(String prop, String title) {
+        String path = (String) paths.get(prop);
+        if (path == null) {
+            path = System.getenv(prop);
+        }
+        if (path == null) {
+            File dir = FileManager.getDirectory(null, title);
+            if (dir != null) {
+                path = dir.toString();
+                paths.put(prop, path);
+            }
+        }
+        return path;
+    }
+
+
+
     /**
      * Get the table path.  Subclasses can overrid
      * @return the base path of the data.
      */
     protected String getTablePath() {
-        return System.getenv(PROP_GEMTBL);
+        return getPath(PROP_GEMTBL, "Where are the Gempak tables stored");
     }
 
     /**
@@ -318,8 +354,10 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return  true if resources set okay
      */
     protected boolean setAdditionalResources() {
-        textDataPath = System.getenv(PROP_TEXT_DATA);
-        gemDataPath  = System.getenv(PROP_GEMDATA);
+        textDataPath = getPath(PROP_TEXT_DATA,
+                               "Where is the Gempak text data stored");
+        gemDataPath = getPath(PROP_GEMDATA,
+                              "Where is the Gempak data stored");
         return ((textDataPath != null) && (gemDataPath != null));
     }
 
@@ -336,13 +374,13 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * Initialize after opening.
      */
     protected void initAfter() {
+        if ( !setAdditionalResources()) {
+            setInError(true, getAdditionalResourcesError());
+            return;
+        }
         tablePath = getTablePath();
         if (tablePath == null) {
             setInError(true, "Couldn't find path to tables");
-            return;
-        }
-        if ( !setAdditionalResources()) {
-            setInError(true, getAdditionalResourcesError());
             return;
         }
         try {
@@ -803,6 +841,26 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     }
 
     /**
+     *  Set the Paths property.
+     *
+     *  @param value The new value for Paths
+     */
+    public void setPaths(Hashtable value) {
+        paths = value;
+    }
+
+    /**
+     *  Get the Paths property.
+     *
+     *  @return The Paths
+     */
+    public Hashtable getPaths() {
+        return paths;
+    }
+
+
+
+    /**
      * Test this
      *
      * @param args  input
@@ -814,6 +872,8 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         }
         System.out.println(getDateFromFileName(args[0]));
     }
+
+
 
 
 }
