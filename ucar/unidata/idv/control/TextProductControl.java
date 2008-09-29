@@ -649,8 +649,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         text = text.replaceAll("\n\\$\\$[\\s]*\n", "<hr>");
         //Line ends with a "." replace with a <p>
         text = text.replaceAll("([^\\.]+)\\.[ ]+\n", "$1.<p>");
+        //309 PM MDT SAT SEP 27 2008
         //italicize dates
-        text = text.replaceAll("^([0-9]+ (AM|PM).*[0-9]+)$", "<i>$1</i>");
+    //        text = text.replaceAll("^([0-9]+\s*(AM|PM).*[0-9]+)$", "<i>$1</i>");
 
 
         //Clean up the extra newlines and p tags around the divs
