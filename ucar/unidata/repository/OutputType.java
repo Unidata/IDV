@@ -77,21 +77,34 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputType extends TwoFacedObject {
+public class OutputType  {
 
     /** _more_ */
     private String suffix = "";
 
+    private String id;
+
+    private String label;
+
+    private boolean forUser = true;
+
+    private String groupName  ="";
+
+    public OutputType(String id) {
+        this.id  =id;
+        this.label = id;
+        this.forUser = false;
+    }
 
     /**
      * _more_
      *
-     * @param name _more_
      * @param output _more_
      * @param suffix _more_
      */
-    public OutputType(String name, String output, String suffix) {
-        super(name, output);
+    public OutputType(String label, String id, String suffix) {
+        this.label =label;
+        this.id = id;
         this.suffix = suffix;
     }
 
@@ -101,11 +114,27 @@ public class OutputType extends TwoFacedObject {
      * @param name _more_
      * @param output _more_
      */
-    public OutputType(String name, String output) {
-        this(name, output, "");
+    public OutputType(String label, String id) {
+        this(label, id, "");
     }
 
+    public OutputType(OutputType that) {
+        this.label  = that.label;
+        this.id  = that.id;
+        this.suffix  = that.suffix;
+    }
 
+    public OutputType(OutputType that, String suffix) {
+        this(that);
+        this.suffix  = suffix;
+    }
+
+    public String getId() {
+        return id;
+    }
+    public String getLabel() {
+        return label;
+    }
 
     /**
      * _more_
@@ -137,6 +166,61 @@ public class OutputType extends TwoFacedObject {
     public String getSuffix() {
         return suffix;
     }
+
+
+    /**
+     * String representation of this object.
+     * @return toString() method of label.
+     */
+    public String toString() {
+        return id;
+    }
+
+
+    public boolean equals(Object other) {
+        if ( !(other instanceof OutputType)) {
+            return false;
+        }
+        OutputType that = (OutputType) other;
+        return Misc.equals(id, that.id);
+    }
+
+    /**
+       Set the ForUser property.
+
+       @param value The new value for ForUser
+    **/
+    public void setForUser (boolean value) {
+	forUser = value;
+    }
+
+    /**
+       Get the ForUser property.
+
+       @return The ForUser
+    **/
+    public boolean getForUser () {
+	return forUser;
+    }
+
+
+/**
+Set the GroupName property.
+
+@param value The new value for GroupName
+**/
+public void setGroupName (String value) {
+	groupName = value;
+}
+
+/**
+Get the GroupName property.
+
+@return The GroupName
+**/
+public String getGroupName () {
+	return groupName;
+}
 
 
 }

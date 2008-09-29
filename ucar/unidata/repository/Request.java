@@ -232,7 +232,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
-                           String value1) {
+                           Object value1) {
         return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1);
     }
 
@@ -264,7 +264,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
-                           String value1, String arg2, String value2) {
+                           Object value1, String arg2, Object value2) {
         return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1, arg2,
                             value2);
     }
@@ -358,7 +358,7 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String url(RequestUrl theUrl, String arg1, String value1) {
+    public String url(RequestUrl theUrl, String arg1, Object value1) {
         return HtmlUtil.url(url(theUrl), arg1, value1);
     }
 
@@ -373,8 +373,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String url(RequestUrl theUrl, String arg1, String value1,
-                      String arg2, String value2) {
+    public String url(RequestUrl theUrl, String arg1, Object value1,
+                      String arg2, Object value2) {
         return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2);
     }
 
@@ -391,9 +391,9 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String url(RequestUrl theUrl, String arg1, String value1,
-                      String arg2, String value2, String arg3,
-                      String value3) {
+    public String url(RequestUrl theUrl, String arg1, Object value1,
+                      String arg2, Object value2, String arg3,
+                      Object value3) {
         return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
                             value3);
     }
@@ -413,9 +413,9 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String url(RequestUrl theUrl, String arg1, String value1,
-                      String arg2, String value2, String arg3, String value3,
-                      String arg4, String value4) {
+    public String url(RequestUrl theUrl, String arg1, Object value1,
+                      String arg2, Object value2, String arg3, Object value3,
+                      String arg4, Object value4) {
         return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
                             value3, arg4, value4);
     }
@@ -567,7 +567,7 @@ public class Request implements Constants {
                 }
                 continue;
             }
-            String svalue = (String) value;
+            String svalue =  value.toString();
             if (svalue.length() == 0) {
                 continue;
             }
@@ -614,7 +614,7 @@ public class Request implements Constants {
                     }
                     continue;
                 }
-                String svalue = (String) value;
+                String svalue = value.toString();
                 if (svalue.length() == 0) {
                     continue;
                 }
@@ -637,7 +637,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public static String encodeEmbedded(String s) {
+    public static String encodeEmbedded(Object o) {
+        String s = o.toString();
         try {
             if (s.indexOf("/") >= 0) {
                 s = "b64:" + XmlUtil.encodeBase64(s.getBytes()).trim();
@@ -709,7 +710,7 @@ public class Request implements Constants {
     public Hashtable getDefinedProperties() {
         Hashtable props = new Hashtable();
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
-            String arg   = (String) keys.nextElement();
+            String arg   =  keys.nextElement().toString();
             Object value = parameters.get(arg);
             if (value instanceof List) {
                 if (((List) value).size() == 0) {
@@ -1009,9 +1010,10 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String getOutput() {
-        return getOutput(OutputHandler.OUTPUT_HTML);
+    public OutputType getOutput() {
+        return getOutput(OutputHandler.OUTPUT_HTML.getId());
     }
+
 
     /**
      * _more_
@@ -1020,8 +1022,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String getOutput(String dflt) {
-        return getString(ARG_OUTPUT, dflt);
+    public OutputType getOutput(String dflt) {
+        return new OutputType(getString(ARG_OUTPUT, dflt));
     }
 
 

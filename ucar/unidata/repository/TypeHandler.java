@@ -477,7 +477,7 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             if (displayTemplatePath != null) {
                 String html =
@@ -681,7 +681,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             String output,
+                                             OutputType output,
                                              boolean showDescription,
                                              boolean showResource,
                                              boolean linkToDownload)
@@ -1182,7 +1182,7 @@ public class TypeHandler extends RepositoryManager {
             StringBuffer mapSB = new StringBuffer();
             MapOutputHandler mapOutputHandler =
                 (MapOutputHandler) getRepository().getOutputHandler(
-                    MapOutputHandler.OUTPUT_MAP);
+                    MapOutputHandler.OUTPUT_MAP.getId());
             if (mapOutputHandler != null) {
                 List<Entry> entries = new ArrayList<Entry>();
                 if (entry != null) {

@@ -324,7 +324,7 @@ public class Column implements Tables, Constants {
      *
      * @return _more_
      */
-    protected int formatValue(StringBuffer sb, String output,
+    protected int formatValue(StringBuffer sb, OutputType output,
                               Object[] values, int valueIdx) {
 
         if (type.equals(TYPE_LATLON)) {

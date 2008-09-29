@@ -180,6 +180,9 @@ public class Repository extends RepositoryBase implements Tables,
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
+    private List<OutputHandler> allOutputHandlers =
+        new ArrayList<OutputHandler>();
+
 
 
     /** _more_ */
@@ -1412,8 +1415,8 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
         getUserManager().initOutputHandlers();
-        OutputHandler outputHandler = new OutputHandler(getRepository()) {
-            public boolean canHandle(String output) {
+        OutputHandler outputHandler = new OutputHandler(getRepository(),"Entry Deleter") {
+            public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER);
             }
             protected void addOutputTypes(Request request, State state,
@@ -1527,7 +1530,7 @@ public class Repository extends RepositoryBase implements Tables,
                                        ARG_DELETE_CONFIRM, hidden);
         sb.append(question(msgSB.toString(), form));
         sb.append("<ul>");
-        new OutputHandler(this).getEntryHtml(sb, entries, request, false,
+        new OutputHandler(this,"tmp").getEntryHtml(sb, entries, request, false,
                           false, true);
         sb.append("</ul>");
         return new Result(msg("Delete Confirm"), sb);
@@ -2209,11 +2212,40 @@ public class Repository extends RepositoryBase implements Tables,
     public List<OutputType> getOutputTypes(Request request,
                                            OutputHandler.State state)
             throws Exception {
-        List<OutputType> list = new ArrayList<OutputType>();
+        List<OutputType>  allTypes= new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.addOutputTypes(request, state, list);
+            outputHandler.addOutputTypes(request, state, allTypes);
         }
-        return list;
+        List<OutputType> okTypes= new ArrayList<OutputType>();
+        for(OutputType outputType: allTypes) {
+            if(isOutputTypeOK(outputType)) {
+                okTypes.add(outputType);
+            }
+        }
+        return okTypes;
+    }
+
+    public List<OutputType> getOutputTypes() 
+            throws Exception {
+        List<OutputType>  allTypes= new ArrayList<OutputType>();
+        for (OutputHandler outputHandler : outputHandlers) {
+            allTypes.addAll(outputHandler.getTypes());
+        }
+        return allTypes;
+    }
+
+
+    public boolean isOutputTypeOK(OutputType outputType) {
+        String prop = getProperty(outputType.getId()+".ok");
+        if(prop == null || prop.equals("true")) {
+            return true;
+        }
+        return false;
+    }
+
+    public void setOutputTypeOK(OutputType outputType, boolean ok) throws Exception {
+        String prop = outputType.getId()+".ok";
+        writeGlobal(prop, ""+ok);
     }
 
 
@@ -2228,6 +2260,12 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    public OutputHandler getOutputHandler(OutputType outputType) throws Exception {
+        if(!isOutputTypeOK(outputType)) return null;
+        return getOutputHandler(outputType.getId());
+    }
+
+
     /**
      * _more_
      *
@@ -2238,11 +2276,8 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     public OutputHandler getOutputHandler(Request request) throws Exception {
-        for (OutputHandler outputHandler : outputHandlers) {
-            if (outputHandler.canHandle(request)) {
-                return outputHandler;
-            }
-        }
+        OutputHandler handler  =  getOutputHandler(request.getOutput());
+        if(handler!=null) return handler;
         throw new IllegalArgumentException(
             msgLabel("Could not find output handler for")
             + request.getOutput());
@@ -2259,8 +2294,9 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     public OutputHandler getOutputHandler(String type) throws Exception {
+        OutputType output = new OutputType("",type);
         for (OutputHandler outputHandler : outputHandlers) {
-            if (outputHandler.canHandle(type)) {
+            if (outputHandler.canHandleOutput(output)) {
                 return outputHandler;
             }
         }
@@ -2849,7 +2885,7 @@ public class Repository extends RepositoryBase implements Tables,
         //it acts like a regular submit (not a submit to change the type)
         sb.append(HtmlUtil.submitImage(getUrlBase() + ICON_BLANK, "submit"));
         TypeHandler typeHandler = getTypeHandler(request);
-        String      output      = (String) request.getOutput(BLANK);
+        OutputType     output    =  request.getOutput(BLANK);
         String      buttons     = HtmlUtil.submit(msg("Search"), "submit");
         sb.append("<table width=\"90%\" border=0><tr><td>");
         typeHandler.addTextSearch(request, sb);
@@ -2897,7 +2933,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
 
-        String output = (String) request.getOutput(BLANK);
+
         String buttons = buttons(HtmlUtil.submit(msg("Search"), "submit"),
                                  HtmlUtil.submit(msg("Search Subset"),
                                      "submit_subset"));
@@ -2924,10 +2960,11 @@ public class Repository extends RepositoryBase implements Tables,
                                     false));
 
 
+
         StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
-        if (output.length() == 0) {}
-        else {
-            outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output));
+        if (request.defined(ARG_OUTPUT)) {
+            OutputType output =  request.getOutput(BLANK);
+            outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output.getId().toString()));
         }
 
         List orderByList = new ArrayList();
@@ -3982,7 +4019,7 @@ public class Repository extends RepositoryBase implements Tables,
             return processEntryXmlCreateInner(request);
         } catch (Exception exc) {
             exc.printStackTrace();
-            if (request.getOutput().equals("xml")) {
+            if (request.getString(ARG_OUTPUT,"").equals("xml")) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
                         XmlUtil.attr(ATTR_CODE, "error"),
                         "" + exc.getMessage()), MIME_XML);
@@ -4003,7 +4040,6 @@ public class Repository extends RepositoryBase implements Tables,
      */
     private Result processEntryXmlCreateInner(Request request)
             throws Exception {
-
         String file = request.getUploadedFile(ARG_FILE);
         if (file == null) {
             throw new IllegalArgumentException("No file argument given");
@@ -4083,7 +4119,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         insertEntries(newEntries, true);
 
-        if (request.getOutput().equals("xml")) {
+        if (request.getString(ARG_OUTPUT,"").equals("xml")) {
             //TODO: Return a list of the newly created entries
             String xml = XmlUtil.toString(resultRoot);
             return new Result(xml, MIME_XML);
@@ -5313,7 +5349,7 @@ public class Repository extends RepositoryBase implements Tables,
                 return new Result(request.url(URL_ENTRY_SHOW, ARG_ID, nextId,
                         ARG_OUTPUT,
                         request.getString(ARG_OUTPUT,
-                                          OutputHandler.OUTPUT_HTML)));
+                                          OutputHandler.OUTPUT_HTML.getId().toString())));
             }
         }
 
@@ -5473,10 +5509,7 @@ public class Repository extends RepositoryBase implements Tables,
             return new String[] { BLANK, BLANK };
         }
         Group  parent = findGroup(request, entry.getParentGroupId());
-        String output = ((request == null)
-                         ? OutputHandler.OUTPUT_HTML
-                         : request.getOutput());
-        output = OutputHandler.OUTPUT_HTML;
+        OutputType output =  OutputHandler.OUTPUT_HTML;
         int length = 0;
         if (extraArgs.length() > 0) {
             extraArgs = "&" + extraArgs;
@@ -5500,10 +5533,10 @@ public class Repository extends RepositoryBase implements Tables,
             String link;
             if (request != null) {
                 link = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, parent,
-                        ARG_OUTPUT, output) + extraArgs, name);
+                        ARG_OUTPUT, output.getId()) + extraArgs, name);
             } else {
                 link = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW.toString(),
-                        ARG_OUTPUT, output) + extraArgs, name);
+                        ARG_OUTPUT, output.getId()) + extraArgs, name);
             }
             breadcrumbs.add(0, link);
             parent = findGroup(request, parent.getParentGroupId());
@@ -5515,7 +5548,7 @@ public class Repository extends RepositoryBase implements Tables,
                                          "class=separator");
 
         String entryLink = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                               entry, ARG_OUTPUT, output), entry.getLabel());
+                               entry, ARG_OUTPUT, output.getId()), entry.getLabel());
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
@@ -5629,10 +5662,7 @@ public class Repository extends RepositoryBase implements Tables,
             throws Exception {
         boolean       doLatest      = request.get(ARG_LATEST, false);
 
-
         OutputHandler outputHandler = getOutputHandler(request);
-
-
         TypeHandler   typeHandler   = getTypeHandler(request);
         List<Clause>  where         =
             typeHandler.assembleWhereClause(request);

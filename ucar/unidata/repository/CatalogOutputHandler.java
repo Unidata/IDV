@@ -95,7 +95,7 @@ public class CatalogOutputHandler extends OutputHandler {
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
 
     /** _more_ */
-    public static final String OUTPUT_CATALOG = "thredds.catalog";
+    public static final OutputType OUTPUT_CATALOG = new OutputType("THREDDS Catalog", "thredds.catalog");
 
 
     /** _more_ */
@@ -186,9 +186,8 @@ public class CatalogOutputHandler extends OutputHandler {
     public CatalogOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_CATALOG);
     }
-
-
 
 
     /**
@@ -250,17 +249,6 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_CATALOG);
-    }
 
 
 
@@ -278,7 +266,7 @@ public class CatalogOutputHandler extends OutputHandler {
     protected void addOutputTypes(Request request, State state,
                                   List<OutputType> types)
             throws Exception {
-        types.add(new OutputType("Thredds Catalog", OUTPUT_CATALOG));
+        types.add(OUTPUT_CATALOG);
     }
 
 
@@ -290,7 +278,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_CATALOG)) {
             return repository.getMimeTypeFromSuffix(".xml");
         } else {

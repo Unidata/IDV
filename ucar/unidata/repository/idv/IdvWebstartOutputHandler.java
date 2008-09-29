@@ -83,7 +83,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_WEBSTART = "idv.webstart";
+    public static final OutputType OUTPUT_WEBSTART = new OutputType("View in IDV","idv.webstart");
 
 
     /**
@@ -96,20 +96,8 @@ public class IdvWebstartOutputHandler extends OutputHandler {
     public IdvWebstartOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_WEBSTART);
     }
-
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_WEBSTART);
-    }
-
 
 
     /**
@@ -129,13 +117,13 @@ public class IdvWebstartOutputHandler extends OutputHandler {
         if(entry.getResource().getPath().endsWith(".xidv") ||
            entry.getResource().getPath().endsWith(".zidv")) {
             String suffix = "/"+entry.getId()+".jnlp";
-            types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
+            types.add(new OutputType(OUTPUT_WEBSTART, suffix));
         } else {
             DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
             if(data !=null) {
                 if(data.canLoadAsCdm(entry)) {
                     String suffix = "/"+entry.getId()+".jnlp";
-                    types.add(new OutputType("View in IDV", OUTPUT_WEBSTART, suffix));
+                    types.add(new OutputType(OUTPUT_WEBSTART, suffix));
                 }
             }
 

@@ -83,8 +83,9 @@ public class GraphOutputHandler extends OutputHandler {
 
 
 
+
     /** _more_ */
-    public static final String OUTPUT_GRAPH = "graph.graph";
+    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph","graph.graph");
 
 
 
@@ -98,19 +99,12 @@ public class GraphOutputHandler extends OutputHandler {
     public GraphOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_GRAPH);
     }
 
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_GRAPH);
-    }
+
+
+
 
 
     /**
@@ -130,10 +124,12 @@ public class GraphOutputHandler extends OutputHandler {
             return;
         }
 
+        if(getRepository().isOutputTypeOK(OUTPUT_GRAPH)) {
         String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
                                       ARG_OUTPUT, OUTPUT_GRAPH);
         links.add(new Link(url, getRepository().fileUrl(ICON_GRAPH),
                            "Show in graph"));
+        }
     }
 
 

@@ -82,7 +82,7 @@ public class ZipOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_ZIP = "zip.zip";
+    public static final OutputType OUTPUT_ZIP = new OutputType("Zip File","zip.zip");
 
 
     /**
@@ -95,18 +95,11 @@ public class ZipOutputHandler extends OutputHandler {
     public ZipOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_ZIP);
     }
 
-    /**
-     * _more_
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_ZIP);
-    }
+
+
 
 
 
@@ -124,11 +117,14 @@ public class ZipOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
+        if(getRepository().isOutputTypeOK(OUTPUT_ZIP)) {
         if ( !entry.isGroup()) {
+
             String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                           entry, ARG_OUTPUT, OUTPUT_ZIP);
             links.add(new Link(url, getRepository().fileUrl(ICON_ZIP),
                                "Zip file"));
+        }
         }
     }
 
@@ -161,7 +157,7 @@ public class ZipOutputHandler extends OutputHandler {
             if ( !ok) {
                 return;
             }
-            types.add(new OutputType("Zip File", OUTPUT_ZIP));
+            types.add(OUTPUT_ZIP);
         }
     }
 
@@ -191,7 +187,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_ZIP)) {
             return repository.getMimeTypeFromSuffix(".zip");
         } else {

@@ -81,13 +81,13 @@ public class ImageOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_GALLERY = "image.gallery";
+    public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery", "image.gallery");
 
     /** _more_ */
-    public static final String OUTPUT_PLAYER = "image.player";
+    public static final OutputType OUTPUT_PLAYER = new OutputType("Image Player", "image.player");
 
     /** _more_ */
-    public static final String OUTPUT_SLIDESHOW = "image.slideshow";
+    public static final OutputType OUTPUT_SLIDESHOW = new OutputType("Slideshow", "image.slideshow");
 
 
 
@@ -102,20 +102,9 @@ public class ImageOutputHandler extends OutputHandler {
     public ImageOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-    }
-
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_GALLERY)
-               || output.equals(OUTPUT_SLIDESHOW)
-               || output.equals(OUTPUT_PLAYER);
+        addType(OUTPUT_GALLERY);
+        addType(OUTPUT_PLAYER);
+        addType(OUTPUT_SLIDESHOW);
     }
 
 
@@ -149,9 +138,9 @@ public class ImageOutputHandler extends OutputHandler {
             }
         }
 
-        types.add(new OutputType("Slideshow", OUTPUT_SLIDESHOW));
-        types.add(new OutputType("Gallery", OUTPUT_GALLERY));
-        types.add(new OutputType("Image Player", OUTPUT_PLAYER));
+        types.add(OUTPUT_SLIDESHOW);
+        types.add(OUTPUT_GALLERY);
+        types.add(OUTPUT_PLAYER);
     }
 
 
@@ -185,7 +174,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_GALLERY) || output.equals(OUTPUT_PLAYER)
                 || output.equals(OUTPUT_SLIDESHOW)) {
             return repository.getMimeTypeFromSuffix(".html");
@@ -213,7 +202,7 @@ public class ImageOutputHandler extends OutputHandler {
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();
-        String       output     = request.getOutput();
+        OutputType    output     = request.getOutput();
         boolean      showApplet = repository.isAppletEnabled(request);
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");

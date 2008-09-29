@@ -85,7 +85,7 @@ public class CsvOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_CSV = "default.csv";
+    public static final OutputType OUTPUT_CSV = new OutputType("CSV", "default.csv");
 
 
 
@@ -99,19 +99,9 @@ public class CsvOutputHandler extends OutputHandler {
     public CsvOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_CSV);
     }
 
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_CSV);
-    }
 
 
     /**
@@ -126,7 +116,7 @@ public class CsvOutputHandler extends OutputHandler {
     protected void addOutputTypes(Request request, State state,
                                   List<OutputType> types)
             throws Exception {
-        types.add(new OutputType("CSV", OUTPUT_CSV));
+        types.add(OUTPUT_CSV);
     }
 
 
@@ -188,7 +178,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_CSV)) {
             return repository.getMimeTypeFromSuffix(".csv");
         }

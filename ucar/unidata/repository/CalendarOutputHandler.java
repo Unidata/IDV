@@ -86,10 +86,10 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_GRID = "calendar.grid";
+    public static final OutputType OUTPUT_GRID = new OutputType("Date Grid","calendar.grid");
 
     /** _more_ */
-    public static final String OUTPUT_CALENDAR = "calendar.calendar";
+    public static final OutputType OUTPUT_CALENDAR = new OutputType("Calendar","calendar.calendar");
 
 
     /**
@@ -102,19 +102,12 @@ public class CalendarOutputHandler extends OutputHandler {
     public CalendarOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_GRID);
+        addType(OUTPUT_CALENDAR);
     }
 
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_GRID) || output.equals(OUTPUT_CALENDAR);
-    }
+
+
 
 
 
@@ -135,8 +128,8 @@ public class CalendarOutputHandler extends OutputHandler {
         if (state.entry != null) {
             return;
         }
-        types.add(new OutputType("Calendar", OUTPUT_CALENDAR));
-        types.add(new OutputType("Date Grid", OUTPUT_GRID));
+        types.add(OUTPUT_CALENDAR);
+        types.add(OUTPUT_GRID);
     }
 
 
@@ -155,7 +148,7 @@ public class CalendarOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        String       output = request.getOutput();
+        OutputType       output = request.getOutput();
         StringBuffer sb     = new StringBuffer();
         showNext(request, subGroups, entries, sb);
         entries.addAll(subGroups);

@@ -83,25 +83,23 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_TIMELINE = "default.timeline";
+    public static final OutputType OUTPUT_TIMELINE = new OutputType("Timeline","default.timeline");
 
     /** _more_ */
-    public static final String OUTPUT_TIMELINE_DATA = "default.timelinedata";
-
-
-    /** _more_ */
-    public static final String OUTPUT_GRAPH = "default.graph";
+    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph","default.graph");
 
     /** _more_ */
-    public static final String OUTPUT_CLOUD = "default.cloud";
+    public static final OutputType OUTPUT_CLOUD = new OutputType("Cloud","default.cloud");
 
     /** _more_ */
-    public static final String OUTPUT_GROUPXML = "groupxml";
-    public static final String OUTPUT_SELECTXML = "selectxml";
+    public static final OutputType OUTPUT_GROUPXML = new OutputType("groupxml");
+
+    /** _more_ */
+    public static final OutputType OUTPUT_SELECTXML = new OutputType("selectxml");
 
 
     /** _more_ */
-    public static final String OUTPUT_METADATAXML = "metadataxml";
+    public static final OutputType OUTPUT_METADATAXML = new OutputType("metadataxml");
 
 
 
@@ -115,25 +113,13 @@ public class HtmlOutputHandler extends OutputHandler {
     public HtmlOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_HTML);
+        addType(OUTPUT_TIMELINE);
+        addType(OUTPUT_GRAPH);
+        addType(OUTPUT_GROUPXML);
+        addType(OUTPUT_SELECTXML);
+        addType(OUTPUT_METADATAXML);
     }
-
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)
-               || output.equals(OUTPUT_TIMELINE_DATA)
-               || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD)
-               || output.equals(OUTPUT_GROUPXML)
-               || output.equals(OUTPUT_SELECTXML)
-               || output.equals(OUTPUT_METADATAXML);
-    }
-
 
 
     /**
@@ -151,9 +137,9 @@ public class HtmlOutputHandler extends OutputHandler {
                                   List<OutputType> types)
             throws Exception {
         List<Entry> entries = state.getAllEntries();
-        types.add(new OutputType("Entry", OUTPUT_HTML));
+        types.add(OUTPUT_HTML);
         if (entries.size() > 1) {
-            types.add(new OutputType("Timeline", OUTPUT_TIMELINE));
+            types.add(OUTPUT_TIMELINE);
         }
     }
 
@@ -212,7 +198,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        String output = request.getOutput();
+        OutputType output = request.getOutput();
         if (output.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, entry);
         }
@@ -373,7 +359,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType    output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             //            appendListHeader(request, output, WHAT_TYPE, sb);
             sb.append("<ul>");
@@ -411,7 +397,7 @@ public class HtmlOutputHandler extends OutputHandler {
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType      output = request.getOutput();
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_CLOUD)) {
             appendListHeader(request, output, WHAT_TAG, sb);
             sb.append("<ul>");
@@ -491,14 +477,12 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_TIMELINE)) {
             return getRepository().getMimeTypeFromSuffix(".html");
         } else if (output.equals(OUTPUT_GRAPH)) {
             return getRepository().getMimeTypeFromSuffix(".xml");
         } else if (output.equals(OUTPUT_HTML)) {
-            return getRepository().getMimeTypeFromSuffix(".html");
-        } else if (output.equals(OUTPUT_CLOUD)) {
             return getRepository().getMimeTypeFromSuffix(".html");
         } else {
             return super.getMimeType(output);
@@ -517,19 +501,17 @@ public class HtmlOutputHandler extends OutputHandler {
     protected Result listAssociations(Request request) throws Exception {
 
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType      output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             //            appendListHeader(request, output, WHAT_ASSOCIATION, sb);
             sb.append("<ul>");
-        } else if (output.equals(OUTPUT_CLOUD)) {
-            sb.append(msgHeader("Association Cloud"));
         }
         TypeHandler typeHandler  = getRepository().getTypeHandler(request);
         String[]    associations = getRepository().getAssociations(request);
 
 
         if (associations.length == 0) {
-            if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_CLOUD)) {
+            if (output.equals(OUTPUT_HTML)) {
                 sb.append(msg("No associations found"));
             }
         }
@@ -816,7 +798,7 @@ public class HtmlOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
 
-        String output = request.getOutput();
+        OutputType output = request.getOutput();
         if (output.equals(OUTPUT_GROUPXML)) {
             return getChildrenXml(request, subGroups, entries);
         }

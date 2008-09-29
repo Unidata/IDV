@@ -712,6 +712,30 @@ public class Admin extends RepositoryManager {
                                         + fileLabel + "</td></tr></table>"));
 
 
+
+        sb.append(tableSubHeader(msg("Available Output Types")));
+        StringBuffer outputSB = new StringBuffer();
+        List<OutputType> types = getRepository().getOutputTypes();
+        String lastGroupName = null;
+        for(OutputType type: types) {
+            if(!type.getForUser()) continue;
+            boolean ok = getRepository().isOutputTypeOK(type);
+            if(!Misc.equals(lastGroupName, type.getGroupName())) {
+                lastGroupName= type.getGroupName();
+                if(lastGroupName!=null) {
+                    outputSB.append("</div>");
+                    outputSB.append(HtmlUtil.p());
+                }
+                outputSB.append("<div class=\"formgroupheader\">" + lastGroupName+"</div><div style=\"margin-left:10px\">");
+            }
+            outputSB.append(HtmlUtil.checkbox("outputtype." + type.getId(),"true",ok));
+            outputSB.append(type.getLabel());
+            outputSB.append(HtmlUtil.space(3));
+        }
+        outputSB.append("</div>");
+        sb.append(HtmlUtil.formEntryTop("",
+                                        HtmlUtil.div(outputSB.toString(),HtmlUtil.cssClass("scrollablediv"))));
+
         StringBuffer handlerSB = new StringBuffer();
         List<OutputHandler> outputHandlers =
             getRepository().getOutputHandlers();
@@ -778,6 +802,12 @@ public class Admin extends RepositoryManager {
             outputHandler.applySettings(request);
         }
 
+        List<OutputType> types = getRepository().getOutputTypes();
+        for(OutputType type: types) {
+            if(!type.getForUser()) continue;
+            boolean ok = request.get("outputtype." + type.getId(),false);
+            getRepository().setOutputTypeOK(type, ok);
+        }
 
         getRepository().writeGlobal(PROP_ACCESS_ADMINONLY,
                                     request.get(PROP_ACCESS_ADMINONLY,

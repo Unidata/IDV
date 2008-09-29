@@ -128,31 +128,29 @@ public class DataOutputHandler extends OutputHandler {
     public static final String ARG_HSTRIDE = "hstride";
 
     /** _more_ */
-    public static final String OUTPUT_OPENDAP = "data.opendap";
+    public static final OutputType OUTPUT_OPENDAP = new OutputType("OpenDAP","data.opendap");
 
     /** _more_ */
-    public static final String OUTPUT_CDL = "data.cdl";
+    public static final OutputType OUTPUT_CDL = new OutputType("CDL","data.cdl");
 
     /** _more_ */
-    public static final String OUTPUT_WCS = "data.wcs";
+    public static final OutputType OUTPUT_WCS = new OutputType("WCS","data.wcs");
 
     /** _more_ */
-    public static final String OUTPUT_POINT_MAP = "data.point.map";
+    public static final OutputType OUTPUT_POINT_MAP = new OutputType("Point as Map","data.point.map");
 
     /** _more_          */
-    public static final String OUTPUT_POINT_CSV = "data.point.csv";
+    public static final OutputType OUTPUT_POINT_CSV = new OutputType("Point as CSV","data.point.csv");
 
     /** _more_          */
-    public static final String OUTPUT_POINT_KML = "data.point.kml";
-
-
+    public static final OutputType OUTPUT_POINT_KML = new OutputType("Point as KML","data.point.kml");
 
     /** _more_ */
-    public static final String OUTPUT_GRIDSUBSET_FORM =
-        "data.gridsubset.form";
+    public static final OutputType OUTPUT_GRIDSUBSET_FORM =
+        new OutputType("Grid Subset","data.gridsubset.form");
 
     /** _more_ */
-    public static final String OUTPUT_GRIDSUBSET = "data.gridsubset";
+    public static final OutputType OUTPUT_GRIDSUBSET = new OutputType("data.gridsubset");
 
 
     /** _more_ */
@@ -219,26 +217,14 @@ public class DataOutputHandler extends OutputHandler {
 
 
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
-
-    }
-
-
-    /**
-     * Can we handle this output type
-     *
-     *
-     * @param output The output type
-     *
-     * @return Is it tds?
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_OPENDAP) || output.equals(OUTPUT_CDL)
-               || output.equals(OUTPUT_WCS)
-               || output.equals(OUTPUT_POINT_MAP)
-               || output.equals(OUTPUT_POINT_CSV)
-               || output.equals(OUTPUT_POINT_KML)
-               || output.equals(OUTPUT_GRIDSUBSET)
-               || output.equals(OUTPUT_GRIDSUBSET_FORM);
+        addType(OUTPUT_OPENDAP);
+        addType(OUTPUT_CDL);
+        addType(OUTPUT_WCS);
+        addType(OUTPUT_POINT_MAP);
+        addType(OUTPUT_POINT_CSV);
+        addType(OUTPUT_POINT_KML);
+        addType(OUTPUT_GRIDSUBSET);
+        addType(OUTPUT_GRIDSUBSET_FORM);
     }
 
 
@@ -262,7 +248,7 @@ public class DataOutputHandler extends OutputHandler {
         }
         if (canLoadAsCdm(state.entry)
                 && (request.getHttpServletRequest() == null)) {
-            types.add(new OutputType("OpenDAP", OUTPUT_OPENDAP) {
+            types.add(new OutputType(OUTPUT_OPENDAP) {
                 public String assembleUrl(Request request) {
                     return request.getRequestPath() + getSuffix() + "/"
                            + request.getPathEmbeddedArgs() + "/" + ARG_OUTPUT
@@ -290,12 +276,14 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (canLoadAsPoint(entry)) {
+            if(getRepository().isOutputTypeOK(OUTPUT_POINT_MAP))
             links.add(
                 new Link(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                         OUTPUT_POINT_MAP), getRepository().fileUrl(ICON_MAP),
                                            "Map Point Data"));
+            if(getRepository().isOutputTypeOK(OUTPUT_POINT_CSV))
             links.add(
                 new Link(
                     HtmlUtil
@@ -308,6 +296,7 @@ public class DataOutputHandler extends OutputHandler {
                                          .fileUrl(
                                              ICON_CSV), "Point Data as CSV"));
 
+            if(getRepository().isOutputTypeOK(OUTPUT_POINT_KML))
             links.add(
                 new Link(
                     HtmlUtil
@@ -323,6 +312,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
         } else if (canLoadAsGrid(entry)) {
+            if(getRepository().isOutputTypeOK(OUTPUT_GRIDSUBSET_FORM))
             links.add(
                 new Link(
                     request.entryUrl(
@@ -330,6 +320,7 @@ public class DataOutputHandler extends OutputHandler {
                         OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
                             ICON_SUBSET), "Subset"));
 
+            if(getRepository().isOutputTypeOK(OUTPUT_WCS)) {
             /*
               links.add(
               new Link(
@@ -338,15 +329,18 @@ public class DataOutputHandler extends OutputHandler {
               OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),
               "WCS"));
             */
+            }
         }
 
+        if(getRepository().isOutputTypeOK(OUTPUT_OPENDAP)) {
         String opendapUrl = request.getRequestPath() + "/"
                             + request.getPathEmbeddedArgs() + "/"
                             + ARG_OUTPUT + ":" + OUTPUT_OPENDAP
                             + "/entry.das";
         links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
                            "OpenDAP"));
-
+        }
+        if(getRepository().isOutputTypeOK(OUTPUT_CDL))
         links.add(
             new Link(
                 request.entryUrl(
@@ -533,7 +527,6 @@ public class DataOutputHandler extends OutputHandler {
             ucar.nc2.NCdump.print(dataset, "", bos, null);
             sb.append("<pre>" + bos.toString() + "</pre>");
         }
-
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
 
@@ -624,7 +617,7 @@ public class DataOutputHandler extends OutputHandler {
         File         file   = entry.getResource().getFile();
         StringBuffer sb     = new StringBuffer();
         String       prefix = ARG_VARIABLE + ".";
-        String       output = request.getOutput();
+        OutputType       output = request.getOutput();
         if (output.equals(OUTPUT_GRIDSUBSET)) {
             List      varNames = new ArrayList();
             Hashtable args     = request.getArgs();
@@ -1031,7 +1024,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput(), ARG_ID,
+                        ARG_OUTPUT, request.getOutput().toString(), ARG_ID,
                         entry.getId(), ARG_SKIP, "" + (skip - max), ARG_MAX,
                         "" + max
                     }), msg("Previous")));
@@ -1043,7 +1036,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput(), ARG_ID,
+                        ARG_OUTPUT, request.getOutput().toString(), ARG_ID,
                         entry.getId(), ARG_SKIP, "" + (skip + max), ARG_MAX,
                         "" + max
                     }), msg("Next")));
@@ -1056,7 +1049,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput(), ARG_ID,
+                        ARG_OUTPUT, request.getOutput().toString(), ARG_ID,
                         entry.getId(), ARG_SKIP, "" + 0, ARG_MAX, "" + total
                     }), msg("All")));
 
@@ -1244,7 +1237,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
 
-        String output = request.getOutput();
+        OutputType output = request.getOutput();
         if (output.equals(OUTPUT_CDL)) {
             return outputCdl(request, entry);
         }

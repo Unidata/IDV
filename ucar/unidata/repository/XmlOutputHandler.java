@@ -81,9 +81,8 @@ import java.util.zip.*;
  */
 public class XmlOutputHandler extends OutputHandler {
 
-
     /** _more_ */
-    public static final String OUTPUT_XML = "xml.xml";
+    public static final OutputType OUTPUT_XML = new OutputType("XML", "xml.xml");
 
 
 
@@ -97,19 +96,11 @@ public class XmlOutputHandler extends OutputHandler {
     public XmlOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_XML);
     }
 
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_XML);
-    }
+
+
 
 
 
@@ -131,7 +122,7 @@ public class XmlOutputHandler extends OutputHandler {
                                List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType      output = request.getOutput();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_TYPES));
         for (TypeHandler theTypeHandler : typeHandlers) {
@@ -150,7 +141,7 @@ public class XmlOutputHandler extends OutputHandler {
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType       output = request.getOutput();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_TAGS));
         request.remove(ARG_OUTPUT);
@@ -190,7 +181,7 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_XML)) {
             return repository.getMimeTypeFromSuffix(".xml");
         }
@@ -209,7 +200,7 @@ public class XmlOutputHandler extends OutputHandler {
     protected Result listAssociations(Request request) throws Exception {
 
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType       output = request.getOutput();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_ASSOCIATIONS));
         TypeHandler   typeHandler  = repository.getTypeHandler(request);
@@ -278,7 +269,7 @@ public class XmlOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        String   output = request.getOutput();
+        OutputType   output = request.getOutput();
         Document doc    = XmlUtil.makeDocument();
         Element  root   = getGroupTag(request, group, doc, null);
         for (Group subgroup : subGroups) {

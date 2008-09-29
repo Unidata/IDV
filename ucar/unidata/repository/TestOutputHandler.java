@@ -89,18 +89,7 @@ public class TestOutputHandler extends OutputHandler {
     public TestOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-    }
-
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals("testit");
+        addType(new OutputType("","testit"));
     }
 
 

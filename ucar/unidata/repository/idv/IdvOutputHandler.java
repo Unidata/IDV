@@ -101,8 +101,9 @@ public class IdvOutputHandler extends OutputHandler {
     //    public static void processScript(String scriptFile) throws Exception {
 
 
+
     /** _more_ */
-    public static final String OUTPUT_IDV_GRID = "idv.grid";
+    public static final OutputType OUTPUT_IDV_GRID = new OutputType("Grid Preview","idv.grid");
 
 
     /** _more_          */
@@ -130,6 +131,7 @@ public class IdvOutputHandler extends OutputHandler {
                 java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
             e.getDefaultScreenDevice();
             idvServer = new IdvServer();
+            addType(OUTPUT_IDV_GRID);
         } catch (Throwable exc) {
             System.err.println(
                 "To run the IdvOutputHandler a graphics environment is needed");
@@ -137,19 +139,6 @@ public class IdvOutputHandler extends OutputHandler {
                 "To run the IdvOutputHandler a graphics environment is needed");
         }
     }
-
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_IDV_GRID);
-    }
-
 
 
     protected void addOutputTypes(Request request,
@@ -160,13 +149,13 @@ public class IdvOutputHandler extends OutputHandler {
             if ( !getDataOutputHandler().canLoadAsGrid(state.entry)) {
                 return;
             }
-            types.add(new OutputType("Preview Grid", OUTPUT_IDV_GRID));
+            types.add(OUTPUT_IDV_GRID);
         } else {
             //            theEntries = getRadarEntries(state.getAllEntries());
         }
 
         /*        if(theEntries!=null && theEntries.size()>0) {
-            types.add(new OutputType("Preview Radar", OUTPUT_IDV));
+            types.add(OUTPUT_IDV);
             }*/
     }
 
@@ -215,7 +204,7 @@ public class IdvOutputHandler extends OutputHandler {
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
 
-        String output = request.getOutput();
+        OutputType output = request.getOutput();
         if (output.equals(OUTPUT_IDV_GRID)) {
             return outputGrid(request, entry);
         }

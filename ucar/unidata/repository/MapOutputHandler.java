@@ -81,7 +81,7 @@ public class MapOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_MAP = "map.map";
+    public static final OutputType OUTPUT_MAP = new OutputType("Map","map.map");
 
 
     /**
@@ -95,21 +95,8 @@ public class MapOutputHandler extends OutputHandler {
     public MapOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_MAP);
     }
-
-    /**
-     * _more_
-     *
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_MAP);
-    }
-
-
 
 
 
@@ -138,7 +125,7 @@ public class MapOutputHandler extends OutputHandler {
         if ( !ok) {
             return;
         }
-        types.add(new OutputType("Map", OUTPUT_MAP));
+        types.add(OUTPUT_MAP);
     }
 
 

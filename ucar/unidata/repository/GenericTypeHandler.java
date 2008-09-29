@@ -344,7 +344,7 @@ public class GenericTypeHandler extends TypeHandler {
 
         String[]     values = SqlUtil.readString(statement, 1);
         StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
+        OutputType       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append(repository.header(title));
             sb.append("<ul>");
@@ -582,7 +582,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             String output,
+                                             OutputType output,
                                              boolean showDescription,
                                              boolean showResource,
                                              boolean linkToDownload)
@@ -624,7 +624,7 @@ public class GenericTypeHandler extends TypeHandler {
             throws Exception {
         html = super.processDisplayTemplate(request, entry, html);
         Object[] values = entry.getValues();
-        String   output = request.getOutput();
+        OutputType   output = request.getOutput();
         if (values != null) {
             int valueIdx = 0;
             for (Column column : columns) {

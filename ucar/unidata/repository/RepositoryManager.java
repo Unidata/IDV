@@ -147,7 +147,7 @@ public class RepositoryManager implements RepositorySource, Constants,
         if (dataOutputHandler == null) {
             dataOutputHandler =
                 (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP);
+                    DataOutputHandler.OUTPUT_OPENDAP.toString());
         }
         return dataOutputHandler;
     }

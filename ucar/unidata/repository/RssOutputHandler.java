@@ -79,18 +79,11 @@ import java.util.zip.*;
 public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final String OUTPUT_RSS_FULL = "rss.full";
+    public static final OutputType OUTPUT_RSS_FULL = new OutputType("Full RSS Feed","rss.full");
 
     /** _more_ */
-    public static final String OUTPUT_RSS_SUMMARY = "rss.summary";
+    public static final OutputType OUTPUT_RSS_SUMMARY = new OutputType("RSS Feed","rss.summary");
 
-    /** _more_ */
-    private static final OutputType TFO_FULL =
-        new OutputType("Full RSS Feed", OUTPUT_RSS_FULL);
-
-    /** _more_ */
-    private static final OutputType TFO_SUMMARY = new OutputType("RSS Feed",
-                                                      OUTPUT_RSS_SUMMARY);
 
 
 
@@ -104,19 +97,11 @@ public class RssOutputHandler extends OutputHandler {
     public RssOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_RSS_FULL);
+        addType(OUTPUT_RSS_SUMMARY);
     }
 
-    /**
-     * _more_
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(String output) {
-        return output.equals(OUTPUT_RSS_FULL)
-               || output.equals(OUTPUT_RSS_SUMMARY);
-    }
+
 
 
     /**
@@ -132,10 +117,12 @@ public class RssOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                      ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
-        links.add(new Link(url, getRepository().fileUrl(ICON_RSS),
-                           "RSS Feed"));
+        if(getRepository().isOutputTypeOK(OUTPUT_RSS_SUMMARY)) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                          ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
+            links.add(new Link(url, getRepository().fileUrl(ICON_RSS),
+                               "RSS Feed"));
+        }
     }
 
 
@@ -148,7 +135,7 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         if (output.equals(OUTPUT_RSS_FULL)
                 || output.equals(OUTPUT_RSS_SUMMARY)) {
             return repository.getMimeTypeFromSuffix(".rss");
@@ -198,7 +185,7 @@ public class RssOutputHandler extends OutputHandler {
         sb.append(XmlUtil.openTag(TAG_RSS_CHANNEL));
         sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", "Repository Query"));
         StringBufferCollection sbc    = new StringBufferCollection();
-        String                 output = request.getOutput();
+        OutputType output = request.getOutput();
         request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
         for (Entry entry : entries) {
             sb.append(XmlUtil.openTag(TAG_RSS_ITEM));

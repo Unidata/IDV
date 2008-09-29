@@ -1,22 +1,20 @@
 <outputhandlers>
-  <outputhandler class="ucar.unidata.repository.HtmlOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.MapOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.CalendarOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.ImageOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.HtmlOutputHandler" name="Default HTML"/>
+  <outputhandler class="ucar.unidata.repository.MapOutputHandler" name="Map"/>
+  <outputhandler class="ucar.unidata.repository.CalendarOutputHandler" name="Calendar"/>
+  <outputhandler class="ucar.unidata.repository.ImageOutputHandler" name="Image"/>
 
 
-
-
-  <outputhandler class="ucar.unidata.repository.CatalogOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.DataOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.RssOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.XmlOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.CatalogOutputHandler" name="THREDDS Catalog"/>
+  <outputhandler class="ucar.unidata.repository.DataOutputHandler" name="Data"/>
+  <outputhandler class="ucar.unidata.repository.RssOutputHandler" name="RSS"/>
+  <outputhandler class="ucar.unidata.repository.XmlOutputHandler" name="XML"/>
 
 <!--
-  <outputhandler class="ucar.unidata.repository.CsvOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.CsvOutputHandler" name="CSV"/>
 -->
-  <outputhandler class="ucar.unidata.repository.ZipOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.GraphOutputHandler"/>
-  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false"/>
-  <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler" />
+  <outputhandler class="ucar.unidata.repository.ZipOutputHandler" name="ZIP Files"/>
+  <outputhandler class="ucar.unidata.repository.GraphOutputHandler" name="Graph"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false" name="IDV Preview"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 </outputhandlers>

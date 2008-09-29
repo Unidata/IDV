@@ -1273,7 +1273,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb   = new StringBuffer();
         User         user = request.getUser();
         if (user.getAnonymous()) {
-            if (request.getOutput().equals("xml")) {
+            if (request.getString(ARG_OUTPUT,"").equals("xml")) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
                         XmlUtil.attr(ATTR_CODE, "error"),
                         "No user defined"), MIME_XML);
@@ -1290,7 +1290,7 @@ public class UserManager extends RepositoryManager {
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
         }
-        if (request.getOutput().equals("xml")) {
+        if (request.getString(ARG_OUTPUT,"").equals("xml")) {
             return new Result(XmlUtil.tag(TAG_RESPONSE,
                                           XmlUtil.attr(ATTR_CODE, "ok"),
                                           user.getId()), MIME_XML);
@@ -1311,7 +1311,7 @@ public class UserManager extends RepositoryManager {
     public Result processLogin(Request request) throws Exception {
         StringBuffer sb     = new StringBuffer();
         User         user   = null;
-        String       output = request.getOutput();
+        String       output = request.getString(ARG_OUTPUT,"");
         if (request.exists(ARG_USER_ID)) {
             String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD, "");
@@ -1388,7 +1388,7 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    public static final String OUTPUT_CART = "user.cart";
+    public static final OutputType OUTPUT_CART = new OutputType("User Cart", "user.cart");
 
     /**
      * _more_
@@ -1396,7 +1396,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initOutputHandlers() throws Exception {
-        OutputHandler outputHandler = new OutputHandler(getRepository()) {
+        OutputHandler outputHandler = new OutputHandler(getRepository(),"Cart") {
             protected void getEntryLinks(Request request, Entry entry,
                                          List<Link> links, boolean forHeader)
                     throws Exception {
@@ -1406,8 +1406,7 @@ public class UserManager extends RepositoryManager {
                                         msg("Add to cart")));
             }
 
-
-            public boolean canHandle(String output) {
+            public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_CART);
             }
 
@@ -1416,7 +1415,7 @@ public class UserManager extends RepositoryManager {
                                           List<OutputType> types)
                     throws Exception {
                 if ( !state.forHeader()) {
-                    types.add(new OutputType("Cart", OUTPUT_CART));
+                    types.add(OUTPUT_CART);
                 }
             }
 

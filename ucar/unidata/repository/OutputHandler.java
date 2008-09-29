@@ -28,6 +28,8 @@ import org.w3c.dom.*;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.TwoFacedObject;
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
@@ -79,19 +81,12 @@ import java.util.zip.*;
 public class OutputHandler extends RepositoryManager {
 
     /** _more_ */
-    public static final String OUTPUT_HTML = "default.html";
+    public static final OutputType OUTPUT_HTML = new OutputType("Entry", "default.html");
 
 
+    private String name;
 
-
-    /** _more_ */
-    protected static String timelineAppletTemplate;
-
-    /** _more_ */
-    protected static String graphXmlTemplate;
-
-    /** _more_ */
-    protected static String graphAppletTemplate;
+    private List<OutputType> types = new ArrayList<OutputType>();
 
 
     /**
@@ -101,9 +96,9 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public OutputHandler(Repository repository) throws Exception {
+    public OutputHandler(Repository repository, String name) throws Exception {
         super(repository);
-
+        this.name = name;
     }
 
 
@@ -116,8 +111,47 @@ public class OutputHandler extends RepositoryManager {
      */
     public OutputHandler(Repository repository, Element element)
             throws Exception {
-        this(repository);
+        this(repository,XmlUtil.getAttribute(element, ATTR_NAME,(String) null));
     }
+
+    public void init() {
+    }
+
+
+    protected void addType(OutputType type) {
+        type.setGroupName(name);
+        types.add(type);
+    }
+
+    public List<OutputType> getTypes() {
+        return types;
+    }
+
+
+    /**
+       Set the Name property.
+
+       @param value The new value for Name
+    **/
+    public void setName (String value) {
+	name = value;
+    }
+
+
+    /**
+       Get the Name property.
+
+       @return The Name
+    **/
+    public String getName () {
+        if(name == null) {
+            name = Misc.getClassName(getClass());
+        }
+	return name;
+    }
+
+
+
 
     /**
      * _more_
@@ -157,18 +191,6 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
-        return canHandle(output);
-    }
-
 
     /**
      * _more_
@@ -177,7 +199,10 @@ public class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public boolean canHandle(String request) {
+    public boolean canHandleOutput(OutputType output) {
+        for(OutputType type: types) {
+            if(type.equals(output)) return true;
+        }
         return false;
     }
 
@@ -408,7 +433,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getMimeType(String output) {
+    public String getMimeType(OutputType output) {
         return null;
     }
 
@@ -546,7 +571,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     public List<Link> getNextPrevLinks(Request request, Entry entry,
-                                       String output) {
+                                       OutputType output) {
         List<Link> links = new ArrayList<Link>();
         links.add(
             new Link(
@@ -563,7 +588,6 @@ public class OutputHandler extends RepositoryManager {
                         ICON_RIGHT), msg("View Next Entry")));
         return links;
     }
-
 
 
 
@@ -630,10 +654,14 @@ public class OutputHandler extends RepositoryManager {
             //            formSB.append(HtmlUtil.space(1));
             List<OutputType> outputList =
                 getRepository().getOutputTypes(request, new State(entries));
+            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+            for(OutputType outputType: outputList) {
+                tfos.add(new TwoFacedObject(outputType.getLabel(), outputType.getId()));
+            }
             sb.append("\n");
             formSB.append(HtmlUtil.space(4));
             formSB.append(msgLabel("View As"));
-            formSB.append(HtmlUtil.select(ARG_OUTPUT, outputList));
+            formSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
             formSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
             formSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
@@ -716,7 +744,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List getHeader(Request request, String output,
+    protected List getHeader(Request request, OutputType output,
                              List<OutputType> outputTypes)
             throws Exception {
         int    cnt            = 0;
@@ -731,14 +759,14 @@ public class OutputHandler extends RepositoryManager {
         String offextra = " class=\"subnavoffcomp\" ";
         String onextra  = " class=\"subnavoncomp\" ";
         for (OutputType outputType : outputTypes) {
-            request.put(ARG_OUTPUT, (String) outputType.getId());
-            if (outputType.getId().equals(output)) {
-                items.add(HtmlUtil.span(l + msg(outputType.toString()) + r,
+            request.put(ARG_OUTPUT, outputType);
+            if (outputType.equals(output)) {
+                items.add(HtmlUtil.span(l + msg(outputType.getLabel()) + r,
                                         onextra));
             } else {
                 String url = outputType.assembleUrl(request);
                 items.add(HtmlUtil.span(HtmlUtil.href(url,
-                        msg(outputType.toString())), offextra));
+                        msg(outputType.getLabel())), offextra));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);

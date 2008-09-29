@@ -1134,5 +1134,7 @@ public interface Constants {
 
 
 
+    public static final String ARG_RESPONSETYPE = "responsetype";
+
 }
 
