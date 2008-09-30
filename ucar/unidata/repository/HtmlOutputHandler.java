@@ -162,9 +162,8 @@ public class HtmlOutputHandler extends OutputHandler {
         String links = getRepository().getEntryLinksHtml(request, entry,
                            false);
         boolean didOne = false;
+        sb.append(links);
         sb.append("<table>");
-        sb.append(HtmlUtil.row(HtmlUtil.colspan("<center>" + links
-                + "</center>", 2)));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, true,false, true));
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, false)) {

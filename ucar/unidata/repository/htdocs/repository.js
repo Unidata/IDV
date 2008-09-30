@@ -290,85 +290,61 @@ function setImage(id,url) {
     }
 }
 
-function Tooltip () {
-    var lastMove = 0;
-    var needsToClose = 1;
-    var showing = 0;
-    var pinned = 0;
 
-    this.unPin = function (event) {
-        pinned = 0;
-        needsToClose = 1;
+
+function Tooltip () {
+    var STATE_INIT = 0;
+    var STATE_LINK = 1;
+    var STATE_TIP = 2;
+
+    var lastMove = 0;
+    var state = STATE_INIT;
+
+    this.keyPressed = function (event) {
+        if(state==STATE_INIT) return;
+        c =util.getKeyChar(event);
+        if(c == '\r' && state == STATE_TIP) {
+            tooltip.doHide();
+        }
+    }
+
+    this.onMouseOut = function (event,id) {
+        if(state !=STATE_LINK) return;
+        setTimeout("tooltip.checkHide(" + lastMove+ ")", 1000);
+    }
+
+
+    this.onMouseOver  = function(event,id) {
+        lastMove++;
+        if(state!=STATE_INIT) return;
+        event = util.getEvent(event);
+        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", 1000);
+    }
+
+
+    this.checkHide  = function(timestamp) {
+	if(timestamp<lastMove) return;
         this.doHide();
     }
 
-    this.keyPressed = function (event) {
-        if(!showing) return;
-
-        c =util.getKeyChar(event);
-        if(c == '\r' && pinned) {
-            tooltip.unPin(event);
-        }
-        if(c == 'p') {
-            img = util.getDomObject('tooltipclose');
-            msg = util.getDomObject('pindiv');
-            hideObject(msg);
-            if(img) {
-                img.obj.src  = "${urlroot}/icons/close.gif";
-                pinned = 1;
-            }
-        }
-
-    }
-
-
-    this.hide = function (event,id) {
-        if(pinned) return;
-        needsToClose = 1;
-        showing = 0;
-        tooltip.doHide();
-    }
-
-
     this.doHide  = function() {
-        if(!needsToClose || pinned) return;
-        if(!showing)
-            lastMove++;
-        var obj = util.getDomObject("tooltipdiv");
-        if(!obj) return;
-        showing = 0;
-        hideObject(obj);
+        if(state !=STATE_LINK && state!=STATE_TIP)
+		return;
+        state = STATE_INIT;
+        hideObject(util.getDomObject("tooltipdiv"));
     }
 
 
-    this.show  = function(event,id) {
-        if(showing) return;
-        event = util.getEvent(event);
-        lastMove++;
-        setTimeout("tooltip.doShow(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", 1000);
-    }
 
-
-    this.divMouseOver = function() {
-        //        needsToClose = 0;
-    }
-
-    this.divMouseOut = function() {
-        //        needsToClose = 1;
-        //        this.doHide();
-    }
-
-    this.doShow = function(moveId,x,y,id) {
-
-        if(lastMove!=moveId) return;
+    this.onClick  = function(event,id) {
+	state = STATE_TIP;
         var link = util.getDomObject(id);
         if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
             x= util.getLeft(link.obj);
-            y = link.obj.offsetHeight+util.getTop(link.obj) + 2;
+            y = link.obj.offsetHeight+util.getTop(link.obj);
         } else {
             x+=20;
         }
-
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
         util.setPosition(obj, x,y);
@@ -377,11 +353,32 @@ function Tooltip () {
     }
 
 
+    this.showLink = function(moveId,x,y,id) {
+        if(lastMove!=moveId) return;
+	if(state!=STATE_INIT) return;
+        var obj = util.getDomObject("tooltipdiv");
+        if(!obj) return;
+        state = STATE_LINK;
+        var link = util.getDomObject(id);
+        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
+            x= util.getLeft(link.obj);
+            y = link.obj.offsetHeight+util.getTop(link.obj);
+        } else {
+            x+=20;
+        }
+
+        util.setPosition(obj, x,y);
+        var imgEvents = " onMouseOver=\"tooltip.onMouseOver(event,'" + id +"')\" " +
+		" onMouseOut=\"tooltip.onMouseOut(event,'" + id +"')\" " +
+		" onClick=\"tooltip.onClick(event,'" + id +"')\" ";
+	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src=${urlroot}/icons/tooltip.gif></div>";
+        showObject(obj);
+    }
+
     function handleTooltip(request, obj) {
         var xmlDoc=request.responseXML.documentElement;
         text = getChildText(xmlDoc);
-        obj.obj.innerHTML = "<div id=\"tooltipwrapper\" onmouseover=\"tooltip.divMouseOver();\"  onmouseout=\"tooltip.divMouseOut();\"><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.unPin();\" id=\"tooltipclose\" onmouseover=\"tooltip.divMouseOver();\" src=${urlroot}/icons/blank.gif></td><td>" + text+"</table><div id=\"pindiv\" class=smallmessage>'p' to pin</div></div>";
-        showing = 1;
+        obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=${urlroot}/icons/close.gif></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
         showObject(obj);
     }
 

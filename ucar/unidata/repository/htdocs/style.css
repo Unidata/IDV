@@ -255,9 +255,18 @@ ul {
 
 
 
-.tooltip {
+.tooltip-inner {
    border : 1px black solid;
    background-color : #FFFFCC;
+   margin:0px;
+}
+
+.tooltip-link-inner {
+   margin:2px;
+}
+
+.tooltip-outer {
+   margin:0px;
    position: absolute; 
    visibility: hidden; 
    z-index: 1;

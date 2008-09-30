@@ -513,9 +513,9 @@ public class OutputHandler extends RepositoryManager {
                 linkText,
                 " id=" + HtmlUtil.quote(elementId) + " "
                 + HtmlUtil.onMouseOver(
-                                       "tooltip.show(event," + HtmlUtil.squote(elementId)
+                                       "tooltip.onMouseOver(event," + HtmlUtil.squote(elementId)
                                        + ");") + HtmlUtil.onMouseOut(
-                                                                     "tooltip.hide(event," + HtmlUtil.squote(elementId)+ ");")));
+                                                                     "tooltip.onMouseOut(event," + HtmlUtil.squote(elementId)+ ");")));
 
         if (includeIcon) {
             //            getMetadataManager().decorateEntry(request, entry, sb,true);
