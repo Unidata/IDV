@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -93,7 +94,7 @@ public class TextPointDataSource extends PointDataSource {
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
 
-    /** _more_          */
+    /** _more_ */
     private Real dfltReal;
 
     /** logging category */
@@ -1327,6 +1328,19 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
+        return (FieldImpl) makeObs(dataChoice, null, null, null, true, true);
+
+    }
 
     /**
      * _more_

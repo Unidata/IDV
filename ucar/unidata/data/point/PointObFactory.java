@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -743,6 +744,28 @@ public class PointObFactory {
                                          LatLonRect llr)
             throws Exception {
 
+        return makePointObs(input, binRoundTo, binWidth, llr, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param input _more_
+     * @param binRoundTo _more_
+     * @param binWidth _more_
+     * @param llr _more_
+     * @param sample _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static FieldImpl makePointObs(PointObsDataset input,
+                                         double binRoundTo, double binWidth,
+                                         LatLonRect llr, boolean sample)
+            throws Exception {
+
 
 
         Object  loadId = JobManager.getManager().startLoad("PointObFactory");
@@ -892,6 +915,9 @@ public class PointObFactory {
             }
             pos.add(po);
             times.add(new DateTime(po.getNominalTimeAsDate()));
+            if (sample) {
+                break;
+            }
         }
         //        Trace.call2("loop-2");
 
@@ -1299,6 +1325,7 @@ public class PointObFactory {
             faGridX = Barnes.getRecommendedGridX(lonMin, lonMax, xSpacing);
             faGridY = Barnes.getRecommendedGridY(latMin, latMax, ySpacing);
         }
+
         double[][] griddedData = Barnes.point2grid(faGridX, faGridY,
                                      new float[][] {
             domainPts[0], domainPts[1], paramVals[0]

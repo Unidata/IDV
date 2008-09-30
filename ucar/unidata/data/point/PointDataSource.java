@@ -21,10 +21,12 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.data.grid.GridDataSource;
 
 import ucar.unidata.geoloc.LatLonRect;
 
@@ -35,6 +37,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.WrapperException;
 
 import visad.*;
 
@@ -163,7 +166,14 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
 
-    public boolean canAddCurrentName(DataChoice dataChoice){
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     *
+     * @return _more_
+     */
+    public boolean canAddCurrentName(DataChoice dataChoice) {
         return false;
     }
 
@@ -286,6 +296,20 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
+        return null;
+    }
+
     /**
      * Make the <code>DataChoices</code> for this <code>DataSource</code>.
      */
@@ -313,12 +337,11 @@ public abstract class PointDataSource extends FilesDataSource {
             addDataChoice(uberChoice);
         }
 
+
         for (int i = 0; i < sources.size(); i++) {
             DataChoice choice = new DirectDataChoice(this, new Integer(i),
                                     getDescription(), getDataName(),
                                     getPointCategories(), properties);
-
-
 
             /*
               We'd like to create sub choices for each parameter but we don't really
@@ -334,6 +357,53 @@ public abstract class PointDataSource extends FilesDataSource {
             } else {
                 addDataChoice(choice);
             }
+            try {
+                FieldImpl sample = getSample(choice);
+                if (sample != null) {
+                    if (ucar.unidata.data.grid.GridUtil.isTimeSequence(
+                            sample)) {
+                        sample = (FieldImpl) sample.getSample(0);
+                    }
+                    PointOb             ob = (PointOb) sample.getSample(0);
+                    Tuple               tuple = (Tuple) ob.getData();
+                    TupleType tupleType = (TupleType) tuple.getType();
+                    MathType[]          types = tupleType.getComponents();
+                    CompositeDataChoice compositeDataChoice = null;
+                    for (int typeIdx = 0; typeIdx < types.length; typeIdx++) {
+                        if ( !(types[typeIdx] instanceof RealType)) {
+                            continue;
+                        }
+                        RealType type = (RealType) types[typeIdx];
+                        if (type.getDefaultUnit() == null) {
+                            continue;
+                        }
+                        //                        List gridCategories = 
+                        //                            DataCategory.parseCategories("OA Fields;GRID-2D-TIME;");
+                        List gridCategories =
+                            DataCategory.parseCategories("GRID-2D-TIME;",
+                                false);
+                        if (compositeDataChoice == null) {
+                            compositeDataChoice =
+                                new CompositeDataChoice(this, "",
+                                    "Objective Analysis Derived Grid Fields",
+                                    "OA Fields",
+                                    Misc.newList(DataCategory.NONE_CATEGORY),
+                                    null);
+                            addDataChoice(compositeDataChoice);
+                        }
+                        DataChoice gridChoice =
+                            new DirectDataChoice(this,
+                                Misc.newList(new Integer(i), type),
+                                type.toString(), type.toString(),
+                                gridCategories, (Hashtable) null);
+                        compositeDataChoice.addDataChoice(gridChoice);
+                    }
+                }
+            } catch (Exception exc) {
+                throw new WrapperException("Making grid parameters", exc);
+            }
+
+
         }
 
     }
@@ -343,7 +413,7 @@ public abstract class PointDataSource extends FilesDataSource {
      * Get the file or url source path from the given data choice.
      * The new version uses an Integer index into the sources list
      * as the id of the data choice. However, this method does handle
-     * 
+     *
      *
      * @param dataChoice The data choice
      *
@@ -403,6 +473,25 @@ public abstract class PointDataSource extends FilesDataSource {
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
 
+        Object id = dataChoice.getId();
+        //If it is a list then we are doing a grid field
+        if (id instanceof List) {
+            Integer  i    = (Integer) ((List) id).get(0);
+            RealType type = (RealType) ((List) id).get(1);
+            DataChoice choice = new DirectDataChoice(this, i, "", "",
+                                    dataChoice.getCategories(),
+                                    dataChoice.getProperties());
+            FieldImpl pointField = (FieldImpl) getDataInner(choice, category,
+                                       dataSelection, requestProperties);
+            if (pointField == null) {
+                return null;
+            }
+            pointField =
+                PointObFactory.makeTimeSequenceOfPointObs(pointField);
+
+            return PointObFactory.barnes(pointField, type, 10, 10, 1);
+        }
+
 
         GeoSelection    geoSelection = ((dataSelection != null)
                                         ? dataSelection.getGeoSelection()
@@ -431,7 +520,9 @@ public abstract class PointDataSource extends FilesDataSource {
                 if (obs == null) {
                     return null;
                 }
-                if(true) return obs;
+                if (true) {
+                    return obs;
+                }
                 datas.add(obs);
                 if ((fieldsDescription == null) && (obs != null)) {
                     makeFieldDescription(obs);
@@ -508,9 +599,14 @@ public abstract class PointDataSource extends FilesDataSource {
                 params.append(paramName);
                 if (alias != null) {
                     params.append(" --  " + alias.getLabel());
-                    DataChoice.addCurrentName(new TwoFacedObject(dataSourceName+">" + alias.getLabel()+" -- " + paramName,paramName)); 
+                    DataChoice.addCurrentName(
+                        new TwoFacedObject(
+                            dataSourceName + ">" + alias.getLabel() + " -- "
+                            + paramName, paramName));
                 } else {
-                    DataChoice.addCurrentName(new TwoFacedObject(dataSourceName+">" + paramName,paramName)); 
+                    DataChoice.addCurrentName(
+                        new TwoFacedObject(
+                            dataSourceName + ">" + paramName, paramName));
                 }
                 Data data = tuple.getComponent(i);
                 if (data instanceof Real) {

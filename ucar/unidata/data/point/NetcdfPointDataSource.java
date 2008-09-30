@@ -257,6 +257,12 @@ public class NetcdfPointDataSource extends PointDataSource {
     }
 
 
+    protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
+        return makeObs(dataChoice, null, null, true);
+
+    }
+
+
     /**
      * Make PointObs from the PointObsDataset
      *
@@ -270,6 +276,12 @@ public class NetcdfPointDataSource extends PointDataSource {
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox)
             throws Exception {
+        return makeObs(dataChoice, subset, bbox, false);
+    }
+
+    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
+                                LatLonRect bbox, boolean sample)
+            throws Exception {
         Object id = dataChoice.getId();
         String    source;
         if(id instanceof Integer) {
@@ -277,6 +289,7 @@ public class NetcdfPointDataSource extends PointDataSource {
         } else {
             source = id.toString();
         }
+
 
 
 
@@ -302,7 +315,7 @@ public class NetcdfPointDataSource extends PointDataSource {
             }
             */
             obs = PointObFactory.makePointObs(pods, getBinRoundTo(),
-                    getBinWidth(), bbox);
+                                              getBinWidth(), bbox,sample);
             pods.close();
         }
         Trace.call2("NetcdfPointDatasource:makeObs");
