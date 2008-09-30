@@ -5194,6 +5194,7 @@ public class Repository extends RepositoryBase implements Tables,
                 theEntry.setNorth(Misc.getProperty(extra, ARG_MAXLAT, 0.0));
                 theEntry.setWest(Misc.getProperty(extra, ARG_MINLON, 0.0));
                 theEntry.setEast(Misc.getProperty(extra, ARG_MAXLON, 0.0));
+                theEntry.trimAreaResolution();
             }
             if ((extra.get(ARG_FROMDATE) != null)
                     && (theEntry.getStartDate()

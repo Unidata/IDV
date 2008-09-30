@@ -91,13 +91,16 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
         if (entry.getValues() == null) {
             return;
         }
-        links.add(
-            new Link(
-                HtmlUtil.url(
-                    "http://radar.weather.gov/radar.php", "rid",
-                    (String) entry.getValues()[0], "product",
-                    (String) entry.getValues()[1]), repository.fileUrl(
-                        "/icons/radar.gif"), "Show NWS Radar Site"));
+        Object[] values = entry.getValues();
+        if(values.length>=2 && values[0]!=null && values[1]!=null) {
+            links.add(
+                      new Link(
+                               HtmlUtil.url(
+                                            "http://radar.weather.gov/radar.php", "rid",
+                                            (String) entry.getValues()[0], "product",
+                                            (String) entry.getValues()[1]), repository.fileUrl(
+                                                                                               "/icons/radar.gif"), "Show NWS Radar Site"));
+        }
     }
 
 
@@ -108,7 +111,7 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Entry entry) throws Exception {
+    public void xxxinitializeNewEntry(Entry entry) throws Exception {
         String station = (String) entry.getValues()[0];
         String lat =
             getRepository().getFieldDescription(station + ".lat",
@@ -119,6 +122,7 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
                 "/ucar/unidata/repository/resources/level3radar.station.properties",
                 null);
 
+
         if ((lat != null) && (lon != null)) {
             double latD = Misc.decodeLatLon(lat);
             double lonD = Misc.decodeLatLon(lon);
@@ -126,6 +130,7 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
             entry.setNorth(latD + 2);
             entry.setEast(lonD + 2);
             entry.setWest(lonD - 2);
+            entry.trimAreaResolution();
         }
 
     }

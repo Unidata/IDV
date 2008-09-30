@@ -573,8 +573,10 @@ public class PatternHarvester extends Harvester {
                 if ( !getActive()) {
                     return;
                 }
+                //                if(true) break;
             }
         }
+
         if ( !getTestMode()) {
             List uniqueEntries =
                 getRepository().getUniqueEntries(entries);

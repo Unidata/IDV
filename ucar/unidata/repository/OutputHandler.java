@@ -507,15 +507,15 @@ public class OutputHandler extends RepositoryManager {
         }
 
         String elementId = entry.getId();
+        String qid = HtmlUtil.squote(elementId);
+        String tooltipEvents =  HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid+ ");") + 
+            HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid+ ");") +
+            HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid+ ");");
         sb.append(
             HtmlUtil.href(
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
                 linkText,
-                " id=" + HtmlUtil.quote(elementId) + " "
-                + HtmlUtil.onMouseOver(
-                                       "tooltip.onMouseOver(event," + HtmlUtil.squote(elementId)
-                                       + ");") + HtmlUtil.onMouseOut(
-                                                                     "tooltip.onMouseOut(event," + HtmlUtil.squote(elementId)+ ");")));
+                " id=" + HtmlUtil.quote(elementId) + " " +tooltipEvents));
 
         if (includeIcon) {
             //            getMetadataManager().decorateEntry(request, entry, sb,true);

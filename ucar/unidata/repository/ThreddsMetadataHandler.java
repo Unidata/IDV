@@ -359,18 +359,22 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     value = "" + attr.getNumericValue();
                 }
                 if (ATTR_MAXLON.equals(name)) {
+                    //                    System.err.println ("maxlon:" + value);
                     extra.put(ARG_MAXLON, new Double(value));
                     continue;
                 }
                 if (ATTR_MINLON.equals(name)) {
+                    //                    System.err.println ("minlon:" + value);
                     extra.put(ARG_MINLON, new Double(value));
                     continue;
                 }
                 if (ATTR_MAXLAT.equals(name)) {
+                    //                    System.err.println ("maxlat:" + value);
                     extra.put(ARG_MAXLAT, new Double(value));
                     continue;
                 }
                 if (ATTR_MINLAT.equals(name)) {
+                    //                    System.err.println ("minlat:" + value);
                     extra.put(ARG_MINLAT, new Double(value));
                     continue;
                 }
@@ -399,6 +403,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
             List<Variable> variables = dataset.getVariables();
+            //            System.err.println(entry.getResource());
             for (Variable var : variables) {
                 if (var instanceof CoordinateAxis) {
                     CoordinateAxis ca       = (CoordinateAxis) var;
@@ -407,16 +412,20 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
                                               CommonUnits.DEGREE);
-                        //                        System.err.println("lat range:" + minmax[0] + " " + minmax[1]);
-                        extra.put(ARG_MINLAT, minmax[0]);
-                        extra.put(ARG_MAXLAT, minmax[1]);
+                        //                        System.err.println("\t" +"lat range:" + minmax[0] + " " + minmax[1]);
+                        if(extra.get(ARG_MINLAT)==null)
+                            extra.put(ARG_MINLAT, minmax[0]);
+                        if(extra.get(ARG_MAXLAT)==null)
+                            extra.put(ARG_MAXLAT, minmax[1]);
                         haveBounds = true;
                     } else if (axisType.equals(AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
-                                              CommonUnits.DEGREE);
-                        //                        System.err.println("lon range:" + minmax[0] + " " + minmax[1]);
-                        extra.put(ARG_MINLON, minmax[0]);
-                        extra.put(ARG_MAXLON, minmax[1]);
+                                                   CommonUnits.DEGREE);
+                        //                        System.err.println("\t"+" lon range:" + minmax[0] + " " + minmax[1]);
+                        if(extra.get(ARG_MINLON)==null)
+                            extra.put(ARG_MINLON, minmax[0]);
+                        if(extra.get(ARG_MAXLON)==null)
+                            extra.put(ARG_MAXLON, minmax[1]);
                         haveBounds = true;
                     } else if (axisType.equals(AxisType.Time)) {
                         Date[] dates = getMinMaxDates(var, ca);
@@ -457,7 +466,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
-            if ( !haveBounds) {
+            if (!haveBounds) {
                 for (CoordinateSystem coordSys : (List<CoordinateSystem>) dataset
                         .getCoordinateSystems()) {
                     ProjectionImpl proj = coordSys.getProjection();
@@ -465,12 +474,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         continue;
                     }
                     LatLonRect llr = proj.getDefaultMapAreaLL();
-                    //                    System.err.println("bounds from cs:" + llr);
                     haveBounds = true;
-                    extra.put(ARG_MINLAT, llr.getLatMin());
-                    extra.put(ARG_MAXLAT, llr.getLatMax());
-                    extra.put(ARG_MINLON, llr.getLonMin());
-                    extra.put(ARG_MAXLON, llr.getLonMax());
+                    if(extra.get(ARG_MINLAT)==null) {
+                        //                        System.err.println("\t"  +" bounds from cs:" + llr);
+                        extra.put(ARG_MINLAT, llr.getLatMin());
+                        extra.put(ARG_MAXLAT, llr.getLatMax());
+                        extra.put(ARG_MINLON, llr.getLonMin());
+                        extra.put(ARG_MAXLON, llr.getLonMax());
+                    }
                     break;
                 }
             }

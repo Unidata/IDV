@@ -117,6 +117,10 @@ function Util () {
         if(!obj) return 0;
         return obj.offsetLeft+this.getLeft(obj.offsetParent);
     }
+    this.getRight =  function(obj) {
+        if(!obj) return 0;
+        return obj.offsetRight+this.getRight(obj.offsetParent);
+    }
 }
 
 util = new Util();
@@ -296,10 +300,13 @@ function Tooltip () {
     var STATE_INIT = 0;
     var STATE_LINK = 1;
     var STATE_TIP = 2;
-
     var lastMove = 0;
     var state = STATE_INIT;
+    var currentID;
 
+    this.debug = function(msg) {
+        //        util.print(msg);
+    }
     this.keyPressed = function (event) {
         if(state==STATE_INIT) return;
         c =util.getKeyChar(event);
@@ -308,16 +315,31 @@ function Tooltip () {
         }
     }
 
+    this.onMouseMove = function (event,id) {
+        lastMove++;
+        if(state!=STATE_INIT) return;
+        event = util.getEvent(event);
+        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", 1000);
+    }
+
     this.onMouseOut = function (event,id) {
+        lastMove++;
         if(state !=STATE_LINK) return;
+        this.debug('on mouse out ' + id);
         setTimeout("tooltip.checkHide(" + lastMove+ ")", 1000);
     }
 
 
-    this.onMouseOver  = function(event,id) {
+    this.onMouseOver = function(event,id) {
+        event = util.getEvent(event);
+
+        if(state ==STATE_LINK && currentID && id!=currentID) {
+            this.doHide();
+            currentID = null;
+
+        }
         lastMove++;
         if(state!=STATE_INIT) return;
-        event = util.getEvent(event);
         setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", 1000);
     }
 
@@ -328,6 +350,7 @@ function Tooltip () {
     }
 
     this.doHide  = function() {
+        currentID = "";
         if(state !=STATE_LINK && state!=STATE_TIP)
 		return;
         state = STATE_INIT;
@@ -335,19 +358,32 @@ function Tooltip () {
     }
 
 
+    this.getX = function(link,eventX) {
+        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
+            return eventX-5;
+            return util.getLeft(link.obj);
+        } else {
+            return 20;
+        }
+    }
+
+    this.getY = function(link,eventY) {
+        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
+            return  link.obj.offsetHeight+util.getTop(link.obj)-2;
+        } else {
+            return eventY;
+        }
+    }
+
 
     this.onClick  = function(event,id) {
 	state = STATE_TIP;
         var link = util.getDomObject(id);
-        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
-            x= util.getLeft(link.obj);
-            y = link.obj.offsetHeight+util.getTop(link.obj);
-        } else {
-            x+=20;
-        }
+        x = this.getX(link);
+        y = this.getY(link);
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
-        util.setPosition(obj, x,y);
+        //        util.setPosition(obj, x,y);
         url = "${urlroot}/entry/show?id=" + id +"&output=metadataxml";
 	util.loadXML( url, handleTooltip,obj);
     }
@@ -356,20 +392,17 @@ function Tooltip () {
     this.showLink = function(moveId,x,y,id) {
         if(lastMove!=moveId) return;
 	if(state!=STATE_INIT) return;
+        currentID = id;
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
         state = STATE_LINK;
         var link = util.getDomObject(id);
-        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
-            x= util.getLeft(link.obj);
-            y = link.obj.offsetHeight+util.getTop(link.obj);
-        } else {
-            x+=20;
-        }
-
+        x = this.getX(link,x);
+        y = this.getY(link,y);
         util.setPosition(obj, x,y);
         var imgEvents = " onMouseOver=\"tooltip.onMouseOver(event,'" + id +"')\" " +
 		" onMouseOut=\"tooltip.onMouseOut(event,'" + id +"')\" " +
+		" onMouseMove=\"tooltip.onMouseMove(event,'" + id +"')\" " +
 		" onClick=\"tooltip.onClick(event,'" + id +"')\" ";
 	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src=${urlroot}/icons/tooltip.gif></div>";
         showObject(obj);

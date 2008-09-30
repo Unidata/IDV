@@ -157,6 +157,9 @@ public class Entry extends Entity {
         setWest(template.getWest());
     }
 
+
+
+
     /**
      * _more_
      *
@@ -423,6 +426,20 @@ public class Entry extends Entity {
             return true;
         }
         return false;
+    }
+
+    public void trimAreaResolution() {
+        double diff = (south-north);
+        if(Math.abs(diff)>1) {
+            south = ((int)(south*1000))/1000.0;
+            north = ((int)(north*1000))/1000.0;
+        }
+        diff = (east-west);
+        if(Math.abs(diff)>1) {
+            east = ((int)(east*1000))/1000.0;
+            west = ((int)(west*1000))/1000.0;
+        }
+
     }
 
     /**

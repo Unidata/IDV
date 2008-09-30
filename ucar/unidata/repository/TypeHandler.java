@@ -822,9 +822,9 @@ public class TypeHandler extends RepositoryManager {
                                       + entry.getNorth()
                                       + "</td></tr><tr align=center><td>"
                                       + entry.getWest() + "  "
-                                      + entry.getSouth()
-                                      + "</td></tr><tr align=center><td>"
                                       + entry.getEast()
+                                      + "</td></tr><tr align=center><td>"
+                                      + entry.getSouth()
                                       + "</td></tr></table>";
                     sb.append(HtmlUtil.formEntry(msgLabel("Area"), areaHtml));
                 }
