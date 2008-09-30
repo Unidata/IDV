@@ -1368,6 +1368,10 @@ public class HtmlUtil {
         return " onmouseover=" + quote(call) + " ";
     }
 
+    public static String onMouseMove(String call) {
+        return " onmousemove=" + quote(call) + " ";
+    }
+
 
     /**
      * _more_
