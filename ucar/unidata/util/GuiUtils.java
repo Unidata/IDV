@@ -5259,8 +5259,9 @@ public class GuiUtils extends LayoutUtil {
             return;
         }
 
-        for (int i = 0; i < cont.getComponentCount(); i++) {
-            Component child = cont.getComponent(i);
+        Component[]comps =  	cont.getComponents();
+        for (int i = 0; i < comps.length;i++) {
+            Component child = comps[i];
             toggleHeavyWeightComponents(child, visible);
         }
     }
