@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -741,7 +742,7 @@ public class TextPointDataSource extends PointDataSource {
         if ( !metaDataOk && (map == null)) {
             try {
                 DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
-                if(!getMakeGridFields()) {
+                if ( !getMakeGridFields()) {
                     //If we are making grid fields then this has already been called
                     //If not then call it here so we check on the header
                     Data sample = makeObs(dataChoice, null, null, null, true,
@@ -1333,13 +1334,13 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Read a sample of the data. e.g., just the first ob
      *
-     * @param dataChoice _more_
+     * @param dataChoice The data choice
      *
-     * @return _more_
+     * @return The first ob
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
         return (FieldImpl) makeObs(dataChoice, null, null, null, true, true);
@@ -1347,7 +1348,7 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * Make the data choices
      */
     public void doMakeDataChoices() {
         super.doMakeDataChoices();
@@ -1382,9 +1383,9 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Add to properties gui
      *
-     * @param comps _more_
+     * @param comps properties comps
      */
     public void getPropertiesComponents(List comps) {
         super.getPropertiesComponents(comps);
@@ -1393,17 +1394,17 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * Get the data represented by this class.  Calls makeObs, real work
+     * needs to be implemented there.
      *
-     * @param dataChoice _more_
-     * @param category _more_
-     * @param dataSelection _more_
-     * @param requestProperties _more_
+     * @param dataChoice         choice for data
+     * @param category           category of data
+     * @param dataSelection      subselection properties
+     * @param requestProperties  additional selection properties (not used here)
+     * @return  Data object representative of the choice
      *
-     * @return _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
     protected Data getDataInner(DataChoice dataChoice, DataCategory category,
                                 DataSelection dataSelection,

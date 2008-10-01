@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -749,17 +750,17 @@ public class PointObFactory {
 
 
     /**
-     * _more_
+     * Make point obs
      *
-     * @param input _more_
-     * @param binRoundTo _more_
-     * @param binWidth _more_
-     * @param llr _more_
-     * @param sample _more_
+     * @param input the data set
+     * @param binRoundTo bin round to
+     * @param binWidth time bin size
+     * @param llr bounding box
+     * @param sample If true then just sample the data, i.e., read the first ob
      *
-     * @return _more_
+     * @return The field
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public static FieldImpl makePointObs(PointObsDataset input,
                                          double binRoundTo, double binWidth,
@@ -1459,29 +1460,30 @@ public class PointObFactory {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public static  double[] getBoundingBox(FieldImpl pointObs)
+    public static double[] getBoundingBox(FieldImpl pointObs)
             throws VisADException, RemoteException {
-            boolean isTimeSequence = GridUtil.isTimeSequence(pointObs);
-            if (isTimeSequence) {
-                double[] bbox = null;
-                Set timeSet  = pointObs.getDomainSet();
-                int numTimes = timeSet.getLength();
-                for (int i = 0; i < numTimes; i++) {
-                    FieldImpl oneTime = (FieldImpl) pointObs.getSample(i);
-                    //{ minY, minX, maxY, maxX };
-                    double[] tmp =PointObFactory.getBoundingBoxOneTime(oneTime);
-                    if(bbox==null) bbox=tmp;
-                    else {
-                        bbox[0] = Math.min(bbox[0], tmp[0]);
-                        bbox[1] = Math.min(bbox[1], tmp[1]);
-                        bbox[2] = Math.max(bbox[0], tmp[2]);
-                        bbox[3] = Math.max(bbox[1], tmp[3]);
-                    }
+        boolean isTimeSequence = GridUtil.isTimeSequence(pointObs);
+        if (isTimeSequence) {
+            double[] bbox     = null;
+            Set      timeSet  = pointObs.getDomainSet();
+            int      numTimes = timeSet.getLength();
+            for (int i = 0; i < numTimes; i++) {
+                FieldImpl oneTime = (FieldImpl) pointObs.getSample(i);
+                //{ minY, minX, maxY, maxX };
+                double[] tmp = PointObFactory.getBoundingBoxOneTime(oneTime);
+                if (bbox == null) {
+                    bbox = tmp;
+                } else {
+                    bbox[0] = Math.min(bbox[0], tmp[0]);
+                    bbox[1] = Math.min(bbox[1], tmp[1]);
+                    bbox[2] = Math.max(bbox[0], tmp[2]);
+                    bbox[3] = Math.max(bbox[1], tmp[3]);
                 }
-                return bbox;
-            } else {
-                return PointObFactory.getBoundingBoxOneTime(pointObs);
             }
+            return bbox;
+        } else {
+            return PointObFactory.getBoundingBoxOneTime(pointObs);
+        }
     }
 
 
@@ -1495,7 +1497,7 @@ public class PointObFactory {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public static  double[] getBoundingBoxOneTime(FieldImpl pointObs)
+    public static double[] getBoundingBoxOneTime(FieldImpl pointObs)
             throws VisADException, RemoteException {
 
         double minX = Double.POSITIVE_INFINITY;

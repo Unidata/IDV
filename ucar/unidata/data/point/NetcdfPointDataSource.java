@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -234,7 +235,7 @@ public class NetcdfPointDataSource extends PointDataSource {
             sources = new ArrayList();
             sources.add(file);
         }
-        StringBuilder    buf     = new StringBuilder();
+        StringBuilder   buf     = new StringBuilder();
         PointObsDataset pods    = null;
         Exception       toThrow = new Exception("Datset is null");
         try {
@@ -257,6 +258,15 @@ public class NetcdfPointDataSource extends PointDataSource {
     }
 
 
+    /**
+     * Read a sample of the data. e.g., just the first ob
+     *
+     * @param dataChoice The data choice
+     *
+     * @return The first ob
+     *
+     * @throws Exception On badness
+     */
     protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
         return makeObs(dataChoice, null, null, true);
 
@@ -279,13 +289,25 @@ public class NetcdfPointDataSource extends PointDataSource {
         return makeObs(dataChoice, subset, bbox, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param subset _more_
+     * @param bbox _more_
+     * @param sample _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, boolean sample)
             throws Exception {
         Object id = dataChoice.getId();
-        String    source;
-        if(id instanceof Integer) {
-            source = (String)sources.get(((Integer)id).intValue());
+        String source;
+        if (id instanceof Integer) {
+            source = (String) sources.get(((Integer) id).intValue());
         } else {
             source = id.toString();
         }
@@ -293,7 +315,7 @@ public class NetcdfPointDataSource extends PointDataSource {
 
 
 
-        FieldImpl obs    = null;
+        FieldImpl obs = null;
         Trace.call1("NetcdfPointDatasource:makeObs");
         if (obs == null) {
             //TODO: We are nulling out the data set to fix a bug where we cannot
@@ -315,7 +337,7 @@ public class NetcdfPointDataSource extends PointDataSource {
             }
             */
             obs = PointObFactory.makePointObs(pods, getBinRoundTo(),
-                                              getBinWidth(), bbox,sample);
+                    getBinWidth(), bbox, sample);
             pods.close();
         }
         Trace.call2("NetcdfPointDatasource:makeObs");
@@ -332,15 +354,16 @@ public class NetcdfPointDataSource extends PointDataSource {
     public static void main(String[] args) {
         try {
             StringBuilder buf   = new StringBuilder();
-            int          cnt   = ((args.length > 1)
-                                  ? new Integer(args[1]).intValue()
-                                  : 1);
-            long         total = 0;
+            int           cnt   = ((args.length > 1)
+                                   ? new Integer(args[1]).intValue()
+                                   : 1);
+            long          total = 0;
             for (int i = 0; i < cnt; i++) {
                 long tt1 = System.currentTimeMillis();
                 PointObsDataset pods =
                     (PointObsDataset) TypedDatasetFactory.open(
-                        ucar.nc2.constants.FeatureType.POINT, args[0], null, buf);
+                        ucar.nc2.constants.FeatureType.POINT, args[0], null,
+                        buf);
                 long tt2 = System.currentTimeMillis();
                 if (pods == null) {
                     throw new BadDataException(

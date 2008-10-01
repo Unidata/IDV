@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -41,6 +42,9 @@ import ucar.unidata.util.WrapperException;
 
 import visad.*;
 
+import java.awt.*;
+import java.awt.event.*;
+
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
@@ -50,8 +54,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -64,9 +66,15 @@ import javax.swing.event.*;
  */
 public abstract class PointDataSource extends FilesDataSource {
 
+    /** dataselection property          */
     public static final String PROP_GRID_POINTSX = "prop.grid.pointsx";
+
+    /** dataselection property          */
     public static final String PROP_GRID_POINTSY = "prop.grid.pointsy";
-    public static final String PROP_GRID_NUMITERATIONS = "prop.grid.numiterations";
+
+    /** dataselection property          */
+    public static final String PROP_GRID_NUMITERATIONS =
+        "prop.grid.numiterations";
 
 
     /** station model name property */
@@ -109,13 +117,23 @@ public abstract class PointDataSource extends FilesDataSource {
     /** for properties dialog */
     private JComboBox widthCbx;
 
+    /** number of points along x for grid         */
     private int gridPointsX = 100;
+
+    /** number of points along y for grid         */
     private int gridPointsY = 100;
+
+    /** Number of barnes iterations       */
     private int numGridIterations = 1;
+
+    /** Do we make grid fields    */
     private boolean makeGridFields = true;
 
 
-    private JCheckBox  makeGridFieldsCbx;
+    /** For gui          */
+    private JCheckBox makeGridFieldsCbx;
+
+    /** For gui         */
     private GridParameters gridProperties;
 
     /**
@@ -182,60 +200,117 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
 
+    /**
+     * Class GridParameters holds the grid spacing/iterations gui. Used for hte field selector
+     * and the properties
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private class GridParameters extends DataSelectionComponent {
+
+        /** gui component         */
         private JCheckBox useDefaultCbx = new JCheckBox("Use Default", true);
+
+        /** gui component         */
         private JTextField gridPointsXFld;
+
+        /** gui component         */
         private JTextField gridPointsYFld;
+
+        /** gui component         */
         private JTextField numGridIterationsFld;
+
+        /** The list of components      */
         private List comps = new ArrayList();
+
+        /** The main component      */
         private JComponent comp;
 
+        /**
+         * ctor
+         */
         public GridParameters() {
             super("Grid Parameters");
-            gridPointsXFld=new JTextField(""+gridPointsX,3);
-            gridPointsYFld=new JTextField(""+gridPointsY,3);
-            numGridIterationsFld=new JTextField(""+numGridIterations,3);
+            gridPointsXFld       = new JTextField("" + gridPointsX, 3);
+            gridPointsYFld       = new JTextField("" + gridPointsY, 3);
+            numGridIterationsFld = new JTextField("" + numGridIterations, 3);
             comps.add(GuiUtils.rLabel("Grid Size:"));
-            comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "), gridPointsXFld,
-                                                  new JLabel("  Y: "), gridPointsYFld)));
+            comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
+                    gridPointsXFld, new JLabel("  Y: "), gridPointsYFld)));
             comps.add(GuiUtils.rLabel("Iterations:"));
             comps.add(GuiUtils.left(numGridIterationsFld));
             useDefaultCbx.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        checkEnable();
-                    }});
+                public void actionPerformed(ActionEvent ae) {
+                    checkEnable();
+                }
+            });
         }
-        
 
+
+        /**
+         * enable/disable the component based on the useDefaultCbx value
+         */
         public void checkEnable() {
-            GuiUtils.enableTree(comp,!useDefaultCbx.isSelected());
+            GuiUtils.enableTree(comp, !useDefaultCbx.isSelected());
         }
+
+        /**
+         * Make the gui for the field selector
+         *
+         * @return gui for field selector
+         */
         protected JComponent doMakeContents() {
             GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-            comp = GuiUtils.doLayout(comps,2, GuiUtils.WT_N, GuiUtils.WT_N);
+            comp = GuiUtils.doLayout(comps, 2, GuiUtils.WT_N, GuiUtils.WT_N);
             checkEnable();
             return GuiUtils.topCenter(GuiUtils.right(useDefaultCbx),
                                       GuiUtils.topLeft(comp));
         }
-    
 
+
+        /**
+         * set properties on dataselection
+         *
+         * @param dataSelection the dataselection
+         */
         public void applyToDataSelection(DataSelection dataSelection) {
-            if(!useDefaultCbx.isSelected()) {
-                dataSelection.putProperty(PROP_GRID_POINTSX, new Integer(getGridPointsX()));
-                dataSelection.putProperty(PROP_GRID_POINTSY, new Integer(getGridPointsY()));
-                dataSelection.putProperty(PROP_GRID_NUMITERATIONS, new Integer(getNumGridIterations()));
+            if ( !useDefaultCbx.isSelected()) {
+                dataSelection.putProperty(PROP_GRID_POINTSX,
+                                          new Integer(getGridPointsX()));
+                dataSelection.putProperty(PROP_GRID_POINTSY,
+                                          new Integer(getGridPointsY()));
+                dataSelection.putProperty(
+                    PROP_GRID_NUMITERATIONS,
+                    new Integer(getNumGridIterations()));
             }
         }
 
+        /**
+         * get grid x
+         *
+         * @return grid x
+         */
         public int getGridPointsX() {
             return GuiUtils.getInt(gridPointsXFld);
         }
 
+        /**
+         * get grid y
+         *
+         * @return grid y
+         */
         public int getGridPointsY() {
             return GuiUtils.getInt(gridPointsYFld);
         }
 
-       public int getNumGridIterations() {
+        /**
+         * get iterations
+         *
+         * @return iterations
+         */
+        public int getNumGridIterations() {
             return GuiUtils.getInt(numGridIterationsFld);
         }
 
@@ -243,21 +318,29 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
+    /**
+     * Add the GridParameters for the field selector
+     *
+     * @param components comps
+     * @param dataChoice for this data
+     */
     protected void initDataSelectionComponents(
             List<DataSelectionComponent> components,
             final DataChoice dataChoice) {
 
-        if(!(dataChoice.getId() instanceof List)) return;
+        if ( !(dataChoice.getId() instanceof List)) {
+            return;
+        }
         components.add(new GridParameters());
     }
 
 
     /**
-     * _more_
+     * not sure what this does
      *
-     * @param dataChoice _more_
+     * @param dataChoice datachoice_
      *
-     * @return _more_
+     * @return false
      */
     public boolean canAddCurrentName(DataChoice dataChoice) {
         return false;
@@ -325,16 +408,23 @@ public abstract class PointDataSource extends FilesDataSource {
 
     }
 
+    /**
+     * Add the Grid Fields component to the properties tab
+     *
+     * @param tabbedPane properties tab
+     */
     public void addPropertiesTabs(JTabbedPane tabbedPane) {
         super.addPropertiesTabs(tabbedPane);
         List comps = new ArrayList();
-        gridProperties = new GridParameters();
-        makeGridFieldsCbx = new JCheckBox("Make Grid Fields",makeGridFields);
+        gridProperties    = new GridParameters();
+        makeGridFieldsCbx = new JCheckBox("Make Grid Fields", makeGridFields);
         comps.add(GuiUtils.filler());
         comps.add(GuiUtils.left(makeGridFieldsCbx));
         comps.addAll(gridProperties.comps);
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        tabbedPane.addTab("Objective Analysis", GuiUtils.topLeft(GuiUtils.doLayout(comps,2, GuiUtils.WT_NN,GuiUtils.WT_N)));
+        tabbedPane.addTab("Objective Analysis",
+                          GuiUtils.topLeft(GuiUtils.doLayout(comps, 2,
+                              GuiUtils.WT_NN, GuiUtils.WT_N)));
     }
 
 
@@ -378,31 +468,32 @@ public abstract class PointDataSource extends FilesDataSource {
             return false;
         }
         boolean changed = false;
-        String what = "";
+        String  what    = "";
         try {
             what = "Bad bin value";
             changed |= (binRoundToField.getTime() != binRoundTo)
-                || (binWidth != binWidthField.getTime());
+                       || (binWidth != binWidthField.getTime());
             binRoundTo = binRoundToField.getTime();
             binWidth   = binWidthField.getTime();
 
-            what = "Bad grid points X value";
-            changed |=  (gridPointsX != gridProperties.getGridPointsX());
-            what = "Bad grid points Y value";
-            changed |=  (gridPointsY != gridProperties.getGridPointsY());
-            what = "Bad grid iterations value";
-            changed |=  (numGridIterations != gridProperties.getNumGridIterations());
+            what       = "Bad grid points X value";
+            changed    |= (gridPointsX != gridProperties.getGridPointsX());
+            what       = "Bad grid points Y value";
+            changed    |= (gridPointsY != gridProperties.getGridPointsY());
+            what       = "Bad grid iterations value";
+            changed |= (numGridIterations
+                        != gridProperties.getNumGridIterations());
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage(what);
             return false;
         }
 
-        gridPointsX = gridProperties.getGridPointsX();
-        gridPointsY = gridProperties.getGridPointsY();
-        numGridIterations=gridProperties.getNumGridIterations();
-        if(makeGridFields!=makeGridFieldsCbx.isSelected()) {
+        gridPointsX       = gridProperties.getGridPointsX();
+        gridPointsY       = gridProperties.getGridPointsY();
+        numGridIterations = gridProperties.getNumGridIterations();
+        if (makeGridFields != makeGridFieldsCbx.isSelected()) {
             makeGridFields = makeGridFieldsCbx.isSelected();
-            dataChoices = null;
+            dataChoices    = null;
             getDataChoices();
             getDataContext().dataSourceChanged(this);
         }
@@ -418,13 +509,13 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
     /**
-     * _more_
+     * Read a sample of the data. e.g., just the first ob
      *
-     * @param dataChoice _more_
+     * @param dataChoice The data choice
      *
-     * @return _more_
+     * @return The first ob
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
         return null;
@@ -478,7 +569,9 @@ public abstract class PointDataSource extends FilesDataSource {
                 addDataChoice(choice);
             }
             try {
-                FieldImpl sample = (makeGridFields?getSample(choice):null);
+                FieldImpl sample = (makeGridFields
+                                    ? getSample(choice)
+                                    : null);
                 if (sample != null) {
                     if (ucar.unidata.data.grid.GridUtil.isTimeSequence(
                             sample)) {
@@ -575,19 +668,6 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
-    protected Object xxxcreateCacheKey(DataChoice dataChoice,
-                                    DataSelection dataSelection,
-                                    Hashtable requestProperties) {
-        Object id = dataChoice.getId();
-        //If it is a list then we are doing a grid field and we don't cache
-        if (id instanceof List) {
-            return null;
-        }
-        return createCacheKey(dataChoice, dataSelection, requestProperties);
-    }
-
-
-
 
     /**
      * Get the data represented by this class.  Calls makeObs, real work
@@ -616,30 +696,37 @@ public abstract class PointDataSource extends FilesDataSource {
                                     dataChoice.getCategories(),
                                     dataChoice.getProperties());
             FieldImpl pointObs = (FieldImpl) getDataInner(choice, category,
-                                       dataSelection, requestProperties);
+                                     dataSelection, requestProperties);
             if (pointObs == null) {
                 return null;
             }
             //{ minY, minX, maxY, maxX };
-            int pointsX = this.gridPointsX;
-            int pointsY = this.gridPointsY;
-            int iterations = this.numGridIterations;
+            int     pointsX    = this.gridPointsX;
+            int     pointsY    = this.gridPointsY;
+            int     iterations = this.numGridIterations;
             Integer tmp;
             tmp = (Integer) dataSelection.getProperty(PROP_GRID_POINTSX);
-            if(tmp!=null) pointsX = tmp.intValue();
-            tmp= (Integer) dataSelection.getProperty(PROP_GRID_POINTSY);
-            if(tmp!=null) pointsY = tmp.intValue();
-            tmp = (Integer) dataSelection.getProperty(PROP_GRID_NUMITERATIONS);
-            if(tmp!=null) iterations = tmp.intValue();
-            pointObs =
-                PointObFactory.makeTimeSequenceOfPointObs(pointObs);
+            if (tmp != null) {
+                pointsX = tmp.intValue();
+            }
+            tmp = (Integer) dataSelection.getProperty(PROP_GRID_POINTSY);
+            if (tmp != null) {
+                pointsY = tmp.intValue();
+            }
+            tmp = (Integer) dataSelection.getProperty(
+                PROP_GRID_NUMITERATIONS);
+            if (tmp != null) {
+                iterations = tmp.intValue();
+            }
+            pointObs = PointObFactory.makeTimeSequenceOfPointObs(pointObs);
             //            System.err.println("spacing:" + pointsX +" " + pointsY);
 
-            double[] bbox = PointObFactory.getBoundingBox(pointObs);
-            float spanY = (float)Math.abs(bbox[0]-bbox[2]);
-            float spanX = (float)Math.abs(bbox[1]-bbox[3]);
+            double[] bbox  = PointObFactory.getBoundingBox(pointObs);
+            float    spanY = (float) Math.abs(bbox[0] - bbox[2]);
+            float    spanX = (float) Math.abs(bbox[1] - bbox[3]);
             LogUtil.message("Doing Barnes Analysis");
-            return PointObFactory.barnes(pointObs, type, spanX/pointsX, spanY/pointsY, iterations);
+            return PointObFactory.barnes(pointObs, type, spanX / pointsX,
+                                         spanY / pointsY, iterations);
         }
 
 
@@ -691,8 +778,7 @@ public abstract class PointDataSource extends FilesDataSource {
      *
      * @param dataChoices base list of choices
      */
-    protected void makeDerivedDataChoices(List dataChoices) {
-    }
+    protected void makeDerivedDataChoices(List dataChoices) {}
 
     /**
      * Override the base class method to add on the listing of the
@@ -849,76 +935,76 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
     /**
-       Set the GridPointsX property.
-
-       @param value The new value for GridPointsX
-    **/
-    public void setGridPointsX (int value) {
-	gridPointsX = value;
+     *  Set the GridPointsX property.
+     *
+     *  @param value The new value for GridPointsX
+     */
+    public void setGridPointsX(int value) {
+        gridPointsX = value;
     }
 
     /**
-       Get the GridPointsX property.
-
-       @return The GridPointsX
-    **/
-    public int getGridPointsX () {
-	return gridPointsX;
+     *  Get the GridPointsX property.
+     *
+     *  @return The GridPointsX
+     */
+    public int getGridPointsX() {
+        return gridPointsX;
     }
 
     /**
-       Set the GridPointsY property.
-
-       @param value The new value for GridPointsY
-    **/
-    public void setGridPointsY (int value) {
-	gridPointsY = value;
+     *  Set the GridPointsY property.
+     *
+     *  @param value The new value for GridPointsY
+     */
+    public void setGridPointsY(int value) {
+        gridPointsY = value;
     }
 
     /**
-       Get the GridPointsY property.
-
-       @return The GridPointsY
-    **/
-    public int getGridPointsY () {
-	return gridPointsY;
+     *  Get the GridPointsY property.
+     *
+     *  @return The GridPointsY
+     */
+    public int getGridPointsY() {
+        return gridPointsY;
     }
 
     /**
-       Set the NumGridIterations property.
-
-       @param value The new value for NumGridIterations
-    **/
-    public void setNumGridIterations (int value) {
-	numGridIterations = value;
+     *  Set the NumGridIterations property.
+     *
+     *  @param value The new value for NumGridIterations
+     */
+    public void setNumGridIterations(int value) {
+        numGridIterations = value;
     }
 
     /**
-       Get the NumGridIterations property.
-
-       @return The NumGridIterations
-    **/
-    public int getNumGridIterations () {
-	return numGridIterations;
+     *  Get the NumGridIterations property.
+     *
+     *  @return The NumGridIterations
+     */
+    public int getNumGridIterations() {
+        return numGridIterations;
     }
 
-/**
-Set the MakeGridFields property.
+    /**
+     * Set the MakeGridFields property.
+     *
+     * @param value The new value for MakeGridFields
+     */
+    public void setMakeGridFields(boolean value) {
+        makeGridFields = value;
+    }
 
-@param value The new value for MakeGridFields
-**/
-public void setMakeGridFields (boolean value) {
-	makeGridFields = value;
-}
-
-/**
-Get the MakeGridFields property.
-
-@return The MakeGridFields
-**/
-public boolean getMakeGridFields () {
-	return makeGridFields;
-}
+    /**
+     * Get the MakeGridFields property.
+     *
+     * @return The MakeGridFields
+     */
+    public boolean getMakeGridFields() {
+        return makeGridFields;
+    }
 
 
 }
