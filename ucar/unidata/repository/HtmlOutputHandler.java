@@ -205,7 +205,7 @@ public class HtmlOutputHandler extends OutputHandler {
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
+                              false);
         StringBuffer sb = new StringBuffer();
         sb.append(crumbs[1]);
 
@@ -722,7 +722,7 @@ public class HtmlOutputHandler extends OutputHandler {
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
             sb.append("<li>");
-            String groupLink = getAjaxLink(request, subGroup);
+            String groupLink = getRepository().getAjaxLink(request, subGroup);
             sb.append(groupLink);
             sb.append(
                 "<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
@@ -731,7 +731,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         for (Entry entry : entries) {
             sb.append("<li>");
-            sb.append(getAjaxLink(request, entry));
+            sb.append(getRepository().getAjaxLink(request, entry));
         }
 
         if ((subGroups.size() == 0) && (entries.size() == 0)) {
@@ -824,7 +824,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if ( !group.isDummy()) {
             String[] crumbs = getRepository().getBreadCrumbs(request, group,
-                                  false, "");
+                                  false);
             title = crumbs[0];
             sb.append(crumbs[1]);
         } else {
@@ -920,7 +920,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 List<Metadata> metadataList =
                     getMetadataManager().getMetadata(subGroup);
                 groupsSB.append("<li>");
-                String groupLink = getAjaxLink(request, subGroup);
+                String groupLink = getRepository().getAjaxLink(request, subGroup);
                 groupsSB.append(groupLink);
                 groupsSB.append(
                     "<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id="

@@ -162,7 +162,7 @@ public class GraphOutputHandler extends OutputHandler {
                                   getRepository().encode(type));
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
+                              false);
 
         String title = crumbs[0];
         sb.append(crumbs[1]);

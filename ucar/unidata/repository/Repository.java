@@ -4778,7 +4778,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public String makeEntryHeader(Request request, Entry entry)
             throws Exception {
-        String crumbs = getBreadCrumbs(request, entry, false, BLANK)[1];
+        String crumbs = getBreadCrumbs(request, entry, false)[1];
         return crumbs;
     }
 
@@ -5475,12 +5475,131 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     public String[] getBreadCrumbs(Request request, Entry entry,
-                                   boolean makeLinkForLastGroup,
-                                   String extraArgs)
+                                   boolean makeLinkForLastGroup)
             throws Exception {
-        return getBreadCrumbs(request, entry, makeLinkForLastGroup,
-                              extraArgs, null);
+        return getBreadCrumbs(request, entry, makeLinkForLastGroup,null);
     }
+
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    protected String getEntryLink(Request request, Entry entry) {
+        return getEntryLink(request, entry, new ArrayList());
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
+    protected String getEntryLink(Request request, Entry entry, List args) {
+        return HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, entry, args),
+                             entry.getLabel());
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    protected String getAjaxLink(Request request, Entry entry) throws Exception {
+        return getAjaxLink(request, entry, entry.getLabel(), true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param linkText _more_
+     * @param includeIcon _more_
+     *
+     * @return _more_
+     */
+    protected String getAjaxLink(Request request, Entry entry,
+                                 String linkText, boolean includeIcon) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        String entryId = entry.getId();
+        if (includeIcon) {
+            boolean okToMove = !request.getUser().getAnonymous();
+            String  icon     = getRepository().getIconUrl(entry);
+            String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
+                                   + entry.getId() + "')");
+            String event = (entry.isGroup()
+                            ? HtmlUtil.onMouseClick("folderClick('"
+                                + entryId + "')")
+                            : "");
+
+            if (okToMove) {
+                event += (entry.isGroup()
+                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event," + HtmlUtil.squote(entryId)+")")
+                          : "") + HtmlUtil.onMouseOut(
+                                                      "mouseOutOnEntry(event," + 
+                                                      HtmlUtil.squote(entryId)+ ")") + 
+                    HtmlUtil.onMouseDown("mouseDownOnEntry(event," + HtmlUtil.squote(entryId)    + "," + 
+                                         HtmlUtil.squote(entry.getLabel().replace("'", ""))  + ");") + (entry.isGroup()
+                        ? dropEvent
+                        : "");
+            }
+
+
+            String img = HtmlUtil.img(icon, (entry.isGroup()
+                                             ? "Click to open group; "
+                                             : "") + (okToMove
+                    ? "Drag to move"
+                    : ""), " id=" + HtmlUtil.quote("img_" + entryId)
+                           + event);
+            if (entry.isGroup()) {
+                //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
+                sb.append(img);
+            } else {
+                sb.append(img);
+            }
+            sb.append(HtmlUtil.space(1));
+            getMetadataManager().decorateEntry(request, entry, sb,true);
+        }
+
+        String elementId = entry.getId();
+        String qid = HtmlUtil.squote(elementId);
+        String tooltipEvents =  HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid+ ");") + 
+            HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid+ ");") +
+            HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid+ ");");
+        sb.append(
+            HtmlUtil.href(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
+                linkText,
+                " id=" + HtmlUtil.quote(elementId) + " " +tooltipEvents));
+
+        if (includeIcon) {
+            //            getMetadataManager().decorateEntry(request, entry, sb,true);
+        }
+
+
+        return HtmlUtil.span(sb.toString(),
+                             " id="
+                             + HtmlUtil.quote("span_" + entry.getId()));
+    }
+
+
 
 
     /**
@@ -5498,7 +5617,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public String[] getBreadCrumbs(Request request, Entry entry,
                                    boolean makeLinkForLastGroup,
-                                   String extraArgs, Group stopAt)
+                                   Group stopAt)
             throws Exception {
         if (request == null) {
             request = new Request(this, "", new Hashtable());
@@ -5512,9 +5631,6 @@ public class Repository extends RepositoryBase implements Tables,
         Group  parent = findGroup(request, entry.getParentGroupId());
         OutputType output =  OutputHandler.OUTPUT_HTML;
         int length = 0;
-        if (extraArgs.length() > 0) {
-            extraArgs = "&" + extraArgs;
-        }
         while (parent != null) {
             if ((stopAt != null)
                     && parent.getFullName().equals(stopAt.getFullName())) {
@@ -5533,11 +5649,13 @@ public class Repository extends RepositoryBase implements Tables,
             titleList.add(0, name);
             String link;
             if (request != null) {
-                link = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, parent,
-                        ARG_OUTPUT, output.getId()) + extraArgs, name);
+                link =  getAjaxLink(request, parent, name, false);
+                //                link = HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, parent,
+                //                        ARG_OUTPUT, output.getId()), name);
             } else {
-                link = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW.toString(),
-                        ARG_OUTPUT, output.getId()) + extraArgs, name);
+                link =  getAjaxLink(request, parent, name, false);
+                //                link = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW.toString(),
+                //                        ARG_OUTPUT, output.getId()), name);
             }
             breadcrumbs.add(0, link);
             parent = findGroup(request, parent.getParentGroupId());
@@ -5630,12 +5748,17 @@ public class Repository extends RepositoryBase implements Tables,
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                    parent), name));
+            String link =  getAjaxLink(request, parent, name, false);
+            breadcrumbs.add(0, link);
+            //            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+            //                    parent), name));
             parent = findGroup(request, parent.getParentGroupId());
         }
-        breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
-                entry), entry.getLabel()));
+        breadcrumbs.add(getAjaxLink(request, entry, entry.getLabel(), false));
+        //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+        //                entry), entry.getLabel()));
+        //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW,
+        //                entry), entry.getLabel()));
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -7019,32 +7142,6 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    protected String getEntryLink(Request request, Entry entry) {
-        return getEntryLink(request, entry, new ArrayList());
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param args _more_
-     *
-     * @return _more_
-     */
-    protected String getEntryLink(Request request, Entry entry, List args) {
-        return HtmlUtil.href(request.entryUrl(URL_ENTRY_SHOW, entry, args),
-                             entry.getLabel());
-    }
 
 
     /**

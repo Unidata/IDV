@@ -494,9 +494,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
         StringBuffer sb = new StringBuffer();
-        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
-        sb.append(crumbs[1]);
+        sb.append(getRepository().makeEntryHeader(request, entry));
         if (request.get(ARG_ADDMETADATA, false)) {
             if (getRepository().getAccessManager().canDoAction(request,
                     entry, Permission.ACTION_EDIT)) {
@@ -709,10 +707,7 @@ public class DataOutputHandler extends OutputHandler {
             }
         }
 
-        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
-
-        sb.append(crumbs[1]);
+        sb.append(getRepository().makeEntryHeader(request, entry));
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
         String fileName = IOUtil.stripExtension(entry.getName())
                           + "_subset.nc";
@@ -904,10 +899,7 @@ public class DataOutputHandler extends OutputHandler {
         File            file = entry.getResource().getFile();
         PointObsDataset pod  = getPointDataset(file);
         StringBuffer    sb   = new StringBuffer();
-
-        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
-        sb.append(crumbs[1]);
+        sb.append(getRepository().makeEntryHeader(request, entry));
         synchronized (pod) {
             List         vars = pod.getDataVariables();
             int          skip = request.get(ARG_SKIP, 0);

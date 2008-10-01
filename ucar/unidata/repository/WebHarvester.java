@@ -380,8 +380,7 @@ public class WebHarvester extends Harvester {
                 if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
                 }
-                String crumbs = repository.getBreadCrumbs(null, entry, true,
-                                    "", null)[1];
+                String crumbs = getRepository().makeEntryHeader(null, entry);
                 crumbs = crumbs.replace("class=", "xclass=");
                 statusMessages.add(crumbs);
                 entryCnt++;

@@ -441,92 +441,6 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    protected String getAjaxLink(Request request, Entry entry) throws Exception {
-        return getAjaxLink(request, entry, entry.getLabel(), true);
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param linkText _more_
-     * @param includeIcon _more_
-     *
-     * @return _more_
-     */
-    protected String getAjaxLink(Request request, Entry entry,
-                                 String linkText, boolean includeIcon) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        String entryId = entry.getId();
-        if (includeIcon) {
-            boolean okToMove = !request.getUser().getAnonymous();
-            String  icon     = getRepository().getIconUrl(entry);
-            String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
-                                   + entry.getId() + "')");
-            String event = (entry.isGroup()
-                            ? HtmlUtil.onMouseClick("folderClick('"
-                                + entryId + "')")
-                            : "");
-
-            if (okToMove) {
-                event += (entry.isGroup()
-                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event," + HtmlUtil.squote(entryId)+")")
-                          : "") + HtmlUtil.onMouseOut(
-                                                      "mouseOutOnEntry(event," + 
-                                                      HtmlUtil.squote(entryId)+ ")") + 
-                    HtmlUtil.onMouseDown("mouseDownOnEntry(event," + HtmlUtil.squote(entryId)    + "," + 
-                                         HtmlUtil.squote(entry.getLabel().replace("'", ""))  + ");") + (entry.isGroup()
-                        ? dropEvent
-                        : "");
-            }
-
-
-            String img = HtmlUtil.img(icon, (entry.isGroup()
-                                             ? "Click to open group; "
-                                             : "") + (okToMove
-                    ? "Drag to move"
-                    : ""), " id=" + HtmlUtil.quote("img_" + entryId)
-                           + event);
-            if (entry.isGroup()) {
-                //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
-                sb.append(img);
-            } else {
-                sb.append(img);
-            }
-            sb.append(HtmlUtil.space(1));
-            getMetadataManager().decorateEntry(request, entry, sb,true);
-        }
-
-        String elementId = entry.getId();
-        String qid = HtmlUtil.squote(elementId);
-        String tooltipEvents =  HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid+ ");") + 
-            HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid+ ");") +
-            HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid+ ");");
-        sb.append(
-            HtmlUtil.href(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
-                linkText,
-                " id=" + HtmlUtil.quote(elementId) + " " +tooltipEvents));
-
-        if (includeIcon) {
-            //            getMetadataManager().decorateEntry(request, entry, sb,true);
-        }
-
-
-        return HtmlUtil.span(sb.toString(),
-                             " id="
-                             + HtmlUtil.quote("span_" + entry.getId()));
-    }
-
 
     protected static String getGroupSelect(Request request,String elementId) throws Exception {
         String event = "selectInitialClick(event," +HtmlUtil.squote(elementId) +")";
@@ -699,7 +613,7 @@ public class OutputHandler extends RepositoryManager {
 
                 sb.append(crumbs);
             } else {
-                sb.append(getAjaxLink(request, entry, entry.getLabel(),
+                sb.append(getRepository().getAjaxLink(request, entry, entry.getLabel(),
                                       true));
                 //                sb.append(getEntryLink(request, entry));
             }
@@ -716,7 +630,6 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-
     /**
      * _more_
      *
@@ -727,7 +640,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     protected String getEntryLink(Request request, Entry entry) throws Exception {
-        return getAjaxLink(request, entry, entry.getLabel(), false);
+        return getRepository().getAjaxLink(request, entry, entry.getLabel(), false);
     }
 
 

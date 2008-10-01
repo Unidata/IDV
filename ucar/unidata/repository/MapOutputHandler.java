@@ -145,7 +145,7 @@ public class MapOutputHandler extends OutputHandler {
         entriesToUse.add(entry);
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
+                              false);
         sb.append(crumbs[1]);
         getMap(request, entriesToUse, sb, 700, 500, true);
         return makeLinksResult(request, "Results", sb, new State(entry));
@@ -173,7 +173,7 @@ public class MapOutputHandler extends OutputHandler {
         entriesToUse.addAll(entries);
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, group,
-                              false, "");
+                              false);
         sb.append(crumbs[1]);
         if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");

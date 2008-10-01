@@ -348,8 +348,8 @@ public class CatalogHarvester extends Harvester {
                                           catalogUrlPath, "", ""));
 
             insertMetadata(group, metadataList);
-            String crumbs = repository.getBreadCrumbs(null, group, true, "",
-                                topGroup)[1];
+            String crumbs = repository.getBreadCrumbs(null, group, true, 
+                                                      topGroup)[1];
             crumbs = crumbs.replace("class=", "xclass=");
             groups.add(crumbs);
             groupCnt++;
