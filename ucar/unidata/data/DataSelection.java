@@ -315,9 +315,7 @@ public class DataSelection {
      * @return  the hash code
      */
     public int hashCode() {
-        return ((times != null)
-                ? times.hashCode()
-                : 1);
+        return Misc.hashcode(times) ^ Misc.hashcode(properties);
     }
 
 
@@ -337,6 +335,7 @@ public class DataSelection {
         }
         DataSelection that = (DataSelection) o;
         return Misc.equals(this.times, that.times)
+            && Misc.equals(this.properties, that.properties)
                && Misc.equals(this.geoSelection, that.geoSelection)
                && Misc.equals(this.fromLevel, that.fromLevel)
                && Misc.equals(this.toLevel, that.toLevel);
