@@ -50,7 +50,10 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -60,6 +63,11 @@ import javax.swing.*;
  * @version $Revision: 1.33 $ $Date: 2007/06/21 14:44:59 $
  */
 public abstract class PointDataSource extends FilesDataSource {
+
+    public static final String PROP_GRID_POINTSX = "prop.grid.pointsx";
+    public static final String PROP_GRID_POINTSY = "prop.grid.pointsy";
+    public static final String PROP_GRID_NUMITERATIONS = "prop.grid.numiterations";
+
 
     /** station model name property */
     public static final String PROP_STATIONMODELNAME =
@@ -107,10 +115,8 @@ public abstract class PointDataSource extends FilesDataSource {
     private boolean makeGridFields = true;
 
 
-    private JTextField gridPointsXFld;
-    private JTextField gridPointsYFld;
-    private JTextField numGridIterationsFld;
     private JCheckBox  makeGridFieldsCbx;
+    private GridParameters gridProperties;
 
     /**
      *
@@ -174,6 +180,76 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     protected void init() throws VisADException {}
 
+
+
+    private class GridParameters extends DataSelectionComponent {
+        private JCheckBox useDefaultCbx = new JCheckBox("Use Default", true);
+        private JTextField gridPointsXFld;
+        private JTextField gridPointsYFld;
+        private JTextField numGridIterationsFld;
+        private List comps = new ArrayList();
+        private JComponent comp;
+
+        public GridParameters() {
+            super("Grid Parameters");
+            gridPointsXFld=new JTextField(""+gridPointsX,3);
+            gridPointsYFld=new JTextField(""+gridPointsY,3);
+            numGridIterationsFld=new JTextField(""+numGridIterations,3);
+            comps.add(GuiUtils.rLabel("Grid Size:"));
+            comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "), gridPointsXFld,
+                                                  new JLabel("  Y: "), gridPointsYFld)));
+            comps.add(GuiUtils.rLabel("Iterations:"));
+            comps.add(GuiUtils.left(numGridIterationsFld));
+            useDefaultCbx.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        checkEnable();
+                    }});
+        }
+        
+
+        public void checkEnable() {
+            GuiUtils.enableTree(comp,!useDefaultCbx.isSelected());
+        }
+        protected JComponent doMakeContents() {
+            GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+            comp = GuiUtils.doLayout(comps,2, GuiUtils.WT_N, GuiUtils.WT_N);
+            checkEnable();
+            return GuiUtils.topCenter(GuiUtils.right(useDefaultCbx),
+                                      GuiUtils.topLeft(comp));
+        }
+    
+
+        public void applyToDataSelection(DataSelection dataSelection) {
+            if(!useDefaultCbx.isSelected()) {
+                dataSelection.putProperty(PROP_GRID_POINTSX, new Integer(getGridPointsX()));
+                dataSelection.putProperty(PROP_GRID_POINTSY, new Integer(getGridPointsY()));
+                dataSelection.putProperty(PROP_GRID_NUMITERATIONS, new Integer(getNumGridIterations()));
+            }
+        }
+
+        public int getGridPointsX() {
+            return GuiUtils.getInt(gridPointsXFld);
+        }
+
+        public int getGridPointsY() {
+            return GuiUtils.getInt(gridPointsYFld);
+        }
+
+       public int getNumGridIterations() {
+            return GuiUtils.getInt(numGridIterationsFld);
+        }
+
+
+    }
+
+
+    protected void initDataSelectionComponents(
+            List<DataSelectionComponent> components,
+            final DataChoice dataChoice) {
+
+        if(!(dataChoice.getId() instanceof List)) return;
+        components.add(new GridParameters());
+    }
 
 
     /**
@@ -247,20 +323,18 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
 
-        gridPointsXFld=new JTextField(""+gridPointsX,5);
-        gridPointsYFld=new JTextField(""+gridPointsY,5);
-        numGridIterationsFld=new JTextField(""+numGridIterations,5);
+    }
+
+    public void addPropertiesTabs(JTabbedPane tabbedPane) {
+        super.addPropertiesTabs(tabbedPane);
+        List comps = new ArrayList();
+        gridProperties = new GridParameters();
         makeGridFieldsCbx = new JCheckBox("Make Grid Fields",makeGridFields);
         comps.add(GuiUtils.filler());
-        comps.add(getPropertiesHeader("Grid Fields"));
-
-        comps.add(GuiUtils.rLabel(""));
         comps.add(GuiUtils.left(makeGridFieldsCbx));
-        comps.add(GuiUtils.rLabel("Grid Size:"));
-        comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "), gridPointsXFld,
-                                              new JLabel("  Y: "), gridPointsYFld)));
-        comps.add(GuiUtils.rLabel("Number of Iterations:"));
-        comps.add(GuiUtils.left(numGridIterationsFld));
+        comps.addAll(gridProperties.comps);
+        GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+        tabbedPane.addTab("Objective Analysis", GuiUtils.topLeft(GuiUtils.doLayout(comps,2, GuiUtils.WT_NN,GuiUtils.WT_N)));
     }
 
 
@@ -313,19 +387,19 @@ public abstract class PointDataSource extends FilesDataSource {
             binWidth   = binWidthField.getTime();
 
             what = "Bad grid points X value";
-            changed |=  (gridPointsX != GuiUtils.getInt(gridPointsXFld));
+            changed |=  (gridPointsX != gridProperties.getGridPointsX());
             what = "Bad grid points Y value";
-            changed |=  (gridPointsY != GuiUtils.getInt(gridPointsYFld));
+            changed |=  (gridPointsY != gridProperties.getGridPointsY());
             what = "Bad grid iterations value";
-            changed |=  (numGridIterations != GuiUtils.getInt(numGridIterationsFld));
+            changed |=  (numGridIterations != gridProperties.getNumGridIterations());
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage(what);
             return false;
         }
 
-        gridPointsX = GuiUtils.getInt(gridPointsXFld);
-        gridPointsY = GuiUtils.getInt(gridPointsYFld);
-        numGridIterations=GuiUtils.getInt(numGridIterationsFld);
+        gridPointsX = gridProperties.getGridPointsX();
+        gridPointsY = gridProperties.getGridPointsY();
+        numGridIterations=gridProperties.getNumGridIterations();
         if(makeGridFields!=makeGridFieldsCbx.isSelected()) {
             makeGridFields = makeGridFieldsCbx.isSelected();
             dataChoices = null;
@@ -513,6 +587,8 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
+
+
     /**
      * Get the data represented by this class.  Calls makeObs, real work
      * needs to be implemented there.
@@ -545,13 +621,25 @@ public abstract class PointDataSource extends FilesDataSource {
                 return null;
             }
             //{ minY, minX, maxY, maxX };
+            int pointsX = this.gridPointsX;
+            int pointsY = this.gridPointsY;
+            int iterations = this.numGridIterations;
+            Integer tmp;
+            tmp = (Integer) dataSelection.getProperty(PROP_GRID_POINTSX);
+            if(tmp!=null) pointsX = tmp.intValue();
+            tmp= (Integer) dataSelection.getProperty(PROP_GRID_POINTSY);
+            if(tmp!=null) pointsY = tmp.intValue();
+            tmp = (Integer) dataSelection.getProperty(PROP_GRID_NUMITERATIONS);
+            if(tmp!=null) iterations = tmp.intValue();
             pointObs =
                 PointObFactory.makeTimeSequenceOfPointObs(pointObs);
+            //            System.err.println("spacing:" + pointsX +" " + pointsY);
+
             double[] bbox = PointObFactory.getBoundingBox(pointObs);
             float spanY = (float)Math.abs(bbox[0]-bbox[2]);
             float spanX = (float)Math.abs(bbox[1]-bbox[3]);
             LogUtil.message("Doing Barnes Analysis");
-            return PointObFactory.barnes(pointObs, type, spanX/gridPointsX, spanY/gridPointsY, numGridIterations);
+            return PointObFactory.barnes(pointObs, type, spanX/pointsX, spanY/pointsY, iterations);
         }
 
 
