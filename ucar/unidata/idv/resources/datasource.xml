@@ -201,7 +201,7 @@
   <datasource
      id="FILE.AREAFILE"
      factory="ucar.unidata.data.imagery.McIDASImageDataSource"
-     patterns=".*AREA....$,.*\.gempak\.images\.sat.*,.*goes8.*,.*\.area$,.*Mcidas_MSG.*"
+     patterns=".*AREA....$,.*\.gempak\.images\.sat.*,.*goes8.*,.*\.area$,.*Mcidas_MSG.*,goes.*BAND_"
      doesmultiples="true"
      fileselection="true"
      label="McIDAS AREA files"></datasource>
