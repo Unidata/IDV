@@ -910,10 +910,10 @@ public class StationModelControl extends ObsDisplayControl {
                 int numTimes = timeSet.getLength();
                 for (int i = 0; i < numTimes; i++) {
                     FieldImpl oneTime = (FieldImpl) data.getSample(i);
-                    boxes.add(getBoundingBox(oneTime));
+                    boxes.add(PointObFactory.getBoundingBoxOneTime(oneTime));
                 }
             } else {
-                boxes.add(getBoundingBox(data));
+                boxes.add(PointObFactory.getBoundingBoxOneTime(data));
             }
 
             for (int i = 0; i < boxes.size(); i++) {
@@ -935,50 +935,6 @@ public class StationModelControl extends ObsDisplayControl {
         }
     }
 
-
-    /**
-     * Get the bounding box of the given obs
-     *
-     * @param pointObs the obs
-     *
-     * @return bbox
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
-    private double[] getBoundingBox(FieldImpl pointObs)
-            throws VisADException, RemoteException {
-
-        double minX = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
-
-
-        if ( !pointObs.isMissing()) {
-            Set domainSet = pointObs.getDomainSet();
-            int numObs    = domainSet.getLength();
-            for (int i = 0; i < numObs; i++) {
-                PointOb     ob  = (PointOb) pointObs.getSample(i);
-                LatLonPoint llp = ob.getEarthLocation().getLatLonPoint();
-                double lat = llp.getLatitude().getValue(CommonUnit.degree);
-                double lon = llp.getLongitude().getValue(CommonUnit.degree);
-                if ((lat == lat) && (lon == lon)) {
-                    if (Math.abs(lat) <= 90) {
-                        minY = Math.min(minY, lat);
-                        maxY = Math.max(maxY, lat);
-                    }
-                    if (Math.abs(lon) <= 180) {
-                        minX = Math.min(minX, lon);
-                        maxX = Math.max(maxX, lon);
-                    }
-                }
-
-            }
-        }
-        double[] bbox = { minY, minX, maxY, maxX };
-        return bbox;
-    }
 
 
 
