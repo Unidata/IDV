@@ -101,6 +101,16 @@ public abstract class PointDataSource extends FilesDataSource {
     /** for properties dialog */
     private JComboBox widthCbx;
 
+    private int gridPointsX = 100;
+    private int gridPointsY = 100;
+    private int numGridIterations = 1;
+    private boolean makeGridFields = true;
+
+
+    private JTextField gridPointsXFld;
+    private JTextField gridPointsYFld;
+    private JTextField numGridIterationsFld;
+    private JCheckBox  makeGridFieldsCbx;
 
     /**
      *
@@ -221,10 +231,9 @@ public abstract class PointDataSource extends FilesDataSource {
         });
 
 
+
         widthCbx = GuiUtils.makeComboBox(widthItems, widthItems.get(0),
                                          false, this, "setWidthFromComboBox");
-
-
 
         comps.add(GuiUtils.filler());
         comps.add(getPropertiesHeader("Time Binning"));
@@ -237,6 +246,21 @@ public abstract class PointDataSource extends FilesDataSource {
                 roundToCbx, 5)));
 
 
+
+        gridPointsXFld=new JTextField(""+gridPointsX,5);
+        gridPointsYFld=new JTextField(""+gridPointsY,5);
+        numGridIterationsFld=new JTextField(""+numGridIterations,5);
+        makeGridFieldsCbx = new JCheckBox("Make Grid Fields",makeGridFields);
+        comps.add(GuiUtils.filler());
+        comps.add(getPropertiesHeader("Grid Fields"));
+
+        comps.add(GuiUtils.rLabel(""));
+        comps.add(GuiUtils.left(makeGridFieldsCbx));
+        comps.add(GuiUtils.rLabel("Grid Size:"));
+        comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "), gridPointsXFld,
+                                              new JLabel("  Y: "), gridPointsYFld)));
+        comps.add(GuiUtils.rLabel("Number of Iterations:"));
+        comps.add(GuiUtils.left(numGridIterationsFld));
     }
 
 
@@ -279,21 +303,43 @@ public abstract class PointDataSource extends FilesDataSource {
         if ( !super.applyProperties()) {
             return false;
         }
+        boolean changed = false;
+        String what = "";
         try {
-            boolean changed = (binRoundToField.getTime() != binRoundTo)
-                              || (binWidth != binWidthField.getTime());
+            what = "Bad bin value";
+            changed |= (binRoundToField.getTime() != binRoundTo)
+                || (binWidth != binWidthField.getTime());
             binRoundTo = binRoundToField.getTime();
             binWidth   = binWidthField.getTime();
-            if (changed) {
-                flushCache();
-            }
+
+            what = "Bad grid points X value";
+            changed |=  (gridPointsX != GuiUtils.getInt(gridPointsXFld));
+            what = "Bad grid points Y value";
+            changed |=  (gridPointsY != GuiUtils.getInt(gridPointsYFld));
+            what = "Bad grid iterations value";
+            changed |=  (numGridIterations != GuiUtils.getInt(numGridIterationsFld));
         } catch (NumberFormatException nfe) {
-            LogUtil.userErrorMessage("Bad bin value");
+            LogUtil.userErrorMessage(what);
             return false;
+        }
+
+        gridPointsX = GuiUtils.getInt(gridPointsXFld);
+        gridPointsY = GuiUtils.getInt(gridPointsYFld);
+        numGridIterations=GuiUtils.getInt(numGridIterationsFld);
+        if(makeGridFields!=makeGridFieldsCbx.isSelected()) {
+            makeGridFields = makeGridFieldsCbx.isSelected();
+            dataChoices = null;
+            getDataChoices();
+            getDataContext().dataSourceChanged(this);
+        }
+
+        if (changed) {
+            flushCache();
         }
 
         return true;
     }
+
 
 
 
@@ -358,7 +404,7 @@ public abstract class PointDataSource extends FilesDataSource {
                 addDataChoice(choice);
             }
             try {
-                FieldImpl sample = getSample(choice);
+                FieldImpl sample = (makeGridFields?getSample(choice):null);
                 if (sample != null) {
                     if (ucar.unidata.data.grid.GridUtil.isTimeSequence(
                             sample)) {
@@ -455,6 +501,18 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
+    protected Object xxxcreateCacheKey(DataChoice dataChoice,
+                                    DataSelection dataSelection,
+                                    Hashtable requestProperties) {
+        Object id = dataChoice.getId();
+        //If it is a list then we are doing a grid field and we don't cache
+        if (id instanceof List) {
+            return null;
+        }
+        return createCacheKey(dataChoice, dataSelection, requestProperties);
+    }
+
+
     /**
      * Get the data represented by this class.  Calls makeObs, real work
      * needs to be implemented there.
@@ -481,15 +539,19 @@ public abstract class PointDataSource extends FilesDataSource {
             DataChoice choice = new DirectDataChoice(this, i, "", "",
                                     dataChoice.getCategories(),
                                     dataChoice.getProperties());
-            FieldImpl pointField = (FieldImpl) getDataInner(choice, category,
+            FieldImpl pointObs = (FieldImpl) getDataInner(choice, category,
                                        dataSelection, requestProperties);
-            if (pointField == null) {
+            if (pointObs == null) {
                 return null;
             }
-            pointField =
-                PointObFactory.makeTimeSequenceOfPointObs(pointField);
-
-            return PointObFactory.barnes(pointField, type, 10, 10, 1);
+            //{ minY, minX, maxY, maxX };
+            pointObs =
+                PointObFactory.makeTimeSequenceOfPointObs(pointObs);
+            double[] bbox = PointObFactory.getBoundingBox(pointObs);
+            float spanY = (float)Math.abs(bbox[0]-bbox[2]);
+            float spanX = (float)Math.abs(bbox[1]-bbox[3]);
+            LogUtil.message("Doing Barnes Analysis");
+            return PointObFactory.barnes(pointObs, type, spanX/gridPointsX, spanY/gridPointsY, numGridIterations);
         }
 
 
@@ -533,6 +595,15 @@ public abstract class PointDataSource extends FilesDataSource {
             logException("Creating obs", exc);
         }
         return retField;
+    }
+
+
+    /**
+     * Override this method so we don't make any derived data choices from the grid fields
+     *
+     * @param dataChoices base list of choices
+     */
+    protected void makeDerivedDataChoices(List dataChoices) {
     }
 
     /**
@@ -688,6 +759,78 @@ public abstract class PointDataSource extends FilesDataSource {
     public double getBinRoundTo() {
         return binRoundTo;
     }
+
+    /**
+       Set the GridPointsX property.
+
+       @param value The new value for GridPointsX
+    **/
+    public void setGridPointsX (int value) {
+	gridPointsX = value;
+    }
+
+    /**
+       Get the GridPointsX property.
+
+       @return The GridPointsX
+    **/
+    public int getGridPointsX () {
+	return gridPointsX;
+    }
+
+    /**
+       Set the GridPointsY property.
+
+       @param value The new value for GridPointsY
+    **/
+    public void setGridPointsY (int value) {
+	gridPointsY = value;
+    }
+
+    /**
+       Get the GridPointsY property.
+
+       @return The GridPointsY
+    **/
+    public int getGridPointsY () {
+	return gridPointsY;
+    }
+
+    /**
+       Set the NumGridIterations property.
+
+       @param value The new value for NumGridIterations
+    **/
+    public void setNumGridIterations (int value) {
+	numGridIterations = value;
+    }
+
+    /**
+       Get the NumGridIterations property.
+
+       @return The NumGridIterations
+    **/
+    public int getNumGridIterations () {
+	return numGridIterations;
+    }
+
+/**
+Set the MakeGridFields property.
+
+@param value The new value for MakeGridFields
+**/
+public void setMakeGridFields (boolean value) {
+	makeGridFields = value;
+}
+
+/**
+Get the MakeGridFields property.
+
+@return The MakeGridFields
+**/
+public boolean getMakeGridFields () {
+	return makeGridFields;
+}
 
 
 }

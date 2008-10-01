@@ -1220,6 +1220,7 @@ public class PointObFactory {
                                    int numPasses)
             throws VisADException, RemoteException {
         FieldImpl retFI = null;
+        //        System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);
         if (GridUtil.isTimeSequence(pointObs)) {
             Set timeSet = GridUtil.getTimeSet(pointObs);
             for (int i = 0; i < timeSet.getLength(); i++) {
@@ -1446,6 +1447,91 @@ public class PointObFactory {
         }
         return subset;
     }
+
+
+    /**
+     * Get the bounding box of the given obs
+     *
+     * @param pointObs the obs
+     *
+     * @return bbox of the given time field-  { minY, minX, maxY, maxX };
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static  double[] getBoundingBox(FieldImpl pointObs)
+            throws VisADException, RemoteException {
+            boolean isTimeSequence = GridUtil.isTimeSequence(pointObs);
+            if (isTimeSequence) {
+                double[] bbox = null;
+                Set timeSet  = pointObs.getDomainSet();
+                int numTimes = timeSet.getLength();
+                for (int i = 0; i < numTimes; i++) {
+                    FieldImpl oneTime = (FieldImpl) pointObs.getSample(i);
+                    //{ minY, minX, maxY, maxX };
+                    double[] tmp =PointObFactory.getBoundingBoxOneTime(oneTime);
+                    if(bbox==null) bbox=tmp;
+                    else {
+                        bbox[0] = Math.min(bbox[0], tmp[0]);
+                        bbox[1] = Math.min(bbox[1], tmp[1]);
+                        bbox[2] = Math.max(bbox[0], tmp[2]);
+                        bbox[3] = Math.max(bbox[1], tmp[3]);
+                    }
+                }
+                return bbox;
+            } else {
+                return PointObFactory.getBoundingBoxOneTime(pointObs);
+            }
+    }
+
+
+    /**
+     * Get the bounding box of the given obs
+     *
+     * @param pointObs the obs
+     *
+     * @return bbox of the given time field-  { minY, minX, maxY, maxX };
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static  double[] getBoundingBoxOneTime(FieldImpl pointObs)
+            throws VisADException, RemoteException {
+
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+
+
+        if ( !pointObs.isMissing()) {
+            Set domainSet = pointObs.getDomainSet();
+            int numObs    = domainSet.getLength();
+            for (int i = 0; i < numObs; i++) {
+                PointOb     ob  = (PointOb) pointObs.getSample(i);
+                LatLonPoint llp = ob.getEarthLocation().getLatLonPoint();
+                double lat = llp.getLatitude().getValue(CommonUnit.degree);
+                double lon = llp.getLongitude().getValue(CommonUnit.degree);
+                if ((lat == lat) && (lon == lon)) {
+                    if (Math.abs(lat) <= 90) {
+                        minY = Math.min(minY, lat);
+                        maxY = Math.max(maxY, lat);
+                    }
+                    if (Math.abs(lon) <= 180) {
+                        minX = Math.min(minX, lon);
+                        maxX = Math.max(maxX, lon);
+                    }
+                }
+
+            }
+        }
+        double[] bbox = { minY, minX, maxY, maxX };
+        return bbox;
+    }
+
+
+
+
 
     /**
      * main

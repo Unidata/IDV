@@ -2061,13 +2061,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         DataSelection selection = DataSelection.merge(incomingDataSelection,
                                       getDataSelection());
-        List cacheKey = Misc.newList(createCacheKey(dataChoice, selection,
-                            requestProperties));
+        Object baseCacheKey = createCacheKey(dataChoice, selection,
+                                             requestProperties);
+        List cacheKey = (baseCacheKey!=null?Misc.newList(baseCacheKey):null);
 
         if (requestProperties != null) {
             Hashtable newProperties = (Hashtable) requestProperties.clone();
             newProperties.remove(DataChoice.PROP_REQUESTER);
-            if (newProperties.size() > 0) {
+            if (cacheKey!=null && newProperties.size() > 0) {
                 cacheKey.add(newProperties.toString());
             }
         }
@@ -2081,7 +2082,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
          */
 
 
-        Data cachedData = (Data) getCache(cacheKey);
+        Data cachedData = (cacheKey!=null?(Data) getCache(cacheKey):null);
         if (cachedData == null) {
             outstandingGetDataCalls++;
             try {
@@ -2095,7 +2096,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             } finally {
                 outstandingGetDataCalls--;
             }
-            if ((cachedData != null) && shouldCache(cachedData)) {
+            if (cacheKey!=null && cachedData != null && shouldCache(cachedData)) {
                 putCache(cacheKey, cachedData);
             }
         } else {}

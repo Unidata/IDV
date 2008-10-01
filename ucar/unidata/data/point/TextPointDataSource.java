@@ -741,8 +741,12 @@ public class TextPointDataSource extends PointDataSource {
         if ( !metaDataOk && (map == null)) {
             try {
                 DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
-                Data sample = makeObs(dataChoice, null, null, null, true,
-                                      false);
+                if(!getMakeGridFields()) {
+                    //If we are making grid fields then this has already been called
+                    //If not then call it here so we check on the header
+                    Data sample = makeObs(dataChoice, null, null, null, true,
+                                          false);
+                }
             } catch (Exception exc) {}
         }
 
