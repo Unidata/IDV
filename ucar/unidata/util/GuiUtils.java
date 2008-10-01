@@ -6054,6 +6054,11 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    public static int getInt(JTextField fld) {
+        return new Integer(fld.getText().trim()).intValue();
+    }
+
+
 
 }
 
