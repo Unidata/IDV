@@ -765,6 +765,10 @@ public class HtmlUtil {
         return "<form method=\"post\" action=\"" + url + "\">";
     }
 
+    public static String formPost(String url, String extra) {
+        return "<form method=\"post\" action=\"" + url + "\"" + " " + extra+">";
+    }
+
 
     /**
      * _more_
