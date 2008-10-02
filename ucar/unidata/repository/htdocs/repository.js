@@ -360,10 +360,10 @@ function Tooltip () {
 
     this.getX = function(link,eventX) {
         if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
-            return eventX-5;
+            return eventX-15;
             return util.getLeft(link.obj);
         } else {
-            return 20;
+            return eventX+20;
         }
     }
 
