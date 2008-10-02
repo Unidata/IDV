@@ -515,9 +515,6 @@ public abstract class PointDataSource extends FilesDataSource {
      * @return ok to create grid
      */
     protected boolean canCreateGrid(RealType type) {
-        if (type.getDefaultUnit() == null) {
-            return false;
-        }
         return true;
     }
 
@@ -630,10 +627,7 @@ public abstract class PointDataSource extends FilesDataSource {
             } catch (Exception exc) {
                 throw new WrapperException("Making grid parameters", exc);
             }
-
-
         }
-
     }
 
 
