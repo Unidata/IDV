@@ -20,7 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.point;
+
 
 import edu.wisc.ssec.mcidas.adde.AddePointURL;
 
@@ -101,8 +103,8 @@ public class AddePointDataSource extends PointDataSource {
             throws VisADException {
         super(descriptor, source, (properties != null)
                                   ? (String) properties
-                                      .get(ucar.unidata.idv.chooser.adde.AddeChooser
-                                          .DATASET_NAME_KEY)
+                                      .get(ucar.unidata.idv.chooser.adde
+                                          .AddeChooser.DATASET_NAME_KEY)
                                   : "Adde Point Data", properties);
         setName(getDescription());
     }
@@ -118,8 +120,9 @@ public class AddePointDataSource extends PointDataSource {
     public String getDataName() {
 
         String dataName =
-            (String) getProperty(ucar.unidata.idv.chooser.adde.AddeChooser.DATA_NAME_KEY,
-                                 STATION_DATA);
+            (String) getProperty(
+                ucar.unidata.idv.chooser.adde.AddeChooser.DATA_NAME_KEY,
+                STATION_DATA);
         if (dataName.equals("")) {
             dataName = super.getDataName();
         }
@@ -181,7 +184,7 @@ public class AddePointDataSource extends PointDataSource {
      */
     private String processUrl(String source, DataSelection subset,
                               LatLonRect bbox) {
-        return processUrl(source,subset,bbox, false);
+        return processUrl(source, subset, bbox, false);
     }
 
     /**
@@ -198,7 +201,7 @@ public class AddePointDataSource extends PointDataSource {
                               LatLonRect bbox, boolean sampleIt) {
         AddePointURL temp = AddePointURL.decodeURL(source);
         source = temp.getSelectClause();
-        System.out.println("origina select clause = " + source);
+        //System.out.println("original select clause = " + source);
         if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
             String llb = "";
             if (bbox != null) {
@@ -228,8 +231,8 @@ public class AddePointDataSource extends PointDataSource {
                                 ? selectedLevel
                                 : levels.get(0);
                 selectedLevel =
-                    getProperty(ucar.unidata.idv.chooser.adde.AddePointDataChooser
-                        .SELECTED_LEVEL, defLev);
+                    getProperty(ucar.unidata.idv.chooser.adde
+                        .AddePointDataChooser.SELECTED_LEVEL, defLev);
             }
             if (selectedLevel != null) {
                 level = "LEV " + selectedLevel.toString();
@@ -238,11 +241,9 @@ public class AddePointDataSource extends PointDataSource {
             source = source.replaceAll(AddeUtil.LEVEL, level);
         }
         if (sampleIt) {
-            if (!(source.indexOf("COL") >= 0 || source.indexOf("col") >= 0)) {
-                source = source+";COL 1 ROW 1;";
-            }
+            temp.setMaxNumber(1);
         }
-        System.out.println("new select clause = " + source);
+        //System.out.println("new select clause = " + source);
         temp.setSelectClause(source);
         source = temp.getURLString();
         return source;
@@ -280,7 +281,7 @@ public class AddePointDataSource extends PointDataSource {
     }
 
     /**
-     * 
+     *
      *
      * @param dataChoice    data choice
      * @param subset        subsetting selection
@@ -297,7 +298,7 @@ public class AddePointDataSource extends PointDataSource {
 
         List realUrls;
         Trace.call1("AddePointDataSource.makeObs");
-        String source =         getSource(dataChoice);
+        String source = getSource(dataChoice);
         if (canSaveDataToLocalDisk()) {
             //Pointing to an adde server
             source   = processUrl(source, subset, bbox, sampleIt);
@@ -319,11 +320,13 @@ public class AddePointDataSource extends PointDataSource {
         if (obs == null) {
             for (int i = 0; i < realUrls.size(); i++) {
                 String sourceUrl = (String) realUrls.get(i);
-                if (sampleIt && i > 0) break;
+                if (sampleIt && (i > 0)) {
+                    break;
+                }
                 log_.debug("sourceUrl = " + sourceUrl);
                 try {
                     Trace.call1("AddePointDataSource.pda ctor");
-                    System.err.println("Source:" + sourceUrl);
+                    //System.err.println("Source:" + sourceUrl);
                     PointDataAdapter pda = new PointDataAdapter(sourceUrl,
                                                false);
                     Trace.call1("AddePointDataSource.pda ctor");
@@ -507,9 +510,11 @@ public class AddePointDataSource extends PointDataSource {
      *
      *
      * @param dataChoice The data choice we are getting levels for
+     * @param dataSelection   data selection
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection) {
+    public List getAllLevels(DataChoice dataChoice,
+                             DataSelection dataSelection) {
         return getLevels();
     }
 
