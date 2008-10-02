@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -66,13 +67,13 @@ import javax.swing.event.*;
  */
 public abstract class PointDataSource extends FilesDataSource {
 
-    /** dataselection property          */
+    /** dataselection property */
     public static final String PROP_GRID_POINTSX = "prop.grid.pointsx";
 
-    /** dataselection property          */
+    /** dataselection property */
     public static final String PROP_GRID_POINTSY = "prop.grid.pointsy";
 
-    /** dataselection property          */
+    /** dataselection property */
     public static final String PROP_GRID_NUMITERATIONS =
         "prop.grid.numiterations";
 
@@ -117,23 +118,23 @@ public abstract class PointDataSource extends FilesDataSource {
     /** for properties dialog */
     private JComboBox widthCbx;
 
-    /** number of points along x for grid         */
+    /** number of points along x for grid */
     private int gridPointsX = 100;
 
-    /** number of points along y for grid         */
+    /** number of points along y for grid */
     private int gridPointsY = 100;
 
-    /** Number of barnes iterations       */
+    /** Number of barnes iterations */
     private int numGridIterations = 1;
 
-    /** Do we make grid fields    */
+    /** Do we make grid fields */
     private boolean makeGridFields = true;
 
 
-    /** For gui          */
+    /** For gui */
     private JCheckBox makeGridFieldsCbx;
 
-    /** For gui         */
+    /** For gui */
     private GridParameters gridProperties;
 
     /**
@@ -210,22 +211,22 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     private class GridParameters extends DataSelectionComponent {
 
-        /** gui component         */
+        /** gui component */
         private JCheckBox useDefaultCbx = new JCheckBox("Use Default", true);
 
-        /** gui component         */
+        /** gui component */
         private JTextField gridPointsXFld;
 
-        /** gui component         */
+        /** gui component */
         private JTextField gridPointsYFld;
 
-        /** gui component         */
+        /** gui component */
         private JTextField numGridIterationsFld;
 
-        /** The list of components      */
+        /** The list of components */
         private List comps = new ArrayList();
 
-        /** The main component      */
+        /** The main component */
         private JComponent comp;
 
         /**
@@ -506,6 +507,20 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
+    /**
+     * Is it ok to create a grid field for the parameter with the given real type
+     *
+     * @param type the type
+     *
+     * @return ok to create grid
+     */
+    protected boolean canCreateGrid(RealType type) {
+        if (type.getDefaultUnit() == null) {
+            return false;
+        }
+        return true;
+    }
+
 
 
     /**
@@ -587,7 +602,7 @@ public abstract class PointDataSource extends FilesDataSource {
                             continue;
                         }
                         RealType type = (RealType) types[typeIdx];
-                        if (type.getDefaultUnit() == null) {
+                        if ( !canCreateGrid(type)) {
                             continue;
                         }
                         //                        List gridCategories = 
