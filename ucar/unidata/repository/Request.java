@@ -312,6 +312,11 @@ public class Request implements Constants {
     }
 
 
+    public String formPost(RequestUrl theUrl, String extra) {
+        return HtmlUtil.formPost(url(theUrl),extra);
+    }
+
+
     /**
      * _more_
      *

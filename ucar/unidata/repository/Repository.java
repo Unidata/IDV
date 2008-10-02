@@ -3937,13 +3937,10 @@ public class Repository extends RepositoryBase implements Tables,
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), null);
 
-
-        entry.setNorth(XmlUtil.getAttribute(node, ATTR_NORTH,
-                                            entry.getNorth()));
-        entry.setSouth(XmlUtil.getAttribute(node, ATTR_SOUTH,
-                                            entry.getSouth()));
-        entry.setEast(XmlUtil.getAttribute(node, ATTR_EAST, entry.getEast()));
-        entry.setWest(XmlUtil.getAttribute(node, ATTR_WEST, entry.getWest()));
+        entry.setNorth(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_NORTH,entry.getNorth()+"")));
+        entry.setSouth(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_SOUTH, entry.getSouth()+"")));
+        entry.setEast(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_EAST, entry.getEast()+"")));
+        entry.setWest(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_WEST, entry.getWest()+"")));
         NodeList entryChildren = XmlUtil.getElements(node);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag  = entryChild.getTagName();

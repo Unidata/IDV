@@ -221,17 +221,16 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(infoSB);
         treeShown.add(true);
 
-
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, true)) {
             tabTitles.add(tfo.toString());
             tabContent.add(tfo.getId());
             treeShown.add(false);
         }
 
-
         tabTitles.add("Comments");
         tabContent.add(getCommentBlock(request, entry));
         treeShown.add(false);
+
         tabTitles.add("Associations");
         tabContent.add(getAssociationBlock(request, entry));
         treeShown.add(false);

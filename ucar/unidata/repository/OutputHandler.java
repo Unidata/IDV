@@ -563,7 +563,7 @@ public class OutputHandler extends RepositoryManager {
         String link = "";
         if (doForm) {
             StringBuffer formSB = new StringBuffer();
-            formSB.append(request.form(getRepository().URL_ENTRY_GETENTRIES,
+            formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        "getentries"));
             //            formSB.append(HtmlUtil.space(1));
             List<OutputType> outputList =

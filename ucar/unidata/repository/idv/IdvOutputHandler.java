@@ -216,7 +216,7 @@ public class IdvOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer();
         File         file   = entry.getResource().getFile();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                         false, "");
+                                                         false);
         sb.append(crumbs[1]);
         GridDataset dataset = getDataOutputHandler().getGridDataset(file);
         synchronized(dataset) {
@@ -266,7 +266,7 @@ public class IdvOutputHandler extends OutputHandler {
             String title="";
             if (!group.isDummy() || theEntry!=null) {
                 String[] crumbs = getRepository().getBreadCrumbs(request,
-                                                                 (theEntry!=null?theEntry:(Entry)group), false,"");
+                                                                 (theEntry!=null?theEntry:(Entry)group), false);
                 title = crumbs[0];
                 sb.append(crumbs[1]);
             }

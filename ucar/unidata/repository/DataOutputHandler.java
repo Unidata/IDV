@@ -333,12 +333,14 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if(getRepository().isOutputTypeOK(OUTPUT_OPENDAP)) {
-        String opendapUrl = request.getRequestPath() + "/"
-                            + request.getPathEmbeddedArgs() + "/"
-                            + ARG_OUTPUT + ":" + OUTPUT_OPENDAP
-                            + "/entry.das";
-        links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
-                           "OpenDAP"));
+            Object oldOutput =   request.getOutput();
+            request.put(ARG_OUTPUT,OUTPUT_OPENDAP);
+            String opendapUrl = request.getRequestPath() + "/"
+                + request.getPathEmbeddedArgs() + 
+                "/entry.das";
+            links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
+                               "OpenDAP"));
+            request.put(ARG_OUTPUT,oldOutput);
         }
         if(getRepository().isOutputTypeOK(OUTPUT_CDL))
         links.add(
