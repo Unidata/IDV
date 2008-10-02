@@ -22,6 +22,7 @@
 
 package ucar.unidata.data.point;
 
+import edu.wisc.ssec.mcidas.adde.AddePointURL;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.LatLonPoint;
@@ -180,6 +181,24 @@ public class AddePointDataSource extends PointDataSource {
      */
     private String processUrl(String source, DataSelection subset,
                               LatLonRect bbox) {
+        return processUrl(source,subset,bbox, false);
+    }
+
+    /**
+     * Process the url. Adding in the level and latlon if needed
+     *
+     * @param source Original url
+     * @param subset For subsetting
+     * @param bbox bbox
+     * @param sampleIt  just get a sample
+     *
+     * @return processed url
+     */
+    private String processUrl(String source, DataSelection subset,
+                              LatLonRect bbox, boolean sampleIt) {
+        AddePointURL temp = AddePointURL.decodeURL(source);
+        source = temp.getSelectClause();
+        System.out.println("origina select clause = " + source);
         if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
             String llb = "";
             if (bbox != null) {
@@ -218,7 +237,29 @@ public class AddePointDataSource extends PointDataSource {
             log_.debug("level = " + level);
             source = source.replaceAll(AddeUtil.LEVEL, level);
         }
+        if (sampleIt) {
+            if (!(source.indexOf("COL") >= 0 || source.indexOf("col") >= 0)) {
+                source = source+";COL 1 ROW 1;";
+            }
+        }
+        System.out.println("new select clause = " + source);
+        temp.setSelectClause(source);
+        source = temp.getURLString();
         return source;
+    }
+
+    /**
+     * Get a sample observation
+     *
+     * @param dataChoice  choice
+     *
+     * @return the sample
+     *
+     * @throws Exception problem getting the sample
+     */
+    protected FieldImpl getSample(DataChoice dataChoice) throws Exception {
+        return (FieldImpl) makeObs(dataChoice, null, null, true);
+
     }
 
     /**
@@ -235,13 +276,31 @@ public class AddePointDataSource extends PointDataSource {
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox)
             throws Exception {
+        return makeObs(dataChoice, subset, bbox, false);
+    }
+
+    /**
+     * 
+     *
+     * @param dataChoice    data choice
+     * @param subset        subsetting selection
+     * @param bbox bounding box. may be null
+     * @param sampleIt      flag to just get a sample ob
+     *
+     * @return  the data
+     *
+     * @throws Exception  problem reading data
+     */
+    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
+                                LatLonRect bbox, boolean sampleIt)
+            throws Exception {
 
         List realUrls;
         Trace.call1("AddePointDataSource.makeObs");
         String source =         getSource(dataChoice);
         if (canSaveDataToLocalDisk()) {
             //Pointing to an adde server
-            source   = processUrl(source, subset, bbox);
+            source   = processUrl(source, subset, bbox, sampleIt);
             realUrls = AddeUtil.generateTimeUrls(this, source);
         } else {
             //Pointing to a file
@@ -260,10 +319,11 @@ public class AddePointDataSource extends PointDataSource {
         if (obs == null) {
             for (int i = 0; i < realUrls.size(); i++) {
                 String sourceUrl = (String) realUrls.get(i);
+                if (sampleIt && i > 0) break;
                 log_.debug("sourceUrl = " + sourceUrl);
                 try {
                     Trace.call1("AddePointDataSource.pda ctor");
-                    // System.err.println("Source:" + sourceUrl);
+                    System.err.println("Source:" + sourceUrl);
                     PointDataAdapter pda = new PointDataAdapter(sourceUrl,
                                                false);
                     Trace.call1("AddePointDataSource.pda ctor");
