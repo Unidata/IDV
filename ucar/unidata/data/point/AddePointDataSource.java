@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -109,8 +110,27 @@ public class AddePointDataSource extends PointDataSource {
         setName(getDescription());
     }
 
+    /** _more_          */
+    private static final String[] excludes = {
+        "COL", "ROW", "NREC", "IDN", "MOD", "TYPE", "HMS"
+    };
 
-
+    /**
+     * Is it ok to create a grid field for the parameter with the
+     * given real type
+     *
+     * @param type the type
+     *
+     * @return ok to create grid
+     */
+    protected boolean canCreateGrid(RealType type) {
+        for (int i = 0; i < excludes.length; i++) {
+            if (type.getName().equals(excludes[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     /**
@@ -156,7 +176,7 @@ public class AddePointDataSource extends PointDataSource {
                                        boolean changeLinks)
             throws Exception {
         String source = sources.get(0).toString();
-        source = processUrl(source, null, null);
+        source = processUrl(source, null, null, null, false);
         List addeUrls = AddeUtil.generateTimeUrls(this, source);
         List urls     = new ArrayList();
         for (int i = 0; i < addeUrls.size(); i++) {
@@ -177,76 +197,101 @@ public class AddePointDataSource extends PointDataSource {
      * Process the url. Adding in the level and latlon if needed
      *
      * @param source Original url
-     * @param subset For subsetting
-     * @param bbox bbox
-     *
-     * @return processed url
-     */
-    private String processUrl(String source, DataSelection subset,
-                              LatLonRect bbox) {
-        return processUrl(source, subset, bbox, false);
-    }
-
-    /**
-     * Process the url. Adding in the level and latlon if needed
-     *
-     * @param source Original url
+     * @param choice for param subsetting
      * @param subset For subsetting
      * @param bbox bbox
      * @param sampleIt  just get a sample
      *
      * @return processed url
      */
-    private String processUrl(String source, DataSelection subset,
-                              LatLonRect bbox, boolean sampleIt) {
+    private String processUrl(String source, DataChoice choice,
+                              DataSelection subset, LatLonRect bbox,
+                              boolean sampleIt) {
         AddePointURL temp = AddePointURL.decodeURL(source);
+        if (temp == null) {
+            return source;
+        }
         source = temp.getSelectClause();
-        //System.out.println("original select clause = " + source);
-        if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
-            String llb = "";
-            if (bbox != null) {
-                LatLonPoint ll = bbox.getLowerLeftPoint();
-                LatLonPoint ur = bbox.getUpperRightPoint();
-                double latMin  = Math.min(ll.getLatitude(), ur.getLatitude());
-                double latMax  = Math.max(ll.getLatitude(), ur.getLatitude());
-                double lonMin = Math.min(-1 * ll.getLongitude(),
-                                         -1 * ur.getLongitude());
-                double lonMax = Math.max(-1 * ll.getLongitude(),
-                                         -1 * ur.getLongitude());
-                llb = "LAT " + latMin + " " + latMax + ";LON " + lonMin + " "
-                      + lonMax;
-            }
-            log_.debug("lat/lon box = " + llb);
-            source = source.replaceAll(AddeUtil.LATLON_BOX, llb);
-        }
-        if (source.indexOf(AddeUtil.LEVEL) >= 0) {
-            String level         = "";
-            Object selectedLevel = null;
-            if (subset != null) {
-                selectedLevel = subset.getFromLevel();
-            }
-            if (selectedLevel == null) {
-                List   levels = getLevels();
-                Object defLev = ((levels == null) || levels.isEmpty())
-                                ? selectedLevel
-                                : levels.get(0);
-                selectedLevel =
-                    getProperty(ucar.unidata.idv.chooser.adde
-                        .AddePointDataChooser.SELECTED_LEVEL, defLev);
-            }
-            if (selectedLevel != null) {
-                level = "LEV " + selectedLevel.toString();
-            }
-            log_.debug("level = " + level);
-            source = source.replaceAll(AddeUtil.LEVEL, level);
-        }
         if (sampleIt) {
+            if (source.indexOf(AddeUtil.LEVEL) >= 0) {
+                String level         = "";
+                Object selectedLevel = null;
+                if (subset != null) {
+                    selectedLevel = subset.getFromLevel();
+                }
+                if (selectedLevel == null) {
+                    List   levels = getLevels();
+                    Object defLev = ((levels == null) || levels.isEmpty())
+                                    ? selectedLevel
+                                    : levels.get(0);
+                    selectedLevel =
+                        getProperty(ucar.unidata.idv.chooser.adde
+                            .AddePointDataChooser.SELECTED_LEVEL, defLev);
+                }
+                if (selectedLevel != null) {
+                    level = "'LEV " + selectedLevel.toString() + "'";
+                }
+                temp.setSelectClause(level);
+            } else {
+                temp.setSelectClause("");
+            }
             temp.setMaxNumber(1);
+            temp.setPosition("0");  // might have to change this to ALL
+        } else {
+            //System.out.println("original select clause = " + source);
+            if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
+                String llb = "";
+                if (bbox != null) {
+                    LatLonPoint ll = bbox.getLowerLeftPoint();
+                    LatLonPoint ur = bbox.getUpperRightPoint();
+                    double latMin = Math.min(ll.getLatitude(),
+                                             ur.getLatitude());
+                    double latMax = Math.max(ll.getLatitude(),
+                                             ur.getLatitude());
+                    double lonMin = Math.min(-1 * ll.getLongitude(),
+                                             -1 * ur.getLongitude());
+                    double lonMax = Math.max(-1 * ll.getLongitude(),
+                                             -1 * ur.getLongitude());
+                    llb = "LAT " + latMin + " " + latMax + ";LON " + lonMin
+                          + " " + lonMax;
+                }
+                log_.debug("lat/lon box = " + llb);
+                source = source.replaceAll(AddeUtil.LATLON_BOX, llb);
+            }
+            if (source.indexOf(AddeUtil.LEVEL) >= 0) {
+                String level         = "";
+                Object selectedLevel = null;
+                if (subset != null) {
+                    selectedLevel = subset.getFromLevel();
+                }
+                if (selectedLevel == null) {
+                    List   levels = getLevels();
+                    Object defLev = ((levels == null) || levels.isEmpty())
+                                    ? selectedLevel
+                                    : levels.get(0);
+                    selectedLevel =
+                        getProperty(ucar.unidata.idv.chooser.adde
+                            .AddePointDataChooser.SELECTED_LEVEL, defLev);
+                }
+                if (selectedLevel != null) {
+                    level = "LEV " + selectedLevel.toString();
+                }
+                log_.debug("level = " + level);
+                source = source.replaceAll(AddeUtil.LEVEL, level);
+            }
+            if ((choice != null)
+                    && (choice.getProperty(PROP_GRID_PARAM) != null)) {
+                String param = ((RealType) choice.getProperty(
+                                   PROP_GRID_PARAM)).getName();
+                temp.setParams("DAY TIME LAT LON ZS " + param);
+            }
+            temp.setSelectClause(source);
+            //System.out.println("new select clause = " + source);
         }
-        //System.out.println("new select clause = " + source);
-        temp.setSelectClause(source);
-        source = temp.getURLString();
-        return source;
+        //source = temp.getURLString();
+        //return source;
+        return temp.getURLString();
+
     }
 
     /**
@@ -301,7 +346,7 @@ public class AddePointDataSource extends PointDataSource {
         String source = getSource(dataChoice);
         if (canSaveDataToLocalDisk()) {
             //Pointing to an adde server
-            source   = processUrl(source, subset, bbox, sampleIt);
+            source   = processUrl(source, dataChoice, subset, bbox, sampleIt);
             realUrls = AddeUtil.generateTimeUrls(this, source);
         } else {
             //Pointing to a file
@@ -326,7 +371,6 @@ public class AddePointDataSource extends PointDataSource {
                 log_.debug("sourceUrl = " + sourceUrl);
                 try {
                     Trace.call1("AddePointDataSource.pda ctor");
-                    //System.err.println("Source:" + sourceUrl);
                     PointDataAdapter pda = new PointDataAdapter(sourceUrl,
                                                false);
                     Trace.call1("AddePointDataSource.pda ctor");
