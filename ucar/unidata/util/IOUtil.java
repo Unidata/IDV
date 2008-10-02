@@ -1022,7 +1022,8 @@ public class IOUtil {
                 URL           dataUrl    = new URL(encodedUrl);
                 URLConnection connection = dataUrl.openConnection();
                 s = connection.getInputStream();
-            } catch (Exception exc) {}
+            } catch (Exception exc) {
+            }
         }
 
 
@@ -1073,9 +1074,10 @@ public class IOUtil {
      */
     public static URL getURL(String filename, Class origin)
             throws FileNotFoundException, IOException {
+        //Trim it
+        filename = filename.trim();
+
         //Try the file system
-
-
         File f = new File(filename);
         if (f.exists()) {
             try {
@@ -1090,13 +1092,11 @@ public class IOUtil {
             } catch (Exception e) {}
         }
 
+        String encodedUrl = StringUtil.replace(filename, " ", "%20");
         try {
-            //            filename = String
-
-
-            String encodedUrl = StringUtil.replace(filename, " ", "%20");
             return new URL(encodedUrl);
-        } catch (Exception exc) {}
+        } catch (Exception exc) {
+        }
 
 
         List classLoaders = Misc.getClassLoaders();
