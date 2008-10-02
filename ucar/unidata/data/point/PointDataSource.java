@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -69,6 +70,10 @@ public abstract class PointDataSource extends FilesDataSource {
 
     /** dataselection property */
     public static final String PROP_GRID_POINTSX = "prop.grid.pointsx";
+
+    /** This gets set on the data choice when we are creating a point ob field intended to be used for making a grid    */
+    public static final String PROP_GRID_PARAM = "prop.grid.param";
+
 
     /** dataselection property */
     public static final String PROP_GRID_POINTSY = "prop.grid.pointsy";
@@ -585,6 +590,7 @@ public abstract class PointDataSource extends FilesDataSource {
                                     ? getSample(choice)
                                     : null);
                 if (sample != null) {
+                    Hashtable seenFields = new Hashtable();
                     if (ucar.unidata.data.grid.GridUtil.isTimeSequence(
                             sample)) {
                         sample = (FieldImpl) sample.getSample(0);
@@ -616,11 +622,15 @@ public abstract class PointDataSource extends FilesDataSource {
                                     null);
                             addDataChoice(compositeDataChoice);
                         }
+                        String name = type.toString();
+                        if (seenFields.get(name) != null) {
+                            continue;
+                        }
+                        seenFields.put(name, name);
                         DataChoice gridChoice =
                             new DirectDataChoice(this,
-                                Misc.newList(new Integer(i), type),
-                                type.toString(), type.toString(),
-                                gridCategories, (Hashtable) null);
+                                Misc.newList(new Integer(i), type), name,
+                                name, gridCategories, (Hashtable) null);
                         compositeDataChoice.addDataChoice(gridChoice);
                     }
                 }
@@ -699,11 +709,15 @@ public abstract class PointDataSource extends FilesDataSource {
         Object id = dataChoice.getId();
         //If it is a list then we are doing a grid field
         if (id instanceof List) {
-            Integer  i    = (Integer) ((List) id).get(0);
-            RealType type = (RealType) ((List) id).get(1);
+            Integer   i          = (Integer) ((List) id).get(0);
+            RealType  type       = (RealType) ((List) id).get(1);
+            Hashtable properties = dataChoice.getProperties();
+            if (properties == null) {
+                properties = new Hashtable();
+            }
+            properties.put(PROP_GRID_PARAM, type);
             DataChoice choice = new DirectDataChoice(this, i, "", "",
-                                    dataChoice.getCategories(),
-                                    dataChoice.getProperties());
+                                    dataChoice.getCategories(), properties);
             FieldImpl pointObs = (FieldImpl) getDataInner(choice, category,
                                      dataSelection, requestProperties);
             if (pointObs == null) {
