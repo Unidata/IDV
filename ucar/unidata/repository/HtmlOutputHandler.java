@@ -835,7 +835,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if(!showApplet) {
             if (group.getDescription().length() > 0) {
-                StringBuffer descSB = new StringBuffer("<div class=\"description\"\n");
+                StringBuffer descSB = new StringBuffer("\n<div class=\"description\">\n");
                 descSB.append(group.getDescription());
                 StringBuffer metadataSB = new StringBuffer();
                 getMetadataManager().decorateEntry(request, group, metadataSB, false);
