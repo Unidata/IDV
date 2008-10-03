@@ -20,8 +20,6 @@
 
 
 
-
-
 package ucar.unidata.data.text;
 
 
@@ -94,7 +92,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     /** This keeps around the gempak directory paths that the user selects when the gem environment variables are not set */
     private Hashtable paths = new Hashtable();
 
-    /** the nwx.properties    */
+    /** the nwx.properties */
     private Properties nwxProperties;
 
     /** GEMTBL property */
@@ -204,7 +202,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         TableInfo tableInfo = getTableInfo(productType);
         if (tableInfo != null) {
             NamedStationTable stations = getStations(tableInfo);
-            if (tableInfo.type.equals(tableInfo.FLAG_W)) {
+            if (tableInfo.flag.equals(tableInfo.FLAG_W)) {
                 // search bulletins for products
                 stations = getAvailableStations(stations, tableInfo,
                         dateSelection);
@@ -225,7 +223,19 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     protected NamedStationTable getAvailableStations(NamedStationTable all,
             TableInfo tableInfo, DateSelection dateSelection) {
-        return all;
+        List<Product> products = readProducts(tableInfo, null, dateSelection);
+        NamedStationTable subset = new NamedStationTable();
+        for (Product p : products) {
+            String station = p.getStation();
+            if ((station == null) || station.equals("")) {
+                continue;
+            }
+            NamedStationImpl nstat = (NamedStationImpl) all.get(station);
+            if (nstat != null) {
+                subset.add(nstat, true);
+            }
+        }
+        return subset;
     }
 
     /**
@@ -724,7 +734,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
             if (date == null) {
                 date = fileDate;
             }
-            if ((ids == null)) {
+            if ((ids == null) || ids.isEmpty()) {
                 products.add(new Product(stationString, product, date));
             } else if (ids.get(stationString) != null) {
                 int num = ((Integer) ids.get(stationString)).intValue();
@@ -747,8 +757,8 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
-        //|| ti.flag.equals(TableInfo.FLAG_W)
-        || ti.flag.equals(TableInfo.FLAG_F);
+               || ti.flag.equals(TableInfo.FLAG_W)
+               || ti.flag.equals(TableInfo.FLAG_F);
     }
 
     /**
