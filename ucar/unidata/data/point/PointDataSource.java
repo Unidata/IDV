@@ -136,16 +136,22 @@ public abstract class PointDataSource extends FilesDataSource {
     private float gridY = GRID_DEFAULT;
 
     /** calculate grid spacing */
-    private static final String COMPUTE = "compute";
+    private static final String SPACING_COMPUTE = "spacing.compute";
 
     /** degree grid spacing */
-    private static final String DEGREE = "degree";
+    private static final String SPACING_DEGREES = "spacing.degrees";
 
     /** points grid spacing */
-    private static final String POINTS = "points";
+    private static final String SPACING_POINTS = "spacing.points";
+
+    /** units for x and y */
+    private static final String[] SPACING_IDS = { SPACING_COMPUTE, SPACING_DEGREES, SPACING_POINTS };
+    private static final String[] SPACING_NAMES = { "Compute", "Degrees", "# Points" };
+
+
 
     /** y for grid */
-    private String gridUnit = COMPUTE;
+    private String gridUnit = SPACING_COMPUTE;
 
     /** Number of barnes iterations */
     private int numGridIterations = 1;
@@ -254,8 +260,6 @@ public abstract class PointDataSource extends FilesDataSource {
         /** The main component */
         private JComponent comp;
 
-        /** units for x and y */
-        private String[] units = { COMPUTE, DEGREE, POINTS };
 
         /**
          * ctor
@@ -265,8 +269,9 @@ public abstract class PointDataSource extends FilesDataSource {
             gridXFld     = new JTextField("" + gridX, 3);
             gridYFld     = new JTextField("" + gridY, 3);
             gridUnitCmbx = new JComboBox();
-            GuiUtils.setListData(gridUnitCmbx, units);
-            gridUnitCmbx.setSelectedItem(gridUnit);
+            List tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
+            GuiUtils.setListData(gridUnitCmbx, tfos);
+            gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(gridUnit,tfos));
             numGridIterationsFld = new JTextField("" + numGridIterations, 3);
             comps.add(GuiUtils.rLabel("Grid Size:"));
             comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
@@ -344,7 +349,7 @@ public abstract class PointDataSource extends FilesDataSource {
          * @return grid unit
          */
         public String getGridUnit() {
-            return (String) gridUnitCmbx.getSelectedItem();
+            return (String) TwoFacedObject.getIdString(gridUnitCmbx.getSelectedItem());
         }
 
         /**
@@ -763,17 +768,17 @@ public abstract class PointDataSource extends FilesDataSource {
                 return null;
             }
             //{ minY, minX, maxY, maxX };
-            float  X          = this.gridX;
-            float  Y          = this.gridY;
+            float  spacingX          = this.gridX;
+            float  spacingY          = this.gridY;
             int    iterations = this.numGridIterations;
             Number tmp;
             tmp = (Float) dataSelection.getProperty(PROP_GRID_X);
             if (tmp != null) {
-                X = tmp.floatValue();
+                spacingX = tmp.floatValue();
             }
             tmp = (Float) dataSelection.getProperty(PROP_GRID_Y);
             if (tmp != null) {
-                Y = tmp.floatValue();
+                spacingY = tmp.floatValue();
             }
             tmp = (Integer) dataSelection.getProperty(
                 PROP_GRID_NUMITERATIONS);
@@ -786,22 +791,26 @@ public abstract class PointDataSource extends FilesDataSource {
                 theUnit = this.gridUnit;
             }
 
+            float degreesX=0, degreesY = 0;
             pointObs = PointObFactory.makeTimeSequenceOfPointObs(pointObs);
-            if (theUnit.equals(COMPUTE) || (X == GRID_DEFAULT)
-                    || (Y == GRID_DEFAULT)) {
-                X = GRID_DEFAULT;
-                Y = GRID_DEFAULT;
-            } else if (theUnit.equals(POINTS)) {
+            if (theUnit.equals(SPACING_COMPUTE) || (spacingX == GRID_DEFAULT)
+                    || (spacingY == GRID_DEFAULT)) {
+                degreesX = GRID_DEFAULT;
+                degreesY = GRID_DEFAULT;
+            } else if (theUnit.equals(SPACING_POINTS)) {
                 double[] bbox  = PointObFactory.getBoundingBox(pointObs);
                 float    spanX = (float) Math.abs(bbox[1] - bbox[3]);
                 float    spanY = (float) Math.abs(bbox[0] - bbox[2]);
-                X = spanX / X;
-                Y = spanY / Y;
+                degreesX = spanX / spacingX;
+                degreesY = spanY / spacingY;
+            } else if (theUnit.equals(SPACING_DEGREES)) {
+                degreesX =  spacingX;
+                degreesY =  spacingY;
             }
             // System.out.println("X = " + X + " Y = " + Y + " unit = " + theUnit);
 
             LogUtil.message("Doing Barnes Analysis");
-            return PointObFactory.barnes(pointObs, type, X, Y, iterations);
+            return PointObFactory.barnes(pointObs, type, degreesX, degreesY, iterations);
         }
 
 
