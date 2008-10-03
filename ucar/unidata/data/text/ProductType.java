@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -47,6 +48,10 @@ public class ProductType {
 
     /** the id */
     private String id;
+
+    /** Should this product type be rendered as html   */
+    private boolean renderAsHtml = false;
+
 
     /**
      * Create a new product type
@@ -124,6 +129,26 @@ public class ProductType {
     public String toString() {
         return name;
     }
+
+    /**
+     *  Set the RenderAsHtml property.
+     *
+     *  @param value The new value for RenderAsHtml
+     */
+    public void setRenderAsHtml(boolean value) {
+        renderAsHtml = value;
+    }
+
+    /**
+     *  Get the RenderAsHtml property.
+     *
+     *  @return The RenderAsHtml
+     */
+    public boolean getRenderAsHtml() {
+        return renderAsHtml;
+    }
+
+
 
 }
 

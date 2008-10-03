@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -64,6 +65,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import java.util.regex.*;
 
@@ -89,10 +91,11 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     /** gemdata path */
     private String gemDataPath;
 
-    /** This keeps around the gempak directory paths that the user selects when the gem environment variables are not set  */
+    /** This keeps around the gempak directory paths that the user selects when the gem environment variables are not set */
     private Hashtable paths = new Hashtable();
 
-
+    /** the nwx.properties    */
+    private Properties nwxProperties;
 
     /** GEMTBL property */
     private static final String PROP_GEMTBL = "GEMTBL";
@@ -455,6 +458,21 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                     }
                     ProductType pt = new ProductType(toks[0].replace("_",
                                          " "), toks[1]);
+                    if (nwxProperties == null) {
+                        nwxProperties = new Properties();
+                        nwxProperties = Misc.readProperties(
+                            "/ucar/unidata/data/text/nwx.properties",
+                            nwxProperties, getClass());
+                    }
+                    //                    System.err.println (pt.getId()+".html" +" = " + nwxProperties.get(pt.getId()+".html"));
+
+                    String render = (String) nwxProperties.get(pt.getId()
+                                        + ".html");
+                    if (render == null) {
+                        render = "false";
+                    }
+                    render = render.trim();
+                    pt.setRenderAsHtml(Misc.equals(render, "true"));
                     TableInfo ti = getTableInfo(pt);
                     if ((ti != null) && canHandleType(ti)) {
                         productGroup.addProduct(pt);
