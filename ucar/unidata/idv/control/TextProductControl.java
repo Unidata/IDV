@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -115,8 +112,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     /** ignore time changes flag */
     private boolean ignoreTimeChanges = false;
 
-    /** selected product group */
-    private ProductGroup productGroup;
 
     /** selected product type */
     private ProductType productType;
@@ -155,6 +150,15 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     /** holds the last 10 converted html text objects */
     private Cache htmlCache = new Cache(10);
 
+    /** the font for displaying html      */
+    private Font htmlFont;
+
+    /** forn for non-html      */
+    private Font fixedFont;
+
+    /** maps producttype to list of stations   */
+    private Hashtable<String, List> stationsForProduct =
+        new Hashtable<String, List>();
 
     /**
      * Default cstr;
@@ -233,6 +237,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         htmlComp.addHyperlinkListener(this);
         htmlComp.setEditable(false);
         htmlComp.setContentType("text/html");
+        htmlFont = htmlComp.getFont();
+        fixedFont = new Font("Monospaced", htmlFont.getStyle(),
+                             htmlFont.getSize());
 
         textComp = new JTextArea("", 30, 80);
         GuiUtils.setFixedWidthFont(textComp);
@@ -287,14 +294,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
         Object[] dateSelectionItems = new Object[] {
             new TwoFacedObject("Most Recent", -1),
-            new TwoFacedObject("1 Hour", 1), 
-            new TwoFacedObject("3 Hours", 3),
+            new TwoFacedObject("1 Hour", 1), new TwoFacedObject("3 Hours", 3),
             new TwoFacedObject("6 Hours", 6),
             new TwoFacedObject("12 Hours", 12),
             new TwoFacedObject("24 Hours", 24),
             new TwoFacedObject("36 Hours", 36),
-            new TwoFacedObject("48 Hours", 48), 
-            new TwoFacedObject("All", 0)
+            new TwoFacedObject("48 Hours", 48), new TwoFacedObject("All", 0)
         };
         TwoFacedObject selectedTfo =
             TwoFacedObject.findId(new Integer(hours),
@@ -337,7 +342,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         showGlossaryCbx = new JCheckBox("Show Glossary", showGlossary);
         showGlossaryCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                setText(currentText);
+                setText(currentText, true);
             }
         });
         textTabbedPane.addTab("HTML",
@@ -420,6 +425,10 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         }
         selectedStations =
             (List<NamedStationImpl>) new ArrayList(selectionList);
+        if (productType != null) {
+            stationsForProduct.put(productType.getId(),
+                                   new ArrayList(selectedStations));
+        }
         updateStationLabel();
         updateText();
     }
@@ -459,10 +468,10 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             public void run() {
                 showWaitCursor();
                 try {
-                    setText("Loading...");
+                    setText("Loading...", false);
                     updateTextInner();
                 } catch (Exception exc) {
-                    setText("Error:" + exc);
+                    setText("Error:" + exc, false);
                 } finally {
                     showNormalCursor();
                 }
@@ -478,6 +487,27 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     protected void xxxaddSelectedToList(List listOfStations) {
         //NOOP
     }
+
+    /**
+     * Make sure the currently selected stations are in the main station list and update the label
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    private void updateSelectedStations()
+            throws VisADException, RemoteException {
+        List<NamedStationImpl> tmp = selectedStations;
+        selectedStations = new ArrayList<NamedStationImpl>();
+        for (NamedStationImpl station : tmp) {
+            int idx = stationList.indexOf(station);
+            if (idx >= 0) {
+                selectedStations.add((NamedStationImpl) stationList.get(idx));
+            }
+        }
+        setSelectedStations(selectedStations);
+        updateStationLabel();
+    }
+
 
     /**
      * Update the text for real
@@ -515,21 +545,20 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                         (NamedStationImpl) stationList.get(0));
                     updateStationLabel();
                 }
-
-
-                List<NamedStationImpl> tmp = selectedStations;
-                selectedStations = new ArrayList<NamedStationImpl>();
-                for (NamedStationImpl station : tmp) {
-                    int idx = stationList.indexOf(station);
-                    if (idx >= 0) {
-                        selectedStations.add(
-                            (NamedStationImpl) stationList.get(idx));
-                    }
-                }
-                setSelectedStations(selectedStations);
-                updateStationLabel();
+                updateSelectedStations();
                 loadData();
                 currentTable = newTable;
+            }
+
+
+            if ((selectedStations.size() == 0) && (productType != null)) {
+                List lastStations =
+                    stationsForProduct.get(productType.getId());
+                if (lastStations != null) {
+                    selectedStations =
+                        (List<NamedStationImpl>) new ArrayList(lastStations);
+                    updateSelectedStations();
+                }
             }
 
 
@@ -560,11 +589,11 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             ignoreTimeChanges = false;
 
             if (products.size() == 0) {
-                setText("No products found");
+                setText("No products found", false);
             } else {
                 //                System.err.println("setText products");
                 //                Misc.printStack("in updateTextInner",10,null);
-                setText(products.get(products.size() - 1).getContent());
+                setText(products.get(products.size() - 1).getContent(), true);
             }
         } catch (Exception exc) {
             logException("Error updating product text", exc);
@@ -729,19 +758,23 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      *
      * @param newText The new text to set
+     * @param fromProduct Is the text from a product
      */
-    protected void setText(String newText) {
+    protected void setText(String newText, boolean fromProduct) {
         currentText = newText;
         String html = "";
         String text = "";
         if (productType == null) {
-            html = text = "Please select a product";
+            fromProduct = false;
+            html        = text = "Please select a product";
         } else if ( !haveSelectedStations()) {
             if ((selectedStationIds != null)
                     && (selectedStationIds.size() > 0)) {
-                html = text = "";
+                html        = text = "";
+                fromProduct = false;
             } else {
-                html = text = "Please select a station";
+                html        = text = "Please select a station";
+                fromProduct = false;
             }
         } else {
             text = newText;
@@ -752,7 +785,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 if (productType.getRenderAsHtml()) {
                     html = convertToHtml(newText);
                 } else {
-                    html = "<pre>" + newText + "</pre>";
+                    html = newText;
                 }
                 long t2 = System.currentTimeMillis();
                 //                System.err.println ("to html time:" + (t2-t1));
@@ -760,12 +793,30 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
         }
 
-        final String finalText = text;
-        final String finalHtml = html;
+        final String  finalText        = text;
+        final String  finalHtml        = html;
+        final boolean finalFromProduct = fromProduct;
 
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                htmlComp.setText("");
+                if (finalFromProduct && (productType != null)) {
+                    if (productType.getRenderAsHtml()) {
+                        htmlComp.setFont(htmlFont);
+                        htmlComp.setContentType("text/html");
+                        showGlossaryCbx.setEnabled(true);
+                    } else {
+                        htmlComp.setFont(fixedFont);
+                        htmlComp.setContentType("text");
+                        showGlossaryCbx.setEnabled(false);
+                    }
+                } else {
+                    htmlComp.setFont(htmlFont);
+                    htmlComp.setContentType("text/html");
+                    showGlossaryCbx.setEnabled(false);
+                }
+
                 textComp.setText(finalText);
                 htmlComp.setText(finalHtml);
                 textComp.setCaretPosition(0);
@@ -789,9 +840,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
             int idx = getAnimation().getCurrent();
             if ((idx >= 0) && (idx < products.size())) {
-                setText(products.get(idx).getContent());
+                setText(products.get(idx).getContent(), true);
             } else {
-                setText("");
+                setText("", false);
             }
         } catch (Exception exc) {
             logException("Error setting time", exc);
@@ -825,36 +876,12 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
         dataSource    = (TextProductDataSource) dataSources.get(0);
         productGroups = dataSource.getProductGroups();
-        if (productGroup != null) {
-            int idx = productGroups.indexOf(productGroup);
-            if (idx >= 0) {
-                productGroup = productGroups.get(idx);
-            } else {
-                productGroup = null;
-            }
-        }
         return super.init(dataChoice);
     }
 
 
 
-    /**
-     *  Set the ProductGroup property.
-     *
-     *  @param value The new value for ProductGroup
-     */
-    public void setProductGroup(ProductGroup value) {
-        productGroup = value;
-    }
 
-    /**
-     *  Get the ProductGroup property.
-     *
-     *  @return The ProductGroup
-     */
-    public ProductGroup getProductGroup() {
-        return productGroup;
-    }
 
     /**
      *  Set the Product property.
