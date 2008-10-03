@@ -24,8 +24,6 @@
 
 
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -38,8 +36,6 @@ import ucar.unidata.data.text.Product;
 import ucar.unidata.data.text.ProductGroup;
 import ucar.unidata.data.text.ProductType;
 import ucar.unidata.data.text.TextProductDataSource;
-
-import ucar.unidata.idv.DisplayConventions;
 
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
@@ -81,9 +77,9 @@ import javax.swing.tree.*;
 
 
 /**
- * Class to display a set of locations
+ * Class to display weather text
  *
- * @author MetApps Development Team
+ * @author IDV Development Team
  * @version $Revision: 1.3 $ $Date: 2006/12/01 20:16:39 $
  */
 
@@ -290,18 +286,15 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
 
         Object[] dateSelectionItems = new Object[] {
-            new TwoFacedObject("Most recent", -1),
-            new TwoFacedObject("1 Hour", 1), new TwoFacedObject("3 Hours", 3),
+            new TwoFacedObject("Most Recent", -1),
+            new TwoFacedObject("1 Hour", 1), 
+            new TwoFacedObject("3 Hours", 3),
             new TwoFacedObject("6 Hours", 6),
             new TwoFacedObject("12 Hours", 12),
-            new TwoFacedObject("1 Day", 24),
-            new TwoFacedObject("1.5 Days", 36),
-            new TwoFacedObject("2 Days", 24 * 2),
-            new TwoFacedObject("3 Days", 24 * 3),
-            new TwoFacedObject("4 Days", 24 * 4),
-            new TwoFacedObject("5 Days", 24 * 5),
-            new TwoFacedObject("6 Days", 24 * 6),
-            new TwoFacedObject("1 Week", 24 * 7), new TwoFacedObject("All", 0)
+            new TwoFacedObject("24 Hours", 24),
+            new TwoFacedObject("36 Hours", 36),
+            new TwoFacedObject("48 Hours", 48), 
+            new TwoFacedObject("All", 0)
         };
         TwoFacedObject selectedTfo =
             TwoFacedObject.findId(new Integer(hours),
