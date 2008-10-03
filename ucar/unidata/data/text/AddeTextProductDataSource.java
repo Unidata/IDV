@@ -85,6 +85,21 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     }
 
     /**
+     * Get the stations for a productType
+     *
+     * @param all    all the possible station
+     * @param tableInfo  table info for the product
+     * @param dateSelection  the date selection
+     *
+     * @return  the list of stations with reports
+    protected NamedStationTable getAvailableStations(NamedStationTable all,
+            TableInfo tableInfo, DateSelection dateSelection) {
+        // TODO: have to figure out what the product is to search
+        return all;
+    }
+     */
+
+    /**
      * Read products for the station
      *
      * @param ti  the table information
@@ -100,9 +115,11 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         if ( !canHandleType(ti)) {
             return products;
         }
+        /*
         if ((stations == null) || (stations.size() == 0)) {
             return products;
         }
+        */
 
         String base = "adde://"+
                       getDataContext().getIdv().getProperty(
@@ -110,6 +127,10 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
 
         try {
             if (!ti.flag.equals(ti.FLAG_O)) {
+                if (stations == null) {
+                    stations = new ArrayList<NamedStationImpl>();
+                    stations.add((NamedStationImpl) null);
+                }
                 for (NamedStationImpl station : stations) {
                     String url = base + getWxTextRequest(ti, station, dateSelection);
                     //System.out.println("url = " + url);
@@ -174,7 +195,18 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         }
 
         StringBuilder buf = new StringBuilder("wxtext?");
-        if (ti.flag.equals(ti.FLAG_F)) {
+        if (ti.flag.equals(ti.FLAG_W)) {
+            // Major  hack
+            String apro = ti.fileExtension;
+            if (apro.length() == 3) {
+                buf.append("APRO=");
+                buf.append(apro);
+                if (station != null) {
+                    buf.append("&WSTN=");
+                    buf.append(station.getID());
+                }
+            }
+        } else if (ti.flag.equals(ti.FLAG_F)) {
             String afos = station.getID();
             if ((afos == null) || afos.equals("")) {
                 return "";
@@ -325,7 +357,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
                || ti.flag.equals(TableInfo.FLAG_F)
-        //|| ti.flag.equals(TableInfo.FLAG_W)
+        || ti.flag.equals(TableInfo.FLAG_W)
         || ti.flag.equals(TableInfo.FLAG_O);
     }
 
