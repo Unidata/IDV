@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -155,6 +156,10 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     /** station list */
     private List stationList = new ArrayList();
 
+    /** holds the last 10 converted html text objects */
+    private Cache htmlCache = new Cache(10);
+
+
     /**
      * Default cstr;
      */
@@ -257,7 +262,17 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         }
 
         DefaultTreeModel treeModel = new DefaultTreeModel(treeRoot);
-        productTree = new JTree(treeModel);
+        productTree = new JTree(treeModel) {
+            public String getToolTipText() {
+                if (productType != null) {
+                    return "Current selected product:" + productType.getId();
+                } else {
+                    return super.getToolTipText();
+                }
+            }
+        };
+        productTree.setToolTipText("Products");
+        ToolTipManager.sharedInstance().registerComponent(productTree);
         productTree.setRootVisible(false);
         productTree.setShowsRootHandles(true);
         if (selectedNode != null) {
@@ -400,8 +415,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      *
      * @param selectionList  list of stations
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected void selectedStationsChanged(List selectionList)
             throws VisADException, RemoteException {
@@ -590,8 +605,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         return dateSelection;
     }
 
-    /** _more_          */
-    private Cache htmlCache = new Cache(10);
 
     /**
      * Convert the text to HTML
@@ -651,7 +664,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         text = text.replaceAll("([^\\.]+)\\.[ ]+\n", "$1.<p>");
         //309 PM MDT SAT SEP 27 2008
         //italicize dates
-    //        text = text.replaceAll("^([0-9]+\s*(AM|PM).*[0-9]+)$", "<i>$1</i>");
+        //        text = text.replaceAll("^([0-9]+\s*(AM|PM).*[0-9]+)$", "<i>$1</i>");
 
 
         //Clean up the extra newlines and p tags around the divs
@@ -659,7 +672,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         text = text.replaceAll(">\n+", ">");
         text = text.replaceAll("<p><div", "<div");
         //        System.out.println(text);
-       
+
 
         String[] icons = {
             "partlycloudy.png", "partlycloudy.png", "cloudy.png",
@@ -722,7 +735,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
      * Set the text
      *
      *
-     * @param newText _more_
+     * @param newText The new text to set
      */
     protected void setText(String newText) {
         currentText = newText;
@@ -739,14 +752,18 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
         } else {
             text = newText;
-            String key = getShowGlossary()+"_"+newText;
+            String key = getShowGlossary() + "_" + newText;
             html = (String) htmlCache.get(key);
             if (html == null) {
                 long t1 = System.currentTimeMillis();
-                html = convertToHtml(newText);
+                if (productType.getRenderAsHtml()) {
+                    html = convertToHtml(newText);
+                } else {
+                    html = "<pre>" + newText + "</pre>";
+                }
                 long t2 = System.currentTimeMillis();
                 //                System.err.println ("to html time:" + (t2-t1));
-                htmlCache.put(key,html);
+                htmlCache.put(key, html);
             }
         }
 
