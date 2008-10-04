@@ -228,7 +228,6 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             return new JLabel("Could not load product data");
         }
         JTabbedPane tabs = doMakeTabs(false, false);
-        tabs = new JTabbedPane();
 
         setCenterOnClick(false);
         //        setDeclutter(false);
