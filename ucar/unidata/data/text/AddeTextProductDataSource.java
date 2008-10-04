@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.text;
 
 
@@ -44,6 +43,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -53,6 +53,26 @@ import java.util.List;
  * @version $Revision: 1.15 $
  */
 public class AddeTextProductDataSource extends NwxTextProductDataSource {
+
+    /**
+     * properties for warnings
+     */
+    private Properties warningProps;
+
+    /**
+     * waring properties file name
+     */
+    private static final String WARN_PROP_FILE = "warnings.search.properties";
+
+    /**
+     * path to table text
+     */
+    public static final String PROP_TABLE_PATH = "text.table.path";
+
+    /**
+     * path to table text
+     */
+    public static final String PROP_WARN_PATH = "text.warning.path";
 
     /**
      * Default bean constructor; does nothing.
@@ -85,21 +105,6 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     }
 
     /**
-     * Get the stations for a productType
-     *
-     * @param all    all the possible station
-     * @param tableInfo  table info for the product
-     * @param dateSelection  the date selection
-     *
-     * @return  the list of stations with reports
-    protected NamedStationTable getAvailableStations(NamedStationTable all,
-            TableInfo tableInfo, DateSelection dateSelection) {
-        // TODO: have to figure out what the product is to search
-        return all;
-    }
-     */
-
-    /**
      * Read products for the station
      *
      * @param ti  the table information
@@ -121,20 +126,22 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         }
         */
 
-        String base = "adde://"+
-                      getDataContext().getIdv().getProperty(
-                          "textserver", "adde.ucar.edu") + "/";
+        String base = "adde://"
+                      + getDataContext().getIdv().getProperty("textserver",
+                          "adde.ucar.edu") + "/";
 
         try {
-            if (!ti.flag.equals(ti.FLAG_O)) {
+            if ( !ti.flag.equals(ti.FLAG_O)) {
                 if (stations == null) {
                     stations = new ArrayList<NamedStationImpl>();
                     stations.add((NamedStationImpl) null);
                 }
                 for (NamedStationImpl station : stations) {
-                    String url = base + getWxTextRequest(ti, station, dateSelection);
-                    //System.out.println("url = " + url);
-                    AddeTextReader atr = new AddeTextReader(url);
+                    String url = base
+                                 + getWxTextRequest(ti, station,
+                                     dateSelection);
+                    // System.out.println("url = " + url);
+                    AddeTextReader      atr   = new AddeTextReader(url);
                     List<WxTextProduct> prods = atr.getWxTextProducts();
                     for (Iterator itera =
                             prods.iterator(); itera.hasNext(); ) {
@@ -144,12 +151,13 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
                     }
                 }
             } else {
-                String url = base + getObTextRequest(ti, stations, dateSelection);
+                String url = base
+                             + getObTextRequest(ti, stations, dateSelection);
                 //System.out.println("url = " + url);
                 AddeTextReader atr = new AddeTextReader(url);
-                String obs = atr.getText();
+                String         obs = atr.getText();
                 products.add(new Product(stations.toString(), atr.getText(),
-                             new Date()));
+                                         new Date()));
             }
 
         } catch (Exception e) {
@@ -167,8 +175,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @return the request string
      */
-    private String getWxTextRequest(TableInfo ti, 
-                                    NamedStationImpl station,
+    private String getWxTextRequest(TableInfo ti, NamedStationImpl station,
                                     DateSelection dateSelection) {
         Date[] dateRange = (((dateSelection == null)
                              || dateSelection.isLatest()
@@ -196,14 +203,26 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
 
         StringBuilder buf = new StringBuilder("wxtext?");
         if (ti.flag.equals(ti.FLAG_W)) {
-            // Major  hack
-            String apro = ti.fileExtension;
-            if (apro.length() == 3) {
-                buf.append("APRO=");
-                buf.append(apro);
+            if (warningProps != null) {
+                String search = warningProps.getProperty(ti.type);
+                if (search != null) {
+                    buf.append(search);
+                }
                 if (station != null) {
                     buf.append("&WSTN=");
                     buf.append(station.getID());
+                }
+            } else {
+
+                // Major  hack
+                String apro = ti.fileExtension;
+                if (apro.length() == 3) {
+                    buf.append("APRO=");
+                    buf.append(apro);
+                    if (station != null) {
+                        buf.append("&WSTN=");
+                        buf.append(station.getID());
+                    }
                 }
             }
         } else if (ti.flag.equals(ti.FLAG_F)) {
@@ -241,7 +260,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      *
      * @return  the request string
      */
-    private String getObTextRequest(TableInfo ti, 
+    private String getObTextRequest(TableInfo ti,
                                     List<NamedStationImpl> stations,
                                     DateSelection dateSelection) {
         Date[] dateRange = (((dateSelection == null)
@@ -249,29 +268,30 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
                              || dateSelection.isAll())
                             ? null
                             : dateSelection.getRange());
-        Date   start   = (dateRange == null)
-                         ? null
-                         : dateRange[0];
-        Date   end     = (dateRange == null)
-                         ? null
-                         : dateRange[1];
+        Date          start = (dateRange == null)
+                              ? null
+                              : dateRange[0];
+        Date          end   = (dateRange == null)
+                              ? null
+                              : dateRange[1];
         int maxCount = (((dateSelection == null) || dateSelection.isLatest())
                         ? 1
                         : dateSelection.getCount());
 
-        StringBuilder buf = new StringBuilder("obtext?");
+        StringBuilder buf   = new StringBuilder("obtext?");
         buf.append("&ID=");
-        for (NamedStationImpl  station : stations) {
-            String id      = station.getID();
+        for (NamedStationImpl station : stations) {
+            String id = station.getID();
             String idn =
-            (String) station.getProperty(NamedStationTable.KEY_IDNUMBER, "");
+                (String) station.getProperty(NamedStationTable.KEY_IDNUMBER,
+                                             "");
             if ( !idn.equals("")) {
                 idn = idn.substring(0, 5);
             }
             if (ti.type.equals("SND_DATA")) {
-                id      = idn;
+                id = idn;
             } else if (ti.type.equals("SYN_DATA")) {
-                id      = idn;
+                id = idn;
             } else {  // (ti.type.equals("SFC_HRLY")) 
                 // uses 3 letter ids
                 if (id.length() < 4) {
@@ -282,7 +302,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
             buf.append(" ");
         }
 
-        int    hourMod = 1;
+        int hourMod = 1;
         buf.append("&descriptor=");
         if (ti.type.equals("SND_DATA")) {
             buf.append("UPPERAIR");
@@ -327,8 +347,9 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
      * @return the base path of the data.
      */
     protected String getTablePath() {
-        return getDataContext().getIdv().getProperty("tablepath",
-                "http://www.unidata.ucar.edu/software/idv/resources");
+        return getIdvProperty(
+            PROP_TABLE_PATH,
+            "http://www.unidata.ucar.edu/software/idv/resources");
     }
 
     /**
@@ -348,6 +369,24 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     }
 
     /**
+     * Initialize after opening.
+     */
+    protected void initAfter() {
+        super.initAfter();
+        String warningPropFile = null;
+        try {
+            warningPropFile = getIdvProperty(PROP_WARN_PATH,
+                                             getTablePath() + "/nwx/"
+                                             + WARN_PROP_FILE);
+            warningProps = Misc.readProperties(warningPropFile, warningProps,
+                    getClass());
+        } catch (Exception e) {
+            System.err.println("Couldn't read warning property file: "
+                               + warningPropFile);
+        }  // doesn't matter if we can't get it
+    }
+
+    /**
      * Can we handle this type of data?
      *
      * @param ti  the table info
@@ -357,8 +396,20 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     protected boolean canHandleType(TableInfo ti) {
         return ti.flag.equals(TableInfo.FLAG_B)
                || ti.flag.equals(TableInfo.FLAG_F)
-        || ti.flag.equals(TableInfo.FLAG_W)
-        || ti.flag.equals(TableInfo.FLAG_O);
+               || ti.flag.equals(TableInfo.FLAG_W)
+               || ti.flag.equals(TableInfo.FLAG_O);
+    }
+
+    /**
+     * Get an IDV property
+     *
+     * @param name  name of property
+     * @param def   default value
+     *
+     * @return  the property if found or the default value
+     */
+    private String getIdvProperty(String name, String def) {
+        return getDataContext().getIdv().getProperty(name, def);
     }
 
 }
