@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -134,13 +135,13 @@ public abstract class TextProductDataSource extends FilesDataSource {
      * Read the products for the product type and station
      *
      * @param productType the product type
-     * @param station the station
+     * @param stations the stations
      * @param dateSelection  the date selection
      *
      * @return the list of products
      */
     public abstract List<Product> readProducts(ProductType productType,
-                                               List<NamedStationImpl> stations, DateSelection dateSelection);
+            List<NamedStationImpl> stations, DateSelection dateSelection);
 
     /**
      * Get the stations for a productType
@@ -157,11 +158,19 @@ public abstract class TextProductDataSource extends FilesDataSource {
      throws Exception;
 
 
-    protected static Hashtable makeStationMap(List<NamedStationImpl> stations) {
-        Hashtable ids = new Hashtable();
-        if(stations!=null && stations.size()>0) {
-            for(NamedStationImpl station: stations) {
-                ids.put(station.getID(),new Integer(0));
+    /**
+     * Make a mapping of station name to integer count
+     *
+     * @param stations   list of stations
+     *
+     * @return  mapping of station name to integer count
+     */
+    protected static Hashtable<String, Integer> makeStationMap(
+            List<NamedStationImpl> stations) {
+        Hashtable<String, Integer> ids = new Hashtable<String, Integer>();
+        if ((stations != null) && (stations.size() > 0)) {
+            for (NamedStationImpl station : stations) {
+                ids.put(station.getID(), new Integer(0));
             }
         }
         return ids;

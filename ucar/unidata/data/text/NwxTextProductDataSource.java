@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.data.text;
 
 
@@ -90,7 +91,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
     private String gemDataPath;
 
     /** This keeps around the gempak directory paths that the user selects when the gem environment variables are not set */
-    private Hashtable paths = new Hashtable();
+    private Hashtable<String, String> paths = new Hashtable<String, String>();
 
     /** the nwx.properties */
     private Properties nwxProperties;
@@ -223,6 +224,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      */
     protected NamedStationTable getAvailableStations(NamedStationTable all,
             TableInfo tableInfo, DateSelection dateSelection) {
+        if (all == null) {
+            return all;
+        }
         List<Product> products = readProducts(tableInfo, null, dateSelection);
         NamedStationTable subset = new NamedStationTable();
         for (Product p : products) {
@@ -661,15 +665,15 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         List<Product> products = new ArrayList<Product>();
         String contents = IOUtil.readContents(path,
                               NwxTextProductDataSource.class);
-        String    prefix   = (recordType
-                              ? ""
-                              : "");
-        String    suffix   = (recordType
-                              ? ""
-                              : "");
-        int       idx      = 0;
-        Hashtable ids      = makeStationMap(stations);
-        Date      fileDate = getDateFromFileName(path);
+        String                     prefix   = (recordType
+                ? ""
+                : "");
+        String                     suffix   = (recordType
+                ? ""
+                : "");
+        int                        idx      = 0;
+        Hashtable<String, Integer> ids      = makeStationMap(stations);
+        Date                       fileDate = getDateFromFileName(path);
         //        System.err.println ("contents:" + contents);
         while (true) {
             int idx1 = contents.indexOf(prefix, idx);
@@ -873,7 +877,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      *  @param value The new value for Paths
      */
-    public void setPaths(Hashtable value) {
+    public void setPaths(Hashtable<String, String> value) {
         paths = value;
     }
 
@@ -882,7 +886,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      *
      *  @return The Paths
      */
-    public Hashtable getPaths() {
+    public Hashtable<String, String> getPaths() {
         return paths;
     }
 
