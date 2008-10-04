@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -519,6 +517,7 @@ public class PointObFactory {
             TupleType tupleType      = null;
             TupleType finalTupleType = null;
             Trace.call1("loop-2", " num vars: " + numNotRequired);
+            int cnt = 0;
             for (int i = 0; i < length; i++) {
                 DateTime dateTime = (DateTime) times.get(i);
                 Tuple    ob       = (Tuple) input.getSample(i);
@@ -1268,9 +1267,10 @@ public class PointObFactory {
                                           float xSpacing, float ySpacing,
                                           int numPasses)
             throws VisADException, RemoteException {
-        int       numObs    = pointObs.getLength();
-        float[][] obVals = new float[3][numObs];
-        PointOb   firstOb   = (PointOb) pointObs.getSample(0);
+
+        int       numObs  = pointObs.getLength();
+        float[][] obVals  = new float[3][numObs];
+        PointOb   firstOb = (PointOb) pointObs.getSample(0);
         // TODO: May not be a tuple
         Tuple     data  = (Tuple) firstOb.getData();
         TupleType ttype = (TupleType) data.getType();
@@ -1279,16 +1279,16 @@ public class PointObFactory {
         if (typeIndex == -1) {
             return null;
         }
-        float latMin = 90;
-        float lonMin = 180;
-        float latMax = -90;
-        float lonMax = -180;
-        int cnt = 0;
-        int numMissing = 0;
+        float latMin     = 90;
+        float lonMin     = 180;
+        float latMax     = -90;
+        float lonMax     = -180;
+        int   cnt        = 0;
+        int   numMissing = 0;
         for (int i = 0; i < numObs; i++) {
-            PointOb       po = (PointOb) pointObs.getSample(i);
-            Tuple obData = (Tuple) po.getData();
-            Real  val    = (Real) obData.getComponent(typeIndex);
+            PointOb po     = (PointOb) pointObs.getSample(i);
+            Tuple   obData = (Tuple) po.getData();
+            Real    val    = (Real) obData.getComponent(typeIndex);
             //System.out.println("val["+i+"] ="+ val);
             double obVal = val.getValue(type.getDefaultUnit());
             if (Double.isNaN(obVal)) {
@@ -1298,6 +1298,11 @@ public class PointObFactory {
 
             EarthLocation el = po.getEarthLocation();
             float lat = (float) el.getLatitude().getValue(CommonUnit.degree);
+            // sanity check
+            if (Float.isNaN(lat) || (lat < -90) || (lat > 90)) {
+                numMissing++;
+                continue;
+            }
             if (lat < latMin) {
                 latMin = lat;
             }
@@ -1305,6 +1310,11 @@ public class PointObFactory {
                 latMax = lat;
             }
             float lon = (float) el.getLongitude().getValue(CommonUnit.degree);
+            // sanity check
+            if (Float.isNaN(lon) || (lon < -360) || (lon > 360)) {
+                numMissing++;
+                continue;
+            }
             if (lon < -180) {
                 lon += 360;
             }
@@ -1325,15 +1335,15 @@ public class PointObFactory {
         }
         //  System.out.println("cnt = " + cnt + " num obs = " + numObs + " missing = " + numMissing);
         if (cnt != numObs) {
-            for (int i = 0;  i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 float[] temp = new float[cnt];
                 System.arraycopy(obVals[i], 0, temp, 0, cnt);
                 obVals[i] = temp;
             }
         }
-            
 
-        //System.out.println("lat = " + latMin + "-"+latMax+", lon = " +lonMin+"-"+lonMax);
+
+        // System.out.println("lat = " + latMin + " "+latMax+", lon = " +lonMin+" "+lonMax);
         float[] faGridX     = null;
         float[] faGridY     = null;
         float   scaleLength = 1.0f;
@@ -1341,7 +1351,9 @@ public class PointObFactory {
         if ((xSpacing == OA_GRID_DEFAULT) || (ySpacing == OA_GRID_DEFAULT)) {
             Barnes.AnalysisParameters ap =
                 Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
-                    latMax, new float[][] {obVals[0], obVals[1]});
+                    latMax, new float[][] {
+                obVals[0], obVals[1]
+            });
             faGridX     = ap.getGridXArray();
             faGridY     = ap.getGridYArray();
             scaleLength = (float) ap.getScaleLengthGU();
@@ -1351,8 +1363,8 @@ public class PointObFactory {
         }
         // System.out.println("X = " + faGridX.length + "  Y = " + faGridY.length + " scaleLength = " + scaleLength);
 
-        double[][] griddedData = Barnes.point2grid(faGridX, faGridY,
-                                     obVals, scaleLength, gain, numPasses);
+        double[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
+                                     scaleLength, gain, numPasses);
 
         float[][] faaDomainSet =
             new float[2][faGridX.length * faGridY.length];
@@ -1380,6 +1392,7 @@ public class PointObFactory {
         FlatField retData = new FlatField(ftLatLon2Param, g2ddsSet);
         retData.setSamples(faaGridValues3, false);
         return retData;
+
     }
 
     /**
