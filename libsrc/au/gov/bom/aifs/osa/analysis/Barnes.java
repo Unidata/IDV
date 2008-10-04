@@ -99,6 +99,10 @@ public class Barnes
 	 * 
 	 */
 
+    private static float[] faLonValues;
+    private static float[] faLatValues;
+    public static boolean useRadii = false;
+
 	public synchronized static double[][] point2grid(float[] lon,
 		float[] lat, float[][] data3D, float scaleLength, float gain,
 		int iNumPasses)
@@ -115,8 +119,8 @@ public class Barnes
 		float fGridSpaceY = Math.abs(lat[1] - lat[0]);
 
 		// create array of lons/lats in grid units
-		float[] faLonValues = new float[numData];
-		float[] faLatValues = new float[numData];
+		faLonValues = new float[numData];
+		faLatValues = new float[numData];
 		float[] faValues = new float[numData];
 
 		for (int i = 0; i < numData; i++) {
@@ -179,8 +183,7 @@ public class Barnes
 				daDifferences, iNumPasses);
 
 		radii = null;
-		System.gc();
-
+                //		System.gc();
 		return (daaGrid);
 	}
 
@@ -204,9 +207,9 @@ public class Barnes
 		float fGridSpaceY = Math.abs(lat[1] - lat[0]);
 
 		// create array of lons/lats in grid units
-		float[] faLonValues = new float[numData];
-		float[] faLatValues = new float[numData];
-		float[] faValues = new float[numData];
+		faLonValues = new float[numData];
+		faLatValues = new float[numData];
+		float[]faValues = new float[numData];
 
 		for (int i = 0; i < numData; i++) {
 			faLonValues[i] = (data3D[0][i] - fMinLon) /fGridSpaceX;
@@ -278,8 +281,7 @@ public class Barnes
 				daDifferences, iNumPasses);
 
 		radii = null;
-		System.gc();
-
+                //		System.gc();
 		return (daaGrid);
 	}
 
@@ -353,7 +355,17 @@ public class Barnes
 						// (the weighting function is a
 						// "bell" shaped curve)
 
-						r2 = radii[i][j][k];
+
+                                            if(useRadii) {
+                                                r2 = radii[i][j][k];
+                                            } else {
+                                                dx =(double)faLonValues[k]- (double)i;
+                                                dy =(double)faLatValues[k]- (double)j;
+                                                r2 = dx*dx + dy*dy;
+                                            }
+
+
+
 						if ((!Double.isNaN(
 							daDifferences[k]))
 							&& (r2 < 
@@ -493,7 +505,13 @@ public class Barnes
 					// how far it is from the grid point
 					// (the weighting function is a "bell"
 					// shaped curve)
-					r2 = radii[i][j][k];
+                                    if(useRadii) {
+                                        r2 = radii[i][j][k];
+                                    } else {
+					dx =(double)faLonValues[k]- (double)i;
+					dy =(double)faLatValues[k]- (double)j;
+                                        r2 = dx*dx + dy*dy;
+                                    }
 					if ((r2 < radiusOfInfluence2)
 						&& (!Float.isNaN(faValues[k])))
 					{
@@ -1211,14 +1229,16 @@ public class Barnes
 		return array;
 	}
 
+
+
 	private synchronized static double[][][] setupRadii(int xSize,
 		int ySize, float[] faLonValues, float[] faLatValues,
 		double scaleLength2)
 	{
-		int numSamples = faLonValues.length;
-		double[][][] radii = new double[xSize][ySize][numSamples];
-
-		for (int i = 0; i < xSize; i++) {
+            if(!useRadii) return null;
+            int numSamples = faLonValues.length;
+            double[][][] radii = new double[xSize][ySize][numSamples];
+        	for (int i = 0; i < xSize; i++) {
 			for (int j = 0; j < ySize; j++) {
 				for (int k = 0; k < numSamples; k++) {
 					double dx =
@@ -1227,13 +1247,12 @@ public class Barnes
 					double dy =
 						(double)faLatValues[k]
 							- (double)j;
-					radii[i][j][k] =
+                                        radii[i][j][k] =
 						Math.pow(dx, 2.0d)
 							+ Math.pow(dy, 2.0d);
-				}
+        		}
 			}
 		}
-
 		return radii;
 	}
 
