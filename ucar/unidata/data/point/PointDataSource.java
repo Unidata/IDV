@@ -127,7 +127,7 @@ public abstract class PointDataSource extends FilesDataSource {
     private JComboBox widthCbx;
 
     /** default value for gridding */
-    private static final float GRID_DEFAULT = PointObFactory.OA_GRID_DEFAULT;
+    private static final float GRID_DEFAULT = 2;
 
     /** x for grid */
     private float gridX = GRID_DEFAULT;
@@ -793,10 +793,10 @@ public abstract class PointDataSource extends FilesDataSource {
 
             float degreesX=0, degreesY = 0;
             pointObs = PointObFactory.makeTimeSequenceOfPointObs(pointObs);
-            if (theUnit.equals(SPACING_COMPUTE) || (spacingX == GRID_DEFAULT)
-                    || (spacingY == GRID_DEFAULT)) {
-                degreesX = GRID_DEFAULT;
-                degreesY = GRID_DEFAULT;
+            if (theUnit.equals(SPACING_COMPUTE) || (spacingX <= 0)
+                    || (spacingY <= 0)) {
+                degreesX = PointObFactory.OA_GRID_DEFAULT;
+                degreesY = PointObFactory.OA_GRID_DEFAULT;
             } else if (theUnit.equals(SPACING_POINTS)) {
                 double[] bbox  = PointObFactory.getBoundingBox(pointObs);
                 float    spanX = (float) Math.abs(bbox[1] - bbox[3]);
@@ -807,7 +807,7 @@ public abstract class PointDataSource extends FilesDataSource {
                 degreesX =  spacingX;
                 degreesY =  spacingY;
             }
-            // System.out.println("X = " + X + " Y = " + Y + " unit = " + theUnit);
+            // System.out.println("X = " + degreesX + " Y = " + degreesY + " unit = " + theUnit);
 
             LogUtil.message("Doing Barnes Analysis");
             return PointObFactory.barnes(pointObs, type, degreesX, degreesY, iterations);
