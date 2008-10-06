@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -335,7 +336,7 @@ public class DataSelection {
         }
         DataSelection that = (DataSelection) o;
         return Misc.equals(this.times, that.times)
-            && Misc.equals(this.properties, that.properties)
+               && Misc.equals(this.properties, that.properties)
                && Misc.equals(this.geoSelection, that.geoSelection)
                && Misc.equals(this.fromLevel, that.fromLevel)
                && Misc.equals(this.toLevel, that.toLevel);
@@ -475,6 +476,15 @@ public class DataSelection {
      */
     public Object getProperty(Object key) {
         return properties.get(key);
+    }
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     */
+    public void removeProperty(Object key) {
+        properties.remove(key);
     }
 
     /**
