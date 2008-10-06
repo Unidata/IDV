@@ -3489,6 +3489,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return the appropriate displayable
      */
     public DisplayableData getDisplayListDisplayable(ViewManager view) {
+
+        if (hasBeenRemoved) {
+	    return null;
+	}	
+
         DisplayableData displayListDisplayable = null;
         if (displayListTable == null) {
             return null;  // in process of removing ?
