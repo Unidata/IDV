@@ -262,7 +262,7 @@ public class ValuePlanViewControl extends PlanViewControl {
                 try {
                     if (getGridDisplayable() != null) {
                         if (currentSlice == null) {
-                            Real newLevel = currentLevel;
+                            Object newLevel = currentLevel;
                             currentLevel = null;
                             loadDataAtLevel(newLevel);
                         } else {

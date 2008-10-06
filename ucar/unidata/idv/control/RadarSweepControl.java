@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -325,11 +326,11 @@ public class RadarSweepControl extends ColorPlanViewControl {
             throws RemoteException, VisADException {
 
         if (currentLevel == null) {
-            currentLevel = (Real) getDataSelection().getFromLevel();
+            currentLevel = getDataSelection().getFromLevel();
             if (currentLevel == null) {
                 List levelsList = dataChoice.getAllLevels(getDataSelection());
                 if ((levelsList != null) && (levelsList.size() > 0)) {
-                    currentLevel = (Real) levelsList.get(0);
+                    currentLevel = levelsList.get(0);
                 }
             }
         }

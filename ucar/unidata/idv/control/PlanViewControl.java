@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -107,7 +108,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     private JCheckBox cycleLevelsCbx;
 
     /** list of current levels */
-    protected Real[] currentLevels;
+    protected Object[] currentLevels;
 
     /** level readout label */
     protected JLabel levelReadout;
@@ -137,7 +138,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected FieldImpl currentSlice;
 
     /** current level */
-    protected Real currentLevel;
+    protected Object currentLevel;
 
     /**
      *  Have we loaded any data yet.
@@ -184,10 +185,24 @@ public abstract class PlanViewControl extends GridDisplayControl {
         return currentSlice;
     }
 
+    /**
+     * _more_
+     *
+     * @param slice _more_
+     *
+     * @throws Exception _more_
+     */
     protected void setCurrentSlice(FieldImpl slice) throws Exception {
         currentSlice = slice;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected FieldImpl getCurrentSlice() throws Exception {
         return currentSlice;
     }
@@ -512,10 +527,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
         DataSelection tmpSelection = new DataSelection(getDataSelection());
         tmpSelection.setFromLevel(null);
         tmpSelection.setToLevel(null);
-        List   levelsList = dataChoice.getAllLevels(tmpSelection);
-        Real[] levels     = null;
+        List     levelsList = dataChoice.getAllLevels(tmpSelection);
+        Object[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
-            levels = (Real[]) levelsList.toArray(new Real[levelsList.size()]);
+            levels =
+                (Object[]) levelsList.toArray(new Object[levelsList.size()]);
         }
 
 
@@ -524,7 +540,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
 
         if (currentLevel == null) {
-            currentLevel = (Real) getDataSelection().getFromLevel();
+            currentLevel = getDataSelection().getFromLevel();
         }
         if ((levels != null) && (levels.length > 0)
                 && (currentLevel == null)) {
@@ -644,7 +660,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @param levels  array of levels
      */
-    public void setLevels(Real[] levels) {
+    public void setLevels(Object[] levels) {
         setOkToFireEvents(false);
         currentLevels = levels;
         levelEnabled  = (levels != null);
@@ -665,7 +681,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         GuiUtils.setListData(levelBox, formatLevels(levels));
         if (currentLevel != null) {
-            levelBox.setSelectedItem(Util.labeledReal(currentLevel));
+            levelBox.setSelectedItem(currentLevel);
         }
 
         setOkToFireEvents(true);
@@ -707,13 +723,13 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return;
         }
         for (int i = 0; i < currentLevels.length; i++) {
-            final TwoFacedObject level = Util.labeledReal(currentLevels[i]);
+            final TwoFacedObject level = getLabeledReal(currentLevels[i]);
             JMenuItem            mi    = new JMenuItem("" + level);
             levelMenu.add(mi);
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
-                        setLevelFromUser((Real) level.getId());
+                        setLevelFromUser(level.getId());
                     } catch (Exception exc) {
                         logException("setLevel", exc);
                     }
@@ -778,7 +794,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @return  active level
      */
-    public Real getLevel() {
+    public Object getLevel() {
         return currentLevel;
     }
 
@@ -788,7 +804,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @param pl  present level.
      */
-    public void setLevel(Real pl) {
+    public void setLevel(Object pl) {
         setLevel(pl, false);
     }
 
@@ -798,7 +814,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @param level present level.
      */
-    public void setSettingsLevel(Real level) {
+    public void setSettingsLevel(Object level) {
         setDataSelectionLevel(level);
         setLevel(level, false);
     }
@@ -809,7 +825,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @param level The level
      */
-    public void setDataSelectionLevel(Real level) {
+    public void setDataSelectionLevel(Object level) {
         getDataSelection().setLevel(level);
     }
 
@@ -822,7 +838,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    protected void setLevelFromUser(Real pl)
+    protected void setLevelFromUser(Object pl)
             throws VisADException, RemoteException {
         setLevelFromUser(pl, false);
     }
@@ -838,7 +854,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private void setLevelFromUser(final Real pl, final boolean fromSelector)
+    private void setLevelFromUser(final Object pl, final boolean fromSelector)
             throws VisADException, RemoteException {
         //We only set the level if there is a level in the data selection
         //This implies that we were created with an initial level
@@ -868,7 +884,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @param  pl   level to select
      * @param  fromSelector   true if being done by the selector.
      */
-    private void setLevel(final Real pl, boolean fromSelector) {
+    private void setLevel(final Object pl, boolean fromSelector) {
         try {
             if ( !getHaveInitialized()) {
                 currentLevel = pl;
@@ -892,7 +908,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws  VisADException  illegal level or other VisAD error
      * @throws  RemoteException  RMI error
      */
-    public void loadDataAtLevel(Real level)
+    public void loadDataAtLevel(Object level)
             throws VisADException, RemoteException {
         loadDataAtLevel(level, false);
     }
@@ -908,8 +924,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws  VisADException  illegal level or other VisAD error
      * @throws  RemoteException  RMI error
      */
-    private void loadDataAtLevel(Real level, boolean fromSelector)
+    private void loadDataAtLevel(Object level, boolean fromSelector)
             throws VisADException, RemoteException {
+
         Trace.call1("PlanView.loadData");
         if (loadedAny && (level != null) && level.equals(currentLevel)) {
             return;
@@ -938,7 +955,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
         currentLevel = level;
         //Trace.call1 ("PlanView.slice");
         currentSlice = null;
-        int samplingMode = getSamplingModeValue(getDefaultSamplingMode());
+        int  samplingMode = getSamplingModeValue(getDefaultSamplingMode());
+        Real realLevel    = getLevelReal(level);
         // NB: someday, someone needs to clean this block up without
         // breaking anything.
         if (GridUtil.isVolume(workingGrid)) {  // need to slice
@@ -950,14 +968,17 @@ public abstract class PlanViewControl extends GridDisplayControl {
             if ((level != null)
                     && ((currentLevels != null)
                         && (currentLevels.length > 1))) {
+                if (realLevel == null) {
+                    return;
+                }
                 // regular volume slice
                 if (displayIs3D && !getMultipleIsTopography()) {
-                    currentSlice = GridUtil.sliceAtLevel(workingGrid, level,
-                            samplingMode);
+                    currentSlice = GridUtil.sliceAtLevel(workingGrid,
+                            realLevel, samplingMode);
                 } else {  // slice for 2D display or topography
                     currentSlice = GridUtil.make2DGridFromSlice(
                         GridUtil.sliceAtLevel(
-                            workingGrid, level, samplingMode));
+                            workingGrid, realLevel, samplingMode));
                 }
             } else {
                 // only one level?  - can we get here?
@@ -967,26 +988,26 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
         } else {  // 2D grid or requested slice
             currentSlice = workingGrid;
-            if (GridUtil.is3D(currentSlice) && 
-                (!displayIs3D || getMultipleIsTopography())) {
+            if (GridUtil.is3D(currentSlice)
+                    && ( !displayIs3D || getMultipleIsTopography())) {
                 currentSlice = GridUtil.make2DGridFromSlice(currentSlice);
             }
         }
 
         getGridDisplayable().loadData(getSliceForDisplay(currentSlice));
         //Trace.call2 ("PlanView.gridDisplayable.loadData");
-        if ((level == null) || !displayIs3D) {
+        if ((level == null) || (realLevel == null) || !displayIs3D) {
             return;
         }
         if (levelBox != null) {
-            levelBox.setSelectedItem(Util.labeledReal(level));
+            levelBox.setSelectedItem(level);
         }
 
         Real altitude = null;
         // we do the try/catch around this for 2D data instead of just
         // setting the level to null.
         try {
-            altitude = GridUtil.getAltitude(currentSlice, level);
+            altitude = GridUtil.getAltitude(currentSlice, realLevel);
         } catch (Exception ve) {
             altitude = null;
         }
@@ -999,13 +1020,14 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 zSelector.setZValue(lastZValue);
             }
             if (fromSelector) {
-                level = GridUtil.getLevel(currentSlice, level);
+                level = GridUtil.getLevel(currentSlice, realLevel);
             }
         }
 
         setLevelReadoutLabel("Current level: " + formatLevel(level));
         updateLegendAndList();
         Trace.call2("PlanView.loadData");
+
     }
 
 
@@ -1081,14 +1103,15 @@ public abstract class PlanViewControl extends GridDisplayControl {
      *
      * @return formatted string for level
      */
-    protected String formatLevel(Real level) {
+    protected String formatLevel(Object level) {
         if (level == null) {
             return "                                       ";
         }
-        StringBuffer buf = new StringBuffer();
-        buf.append(getDisplayConventions().format(currentLevel.getValue()));
+        Real         myLevel = getLevelReal(level);
+        StringBuffer buf     = new StringBuffer();
+        buf.append(getDisplayConventions().format(myLevel.getValue()));
         buf.append(" ");
-        buf.append(level.getUnit());
+        buf.append(myLevel.getUnit());
         return buf.toString();
     }
 
@@ -1131,7 +1154,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (dataId.equals(SHARE_LEVEL)) {
             try {
                 //loadDataAtLevel((Real) data[0]);
-                setLevelFromUser((Real) data[0]);
+                setLevelFromUser(data[0]);
             } catch (Exception exc) {
                 logException("receiveShareData.level", exc);
             }

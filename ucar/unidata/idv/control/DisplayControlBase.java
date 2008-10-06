@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -78,6 +79,7 @@ import ucar.unidata.xml.XmlPersistable;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.UtcDate;
+import ucar.visad.Util;
 
 import ucar.visad.display.*;
 
@@ -191,6 +193,7 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** Macro for the display  unit for the label */
     public static final String MACRO_TIMESTAMP = UtcDate.MACRO_TIMESTAMP;
 
+    /** forecast hour macro */
     public static final String MACRO_FHOUR = "%fhour%";
 
     /** String used as the action command for the color setting button */
@@ -313,38 +316,38 @@ public abstract class DisplayControlBase extends SharableImpl {
     public static final String LABEL_NONE = "None";
 
 
-    /** _more_ */
+    /** search string for this */
     public static final String FIND_THIS = "this";
 
-    /** _more_ */
+    /** search string for all */
     public static final String FIND_ALL = "all";
 
-    /** _more_ */
+    /** search string for class: */
     public static final String FIND_CLASS = "class:";
 
-    /** _more_ */
+    /** search string for category */
     public static final String FIND_CATEGORY = "category:";
 
-    /** _more_ */
+    /** search string for displays with data */
     public static final String FIND_WITHDATA = "withdata";
 
-    /** _more_ */
+    /** search string for display like this with data */
     public static final String FIND_WITHTHISDATA = "withthisdata";
 
-    /** _more_ */
+    /** search string for display with this data */
     public static final String FIND_WITHTHISFIELD = "withthisfield";
 
-    /** _more_ */
+    /** search string for special */
     public static final String FIND_SPECIAL = "special";
 
-    /** _more_ */
+    /** search string with displays in this view */
     public static final String FIND_WITHTHISVIEW = "withthisview";
 
 
-    /** _more_ */
+    /** display group setting */
     public static final String SETTINGS_GROUP_DISPLAY = "Display";
 
-    /** _more_ */
+    /** group flags */
     public static final String SETTINGS_GROUP_FLAGS = "Flags";
 
     /**
@@ -865,17 +868,71 @@ public abstract class DisplayControlBase extends SharableImpl {
      * @return formatted levels.  Currently an array of TwoFacedObjects
      *                            with formatted values as the label.
      */
-    protected Object[] formatLevels(Real[] levels) {
+    protected Object[] formatLevels(Object[] levels) {
         if (levels == null) {
             return null;
         }
         Object[] tfoList = new Object[levels.length];
         for (int i = 0; i < levels.length; i++) {
-            tfoList[i] = ucar.visad.Util.labeledReal(levels[i]);
+            tfoList[i] = getLabeledReal(levels[i]);
         }
         return tfoList;
     }
 
+
+    /**
+     * Get a labeled Real
+     *
+     * @param level the level object
+     *
+     * @return a labeled level as a TwoFacedObject
+     */
+    protected TwoFacedObject getLabeledReal(Object level) {
+        if (level == null) return (TwoFacedObject) level;
+        if (level instanceof TwoFacedObject) {
+            Object lev = ((TwoFacedObject) level).getId();
+            if (lev instanceof Real) return (TwoFacedObject) level;
+        } else if (level instanceof Real) {
+            return Util.labeledReal((Real) level);
+        } else if (level instanceof String) {
+            String tmp = (String) level;
+            try {
+                double value = Misc.parseValue(tmp);
+                return new TwoFacedObject(tmp, new Real(value));
+            } catch (Exception e) {}
+        }
+        userMessage("Unable to handle a level of type "
+                    + level.getClass().getName());
+        return null;
+    }
+
+    /**
+     * Get the real value from a level object
+     *
+     * @param level  the level (TwoFacedObject, Real or number String);
+     *
+     * @return  a corresponding Real or null
+     */
+    protected Real getLevelReal(Object level) {
+        if (level == null) return (Real) level;
+        if (level instanceof TwoFacedObject) {
+            Object lev = ((TwoFacedObject) level).getId();
+            if (lev instanceof Real) {
+                return (Real) lev;
+            }
+        } else if (level instanceof Real) {
+            return (Real) level;
+        } else if (level instanceof String) {
+            String tmp = (String) level;
+            try {
+                double value = Misc.parseValue(tmp);
+                return new Real(value);
+            } catch (Exception e) {}
+        }
+        userMessage("Unable to handle a level of type "
+                    + level.getClass().getName());
+        return null;
+    }
 
 
 }

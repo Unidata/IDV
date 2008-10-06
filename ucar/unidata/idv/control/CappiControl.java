@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -92,7 +93,7 @@ public class CappiControl extends ColorPlanViewControl {
      *
      * @param levels  array of levels
      */
-    public void setLevels(Real[] levels) {
+    public void setLevels(Object[] levels) {
         super.setLevels(getCappiLevels());
     }
 
@@ -116,7 +117,7 @@ public class CappiControl extends ColorPlanViewControl {
      * @throws  VisADException  illegal level or other VisAD error
      * @throws  RemoteException  RMI error
      */
-    public void loadDataAtLevel(Real level)
+    public void loadDataAtLevel(Object level)
             throws VisADException, RemoteException {
         super.loadDataAtLevel(level);
         //if (!getHaveInitialized()) return;
@@ -169,7 +170,7 @@ public class CappiControl extends ColorPlanViewControl {
             throws RemoteException, VisADException {
 
         if (currentLevel == null) {
-            currentLevel = (Real) getDataSelection().getFromLevel();
+            currentLevel = getDataSelection().getFromLevel();
             if (currentLevel == null) {
                 currentLevel = getCappiLevels()[0];
             }

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -131,20 +132,47 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
 
 
 
+    /**
+     * Get the cursor readout data
+     *
+     * @return the data
+     *
+     * @throws Exception problem getting data
+     */
     protected Data getCursorReadoutData() throws Exception {
-        return  getGridDataInstance().getData();
+        return getGridDataInstance().getData();
     }
 
 
-    protected List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
+    /**
+     * Get cursor readout
+     *
+     * @param el  earth location
+     * @param animationValue animation value
+     * @param animationStep animation step
+     *
+     * @return list of values
+     *
+     * @throws Exception problem getting values
+     */
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep)
+            throws Exception {
         Data data = getCursorReadoutData();
-        if(data == null || !(data instanceof FieldImpl)) return null;
+        if ((data == null) || !(data instanceof FieldImpl)) {
+            return null;
+        }
         FieldImpl field = (FieldImpl) data;
-        if(field==null) {return null;}
+        if (field == null) {
+            return null;
+        }
         List result = new ArrayList();
-        Real r = GridUtil.sampleToReal(field, el, animationValue);
-        if(r!=null && !r.isMissing()) {
-            result.add("<tr><td>"+getMenuLabel()+":</td><td align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
+        Real r      = GridUtil.sampleToReal(field, el, animationValue);
+        if ((r != null) && !r.isMissing()) {
+            result.add("<tr><td>" + getMenuLabel()
+                       + ":</td><td align=\"right\">"
+                       + formatForCursorReadout(r) + "</td></tr>");
         }
         return result;
     }
@@ -373,7 +401,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      *
      * @param r    level for data
      */
-    public void setLevel(Real r) {}
+    public void setLevel(Object r) {}
 
     /**
      * The user has changed the level
@@ -383,7 +411,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    protected void setLevelFromUser(Real pl)
+    protected void setLevelFromUser(Object pl)
             throws VisADException, RemoteException {
         setLevel(pl);
     }
@@ -421,7 +449,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      * @param l    the level
      * @param levelBox  the level box
      */
-    public void setLevel(Real l, JComboBox levelBox) {
+    public void setLevel(Object l, JComboBox levelBox) {
         //      (The settingLevel code is there to prevent us from 
         // responding to the changed level in the ActionListener event.)
 
@@ -471,7 +499,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      * @param levels    the levels to populat the combo box with
      * @return   the combo box
      */
-    public JComboBox doMakeLevelControl(Real[] levels) {
+    public JComboBox doMakeLevelControl(Object[] levels) {
         JComboBox box;
         if (levels != null) {
             box = new JComboBox(formatLevels(levels));
@@ -560,8 +588,9 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      */
     private void setLevelFromBox(JComboBox box)
             throws RemoteException, VisADException {
-        Real   levelValue;
-        Object value = box.getSelectedItem();
+        //Real   levelValue;
+        Object levelValue = box.getSelectedItem();
+        /*
         if (value instanceof TwoFacedObject) {
             levelValue = (Real) ((TwoFacedObject) value).getId();
         } else if (value instanceof Real) {
@@ -583,6 +612,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                 return;
             }
         }
+        */
         settingLevel = true;
         setLevelFromUser(levelValue);
         settingLevel = false;
