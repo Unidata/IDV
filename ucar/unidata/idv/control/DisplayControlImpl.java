@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -35,6 +36,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataOperand;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSelectionComponent;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceImpl;
 
@@ -58,8 +60,8 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.DataSelectionWidget;
+import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.IdvUIManager;
@@ -800,6 +802,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** geoselection panel */
     private GeoSelectionPanel geoSelectionPanel;
 
+    /** _more_          */
     private DataSelectionWidget dataSelectionWidget;
 
     /** The color scale dialog used in the properties dialog */
@@ -822,6 +825,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** initial settings */
     private List initialSettings;
+
+    /** Data selection components from the data source for the properties dialog    */
+    private List<DataSelectionComponent> dataSelectionComponents;
+
 
     /**
      * Default constructor. This is called when the control is
@@ -1110,6 +1117,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    /**
+     * _more_
+     */
     protected void addToControlContext() {
         //Add this control to the main controlContext
         controlContext.addDisplayControl(this);
@@ -1357,7 +1367,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return true if there is a time macro
      */
     protected boolean hasTimeMacro(String t) {
-        if(t==null) return false;
+        if (t == null) {
+            return false;
+        }
         return UtcDate.containsTimeMacro(t) || (t.indexOf(MACRO_FHOUR) >= 0);
 
     }
@@ -1370,8 +1382,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected boolean shouldAddAnimationListener() {
         return hasTimeMacro(getLegendLabelTemplate())
-               || hasTimeMacro(getExtraLabelTemplate()) ||
-            hasTimeMacro(getDisplayListTemplate());
+               || hasTimeMacro(getExtraLabelTemplate())
+               || hasTimeMacro(getDisplayListTemplate());
     }
 
 
@@ -1428,7 +1440,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         GraphicsDevice d = getIdv().getIdvUIManager().getScreen(p);
 
-        return ucar.visad.display.DisplayUtil.getPreferredConfig(d, is3D, useStereo);
+        return ucar.visad.display.DisplayUtil.getPreferredConfig(d, is3D,
+                useStereo);
     }
 
     /**
@@ -2798,24 +2811,27 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected void addNewData(List newChoices)
             throws VisADException, RemoteException {
         boolean needToInstantiateAttributes = true;
-        if(newChoices.size()==myDataChoices.size()) {
+        if (newChoices.size() == myDataChoices.size()) {
             boolean allOk = true;
-            for(int i=0;i<newChoices.size();i++) {
-                DataChoice newDataChoice = (DataChoice)newChoices.get(i);
-                DataChoice oldDataChoice = (DataChoice)myDataChoices.get(i);
-                if(!newDataChoice.basicallyEquals(oldDataChoice) && !Misc.equals(newDataChoice.getName(), oldDataChoice.getName())) {
+            for (int i = 0; i < newChoices.size(); i++) {
+                DataChoice newDataChoice = (DataChoice) newChoices.get(i);
+                DataChoice oldDataChoice = (DataChoice) myDataChoices.get(i);
+                if ( !newDataChoice.basicallyEquals(oldDataChoice)
+                        && !Misc.equals(newDataChoice.getName(),
+                                        oldDataChoice.getName())) {
                     allOk = false;
                     break;
-                } else {
-                }
+                } else {}
             }
-            if(allOk) needToInstantiateAttributes = false;
+            if (allOk) {
+                needToInstantiateAttributes = false;
+            }
         }
 
         setDataChoices(newChoices);
         setData(myDataChoices);
-       
-        if(needToInstantiateAttributes) {
+
+        if (needToInstantiateAttributes) {
             instantiateAttributes();
         }
         updateLegendAndList();
@@ -3650,7 +3666,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void getLegendLabels(List labels, int legendType) {
         labels.add(applyMacrosToTemplate(getLegendLabelTemplate(), true));
-        if (extraLabelTemplate!=null && extraLabelTemplate.length() > 0) {
+        if ((extraLabelTemplate != null)
+                && (extraLabelTemplate.length() > 0)) {
             labels.addAll(
                 StringUtil.split(
                     applyMacrosToTemplate(extraLabelTemplate, true), "\n",
@@ -3671,7 +3688,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List values   = new ArrayList();
         addLabelMacros(template, patterns, values);
         if (timeOk && hasTimeMacro(template)) {
-            if (firstTime == null || currentTime == null) {
+            if ((firstTime == null) || (currentTime == null)) {
                 checkTimestampLabel(null);
             }
             if (UtcDate.containsTimeMacro(template)) {
@@ -4368,30 +4385,32 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void initWindow(final IdvWindow window) {
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {        
-                    try {
-                        window.setTitle(getTitle());
-                        window.setContents(outerContents);
-                        if (windowSize != null) {
-                            window.setWindowBounds(new Rectangle(windowX, windowY,
-                                                                 windowSize.width, windowSize.height));
-                        } else {
-                            window.setLocation(windowX, windowY);
-                        }
-                        controlContext.showWindow(DisplayControlImpl.this, window);
-                        if (myWindowVisible) {
-                            //                            System.err.println("calling show");
-                            //                            show();
-                        } else {
-                            //System.err.println("calling hide");
-                            //                            hide();
-                        }
-                    } catch(Exception exc) {
-                        System.err.println ("oops: " + exc);
-                        exc.printStackTrace();
+            public void run() {
+                try {
+                    window.setTitle(getTitle());
+                    window.setContents(outerContents);
+                    if (windowSize != null) {
+                        window.setWindowBounds(new Rectangle(windowX,
+                                windowY, windowSize.width,
+                                windowSize.height));
+                    } else {
+                        window.setLocation(windowX, windowY);
                     }
-                  }
-            });
+                    controlContext.showWindow(DisplayControlImpl.this,
+                            window);
+                    if (myWindowVisible) {
+                        //                            System.err.println("calling show");
+                        //                            show();
+                    } else {
+                        //System.err.println("calling hide");
+                        //                            hide();
+                    }
+                } catch (Exception exc) {
+                    System.err.println("oops: " + exc);
+                    exc.printStackTrace();
+                }
+            }
+        });
     }
 
 
@@ -4858,7 +4877,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 continue;
             }
             RealType aniType = animation.getAnimationRealType();
-            Set set = displayInfo.getDisplayable().getAnimationSet(aniType,true);
+            Set set = displayInfo.getDisplayable().getAnimationSet(aniType,
+                          true);
             if (set == null) {
                 continue;
             }
@@ -5239,31 +5259,32 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-        GeoSelection geoSelection = null;
-        List selectedTimes=null;
+        GeoSelection geoSelection  = null;
+        List         selectedTimes = null;
         if (dataSelection != null) {
             geoSelection = dataSelection.getGeoSelection(true);
-            if(dataSelection.hasTimes()) {
+            if (dataSelection.hasTimes()) {
                 selectedTimes = dataSelection.getTimes();
             }
         }
 
-        
+
         dataSelectionWidget = null;
-        if(/*selectedTimes!=null && */myDataChoices.size()==1) {
+        if ( /*selectedTimes!=null && */myDataChoices.size() == 1) {
             DataChoice dataChoice = (DataChoice) myDataChoices.get(0);
-            List allTimes = dataChoice.getAllDateTimes();
-            if(allTimes!=null&& allTimes.size()>0) {
+            List       allTimes   = dataChoice.getAllDateTimes();
+            if ((allTimes != null) && (allTimes.size() > 0)) {
                 dataSelectionWidget = new DataSelectionWidget(getIdv());
                 jtp.add("Times", dataSelectionWidget.getTimesList());
                 dataSelectionWidget.setTimes(allTimes, selectedTimes);
-                if(selectedTimes!=null) {
+                if (selectedTimes != null) {
                     dataSelectionWidget.setUseAllTimes(false);
                 }
             }
         }
 
 
+        dataSelectionComponents = null;
 
         List dataSources = Misc.makeUnique(getDataSources());
         geoSelectionPanel = null;
@@ -5275,6 +5296,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         true, geoSelection);
                 jtp.add("Spatial Subset", geoSelectionPanel);
             }
+
+
+            try {
+                if (getDataChoice() != null) {
+                    dataSelectionComponents =
+                        dataSource.getDataSelectionComponents(
+                            getDataChoice());
+                    if (dataSelectionComponents != null) {
+                        for (DataSelectionComponent dsc : dataSelectionComponents) {
+                            jtp.add(dsc.getName(),
+                                    dsc.getContents(getDataSelection()));
+                        }
+                    }
+                }
+            } catch (Exception exc) {
+                logException("Initializing  properties", exc);
+            }
+
         }
 
 
@@ -5518,15 +5557,22 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     needToReloadData = true;
                 }
             }
-            if(dataSelectionWidget!=null) {
-                List oldSelectedTimes  = getDataSelection().getTimes();
-                List selectedTimes = dataSelectionWidget.getSelectedDateTimes();
-                if(!Misc.equals(oldSelectedTimes, selectedTimes)) {
+            if (dataSelectionComponents != null) {
+                for (DataSelectionComponent dsc : dataSelectionComponents) {
+                    dsc.applyToDataSelection(getDataSelection());
+                    needToReloadData = true;
+                }
+            }
+            if (dataSelectionWidget != null) {
+                List oldSelectedTimes = getDataSelection().getTimes();
+                List selectedTimes =
+                    dataSelectionWidget.getSelectedDateTimes();
+                if ( !Misc.equals(oldSelectedTimes, selectedTimes)) {
                     getDataSelection().setTimes(selectedTimes);
                     needToReloadData = true;
-                } 
+                }
             }
-            if(needToReloadData) {
+            if (needToReloadData) {
                 reloadDataSourceInThread();
             }
 
@@ -5558,8 +5604,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         setLegendLabelTemplate(legendLabelTemplateFld.getText());
         if (hasTimeMacro(legendLabelTemplate)
-            || hasTimeMacro(extraLabelTemplate) ||
-            hasTimeMacro(getDisplayListTemplate())) {
+                || hasTimeMacro(extraLabelTemplate)
+                || hasTimeMacro(getDisplayListTemplate())) {
             try {
                 if (animation == null) {
                     getAnimation();
@@ -5719,7 +5765,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (haveDataTimes()) {
             items.add(GuiUtils.makeCheckboxMenuItem("Use Times In Animation",
                     this, "useTimesInAnimation", null));
-        } 
+        }
 
         if (getDisplayInfos().size() > 0) {
             JMenu dlMenu = new JMenu("Display List");
@@ -7921,7 +7967,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param comp The component to popup near
      */
     private void popupDisplayListColorMenu(JComponent comp) {
-        JPopupMenu popup = GuiUtils.makePopupMenu(makeChangeColorMenuItems("setDisplayListColor", getDisplayListColor()));
+        JPopupMenu popup = GuiUtils.makePopupMenu(
+                               makeChangeColorMenuItems(
+                                   "setDisplayListColor",
+                                   getDisplayListColor()));
         popup.show(comp, 0, comp.getHeight());
     }
 
@@ -8765,7 +8814,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void popup(Component src) {
         Window f = GuiUtils.getWindow(contents);
-        System.err.println ((f!=null) + " " + makeWindow);
+        System.err.println((f != null) + " " + makeWindow);
         if ((f != null) && !makeWindow) {
             GuiUtils.showComponentInTabs(contents);
             //            if (f != null) {
