@@ -902,13 +902,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   get cappi value");
 
 
-        if (cutmap == null) {
-            cutmap = new HashMap();
-            for (int b = 0; b < numSweep; b++) {
-                int sb =  Integer.parseInt(cut[b].toString());
-                cutmap.put(sb, b);
-            }
+     //   if (cutmap == null) {
+        cutmap = new HashMap();
+        for (int b = 0; b < numSweep; b++) {
+            int sb =  Integer.parseInt(cut[b].toString());
+            cutmap.put(sb, b);
         }
+     //   }
         // get the cappi value for each ray and bin
         for (int a = 0; a < numRay; a++) {
             float azi = az[a];  //sw0.getAzimuth(a);
@@ -916,7 +916,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             for (int b = 0; b < numBin; b++) {
                 int swIndex = sweepI[b];
-                if (swIndex == 999) {
+                if (swIndex == 999 || !cutmap.containsKey(swIndex)) {
                     cappiValue[b][a] = Float.NaN;
                 } else {
                     int cutIdx = Integer.parseInt(cutmap.get(swIndex).toString());
@@ -2750,7 +2750,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         try {
             u = Util.parseUnit(unitName);
         } catch (Exception pe) {
-            System.err.println("Warning: could not parse unit:" + unitName);
+           // System.err.println("Warning: could not parse unit:" + unitName);
             u = null;
             //            pe.printStackTrace();
         }
