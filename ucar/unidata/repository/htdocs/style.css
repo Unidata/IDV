@@ -274,6 +274,12 @@ ul {
 }
 
 
+.moreblock {
+   visibility: hidden; 
+   display:none;
+}
+
+
 .menu a:hover {
    text-decoration: underline;
 }

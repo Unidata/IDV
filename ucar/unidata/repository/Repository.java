@@ -2675,7 +2675,7 @@ public class Repository extends RepositoryBase implements Tables,
 
 
     /** _more_ */
-    static int blockCnt = 0;
+    public static int blockCnt = 0;
 
     /**
      * _more_
@@ -8068,6 +8068,28 @@ public class Repository extends RepositoryBase implements Tables,
 
 
 
+    public String processText(Request request, Entry entry, String text) {
+        int idx = text.indexOf("<more>");
+        if(idx>=0) {
+            String first = text.substring(0,idx);
+            String base = ""+(blockCnt++);
+            String divId = "morediv_" + base;
+            String linkId = "morelink_" + base;
+            String second = text.substring(idx+"<more>".length());
+            String moreLink  = "javascript:showMore(" + HtmlUtil.squote(base) +")";
+            String lessLink  = "javascript:hideMore(" + HtmlUtil.squote(base) +")";
+            text = first+"<br><a " + HtmlUtil.id(linkId) +" href=" + HtmlUtil.quote(moreLink) +">More...</a><div style=\"\" class=\"moreblock\" " + HtmlUtil.id(divId)+">" + second +
+                "<br>" +
+                "<a href=" + HtmlUtil.quote(lessLink) +">...Less</a>" +
+                "</div>";
+        }
+        return text;
+    }
+
+
+
+
+
     /**
      * Class AccessException _more_
      *
@@ -8230,6 +8252,8 @@ public class Repository extends RepositoryBase implements Tables,
             super(msg);
         }
     }
+
+    
 
 
 

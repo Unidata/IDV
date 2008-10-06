@@ -594,6 +594,23 @@ function hideObject(obj) {
 }
 
 
+function hideMore(base) {
+        var link = util.getDomObject("morelink_" + base);
+        var div = util.getDomObject("morediv_" + base);
+	hideObject(div);
+	showObject(link);
+}
+
+function showMore(base) {
+        var link = util.getDomObject("morelink_" + base);
+        var div = util.getDomObject("morediv_" + base);
+	hideObject(link);
+	showObject(div);
+}
+
+
+
+
 function showObject(obj, display) {
     if(!obj) return 0;
     if(!display) display = "block";

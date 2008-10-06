@@ -239,7 +239,8 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getRepository().getEntryLinksList(request, entry));
         treeShown.add(false);
 
-        sb.append(entry.getDescription());
+        addDescription(request, entry, sb);
+
         getMetadataManager().decorateEntry(request, entry, sb,false);
         sb.append(HtmlUtil.br());
         sb.append(getRepository().makeTabs(tabTitles, tabContent, true));
@@ -779,6 +780,19 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
+    private void addDescription(Request request, Entry entry, StringBuffer sb) {
+        String desc= entry.getDescription();
+        if (desc.length() > 0) {
+            desc = getRepository().processText(request, entry, desc);
+            StringBuffer descSB = new StringBuffer("\n<div class=\"description\">\n");
+            descSB.append(desc);
+            descSB.append("</div>\n");
+            sb.append(getRepository().makeShowHideBlock(request, "Description",
+                                                        descSB,true));
+        }
+    }
+
+
 
     /**
      * _more_
@@ -834,27 +848,15 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if(!showApplet) {
-            if (group.getDescription().length() > 0) {
-                StringBuffer descSB = new StringBuffer("\n<div class=\"description\">\n");
-                descSB.append(group.getDescription());
-                StringBuffer metadataSB = new StringBuffer();
-                getMetadataManager().decorateEntry(request, group, metadataSB, false);
-                String metataDataHtml = metadataSB.toString();
-                if(metataDataHtml.length()>0) {
-                    //                    descSB.append(getRepository().makeShowHideBlock(request, "Attachments",
-                    //                                                            metadataSB,true));
-                    //                    descSB.append(metataDataHtml);
-                }
-                descSB.append("</div>\n");
-                sb.append(getRepository().makeShowHideBlock(request, "Description",
-                                                            descSB,true));
-                if(metataDataHtml.length()>0) {
-                    
-                    sb.append(getRepository().makeShowHideBlock(request, "Attachments",
-                                                                new StringBuffer("<div class=\"description\">" +metadataSB+"</div>"),true));
-                    //                    descSB.append(metataDataHtml);
-                }
+            addDescription(request, group, sb);
+            StringBuffer metadataSB = new StringBuffer();
+            getMetadataManager().decorateEntry(request, group, metadataSB, false);
+            String metataDataHtml = metadataSB.toString();
+            if(metataDataHtml.length()>0) {
+                sb.append(getRepository().makeShowHideBlock(request, "Attachments",
+                                                            new StringBuffer("<div class=\"description\">" +metadataSB+"</div>"),true));
             }
+
         }
 
 
