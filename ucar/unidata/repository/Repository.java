@@ -7894,7 +7894,8 @@ public class Repository extends RepositoryBase implements Tables,
         if (t2 > t1) {
             //System.err.println("added:" + entries.size() + " entries in " + (t2-t1) + " ms  Rate:" + (entries.size()/(t2-t1)));
             double seconds = totalTime / 1000.0;
-            if ((totalEntries % 100 == 0) && (seconds > 0)) {
+            //            if ((totalEntries % 100 == 0) && (seconds > 0)) {
+            if (seconds > 0) {
                 System.err.println(totalEntries + " average rate:"
                                    + (int) (totalEntries / seconds)
                                    + "/second");
