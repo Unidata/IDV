@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.data.point;
 
 
@@ -149,7 +151,7 @@ public abstract class PointDataSource extends FilesDataSource {
     private static final String[] SPACING_IDS = { SPACING_COMPUTE,
             SPACING_DEGREES, SPACING_POINTS };
 
-    /** names for spacing ids*/
+    /** names for spacing ids */
     private static final String[] SPACING_NAMES = { "Compute", "Degrees",
             "# Points" };
 
@@ -263,20 +265,22 @@ public abstract class PointDataSource extends FilesDataSource {
         /** The main component */
         private JComponent comp;
 
+        /** The unit two faced objects_ */
+        List tfos;
 
         /**
          * ctor
          */
         public GridParameters() {
             super("Grid Parameters");
-            gridXFld     = new JTextField("" + gridX, 3);
-            gridYFld     = new JTextField("" + gridY, 3);
+            gridXFld     = new JTextField("" + gridX, 4);
+            gridYFld     = new JTextField("" + gridY, 4);
             gridUnitCmbx = new JComboBox();
-            List tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
+            tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
             GuiUtils.setListData(gridUnitCmbx, tfos);
             gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(gridUnit,
                     tfos));
-            numGridIterationsFld = new JTextField("" + numGridIterations, 3);
+            numGridIterationsFld = new JTextField("" + numGridIterations, 4);
             comps.add(GuiUtils.rLabel("Grid Size:"));
             comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
                     gridXFld, new JLabel("  Y: "), gridYFld)));
@@ -307,6 +311,30 @@ public abstract class PointDataSource extends FilesDataSource {
         protected JComponent doMakeContents() {
             GuiUtils.tmpInsets = GuiUtils.INSETS_5;
             comp = GuiUtils.doLayout(comps, 2, GuiUtils.WT_N, GuiUtils.WT_N);
+            if (dataSelection != null) {
+                Object prop;
+                prop = dataSelection.getProperty(PROP_GRID_X);
+                if (prop != null) {
+                    gridXFld.setText("" + prop);
+                    //If we have a data selection property then turn of cbx
+                    useDefaultCbx.setSelected(false);
+                }
+                prop = dataSelection.getProperty(PROP_GRID_Y);
+                if (prop != null) {
+                    gridYFld.setText("" + prop);
+                }
+
+                prop = dataSelection.getProperty(PROP_GRID_UNIT);
+                if (prop != null) {
+                    gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(prop,
+                            tfos));
+                }
+                prop = dataSelection.getProperty(PROP_GRID_NUMITERATIONS);
+                if (prop != null) {
+                    numGridIterationsFld.setText("" + prop);
+                }
+            }
+
             checkEnable();
             return GuiUtils.topCenter(GuiUtils.right(useDefaultCbx),
                                       GuiUtils.topLeft(comp));
@@ -326,6 +354,11 @@ public abstract class PointDataSource extends FilesDataSource {
                 dataSelection.putProperty(
                     PROP_GRID_NUMITERATIONS,
                     new Integer(getNumGridIterations()));
+            } else {
+                dataSelection.removeProperty(PROP_GRID_X);
+                dataSelection.removeProperty(PROP_GRID_Y);
+                dataSelection.removeProperty(PROP_GRID_UNIT);
+                dataSelection.removeProperty(PROP_GRID_NUMITERATIONS);
             }
         }
 

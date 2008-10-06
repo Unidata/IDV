@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -58,16 +59,19 @@ import javax.swing.event.*;
  */
 public abstract class DataSelectionComponent {
 
-    /** _more_ */
+    /** the name*/
     private String name;
 
-    /** _more_ */
+    /** gui content*/
     JComponent contents;
 
+    /** We can be used by a display control and this is the control's data selection      */
+    protected DataSelection dataSelection;
+
     /**
-     * _more_
+     * ctor
      *
-     * @param name _more_
+     * @param name name
      */
     public DataSelectionComponent(String name) {
         this.name = name;
@@ -75,11 +79,22 @@ public abstract class DataSelectionComponent {
 
 
     /**
-     * _more_
+     * Make if needed and return the gui contents
      *
-     * @return _more_
+     * @return gui contents
      */
     public JComponent getContents() {
+        return getContents(null);
+    }
+
+    /**
+     * Make if needed and return the gui contents
+     *
+     * @param dataSelection If created by a display control this is the control's dataselection
+     * @return gui contents
+     */
+    public JComponent getContents(DataSelection dataSelection) {
+        this.dataSelection = dataSelection;
         if (contents == null) {
             contents = doMakeContents();
         }
@@ -88,25 +103,25 @@ public abstract class DataSelectionComponent {
 
 
     /**
-     * _more_
+     * Hook method to make the contents
      *
-     * @return _more_
+     * @return gui contents
      */
     protected abstract JComponent doMakeContents();
 
     /**
-     * _more_
+     * Apply settings to the data selection
      *
-     * @param dataSelection _more_
+     * @param dataSelection data selection to apply to
      */
     public abstract void applyToDataSelection(DataSelection dataSelection);
 
 
 
     /**
-     * _more_
+     * get name
      *
-     * @return _more_
+     * @return name
      */
     public String getName() {
         return name;
