@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -144,17 +145,19 @@ public abstract class PointDataSource extends FilesDataSource {
     /** points grid spacing */
     private static final String SPACING_POINTS = "spacing.points";
 
-    /** units for x and y */
-    private static final String[] SPACING_IDS = { SPACING_COMPUTE, SPACING_DEGREES, SPACING_POINTS };
-    private static final String[] SPACING_NAMES = { "Compute", "Degrees", "# Points" };
+    /** spacing types */
+    private static final String[] SPACING_IDS = { SPACING_COMPUTE,
+            SPACING_DEGREES, SPACING_POINTS };
 
+    /** names for spacing ids*/
+    private static final String[] SPACING_NAMES = { "Compute", "Degrees",
+            "# Points" };
 
-
-    /** y for grid */
+    /** unit for grid spacing */
     private String gridUnit = SPACING_COMPUTE;
 
     /** Number of barnes iterations */
-    private int numGridIterations = 1;
+    private int numGridIterations = 2;
 
     /** Do we make grid fields */
     private boolean makeGridFields = true;
@@ -271,7 +274,8 @@ public abstract class PointDataSource extends FilesDataSource {
             gridUnitCmbx = new JComboBox();
             List tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
             GuiUtils.setListData(gridUnitCmbx, tfos);
-            gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(gridUnit,tfos));
+            gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(gridUnit,
+                    tfos));
             numGridIterationsFld = new JTextField("" + numGridIterations, 3);
             comps.add(GuiUtils.rLabel("Grid Size:"));
             comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
@@ -349,7 +353,8 @@ public abstract class PointDataSource extends FilesDataSource {
          * @return grid unit
          */
         public String getGridUnit() {
-            return (String) TwoFacedObject.getIdString(gridUnitCmbx.getSelectedItem());
+            return (String) TwoFacedObject.getIdString(
+                gridUnitCmbx.getSelectedItem());
         }
 
         /**
@@ -768,8 +773,8 @@ public abstract class PointDataSource extends FilesDataSource {
                 return null;
             }
             //{ minY, minX, maxY, maxX };
-            float  spacingX          = this.gridX;
-            float  spacingY          = this.gridY;
+            float  spacingX   = this.gridX;
+            float  spacingY   = this.gridY;
             int    iterations = this.numGridIterations;
             Number tmp;
             tmp = (Float) dataSelection.getProperty(PROP_GRID_X);
@@ -791,7 +796,8 @@ public abstract class PointDataSource extends FilesDataSource {
                 theUnit = this.gridUnit;
             }
 
-            float degreesX=0, degreesY = 0;
+            float degreesX = 0,
+                  degreesY = 0;
             pointObs = PointObFactory.makeTimeSequenceOfPointObs(pointObs);
             if (theUnit.equals(SPACING_COMPUTE) || (spacingX <= 0)
                     || (spacingY <= 0)) {
@@ -804,13 +810,14 @@ public abstract class PointDataSource extends FilesDataSource {
                 degreesX = spanX / spacingX;
                 degreesY = spanY / spacingY;
             } else if (theUnit.equals(SPACING_DEGREES)) {
-                degreesX =  spacingX;
-                degreesY =  spacingY;
+                degreesX = spacingX;
+                degreesY = spacingY;
             }
             // System.out.println("X = " + degreesX + " Y = " + degreesY + " unit = " + theUnit);
 
             LogUtil.message("Doing Barnes Analysis");
-            return PointObFactory.barnes(pointObs, type, degreesX, degreesY, iterations);
+            return PointObFactory.barnes(pointObs, type, degreesX, degreesY,
+                                         iterations);
         }
 
 

@@ -1272,10 +1272,9 @@ public class PointObFactory {
         float[][] obVals  = new float[3][numObs];
         PointOb   firstOb = (PointOb) pointObs.getSample(0);
         // TODO: May not be a tuple
-        Tuple     data  = (Tuple) firstOb.getData();
-        TupleType ttype = (TupleType) data.getType();
-        //System.out.println("type = " + ttype);
-        int typeIndex = ttype.getIndex(type);
+        Tuple     data      = (Tuple) firstOb.getData();
+        TupleType ttype     = (TupleType) data.getType();
+        int       typeIndex = ttype.getIndex(type);
         if (typeIndex == -1) {
             return null;
         }
@@ -1343,7 +1342,8 @@ public class PointObFactory {
         }
 
 
-        // System.out.println("lat = " + latMin + " "+latMax+", lon = " +lonMin+" "+lonMax);
+        log_.debug("lat range = " + latMin + " " + latMax + ", lon range = "
+                   + lonMin + " " + lonMax);
         float[] faGridX     = null;
         float[] faGridY     = null;
         float   scaleLength = 1.0f;
@@ -1361,7 +1361,8 @@ public class PointObFactory {
             faGridX = Barnes.getRecommendedGridX(lonMin, lonMax, xSpacing);
             faGridY = Barnes.getRecommendedGridY(latMin, latMax, ySpacing);
         }
-        // System.out.println("X = " + faGridX.length + "  Y = " + faGridY.length + " scaleLength = " + scaleLength);
+        log_.debug("num X pts = " + faGridX.length + "  num Y pts = "
+                   + faGridY.length + " scaleLength = " + scaleLength);
 
         double[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
                                      scaleLength, gain, numPasses);
