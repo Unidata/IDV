@@ -5272,9 +5272,11 @@ public class GuiUtils extends LayoutUtil {
      * @param tab tab
      */
     private static void checkHeavyWeightComponents(JTabbedPane tab) {
-        for (int i = 0; i < tab.getTabCount(); i++) {
-            toggleHeavyWeightComponents(tab.getComponentAt(i),
-                                        i == tab.getSelectedIndex());
+        Component[]comps =  	tab.getComponents();
+        int selectedIdx = tab.getSelectedIndex();
+        for (int i = 0; i < comps.length;i++) {
+            toggleHeavyWeightComponents(comps[i],
+                                        i == selectedIdx);
         }
     }
 
