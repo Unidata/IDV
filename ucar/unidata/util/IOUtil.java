@@ -1681,13 +1681,14 @@ public class IOUtil {
         if (children == null) {
             return true;
         }
+        children = IOUtil.sortFilesOnName(children);
         for (int i = 0; i < children.length; i++) {
             int what = fileViewer.viewFile(children[i]);
             if (what == FileViewer.DO_STOP) {
                 return false;
             }
             if (what == FileViewer.DO_CONTINUE) {
-                if ( !walkDirectory(children[i], fileViewer, level + 1)) {
+                if (!walkDirectory(children[i], fileViewer, level + 1)) {
                     return false;
                 }
             }
