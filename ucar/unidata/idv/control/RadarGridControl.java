@@ -785,6 +785,7 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
      */
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
+        if(lat!=lat || lon!=lon) return;
         labels.add("Position: " + getDisplayConventions().formatLatLon(lat)
                    + " " + getDisplayConventions().formatLatLon(lon));
     }
