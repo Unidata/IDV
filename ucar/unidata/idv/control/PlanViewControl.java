@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -175,48 +172,48 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Get the cursor readout data
      *
-     * @return _more_
+     * @return the data
      *
-     * @throws Exception _more_
+     * @throws Exception problem getting data
      */
     protected Data getCursorReadoutData() throws Exception {
         return currentSlice;
     }
 
     /**
-     * _more_
+     * Set the current slice
      *
-     * @param slice _more_
+     * @param slice  the slice
      *
-     * @throws Exception _more_
+     * @throws Exception  problem setting the slice
      */
     protected void setCurrentSlice(FieldImpl slice) throws Exception {
         currentSlice = slice;
     }
 
     /**
-     * _more_
+     * Get the current slice
      *
-     * @return _more_
+     * @return the current data for the plan view
      *
-     * @throws Exception _more_
+     * @throws Exception  problem getting the data
      */
     protected FieldImpl getCurrentSlice() throws Exception {
         return currentSlice;
     }
 
     /**
-     * _more_
+     * Get the cursor data
      *
-     * @param el _more_
-     * @param animationValue _more_
-     * @param animationStep _more_
+     * @param el  earth location
+     * @param animationValue   the animation value
+     * @param animationStep  the animation step
      *
-     * @return _more_
+     * @return  the list of readout data
      *
-     * @throws Exception _more_
+     * @throws Exception  problem getting the data
      */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
@@ -961,7 +958,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         // breaking anything.
         if (GridUtil.isVolume(workingGrid)) {  // need to slice
             if (((level != null) && (currentLevels != null))
-                    && (Arrays.binarySearch(currentLevels, level) >= 0)) {
+                    && hasLevel(level)) {
                 samplingMode = Data.NEAREST_NEIGHBOR;
             }
             // more than one level
@@ -1030,6 +1027,28 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     }
 
+    /**
+     * Does the list of levels have this level
+     *
+     * @param level  the level in question
+     *
+     * @return  true if it is in the list
+     */
+    private boolean hasLevel(Object level) {
+        if ((currentLevels == null) || (level == null)) {
+            return false;
+        }
+        Object firstLevel = currentLevels[0];
+        if (level.getClass().equals(firstLevel.getClass())) {
+            return (Arrays.binarySearch(currentLevels, level) >= 0);
+        }
+        if ((level instanceof Real)
+                && (firstLevel instanceof TwoFacedObject)) {
+            return TwoFacedObject.findId(level, Misc.toList(currentLevels))
+                   != null;
+        }
+        return false;
+    }
 
     /**
      * Get the slice for the display
