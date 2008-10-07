@@ -795,10 +795,8 @@ public class MetadataManager extends RepositoryManager {
                                       MetadataHandler handler,
                                       Metadata.Type type)
             throws Exception {
-        if (distinctMap == null) {
-            distinctMap = new Hashtable();
-        }
-        String[] values = (String[]) distinctMap.get(type.getType());
+        Hashtable myDistinctMap = distinctMap;
+        String[] values = (String[]) (myDistinctMap==null?null:myDistinctMap.get(type.getType()));
 
         if (values == null) {
             Statement stmt = getDatabaseManager().select(
@@ -807,7 +805,9 @@ public class MetadataManager extends RepositoryManager {
                                  Clause.eq(
                                      COL_METADATA_TYPE, type.getType()));
             values = SqlUtil.readString(stmt, 1);
-            distinctMap.put(type.getType(), values);
+            if(myDistinctMap!=null) {
+                myDistinctMap.put(type.getType(), values);
+            }
         }
         return values;
     }

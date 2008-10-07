@@ -62,6 +62,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -635,6 +636,8 @@ public class PatternHarvester extends Harvester {
         return StringUtil.join(Group.PATHDELIMITER, names);
     }
 
+
+
     /**
      * _more_
      *
@@ -739,27 +742,31 @@ public class PatternHarvester extends Harvester {
             ext = ext.substring(1);
         }
         tag       = tag.replace("${extension}", ext);
-
+        
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        cal.setTime(fromDate);
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
-        groupName = groupName.replace("${fromdate}",
-                                      getRepository().formatDate(fromDate));
-        groupName = groupName.replace("${todate}",
-                                      getRepository().formatDate(toDate));
+        int day = cal.get(cal.DAY_OF_MONTH);
+        int month =(cal.get(cal.MONTH)+1);
+        String[]macros = {"fromdate",                                      
+                          getRepository().formatDate(fromDate),
+                          "todate",
+                          getRepository().formatDate(toDate),
+                          "year",""+cal.get(cal.YEAR),
+                          "month",(month<10?"0":"")+month,
+                          "monthname",DateUtil.MONTH_NAMES[cal.get(cal.MONTH)],
+                          "day",(day<10?"0":"")+day,
+                          "${filename}", f.getName()
+        };
 
-        name = name.replace("${filename}", f.getName());
-        name = name.replace("${fromdate}",
-                            getRepository().formatDate(fromDate));
-
-        name = name.replace("${todate}", getRepository().formatDate(toDate));
-
-        
-        desc = desc.replace("${fromdate}",
-                            getRepository().formatDate(fromDate));
-        desc = desc.replace("${todate}", getRepository().formatDate(toDate));
+        for(int i=0;i<macros.length;i+=2) {
+            String macro = "${" +macros[i]+"}";
+            groupName = groupName.replace(macro, macros[i+1]);
+            name = name.replace(macro, macros[i+1]);
+            desc = desc.replace(macro, macros[i+1]);
+        }
         desc = desc.replace("${name}", name);
-
-
 
         if (baseGroup != null) {
             groupName = baseGroup.getFullName() + Group.PATHDELIMITER

@@ -6912,8 +6912,10 @@ public class Repository extends RepositoryBase implements Tables,
     protected String getQueryOrderAndLimit(Request request,
                                            boolean addOrderBy) {
         String order = " DESC ";
+        boolean haveOrder = false;
         if (request.get(ARG_ASCENDING, false)) {
             order = " ASC ";
+            haveOrder = true;
         }
         int    skipCnt     = request.get(ARG_SKIP, 0);
         String limitString = BLANK;
@@ -6934,6 +6936,7 @@ public class Repository extends RepositoryBase implements Tables,
             } else if (by.equals("createdate")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_CREATEDATE + order;
             } else if (by.equals("name")) {
+                if(!haveOrder) order = " ASC ";
                 orderBy = " ORDER BY " + COL_ENTRIES_NAME + order;
             }
         }
