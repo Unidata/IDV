@@ -39,7 +39,6 @@ import ucar.unidata.xml.XmlUtil;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,7 +95,7 @@ public class Column implements Tables, Constants {
     public static final String TYPE_ENUMERATION = "enumeration";
 
     /** _more_ */
-    public static final String TYPE_TIMESTAMP = "timestamp";
+    public static final String TYPE_DATE = "date";
 
     /** _more_ */
     public static final String TYPE_LATLON = "latlon";
@@ -379,15 +378,9 @@ public class Column implements Tables, Constants {
                 stmt.setInt(stmtIdx, 0);
             }
             stmtIdx++;
-        } else if (type.equals(TYPE_TIMESTAMP)) {
-            if (values[offset] != null) {
-                Date dttm = (Date) values[offset];
-                stmt.setTimestamp(stmtIdx,
-                                  new java.sql.Timestamp(dttm.getTime()),
-                                  Repository.calendar);
-            } else {
-                stmt.setTimestamp(stmtIdx, null);
-            }
+        } else if (type.equals(TYPE_DATE)) {
+            Date dttm = (Date) values[offset];
+            typeHandler.getRepository().getDatabaseManager().setDate(stmt, stmtIdx, dttm);
             stmtIdx++;
         } else if (type.equals(TYPE_LATLON)) {
             if (values[offset] != null) {
@@ -477,8 +470,6 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     public void createTable(Statement statement) throws Exception {
-
-
         if (type.equals(TYPE_STRING)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_ENUMERATION)) {
@@ -541,7 +532,7 @@ public class Column implements Tables, Constants {
             return new Double(value);
         } else if (type.equals(TYPE_BOOLEAN)) {
             return new Boolean(value);
-        } else if (type.equals(TYPE_TIMESTAMP)) {
+        } else if (type.equals(TYPE_DATE)) {
             //TODO
         } else if (type.equals(TYPE_LATLON)) {
             //TODO

@@ -127,7 +127,7 @@ public class Admin extends RepositoryManager {
 
 
     /** _more_ */
-    int cleanupTimeStamp = 0;
+    int cleanupTS = 0;
 
     /** _more_ */
     boolean runningCleanup = false;
@@ -999,7 +999,7 @@ public class Admin extends RepositoryManager {
                         if (rsmd.getColumnType(colcnt)
                                 == java.sql.Types.TIMESTAMP) {
                             Date dttm = results.getTimestamp(colcnt,
-                                            Repository.calendar);
+                                                             Repository.calendar);
                             sb.append(HtmlUtil.col(formatDate(request,
                                     dttm)));
                         } else {
@@ -1087,7 +1087,7 @@ public class Admin extends RepositoryManager {
         sb.append(request.form(URL_ADMIN_CLEANUP));
         if (request.defined(ACTION_STOP)) {
             runningCleanup = false;
-            cleanupTimeStamp++;
+            cleanupTS++;
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_START)) {
             Misc.run(this, "runDatabaseCleanUp", request);
@@ -1135,7 +1135,7 @@ public class Admin extends RepositoryManager {
         }
         runningCleanup = true;
         cleanupStatus  = new StringBuffer();
-        int myTimeStamp = ++cleanupTimeStamp;
+        int myTS = ++cleanupTS;
         try {
             Statement stmt =
                 getDatabaseManager().select(SqlUtil.comma(COL_ENTRIES_ID,
@@ -1151,7 +1151,7 @@ public class Admin extends RepositoryManager {
             List<Entry>      entries   = new ArrayList<Entry>();
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    if ((cleanupTimeStamp != myTimeStamp)
+                    if ((cleanupTS != myTS)
                             || !runningCleanup) {
                         runningCleanup = false;
                         break;
@@ -1179,7 +1179,7 @@ public class Admin extends RepositoryManager {
                                 + deleteCnt + " entries from database");
                     }
                 }
-                if ((cleanupTimeStamp != myTimeStamp) || !runningCleanup) {
+                if ((cleanupTS != myTS) || !runningCleanup) {
                     runningCleanup = false;
                     break;
                 }

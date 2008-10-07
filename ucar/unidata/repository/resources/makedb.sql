@@ -20,17 +20,20 @@ CREATE TABLE entries (id varchar(200),
 	           resource varchar(200),	           
                    resource_type varchar(200),
 		   datatype varchar(200),
-	           createdate timestamp, 
-	           fromdate timestamp, 
-	           todate timestamp,
-	           south float8,
-	           north float8,
-	           east float8,
-	           west float8); 
+	           createdate ramadda.datetime, 
+	           fromdate ramadda.datetime, 
+	           todate ramadda.datetime,
+	           south ramadda.double,
+	           north ramadda.double,
+	           east ramadda.double,
+	           west ramadda.double); 
 
 
 #for mysql
 alter table entries modify column description varchar(10000);
+alter table entries modify column createdate ramadda.datetime;
+alter table entries modify column fromdate ramadda.datetime;
+alter table entries modify column todate ramadda.datetime;
 #for derby
 alter table entries alter column description set data type varchar(10000);
 
@@ -57,7 +60,7 @@ CREATE TABLE  metadata (id varchar(200),
                         attr3 varchar(10000),
                         attr4 varchar(10000)
 			);
-p
+
 alter table metadata add column  inherited int;
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);
@@ -69,12 +72,14 @@ CREATE INDEX METADATA_INDEX_ATTR1 ON metadata (ATTR1);
 CREATE TABLE  comments (id varchar(200),
 		        entry_id varchar(200),
 			user_id  varchar(200),
-                        date timestamp, 
+                        date ramadda.datetime, 
 			subject  varchar(200),
                         comment varchar(1000));
 
 CREATE INDEX COMMENTS_INDEX_ID ON comments (ID);
 CREATE INDEX COMMENTS_INDEX_ENTRY_ID ON comments (ENTRY_ID);
+
+alter table comments modify column date ramadda.datetime;
 
 
 

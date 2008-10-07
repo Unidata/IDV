@@ -4487,8 +4487,7 @@ public class Repository extends RepositoryBase implements Tables,
             insert.setString(col++, getGUID());
             insert.setString(col++, entry.getId());
             insert.setString(col++, request.getUser().getId());
-            insert.setTimestamp(col++, new java.sql.Timestamp(currentTime()),
-                                calendar);
+            getDatabaseManager().setDate(insert, col++, currentTime());
             insert.setString(col++, subject);
             insert.setString(col++, request.getString(ARG_COMMENT, BLANK));
             insert.execute();
@@ -5000,6 +4999,7 @@ public class Repository extends RepositoryBase implements Tables,
                 }
 
 
+
                 for (int resourceIdx = 0; resourceIdx < resources.size();
                         resourceIdx++) {
                     String theResource = (String) resources.get(resourceIdx);
@@ -5106,6 +5106,7 @@ public class Repository extends RepositoryBase implements Tables,
                                        ARG_TODATE, new Date());
                 String newName = request.getString(ARG_NAME,
                                      entry.getLabel());
+
 
 
                 if (entry.isGroup()) {
@@ -7282,10 +7283,9 @@ public class Repository extends RepositoryBase implements Tables,
                     .add(new Comment(results
                         .getString(1), entry, getUserManager()
                         .findUser(results
-                            .getString(3), true), new Date(results
-                            .getTimestamp(4, Repository.calendar)
-                            .getTime()), results.getString(5), results
-                                .getString(6)));
+                                  .getString(3), true), 
+                                     getDatabaseManager().getDate(results,4),
+                                     results.getString(5), results.getString(6)));
             }
         }
         entry.setComments(comments);
@@ -7444,24 +7444,15 @@ public class Repository extends RepositoryBase implements Tables,
         statement.setString(col++, entry.getResource().getPath());
         statement.setString(col++, entry.getResource().getType());
         statement.setString(col++, entry.getDataType());
-        statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()),
-                               calendar);
-        //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
+        getDatabaseManager().setDate(statement,col++, currentTime());
         try {
-            statement.setTimestamp(
-                col, new java.sql.Timestamp(entry.getStartDate()), calendar);
-            statement.setTimestamp(
-                col + 1, new java.sql.Timestamp(entry.getEndDate()),
-                calendar);
-
+            getDatabaseManager().setDate(statement, col,entry.getStartDate());
+            getDatabaseManager().setDate(statement, col+1,entry.getEndDate());
         } catch (Exception exc) {
             System.err.println("Error: Bad date " + entry.getResource() + " "
                                + new Date(entry.getStartDate()));
-            statement.setTimestamp(
-                col, new java.sql.Timestamp(new Date().getTime()), calendar);
-            statement.setTimestamp(
-                col + 1, new java.sql.Timestamp(new Date().getTime()),
-                calendar);
+            getDatabaseManager().setDate(statement,col, new Date());
+            getDatabaseManager().setDate(statement, col+1, new Date());
         }
         col += 2;
         statement.setDouble(col++, entry.getSouth());

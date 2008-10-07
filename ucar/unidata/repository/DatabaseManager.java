@@ -479,7 +479,7 @@ public class DatabaseManager extends RepositoryManager {
                         if (type == java.sql.Types.TIMESTAMP) {
                             Timestamp ts = results.getTimestamp(i);
                             //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
-                            value.append("'" + ts.toString() + "'");
+                            value.append(HtmlUtil.squote(ts.toString()));
                         } else if (type == java.sql.Types.VARCHAR) {
                             String s = results.getString(i);
                             if (s != null) {
@@ -649,6 +649,51 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
+    public void setTimestamp(PreparedStatement stmt, int col, Date date) throws Exception {
+        if(date == null) {
+            stmt.setTimestamp(col, null);
+        } else {
+            stmt.setTimestamp(col, new java.sql.Timestamp(date.getTime()),Repository.calendar);
+        }
+    }
+
+
+    public Date getTimestamp(ResultSet results, int col) throws Exception {
+        Date date = results.getTimestamp(col, Repository.calendar);
+        if(date!=null) return date;
+        return new Date();
+    }
+
+
+
+    public void setDate(PreparedStatement stmt, int col, long time) throws Exception {
+        setDate(stmt,col, new Date(time));
+    }
+
+
+    public void setDate(PreparedStatement stmt, int col, Date date) throws Exception {
+        //        if (!db.equals(DB_MYSQL)) {
+        if (true ||!db.equals(DB_MYSQL)) {
+            setTimestamp(stmt,col,date);
+        } else {
+            if(date == null) {
+                stmt.setTime(col, null);
+            } else {
+                stmt.setTime(col, new java.sql.Time(date.getTime()), Repository.calendar);
+            }
+        }
+    }
+
+
+    public Date getDate(ResultSet results, int col) throws Exception {
+        //        if (!db.equals(DB_MYSQL)) {
+        if (true ||!db.equals(DB_MYSQL)) {
+           return getTimestamp(results,col);
+        }
+        Date date = results.getTime(col, Repository.calendar);
+        if(date!=null) return date;
+        return new Date();
+    }
 
 
 
@@ -668,10 +713,7 @@ public class DatabaseManager extends RepositoryManager {
             if (values[i] == null) {
                 pstmt.setNull(i + 1, java.sql.Types.VARCHAR);
             } else if (values[i] instanceof Date) {
-                pstmt.setTimestamp(
-                    i + 1,
-                    new java.sql.Timestamp(((Date) values[i]).getTime()),
-                    Repository.calendar);
+                setDate(pstmt,i+1,(Date) values[i]);
             } else if (values[i] instanceof Boolean) {
                 boolean b = ((Boolean) values[i]).booleanValue();
                 pstmt.setInt(i + 1, (b
@@ -703,12 +745,20 @@ public class DatabaseManager extends RepositoryManager {
      */
     protected String convertSql(String sql) {
         if (db.equals(DB_MYSQL)) {
-            sql = sql.replace("float8", "double");
+            sql = sql.replace("ramadda.double", "double");
+            sql = sql.replace("ramadda.datetime", "datetime");
+            //sql = sql.replace("ramadda.datetime", "timestamp");
         } else if (db.equals(DB_DERBY)) {
-            sql = sql.replace("float8", "double");
+            sql = sql.replace("ramadda.double", "double");
+            sql = sql.replace("ramadda.datetime", "timestamp");
+        } else if (db.equals(DB_POSTGRES)) {
+            sql = sql.replace("ramadda.double", "float8");
+            sql = sql.replace("ramadda.datetime", "timestamp");
         }
         return sql;
     }
+
+
 
     /**
      * _more_

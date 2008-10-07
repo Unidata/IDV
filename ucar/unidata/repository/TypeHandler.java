@@ -417,9 +417,9 @@ public class TypeHandler extends RepositoryManager {
             getUserManager().findUser(results.getString(col++), true),
             new Resource(results.getString(col++), results.getString(col++)),
             results.getString(col++),
-            results.getTimestamp(col++, getRepository().calendar).getTime(),
-            results.getTimestamp(col++, getRepository().calendar).getTime(),
-            results.getTimestamp(col++, getRepository().calendar).getTime(),
+            getDatabaseManager().getDate(results,col++).getTime(),
+            getDatabaseManager().getDate(results,col++).getTime(),
+            getDatabaseManager().getDate(results,col++).getTime(),
             null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
