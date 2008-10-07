@@ -749,22 +749,22 @@ public class PatternHarvester extends Harvester {
 
         int day = cal.get(cal.DAY_OF_MONTH);
         int month =(cal.get(cal.MONTH)+1);
-        String[]macros = {"fromdate",                                      
-                          getRepository().formatDate(fromDate),
-                          "todate",
-                          getRepository().formatDate(toDate),
+        String[]macros = {"fromdate", getRepository().formatDate(fromDate),
+                          "todate",  getRepository().formatDate(toDate),
                           "year",""+cal.get(cal.YEAR),
                           "month",(month<10?"0":"")+month,
                           "monthname",DateUtil.MONTH_NAMES[cal.get(cal.MONTH)],
                           "day",(day<10?"0":"")+day,
-                          "${filename}", f.getName()
+                          "filename", f.getName()
         };
 
         for(int i=0;i<macros.length;i+=2) {
             String macro = "${" +macros[i]+"}";
-            groupName = groupName.replace(macro, macros[i+1]);
-            name = name.replace(macro, macros[i+1]);
-            desc = desc.replace(macro, macros[i+1]);
+            String value = macros[i+1];
+            groupName = groupName.replace(macro, value);
+            System.err.println (groupName + ";" + macro + ":" +value);
+            name = name.replace(macro, value);
+            desc = desc.replace(macro, value);
         }
         desc = desc.replace("${name}", name);
 
