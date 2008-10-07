@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -119,35 +120,31 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
                     IOUtil.makeDirRecursive(new File(IOUtil.joinDir(userHome,
                             ".unidata")));
                     if (metappsDir.exists()) {
-                        if ( !GuiUtils.showOkCancelDialog(
-                                null, "Move .metapps directory",
-                                GuiUtils.inset(
-                                    new JLabel(
-                                        "<html>Note: The IDV is moving the old .metapps directory:<br><i>&nbsp;&nbsp;"
-                                        + metappsDir
-                                        + "</i><br> to:<br>&nbsp&nbsp;<i>"
-                                        + toDir + "</i>"), 5), null)) {
-                            System.exit(0);
-                        }
+                        JLabel label =
+                            new JLabel(
+                                "<html>The IDV is moving the user state directory (.metapps):<br><i>&nbsp;&nbsp;"
+                                + metappsDir
+                                + "</i><br> to:<br>&nbsp&nbsp;<i>" + toDir
+                                + "</i><p><br>This shouldn't be a problem and will just take a second");
                         boolean ok = metappsDir.renameTo(toDir);
-                        //                        boolean ok = false;
                         if ( !ok) {
-                            GuiUtils.showOkDialog(
-                                null, "Move failed",
-                                GuiUtils.inset(
-                                    new JLabel(
-                                        "<html>For some reason the directory move failed. Please move the directory:<br><i>&nbsp;&nbsp;"
-                                        + metappsDir
-                                        + "</i><br> to:<br>&nbsp;&nbsp;<i>"
-                                        + toDir
-                                        + "</i><p><br>And then restart the IDV"), 5), null);
+                            JLabel msg =
+                                new JLabel(
+                                    "<html>The IDV attempted to move the user directory to a new location.<br>For some reason the directory move failed.<p><br>Please move the directory:<br><i>&nbsp;&nbsp;"
+                                    + metappsDir
+                                    + "</i><br> to:<br>&nbsp;&nbsp;<i>"
+                                    + toDir
+                                    + "</i><p><br>And then restart the IDV");
+                            javax.swing.JOptionPane.showMessageDialog(null,
+                                    msg, "Error", JOptionPane.ERROR_MESSAGE);
                             System.exit(0);
                         } else {
+                            /*
                             GuiUtils.showOkDialog(
                                 null, "Move succeeded",
                                 GuiUtils.inset(
                                     new JLabel(
-                                        "The directory has been moved"), 5), null);
+                                    "The directory has been moved"), 5), null);*/
                         }
                     }
                 }
