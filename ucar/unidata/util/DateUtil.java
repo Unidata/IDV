@@ -42,6 +42,8 @@ import java.util.TimeZone;
  */
 public class DateUtil {
 
+    public static final String[] MONTH_NAMES = {"January","February","March","April","May","June","July","August","September","October","November", "December"};
+
     /** milliseconds in  a millisecond */
     public static final long MILLIS = 1;
 
