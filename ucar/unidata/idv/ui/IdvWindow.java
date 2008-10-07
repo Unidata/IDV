@@ -242,9 +242,13 @@ public class IdvWindow extends MultiFrame {
      */
     public void setContents(JComponent contents) {
         this.contents = contents;
-        getContentPane().removeAll();
-        getContentPane().add(contents);
-        pack();
+        if(contents == null) return;
+        Container contentPane = getContentPane();
+        if(contentPane!=null) {
+            contentPane.removeAll();
+            contentPane.add(contents);
+            pack();
+        }
     }
 
     /**

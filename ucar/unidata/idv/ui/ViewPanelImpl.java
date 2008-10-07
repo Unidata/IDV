@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -150,9 +151,11 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
     /** Maps viewManager to the tab in the displays tab */
     private List vmInfos = new ArrayList();
 
+    /** _more_          */
+    private static final String PROP_CONTROLINFO = "prop.controlinfo";
 
-    /** Used in control tabs */
-    private Hashtable controlToInfo = new Hashtable();
+
+
 
 
     /**
@@ -212,11 +215,12 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param up If true select previous, else select next
      */
     private void selectNext(boolean up) {
-        boolean gotit  = false;
-        VMInfo  select = null;
-        int     index  = 0;
-        List localVMInfos = new ArrayList(vmInfos);
-        for (int vmIdx = 0; !gotit && (vmIdx < localVMInfos.size()); vmIdx++) {
+        boolean gotit        = false;
+        VMInfo  select       = null;
+        int     index        = 0;
+        List    localVMInfos = new ArrayList(vmInfos);
+        for (int vmIdx = 0; !gotit && (vmIdx < localVMInfos.size());
+                vmIdx++) {
             VMInfo vmInfo = (VMInfo) localVMInfos.get(vmIdx);
             List   cis    = vmInfo.controlInfos;
             for (int i = 0; i < cis.size(); i++) {
@@ -231,7 +235,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                     } else {
                         vmIdx--;
                         while (vmIdx >= 0) {
-                            VMInfo prev = (VMInfo)localVMInfos.get(vmIdx--);
+                            VMInfo prev = (VMInfo) localVMInfos.get(vmIdx--);
                             if (prev.getCatOpen()
                                     && (prev.controlInfos.size() > 0)) {
                                 select = prev;
@@ -308,7 +312,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param viewManager The ViewManager that was destroyed
      */
     public void viewManagerDestroyed(ViewManager viewManager) {
-        synchronized(VM_MUTEX) {
+        synchronized (VM_MUTEX) {
             VMInfo vmInfo = findVMInfo(viewManager);
             if (vmInfo != null) {
                 vmInfos.remove(vmInfo);
@@ -339,15 +343,29 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param control The control
      * @param forceShow If true then show the component in the window no matter what
      */
-    private void addControlTab(final DisplayControl control, final boolean forceShow) {
-        SwingUtilities.invokeLater(new Runnable(){
-                public void run() {
-                    addControlTabInThread(control, forceShow);
-                }});
+    private void addControlTab(final DisplayControl control,
+                               final boolean forceShow) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                addControlTabInThread(control, forceShow);
+            }
+        });
     }
 
 
-    private void addControlTabInThread(final DisplayControl control, final boolean forceShow) {
+    /**
+     * _more_
+     *
+     * @param control _more_
+     * @param forceShow _more_
+     */
+    private void addControlTabInThread(final DisplayControl control,
+                                       final boolean forceShow) {
+
+        if ( !control.getActive()) {
+            return;
+        }
+
         if ( !control.canBeDocked() || !control.shouldBeDocked()) {
             return;
         }
@@ -371,15 +389,13 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             }
         }
 
-
-        ControlInfo controlInfo = (ControlInfo) controlToInfo.get(control);
+        ControlInfo controlInfo =
+            (ControlInfo) control.getTmpProperty(PROP_CONTROLINFO);
         if (controlInfo != null) {
-            //            System.err.println("Already have it");
             return;
         }
         //For now cheat a little with the cast
         ((DisplayControlImpl) control).setMakeWindow(false);
-
 
         JButton removeBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Remove16.gif",
@@ -422,11 +438,15 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         inner = GuiUtils.centerBottom(inner, buttonPanel);
         final JComponent outer = GuiUtils.top(inner);
         outer.setBorder(BorderFactory.createEmptyBorder(2, 1, 0, 0));
-        controlInfo =
-            new ControlInfo(control, expandBtn, outer, inner,
-                            getVMInfo(control.getDefaultViewManager()));
-        controlToInfo.put(control, controlInfo);
-        boolean didToggle  = false;
+
+        if ( !control.getActive()) {
+            return;
+        }
+        Object dfltViewManager = control.getDefaultViewManager();
+        controlInfo = new ControlInfo(control, expandBtn, outer, inner,
+                                      getVMInfo(dfltViewManager));
+        control.putTmpProperty(PROP_CONTROLINFO, controlInfo);
+        boolean didToggle = false;
         if ( !getStateManager().getProperty(IdvConstants.PROP_LOADINGXML,
                                             false)) {
             if (forceShow || true
@@ -440,20 +460,22 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                 }
             }
         }
-        if(!didToggle) {
+        if ( !didToggle) {
             GuiUtils.toggleHeavyWeightComponents(outer, false);
         }
+
+
     }
 
 
     /**
      * Called by the IDV when there has been a change to the display controls.
      *
-     * @param displayControl The control that changed
+     * @param control The control that changed
      */
-    public void displayControlChanged(DisplayControl displayControl) {
+    public void displayControlChanged(DisplayControl control) {
         ControlInfo controlInfo =
-            (ControlInfo) controlToInfo.get(displayControl);
+            (ControlInfo) control.getTmpProperty(PROP_CONTROLINFO);
         if (controlInfo != null) {
             controlInfo.displayControlChanged();
         }
@@ -461,6 +483,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
 
 
 
+    /** _more_          */
     private Object VM_MUTEX = new Object();
 
     /**
@@ -475,7 +498,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         if (vm == null) {
             vm = "No View";
         }
-        synchronized(VM_MUTEX) {
+        synchronized (VM_MUTEX) {
             VMInfo vmInfo = findVMInfo(vm);
             if (vmInfo == null) {
                 vmInfo = new VMInfo(vm);
@@ -525,12 +548,20 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         removeControlTab(control, true);
     }
 
-    public void removeControlTab(final DisplayControl control, boolean inSwingThread) {
-        if(inSwingThread) {
-            SwingUtilities.invokeLater(new Runnable(){
-                    public void run() {
-                        removeControlTabInThread(control);
-                    }});
+    /**
+     * _more_
+     *
+     * @param control _more_
+     * @param inSwingThread _more_
+     */
+    public void removeControlTab(final DisplayControl control,
+                                 boolean inSwingThread) {
+        if (inSwingThread) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    removeControlTabInThread(control);
+                }
+            });
         } else {
             removeControlTabInThread(control);
         }
@@ -542,7 +573,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param control The control
      */
     private void removeControlTabInThread(DisplayControl control) {
-        ControlInfo tabInfo = (ControlInfo) controlToInfo.remove(control);
+        ControlInfo tabInfo =
+            (ControlInfo) control.removeTmpProperty(PROP_CONTROLINFO);
         if (tabInfo != null) {
             tabInfo.removeDisplayControl();
         }
@@ -588,7 +620,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param control The control
      */
     public void expandControl(DisplayControl control) {
-        ControlInfo tabInfo = (ControlInfo) controlToInfo.get(control);
+        ControlInfo tabInfo =
+            (ControlInfo) control.getTmpProperty(PROP_CONTROLINFO);
         if (tabInfo == null) {
             return;
         }
@@ -616,13 +649,14 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      * @param control The control
      */
     public void undockControl(final DisplayControl control) {
-        SwingUtilities.invokeLater(new Runnable(){
-                public void run() {
-                    removeControlTab(control,false);
-                    control.setShowInTabs(false);
-                    ((DisplayControlImpl) control).setMakeWindow(true);
-                    ((DisplayControlImpl) control).popup(null);
-                }});
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                removeControlTab(control, false);
+                control.setShowInTabs(false);
+                ((DisplayControlImpl) control).setMakeWindow(true);
+                ((DisplayControlImpl) control).popup(null);
+            }
+        });
     }
 
     /**
@@ -635,29 +669,31 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         addControlTab(control, true);
     }
 
+    /** _more_          */
     private static final Object BUTTONSTATE_MUTEX = new Object();
+
     /**
      * Initialize the button state
      *
      * @param idv the idv
      */
     protected static void initButtonState(IntegratedDataViewer idv) {
-        synchronized(BUTTONSTATE_MUTEX) {
+        synchronized (BUTTONSTATE_MUTEX) {
             if (BUTTON_FG_COLOR == null) {
-                BUTTON_SHOWPOPUP = idv.getProperty("idv.ui.viewpanel.showpopup",
-                                                   false);
+                BUTTON_SHOWPOPUP =
+                    idv.getProperty("idv.ui.viewpanel.showpopup", false);
                 BUTTON_SHOWCATEGORIES =
                     idv.getProperty("idv.ui.viewpanel.showcategories", false);
 
-                BUTTON_BORDER     = BorderFactory.createEmptyBorder(2, 6, 2, 0);
+                BUTTON_BORDER = BorderFactory.createEmptyBorder(2, 6, 2, 0);
                 BUTTON_FONT       = new Font("Dialog", Font.PLAIN, 11);
                 CATEGORY_FONT     = new Font("Dialog", Font.BOLD, 11);
                 BUTTON_LINE_COLOR = Color.gray;
-                CATEGORY_OPEN_ICON =
-                    GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryOpen.gif");
-                CATEGORY_CLOSED_ICON =
-                    GuiUtils.getImageIcon("/auxdata/ui/icons/CategoryClosed.gif");
-                BUTTON_FG_COLOR   = Color.black;
+                CATEGORY_OPEN_ICON = GuiUtils.getImageIcon(
+                    "/auxdata/ui/icons/CategoryOpen.gif");
+                CATEGORY_CLOSED_ICON = GuiUtils.getImageIcon(
+                    "/auxdata/ui/icons/CategoryClosed.gif");
+                BUTTON_FG_COLOR = Color.black;
             }
         }
     }
@@ -934,7 +970,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                 ignore = false;
                 if (controlInfos.size() == 0) {
                     List localVMInfos = new ArrayList(vmInfos);
-                    for (int vmIdx = 0; vmIdx < localVMInfos.size(); vmIdx++) {
+                    for (int vmIdx = 0; vmIdx < localVMInfos.size();
+                            vmIdx++) {
                         VMInfo vmInfo = (VMInfo) localVMInfos.get(vmIdx);
                         if (vmInfo.controlInfos.size() > 0) {
                             ControlInfo ci =
@@ -1177,7 +1214,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                 String name = viewManager.getName();
                 if ((name == null) || (name.trim().length() == 0)) {
                     List localVMInfos = new ArrayList(vmInfos);
-                    int idx = localVMInfos.indexOf(this);
+                    int  idx          = localVMInfos.indexOf(this);
                     if (idx == -1) {
                         idx = localVMInfos.size();
                     }

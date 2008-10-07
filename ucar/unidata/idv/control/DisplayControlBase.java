@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -350,11 +351,57 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** group flags */
     public static final String SETTINGS_GROUP_FLAGS = "Flags";
 
+    /** _more_          */
+    private Hashtable tmpProperties;
+
+
     /**
      * ctor
      */
     public DisplayControlBase() {}
 
+
+    /**
+     * Get the tmp property.
+     *
+     * @param key key
+     *
+     * @return property
+     */
+    public Object getTmpProperty(Object key) {
+        if (tmpProperties != null) {
+            return tmpProperties.get(key);
+        }
+        return null;
+    }
+
+    /**
+     * put the tmp property. These are not persisted off
+     *
+     * @param key key
+     * @param value value
+     */
+    public void putTmpProperty(Object key, Object value) {
+        if (tmpProperties == null) {
+            tmpProperties = new Hashtable();
+        }
+        tmpProperties.put(key, value);
+    }
+
+
+    /**
+     * remove the tmp property
+     *
+     * @param key key
+     *
+     * @return the value or null if not found
+     */
+    public Object removeTmpProperty(Object key) {
+        if (tmpProperties != null) {
+            return tmpProperties.remove(key);
+        }
+        return null;
+    }
 
     /**
      * A utility that takes a list
@@ -888,10 +935,14 @@ public abstract class DisplayControlBase extends SharableImpl {
      * @return a labeled level as a TwoFacedObject
      */
     protected TwoFacedObject getLabeledReal(Object level) {
-        if (level == null) return (TwoFacedObject) level;
+        if (level == null) {
+            return (TwoFacedObject) level;
+        }
         if (level instanceof TwoFacedObject) {
             Object lev = ((TwoFacedObject) level).getId();
-            if (lev instanceof Real) return (TwoFacedObject) level;
+            if (lev instanceof Real) {
+                return (TwoFacedObject) level;
+            }
         } else if (level instanceof Real) {
             return Util.labeledReal((Real) level);
         } else if (level instanceof String) {
@@ -914,7 +965,9 @@ public abstract class DisplayControlBase extends SharableImpl {
      * @return  a corresponding Real or null
      */
     protected Real getLevelReal(Object level) {
-        if (level == null) return (Real) level;
+        if (level == null) {
+            return (Real) level;
+        }
         if (level instanceof TwoFacedObject) {
             Object lev = ((TwoFacedObject) level).getId();
             if (lev instanceof Real) {

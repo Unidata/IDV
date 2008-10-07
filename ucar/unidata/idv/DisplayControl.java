@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -279,6 +280,13 @@ public interface DisplayControl extends Sharable {
      * @return  true if it can remove all
      */
     public boolean getCanDoRemoveAll();
+
+    /**
+     * Is this control active or has it been removed
+     *
+     * @return is active
+     */
+    public boolean getActive();
 
     /**
      * Get the {@link DataChoice} associated with this control.
@@ -617,6 +625,33 @@ public interface DisplayControl extends Sharable {
                                  int animationStep)
      throws Exception;
 
+
+
+    /**
+     * Get the tmp property. 
+     *
+     * @param key key
+     *
+     * @return property
+     */
+    public Object getTmpProperty(Object key);
+
+    /**
+     * put the tmp property. These are not persisted off
+     *
+     * @param key key
+     * @param value value
+     */
+    public void putTmpProperty(Object key, Object value);
+
+    /**
+     * remove the tmp property
+     *
+     * @param key key
+     *
+     * @return the value or null if not found
+     */
+    public Object removeTmpProperty(Object key);
 
 }
 

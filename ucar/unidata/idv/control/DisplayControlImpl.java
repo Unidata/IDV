@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -802,7 +803,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** geoselection panel */
     private GeoSelectionPanel geoSelectionPanel;
 
-    /** _more_          */
+    /** _more_ */
     private DataSelectionWidget dataSelectionWidget;
 
     /** The color scale dialog used in the properties dialog */
@@ -826,7 +827,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** initial settings */
     private List initialSettings;
 
-    /** Data selection components from the data source for the properties dialog    */
+    /** Data selection components from the data source for the properties dialog */
     private List<DataSelectionComponent> dataSelectionComponents;
 
 
@@ -3491,8 +3492,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public DisplayableData getDisplayListDisplayable(ViewManager view) {
 
         if (hasBeenRemoved) {
-	    return null;
-	}	
+            return null;
+        }
 
         DisplayableData displayListDisplayable = null;
         if (displayListTable == null) {
@@ -4392,6 +4393,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
+                    //Was removed?
+                    if (outerContents == null) {
+                        return;
+                    }
+
                     window.setTitle(getTitle());
                     window.setContents(outerContents);
                     if (windowSize != null) {
@@ -6404,12 +6410,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         defaultViewManager = null;
         removeListenerFromDataChoices();
         if (contents != null) {
-            GuiUtils.empty(contents);
+            //Don't do this for now:
+            //GuiUtils.empty(contents);
             contents = null;
         }
 
         if (outerContents != null) {
-            GuiUtils.empty(outerContents);
+            //Don't do this for now:
+            //            GuiUtils.empty(outerContents);
             outerContents = null;
         }
 
@@ -8805,9 +8813,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private void disposeOfWindow() {
         if (myWindow != null) {
-            myWindow.setVisible(false);
-            myWindow.dispose();
+            final IdvWindow tmpWindow = myWindow;
             myWindow = null;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tmpWindow.setVisible(false);
+                    tmpWindow.dispose();
+                }
+            });
         }
     }
 
@@ -8819,7 +8832,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void popup(Component src) {
         Window f = GuiUtils.getWindow(contents);
-        System.err.println((f != null) + " " + makeWindow);
         if ((f != null) && !makeWindow) {
             GuiUtils.showComponentInTabs(contents);
             //            if (f != null) {
