@@ -775,7 +775,7 @@ public class IOUtil {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
         if ( !from.renameTo(to)) {
-            throw new IllegalStateException("Could not move file:" + from);
+            throw new IllegalStateException("Could not move file:" + from +" to:" + to);
         }
         //        copyFile(from, to);
         //        from.delete();
