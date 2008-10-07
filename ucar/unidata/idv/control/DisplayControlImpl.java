@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -31,6 +29,7 @@ import org.w3c.dom.Element;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
+
 import ucar.unidata.data.DataCancelException;
 import ucar.unidata.data.DataChangeListener;
 import ucar.unidata.data.DataChoice;
@@ -40,20 +39,18 @@ import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSelectionComponent;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceImpl;
-
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.idv.ControlContext;
 
+import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.IdvPreferenceManager;
-
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.NavigatedViewManager;
@@ -61,14 +58,13 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
+
 import ucar.unidata.idv.ui.DataSelectionWidget;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.IdvUIManager;
 import ucar.unidata.idv.ui.IdvWindow;
-
-
 
 import ucar.unidata.metdata.NamedStationImpl;
 
@@ -81,19 +77,13 @@ import ucar.unidata.ui.colortable.ColorTableManager;
 
 
 import ucar.unidata.util.ColorTable;
-
-
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
-
-
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.Prototypable;
@@ -120,13 +110,8 @@ import ucar.visad.display.DisplayMaster;
 import visad.*;
 
 import visad.georef.EarthLocation;
-
-import visad.georef.EarthLocation;
-
-
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
-
 import visad.georef.MapProjection;
 
 import visad.util.DataUtility;
@@ -138,7 +123,6 @@ import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
 
 import java.beans.PropertyChangeEvent;
-
 import java.beans.PropertyChangeListener;
 
 import java.io.File;
@@ -803,7 +787,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** geoselection panel */
     private GeoSelectionPanel geoSelectionPanel;
 
-    /** _more_ */
+    /** data selection widget */
     private DataSelectionWidget dataSelectionWidget;
 
     /** The color scale dialog used in the properties dialog */
@@ -1119,7 +1103,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Add to the control context
      */
     protected void addToControlContext() {
         //Add this control to the main controlContext
