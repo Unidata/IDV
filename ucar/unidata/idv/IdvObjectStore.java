@@ -20,7 +20,11 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
+
+
+import ucar.unidata.util.GuiUtils;
 
 
 import ucar.unidata.util.IOUtil;
@@ -31,14 +35,15 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlObjectStore;
 
-
-
 import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+
+
+import javax.swing.*;
 
 
 
@@ -97,15 +102,58 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
                           String overrideUserDirectory) {
         super(encoder);
         this.idv = idv;
-
         if (overrideUserDirectory != null) {
             systemDirectory          = overrideUserDirectory;
             userDirectory            = new File(overrideUserDirectory);
             usingNormalUserDirectory = false;
         } else {
+
             String userHome = Misc.getSystemProperty("user.home", ".");
-            systemDirectory = IOUtil.makeDir(IOUtil.joinDir(userHome,
-                    "." + systemName));
+            systemDirectory = IOUtil.joinDir(userHome, "." + systemName);
+
+            if (systemName.equals("unidata/idv")) {
+                if ( !new File(systemDirectory).exists()) {
+                    File metappsDir = new File(IOUtil.joinDir(userHome,
+                                          ".metapps"));
+                    File toDir = new File(systemDirectory);
+                    IOUtil.makeDirRecursive(new File(IOUtil.joinDir(userHome,
+                            ".unidata")));
+                    if (metappsDir.exists()) {
+                        if ( !GuiUtils.showOkCancelDialog(
+                                null, "Move .metapps directory",
+                                GuiUtils.inset(
+                                    new JLabel(
+                                        "<html>Note: The IDV is moving the old .metapps directory:<br><i>&nbsp;&nbsp;"
+                                        + metappsDir
+                                        + "</i><br> to:<br>&nbsp&nbsp;<i>"
+                                        + toDir + "</i>"), 5), null)) {
+                            System.exit(0);
+                        }
+                        boolean ok = metappsDir.renameTo(toDir);
+                        //                        boolean ok = false;
+                        if ( !ok) {
+                            GuiUtils.showOkDialog(
+                                null, "Move failed",
+                                GuiUtils.inset(
+                                    new JLabel(
+                                        "<html>For some reason the directory move failed. Please move the directory:<br><i>&nbsp;&nbsp;"
+                                        + metappsDir
+                                        + "</i><br> to:<br>&nbsp;&nbsp;<i>"
+                                        + toDir
+                                        + "</i><p><br>And then restart the IDV"), 5), null);
+                            System.exit(0);
+                        } else {
+                            GuiUtils.showOkDialog(
+                                null, "Move succeeded",
+                                GuiUtils.inset(
+                                    new JLabel(
+                                        "The directory has been moved"), 5), null);
+                        }
+                    }
+                }
+            }
+
+            IOUtil.makeDirRecursive(new File(systemDirectory));
             userDirectory = new File(IOUtil.joinDir(systemDirectory,
                     appName));
 
