@@ -64,7 +64,7 @@ import java.util.Properties;
 /**
  * This class manages the intialize properties that configure
  * the IDV and the persistent store for writing preferences, etc.
- * to the user's local .metapps directory
+ * to the user's local .unidata/idv directory
  *
  * @author IDV development team
  */
@@ -112,7 +112,7 @@ public class StateManager extends IdvManager {
 
     /**
      * The persistent store. Used to write out preferences,
-     * manage the user's local .metapps directory, etc.
+     * manage the user's local .unidata/idv directory, etc.
      */
     private IdvObjectStore store;
 
@@ -759,7 +759,7 @@ public class StateManager extends IdvManager {
 
     /**
      * Initialize the given object store. This mostly
-     * initializes the user's local .metapps directory
+     * initializes the user's local .unidata/idv directory
      * when it is first created.
      *
      * @param store The object store to initialize
@@ -794,7 +794,7 @@ public class StateManager extends IdvManager {
      * of the IDV class (e.g., DefaultIdv).
      *
      * @return The name of the store. This ends up being the name of the
-     * subdirectory of the ~/.metapps base directory.
+     * subdirectory of the ~/.unidata/idv base directory.
      */
     public String getStoreName() {
         String storeName = getProperty("idv.store.name", NULL_STRING);
@@ -813,12 +813,12 @@ public class StateManager extends IdvManager {
      * Get the name of the top level users directory.
      *  It is either the value of the
      * idv.store.system property or
-     * &quot;metapps&quot;
+     * &quot;unidata/idv&quot;
      *
      * @return The system name
      */
     public String getStoreSystemName() {
-        return getProperty("idv.store.system", "metapps");
+        return getProperty("idv.store.system", "unidata/idv");
     }
 
 
@@ -830,7 +830,7 @@ public class StateManager extends IdvManager {
      */
     protected void initNewUserDirectory(File dir) {
         try {
-            //Copy the README file over to the .metapps dir
+            //Copy the README file over to the .unidata/idv dir
             String readMeFile = IOUtil.joinDir(dir, "README");
             FileOutputStream fos = new FileOutputStream(readMeFile);
             InputStream readmeInputStream = IOUtil.getInputStream("/ucar/unidata/idv/resources/README.store", getClass());

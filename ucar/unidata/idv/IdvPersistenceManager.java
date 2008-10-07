@@ -1671,7 +1671,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     /**
      * Prompt the user for a name and write out the given display control
-     * as a bundle into the user's .metapps/displaytemplates directory.
+     * as a bundle into the user's .unidata/idv/displaytemplates directory.
      *
      * @param displayControl The display control to write
      * @param templateName Possibly null initial name for the template

@@ -1427,7 +1427,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      *  Return the path used to substitute the %USERPATH% macro for in the
      *  resource list properties.
      *
-     * @return The user path (e.g., ~/.metapps/DefaultIdv)
+     * @return The user path (e.g., ~/.unidata/idv/DefaultIdv)
      */
     public String getUserPath() {
         return getStore().getUserDirectory().getPath();

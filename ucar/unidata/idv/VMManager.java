@@ -366,7 +366,7 @@ public class VMManager extends IdvManager {
 
 
     /**
-     *  Write the vmState list to the file: ~user/.metapps/&lt;APP&gt;/vmstate.xml
+     *  Write the vmState list to the file: ~user/.unidata/idv/&lt;APP&gt;/vmstate.xml
      */
     public void writeVMState() {
         getVMState();

@@ -279,7 +279,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     /**
      * Initialize the Python package in a thread.
      * We define the python cache to be in the users
-     * .metapps directory. Python puts the results of its
+     * .unidata/idv directory. Python puts the results of its
      * parsing the jar files there.
      */
     private void initPython() {
@@ -1369,7 +1369,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
     /**
      * Save the end user jython code from the jython editor into
-     * the user's .metapps area.
+     * the user's .unidata/idv area.
      *
      *
      * @param holder lib

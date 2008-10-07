@@ -49,7 +49,7 @@ import javax.swing.*;
 
 /**
  * Provides some IDV specific extensions to the XmlObjectStore. Creates the
- * users local .metapps directory, jython cache dir, etc.
+ * users local .unidata/idv directory, jython cache dir, etc.
  *
  * @author IDV development team
  */
@@ -71,10 +71,10 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
     private IntegratedDataViewer idv;
 
 
-    /** The system directory. e.g., .metapps */
+    /** The system directory. e.g., .unidata/idv */
     String systemDirectory;
 
-    /** The users local state directory. e.g., This is the .metapps/DefaultIdv */
+    /** The users local state directory. e.g., This is the .unidata/idv/DefaultIdv */
     File userDirectory;
 
     /** Was the users directory created for the first time */
@@ -91,7 +91,7 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
      * Create the store.
      *
      * @param idv        The IntegratedDataViewer for this object store
-     * @param systemName The name of the top level directory (e.g., .metapps)
+     * @param systemName The name of the top level directory (e.g., .unidata/idv)
      * @param appName The name of the subdir (e.g., DefaultIdv)
      * @param encoder The encoder to use for writing out and reading in  the store
      * @param overrideUserDirectory If non-null this overrides wehre we look for
@@ -181,7 +181,7 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
 
 
     /**
-     * Get the path to the system directory. Ex: ~/.metapps
+     * Get the path to the system directory. Ex: ~/.unidata/idv
      *
      * @return The system directory path.
      */
@@ -218,7 +218,7 @@ public class IdvObjectStore extends XmlObjectStore implements IdvConstants {
     }
 
     /**
-     * Get the users local directory. Example: ~/.metapps.DefaultIdv
+     * Get the users local directory. Example: ~/.unidata/idv/DefaultIdv
      *
      * @return The user's local IDV directory
      */
