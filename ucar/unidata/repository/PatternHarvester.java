@@ -758,11 +758,12 @@ public class PatternHarvester extends Harvester {
                           "filename", f.getName()
         };
 
+        System.err.println ("doing macros");
         for(int i=0;i<macros.length;i+=2) {
             String macro = "${" +macros[i]+"}";
             String value = macros[i+1];
             groupName = groupName.replace(macro, value);
-            System.err.println (groupName + ";" + macro + ":" +value);
+            System.err.println (groupName + ":" + macro + ":" +value);
             name = name.replace(macro, value);
             desc = desc.replace(macro, value);
         }
@@ -775,10 +776,10 @@ public class PatternHarvester extends Harvester {
         Group group = getRepository().findGroupFromName(groupName, getUser(),
                           true);
         if(getTestMode()) {
-            debug("\tname: " + name + "\n\tgroup:" + group.getFullName()+ "\n\tfromdate:" + getRepository().formatDate(fromDate));
+            //            debug("\tname: " + name + "\n\tgroup:" + group.getFullName()+ "\n\tfromdate:" + getRepository().formatDate(fromDate));
             if(values!=null) {
                 for(int i=0;i<values.length;i++) {
-                    debug("\tvalue: " + values[i]);
+                    //                    debug("\tvalue: " + values[i]);
                 }
             }
         }
