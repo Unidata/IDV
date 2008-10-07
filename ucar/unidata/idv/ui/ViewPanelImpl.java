@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -151,7 +152,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
     /** Maps viewManager to the tab in the displays tab */
     private List vmInfos = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private static final String PROP_CONTROLINFO = "prop.controlinfo";
 
 
@@ -345,6 +346,12 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
      */
     private void addControlTab(final DisplayControl control,
                                final boolean forceShow) {
+        if ( !control.getActive() || !control.canBeDocked()
+                || !control.shouldBeDocked()) {
+            return;
+        }
+        //For now cheat a little with the cast
+        ((DisplayControlImpl) control).setMakeWindow(false);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 addControlTabInThread(control, forceShow);
@@ -453,11 +460,11 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                     || ((DisplayControlImpl) control)
                         .shouldWindowBeVisible()) {
                 //A hack for now
-                if ( !(control instanceof MapDisplayControl)) {
-                    didToggle = true;
-                    GuiUtils.toggleHeavyWeightComponents(outer, true);
-                    GuiUtils.showComponentInTabs(outer);
-                }
+                //                if ( !(control instanceof MapDisplayControl)) {
+                didToggle = true;
+                GuiUtils.toggleHeavyWeightComponents(outer, true);
+                GuiUtils.showComponentInTabs(outer);
+                //                }
             }
         }
         if ( !didToggle) {
@@ -483,7 +490,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Object VM_MUTEX = new Object();
 
     /**
@@ -669,7 +676,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         addControlTab(control, true);
     }
 
-    /** _more_          */
+    /** _more_ */
     private static final Object BUTTONSTATE_MUTEX = new Object();
 
     /**

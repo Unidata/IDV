@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -985,8 +986,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-
-
         if (getIdv().getInteractiveMode()) {
             Trace.call1("DisplayControlImpl.init doMakeWindow");
             //Now create the gui
@@ -1041,7 +1040,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             myWindow = createIdvWindow();
             if (myWindow != null) {
                 initWindow(myWindow);
-                //                controlContext.showWindow(this, myWindow);
             }
         }
 
@@ -3807,6 +3805,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return null;
         }
 
+
         myWindow       = new IdvWindow(getTitle(), getIdv());
 
         windowListener = new WindowAdapter() {
@@ -4378,6 +4377,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             public void run() {
                 try {
                     //Was removed?
+                    if (hasBeenRemoved) {
+                        return;
+                    }
                     if (outerContents == null) {
                         return;
                     }
