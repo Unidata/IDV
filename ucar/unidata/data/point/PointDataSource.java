@@ -150,7 +150,7 @@ public abstract class PointDataSource extends FilesDataSource {
             SPACING_DEGREES, SPACING_POINTS };
 
     /** names for spacing ids */
-    private static final String[] SPACING_NAMES = { "Compute", "Degrees",
+    private static final String[] SPACING_NAMES = { "Automatic", "Degrees",
             "# Points" };
 
     /** unit for grid spacing */
