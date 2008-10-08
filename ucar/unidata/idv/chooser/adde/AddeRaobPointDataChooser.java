@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.chooser.adde;
 
 
@@ -36,6 +37,12 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PreferenceList;
 import ucar.unidata.util.TwoFacedObject;
+
+import ucar.visad.quantities.CommonUnits;
+
+import visad.Real;
+import visad.RealType;
+import visad.VisADException;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -58,11 +65,20 @@ import javax.swing.event.*;
 public class AddeRaobPointDataChooser extends AddePointDataChooser {
 
 
-    /** list of levels */
-    private static String[] levels = {
+    /** list of levels names */
+    private static String[] levelNames = {
         "SFC", "1000", "925", "850", "700", "500", "400", "300", "250", "200",
         "150", "100", "70", "50", "30", "20", "10"
     };
+
+    /** list of level values */
+    private static int[] levelValues = {
+        1001, 1000, 925, 850, 700, 500, 400, 300, 250, 200, 150, 100, 70, 50,
+        30, 20, 10
+    };
+
+    /** List of levels */
+    private List levels = null;
 
     /** flag for selecting 00 and 12Z data only */
     private boolean zeroAndTwelveZOnly = true;
@@ -81,8 +97,27 @@ public class AddeRaobPointDataChooser extends AddePointDataChooser {
      */
     public AddeRaobPointDataChooser(IdvChooserManager mgr, Element root) {
         super(mgr, root);
+        makeLevels();
     }
 
+
+    /**
+     * Make the levels
+     *
+     * @return list of levels
+     */
+    private List makeLevels() {
+        levels = new ArrayList();
+        try {
+            for (int i = 0; i < levelValues.length; i++) {
+                levels.add(new TwoFacedObject(levelNames[i],
+                        new Real(RealType.getRealType("Pressure",
+                            CommonUnits.MILLIBAR), levelValues[i],
+                                CommonUnits.MILLIBAR)));
+            }
+        } catch (VisADException ve) {}
+        return levels;
+    }
 
 
 
@@ -189,7 +224,10 @@ public class AddeRaobPointDataChooser extends AddePointDataChooser {
      * @return list of levels;
      */
     public List getLevels() {
-        return Misc.toList(levels);
+        if (levels == null) {
+            makeLevels();
+        }
+        return levels;
     }
 
 }
