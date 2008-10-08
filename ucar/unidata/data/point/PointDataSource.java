@@ -23,8 +23,6 @@
 
 
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -265,6 +263,12 @@ public abstract class PointDataSource extends FilesDataSource {
         /** The main component */
         private JComponent comp;
 
+        /** The size component */
+        private JComponent sizeComp;
+
+        /** flag for compute */
+        boolean useCompute = true;
+
         /** The unit two faced objects_ */
         List tfos;
 
@@ -280,12 +284,25 @@ public abstract class PointDataSource extends FilesDataSource {
             GuiUtils.setListData(gridUnitCmbx, tfos);
             gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(gridUnit,
                     tfos));
+            gridUnitCmbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    TwoFacedObject tfo =
+                        (TwoFacedObject) ((JComboBox) ae.getSource())
+                            .getSelectedItem();
+                    if (tfo != null) {
+                        useCompute = tfo.getId().equals(SPACING_IDS[0]);
+                        GuiUtils.enableTree(sizeComp, !useCompute);
+                    }
+                }
+            });
+
             numGridIterationsFld = new JTextField("" + numGridIterations, 4);
-            comps.add(GuiUtils.rLabel("Grid Size:"));
-            comps.add(GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
-                    gridXFld, new JLabel("  Y: "), gridYFld)));
-            comps.add(GuiUtils.rLabel("Size Unit:"));
+            comps.add(GuiUtils.rLabel("Spacing:"));
             comps.add(GuiUtils.left(gridUnitCmbx));
+            comps.add(GuiUtils.rLabel("Grid Size:"));
+            sizeComp = GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
+                    gridXFld, new JLabel("  Y: "), gridYFld));
+            comps.add(sizeComp);
             comps.add(GuiUtils.rLabel("Iterations:"));
             comps.add(GuiUtils.left(numGridIterationsFld));
             useDefaultCbx.addActionListener(new ActionListener() {
@@ -301,6 +318,9 @@ public abstract class PointDataSource extends FilesDataSource {
          */
         public void checkEnable() {
             GuiUtils.enableTree(comp, !useDefaultCbx.isSelected());
+            if ( !useDefaultCbx.isSelected()) {
+                GuiUtils.enableTree(sizeComp, !useCompute);
+            }
         }
 
         /**
@@ -698,8 +718,8 @@ public abstract class PointDataSource extends FilesDataSource {
                         if (compositeDataChoice == null) {
                             compositeDataChoice =
                                 new CompositeDataChoice(this, "",
-                                    "Objective Analysis Derived Grid Fields",
-                                    "OA Fields",
+                                    "Grid Fields from Objective Analysis",
+                                    "Gridded Fields",
                                     Misc.newList(DataCategory.NONE_CATEGORY),
                                     null);
                             addDataChoice(compositeDataChoice);
@@ -840,8 +860,8 @@ public abstract class PointDataSource extends FilesDataSource {
                 double[] bbox  = PointObFactory.getBoundingBox(pointObs);
                 float    spanX = (float) Math.abs(bbox[1] - bbox[3]);
                 float    spanY = (float) Math.abs(bbox[0] - bbox[2]);
-                degreesX = spanX / spacingX;
-                degreesY = spanY / spacingY;
+                degreesX = spanX / (int) spacingX;
+                degreesY = spanY / (int) spacingY;
             } else if (theUnit.equals(SPACING_DEGREES)) {
                 degreesX = spacingX;
                 degreesY = spacingY;
