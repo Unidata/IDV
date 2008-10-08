@@ -1,15 +1,17 @@
 
---- Initial data base creation
+
+-----------------------------------------------------------------------
+---Note: the ramadda.datetime and ramadda.double are replaced by ramadda
+---with the appropriate datatype for the database being used.
+---mysql has a datetime type, postgres and derby have timestamp
+---we can't use timestamp for mysql because it only goes back to 1970
+---derby and mysql have double. postgres has float8
+-----------------------------------------------------------------------
 
 
-CREATE TABLE  dummy (name varchar(500));
-
-
-CREATE TABLE  globals (name varchar(500),
-                       value varchar(10000));
-
-
-
+-----------------------------------------------------------------------
+--- the main entries table
+-----------------------------------------------------------------------
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
 	           name varchar(200),
@@ -17,7 +19,7 @@ CREATE TABLE entries (id varchar(200),
                    parent_group_id varchar(200),
                    top_group_id varchar(200),
    		   user_id varchar(200),
-	           resource varchar(200),	           
+	           resource varchar(500),	           
                    resource_type varchar(200),
 		   datatype varchar(200),
 	           createdate ramadda.datetime, 
@@ -29,16 +31,18 @@ CREATE TABLE entries (id varchar(200),
 	           west ramadda.double); 
 
 
-#for mysql
-alter table entries modify column description varchar(10000);
+--- for mysql
+alter table entries modify column resource varchar(500);
 alter table entries modify column createdate ramadda.datetime;
 alter table entries modify column fromdate ramadda.datetime;
 alter table entries modify column todate ramadda.datetime;
-#for derby
-alter table entries alter column description set data type varchar(10000);
+--- for derby
+alter table entries alter column resource set data type varchar(500);
+alter table entries alter column createdate set data type ramadda.datetime;
+alter table entries alter column fromdate set data type ramadda.datetime;
+alter table entries alter column todate set data type ramadda.datetime;
 
-alter table entries add column  datatype varchar(200);
-alter table entries add column  top_group_id varchar(200) default '0';
+
 
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
@@ -51,6 +55,11 @@ CREATE INDEX ENTRIES_INDEX_FROMDATE ON entries (FROMDATE);
 CREATE INDEX ENTRIES_INDEX_TODATE ON entries (TODATE);
 
 
+-----------------------------------------------------------------------
+---Holds metadata 
+---Entries can have any number of metadata items
+---The MetadataHandler classes handle the semantics. 
+-----------------------------------------------------------------------
 CREATE TABLE  metadata (id varchar(200),
 			entry_id varchar(200),
                         type varchar(200),
@@ -61,14 +70,15 @@ CREATE TABLE  metadata (id varchar(200),
                         attr4 varchar(10000)
 			);
 
-alter table metadata add column  inherited int;
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);
 CREATE INDEX METADATA_INDEX_ENTRYID ON metadata (ENTRY_ID);
 CREATE INDEX METADATA_INDEX_TYPE ON metadata (TYPE);
 CREATE INDEX METADATA_INDEX_ATTR1 ON metadata (ATTR1);
 
-
+-----------------------------------------------------------------------
+--- comments 
+-----------------------------------------------------------------------
 CREATE TABLE  comments (id varchar(200),
 		        entry_id varchar(200),
 			user_id  varchar(200),
@@ -79,21 +89,20 @@ CREATE TABLE  comments (id varchar(200),
 CREATE INDEX COMMENTS_INDEX_ID ON comments (ID);
 CREATE INDEX COMMENTS_INDEX_ENTRY_ID ON comments (ENTRY_ID);
 
-alter table comments modify column date ramadda.datetime;
 
-
-
+-----------------------------------------------------------------------
+--- associations 
+-----------------------------------------------------------------------
 CREATE TABLE associations (id varchar(200),
                            name varchar(200),
 		           type varchar(200),
 			   from_entry_id varchar(200),
 		           to_entry_id varchar(200));
 
-alter table associations add column id varchar(200);
-alter table associations add column type varchar(200);
 
-
-
+-----------------------------------------------------------------------
+--- users 
+-----------------------------------------------------------------------
 CREATE TABLE  users (id varchar(200),
                      name  varchar(200),
                      email varchar(200),
@@ -103,14 +112,20 @@ CREATE TABLE  users (id varchar(200),
 		     admin int,
 		     language varchar(50));
 
-alter table users add column  language varchar(50);
 
 
+
+-----------------------------------------------------------------------
+--- roles users have
+-----------------------------------------------------------------------
 CREATE TABLE  userroles (
         user_id varchar(200),
         role varchar(200));
 
 
+-----------------------------------------------------------------------
+---  permissions on entries
+-----------------------------------------------------------------------
 CREATE TABLE  permissions (
 	entry_id varchar(200),
 	action varchar(200),
@@ -119,14 +134,30 @@ CREATE TABLE  permissions (
 
 
 
+-----------------------------------------------------------------------
+--- the harvesters. content is the xml they encode/decode to store state
+-----------------------------------------------------------------------
 CREATE TABLE  harvesters (
        	      id varchar(200),
               class varchar(500),
               content varchar(10000));
 
 
-drop table tags;
-drop table report1;
 
 
---CREATE TABLE stats ();
+-----------------------------------------------------------------------
+--- global properties
+-----------------------------------------------------------------------
+
+CREATE TABLE  globals (name varchar(500),
+                       value varchar(10000));
+
+
+
+-----------------------------------------------------------------------
+--- just here so ramadda knows if the db has been created
+-----------------------------------------------------------------------
+CREATE TABLE  dummy (name varchar(500));
+
+
+---CREATE TABLE stats ();

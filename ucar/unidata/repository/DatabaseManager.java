@@ -733,9 +733,6 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-
-
-
     /**
      * _more_
      *
