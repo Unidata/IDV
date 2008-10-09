@@ -407,6 +407,42 @@ public class Repository extends RepositoryBase implements Tables,
     protected void init(Properties properties) throws Exception {
         initProperties(properties);
         initServer();
+        Misc.run(this, "runBufrTest",null);
+    }
+
+    public void runBufrTest() {
+        try {
+            int total = 0;
+            Connection connection = getDatabaseManager().getNewConnection();
+            Statement statement = connection.createStatement();
+            statement.execute("delete from bufrtest");
+            statement.close();
+            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into bufrtest values(?,?,?)");
+            long t1 = System.currentTimeMillis();
+            System.err.println("start test");
+            connection.setAutoCommit(false);
+            for(int j=0;j<10;j++) {
+                for(int i=0;i<1000;i++) {
+                    pstmt.setString(1,"stn" +j);
+                    pstmt.setInt(2,i);
+                    pstmt.setString(3,"the file");
+                    pstmt.addBatch();
+                    total++;
+                }
+                pstmt.executeBatch();
+                long t2 = System.currentTimeMillis();
+                if(t2>t1) {
+                    double seconds = (t2-t1)/1000.0;
+                    System.err.println("cnt:" + total +  " rate:"  + ((int)(total/seconds))+"/s");
+                }
+            }
+            connection.setAutoCommit(true);
+            connection.commit();
+            pstmt.close();
+            System.err.println("done");
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
     }
 
 

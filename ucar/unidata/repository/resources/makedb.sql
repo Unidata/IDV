@@ -161,3 +161,11 @@ CREATE TABLE  dummy (name varchar(500));
 
 
 ---CREATE TABLE stats ();
+
+
+CREATE TABLE  BUFRTEST (station varchar(200),
+              		offset int,
+			file  varchar(200));
+
+CREATE INDEX BUFRTEST_INDEX_STATION ON BUFRTEST (station);
+
