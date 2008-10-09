@@ -850,7 +850,7 @@ public class DatabaseManager extends RepositoryManager {
         Connection connection = getConnection();
         Statement stmt = SqlUtil.select(connection, what,
                                         Misc.newList(table),
-                                        new Clause[] { clause }, extra);
+                                        (clause==null?null:new Clause[] { clause }), extra);
         releaseConnection(connection);
         return stmt;
     }
@@ -893,7 +893,7 @@ public class DatabaseManager extends RepositoryManager {
      */
     public Statement select(String what, String table, Clause clause)
             throws Exception {
-        return select(what, Misc.newList(table), new Clause[] { clause });
+        return select(what, Misc.newList(table), (clause==null?null:new Clause[] { clause }));
     }
 
 

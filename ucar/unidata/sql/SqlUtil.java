@@ -925,6 +925,7 @@ public class SqlUtil {
                     //                        System.err.println ("OK:" + command);
                 }
             } catch (Exception exc) {
+
                 if ( !ignoreErrors) {
                     System.err.println("Bad sql:" + command);
                     //                    System.err.println("" + exc);
@@ -1403,7 +1404,9 @@ public class SqlUtil {
             String what, List tables, Clause clause, String extra)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        clause.addClause(sb);
+        if(clause!=null) {
+            clause.addClause(sb);
+        }
         if (debug) {
             System.err.println(sb);
         }
@@ -1456,7 +1459,9 @@ public class SqlUtil {
         if (max > 0) {
             stmt.setMaxRows(max);
         }
-        clause.setValue(stmt, 1);
+        if(clause!=null) {
+            clause.setValue(stmt, 1);
+        }
         //        System.err.println ("stmt: " + stmt);
         stmt.execute();
         return stmt;
@@ -1538,7 +1543,7 @@ public class SqlUtil {
     public static Statement select(Connection connection, String what,
                                    List tables, Clause[] clauses)
             throws Exception {
-        return select(connection, what, tables, Clause.and(clauses));
+        return select(connection, what, tables, (clauses==null?null:Clause.and(clauses)));
     }
 
     /**
@@ -1558,7 +1563,7 @@ public class SqlUtil {
                                    List tables, Clause[] clauses,
                                    String extra)
             throws Exception {
-        return select(connection, what, tables, Clause.and(clauses), extra);
+        return select(connection, what, tables, (clauses==null?null:Clause.and(clauses)), extra);
     }
 
 

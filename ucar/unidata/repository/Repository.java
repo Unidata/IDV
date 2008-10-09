@@ -412,32 +412,39 @@ public class Repository extends RepositoryBase implements Tables,
 
     public void runBufrTest() {
         try {
+            boolean autoCommit = false;
             int total = 0;
             Connection connection = getDatabaseManager().getNewConnection();
             Statement statement = connection.createStatement();
-            statement.execute("delete from bufrtest");
+            statement.execute("delete from BUFRTEST");
             statement.close();
-            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into bufrtest values(?,?,?)");
+            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into BUFRTEST values(?,?,?)");
             long t1 = System.currentTimeMillis();
-            System.err.println("start test");
-            connection.setAutoCommit(false);
-            for(int j=0;j<10;j++) {
+            System.err.println("start test " + (autoCommit?" doing autocommit":" not commiting"));
+            if(!autoCommit) {
+                connection.setAutoCommit(false);
+            }
+            for(int j=0;j<100;j++) {
                 for(int i=0;i<1000;i++) {
-                    pstmt.setString(1,"stn" +j);
+                    pstmt.setString(1,"stn");
                     pstmt.setInt(2,i);
                     pstmt.setString(3,"the file");
                     pstmt.addBatch();
                     total++;
+                    pstmt.executeBatch();
                 }
-                pstmt.executeBatch();
+                //                pstmt.executeBatch();
                 long t2 = System.currentTimeMillis();
                 if(t2>t1) {
                     double seconds = (t2-t1)/1000.0;
                     System.err.println("cnt:" + total +  " rate:"  + ((int)(total/seconds))+"/s");
                 }
             }
-            connection.setAutoCommit(true);
-            connection.commit();
+            if(!autoCommit) {
+                connection.commit();
+                connection.setAutoCommit(true);
+            }
+            connection.close();
             pstmt.close();
             System.err.println("done");
         } catch(Exception exc) {
