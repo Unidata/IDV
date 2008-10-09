@@ -416,9 +416,14 @@ public class Repository extends RepositoryBase implements Tables,
             int total = 0;
             Connection connection = getDatabaseManager().getNewConnection();
             Statement statement = connection.createStatement();
-            statement.execute("delete from BUFRTEST");
+            statement.execute("delete from BUFRTEST2");
             statement.close();
-            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into BUFRTEST values(?,?,?)");
+            
+            if(true) {
+                connection.close();
+                return;
+            }
+            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into BUFRTEST2 values(?,?,?)");
             long t1 = System.currentTimeMillis();
             System.err.println("start test " + (autoCommit?" doing autocommit":" not commiting"));
             if(!autoCommit) {

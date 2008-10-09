@@ -169,3 +169,8 @@ CREATE TABLE  BUFRTEST (station varchar(200),
 
 CREATE INDEX BUFRTEST_INDEX_STATION ON BUFRTEST (station);
 
+
+CREATE TABLE  BUFRTEST2 (station varchar(200),
+              		offset int,
+			file  varchar(200));
+
