@@ -236,6 +236,7 @@ argument -Dfoo=bar) -->
 
     <target name="timelinejar" depends="init,clean">
         <javac
+            classpath="${classpath}"
             debug="true"
             source="${srcversion}"
             deprecation="false" 
