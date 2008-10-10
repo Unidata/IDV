@@ -169,11 +169,14 @@ public class TimelineApplet extends Applet {
         }
         URL base  = getDocumentBase();
         loadUrl  = loadUrl.replace("%ids%", ids.toString());
+        loadUrl  = loadUrl.replace("%25ids%25", ids.toString());
         if(loadWhat!=null) {
             loadUrl  = loadUrl.replace("%loadtype%", loadWhat.getSelectedItem().toString());
+            loadUrl  = loadUrl.replace("%25loadtype%25", loadWhat.getSelectedItem().toString());
         }
         String s = "http://" + base.getHost() +":" + base.getPort() +loadUrl;
         URL doc = new URL(s);
+        System.err.println ("URL: " + doc);
         getAppletContext().showDocument(doc);
         } catch(Exception exc) {
             exc.printStackTrace();
