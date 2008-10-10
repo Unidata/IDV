@@ -1416,7 +1416,7 @@ public class MapViewManager extends NavigatedViewManager {
                     && !getStateManager().getProperty(
                         IdvConstants.PROP_LOADINGXML, false)) {
                 if(getIdv().getArgsManager().getIsOffScreen()) {
-                    System.err.println("Setting projection from display ");
+                    //                    System.err.println("Setting projection from display ");
                 }
                 MapProjection mp = display.getDataProjection();
                 if (displayProjectionOk(mp)) {

@@ -3485,7 +3485,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             if (loadDialog.okToRun()) {
                 if (newControls != null) {
                 if(getIdv().getArgsManager().getIsOffScreen()) {
-                    System.err.println ("initializing displays");
+                    //                    System.err.println ("initializing displays");
                 }
                     //Here we might want to first collect the displaycontrols
                     //that need to have data bound to them (i.e., those that

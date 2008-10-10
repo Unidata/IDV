@@ -5811,7 +5811,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             initMatrix = ProjectionControl.matrixDConvert(newMatrix);
         }
         if(getIdv().getArgsManager().getIsOffScreen()) {
-            System.err.println("Setting projection matrix");
+            //            System.err.println("Setting projection matrix");
         }
         getMaster().setProjectionMatrix(initMatrix);
     }
