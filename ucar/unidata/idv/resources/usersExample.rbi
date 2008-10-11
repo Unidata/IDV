@@ -9,7 +9,7 @@
   that points to some resource to load (e.g., the color tables).
   This location can also hold macros that the IDV replaces with
   the appropriate path:
-        %USERPATH% is the .metapps/<AppName> directory that is created in the user's home directory.
+        %USERPATH% is the .unidata/idv/<AppName> directory that is created in the user's home directory.
         %SITEPATH% is the sitepath defined with the -sitepath argument
         %IDVPATH% is the /ucar/unidata/idv/resources path in the jar file.
 
