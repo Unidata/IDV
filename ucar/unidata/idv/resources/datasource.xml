@@ -64,13 +64,6 @@
      label="STI Storm Data"/>
 -->
 
-  <datasource
-     id="STORM.ATCF"
-     fileselection="true"
-     standalone="true"
-     factory="ucar.unidata.data.storm.AtcfStormDataSource"
-     label="ATCF Storm Data"/>
-
 
   <datasource
      id="DB.TRAJECTORY"
@@ -240,26 +233,33 @@
      label="DEM files"/>
 
   <datasource
-     id="PRODUCT.GEMPAK"
-     factory="ucar.unidata.data.text.NwxTextProductDataSource"
-     fileselection="true"
+     id="PRODUCT.ADDE"
+     factory="ucar.unidata.data.text.AddeTextProductDataSource"
      standalone="true"
-     label="NWX Text Products">
+     fileselection="true"
+     label="Text Products from Server">
     <property
        name="default_display"
        value="textproductcontrol"/>
   </datasource>
 
   <datasource
-     id="PRODUCT.ADDE"
-     factory="ucar.unidata.data.text.AddeTextProductDataSource"
-     standalone="true"
+     id="PRODUCT.GEMPAK"
+     factory="ucar.unidata.data.text.NwxTextProductDataSource"
      fileselection="true"
-     label="ADDE Text Products">
+     standalone="true"
+     label="Local Text Products (NWX)">
     <property
        name="default_display"
        value="textproductcontrol"/>
   </datasource>
+
+  <datasource
+     id="STORM.ATCF"
+     fileselection="true"
+     standalone="true"
+     factory="ucar.unidata.data.storm.AtcfStormDataSource"
+     label="ATCF Storm Data"/>
 
 
   <datasource
