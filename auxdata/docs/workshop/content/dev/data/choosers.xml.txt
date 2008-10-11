@@ -50,8 +50,8 @@ for UrlChooser:
 	url_label="the label to be used in front of the text field"
 
 This is an example of how one would add in a chooser into the gui.
-By default if you include an xml file this in your metapps directory:
-~/.metapps/DefaultIdv/choosers.xml
+By default if you include an xml file this in your unidata/idv directory:
+~/.unidata/idv/DefaultIdv/choosers.xml
 the Idv will include this in the chooser ui. 
 This is inclusive so whatever is in your own file will be added to
 the chooser ui components that is in the system file. So, you should remove
@@ -62,7 +62,7 @@ everything except what you want to add.
 
 If you want to override the default choosers and *just* use  your  own then look at the
 resource bundle file:
-~/.metapps/DefaultIdv/idv.rbi
+~/.unidata/idv/DefaultIdv/idv.rbi
 
 This file allows you to override the resources that are read in. Add in an entry like:
 

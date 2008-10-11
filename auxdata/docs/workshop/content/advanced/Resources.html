@@ -10,11 +10,11 @@ So, how do you put all of this together?
     
     <li>Remember all of those resources we created in earlier exercises? They
         are saved off  in the user's
-        <a name="metappsdir" class="index" word="User's local application
+        <a name="idvdir" class="index" word="User's local application
         resource
         directory"></a>
         local resource directory:
-        [ht::popup file:<%workshop.homedir%>/.metapps/DefaultIdv [ht::filename    <%workshop.homedir%>/.metapps/DefaultIdv]].</li>
+        [ht::popup file:<%workshop.homedir%>/.unidata/idv/DefaultIdv [ht::filename    <%workshop.homedir%>/.unidata/idv/DefaultIdv]].</li>
     
     <li>The files include:</li>
     
@@ -45,7 +45,7 @@ across a site one just needs to copy these files to an accessible
 web site or directory. Then point the IDV to that path with the <i>-sitepath</i>
 command line argument. Try running the IDV with:
 <pre>
-idv -userpath ~/othermetapps -noplugins -listresources -sitepath http://www.unidata.ucar.edu/software/idv/workshop 
+idv -userpath ~/otheridv -noplugins -listresources -sitepath http://www.unidata.ucar.edu/software/idv/workshop 
 </pre>
 
 <li> Note: when running with the -sitepath argument that value is persistent. Bring up the Preferences

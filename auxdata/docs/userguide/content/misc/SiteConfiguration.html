@@ -31,7 +31,7 @@ formula editor, etc.)
 By default the IDV looks in three places for the 
 resources it uses to configure itself:
 <ul>
-<li> <i>User path</i>. This is the ~user/.metapps/&lt;Application name&gt; directory that gets
+<li> <i>User path</i>. This is the ~user/.unidata/idv/&lt;Application name&gt; directory that gets
 created for each user. Note: the &quot;Application name&quot; is usually &quot;DefaultIdv&quot;
 
 <li> <i>Site path</i>. This is the file directory or URL directory that can be defined
@@ -74,7 +74,7 @@ idv.resourcefiles=%USERPATH%/idv.rbi;%SITEPATH%/idv.rbi;%IDVPATH%/idv.rbi
 </pre>
 
 When you first run the IDV, the application, as a thoughtful convenience,
-writes out an example RBI file into your local .metapps/DefaultIdv
+writes out an example RBI file into your local .unidata/idv/DefaultIdv
 directory. This example file has documentation that describes how to 
 add in new resources.
 
@@ -110,7 +110,7 @@ then the IDV would only load in these colortables.
 Using the RBI file, what are the set of steps you need to take to configure
 your site to use a set of special color tables that you have created. What you 
 would do is bring up the IDV. Create the color tables. They would get saved off in
-your local .metapps/DefaultIdv directory in the file colortables.xml (as defined by 
+your local .unidata/idv/DefaultIdv directory in the file colortables.xml (as defined by 
 the resource paths  defined in the default RBI).
 You could simply copy that file to an area on your web site or on 
 a shared file system that is pointed to by the IDV sitepath. 
