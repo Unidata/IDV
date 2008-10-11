@@ -27,10 +27,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-
-
-
-
 import ucar.unidata.idv.IdvPersistenceManager;
 
 
@@ -89,6 +85,9 @@ import javax.swing.*;
 
 public class IslDialog {
 
+    private JTabbedPane tabs;
+
+
     /** Widget for the isl dialog */
     private JCheckBox offscreenCbx;
 
@@ -104,11 +103,16 @@ public class IslDialog {
     /** Widget for the isl dialog */
     private JTextField imageFld;
 
+    private List datasetFlds = new ArrayList();
+
     /** Widget for the isl dialog */
     private JTextField sleepFld;
 
     /** Widget for the isl dialog */
     private JTextField loopFld;
+
+    private JTextField widthFld;
+    private JTextField heightFld;
 
     /** Widget for the isl dialog */
     private JCheckBox movieCbx;
@@ -164,46 +168,72 @@ public class IslDialog {
                          + ".mov";
 
         if (islContents == null) {
-            List comps = new ArrayList();
+
+
+            List comps1 = new ArrayList();
+            List comps2 = new ArrayList();
+
             offscreenCbx = new JCheckBox("Offscreen", true);
             debugCbx     = new JCheckBox("Debug", true);
             inlineCbx    = new JCheckBox("Include Bundle Inline", false);
 
-            comps.add(GuiUtils.rLabel("Flags:"));
-            List lineComps = Misc.newList(offscreenCbx, debugCbx, inlineCbx);
-            comps.add(GuiUtils.left(GuiUtils.hbox(lineComps, 5)));
-
-            loopFld  = new JTextField("1", 5);
-            sleepFld = new JTextField("60", 5);
-
-            comps.add(GuiUtils.rLabel("#Iterations:"));
-            comps.add(GuiUtils.left(GuiUtils.hbox(loopFld,
-                    GuiUtils.rLabel("   Sleep time:  "), sleepFld,
-                    new JLabel(" (minutes)"))));
-
-
-            importFld = new JTextField("", 30);
-            comps.add(GuiUtils.rLabel("Import ISL File:"));
-            comps.add(
-                GuiUtils.centerRight(
-                    importFld, GuiUtils.makeFileBrowseButton(importFld)));
-
-
             imageCbx = new JCheckBox("", true);
             imageFld = new JTextField(pngFile, 30);
-            comps.add(GuiUtils.rLabel("Generate an Image:"));
-            comps.add(GuiUtils.leftCenterRight(imageCbx, imageFld,
+            imageFld.setToolTipText(
+                "<html><b>.png,.gif,.jpg</b> for images<br><b>.kml/kmz</b> for Google Earth<br>Use ${viewindex} for each view<br>Use ${viewname} for view name<br>Use ${loopindex} for each loop iteration");
+
+            comps1.add(GuiUtils.rLabel("Generate an Image:"));
+            comps1.add(GuiUtils.leftCenterRight(imageCbx, imageFld,
                     GuiUtils.makeFileBrowseButton(imageFld)));
             movieCbx = new JCheckBox("", false);
             movieFld = new JTextField(movFile, 30);
             movieFld.setToolTipText(
-                "<html><b>.mov</b> for Quicktime<br><b>.gif</b> for animated GIF<br><b>.kml/kmz</b> for Google Earth<br><b>.html</b> for AniS Applet");
-            comps.add(GuiUtils.rLabel("Generate a Movie:"));
-            comps.add(GuiUtils.leftCenterRight(movieCbx, movieFld,
+                "<html><b>.mov</b> for Quicktime<br><b>.gif</b> for animated GIF<br><b>.kml/kmz</b> for Google Earth<br><b>.html</b> for AniS Applet<br>Use ${viewindex} for each view<br>Use ${viewname} for view name<br>Use ${loopindex} for each loop iteration");
+            comps1.add(GuiUtils.rLabel("Generate a Movie:"));
+            comps1.add(GuiUtils.leftCenterRight(movieCbx, movieFld,
                     GuiUtils.makeFileBrowseButton(movieFld)));
+
+
+            comps2.add(GuiUtils.rLabel("Flags:"));
+            List lineComps = Misc.newList(offscreenCbx, debugCbx, inlineCbx);
+            comps2.add(GuiUtils.left(GuiUtils.hbox(lineComps, 5)));
+
+            loopFld  = new JTextField("1", 5);
+            sleepFld = new JTextField("60", 5);
+            widthFld = new JTextField("",4);
+            heightFld = new JTextField("",4);
+
+            comps2.add(GuiUtils.rLabel("#Iterations:"));
+            comps2.add(GuiUtils.left(GuiUtils.hbox(loopFld,
+                    GuiUtils.rLabel("   Sleep Time:  "), sleepFld,
+                    new JLabel(" (minutes)"))));
+
+            widthFld.setToolTipText("View width");
+            heightFld.setToolTipText("View height");
+            comps2.add(GuiUtils.rLabel("Dimensions:"));
+            comps2.add(GuiUtils.left(GuiUtils.hbox(widthFld,
+                                                  new JLabel(" X "),
+                                                  heightFld,
+                                                  new JLabel(" Optional View Dimensions"))));
+
+            importFld = new JTextField("", 30);
+            comps2.add(GuiUtils.rLabel("Import ISL File:"));
+            comps2.add(
+                GuiUtils.centerRight(
+                    importFld, GuiUtils.makeFileBrowseButton(importFld)));
+
+
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            islContents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
+            tabs = new JTabbedPane();
+            JComponent tab1 = GuiUtils.doLayout(comps1, 2, GuiUtils.WT_NY,
                                             GuiUtils.WT_N);
+            GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+            JComponent tab2 = GuiUtils.doLayout(comps2, 2, GuiUtils.WT_NY,
+                                            GuiUtils.WT_N);
+
+            tabs.addTab("Product", GuiUtils.top(tab1));
+            tabs.addTab("Advanced", GuiUtils.top(tab2));
+            islContents = tabs;
         }
         if ( !GuiUtils.showOkCancelDialog(null, "ISL Properties",
                                           islContents, null)) {
@@ -227,6 +257,14 @@ public class IslDialog {
 
         Element bundleNode = doc.createElement(ImageGenerator.TAG_BUNDLE);
         root.appendChild(bundleNode);
+
+        if(widthFld.getText().trim().length()>0 &&
+           heightFld.getText().trim().length()>0) {
+            bundleNode.setAttribute(ImageGenerator.ATTR_WIDTH,
+                                    widthFld.getText().trim());
+            bundleNode.setAttribute(ImageGenerator.ATTR_HEIGHT,
+                                    heightFld.getText().trim());
+        }
 
         if (inlineCbx.isSelected()) {
             bundleNode.appendChild(
