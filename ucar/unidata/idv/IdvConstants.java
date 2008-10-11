@@ -318,6 +318,8 @@ public interface IdvConstants {
     /** Holds the preference for the one instance port */
     public static final String PROP_ONEINSTANCEPORT = "idv.oneinstanceport";
 
+    public static final String PROP_MONITORPORT = "idv.monitorport";
+
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";
 

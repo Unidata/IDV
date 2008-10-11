@@ -88,6 +88,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import java.lang.reflect.*;
+import java.lang.management.*;
 
 import java.net.Socket;
 
@@ -192,6 +193,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
     /** This is instantiated to allow other idvs to connect to only have one process running */
     private OneInstanceServer oneInstanceServer;
+
+    /** The http based monitor to dump stack traces and shutdown the IDV */
+    private  IdvMonitor idvMonitor;
 
 
     /** The list of background image wmsselections */
@@ -466,6 +470,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *  This is a wrapper that calls initInner within a thread.
      *  That  way the  gui can get built and displayed, etc.
      */
+
     protected final void init() {
 
 
@@ -502,7 +507,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             }
         });
     }
-
 
 
 
@@ -686,9 +690,52 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                 }
             });
         }
+
+
+        startMonitor();
     }
 
 
+    protected void startMonitor() {
+        if(idvMonitor!=null) return;
+        final String monitorPort = getProperty(PROP_MONITORPORT,"");
+        if(monitorPort!=null && monitorPort.trim().length()>0 && !monitorPort.trim().equals("none")) {
+            Misc.run(new Runnable() {
+                    public void run() {
+                        try {
+                            idvMonitor = new IdvMonitor(IntegratedDataViewer.this,new Integer(monitorPort).intValue());
+                            idvMonitor.init();
+                        }    catch (Exception exc) {
+                            logException("Running IDV monitor", exc);
+                        }
+                    }});
+        }
+
+        final Object test1 = new Object();
+        final Object test2 = new Object();
+        Misc.run(new Runnable() {
+                    public void run() {
+                        synchronized(test1) {
+                            Misc.sleep(1000);
+                        synchronized(test2) {
+                        }
+                        }
+                    }});
+
+
+Misc.run(new Runnable() {
+                    public void run() {
+                        synchronized(test2) {
+                            Misc.sleep(1000);
+                        synchronized(test1) {
+                        }
+                        }
+                    }});
+
+
+
+
+    }
 
     /**
      * Set the state in the cache manager
