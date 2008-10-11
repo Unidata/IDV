@@ -1222,6 +1222,27 @@ public class PointObFactory {
                                    float xSpacing, float ySpacing,
                                    int numPasses)
             throws VisADException, RemoteException {
+        return barnes(pointObs, type, xSpacing, ySpacing, numPasses, 10f, 1.0f);
+    }
+
+    /**
+     *  Perform an object analysis on a set of point obs
+     *
+     * @param pointObs Observations to analyze
+     * @param type  RealTypes of parameter
+     * @param xSpacing  x spacing (degrees)
+     * @param ySpacing  y spacing (degrees)
+     * @param numPasses number of passes
+     *
+     * @return  Grid of objectively analyzed data
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static FieldImpl barnes(FieldImpl pointObs, RealType type,
+                                   float xSpacing, float ySpacing,
+                                   int numPasses, float gain, float scaleLength)
+            throws VisADException, RemoteException {
         FieldImpl retFI = null;
         // System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);
         if (GridUtil.isTimeSequence(pointObs)) {
@@ -1229,7 +1250,7 @@ public class PointObFactory {
             for (int i = 0; i < timeSet.getLength(); i++) {
                 FieldImpl oneTime =
                     barnesOneTime((FieldImpl) pointObs.getSample(i), type,
-                                  xSpacing, ySpacing, numPasses);
+                                  xSpacing, ySpacing, numPasses, gain, scaleLength);
                 if ((retFI == null) && (oneTime != null)) {
                     FunctionType ft =
                         new FunctionType(
@@ -1243,7 +1264,7 @@ public class PointObFactory {
             }
         } else {
             retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing,
-                                  numPasses);
+                                  numPasses, gain, scaleLength);
         }
         return retFI;
     }
@@ -1266,6 +1287,29 @@ public class PointObFactory {
     public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
                                           float xSpacing, float ySpacing,
                                           int numPasses)
+            throws VisADException, RemoteException {
+        return barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses, 10f, 1.0f);
+    }
+
+    /**
+     * Do the analysis on the single time.  Should be of the structure:
+     *  (index -> PointOb)
+     *
+     * @param pointObs Observations to analyze
+     * @param type  RealTypes of parameter
+     * @param xSpacing  x spacing (degrees)
+     * @param ySpacing  y spacing (degrees)
+     * @param numPasses number of passes
+     *
+     * @return  Grid of objectively analyzed data
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
+                                          float xSpacing, float ySpacing,
+                                          int numPasses, float gain, 
+                                          float scaleLength)
             throws VisADException, RemoteException {
 
         int       numObs  = pointObs.getLength();
@@ -1346,8 +1390,6 @@ public class PointObFactory {
                    + lonMin + " " + lonMax);
         float[] faGridX     = null;
         float[] faGridY     = null;
-        float   scaleLength = 1.0f;
-        float   gain        = 1.0f;
         if ((xSpacing == OA_GRID_DEFAULT) || (ySpacing == OA_GRID_DEFAULT)) {
             Barnes.AnalysisParameters ap =
                 Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
@@ -1362,7 +1404,7 @@ public class PointObFactory {
             faGridY = Barnes.getRecommendedGridY(latMin, latMax, ySpacing);
         }
         log_.debug("num X pts = " + faGridX.length + "  num Y pts = "
-                   + faGridY.length + " scaleLength = " + scaleLength);
+                   + faGridY.length + " scaleLength = " + scaleLength + " gain = " + gain);
 
         double[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
                                      scaleLength, gain, numPasses);

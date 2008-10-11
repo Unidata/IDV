@@ -159,6 +159,12 @@ public abstract class PointDataSource extends FilesDataSource {
     /** Number of barnes iterations */
     private int numGridIterations = 2;
 
+    /** Gain for each pass */
+    private float gridGain = 1.0f;
+
+    /** Scale length */
+    private float gridScaleLength = 10.0f;
+
     /** Do we make grid fields */
     private boolean makeGridFields = true;
 
@@ -250,6 +256,12 @@ public abstract class PointDataSource extends FilesDataSource {
 
         /** gui component */
         private JTextField gridYFld;
+
+        /** gui component */
+        private JSlider gainSlider;
+
+        /** gui component */
+        private JSlider scaleLengthSlider;
 
         /** gui component */
         private JComboBox gridUnitCmbx;
@@ -1148,6 +1160,42 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     public int getNumGridIterations() {
         return numGridIterations;
+    }
+
+    /**
+     *  Set the grid gain property.
+     *
+     *  @param value The new value for gain
+     */
+    public void setGridGain(float value) {
+        gridGain = value;
+    }
+
+    /**
+     *  Get the grid gain property.
+     *
+     *  @return The gain
+     */
+    public float getGridGain() {
+        return gridGain;
+    }
+
+    /**
+     *  Set the grid gain property.
+     *
+     *  @param value The new value for gain
+     */
+    public void setGridScaleLength(float value) {
+        gridScaleLength = value;
+    }
+
+    /**
+     *  Get the grid gain property.
+     *
+     *  @return The gain
+     */
+    public float getGridScaleLength() {
+        return gridScaleLength;
     }
 
     /**
