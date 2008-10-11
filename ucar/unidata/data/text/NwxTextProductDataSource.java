@@ -19,8 +19,6 @@
  */
 
 
-
-
 package ucar.unidata.data.text;
 
 
@@ -119,6 +117,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
 
     /** date format parser */
     private static SimpleDateFormat sdf;
+
+    /** flag for letting the user define the locations */
+    private boolean askForPaths = false;
 
     /**
      * Default bean constructor; does nothing.
@@ -346,7 +347,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         if (path == null) {
             path = System.getenv(prop);
         }
-        if (path == null) {
+        if ((path == null) && askForPaths) {
             File dir = FileManager.getDirectory(null, title);
             if (dir != null) {
                 path = dir.toString();
@@ -363,7 +364,9 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return the base path of the data.
      */
     protected String getTablePath() {
-        return getPath(PROP_GEMTBL, "Where are the Gempak tables stored");
+        return getPath(PROP_GEMTBL,
+                       "Where are the GEMPAK tables (" + PROP_GEMTBL
+                       + ") stored?");
     }
 
     /**
@@ -371,11 +374,16 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * @return  true if resources set okay
      */
     protected boolean setAdditionalResources() {
-        textDataPath = getPath(PROP_TEXT_DATA,
-                               "Where is the Gempak text data stored");
         gemDataPath = getPath(PROP_GEMDATA,
-                              "Where is the Gempak data stored");
-        return ((textDataPath != null) && (gemDataPath != null));
+                              "Where is the GEMPAK data (" + PROP_GEMDATA
+                              + ") stored?");
+        if (gemDataPath == null) {
+            return false;
+        }
+        textDataPath = getPath(PROP_TEXT_DATA,
+                               "Where is the GEMPAK text data ("
+                               + PROP_TEXT_DATA + ") stored?");
+        return (textDataPath != null);
     }
 
     /**
@@ -391,13 +399,24 @@ public class NwxTextProductDataSource extends TextProductDataSource {
      * Initialize after opening.
      */
     protected void initAfter() {
-        if ( !setAdditionalResources()) {
-            setInError(true, getAdditionalResourcesError());
-            return;
-        }
         tablePath = getTablePath();
         if (tablePath == null) {
-            setInError(true, "Couldn't find path to tables");
+            // ask user if they want to define the paths
+            askForPaths = GuiUtils.showYesNoDialog(
+                null,
+                "<html>You need to have access to GEMPAK tables and data.<p><br>Do you wish to continue?</html>",
+                "Define GEMPAK Resources?");
+            if (askForPaths) {
+                tablePath = getTablePath();
+            }
+        }
+        // check again
+        if (tablePath == null) {
+            setInError(true, "Couldn't find path to text product tables");
+            return;
+        }
+        if ( !setAdditionalResources()) {
+            setInError(true, getAdditionalResourcesError());
             return;
         }
         try {
