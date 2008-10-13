@@ -1,7 +1,7 @@
 /*
  * $Id: PointObFactory.java,v 1.53 2007/05/22 14:56:04 dmurray Exp $
  *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2008 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -1222,7 +1222,8 @@ public class PointObFactory {
                                    float xSpacing, float ySpacing,
                                    int numPasses)
             throws VisADException, RemoteException {
-        return barnes(pointObs, type, xSpacing, ySpacing, numPasses, 10f, 1.0f);
+        return barnes(pointObs, type, xSpacing, ySpacing, numPasses, 10f,
+                      1.0f, null);
     }
 
     /**
@@ -1233,6 +1234,9 @@ public class PointObFactory {
      * @param xSpacing  x spacing (degrees)
      * @param ySpacing  y spacing (degrees)
      * @param numPasses number of passes
+     * @param gain      grid convergence/pass
+     * @param scaleLength  search radius
+     * @param params       analysis parameters - used to pass back computed vals
      *
      * @return  Grid of objectively analyzed data
      *
@@ -1241,7 +1245,9 @@ public class PointObFactory {
      */
     public static FieldImpl barnes(FieldImpl pointObs, RealType type,
                                    float xSpacing, float ySpacing,
-                                   int numPasses, float gain, float scaleLength)
+                                   int numPasses, float gain,
+                                   float scaleLength,
+                                   Barnes.AnalysisParameters params)
             throws VisADException, RemoteException {
         FieldImpl retFI = null;
         // System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);
@@ -1250,7 +1256,8 @@ public class PointObFactory {
             for (int i = 0; i < timeSet.getLength(); i++) {
                 FieldImpl oneTime =
                     barnesOneTime((FieldImpl) pointObs.getSample(i), type,
-                                  xSpacing, ySpacing, numPasses, gain, scaleLength);
+                                  xSpacing, ySpacing, numPasses, gain,
+                                  scaleLength, params);
                 if ((retFI == null) && (oneTime != null)) {
                     FunctionType ft =
                         new FunctionType(
@@ -1264,7 +1271,7 @@ public class PointObFactory {
             }
         } else {
             retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing,
-                                  numPasses, gain, scaleLength);
+                                  numPasses, gain, scaleLength, params);
         }
         return retFI;
     }
@@ -1288,7 +1295,8 @@ public class PointObFactory {
                                           float xSpacing, float ySpacing,
                                           int numPasses)
             throws VisADException, RemoteException {
-        return barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses, 10f, 1.0f);
+        return barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses,
+                             10f, 1.0f, null);
     }
 
     /**
@@ -1300,6 +1308,9 @@ public class PointObFactory {
      * @param xSpacing  x spacing (degrees)
      * @param ySpacing  y spacing (degrees)
      * @param numPasses number of passes
+     * @param gain      grid convergence/pass
+     * @param scaleLength  search radius
+     * @param params       analysis parameters - used to pass back computed vals
      *
      * @return  Grid of objectively analyzed data
      *
@@ -1308,8 +1319,9 @@ public class PointObFactory {
      */
     public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
                                           float xSpacing, float ySpacing,
-                                          int numPasses, float gain, 
-                                          float scaleLength)
+                                          int numPasses, float gain,
+                                          float scaleLength,
+                                          Barnes.AnalysisParameters params)
             throws VisADException, RemoteException {
 
         int       numObs  = pointObs.getLength();
@@ -1388,8 +1400,8 @@ public class PointObFactory {
 
         log_.debug("lat range = " + latMin + " " + latMax + ", lon range = "
                    + lonMin + " " + lonMax);
-        float[] faGridX     = null;
-        float[] faGridY     = null;
+        float[] faGridX = null;
+        float[] faGridY = null;
         if ((xSpacing == OA_GRID_DEFAULT) || (ySpacing == OA_GRID_DEFAULT)) {
             Barnes.AnalysisParameters ap =
                 Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
@@ -1399,12 +1411,19 @@ public class PointObFactory {
             faGridX     = ap.getGridXArray();
             faGridY     = ap.getGridYArray();
             scaleLength = (float) ap.getScaleLengthGU();
+            log_.debug("random data spacing = " + ap.getRandomDataSpacing());
         } else {
             faGridX = Barnes.getRecommendedGridX(lonMin, lonMax, xSpacing);
             faGridY = Barnes.getRecommendedGridY(latMin, latMax, ySpacing);
         }
+        if (params != null) {
+            params.setGridXArray(faGridX);
+            params.setGridYArray(faGridY);
+            params.setScaleLengthGU(scaleLength);
+        }
         log_.debug("num X pts = " + faGridX.length + "  num Y pts = "
-                   + faGridY.length + " scaleLength = " + scaleLength + " gain = " + gain);
+                   + faGridY.length + " scaleLength = " + scaleLength
+                   + " gain = " + gain);
 
         double[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
                                      scaleLength, gain, numPasses);

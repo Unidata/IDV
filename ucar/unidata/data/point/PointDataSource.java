@@ -1,7 +1,7 @@
 /*
  * $Id: PointDataSource.java,v 1.33 2007/06/21 14:44:59 jeffmc Exp $
  *
- * Copyright (c) 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright (c) 1997-2008 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -22,14 +22,16 @@
 
 
 
-
 package ucar.unidata.data.point;
 
+
+import au.gov.bom.aifs.osa.analysis.Barnes;
 
 import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataSource;
 
 import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.idv.ui.ValueSliderComponent;
 
 
 import ucar.unidata.ui.TimeLengthField;
@@ -66,19 +68,28 @@ import javax.swing.event.*;
  */
 public abstract class PointDataSource extends FilesDataSource {
 
-    /** dataselection property */
+    /** logging category */
+    static LogUtil.LogCategory log_ =
+        LogUtil.getLogInstance(PointDataSource.class.getName());
+
+    /** dataselection property for grid x spacing */
     public static final String PROP_GRID_X = "prop.grid.x";
 
-
-    /** dataselection property */
+    /** dataselection property for grid x spacing */
     public static final String PROP_GRID_Y = "prop.grid.y";
 
-    /** dataselection property */
+    /** dataselection property for grid y spacing */
     public static final String PROP_GRID_UNIT = "prop.grid.unit";
 
-    /** dataselection property */
-    public static final String PROP_GRID_NUMITERATIONS =
-        "prop.grid.numiterations";
+    /** dataselection property for grid passes */
+    public static final String PROP_GRID_NUMPASSES = "prop.grid.numpasses";
+
+    /** dataselection property for grid gain */
+    public static final String PROP_GRID_GAIN = "prop.grid.gain";
+
+    /** dataselection property for grid search radius */
+    public static final String PROP_GRID_SEARCH_RADIUS =
+        "prop.grid.search.radius";
 
     /**
      * This gets set on the data choice when we are creating a
@@ -156,14 +167,14 @@ public abstract class PointDataSource extends FilesDataSource {
     /** unit for grid spacing */
     private String gridUnit = SPACING_COMPUTE;
 
-    /** Number of barnes iterations */
-    private int numGridIterations = 2;
+    /** Number of barnes passes */
+    private int numGridPasses = 2;
 
     /** Gain for each pass */
     private float gridGain = 1.0f;
 
     /** Scale length */
-    private float gridScaleLength = 10.0f;
+    private float gridSearchRadius = 10.0f;
 
     /** Do we make grid fields */
     private boolean makeGridFields = true;
@@ -239,7 +250,7 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
     /**
-     * Class GridParameters holds the grid spacing/iterations gui. Used for hte field selector
+     * Class GridParameters holds the grid spacing/passes gui. Used for hte field selector
      * and the properties
      *
      *
@@ -258,16 +269,10 @@ public abstract class PointDataSource extends FilesDataSource {
         private JTextField gridYFld;
 
         /** gui component */
-        private JSlider gainSlider;
-
-        /** gui component */
-        private JSlider scaleLengthSlider;
-
-        /** gui component */
         private JComboBox gridUnitCmbx;
 
         /** gui component */
-        private JTextField numGridIterationsFld;
+        private JTextField numGridPassesFld;
 
         /** The list of components */
         private List comps = new ArrayList();
@@ -277,6 +282,12 @@ public abstract class PointDataSource extends FilesDataSource {
 
         /** The size component */
         private JComponent sizeComp;
+
+        /** The gain component */
+        private ValueSliderComponent gainComp;
+
+        /** The gain component */
+        private ValueSliderComponent searchComp;
 
         /** flag for compute */
         boolean useCompute = true;
@@ -303,20 +314,28 @@ public abstract class PointDataSource extends FilesDataSource {
                             .getSelectedItem();
                     if (tfo != null) {
                         useCompute = tfo.getId().equals(SPACING_IDS[0]);
-                        GuiUtils.enableTree(sizeComp, !useCompute);
+                        enableAutoComps( !useCompute);
                     }
                 }
             });
+            gainComp = new ValueSliderComponent(PointDataSource.this, 0, 1,
+                    "gridGain", "Gain", 10, false);
+            searchComp = new ValueSliderComponent(PointDataSource.this, 0,
+                    20, "gridSearchRadius", "Search Radius", 1, false);
 
-            numGridIterationsFld = new JTextField("" + numGridIterations, 4);
+            numGridPassesFld = new JTextField("" + numGridPasses, 4);
             comps.add(GuiUtils.rLabel("Spacing:"));
             comps.add(GuiUtils.left(gridUnitCmbx));
             comps.add(GuiUtils.rLabel("Grid Size:"));
             sizeComp = GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
                     gridXFld, new JLabel("  Y: "), gridYFld));
             comps.add(sizeComp);
-            comps.add(GuiUtils.rLabel("Iterations:"));
-            comps.add(GuiUtils.left(numGridIterationsFld));
+            comps.add(GuiUtils.rLabel("Passes:"));
+            comps.add(GuiUtils.left(numGridPassesFld));
+            comps.add(GuiUtils.rLabel("Search Radius:"));
+            comps.add(GuiUtils.left(searchComp.getContents(false)));
+            comps.add(GuiUtils.rLabel("Gain:"));
+            comps.add(GuiUtils.left(gainComp.getContents(false)));
             useDefaultCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     checkEnable();
@@ -331,8 +350,18 @@ public abstract class PointDataSource extends FilesDataSource {
         public void checkEnable() {
             GuiUtils.enableTree(comp, !useDefaultCbx.isSelected());
             if ( !useDefaultCbx.isSelected()) {
-                GuiUtils.enableTree(sizeComp, !useCompute);
+                enableAutoComps( !useCompute);
             }
+        }
+
+        /**
+         * enable/disable the components that can't be changed in autocompute
+         *
+         * @param enable  true to enable
+         */
+        private void enableAutoComps(boolean enable) {
+            GuiUtils.enableTree(sizeComp, enable);
+            searchComp.setEnabled(enable);
         }
 
         /**
@@ -361,9 +390,17 @@ public abstract class PointDataSource extends FilesDataSource {
                     gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(prop,
                             tfos));
                 }
-                prop = dataSelection.getProperty(PROP_GRID_NUMITERATIONS);
+                prop = dataSelection.getProperty(PROP_GRID_NUMPASSES);
                 if (prop != null) {
-                    numGridIterationsFld.setText("" + prop);
+                    numGridPassesFld.setText("" + prop);
+                }
+                prop = dataSelection.getProperty(PROP_GRID_GAIN);
+                if (prop != null) {
+                    gainComp.setValue(((Number) prop).floatValue());
+                }
+                prop = dataSelection.getProperty(PROP_GRID_SEARCH_RADIUS);
+                if (prop != null) {
+                    searchComp.setValue(((Number) prop).floatValue());
                 }
             }
 
@@ -383,14 +420,19 @@ public abstract class PointDataSource extends FilesDataSource {
                 dataSelection.putProperty(PROP_GRID_X, new Float(getGridX()));
                 dataSelection.putProperty(PROP_GRID_Y, new Float(getGridY()));
                 dataSelection.putProperty(PROP_GRID_UNIT, getGridUnit());
-                dataSelection.putProperty(
-                    PROP_GRID_NUMITERATIONS,
-                    new Integer(getNumGridIterations()));
+                dataSelection.putProperty(PROP_GRID_NUMPASSES,
+                                          new Integer(getNumGridPasses()));
+                dataSelection.putProperty(PROP_GRID_GAIN,
+                                          new Float(getGridGain()));
+                dataSelection.putProperty(PROP_GRID_SEARCH_RADIUS,
+                                          new Float(getGridGain()));
             } else {
                 dataSelection.removeProperty(PROP_GRID_X);
                 dataSelection.removeProperty(PROP_GRID_Y);
                 dataSelection.removeProperty(PROP_GRID_UNIT);
-                dataSelection.removeProperty(PROP_GRID_NUMITERATIONS);
+                dataSelection.removeProperty(PROP_GRID_NUMPASSES);
+                dataSelection.removeProperty(PROP_GRID_GAIN);
+                dataSelection.removeProperty(PROP_GRID_SEARCH_RADIUS);
             }
         }
 
@@ -423,14 +465,43 @@ public abstract class PointDataSource extends FilesDataSource {
         }
 
         /**
-         * get iterations
+         * get passes
          *
-         * @return iterations
+         * @return passes
          */
-        public int getNumGridIterations() {
-            return GuiUtils.getInt(numGridIterationsFld);
+        public int getNumGridPasses() {
+            return GuiUtils.getInt(numGridPassesFld);
         }
 
+        /**
+         * get gain
+         *
+         * @return gain
+         */
+        public float getGridGain() {
+            return gainComp.getValue();
+        }
+
+        /**
+         * get search radius
+         *
+         * @return search radius
+         */
+        public int getGridSearchRadius() {
+            return (int) searchComp.getValue();
+        }
+
+        /**
+         * Remove any components holding refereces to stuff.
+         */
+        public void doRemove() {
+            if (gainComp != null) {
+                gainComp.doRemove();
+            }
+            if (searchComp != null) {
+                searchComp.doRemove();
+            }
+        }
 
     }
 
@@ -455,7 +526,7 @@ public abstract class PointDataSource extends FilesDataSource {
     /**
      * not sure what this does
      *
-     * @param dataChoice datachoice_
+     * @param dataChoice datachoice
      *
      * @return false
      */
@@ -597,20 +668,27 @@ public abstract class PointDataSource extends FilesDataSource {
             changed    |= (gridX != gridProperties.getGridX());
             what       = "Bad grid points Y value";
             changed    |= (gridY != gridProperties.getGridY());
-            what       = "Bad grid iterations value";
-            changed |= (numGridIterations
-                        != gridProperties.getNumGridIterations());
-            what    = "Bad grid iterations value";
-            changed |= ( !gridUnit.equals(gridProperties.getGridUnit()));
+            what       = "Bad grid passes value";
+            changed    |= (numGridPasses
+                           != gridProperties.getNumGridPasses());
+            what       = "Bad grid unit value";
+            changed    |= ( !gridUnit.equals(gridProperties.getGridUnit()));
+            what       = "Bad grid search value";
+            changed |= (gridSearchRadius
+                        != gridProperties.getGridSearchRadius());
+            what    = "Bad grid gain value";
+            changed |= (gridGain != gridProperties.getGridGain());
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage(what);
             return false;
         }
 
-        gridX             = gridProperties.getGridX();
-        gridY             = gridProperties.getGridY();
-        gridUnit          = gridProperties.getGridUnit();
-        numGridIterations = gridProperties.getNumGridIterations();
+        gridX            = gridProperties.getGridX();
+        gridY            = gridProperties.getGridY();
+        gridUnit         = gridProperties.getGridUnit();
+        numGridPasses    = gridProperties.getNumGridPasses();
+        gridGain         = gridProperties.getGridGain();
+        gridSearchRadius = gridProperties.getGridSearchRadius();
         if (makeGridFields != makeGridFieldsCbx.isSelected()) {
             makeGridFields = makeGridFieldsCbx.isSelected();
             dataChoices    = null;
@@ -838,9 +916,11 @@ public abstract class PointDataSource extends FilesDataSource {
                 return null;
             }
             //{ minY, minX, maxY, maxX };
-            float  spacingX   = this.gridX;
-            float  spacingY   = this.gridY;
-            int    iterations = this.numGridIterations;
+            float  spacingX     = this.gridX;
+            float  spacingY     = this.gridY;
+            int    passes       = this.numGridPasses;
+            float  gain         = this.gridGain;
+            float  searchRadius = this.gridSearchRadius;
             Number tmp;
             tmp = (Float) dataSelection.getProperty(PROP_GRID_X);
             if (tmp != null) {
@@ -850,16 +930,24 @@ public abstract class PointDataSource extends FilesDataSource {
             if (tmp != null) {
                 spacingY = tmp.floatValue();
             }
-            tmp = (Integer) dataSelection.getProperty(
-                PROP_GRID_NUMITERATIONS);
+            tmp = (Integer) dataSelection.getProperty(PROP_GRID_NUMPASSES);
             if (tmp != null) {
-                iterations = tmp.intValue();
+                passes = tmp.intValue();
             }
             String theUnit =
                 (String) dataSelection.getProperty(PROP_GRID_UNIT);
             if (theUnit == null) {
                 theUnit = this.gridUnit;
             }
+            tmp = (Float) dataSelection.getProperty(PROP_GRID_GAIN);
+            if (tmp != null) {
+                gain = tmp.floatValue();
+            }
+            tmp = (Float) dataSelection.getProperty(PROP_GRID_SEARCH_RADIUS);
+            if (tmp != null) {
+                searchRadius = tmp.floatValue();
+            }
+
 
             float degreesX = 0,
                   degreesY = 0;
@@ -878,11 +966,21 @@ public abstract class PointDataSource extends FilesDataSource {
                 degreesX = spacingX;
                 degreesY = spacingY;
             }
-            // System.out.println("X = " + degreesX + " Y = " + degreesY + " unit = " + theUnit);
+            Barnes.AnalysisParameters ap =
+                new Barnes.AnalysisParameters(degreesX, degreesY,
+                    searchRadius, 0.0d);
+            log_.debug("X = " + degreesX + " Y = " + degreesY + " unit = "
+                       + theUnit + " gain = " + gain + " search = "
+                       + searchRadius);
 
             LogUtil.message("Doing Barnes Analysis");
-            return PointObFactory.barnes(pointObs, type, degreesX, degreesY,
-                                         iterations);
+            FieldImpl fi = PointObFactory.barnes(pointObs, type, degreesX,
+                               degreesY, passes, gain, searchRadius, ap);
+            log_.debug("Analysis params: X = " + ap.getGridXArray().length
+                       + " Y = " + ap.getGridYArray().length + " search = "
+                       + ap.getScaleLengthGU() + " random = "
+                       + ap.getRandomDataSpacing());
+            return fi;
         }
 
 
@@ -1023,6 +1121,14 @@ public abstract class PointDataSource extends FilesDataSource {
         }
     }
 
+    /**
+     * Gets called by the {@link DataManager} when this DataSource has
+     * been removed.
+     */
+    public void doRemove() {
+        super.doRemove();
+        gridProperties.doRemove();
+    }
 
 
     /**
@@ -1145,21 +1251,21 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
     /**
-     *  Set the NumGridIterations property.
+     *  Set the NumGridPasses property.
      *
-     *  @param value The new value for NumGridIterations
+     *  @param value The new value for NumGridPasses
      */
-    public void setNumGridIterations(int value) {
-        numGridIterations = value;
+    public void setNumGridPasses(int value) {
+        numGridPasses = value;
     }
 
     /**
-     *  Get the NumGridIterations property.
+     *  Get the NumGridPasses property.
      *
-     *  @return The NumGridIterations
+     *  @return The NumGridPasses
      */
-    public int getNumGridIterations() {
-        return numGridIterations;
+    public int getNumGridPasses() {
+        return numGridPasses;
     }
 
     /**
@@ -1181,21 +1287,21 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
     /**
-     *  Set the grid gain property.
+     *  Set the grid search radius
      *
-     *  @param value The new value for gain
+     *  @param value The new value for search radius
      */
-    public void setGridScaleLength(float value) {
-        gridScaleLength = value;
+    public void setGridSearchRadius(float value) {
+        gridSearchRadius = value;
     }
 
     /**
-     *  Get the grid gain property.
+     *  Get the search radius property
      *
-     *  @return The gain
+     *  @return The search radius
      */
-    public float getGridScaleLength() {
-        return gridScaleLength;
+    public float getGridSearchRadius() {
+        return gridSearchRadius;
     }
 
     /**
@@ -1215,7 +1321,6 @@ public abstract class PointDataSource extends FilesDataSource {
     public boolean getMakeGridFields() {
         return makeGridFields;
     }
-
 
 }
 
