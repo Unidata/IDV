@@ -313,7 +313,8 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             }
         });
 
-        productTree.setPreferredSize(new Dimension(250, 100));
+        // uncommenting this precludes the vertical scrollbars
+        //productTree.setPreferredSize(new Dimension(250, 100));
 
         JScrollPane treeScroller = GuiUtils.makeScrollPane(productTree, 250,
                                        100);
