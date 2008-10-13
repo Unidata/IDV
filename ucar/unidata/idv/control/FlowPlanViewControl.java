@@ -777,5 +777,26 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return !haveMultipleFields();
     }
 
+    /**
+     *  Remove this DisplayControl. Tells the {@link ucar.unidata.idv.ControlContext}
+     *  to removeDisplayControl.
+     *  Removes all Displayable-s from
+     *  their ViewManager-s, remove this object from its  Sharable
+     *  group, and sets the visibility of the dialog window to false.
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    public void doRemove() throws RemoteException, VisADException {
+        super.doRemove();
+        if (barbSizeWidget != null) {
+            barbSizeWidget.doRemove();
+            barbSizeWidget = null;
+        }
+        if (skipFactorWidget != null) {
+            skipFactorWidget.doRemove();
+            skipFactorWidget = null;
+        }
+    }
 }
 

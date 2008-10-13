@@ -62,7 +62,7 @@ public class ValueSliderWidget extends ValueSliderComponent {
      */
     public ValueSliderWidget(DisplayControlImpl dc, int min, int max,
                              String property, String label, float scale) {
-        super(dc, min, max, property, label, scale);
+        super(dc, min, max, property, label, scale, true);
     }
 
     /**
