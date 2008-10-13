@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -77,9 +78,8 @@ import javax.swing.tree.*;
  */
 public class GuiUtils extends LayoutUtil {
 
-    /** _more_ */
+    /** missing image path */
     public static String MISSING_IMAGE = "/ucar/undiata/util/scream.gif";
-
 
     /** xml attribute name */
     public static final String ATTR_ACTION = "action";
@@ -232,43 +232,43 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
-    /** _more_ */
+    /** default icon size */
     private static int dfltIconSize = -1;
 
     /**
-     * _more_
+     * Set the default icon size
      *
-     * @param size _more_
+     * @param size  new size
      */
     public static void setDefaultIconSize(int size) {
         dfltIconSize = size;
     }
 
     /**
-     * _more_
+     *  Get the default icon size
      *
-     * @return _more_
+     * @return  the default icon size
      */
     public static int getDefaultIconSize() {
         return dfltIconSize;
     }
 
-    /** _more_ */
+    /** default font */
     private static Font dfltFont;
 
     /**
-     * _more_
+     * Set the default font
      *
-     * @param font _more_
+     * @param font the default font
      */
     public static void setDefaultFont(Font font) {
         dfltFont = font;
     }
 
     /**
-     * _more_
+     * Get the default font
      *
-     * @return _more_
+     * @return the default font
      */
     public static Font getDefaultFont() {
         if (dfltFont != null) {
@@ -530,11 +530,11 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Check the height against a value
      *
-     * @param height _more_
+     * @param height  the value to check
      *
-     * @return _more_
+     * @return return height > 100;
      */
     public static boolean checkHeight(int height) {
         if (height > 100) {
@@ -547,10 +547,10 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Set the preferred width on a component
      *
-     * @param comp _more_
-     * @param width _more_
+     * @param comp  component
+     * @param width width
      */
     public static void setPreferredWidth(JComponent comp, int width) {
         int height = comp.getPreferredSize().height;
@@ -570,7 +570,7 @@ public class GuiUtils extends LayoutUtil {
      */
     public static class ColorSwatch extends JPanel {
 
-        /** _more_ */
+        /** flag for alpha */
         boolean doAlpha = false;
 
         /** color of the swatch */
@@ -596,11 +596,11 @@ public class GuiUtils extends LayoutUtil {
         }
 
         /**
-         * _more_
+         * Create a new color swatch
          *
-         * @param c _more_
-         * @param dialogLabel _more_
-         * @param alphaOk _more_
+         * @param c   the color
+         * @param dialogLabel label for the dialog
+         * @param alphaOk  use alpha?
          */
         public ColorSwatch(Color c, String dialogLabel, boolean alphaOk) {
             this.doAlpha = alphaOk;
@@ -883,13 +883,13 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Get a scaled image icon
      *
-     * @param file _more_
-     * @param c _more_
-     * @param cache _more_
+     * @param file  location of the image
+     * @param c     relative class
+     * @param cache  true to cache result
      *
-     * @return _more_
+     * @return  the icon or null
      */
     public static ImageIcon getScaledImageIcon(String file, Class c,
             boolean cache) {
@@ -952,14 +952,14 @@ public class GuiUtils extends LayoutUtil {
     }
 
     /**
-     * _more_
+     * Get an image
      *
-     * @param file _more_
-     * @param c _more_
-     * @param cache _more_
-     * @param returnNullIfNotFound _more_
+     * @param file  location of the image
+     * @param c     relative class
+     * @param cache true to cache result
+     * @param returnNullIfNotFound  true to return null;
      *
-     * @return _more_
+     * @return  image or null (if returnNullIfNotFound is true);
      */
     public static Image getImage(String file, Class c, boolean cache,
                                  boolean returnNullIfNotFound) {
@@ -1690,10 +1690,10 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Insert text into the component
      *
-     * @param comp _more_
-     * @param s _more_
+     * @param comp   component
+     * @param s      text to insert
      */
     public static void insertText(JTextComponent comp, String s) {
         int    pos = comp.getCaretPosition();
@@ -1987,17 +1987,24 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    /**
+     * Show OK dialog
+     *
+     * @param f     relative window
+     * @param title title for the dialog
+     * @param contents  dialog contents
+     * @param src       src component
+     */
     public static void showOkDialog(Window f, String title,
-                                       Component contents,
-                                       Component src) {
+                                    Component contents, Component src) {
         if ( !LogUtil.getInteractiveMode()) {
             throw new IllegalStateException(
                 "Cannot show dialog in non-interactive mode");
         }
         JDialog              dialog   = createDialog(f, title, true);
         final ObjectListener listener = getCloseDialogListener(dialog);
-        JPanel buttons =  makeButtons(listener, new String[] { CMD_OK},
-                                      new String[] { CMD_OK});
+        JPanel buttons = makeButtons(listener, new String[] { CMD_OK },
+                                     new String[] { CMD_OK });
         packDialog(dialog, centerBottom(contents, buttons));
         setDefaultButton(buttons, dialog.getRootPane());
         if (src != null) {
@@ -2452,14 +2459,14 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Get a scaled image button
      *
-     * @param icon _more_
-     * @param origin _more_
-     * @param hInset _more_
-     * @param vInset _more_
+     * @param icon   path to icon for the button
+     * @param origin relative class
+     * @param hInset horizontal inset
+     * @param vInset vertical inset
      *
-     * @return _more_
+     * @return the button
      */
     public static JButton getScaledImageButton(String icon, Class origin,
             int hInset, int vInset) {
@@ -2517,7 +2524,7 @@ public class GuiUtils extends LayoutUtil {
      * @param selectedIcon Image to use when selected
      * @param hinset Hor. inset
      * @param vinset Vert. inset
-     * @param addMouseOverBorder _more_
+     * @param addMouseOverBorder add a mouseover border
      * @return New button
      */
     public static JToggleButton getToggleImageButton(String icon,
@@ -2555,7 +2562,7 @@ public class GuiUtils extends LayoutUtil {
      * @param selectedIcon Image to use when selected
      * @param hinset Hor. inset
      * @param vinset Vert. inset
-     * @param addMouseOverBorder _more_
+     * @param addMouseOverBorder add a mouseover border
      * @return New button
      */
     public static JToggleButton getToggleImageButton(ImageIcon icon,
@@ -2578,9 +2585,9 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Make a mouse over border
      *
-     * @param b _more_
+     * @param b   the component
      */
     public static void makeMouseOverBorder(final JComponent b) {
         b.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -3974,11 +3981,11 @@ public class GuiUtils extends LayoutUtil {
     }
 
     /**
-     * _more_
+     * Export a table as csv
      *
-     * @param header _more_
-     * @param model _more_
-     * @param filename _more_
+     * @param header   header for the output
+     * @param model    table model
+     * @param filename  file name to export to
      */
     public static void exportAsCsv(String header, TableModel model,
                                    String filename) {
@@ -4342,7 +4349,7 @@ public class GuiUtils extends LayoutUtil {
      * @param object Object to call
      * @param methodName Method name to call
      * @param arg Pass this to method name if non-null.
-     * @param addMouseOverBorder _more_
+     * @param addMouseOverBorder add a mouse-over border
      *
      * @return The button
      */
@@ -4430,7 +4437,7 @@ public class GuiUtils extends LayoutUtil {
      * @param name Menu name
      * @param object Object to call
      * @param methodName method to invoke
-     * @param doRemoveAll _more_
+     * @param doRemoveAll   true to remove all first
      * @return The menu
      */
     public static JMenu makeDynamicMenu(final String name,
@@ -5207,10 +5214,10 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Position and fit a window to the screen
      *
-     * @param window _more_
-     * @param bounds _more_
+     * @param window  window to fit
+     * @param bounds  new bounds
      */
     public static void positionAndFitToScreen(Window window,
             Rectangle bounds) {
@@ -5259,8 +5266,8 @@ public class GuiUtils extends LayoutUtil {
             return;
         }
 
-        Component[]comps =  	cont.getComponents();
-        for (int i = 0; i < comps.length;i++) {
+        Component[] comps = cont.getComponents();
+        for (int i = 0; i < comps.length; i++) {
             Component child = comps[i];
             toggleHeavyWeightComponents(child, visible);
         }
@@ -5272,11 +5279,10 @@ public class GuiUtils extends LayoutUtil {
      * @param tab tab
      */
     private static void checkHeavyWeightComponents(JTabbedPane tab) {
-        Component[]comps =  	tab.getComponents();
-        int selectedIdx = tab.getSelectedIndex();
-        for (int i = 0; i < comps.length;i++) {
-            toggleHeavyWeightComponents(comps[i],
-                                        i == selectedIdx);
+        Component[] comps       = tab.getComponents();
+        int         selectedIdx = tab.getSelectedIndex();
+        for (int i = 0; i < comps.length; i++) {
+            toggleHeavyWeightComponents(comps[i], i == selectedIdx);
         }
     }
 
@@ -5529,7 +5535,7 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param comp The component
      *
-     * @return _more_
+     * @return the component
      */
     public static Component italicizeFont(Component comp) {
         if (comp != null) {
@@ -5563,7 +5569,7 @@ public class GuiUtils extends LayoutUtil {
         /** maps component to key */
         Hashtable map = new Hashtable();
 
-        /** _more_ */
+        /** key map */
         Hashtable keyMap = new Hashtable();
 
         /**
@@ -5645,18 +5651,18 @@ public class GuiUtils extends LayoutUtil {
         }
 
         /**
-         * _more_
+         * Show the card
          *
-         * @param i _more_
+         * @param i  card index
          */
         public void show(int i) {
             show(getComponent(i));
         }
 
         /**
-         * _more_
+         * Get the visible index
          *
-         * @return _more_
+         * @return  the index
          */
         public int getVisibleIndex() {
             int cnt = getComponentCount();
@@ -5671,7 +5677,7 @@ public class GuiUtils extends LayoutUtil {
 
 
         /**
-         * _more_
+         *  flip to the next component
          */
         public void flip() {
             int cnt = getComponentCount();
@@ -5689,22 +5695,22 @@ public class GuiUtils extends LayoutUtil {
         }
 
         /**
-         * _more_
+         * Does this contain the component
          *
-         * @param comp _more_
+         * @param comp  the component
          *
-         * @return _more_
+         * @return  true if it's there
          */
         public boolean contains(Component comp) {
             return map.get(comp) != null;
         }
 
         /**
-         * _more_
+         * Look for a key
          *
-         * @param object _more_
+         * @param object key object
          *
-         * @return _more_
+         * @return  true if found
          */
         public boolean containsKey(Object object) {
             return keyMap.get(object) != null;
@@ -6056,34 +6062,24 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * Get an integer value from the text field
+     * @param fld text field
+     * @return integer value shown
+     */
     public static int getInt(JTextField fld) {
         return (int) getValue(fld);
     }
 
 
+    /**
+     * Get an double value from the text field
+     * @param fld text field
+     * @return double value shown
+     */
     public static double getValue(JTextField fld) {
         return Misc.parseValue(fld.getText().trim());
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
