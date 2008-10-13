@@ -88,6 +88,9 @@ public class ValueSliderComponent {
     /** maximum slider value */
     private float scaleFactor = 1;
 
+    /** flag for calling set method */
+    private boolean useSetMethod = true;
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
@@ -104,7 +107,7 @@ public class ValueSliderComponent {
      */
     public ValueSliderComponent(Object co, int min, int max, String property,
                                 String label) {
-        this(co, min, max, property, label, 1.0f);
+        this(co, min, max, property, label, 1, true);
     }
 
     /**
@@ -116,15 +119,17 @@ public class ValueSliderComponent {
      * @param property DisplayControl property to set
      * @param label  label for the widget
      * @param scale  scale factor for the values
+     * @param andSet  set the property on the calling object if true
      */
     public ValueSliderComponent(Object co, int min, int max, String property,
-                                String label, float scale) {
+                                String label, float scale, boolean andSet) {
         callingObject = co;
         propertyName  = property;
         labelText     = label;
         sliderMin     = min;
         sliderMax     = max;
         scaleFactor   = scale;
+        useSetMethod  = andSet;
         init();
     }
 
@@ -142,11 +147,11 @@ public class ValueSliderComponent {
         setMethod = Misc.findMethod(callingObject.getClass(), setMethodName,
                                     null);
 
-        if ((getMethod == null) || (setMethod == null)) {
+        if ((getMethod == null) || ((setMethod == null) && useSetMethod)) {
             logException(
                 "ValueSliderComponent.init",
                 new IllegalArgumentException(
-                    "Unable to find set/get methods for property "
+                    "Unable to find set or get methods for property "
                     + propertyName));
         }
 
@@ -275,7 +280,7 @@ public class ValueSliderComponent {
      * @param newValue  the value in slider range
      */
     private void handleValueChanged(int newValue) {
-        if (setMethod != null) {
+        if ((setMethod != null) && useSetMethod) {
             try {
                 String floatString = getDisplayConventions().format(newValue
                                          / scaleFactor);
@@ -312,6 +317,14 @@ public class ValueSliderComponent {
         valueReadout.setText("" + value);
     }
 
+    /**
+     * Get the value of the widget
+     * @return new value
+     */
+    public float getValue() {
+        return (float) GuiUtils.getValue(valueReadout);
+    }
+
 
     /**
      * Enable or disable the widget.
@@ -328,11 +341,11 @@ public class ValueSliderComponent {
      * @return a label table
      */
     private Hashtable<Integer, JLabel> makeLabelTable() {
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-        float     min        = sliderMin / scaleFactor;
-        float     max        = sliderMax / scaleFactor;
-        float     increment  = valueSlider.getMajorTickSpacing()
-                               / scaleFactor;
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer,
+                                                    JLabel>();
+        float min       = sliderMin / scaleFactor;
+        float max       = sliderMax / scaleFactor;
+        float increment = valueSlider.getMajorTickSpacing() / scaleFactor;
         if ((min > max) || (increment > (max - min))) {
             return labelTable;
         }
