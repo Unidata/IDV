@@ -402,9 +402,9 @@ public class ImageXmlDataSource extends FilesDataSource {
                     String fullUrl = getUrl(child);
                     //If its relative then add it into the files list
                     if(!Misc.equals(fullUrl, url) || new File(url).exists()) {
-                        System.err.println ("adding relative:" + fullUrl);
+                        //System.err.println ("adding relative:" + fullUrl);
                         relativeFiles.add(fullUrl);
-                        System.err.println ("after:" + relativeFiles);
+                        //System.err.println ("after:" + relativeFiles);
                     }
                 } else if (XmlUtil.hasAttribute(child, ATTR_ID)) {
                     haveEmbeddedFiles = true;
