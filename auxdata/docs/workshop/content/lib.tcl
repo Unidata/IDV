@@ -24,7 +24,7 @@ set ::idvInstall /home/idv/
 gen::defineMacro {<%workshop.datadir%>} {/data/idv}
 
 ##We use this for referencing download file names
-gen::defineMacro {<%idv.version%>} {2.5}
+gen::defineMacro {<%idv.version%>} {2.6}
 
 ##The installed directory of the source
 gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
@@ -92,7 +92,7 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::setIndexFile   regional.index
         set ::workshopTitle {Regional Unidata IDV Workshop}
         gen::define flag_regionalworkshop 
-        gen::defineMacro {<%idv.version%>} {2.5}
+        gen::defineMacro {<%idv.version%>} {2.6}
         set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
         set ::workshopHome {c:\\\\data\\\\idv}
         gen::defineMacro {<%workshop.installdir%>} "$::workshopHome"
