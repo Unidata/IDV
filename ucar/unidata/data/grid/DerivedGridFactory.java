@@ -1703,7 +1703,7 @@ public class DerivedGridFactory {
      *
      * @param  temperFI  grid or time sequence of grids of temperature with
      *                   a spatial domain that includes pressure in vertical
-     * @param  wind      grid or time sequence of grids wind
+     * @param  vector    grid or time sequence of grids wind
      *
      * @return computed grid(s)
      *
