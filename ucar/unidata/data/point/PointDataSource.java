@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -669,11 +670,11 @@ public abstract class PointDataSource extends FilesDataSource {
             what       = "Bad grid points Y value";
             changed    |= (gridY != gridProperties.getGridY());
             what       = "Bad grid passes value";
-            changed    |= (numGridPasses
-                           != gridProperties.getNumGridPasses());
-            what       = "Bad grid unit value";
-            changed    |= ( !gridUnit.equals(gridProperties.getGridUnit()));
-            what       = "Bad grid search value";
+            changed |= (numGridPasses
+                        != versiongridProperties.getNumGridPasses());
+            what    = "Bad grid unit value";
+            changed |= ( !gridUnit.equals(gridProperties.getGridUnit()));
+            what    = "Bad grid search value";
             changed |= (gridSearchRadius
                         != gridProperties.getGridSearchRadius());
             what    = "Bad grid gain value";
@@ -1127,7 +1128,9 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     public void doRemove() {
         super.doRemove();
-        gridProperties.doRemove();
+        if (gridProperties != null) {
+            gridProperties.doRemove();
+        }
     }
 
 
