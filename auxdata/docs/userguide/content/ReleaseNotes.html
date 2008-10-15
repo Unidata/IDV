@@ -11,34 +11,66 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.4 release.
+The items below reflect changes since the 2.5 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="What's new?" id="whatsnew">
-This is mainly a maintenance release with some bug fixes
-and performance improvements.
+<faqitem q="Use of netCDF 4.0 library" id="whatsnext">
+The IDV now uses the Java-netCDF 4.0 library. This provides
+limited support for HDF-4 and HDF-5 files.</li>
 </faqitem>
 
-<faqitem q="What's next?" id="whatsnext">
-The next release after <%idv.version%> will involve several 
-changes to the underlying infrastructure:
+<faqitem q="Use of Java 1.6" id="jdk6">
+The IDV installers now use Java 6.  Web Start still uses Java 5
+(JDK 1.5) since there is no version of Java 6 on Mac OS-X for
+older systems.</li>
+</faqitem>
 
-<ul>
-<li>Use of the Java-netCDF 4.0 library. This will provide
-limited support for HDF-4 and HDF-5 files.</li>
-
-<li>Use of Java 6 (JDK 1.6) in the installers and Web Start.</li>
-</ul>
+<faqitem cat="Display Changes"></faqitem>
+<faqitem q="Publication Quality Graphics" id="vector graphics">
+Any display can now be saved in a vector graphics (PDF, PostScript,
+Scalar Vector Graphics (SVG)) format.  Use the [ug::menu View Capture Image]
+menu and use .pdf, .ps or .svg for the file suffix to create the
+appropriate format.  This works best for overhead,
+line plots.  For 3D plots, raster (e.g. GIF, PNG, JPEG) is still the
+best option.  This work was made possible using code from the
+Australian Bureau of Meteorology.
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
-<faqitem q="Remote Level II Radar access" id="remotelevel2">
-There is a new chooser under the Radar tab of the Data Chooser
-window that allows you to access radar volume data (Level II)
-from a THREDDS Data Server (TDS).
+<faqitem q="Remote Level III Radar access" id="remotelevel3">
+The chooser for the Level II data from the THREDDS Data Server (TDS)
+can now be used to access Level III products as well.  This provides
+faster access than the ADDE server and allows you to access data
+across days.
+</faqitem>
+
+<faqitem q="Objective Analysis of Point Data" id="oabarnes">
+Point data (observations) can now be gridded using a Barnes
+objective analysis routine.  Numeric fields are listed under
+a "Gridded Data" category in the Field Selector.  Users can control
+the analysis parameters through the Data Source properties or
+through the Data Subset panel.  This work was made possible using 
+code from the Australian Bureau of Meteorology.
+</faqitem>
+
+<faqitem q="Weather Text Bulletins" id="wxtext">
+Users can now access weather text products from a remote server
+or their own local archives.  The server products use the ADDE
+protocol.  The local archives are based on the GEMPAK NWX tables.
+For the latter, you must have GEMPAK installed and have the
+appropriate environment variables defined for the NWX program.
+</faqitem>
+
+<faqitem q="ATCF Tropical Storm track display" id="atcf">
+Users can access the Automated Tropical Cyclone Forecasting (ATCF) data 
+from the National Hurricane Center in the IDV.  This archive has
+historical storm tracks back to the 1800's.  Use the
+[ug::menu Data {Load Data} {ATCF Storm Tracks}] menu to access
+this feature.  The resulting display allows you to compare model
+forecasts in the database.
 </faqitem>
 
 <faqitem cat="Bug Fixes"></faqitem>
