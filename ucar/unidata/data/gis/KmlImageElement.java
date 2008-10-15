@@ -155,7 +155,6 @@ public abstract class KmlImageElement extends KmlInfo {
      * get the image data
      *
      * @param dataSource data source
-     * @param loadId for loading
      *
      * @return image data
      *
