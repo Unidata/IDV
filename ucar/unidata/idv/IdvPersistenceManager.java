@@ -2542,7 +2542,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @param xmlFile The bundle file
      * @param checkToRemove Should check the user preference to remove all/show dialog or not.
-     * @param overrideTimes If non-null then use the set of time indices for the data sources
+     * @param bundleProperties  set of properties
      *
      *
      * @return success
@@ -2576,7 +2576,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param xmlFile file name
      * @param label description for dialog
      * @param checkToRemove Should we ask the user about removing data/displays
-     * @param overrideTimes If non-null then use the set of time indices for the data sources
+     * @param bundleProperties  set of properties
      *
      * @return success
      */
@@ -2596,7 +2596,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param label label
      * @param checkToRemove check to remove
      * @param letUserChangeData if true then ask user to change data paths
-     * @param overrideTimes List of time indices to override the data sources times
+     * @param bundleProperties  set of properties
      *
      * @return everything cool
      */
@@ -2788,7 +2788,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param label The label to use  in the dialog
      * @param showDialog Should the dialog be shown
      * @param shouldMerge Should we merge the windows/views in the bundle into the existing windows
-     * @param overrideTimes If non-null then use the set of time indices for the data sources
+     * @param bundleProperties  set of properties
      * @param removeAll Should we remove all data/displays
      * @param letUserChangeData Should popup the data path dialog
      */
@@ -2935,7 +2935,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param label The label to show in the gui
      * @param showDialog Should the loadbundle dialog be shown
      * @param shouldMerge Should we merge the windows/views in the bundle into the existing windows
-     * @param overrideTimes If non-null then use the set of time indices for the data sources
+     * @param bundleProperties  set of properties
      * @param didRemoveAll Was remove all called before we decoded the xml
      * @param letUserChangeData Should popup data path change dialog
      */
@@ -3217,7 +3217,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * If it was we treat it differently.
      * @param loadDialog  The load bundle dialog
      * @param shouldMerge Should we merge the windows/views in the bundle into the existing windows
-     * @param overrideTimes If non-null then use the set of time indices for the data sources
+     * @param bundleProperties  set of properties
      * @param didRemoveAll Was remove all called before we decoded the xml
      * @param letUserChangeData Should popup data path change dialog
      *
