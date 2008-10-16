@@ -671,7 +671,7 @@ public abstract class PointDataSource extends FilesDataSource {
             changed    |= (gridY != gridProperties.getGridY());
             what       = "Bad grid passes value";
             changed |= (numGridPasses
-                        != versiongridProperties.getNumGridPasses());
+                        != gridProperties.getNumGridPasses());
             what    = "Bad grid unit value";
             changed |= ( !gridUnit.equals(gridProperties.getGridUnit()));
             what    = "Bad grid search value";
