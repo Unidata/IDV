@@ -4030,7 +4030,7 @@ public class GridUtil {
                         SampledSet ss        = getSpatialDomain(ff);
                         SampledSet latLonSet = null;
                         if (ss.getCoordinateSystem() != null) {
-                            Util.convertDomain(ss,
+                            latLonSet = Util.convertDomain(ss,
                                     ss.getCoordinateSystem().getReference(),
                                     null);
                         } else {
