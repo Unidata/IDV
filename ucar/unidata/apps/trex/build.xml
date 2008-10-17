@@ -49,7 +49,7 @@ argument -Dfoo=bar) -->
     </target>
 
     <target name="plugin" depends="trexjar">
-        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
              <fileset file="lib/trex.jar"/>
         </copy>
     </target>

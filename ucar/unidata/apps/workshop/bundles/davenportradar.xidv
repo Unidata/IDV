@@ -21,7 +21,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:00:00 21:00:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:00:00 21:00:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -39,7 +39,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:06:00 21:06:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:06:00 21:06:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -57,7 +57,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:12:00 21:12:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:12:00 21:12:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -75,7 +75,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:18:00 21:18:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:18:00 21:18:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -93,7 +93,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:24:00 21:24:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:24:00 21:24:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -111,7 +111,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:29:00 21:29:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:29:00 21:29:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -129,7 +129,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:35:00 21:35:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:35:00 21:35:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -147,7 +147,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:41:00 21:41:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:41:00 21:41:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -165,7 +165,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:47:00 21:47:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:47:00 21:47:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -183,7 +183,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:53:00 21:53:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:53:00 21:53:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>
@@ -201,7 +201,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA7AAAAAAAAAMAAAAAHw==</pa
                                         </object>
                                     </property>
                                     <property name="Source">
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:59:00 21:59:00 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=CCS039R&DAY=1998-06-29&TIME=21:59:00 21:59:59 I &descr=BREF1&id=DVN&unit=ECHO&spac=4&mag=1 1&size=460 460]]></string>
                                     </property>
                                 </object>
                             </method>

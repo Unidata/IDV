@@ -11,7 +11,7 @@
                             <method name="add" >
                                 <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id7" >
                                     <property name="Source" >
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:00:00 21:00:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:00:00 21:00:59 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
                                     </property>
                                     <property name="Directory" >
                                         <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
@@ -31,7 +31,7 @@
                             <method name="add" >
                                 <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id10" >
                                     <property name="Source" >
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:06:00 21:06:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:06:00 21:06:59 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
                                     </property>
                                     <property name="Directory" >
                                         <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
@@ -51,7 +51,7 @@
                             <method name="add" >
                                 <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id13" >
                                     <property name="Source" >
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:12:00 21:12:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:12:00 21:12:59 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
                                     </property>
                                     <property name="Directory" >
                                         <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
@@ -71,7 +71,7 @@
                             <method name="add" >
                                 <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id16" >
                                     <property name="Source" >
-                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:18:00 21:18:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:18:00 21:18:59 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
                                     </property>
                                     <property name="Directory" >
                                         <object class="edu.wisc.ssec.mcidas.AreaDirectory" >

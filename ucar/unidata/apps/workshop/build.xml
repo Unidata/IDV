@@ -48,7 +48,7 @@ argument -Dfoo=bar) -->
     </target>
 
     <target name="install_plugin" depends="jar">
-        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
              <fileset file="${jars_dest}/workshop.jar"/>
         </copy>
     </target>

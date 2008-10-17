@@ -45,7 +45,7 @@ argument -Dfoo=bar) -->
     </target>
 
     <target name="plugin" depends="stijar">
-        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
              <fileset file="lib/tcidv.jar"/>
         </copy>
     </target>
