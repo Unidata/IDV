@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -337,6 +338,7 @@ public abstract class PointDataSource extends FilesDataSource {
             comps.add(GuiUtils.left(searchComp.getContents(false)));
             comps.add(GuiUtils.rLabel("Gain:"));
             comps.add(GuiUtils.left(gainComp.getContents(false)));
+            enableAutoComps( !useCompute);
             useDefaultCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     checkEnable();
@@ -670,11 +672,11 @@ public abstract class PointDataSource extends FilesDataSource {
             what       = "Bad grid points Y value";
             changed    |= (gridY != gridProperties.getGridY());
             what       = "Bad grid passes value";
-            changed |= (numGridPasses
-                        != gridProperties.getNumGridPasses());
-            what    = "Bad grid unit value";
-            changed |= ( !gridUnit.equals(gridProperties.getGridUnit()));
-            what    = "Bad grid search value";
+            changed    |= (numGridPasses
+                           != gridProperties.getNumGridPasses());
+            what       = "Bad grid unit value";
+            changed    |= ( !gridUnit.equals(gridProperties.getGridUnit()));
+            what       = "Bad grid search value";
             changed |= (gridSearchRadius
                         != gridProperties.getGridSearchRadius());
             what    = "Bad grid gain value";
