@@ -896,13 +896,16 @@ public class GeoGridDataSource extends GridDataSource {
                 sb.append("Resolver URL:" + resolverUrl);
             }
             sb.append(
-                "<p><table><tr><td><b>Field</b></td><td><b>Description</b></td><td><b>Dimensions</b></td><td><b>#Times</b></td><td><b>#Points</b></td></tr>\n");
+                "\n<p><table><tr><td><b>Field</b></td><td><b>Description</b></td><td><b>Dimensions</b></td><td><b>#Times</b></td><td><b>#Points</b></td></tr>\n");
         }
         if (sb2d != null) {
             sb.append(sb2d);
         }
         if (sb3d != null) {
             sb.append(sb3d);
+        }
+        if (sb!=null) {
+            sb.append("</table>\n");
         }
 
         if (sb == null) {
