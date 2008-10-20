@@ -243,6 +243,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             stationName    = rds.getRadarName();
             isVolume       = rds.isVolume();
             dataFormatName = rds.getDataFormat();
+            Attribute sweepMode = rds.findGlobalAttributeIgnoreCase("SweepMode");
             Attribute vcpAttr = rds.findGlobalAttributeIgnoreCase(
                 "VolumeCoveragePatternName");
             if(vcpAttr != null)
@@ -2617,12 +2618,23 @@ public class CDMRadarAdapter implements RadarAdapter {
                 values[0][l++]     = rawValues[elem];
             }
         } else if (az0 > 1.0) {
-            for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[ray0] * numGates + cell;
-                domainVals3d[0][l] = cell;
-                domainVals3d[1][l] = az0 - 0.5f;
-                domainVals3d[2][l] = elevations[sortedAzs[ray0]];
-                values[0][l++]     = rawValues[elem];
+            if(azN >= 360.0 && azN <= 361.0){
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[rayN] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = (azN - 360 - 0.5f < 0 ? 0 : azN - 360 - 0.5f);
+                    domainVals3d[2][l] = elevations[sortedAzs[rayN]];
+                    values[0][l++]     = rawValues[elem];
+                }
+
+            } else {
+                for (int cell = 0; cell < numGates; cell++) {
+                    int elem = sortedAzs[ray0] * numGates + cell;
+                    domainVals3d[0][l] = cell;
+                    domainVals3d[1][l] = az0 - 0.5f;
+                    domainVals3d[2][l] = elevations[sortedAzs[ray0]];
+                    values[0][l++]     = rawValues[elem];
+                }
             }
         }
         // radial data
@@ -2638,7 +2650,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         // additional radial at the end of the sweep
-        if( azN >=359 && azN < 360) {
+        if( azN >=359 && azN <= 360) {
             for (int cell = 0; cell < numGates; cell++) {
                 int elem = sortedAzs[rayN] * numGates + cell;
                 domainVals3d[0][l] = cell;
@@ -2652,6 +2664,14 @@ public class CDMRadarAdapter implements RadarAdapter {
                 int elem = sortedAzs[rayN] * numGates + cell;
                 domainVals3d[0][l] = cell;
                 domainVals3d[1][l] = azN + 0.5f;
+                domainVals3d[2][l] = elevations[sortedAzs[rayN]];
+                values[0][l++]     = rawValues[elem];
+            }
+        } else if(azN > 360 && azN <= 361) {
+            for (int cell = 0; cell < numGates; cell++) {
+                int elem = sortedAzs[rayN] * numGates + cell;
+                domainVals3d[0][l] = cell;
+                domainVals3d[1][l] = 360;
                 domainVals3d[2][l] = elevations[sortedAzs[rayN]];
                 values[0][l++]     = rawValues[elem];
             }
