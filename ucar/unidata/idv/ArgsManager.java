@@ -737,6 +737,12 @@ public class ArgsManager extends IdvManager {
             idx++;
             idx = parseArg(arg, args, idx);
         }
+        //If we are in off screen mode (e.g., from an isl script) then don't have the LogUtil
+        //show dialogs, etc.
+        if(isOffScreen) {
+            LogUtil.setTestMode(true);
+        }
+
     }
 
 
@@ -1210,7 +1216,6 @@ public class ArgsManager extends IdvManager {
      */
     public void setIsOffScreen(boolean v) {
         isOffScreen = v;
-        LogUtil.setTestMode(v);
     }
 
 }
