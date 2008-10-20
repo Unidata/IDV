@@ -566,6 +566,31 @@ public class DataManager {
         }
     }
 
+    /** 
+     * get an html listing of all of the data source descriptions
+     *
+     * @return html listing of data sources
+     */
+    public StringBuffer getDataSourceHtml() {
+        StringBuffer html = new StringBuffer();
+        try {
+            List dataSources = getDataSources();
+            for (int i = 0; i < dataSources.size(); i++) {
+                DataSource dataSource = (DataSource) dataSources.get(i);
+                try {
+                    html.append("\n<hr>");
+                    html.append(dataSource.getFullDescription());
+                } catch(Exception exc) {
+                    html.append("Error getting datasource html:" + dataSource.getName());
+                }
+            }
+            html.append("\n<hr>");
+        } catch(Exception exc) {
+            html.append("Error getting datasource html");
+        }
+        return html;
+    }
+
     /**
      * This method processes the given datasourceNode, creating a
      * {@link  DataSourceDescriptor} if one has not been created already.
