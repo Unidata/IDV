@@ -64,6 +64,7 @@ index.html
 >>tools/ProjectionManager.html
 >>tools/ColorTableEditor.html
 >>tools/StationModelEditor.html
+-tools/stationsymbols.xml
 >>tools/DisplaySettings.html
 >>tools/AliasEditor.html
 >>tools/ParameterDefaultsEditor.html

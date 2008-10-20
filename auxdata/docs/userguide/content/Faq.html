@@ -285,6 +285,7 @@ window.
 
 </faqitem>
 
+
 <faqitem q="How can I change the size of the IDV window?" id="windowsize">
 You can save particular IDV set-up including map, projection, 
 With the IDV running, move and re-size the display and data source
@@ -617,6 +618,23 @@ section of the manual for the procedures on how to do this.
 <faqitem q="How do I open the Error Logs Console?" id="console">
 Open a console to show error logs with the [ug::mmenu Help {Show Console}] menu.
 </faqitem>
+
+
+
+<faqitem q="The IDV has locked up and is not responding. What do I do?" id="lockup">
+
+You can either close the windows or, if that does not work, remove (on Windows) the <i>java.exe</i> process through  the Windows Task Manager  or by killing the process on Linux/Unix.
+<p>
+However, before you do that we want to find out why it locked up. To do this we need you to get a stack trace
+of the program and send it to us at <a href="mailto:support-idv@unidata.ucar.edu">support-idv@unidata.ucar.edu</a>.
+<p>
+On Windows do a <i>control-break</i> key in the  IDV terminal window and copy/paste the result.
+<p>
+On Linux/Unix either do a <i>control-/</i> in the terminal window or do a <i>kill -3 &lt;java process id&gt;</i>
+<p>
+At this time we're not sure how to do this on a Mac.
+</faqitem>
+
 
 </faq>
 
