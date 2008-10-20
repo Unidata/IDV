@@ -106,9 +106,15 @@ public class IdvMonitor extends HttpServer {
             this.idv = idv;
         }
 
+        private void decorateHtml(StringBuffer sb) throws Exception {
+            String header = "<a href=stack.html>Stack Trace</a>&nbsp;|&nbsp;"+
+                "<a href=info.html>System Information</a>&nbsp;|&nbsp;" +
+                "<a href=shutdown.html>Shutdown</a><hr>";
+            writeResult(true,  header+sb.toString(),"text/html");
+        }
+
+
         /**
-         * Handle the request. This reads the command line arguments, writes back "ok",
-         * nad has the idv process the args.
          *
          * @param path url path. ignored.
          * @param formArgs form args
@@ -122,7 +128,7 @@ public class IdvMonitor extends HttpServer {
                 throws Exception {
             if(path.equals("/stack.html")) {
                 StringBuffer stack = LogUtil.getStackDump(true);
-                writeResult(true,  stack.toString(),"text/html");
+                decorateHtml(stack);
             } else  if(path.equals("/info.html")) {
                 StringBuffer extra   = idv.getIdvUIManager().getSystemInfo();
                 extra.append("<H3>Data Sources</H3>");
@@ -131,14 +137,14 @@ public class IdvMonitor extends HttpServer {
                 extra.append("</div>");
                 extra.append(idv.getPluginManager().getPluginHtml());
                 extra.append(idv.getResourceManager().getHtmlView());
-                writeResult(true,  extra.toString(),"text/html");
+                decorateHtml(extra);
             } else  if(path.equals("/shutdown.html")) {
-                writeResult(true,  "Really shutdown the IDV?<br><a href=\"reallyshutdown.html\">Yes</a>","text/html");
+                decorateHtml(new StringBuffer("Really shutdown the IDV?<br><a href=\"reallyshutdown.html\">Yes</a>"));
             } else  if(path.equals("/reallyshutdown.html")) {
                 writeResult(true,  "OK, IDV is shutting down","text/html");
                 System.exit(0);
             } else{
-                writeResult(false,  "Unknown url:" + path,"text/html");
+                decorateHtml(new StringBuffer("Unknown url:" + path));
             }
         }
     }
