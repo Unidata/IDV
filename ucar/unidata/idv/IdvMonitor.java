@@ -25,10 +25,11 @@ package ucar.unidata.idv;
 
 
 import ucar.unidata.util.HttpServer;
+import ucar.unidata.util.LogUtil;
 
 import java.util.Hashtable;
 
-import java.lang.management.*;
+
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -37,61 +38,33 @@ import java.net.Socket;
 /**
  * This provides http based access to a stack trace and enables the user to shutdown the IDV.
  * This only is responsive to incoming requests from localhost
+ * the urls this provides are:
+ * http://localhost:<port>/stack.html
+ * http://localhost:<port>/info.html
+ * http://localhost:<port>/shutdown.html
+ *
  * @author IDV development team
  */
-
 public class IdvMonitor extends HttpServer {
-    IntegratedDataViewer idv;
+
+    private IntegratedDataViewer idv;
 
     /** The localhost */
-    InetAddress localHost;
+    private InetAddress localHost;
 
     public IdvMonitor(IntegratedDataViewer idv, int port) {
         super(port);
         this.idv = idv;
     }
 
-    public StringBuffer  getStackDump() {
-        StringBuffer longSB = new StringBuffer();
-        StringBuffer shortSB = new StringBuffer();
 
-        ThreadMXBean threadBean =ManagementFactory.getThreadMXBean();
-        long[] ids = threadBean.getAllThreadIds();
-        StringBuffer blockedSB = new StringBuffer();
-        StringBuffer otherSB = new StringBuffer();
-        for(int i=0;i<ids.length;i++) {
-            ThreadInfo info =   threadBean.getThreadInfo(ids[i],Integer.MAX_VALUE);
-            if(info==null) continue;
-            StackTraceElement[]stack =	info.getStackTrace();
-            shortSB.append(info);
-            String extra = "";
-            String style="";
-            StringBuffer sb= otherSB;
-            if(info.getThreadState()==Thread.State.WAITING) {
-                extra = " on " + info.getLockName();
-            } else   if(info.getThreadState()==Thread.State.BLOCKED) {
-                style="  background-color:#cccccc; ";
-                extra = " on " + info.getLockName() + " held by <a href=\"#id" + info.getLockOwnerId()+"\">" + info.getLockOwnerName() + " id:" + info.getLockOwnerId()+"</a>";
-                sb = blockedSB;
-            }
-            sb.append("<a name=\"id" +ids[i]+"\"></a>");
-            sb.append("<span style=\"" + style +"\">&quot;" +info.getThreadName() +"&quot;" +  " ID:" + ids[i] +"  "+ info.getThreadState()+extra+"</span>\n");
-            for(int stackIdx=0;stackIdx<stack.length;stackIdx++) {
-                sb.append("    " +stack[stackIdx]+"\n");
-            }
-            sb.append("\n\n");
-        }
-        longSB.append(blockedSB);
-        longSB.append(otherSB);
-
-        //        shortSB.append("--------------------------------------------------------------------------------\n");
-        //        shortSB.append("Full stack trace\n");
-        //        shortSB.append("--------------------------------------------------------------------------------\n");
-        //        shortSB.append(longSB);
-        //        return shortSB;
-        return longSB;
-    }
-
+    /**
+     * Make the handler for this request. Check if the client is coming from localhost
+     * if not then return null.
+     *
+     * @param socket incoming socket
+     * @return handler or null
+     */
     protected RequestHandler doMakeRequestHandler(Socket socket)
             throws Exception {
         if (localHost == null) {
@@ -148,8 +121,17 @@ public class IdvMonitor extends HttpServer {
                                      Hashtable httpArgs, String content)
                 throws Exception {
             if(path.equals("/stack.html")) {
-                StringBuffer stack = getStackDump();
-                writeResult(true,  "<pre>" +stack.toString()+"</pre>","text/html");
+                StringBuffer stack = LogUtil.getStackDump(true);
+                writeResult(true,  stack.toString(),"text/html");
+            } else  if(path.equals("/info.html")) {
+                StringBuffer extra   = idv.getIdvUIManager().getSystemInfo();
+                extra.append("<H3>Data Sources</H3>");
+                extra.append("<div style=\"margin-left:20px;\">");
+                extra.append(idv.getDataManager().getDataSourceHtml());
+                extra.append("</div>");
+                extra.append(idv.getPluginManager().getPluginHtml());
+                extra.append(idv.getResourceManager().getHtmlView());
+                writeResult(true,  extra.toString(),"text/html");
             } else  if(path.equals("/shutdown.html")) {
                 writeResult(true,  "Really shutdown the IDV?<br><a href=\"reallyshutdown.html\">Yes</a>","text/html");
             } else  if(path.equals("/reallyshutdown.html")) {

@@ -696,6 +696,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
 
+    /**
+     * Start up the IDV montior server. This is an http server on the port defined
+     * by the property idv.monitorport (8788). It provides 2 urls only accessible from localhost:
+     * http://localhost:8788/stack.html
+     * http://localhost:8788/shutdown.html
+     */
     protected void startMonitor() {
         if(idvMonitor!=null) return;
         final String monitorPort = getProperty(PROP_MONITORPORT,"");
@@ -706,11 +712,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                             idvMonitor = new IdvMonitor(IntegratedDataViewer.this,new Integer(monitorPort).intValue());
                             idvMonitor.init();
                         }    catch (Exception exc) {
-                            logException("Running IDV monitor", exc);
+                            LogUtil.consoleMessage("Unable to start IDV monitor on port:" + monitorPort);
+                            LogUtil.consoleMessage("Error:" + exc);
                         }
                     }});
         }
-
+        /*
         final Object test1 = new Object();
         final Object test2 = new Object();
         Misc.run(new Runnable() {
@@ -734,7 +741,7 @@ Misc.run(new Runnable() {
 
 
 
-
+        */
     }
 
     /**

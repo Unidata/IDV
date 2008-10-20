@@ -5643,6 +5643,23 @@ public class IdvUIManager extends IdvManager {
 
 
 
+    public StringBuffer getSystemInfo() {
+        StringBuffer extra   = new StringBuffer();
+        extra.append("<h3>OS</h3>\n");
+        append(extra, "os.name", System.getProperty("os.name"));
+        append(extra, "os.arch", System.getProperty("os.arch"));
+        append(extra, "os.version", System.getProperty("os.version"));
+        extra.append("<h3>Java</h3>\n");
+        append(extra, "java.vendor", System.getProperty("java.vendor"));
+        append(extra, "java.version", System.getProperty("java.version"));
+        append(extra, "java.home", System.getProperty("java.home"));
+        append(extra, "java.heap",
+               Misc.format(Runtime.getRuntime().maxMemory() / 1000000.0)
+               + " " + Msg.msg("MB"));
+
+        return extra;
+    }
+
 
     /**
      * Show the support request form in a non-swing thread. We do this because we cannot
@@ -5652,31 +5669,14 @@ public class IdvUIManager extends IdvManager {
      * @param stackTrace The stack trace that caused this error.
      * @param dialog The dialog to put the gui in, if non-null.
      */
-
     private void showSupportFormInThread(String description,
                                          String stackTrace, JDialog dialog) {
 
+        StringBuffer extra   = getSystemInfo();
         List         entries = new ArrayList();
-
-        StringBuffer extra   = new StringBuffer("<h3>OS</h3>\n");
-        append(extra, "os.name", System.getProperty("os.name"));
-        append(extra, "os.arch", System.getProperty("os.arch"));
-        append(extra, "os.version", System.getProperty("os.version"));
-
-        extra.append("<h3>Java</h3>\n");
-
-        append(extra, "java.vendor", System.getProperty("java.vendor"));
-        append(extra, "java.version", System.getProperty("java.version"));
-        append(extra, "java.home", System.getProperty("java.home"));
-        append(extra, "java.heap",
-               Misc.format(Runtime.getRuntime().maxMemory() / 1000000.0)
-               + " " + Msg.msg("MB"));
-
         StringBuffer javaInfo = new StringBuffer();
         javaInfo.append("Java: home: " + System.getProperty("java.home"));
         javaInfo.append(" version: " + System.getProperty("java.version"));
-
-
         Class c = null;
         try {
             c = Class.forName("javax.media.j3d.VirtualUniverse");
@@ -5699,7 +5699,9 @@ public class IdvUIManager extends IdvManager {
             append(extra, "j3d", "none");
         }
 
-
+        extra.append(getIdv().getDataManager().getDataSourceHtml());
+        extra.append(getIdv().getPluginManager().getPluginHtml());
+        extra.append(getResourceManager().getHtmlView());
 
         HttpFormEntry descriptionEntry;
         HttpFormEntry nameEntry;
@@ -5799,9 +5801,6 @@ public class IdvUIManager extends IdvManager {
             }
 
             try {
-                extra.append(getIdv().getPluginManager().getPluginHtml());
-                extra.append(getResourceManager().getHtmlView());
-
                 entriesToPost.add(new HttpFormEntry("attachmentOne",
                         "extra.html", extra.toString().getBytes()));
 
