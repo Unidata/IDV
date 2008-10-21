@@ -622,17 +622,29 @@ Open a console to show error logs with the [ug::mmenu Help {Show Console}] menu.
 
 
 <faqitem q="The IDV has locked up and is not responding. What do I do?" id="lockup">
-
-You can either close the windows or, if that does not work, remove (on Windows) the <i>java.exe</i> process through  the Windows Task Manager  or by killing the process on Linux/Unix.
+First, we need to have you retrieve a stack track of the program so we can find out 
+why this is happening. 
+If you are running the most recent version  of the IDV (after October 15th, 2008) the IDV provides
+a web-based service that produces a stack trace. Just view the URL:
+<pre>
+http://localhost:8788/stack.html
+</pre>
+and send the results to <a href="mailto:support-idv@unidata.ucar.edu">support-idv@unidata.ucar.edu</a>.
+Note: this service is only available from browsers running on the machine the IDV is running on.
 <p>
-However, before you do that we want to find out why it locked up. To do this we need you to get a stack trace
-of the program and send it to us at <a href="mailto:support-idv@unidata.ucar.edu">support-idv@unidata.ucar.edu</a>.
+You can also use this service to shutdown the IDV. 
+<p>
+If you are running an earlier version of the IDV you can:
 <p>
 On Windows do a <i>control-break</i> key in the  IDV terminal window and copy/paste the result.
 <p>
 On Linux/Unix either do a <i>control-/</i> in the terminal window or do a <i>kill -3 &lt;java process id&gt;</i>
 <p>
+To kill the IDV you can either close the windows or, if that does not work, remove (on Windows) the <i>java.exe</i> process through  the Windows Task Manager  or by killing the process on Linux/Unix.
+<p>
 At this time we're not sure how to do this on a Mac.
+<p>
+
 </faqitem>
 
 
