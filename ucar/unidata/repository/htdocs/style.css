@@ -1,7 +1,7 @@
 
 body {
    font-weight: normal;
-   font-size: 10pt;
+   font-size: 12pt;
    font-family: Arial, Helvetica, sans-serif;
    color: black;
    margin: 0px;
@@ -60,14 +60,14 @@ a.header  {
 
 
 .nav {
-   font-size: 10pt;
+   font-size: 12pt;
    font-weight: bold;
    color: black;
 }
 
 
 .subnav {
-   font-size: 10pt;
+   font-size: 12pt;
    padding-left:5;   
    padding-top:5;   
    background-color : #c3d9ff;
@@ -185,7 +185,7 @@ a.subnavoffcomp  {
 
 td {
    font-weight: normal;
-   font-size: 10pt;
+   font-size: 12pt;
    font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -353,7 +353,7 @@ a.menulink {
 
 .entryheader {
    font-weight: bold;
-   font-size: 10pt;
+   font-size: 12pt;
    color: #9C9C9C;
    border-bottom : 1px #666666 solid;
 }
@@ -437,7 +437,7 @@ form {
 
 .formgroupheader {
    background-color : #ccccCC;
-   font-size: 10pt;
+   font-size: 12pt;
    font-weight: bold;
    padding-left: 5px;
    padding-top: 5px;
