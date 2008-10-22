@@ -312,7 +312,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private static String llp(double lat, double lon) {
+    public static String llp(double lat, double lon) {
         if (lat < -90) {
             lat = -90;
         }

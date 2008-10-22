@@ -104,7 +104,8 @@ public class RepositoryClient extends RepositoryBase {
     public RepositoryClient(String hostname, int port, String base,
                             String user, String password)
             throws Exception {
-        super(hostname, port);
+        super(port);
+        this.hostname = hostname;
         this.user     = user;
         this.password = password;
         setUrlBase(base);

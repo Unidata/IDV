@@ -42,7 +42,6 @@ function initMarker(marker,id) {
 	marker.iconSize = [16,16];
 	marker.iconShadowUrl = "${urlroot}/icons/blank.gif";
 	markers[id]=marker;
-
 	mapstraction.addMarker(marker);
 }
 

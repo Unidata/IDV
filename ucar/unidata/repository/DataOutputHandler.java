@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -49,6 +50,7 @@ import ucar.nc2.Variable;
 import ucar.nc2.VariableSimpleIF;
 
 import ucar.nc2.constants.AxisType;
+import ucar.nc2.constants.FeatureType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -57,11 +59,16 @@ import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
+
+import ucar.nc2.dt.TrajectoryObsDataset;
+import ucar.nc2.dt.TrajectoryObsDatatype;
 import ucar.nc2.dt.TypedDatasetFactory;
 
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
+import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.gis.KmlUtil;
 
 import ucar.unidata.geoloc.*;
@@ -128,29 +135,40 @@ public class DataOutputHandler extends OutputHandler {
     public static final String ARG_HSTRIDE = "hstride";
 
     /** _more_ */
-    public static final OutputType OUTPUT_OPENDAP = new OutputType("OpenDAP","data.opendap");
+    public static final OutputType OUTPUT_OPENDAP = new OutputType("OpenDAP",
+                                                        "data.opendap");
 
     /** _more_ */
-    public static final OutputType OUTPUT_CDL = new OutputType("CDL","data.cdl");
+    public static final OutputType OUTPUT_CDL = new OutputType("CDL",
+                                                    "data.cdl");
 
     /** _more_ */
-    public static final OutputType OUTPUT_WCS = new OutputType("WCS","data.wcs");
+    public static final OutputType OUTPUT_WCS = new OutputType("WCS",
+                                                    "data.wcs");
 
     /** _more_ */
-    public static final OutputType OUTPUT_POINT_MAP = new OutputType("Point as Map","data.point.map");
+    public static final OutputType OUTPUT_POINT_MAP =
+        new OutputType("Point as Map", "data.point.map");
 
-    /** _more_          */
-    public static final OutputType OUTPUT_POINT_CSV = new OutputType("Point as CSV","data.point.csv");
+    /** _more_ */
+    public static final OutputType OUTPUT_POINT_CSV =
+        new OutputType("Point as CSV", "data.point.csv");
 
-    /** _more_          */
-    public static final OutputType OUTPUT_POINT_KML = new OutputType("Point as KML","data.point.kml");
+    /** _more_ */
+    public static final OutputType OUTPUT_POINT_KML =
+        new OutputType("Point as KML", "data.point.kml");
+
+    /** _more_ */
+    public static final OutputType OUTPUT_TRAJECTORY_MAP =
+        new OutputType("Trajectory as Map", "data.trajectory.map");
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET_FORM =
-        new OutputType("Grid Subset","data.gridsubset.form");
+        new OutputType("Grid Subset", "data.gridsubset.form");
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRIDSUBSET = new OutputType("data.gridsubset");
+    public static final OutputType OUTPUT_GRIDSUBSET =
+        new OutputType("data.gridsubset");
 
 
     /** _more_ */
@@ -161,37 +179,53 @@ public class DataOutputHandler extends OutputHandler {
     private Hashtable<String, Boolean> gridEntries = new Hashtable<String,
                                                          Boolean>();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, Boolean> pointEntries = new Hashtable<String,
                                                           Boolean>();
 
+    /** _more_          */
+    private Hashtable<String, Boolean> trajectoryEntries =
+        new Hashtable<String, Boolean>();
 
 
+
+    /** _more_          */
     private Cache ncFileCache = new Cache(10) {
-            protected void removeValue(Object key, Object value) {
-                try {
-                    ((NetcdfFile)value).close();
-                }catch(Exception exc) {}
-            }
-        };
+        protected void removeValue(Object key, Object value) {
+            try {
+                ((NetcdfFile) value).close();
+            } catch (Exception exc) {}
+        }
+    };
 
 
+    /** _more_          */
     private Cache gridCache = new Cache(10) {
-            protected void removeValue(Object key, Object value) {
-                try {
-                    ((NetcdfFile)value).close();
-                }catch(Exception exc) {}
-            }
-        };
+        protected void removeValue(Object key, Object value) {
+            try {
+                ((NetcdfFile) value).close();
+            } catch (Exception exc) {}
+        }
+    };
 
 
+    /** _more_          */
     private Cache pointCache = new Cache(10) {
-            protected void removeValue(Object key, Object value) {
-                try {
-                    ((NetcdfFile)value).close();
-                }catch(Exception exc) {}
-            }
-        };
+        protected void removeValue(Object key, Object value) {
+            try {
+                ((NetcdfFile) value).close();
+            } catch (Exception exc) {}
+        }
+    };
+
+    /** _more_          */
+    private Cache trajectoryCache = new Cache(10) {
+        protected void removeValue(Object key, Object value) {
+            try {
+                ((NetcdfFile) value).close();
+            } catch (Exception exc) {}
+        }
+    };
 
 
 
@@ -220,6 +254,7 @@ public class DataOutputHandler extends OutputHandler {
         addType(OUTPUT_OPENDAP);
         addType(OUTPUT_CDL);
         addType(OUTPUT_WCS);
+        addType(OUTPUT_TRAJECTORY_MAP);
         addType(OUTPUT_POINT_MAP);
         addType(OUTPUT_POINT_CSV);
         addType(OUTPUT_POINT_KML);
@@ -275,79 +310,96 @@ public class DataOutputHandler extends OutputHandler {
             return;
         }
 
-        if (canLoadAsPoint(entry)) {
-            if(getRepository().isOutputTypeOK(OUTPUT_POINT_MAP))
-            links.add(
-                new Link(
-                    request.entryUrl(
-                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                        OUTPUT_POINT_MAP), getRepository().fileUrl(ICON_MAP),
-                                           "Map Point Data"));
-            if(getRepository().isOutputTypeOK(OUTPUT_POINT_CSV))
-            links.add(
-                new Link(
-                    HtmlUtil
-                        .url(request.getRequestPath() + "/"
-                             + IOUtil.stripExtension(entry.getName())
-                             + ".csv", Misc
-                                 .newList(
-                                     ARG_ID, entry.getId(), ARG_OUTPUT,
-                                     OUTPUT_POINT_CSV)), getRepository()
-                                         .fileUrl(
-                                             ICON_CSV), "Point Data as CSV"));
+        if (canLoadAsTrajectory(entry)) {
+            if (getRepository().isOutputTypeOK(OUTPUT_TRAJECTORY_MAP)) {
+                links.add(
+                    new Link(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW, entry,
+                            ARG_OUTPUT,
+                            OUTPUT_TRAJECTORY_MAP), getRepository().fileUrl(
+                                ICON_MAP), "Map Trajectory Data"));
+            }
+        }
 
-            if(getRepository().isOutputTypeOK(OUTPUT_POINT_KML))
-            links.add(
-                new Link(
-                    HtmlUtil
-                        .url(request.getRequestPath() + "/"
-                             + IOUtil.stripExtension(entry.getName())
-                             + ".kml", Misc
-                                 .newList(
-                                     ARG_ID, entry.getId(), ARG_OUTPUT,
-                                     OUTPUT_POINT_KML)), getRepository()
-                                         .fileUrl(
-                                             ICON_KML), "Point Data as KML"));
+        if (canLoadAsPoint(entry)) {
+            if (getRepository().isOutputTypeOK(OUTPUT_POINT_MAP)) {
+                links.add(
+                    new Link(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW, entry,
+                            ARG_OUTPUT,
+                            OUTPUT_POINT_MAP), getRepository().fileUrl(
+                                ICON_MAP), "Map Point Data"));
+            }
+            if (getRepository().isOutputTypeOK(OUTPUT_POINT_CSV)) {
+                links.add(
+                    new Link(
+                        HtmlUtil.url(
+                            request.getRequestPath() + "/"
+                            + IOUtil.stripExtension(entry.getName())
+                            + ".csv", Misc.newList(
+                                ARG_ID, entry.getId(), ARG_OUTPUT,
+                                OUTPUT_POINT_CSV)), getRepository().fileUrl(
+                                    ICON_CSV), "Point Data as CSV"));
+            }
+
+            if (getRepository().isOutputTypeOK(OUTPUT_POINT_KML)) {
+                links.add(
+                    new Link(
+                        HtmlUtil.url(
+                            request.getRequestPath() + "/"
+                            + IOUtil.stripExtension(entry.getName())
+                            + ".kml", Misc.newList(
+                                ARG_ID, entry.getId(), ARG_OUTPUT,
+                                OUTPUT_POINT_KML)), getRepository().fileUrl(
+                                    ICON_KML), "Point Data as KML"));
+            }
 
 
 
         } else if (canLoadAsGrid(entry)) {
-            if(getRepository().isOutputTypeOK(OUTPUT_GRIDSUBSET_FORM))
+            if (getRepository().isOutputTypeOK(OUTPUT_GRIDSUBSET_FORM)) {
+                links.add(
+                    new Link(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW, entry,
+                            ARG_OUTPUT,
+                            OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
+                                ICON_SUBSET), "Subset"));
+            }
+
+            if (getRepository().isOutputTypeOK(OUTPUT_WCS)) {
+                /*
+                  links.add(
+                  new Link(
+                  request.entryUrl(
+                  getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                  OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),
+                  "WCS"));
+                */
+            }
+        }
+
+        if (getRepository().isOutputTypeOK(OUTPUT_OPENDAP)) {
+            Object oldOutput = request.getOutput();
+            request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
+            String opendapUrl = request.getRequestPath() + "/"
+                                + request.getPathEmbeddedArgs()
+                                + "/entry.das";
+            links.add(new Link(opendapUrl,
+                               getRepository().fileUrl(ICON_OPENDAP),
+                               "OpenDAP"));
+            request.put(ARG_OUTPUT, oldOutput);
+        }
+        if (getRepository().isOutputTypeOK(OUTPUT_CDL)) {
             links.add(
                 new Link(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                        OUTPUT_GRIDSUBSET_FORM), getRepository().fileUrl(
-                            ICON_SUBSET), "Subset"));
-
-            if(getRepository().isOutputTypeOK(OUTPUT_WCS)) {
-            /*
-              links.add(
-              new Link(
-              request.entryUrl(
-              getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-              OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),
-              "WCS"));
-            */
-            }
+                        OUTPUT_CDL), getRepository().fileUrl(ICON_DATA),
+                                     "CDL"));
         }
-
-        if(getRepository().isOutputTypeOK(OUTPUT_OPENDAP)) {
-            Object oldOutput =   request.getOutput();
-            request.put(ARG_OUTPUT,OUTPUT_OPENDAP);
-            String opendapUrl = request.getRequestPath() + "/"
-                + request.getPathEmbeddedArgs() + 
-                "/entry.das";
-            links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
-                               "OpenDAP"));
-            request.put(ARG_OUTPUT,oldOutput);
-        }
-        if(getRepository().isOutputTypeOK(OUTPUT_CDL))
-        links.add(
-            new Link(
-                request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    OUTPUT_CDL), getRepository().fileUrl(ICON_DATA), "CDL"));
 
 
 
@@ -402,13 +454,12 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    String  file = entry.getResource().getFile().toString();
+                    String file = entry.getResource().getFile().toString();
                     //Exclude zip files becase canOpen tries to unzip them (?)
-                    if(!(file.endsWith(".zip"))) {
-                        ok  = NetcdfDataset.canOpen(file);
+                    if ( !(file.endsWith(".zip"))) {
+                        ok = NetcdfDataset.canOpen(file);
                     }
-                } catch (Exception ignoreThis) {
-                }
+                } catch (Exception ignoreThis) {}
             }
             b = new Boolean(ok);
             checkedEntries.put(entry.getId(), b);
@@ -454,6 +505,36 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
+    public boolean canLoadAsTrajectory(Entry entry) {
+        Boolean b = trajectoryEntries.get(entry.getId());
+        if (b == null) {
+            boolean ok = false;
+            if (entry.isGroup()) {
+                ok = false;
+            } else if ( !entry.getResource().isFile()) {
+                ok = false;
+            } else {
+                try {
+                    StringBuilder buf  = new StringBuilder();
+                    File          file = entry.getResource().getFile();
+                    if (getTrajectoryDataset(file) != null) {
+                        ok = true;
+                    }
+                } catch (Exception ignoreThis) {}
+            }
+            trajectoryEntries.put(entry.getId(), b = new Boolean(ok));
+        }
+        return b.booleanValue();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public boolean canLoadAsGrid(Entry entry) {
         if ( !canLoadAsCdm(entry)) {
             return false;
@@ -471,7 +552,10 @@ public class DataOutputHandler extends OutputHandler {
                     //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
                     //Use openFile
                     GridDataset gds = GridDataset.open(file.toString());
-                    ok = true;
+                    //Look for the first grid
+                    if(gds.getGrids().iterator().hasNext()) {
+                        ok = true;
+                    }
                 } catch (Exception ignoreThis) {}
             }
             b = new Boolean(ok);
@@ -519,7 +603,8 @@ public class DataOutputHandler extends OutputHandler {
             request.put(ARG_ADDMETADATA, "true");
             sb.append(HtmlUtil.href(request.getUrl(), "Add metadata"));
         }
-        NetcdfDataset dataset = getNetcdfDataset(entry.getResource().getFile());
+        NetcdfDataset dataset =
+            getNetcdfDataset(entry.getResource().getFile());
         if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
@@ -552,12 +637,11 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public PointObsDataset getPointDataset(File file) throws Exception {
-        String path = file.toString();
-        PointObsDataset pds = (PointObsDataset) pointCache.get(path);
-        if(pds == null) {
-            pds =  (PointObsDataset) TypedDatasetFactory.open(
-                                                              ucar.nc2.constants.FeatureType.POINT, path, null,
-                new StringBuilder());
+        String          path = file.toString();
+        PointObsDataset pds  = (PointObsDataset) pointCache.get(path);
+        if (pds == null) {
+            pds = (PointObsDataset) TypedDatasetFactory.open(
+                FeatureType.POINT, path, null, new StringBuilder());
             pointCache.put(path, pds);
         }
         return pds;
@@ -574,25 +658,57 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public GridDataset getGridDataset(File file) throws Exception {
-        String path = file.toString();
-        GridDataset gds =(GridDataset) gridCache.get(path);
-        if(gds == null) {
-            gridCache.put(path, gds =  GridDataset.open(path));
+        String      path = file.toString();
+        GridDataset gds  = (GridDataset) gridCache.get(path);
+        if (gds == null) {
+            gridCache.put(path, gds = GridDataset.open(path));
         }
         return gds;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public NetcdfDataset getNetcdfDataset(File file) throws Exception {
-        String path = file.toString();
-        NetcdfDataset dataset = (NetcdfDataset)ncFileCache.get(path);
-        if(dataset==null) {
+        String        path    = file.toString();
+        NetcdfDataset dataset = (NetcdfDataset) ncFileCache.get(path);
+        if (dataset == null) {
             dataset = NetcdfDataset.openDataset(path);
             ncFileCache.put(path, dataset);
-        } 
+        }
         return dataset;
     }
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public TrajectoryObsDataset getTrajectoryDataset(File file)
+            throws Exception {
+        String path = file.toString();
+        TrajectoryObsDataset pds =
+            (TrajectoryObsDataset) trajectoryCache.get(path);
+        if (pds == null) {
+            pds = (TrajectoryObsDataset) TypedDatasetFactory.open(
+                FeatureType.TRAJECTORY, path, null, new StringBuilder());
+            trajectoryCache.put(path, pds);
+        }
+        return pds;
+    }
+
 
 
 
@@ -617,7 +733,7 @@ public class DataOutputHandler extends OutputHandler {
         File         file   = entry.getResource().getFile();
         StringBuffer sb     = new StringBuffer();
         String       prefix = ARG_VARIABLE + ".";
-        OutputType       output = request.getOutput();
+        OutputType   output = request.getOutput();
         if (output.equals(OUTPUT_GRIDSUBSET)) {
             List      varNames = new ArrayList();
             Hashtable args     = request.getArgs();
@@ -1065,6 +1181,108 @@ public class DataOutputHandler extends OutputHandler {
 
     }
 
+
+    /** Fixed var name for lat */
+    public static final String VAR_LATITUDE = "Latitude";
+
+    /** Fixed var name for lon */
+    public static final String VAR_LONGITUDE = "Longitude";
+
+    /** Fixed var name for alt */
+    public static final String VAR_ALTITUDE = "Altitude";
+
+    /** Fixed var name for time */
+    public static final String VAR_TIME = "Time";
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputTrajectoryMap(Request request, Entry entry)
+            throws Exception {
+        File                 file = entry.getResource().getFile();
+        TrajectoryObsDataset tod  = getTrajectoryDataset(file);
+        StringBuffer         sb   = new StringBuffer();
+        sb.append(getRepository().makeEntryHeader(request, entry));
+        synchronized (tod) {
+            StringBuffer js           = new StringBuffer();
+            List         trajectories = tod.getTrajectories();
+            for (int i = 0; i < trajectories.size(); i++) {
+                List allVariables = tod.getDataVariables();
+                TrajectoryObsDatatype todt =
+                    (TrajectoryObsDatatype) trajectories.get(i);
+                float[] lats = DataUtil.toFloatArray(todt.getLatitude(null));
+                float[] lons = DataUtil.toFloatArray(todt.getLongitude(null));
+                StringBuffer markerSB = new StringBuffer();
+                js.append("line = new Polyline([");
+                for (int ptIdx = 0; ptIdx < lats.length; ptIdx++) {
+                    if (ptIdx > 0) {
+                        js.append(",");
+                        if (ptIdx == lats.length - 1) {
+                            markerSB.append(
+                                "var endMarker = new Marker("
+                                + MapOutputHandler.llp(
+                                    lats[ptIdx], lons[ptIdx]) + ");\n");
+                            markerSB.append(
+                                "endMarker.setInfoBubble(\"End time:"
+                                + todt.getEndDate() + "\");\n");
+                            markerSB.append(
+                                "initMarker(endMarker,\"endMarker\");\n");
+                        }
+                    } else {
+                        markerSB.append("var startMarker = new Marker("
+                                        + MapOutputHandler.llp(lats[ptIdx],
+                                            lons[ptIdx]) + ");\n");
+                        markerSB.append(
+                            "startMarker.setInfoBubble(\"Start time:"
+                            + todt.getStartDate() + "\");\n");
+                        markerSB.append(
+                            "initMarker(startMarker,\"startMarker\");\n");
+                    }
+                    js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
+                }
+                js.append("]);\n");
+                js.append("line.setWidth(2);\n");
+                js.append("line.setColor(\"#FF0000\");\n");
+                js.append("mapstraction.addPolyline(line);\n");
+                js.append(markerSB);
+                StructureData    structure = todt.getData(0);
+                VariableSimpleIF theVar    = null;
+                for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
+                    VariableSimpleIF var =
+                        (VariableSimpleIF) allVariables.get(varIdx);
+                    if (var.getRank() != 0) {
+                        continue;
+                    }
+                    theVar = var;
+                    break;
+                }
+                if (theVar == null) {
+                    continue;
+                }
+            }
+
+
+
+            js.append("mapstraction.autoCenterAndZoom();\n");
+            getRepository().initMap(request, sb, 800, 500, true);
+            sb.append(HtmlUtil.script(js.toString()));
+            return new Result("Trajectory Data", sb);
+        }
+
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -1246,6 +1464,11 @@ public class DataOutputHandler extends OutputHandler {
         }
 
 
+        if (output.equals(OUTPUT_TRAJECTORY_MAP)) {
+            return outputTrajectoryMap(request, entry);
+        }
+
+
         if (output.equals(OUTPUT_POINT_MAP)) {
             return outputPointMap(request, entry);
         }
@@ -1339,11 +1562,12 @@ public class DataOutputHandler extends OutputHandler {
             String location = entry.getResource().getFile().toString();
 
             try {
-                NetcdfFile         ncFile  =  getNetcdfDataset(entry.getResource().getFile());
+                NetcdfFile ncFile =
+                    getNetcdfDataset(entry.getResource().getFile());
                 GuardedDatasetImpl guardedDataset =
                     new GuardedDatasetImpl(reqPath, ncFile, true);
                 return guardedDataset;
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new WrapperException(exc);
             }
         }

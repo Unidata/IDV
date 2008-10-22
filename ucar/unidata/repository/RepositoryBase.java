@@ -226,7 +226,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
     /** _more_ */
-    private String hostname = "";
+    protected String hostname = "";
 
     /** _more_ */
     private int port = 80;
@@ -264,8 +264,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @throws Exception _more_
      */
-    public RepositoryBase(String hostname, int port) throws Exception {
-        this.hostname = hostname;
+    public RepositoryBase(int port) throws Exception {
         this.port     = port;
     }
 

@@ -87,7 +87,7 @@ public class MetadataServlet extends HttpServlet {
      */
     private void createRepository(HttpServletRequest request)
             throws Exception {
-        repository = new Repository(getInitParams(), request.getServerName(),
+        repository = new Repository(getInitParams(), 
                                     request.getServerPort(), true);
         String      propertyFile     = "/WEB-INF/repository.properties";
         Properties  webAppProperties = new Properties();

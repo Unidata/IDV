@@ -307,11 +307,13 @@ public class Repository extends RepositoryBase implements Tables,
      * @param inTomcat _more_
      *
      * @throws Exception _more_
-     */
-    public Repository(String[] args, String hostname, int port,
+    */
+    public Repository(String[] args, int port,
                       boolean inTomcat)
             throws Exception {
-        super(hostname, port);
+        super(port);
+        java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
+        this.hostname =localMachine.getHostName();
         this.inTomcat = inTomcat;
         this.args     = args;
     }
@@ -415,15 +417,18 @@ public class Repository extends RepositoryBase implements Tables,
             boolean autoCommit = false;
             int total = 0;
             Connection connection = getDatabaseManager().getNewConnection();
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             Statement statement = connection.createStatement();
-            statement.execute("delete from BUFRTEST2");
+            statement.execute("delete from BUFRTEST");
             statement.close();
             
+
             if(true) {
                 connection.close();
                 return;
             }
-            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into BUFRTEST2 values(?,?,?)");
+
+            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into BUFRTEST values(?,?,?)");
             long t1 = System.currentTimeMillis();
             System.err.println("start test " + (autoCommit?" doing autocommit":" not commiting"));
             if(!autoCommit) {
@@ -1057,6 +1062,10 @@ public class Repository extends RepositoryBase implements Tables,
                 getProperty("ramadda.html.htdocroots", BLANK), ";", true,
                 true));
 
+        String hostname = getProperty(PROP_HOSTNAME,(String)null);
+        if(hostname!=null) {
+            this.hostname = hostname;
+        }
 
     }
 
