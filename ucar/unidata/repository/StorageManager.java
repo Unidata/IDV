@@ -98,14 +98,13 @@ import javax.swing.*;
  */
 public class StorageManager extends RepositoryManager {
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     */
-    public StorageManager(Repository repository) {
-        super(repository);
-    }
+    public static final String PROP_DIRDEPTH = "ramadda.storage.dirdepth";
+    public static final String PROP_DIRRANGE = "ramadda.storage.dirrange";
+
+
+    private int dirDepth = 3;
+    private int dirRange = 100;
+
 
     /** _more_ */
     private List<String> downloadPrefixes = new ArrayList<String>();
@@ -127,12 +126,22 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String thumbDir;
 
+
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
+    public StorageManager(Repository repository) {
+        super(repository);
+    }
+
     /**
      * _more_
      *
      */
     protected void init() {
-
         repositoryDir = getRepository().getProperty(PROP_REPOSITORY_HOME,
                 (String) null);
         if (repositoryDir == null) {
@@ -147,6 +156,8 @@ public class StorageManager extends RepositoryManager {
         String resourcesDir = IOUtil.joinDir(repositoryDir, "resources");
         IOUtil.makeDir(resourcesDir);
 
+        dirDepth = getRepository().getProperty(PROP_DIRDEPTH, dirDepth);
+        dirRange = getRepository().getProperty(PROP_DIRRANGE, dirRange);
         getUploadDir();
     }
 
@@ -356,8 +367,17 @@ public class StorageManager extends RepositoryManager {
      */
     public File moveToStorage(Request request, File original, String prefix)
             throws Exception {
-        File newFile = new File(IOUtil.joinDir(getStorageDir(),
-                           prefix + original.getName()));
+        String targetName = prefix + original.getName();
+        String storageDir = getStorageDir();
+        for(int depth=0;depth<dirDepth;depth++) {
+            int index=(int)(dirRange*Math.random());
+            storageDir = IOUtil.joinDir(storageDir,"data" + index);
+            IOUtil.makeDir(storageDir);
+        }
+
+        File newFile = new File(IOUtil.joinDir(storageDir,
+                                               targetName));
+        System.err.println (newFile);
         IOUtil.moveFile(original, newFile);
         return newFile;
     }

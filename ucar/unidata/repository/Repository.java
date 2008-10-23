@@ -2157,6 +2157,23 @@ public class Repository extends RepositoryBase implements Tables,
         return Misc.getProperty(properties, name, dflt);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public int getProperty(String name, int dflt) {
+        String prop = getProperty(name);
+        if (prop != null) {
+            return new Integer(prop).intValue();
+        }
+        return Misc.getProperty(properties, name, dflt);
+    }
+
     /**
      * _more_
      *
