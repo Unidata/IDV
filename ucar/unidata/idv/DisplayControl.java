@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -168,6 +169,12 @@ public interface DisplayControl extends Sharable {
      throws VisADException, RemoteException;
 
 
+    /**
+     * Are we fully initialized
+     *
+     * @return is init done
+     */
+    public boolean isInitDone();
 
 
     /**
@@ -628,7 +635,7 @@ public interface DisplayControl extends Sharable {
 
 
     /**
-     * Get the tmp property. 
+     * Get the tmp property.
      *
      * @param key key
      *

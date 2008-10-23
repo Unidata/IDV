@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -1294,6 +1295,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * that allows derived classes to do any further initialization.
      */
     public void initDone() {}
+
 
 
 
@@ -10352,7 +10354,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return true if done
      */
-    protected boolean isInitDone() {
+    public boolean isInitDone() {
         return initializationDone;
     }
 

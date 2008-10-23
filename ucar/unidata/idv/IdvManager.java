@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -367,21 +368,25 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
      */
     public static void waitUntilDisplaysAreDone(IdvUIManager uiManager) {
         Trace.call1("Waiting on displays");
-        int  successiveTimesWithNoActive = 0;
-        int  sleepTime                   = 10;
+        int successiveTimesWithNoActive = 0;
+        int sleepTime                   = 10;
         //        long timeToWait                  = 500;
-        long timeToWait                  = 50;
-        long firstTime                   = System.currentTimeMillis();
-        int cnt = 0;
+        long timeToWait = 50;
+        long firstTime  = System.currentTimeMillis();
+        int  cnt        = 0;
         while (true) {
             boolean cursorCount = (uiManager.getWaitCursorCount() > 0);
             boolean actionCount = ActionImpl.getTaskCount() > 0;
             boolean dataActive = DataSourceImpl.getOutstandingGetDataCalls()
                                  > 0;
-            if((cnt++)%30 == 0) {
+            boolean allDisplaysInitialized =
+                uiManager.getIdv().getAllDisplaysIntialized();
+
+            if ((cnt++) % 30 == 0) {
                 //                System.err.println ("\tcnt:" + uiManager.getWaitCursorCount() + " " +actionCount + " " + dataActive);
             }
-            boolean anyActive = actionCount || cursorCount || dataActive;
+            boolean anyActive = actionCount || cursorCount || dataActive
+                                || !allDisplaysInitialized;
             if (dataActive) {
                 firstTime = System.currentTimeMillis();
             }

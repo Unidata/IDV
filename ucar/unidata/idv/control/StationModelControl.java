@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -210,6 +211,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** widget */
     private JButton changeButton;
 
+    /** _more_          */
     protected LayoutModelWidget layoutModelWidget;
 
     static {
@@ -290,7 +292,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
-    /** _more_          */
+    /** _more_ */
     private boolean haveSetInitialScale = false;
 
     /** scale factor for the shapes */
@@ -467,6 +469,18 @@ public class StationModelControl extends ObsDisplayControl {
         loadDataInAWhile();
     }
 
+
+    /**
+     * Are we fully initialized
+     *
+     * @return is init done
+     */
+    public boolean isInitDone() {
+        if ( !super.isInitDone()) {
+            return false;
+        }
+        return !waitingToLoad;
+    }
 
 
     /**
@@ -710,7 +724,7 @@ public class StationModelControl extends ObsDisplayControl {
      * disable the table
      */
     private void disableTable() {
-        if(table!=null) {
+        if (table != null) {
             table.setBackground(tableDisableColor);
             table.repaint();
         }
@@ -2111,7 +2125,7 @@ public class StationModelControl extends ObsDisplayControl {
     private void setStationModel(StationModel sm) {
         try {
             stationModel = sm;
-            if(layoutModelWidget!=null) {
+            if (layoutModelWidget != null) {
                 layoutModelWidget.setLayoutModel(sm);
             }
             myDisplay.setStationModel(sm, false);
@@ -2123,12 +2137,24 @@ public class StationModelControl extends ObsDisplayControl {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param sm _more_
+     */
     public void setStationModelFromWidget(StationModel sm) {
         setStationModel(sm);
     }
 
 
-    protected void setLayoutModel(String id, ucar.unidata.ui.symbol.StationModel stationModel) {
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param stationModel _more_
+     */
+    protected void setLayoutModel(
+            String id, ucar.unidata.ui.symbol.StationModel stationModel) {
         setStationModel(stationModel);
     }
 
@@ -2329,14 +2355,19 @@ public class StationModelControl extends ObsDisplayControl {
 
 
         JPanel stationModelPanel =
-            GuiUtils.hbox(GuiUtils.left(layoutModelWidget=new LayoutModelWidget(this,this,"setStationModelFromWidget",getStationModel())),
-                          GuiUtils.rLabel("   Scale:"),
-                          GuiUtils.hflow(Misc.newList(scaleField, scaleBtn),
-                                         4, 0));
+            GuiUtils.hbox(
+                GuiUtils.left(
+                    layoutModelWidget =
+                        new LayoutModelWidget(
+                            this, this, "setStationModelFromWidget",
+                            getStationModel())), GuiUtils.rLabel(
+                                "   Scale:"), GuiUtils.hflow(
+                                Misc.newList(scaleField, scaleBtn), 4, 0));
 
         controlWidgets.add(
             new WrapperWidget(
-                this, GuiUtils.rLabel("Layout Model:"), GuiUtils.left(stationModelPanel)));
+                this, GuiUtils.rLabel("Layout Model:"),
+                GuiUtils.left(stationModelPanel)));
 
 
         controlWidgets.add(
@@ -3439,6 +3470,9 @@ public class StationModelControl extends ObsDisplayControl {
      * has come in.
      */
     private static final long SLEEPTIME_MS = 200;
+
+
+
 
 
     /**

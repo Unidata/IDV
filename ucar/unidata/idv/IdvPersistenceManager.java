@@ -2958,9 +2958,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                           IOUtil.getFileRoot(xmlFile));
         }
 
-        if(getIdv().getArgsManager().getIsOffScreen()) {
-            System.err.println ("loading bundle");
-        }
+
         getStateManager().putProperty(PROP_LOADINGXML, true);
         try {
             xml = applyPropertiesToBundle(xml);
@@ -3011,9 +3009,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             showNormalCursor();
         }
 
-        if(getIdv().getArgsManager().getIsOffScreen()) {
-            System.err.println ("done loading bundle");
-        }
 
         getStateManager().putProperty(PROP_BUNDLEPATH, "");
         getStateManager().putProperty(PROP_ZIDVPATH, "");
@@ -3380,9 +3375,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             if (newViewManagers != null) {
                 //This just does basic initialization
-                if(getIdv().getArgsManager().getIsOffScreen()) {
-                    System.err.println ("unpersisting viewmanagers");
-                }
                 getVMManager().unpersistViewManagers(newViewManagers);
                 for (ViewManager viewManager: (List<ViewManager>)newViewManagers) {
                     //                    System.err.println ("vm:"+viewManager);

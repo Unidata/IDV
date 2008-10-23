@@ -1318,6 +1318,14 @@ Misc.run(new Runnable() {
         return new ArrayList(displayControls);
     }
 
+    public boolean getAllDisplaysIntialized() {
+        for(DisplayControl control: (List<DisplayControl>) getDisplayControls()) {
+            if(!control.isInitDone()) return false;
+        }
+        return true;
+    }
+
+
     /**
      * Move the given display control to the front. We simply move the control to the end of
      * the list of display controls.

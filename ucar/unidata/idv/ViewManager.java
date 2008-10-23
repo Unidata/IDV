@@ -1468,13 +1468,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         if (that.initMatrix != null) {
-            if(getIdv().getArgsManager().getIsOffScreen()) {
-                StringBuffer sb  = new StringBuffer();
-                for(int i=0;i<that.initMatrix.length;i++) {
-                    sb.append(that.initMatrix[i]+" ");
-                }
-                System.err.println("Setting view matrix:" + sb);
-            }
             setDisplayMatrix(that.initMatrix);
         }
 
