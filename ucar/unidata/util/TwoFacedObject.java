@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.util;
 
 
@@ -163,14 +160,23 @@ public class TwoFacedObject implements Comparable {
      *         otherwise the toString() method of o.
      */
     public static String getIdString(Object o) {
-        if (o instanceof TwoFacedObject) {
-            Object id = ((TwoFacedObject) o).getId();
-            if (id == null) {
-                return null;
-            }
-            return id.toString();
+        Object id = getIdObject(o);
+        if (id == null) {
+            return null;
         }
-        return o.toString();
+        return id.toString();
+    }
+
+    /**
+     * Get the id object of this possible TwoFacedObject.
+     * @param  o object in question.
+     * @return the id if this is a TwoFacedObject, otherwise o.
+     */
+    public static Object getIdObject(Object o) {
+        if (o instanceof TwoFacedObject) {
+            return ((TwoFacedObject) o).getId();
+        }
+        return o;
     }
 
 
@@ -249,8 +255,18 @@ public class TwoFacedObject implements Comparable {
     }
 
 
+    /**
+     * Find the label for the object in the list
+     *
+     * @param id  object to search for
+     * @param l   list of TwoFacedObjects objects
+     *
+     * @return
+     */
     public static String findLabel(Object id, List l) {
-        if(id == null) return null;
+        if (id == null) {
+            return null;
+        }
         for (int i = 0; i < l.size(); i++) {
             TwoFacedObject tfo = (TwoFacedObject) l.get(i);
             if (Misc.equals(id, tfo.getId())) {
