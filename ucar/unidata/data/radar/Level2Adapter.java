@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -33,6 +34,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlResourceCollection;
 
@@ -279,8 +281,14 @@ public class Level2Adapter implements RadarAdapter {
                 Double fromProperties;
                 if (ds != null) {
                     Object o = ds.getFromLevel();
-                    if ((o != null) && (o instanceof Real)) {
-                        value = ((Real) o).getValue();
+                    if (o != null) {
+                        Object newO = o;
+                        if (o instanceof TwoFacedObject) {
+                            newO = ((TwoFacedObject) o).getId();
+                        }
+                        if (newO instanceof Real) {
+                            value = ((Real) newO).getValue();
+                        }
                     }
                 }
                 if (Double.isNaN(value)) {
