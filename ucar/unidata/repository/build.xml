@@ -97,7 +97,7 @@
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar ncIdv.jar"/>
+              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar tdsrepository.jar servlet-api.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
@@ -119,6 +119,9 @@
         <copy  file="${ramaddadir}/release/ramadda.sh" todir="${releasedir}"/>
         <copy  file="${ramaddadir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${ramaddadir}/README" todir="${releasedir}"/>
+        <copy  file="${libsdir}/tdsrepository.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/servlet-api.jar" todir="${releasedir}"/>
+
         <delete file="${libsdir}/ramadda.tar"/>
         <tar 
             destfile="${libsdir}/ramadda${version}.tar">
