@@ -383,7 +383,10 @@ public class CatalogUtil {
                                     TAG_SERVICE);
                 for (int childIdx = 0; childIdx < children.size();
                         childIdx++) {
-                    nodes.add(children.get(childIdx));
+                    Element child = (Element) children.get(childIdx);
+                    if(Misc.equals(serviceName, XmlUtil.getAttribute(child, ATTR_NAME,""))) {
+                        nodes.add(children.get(childIdx));
+                    }
                 }
             } else {
                 nodes.add(serviceNode);
@@ -423,6 +426,7 @@ public class CatalogUtil {
         double version = getVersion(datasetNode);
         String serviceName = findServiceNameForDataset(datasetNode, version,
                                  true);
+
         if (serviceName == null) {
             if (showErrors) {
                 errorMessage("Could not find service name");
