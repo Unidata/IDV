@@ -131,7 +131,6 @@ public class CatalogHarvester extends Harvester {
         groups = new ArrayList();
         importCatalog(topUrl, topGroup, 0);
         //        repository.processEntries(this, null, entries,false);
-        System.err.println ("entries:" + entries);
         if (entries.size() > 0) {
             repository.processEntries(this, null, entries,false);
         }
@@ -338,7 +337,7 @@ public class CatalogHarvester extends Harvester {
             group = (Group) newGroup;
         }
         if (group == null) {
-            System.err.println("Making new group:" + name);
+            //            System.err.println("Making new group:" + name);
             group = repository.makeNewGroup(parent, name, user);
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(repository, metadataList,
