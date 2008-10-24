@@ -900,6 +900,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public Metadata makeMetadataFromCatalogNode(Element child) {
         String tag = child.getTagName();
+        System.err.println("thredds:" + tag);
         if (isTag(tag, TYPE_DOCUMENTATION)) {
             if (XmlUtil.hasAttribute(child, "xlink:href")) {
                 String url = XmlUtil.getAttribute(child, "xlink:href");
@@ -908,6 +909,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                     XmlUtil.getAttribute(child,
                                         "xlink:title", url), url, "", "");
             } else {
+                System.err.println("making DOCUMENTATION");
                 String type = XmlUtil.getAttribute(child, "type", "summary");
                 String text = XmlUtil.getChildText(child).trim();
                 return new Metadata(getRepository().getGUID(), "",

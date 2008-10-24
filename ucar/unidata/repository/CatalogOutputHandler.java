@@ -204,13 +204,23 @@ public class CatalogOutputHandler extends OutputHandler {
                                        List<Metadata> metadataList,
                                        Element node)
             throws Exception {
+
+        collectMetadata(repository, metadataList, node,"");
+    }
+
+    public static void collectMetadata(Repository repository,
+                                       List<Metadata> metadataList,
+                                       Element node, String tab)
+            throws Exception {
         NodeList elements = XmlUtil.getElements(node);
         List<MetadataHandler> metadataHandlers =
             repository.getMetadataManager().getMetadataHandlers();
 
+
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             String  tag   = child.getTagName();
+            //            System.err.println(tab+ "tag:" + tag);
             if (tag.equals(TAG_METADATA)) {
                 if ( !XmlUtil.getAttribute(child, "metadataType",
                                            "THREDDS").equals("THREDDS")) {
@@ -223,17 +233,17 @@ public class CatalogOutputHandler extends OutputHandler {
                     Element root = XmlUtil.getRoot(url,
                                        CatalogOutputHandler.class);
                     if (root != null) {
-                        collectMetadata(repository, metadataList, root);
+                        collectMetadata(repository, metadataList, root,tab+"  ");
                     }
                 } else {
-                    collectMetadata(repository, metadataList, child);
+                    collectMetadata(repository, metadataList, child,tab+"  ");
                 }
             } else {
-
                 for (MetadataHandler metadataHandler : metadataHandlers) {
                     Metadata metadata =
                         metadataHandler.makeMetadataFromCatalogNode(child);
                     if (metadata != null) {
+                        System.err.println("adding metadata:" + metadata);
                         metadataList.add(metadata);
                         break;
                     }
