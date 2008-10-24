@@ -17,7 +17,7 @@
         <property name="ramaddadir" value="${srcdir}/ucar/unidata/repository" />
         <property name="releasedir" value="${libsdir}/ramadda${version}" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/tdsrepository.jar:${libsdir}/extra.jar:${libsdir}/ramaddalib.jar:${libsdir}/jython.jar"/>
+        <property name="classpath" value="${libsdir}/tdsrepository.jar:${libsdir}/ramaddalib.jar:${libsdir}/jython.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -97,7 +97,7 @@
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar tdsrepository.jar servlet-api.jar"/>
+              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar tdsrepository.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
@@ -120,8 +120,9 @@
         <copy  file="${ramaddadir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${ramaddadir}/README" todir="${releasedir}"/>
         <copy  file="${libsdir}/tdsrepository.jar" todir="${releasedir}"/>
+<!--
         <copy  file="${libsdir}/servlet-api.jar" todir="${releasedir}"/>
-
+-->
         <delete file="${libsdir}/ramadda.tar"/>
         <tar 
             destfile="${libsdir}/ramadda${version}.tar">
@@ -142,7 +143,6 @@
     <target name="war" depends="init">
       <war webxml="${ramaddadir}/release/web.xml" destfile="${libsdir}/repository.war">
           <webinf file="${ramaddadir}/release/repository.properties"/>
-
           <lib file="${libsdir}/ramadda.jar"/>
           <lib file="${libsdir}/ramaddalib.jar"/>
           <lib file="${libsdir}/tdsrepository.jar"/>
@@ -161,13 +161,13 @@
         <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
-
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derbytools.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-io-1.4.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/servlet-api.jar" dest="${tmpjardir}"/>
         <jar 
             basedir="${tmpjardir}"
             compress="true"

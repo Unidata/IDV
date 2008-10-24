@@ -130,9 +130,10 @@ public class CatalogHarvester extends Harvester {
     protected void runInner() throws Exception {
         groups = new ArrayList();
         importCatalog(topUrl, topGroup, 0);
-        //        repository.processEntries(this, null, entries);
+        //        repository.processEntries(this, null, entries,false);
+        System.err.println ("entries:" + entries);
         if (entries.size() > 0) {
-            repository.processEntries(this, null, entries);
+            repository.processEntries(this, null, entries,false);
         }
         entries = new ArrayList<Entry>();
     }
@@ -236,19 +237,19 @@ public class CatalogHarvester extends Harvester {
                                 int recurseDepth)
             throws Exception {
 
+        String tab = "";
+        for(int i=0;i<xmlDepth;i++ )
+            tab  =tab+"  ";
         URL catalogUrl = new URL(catalogUrlPath);
-
-        if (xmlDepth > 1) {
-            return;
-        }
+        //        if (xmlDepth > 1) {
+            //            return;
+        //        }
 
 
         if ( !getActive()) {
             return;
         }
         String   name     = XmlUtil.getAttribute(node, ATTR_NAME);
-
-
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node,
                              CatalogOutputHandler.ATTR_URLPATH,
@@ -263,6 +264,7 @@ public class CatalogHarvester extends Harvester {
         }
 
 
+
         boolean haveChildDatasets = false;
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
@@ -272,7 +274,7 @@ public class CatalogHarvester extends Harvester {
             }
         }
 
-
+        //        System.err.println(tab+"name:" + name+"  #children:" + elements.getLength() +" depth:" + xmlDepth + " " + urlPath +" " + haveChildDatasets);
         if ( !haveChildDatasets && (xmlDepth > 0) && (urlPath != null)) {
             Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
                                       false, null);
@@ -322,7 +324,7 @@ public class CatalogHarvester extends Harvester {
             }
 
             if (entries.size() > 100) {
-                repository.processEntries(this, null, entries);
+                repository.processEntries(this, null, entries,false);
                 entries = new ArrayList<Entry>();
             }
             return;
@@ -336,6 +338,7 @@ public class CatalogHarvester extends Harvester {
             group = (Group) newGroup;
         }
         if (group == null) {
+            System.err.println("Making new group:" + name);
             group = repository.makeNewGroup(parent, name, user);
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(repository, metadataList,
@@ -359,6 +362,7 @@ public class CatalogHarvester extends Harvester {
         }
 
 
+
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
@@ -376,6 +380,8 @@ public class CatalogHarvester extends Harvester {
                               + catalogUrl.getHost() + ":"
                               + catalogUrl.getPort() + url;
                     } else {
+                        //                        System.err.println("url:" + url +" catalog:" +
+                        //                                           catalogUrlPath +  " root: " + IOUtil.getFileRoot(catalogUrlPath));
                         url = IOUtil.getFileRoot(catalogUrlPath) + "/" + url;
                     }
                 }

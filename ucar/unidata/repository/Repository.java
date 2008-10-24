@@ -7964,9 +7964,9 @@ public class Repository extends RepositoryBase implements Tables,
             double seconds = totalTime / 1000.0;
             //            if ((totalEntries % 100 == 0) && (seconds > 0)) {
             if (seconds > 0) {
-                System.err.println(totalEntries + " average rate:"
-                                   + (int) (totalEntries / seconds)
-                                   + "/second");
+                //                System.err.println(totalEntries + " average rate:"
+                //                 + (int) (totalEntries / seconds)
+                //                 + "/second");
             }
         }
 
@@ -8047,9 +8047,12 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public boolean processEntries(Harvester harvester,
                                   TypeHandler typeHandler,
-                                  List<Entry> entries)
+                                  List<Entry> entries, boolean makeThemUnique)
             throws Exception {
-        insertEntries(getUniqueEntries(entries), true, true);
+        if(makeThemUnique) {
+            entries = getUniqueEntries(entries);
+        }
+        insertEntries(entries, true, true);
         return true;
     }
 
