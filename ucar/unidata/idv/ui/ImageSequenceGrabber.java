@@ -623,9 +623,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         fullWindowBtn  = new JRadioButton("Full Window", false);
         GuiUtils.buttonGroup(mainDisplayBtn, fullWindowBtn).add(contentsBtn);
 
-        JComponent whatPanel = GuiUtils.vbox(new JLabel("What to capture:"),
+        beepCbx.setToolTipText("Beep when an image is captured");
+        JComponent whatPanel = GuiUtils.vbox(Misc.newList(new JLabel("What to capture:"),
                                              mainDisplayBtn, contentsBtn,
-                                             fullWindowBtn);
+                                             fullWindowBtn,
+                                             beepCbx));
 
 
 
@@ -699,7 +701,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         JPanel runPanel =
             GuiUtils.hflow(Misc.newList(GuiUtils.rLabel(" Rate: "),
                                         captureRateFld,
-                                        new JLabel(" seconds"), beepCbx));
+                                        new JLabel(" seconds")));
 
 
         int maxBtnWidth =
@@ -1335,9 +1337,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     public void run() {
         capturingAuto = true;
         while (capturingAuto) {
-            if(beepCbx!=null && beepCbx.isSelected()) {
-                Toolkit.getDefaultToolkit().beep();
-            }
             grabImageAndBlock();
             if ( !capturingAuto) {
                 return;
@@ -1494,6 +1493,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
+
+        if(beepCbx!=null && beepCbx.isSelected()) {
+            Toolkit.getDefaultToolkit().beep();
+        }
 
         try {
             synchronized (MUTEX) {
