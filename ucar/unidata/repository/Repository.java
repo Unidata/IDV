@@ -126,6 +126,9 @@ public class Repository extends RepositoryBase implements Tables,
     /** _more_ */
     private static final int ENTRY_CACHE_LIMIT = 5000;
 
+    /** _more_ */
+    public static final OutputType OUTPUT_DELETER = new OutputType("Delete Entry", "repository.delete");
+
 
 
     /** _more_ */
@@ -1488,7 +1491,7 @@ public class Repository extends RepositoryBase implements Tables,
                         return;
                     }
                 }
-                types.add(new OutputType("Delete", OUTPUT_DELETER));
+                types.add(OUTPUT_DELETER);
             }
 
 
@@ -1507,11 +1510,10 @@ public class Repository extends RepositoryBase implements Tables,
                         idBuffer.toString()));
             }
         };
+        outputHandler.addType(OUTPUT_DELETER);
         addOutputHandler(outputHandler);
     }
 
-    /** _more_ */
-    public static final String OUTPUT_DELETER = "repository.delete";
 
     /**
      * _more_

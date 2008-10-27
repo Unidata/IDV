@@ -99,7 +99,7 @@ public class PatternHarvester extends Harvester {
     private String dateFormat = "yyyyMMdd_HHmm";
 
     /** _more_ */
-    private SimpleDateFormat sdf;
+    private List<SimpleDateFormat> sdf;
     //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
 
 
@@ -317,14 +317,19 @@ public class PatternHarvester extends Harvester {
      *
      * @return _more_
      */
-    private SimpleDateFormat getSDF() {
+    private List<SimpleDateFormat> getSDF() {
         if (sdf == null) {
+            sdf = new ArrayList<SimpleDateFormat>();
             if ((dateFormat != null) && (dateFormat.length() > 0)) {
-                sdf = new SimpleDateFormat(dateFormat);
+                for(String tok :(List<String>) StringUtil.split(dateFormat,",",true,true)) {
+                    sdf.add(new SimpleDateFormat(tok));
+                }
             } else {
-                sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+                sdf.add(new SimpleDateFormat("yyyyMMdd_HHmm"));
             }
-            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            for(SimpleDateFormat format : sdf) {
+                format.setTimeZone(DateUtil.TIMEZONE_GMT);
+            }
         }
         return sdf;
 
@@ -637,6 +642,24 @@ public class PatternHarvester extends Harvester {
     }
 
 
+    private Date parseDate(String value) throws Exception {
+        Exception lastException = null;
+        for(SimpleDateFormat sdf: getSDF()) {
+            try {
+                return sdf.parse(value);
+            } catch(Exception exc) {
+                lastException = exc;
+            }
+        }
+        if(lastException!=null) throw lastException;
+        return null;
+    }
+
+
+
+    public static void main(String[]args) {
+        StringUtil.replaceDate("hello ${fromdate:yyyy-mm-dd}", "fromdate", new Date());
+    }
 
     /**
      * _more_
@@ -707,9 +730,9 @@ public class PatternHarvester extends Harvester {
             String dataName = patternNames.get(dataIdx);
             Object value    = matcher.group(dataIdx + 1);
             if (dataName.equals("fromdate")) {
-                value = fromDate = getSDF().parse((String) value);
+                value = fromDate = parseDate((String)value);
             } else if (dataName.equals("todate")) {
-                value = toDate = getSDF().parse((String) value);
+                value = toDate = parseDate((String) value);
             } else {
                 value = typeHandler.convert(dataName, (String) value);
                 groupName = groupName.replace("${" + dataName + "}",
@@ -719,6 +742,11 @@ public class PatternHarvester extends Harvester {
                 map.put(dataName, value);
             }
         }
+        
+
+
+
+
         //        System.err.println("values:");
         //        System.err.println("map:" + map);
         Object[] values = typeHandler.makeValues(map);
@@ -735,6 +763,14 @@ public class PatternHarvester extends Harvester {
         if (toDate == null) {
             toDate = createDate;
         }
+
+
+        groupName = StringUtil.replaceDate(groupName,"fromdate",fromDate);
+        groupName = StringUtil.replaceDate(groupName,"todate",toDate);
+        name = StringUtil.replaceDate(name,"fromdate",fromDate);
+        name = StringUtil.replaceDate(name,"todate",toDate);
+        desc = StringUtil.replaceDate(desc,"fromdate",fromDate);
+        desc = StringUtil.replaceDate(desc,"todate",toDate);
 
 
         String ext = IOUtil.getFileExtension(fileName);

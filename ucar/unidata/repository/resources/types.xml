@@ -67,7 +67,7 @@
 
   <type name="modelproduct"  description="Model product" datatype="modelproduct" >
      <column name="model" type="string" isindex="true" cansearch="true" searchtype="select" label="Model"/>
-     <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
+     <column name="parameter" type="string" isindex="true" cansearch="true" searchtype="select" label="Forecast Hour"/>
      <column name="forecasthour" type="int" label="Forecast Hour"/>
   </type>
 
