@@ -1387,9 +1387,9 @@ public class StringUtil {
      *
      * @param content The String to  parse
      * @param lengths the length of each word.
-     * @param lineDelimiter What to split  the line content string on 
+     * @param lineDelimiter What to split  the line content string on
      *                      (usually "\n").
-     * @param commentString If non-null defines the comment String in 
+     * @param commentString If non-null defines the comment String in
      *                      the content.
      * @param trimWords Do we trim each word.
      *
@@ -1557,6 +1557,60 @@ public class StringUtil {
         return a;
     }
 
+
+    /**
+     * Replace the macro within s with the formatted date.
+     * s can contain macros of the form ${macroName:some date format}
+     *
+     * @param s source string
+     * @param macroName macro name_
+     * @param date date to use
+     *
+     * @return formatted string
+     */
+    public static String replaceDate(String s, String macroName, Date date) {
+        return replaceDate(s, macroName, date, "${", "}");
+    }
+
+
+    /**
+     * Replace the macro within s with the formatted date.
+     * s can contain macros of the form <macroPrefix>macroName:some date format<macroSuffix>
+     *
+     * @param s source string
+     * @param macroName macro name_
+     * @param date date to use
+     * @param macroPrefix _more_
+     * @param macroSuffix _more_
+     *
+     * @return formatted string
+     */
+    public static String replaceDate(String s, String macroName, Date date,
+                                     String macroPrefix, String macroSuffix) {
+        int idx1 = s.indexOf(macroPrefix + macroName);
+        if (idx1 < 0) {
+            return s;
+        }
+
+        int idx2 = s.indexOf(macroSuffix, idx1);
+        if (idx2 < 0) {
+            return s;
+        }
+
+        String   fullMacro = s.substring(idx1 + macroPrefix.length(), idx2);
+        String[] toks      = StringUtil.split(fullMacro, ":", 2);
+
+        if (toks.length != 2) {
+            throw new IllegalArgumentException("Could not find date format:"
+                    + s);
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(toks[1]);
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        String formattedDate = sdf.format(date);
+        s = s.replace(macroPrefix + fullMacro + macroSuffix, formattedDate);
+        //        System.err.println(s);
+        return s;
+    }
 
 
 
