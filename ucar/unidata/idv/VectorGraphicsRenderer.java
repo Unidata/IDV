@@ -20,7 +20,6 @@
 
 
 
-
 package ucar.unidata.idv;
 
 
@@ -212,6 +211,10 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             if (wasShowingWireframe) {
                 viewManager.setWireframe(false);
             }
+            boolean wasShowingScales = viewManager.getShowScales();
+            if (wasShowingScales) {
+                viewManager.setShowScales(false);
+            }
 
 
             //Find all visibile displays
@@ -253,6 +256,9 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
 
             if (wasShowingWireframe) {
                 viewManager.setWireframe(true);
+            }
+            if (wasShowingScales) {
+                viewManager.setShowScales(true);
             }
 
             //Render the scene graph

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -339,6 +340,10 @@ public class CrossSectionViewManager extends ViewManager {
             if (getXSDisplay() != null) {
                 getXSDisplay().enableClipping(value);
             }
+        } else if (id.equals(PREF_SHOWSCALES)) {
+            if (getXSDisplay() != null) {
+                getXSDisplay().showAxisScales(value);
+            }
         } else {
             super.handleBooleanPropertyChange(id, value);
         }
@@ -354,6 +359,8 @@ public class CrossSectionViewManager extends ViewManager {
         super.getInitialBooleanProperties(props);
         props.add(new BooleanProperty(PREF_CLIP, "Clip View At Box", "",
                                       false));
+        props.add(new BooleanProperty(PREF_SHOWSCALES, "Show Axis Scales",
+                                      "", true));
     }
 
 
@@ -365,6 +372,7 @@ public class CrossSectionViewManager extends ViewManager {
     protected JMenu makeShowMenu() {
         JMenu showMenu = super.makeShowMenu();
         createCBMI(showMenu, PREF_CLIP);
+        createCBMI(showMenu, PREF_SHOWSCALES);
         return showMenu;
     }
 

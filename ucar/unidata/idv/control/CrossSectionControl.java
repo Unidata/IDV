@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -33,8 +34,6 @@ import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.ControlContext;
-
-import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.idv.CrossSectionViewManager;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.MapViewManager;
@@ -42,6 +41,8 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.VerticalXSDisplay;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
+
+import ucar.unidata.ui.LatLonWidget;
 
 import ucar.unidata.util.Coord;
 import ucar.unidata.util.GuiUtils;
@@ -211,13 +212,17 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     /** range for Y axis */
     private Range verticalAxisRange = null;
 
+    /** start lat/lon widget */
     LatLonWidget startLLW;
-    
+
+    /** end lat/lon widget */
     LatLonWidget endLLW;
 
+    /** range label */
     private JLabel rangeLabel;
 
-    private   JCheckBox autoscaleCbx;
+    /** auto scale checkbox */
+    private JCheckBox autoscaleCbx;
 
     /**
      * Default constructor.  Sets the appropriate attribute flags.
@@ -353,7 +358,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             //Create the new ViewManager
             crossSectionView = new CrossSectionViewManager(getViewContext(),
                     new ViewDescriptor("CrossSectionView"),
-                    "showControlLegend=false;", animationInfo);
+                    "showControlLegend=false;showScales=true", animationInfo);
             crossSectionView.setIsShared(false);
             crossSectionView.setAniReadout(false);
             //This will only be non-null if we have been unpersisted from an old
@@ -404,20 +409,41 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
 
+    /**
+     * Add display settings for cross section controls
+     *
+     * @param dsd  the dialog to add to
+     */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(getVerticalAxisRange(), "verticalAxisRange", "Vertical Scale",
-                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(getVerticalAxisRange(), "verticalAxisRange",
+                             "Vertical Scale", SETTINGS_GROUP_DISPLAY);
         if (getAllowAutoScale()) {
-            dsd.addPropertyValue(new Boolean(getAutoScaleYAxis()), "autoScaleYAxis", "Auto-Scale",
+            dsd.addPropertyValue(new Boolean(getAutoScaleYAxis()),
+                                 "autoScaleYAxis", "Auto-Scale",
                                  SETTINGS_GROUP_DISPLAY);
         }
 
     }
 
 
-    public List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
-        if(!isInTransectView()) return null;
+    /**
+     * Get the cursor readout info
+     *
+     * @param el  earth location
+     * @param animationValue  animation value
+     * @param animationStep  animation step
+     *
+     * @return the list of items
+     *
+     * @throws Exception    problem reading the data
+     */
+    public List getCursorReadoutInner(EarthLocation el, Real animationValue,
+                                      int animationStep)
+            throws Exception {
+        if ( !isInTransectView()) {
+            return null;
+        }
         //TODO: Sample on slice
         return null;
     }
@@ -587,33 +613,49 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
 
+    /**
+     * Format a lat/lon
+     *
+     * @param latlon  the lat/lon
+     *
+     * @return  the formatted string
+     */
     private String fmt(double latlon) {
-        return  getDisplayConventions().formatLatLon(latlon);
+        return getDisplayConventions().formatLatLon(latlon);
     }
 
+    /**
+     *  update the position widget
+     */
     private void updatePositionWidget() {
         try {
-            if(startLLW==null) return;
+            if (startLLW == null) {
+                return;
+            }
             EarthLocation[] coords = getLineCoords();
             startLLW.setLatLon(fmt(coords[0].getLatitude().getValue()),
-                               fmt(coords[0].getLongitude().getValue()));        
+                               fmt(coords[0].getLongitude().getValue()));
             endLLW.setLatLon(fmt(coords[1].getLatitude().getValue()),
                              fmt(coords[1].getLongitude().getValue()));
-        
+
         } catch (Exception exc) {
             logException("Error setting position ", exc);
         }
     }
 
-    private  void   setPositionFromWidget() {
+    /**
+     * Set the position from a widget
+     */
+    private void setPositionFromWidget() {
         try {
-            setPosition(new EarthLocationTuple(new Real(RealType.Latitude, startLLW.getLat()),
-                                               new Real(RealType.Longitude, startLLW.getLon()),
-                                               new Real(RealType.Altitude, 0)),
-                        new EarthLocationTuple(new Real(RealType.Latitude, endLLW.getLat()),
-                                               new Real(RealType.Longitude, endLLW.getLon()),
-                                               new Real(RealType.Altitude, 0)));
-        
+            setPosition(new EarthLocationTuple(new Real(RealType.Latitude,
+                    startLLW.getLat()), new Real(RealType.Longitude,
+                        startLLW.getLon()), new Real(RealType.Altitude,
+                            0)), new EarthLocationTuple(new Real(RealType
+                                .Latitude, endLLW.getLat()), new Real(RealType
+                                .Longitude, endLLW
+                                .getLon()), new Real(RealType.Altitude, 0)));
+
         } catch (Exception exc) {
             logException("Error setting position ", exc);
         }
@@ -668,22 +710,22 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * @return Display tab component
      */
     protected JComponent getDisplayTabComponent() {
-        ActionListener llListener  =new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    setPositionFromWidget();
-                }
-            };
+        ActionListener llListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                setPositionFromWidget();
+            }
+        };
         startLLW = new LatLonWidget("Lat: ", "Lon: ", llListener);
-        endLLW = new LatLonWidget("Lat: ", "Lon: ", llListener);
+        endLLW   = new LatLonWidget("Lat: ", "Lon: ", llListener);
 
         //        locationLabel = new JLabel(
         //            "From:                     To:                        ");
         //        JComponent locationComp = GuiUtils.label("Location: ", locationLabel);
-        JComponent locationComp = GuiUtils.hbox(new Component[]{GuiUtils.rLabel("Location:"),
-                                                GuiUtils.filler(5,5),
-                                                startLLW, 
-                                                GuiUtils.cLabel("  To  "),
-                                                endLLW},3);
+        JComponent locationComp = GuiUtils.hbox(new Component[] {
+                                      GuiUtils.rLabel("Location:"),
+                                      GuiUtils.filler(5, 5), startLLW,
+                                      GuiUtils.cLabel("  To  "),
+                                      endLLW }, 3);
 
 
         viewContents = crossSectionView.getContents();
@@ -743,7 +785,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         rangeLabel = new JLabel("  Range: " + ((r != null)
                 ? r.toString()
                 : "     "));
-        JButton      rdButton   = new JButton("Change");
+        JButton rdButton = new JButton("Change");
         rdButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 RangeDialog rd = new RangeDialog(CrossSectionControl.this,
@@ -757,8 +799,8 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         });
         Component c = GuiUtils.hbox(rdButton, rangeLabel);
         if (getAllowAutoScale()) {
-            autoscaleCbx = GuiUtils.makeCheckbox("Auto-scale?",
-                                                 this, "autoScaleYAxis");
+            autoscaleCbx = GuiUtils.makeCheckbox("Auto-scale?", this,
+                    "autoScaleYAxis");
             c = GuiUtils.leftRight(c, autoscaleCbx);
         }
         return c;
@@ -1094,16 +1136,28 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
 
 
-                    
-    private void setPosition(EarthLocation startEl, EarthLocation endEl) throws VisADException, RemoteException {
+
+    /**
+     * Set the position
+     *
+     * @param startEl  starting point
+     * @param endEl    ending point
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    private void setPosition(EarthLocation startEl, EarthLocation endEl)
+            throws VisADException, RemoteException {
         double[] startXYZ = earthToBox(startEl);
-        double[] endXYZ = earthToBox(endEl);
-        csSelector.setPosition(new RealTuple(
-                    RealTupleType.SpatialCartesian2DTuple, new double[] { startXYZ[0],
-                                                                          startXYZ[1]}),
-                               new RealTuple(
-                                             RealTupleType.SpatialCartesian2DTuple, new double[] { endXYZ[0],
-                                                                                                   endXYZ[1]}));
+        double[] endXYZ   = earthToBox(endEl);
+        csSelector.setPosition(
+            new RealTuple(
+                RealTupleType.SpatialCartesian2DTuple,
+                new double[] { startXYZ[0],
+                               startXYZ[1] }), new RealTuple(
+                                   RealTupleType.SpatialCartesian2DTuple,
+                                   new double[] { endXYZ[0],
+                endXYZ[1] }));
     }
 
 
@@ -1364,7 +1418,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
                 logException("Setting Y Axis Range: ", exc);
             }
         }
-        if(rangeLabel!=null) {
+        if (rangeLabel != null) {
             rangeLabel.setText("  Range: "
                                + getVerticalAxisRange().toString());
         }
@@ -1693,7 +1747,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         } catch (Exception exc) {
             logException("Loading data from line", exc);
         }
-        if(autoscaleCbx!=null) {
+        if (autoscaleCbx != null) {
             autoscaleCbx.setSelected(value);
         }
     }

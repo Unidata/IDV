@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -572,6 +573,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Holds the display list displayables */
     private CompositeDisplayable displayListDisplayables;
 
+    /** mutext for the display list */
     private Object MUTEX_DISPLAYLIST = new Object();
 
     /** default display list font */
@@ -1955,42 +1957,43 @@ public class ViewManager extends SharableImpl implements ActionListener,
         //        if(true) return;
 
         try {
-            synchronized(MUTEX_DISPLAYLIST) {
-            if ( !hasDisplayMaster()) {
-                return;
-            }
-            if (displayListDisplayables == null) {
-                displayListDisplayables = new CompositeDisplayable();
-                displayListDisplayables.setUseTimesInAnimation(false);
-            } else {
-                getMaster().removeDisplayable(displayListDisplayables);
-                displayListDisplayables.clearDisplayables();
-            }
-            if ( !getShowDisplayList()) {
-                return;
-            }
-            int  count    = 0;
-            List controls = getControls();
+            synchronized (MUTEX_DISPLAYLIST) {
+                if ( !hasDisplayMaster()) {
+                    return;
+                }
+                if (displayListDisplayables == null) {
+                    displayListDisplayables = new CompositeDisplayable();
+                    displayListDisplayables.setUseTimesInAnimation(false);
+                } else {
+                    getMaster().removeDisplayable(displayListDisplayables);
+                    displayListDisplayables.clearDisplayables();
+                }
+                if ( !getShowDisplayList()) {
+                    return;
+                }
+                int  count    = 0;
+                List controls = getControls();
 
-            for (int i = 0; i < controls.size(); i++) {
-                DisplayControl control = (DisplayControl) controls.get(i);
-                if ( !control.getShowInDisplayList()
-                        || !control.getDisplayVisibility()) {
-                    continue;
+                for (int i = 0; i < controls.size(); i++) {
+                    DisplayControl control = (DisplayControl) controls.get(i);
+                    if ( !control.getShowInDisplayList()
+                            || !control.getDisplayVisibility()) {
+                        continue;
+                    }
+                    TextDisplayable d =
+                        (TextDisplayable) control.getDisplayListDisplayable(
+                            this);
+                    if (d == null) {
+                        continue;
+                    }
+                    count++;
+                    boolean success = setDisplayablePosition(d, count);
+                    if (success) {
+                        displayListDisplayables.addDisplayable(d);
+                    }
                 }
-                TextDisplayable d =
-                    (TextDisplayable) control.getDisplayListDisplayable(this);
-                if (d == null) {
-                    continue;
-                }
-                count++;
-                boolean success = setDisplayablePosition(d, count);
-                if (success) {
-                    displayListDisplayables.addDisplayable(d);
-                }
-            }
-            getMaster().addDisplayable(displayListDisplayables);
-            //displayListDisplayables.setVisible(true);
+                getMaster().addDisplayable(displayListDisplayables);
+                //displayListDisplayables.setVisible(true);
             }
         } catch (Exception exp) {
             logException("Setting display list", exp);
@@ -2078,7 +2081,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param msg message to print
      */
     private void debug(String msg) {
-        //        System.err.println (msg);
+        // System.err.println (msg);
     }
 
     /**
@@ -2086,9 +2089,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * These hold all of the different flag based display state.
      */
     protected void initBooleanProperties() {
-        //        debug("initBooleanProperties");
+        // debug("initBooleanProperties");
         if (booleanPropertiesForPersistence == null) {
-            //            debug("\tno bpforpersistence");
+            // debug("\tno bpforpersistence");
         }
         List props = new ArrayList();
         getInitialBooleanProperties(props);
@@ -2118,12 +2121,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     bp.setValue(b.booleanValue());
                 }
             }
-            //            debug("\tbp: " + bp);
+            // debug("\tbp: " + bp);
             BooleanProperty existingBp =
                 (BooleanProperty) booleanPropertyMap.get(bp.getId());
             if ((existingBp != null)
                     && (booleanPropertiesForPersistence == null)) {
-                //                debug("\thave existing " + existingBp);
+                // debug("\thave existing " + existingBp);
                 bp.setValue(existingBp.getValue());
             }
 
@@ -2339,6 +2342,24 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public boolean getWireframe() {
         return getBp(PREF_WIREFRAME);
+    }
+
+
+    /**
+     * Set the show display scale flag
+     *
+     * @param value The value
+     */
+    public void setShowScales(boolean value) {
+        setBp(PREF_SHOWSCALES, value);
+    }
+
+    /**
+     * Get  the show display scale flag
+     * @return The flag value
+     */
+    public boolean getShowScales() {
+        return getBp(PREF_SHOWSCALES);
     }
 
 
@@ -2941,7 +2962,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         return;
                     }
                     while (runVisibilityAnimation && !getIsDestroyed()
-                           && !getDisplayInfos().isEmpty()) {
+                            && !getDisplayInfos().isEmpty()) {
                         stepVisibilityToggle();
                         try {
                             Thread.sleep(animationSpeed);
@@ -3197,9 +3218,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return List of display controls
      */
     public List getControls() {
-        ArrayList controls = new ArrayList();
-        List localDisplayInfos = getDisplayInfos();
-        Hashtable seen     = new Hashtable();
+        ArrayList controls          = new ArrayList();
+        List      localDisplayInfos = getDisplayInfos();
+        Hashtable seen              = new Hashtable();
         for (int i = 0; i < localDisplayInfos.size(); i++) {
             DisplayControl control =
                 ((DisplayInfo) localDisplayInfos.get(i)).getDisplayControl();
@@ -3506,7 +3527,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (getIsDestroyed()) {
             return;
         }
-        synchronized(displayInfos) {
+        synchronized (displayInfos) {
             displayInfos.remove(displayInfo);
         }
         if (master != null) {
@@ -3549,7 +3570,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             return false;
         }
 
-        synchronized(displayInfos) {
+        synchronized (displayInfos) {
             if (displayInfos.contains(displayInfo)) {
                 return true;
             }
@@ -4044,7 +4065,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return A copy of the the display infos
      */
     protected List<DisplayInfo> getDisplayInfos() {
-        synchronized(displayInfos) {
+        synchronized (displayInfos) {
             List<DisplayInfo> tmp = new ArrayList<DisplayInfo>(displayInfos);
             return tmp;
         }
@@ -4623,7 +4644,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Use the images
      */
     public void useImages() {
-        if(true)return;
+        if (true) {
+            return;
+        }
         if (usingImagePanel) {
             return;
         }
@@ -4644,7 +4667,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param andShow true to show
      */
     public void useImages(List images, boolean andShow) {
-        if(true)return;
+        if (true) {
+            return;
+        }
         if (imagePanel == null) {
             imagePanel = new ImagePanel();
         }
@@ -5803,7 +5828,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (displayMatrix.length != newMatrix.length) {
             initMatrix = ProjectionControl.matrixDConvert(newMatrix);
         }
-        if(getIdv().getArgsManager().getIsOffScreen()) {
+        if (getIdv().getArgsManager().getIsOffScreen()) {
             //            System.err.println("Setting projection matrix");
         }
         getMaster().setProjectionMatrix(initMatrix);
