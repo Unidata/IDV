@@ -143,6 +143,44 @@ a.subnavoffcomp  {
 	overflow-x: hidden;
 }
 
+.calnav {
+}
+
+.calnavmonthheader {
+   text-align:center;
+   background-color:#c3d9ff;
+   font-weight: bold;
+   font-size: 8pt;
+
+}
+
+.calnavdayheader {
+   text-align:center;
+   background-color:#c3d9ff;
+   font-weight: bold;
+   font-size: 8pt;
+}
+
+.calnavday {
+   text-align:right;
+   font-size: 8pt;
+   background-color:#c3d9ff;
+}
+
+.calnavtheday {
+   text-align:right;
+   font-size: 8pt;
+   background-color:white;
+}
+
+.calnavoffday {
+   text-align:right;
+   font-size: 8pt;
+   background-color:#cccccc;
+}
+
+
+
 .browseblock  a {
    color:#000000;
 }

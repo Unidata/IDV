@@ -5359,6 +5359,108 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
+    public void createMonthNav(StringBuffer sb, Date date, String url,Hashtable dayLinks) {
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        cal.setTime(date);
+        int[]  theDate = CalendarOutputHandler.getDayMonthYear(cal);
+        int    theDay = cal.get(cal.DAY_OF_MONTH);
+        int    theMonth = cal.get(cal.MONTH);
+        int    theYear = cal.get(cal.YEAR);
+        while (cal.get(cal.DAY_OF_MONTH)>1) {
+            cal.add(cal.DAY_OF_MONTH, -1);
+        }
+        GregorianCalendar prev = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        prev.setTime(date);
+        prev.add(cal.MONTH, -1);
+        GregorianCalendar next = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        next.setTime(date);
+        next.add(cal.MONTH, 1);
+
+        sb.append(
+                  "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">");
+        String[] dayNames = {
+            "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"
+        };
+        String prevUrl = HtmlUtil.space(1)+HtmlUtil.href(url +"&" +CalendarOutputHandler.getUrlArgs(prev),"&lt;");
+        String nextUrl = HtmlUtil.href(url +"&" +CalendarOutputHandler.getUrlArgs(next),"&gt;")+HtmlUtil.space(1);
+        sb.append("<tr valign=top><td colspan=\"7\" align=\"center\"  class=\"calnavmonthheader\">");
+        sb.append("<table cellspacing=0 cellpadding=0 width=100%><tr>");
+        sb.append("<td width=1  class=\"calnavmonthheader\">");
+        sb.append(prevUrl);
+        sb.append("</td>");        
+        sb.append("<td  class=\"calnavmonthheader\">");
+        sb.append(DateUtil.MONTH_NAMES[cal.get(cal.MONTH)]);
+        sb.append(HtmlUtil.space(1));
+        sb.append(""+theYear);
+        sb.append("</td>");
+        sb.append("<td width=1  class=\"calnavmonthheader\">");
+        sb.append(nextUrl);
+        sb.append("</td>");        
+        sb.append("</table>");
+
+        sb.append("</tr>");
+        sb.append("<tr>");
+        for (int colIdx = 0; colIdx < 7; colIdx++) {
+            sb.append("<td width=\"14%\" class=\"calnavdayheader\">"
+                      + dayNames[colIdx] + "</td>");
+        }
+        sb.append("</tr>");
+        int startDow = cal.get(cal.DAY_OF_WEEK);
+        while (startDow > 1) {
+            cal.add(cal.DAY_OF_MONTH, -1);
+            startDow--;
+        }
+        for (int rowIdx = 0; rowIdx < 6; rowIdx++) {
+            sb.append("<tr valign=top>");
+            for (int colIdx = 0; colIdx < 7; colIdx++) {
+                int    thisDay   = cal.get(cal.DAY_OF_MONTH);
+                int    thisMonth = cal.get(cal.MONTH);
+                int    thisYear  = cal.get(cal.YEAR);
+                String dayClass = "calnavday";
+                if (thisMonth != theMonth) {
+                    dayClass = "calnavoffday";
+                } else if(theMonth == thisMonth && theYear == thisYear && theDay == thisDay) {
+                    dayClass = "calnavtheday";                    
+                }
+                String content;
+                if(dayLinks!=null) {
+                    String key = thisYear+"/" + thisMonth +"/" + thisDay;
+                    if(dayLinks.get(key)!=null) {
+                        content = HtmlUtil.href(url+"&" + CalendarOutputHandler.getUrlArgs(cal),""+thisDay);
+                        dayClass = "calnavtheday";                    
+                    } else {
+                        content = ""+thisDay;
+                        dayClass = "calnavday";
+                    }
+                } else {
+                    content = HtmlUtil.href(url+"&" + CalendarOutputHandler.getUrlArgs(cal),""+thisDay);
+                }
+
+                sb.append("<td " + HtmlUtil.cssClass(dayClass)+ " >" + content
+                          + "</td>");
+                sb.append("\n");
+                cal.add(cal.DAY_OF_MONTH, 1);
+            }
+            if (cal.get(cal.MONTH) > theMonth)
+                break;
+            if (cal.get(cal.YEAR) > theYear)
+                break;
+        }
+        sb.append("</table>");
+    }
+
+
+    public Result processModelProducts(Request request) throws Exception {
+        Date date = request.get(ARG_DATE,new Date());
+        //        System.err.println(date);
+        StringBuffer sb = new StringBuffer();
+        request.remove(ARG_DATE);
+        Hashtable dayLinks = new Hashtable();
+        dayLinks.put("2008/10/2","");
+        dayLinks.put("2008/10/3","");
+        createMonthNav(sb, date,request.getUrl(),dayLinks);
+        return new Result("Model Products", sb);
+    }
 
     /**
      * _more_
