@@ -2908,9 +2908,13 @@ public class ImageGenerator extends IdvManager {
             }*/
 
         s = StringUtil.replaceDate(s,"now:",now);
+
         Date animationTime  = getAnimationTime();
         if(animationTime==null) animationTime = now;
         s = StringUtil.replaceDate(s,"anim:",animationTime);
+        s = StringUtil.replaceDate(s,"time:",animationTime);
+
+
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
         s = StringUtil.applyMacros(s, getStateManager().getProperties(),
