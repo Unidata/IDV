@@ -306,7 +306,7 @@ public class XYDisplay extends DisplayMaster {
     public void showAxisScales(boolean show) {
 
         try {
-            getDisplay().getGraphicsModeControl().setScaleEnable(true);
+            getDisplay().getGraphicsModeControl().setScaleEnable(show);
         } catch (VisADException ve) {
             ;
         } catch (RemoteException re) {
