@@ -2893,6 +2893,8 @@ public class ImageGenerator extends IdvManager {
 
         props.put("memory", "" + Misc.usedMemory());
 
+
+        /*
         if (s.indexOf("${anim:") >= 0) {
             now = getAnimationTime();
             if (now != null) {
@@ -2903,8 +2905,12 @@ public class ImageGenerator extends IdvManager {
                 }
 
             }
-        }
+            }*/
 
+        s = StringUtil.replaceDate(s,"now:",now);
+        Date animationTime  = getAnimationTime();
+        if(animationTime==null) animationTime = now;
+        s = StringUtil.replaceDate(s,"anim:",animationTime);
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
         s = StringUtil.applyMacros(s, getStateManager().getProperties(),
