@@ -362,7 +362,21 @@ public class FileManager {
 
 
         dialog.getContentPane().add(contents);
-        GuiUtils.showInCenter(dialog);
+
+        //Show the dialog in the awt thread to prevent a deadlock on macs
+        if(SwingUtilities.isEventDispatchThread()) {
+            //Just show the dailog if we are in the awt thread
+            GuiUtils.showInCenter(dialog);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            GuiUtils.showInCenter(dialog);
+                        }});
+            } catch(Exception exc) {
+                throw new WrapperException("Error selecting file", exc);
+            }
+        } 
 
         System.setSecurityManager(backup);
         File file = chooser.getSelectedFile();
