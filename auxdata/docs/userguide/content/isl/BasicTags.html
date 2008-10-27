@@ -58,13 +58,6 @@ The property names are those defined for the Java
 <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat.html">
 SimpleDateFormat</a> class. 
 <p>
-If you preface any of these properties with &quot;anim:&quot; then the current animation time (if defined)
-is used. e.g.:<pre>
-${anim:yyyy}
-</pre>
-
-
-<p>
 The time properties are:
 <blockquote>
 <table>
@@ -93,6 +86,21 @@ The time properties are:
 <tr><td>${G}</td><td> Era designator</td></tr>
 </table>
 </blockquote>
+
+
+You can also define a property with &quot;now:&lt;some date format&gt;&quot in it. This takes the current time
+and formats it with the full date format. e.g.,:<pre>
+  ${now:yyyy-MM-DD}
+  ${now:yyyy_MM_DD:hh:mm}
+</pre>
+
+
+You can also use &quot;anim:&quot; to use the current animation time as the time to format:<pre>
+  ${anim:yyyy-MM-DD}
+  ${anim:yyyy_MM_DD:hh:mm}
+</pre>
+
+
 
 
 [isl::tagdef append {Append to a property} -attrs {name+ {property name} value {property value} fromfile {filename to read contents from}}]
