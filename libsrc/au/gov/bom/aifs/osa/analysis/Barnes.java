@@ -23,7 +23,7 @@ Boston, MA 02111-1307 USA
  * <p>
  * Description: The BOA is implemented as the static method "point2grid" and is
  * for converting irregularly spaced data defined by (longitude, latitude,
- * value) to a regular, but not neccessarily evenly spaced, grid whose
+ * value) to a regular, but not necessarily evenly spaced, grid whose
  * coordinates are also defined by longitude and latitude.
  * 
  * Other methods useful to the BOA are also included in this package, such as
@@ -53,9 +53,11 @@ public class Barnes
 
 	private static boolean reportRMSErrors = false;
 
-	private static double epsilon = 1.0E-11;
+	private static float epsilon = 1.0E-11f;
 
-	private static double[][][] radii;
+	private static float[][][] radii;
+
+	public static boolean useRadii = false;
 
 	/**
 	 * Description: point2grid is for converting irregularly spaced data
@@ -95,15 +97,11 @@ public class Barnes
 	 *                schemes") 2 passes only recommended for "quick look"
 	 *                type analyses
 	 * 
-	 * @return double[numLon][numLat] : regular gridded data
+	 * @return float[numLon][numLat] : regular gridded data
 	 * 
 	 */
 
-    private static float[] faLonValues;
-    private static float[] faLatValues;
-    public static boolean useRadii = false;
-
-	public synchronized static double[][] point2grid(float[] lon,
+	public synchronized static float[][] point2grid(float[] lon,
 		float[] lat, float[][] data3D, float scaleLength, float gain,
 		int iNumPasses)
 	{
@@ -119,8 +117,8 @@ public class Barnes
 		float fGridSpaceY = Math.abs(lat[1] - lat[0]);
 
 		// create array of lons/lats in grid units
-		faLonValues = new float[numData];
-		faLatValues = new float[numData];
+		float[] faLonValues = new float[numData];
+		float[] faLatValues = new float[numData];
 		float[] faValues = new float[numData];
 
 		for (int i = 0; i < numData; i++) {
@@ -137,22 +135,20 @@ public class Barnes
 			setupRadii(numLon, numLat, faLonValues, faLatValues,
 				scaleLength * scaleLength);
 
-		double[][] daaGrid = passOne(lon, lat, data3D, scaleLength);
+		float[][] faaGrid = passOne(lon, lat, data3D, scaleLength);
 
 		// now, based on the gridded values, obtain interpolated values
 		// for each data point.
 		// these interpolates will then be compared to each data
 		// value to find out how "different" that analysis grid is
 		// from the data values
-		double[] daDifferences = new double[numData];
-		double dRMSE = 0.0d;
+		float[] faDifferences = new float[numData];
 
 		for (int k = 0; k < numData; k++) {
-			double dInterpolatedData =
-				Barnes.scinex(faLonValues[k] +1, 
-					faLatValues[k] + 1, daaGrid);
-			daDifferences[k] =
-				(double)faValues[k] - dInterpolatedData;
+			float fInterpolatedData =
+				Barnes.scinex(faLonValues[k] + 1,
+					faLatValues[k] + 1, faaGrid);
+			faDifferences[k] = faValues[k] - fInterpolatedData;
 		}
 
 		// now we are ready for pass 2
@@ -178,118 +174,23 @@ public class Barnes
 		scaleLength *= gain;
 		// pass 2, which is very similar to the method "passOne"
 		//
-		daaGrid =
-			pass2toN(lon, lat, data3D, scaleLength, daaGrid,
-				daDifferences, iNumPasses);
+		faaGrid =
+			pass2toN(lon, lat, data3D, scaleLength, faaGrid,
+				faDifferences, iNumPasses);
 
 		radii = null;
-                //		System.gc();
-		return (daaGrid);
+		//System.gc();
+
+		return (faaGrid);
 	}
 
 	/**
 	 * Performs the same task as point2grid, but instead of the first step,
 	 * it uses a supplied first guess field (eg. a model background)
 	 */
-	public synchronized static double[][] point2grid(float[] lon,
-		float[] lat, float[][] data3D, double[][] firstGuess,
+	public synchronized static float[][] point2grid(float[] lon,
+		float[] lat, float[][] data3D, float[][] firstGuess,
 		float scaleLength, float gain, int iNumPasses)
-	{
-		int numLon = lon.length;
-		int numLat = lat.length;
-		int numData = data3D[0].length;
-
-		float fMinLon = Barnes.min(lon);
-		float fMinLat = Barnes.min(lat);
-
-		// check dimensions of lon & lat
-		float fGridSpaceX = Math.abs(lon[1] - lon[0]);
-		float fGridSpaceY = Math.abs(lat[1] - lat[0]);
-
-		// create array of lons/lats in grid units
-		faLonValues = new float[numData];
-		faLatValues = new float[numData];
-		float[]faValues = new float[numData];
-
-		for (int i = 0; i < numData; i++) {
-			faLonValues[i] = (data3D[0][i] - fMinLon) /fGridSpaceX;
-		}
-		for (int i = 0; i < numData; i++) {
-			faLatValues[i] = (data3D[1][i] - fMinLat) /fGridSpaceY;
-		}
-		for (int i = 0; i < numData; i++) {
-			faValues[i] = data3D[2][i];
-		}
-
-		radii =
-			setupRadii(numLon, numLat, faLonValues, faLatValues,
-				scaleLength * scaleLength);
-
-		double gridMean = Barnes.mean(faValues);
-		firstGuess = filterNaN(firstGuess, gridMean);
-
-		// Set the gridded analysis to the first guess
-		double[][] daaGrid = firstGuess;
-
-		// now, based on the gridded values, obtain interpolated values
-		// for each data point.
-		// these interpolates will then be compared to each data
-		// value to find out how "different" that analysis grid is
-		// from the data values
-		double[] daDifferences = new double[numData];
-		double dRMSE = 0.0d;
-
-		for (int k = 0; k < numData; k++) {
-			// NOTE Scinex is based on a fortran subroutine and
-			// is expecting the arrays to be indexed from 1 ->
-			// not 0 -> so add one to the coordinate arguments
-			double dInterpolatedData =
-				Barnes.scinex(faLonValues[k] + 1,
-					faLatValues[k] + 1, daaGrid);
-			daDifferences[k] =
-				(double)faValues[k] - dInterpolatedData;
-			int xInt = (int)faLonValues[k];
-			int yInt = (int)faLatValues[k];
-		}
-
-		// now we are ready for pass 2
-		// we have:
-		// 1) a first attempt to estimate the grid (daaGrid)
-		// 2) the differences between the grid point and the data 
-		// values evaluated at each data point 
-		// (ie an estimate of how "bad" grid is at each data point). 
-		// We will use this estimate
-		// to correct the grid on passes 2 and 3
-		// for each grid point ....
-		// scaleLength may be reduced for the second pass
-		// (but not further reduced) for later passes
-		// An aside:
-		// it is better to do 3 passes, and leave scaleLength unchanged
-		// ie a "gain" of 1
-		// 2 passes with a gain of say 0.3 will produce a faster
-		// result, but at the expense of accuracy
-		// ie 2pass with gain 0.3 is ok for a "quick look" type 
-		// analysis but 3pass with gain 1 is better for scientific use
-		// aside: Pass 1 RMSE at data points is
-		// dRMSE = Barnes.rmse(daDifferences);
-
-		scaleLength *= gain;
-		// pass 2, which is very similar to the method "passOne"
-		//
-		daaGrid =
-			pass2toN(lon, lat, data3D, scaleLength, daaGrid,
-				daDifferences, iNumPasses);
-
-		radii = null;
-                //		System.gc();
-		return (daaGrid);
-	}
-
-	private static double[][] pass2toN(float[] lon, float[] lat,
-		float[][] data3D, float scaleLength,
-		// float[] faLonValues, float[] faLatValues,
-		// float[] faValues, float scaleLength,
-		double[][] daaGrid, double[] daDifferences, int iNumPasses)
 	{
 		int numLon = lon.length;
 		int numLat = lat.length;
@@ -308,27 +209,143 @@ public class Barnes
 		float[] faValues = new float[numData];
 
 		for (int i = 0; i < numData; i++) {
-			faLonValues[i] = (data3D[0][i] - fMinLon) /fGridSpaceX;
+			faLonValues[i] = (data3D[0][i] - fMinLon) / fGridSpaceX;
 		}
 		for (int i = 0; i < numData; i++) {
-			faLatValues[i] = (data3D[1][i] - fMinLat) /fGridSpaceY;
+			faLatValues[i] = (data3D[1][i] - fMinLat) / fGridSpaceY;
 		}
 		for (int i = 0; i < numData; i++) {
 			faValues[i] = data3D[2][i];
 		}
 
-		double[][] daaWeights = new double[numLon][numLat];
-		double dWeight = 0.0d;
-		double dSumWeights = 0.0d;
-		double[][] daaCorrections = new double[numLon][numLat];
-		double dCorrection = 0.0d;
-		double dSumCorrections = 0.0d;
-		double scaleLength2 = (double)(scaleLength * scaleLength);
+		radii =
+			setupRadii(numLon, numLat, faLonValues, faLatValues,
+				scaleLength * scaleLength);
 
-		double r = 0.0d; // distance from grid point to data location
-		double r2 = 0.0d; // r*r
-		double dx = 0.0d;
-		double dy = 0.0d;
+		float gridMean = (float)Barnes.mean(faValues);
+		firstGuess = filterNaN(firstGuess, gridMean);
+
+		// Set the gridded analysis to the first guess
+		float[][] faaGrid = firstGuess;
+
+		// now, based on the gridded values, obtain interpolated values
+		// for each data point.
+		// these interpolates will then be compared to each data
+		// value to find out how "different" that analysis grid is
+		// from the data values
+		float[] faDifferences = new float[numData];
+
+		for (int k = 0; k < numData; k++) {
+			// NOTE Scinex is based on a fortran subroutine and
+			// is expecting the arrays to be indexed from 1 ->
+			// not 0 -> so add one to the coordinate arguments
+			float fInterpolatedData =
+				Barnes.scinex(faLonValues[k] + 1,
+					faLatValues[k] + 1, faaGrid);
+			faDifferences[k] = faValues[k] - fInterpolatedData;
+		}
+
+		// now we are ready for pass 2
+		// we have:
+		// 1) a first attempt to estimate the grid (faaGrid)
+		// 2) the differences between the grid point and the data 
+		// values evaluated at each data point 
+		// (ie an estimate of how "bad" grid is at each data point). 
+		// We will use this estimate
+		// to correct the grid on passes 2 and 3
+		// for each grid point ....
+		// scaleLength may be reduced for the second pass
+		// (but not further reduced) for later passes
+		// An aside:
+		// it is better to do 3 passes, and leave scaleLength unchanged
+		// ie a "gain" of 1
+		// 2 passes with a gain of say 0.3 will produce a faster
+		// result, but at the expense of accuracy
+		// ie 2pass with gain 0.3 is ok for a "quick look" type 
+		// analysis but 3pass with gain 1 is better for scientific use
+		// aside: Pass 1 RMSE at data points is
+		// dRMSE = Barnes.rmse(daDifferences);
+
+		// normal Barnes analysis goes like this:
+		// first pass
+		// reduce scale length to "pay" obs better
+		// passes 2 to N
+
+		// here we have a modified Barnes, where the firstGuess has 
+		// been supplied by the NWP. So we then want to run a 
+		// "first pass" with the full scale length, before reducing 
+		// the scale length in subsequent
+		// so the modified process goes like this:
+		// 
+		// zero pass (first guess)
+		// first pass (which will be performed by calling pass2toN 
+		//             with numPasses set to 2, to perform a single 
+		//		pass)
+		// passes 2 to N (call pass2toN again to do "normal" second 
+		//                pass onwards)
+		// So here we go...
+		//		
+		//
+		// 
+		// first pass (but by calling pass2toN as above)
+		faaGrid =
+			pass2toN(lon, lat, data3D, scaleLength, faaGrid,
+				faDifferences, 2);
+
+		// passes 2 to N with reduced scale length...
+		scaleLength *= gain;
+		faaGrid =
+			pass2toN(lon, lat, data3D, scaleLength, faaGrid,
+				faDifferences, iNumPasses);
+		radii = null;
+
+		return (faaGrid);
+	}
+
+	private static float[][] pass2toN(float[] lon, float[] lat,
+		float[][] data3D, float scaleLength,
+		// float[] faLonValues, float[] faLatValues,
+		// float[] faValues, float scaleLength,
+		float[][] faaGrid, float[] faDifferences, int iNumPasses)
+	{
+		int numLon = lon.length;
+		int numLat = lat.length;
+		int numData = data3D[0].length;
+
+		float fMinLon = Barnes.min(lon);
+		float fMinLat = Barnes.min(lat);
+
+		// check dimensions of lon & lat
+		float fGridSpaceX = Math.abs(lon[1] - lon[0]);
+		float fGridSpaceY = Math.abs(lat[1] - lat[0]);
+
+		// create array of lons/lats in grid units
+		float[] faLonValues = new float[numData];
+		float[] faLatValues = new float[numData];
+		float[] faValues = new float[numData];
+
+		for (int i = 0; i < numData; i++) {
+			faLonValues[i] = (data3D[0][i] - fMinLon) / fGridSpaceX;
+		}
+		for (int i = 0; i < numData; i++) {
+			faLatValues[i] = (data3D[1][i] - fMinLat) / fGridSpaceY;
+		}
+		for (int i = 0; i < numData; i++) {
+			faValues[i] = data3D[2][i];
+		}
+
+		float[][] faaWeights = new float[numLon][numLat];
+		float fWeight = 0.0f;
+		float fSumWeights = 0.0f;
+		float[][] faaCorrections = new float[numLon][numLat];
+		float fCorrection = 0.0f;
+		float fSumCorrections = 0.0f;
+		float scaleLength2 = (scaleLength * scaleLength);
+
+		float r = 0.0f; // distance from grid point to data location
+		float r2 = 0.0f; // r*r
+		float dx = 0.0f;
+		float dy = 0.0f;
 
 		// obs further away than "radius of influence" contribute
 		// less than "epsilon" (1/1000th) of their value to a given
@@ -337,13 +354,14 @@ public class Barnes
 		// analysis. Note: if performance is not an issue, then
 		// all obs should be included.
 		// radiusOfInfluence squared is:
-		double radiusOfInfluence2 = -scaleLength2 * Math.log(epsilon);
+		float radiusOfInfluence2 =
+			-scaleLength2 * (float)Math.log(epsilon);
 
 		for (int iPass = 2; iPass <= iNumPasses; iPass++) {
 			for (int i = 0; i < numLon; i++) {
 				for (int j = 0; j < numLat; j++) {
-					dSumCorrections = 0.0d;
-					dSumWeights = 0.0d;
+					fSumCorrections = 0.0f;
+					fSumWeights = 0.0f;
 					// .... loop over all data values and
 					// assign the grid point the
 					// weighted average of all the data
@@ -355,37 +373,35 @@ public class Barnes
 						// (the weighting function is a
 						// "bell" shaped curve)
 
-
-                                            if(useRadii) {
-                                                r2 = radii[i][j][k];
-                                            } else {
-                                                dx =(double)faLonValues[k]- (double)i;
-                                                dy =(double)faLatValues[k]- (double)j;
-                                                r2 = dx*dx + dy*dy;
-                                            }
-
-
-
-						if ((!Double.isNaN(
-							daDifferences[k]))
-							&& (r2 < 
-							radiusOfInfluence2))
+                                                if (useRadii) {
+						    r2 = radii[i][j][k];
+                                                } else {
+                                                    dx = faLonValues[k]- (float)i;
+                                                    dy = faLatValues[k]- (float)j;
+                                                    r2 = dx*dx + dy*dy;
+                                                }
+						if ((!Float
+							.isNaN(faDifferences[k]))
+							&& (r2 < radiusOfInfluence2))
 						{
-							dWeight = Math.exp(-r2/
-								scaleLength2);
-							dSumWeights += dWeight;
+							fWeight =
+								(float)Math
+									.exp(-r2
+										/ scaleLength2);
+							fSumWeights += fWeight;
 							// this line different
 							// to pass 1:
-							dCorrection =
-							  daDifferences[k]
-								* dWeight;
-							dSumCorrections +=
-								dCorrection;
+							fCorrection =
+								faDifferences[k]
+									* fWeight;
+							fSumCorrections +=
+								fCorrection;
 						}
 
 					}
-					daaWeights[i][j] = dSumWeights;
-					daaCorrections[i][j] = dSumCorrections;
+					faaWeights[i][j] = (float)fSumWeights;
+					faaCorrections[i][j] =
+						(float)fSumCorrections;
 				}
 			}
 
@@ -394,12 +410,12 @@ public class Barnes
 					// no need for initialisation step in
 					// pass >= 2:
 					// daaGrid[i][j] = gridMean;
-					if (daaWeights[i][j] > epsilon) {
+					if (faaWeights[i][j] > (float)epsilon) {
 						// this line also different for
 						// pass >= 2:
-						daaGrid[i][j] +=
-							daaCorrections[i][j]
-							/ daaWeights[i][j];
+						faaGrid[i][j] +=
+							faaCorrections[i][j]
+								/ faaWeights[i][j];
 					}
 				}
 			}
@@ -421,26 +437,23 @@ public class Barnes
 					// indexed from 1 ->
 					// not 0 -> so add one to the 
 					// coordinate arguments
-					double dInterpolatedData =
+					float fInterpolatedData =
 						Barnes.scinex(
 							faLonValues[k] + 1,
 							faLatValues[k] + 1,
-							daaGrid);
-					daDifferences[k] =
-						(double)faValues[k]
-							- dInterpolatedData;
-					int xInt = (int)faLonValues[k];
-					int yInt = (int)faLatValues[k];
+							faaGrid);
+					faDifferences[k] =
+						faValues[k] - fInterpolatedData;
 				}
 				// RMSE (at data points) =
 				// Barnes.rmse(daDifferences);
 			}
 		}
 
-		return daaGrid;
+		return faaGrid;
 	}
 
-	private static double[][] passOne(float[] lon, float[] lat,
+	private static float[][] passOne(float[] lon, float[] lat,
 		float[][] data3D, float scaleLength)
 	{
 
@@ -461,28 +474,28 @@ public class Barnes
 		float[] faValues = new float[numData];
 
 		for (int i = 0; i < numData; i++) {
-			faLonValues[i] = (data3D[0][i] - fMinLon) /fGridSpaceX;
+			faLonValues[i] = (data3D[0][i] - fMinLon) / fGridSpaceX;
 		}
 		for (int i = 0; i < numData; i++) {
-			faLatValues[i] = (data3D[1][i] - fMinLat) /fGridSpaceY;
+			faLatValues[i] = (data3D[1][i] - fMinLat) / fGridSpaceY;
 		}
 		for (int i = 0; i < numData; i++) {
 			faValues[i] = data3D[2][i];
 		}
-		double[][] daaGrid = new double[numLon][numLat];
-		double[][] daaWeights = new double[numLon][numLat];
-		double dWeight = 0.0d;
-		double dSumWeights = 0.0d;
-		double[][] daaCorrections = new double[numLon][numLat];
-		double dCorrection = 0.0d;
-		double dSumCorrections = 0.0d;
-		double scaleLength2 = (double)(scaleLength * scaleLength);
+		float[][] faaGrid = new float[numLon][numLat];
+		float[][] faaWeights = new float[numLon][numLat];
+		float fWeight = 0.0f;
+		float fSumWeights = 0.0f;
+		float[][] faaCorrections = new float[numLon][numLat];
+		float fCorrection = 0.0f;
+		float fSumCorrections = 0.0f;
+		float scaleLength2 = (scaleLength * scaleLength);
 
-		double r = 0.0d; // distance from grid point to data
+		float r = 0.0f; // distance from grid point to data
 		// location
-		double r2 = 0.0d; // r*r
-		double dx = 0.0d;
-		double dy = 0.0d;
+		float r2 = 0.0f; // r*r
+                float dx = 0.0f;
+                float dy = 0.0f;
 
 		// obs further away than "radius of influence" contribute
 		// less than "epsilon" (1/1000th) of their value to a given
@@ -491,75 +504,76 @@ public class Barnes
 		// analysis. Note: if performance is not an issue, then
 		// all obs should be included.
 		// radiusOfInfluence squared is:
-		double radiusOfInfluence2 = -scaleLength2 * Math.log(epsilon);
+		float radiusOfInfluence2 =
+			-scaleLength2 * (float)Math.log(epsilon);
 		// for each grid point ....
 		for (int i = 0; i < numLon; i++) {
 			for (int j = 0; j < numLat; j++) {
 				// .... loop over all data values and assign
 				// the grid point the weighted average of all
 				// the data values
-				dSumCorrections = 0.0d;
-				dSumWeights = 0.0d;
+				fSumCorrections = 0.0f;
+				fSumWeights = 0.0f;
 				for (int k = 0; k < numData; k++) {
 					// assign this value a weight based on
 					// how far it is from the grid point
 					// (the weighting function is a "bell"
 					// shaped curve)
-                                    if(useRadii) {
+                                    if (useRadii) {
                                         r2 = radii[i][j][k];
                                     } else {
-					dx =(double)faLonValues[k]- (double)i;
-					dy =(double)faLatValues[k]- (double)j;
+                                        dx = faLonValues[k]- (float)i;
+                                        dy = faLatValues[k]- (float)j;
                                         r2 = dx*dx + dy*dy;
                                     }
 					if ((r2 < radiusOfInfluence2)
 						&& (!Float.isNaN(faValues[k])))
 					{
-						dWeight =
-							Math.exp(-r2/
-								scaleLength2);
-						dSumWeights += dWeight;
-						dCorrection =
-							faValues[k] * dWeight;
-						dSumCorrections += dCorrection;
+						fWeight =
+							(float)Math.exp(-r2
+								/ scaleLength2);
+						fSumWeights += fWeight;
+						fCorrection =
+							faValues[k] * fWeight;
+						fSumCorrections += fCorrection;
 					}
 				}
-				daaWeights[i][j] = dSumWeights;
-				daaCorrections[i][j] = dSumCorrections;
+				faaWeights[i][j] = (float)fSumWeights;
+				faaCorrections[i][j] = (float)fSumCorrections;
 			}
 		}
 
 		// initialise grid to the mean of all the data values
 		// (safety procedure in case some grid points are a
 		// large distance from all data points)
-		double gridMean = Barnes.mean(faValues);
+		float gridMean = Barnes.mean(faValues);
 		for (int i = 0; i < numLon; i++) {
 			for (int j = 0; j < numLat; j++) {
-				daaGrid[i][j] = gridMean;
-				if (daaWeights[i][j] > epsilon) {
-					daaGrid[i][j] =
-						daaCorrections[i][j]
-							/ daaWeights[i][j];
+				faaGrid[i][j] = (float)gridMean;
+				if (faaWeights[i][j] > (float)epsilon) {
+					faaGrid[i][j] =
+						faaCorrections[i][j]
+							/ faaWeights[i][j];
 				}
 			}
 		}
 
-		return daaGrid;
+		return faaGrid;
 	}
 
-	private static synchronized double rmse(double[] daDifferences)
+	private static synchronized float rmse(float[] daDifferences)
 	{
 		int numData = daDifferences.length;
-		double sumDifferences = 0.0d;
-		double sumDifferences2 = 0.0d;
-		double dRMSE = 0.0d;
+		float sumDifferences = 0.0f;
+		float sumDifferences2 = 0.0f;
+		float dRMSE = 0.0f;
 
 		for (int k = 0; k < numData; k++) {
 			sumDifferences2 +=
 				(daDifferences[k] * daDifferences[k]);
 		}
 
-		dRMSE = Math.sqrt(sumDifferences2 / numData);
+		dRMSE = (float)Math.sqrt(sumDifferences2 / numData);
 		return (dRMSE);
 	}
 
@@ -577,10 +591,10 @@ public class Barnes
 	 *                maximum latitude for grid
 	 * @param data3D :
 	 *                3D array of data values
-	 * @return double[numLon][numLat] : regular gridded data
+	 * @return float[numLon][numLat] : regular gridded data
 	 */
 
-	public static double[][] point2grid(float fLonMin, float fLatMin,
+	public static float[][] point2grid(float fLonMin, float fLatMin,
 		float fLonMax, float fLatMax, float[][] data3D)
 	{
 		return (point2grid(fLonMin, fLatMin, fLonMax, fLatMax, data3D,
@@ -609,11 +623,11 @@ public class Barnes
 	 *                a latitude, and a value to be interpolated.
 	 * @param iNumPasses
 	 *                number of passes of the BOA to do.
-	 * @return double[numLon][numLat] : regular gridded data
+	 * @return float[numLon][numLat] : regular gridded data
 	 * 
 	 */
 
-	public static double[][] point2grid(float fLonMin, float fLatMin,
+	public static float[][] point2grid(float fLonMin, float fLatMin,
 		float fLonMax, float fLatMax, float[][] data3D, int iNumPasses)
 	{
 
@@ -623,11 +637,11 @@ public class Barnes
 			getRecommendedParameters(fLonMin, fLatMin, fLonMax,
 				fLatMax, data3D);
 
-		double[][] daaGrid =
+		float[][] faaGrid =
 			point2grid(ap.getGridXArray(), ap.getGridYArray(),
 				data3D, (float)ap.getScaleLengthGU(), gain,
 				iNumPasses);
-		return (daaGrid);
+		return (faaGrid);
 	}
 
 	/**
@@ -643,20 +657,20 @@ public class Barnes
 	 *                3D array of irregularly spaced data values
 	 * @param daaGrid :
 	 *                regular gridded data
-	 * @return double[] daDifferences: an array of all the differences
+	 * @return float[] daDifferences: an array of all the differences
 	 *         (between the irregular data and the value interpolated from
 	 *         the analysed grid)
 	 */
 
-	public static double[] pointDifferences(float[] lon, float[] lat,
-		float[][] data3D, double[][] daaGrid)
+	public static float[] pointDifferences(float[] lon, float[] lat,
+		float[][] data3D, float[][] faaGrid)
 	{
 		int numData = data3D[0].length;
 		float[] faValues = new float[numData];
 		float[] faLonValues = new float[numData];
 		float[] faLatValues = new float[numData];
-		double[] daDifferences = new double[numData];
-		double dInterpolatedData = 0.0d;
+		float[] faDifferences = new float[numData];
+		float fInterpolatedData = 0.0f;
 
 		float fMinLon = Barnes.min(lon);
 		float fMinLat = Barnes.min(lat);
@@ -667,11 +681,11 @@ public class Barnes
 		float fGridSpaceY = Math.abs(lat[1] - lat[0]);
 
 		for (int i = 0; i < numData; i++) {
-			faLonValues[i] = (data3D[0][i] - fMinLon) /fGridSpaceX;
+			faLonValues[i] = (data3D[0][i] - fMinLon) / fGridSpaceX;
 		}
 
 		for (int i = 0; i < numData; i++) {
-			faLatValues[i] = (data3D[1][i] - fMinLat) /fGridSpaceY;
+			faLatValues[i] = (data3D[1][i] - fMinLat) / fGridSpaceY;
 		}
 
 		for (int i = 0; i < numData; i++) {
@@ -679,14 +693,13 @@ public class Barnes
 		}
 
 		for (int k = 0; k < numData; k++) {
-			dInterpolatedData =
+			fInterpolatedData =
 				Barnes.scinex(faLonValues[k], faLatValues[k],
-					daaGrid);
-			daDifferences[k] =
-				(double)faValues[k] - dInterpolatedData;
+					faaGrid);
+			faDifferences[k] = faValues[k] - fInterpolatedData;
 		}
 
-		return (daDifferences);
+		return (faDifferences);
 	}
 
 	/**
@@ -705,8 +718,6 @@ public class Barnes
 		float gridX)
 	{
 		float fDegreesX = fLonMax - fLonMin;
-		int numToDiscard = 3;
-		int numToDiscard2 = numToDiscard * 2;
 
 		int nX = (int)(fDegreesX / gridX) + 1;
 
@@ -738,8 +749,6 @@ public class Barnes
 	public static float[] getRecommendedGridY(float fLatMin, float fLatMax,
 		float gridY)
 	{
-		int numToDiscard = 3;
-		int numToDiscard2 = numToDiscard * 2;
 		float fDegreesY = fLatMax - fLatMin;
 		int nY = (int)(fDegreesY / gridY) + 1;
 
@@ -757,7 +766,7 @@ public class Barnes
 		return (faLatGrid);
 	}
 
-	private static double mean(float[] fa)
+	private static float mean(float[] fa)
 	{
 		if (fa == null) {
 			return Float.NaN;
@@ -767,10 +776,10 @@ public class Barnes
 		if (iLength == 0) {
 			return Float.NaN;
 		}
-		double sum = 0.0d;
+		float sum = 0.0f;
 
 		for (int i = 0; i < iLength; i++) {
-			sum += (double)fa[i];
+			sum += fa[i];
 		}
 
 		return (sum / iLength);
@@ -843,7 +852,7 @@ public class Barnes
 			getRecommendedParameters(fLonMin, fLatMin, fLonMax,
 				fLatMax, data3D);
 
-		double[][] daaGrid =
+		float[][] daaGrid =
 			point2grid(fLonMin, fLatMin, fLonMax, fLatMax, data3D);
 
 	}
@@ -1084,7 +1093,6 @@ public class Barnes
 		float[][] faa3DData)
 	{
 
-		double result = 0.0d;
 		double dKmx = 0.0d;
 		double dKmy = 0.0d;
 		double[] daKm = new double[2];
@@ -1108,21 +1116,18 @@ public class Barnes
 
 		randomDataSpacing =
 			Math.sqrt(dKmx * dKmy)
-				* ((1.0d + Math.sqrt(sizeOfUniqueData)) / 
-				(sizeOfUniqueData - 1.0d));
+				* ((1.0d + Math.sqrt(sizeOfUniqueData)) / (sizeOfUniqueData - 1.0d));
 		scaleLengthDeg = randomDataSpacing * degreesPerKmX;
 		double gridSpace = randomDataSpacing * 0.3d;
 
 		// round to nearest 0.01 deg
 		double gridSpaceDegX =
-			(Math.round(gridSpace * degreesPerKmX * 100.0d)) / 
-									100.0d;
+			(Math.round(gridSpace * degreesPerKmX * 100.0d)) / 100.0d;
 		double gridX = gridSpaceDegX;
 
 		// round to nearest 0.01 deg
 		double gridSpaceDegY =
-			(Math.round(gridSpace * degreesPerKmY * 100.0d)) / 
-									100.0d;
+			(Math.round(gridSpace * degreesPerKmY * 100.0d)) / 100.0d;
 		double gridY = gridSpaceDegY;
 
 		double scaleLengthGU = scaleLengthDeg / gridX;
@@ -1176,16 +1181,18 @@ public class Barnes
 		double dAvgLat =
 			(double)((fLat1 + fLat2)) / 2.0d * Math.PI / 180.0d;
 		double dKmx =
-			(double)((fLon2 - fLon1)) / 1000.0d
+			(double)((fLon2 - fLon1))
+				/ 1000.0d
 				* ((111415.1d * Math.cos(dAvgLat))
-					- (94.54999d * Math.cos(3.0d*dAvgLat))
-					- (0.12d * Math.cos(5.0d * dAvgLat)));
+					- (94.54999d * Math.cos(3.0d * dAvgLat)) - (0.12d * Math
+					.cos(5.0d * dAvgLat)));
 		double dKmy =
-			(double)((fLat2 - fLat1)) / 1000.0d
+			(double)((fLat2 - fLat1))
+				/ 1000.0d
 				* (111132.1d
 					- (566.05d * Math.cos(2.0d * dAvgLat))
-					+ (1.2d * Math.cos(4.0d * dAvgLat)) 
-					- (0.003d * Math.cos(6.0d * dAvgLat)));
+					+ (1.2d * Math.cos(4.0d * dAvgLat)) - (0.003d * Math
+					.cos(6.0d * dAvgLat)));
 		double[] daKm = new double[2];
 		daKm[0] = dKmx;
 		daKm[1] = dKmy;
@@ -1214,11 +1221,11 @@ public class Barnes
 	 *                The replacement value for NaN
 	 * @returns the array of values, with NaN replaced by nonNaN
 	 */
-	private static double[][] filterNaN(double[][] array, double nonNaN)
+	private static float[][] filterNaN(float[][] array, float nonNaN)
 	{
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < array[0].length; j++) {
-				Double val = new Double(
+				Float val = new Float(
 					array[i][j]);
 				if (val.isNaN()) {
 					array[i][j] = nonNaN;
@@ -1229,30 +1236,28 @@ public class Barnes
 		return array;
 	}
 
-
-
-	private synchronized static double[][][] setupRadii(int xSize,
+	private synchronized static float[][][] setupRadii(int xSize,
 		int ySize, float[] faLonValues, float[] faLatValues,
 		double scaleLength2)
 	{
-            if(!useRadii) return null;
-            int numSamples = faLonValues.length;
-            double[][][] radii = new double[xSize][ySize][numSamples];
-        	for (int i = 0; i < xSize; i++) {
+                if (!useRadii) return null;
+		int numSamples = faLonValues.length;
+		float[][][] radii = new float[xSize][ySize][numSamples];
+
+		for (int i = 0; i < xSize; i++) {
 			for (int j = 0; j < ySize; j++) {
 				for (int k = 0; k < numSamples; k++) {
-					double dx =
-						(double)faLonValues[k]
-							- (double)i;
-					double dy =
-						(double)faLatValues[k]
-							- (double)j;
-                                        radii[i][j][k] =
-						Math.pow(dx, 2.0d)
-							+ Math.pow(dy, 2.0d);
-        		}
+					float fx =
+						faLonValues[k]
+							- (float)i;
+					float fy =
+						faLatValues[k]
+							- (float)j;
+					radii[i][j][k] = fx*fx + fy*fy;
+				}
 			}
 		}
+
 		return radii;
 	}
 
@@ -1277,7 +1282,7 @@ public class Barnes
 	 * 04/01/95 (IDL version) James Kelly J.Kelly@bom.gov.au Jan 2001 (Java
 	 * version)
 	 */
-	public static double scinex(float gm, float gn, double[][] scala)
+	public static float scinex(float gm, float gn, float[][] scala)
 	{
 		int msize = scala.length;
 		int nsize = scala[0].length;
@@ -1304,38 +1309,44 @@ public class Barnes
 		int nr = nmin + 1;
 
 		float e = 0.0f;
-		double t1 = 0.0d;
-		double t2 = 0.0d;
-		double p = 0.0d;
-		double h = 0.0d;
-		double scinto = 0.0d;
+		float t1 = 0.0f;
+		float t2 = 0.0f;
+		float p = 0.0f;
+		float h = 0.0f;
+		float scinto = 0.0f;
 
 		if (gm >= mmax) {
 			if (gn >= nmax) {
 				e = gm - (float)mmax;
-				t1 = e * (scala[mmax - 1][nmax - 1] - 
-					scala[ms - 1][nmax - 1]);
+				t1 =
+					e
+						* (scala[mmax - 1][nmax - 1] - scala[ms - 1][nmax - 1]);
 				e = gn - (float)nmax;
-				t2 = e * (scala[mmax - 1][nmax - 1] - 
-					scala[mmax - 1][ns - 1]);
+				t2 =
+					e
+						* (scala[mmax - 1][nmax - 1] - scala[mmax - 1][ns - 1]);
 				scinto = scala[mmax - 1][nmax - 1] + t1 + t2;
 				return scinto;
 			} else if (gn < nmin) {
 				e = gm - (float)mmax;
-				t1 = e * (scala[mmax - 1][nmin - 1] - 
-					scala[ms - 1][nmin - 1]);
+				t1 =
+					e
+						* (scala[mmax - 1][nmin - 1] - scala[ms - 1][nmin - 1]);
 				e = (float)nmin - gn;
-				t2 = e * (scala[mmax - 1][nmin - 1] - 
-					scala[mmax - 1][nr - 1]);
+				t2 =
+					e
+						* (scala[mmax - 1][nmin - 1] - scala[mmax - 1][nr - 1]);
 				scinto = scala[mmax - 1][nmin - 1] + t1 + t2;
 				return scinto;
 			} else {
-				p = scala[mmax - 1][jgn - 1] + fn
-					* (scala[mmax - 1][jgn] -
-						scala[mmax - 1][jgn - 1]);
-				h = scala[ms - 1][jgn - 1] + fn
-					* (scala[ms - 1][jgn] -
-						scala[ms - 1][jgn - 1]);
+				p =
+					scala[mmax - 1][jgn - 1]
+						+ fn
+						* (scala[mmax - 1][jgn] - scala[mmax - 1][jgn - 1]);
+				h =
+					scala[ms - 1][jgn - 1]
+						+ fn
+						* (scala[ms - 1][jgn] - scala[ms - 1][jgn - 1]);
 				e = gm - (float)mmax;
 				scinto = p + e * (p - h);
 				return scinto;
@@ -1343,58 +1354,72 @@ public class Barnes
 		} else if (gm < mmin) {
 			if (gn >= nmax) {
 				e = gn - (float)nmax;
-				t2 = e * (scala[mmin - 1][nmax - 1] 
-					- scala[mmin - 1][ns - 1]);
+				t2 =
+					e
+						* (scala[mmin - 1][nmax - 1] - scala[mmin - 1][ns - 1]);
 				e = (float)mmin - gm;
-				t1 = e * (scala[mmin - 1][nmax - 1] -
-					scala[mr - 1][nmax - 1]);
+				t1 =
+					e
+						* (scala[mmin - 1][nmax - 1] - scala[mr - 1][nmax - 1]);
 				scinto = scala[mmin - 1][nmax - 1] + t1 + t2;
 				return scinto;
 			} else if (gn < nmin) {
 				e = (float)nmin - gn;
-				t2 = e * (scala[mmin - 1][nmin - 1] - 
-					scala[mmin - 1][nr - 1]);
+				t2 =
+					e
+						* (scala[mmin - 1][nmin - 1] - scala[mmin - 1][nr - 1]);
 				e = (float)mmin - gm;
-				t1 = e * (scala[mmin - 1][nmin - 1] - 
-					scala[mr - 1][nmin - 1]);
+				t1 =
+					e
+						* (scala[mmin - 1][nmin - 1] - scala[mr - 1][nmin - 1]);
 				scinto = scala[mmin - 1][nmin - 1] + t1 + t2;
 				return scinto;
 			} else {
 				e = (float)mmin - gm;
-				p = scala[mmin - 1][jgn - 1] + fn
-					* (scala[mmin - 1][jgn] - 
-						scala[mmin - 1][jgn - 1]);
-				h = scala[mr - 1][jgn - 1] + fn
-					* (scala[mr - 1][jgn] - 
-						scala[mr - 1][jgn - 1]);
+				p =
+					scala[mmin - 1][jgn - 1]
+						+ fn
+						* (scala[mmin - 1][jgn] - scala[mmin - 1][jgn - 1]);
+				h =
+					scala[mr - 1][jgn - 1]
+						+ fn
+						* (scala[mr - 1][jgn] - scala[mr - 1][jgn - 1]);
 				scinto = p - e * (h - p);
 				return scinto;
 			}
 		} else if (gn >= nmax) {
 			e = gn - (float)nmax;
-			p = scala[igm - 1][nmax - 1] + fm * 
-				(scala[igm][nmax - 1] - 
-					scala[igm - 1][nmax - 1]);
-			h = scala[igm - 1][ns - 1] + fm * 
-				(scala[igm][ns - 1] - scala[igm - 1][ns - 1]);
+			p =
+				scala[igm - 1][nmax - 1]
+					+ fm
+					* (scala[igm][nmax - 1] - scala[igm - 1][nmax - 1]);
+			h =
+				scala[igm - 1][ns - 1]
+					+ fm
+					* (scala[igm][ns - 1] - scala[igm - 1][ns - 1]);
 			scinto = p + e * (p - h);
 			return scinto;
 		} else if (gn < nmin) {
 			e = (float)nmin - gn;
-			p = scala[igm - 1][nmin - 1] + fm *
-				(scala[igm][nmin - 1] - 
-					scala[igm - 1][nmin - 1]);
-			h = scala[igm - 1][nr - 1] + fm * (scala[igm][nr - 1] -
-				 scala[igm - 1][nr - 1]);
+			p =
+				scala[igm - 1][nmin - 1]
+					+ fm
+					* (scala[igm][nmin - 1] - scala[igm - 1][nmin - 1]);
+			h =
+				scala[igm - 1][nr - 1]
+					+ fm
+					* (scala[igm][nr - 1] - scala[igm - 1][nr - 1]);
 			scinto = p - e * (h - p);
 			return scinto;
-		} else if ((gm >= ms) || (gm < mr) 
-				|| (gn >= ns) || (gn < nr)) {
-			p = scala[igm][jgn - 1] + fn
-				* (scala[igm][jgn] - scala[igm][jgn - 1]);
-			h = scala[igm - 1][jgn - 1] + fn
-				* (scala[igm - 1][jgn] - 
-					scala[igm - 1][jgn - 1]);
+		} else if ((gm >= ms) || (gm < mr) || (gn >= ns) || (gn < nr)) {
+			p =
+				scala[igm][jgn - 1]
+					+ fn
+					* (scala[igm][jgn] - scala[igm][jgn - 1]);
+			h =
+				scala[igm - 1][jgn - 1]
+					+ fn
+					* (scala[igm - 1][jgn] - scala[igm - 1][jgn - 1]);
 			scinto = h + fm * (p - h);
 			return scinto;
 		} else {
@@ -1408,22 +1433,22 @@ public class Barnes
 			float b = 3.0f * s1 * s34;
 			float c = -3.0f * s12 * s4;
 			float d = s12 * s3;
-			double x1 =
+			float x1 =
 				a * scala[igm - 2][jgn - 2] + b
 					* scala[igm - 1][jgn - 2] + c
 					* scala[igm][jgn - 2] + d
 					* scala[igm + 1][jgn - 2];
-			double x2 =
+			float x2 =
 				a * scala[igm - 2][jgn - 1] + b
 					* scala[igm - 1][jgn - 1] + c
 					* scala[igm][jgn - 1] + d
 					* scala[igm + 1][jgn - 1];
-			double x3 =
+			float x3 =
 				a * scala[igm - 2][jgn] + b
 					* scala[igm - 1][jgn] + c
 					* scala[igm][jgn] + d
 					* scala[igm + 1][jgn];
-			double x4 =
+			float x4 =
 				a * scala[igm - 2][jgn + 1] + b
 					* scala[igm - 1][jgn + 1] + c
 					* scala[igm][jgn + 1] + d
@@ -1438,8 +1463,8 @@ public class Barnes
 			b = 3.0f * s1 * s34;
 			c = -3.0f * s12 * s4;
 			d = s12 * s3;
-			double y = a * x1 + b * x2 + c * x3 + d * x4;
-			scinto = y / 36.0;
+			float y = a * x1 + b * x2 + c * x3 + d * x4;
+			scinto = y / 36.0f;
 			return scinto;
 		}
 	}
