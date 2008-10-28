@@ -14,10 +14,10 @@
         <property name="jars_dest" value="${basedir}/lib"/>
         <property name="libsrc" value="${basedir}/libsrc"/>
         <property name="libsdir" value="${jars_dest}"/>
-        <property name="ramaddadir" value="${srcdir}/ucar/unidata/repository" />
-        <property name="releasedir" value="${libsdir}/ramadda${version}" />
+        <property name="repositorydir" value="${srcdir}/ucar/unidata/repository" />
+        <property name="releasedir" value="${libsdir}/repository${version}" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="classpath" value="${libsdir}/tdsrepository.jar:${libsdir}/ramaddalib.jar:${libsdir}/jython.jar"/>
+        <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/jython.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -27,7 +27,16 @@
     </target>
 
 
-    <target name="all" depends="ramaddajar,release,war">
+    <target name="fullrelease" depends="init,clean">
+        <antcall target="repositoryjar"/>
+        <antcall target="repositorylib"/>
+        <antcall target="release"/>
+        <antcall target="war"/>
+        <antcall target="clean"/>
+        <antcall target="srcjar"/>
+    </target>
+
+    <target name="all" depends="repositoryjar,release,war">
     </target>
 
 
@@ -86,18 +95,18 @@
         </javac>
     </target>
 
-    <target name="ramaddajar" depends="compile">
+    <target name="repositoryjar" depends="compile">
         <jar 
             basedir="${srcdir}"
             compress="true"
             update="false"
-            jarfile="${jars_dest}/ramadda.jar">
+            jarfile="${jars_dest}/repository.jar">
            <manifest>
               <attribute name="Implementation-Title" value="Unidata's Ramada"/>
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="ramaddalib.jar idv.jar  jython.jar external.jar tdsrepository.jar"/>
+              <attribute name="Class-Path" value="repositorylib.jar idv.jar  jython.jar external.jar repositorytds.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
@@ -114,20 +123,17 @@
         <delete includeemptydirs="true">
             <fileset dir="${releasedir}" includes="**/*"/>
         </delete>
-        <copy  file="${libsdir}/ramadda.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/ramaddalib.jar" todir="${releasedir}"/>
-        <copy  file="${ramaddadir}/release/ramadda.sh" todir="${releasedir}"/>
-        <copy  file="${ramaddadir}/release/ramaddamysql.sh" todir="${releasedir}"/>
-        <copy  file="${ramaddadir}/README" todir="${releasedir}"/>
-        <copy  file="${libsdir}/tdsrepository.jar" todir="${releasedir}"/>
-<!--
-        <copy  file="${libsdir}/servlet-api.jar" todir="${releasedir}"/>
--->
-        <delete file="${libsdir}/ramadda.tar"/>
+        <copy  file="${libsdir}/repository.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/repositorylib.jar" todir="${releasedir}"/>
+        <copy  file="${repositorydir}/release/ramadda.sh" todir="${releasedir}"/>
+        <copy  file="${repositorydir}/release/ramaddamysql.sh" todir="${releasedir}"/>
+        <copy  file="${repositorydir}/README" todir="${releasedir}"/>
+        <copy  file="${libsdir}/repositorytds.jar" todir="${releasedir}"/>
+        <delete file="${libsdir}/repository${version}.tar"/>
         <tar 
-            destfile="${libsdir}/ramadda${version}.tar">
+            destfile="${libsdir}/repository${version}.tar">
           <tarfileset dir="${releasedir}"
-              prefix="ramadda${version}">
+              prefix="repository${version}">
               <include name="*"/>
          </tarfileset>
 
@@ -141,18 +147,18 @@
 
 
     <target name="war" depends="init">
-      <war webxml="${ramaddadir}/release/web.xml" destfile="${libsdir}/repository.war">
-          <webinf file="${ramaddadir}/release/repository.properties"/>
-          <lib file="${libsdir}/ramadda.jar"/>
-          <lib file="${libsdir}/ramaddalib.jar"/>
-          <lib file="${libsdir}/tdsrepository.jar"/>
+      <war webxml="${repositorydir}/release/web.xml" destfile="${libsdir}/repository.war">
+          <webinf file="${repositorydir}/release/repository.properties"/>
+          <lib file="${libsdir}/repository.jar"/>
+          <lib file="${libsdir}/repositorylib.jar"/>
+          <lib file="${libsdir}/repositorytds.jar"/>
       </war>
 
 
     </target>
 
 
-    <target name="lib" depends="init">
+    <target name="repositorylib" depends="init">
         <mkdir dir="${tmpjardir}"/>
         <delete includeemptydirs="true">
             <fileset dir="${tmpjardir}" includes="**/*"/>
@@ -171,7 +177,7 @@
         <jar 
             basedir="${tmpjardir}"
             compress="true"
-            jarfile="${libsdir}/ramaddalib.jar">
+            jarfile="${libsdir}/repositorylib.jar">
               <include name="**"/>
 
         </jar>
@@ -180,8 +186,45 @@
 
 
 
-
-
+    <target name="srcjar" depends="init">
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="repository_src${version}.jar"
+        >
+            <include name="ucar/**"/>
+            <include name="lib/repositorylib.jar"/>
+            <include name="lib/repositorytds.jar"/>
+            <exclude name="ucar/**/CVS/**"/>
+            <exclude name="ucar/**/*.class"/>
+            <exclude name="ucar/**/*.map"/>
+            <exclude name="ucar/**/*.jar"/>            
+            <exclude name="ucar/**/*.ascii"/>            
+            <exclude name="ucar/**/*.tml"/>            
+            <exclude name="ucar/**/*.bak"/>            
+            <exclude name="ucar/**/*.zip"/>            
+            <exclude name="ucar/**/*.shp"/>            
+            <exclude name="ucar/**/*.nc"/>            
+            <exclude name="ucar/unidata/gis/**"/>
+            <exclude name="ucar/unidata/repository/docs/**"/>
+            <exclude name="ucar/unidata/ui/symbol/**"/>
+            <exclude name="ucar/unidata/idv/resources/**"/>
+	    <exclude name="ucar/unidata/idv/release/**"/>
+	    <exclude name="ucar/unidata/idv/test/**"/>
+	    <exclude name="ucar/unidata/idv/**"/>
+            <exclude name="ucar/unidata/apps/**"/>
+            <exclude name="ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="ucar/visad/physics/**"/>
+            <exclude name="ucar/visad/functiontypes/**"/>
+            <exclude name="ucar/visad/display/**"/>
+            <exclude name="ucar/unidata/view/sounding/**"/>
+            <exclude name="ucar/unidata/idv/control/**"/>
+            <exclude name="ucar/unidata/grid/**"/>
+            <exclude name="ucar/unidata/geoloc/**"/>
+            <exclude name="ucar/unidata/idv/release/**"/>
+            <exclude name="ucar/unidata/view/sounding/test/**"/>
+        </jar>
+    </target>
 
 
 

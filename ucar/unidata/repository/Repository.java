@@ -25,8 +25,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
+
 import ucar.unidata.sql.Clause;
 
 import ucar.unidata.sql.SqlUtil;
@@ -45,7 +44,6 @@ import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -3237,21 +3235,10 @@ public class Repository extends RepositoryBase implements Tables,
     }
 
 
-    /** _more_ */
-    private NavigatedMapPanel nmp;
-
 
 
 
     /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
     public Result processMap(Request request) throws Exception {
         if (nmp == null) {
             nmp = new NavigatedMapPanel(
@@ -3296,7 +3283,7 @@ public class Repository extends RepositoryBase implements Tables,
                               getMimeTypeFromSuffix(".png"));
         }
     }
-
+    */
 
 
     /**

@@ -30,7 +30,6 @@
 
       <api request="/association/add"        method="processAssociationAdd"/>
       <api request="/association/delete"     method="processAssociationDelete"   actions="edit"/>
-      <api request="/getmap"                 method="processMap"       cancache="false"/>
       <api request="/graph/get"              method="processGraphGet"/>
       <api request="/message"                method="processMessage"    cancache="false" />
       <api request="/dummy"                  method="processDummy"/>

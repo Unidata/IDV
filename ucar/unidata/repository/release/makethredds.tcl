@@ -11,7 +11,7 @@ foreach jar [glob ../lib/*.jar] {
     exec jar -xvf $jar
 }
 
-puts "Making tdsrepository.jar"
+puts "Making repositorytds.jar"
 puts "pwd: [pwd]"
 puts "exec: [exec pwd]"
 set files ""
@@ -20,8 +20,7 @@ foreach file [glob *] {
     append files "\{[file tail $file]\}"
 }
 
-set execLine "jar -cvf ../../../tdsrepository.jar $files"
-puts $execLine
+set execLine "jar -cvf ../../../repositorytds.jar $files"
 eval exec $execLine
 
 

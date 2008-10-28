@@ -39,6 +39,7 @@ import thredds.server.opendap.GuardedDatasetImpl;
 
 
 
+import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
@@ -68,13 +69,12 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
-import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.gis.KmlUtil;
 
-import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.LatLonPointImpl;
 
 
-import ucar.unidata.repository.*;
 import ucar.unidata.util.Cache;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -1197,6 +1197,49 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /**
+     * Get the 1D values for an array as floats.
+     *
+     * @param arr   Array of values
+     * @return  float representation
+     */
+    public static float[] toFloatArray(Array arr) {
+        Object dst       = arr.get1DJavaArray(float.class);
+        Class  fromClass = dst.getClass().getComponentType();
+        if (fromClass.equals(float.class)) {
+            //It should always be a float
+            return (float[]) dst;
+        } else {
+            float[] values = new float[(int) arr.getSize()];
+            if (fromClass.equals(byte.class)) {
+                byte[] fromArray = (byte[]) dst;
+                for (int i = 0; i < fromArray.length; ++i) {
+                    values[i] = fromArray[i];
+                }
+            } else if (fromClass.equals(short.class)) {
+                short[] fromArray = (short[]) dst;
+                for (int i = 0; i < fromArray.length; ++i) {
+                    values[i] = fromArray[i];
+                }
+            } else if (fromClass.equals(int.class)) {
+                int[] fromArray = (int[]) dst;
+                for (int i = 0; i < fromArray.length; ++i) {
+                    values[i] = fromArray[i];
+                }
+            } else if (fromClass.equals(double.class)) {
+                double[] fromArray = (double[]) dst;
+                for (int i = 0; i < fromArray.length; ++i) {
+                    values[i] = (float) fromArray[i];
+                }
+            } else {
+                throw new IllegalArgumentException("Unknown array type:" + fromClass.getName());
+            }
+            return values;
+        }
+
+    }
+
+
+    /**
      * _more_
      *
      * @param request _more_
@@ -1219,8 +1262,8 @@ public class DataOutputHandler extends OutputHandler {
                 List allVariables = tod.getDataVariables();
                 TrajectoryObsDatatype todt =
                     (TrajectoryObsDatatype) trajectories.get(i);
-                float[] lats = DataUtil.toFloatArray(todt.getLatitude(null));
-                float[] lons = DataUtil.toFloatArray(todt.getLongitude(null));
+                float[] lats = toFloatArray(todt.getLatitude(null));
+                float[] lons = toFloatArray(todt.getLongitude(null));
                 StringBuffer markerSB = new StringBuffer();
                 js.append("line = new Polyline([");
                 for (int ptIdx = 0; ptIdx < lats.length; ptIdx++) {

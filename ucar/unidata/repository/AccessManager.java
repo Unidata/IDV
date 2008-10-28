@@ -27,14 +27,11 @@ import org.w3c.dom.*;
 
 
 
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.sql.Clause;
 
 
 import ucar.unidata.sql.SqlUtil;
 
-import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -46,7 +43,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
 
-import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.xml.XmlUtil;
 
 

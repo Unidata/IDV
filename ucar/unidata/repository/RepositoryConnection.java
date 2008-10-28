@@ -21,78 +21,15 @@
 
 package ucar.unidata.repository;
 
-
-import org.w3c.dom.*;
-
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.sql.Clause;
-
 import ucar.unidata.sql.SqlUtil;
 
-import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.HttpServer;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.JobManager;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringBufferCollection;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.view.geoloc.NavigatedMapPanel;
-import ucar.unidata.xml.XmlUtil;
-
-
-import java.awt.*;
-import java.awt.Image;
-
-import java.io.*;
-
-import java.io.File;
-import java.io.InputStream;
-
-import java.lang.reflect.*;
+import java.sql.*;
 
 
 
-import java.net.*;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TimeZone;
 
 
-
-import java.util.regex.*;
-import java.util.zip.*;
-
-
-import javax.swing.*;
 
 
 /**

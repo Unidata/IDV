@@ -56,7 +56,6 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
-import ucar.visad.quantities.CommonUnits;
 
 import visad.Unit;
 
@@ -411,7 +410,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     if(axisType == null) continue;
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
-                                              CommonUnits.DEGREE);
+                                              visad.CommonUnit.degree);
                         //                        System.err.println("\t" +"lat range:" + minmax[0] + " " + minmax[1]);
                         if(extra.get(ARG_MINLAT)==null)
                             extra.put(ARG_MINLAT, minmax[0]);
@@ -420,7 +419,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         haveBounds = true;
                     } else if (axisType.equals(AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
-                                                   CommonUnits.DEGREE);
+                                                   visad.CommonUnit.degree);
                         //                        System.err.println("\t"+" lon range:" + minmax[0] + " " + minmax[1]);
                         if(extra.get(ARG_MINLON)==null)
                             extra.put(ARG_MINLON, minmax[0]);
