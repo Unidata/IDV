@@ -1,14 +1,14 @@
 
 <html>
 <head>
-<title>Doing More with Level II Data Displays</title>
+<title>Doing More with Nexrad Data Displays</title>
 </head>
 
 <body>
 
 <div class="overview">
 <p>
-Learn to do more with Level II Data Displays
+Learn to do more with NEXRAD Data Displays
 </p>
 </div>
 
@@ -16,15 +16,15 @@ Learn to do more with Level II Data Displays
 
 <ol class="step">
 
-<li>Access realtime level II data from the file system from the 
-Level II Data Source Chooser</li>
+<li>Access realtime NEXRAD data from the file system from the
+Radar Data Source Chooser</li>
   <ul class="substep">
     <li> [ht::openDataSourceChooser] 
     <li>
     In the [ht::dialog Data Source Chooser]
     click on the [ht::tab Radar] tab. 
-    Then click on the [ht::tab Level II]
-    tab to see the Level II radar data chooser panel. 
+    Then click on the [ht::tab NEXRAD Local]
+    tab to see the NEXARD radar data chooser panel.
     <li>From the [ht::command Relative Times] selector, select the
     [ht::command Use Most Recent 5 files].
     <li>Use the directory (folder) selector to find the radar 
@@ -46,6 +46,31 @@ Level II Data Source Chooser</li>
     <li>Wait for 5 minutes and see that the display reloads with
         new data.
   </ul>
+
+<li>Access realtime and casestudies Level3 data from the remote server from the
+Radar Data Source Chooser</li>
+    <ul class="substep">
+      <li> [ht::openDataSourceChooser] </li>
+      <li> In the [ht::dialog Data Source Chooser] click on the
+           [ht::tab Radar] tab. Then click on the [ht::tab NEXRAD Remote] tab to see the
+           NEXRAD radar data remote chooser panel. </li>
+      <li> In the catalog selector drop-down, select (or type in) the motherlode
+           catalog this is included. In the collections drop-down,
+           select [ht::tab Level III Radar for Case Study CCS039]
+      <ul class="substep">
+          <li>Select a product from [ht::tab product] drop down selector, or the first product will be selected</li>
+          <li>Zoom in the map and select the station KDVN. </li>
+          <li> Click on the <code class="command">Absolute time </code>radio button.
+              Select the images from <code class="param">1998-06-29 21:00:00Z</code>
+              through <code class="param">1998-06-29 21:59:00Z</code>. </li>
+          <li>Click the [ht::button {Add Source}] button. </li>
+      </ul>
+      <li> Display the casestudies Level 3 datasets. </li>
+      <li> In the collections drop-down,
+           select [ht::tab Level III Radar from IDD]
+      <li> Display the real time Level 3 datasets. </li>
+
+    </ul>
 
 <li>Multiple Radars</li>
   <ul class="substep">
