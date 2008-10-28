@@ -237,7 +237,7 @@
      factory="ucar.unidata.data.text.AddeTextProductDataSource"
      standalone="true"
      fileselection="true"
-     label="Text Products from Server">
+     label="Weather Text Products (from server)">
     <property
        name="default_display"
        value="textproductcontrol"/>
@@ -248,7 +248,7 @@
      factory="ucar.unidata.data.text.NwxTextProductDataSource"
      fileselection="true"
      standalone="true"
-     label="Local Text Products (NWX)">
+     label="Weather Text Products (from NWX files)">
     <property
        name="default_display"
        value="textproductcontrol"/>
@@ -259,7 +259,7 @@
      fileselection="true"
      standalone="true"
      factory="ucar.unidata.data.storm.AtcfStormDataSource"
-     label="ATCF Storm Data"/>
+     label="ATCF Tropical Storm Data"/>
 
 
   <datasource

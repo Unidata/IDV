@@ -894,10 +894,10 @@ example:
      id="textproductcontrol"
      categories="textproducts"
      class="ucar.unidata.idv.control.TextProductControl"
-     description="Text product display"
-     label="Text product display"
+     description="Weather text product display"
+     label="Weather Text Product Display"
      displaycategory="General"
-     properties="displayName=Text Product Display;windowVisible=true;showInTabs=false"/>
+     properties="displayName=Weather Text Product Display;windowVisible=true;showInTabs=false"/>
 
 
   <control
