@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -211,7 +212,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** widget */
     private JButton changeButton;
 
-    /** _more_          */
+    /** The widget to show the layout model in the gui */
     protected LayoutModelWidget layoutModelWidget;
 
     static {
@@ -292,7 +293,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
-    /** _more_ */
+    /** Have we gotten the initial display scale */
     private boolean haveSetInitialScale = false;
 
     /** scale factor for the shapes */
@@ -317,11 +318,11 @@ public class StationModelControl extends ObsDisplayControl {
     /** flag for waiting to load */
     private boolean waitingToLoad = false;
 
-    /** last check load time */
-    private long lastCheckLoadTime;
-
     /** last load event time */
-    private long lastLoadEventTime;
+    private long lastTimeLoadDataWasCalled;
+
+    /** For loadDataInAWhile       */
+    private Object LOADDATA_MUTEX = new Object();
 
     /** locking object */
     private Object MUTEX = new Object();
@@ -2138,9 +2139,9 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
     /**
-     * _more_
+     * Set the station model
      *
-     * @param sm _more_
+     * @param sm station model
      */
     public void setStationModelFromWidget(StationModel sm) {
         setStationModel(sm);
@@ -2148,10 +2149,10 @@ public class StationModelControl extends ObsDisplayControl {
 
 
     /**
-     * _more_
+     * Set layout model
      *
-     * @param id _more_
-     * @param stationModel _more_
+     * @param id id
+     * @param stationModel station model
      */
     protected void setLayoutModel(
             String id, ucar.unidata.ui.symbol.StationModel stationModel) {
@@ -3487,34 +3488,64 @@ public class StationModelControl extends ObsDisplayControl {
     protected void loadDataInAWhile() {
 
         //This is the time we last called this method
-        lastLoadEventTime = System.currentTimeMillis();
+        lastTimeLoadDataWasCalled = System.currentTimeMillis();
 
-        //Do we have a pending loadData already running? 
-        if (waitingToLoad) {
-            return;
-        }
-        waitingToLoad     = true;
-        lastCheckLoadTime = lastLoadEventTime;
-
-        //Start up the runnable
-        Misc.runInABit(SLEEPTIME_MS, new Runnable() {
-            public void run() {
-                while (true) {
-                    // Check if we can load data 
-                    if (lastLoadEventTime != lastCheckLoadTime) {
-                        lastCheckLoadTime = lastLoadEventTime;
-                        Misc.sleep(SLEEPTIME_MS);
-                        continue;
-                    }
-                    loadData();
-                    waitingToLoad = false;
-                    return;
-                }
+        DataLoader dataLoader;
+        synchronized (LOADDATA_MUTEX) {
+            //Do we have a pending loadData already running? 
+            if (waitingToLoad) {
+                return;
             }
-        });
-
+            waitingToLoad = true;
+            dataLoader = new DataLoader();
+        }
+        Misc.runInABit(SLEEPTIME_MS, dataLoader);
     }
 
+    /**
+     * Class DataLoader handles the delayed loadDataInAWhile calls
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
+    private class DataLoader implements Runnable {
+
+        /** Last time we checked        */
+        long lastCheckLoadTime;
+
+        /**
+         * ctor
+         */
+        public DataLoader() {
+            lastCheckLoadTime = lastTimeLoadDataWasCalled;
+        }
+
+        /**
+         * run
+         */
+        public void run() {
+            while (true) {
+                // Check if we can load data 
+                boolean sleepAndContinue = false;
+                sleepAndContinue = (lastTimeLoadDataWasCalled
+                                    != lastCheckLoadTime);
+                if (sleepAndContinue) {
+                    lastCheckLoadTime = lastTimeLoadDataWasCalled;
+                    Misc.sleep(SLEEPTIME_MS);
+                    continue;
+                }
+                loadData();
+                synchronized (LOADDATA_MUTEX) {
+                    waitingToLoad = false;
+                }
+                return;
+            }
+
+        }
+    }
+
+    ;
 
 
 
