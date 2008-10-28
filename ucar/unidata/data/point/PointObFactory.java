@@ -1425,7 +1425,7 @@ public class PointObFactory {
                    + faGridY.length + " scaleLength = " + scaleLength
                    + " gain = " + gain);
 
-        double[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
+        float[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
                                      scaleLength, gain, numPasses);
 
         float[][] faaDomainSet =
