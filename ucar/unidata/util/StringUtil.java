@@ -1600,7 +1600,7 @@ public class StringUtil {
         String   fullMacro = s.substring(idx1 + macroPrefix.length(), idx2);
         String[] toks      = StringUtil.split(fullMacro, ":", 2);
 
-        if (toks.length != 2) {
+        if (toks == null || toks.length != 2) {
             throw new IllegalArgumentException("Could not find date format:"
                     + s);
         }
