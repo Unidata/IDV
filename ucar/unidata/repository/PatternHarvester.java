@@ -296,7 +296,7 @@ public class PatternHarvester extends Harvester {
 
         sb.append(HtmlUtil.formEntry(msgLabel("Date format"),
                                      HtmlUtil.input(ATTR_DATEFORMAT,
-                                         dateFormat, HtmlUtil.SIZE_30)));
+                                         dateFormat, HtmlUtil.SIZE_60)));
 
 
         sb.append(HtmlUtil.formEntry(msgLabel("Move file to storage"),
@@ -765,13 +765,6 @@ public class PatternHarvester extends Harvester {
         }
 
 
-        groupName = StringUtil.replaceDate(groupName,"fromdate",fromDate);
-        groupName = StringUtil.replaceDate(groupName,"todate",toDate);
-        name = StringUtil.replaceDate(name,"fromdate",fromDate);
-        name = StringUtil.replaceDate(name,"todate",toDate);
-        desc = StringUtil.replaceDate(desc,"fromdate",fromDate);
-        desc = StringUtil.replaceDate(desc,"todate",toDate);
-
 
         String ext = IOUtil.getFileExtension(fileName);
         if (ext.startsWith(".")) {
@@ -802,6 +795,14 @@ public class PatternHarvester extends Harvester {
             name = name.replace(macro, value);
             desc = desc.replace(macro, value);
         }
+
+        groupName = StringUtil.replaceDate(groupName,"fromdate",fromDate);
+        groupName = StringUtil.replaceDate(groupName,"todate",toDate);
+        name = StringUtil.replaceDate(name,"fromdate",fromDate);
+        name = StringUtil.replaceDate(name,"todate",toDate);
+        desc = StringUtil.replaceDate(desc,"fromdate",fromDate);
+        desc = StringUtil.replaceDate(desc,"todate",toDate);
+
         desc = desc.replace("${name}", name);
 
         if (baseGroup != null) {

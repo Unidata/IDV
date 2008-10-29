@@ -243,7 +243,6 @@ public class CatalogOutputHandler extends OutputHandler {
                     Metadata metadata =
                         metadataHandler.makeMetadataFromCatalogNode(child);
                     if (metadata != null) {
-                        System.err.println("adding metadata:" + metadata);
                         metadataList.add(metadata);
                         break;
                     }

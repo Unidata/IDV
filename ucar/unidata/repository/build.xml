@@ -17,7 +17,7 @@
         <property name="repositorydir" value="${srcdir}/ucar/unidata/repository" />
         <property name="releasedir" value="${libsdir}/repository" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/jython.jar"/>
+        <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -107,7 +107,7 @@
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="repositorylib.jar idv.jar  jython.jar external.jar repositorytds.jar"/>
+              <attribute name="Class-Path" value="repositorylib.jar idv.jar  jython.jar external.jar repositorytds.jar servlet-api.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
@@ -130,6 +130,7 @@
         <copy  file="${repositorydir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${repositorydir}/README" todir="${releasedir}"/>
         <copy  file="${libsdir}/repositorytds.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/servlet-api.jar" todir="${releasedir}"/>
         <delete file="${libsdir}/repository.tar"/>
         <tar 
             destfile="${libsdir}/repository.tar">
@@ -174,7 +175,9 @@
         <unjar src="${libsrc}/derbytools.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-io-1.4.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
+<!--
         <unjar src="${libsdir}/servlet-api.jar" dest="${tmpjardir}"/>
+-->
         <jar 
             basedir="${tmpjardir}"
             compress="true"

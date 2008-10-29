@@ -7975,7 +7975,7 @@ public class Repository extends RepositoryBase implements Tables,
                     typeStatements.put(sql, typeStatement);
                 }
             }
-
+            //           System.err.println ("entry: " + entry.getId());
             setStatement(entry, entryStmt, isNew);
             batchCnt++;
             entryStmt.addBatch();
@@ -7995,10 +7995,11 @@ public class Repository extends RepositoryBase implements Tables,
                                              entry.getId()));
                 }
                 for (Metadata metadata : metadataList) {
+                    //                    System.err.println ("\tmetadata:" + metadata.getEntryId() +" " + metadata.getType() + " " + metadata.getAttr1());
                     int col = 1;
                     metadataCnt++;
                     metadataStmt.setString(col++, metadata.getId());
-                    metadataStmt.setString(col++, metadata.getEntryId());
+                    metadataStmt.setString(col++, entry.getId());
                     metadataStmt.setString(col++, metadata.getType());
                     metadataStmt.setInt(col++, metadata.getInherited()
                             ? 1

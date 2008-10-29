@@ -316,8 +316,8 @@ public class CatalogHarvester extends Harvester {
                                           DFLT_INHERITED,
                                           "Imported from catalog",
                                           catalogUrlPath, "", ""));
-            System.err.println ("metadata:" + metadataList);
             for (Metadata metadata : metadataList) {
+                metadata.setEntryId(entry.getId());
                 entry.addMetadata(metadata);
             }
 
