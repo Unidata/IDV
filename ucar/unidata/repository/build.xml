@@ -15,7 +15,7 @@
         <property name="libsrc" value="${basedir}/libsrc"/>
         <property name="libsdir" value="${jars_dest}"/>
         <property name="repositorydir" value="${srcdir}/ucar/unidata/repository" />
-        <property name="releasedir" value="${libsdir}/repository${version}" />
+        <property name="releasedir" value="${libsdir}/repository" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
         <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/jython.jar"/>
     </target>
@@ -27,17 +27,18 @@
     </target>
 
 
-    <target name="fullrelease" depends="init,clean">
-        <antcall target="repositoryjar"/>
-        <antcall target="repositorylib"/>
-        <antcall target="release"/>
-        <antcall target="war"/>
-        <antcall target="clean"/>
-        <antcall target="srcjar"/>
+    <target name="all" depends="repositoryjar,repositorywar">
     </target>
 
-    <target name="all" depends="repositoryjar,release,war">
+    <target name="release" depends="init,clean">
+        <antcall target="repositorylib"/>
+        <antcall target="clean"/>
+        <antcall target="repositorysrcjar"/>
+        <antcall target="repositoryjar"/>
+        <antcall target="repositorytar"/>
+        <antcall target="repositorywar"/>
     </target>
+
 
 
     <target name="idvplugin" depends="init,clean">
@@ -118,7 +119,7 @@
     </target>
 
 
-    <target name="release" depends="init">
+    <target name="repositorytar" depends="init">
         <mkdir dir="${releasedir}"/>
         <delete includeemptydirs="true">
             <fileset dir="${releasedir}" includes="**/*"/>
@@ -129,11 +130,11 @@
         <copy  file="${repositorydir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${repositorydir}/README" todir="${releasedir}"/>
         <copy  file="${libsdir}/repositorytds.jar" todir="${releasedir}"/>
-        <delete file="${libsdir}/repository${version}.tar"/>
+        <delete file="${libsdir}/repository.tar"/>
         <tar 
-            destfile="${libsdir}/repository${version}.tar">
+            destfile="${libsdir}/repository.tar">
           <tarfileset dir="${releasedir}"
-              prefix="repository${version}">
+              prefix="repository">
               <include name="*"/>
          </tarfileset>
 
@@ -146,7 +147,7 @@
     </target>
 
 
-    <target name="war" depends="init">
+    <target name="repositorywar" depends="init">
       <war webxml="${repositorydir}/release/web.xml" destfile="${libsdir}/repository.war">
           <webinf file="${repositorydir}/release/repository.properties"/>
           <lib file="${libsdir}/repository.jar"/>
@@ -186,11 +187,11 @@
 
 
 
-    <target name="srcjar" depends="init">
+    <target name="repositorysrcjar" depends="init">
         <jar 
             basedir="${compiledir}"
             compress="true"
-            jarfile="repository_src${version}.jar"
+            jarfile="${libsdir}/repository_src.jar"
         >
             <include name="ucar/**"/>
             <include name="lib/repositorylib.jar"/>
@@ -208,9 +209,6 @@
             <exclude name="ucar/unidata/gis/**"/>
             <exclude name="ucar/unidata/repository/docs/**"/>
             <exclude name="ucar/unidata/ui/symbol/**"/>
-            <exclude name="ucar/unidata/idv/resources/**"/>
-	    <exclude name="ucar/unidata/idv/release/**"/>
-	    <exclude name="ucar/unidata/idv/test/**"/>
 	    <exclude name="ucar/unidata/idv/**"/>
             <exclude name="ucar/unidata/apps/**"/>
             <exclude name="ucar/unidata/gridviewer/**/*.*"/>
@@ -218,10 +216,8 @@
             <exclude name="ucar/visad/functiontypes/**"/>
             <exclude name="ucar/visad/display/**"/>
             <exclude name="ucar/unidata/view/sounding/**"/>
-            <exclude name="ucar/unidata/idv/control/**"/>
             <exclude name="ucar/unidata/grid/**"/>
             <exclude name="ucar/unidata/geoloc/**"/>
-            <exclude name="ucar/unidata/idv/release/**"/>
             <exclude name="ucar/unidata/view/sounding/test/**"/>
         </jar>
     </target>
