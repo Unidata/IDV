@@ -1,0 +1,65 @@
+{Weather Text Product Control}
+
+{
+<meta name="jhid" value="idv.controls.textproductcontrol">
+
+This control is used to display weather text products (forecasts,
+warnings, watches, etc) produced by the National Weather Service
+and other international meteorological agencies.
+<p>
+The user interface consists of 3 tabs.  The first allows the
+user to select and display the text products.  The 
+[ht::command Products] panel allows the user to select the
+type of product to view. When a product is selected, the
+available stations are plotted in the associated view window.
+One or more stations can be selected by clicking on the
+station in the view window (or Ctrl-click for multiple
+stations).  When a station is selected, the text product
+for that station is displayed.
+
+[ht::cimg images/TextProductControlGui1.gif]
+
+The user can select between displaying the products as raw
+text or as HTML by clicking on the tab at the bottom of
+the text display area.
+
+In the HTML view, you can toggle on a glossary which will 
+highlight certain meteorological terms.  When the links
+are clicked, a dialog will pop up with an explanation of
+the term.
+
+[ht::cimg images/TextProductControlGui1a.gif]
+
+By default, the most recent text product is displayed.  
+Multiple products can be displayed by selecting a time
+range from the  [ht::command {Time Covered}] selector.
+You can loop through multiple products using the
+<a href="../ui/Animation.html">Time Animation</a> 
+widget.  The time animation will be synched with any
+other data in the associated view window.
+<p>
+
+The second tab controls the display of the station locations
+in the associated View window.  It is the same as the
+<a href="../StationLocationControl.html">Station Location 
+Control's</a> [ht::command Display] tab.
+
+[ht::cimg images/TextProductControlGui2.gif]
+
+When you select a product,
+the available stations are shown in the View window.  This
+tab can be used to control the station density and the layout
+of the station identifiers.
+<p>
+
+The third tab lists information about the selected location
+and shows lists of all the locations and the displayed  
+selections.  
+
+[ht::cimg images/TextProductControlGui3.gif]
+
+It is the same as the [ht::command Locations] tab in the 
+<a href="../StationLocationControl.html">Station Location Control</a>.
+}
+
+
