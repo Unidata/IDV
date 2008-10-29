@@ -1,5 +1,5 @@
 /*
- * $Id: YahooLocationControl.java,v 1.3 2006/12/01 20:16:39 jeffmc Exp $
+ * $Id: TextProductControl,v 1.3 2006/12/01 20:16:39 jeffmc Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -83,6 +83,11 @@ import javax.swing.tree.*;
 
 public class TextProductControl extends StationLocationControl implements HyperlinkListener {
 
+    /** type for text */
+    public static final String TEXT_TYPE = "Text";
+
+    /** type for html */
+    public static final String HTML_TYPE = "HTML";
 
     /** hours */
     private int hours = -1;
@@ -108,6 +113,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
     /** product tree */
     JTree productTree;
+
+    /** product tree */
+    private JTabbedPane textTabbedPane;
 
     /** ignore time changes flag */
     private boolean ignoreTimeChanges = false;
@@ -150,13 +158,16 @@ public class TextProductControl extends StationLocationControl implements Hyperl
     /** holds the last 10 converted html text objects */
     private Cache htmlCache = new Cache(10);
 
-    /** the font for displaying html      */
+    /** the font for displaying html */
     private Font htmlFont;
 
-    /** forn for non-html      */
+    /** forn for non-html */
     private Font fixedFont;
 
-    /** maps producttype to list of stations   */
+    /** default type */
+    private String displayType = TEXT_TYPE;
+
+    /** maps producttype to list of stations */
     private Hashtable<String, List> stationsForProduct =
         new Hashtable<String, List>();
 
@@ -337,7 +348,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         JComponent textHolder = GuiUtils.centerBottom(textScroller,
                                     textSearcher);
-        JTabbedPane textTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+        textTabbedPane  = new JTabbedPane(JTabbedPane.BOTTOM);
 
         showGlossaryCbx = new JCheckBox("Show Glossary", showGlossary);
         showGlossaryCbx.addActionListener(new ActionListener() {
@@ -345,10 +356,11 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 setText(currentText, true);
             }
         });
-        textTabbedPane.addTab("HTML",
+        textTabbedPane.addTab(TEXT_TYPE, textHolder);
+        textTabbedPane.addTab(HTML_TYPE,
                               GuiUtils.centerBottom(htmlScroller,
                                   GuiUtils.right(showGlossaryCbx)));
-        textTabbedPane.addTab("Text", textHolder);
+        textTabbedPane.setSelectedIndex(getTextTabIndex(displayType));
         GuiUtils.tmpInsets = GuiUtils.INSETS_2;
         JComponent topComp =
             GuiUtils.leftRight(GuiUtils.bottom(stationLabel),
@@ -366,7 +378,18 @@ public class TextProductControl extends StationLocationControl implements Hyperl
 
     }
 
-
+    /**
+     * Get the tab index for the text type
+     *
+     * @param tabName the name of the tab
+     *
+     * @return  the tab index
+     */
+    private int getTextTabIndex(String tabName) {
+        return (tabName.equalsIgnoreCase(HTML_TYPE))
+               ? 1
+               : 0;
+    }
 
 
     /**
@@ -879,8 +902,28 @@ public class TextProductControl extends StationLocationControl implements Hyperl
         return super.init(dataChoice);
     }
 
+    /**
+     * Set the text display type
+     * @param type  type (TEXT_TYPE or HTML_TYPE);
+     */
+    public void setDisplayType(String type) {
+        displayType = type;
+    }
 
-
+    /**
+     * Get the text display type
+     * @return type (TEXT_TYPE or HTML_TYPE);
+     */
+    public String getDisplayType() {
+        if (textTabbedPane != null) {
+            String tabText =
+                textTabbedPane.getTitleAt(textTabbedPane.getSelectedIndex());
+            return tabText.equalsIgnoreCase(HTML_TYPE)
+                   ? HTML_TYPE
+                   : TEXT_TYPE;
+        }
+        return displayType;
+    }
 
 
     /**
