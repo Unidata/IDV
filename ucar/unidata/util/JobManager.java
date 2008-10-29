@@ -245,8 +245,12 @@ public class JobManager {
             loadMap.put(id, name);
             Misc.run(new Runnable() {
                 public void run() {
-                    DialogInfo dialogInfo = new DialogInfo(id, name, modal);
-                    dialogMap.put(id, dialogInfo);
+                    DialogInfo dialogInfo = null;
+                    synchronized (MUTEX) {
+                        if(loadMap.get(id)==null) return;
+                        dialogInfo = new DialogInfo(id, name, modal);
+                        dialogMap.put(id, dialogInfo);
+                    }
                     if (showDialog) {
                         dialogInfo.showDialog();
                     }
