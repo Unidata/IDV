@@ -18,6 +18,8 @@
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false" name="IDV Preview"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 
+<!--
   <outputhandler class="ucar.unidata.repository.ExampleOutputHandler"  name="Example"/>
+-->
 
 </outputhandlers>
