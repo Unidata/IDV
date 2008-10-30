@@ -5,9 +5,9 @@ index.html
 >>overview/WhatIsIdv.html
 >>overview/IdvFeatures.html
 
->installandstart/Install.html
->>installandstart/Download.html
->>installandstart/Installer.html
+#>installandstart/Install.html
+#>>installandstart/Download.html
+#>>installandstart/Installer.html
 
 >installandstart/Start.html
 >>installandstart/FirstStart.html
@@ -21,7 +21,7 @@ index.html
 >>>resources/ProjectionManager.html
 >>>resources/Preferences.html
 >>>installandstart/basics/Exiting.html
->>>installandstart/WebStart.html
+|>>>installandstart/WebStart.html
 
 |installandstart/basics/MouseAndKeyboard.html
 |installandstart/basics/MapSelector.html
@@ -83,6 +83,11 @@ index.html
 >>>datadisplays/point/SubsettingPointData.html
 >>>datadisplays/point/ObsListDisplay.html
 >>>datadisplays/point/OtherPointDisplay.html
+
+#>>title:Layout Models:This section will cover how the Layout Model Editor is used to create and modify Layout Models.
+>>>resources/stationmodel/StationModelEditor.html
+>>>resources/stationmodel/StationModelEditor2.html
+|>>>resources/stationmodel/JythonInStationModels.html
 >>>datadisplays/point/DoingMorePointObs.html
 
 
@@ -158,13 +163,6 @@ index.html
 +>>>formulas/JythonAndVisad.html
 #>>>formulas/RainFallRatesWithJython.html
 >>>formulas/DerivedData.html
-#>>>dev/data/DerivedData.html
-
->>title:Layout Models:This section will cover how the Layout Model Editor is used to create and modify Layout Models.
->>>resources/stationmodel/StationModelEditor.html
->>>resources/stationmodel/StationModelEditor2.html
->>>resources/stationmodel/JythonInStationModels.html
-
 
 >>isl/main.index
 

@@ -8,7 +8,7 @@ gen::setIndexFile   main.index
 
 ##Where is the userguide located at
 ##TODO: Set this to point to the right place
-set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/
+set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/release/nightly
 set ::userguideRoot $::workshopDocroot/docs/userguide
 
 ##The page title

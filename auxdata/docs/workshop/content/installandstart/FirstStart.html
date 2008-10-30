@@ -40,13 +40,13 @@ the <code class="filename">runIDV</code> script. </div>
 #!/bin/sh
 
 dirname=`dirname $0`
-command="java -Xmx512m -Didv.enableStereo=false -jar idv.jar $*"
+command="java -Xmx512m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*"
     </pre>
 and then some code to find the version of java to use.
     <p>
     <i>On Windows:</i>
     <pre>
-jre\\\bin\\\java -Xmx512m -Didv.enableStereo=false -jar idv.jar %*
+jre\\bin\\java -Xmx512m -Didv.enableStereo=false -jar idv.jar %*
     </pre>
 
     <p>The script sets up the environment for the IDV to run.  
@@ -59,9 +59,12 @@ java -Xmx512m -jar idv.jar $*
        <li><code class="command">java</code> -
            creates the Java Virtual Machine</li>
        <li> <code class="command">-Xmx512m</code> - 
-           sets the maximum memory used by Java to 512 Mb</li>
+           sets the maximum memory used by Java to 512 Mb.  You can
+           change this value to increase the memory allotted to
+           the IDV if your system has more than 1Gb of RAM.</li>
        <li> <code class="command">-Didv.enableStereo=false</code> - 
-           disables stereo viewing.  Set this to true to enable</li>
+           disables stereo viewing.  Set this to true to enable
+           a stereo display.</li>
        <li> <code class="command">-jar idv.jar</code> -
             executes the main class specified in 
             <code class="filename">idv.jar</code></li>
