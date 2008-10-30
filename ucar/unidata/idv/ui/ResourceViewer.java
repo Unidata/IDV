@@ -93,8 +93,11 @@ public class ResourceViewer extends IdvManager {
         localOnlyCbx = new JCheckBox("Local Only", false);
         localOnlyCbx.setToolTipText("Only show local resources");
         localOnlyCbx.addActionListener(GuiUtils.makeActionListener(this,"updateTrees",null));
-        JComponent buttons = GuiUtils.leftCenter(localOnlyCbx,GuiUtils.wrap(GuiUtils.makeButton("Update", this,
-                                 "updateTrees")));
+        JButton listResources = GuiUtils.makeButton("List Sources",getIdv().getResourceManager(),"showHtmlView",null);
+
+        JComponent buttons = GuiUtils.leftCenter(localOnlyCbx,GuiUtils.wrap(GuiUtils.hbox(
+                                                                                          GuiUtils.makeButton("Update", this,
+                                                                                                              "updateTrees"),listResources,5)));
         contents = GuiUtils.inset(GuiUtils.centerBottom(tabbedPane,
                                                         buttons), 3);
         updateTrees();
