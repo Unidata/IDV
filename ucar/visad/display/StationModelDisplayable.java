@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.visad.display;
 
 
@@ -170,7 +172,7 @@ public class StationModelDisplayable extends DisplayableData {
     /** A cache of shapes */
     private Hashtable shapeCache = new Hashtable();
 
-    /** _more_          */
+    /** my color */
     private Color myColor;
 
 
@@ -381,12 +383,12 @@ public class StationModelDisplayable extends DisplayableData {
 
 
     /**
-     * _more_
+     * Set the color
      *
-     * @param c _more_
+     * @param c  the new color
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws VisADException unable to create specified VisAD objects
+     * @throws RemoteException unable to create specified remote objects
      */
     public void setColor(Color c) throws VisADException, RemoteException {
         super.setColor(c);
@@ -396,10 +398,21 @@ public class StationModelDisplayable extends DisplayableData {
         }
     }
 
+    /**
+     * Get the default color
+     *
+     * @return  the color
+     */
     public Color getColor() {
         return myColor;
     }
 
+    /**
+     * Implement toFront
+     *
+     * @throws VisADException unable to create specified VisAD objects
+     * @throws RemoteException unable to create specified remote objects
+     */
     public void toFront() throws RemoteException, VisADException {
         super.toFront();
         DisplayMaster master = getDisplayMaster();
@@ -846,10 +859,12 @@ public class StationModelDisplayable extends DisplayableData {
                     } else if (metSymbol instanceof LabelSymbol) {
                         stringValue = ((LabelSymbol) metSymbol).getText();
                     } else if (metSymbol instanceof TextSymbol) {
-                        stringValue = (scalar instanceof Text)
-                                      ? ((Text) scalar).getValue()
-                                      : ((TextSymbol) metSymbol).formatNumber(
-                                          ((Real) scalar).getValue());
+                        if (scalar instanceof Text) {
+                            stringValue = ((Text) scalar).getValue();
+                        } else {
+                            stringValue = ((TextSymbol) metSymbol).format(
+                                (Real) scalar);
+                        }
                     }
                     if (stringValue != null) {
                         if (font != null) {
