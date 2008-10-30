@@ -21,15 +21,12 @@
  */
 
 
-
 package ucar.unidata.util;
-
 
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 
 
 /**
@@ -109,7 +106,7 @@ public class DateSelection {
     /** The total count of times we want */
     private int count = MAX_COUNT;
 
-    /** _more_          */
+    /** maximum count */
     public static final int MAX_COUNT = Integer.MAX_VALUE;
 
     /** How many times do we choose within a given interval range */
@@ -119,13 +116,13 @@ public class DateSelection {
     /** This can hold a set of absolute times. If non-null then these times override any of the query information */
     private List times;
 
-    /** _more_          */
+    /** flag for using the latest */
     private boolean doLatest = false;
 
-    /** _more_          */
+    /** flag for using all */
     private boolean doAll = false;
 
-    /** _more_          */
+    /** now  time */
     private Date nowTime;
 
     /**
@@ -156,12 +153,12 @@ public class DateSelection {
 
 
     /**
-     * _more_
+     * Construct a DateSelection
      *
-     * @param startMode _more_
-     * @param startOffset _more_
-     * @param endMode _more_
-     * @param endOffset _more_
+     * @param startMode  starting time mode
+     * @param startOffset  offset from start time
+     * @param endMode end time mode
+     * @param endOffset offset from end time
      */
     public DateSelection(int startMode, double startOffset, int endMode,
                          double endOffset) {
@@ -469,8 +466,12 @@ public class DateSelection {
      * @return time range. If in doLatest or doAll mode this returns null
      */
     public Date[] getRange() {
-        if(doLatest) return null;
-        if(doAll) return null;
+        if (doLatest) {
+            return null;
+        }
+        if (doAll) {
+            return null;
+        }
         double now   = (double) (((nowTime != null)
                                   ? nowTime.getTime()
                                   : System.currentTimeMillis()));
