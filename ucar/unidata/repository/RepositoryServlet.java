@@ -73,6 +73,9 @@ public class RepositoryServlet extends HttpServlet {
 
 
 
+    private Object MUTEX = new Object();
+
+
     /**
      * Create the repository
      *
@@ -82,9 +85,13 @@ public class RepositoryServlet extends HttpServlet {
      */
     private void createRepository(HttpServletRequest request)
             throws Exception {
-        repository = new Repository(getInitParams(), 
+        //Have  a local variable here so we can create and initialize it
+        Repository tmp = new Repository(getInitParams(), 
                                     request.getServerPort(), true);
-        repository.init(null);
+        tmp.init(null);
+
+        //Now set it
+        repository  = tmp;
     }
 
 
@@ -148,18 +155,21 @@ public class RepositoryServlet extends HttpServlet {
 
         // there can be only one
         if (repository == null) {
-            try {
-                createRepository(request);
-            } catch (Exception e) {
-                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
-                response.sendError(response.SC_INTERNAL_SERVER_ERROR,
-                                   "An error has occurred:" + e.getMessage());
-                return;
+            synchronized(MUTEX) {
+                if (repository == null) {
+                    try {
+                        createRepository(request);
+                    } catch (Exception e) {
+                        ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+                        response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                                           "An error has occurred:" + e.getMessage());
+                        return;
+                    }
+                }
             }
         }
 
         RequestHandler handler          = new RequestHandler(request);
-
         Result         repositoryResult = null;
         try {
             // need to support HTTP HEAD request since we are overriding HttpServlet doGet   
