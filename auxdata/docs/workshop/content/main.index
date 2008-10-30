@@ -110,7 +110,7 @@ index.html
 ##>>>datadisplays/trajectory/TracksInTransect.html
 
 
->>title:GIS and Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles) and the drawing tool.
+>>title:Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles), the drawing tool and weather text displays.
 >>>datadisplays/gis/WMS.html
 ##>>>datadisplays/gis/WMS2.html
 >>>datadisplays/gis/Shapefile.html
