@@ -19,7 +19,6 @@ index.html
 >>>installandstart/basics/ViewManagerMenus.html
 >>>installandstart/basics/BackgroundMaps.html
 >>>resources/ProjectionManager.html
->>>resources/Preferences.html
 >>>installandstart/basics/Exiting.html
 |>>>installandstart/WebStart.html
 
@@ -149,12 +148,13 @@ index.html
 >>>resources/colortable/UsingTheNewTable.html
 
 
->>resources/parameters/index.html
->>>resources/parameters/ParameterDefaultsEditor.html
-|resources/parameters/Patterns.html
->>>resources/parameters/ParameterAliasEditor.html
->>>resources/parameters/ParameterAliasEditor2.html
->>>resources/parameters/ParameterGroupEditor.html
+>>title:Configuring the IDV:In this section we will cover how to configure various aspects of the IDV
+>>>config/Preferences.html
+>>>config/ParameterDefaultsEditor.html
+|config/Patterns.html
+>>>config/ParameterAliasEditor.html
+>>>config/ParameterAliasEditor2.html
+>>>config/ParameterGroupEditor.html
 
 >>formulas/index.html
 >>>formulas/SimpleFormulas.html

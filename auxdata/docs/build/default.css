@@ -30,6 +30,10 @@ body.popup {
     font-style:italic;
 }
 
+.moreblock {
+   visibility: hidden; 
+   display:none;
+}
 
 
 .note {

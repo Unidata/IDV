@@ -331,6 +331,8 @@ proc gen::js::get  {depth extra keyExtra} {
         }
     }
 
+
+
 return "
 <script language=\"JavaScript\">
     //<!--
@@ -340,6 +342,7 @@ return "
 	    isNav = true
 	} 
     }
+
     function getCharCode(evt) {if (isNav)  {return evt.charCode;}return evt.charCode;}
     function getEvent(evt) {if (isNav)  {return evt;}  return window.event;}
     function rollTo(nextBullet, andScroll) {
@@ -1012,7 +1015,9 @@ proc gen::walkTree {indexFile {parent ""}} {
                 if  {![file exists $f]} {
                     puts "Error: file $f does not exist."
                 } else {
-                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] $dir [file dirname $f]]
+                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] $dir ]
+##                    puts "lappend ::filesToCopy  $f [file join [gen::getTargetDir] $dir ]"
+##                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] $dir [file dirname $f]]
                 }
             }
             continue
@@ -1274,6 +1279,11 @@ proc gen::getCss {depth} {
     foreach cssFile [gen::getCssFiles] {
         append html  "  <link rel=\"stylesheet\" type=\"text/css\" href=\"[gen::getDotPath $depth][file tail $cssFile]\" title=\"Style\">\n"
     }
+
+
+    if {[gen::getDoJSNav]} {
+            append html  " <script language=\"JavaScript1.2\" src=\"[gen::getDotPath $depth]/unidata.js\"></script>\n"
+    }
     return $html
 }
 
@@ -1380,6 +1390,21 @@ proc gen::initMacroArray {} {
 
 proc gen::getHeadContent {from depth} {
     return "[gen::getCss $depth]"
+}
+
+
+set ::moreId 0
+proc ht::more {content {more {More...}} {less {...Less}}} {
+    if {![gen::getDoJSNav]} {
+         return $content
+    }
+
+    set  base  [incr ::moreId]
+    set  divId  "morediv_$base"
+    set  linkId "morelink_$base"
+    set  moreLink   "javascript:showMore('$base')"
+    set  lessLink   "javascript:hideMore('$base')"
+    set  text   "<br><a id=\"$linkId\" href=\"$moreLink\">$more</a><div class=\"moreblock\" id=\"$divId\">$content<br><a href=\"$lessLink\">$less</a></div>"
 }
 
 
@@ -2761,6 +2786,7 @@ foreach cssFile  $cssFiles {
 }
 
 catch {file copy  [file join $scriptDir/default.css]  [gen::getTargetDir]}
+catch {file copy  [file join $scriptDir/unidata.js]  [gen::getTargetDir]}
 
 if {[llength [gen::getCssFiles]] == 0} {
     puts "Adding default.css"
