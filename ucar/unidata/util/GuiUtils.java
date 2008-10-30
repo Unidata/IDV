@@ -3676,6 +3676,10 @@ public class GuiUtils extends LayoutUtil {
         }
         window.getContentPane().add(contents);
         window.pack();
+        try {
+            editor.setCaretPosition(0);
+            editor.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+        } catch(Exception noop){}
         Msg.translateTree(window);
         window.setVisible(true);
         return new Component[] { window, editor };
