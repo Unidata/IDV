@@ -23,7 +23,7 @@
    <bundle  category="Toolbar&gt;Workshop"   name="Mars Imagery"
             url="/ucar/unidata/apps/workshop/bundles/marsquad.xidv"/>
 
-   <bundle  category="Toolbar&gt;Workshop"   name="US Radar/Satellite/Fronts"
+   <bundle  category="Toolbar&gt;Workshop"   name="Current U.S. Weather"
             url="/ucar/unidata/apps/workshop/bundles/nationalwx.xidv"/>
 
 </bundles>
