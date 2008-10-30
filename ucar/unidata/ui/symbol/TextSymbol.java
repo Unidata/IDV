@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui.symbol;
 
 
@@ -27,15 +28,14 @@ package ucar.unidata.ui.symbol;
 import ucar.unidata.ui.drawing.DisplayCanvas;
 import ucar.unidata.util.Misc;
 
+import visad.DateTime;
 import visad.Real;
-
 import visad.Unit;
 
 import java.awt.*;
 import java.awt.geom.*;
 
 import java.text.DecimalFormat;
-
 import java.text.NumberFormat;
 
 
@@ -364,11 +364,17 @@ public class TextSymbol extends MetSymbol {
      * @return the formatted value
      */
     public String format(Real d) {
+        String fmtString = null;
         try {
-            return formatNumber(d.getValue());
+            if (d instanceof DateTime) {
+                fmtString = ((DateTime) d).toString();
+            } else {
+                fmtString = formatNumber(d.getValue());
+            }
         } catch (Exception exc) {
             return "error: " + exc;
         }
+        return fmtString;
     }
 
 
