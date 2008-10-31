@@ -2660,10 +2660,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The data choice
      */
     public DataChoice getDataChoice() {
-        if ((myDataChoices == null) || (myDataChoices.size() == 0)) {
+        List tmp = myDataChoices;
+        if ((tmp == null) || (tmp.size() == 0)) {
             return null;
         }
-        return (DataChoice) myDataChoices.get(0);
+        return (DataChoice) tmp.get(0);
     }
 
 
@@ -3582,9 +3583,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The String to be used for the long parameter name
      */
     protected String getLongParamName() {
-        return ((getDataChoice() == null)
+        DataChoice dataChoice = getDataChoice();
+        return ((dataChoice == null)
                 ? null
-                : getDataChoice().getDescription());
+                : dataChoice.getDescription());
     }
 
     /**
@@ -4405,6 +4407,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         //                            hide();
                     }
                 } catch (Exception exc) {
+                    System.err.println ("ERROR:" + hasBeenRemoved);
                     System.err.println("oops: " + exc);
                     exc.printStackTrace();
                 }

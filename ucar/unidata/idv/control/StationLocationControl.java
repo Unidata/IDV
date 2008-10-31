@@ -968,6 +968,16 @@ public class StationLocationControl extends StationModelControl {
         return v;
     }
 
+    private void updateTable() {
+        final List sortedStations = Misc.sort(displayedStations);
+        final List allSortedStations = Misc.sort(getStationList());
+        GuiUtils.invokeInSwingThread(new Runnable() {public void run() {
+            locationsTableModel.setLocations(sortedStations);
+            allLocationsTableModel.setLocations(allSortedStations);
+        }});
+
+    }
+
 
     /**
      * Loads the data into the <code>StationModelDisplayable</code>.
@@ -1044,10 +1054,7 @@ public class StationLocationControl extends StationModelControl {
                         locationDisplayable.setStations(listOfStations);
                         Trace.call2("setStations");
                         if (locationsTableModel != null) {
-                            locationsTableModel.setLocations(
-                                Misc.sort(displayedStations));
-                            allLocationsTableModel.setLocations(
-                                Misc.sort(getStationList()));
+                            updateTable();
                         }
                         List datum = null;
                         for (int i = 0; i < listOfStations.size(); i++) {
