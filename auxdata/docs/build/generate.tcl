@@ -1018,7 +1018,7 @@ proc gen::walkTree {indexFile {parent ""}} {
                 } else {
                         
                     lappend ::filesToCopy  $f [file join [gen::getTargetDir] [file join $dir $fileDir] ]
-                    puts "lappend ::filesToCopy  $f [file join [gen::getTargetDir] [file join $dir $fileDir]]"
+##                    puts "lappend ::filesToCopy  $f [file join [gen::getTargetDir] [file join $dir $fileDir]]"
 ##                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] $dir [file dirname $f]]
                 }
             }
