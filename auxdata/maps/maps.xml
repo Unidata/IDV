@@ -96,4 +96,13 @@
        linestyle="0"
        />
 
+  <map
+       source="/auxdata/maps/OUTLANT"
+       description="Antarctica"
+       visible="false"
+       color="0x00FFFF"
+       linewidth="1.0"
+       linestyle="0"
+       />
+
 </maps>
