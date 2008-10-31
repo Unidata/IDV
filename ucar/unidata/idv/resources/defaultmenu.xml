@@ -171,8 +171,8 @@
        label="Choose Data"
        id="data.newdata"/>
     <menu
-       label="Load Data"
-       id="data.loaddata"/>
+       label="Special"
+       id="data.special"/>
     <separator/>
   </menu>
   <menu

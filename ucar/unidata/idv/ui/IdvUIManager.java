@@ -1551,7 +1551,7 @@ public class IdvUIManager extends IdvManager {
             GuiUtils.makeMenu(
                 menu,
                 getIdvChooserManager().makeChooserMenus(new ArrayList()));
-        } else if (id.equals("data.loaddata")) {
+        } else if (id.equals("data.special")) {
             menu.removeAll();
             List menus = new ArrayList();
             for (DataSourceDescriptor descriptor : getDataManager()
