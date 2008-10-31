@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.visad.display;
 
 
@@ -249,6 +246,9 @@ public class StationModelDisplayable extends DisplayableData {
     /** mutex for locking when creating shapes */
     private static Object SHAPES_MUTEX = new Object();
 
+    /** mutex for locking when creating shapes */
+    private static Object DATA_MUTEX = new Object();
+
     /** flag for a time sequence */
     private boolean isTimeSequence = false;
 
@@ -360,7 +360,6 @@ public class StationModelDisplayable extends DisplayableData {
     }
 
 
-
     /**
      * Set the station data to display using the StationModel.
      * @param  stationData Field of station observations.
@@ -370,15 +369,18 @@ public class StationModelDisplayable extends DisplayableData {
     public void setStationData(FieldImpl stationData)
             throws VisADException, RemoteException {
 
-        setDisplayInactive();
-        Data d = makeNewDataWithShapes(stationData);
-        if ((d != null) && !d.isMissing()) {
-            setData(d);
-        } else {
-            setData(new Real(0));
+        synchronized (DATA_MUTEX) {
+            setDisplayInactive();
+            Data d = makeNewDataWithShapes(stationData);
+            if ((d != null) && !d.isMissing()) {
+                setData(d);
+            } else {
+                //ucar.unidata.util.Misc.printStack("data is null", 5);
+                setData(new Real(0));
+            }
+            this.stationData = stationData;  // hold around for posterity
+            setDisplayActive();
         }
-        this.stationData = stationData;  // hold around for posterity
-        setDisplayActive();
     }
 
 
@@ -1748,10 +1750,13 @@ public class StationModelDisplayable extends DisplayableData {
     public void setShouldUseAltitude(boolean value)
             throws VisADException, RemoteException {
         shouldUseAltitude = value;
-        FieldImpl tmp = stationData;
+        if (stationData != null) {
+            setStationData(stationData);
+        }
+        //FieldImpl tmp = stationData;
         //        setDisplayInactive();
-        setStationData(null);
-        setStationData(tmp);
+        //setStationData(null);
+        //setStationData(tmp);
         //        setDisplayActive();
     }
 
