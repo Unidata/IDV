@@ -1,0 +1,35 @@
+<title>PDF/PS/SVG Capture</title>
+
+
+
+<div class="overview">
+In this section we will cover how to capture PDF, Postscript and SVG images within the IDV.
+</div>
+
+<ol class="step">
+
+  <li>Clear your displays and create a contour plan view.
+  
+  <li>Select the [ht::menu View Capture {Image...}] menu item from
+      the map view's   menu bar. The [ht::dialog File Dialog] will popup.</li>
+  
+  <li>You can save the display as a PDF, Postscript or Scalable Vector Graphics file. [ht::save workshop.pdf]</li>
+  
+  <li> In the dialog that pops up select [ht::button Preview] and also enter some label text.</li>
+  <li> On the workshop Linux machines run <i>evince</i> to view the PDF<pre>
+evince workshp.pdf</pre>
+  <ul>
+    <li> Vector capture is a 2 stage process. The raster-like  displays (e.g., images) are captured then the vector displays (e.g., contours, maps).
+  </ul>
+
+  <li> Lets look at the limitations of vector catpure.
+    <ul>
+      <li> Leaving the contour plan view also create an isosurface display.
+      <li> Make sure the contour plan view intersects the isosurface at some level.
+      <li> Capture and view [ht::filename workshop2.pdf].
+    </ul>
+
+</ol>
+
+
+
