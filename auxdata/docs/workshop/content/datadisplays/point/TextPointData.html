@@ -1,25 +1,77 @@
 <html>
 <head>
-<title>Text (ASCII) Point Data Display</title>
+<title>Text (ASCII) Point Data</title>
 </head>
 
 <body>
 
 <div class="overview">
-    In this section, we are going to look at the IDV's support of reading in point observation
-     data in a text comma separated value (CSV) file format.
-    </div>
+The IDV can read in point observation data in Comma Separated Value (CSV) form (as well as tab separated values and Excel xls files).
+</div>
 
 <p>
-<ol class="step">
+<ul class="step">
 
-    <li> [ht::clearDisplaysAndData]
+    <li> Here is an example file: <a target="_other" href="metar.csv.txt">metar.csv</a>.
+    The minimum data required by the IDV is time, latitude and longitude.
 
-    <li> Text point data with header.
+    <li> Load the csv file in.
+    <ul>
+     <li> In the [ht::dialog Data Source Chooser] click on the
+         [ht::command Files] tab.
+     <li> Go to the point data directory:     [ht::filename <%workshop.datadir%>/point/].
+     <li> Select [ht::filename metar.csv] and press  [ht::button Add Source].
+     </ul>
+
+     <li> The Text Point Metadata Gui will pop up.    This allows you to define the metadata for the point data.
+
+
+[ht::cimg images/TextPointMetaDataGui.gif] 
+
+
+    <li>Using the Text Point Metadata Gui
+    <ul>
+    <li> At the top a number of the initial lines from the text data are shown.
+         The arrow buttons allow you to specify where the data starts. Skip the first line.
+
+    <li> For each column of text data there is a row that shows sample value and allows you to enter a name, unit, date format, missing
+        value and extra information. 
+
+    <li> We're going to skip the &quot;ROW&quot; parameter and define metadata for:<br>
+        &quot;Time &quot;,&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;T&quot;,
+        &quot;DIR&quot;,and &quot;SPD&quot;.
+
+    <li> Note that the time field spans two columns - year and time. The IDV needs to have the time in one column so we use:<br>
+<i>colspan="2"</i><br>
+This tells the IDV to concatenate columns 1 and 2 and treat them as a single column.
+
+    <li> Note: the unit for longitude is &quot;degrees_west&quot;
+   
+    <li> Enter the names and units as shown above.
+
+    <li> You can save these settings for future use.
+     <ul>
+       <li> 
+       Press the [ht::button Preferences] button and select  [ht::menu {Save Current}]. 
+       <li> Enter a name, e.g., &quot;workshop&quot;
+       <li> You can reapply these settings with the [ht::button Preferences] button.
+      </ul>
+
+     <li> When done press [ht::button OK]. You can also bring up this GUI in the Data Source Properties Dialog.
+
+    </ul>
+
+
+    <li> Create the [ht::display Point Data Plot] and change its layout model to &quot;METAR&quot;
+
+
+
+
+    <li> You can also add a special 2 line header to the top of your text file.
  <pre>
- (index) -> (Date,Time,Latitude,Longitude,T,ROW,DIR,SPD)
+ (index) -> (Date,Time,Latitude,Longitude,T,DIR,SPD)
   Time\[fmt="yyyy-MM-dd HH:mm:ss"\],Latitude\[unit="deg"\],Longitude\[unit="degrees west"\],T\[unit="celsius"\],
-        ROW\[unit=""\],DIR\[unit="deg"\],SPD\[unit="m/s"\]
+        skip,DIR\[unit="deg"\],SPD\[unit="m/s"\]
   2008-10-31, 14:00:00,36.773,98.670,9.0,43.0,320.0,1.5
   2008-10-31, 14:00:00,30.317,97.767,16.7,43.0,0.0,0.0
   2008-10-31, 14:00:00,34.398,96.148,13.0,43.0,0.0,0.0
@@ -28,60 +80,13 @@
            .......
  </pre>
 
+In the example above, the first line's structure is a VisAD type definition.
+The second line defines the formatting and units of the parameters.
+Starting the third line is the data section of this sample.
+There is more documentation in the <a target="_other" href="http://www.unidata.ucar.edu/software/idv/release/nightly/docs/userguide/data/TextPointData.html">User Guide</a>.
 
 
-      <p> In the example above, the first line's structure is a mapping of domain parameter.
-           The second line defines the formatting and units of the parameters.
-           Starting the third line is the data section of this sample.
-      </p>
-
-
-
-    <li> Load text point data without header.
-    <ul>
-     <li> [ht::openDataSourceChooser]
-     <li> In the [ht::dialog Data Source Chooser] click on the
-         [ht::command Files] tab.
-     <li> Go to the point data directory:     [ht::filename <%workshop.datadir%>/point/].
-     <li> Select [ht::filename metar.csv]
-     <li> Under the [ht::command Data Source Type] pulldown menu, select &quot;Text Point Data files&quot;
-     <li> Press [ht::button Add Source], and the Text Point Metadata Gui will pop up.
-     <li> Notice the header part of this csv file being commenting out.
-    </ul>
-
-    [ht::cimg images/TextPointMetaDataGui.gif]
-
-
-    <li>Using the Text Point Metadata Gui
-    <ul>
-    <li> At the top a number of the initial lines from the text data are shown.
-         The arrow keys allow you to specify the start line. For example, if you had
-         some other header information you can skip over those commenting lines.
-
-    <li> For each column of text data there is a row shown in the bottom of the dialog.
-        This shows the sampled value and allows you to enter a name, unit, date format, missing
-        value and extra information. These parameters are:
-        &quot;Time &quot;,&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;T&quot;,
-        &quot;ROW&quot;, &quot;DIR&quot;,and &quot;SPD&quot;.
-    <li> After entering all the fields and you want to keep from having to do this again next time
-        you load a new text point data of the form simply press the &quot;Preferences&quot; button
-        and select [ht::menu {Save Current}]. This allows you to save these metadata settings and
-        reapply them later using the &quot;Preferences&quot; button.
-  
-    </ul>
-
-
-    <li> Create the display.
-    <ul>
-    <li> In the [ht::command Fields] panel select [ht::param Point Data].
-    <li> In the [ht::command Displays]  select [ht::display Point Data List] and press
-         [ht::button Create Display]
-    <li> In the control window, use the [ht::command Layout Model] selector box to
-        change station model from LOCATION to METAR.
-    </ul>
-
-
-</ol>
+</ul>
 
 </body>
 </html>

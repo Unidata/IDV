@@ -9,47 +9,31 @@
 <p>
 METAR and Synoptic data can be accessed in the IDV from
 ADDE servers.  The data available is hourly, each hourly file having 
- all station observations at that time. 
+all station observations at that time. 
 </div>
 
-<p>
-
-<p>
 
 <ol class="step">
-
-<li>Open the Surface Data Source Chooser</li>
-  <ul class="substep">
     <li>[ht::clearDisplaysAndData]
-    <li> [ht::openDataSourceChooser] 
-    <li>In the [ht::dialog Data Source Chooser] click on the 
-    [ht::command Point] tab. 
-    <li>In the 
-    [ht::command Server:] entry box, select the remote ADDE server 
-    [ht::command adde.ucar.edu].
+    <li>In the [ht::dialog Data Source Chooser] go to the  [ht::command Point] tab. 
+    <li>In the  [ht::command Server:] entry box, select the remote ADDE server 
+    &quot;adde.ucar.edu&quot;.
     <li>In the [ht::command Data Type:] entry box, select the choice 
-    [ht::command Surface (METAR) Data].
-    <li>Click on [ht::button Connect].
+    &quot;Surface (METAR) Data&quot; and click on [ht::button Connect].
     <li>The IDV will connect to the ADDE server at adde.ucar.edu and
-    download metadata about available METAR data. Select 
-    [ht::command Absolute times] to see a list of data times that you 
+    download metadata about the available METAR data. 
+    <li> Select  [ht::command Absolute times] to see a list of data times that you 
     can get from this server.
-    <li>The bottom time in the list, 
-    the most recent time, should be highlighted.
+    <li>The bottom time in the list,  the most recent time, should be highlighted.
     If it is not, click on it.
-    <LI>Hold down the shift key and click on the time one above the bottom,
+    <li> Hold down the control key and click on the second to last time
     so that two times are selected.
-    <LI>You could also select [ht::command Use relative times] and select
+    <li>You could also select [ht::command Use relative times] and select
     [ht::command Most recent 2 times].
-    <li>If the entry box [ht::command Layout Model:] does not show METAR, 
-    select METAR.
-    <li>Click the [ht::button Add Source] button at the 
-    bottom of the selector window. 
-  <li> Because the [ht::button Create Display] checkbox is on in the chooser the IDV automatically creates a point data plot.
-  </ul>
-</li>
-
-</OL>
+    <li>Make sure the [ht::command Layout Model:] is  &quot;Observations&gt;METAR&quot;.
+    <li>Click the [ht::button Add Source] button.
+    <li> Because the [ht::button Create Display] checkbox is selected the IDV automatically creates a point data plot.
+</ol>
 
 
 
