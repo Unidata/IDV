@@ -83,6 +83,7 @@ index.html
 >>>datadisplays/point/SubsettingPointData.html
 >>>datadisplays/point/ObsListDisplay.html
 >>>datadisplays/point/OtherPointDisplay.html
+-datadisplays/point/metar.csv
 
 #>>title:Layout Models:This section will cover how the Layout Model Editor is used to create and modify Layout Models.
 >>>resources/stationmodel/StationModelEditor.html
