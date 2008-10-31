@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -30,6 +31,7 @@ import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.dt.TypedDataset;
 import ucar.nc2.dt.TypedDatasetFactoryIF;
 
@@ -85,7 +87,19 @@ public class CosmicTrajectoryObsDataset extends SingleTrajectoryObsDataset imple
      * @return true if the right format
      */
     static public boolean isValidFile(NetcdfDataset ncd) {
-        return (buildConfig(ncd) != null);
+        //return (buildConfig(ncd) != null);
+        // Check for "center" attribute w/ value of "UCAR/CDAAC".
+        Attribute attrib = ncd.findGlobalAttributeIgnoreCase("center");
+        if (attrib == null) {
+            return false;
+        }
+        if ( !attrib.isString()) {
+            return false;
+        }
+        if ( !attrib.getStringValue().equals("UCAR/CDAAC")) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -97,7 +111,7 @@ public class CosmicTrajectoryObsDataset extends SingleTrajectoryObsDataset imple
      */
     private static Config buildConfig(NetcdfDataset ncd) {
 
-        // Check for "zebra_platform" attribute w/ value of "class".
+        // already did this in isValid, but we'll keep here for later refactor
         Attribute attrib = ncd.findGlobalAttributeIgnoreCase("center");
         if (attrib == null) {
             return null;
@@ -167,17 +181,20 @@ public class CosmicTrajectoryObsDataset extends SingleTrajectoryObsDataset imple
         double[] times    = new double[numTimes];
         //Variable timeVar = new Variable(var);
         //timeVar.setName(timeVarName);
-        Variable timeVar = new Variable(ncd, ncd.getRootGroup(), null,
-                                        timeVarName);
-        timeVar.setDataType(DataType.DOUBLE);
-        timeVar.setDimensions(list);
-        Attribute newUnits =
-            new Attribute("units", "seconds since 1980-01-06 00:00:00");
-        timeVar.addAttribute(newUnits);
+        VariableDS timeVar =
+            new VariableDS(ncd, ncd.getRootGroup(), null, timeVarName,
+                           DataType.DOUBLE, timeDimName,
+                           "seconds since 1980-01-06 00:00:00",
+                           "Time coordinate");
+        //Variable timeVar = new Variable(ncd, ncd.getRootGroup(), null,
+        //                              timeVarName);
+        //timeVar.setDataType(DataType.DOUBLE);
+        //timeVar.setDimensions(list);
+        //Attribute newUnits =
+        //    new Attribute("units", "seconds since 1980-01-06 00:00:00");
+        //timeVar.addAttribute(newUnits);
         timeVar.setCachedData(Array.makeArray(DataType.DOUBLE, numTimes,
-                                            endTime,
-                                            ((startTime - endTime)
-                                             / numTimes)), true);
+                endTime, ((startTime - endTime) / numTimes)), true);
         ncd.addVariable(ncd.getRootGroup(), timeVar);
         trajConfig.setTimeVar(timeVar);
 
