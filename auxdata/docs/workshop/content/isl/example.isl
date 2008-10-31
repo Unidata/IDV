@@ -26,16 +26,9 @@ Then do successive generate calls
 Then finish with  the generate_end call
  -->
 
-<!-- 
-Import the library
-
-Normally we would just include  the system script
-  <import file="/ucar/unidata/idv/isl/generate.isl"/>
--->
-
+<!-- Import the library -->
   <import file="/ucar/unidata/idv/isl/generate.isl"/>
 
-<!--  <import file="${islpath}/generate.isl"/> -->
 
 <!--
 The generate_ flags allow you to control what is generated.
