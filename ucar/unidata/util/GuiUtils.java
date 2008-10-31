@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -3679,7 +3680,7 @@ public class GuiUtils extends LayoutUtil {
         try {
             editor.setCaretPosition(0);
             editor.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
-        } catch(Exception noop){}
+        } catch (Exception noop) {}
         Msg.translateTree(window);
         window.setVisible(true);
         return new Component[] { window, editor };
@@ -4309,6 +4310,23 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * RUn the given runnable in the swing event dispatch thread
+     *
+     * @param runnable runnable to run
+     */
+    public static void invokeInSwingThread(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (Exception exc) {
+                throw new WrapperException("Error invoking in swing thread",
+                                           exc);
+            }
+        }
+    }
 
 
     /**
@@ -6086,4 +6104,5 @@ public class GuiUtils extends LayoutUtil {
     }
 
 }
+
 
