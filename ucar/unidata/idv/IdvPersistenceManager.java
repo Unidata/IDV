@@ -2484,6 +2484,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         try {
             LogUtil.consoleMessage("Decode jnlp file\n");
             Element root          = XmlUtil.getRoot(filename, getClass());
+            if(root == null) {
+                throw new IllegalArgumentException ("Could not load JNLP file:" + filename);
+            }
             List    arguments     = XmlUtil.findDescendants(root, "argument");
             boolean nextOneBundle = false;
             for (int i = 0; i < arguments.size(); i++) {
