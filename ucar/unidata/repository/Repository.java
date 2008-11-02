@@ -99,7 +99,7 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository extends RepositoryBase implements Tables,
+public class Repository extends RepositoryBase implements 
         RequestHandler {
 
     /** _more_ */
@@ -1099,8 +1099,8 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected void readGlobals() throws Exception {
-        Statement statement = getDatabaseManager().select(COLUMNS_GLOBALS,
-                                  TABLE_GLOBALS, new Clause[] {});
+        Statement statement = getDatabaseManager().select(Tables.GLOBALS.COLUMNS,
+                                  Tables.GLOBALS.NAME, new Clause[] {});
         dbProperties = new Properties();
         ResultSet results = statement.getResultSet();
         while (results.next()) {
@@ -2261,9 +2261,9 @@ public class Repository extends RepositoryBase implements Tables,
      * @throws Exception _more_
      */
     protected void writeGlobal(String name, String value) throws Exception {
-        getDatabaseManager().delete(TABLE_GLOBALS,
-                                    Clause.eq(COL_GLOBALS_NAME, name));
-        getDatabaseManager().executeInsert(INSERT_GLOBALS,
+        getDatabaseManager().delete(Tables.GLOBALS.NAME,
+                                    Clause.eq(Tables.GLOBALS.COL_NAME, name));
+        getDatabaseManager().executeInsert(Tables.GLOBALS.INSERT,
                                            new Object[] { name,
                 value });
         dbProperties.put(name, value);
@@ -2540,9 +2540,9 @@ public class Repository extends RepositoryBase implements Tables,
         if (clause != null) {
             clauses.add(clause);
         }
-        clauses.add(Clause.eq(COL_ENTRIES_TYPE, TypeHandler.TYPE_GROUP));
-        Statement statement = getDatabaseManager().select(COL_ENTRIES_ID,
-                                  TABLE_ENTRIES, clauses);
+        clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE, TypeHandler.TYPE_GROUP));
+        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COL_ID,
+                                  Tables.ENTRIES.NAME, clauses);
         return getGroups(request, SqlUtil.readString(statement, 1));
     }
 
@@ -3560,13 +3560,13 @@ public class Repository extends RepositoryBase implements Tables,
                     newId = getGroupId(toGroup);
                     fromEntry.setId(newId);
                     String[] info = {
-                        TABLE_ENTRIES, COL_ENTRIES_ID, TABLE_ENTRIES,
-                        COL_ENTRIES_PARENT_GROUP_ID, TABLE_METADATA,
-                        COL_METADATA_ENTRY_ID, TABLE_COMMENTS,
-                        COL_COMMENTS_ENTRY_ID, TABLE_ASSOCIATIONS,
-                        COL_ASSOCIATIONS_FROM_ENTRY_ID, TABLE_ASSOCIATIONS,
-                        COL_ASSOCIATIONS_TO_ENTRY_ID, TABLE_PERMISSIONS,
-                        COL_PERMISSIONS_ENTRY_ID
+                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
+                        Tables.ENTRIES.COL_PARENT_GROUP_ID, Tables.METADATA.NAME,
+                        Tables.METADATA.COL_ENTRY_ID, Tables.COMMENTS.NAME,
+                        Tables.COMMENTS.COL_ENTRY_ID, Tables.ASSOCIATIONS.NAME,
+                        Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, Tables.ASSOCIATIONS.NAME,
+                        Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, Tables.PERMISSIONS.NAME,
+                        Tables.PERMISSIONS.COL_ENTRY_ID
                     };
 
 
@@ -3590,12 +3590,12 @@ public class Repository extends RepositoryBase implements Tables,
                 }
 
                 //Change the parent
-                String sql = "UPDATE  " + TABLE_ENTRIES + " SET "
-                             + SqlUtil.unDot(COL_ENTRIES_PARENT_GROUP_ID)
+                String sql = "UPDATE  " + Tables.ENTRIES.NAME + " SET "
+                             + SqlUtil.unDot(Tables.ENTRIES.COL_PARENT_GROUP_ID)
                              + " = "
                              + SqlUtil.quote(fromEntry.getParentGroupId())
                              + " WHERE "
-                             + SqlUtil.eq(COL_ENTRIES_ID,
+                             + SqlUtil.eq(Tables.ENTRIES.COL_ID,
                                           SqlUtil.quote(fromEntry.getId()));
                 statement.execute(sql);
                 connection.commit();
@@ -3787,8 +3787,8 @@ public class Repository extends RepositoryBase implements Tables,
             if(entry == null) return null;
         } else {
             Statement entryStmt =
-                getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
-                                            Clause.eq(COL_ENTRIES_ID,
+                getDatabaseManager().select(Tables.ENTRIES.COLUMNS, Tables.ENTRIES.NAME,
+                                            Clause.eq(Tables.ENTRIES.COL_ID,
                                                 entryId));
 
             ResultSet results = entryStmt.getResultSet();
@@ -4503,8 +4503,8 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Result processCommentsEdit(Request request) throws Exception {
         Entry entry = getEntry(request);
-        getDatabaseManager().delete(TABLE_COMMENTS,
-                       Clause.eq(COL_COMMENTS_ID,
+        getDatabaseManager().delete(Tables.COMMENTS.NAME,
+                       Clause.eq(Tables.COMMENTS.COL_ID,
                                  request.getUnsafeString(ARG_COMMENT_ID,
                                      BLANK)));
         entry.setComments(null);
@@ -4545,7 +4545,7 @@ public class Repository extends RepositoryBase implements Tables,
         if (comment.length() == 0) {
             sb.append(warning(msg("Please enter a comment")));
         } else {
-            PreparedStatement insert = getDatabaseManager().getPreparedStatement(INSERT_COMMENTS);
+            PreparedStatement insert = getDatabaseManager().getPreparedStatement(Tables.COMMENTS.INSERT);
             int col = 1;
             insert.setString(col++, getGUID());
             insert.setString(col++, entry.getId());
@@ -4612,7 +4612,7 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
 
-        PreparedStatement assocInsert = getDatabaseManager().getPreparedStatement(INSERT_ASSOCIATIONS);
+        PreparedStatement assocInsert = getDatabaseManager().getPreparedStatement(Tables.ASSOCIATIONS.INSERT);
         int    col = 1;
         String id  = getGUID();
         assocInsert.setString(col++, id);
@@ -4685,7 +4685,7 @@ public class Repository extends RepositoryBase implements Tables,
      */
     public Result processAssociationDelete(Request request) throws Exception {
         String associationId = request.getString(ARG_ASSOCIATION, "");
-        Clause clause = Clause.eq(COL_ASSOCIATIONS_ID, associationId);
+        Clause clause = Clause.eq(Tables.ASSOCIATIONS.COL_ID, associationId);
         List<Association> associations = getAssociations(request, clause);
         if (associations.size() == 0) {
             return new Result(
@@ -4702,7 +4702,7 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
-            getDatabaseManager().delete(TABLE_ASSOCIATIONS, clause);
+            getDatabaseManager().delete(Tables.ASSOCIATIONS.NAME, clause);
             fromEntry.setAssociations(null);
             toEntry.setAssociations(null);
             return new Result(request.entryUrl(URL_ENTRY_SHOW, fromEntry));
@@ -5308,9 +5308,9 @@ public class Repository extends RepositoryBase implements Tables,
         }
         //        System.err.println("ramadda: getTopGroups " + topGroup);
 
-        Statement statement = getDatabaseManager().select(COL_ENTRIES_ID,
-                                  TABLE_ENTRIES,
-                                  Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COL_ID,
+                                  Tables.ENTRIES.NAME,
+                                  Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                             topGroup.getId()));
         String[]    ids    = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
@@ -6057,10 +6057,10 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         where = new ArrayList<Clause>(where);
-        where.add(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, group.getId()));
+        where.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, group.getId()));
         TypeHandler typeHandler = getTypeHandler(request);
         int         skipCnt     = request.get(ARG_SKIP, 0);
-        Statement statement = typeHandler.select(request, COL_ENTRIES_ID,
+        Statement statement = typeHandler.select(request, Tables.ENTRIES.COL_ID,
                                   where,
                                   getQueryOrderAndLimit(request, true));
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
@@ -6256,11 +6256,11 @@ public class Repository extends RepositoryBase implements Tables,
             Statement stmt = typeHandler.select(
                                  request,
                                  SqlUtil.comma(
-                                     COL_ENTRIES_ID, COL_ENTRIES_NAME,
-                                     COL_ENTRIES_TYPE,
-                                     COL_ENTRIES_PARENT_GROUP_ID,
-                                     COL_ENTRIES_RESOURCE), Clause.eq(
-                                         COL_ENTRIES_ID, id), "");
+                                     Tables.ENTRIES.COL_ID, Tables.ENTRIES.COL_NAME,
+                                     Tables.ENTRIES.COL_TYPE,
+                                     Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                     Tables.ENTRIES.COL_RESOURCE), Clause.eq(
+                                         Tables.ENTRIES.COL_ID, id), "");
 
             ResultSet results = stmt.getResultSet();
             if ( !results.next()) {
@@ -6305,7 +6305,7 @@ public class Repository extends RepositoryBase implements Tables,
         getAssociationsGraph(request, id, sb);
         List<Group> subGroups =
             getGroups(request,
-                      Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, group.getId()));
+                      Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, group.getId()));
 
 
         Group parent = findGroup(request, group.getParentGroupId());
@@ -6361,11 +6361,11 @@ public class Repository extends RepositoryBase implements Tables,
 
 
         Statement stmt =
-            getDatabaseManager().select(SqlUtil.comma(COL_ENTRIES_ID,
-                COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
-                COL_ENTRIES_PARENT_GROUP_ID,
-                COL_ENTRIES_RESOURCE), TABLE_ENTRIES,
-                                       Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+            getDatabaseManager().select(SqlUtil.comma(Tables.ENTRIES.COL_ID,
+                Tables.ENTRIES.COL_NAME, Tables.ENTRIES.COL_TYPE,
+                Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                Tables.ENTRIES.COL_RESOURCE), Tables.ENTRIES.NAME,
+                                       Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                            group.getId()));
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
@@ -6526,7 +6526,7 @@ public class Repository extends RepositoryBase implements Tables,
 
         List<Clause> where = typeHandler.assembleWhereClause(request);
         Statement stmt =
-            typeHandler.select(request, SqlUtil.distinct(COL_ENTRIES_TYPE),
+            typeHandler.select(request, SqlUtil.distinct(Tables.ENTRIES.COL_TYPE),
                                where, "");
         String[] types = SqlUtil.readString(stmt, 1);
         for (int i = 0; i < types.length; i++) {
@@ -6554,8 +6554,8 @@ public class Repository extends RepositoryBase implements Tables,
             return dataTypeList;
         }
         Statement stmt = getDatabaseManager().select(
-                             SqlUtil.distinct(COL_ENTRIES_DATATYPE),
-                             TABLE_ENTRIES, new Clause[] {});
+                             SqlUtil.distinct(Tables.ENTRIES.COL_DATATYPE),
+                             Tables.ENTRIES.NAME, new Clause[] {});
         String[]  types = SqlUtil.readString(stmt, 1);
         List      tmp   = new ArrayList();
         Hashtable seen  = new Hashtable();
@@ -6613,20 +6613,20 @@ public class Repository extends RepositoryBase implements Tables,
      *   if (where.size() == 0) {
      *       String type = (String) request.getString(ARG_TYPE,(BLANK).trim();
      *       if ((type.length() > 0) && !type.equals(TypeHandler.TYPE_ANY)) {
-     *           typeHandler.addOr(COL_ENTRIES_TYPE, type, where, true);
+     *           typeHandler.addOr(Tables.ENTRIES.COL_TYPE, type, where, true);
      *       }
      *   }
      *   if (where.size() > 0) {
-     *       where.add(SqlUtil.eq(COL_TAGS_ENTRY_ID, COL_ENTRIES_ID));
+     *       where.add(SqlUtil.eq(Tables.TAGS.COL_ENTRY_ID, Tables.ENTRIES.COL_ID));
      *   }
      *
      *   Statement stmt;
      *   String[] tags =
      *       SqlUtil.readString(stmt =
      *           typeHandler.select(request,
-     *                                     SqlUtil.distinct(COL_TAGS_NAME),
+     *                                     SqlUtil.distinct(Tables.TAGS.COL_NAME),
      *                                     where,
-     *                                     " order by " + COL_TAGS_NAME), 1);
+     *                                     " order by " + Tables.TAGS.COL_NAME), 1);
      *   stmt.close();
      *
      *   List<Tag>     tagList = new ArrayList();
@@ -6639,7 +6639,7 @@ public class Repository extends RepositoryBase implements Tables,
      *       String tag = tags[i];
      *       Statement stmt2 = typeHandler.select(request,
      *                             SqlUtil.count("*"),
-     *                             Misc.newList(SqlUtil.eq(COL_TAGS_NAME,
+     *                             Misc.newList(SqlUtil.eq(Tables.TAGS.COL_NAME,
      *                                 SqlUtil.quote(tag))));
      *
      *       ResultSet results2 = stmt2.getResultSet();
@@ -6842,9 +6842,9 @@ public class Repository extends RepositoryBase implements Tables,
         }
 
 
-        Statement statement = getDatabaseManager().select(COLUMNS_ENTRIES,
-                                  TABLE_ENTRIES,
-                                  Clause.eq(COL_ENTRIES_ID, id));
+        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                                  Tables.ENTRIES.NAME,
+                                  Clause.eq(Tables.ENTRIES.COL_ID, id));
 
         List<Group> groups = readGroups(statement);
         if (groups.size() > 0) {
@@ -6897,12 +6897,12 @@ public class Repository extends RepositoryBase implements Tables,
         }
         String[] ids = SqlUtil.readString(
                            getDatabaseManager().select(
-                               COL_ENTRIES_ID, TABLE_ENTRIES,
+                               Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
                                Clause.and(
                                    Clause.eq(
-                                       COL_ENTRIES_PARENT_GROUP_ID,
+                                       Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                        parent.getId()), Clause.eq(
-                                           COL_ENTRIES_NAME, name))));
+                                           Tables.ENTRIES.COL_NAME, name))));
         if (ids.length == 0) {
             return null;
         }
@@ -6956,16 +6956,16 @@ public class Repository extends RepositoryBase implements Tables,
                 }
             }
             List<Clause> clauses = new ArrayList<Clause>();
-            clauses.add(Clause.eq(COL_ENTRIES_TYPE, TypeHandler.TYPE_GROUP));
+            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE, TypeHandler.TYPE_GROUP));
             if (parent != null) {
-                clauses.add(Clause.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                clauses.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       parent.getId()));
             } else {
-                clauses.add(Clause.isNull(COL_ENTRIES_PARENT_GROUP_ID));
+                clauses.add(Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
             }
-            clauses.add(Clause.eq(COL_ENTRIES_NAME, lastName));
+            clauses.add(Clause.eq(Tables.ENTRIES.COL_NAME, lastName));
             Statement statement =
-                getDatabaseManager().select(COLUMNS_ENTRIES, TABLE_ENTRIES,
+                getDatabaseManager().select(Tables.ENTRIES.COLUMNS, Tables.ENTRIES.NAME,
                                             clauses);
             List<Group> groups = readGroups(statement);
             statement.close();
@@ -7038,9 +7038,9 @@ public class Repository extends RepositoryBase implements Tables,
         Clause idClause;
         String idWhere;
         if (parent == null) {
-            idClause = Clause.isNull(COL_ENTRIES_PARENT_GROUP_ID);
+            idClause = Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID);
         } else {
-            idClause = Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, parent.getId());
+            idClause = Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, parent.getId());
         }
         String newId = null;
         while (true) {
@@ -7050,9 +7050,9 @@ public class Repository extends RepositoryBase implements Tables,
                 newId = parent.getId() + Group.IDDELIMITER + baseId;
             }
 
-            Statement stmt = getDatabaseManager().select(COL_ENTRIES_ID,
-                                 TABLE_ENTRIES, new Clause[] { idClause,
-                    Clause.eq(COL_ENTRIES_ID, newId) });
+            Statement stmt = getDatabaseManager().select(Tables.ENTRIES.COL_ID,
+                                 Tables.ENTRIES.NAME, new Clause[] { idClause,
+                    Clause.eq(Tables.ENTRIES.COL_ID, newId) });
             ResultSet idResults = stmt.getResultSet();
 
             if ( !idResults.next()) {
@@ -7091,19 +7091,19 @@ public class Repository extends RepositoryBase implements Tables,
         limitString = getDatabaseManager().getLimitString(skipCnt, max);
         String orderBy = BLANK;
         if (addOrderBy) {
-            orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+            orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
         }
         if (request.defined(ARG_ORDERBY)) {
             String by = request.getString(ARG_ORDERBY, BLANK);
             if (by.equals("fromdate")) {
-                orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
             } else if (by.equals("todate")) {
-                orderBy = " ORDER BY " + COL_ENTRIES_TODATE + order;
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_TODATE + order;
             } else if (by.equals("createdate")) {
-                orderBy = " ORDER BY " + COL_ENTRIES_CREATEDATE + order;
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_CREATEDATE + order;
             } else if (by.equals("name")) {
                 if(!haveOrder) order = " ASC ";
-                orderBy = " ORDER BY " + COL_ENTRIES_NAME + order;
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_NAME + order;
             }
         }
 
@@ -7144,7 +7144,7 @@ public class Repository extends RepositoryBase implements Tables,
                                  searchCriteriaSB);
         int skipCnt = request.get(ARG_SKIP, 0);
 
-        Statement statement = typeHandler.select(request, COLUMNS_ENTRIES,
+        Statement statement = typeHandler.select(request, Tables.ENTRIES.COLUMNS,
                                   where,
                                   getQueryOrderAndLimit(request, false));
 
@@ -7354,8 +7354,8 @@ public class Repository extends RepositoryBase implements Tables,
             getAssociations(
                 request,
                 Clause.or(
-                    Clause.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, entry.getId()),
-                    Clause.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, entry.getId()))));
+                    Clause.eq(Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, entry.getId()),
+                    Clause.eq(Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, entry.getId()))));
         return entry.getAssociations();
     }
 
@@ -7373,8 +7373,8 @@ public class Repository extends RepositoryBase implements Tables,
     protected List<Association> getAssociations(Request request,
             Clause clause)
             throws Exception {
-        Statement stmt = getDatabaseManager().select(COLUMNS_ASSOCIATIONS,
-                             TABLE_ASSOCIATIONS, clause);
+        Statement stmt = getDatabaseManager().select(Tables.ASSOCIATIONS.COLUMNS,
+                             Tables.ASSOCIATIONS.NAME, clause);
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
         ResultSet         results;
@@ -7405,14 +7405,14 @@ public class Repository extends RepositoryBase implements Tables,
         TypeHandler  typeHandler = getRepository().getTypeHandler(request);
         List<Clause> where       = typeHandler.assembleWhereClause(request);
         if (where.size() > 0) {
-            where.add(0, Clause.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
-                                   COL_ENTRIES_ID));
-            where.add(0, Clause.eq(COL_ASSOCIATIONS_TO_ENTRY_ID,
-                                   COL_ENTRIES_ID));
+            where.add(0, Clause.eq(Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID,
+                                   Tables.ENTRIES.COL_ID));
+            where.add(0, Clause.eq(Tables.ASSOCIATIONS.COL_TO_ENTRY_ID,
+                                   Tables.ENTRIES.COL_ID));
         }
 
         return SqlUtil.readString(typeHandler.select(request,
-                SqlUtil.distinct(COL_ASSOCIATIONS_NAME), where, ""), 1);
+                SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME), where, ""), 1);
     }
 
 
@@ -7435,10 +7435,10 @@ public class Repository extends RepositoryBase implements Tables,
         if (entry.isDummy()) {
             return new ArrayList<Comment>();
         }
-        Statement stmt = getDatabaseManager().select(COLUMNS_COMMENTS,
-                             TABLE_COMMENTS,
-                             Clause.eq(COL_COMMENTS_ENTRY_ID, entry.getId()),
-                             " order by " + COL_COMMENTS_DATE + " asc ");
+        Statement stmt = getDatabaseManager().select(Tables.COMMENTS.COLUMNS,
+                             Tables.COMMENTS.NAME,
+                             Clause.eq(Tables.COMMENTS.COL_ENTRY_ID, entry.getId()),
+                             " order by " + Tables.COMMENTS.COL_DATE + " asc ");
         SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
@@ -7660,11 +7660,11 @@ public class Repository extends RepositoryBase implements Tables,
             }
             Statement stmt = SqlUtil.select(connection,
                                             SqlUtil.comma(new String[] {
-                                                COL_ENTRIES_ID,
-                    COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
-                    COL_ENTRIES_RESOURCE_TYPE }), Misc.newList(
-                        TABLE_ENTRIES), Clause.eq(
-                        COL_ENTRIES_PARENT_GROUP_ID, entry.getId()));
+                                                Tables.ENTRIES.COL_ID,
+                    Tables.ENTRIES.COL_TYPE, Tables.ENTRIES.COL_RESOURCE,
+                    Tables.ENTRIES.COL_RESOURCE_TYPE }), Misc.newList(
+                        Tables.ENTRIES.NAME), Clause.eq(
+                        Tables.ENTRIES.COL_PARENT_GROUP_ID, entry.getId()));
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
@@ -7745,32 +7745,32 @@ public class Repository extends RepositoryBase implements Tables,
         List<String[]> found = getDescendents(request, entries, connection,
                                    true);
         String query;
-        query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
-                                   SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID, "?"));
+        query = SqlUtil.makeDelete(Tables.PERMISSIONS.NAME,
+                                   SqlUtil.eq(Tables.PERMISSIONS.COL_ENTRY_ID, "?"));
 
         PreparedStatement permissionsStmt =
             connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(
-            TABLE_ASSOCIATIONS,
+            Tables.ASSOCIATIONS.NAME,
             SqlUtil.makeOr(
                 Misc.newList(
-                    SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, "?"),
-                    SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, "?"))));
+                    SqlUtil.eq(Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, "?"),
+                    SqlUtil.eq(Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, "?"))));
         PreparedStatement assocStmt = connection.prepareStatement(query);
 
-        query = SqlUtil.makeDelete(TABLE_COMMENTS,
-                                   SqlUtil.eq(COL_COMMENTS_ENTRY_ID, "?"));
+        query = SqlUtil.makeDelete(Tables.COMMENTS.NAME,
+                                   SqlUtil.eq(Tables.COMMENTS.COL_ENTRY_ID, "?"));
         PreparedStatement commentsStmt = connection.prepareStatement(query);
 
-        query = SqlUtil.makeDelete(TABLE_METADATA,
-                                   SqlUtil.eq(COL_METADATA_ENTRY_ID, "?"));
+        query = SqlUtil.makeDelete(Tables.METADATA.NAME,
+                                   SqlUtil.eq(Tables.METADATA.COL_ENTRY_ID, "?"));
         PreparedStatement metadataStmt = connection.prepareStatement(query);
 
 
         PreparedStatement entriesStmt =
-            connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
-                COL_ENTRIES_ID, "?"));
+            connection.prepareStatement(SqlUtil.makeDelete(Tables.ENTRIES.NAME,
+                Tables.ENTRIES.COL_ID, "?"));
 
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
@@ -7949,11 +7949,11 @@ public class Repository extends RepositoryBase implements Tables,
         int               metadataCnt = 0;
 
         PreparedStatement entryStmt   = connection.prepareStatement(isNew
-                ? INSERT_ENTRIES
-                : UPDATE_ENTRIES);
+                ? Tables.ENTRIES.INSERT
+                : Tables.ENTRIES.UPDATE);
 
         PreparedStatement metadataStmt =
-            connection.prepareStatement(INSERT_METADATA);
+            connection.prepareStatement(Tables.METADATA.INSERT);
 
 
         Hashtable typeStatements = new Hashtable();
@@ -7990,8 +7990,8 @@ public class Repository extends RepositoryBase implements Tables,
             List<Metadata> metadataList = entry.getMetadata();
             if (metadataList != null) {
                 if ( !isNew) {
-                    getDatabaseManager().delete(TABLE_METADATA,
-                                   Clause.eq(COL_METADATA_ENTRY_ID,
+                    getDatabaseManager().delete(Tables.METADATA.NAME,
+                                   Clause.eq(Tables.METADATA.COL_ENTRY_ID,
                                              entry.getId()));
                 }
                 for (Metadata metadata : metadataList) {
@@ -8172,11 +8172,11 @@ public class Repository extends RepositoryBase implements Tables,
             Connection connection = getDatabaseManager().getConnection();
             PreparedStatement select = 
                 SqlUtil.getSelectStatement(
-                                           connection, "count(" + COL_ENTRIES_ID + ")",
-                    Misc.newList(TABLE_ENTRIES),
+                                           connection, "count(" + Tables.ENTRIES.COL_ID + ")",
+                    Misc.newList(Tables.ENTRIES.NAME),
                     Clause.and(
-                        Clause.eq(COL_ENTRIES_RESOURCE, ""),
-                        Clause.eq(COL_ENTRIES_PARENT_GROUP_ID, "?")), "");
+                        Clause.eq(Tables.ENTRIES.COL_RESOURCE, ""),
+                        Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, "?")), "");
             long t1 = System.currentTimeMillis();
             for (Entry entry : entries) {
                 String path = entry.getResource().getPath();

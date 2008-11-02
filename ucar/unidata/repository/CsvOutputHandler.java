@@ -207,7 +207,7 @@ public class CsvOutputHandler extends OutputHandler {
         for (int i = 0; i < associations.length; i++) {
             String association = associations[i];
             Statement stmt2 = typeHandler.select(request, SqlUtil.count("*"),
-                                  Clause.eq(COL_ASSOCIATIONS_NAME,
+                                  Clause.eq(Tables.ASSOCIATIONS.COL_NAME,
                                             association), "");
 
             ResultSet results2 = stmt2.getResultSet();

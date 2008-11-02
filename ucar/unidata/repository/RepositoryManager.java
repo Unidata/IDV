@@ -90,7 +90,7 @@ import java.util.Properties;
  * @version $Revision: 1.3 $
  */
 public class RepositoryManager implements RepositorySource, Constants,
-                                          Tables, RequestHandler {
+                                          RequestHandler {
 
 
 

@@ -51,7 +51,7 @@ import java.util.List;
 /**
  */
 
-public class Column implements Tables, Constants {
+public class Column implements  Constants {
 
 
     /** _more_ */

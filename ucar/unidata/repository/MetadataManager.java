@@ -233,10 +233,10 @@ public class MetadataManager extends RepositoryManager {
         }
 
 
-        Statement stmt = getDatabaseManager().select(COLUMNS_METADATA,
-                             TABLE_METADATA,
-                             Clause.eq(COL_METADATA_ENTRY_ID, entry.getId()),
-                             " order by " + COL_METADATA_TYPE);
+        Statement stmt = getDatabaseManager().select(Tables.METADATA.COLUMNS,
+                             Tables.METADATA.NAME,
+                             Clause.eq(Tables.METADATA.COL_ENTRY_ID, entry.getId()),
+                             " order by " + Tables.METADATA.COL_TYPE);
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
         metadataList = new ArrayList();
@@ -468,8 +468,8 @@ public class MetadataManager extends RepositoryManager {
                     if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
                         continue;
                     }
-                    getDatabaseManager().delete(TABLE_METADATA,
-                                                Clause.eq(COL_METADATA_ID,
+                    getDatabaseManager().delete(Tables.METADATA.NAME,
+                                                Clause.eq(Tables.METADATA.COL_ID,
                                                           request.getString(arg, BLANK)));
                 }
             } else {
@@ -479,8 +479,8 @@ public class MetadataManager extends RepositoryManager {
                 }
 
                 for (Metadata metadata : newMetadata) {
-                    getDatabaseManager().delete(TABLE_METADATA,
-                                          Clause.eq(COL_METADATA_ID,
+                    getDatabaseManager().delete(Tables.METADATA.NAME,
+                                          Clause.eq(Tables.METADATA.COL_ID,
                                                     metadata.getId()));
                     insertMetadata(metadata);
                 }
@@ -534,12 +534,12 @@ public class MetadataManager extends RepositoryManager {
             String value = values[i];
             cnt[i] = 0;
             Statement stmt = getDatabaseManager().select(
-                                 SqlUtil.count("*"), TABLE_METADATA,
+                                 SqlUtil.count("*"), Tables.METADATA.NAME,
                                  Clause.and(
                                      Clause.eq(
-                                         COL_METADATA_TYPE,
+                                         Tables.METADATA.COL_TYPE,
                                          type.getType()), Clause.eq(
-                                             COL_METADATA_ATTR1, value)));
+                                             Tables.METADATA.COL_ATTR1, value)));
             ResultSet results = stmt.getResultSet();
             if ( !results.next()) {
                 continue;
@@ -798,10 +798,10 @@ public class MetadataManager extends RepositoryManager {
 
         if (values == null) {
             Statement stmt = getDatabaseManager().select(
-                                 SqlUtil.distinct(COL_METADATA_ATTR1),
-                                 TABLE_METADATA,
+                                 SqlUtil.distinct(Tables.METADATA.COL_ATTR1),
+                                 Tables.METADATA.NAME,
                                  Clause.eq(
-                                     COL_METADATA_TYPE, type.getType()));
+                                     Tables.METADATA.COL_TYPE, type.getType()));
             values = SqlUtil.readString(stmt, 1);
             if(myDistinctMap!=null) {
                 myDistinctMap.put(type.getType(), values);
@@ -820,7 +820,7 @@ public class MetadataManager extends RepositoryManager {
      */
     public void insertMetadata(Metadata metadata) throws Exception {
         distinctMap = null;
-        getDatabaseManager().executeInsert(INSERT_METADATA, new Object[] {
+        getDatabaseManager().executeInsert(Tables.METADATA.INSERT, new Object[] {
             metadata.getId(), metadata.getEntryId(), metadata.getType(),
             new Integer(metadata.getInherited()
                         ? 1

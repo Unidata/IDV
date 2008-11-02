@@ -157,7 +157,7 @@ public class HarvesterManager extends RepositoryManager {
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(
                                     getDatabaseManager().select(
-                                        COLUMNS_HARVESTERS, TABLE_HARVESTERS,
+                                        Tables.HARVESTERS.COLUMNS, Tables.HARVESTERS.NAME,
                                         new Clause()));;
         ResultSet results;
         while ((results = iter.next()) != null) {
@@ -270,7 +270,7 @@ public class HarvesterManager extends RepositoryManager {
             harvesters.add(harvester);
             harvesterMap.put(harvester.getId(), harvester);
 
-            getDatabaseManager().executeInsert(INSERT_HARVESTERS,
+            getDatabaseManager().executeInsert(Tables.HARVESTERS.INSERT,
                     new Object[] { harvester.getId(),
                                    harvester.getClass().getName(),
                                    harvester.getContent() });
@@ -358,8 +358,8 @@ public class HarvesterManager extends RepositoryManager {
         if (request.exists(ARG_DELETE_CONFIRM)) {
             harvesterMap.remove(harvester.getId());
             harvesters.remove(harvester);
-            getDatabaseManager().delete(TABLE_HARVESTERS,
-                                        Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
+            getDatabaseManager().delete(Tables.HARVESTERS.NAME,
+                                        Clause.eq(Tables.HARVESTERS.COL_ID, harvester.getId()));
             return new Result(request.url(URL_HARVESTERS_LIST));
         } else if (request.exists(ARG_DELETE)) {
             sb.append(
@@ -371,9 +371,9 @@ public class HarvesterManager extends RepositoryManager {
         } else {
             if (request.exists(ARG_CHANGE)) {
                 harvester.applyEditForm(request);
-                getDatabaseManager().delete(TABLE_HARVESTERS,
-                                            Clause.eq(COL_HARVESTERS_ID, harvester.getId()));
-                getDatabaseManager().executeInsert(INSERT_HARVESTERS,
+                getDatabaseManager().delete(Tables.HARVESTERS.NAME,
+                                            Clause.eq(Tables.HARVESTERS.COL_ID, harvester.getId()));
+                getDatabaseManager().executeInsert(Tables.HARVESTERS.INSERT,
                         new Object[] { harvester.getId(),
                                        harvester.getClass().getName(),
                                        harvester.getContent() });

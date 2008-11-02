@@ -200,7 +200,7 @@ public class AccessManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_ASSOCIATION)) {
-            Clause clause = Clause.eq(COL_ASSOCIATIONS_ID,
+            Clause clause = Clause.eq(Tables.ASSOCIATIONS.COL_ID,
                                       request.getString(ARG_ASSOCIATION, ""));
             List<Association> associations =
                 getRepository().getAssociations(request, clause);
@@ -460,14 +460,14 @@ public class AccessManager extends RepositoryManager {
                                      List<Permission> permissions)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            getDatabaseManager().delete(TABLE_PERMISSIONS,
-                           Clause.eq(COL_PERMISSIONS_ENTRY_ID,
+            getDatabaseManager().delete(Tables.PERMISSIONS.NAME,
+                           Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID,
                                      entry.getId()));
 
             for (Permission permission : permissions) {
                 List roles = permission.getRoles();
                 for (int i = 0; i < roles.size(); i++) {
-                    getDatabaseManager().executeInsert(INSERT_PERMISSIONS,
+                    getDatabaseManager().executeInsert(Tables.PERMISSIONS.INSERT,
                             new Object[] { entry.getId(),
                                            permission.getAction(),
                                            roles.get(i) });
@@ -507,10 +507,10 @@ public class AccessManager extends RepositoryManager {
             //                System.err.println ("getPermissions for entry:" + entry.getId());
             SqlUtil.Iterator iter = SqlUtil.getIterator(
                                         getDatabaseManager().select(
-                                            COLUMNS_PERMISSIONS,
-                                            TABLE_PERMISSIONS,
+                                            Tables.PERMISSIONS.COLUMNS,
+                                            Tables.PERMISSIONS.NAME,
                                             Clause.eq(
-                                                COL_PERMISSIONS_ENTRY_ID,
+                                                Tables.PERMISSIONS.COL_ENTRY_ID,
                                                 entry.getId())));
 
             List<Permission> permissions = new ArrayList<Permission>();

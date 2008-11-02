@@ -474,7 +474,7 @@ public class GenericTypeHandler extends TypeHandler {
             column.assembleWhereClause(request, where, searchCriteria);
         }
         if ((originalSize != where.size()) && (originalSize > 0)) {
-            where.add(Clause.join(COL_ENTRIES_ID, getTableName() + ".id"));
+            where.add(Clause.join(Tables.ENTRIES.COL_ID, getTableName() + ".id"));
         }
         return where;
     }

@@ -327,12 +327,11 @@ public class Admin extends RepositoryManager {
      * _more_
      *
      *
-     * @param generateJava _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected StringBuffer getDbMetaData(boolean generateJava)
+    protected StringBuffer getDbMetaData()
             throws Exception {
 
         Connection       connection = getDatabaseManager().getNewConnection();
@@ -344,9 +343,9 @@ public class Admin extends RepositoryManager {
                                           new String[] { "TABLE" });
 
         while (tables.next()) {
-            String tableName = tables.getString("TABLE_NAME");
+            String tableName = tables.getString("Tables.NAME.NAME");
             //            System.err.println("table name:" + tableName);
-            String tableType = tables.getString("TABLE_TYPE");
+            String tableType = tables.getString("Tables.TYPE.NAME");
             //            System.err.println("table type" + tableType);
             if (Misc.equals(tableType, "INDEX")) {
                 continue;
@@ -359,11 +358,6 @@ public class Admin extends RepositoryManager {
                 continue;
             }
 
-            if (generateJava
-                    && (getRepository().getTypeHandler(tableName, false,
-                        false) != null)) {
-                continue;
-            }
 
             ResultSet columns = dbmd.getColumns(null, null, tableName, null);
             String encoded = new String(XmlUtil.encodeBase64(("text:?"
@@ -375,83 +369,29 @@ public class Admin extends RepositoryManager {
             }
             String tableVar  = null;
             String TABLENAME = tableName.toUpperCase();
-            if (generateJava) {
-                tableVar = "TABLE_" + TABLENAME;
-                sb.append("public static final String " + tableVar + "  = \""
-                          + tableName.toLowerCase() + "\";\n");
-            } else {
-                sb.append("Table:" + tableName + " (#" + cnt + ")");
-                sb.append("<ul>");
-            }
+            sb.append("Table:" + tableName + " (#" + cnt + ")");
+            sb.append("<ul>");
             List colVars = new ArrayList();
 
             while (columns.next()) {
                 String colName = columns.getString("COLUMN_NAME");
                 String colSize = columns.getString("COLUMN_SIZE");
-                if (generateJava) {
-                    colName = colName.toLowerCase();
-                    String colVar = "COL_" + TABLENAME + "_"
-                                    + colName.toUpperCase();
-                    colVars.add(colVar);
-                    sb.append("public static final String " + colVar + " = "
-                              + tableVar + "+\"." + colName + "\";\n");
-                    sb.append("public static final String " + colVar+"_SIZE" + " = "
-                              + colSize + ";\n");
-
-                } else {
-                    sb.append("<li>");
-                    sb.append(colName + " (" + columns.getString("TYPE_NAME")
-                              + " " + colSize+")");
-                }
+                sb.append("<li>");
+                sb.append(colName + " (" + columns.getString("TYPE_NAME")
+                          + " " + colSize+")");
             }
 
-
-            if (generateJava) {
-                sb.append("\n");
-                sb.append("public static final String []ARRAY_" + TABLENAME
-                          + "= new String[]{\n");
-                sb.append(StringUtil.join(",\n", colVars));
-                sb.append("};\n\n");
-                sb.append("public static final String COLUMNS_" + TABLENAME
-                          + " = SqlUtil.comma(ARRAY_" + TABLENAME + ");\n");
-
-
-                sb.append("public static final String NODOT_COLUMNS_"
-                          + TABLENAME + " = SqlUtil.commaNoDot(ARRAY_"
-                          + TABLENAME + ");\n");
-
-
-                sb.append("public static final String INSERT_" + TABLENAME
-                          + "=\n");
-                sb.append("SqlUtil.makeInsert(\n");
-                sb.append("TABLE_" + TABLENAME + ",\n");
-                sb.append("NODOT_COLUMNS_" + TABLENAME + ",\n");
-                sb.append("SqlUtil.getQuestionMarks(ARRAY_" + TABLENAME
-                          + ".length));\n");
-                sb.append("\n");
-                if (TABLENAME.equals("ENTRIES")) {
-                    sb.append("public static final String UPDATE_"
-                              + TABLENAME + " =\n");
-                    sb.append("SqlUtil.makeUpdate(\n");
-                    sb.append(tableVar + ",\n");
-                    sb.append("COL_" + TABLENAME + "_ID,\n");
-                    sb.append("ARRAY_" + TABLENAME + ");\n");
-                }
-                sb.append("\n\n");
-            } else {
-
-                ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
-                                        false, true);
-                boolean didone = false;
-                while (indices.next()) {
-                    if ( !generateJava) {
-                        if ( !didone) {
-                            //                            sb.append(
-                            //                                "<br><b>Indices</b> (name,order,type,pages)<br>");
-                            sb.append("<br><b>Indices</b><br>");
-                        }
-                        didone = true;
-                        String indexName  = indices.getString("INDEX_NAME");
+            ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
+                                                  false, true);
+            boolean didone = false;
+            while (indices.next()) {
+                if ( !didone) {
+                        //                            sb.append(
+                        //                                "<br><b>Indices</b> (name,order,type,pages)<br>");
+                        sb.append("<br><b>Indices</b><br>");
+                    }
+                    didone = true;
+                    String indexName  = indices.getString("INDEX_NAME");
                         String asc        = indices.getString("ASC_OR_DESC");
                         int    type       = indices.getInt("TYPE");
                         String typeString = "" + type;
@@ -469,15 +409,10 @@ public class Admin extends RepositoryManager {
                         sb.append("Index:" + indexName + "<br>");
 
 
-                    }
                 }
 
                 sb.append("</ul>");
-            }
         }
-
-
-
         return sb;
         } finally {
             getDatabaseManager().closeConnection(connection);
@@ -567,18 +502,8 @@ public class Admin extends RepositoryManager {
      */
     public Result adminDbTables(Request request) throws Exception {
         StringBuffer sb           = new StringBuffer();
-        boolean      generateJava = request.exists("java");
-        if (generateJava) {
-            sb.append("//J+\n/** begin generated table definitions**/\n\n");
-        } else {
-            sb.append(header("Database Tables"));
-        }
-        sb.append(getDbMetaData(generateJava));
-        if (generateJava) {
-            sb.append("\n\n/** end generated table definitions**/\n\n//J+");
-            return new Result("", sb, "text");
-        }
-
+        sb.append(header("Database Tables"));
+        sb.append(getDbMetaData());
         return makeResult(request, "Administration", sb);
     }
 
@@ -849,7 +774,7 @@ public class Admin extends RepositoryManager {
         sb.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
                            msg("Metadata Items") };
-        String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS, TABLE_METADATA };
+        String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME, Tables.METADATA.NAME };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
                     + getDatabaseManager().getCount(tables[i].toLowerCase(),
@@ -865,12 +790,12 @@ public class Admin extends RepositoryManager {
             HtmlUtil.row(
                 HtmlUtil.cols(
                     "" + getDatabaseManager().getCount(
-                        TABLE_ENTRIES, new Clause()), msg("Total entries"))));
+                        Tables.ENTRIES.NAME, new Clause()), msg("Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
             }
-            int cnt = getDatabaseManager().getCount(TABLE_ENTRIES,
+            int cnt = getDatabaseManager().getCount(Tables.ENTRIES.NAME,
                           Clause.eq("type", typeHandler.getType()));
 
             String url =
@@ -1039,9 +964,9 @@ public class Admin extends RepositoryManager {
         boolean      delete = request.get("delete", false);
         StringBuffer sb     = new StringBuffer();
         Statement stmt = getDatabaseManager().execute("select "
-                             + Tables.COL_ENTRIES_ID + ","
-                             + Tables.COL_ENTRIES_PARENT_GROUP_ID + " from "
-                             + Tables.TABLE_ENTRIES, 10000000, 0);
+                             + Tables.ENTRIES.COL_ID + ","
+                             + Tables.ENTRIES.COL_PARENT_GROUP_ID + " from "
+                             + Tables.ENTRIES.NAME, 10000000, 0);
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
         int              cnt        = 0;
@@ -1138,9 +1063,9 @@ public class Admin extends RepositoryManager {
         int myTS = ++cleanupTS;
         try {
             Statement stmt =
-                getDatabaseManager().select(SqlUtil.comma(COL_ENTRIES_ID,
-                    COL_ENTRIES_RESOURCE, COL_ENTRIES_TYPE), TABLE_ENTRIES,
-                        Clause.eq(COL_ENTRIES_RESOURCE_TYPE,
+                getDatabaseManager().select(SqlUtil.comma(Tables.ENTRIES.COL_ID,
+                    Tables.ENTRIES.COL_RESOURCE, Tables.ENTRIES.COL_TYPE), Tables.ENTRIES.NAME,
+                        Clause.eq(Tables.ENTRIES.COL_RESOURCE_TYPE,
                                   Resource.TYPE_FILE));
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);

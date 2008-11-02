@@ -43,7 +43,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class EntryListener implements Constants, Tables {
+public class EntryListener implements Constants {
 
     /** _more_ */
     private Request request;

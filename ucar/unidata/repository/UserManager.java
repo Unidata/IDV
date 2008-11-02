@@ -490,8 +490,8 @@ public class UserManager extends RepositoryManager {
             //            System.err.println ("got from user map:" + id +" " + user);
             return user;
         }
-        Statement stmt = getDatabaseManager().select(COLUMNS_USERS,
-                             TABLE_USERS, Clause.eq(COL_USERS_ID, id));
+        Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+                             Tables.USERS.NAME, Clause.eq(Tables.USERS.COL_ID, id));
         ResultSet results = stmt.getResultSet();
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
@@ -519,18 +519,18 @@ public class UserManager extends RepositoryManager {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        if (getRepository().tableContains(user.getId(), TABLE_USERS,
-                                          COL_USERS_ID)) {
+        if (getRepository().tableContains(user.getId(), Tables.USERS.NAME,
+                                          Tables.USERS.COL_ID)) {
             if ( !updateIfNeeded) {
                 throw new IllegalArgumentException(
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            getDatabaseManager().update(TABLE_USERS, COL_USERS_ID,
+            getDatabaseManager().update(Tables.USERS.NAME, Tables.USERS.COL_ID,
                            user.getId(), new String[] {
-                COL_USERS_NAME, COL_USERS_PASSWORD, COL_USERS_EMAIL,
-                COL_USERS_QUESTION, COL_USERS_ANSWER, COL_USERS_ADMIN,
-                COL_USERS_LANGUAGE
+                Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD, Tables.USERS.COL_EMAIL,
+                Tables.USERS.COL_QUESTION, Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
+                Tables.USERS.COL_LANGUAGE
             }, new Object[] {
                 user.getName(), user.getPassword(), user.getEmail(),
                 user.getQuestion(), user.getAnswer(), user.getAdmin()
@@ -540,7 +540,7 @@ public class UserManager extends RepositoryManager {
             return;
         }
 
-        getDatabaseManager().executeInsert(INSERT_USERS, new Object[] {
+        getDatabaseManager().executeInsert(Tables.USERS.INSERT, new Object[] {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
             user.getAnswer(), user.getPassword(),
             new Boolean(user.getAdmin()), user.getLanguage()
@@ -574,8 +574,8 @@ public class UserManager extends RepositoryManager {
      */
     protected void deleteUser(User user) throws Exception {
         deleteRoles(user);
-        getDatabaseManager().delete(TABLE_USERS,
-                                    Clause.eq(COL_USERS_ID, user.getId()));
+        getDatabaseManager().delete(Tables.USERS.NAME,
+                                    Clause.eq(Tables.USERS.COL_ID, user.getId()));
     }
 
     /**
@@ -586,8 +586,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteRoles(User user) throws Exception {
-        getDatabaseManager().delete(TABLE_USERROLES,
-                                    Clause.eq(COL_USERROLES_USER_ID, user.getId()));
+        getDatabaseManager().delete(Tables.USERROLES.NAME,
+                                    Clause.eq(Tables.USERROLES.COL_USER_ID, user.getId()));
     }
 
 
@@ -649,7 +649,7 @@ public class UserManager extends RepositoryManager {
                                  true, true);
             deleteRoles(user);
             for (String role : roles) {
-                getDatabaseManager().executeInsert(INSERT_USERROLES,
+                getDatabaseManager().executeInsert(Tables.USERROLES.INSERT,
                         new Object[] { user.getId(),
                                        role });
             }
@@ -947,9 +947,9 @@ public class UserManager extends RepositoryManager {
         usersHtml.append(HtmlUtil.submit(msg("New User")));
         usersHtml.append("</form>");
 
-        Statement stmt = getDatabaseManager().select(COLUMNS_USERS,
-                             TABLE_USERS, new Clause(),
-                             " order by " + COL_USERS_ID);
+        Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+                             Tables.USERS.NAME, new Clause(),
+                             " order by " + Tables.USERS.COL_ID);
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
@@ -1027,9 +1027,9 @@ public class UserManager extends RepositoryManager {
                              results.getBoolean(col++),
                              results.getString(col++));
 
-        Statement stmt = getDatabaseManager().select(COL_USERROLES_ROLE,
-                             TABLE_USERROLES,
-                             Clause.eq(COL_USERROLES_USER_ID, user.getId()));
+        Statement stmt = getDatabaseManager().select(Tables.USERROLES.COL_ROLE,
+                             Tables.USERROLES.NAME,
+                             Clause.eq(Tables.USERROLES.COL_USER_ID, user.getId()));
 
         String[]     array = SqlUtil.readString(stmt, 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
@@ -1316,10 +1316,10 @@ public class UserManager extends RepositoryManager {
             String password = request.getString(ARG_USER_PASSWORD, "");
             password = hashPassword(password);
 
-            Statement stmt = getDatabaseManager().select(COLUMNS_USERS,
-                                 TABLE_USERS,
-                                 Clause.and(Clause.eq(COL_USERS_ID, name),
-                                            Clause.eq(COL_USERS_PASSWORD,
+            Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+                                 Tables.USERS.NAME,
+                                 Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
+                                            Clause.eq(Tables.USERS.COL_PASSWORD,
                                                 password)));
 
             ResultSet results = stmt.getResultSet();
@@ -1441,8 +1441,8 @@ public class UserManager extends RepositoryManager {
     public List<String> getRoles() throws Exception {
         String[] roleArray = SqlUtil.readString(
                                  getDatabaseManager().select(
-                                     SqlUtil.distinct(COL_USERROLES_ROLE),
-                                     TABLE_USERROLES, new Clause()), 1);
+                                     SqlUtil.distinct(Tables.USERROLES.COL_ROLE),
+                                     Tables.USERROLES.NAME, new Clause()), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
         roles.add(0, ROLE_ANY);
         return roles;

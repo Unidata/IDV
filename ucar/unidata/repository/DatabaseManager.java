@@ -409,8 +409,8 @@ public class DatabaseManager extends RepositoryManager {
 
         int totalRowCnt = 0;
         while (tables.next()) {
-            String tableName = tables.getString("TABLE_NAME");
-            String tableType = tables.getString("TABLE_TYPE");
+            String tableName = tables.getString("Tables.NAME.NAME");
+            String tableType = tables.getString("Tables.TYPE.NAME");
             if ((tableType == null) || Misc.equals(tableType, "INDEX")
                     || tableType.startsWith("SYSTEM")) {
                 continue;
@@ -419,10 +419,10 @@ public class DatabaseManager extends RepositoryManager {
 
             String tn = tableName.toLowerCase();
             if ( !all) {
-                if (tn.equals(TABLE_GLOBALS) || tn.equals(TABLE_USERS)
-                        || tn.equals(TABLE_PERMISSIONS)
-                        || tn.equals(TABLE_HARVESTERS)
-                        || tn.equals(TABLE_USERROLES)) {
+                if (tn.equals(Tables.GLOBALS.NAME) || tn.equals(Tables.USERS.NAME)
+                        || tn.equals(Tables.PERMISSIONS.NAME)
+                        || tn.equals(Tables.HARVESTERS.NAME)
+                        || tn.equals(Tables.USERROLES.NAME)) {
                     continue;
                 }
             }
