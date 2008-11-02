@@ -18,12 +18,31 @@ The IDV can display tropical storm track data from the ATCF FTP database.
 
     <li> [ht::clearDisplaysAndData]
 
-    <li> Load in the ATCF data adn create the Storm Track display.
+    <li> Load in the ATCF data and create the Storm Track display.
     <ul>
     <li> In the [ht::menu Data Special] menu choose [ht::menu {ATCF Data}]
+    <li> Create a [ht::display Storm Track] display.
     </ul>
 
-
+    <li> Choose [ht::menu 2008 {Basin:AL} IKE] and select [ht::button Load Tracks]
+    <li> Note the huge number of forecasts. We want to pare this list down.
+    <ul>
+    <li> Bring up the Properties dialog for the display. ([ht::menu Edit Properties] menu).
+    <li> In the &quot;Techs to use&quot; tab select all of the Techs in the &quot;Use&quot; list. Click and press control-a.
+    <li> Press [ht::button Remove].
+    <li> Select a number of Techs in the &quot;Don't use&quot; list and press [ht::button Add]. Make sure you include  GFDL and HWRF in your selection.
+    <li> Apply these selections  by pressing [ht::button OK].
+    </ul>
+    <li> Turn on the [ht::button Forecasts] checkbox to show the forecast tracks.
+    <li> Note, the forecasts  tracks are showing forecast hours which results in a complicated display. Turn this off by selecting a &quot;None&quot; for the  Points Layout model.
+    <li> Turn off all but one Forecast and set the [ht::command Animation Mode] to &quot;Off&quot;.
+    <li> Let's look at charting the forecasts.
+    <ul>
+    <li> In the [ht::command Storm Chart] tab select GFDL and HWRF and Observation in the Techs list.
+    <li> Select one of the later times, e.g., 2008-09-10.
+    <li> Select both [ht::button Min Pressure] and [ht::button Max Windspeed].
+    <li> Turn on [ht::button Use Difference].
+    </ul>
 
 </ol>
 
