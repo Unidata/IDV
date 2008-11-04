@@ -289,6 +289,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         boolean isZip = trackFile.endsWith(".gz");
         if (bytes == null && isZip) {
             String withoutGZ = trackFile.substring(0, trackFile.length()-3);
+            System.err.println ("without:" + withoutGZ);
             bytes = readFile(withoutGZ, true);
             isZip = false;
         }
@@ -541,6 +542,7 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             return IOUtil.readBytes(IOUtil.getInputStream(file, getClass()));
         }
         if ( !file.startsWith("ftp:")) {
+            if(ignoreErrors) return null;
             throw new FileNotFoundException("Could not read file: " + file);
         }
 
