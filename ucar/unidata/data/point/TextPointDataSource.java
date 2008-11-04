@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -288,7 +286,10 @@ public class TextPointDataSource extends PointDataSource {
             }
             try {
                 Data d = ta.getData();
-                obs        = makePointObs(d, trackParam);
+                obs = makePointObs(d, trackParam);
+                if ((fieldsDescription == null) && (obs != null)) {
+                    makeFieldDescription(obs);
+                }
                 metaDataOk = true;
             } catch (Exception exc) {
                 map    = null;

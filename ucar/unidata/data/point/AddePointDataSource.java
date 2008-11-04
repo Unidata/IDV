@@ -110,7 +110,7 @@ public class AddePointDataSource extends PointDataSource {
         setName(getDescription());
     }
 
-    /** _more_          */
+    /** list of excluded params for objective analysis */
     private static final String[] excludes = {
         "COL", "ROW", "NREC", "IDN", "MOD", "TYPE", "HMS"
     };
@@ -400,39 +400,9 @@ public class AddePointDataSource extends PointDataSource {
 
 
     /**
-     * Create a field description from the field
-     *
-     * @param fi  field to use
-     */
-    protected void makeFieldDescription(FieldImpl fi) {
-        super.makeFieldDescription(fi);
-        fieldsDescription = getSources().get(0) + "<p>" + fieldsDescription;
-    }
-
-    /**
-     * Get the data choice to use for the description
-     *
-     * @return  the data choice
-     */
-    protected DataChoice getDescriptionDataChoice() {
-        DirectDataChoice retDC =
-            new DirectDataChoice((DirectDataChoice) getDataChoices().get(0));
-        String source = (String) retDC.getId();
-        if (source.indexOf("num=all") >= 0) {
-            source = source.replaceAll("num=all", "num=1");
-        }
-        if (source.indexOf(AddeUtil.RELATIVE_TIME) >= 0) {
-            source = source.replaceAll(AddeUtil.RELATIVE_TIME, "");
-        }
-        retDC.setId(source);
-        return retDC;
-    }
-
-
-    /**
      * Can this datasource do the geoselection subsetting and decimation
      *
-     * @return _can do geo subsetting
+     * @return can do geo subsetting
      */
     public boolean canDoGeoSelection() {
         return true;

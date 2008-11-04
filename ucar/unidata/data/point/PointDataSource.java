@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -979,10 +977,13 @@ public abstract class PointDataSource extends FilesDataSource {
             LogUtil.message("Doing Barnes Analysis");
             FieldImpl fi = PointObFactory.barnes(pointObs, type, degreesX,
                                degreesY, passes, gain, searchRadius, ap);
-            log_.debug("Analysis params: X = " + ap.getGridXArray().length
-                       + " Y = " + ap.getGridYArray().length + " search = "
-                       + ap.getScaleLengthGU() + " random = "
-                       + ap.getRandomDataSpacing());
+            if (ap.getGridXArray() != null) {
+                log_.debug("Analysis params: X = "
+                           + ap.getGridXArray().length + " Y = "
+                           + ap.getGridYArray().length + " search = "
+                           + ap.getScaleLengthGU() + " random = "
+                           + ap.getRandomDataSpacing());
+            }
             return fi;
         }
 
@@ -1046,17 +1047,14 @@ public abstract class PointDataSource extends FilesDataSource {
     public String getFullDescription() {
         String parentDescription = super.getFullDescription();
         if (fieldsDescription == null) {
-            /*
-              Don't do this can this can cost us
             try {
                 FieldImpl fi =
-                    (FieldImpl) getData(getDescriptionDataChoice(), null,
-                                        null);
+                    (FieldImpl) getSample(getDescriptionDataChoice());
+                makeFieldDescription(fi);
             } catch (Exception exc) {
                 logException("getting description", exc);
                 return "";
             }
-            */
         }
         return parentDescription + "<p>" + ((fieldsDescription != null)
                                             ? fieldsDescription
