@@ -155,6 +155,7 @@ index.html
 
 >>title:Configuring the IDV:In this section we will cover how to configure various aspects of the IDV
 >>>config/Preferences.html
+>>>config/DisplaySettings.html
 >>>config/ParameterDefaultsEditor.html
 |config/Patterns.html
 >>>config/ParameterAliasEditor.html

@@ -20,7 +20,12 @@ The IDV can display tropical storm track data from the ATCF FTP database.
 
     <li> Load in the ATCF data and create the Storm Track display.
     <ul>
-    <li> In the [ht::menu Data Special] menu choose [ht::menu {ATCF Data}]
+    <li> Normally selecting [ht::menu Data Special {ATCF Data}] will load in a data source with a predefined
+    path to the National Hurricane Center ftp site.
+    <li> But, for stability and speed in the workshop we copied over the data for 2008 and 2007 to our ftp site so...
+    <li> In the URL chooser type in:<br><i>ftp://ftp.unidata.ucar.edu/pub/idv/data/atcf/</i>
+    <li>Under [ht::command Data Sources of Type] select &quot;ATCF Tropical Storm Data&quot; (hint: click in the pull-down box and enter an 'a').
+    <li> Load in the data source.
     <li> Create a [ht::display Storm Track] display.
     </ul>
 

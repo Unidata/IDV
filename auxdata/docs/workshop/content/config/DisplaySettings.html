@@ -2,12 +2,51 @@
 
 
 <div class="overview">
+Display settings are a way to share properties among a group of display controls and to define
+configuration profiles when creating new displays.
 </div>
 
 <ol class="step">
 
-  <li>
+  <li> Setup...
+  <ul>
+  <li> We are going to load in two different &quot;NCEP NAM CONUS 80 km&quot; model runs from the Catalog chooser
+  under the IDV catalog. e.g., choose the 0Z and the 12Z.
+  <li> Create a [ht::display Contour Plan View] of Temperature from each model.
+  <li> In one of the displays change the Contour interval to be 3, change the color table
+  to some other color table (e.g., VisAD), change the level to 500.
+  <li> Add in some Location display (i.e., from the [ht::menu Display Special Locations] menu).
+  <li> Add in a Range and Bearing display.
+  <li> Or, alternatively load in the bundle: /data/idv/bundles/settings.xidv
+  </ul>
 
+  <li> Note we can't really have an apples to apples comparison of the two Contour displays because
+they differ in the interval, color table and level.
+  <li> We could go and change these settings in one of the displays to match the other but imagine
+  if you had, say, 4 displays to change. Lots of clicking.
+  <li> Instead, go to the [ht::menu Edit {Display Settings}] menu for one of the contour displays to bring
+up the Display Settings dialog.
+  <ul>
+  <li> The Display Settings dialog shows a list of properties from the selected display (highlighted in blue).
+  <li> Note how the [ht::button Display Groups] menu can be used to select different groups of displays.
+  <li> Select  both of the Plan View Contour displays.
+  <li> Change the highlighted display by right-clicking on another one in the list on the right and view
+  the new Property values on the left.
+  <li> Highlight the &quot;500 hPA&quot; Contour Display.
+  <li> Select the [ht::button Color Table], [ht::button Contour Settings] and [ht::button Level] properties on the left.
+  <li> Press [ht::button Apply] to apply these selected properties to the selected displays.
+  </ul>
+
+  <li> We can also save the selected properties and use them when creating a new Display.
+  <ul>
+  <li> Select the properties you want to save (e.g., Level, Color Table, etc.)
+  <li> Press [ht::button Save]
+  <li> In the dialog enter &quot;Workshop&quot; for the category and &quot;500 MB Contours&quot; for the name. Select [ht::button Applicable only to displays of type...]
+  <li> Press [ht::button OK] and then close the Display Settings dialog.
+  </ul>
+  <li> Go to the Field Selector, clear the existing displays and select [ht::display Contour Plan View].
+  <li> In the [ht::command Settings] tab select the &quot;500 MB Contours&quot; and create the display.
+  <li> Note the results.
 </ol>
 
 
