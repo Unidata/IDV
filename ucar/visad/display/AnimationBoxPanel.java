@@ -205,6 +205,11 @@ public class AnimationBoxPanel extends JPanel implements MouseListener,
         if (widget == null) {
             return super.getToolTipText(event);
         }
+        return getToolTipText();
+    }
+
+    public String getToolTipText() {
+        if(widget == null) return "";
         String text = "";
         if ((overBoxIndex >= 0) && (widget != null)) {
             DateTime dttm = widget.getTimeAtIndex(overBoxIndex);
@@ -224,7 +229,6 @@ public class AnimationBoxPanel extends JPanel implements MouseListener,
         return "<html>" + text + "</html>";
 
     }
-
 
 
     /**
