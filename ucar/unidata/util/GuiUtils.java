@@ -628,45 +628,52 @@ public class GuiUtils extends LayoutUtil {
             });
 
 
-
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    Color         oldColor = ColorSwatch.this.getBackground();
-                    int           alpha       = oldColor.getAlpha();
-                    JColorChooser chooser     = new JColorChooser(oldColor);
-                    JSlider       alphaSlider = new JSlider(0, 255, alpha);
-                    JComponent    contents;
-                    if (doAlpha) {
-                        contents = centerBottom(chooser,
-                                inset(hbox(new JLabel("Transparency:"),
-                                           alphaSlider), new Insets(5, 5, 5,
-                                               5)));
-                    } else {
-                        contents = chooser;
-                    }
-                    if ( !showOkCancelDialog(null, label, contents, null)) {
-                        return;
-                    }
-                    alpha = alphaSlider.getValue();
-                    //                    Color newColor = JColorChooser.showDialog(null, label,
-                    //                                                              oldColor);
-                    Color newColor = chooser.getColor();
-                    if (newColor != null) {
-                        newColor = new Color(newColor.getRed(),
-                                             newColor.getGreen(),
-                                             newColor.getBlue(), alpha);
-                        ColorSwatch.this.setBackground(newColor);
-                    }
+                    Misc.run(new Runnable() {
+                            public void run() {
+                                showColorChooser();
+                            }});
                 }
             });
         }
+
+        private void showColorChooser() {
+            Color         oldColor = this.getBackground();
+            int           alpha       = oldColor.getAlpha();
+            JColorChooser chooser     = new JColorChooser(oldColor);
+            JSlider       alphaSlider = new JSlider(0, 255, alpha);
+            JComponent    contents;
+            if (doAlpha) {
+                contents = centerBottom(chooser,
+                                        inset(hbox(new JLabel("Transparency:"),
+                                                   alphaSlider), new Insets(5, 5, 5,
+                                                                            5)));
+            } else {
+                contents = chooser;
+            }
+            if ( !showOkCancelDialog(null, label, contents, null)) {
+                return;
+            }
+            alpha = alphaSlider.getValue();
+            //                    Color newColor = JColorChooser.showDialog(null, label,
+            //                                                              oldColor);
+            Color newColor = chooser.getColor();
+            if (newColor != null) {
+                newColor = new Color(newColor.getRed(),
+                                     newColor.getGreen(),
+                                     newColor.getBlue(), alpha);
+                this.setBackground(newColor);
+            }
+        }
+
 
         /**
          * Set color from chooser
          */
         private void setColorFromChooser() {
             Color newColor = JColorChooser.showDialog(null, label,
-                                 ColorSwatch.this.getBackground());
+                                                      this.getBackground());
             if (newColor != null) {
                 ColorSwatch.this.setBackground(newColor);
             }

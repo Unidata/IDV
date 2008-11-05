@@ -2073,6 +2073,12 @@ public class StringUtil {
 
 
 
+    public static String camelCase(String s) {
+        return s.substring(0, 1).toUpperCase()
+            + s.substring(1).toLowerCase();
+    }
+
+
     /**
      * Not working yet but this is supposed to parse an iso8601 date format
      *
