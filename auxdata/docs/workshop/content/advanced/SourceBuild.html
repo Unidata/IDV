@@ -40,19 +40,19 @@ Download the IDV source files from the Unidata Web Site
 
 <ol class="step">
   <li>Open the IDV Downloads page in a new window by clicking
-      <a href="http://www.unidata.ucar.edu/downloads/idv/latest/index.jsp" target="downloadPage">here</a>.</li>
+      <a href="http://www.unidata.ucar.edu/downloads/idv/nightly/index.jsp" target="downloadPage">here</a>.</li>
   <li>To download the IDV source, you must be registered as a Unidata user.
       If you have already registered, log in using your user name
       and password.  If you have not registered or you have forgotten
       your password, follow the instructions on the login sidebar.</li>
   <li>Under &quot;IDV <%idv.version%> Documentation and Source Code&quot;, click on the 
-<a href="http://www.unidata.ucar.edu/downloads/idv/latest/ftp/idv_src_<%idv.version%>.jar">
+<a href="http://www.unidata.ucar.edu/downloads/idv/nightly/ftp/idv_src_<%idv.version%>.jar">
 IDV <%idv.version%> Source Code</a> link  to start the download.  You will be prompted for a location
       to save the file to.  Save it your home directory.
 
   <li>You will also need the set of ancillary libraries (VisAD, netCDF, etc) 
       that the IDV uses contained in the zip file:
-<a href="http://www.unidata.ucar.edu/downloads/idv/latest/ftp/idv_jars_<%idv.version%>.zip">
+<a href="http://www.unidata.ucar.edu/downloads/idv/nightly/ftp/idv_jars_<%idv.version%>.zip">
 IDV <%idv.version%> Jar Files</a>.
       Save this to your home directory.</li>
   <li>After the download is complete, close the extra browser window. </li>
@@ -179,7 +179,7 @@ Now you should be able to build the IDV from scratch.
       </li>
 
       <li>then run:
-          [ht::cmdline {java&nbsp;&nbsp;-Xmx512m&nbsp;&nbsp;-jar idv.jar}]
+          [ht::cmdline {java&nbsp;&nbsp;-Xmx1024m&nbsp;&nbsp;-jar idv.jar}]
       </li>
     </ul>
 
@@ -195,12 +195,12 @@ Now you should be able to build the IDV from scratch.
 <ol class="step">
 
   <li>Change to the <code class="filename">ucar</code> directory.
-      [ht::cmdline {cd&nbsp;&nbsp;/home/idvdev/idv/ucar}]
+      [ht::cmdline {cd&nbsp;&nbsp;/home/idv/idv/ucar}]
   </li>
 
   <li>Execute the ant command to build 
       <code class="filename">clean idv</code>.
-      [ht::cmdline {ant&nbsp;&nbsp;idvjar}]
+      [ht::cmdline {ant&nbsp;&nbsp;clean idv}]
     This removes all Java class files (there will be none
     the first time), re-builds them.
 
@@ -213,7 +213,7 @@ Now you should be able to build the IDV from scratch.
   </li>
   <li> For the purposes of this workshop, we've created an alias so you
   can just type:
-          [ht::cmdline {idv}]
+          [ht::cmdline {idvdev}]
   </li>
   <li> List out the CLASSPATH we have set up for you:
           [ht::cmdline {set | grep CLASSPATH}]
