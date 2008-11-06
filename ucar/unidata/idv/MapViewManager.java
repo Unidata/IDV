@@ -283,7 +283,7 @@ public class MapViewManager extends NavigatedViewManager {
 
         if (useGlobe) {
             //TODO: Set the dimension
-            GlobeDisplay globeDisplay = new GlobeDisplay();
+            GlobeDisplay globeDisplay = new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),dimension,null);
             navDisplay = globeDisplay;
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
