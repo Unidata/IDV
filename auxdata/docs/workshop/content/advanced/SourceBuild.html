@@ -45,15 +45,15 @@ Download the IDV source files from the Unidata Web Site
       If you have already registered, log in using your user name
       and password.  If you have not registered or you have forgotten
       your password, follow the instructions on the login sidebar.</li>
-  <li>Under &quot;IDV <%idv.version%> Documentation and Source Code&quot;, click on the 
-<a href="http://www.unidata.ucar.edu/downloads/idv/nightly/ftp/idv_src_<%idv.version%>.jar">
-IDV <%idv.version%> Source Code</a> link  to start the download.  You will be prompted for a location
+  <li>Under &quot;IDV <%dev.version%> Documentation and Source Code&quot;, click on the 
+<a href="http://www.unidata.ucar.edu/downloads/idv/nightly/ftp/idv_src_<%dev.version%>.jar">
+IDV <%dev.version%> Source Code</a> link  to start the download.  You will be prompted for a location
       to save the file to.  Save it your home directory.
 
   <li>You will also need the set of ancillary libraries (VisAD, netCDF, etc) 
       that the IDV uses contained in the zip file:
-<a href="http://www.unidata.ucar.edu/downloads/idv/nightly/ftp/idv_jars_<%idv.version%>.zip">
-IDV <%idv.version%> Jar Files</a>.
+<a href="http://www.unidata.ucar.edu/downloads/idv/nightly/ftp/idv_jars_<%dev.version%>.zip">
+IDV <%dev.version%> Jar Files</a>.
       Save this to your home directory.</li>
   <li>After the download is complete, close the extra browser window. </li>
 
@@ -69,14 +69,14 @@ Download the nightly build IDV source files from the Unidata Web Site:
   <li>Open the IDV nightly builds page in a new window by clicking
       <a href="http://www.unidata.ucar.edu/software/idv/release/nightly/index.html" target="downloadPage">here</a>.</li>
   <li>Under &quot;Jars, etc:&quot;, click on the 
-<a href="http://www.unidata.ucar.edu/software/idv/release/nightly/idv_src_<%idv.version%>.jar">
+<a href="http://www.unidata.ucar.edu/software/idv/release/nightly/idv_src_<%dev.version%>.jar">
 IDV Source</a> link  to start the download.  You will be prompted for a location
       to save the file to.  Save it your home directory.
 
   <li>You will also need the set of ancillary libraries (VisAD, netCDF, etc) 
       that the IDV uses contained in the zip file:
-<a href="http://www.unidata.ucar.edu/software/idv/release/nightly/idv_jars_<%idv.version%>.zip">
-IDV <%idv.version%> Jar Files</a>.
+<a href="http://www.unidata.ucar.edu/software/idv/release/nightly/idv_jars_<%dev.version%>.zip">
+IDV <%dev.version%> Jar Files</a>.
       Save this to your home directory.</li>
 
 
@@ -99,13 +99,11 @@ You are now ready to install the IDV source.</li>
 <ol class="step">
   <li>Open a terminal window.</li>
 
-  <li>Change to your home directory or the directory to which you 
-      downloaded the source and binary files
-      (if you are not already there). </li>
+  <li>Change to your home directory (if you are not already there). </li>
 
 
   <li>unJAR the source file. 
-    [ht::cmdline {jar&nbsp;&nbsp;xvf&nbsp;&nbsp;idv_src_<%idv.version%>.jar}]
+    [ht::cmdline {jar&nbsp;&nbsp;xvf&nbsp;&nbsp;(downloaddir)/idv_src_<%dev.version%>.jar}]
     This will create a "idv" directory underneath the install
     directory (where you unJAR'ed the file).</p>
   </li>
@@ -136,7 +134,7 @@ idv
 
 
   <li>Unzip the file you downloaded into this directory.
-[ht::cmdline {unzip&nbsp;&nbsp;../../idv_jars_<%idv.version%>.zip}]
+[ht::cmdline {unzip&nbsp;&nbsp;../../(downloaddir)/idv_jars_<%dev.version%>.zip}]
   </li>
 
 <ifdef flag_developerworkshop>

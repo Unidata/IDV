@@ -49,6 +49,9 @@ gen::defineMacro {<%workshop.exampledir%>} $::workshopexampledir
 ##Add the page title macro
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
 
+##We use this for referencing download file names
+gen::defineMacro {<%dev.version%>} {<%idv.version%>}
+
 
 ##Assuming we are in the auxdata/docs/userguide/content directory
 ##read in the version.properties file in
@@ -71,6 +74,7 @@ catch {
     }
     if {$ok} {
 #       gen::defineMacro {<%idv.version%>} "$major.${minor}$revision"
+       gen::defineMacro {<%dev.version%>} "$major.${minor}$revision"
     }
 } err
 

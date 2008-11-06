@@ -5,9 +5,9 @@ index.html
 >>overview/WhatIsIdv.html
 >>overview/IdvFeatures.html
 
-#>installandstart/Install.html
-#>>installandstart/Download.html
-#>>installandstart/Installer.html
++>installandstart/Install.html
++>>installandstart/Download.html
++>>installandstart/Installer.html
 
 >installandstart/Start.html
 >>installandstart/FirstStart.html
@@ -18,9 +18,9 @@ index.html
 >>>installandstart/basics/MainMenu.html
 >>>installandstart/basics/ViewManagerMenus.html
 >>>installandstart/basics/BackgroundMaps.html
->>>resources/ProjectionManager.html
++>>>resources/ProjectionManager.html
 >>>installandstart/basics/Exiting.html
-|>>>installandstart/WebStart.html
++>>>installandstart/WebStart.html
 
 |installandstart/basics/MouseAndKeyboard.html
 |installandstart/basics/MapSelector.html
