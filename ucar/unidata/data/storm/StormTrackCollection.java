@@ -51,9 +51,6 @@ public class StormTrackCollection {
     private HashMap<Way, List> wayToTracksHashMap;
 
     /** _more_ */
-    private List stormsTimeRanges;
-
-    /** _more_ */
     List<StormTrack> tracks = new ArrayList<StormTrack>();
 
 

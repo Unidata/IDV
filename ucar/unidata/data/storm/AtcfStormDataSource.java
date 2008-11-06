@@ -69,6 +69,44 @@ import java.util.zip.GZIPInputStream;
  */
 public class AtcfStormDataSource extends StormDataSource {
 
+private int  BASEIDX = 0;
+private int  IDX_BASIN=BASEIDX++;
+private int  IDX_CY=BASEIDX++;
+private int  IDX_YYYYMMDDHH=BASEIDX++;
+private int  IDX_TECHNUM=BASEIDX++;
+private int  IDX_TECH=BASEIDX++;
+private int  IDX_TAU=BASEIDX++;
+private int  IDX_LAT=BASEIDX++;
+private int  IDX_LON=BASEIDX++;
+private int  IDX_VMAX=BASEIDX++;
+private int  IDX_MSLP=BASEIDX++;
+private int  IDX_TY=BASEIDX++;
+private int  IDX_RAD=BASEIDX++;
+private int  IDX_WINDCODE=BASEIDX++;
+private int  IDX_RAD1=BASEIDX++;
+private int  IDX_RAD2=BASEIDX++;
+private int  IDX_RAD3=BASEIDX++;
+private int  IDX_RAD4=BASEIDX++;
+private int  IDX_RADP=BASEIDX++;
+private int  IDX_RRP=BASEIDX++;
+private int  IDX_MRD=BASEIDX++;
+private int  IDX_GUSTS=BASEIDX++;
+private int  IDX_EYE=BASEIDX++;
+private int  IDX_SUBREGION=BASEIDX++;
+private int  IDX_MAXSEAS=BASEIDX++;
+private int  IDX_INITIALS=BASEIDX++;
+private int  IDX_DIR=BASEIDX++;
+private int  IDX_SPEED=BASEIDX++;
+private int  IDX_STORMNAME=BASEIDX++;
+private int  IDX_DEPTH=BASEIDX++;
+private int  IDX_SEAS=BASEIDX++;
+private int  IDX_SEASCODE=BASEIDX++;
+private int  IDX_SEAS1=BASEIDX++;
+private int  IDX_SEAS2=BASEIDX++;
+private int  IDX_SEAS3=BASEIDX++;
+private int  IDX_SEAS4=BASEIDX++;
+
+
     private static final String PREFIX_ANALYSIS = "a";
     private static final String PREFIX_BEST = "b";
 
@@ -158,14 +196,20 @@ public class AtcfStormDataSource extends StormDataSource {
         try {
             incrOutstandingGetDataCalls();
             stormInfos = new ArrayList<StormInfo>();
-            if (path.toLowerCase().endsWith(".gz")
-                    || path.toLowerCase().endsWith(".dat")) {
+            if (path.toLowerCase().endsWith(".atcf") ||
+                path.toLowerCase().endsWith(".gz")   || 
+                path.toLowerCase().endsWith(".dat")) {
                 String name  =
                     IOUtil.stripExtension(IOUtil.getFileTail(path));
                 StormInfo si = new StormInfo(name, new DateTime(new Date()));
                 stormInfos.add(si);
                 localTracks = new StormTrackCollection();
                 readTracks(si, localTracks, path, null,true);
+                List<StormTrack> trackList = localTracks.getTracks();
+
+                if(trackList.size()>0) {
+                    si.setStartTime(trackList.get(0).getStartTime());
+                }
                 return;
             }
 
@@ -289,7 +333,6 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         boolean isZip = trackFile.endsWith(".gz");
         if (bytes == null && isZip) {
             String withoutGZ = trackFile.substring(0, trackFile.length()-3);
-            System.err.println ("without:" + withoutGZ);
             bytes = readFile(withoutGZ, true);
             isZip = false;
         }
@@ -337,16 +380,18 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             }
             List toks = StringUtil.split(line, ",", true);
 
+
+
             //BASIN,CY,YYYYMMDDHH,TECHNUM,TECH,TAU,LatN/S,LonE/W,VMAX,MSLP,TY,RAD,WINDCODE,RAD1,RAD2,RAD3,RAD4,RADP,RRP,MRD,GUSTS,EYE,SUBREGION,MAXSEAS,INITIALS,DIR,SPEED,STORMNAME,DEPTH,SEAS,SEASCODE,SEAS1,SEAS2,SEAS3,SEAS4
             //AL, 01, 2007050612,   , BEST,   0, 355N,  740W,  35, 1012, EX,  34, NEQ,    0,    0,    0,  120, 
             //AL, 01, 2007050812, 01, CARQ, -24, 316N,  723W,  55,    0, DB,  34, AAA,    0,    0,    0,    0, 
 
-            int category = getCategory((String) toks.get(10));
+            int category = getCategory((String) toks.get(IDX_TY));
             if (category != CATEGORY_XX) {
                 //                System.err.println("cat:" + category);
             }
-            String dateString = (String) toks.get(2);
-            String wayString  = (String) toks.get(4);
+            String dateString = (String) toks.get(IDX_YYYYMMDDHH);
+            String wayString  = (String) toks.get(IDX_TECH);
             //            if (okWays.get(wayString) == null) {
             //                continue;
             //            }
@@ -354,7 +399,14 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             boolean isWarning = wayString.equals(WAY_WRNG);
             boolean isCarq    = wayString.equals(WAY_CARQ);
 
-            int forecastHour  = new Integer((String) toks.get(5)).intValue();
+            String fhour = (String) toks.get(IDX_TAU);
+            int forecastHour  = new Integer(fhour).intValue();
+            //A hack - we've seen some atfc files that have a 5 character forecast hour
+            //right padded with "00", eg., 01200
+            if(fhour.length()==5 && forecastHour>100) {
+                forecastHour = forecastHour/100;
+            }
+
             if (isWarning || isCarq) {
                 forecastHour = -forecastHour;
             }
@@ -393,8 +445,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                 trackMap.put(key, track);
                 tracks.addTrack(track);
             }
-            String  latString = (String) toks.get(6);
-            String  lonString = (String) toks.get(7);
+            String  latString = (String) toks.get(IDX_LAT);
+            String  lonString = (String) toks.get(IDX_LON);
             String  t         = latString + " " + lonString;
 
             boolean south     = latString.endsWith("S");
@@ -417,8 +469,8 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
 
             List<Real> attributes = new ArrayList<Real>();
 
-            double     windspeed  = getDouble((String) toks.get(8));
-            double     pressure   = getDouble((String) toks.get(9));
+            double     windspeed  = getDouble((String) toks.get(IDX_VMAX));
+            double     pressure   = getDouble((String) toks.get(IDX_MSLP));
             attributes.add(PARAM_STORMCATEGORY.getReal((double) category));
             attributes.add(PARAM_MINPRESSURE.getReal(pressure));
             attributes.add(PARAM_MAXWINDSPEED_KTS.getReal(windspeed));
