@@ -204,6 +204,7 @@ public class StormTrackControl extends DisplayControlImpl {
     private JCheckBox mostRecentCbx;
 
 
+
     /** _more_ */
     private TwoListPanel waysToUseSelector;
 
@@ -336,13 +337,8 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-    /**
-     * _more_
-     *
-     * @param jtp _more_
-     */
-    protected void addPropertiesComponents(JTabbedPane jtp) {
-        super.addPropertiesComponents(jtp);
+    private JComponent getWaysToUseComp() {
+
         useWays = new ArrayList<Way>();
         allWays = new ArrayList<Way>();
         for (Way way : stormDataSource.getWays()) {
@@ -364,7 +360,54 @@ public class StormTrackControl extends DisplayControlImpl {
                                              "Use", null, false);
         JComponent contents = GuiUtils.centerBottom(waysToUseSelector,
                                   GuiUtils.left(waysToUsePreferenceCbx));
-        jtp.add(getWaysName() + " to use", contents);
+
+        return contents;
+    }
+
+
+
+
+    private boolean applyWaysToUse() {
+        boolean changed = false;
+        List    only    = Misc.sort(waysToUseSelector.getCurrentEntries());
+        if ( !useWays.equals(only)) {
+            changed = true;
+            if (only.size() == allWays.size()) {
+                onlyShowTheseWays(new ArrayList<Way>(),
+                                  waysToUsePreferenceCbx.isSelected());
+            } else {
+                onlyShowTheseWays((List<Way>) only,
+                                  waysToUsePreferenceCbx.isSelected());
+            }
+        }
+        return changed;
+    }
+
+
+
+
+    public void  showWaysToUseDialog(){
+        JComponent waysToUseComp = getWaysToUseComp();
+        JLabel label = GuiUtils.cLabel(getWaysName() + " to use");
+        JComponent contents= GuiUtils.topCenter(label,waysToUseComp);
+        if(!GuiUtils.showOkCancelDialog(null,getWaysName() + " to use",
+                                        waysToUseComp,null)) return;
+        if(applyWaysToUse()) {
+            //??
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param jtp _more_
+     */
+    protected void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+        JComponent waysToUseComp = getWaysToUseComp();
+        jtp.add(getWaysName() + " to use", waysToUseComp);
 
         // chart parameters selector
         useParams = new ArrayList<StormParam>();
@@ -420,12 +463,11 @@ public class StormTrackControl extends DisplayControlImpl {
                         width, height);
             }
             jtp.add(
-                "Observation " + getWayName(),
-                GuiUtils.centerBottom(
-                    obsWayContents, GuiUtils.left(obsWayPreferenceCbx)));
+                "Observation " + getWayName(),GuiUtils.centerBottom(
+                                                         obsWayContents, GuiUtils.left(obsWayPreferenceCbx)));
         }
-
     }
+
 
     public List<StormParam> getTrackParams() {
         List<StormParam> params = new ArrayList<StormParam>();
@@ -473,7 +515,6 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-
     /**
      * _more_
      *
@@ -484,17 +525,9 @@ public class StormTrackControl extends DisplayControlImpl {
             return false;
         }
 
-        List    only    = Misc.sort(waysToUseSelector.getCurrentEntries());
         boolean changed = false;
-        if ( !useWays.equals(only)) {
+        if(applyWaysToUse()) {
             changed = true;
-            if (only.size() == allWays.size()) {
-                onlyShowTheseWays(new ArrayList<Way>(),
-                                  waysToUsePreferenceCbx.isSelected());
-            } else {
-                onlyShowTheseWays((List<Way>) only,
-                                  waysToUsePreferenceCbx.isSelected());
-            }
         }
 
         List    onlyCP    = chartParamsSelector.getCurrentEntries();
@@ -740,8 +773,12 @@ public class StormTrackControl extends DisplayControlImpl {
      * @return _more_
      */
     protected boolean okToShowWay(Way way) {
+
         if (way.isObservation()) {
             return true;
+        }
+        if (okWays == null) {
+            showWaysToUseDialog();
         }
         if (okWays == null) {
             return true;
@@ -2410,6 +2447,7 @@ public class StormTrackControl extends DisplayControlImpl {
     public int getYearTimeMode() {
         return yearTimeMode;
     }
+
 
 
 

@@ -344,6 +344,27 @@ public class StormDisplayState {
     }
 
 
+    private int wayCnt = -1;
+
+    /**
+     * Check if its ok to show the given way.
+     * if we have less than 2 ways total then always showit
+     */
+    protected boolean okToShowWay(Way way) {
+        if(wayCnt==-1) {
+            List<StormTrack> tracks = trackCollection.getTracks();
+            Hashtable ways = new Hashtable();
+            wayCnt = 0;
+            for (StormTrack track : tracks) {
+                if(ways.get(track.getWay())==null) {
+                    wayCnt++;
+                    ways.put(track.getWay(), "");
+                }
+            }
+        }
+        if(wayCnt<=1) return true;
+        return stormTrackControl.okToShowWay(way);
+    }
 
     /**
      * _more_
@@ -360,8 +381,9 @@ public class StormDisplayState {
         double  maxLat = Double.NEGATIVE_INFINITY;
 
         boolean didone = false;
-        for (StormTrack track : trackCollection.getTracks()) {
-            if ( !stormTrackControl.okToShowWay(track.getWay())) {
+        List<StormTrack> tracks = trackCollection.getTracks();
+        for (StormTrack track : tracks) {
+            if (!okToShowWay(track.getWay())) {
                 continue;
             }
             LatLonRect bbox = track.getBoundingBox();
@@ -951,7 +973,7 @@ public class StormDisplayState {
 
         for (Way way : ways) {
             WayDisplayState wds = getWayDisplayState(way);
-            if ( !stormTrackControl.okToShowWay(wds.getWay())) {
+            if (!okToShowWay(wds.getWay())) {
                 continue;
             }
             JComponent labelComp =
@@ -1376,7 +1398,7 @@ public class StormDisplayState {
         try {
             List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
             for (WayDisplayState wds : wayDisplayStates) {
-                if ( !stormTrackControl.okToShowWay(wds.getWay())) {
+                if (!okToShowWay(wds.getWay())) {
                     continue;
                 }
                 wds.updateDisplay();
