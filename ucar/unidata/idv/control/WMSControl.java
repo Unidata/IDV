@@ -250,6 +250,8 @@ public class WMSControl extends ImageControl implements ImageObserver {
         return true;
     }
 
+    private boolean waitingToLoad = false;
+
 
     /**
      * initdone
@@ -263,6 +265,12 @@ public class WMSControl extends ImageControl implements ImageObserver {
         super.initDone();
     }
 
+    public boolean isInitDone() {
+        if ( !super.isInitDone()) {
+            return false;
+        }
+        return !waitingToLoad;
+    }
 
 
 
@@ -753,12 +761,12 @@ public class WMSControl extends ImageControl implements ImageObserver {
                 return;
             }
             NavigatedDisplay navDisplay = getNavigatedDisplay();
-            if ((navDisplay == null) || (navDisplay.getDisplay() == null)
-                    || (navDisplay.getDisplay().getComponent() == null)) {
+            if ((navDisplay == null) || (navDisplay.getDisplay() == null)) {
+                //                    || (navDisplay.getDisplay().getComponent() == null)) {
                 return;
             }
             Rectangle screenBounds =
-                navDisplay.getDisplay().getComponent().getBounds();
+                navDisplay.getScreenBounds();
             imageWidth = (int) (screenBounds.width * scale);
             Rectangle2D.Double rect = getNavigatedDisplay().getLatLonBox();
             if ((scale > 1.0) && !inGlobe) {
@@ -786,11 +794,16 @@ public class WMSControl extends ImageControl implements ImageObserver {
     private void loadImage() {
         //      System.err.println (cnt+" WMSControl loadImage");
         //      Misc.printStack (cnt+" WMSControl loadImage");
+        waitingToLoad = true;
         Misc.run(new Runnable() {
             public void run() {
-                loadImage(loadId =
-                    JobManager.getManager().stopAndRestart(loadId,
-                        "WMSControl"));
+                try {
+                    loadImage(loadId =
+                              JobManager.getManager().stopAndRestart(loadId,
+                                                                     "WMSControl"));
+                } finally {
+                    waitingToLoad = false;
+                }
             }
         });
     }
