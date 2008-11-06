@@ -382,6 +382,7 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
             boolean allDisplaysInitialized =
                 uiManager.getIdv().getAllDisplaysIntialized();
 
+            //            System.err.println ("\tAll displays init:" + allDisplaysInitialized +" cursor cnt:" + uiManager.getWaitCursorCount() + " action cnt:" +actionCount + " data active: " + dataActive);
             if ((cnt++) % 30 == 0) {
                 //                System.err.println ("\tcnt:" + uiManager.getWaitCursorCount() + " " +actionCount + " " + dataActive);
             }
