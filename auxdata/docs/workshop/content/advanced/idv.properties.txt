@@ -4,4 +4,4 @@ idv.title = Unidata Workshop IDV
 idv.cataloglist= /ucar/unidata/apps/workshop/workshopCatalog.xml;http://www.unidata.ucar.edu/georesources/idvcatalog.xml
 
 ## default projection
-idv.projection.default=World
+idv.projection.default=US>CONUS

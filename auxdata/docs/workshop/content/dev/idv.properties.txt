@@ -4,13 +4,6 @@ idv.title.propdesc = Title to use for windows, etc.
 idv.title = Unidata IDV
 
 
-##Here we can specify other property files that will get loaded in after this one is
-##idv.properties = idv.properties;%APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/idv.properties;
-idv.properties.propdelimiter=;
-idv.properties.proplabel = Property files
-idv.properties = %APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/idv.properties;
-
-
 
 ########################################################################
 ##  Resources
@@ -22,7 +15,7 @@ idv.properties = %APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/i
 ##  %USERPATH%   The file system path of the user's .unidata/idv/application directory
 ##  %SITEPATH%   If defined (usually by the -sitepath argument) the directory path 
 ##               or url of where to find site resources
-##  %IDVPATH%    The internal (to the jars) /ucar/unidata/idv/resources  path
+##  %IDVPATH%    The internal (to the jars) /ucar/unidata/idv  path
 ##  %APPPATH%    The value of the idv.resourcepath property 
 ##
                
@@ -30,9 +23,6 @@ idv.properties = %APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/i
 idv.resourcefiles.proplabel=Resource files
 idv.resourcefiles.propdelimiter=;
 idv.resourcefiles=%USERPATH%/idv.rbi;%SITEPATH%/idv.rbi;%APPPATH%/idv.rbi;%IDVPATH%/idv.rbi
-
-
-
 
 
 
@@ -48,6 +38,16 @@ idv.support.message.proplabel=Support form message
 idv.support.message=This form allows you to post a support request to the Unidata Program Center (UPC).<br>\
 Alternatively, use the form on the Support page at http://www.unidata.ucar.edu.
 
+
+idv.ui.skin.template.proplabel=Path to the default template UI skin
+idv.ui.skin.template=/ucar/unidata/idv/resources/skins/template.xml
+
+
+
+idv.ui.initskins.propdesc=The path to the skins used to create the first windows
+idv.ui.initskins.proplabel=Initial UI Skins
+idv.ui.initskins.propdelimiter=;
+idv.ui.initskins=/ucar/unidata/idv/resources/skins/dashboard.xml;
 
 idv.ui.viewpanel.showcategories.proplabel=ViewPanel: Show Categories
 idv.ui.viewpanel.showcategories=false
@@ -72,6 +72,15 @@ idv.ui.splash.iconroll = /ucar/unidata/idv/images/logo_rollover.gif
 idv.ui.splash.eastermsg.propignore=true
 idv.ui.splash.eastermsg = Your prize is that you owe us a beer
 
+
+#If you want the IDV to only have one instance running at all times then 
+#set the oneinstanceport property
+#idv.oneinstanceport.proplabel=One instance port
+#idv.oneinstanceport=8787
+
+
+idv.monitorport.proplabel=Port to run the IDV monitor on
+idv.monitorport=8788
 
 idv.locations.default.proplabel = Default locations file
 idv.locations.default = nexrad
@@ -98,6 +107,20 @@ idv.data.adde.servers.proplabel = ADDE Servers
 idv.data.adde.servers.propdesc=List of ADDE servers. One per row.
 idv.data.adde.servers.propdelimiter=;
 idv.data.adde.servers = adde.cise-nsf.gov;adde.ucar.edu;stratus.al.noaa.gov;weather3.admin.niu.edu;twister.millersville.edu;pscwx.plymouth.edu;papagayo.unl.edu
+
+##Semicolon separated list of adde servers
+
+
+idv.data.tds.radar.servers.proplabel=Catalogs
+idv.data.tds.radar.servers.propdelimiter=;
+idv.data.tds.radar.servers=http://motherlode.ucar.edu:8080/thredds/radarServer/catalog.xml
+idv.data.tds.radar.servers.merge=true
+idv.data.tds.radar.servers.merge.proplabel=Merge Catalogs
+idv.data.tds.radar.servers.delete.proplabel=Catalogs To Remove
+idv.data.tds.radar.servers.delete.propdelimiter=;
+idv.data.tds.radar.servers.delete=http://motherlode.ucar.edu:8080/thredds/radarServer/nexrad/level2/catalog.xml;
+
+
 
 ## if there is an existing preference list, don't add these in
 idv.data.adde.servers.merge = true
@@ -262,6 +285,8 @@ idv.viewmanager.map.verticalrange.proplabel=Vertical range for Map displays
 idv.viewmanager.map.verticalrange.propdesc=Vertical range is of the form: start,end,unit
 idv.viewmanager.map.verticalrange=0,16000,meters
 
+idv.viewmanager.toolbars.floatable.proplabel=Make Toolbars Floatable
+idv.viewmanager.toolbars.floatable=false
 
 
 ##Show the icons in the data tree jtree
@@ -296,6 +321,12 @@ idv.quicklinks.windows.show=true
 
 
 
+##Here we can specify other property files that will get loaded in after this one is
+##idv.properties = idv.properties;%APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/idv.properties;
+idv.properties.propdelimiter=;
+idv.properties.proplabel = Property files
+
+idv.properties = %APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/idv.properties;
 
 
 idv.preferencepaths.proplabel =User preferences
@@ -320,4 +351,29 @@ idv.data.image.maxsize=-1
 
 idv.browser.path.proplabel=The path to the browser executable
 idv.browser.path=
+
+
+
+
+
+##idv.chooser.treeview=true
+##idv.chooser.treeview.width=200
+##idv.chooser.treeview.usesplitpane=false
+
+
+
+
+##The idv.jython.editor defines the full path to an external executable
+##that is used to edit the user's jython library
+##The %filename% macro is replaced with the actual file path that is to be edited
+##If its not there then the filename is appended to the end
+##e.g.:
+##idv.jython.editor=/usr/bin/emacs %filename%
+
+idv.jython.editor=
+idv.jython.editor.proplabel=Path to the executable used for jython editing
+idv.jython.editor.propdesc= Use %filename% macro, e.g., '/usr/bin/emacs %filename%'
+
+
+
 

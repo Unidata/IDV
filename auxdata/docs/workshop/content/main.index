@@ -110,30 +110,30 @@ index.html
 >>title:Trajectory Data:The IDV supports a variety of aircraft track data and displays.
 >>>datadisplays/trajectory/Tracks.html
 >>>datadisplays/trajectory/PointDisplay.html
->>>datadisplays/trajectory/StormTracks.html
++>>>datadisplays/trajectory/StormTracks.html
 #>>>datadisplays/trajectory/TracksInTransect.html
 
 
 >>title:Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles), the drawing tool and weather text displays.
 >>>datadisplays/gis/WMS.html
 ##>>>datadisplays/gis/WMS2.html
->>>datadisplays/gis/Shapefile.html
++>>>datadisplays/gis/Shapefile.html
 >>>datadisplays/gis/Locations.html
->>>datadisplays/gis/WorldWind.html
->>>datadisplays/gis/DEM.html
->>>datadisplays/gis/DoingMoreGis.html
++>>>datadisplays/gis/WorldWind.html
++>>>datadisplays/gis/DEM.html
++>>>datadisplays/gis/DoingMoreGis.html
 >>>datadisplays/misc/Drawing1.html
 >>>datadisplays/misc/Drawing2.html
->>>datadisplays/misc/GeoLocatedImage.html
++>>>datadisplays/misc/GeoLocatedImage.html
 >>>datadisplays/misc/WeatherTextProducts.html
 
 
->>datadisplays/profiler/index.html
->>>datadisplays/profiler/ProfilerDataLoading.html
->>>datadisplays/profiler/TimeHeightDisplay.html
->>>datadisplays/profiler/StationPlot.html
->>>datadisplays/profiler/ThreeDView.html
->>>datadisplays/profiler/DoingMoreProfiler.html
++>>datadisplays/profiler/index.html
++>>>datadisplays/profiler/ProfilerDataLoading.html
++>>>datadisplays/profiler/TimeHeightDisplay.html
++>>>datadisplays/profiler/StationPlot.html
++>>>datadisplays/profiler/ThreeDView.html
++>>>datadisplays/profiler/DoingMoreProfiler.html
 
 |Conventions.html
 
@@ -165,7 +165,7 @@ index.html
 >>formulas/index.html
 >>>formulas/SimpleFormulas.html
 >>>formulas/JythonMethods.html
->>>formulas/DoingMoreFormulas.html
++>>>formulas/DoingMoreFormulas.html
 >>>formulas/MoreWithJython.html
 +>>>formulas/JythonAndVisad.html
 #>>>formulas/RainFallRatesWithJython.html
@@ -180,7 +180,7 @@ index.html
 >>>advanced/Resources.html
 >>>advanced/PluginManager.html
 >>>advanced/PluginCreator.html
->>>advanced/UsingWebstart.html
++>>>advanced/UsingWebstart.html
 -advanced/workshop.jnlp
 -advanced/workshop.jnlp.txt
 -advanced/idv.properties.txt

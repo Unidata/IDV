@@ -277,7 +277,7 @@ proc ht::loadBasicGrid {} {
                  <li> Click the [ht::command Catalogs] tab in the [ht::command {Data Chooser}].
                  </li>
              </ul>
-         <li> Select the [ht::menu {Miscellaneous Data}  {Sample RUC Data}] item.
+         <li> Select the [ht::menu {Sample Data}  {Sample RUC Data}] item.
          </li>
          <li> Select the [ht::button Add Source] button.
        </ul>

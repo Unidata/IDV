@@ -11,6 +11,8 @@ DataSource implementations:
 <ul>
   <li>[dg::className ucar.unidata.data.DataSourceImpl]
   <ul>
+  <li>[dg::className ucar.unidata.data.FilesDataSource]
+  <ul>
     <li>[dg::className ucar.unidata.data.grid.GridDataSource]
     <ul>
       <li>[dg::className ucar.unidata.data.grid.GeoGridDataSource]
@@ -19,19 +21,50 @@ DataSource implementations:
       </ul>
       <li>[dg::className ucar.unidata.data.grid.Vis5DDataSource]
     </ul>
+    <li>[dg::className ucar.unidata.data.gis.DemDataSource.java],
+        <br>[dg::className ucar.unidata.data.gis.GeodasDataSource.java],
+        <br>[dg::className ucar.unidata.data.gis.KmlDataSource.java],
+        <br>[dg::className ucar.unidata.data.gis.ShapefileDataSource.java],
+        <br>[dg::className ucar.unidata.data.gis.WmsDataSource.java]
+    </li>
     <li>[dg::className ucar.unidata.data.imagery.ImageDataSource]
     <ul>
       <li>[dg::className ucar.unidata.data.imagery.AddeImageDataSource], 	      <br>[dg::className ucar.unidata.data.imagery.McIDASImageDataSource]
+      </li>
     </ul>
     <li>[dg::className ucar.unidata.data.point.PointDataSource]
         <ul>
         <li>[dg::className ucar.unidata.data.point.AddePointDataSource], 
-        <br>[dg::className ucar.unidata.data.point.NetcdfMetarDataSource], 
+        <br>[dg::className ucar.unidata.data.point.NetcdfPointDataSource], 
+        <br>[dg::className ucar.unidata.data.point.TextPointDataSource] 
+        </ul>
+    </li>
+    <li>[dg::className ucar.unidata.data.radar.RadarDataSource]
+        <ul>
+        <li>[dg::className ucar.unidata.data.radar.CDMRadarDataSource]
         </ul>
     <li>[dg::className ucar.unidata.data.sounding.RaobDataSource], 
     <li>[dg::className ucar.unidata.data.sounding.TrackDataSource],
-	    <li>[dg::className ucar.unidata.data.text.TextDataSource], 
-	        <br>[dg::className ucar.unidata.data.text.AddeTextDataSource]
+        <ul>
+        <li>[dg::className ucar.unidata.data.sounding.SondeDataSource]
+        </ul>
+    <li>[dg::className ucar.unidata.data.storm.StormDataSource]
+        <ul>
+        <li>[dg::className ucar.unidata.data.storm.AtcfDataSource]
+        <li>[dg::className ucar.unidata.data.storm.STIDataSource]
+        </ul>
+    </li>
+    <li>[dg::className ucar.unidata.data.text.TextDataSource], 
+        <br>[dg::className ucar.unidata.data.text.AddeTextDataSource],
+        <br>[dg::className ucar.unidata.data.text.FrontDataSource]
+    </li>
+    <li>[dg::className ucar.unidata.data.text.TextProductDataSource], 
+        <ul>
+        <li>[dg::className ucar.unidata.data.text.NwxTextProductDataSource]
+        <li>[dg::className ucar.unidata.data.text.AddeTextProductDataSource]
+        </ul>
+    </li>
+  </ul>
   </ul>
 </ul>
 
