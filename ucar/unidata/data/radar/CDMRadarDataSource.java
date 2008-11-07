@@ -475,7 +475,7 @@ public class CDMRadarDataSource extends RadarDataSource {
         }
         if (((CDMRadarAdapter) adapters.get(0)).getDataFormatName().equals(
                 ucar.nc2.dt.RadialDatasetSweep.LevelII)) {
-            Vector items = new Vector();
+            Vector<NamedStation> items = new Vector<NamedStation>();
             items.addAll(getStations().values());
             Collections.sort(items);
             stationBox = new JComboBox(items);
@@ -490,7 +490,15 @@ public class CDMRadarDataSource extends RadarDataSource {
                 }
             }
             if (namedStation != null) {
-                stationBox.setSelectedItem(namedStation);
+                int selected = 0;
+                for(int i=0; i< items.size(); i++){
+                    if(Misc.equals(namedStation.getID(),((NamedStation)items.get(i)).getID())){
+                        selected = i;
+                        break;
+                    }
+
+                }
+                stationBox.setSelectedIndex(selected);
             }
             comps.add(GuiUtils.rLabel("Station Location: "));
             comps.add(stationBox);
