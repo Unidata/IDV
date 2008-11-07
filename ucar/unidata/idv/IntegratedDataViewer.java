@@ -597,7 +597,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getIdvUIManager().initDone();
         getArgsManager().initDone();
 
-
         if ( !getArgsManager().getIsOffScreen()) {
             //checkVersion();
         }
@@ -632,7 +631,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
 
         //Create the chooser so it is snappy when  it is first requested
-        if ( !getArgsManager().getIsOffScreen()) {
+        if (!getArgsManager().isScriptingMode()) {
             getIdvChooserManager();
         }
 
@@ -644,13 +643,15 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
 
 
-        ucar.unidata.ui.HelpActionLabel.setActionListener(
-            new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                handleAction(ae.getActionCommand(), null);
-            }
+        if (!getArgsManager().isScriptingMode()) {
+            ucar.unidata.ui.HelpActionLabel.setActionListener(
+                                                              new ActionListener() {
+                                                                  public void actionPerformed(ActionEvent ae) {
+                                                                      handleAction(ae.getActionCommand(), null);
+                                                                  }
 
-        });
+                                                              });
+        }
 
 
         initDone();
@@ -690,8 +691,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                 }
             });
         }
-
-
         startMonitor();
     }
 

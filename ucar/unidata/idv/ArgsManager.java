@@ -1218,5 +1218,10 @@ public class ArgsManager extends IdvManager {
         isOffScreen = v;
     }
 
+    public boolean isScriptingMode() {
+        return !islInteractive && scriptingFiles.size()>0;
+    }
+
+
 }
 

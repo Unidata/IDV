@@ -590,7 +590,7 @@ public class IdvUIManager extends IdvManager {
             MultiFrame.useDesktopPane(desktopPane);
         }
 
-        if (getIdv().getStateManager().getShowDashboardOnStart()) {
+        if (!getArgsManager().isScriptingMode() && getIdv().getStateManager().getShowDashboardOnStart()) {
             showBasicWindow(true);
             //            doMakeBasicWindows();
         }
@@ -822,6 +822,7 @@ public class IdvUIManager extends IdvManager {
      */
     public boolean handleSideLegend(final ViewManager viewManager,
                                     JComponent sideLegend) {
+
         if (getArgsManager().getIsOffScreen()) {
             return false;
         }

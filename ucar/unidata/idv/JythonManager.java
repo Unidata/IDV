@@ -148,7 +148,7 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
     /** One text component per tab */
-    private ArrayList libHolders;
+    private ArrayList libHolders=new ArrayList();
 
     /** Shows the temp jython */
     private JTextArea tmpTextArea = new JTextArea();
@@ -283,11 +283,15 @@ public class JythonManager extends IdvManager implements ActionListener {
      * parsing the jar files there.
      */
     private void initPython() {
-        Misc.run(new Runnable() {
-            public void run() {
-                initPythonInner();
-            }
-        });
+        if(getArgsManager().isScriptingMode()) {
+            initPythonInner();
+        } else {
+            Misc.run(new Runnable() {
+                    public void run() {
+                        initPythonInner();
+                    }
+                });
+        }
     }
 
 
@@ -324,7 +328,6 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
 
 
-
         Properties pythonProps = new Properties();
         if (cacheDir != null) {
             pythonProps.put("python.home", cacheDir);
@@ -333,10 +336,12 @@ public class JythonManager extends IdvManager implements ActionListener {
         PythonInterpreter.initialize(System.getProperties(), pythonProps,
                                      getArgsManager().commandLineArgs);
 
+
         doMakeContents();
 
-        makeFormulasFromLib();
-
+        if(!getArgsManager().isScriptingMode()) {
+            makeFormulasFromLib();
+        }
 
         //      PySystemState sys = Py.getSystemState ();
         //      sys.add_package ("visad");
@@ -477,6 +482,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     protected JComponent doMakeContents() {
 
+
         if (contents != null) {
             return contents;
         }
@@ -593,6 +599,9 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @return continue with exit
      */
     public boolean saveOnExit() {
+        if(getArgsManager().isScriptingMode()) {
+            return true;
+        }
         List toSave = new ArrayList();
         for (int i = libHolders.size() - 1; i >= 0; i--) {
             LibHolder holder = (LibHolder) libHolders.get(i);
@@ -949,6 +958,9 @@ public class JythonManager extends IdvManager implements ActionListener {
      * Gets called when the IDV is quitting. Kills the editor process if there is one
      */
     protected void applicationClosing() {
+        if(getArgsManager().isScriptingMode()) {
+            return;
+        }
         for (int i = libHolders.size() - 1; i >= 0; i--) {
             LibHolder holder = (LibHolder) libHolders.get(i);
             if (holder.editProcess != null) {

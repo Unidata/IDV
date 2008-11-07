@@ -2936,6 +2936,7 @@ public class ImageGenerator extends IdvManager {
             Object result = getInterpreter().eval(s);
             s = result.toString();
         }
+        s = s.replace("\\n","\n");
         return s;
     }
 
