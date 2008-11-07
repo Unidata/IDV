@@ -473,11 +473,26 @@ public class WmsDataSource extends DataSourceImpl {
      * @return description
      */
     public String getFullDescription() {
-        String desc = super.getFullDescription();
+        StringBuffer sb = new StringBuffer(super.getFullDescription());
         if (lastUrl != null) {
-            desc = desc + "<p><b>Last request:</b> " + lastUrl;
+            sb.append("<p><b>Last request:</b> " + lastUrl);
         }
-        return desc;
+
+        sb.append("Images<p><table><tr><td><b>Name</b></td><td><b>Layer</b></td><td><b>Server</b></td></tr>\n");
+        for (int i = 0; i < wmsSelections.size(); i++) {
+            WmsSelection selection = (WmsSelection) wmsSelections.get(i);
+            sb.append("<tr><td>");
+            sb.append(selection.getTitle());
+            sb.append("</td><td>");
+            sb.append(selection.getLayer());
+            sb.append("</td><td>");
+            sb.append(selection.getServer());
+            sb.append("</td></tr>");
+        }
+        sb.append("</table>");
+
+
+        return sb.toString();
     }
 
 
