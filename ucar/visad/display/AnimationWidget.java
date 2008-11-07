@@ -774,11 +774,15 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * Share the value of the animation step.
      */
     protected void shareValue() {
-        if (anime.getNumSteps() > 0) {
+        Animation myAnime = anime;
+        if(myAnime==null || animationInfo==null) {
+            return;
+        }
+        if (myAnime.getNumSteps() > 0) {
             if (animationInfo.getShareIndex()) {
                 shareIndex();
             } else {
-                shareValue(anime.getAniValue());
+                shareValue(myAnime.getAniValue());
             }
         }
     }

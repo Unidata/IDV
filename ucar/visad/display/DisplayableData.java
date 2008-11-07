@@ -637,6 +637,7 @@ public class DisplayableData extends Displayable {
      * @throws RemoteException    Java RMI failure.
      */
     public boolean hasData() throws VisADException, RemoteException {
+        if(reference==null) return false;
         return reference.getData() != null;
     }
 
