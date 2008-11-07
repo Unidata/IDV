@@ -33,6 +33,7 @@
 <plugin  version="2.2"  name="Pacific and Atlantic Products" description="Map" size="12409" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_intl.jar" category="Maps"/>
 <plugin name="European Maps" description="Map" size="381433" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/europemaps.jar" category="Maps"/>
 <plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
+<plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico_maps.jar" category="Maps"/>
 
 <!-- Misc -->
 <plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
