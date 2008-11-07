@@ -8378,6 +8378,9 @@ public class Repository extends RepositoryBase implements
         for (String line : (List<String>) StringUtil.split(googleKeys, "\n",
                 true, true)) {
             String[] toks = StringUtil.split(line, ":", 2);
+            if(toks == null) {
+                continue;
+            }
             if (toks.length != 2) {
                 continue;
             }
