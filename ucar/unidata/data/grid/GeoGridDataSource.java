@@ -572,6 +572,9 @@ public class GeoGridDataSource extends GridDataSource {
      * @return true if this DataSource can save data to local disk?
      */
     public boolean canSaveDataToLocalDisk() {
+        if (isFileBased()) {
+            return false;
+        }
         return true;
     }
 
@@ -612,6 +615,16 @@ public class GeoGridDataSource extends GridDataSource {
         actions.add(a);
     }
 
+
+
+
+    /**
+     * Overwrite this method so we don't show the loading dialog
+     */
+    protected Object beginWritingDataToLocalDisk(String msg) {
+        final Object loadId = JobManager.getManager().startLoad(msg, false, false);
+        return loadId;
+    }
 
 
 
@@ -729,6 +742,8 @@ public class GeoGridDataSource extends GridDataSource {
                 GuiUtils.leftRight(
                     new JLabel("Select the fields to download"),
                     allCbx), 5), contents);
+        JLabel label  = new JLabel(getNameForDataSource(this,50,true));
+        contents = GuiUtils.topCenter(label,contents);
         contents = GuiUtils.inset(contents, 5);
         if ( !GuiUtils.showOkCancelDialog(null, "", contents, null)) {
             return null;
@@ -777,6 +792,9 @@ public class GeoGridDataSource extends GridDataSource {
 
         String         path   = prefix;
         NetcdfCFWriter writer = new NetcdfCFWriter();
+
+        //Start the load, showing the dialog
+        loadId = JobManager.getManager().startLoad("Copying data", true, true);
         try {
             writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
                             includeLatLon, hStride, zStride, timeStride);
@@ -784,6 +802,8 @@ public class GeoGridDataSource extends GridDataSource {
             logException("Error writing local netcdf file.\nData:"
                          + getFilePath() + "\nVariables:" + varNames, exc);
             return null;
+        } finally {
+            JobManager.getManager().stopLoad(loadId);
         }
 
 
