@@ -838,7 +838,7 @@ public class VisADPersistence {
             name = identifier;
         }
         Unit theUnit = Util.parseUnit(identifier, name);
-        // System.err.println ("Created unit" + theUnit + " id=" + theUnit.getIdentifier());
+        // System.err.println ("Created unit: " + theUnit.getDefinition() + " id=" + theUnit.getIdentifier());
         return theUnit;
     }
 
