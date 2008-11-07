@@ -34,6 +34,7 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.metdata.NamedStationTable;
 
 import ucar.unidata.ui.GraphPaperLayout;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -625,16 +626,33 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+    public void writeHeader() {
+        try {
+            String filename = FileManager.getWriteFile(FileManager.FILTER_CSV,
+                                                       null);
+            if(filename == null) return;
+            String[]tmp = makeMetadataHeader();
+            StringBuffer  sb = new StringBuffer(tmp[0]);
+            sb.append("\n");
+            sb.append(tmp[1]);
+            IOUtil.writeFile(filename, sb.toString());
+        } catch (IOException exc) {
+            logException("Writing header", exc);
+        }
+    }
+
+
     /**
      * Show the metadata preference menu
      *
      * @param near The component to show the menu near
      */
     public void popupMetaDataMenu(JComponent near) {
-
         List items = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Save Currrent", this,
                                         "saveMetaDataMap"));
+        items.add(GuiUtils.makeMenuItem("Write Header", this,
+                                        "writeHeader"));
         Hashtable pointMetaDataMap = getMetaDataMap();
         if (pointMetaDataMap.size() > 0) {
             List delitems = new ArrayList();
@@ -768,8 +786,15 @@ public class TextPointDataSource extends PointDataSource {
      * Apply properties
      */
     private void applyMetaDataFields() {
-        map    = "(index)->(";
-        params = "";
+        String[]tmp = makeMetadataHeader();
+        map = tmp[0];
+        params = tmp[1];
+    }
+
+
+    private String[] makeMetadataHeader() {
+        String map    = "(index)->(";
+        String params = "";
         int cnt = 0;
         metaDataFields = new ArrayList();
         String delimiter = getDelimiter();
@@ -838,6 +863,7 @@ public class TextPointDataSource extends PointDataSource {
             params = params + "]";
         }
         map = map + ")";
+        return new String[]{map,params};
         //        System.out.println (map);
         //        System.out.println (params);
 
