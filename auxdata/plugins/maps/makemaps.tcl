@@ -91,6 +91,11 @@ makeMap files/highseaszones.zip "High Seas Zones" -color blue -category "Marine 
 endPlugin
   
 
+startPlugin mexico "Mexico States" -category {Misc}
+makeMap files/aschistmx.nws "Mexico States"
+endPlugin 
+
+
 startPlugin gempak_basic "Gempak Weather" -category {Weather}
 makeMap ${gempak}bwx1224.ncp "Basic Weather 12 and 24hr"
 makeMap ${gempak}bwx3648.ncp "Basic Weather 36 and 48hr"
