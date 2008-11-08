@@ -19,6 +19,7 @@ By default ramadda will use: <pre>
 i.e., the home directory of the process that runs tomcat.
 <p>
 You can override this a number of ways. What ramadda does is look for the property: ramadda_home in a variety of places, in precedence:
+
 <ol>
 
 <li> In the web.xml<br>
@@ -38,7 +39,7 @@ e.g.:<pre>JAVA_OPTS="-Xmx512m ... -Dramadda_home=/home/dir"</pre>
 <li> As a process environment variable.<br>
 Environment variables can be set for the tomcat process
 Just define:<pre>ramadda_home=/home/dir</pre>
-</ol?
+</ol>
 
 
 <h2>Running Standalone</h2>
