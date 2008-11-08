@@ -168,7 +168,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Is this control enabled */
     private boolean enabled = true;
 
-    /** Are we a font display         */
+    /** Are we a front display         */
     private boolean frontDisplay = false;
 
     /** Controls the disabled state */
@@ -497,10 +497,11 @@ public class DrawingControl extends DisplayControlImpl {
         setDisplayInactive();
         NodeList elements = XmlUtil.getElements(root);
         //Only set the usetimesinanimation when we are newly created
-        if(getWasUnPersisted()) {
+        if(!getWasUnPersisted()) {
             setUseTimesInAnimation(XmlUtil.getAttribute(root,
                                                         ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
         }
+        
         frontDisplay = XmlUtil.getAttribute(root, ATTR_FRONTDISPLAY,
                                             frontDisplay);
         if (displayHolder != null) {
@@ -1510,9 +1511,13 @@ public class DrawingControl extends DisplayControlImpl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
-        tabbedPane.add("Style", GuiUtils.top(doMakeStylePanel()));
-        tabbedPane.add("Shapes", doMakeShapesPanel());
+        if(frontDisplay) {
+            tabbedPane.add("Fronts", doMakeShapesPanel());
+        } else {
+            tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
+            tabbedPane.add("Style", GuiUtils.top(doMakeStylePanel()));
+            tabbedPane.add("Shapes", doMakeShapesPanel());
+        }
         return GuiUtils.centerBottom(tabbedPane, msgLabel);
     }
 

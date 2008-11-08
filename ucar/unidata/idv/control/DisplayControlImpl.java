@@ -913,7 +913,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-
         initSharable();
         this.displayId      = displayId;
         this.categories     = categories;
@@ -923,8 +922,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             this.dataSelection = new DataSelection();
         }
 
-
-
         //Initialize the adjust flags if we have not been unpersisted
         if ( !wasUnPersisted) {
             useFastRendering = controlContext.getObjectStore().get(
@@ -933,7 +930,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         //Set the myDataChoices member and add this object as a DataChangeListener
         setDataChoices(choices);
-
 
         if (properties != null) {
             applyProperties(properties);
