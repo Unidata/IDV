@@ -573,7 +573,7 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public boolean canSaveDataToLocalDisk() {
         if (isFileBased()) {
-            return false;
+            //            return false;
         }
         return true;
     }
@@ -597,7 +597,7 @@ public class GeoGridDataSource extends GridDataSource {
      */
     protected void makeSaveLocalActions(List actions) {
         String         lbl = (isFileBased()
-                              ? "Write Grid"
+                              ? "Subset and Write Grid"
                               : "Write Local Grid");
         AbstractAction a   = new AbstractAction(lbl) {
             public void actionPerformed(ActionEvent ae) {
@@ -643,6 +643,7 @@ public class GeoGridDataSource extends GridDataSource {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
+
 
         List                  choices            = getDataChoices();
         final List<JCheckBox> checkboxes         = new ArrayList<JCheckBox>();
