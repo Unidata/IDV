@@ -758,12 +758,12 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException   VisAD Error
      */
     protected void resetData() throws VisADException, RemoteException {
-        synchronized(INFO_MUTEX) {
+        //        synchronized(INFO_MUTEX) {
             clearCachedSamples();
             updateLegendLabel();
             setTimesForAnimation();
             doMoveProbe();
-        }
+            //        }
         fireStructureChanged();
     }
 
@@ -965,12 +965,15 @@ public class ProbeControl extends DisplayControlImpl {
      * @param time new time
      */
     protected void timeChanged(Real time) {
-        try {
-            updateTime();
-            getChart().timeChanged();
-        } catch (Exception exc) {
-            logException("changePosition", exc);
-        }
+        GuiUtils.invokeInSwingThread(new Runnable(){
+                public void run() {
+                    try {
+                        updateTime();
+                        getChart().timeChanged();
+                    } catch (Exception exc) {
+                        logException("changePosition", exc);
+                    }
+                }});
         super.timeChanged(time);
     }
 
@@ -1736,14 +1739,25 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private void updatePosition(RealTuple position)
+    private void updatePosition(final RealTuple position)
             throws VisADException, RemoteException {
-
-        updatePending = false;
         if ( !getHaveInitialized()) {
             return;
         }
+        GuiUtils.invokeInSwingThread(new Runnable(){
+                public void run() {
+                    try {
+                        updatePositionInSwingThread(position);
+                    } catch (Exception exc) {
+                        logException("Updating chart", exc);
+                    }
+                }});
+    }
 
+
+    private void updatePositionInSwingThread(RealTuple position)
+            throws VisADException, RemoteException {
+        updatePending = false;
         double[] positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
@@ -1758,9 +1772,8 @@ public class ProbeControl extends DisplayControlImpl {
                 updateLatLonWidget(elt);
             }
         }
-
         updateTime();
-        List<ProbeRowInfo> rowInfos = new ArrayList();
+        final List<ProbeRowInfo> rowInfos = new ArrayList();
         List               choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
             rowInfos.add(getRowInfo(i));
@@ -1781,9 +1794,9 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException On badness
      */
     private void updateTime() throws VisADException, RemoteException {
-        synchronized(INFO_MUTEX) {
+        //        synchronized(INFO_MUTEX) {
             updateTimeInner();
-        }
+            //        }
     }
 
 

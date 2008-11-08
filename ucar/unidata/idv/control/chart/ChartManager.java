@@ -156,6 +156,8 @@ public abstract class ChartManager implements ImageObserver {
     /** flag for showing the thumbnail */
     private boolean showThumb = false;
 
+    private boolean thumbUpdatePending = false;
+
 
     /**
      * ctor
@@ -341,6 +343,23 @@ public abstract class ChartManager implements ImageObserver {
      *
      */
     public void updateThumb() {
+        updateThumb(false);
+        
+    }
+
+    private void updateThumb(boolean force) {
+        if(force) {
+            updateThumbInner();
+            return;
+        }
+        if(thumbUpdatePending) return;
+        thumbUpdatePending = true;
+        //In 500 ms update the thumbnail image
+        Misc.runInABit(500, this,"updateThumbInner", null);
+    }
+
+
+    public void updateThumbInner() {
         try {
             if ( !showThumb) {
                 return;
@@ -389,6 +408,7 @@ public abstract class ChartManager implements ImageObserver {
         } catch (Exception exc) {
             //            LogUtil.logException("Showing thumbnail", exc);
         }
+        thumbUpdatePending = false;
     }
 
 
@@ -509,7 +529,7 @@ public abstract class ChartManager implements ImageObserver {
     protected void doneLoadingData() {
         settingData = false;
         signalChartChanged();
-        updateThumb();
+        updateThumb(false);
     }
 
     /**
@@ -553,7 +573,7 @@ public abstract class ChartManager implements ImageObserver {
                     if ( !applyProperties(chartHolder)) {
                         return;
                     }
-                    updateThumb();
+                    updateThumb(true);
                 }
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_CANCEL)) {
@@ -779,7 +799,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     public void timeChanged(Real value) {
         signalChartChanged();
-        updateThumb();
+        updateThumb(true);
         //        getContents().repaint();
     }
 
@@ -1169,7 +1189,7 @@ public abstract class ChartManager implements ImageObserver {
         //If we have a thumb nail then update it
         if (chartThumb != null) {
             getThumb().setVisible(value);
-            updateThumb();
+            updateThumb(true);
         }
     }
 
