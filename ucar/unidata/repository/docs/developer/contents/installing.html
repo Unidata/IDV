@@ -1,0 +1,146 @@
+<html>
+<head>
+  <title>Installing RAMADDA</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+
+<h2>Running under Tomcat</h2>
+
+Place the repository.war in the tomcat webapps directory. By default the repository is accessed at /repository on the web server.
+<p>
+
+You need to specify the ramadda home directory. This is where it looks for properties files and other resources, where the java derby database is stored and where any uploaded data files are stored. 
+<p>
+By default ramadda will use: <pre>
+   &lt;tomcat home&gt;/.unidata/repository</pre>
+i.e., the home directory of the process that runs tomcat.
+<p>
+You can override this a number of ways. What ramadda does is look for the property: ramadda_home in a variety of places, in precedence:
+<ol>
+
+<li> In the web.xml<br>
+In the web.xml  in the repository.war you can specify command line properties:<pre>
+    &lt;param-value&gt;-Dramadda_home=/home/dir&lt;/param-value&gt;
+</pre>
+The problem with this is you have to unjar the war and change the web.xml. Then, when you install a 
+new release you have to repeat the process.
+
+<li> As a Java environment variable<br>
+In the setenv.sh (or whereever you define the arguments for java) include in the JAVA_OPTS:<pre>
+-Dramadda_home=/home/dir
+</pre>
+e.g.:<pre>JAVA_OPTS="-Xmx512m ... -Dramadda_home=/home/dir"</pre>
+
+
+<li> As a process environment variable.<br>
+Environment variables can be set for the tomcat process
+Just define:<pre>ramadda_home=/home/dir</pre>
+</ol?
+
+
+<h2>Running Standalone</h2>
+You can run RAMADDA stand-alone. This is really useful for development and just requires  Java 1.5 or greater.
+<p>
+To run RAMADDA run the ramadda.sh. This just does:<pre>
+   java -Xmx512m -jar repository.jar
+</pre>
+
+
+By default the server is on port 8080.  To change the port do:<pre>
+    java -Xmx512m -jar repository.jar -port &lt;some port&gt;
+</pre>
+
+RAMADDA creates a local storage directory in:<pre>
+&lt;home dir&gt;/.unidata/repository</pre>
+
+To change this do:<pre>
+    java -Xmx512m -jar repository.jar -Dramadda_home=/home/dir
+</pre>
+
+
+<h2>Configuration</h2>
+
+RAMADDA looks in the home directory for a repository.properties
+To configure RAMADDA create a repository.properties file. The properties
+defined in the local file override the ones defined in the system file.
+The system properties file, from the source release, can be viewed:<br>
+/ucar/unidata/repository/resources/repository.properties
+<p>
+
+The major thing you want to change would be the database.
+<p>
+
+By default RAMADDA uses a local Java Derby database. RAMADDA also runs
+using mysql and postgres (though the postgres hasn't been test in a while).
+To define the database just define one of the ramadda.db properties in repository.properties:
+<pre>
+ramadda.db=derby
+#ramadda.db=mysql
+#ramadda.db=postgres
+</pre>
+
+
+The mysql database and user/password is defined in the repository.properties 
+file. To change it add to the repository.properties file the following:
+<pre>
+ramadda.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull
+ramadda.db.mysql.user=the database user
+ramadda.db.mysql.password=the database password
+</pre>
+
+
+<h2>Copying a Database</h2>
+If you ran RAMADDA with the default settings annd created some content that is in the database 
+and you want to switch databases (e.g., from derby to mysql). Log in to the original RAMADDA
+and go to the Admin-&gt;SQL page. There is a Dump Database link. This will give you a text file of the
+entire database. Note: This might be a big file. You can save this file on the server or have it local.
+<p>
+Then, reconfigure RAMADDA to point to the new database and login again. Note: you'll have to
+add a new admin password, etc. Then go to the Admin-&gt;SQL page. If you saved the SQL file on the 
+server then just enter:<pre>
+file:/path/to/sql/file
+</pre>
+in the text area and hit execute.
+<p>
+If you have the SQL file on your local machine upload through the sql file form.
+<p>
+Its probably best to shutdown and then restart RAMADDA after doing this and you should have
+your old database running in the new RAMADDA. 
+<p>
+If you changed systems then you also need to copy over the storage directory tree to the
+new system. This is in:
+<pre>&lt;ramadda_home&gt;/storage</pre>
+
+
+<h2>Building from Source</h2>
+The  source release creates, at the top level, the ucar source tree and a lib directory. 
+The lib directory has two jar files:<pre>
+lib/repositorylib.jar
+lib/repositorytds.jar
+</pre>
+
+To compile stand-alone (e.g., using javac) put those 2 jar files in your class path.
+<p>
+To compile using ant:<br>
+The default ant target  (all) will compile the repository source and create:
+<pre>
+lib/repository.jar
+lib/repository.war
+</pre>
+
+
+You can run the repository stand-alone by doing:
+<pre>java -jar repository.jar</pre>
+
+All of the services except OpenDAP are available stand-alone.
+<p>
+The repository.war is a tomcat war file that needs to be placed in the tomcat install area.
+
+
+
+
+
+</body>
