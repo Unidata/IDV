@@ -146,6 +146,8 @@ public class Repository extends RepositoryBase implements
     /** _more_ */
     private Properties properties = new Properties();
 
+    Map<String, String> systemEnv;
+
     /** _more_ */
     private Properties dbProperties = new Properties();
 
@@ -2116,12 +2118,24 @@ public class Repository extends RepositoryBase implements
      * @return _more_
      */
     public String getProperty(String name) {
-        Map<String, String> env  = System.getenv();
-        String              prop = env.get(name);
-        if (prop != null) {
-            return prop;
+        if(systemEnv==null) {
+            systemEnv  = System.getenv();
         }
-        return (String) properties.get(name);
+        String prop = null;
+        
+        //Look at the repository.properties first
+        if(prop == null)
+            prop =(String) properties.get(name);
+
+        //Then look at system properties
+        if(prop == null)
+            prop = System.getProperty(name);
+
+        //Then env vars
+        if(prop == null)
+            prop = systemEnv.get(name);
+
+        return prop;
     }
 
 
