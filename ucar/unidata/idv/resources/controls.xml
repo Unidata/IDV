@@ -774,7 +774,7 @@ example:
      description="Movie Display"
      label="Movie Display"
      displaycategory="General"
-     properties="windowVisible=true; displayName=Movie Display;showInTabs=false;"/>
+     properties="windowVisible=true; displayName=Movie Display;showInTabs=false;windowVisible=true;"/>
 
 
 <!--

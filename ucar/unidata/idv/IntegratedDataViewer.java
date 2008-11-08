@@ -291,7 +291,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             });*/
         super.setIdv(this);
 
-        if ( !interactiveMode) {
+        if (!interactiveMode) {
             getArgsManager().setIsOffScreen(true);
         }
 
@@ -347,7 +347,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @return is interactive
      */
     public boolean getInteractiveMode() {
-        return interactiveMode;
+        return interactiveMode && !getArgsManager().isScriptingMode();
     }
 
 
