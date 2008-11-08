@@ -3357,7 +3357,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected void reallyFillLegends() {
         //If we are not loading a bundle then fill the legends right now
-        if ( !getStateManager().isLoadingXml()) {
+        if ( !getStateManager().isLoadingXml() || !getIdv().getInteractiveMode()) {
             fillLegendsInner();
         } else {
             //else fill them in about 1 second
@@ -3588,7 +3588,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (getIdv().getInteractiveMode()) {
             fillLegends();
             updateTimelines(true);
-            if ( !getStateManager().isLoadingXml()) {
+            if (!getStateManager().isLoadingXml()) {
                 toFront();
             }
         } else {
