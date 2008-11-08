@@ -10,9 +10,9 @@
   </description>
 
   <context-param>
-    <param-name>args</param-name>
 <!--
 To change the home directory do:
+    <param-name>args</param-name>
     <param-value>-Dramadda_home=/web/repository</param-value>
 -->
     <description>

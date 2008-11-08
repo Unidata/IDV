@@ -30,11 +30,10 @@ The problem with this is you have to unjar the war and change the web.xml. Then,
 new release you have to repeat the process.
 
 <li> As a Java environment variable<br>
-In the setenv.sh (or whereever you define the arguments for java) include in the JAVA_OPTS:<pre>
+Wherever you define the arguments that are passed to <i>java</i> when starting Tomcat include:<pre>
 -Dramadda_home=/home/dir
 </pre>
-e.g.:<pre>JAVA_OPTS="-Xmx512m ... -Dramadda_home=/home/dir"</pre>
-
+e.g.:<pre>java -Xmx512m  -Dramadda_home=/home/dir
 
 <li> As a process environment variable.<br>
 Environment variables can be set for the tomcat process
