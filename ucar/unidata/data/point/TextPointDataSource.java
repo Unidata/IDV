@@ -77,6 +77,11 @@ import javax.swing.event.*;
  */
 public class TextPointDataSource extends PointDataSource {
 
+    public static final String PROP_HEADER_MAP = "data.textpoint.map";
+    public static final String PROP_HEADER_PARAMS = "data.textpoint.params";
+    public static final String PROP_HEADER_SKIP = "data.textpoint.skip";
+    public static final String PROP_HEADER_BLOB = "data.textpoint.blob";
+
     /** Where to write out the saved meta data listing */
     public static final String PREF_METADATAMAP =
         "pref.textpointdatasource.metadatamap.xml";
@@ -138,6 +143,10 @@ public class TextPointDataSource extends PointDataSource {
 
     /** group var name */
     private String groupVarName = null;
+
+    private String lastType="";
+
+    private String lastLabel="";
 
     /**
      * Default constructor
@@ -268,6 +277,21 @@ public class TextPointDataSource extends PointDataSource {
         if (obs == null) {
             TextAdapter ta = null;
             try {
+                if(params==null || params.length()==0) {
+                    params = getProperty(PROP_HEADER_PARAMS,(String)null);
+                }
+                if(map==null || map.length()==0) {
+                    map = getProperty(PROP_HEADER_MAP,(String)null);
+                }
+                if(skipRows == 0) {
+                    skipRows = getProperty(PROP_HEADER_SKIP, skipRows);
+                }
+                String blob= getProperty(PROP_HEADER_BLOB,(String)null);
+                if(blob!=null && metaDataFields.size()==0) {
+                    metaDataFields = (List) getDataContext().getIdv().decodeObject(blob);
+                    applySavedMetaData(metaDataFields);
+                }
+
                 ta = new TextAdapter(getInputStream(contents), delimiter,
                                      map, params, sampleIt);
             } catch (visad.data.BadFormException bfe) {
@@ -605,7 +629,7 @@ public class TextPointDataSource extends PointDataSource {
     private Hashtable getMetaDataMap() {
         Hashtable pointMetaDataMap =
             (Hashtable) getDataContext().getIdv().getStore().getEncodedFile(
-                PREF_METADATAMAP);
+                                                                            PREF_METADATAMAP);
         if (pointMetaDataMap == null) {
             pointMetaDataMap = new Hashtable();
         }
@@ -625,6 +649,32 @@ public class TextPointDataSource extends PointDataSource {
                 pointMetaDataMap);
     }
 
+
+
+    public void writePlugin() {
+        try {
+            JTextField typeFld = new JTextField(lastType,30);
+            JTextField labelFld = new JTextField(lastLabel,30);
+            JComponent contents = GuiUtils.formLayout(new Object[]{
+                "Type:",            typeFld,
+                "Label:",           labelFld});
+            if(!GuiUtils.showOkCancelDialog(null,"Data Source Type Plugin",  contents,null)) return;
+            lastType = typeFld.getText().trim();
+            lastLabel = labelFld.getText().trim();
+            String[]tmp = makeMetadataHeader();
+            if(tmp==null) return;
+            String xml = DataManager.getDatasourceXml(lastType, lastLabel, getClass(),Misc.newHashtable(new Object[]{PROP_HEADER_MAP,
+                                                                                                        tmp[0],
+                                                                                                        PROP_HEADER_PARAMS,tmp[1],
+                                                                                                        PROP_HEADER_SKIP,
+                                                                                                        ""+skipRows,
+                                                                                                        PROP_HEADER_BLOB,
+                                                                                                        getDataContext().getIdv().encodeObject(metaDataFields,false)}));
+            getDataContext().getIdv().getPluginManager().addText(xml, lastType+"datasource.xml");
+        } catch (Exception exc) {
+            logException("Writing data source type", exc);
+        }
+    }
 
     public void writeHeader() {
         try {
@@ -653,6 +703,8 @@ public class TextPointDataSource extends PointDataSource {
                                         "saveMetaDataMap"));
         items.add(GuiUtils.makeMenuItem("Write Header", this,
                                         "writeHeader"));
+        items.add(GuiUtils.makeMenuItem("Write Data Source Plugin", this,
+                                        "writePlugin"));
         Hashtable pointMetaDataMap = getMetaDataMap();
         if (pointMetaDataMap.size() > 0) {
             List delitems = new ArrayList();

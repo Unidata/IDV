@@ -591,6 +591,40 @@ public class DataManager {
         return html;
     }
 
+    public static String getDatasourceXml(String type, String label,Class datasourceClass,Hashtable properties) throws Exception {
+        Document doc = XmlUtil.makeDocument();
+        Element root = doc.createElement(TAG_DATASOURCES);
+        Element node = XmlUtil.create(TAG_DATASOURCE, root);
+        node.setAttribute(ATTR_ID, type);
+        node.setAttribute(ATTR_LABEL,label);
+        node.setAttribute(ATTR_FACTORY, datasourceClass.getName());
+        node.setAttribute(ATTR_FILESELECTION,"true");
+        if(properties!=null) {
+            for (java.util.Enumeration keys=properties.keys();keys.hasMoreElements();) {
+                String key = (String)keys.nextElement();
+                String value = (String) properties.get(key);
+                Element propNode = XmlUtil.create(doc,TAG_PROPERTY,node,value,new String[]{
+                    ATTR_NAME, key
+                });
+            }
+        }
+        /*
+<datasources>
+  <datasource
+     id="NetCDF.POINT.PAM"
+     factory="ucar.unidata.data.point.NetcdfPointDataSource"
+     ncmltemplate="/pam.ncml"
+     fileselection="true"
+     label="PAM Point Data files"/>
+</datasources>
+        */
+
+        return XmlUtil.getHeader() +XmlUtil.toString(root);
+    }
+
+
+
+
     /**
      * This method processes the given datasourceNode, creating a
      * {@link  DataSourceDescriptor} if one has not been created already.
@@ -667,9 +701,15 @@ public class DataManager {
                 for (int propIdx = 0; propIdx < props.getLength();
                         propIdx++) {
                     Element propNode = (Element) props.item(propIdx);
-                    properties.put(XmlUtil.getAttribute(propNode, ATTR_NAME),
-                                   XmlUtil.getAttribute(propNode,
-                                       ATTR_VALUE));
+                    if(XmlUtil.hasAttribute(propNode, ATTR_VALUE)) {
+                        properties.put(XmlUtil.getAttribute(propNode, ATTR_NAME),
+                                       XmlUtil.getAttribute(propNode,
+                                                            ATTR_VALUE));
+                    } else {
+                        String value = XmlUtil.getChildText(propNode);
+                        properties.put(XmlUtil.getAttribute(propNode, ATTR_NAME),
+                                       value);
+                    }
                 }
                 DataSourceDescriptor descriptor =
                     new DataSourceDescriptor(id, label, this,
