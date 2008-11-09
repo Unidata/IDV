@@ -539,13 +539,14 @@ public class TimeSeriesChart extends XYChartManager {
                     }
                     lineState.unit = info.getUnit();
                     lineState.setNameIfNeeded(info.getDataInstance().getParamName());
+                    String  name  =lineState.getName();
                     if (info.getLevel() != null) {
-                        lineState.setName(lineState.getName() + "@"
-                                          + Util.formatReal(info.getLevel())
-                                          + info.getLevel().getUnit() + " ");
+                        name = name+ "@"
+                            + Util.formatReal(info.getLevel())
+                            + info.getLevel().getUnit();
                     }
 
-                    TimeSeries series = new TimeSeries(lineState.getName(),
+                    TimeSeries series = new TimeSeries(name,
                                             Millisecond.class);
 
                     Set        timeSet   = field.getDomainSet();
