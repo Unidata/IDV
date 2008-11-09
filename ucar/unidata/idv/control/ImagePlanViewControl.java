@@ -152,7 +152,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                     getDisplayUnit());
         }
         if (range == null) {
-            return new Range(0, 255);
+        //    return new Range(0, 255);
+            range = super.getInitialRange();
         }
         return range;
     }
