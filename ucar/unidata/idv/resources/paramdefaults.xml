@@ -285,7 +285,7 @@ specified  -->
      ci_base="0"
      ci_min="0.25"
      ci_interval="2.5"
-     unit="kg.m-2"/>
+     unit="mm"/>
   <param
      name="^.*_precipitation"
      table="Precip"
@@ -294,7 +294,7 @@ specified  -->
      ci_base="0"
      ci_min="0.25"
      ci_interval="2.5"
-     unit="kg.m-2"/>
+     unit="mm"/>
   <param
      name="theta"
      table="Temperature"
