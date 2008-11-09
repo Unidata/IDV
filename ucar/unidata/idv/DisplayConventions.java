@@ -273,6 +273,7 @@ public class DisplayConventions extends IdvManager {
      * @return The formatted version
      */
     public String formatDistance(double d) {
+        if(d>1000) return ""+(int)d;
         return distanceFormat.format(d);
     }
 
