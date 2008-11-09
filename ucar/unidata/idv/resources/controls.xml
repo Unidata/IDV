@@ -907,7 +907,9 @@ example:
      description="Front display"
      label="Front Display"
      displaycategory="General"
-     properties="displayName=Front Display;windowVisible=true;showInTabs=true"/>
+     properties="displayName=Front Display;windowVisible=true;showInTabs=true">
+    <property name="displayListTemplate" value="%displayname% %timestamp%"/>
+</control>
 
   <control
      id="filedrawingcontrol"
