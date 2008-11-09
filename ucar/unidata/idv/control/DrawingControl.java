@@ -1026,11 +1026,15 @@ public class DrawingControl extends DisplayControlImpl {
                 if (currentCmd.equals(CMD_MOVE)) {
                     setSelection(currentGlyph);
                     currentGlyph.doMove(event);
+                    //Update the table listing
+                    if(glyphTable!=null) glyphTable.repaint();
                     return;
                 }
                 if (currentCmd.equals(CMD_STRETCH)) {
                     setSelection(currentGlyph);
                     currentGlyph.doStretch(event);
+                    //Update the table listing
+                    if(glyphTable!=null) glyphTable.repaint();
                     return;
                 }
                 setCurrentGlyph(currentGlyph,

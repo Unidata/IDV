@@ -860,6 +860,35 @@ public abstract class DrawingGlyph {
         return getTypeName();
     }
 
+
+    public String getAreaString()  throws Exception {
+        double squareFeet = getArea();
+        double acres = squareFeet/43560.0;
+        double hectares = acres*0.404685642;
+        double squareKM = acres*0.00404685642;
+        double squareMiles = squareFeet/ 27878400.0;
+
+        StringBuffer desc     = new StringBuffer();
+        desc.append("  ");
+        if(squareKM>1.0) {
+            desc.append(control.getDisplayConventions().formatDistance(squareKM));
+            desc.append("[km^2] ");
+        } else {
+            desc.append(control.getDisplayConventions().formatDistance(hectares));
+            desc.append("[hectares] ");
+        }
+        desc.append("  ");
+        if(squareMiles>1.0) {
+            desc.append(control.getDisplayConventions().formatDistance(squareMiles));
+            desc.append("[miles^2] ");
+        } else {
+            desc.append(control.getDisplayConventions().formatDistance(acres));
+            desc.append("[acres] ");
+        }
+        return desc.toString();
+    }
+
+
     /**
      * Get extra description to show in the JTable
      *
@@ -868,19 +897,13 @@ public abstract class DrawingGlyph {
     public String getExtraDescription() {
         if (canShowArea()) {
             try {
-                double squareFeet = getArea();
-                String acres =
-                    control.getDisplayConventions().formatDistance(squareFeet
-                        / 43560.0);
-                String miles =
-                    control.getDisplayConventions().formatDistance(squareFeet
-                        / 27878400.0);
                 Real   distance = getDistance();
-                String desc     = "";
+                StringBuffer desc     = new StringBuffer();
                 if (distance != null) {
-                    desc = "Distance: " + control.formatDistance(distance);
+                    desc.append(control.formatDistance(distance));
                 }
-                return desc + " Acres: " + acres + " sq miles: " + miles;
+                desc.append(getAreaString());
+                return desc.toString();
             } catch (Exception exc) {}
         }
         return "";
@@ -1506,15 +1529,7 @@ public abstract class DrawingGlyph {
             }
             if (canShowArea()) {
                 comps.add(GuiUtils.rLabel("Area:"));
-                double squareFeet = getArea();
-                String acres =
-                    control.getDisplayConventions().formatDistance(squareFeet
-                        / 43560.0);
-                String miles =
-                    control.getDisplayConventions().formatDistance(squareFeet
-                        / 27878400.0);
-                comps.add(new JLabel(acres + " acres " + miles
-                                     + " sq miles"));
+                comps.add(new JLabel(getAreaString()));
             }
         } catch (Exception exc) {
             LogUtil.logException("Setting distance", exc);
