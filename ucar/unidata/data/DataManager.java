@@ -650,7 +650,7 @@ public class DataManager {
                                       ATTR_PATTERNS, (String) null);
                 String label = XmlUtil.getAttribute(datasourceNode,
                                    ATTR_LABEL, "");
-                //                System.out.println (id + "    " + label);
+                //                System.out.println ("<tr><td>"+id + "</td><td>" + label+"</td></tr>");
                 boolean fileSelection = XmlUtil.getAttribute(datasourceNode,
                                             ATTR_FILESELECTION, false);
                 if (count > 1) {
