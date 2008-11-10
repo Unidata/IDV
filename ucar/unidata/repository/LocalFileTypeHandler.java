@@ -255,7 +255,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             parent = (Group) getRepository().getEntry(request, parentId,false,false);
         }
 
-        entry.initEntry(name, "", parent, "",
+        entry.initEntry(name, "", parent, 
                             getUserManager().localFileUser,
                             new Resource(targetFile, (targetFile.isDirectory()
                                              ? Resource.TYPE_LOCAL_DIRECTORY

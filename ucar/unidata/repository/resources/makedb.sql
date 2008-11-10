@@ -17,7 +17,7 @@ CREATE TABLE entries (id varchar(200),
 	           name varchar(200),
                    description varchar(10000),
                    parent_group_id varchar(200),
-                   top_group_id varchar(200),
+		   tree_id varchar(1000);
    		   user_id varchar(200),
 	           resource varchar(500),	           
                    resource_type varchar(200),
@@ -31,16 +31,14 @@ CREATE TABLE entries (id varchar(200),
 	           west ramadda.double); 
 
 
+ALTER TABLE entries DROP COLUMN top_group_id;
+
+
 --- for mysql
-alter table entries modify column resource varchar(500);
-alter table entries modify column createdate ramadda.datetime;
-alter table entries modify column fromdate ramadda.datetime;
-alter table entries modify column todate ramadda.datetime;
+--- alter table entries modify column resource varchar(500);
 --- for derby
-alter table entries alter column resource set data type varchar(500);
-alter table entries alter column createdate set data type ramadda.datetime;
-alter table entries alter column fromdate set data type ramadda.datetime;
-alter table entries alter column todate set data type ramadda.datetime;
+---alter table entries alter column resource set data type varchar(500);
+
 
 
 
@@ -53,6 +51,15 @@ CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
 CREATE INDEX ENTRIES_INDEX_FROMDATE ON entries (FROMDATE);
 CREATE INDEX ENTRIES_INDEX_TODATE ON entries (TODATE);
+
+
+CREATE TABLE ancestors (id varchar(200),
+	                ancestor_id varchar(200));
+
+CREATE INDEX entries_index_id ON entries (id);
+CREATE INDEX entries_index_id ON entries (ancestor_id);
+
+
 
 
 -----------------------------------------------------------------------

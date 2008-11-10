@@ -9,7 +9,6 @@
       <api request="/entry/show/*"           method="processEntryShow"/>
 
       <api request="/search/textform"        method="processEntryTextSearchForm"     name="Search" toplevel="true"/>
-      <api request="/modelproducts"          method="processModelProducts"           name="Models" toplevel="true"/>
       <api request="/search/form"            method="processEntrySearchForm"         name="Search"/>
       <api request="/search/browse"          method="processEntryBrowseSearchForm"   name="Search"/>
       <api request="/search/do"              method="processEntrySearch"/>

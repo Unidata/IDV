@@ -300,7 +300,7 @@ public class CatalogHarvester extends Harvester {
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
                         DFLT_INHERITED, ext, "", "", ""));
             }
-            entry.initEntry(name, "", parent, "", user,
+            entry.initEntry(name, "", parent,  user,
                             new Resource(urlPath, Resource.TYPE_URL), "",
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);

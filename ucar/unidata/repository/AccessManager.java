@@ -40,7 +40,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;

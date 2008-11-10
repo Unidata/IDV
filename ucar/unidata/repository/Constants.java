@@ -30,7 +30,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -282,29 +282,6 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_RSS_VERSION = "version";
 
-    /** _more_ */
-    public static final String TAG_RSS_RSS = "rss";
-
-    /** _more_ */
-    public static final String TAG_RSS_LINK = "link";
-
-    /** _more_ */
-    public static final String TAG_RSS_GUID = "guid";
-
-    /** _more_ */
-    public static final String TAG_RSS_CHANNEL = "channel";
-
-    /** _more_ */
-    public static final String TAG_RSS_ITEM = "item";
-
-    /** _more_ */
-    public static final String TAG_RSS_TITLE = "title";
-
-    /** _more_ */
-    public static final String TAG_RSS_PUBDATE = "pubDate";
-
-    /** _more_ */
-    public static final String TAG_RSS_DESCRIPTION = "description";
 
 
     /** _more_ */
@@ -693,6 +670,8 @@ public interface Constants {
     /** _more_ */
     public static final String TYPE_ASSOCIATION = "association";
 
+
+    public static final String PROP_VERSION = "ramadda.version";
 
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";

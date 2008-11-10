@@ -35,7 +35,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
@@ -831,7 +831,7 @@ public class PatternHarvester extends Harvester {
         } else {
             resource = new Resource(fileName, Resource.TYPE_FILE);
         }
-        entry.initEntry(name, desc, group, group.getCollectionGroupId(),
+        entry.initEntry(name, desc, group, 
                         getUser(), resource, "", createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), values);
         if (tag.length() > 0) {

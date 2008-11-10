@@ -34,7 +34,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
@@ -145,7 +145,7 @@ public class TestGenerator extends Harvester {
                     Entry entry =
                         typeHandler.createEntry(repository.getGUID());
                     entry.initEntry("test_" + i + "_" + j + "_" + k, "",
-                                    group, group.getCollectionGroupId(),
+                                    group, 
                                     user,
                                     new Resource("", Resource.TYPE_UNKNOWN),
                                     "", createDate.getTime(),

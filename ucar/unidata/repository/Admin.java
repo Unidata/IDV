@@ -34,7 +34,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
 
 
@@ -1083,7 +1082,7 @@ public class Admin extends RepositoryManager {
                     }
                     int    col      = 1;
                     String id       = results.getString(col++);
-                    String resource = results.getString(col++);
+                    String resource = getStorageManager().resourceFromDB(results.getString(col++));
                     Entry entry = getRepository().getTypeHandler(
                                       results.getString(col++)).createEntry(
                                       id);

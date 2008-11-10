@@ -87,7 +87,7 @@ public class RepositoryServlet extends HttpServlet {
             throws Exception {
         //Have  a local variable here so we can create and initialize it
         Repository tmp = new Repository(getInitParams(), 
-                                    request.getServerPort(), true);
+                                        request.getServerPort(), true);
         tmp.init(null);
 
         //Now set it

@@ -31,7 +31,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
@@ -114,7 +114,7 @@ public class Request implements Constants {
     private String ip;
 
     /** _more_ */
-    private Entry collectionEntry;
+    //    private Entry collectionEntry;
 
 
     /** _more_ */
@@ -203,20 +203,20 @@ public class Request implements Constants {
         if (entry.getIsLocalFile()) {
             return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
         }
-        Group collectionGroup = entry.getCollectionGroup();
-        if (repository.isSynthEntry(entry.getId())) {
-            return url(theUrl, arg, entry.getId());
-        }
+        
+//        Group collectionGroup = entry.getCollectionGroup();
+//        if (repository.isSynthEntry(entry.getId())) {
+//            return url(theUrl, arg, entry.getId());
+//        }
 
-        //This should always be true (?)
-        if (collectionGroup != null) {
-            return url(theUrl, arg, entry.getId());
-            /*
-            String collectionPath =
-                repository.getPathFromEntry(collectionGroup);
-            return HtmlUtil.url(theUrl.getUrl(collectionPath), arg,
-            entry.getId());*/
-        }
+        //if (collectionGroup != null) {
+        //            return url(theUrl, arg, entry.getId());
+        //            String collectionPath =
+        //                repository.getPathFromEntry(collectionGroup);
+        //            return HtmlUtil.url(theUrl.getUrl(collectionPath), arg,
+        //            entry.getId());
+        //        }
+
 
         return url(theUrl, arg, entry.getId());
     }
@@ -280,11 +280,12 @@ public class Request implements Constants {
      * @return _more_
      */
     public String url(RequestUrl theUrl) {
+        /*
         if (collectionEntry != null) {
             String collectionPath =
                 repository.getPathFromEntry(collectionEntry);
             return theUrl.getUrl(collectionPath);
-        }
+            }*/
         return theUrl.toString();
     }
 
@@ -1391,18 +1392,21 @@ public class Request implements Constants {
      *
      *  @param value The new value for CollectionEntry
      */
+/*
     public void setCollectionEntry(Entry value) {
         collectionEntry = value;
     }
-
+*/
     /**
      *  Get the CollectionEntry property.
      *
      *  @return The CollectionEntry
      */
+/*
     public Entry getCollectionEntry() {
         return collectionEntry;
     }
+*/
 
 
 

@@ -405,16 +405,16 @@ public class TypeHandler extends RepositoryManager {
      */
     public Entry getEntry(ResultSet results, boolean abbreviated)
             throws Exception {
-        //id,type,name,desc,group,topGroup, user,file,createdata,fromdate,todate
+        //id,type,name,desc,group, user,file,createdata,fromdate,todate
         int    col   = 3;
         String id    = results.getString(1);
         Entry  entry = createEntry(id);
         entry.initEntry(
             results.getString(col++), results.getString(col++),
             getRepository().findGroup(null, results.getString(col++)),
-            results.getString(col++),
             getUserManager().findUser(results.getString(col++), true),
-            new Resource(results.getString(col++), results.getString(col++)),
+            new Resource(getStorageManager().resourceFromDB(results.getString(col++)), 
+                         results.getString(col++)),
             results.getString(col++),
             getDatabaseManager().getDate(results,col++).getTime(),
             getDatabaseManager().getDate(results,col++).getTime(),
@@ -1377,6 +1377,7 @@ public class TypeHandler extends RepositoryManager {
 
         }
 
+        /**
         Entry collection = request.getCollectionEntry();
         String collectionSelect = HtmlUtil.select(ARG_COLLECTION,
                                       collections, ((collection != null)
@@ -1387,6 +1388,7 @@ public class TypeHandler extends RepositoryManager {
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
                     collectionSelect));
         }
+        */
 
         advancedSB.append(HtmlUtil.formEntry(msgLabel("File Suffix"),
                                              HtmlUtil.input(ARG_FILESUFFIX,
@@ -1514,10 +1516,11 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+        /*
         if (collection != null) {
             basicSB.append(HtmlUtil.formEntry(msgLabel("Collection"),
                     collectionSelect));
-        }
+                    }*/
 
 
         basicSB.append(HtmlUtil.formTableClose());
@@ -1591,8 +1594,9 @@ public class TypeHandler extends RepositoryManager {
         if (request.defined(ARG_RESOURCE)) {
             addCriteria(searchCriteria, "Resource=",
                         request.getString(ARG_RESOURCE, ""));
-            addOrClause(Tables.ENTRIES.COL_RESOURCE,
-                        request.getString(ARG_RESOURCE, ""), where);
+            String resource = request.getString(ARG_RESOURCE, "");
+            resource = getStorageManager().resourceFromDB(resource);
+            addOrClause(Tables.ENTRIES.COL_RESOURCE, resource, where);
         }
 
         if (request.defined(ARG_DATATYPE)) {
@@ -1609,6 +1613,7 @@ public class TypeHandler extends RepositoryManager {
                         request.getString(ARG_USER_ID, ""), where);
         }
 
+        /**
         if (request.defined(ARG_COLLECTION)) {
             Entry collectionEntry = getRepository().getEntry(request,
                                         request.getString(ARG_COLLECTION,
@@ -1621,7 +1626,7 @@ public class TypeHandler extends RepositoryManager {
             }
             addOrClause(Tables.ENTRIES.COL_TOP_GROUP_ID,
                         request.getString(ARG_COLLECTION, ""), where);
-        }
+                        }**/
 
         if (request.defined(ARG_FILESUFFIX)) {
             addCriteria(searchCriteria, "File Suffix=",

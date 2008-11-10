@@ -31,6 +31,7 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.util.PluginClassLoader;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -40,7 +41,7 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
@@ -71,6 +72,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
+
+import java.util.jar.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -199,27 +202,14 @@ public class Repository extends RepositoryBase implements
     /** _more_ */
     private Object MUTEX_GROUP = new Object();
 
-
-
-
     /** _more_ */
     private Object MUTEX_KEY = new Object();
 
 
-
-    /** _more_ */
-    List<String> typeDefinitionFiles;
-
-    /** _more_ */
-    List<String> metadataDefFiles;
-
-
-
-    /** _more_ */
-    List<String> apiDefFiles;
-
-    /** _more_ */
-    List<String> outputDefFiles;
+    private  List<String> typeDefFiles   = new ArrayList<String>();
+    private  List<String> apiDefFiles    = new ArrayList<String>();
+    private  List<String> outputDefFiles       = new ArrayList<String>();
+    private  List<String> metadataDefFiles     = new ArrayList<String>();
 
 
     /** _more_ */
@@ -299,6 +289,10 @@ public class Repository extends RepositoryBase implements
     private List<File> localFilePaths = new ArrayList<File>();
 
     public static final String ID_PREFIX_SYNTH = "synth:";
+
+
+
+
 
 
     /**
@@ -412,57 +406,6 @@ public class Repository extends RepositoryBase implements
     protected void init(Properties properties) throws Exception {
         initProperties(properties);
         initServer();
-        Misc.run(this, "runBufrTest",null);
-    }
-
-    public void runBufrTest() {
-        try {
-            boolean autoCommit = false;
-            int total = 0;
-            Connection connection = getDatabaseManager().getNewConnection();
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            Statement statement = connection.createStatement();
-            statement.execute("delete from BUFRTEST");
-            statement.close();
-            
-
-            if(true) {
-                connection.close();
-                return;
-            }
-
-            PreparedStatement pstmt = getDatabaseManager().getPreparedStatement("insert into BUFRTEST values(?,?,?)");
-            long t1 = System.currentTimeMillis();
-            System.err.println("start test " + (autoCommit?" doing autocommit":" not commiting"));
-            if(!autoCommit) {
-                connection.setAutoCommit(false);
-            }
-            for(int j=0;j<100;j++) {
-                for(int i=0;i<1000;i++) {
-                    pstmt.setString(1,"stn");
-                    pstmt.setInt(2,i);
-                    pstmt.setString(3,"the file");
-                    pstmt.addBatch();
-                    total++;
-                    pstmt.executeBatch();
-                }
-                //                pstmt.executeBatch();
-                long t2 = System.currentTimeMillis();
-                if(t2>t1) {
-                    double seconds = (t2-t1)/1000.0;
-                    System.err.println("cnt:" + total +  " rate:"  + ((int)(total/seconds))+"/s");
-                }
-            }
-            if(!autoCommit) {
-                connection.commit();
-                connection.setAutoCommit(true);
-            }
-            connection.close();
-            pstmt.close();
-            System.err.println("done");
-        } catch(Exception exc) {
-            exc.printStackTrace();
-        }
     }
 
 
@@ -790,6 +733,20 @@ public class Repository extends RepositoryBase implements
         return admin;
     }
 
+
+    public static final double VERSION = 1.0;
+
+    private void  updateToVersion1_0() throws Exception {
+
+    }
+
+    protected void checkVersion() throws Exception {
+        double version = getDbProperty(PROP_VERSION,0.0);
+        if(version==VERSION) return;
+        updateToVersion1_0();
+        //        writeGlobal(PROP_VERSION,""+VERSION);
+    }
+
     /**
      * _more_
      *
@@ -812,6 +769,7 @@ public class Repository extends RepositoryBase implements
         }
         readGlobals();
 
+        checkVersion();
 
         initOutputHandlers();
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
@@ -912,6 +870,63 @@ public class Repository extends RepositoryBase implements
     }
 
 
+    protected void loadPluginFile(File f) {
+        
+    }
+
+    private class MyClassLoader extends PluginClassLoader {
+        public MyClassLoader(String path, ClassLoader parent) throws Exception {
+            super(path, parent);
+        }
+        protected void checkClass(Class c) throws Exception {
+        }
+        protected String defineResource(JarEntry jarEntry) {
+            String path = super.defineResource(jarEntry);
+            checkFile(path);
+            return path;
+        }
+    }
+
+
+    protected void  initPlugins() throws Exception  {
+        File dir = new File(getStorageManager().getPluginsDir());
+        File[]plugins = dir.listFiles();
+        for(int i=0;i<plugins.length;i++) {
+            if(plugins[i].isDirectory()) continue;
+            if(plugins[i].toString().endsWith(".jar")) {
+                PluginClassLoader cl = new MyClassLoader(plugins[i].toString(),
+                                                             getClass().getClassLoader());
+
+                Misc.addClassLoader(cl);
+                List entries = cl.getEntryNames();
+                for (int entryIdx = 0; entryIdx < entries.size(); entryIdx++) {
+                    String entry = (String) entries.get(entryIdx);
+                    if(!checkFile(entry)) {
+                        System.err.println ("Don't know how to handle plugin resource:" + entry +" from plugin:" + plugins[i]);
+                    }
+                }
+            } else {
+                checkFile(plugins[i].toString());
+            }
+        }
+    }
+
+
+    protected boolean checkFile(String file) {
+        if (file.indexOf("api.xml") >= 0) {
+            apiDefFiles.add(file);
+        } else if (file.indexOf("types.xml") >= 0) {
+            typeDefFiles.add(file);
+        } else if (file.indexOf("outputhandlers.xml") >= 0) {
+            outputDefFiles.add(file);
+        } else if (file.indexOf("metadatahandlers.xml") >= 0) {
+            metadataDefFiles.add(file);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * _more_
@@ -941,25 +956,13 @@ public class Repository extends RepositoryBase implements
                 getClass()));
 
         Properties   argProperties       = new Properties();
-
-        List<String> argEntryDefFiles    = new ArrayList();
-        List<String> argApiDefFiles      = new ArrayList();
-        List<String> argOutputDefFiles   = new ArrayList();
-        List<String> argMetadataDefFiles = new ArrayList();
-
-
         for (int i = 0; i < args.length; i++) {
+            if(checkFile(args[i])) {
+                continue;
+            }
             if (args[i].endsWith(".properties")) {
                 argProperties.load(IOUtil.getInputStream(args[i],
                         getClass()));
-            } else if (args[i].indexOf("api.xml") >= 0) {
-                argApiDefFiles.add(args[i]);
-            } else if (args[i].indexOf("types.xml") >= 0) {
-                argEntryDefFiles.add(args[i]);
-            } else if (args[i].indexOf("outputhandlers.xml") >= 0) {
-                argOutputDefFiles.add(args[i]);
-            } else if (args[i].indexOf("metadatahandlers.xml") >= 0) {
-                argMetadataDefFiles.add(args[i]);
             } else if (args[i].equals("-dump")) {
                 dumpFile = args[i + 1];
                 i++;
@@ -1009,17 +1012,12 @@ public class Repository extends RepositoryBase implements
         //Now put back any of the cmd line arg properties because they have precedence
         properties.putAll(argProperties);
 
-        apiDefFiles = getResourcePaths(PROP_API);
-        apiDefFiles.addAll(argApiDefFiles);
+        initPlugins();
 
-        typeDefinitionFiles = getResourcePaths(PROP_TYPES);
-        typeDefinitionFiles.addAll(argEntryDefFiles);
-
-        outputDefFiles = getResourcePaths(PROP_OUTPUTHANDLERS);
-        outputDefFiles.addAll(argOutputDefFiles);
-
-        metadataDefFiles = getResourcePaths(PROP_METADATAHANDLERS);
-        metadataDefFiles.addAll(argMetadataDefFiles);
+        apiDefFiles.addAll(0,getResourcePaths(PROP_API));
+        typeDefFiles.addAll(0, getResourcePaths(PROP_TYPES));
+        outputDefFiles.addAll(0, getResourcePaths(PROP_OUTPUTHANDLERS));
+        metadataDefFiles.addAll(0, getResourcePaths(PROP_METADATAHANDLERS));
 
         debug = getProperty(PROP_DEBUG, false);
         //        System.err.println ("debug:" + debug);
@@ -1034,7 +1032,6 @@ public class Repository extends RepositoryBase implements
                                     "repository.log"));
         //TODO: Roll the log file
         logFOS = new FileOutputStream(logFile, true);
-
 
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if (derbyHome != null) {
@@ -1757,7 +1754,7 @@ public class Repository extends RepositoryBase implements
             String name = "/" + getPathFromEntry(group);
             //            System.err.println ("\t" + name);
             if (incoming.startsWith(name + "/")) {
-                request.setCollectionEntry(group);
+                //                request.setCollectionEntry(group);
                 incoming = incoming.substring(name.length());
                 break;
             }
@@ -1946,11 +1943,13 @@ public class Repository extends RepositoryBase implements
     protected void decorateResult(Request request, Result result)
             throws Exception {
         String template = null;
-        Metadata metadata =
-            getMetadataManager().findMetadata((request.getCollectionEntry()
-                != null)
-                ? request.getCollectionEntry()
-                : topGroup, AdminMetadataHandler.TYPE_TEMPLATE, true);
+        Metadata metadata =null;
+            /*
+//            getMetadataManager().findMetadata((request.getCollectionEntry()
+//                != null)
+//                ? request.getCollectionEntry()
+//                : topGroup, AdminMetadataHandler.TYPE_TEMPLATE, true);
+            */
         if (metadata != null) {
             template = metadata.getAttr1();
             if (template.startsWith("file:")) {
@@ -2201,6 +2200,13 @@ public class Repository extends RepositoryBase implements
     }
 
 
+    public double getDbProperty(String name, double dflt) {
+        return Misc.getProperty(dbProperties, name, dflt);
+    }
+
+
+
+
 
 
     /**
@@ -2219,7 +2225,7 @@ public class Repository extends RepositoryBase implements
         Statement statement = getDatabaseManager().createStatement();
         SqlUtil.loadSql(sql, statement, true);
 
-        for (String file : typeDefinitionFiles) {
+        for (String file : typeDefFiles) {
             file = getStorageManager().localizePath(file);
             Element entriesRoot = XmlUtil.getRoot(file, getClass());
             if (entriesRoot == null) {
@@ -2523,7 +2529,6 @@ public class Repository extends RepositoryBase implements
                     type });
             } catch (Throwable cnfe) {}
         }
-
 
         if (typeHandler == null) {
             if ( !makeNewOneIfNeeded) {
@@ -3645,6 +3650,7 @@ public class Repository extends RepositoryBase implements
      */
     public Result processEntryGet(Request request) throws Exception {
         String entryId = (String) request.getId((String) null);
+        
         if (entryId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
         }
@@ -3803,7 +3809,7 @@ public class Repository extends RepositoryBase implements
             Statement entryStmt =
                 getDatabaseManager().select(Tables.ENTRIES.COLUMNS, Tables.ENTRIES.NAME,
                                             Clause.eq(Tables.ENTRIES.COL_ID,
-                                                entryId));
+                                                      entryId));
 
             ResultSet results = entryStmt.getResultSet();
             if ( !results.next()) {
@@ -4009,7 +4015,7 @@ public class Repository extends RepositoryBase implements
             throw new IllegalArgumentException("Cannot create an entry of type " + typeHandler.getDescription());
         }
         Entry entry = typeHandler.createEntry(id);
-        entry.initEntry(name, description, parentGroup, "",
+        entry.initEntry(name, description, parentGroup, 
                         request.getUser(), resource, dataType,
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), null);
@@ -4753,12 +4759,13 @@ public class Repository extends RepositoryBase implements
                                        final List<Entry> entries) {
         final Request theRequest = request;
         Entry         entry      = entries.get(0);
-        if (request.getCollectionEntry() != null) {
-            if (Misc.equals(entry.getId(),
-                            request.getCollectionEntry().getId())) {
-                request.setCollectionEntry(null);
-            }
-        }
+        /*
+//        if (request.getCollectionEntry() != null) {
+//            if (Misc.equals(entry.getId(),
+//                            request.getCollectionEntry().getId())) {
+//                request.setCollectionEntry(null);
+//            }
+            }*/
         Entry                group   = entries.get(0).getParentGroup();
         final String         groupId = entries.get(0).getParentGroupId();
 
@@ -5165,7 +5172,7 @@ public class Repository extends RepositoryBase implements
                     }
 
                     entry = typeHandler.createEntry(id);
-                    entry.initEntry(name, description, parentGroup, "",
+                    entry.initEntry(name, description, parentGroup, 
                                     request.getUser(),
                                     new Resource(theResource, resourceType),
                                     dataType, createDate.getTime(),
@@ -6200,18 +6207,18 @@ public class Repository extends RepositoryBase implements
         String      name        = results.getString(col++);
         String      fileType    = results.getString(col++);
         String      groupId     = results.getString(col++);
-        String      file        = results.getString(col++);
+        String      resource    = getStorageManager().resourceFromDB(results.getString(col++));
         TypeHandler typeHandler = getTypeHandler(request);
         String      nodeType    = typeHandler.getNodeType();
-        if (ImageUtils.isImage(file)) {
+        if (ImageUtils.isImage(resource)) {
             nodeType = "imageentry";
         }
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, entryId,
                                      ATTR_TITLE, name);
-        if (ImageUtils.isImage(file)) {
+        if (ImageUtils.isImage(resource)) {
             String imageUrl =
                 HtmlUtil.url(URL_ENTRY_GET + entryId
-                             + IOUtil.getFileExtension(file), ARG_ID,
+                             + IOUtil.getFileExtension(resource), ARG_ID,
                                  entryId, ARG_IMAGEWIDTH, "75");
             attrs = attrs + " " + XmlUtil.attr("image", imageUrl);
         }
@@ -6293,8 +6300,6 @@ public class Repository extends RepositoryBase implements
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
                                       ATTR_FROM, group.getId(), ATTR_TO,
                                       results.getString(1))));
-
-
 
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
@@ -6857,8 +6862,8 @@ public class Repository extends RepositoryBase implements
 
 
         Statement statement = getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                                  Tables.ENTRIES.NAME,
-                                  Clause.eq(Tables.ENTRIES.COL_ID, id));
+                                                          Tables.ENTRIES.NAME,
+                                                          Clause.eq(Tables.ENTRIES.COL_ID, id));
 
         List<Group> groups = readGroups(statement);
         if (groups.size() > 0) {
@@ -7615,12 +7620,12 @@ public class Repository extends RepositoryBase implements
         statement.setString(col++, entry.getName());
         statement.setString(col++, entry.getDescription());
         statement.setString(col++, entry.getParentGroupId());
-        statement.setString(col++, entry.getCollectionGroupId());
+        //        statement.setString(col++, entry.getCollectionGroupId());
         statement.setString(col++, entry.getUser().getId());
         if (entry.getResource() == null) {
             entry.setResource(new Resource());
         }
-        statement.setString(col++, entry.getResource().getPath());
+        statement.setString(col++, getStorageManager().resourceToDB(entry.getResource().getPath()));
         statement.setString(col++, entry.getResource().getType());
         statement.setString(col++, entry.getDataType());
         getDatabaseManager().setDate(statement,col++, currentTime());
@@ -7687,7 +7692,7 @@ public class Repository extends RepositoryBase implements
                     int    col          = 1;
                     String childId      = results.getString(col++);
                     String childType    = results.getString(col++);
-                    String resource     = results.getString(col++);
+                    String resource     = getStorageManager().resourceFromDB(results.getString(col++));
                     String resourceType = results.getString(col++);
                     children.add(new String[] { childId, childType, resource,
                             resourceType });
@@ -7975,9 +7980,10 @@ public class Repository extends RepositoryBase implements
         int       batchCnt       = 0;
         connection.setAutoCommit(false);
         for (Entry entry : entries) {
-            if (entry.isCollectionGroup()) {
-                topGroups = null;
-            }
+          
+// if (entry.isCollectionGroup()) {
+//                topGroups = null;
+//                }
             TypeHandler typeHandler = entry.getTypeHandler();
             String      sql         = typeHandler.getInsertSql(isNew);
             //            System.err.println("sql:" + sql);
@@ -8193,7 +8199,7 @@ public class Repository extends RepositoryBase implements
                         Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, "?")), "");
             long t1 = System.currentTimeMillis();
             for (Entry entry : entries) {
-                String path = entry.getResource().getPath();
+                String path = getStorageManager().resourceToDB(entry.getResource().getPath());
                 String key  = entry.getParentGroup().getId() + "_" + path;
                 if (seenResources.get(key) != null) {
                     //                    System.out.println("seen resource:" + path);

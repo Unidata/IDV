@@ -34,7 +34,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
@@ -451,7 +451,7 @@ public class WebHarvester extends Harvester {
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);
 
-        entry.initEntry(name, desc, group, group.getCollectionGroupId(),
+        entry.initEntry(name, desc, group, 
                         getUser(), resource, "", createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), null);
         if (tag.length() > 0) {

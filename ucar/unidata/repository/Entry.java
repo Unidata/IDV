@@ -166,7 +166,6 @@ public class Entry extends Entity {
      * @param name _more_
      * @param description _more_
      * @param group _more_
-     * @param topGroupId _more_
      * @param user _more_
      * @param resource _more_
      * @param dataType _more_
@@ -176,7 +175,7 @@ public class Entry extends Entity {
      * @param values _more_
      */
     public void initEntry(String name, String description, Group group,
-                          String topGroupId, User user, Resource resource,
+                          User user, Resource resource,
                           String dataType, long createDate, long startDate,
                           long endDate, Object[] values) {
         super.init(name, description, group, user, createDate);
@@ -302,45 +301,47 @@ public class Entry extends Entity {
      *
      * @return _more_
      */
-    public boolean isCollectionGroup() {
-        if (isGroup() && (getParentGroup() != null)) {
-            return getParentGroup().isTopGroup();
-        }
-        return false;
-    }
+    //    public boolean isCollectionGroup() {
+    //        if (isGroup() && (getParentGroup() != null)) {
+    //            return getParentGroup().isTopGroup();
+    //        }
+    //        return false;
+    //    }
+
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public String getCollectionGroupId() {
-        if (getIsLocalFile()) {
-            return null;
-        }
-        if (isCollectionGroup()) {
-            return getId();
-        }
-        if (getParentGroup() == null) {
-            return getId();
-        }
-        return getParentGroup().getCollectionGroupId();
-    }
+    //    public String getCollectionGroupId() {
+    //        if (getIsLocalFile()) {
+    //            return null;
+    //        }
+    //        if (isCollectionGroup()) {
+    //            return getId();
+    //        }
+    //        if (getParentGroup() == null) {
+    //            return getId();
+    //        }
+    //        return getParentGroup().getCollectionGroupId();
+    //        }
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public Group getCollectionGroup() {
-        if (isCollectionGroup()) {
-            return (Group) this;
-        }
-        if (getParentGroup() == null) {
-            return (Group) this;
-        }
-        return getParentGroup().getCollectionGroup();
-    }
+
+    //    public Group getCollectionGroup() {
+    //        if (isCollectionGroup()) {
+    //            return (Group) this;
+    //        }
+    //        if (getParentGroup() == null) {
+    //            return (Group) this;
+    //        }
+    //        return getParentGroup().getCollectionGroup();
+    //    }
 
 
     /**

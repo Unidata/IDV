@@ -37,7 +37,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
@@ -123,7 +123,6 @@ public class StorageManager extends RepositoryManager {
     private String thumbDir;
 
 
-
     /**
      * _more_
      *
@@ -133,6 +132,19 @@ public class StorageManager extends RepositoryManager {
         super(repository);
     }
 
+    public String resourceFromDB(String resource) {
+        if(resource!=null)
+            resource = resource.replace("${ramadda.storagedir}",getStorageDir());
+        return resource;
+    }
+
+    public String resourceToDB(String resource) {
+        if(resource!=null)
+            resource = resource.replace(getStorageDir(),"${ramadda.storagedir}");
+        return resource;
+    }
+
+
     /**
      * _more_
      *
@@ -140,7 +152,6 @@ public class StorageManager extends RepositoryManager {
     protected void init() {
         repositoryDir = getRepository().getProperty(PROP_REPOSITORY_HOME,
                 (String) null);
-        System.err.println ("dir:" + repositoryDir);
         if (repositoryDir == null) {
             repositoryDir =
                 IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),
@@ -254,6 +265,12 @@ public class StorageManager extends RepositoryManager {
             addDownloadPrefix(storageDir);
         }
         return storageDir;
+    }
+
+    public String getPluginsDir() {
+        String dir =  IOUtil.joinDir(getRepositoryDir(), "plugins");
+        IOUtil.makeDirRecursive(new File(dir));
+        return dir;
     }
 
     /**

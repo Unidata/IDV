@@ -25,13 +25,14 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
+import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -77,6 +78,34 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class RssOutputHandler extends OutputHandler {
+
+    /** _more_ */
+    public static final String TAG_RSS_RSS = "rss";
+
+    public static final String TAG_RSS_GEOLAT = "geo:lat";
+    public static final String TAG_RSS_GEOLON = "geo:lon";
+
+    /** _more_ */
+    public static final String TAG_RSS_LINK = "link";
+
+    /** _more_ */
+    public static final String TAG_RSS_GUID = "guid";
+
+    /** _more_ */
+    public static final String TAG_RSS_CHANNEL = "channel";
+
+    /** _more_ */
+    public static final String TAG_RSS_ITEM = "item";
+
+    /** _more_ */
+    public static final String TAG_RSS_TITLE = "title";
+
+    /** _more_ */
+    public static final String TAG_RSS_PUBDATE = "pubDate";
+
+    /** _more_ */
+    public static final String TAG_RSS_DESCRIPTION = "description";
+
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_FULL = new OutputType("Full RSS Feed","rss.full");
@@ -209,6 +238,16 @@ public class RssOutputHandler extends OutputHandler {
             }
 
             sb.append(XmlUtil.closeTag(TAG_RSS_DESCRIPTION));
+            if(entry.hasLocationDefined()) {
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT,"",""+entry.getSouth()));
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLON,"",""+entry.getEast()));
+            } else  if(entry.hasAreaDefined()) {
+                //For now just include the southeast point
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT,"",""+entry.getSouth()));
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLON,"",""+entry.getEast()));
+            }
+
+
             sb.append(XmlUtil.closeTag(TAG_RSS_ITEM));
         }
 
