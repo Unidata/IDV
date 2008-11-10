@@ -155,11 +155,16 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /** Indicator (currently a JComboBox) */
     private JComboBox indicator = null;
 
-    /** flag for whether to ingnore indicator events or not */
-    private boolean ignoreIndicatorEvents = false;
+    /** mutex  for accessing the indicator */
+    private Object indicatorMutex;
 
     /** Times array from current animation set */
     private DateTime[] timesArray;
+
+    /** flag for whether to ingnore indicator events or not */
+    private boolean ignoreIndicatorEvents = false;
+
+
 
 
     /**
@@ -214,15 +219,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         // Initialize sharing to true
         super("AnimationWidget", true);
-        indicator      = new JComboBox() {
-                public String getToolTipText(MouseEvent event) {
-                    if (boxPanel != null) {
-                        return boxPanel.getToolTipText();
-                    }
-                    return "Animation time list";  
-                }
-            };
-        indicator.setToolTipText("Animation time list");  
+        indicator      = new JComboBox();
+        indicatorMutex = indicator.getTreeLock();
         indicator.setFont(new Font("Dialog", Font.PLAIN, 9));
         indicator.setLightWeightPopupEnabled(false);
         // set to non-visible until items are added
@@ -230,11 +228,9 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         indicator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if ( !ignoreIndicatorEvents && (anime != null)) {
-                    Real selectedItem = (Real) indicator.getSelectedItem();
-                    int selectedIndex = indicator.getSelectedIndex();
-                    setTimeFromUser(selectedItem);
+                    setTimeFromUser((Real) indicator.getSelectedItem());
                     if (boxPanel != null) {
-                        boxPanel.setOnIndex(selectedIndex);
+                        boxPanel.setOnIndex(indicator.getSelectedIndex());
                     }
                 }
             }
@@ -266,15 +262,15 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             throws VisADException, RemoteException {
         getAnimationSetInfo().setBaseTimes(times);
         if(times!=null) {
-            if (anime != null) {
-                if (getAnimationSetInfo().getActive()) {
-                    Set newSet = getAnimationSetInfo().makeTimeSet(null);
-                    anime.setSet(newSet);
-                } else {
-                    anime.setSet(times);
-                }
-                updateIndicator(anime.getSet());
-            } 
+        if (anime != null) {
+            if (getAnimationSetInfo().getActive()) {
+                Set newSet = getAnimationSetInfo().makeTimeSet(null);
+                anime.setSet(newSet);
+            } else {
+                anime.setSet(times);
+            }
+            updateIndicator(anime.getSet());
+        } 
         } else {
             updateIndicator(null);
         }
@@ -774,15 +770,11 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * Share the value of the animation step.
      */
     protected void shareValue() {
-        Animation myAnime = anime;
-        if(myAnime==null || animationInfo==null) {
-            return;
-        }
-        if (myAnime.getNumSteps() > 0) {
+        if (anime.getNumSteps() > 0) {
             if (animationInfo.getShareIndex()) {
                 shareIndex();
             } else {
-                shareValue(myAnime.getAniValue());
+                shareValue(anime.getAniValue());
             }
         }
     }
@@ -936,31 +928,23 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             }
 
             /** The Animation associated with this widget */
-            DateTime tmpTime = null;
+            DateTime time = null;
             try {
-                tmpTime = new DateTime(eventValue);
+                time = new DateTime(eventValue);
             } catch (VisADException ve) {
                 ;
             }
-            final DateTime time = tmpTime;
-            final int  currentIndex = (anime!=null?anime.getCurrent():-1);
-            Runnable runnable = new Runnable() {
-                    public void run() {
-                        boolean oldValue = ignoreIndicatorEvents;
-                        try {
-                            ignoreIndicatorEvents = true;
-                            indicator.setSelectedItem(time);
-                            if (boxPanel != null) {
-                                boxPanel.setOnIndex(currentIndex);
-                            }
-                            //                            indicator.repaint();
-                            shareValue();
-                        } finally {
-                            ignoreIndicatorEvents = oldValue;
-                        }
-                    }};
-            SwingUtilities.invokeLater(runnable);
-            //            GuiUtils.invokeInSwingThread(runnable);
+            boolean oldValue = ignoreIndicatorEvents;
+            ignoreIndicatorEvents = true;
+            synchronized (indicatorMutex) {
+                indicator.setSelectedItem(time);
+            }
+            if (boxPanel != null) {
+                boxPanel.setOnIndex(anime.getCurrent());
+            }
+            indicator.repaint();
+            shareValue();
+            ignoreIndicatorEvents = oldValue;
         } else if (evt.getPropertyName().equals(Animation.ANI_SET)) {
             if (ignoreAnimationSetChange) {
                 return;
@@ -1010,8 +994,14 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      *
      * @param timeSet  set of times
      */
-    public void updateIndicator(Set timeSet) {
-        updateIndicatorInner(timeSet, false);
+    public void updateIndicator(final Set timeSet) {
+        //Call the updateIndicatorInner insode a thread to
+        //prevent possible deadlock around the Swing component tree
+        Misc.run(new Runnable() {
+            public void run() {
+                updateIndicatorInner(timeSet, false);
+            }
+        });
     }
 
 
@@ -1059,29 +1049,27 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * from when we just have a new Animation at initialization time (timeSetChange=false)
      * from when the times have changed in the display.
      */
-    private void updateIndicatorInner(Set timeSet, final boolean timeSetChange) {
+    private void updateIndicatorInner(Set timeSet, boolean timeSetChange) {
         //      timeSet  = checkAnimationSet(timeSet);
         timesArray = Animation.getDateTimeArray(timeSet);
-        final DateTime[] theTimesArray  = timesArray;
-        Runnable runnable = new Runnable() {
-                public void run() {
-                    boolean oldValue = ignoreIndicatorEvents;
-                    ignoreIndicatorEvents = true;
-                    try {
-                        GuiUtils.setListData(indicator, timesArray);
-                        //Stop running if there are no times
-                        if ((theTimesArray==null || theTimesArray.length == 0) && timeSetChange) {
-                            setRunning(false);
-                        }
-                        indicator.setVisible((theTimesArray != null)
-                                             && (indicator.getItemCount() > 0));
-                        updateRunButton();
-                    } finally { 
-                        ignoreIndicatorEvents = oldValue;
-                    }
-                    updateBoxPanel(theTimesArray);
-                }};
-        SwingUtilities.invokeLater(runnable);
+        boolean oldValue = ignoreIndicatorEvents;
+        ignoreIndicatorEvents = true;
+        synchronized (indicatorMutex) {
+            GuiUtils.setListData(indicator, timesArray);
+        }
+
+        //Stop running if there are no times
+        if ((timesArray.length == 0) && timeSetChange) {
+            setRunning(false);
+        }
+
+        synchronized (indicatorMutex) {
+            indicator.setVisible((timesArray != null)
+                                 && (indicator.getItemCount() > 0));
+        }
+        updateRunButton();
+        ignoreIndicatorEvents = oldValue;
+        updateBoxPanel(timesArray);
     }
 
 
