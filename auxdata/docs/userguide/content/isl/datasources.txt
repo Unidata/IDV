@@ -1,41 +1,187 @@
-dods.grid    Grids from an OPeNDAP server
-opendap.grid    Grids from an OPeNDAP server
-dods    Data from an OPeNDAP server
-opendap    Data from an OPeNDAP server
-adde.image    Images from an ADDE server
-raob    
-adde.point    Point data from an ADDE server
-adde.profiler    Wind Profiler Data
-file.track    Track files
-file.sonde    Upsonde/Dropsonde files
-netcdf.point    netCDF Point Data files
-netcdf.grid    Grid files (netCDF/GRIB/OPeNDAP)
-file.netcdf    netCDF files
-file.radar    NEXRAD Radar files
-opendap.radial    OPeNDAP Radar files
-file.doraderadar    DORADE Radar files
-wms    WMS image data
-kml    Google Earth Files KML/KMZ
-file.vis5d    Vis5D files
-file.areafile    McIDAS AREA files
-file.shapefile    Shape files
-file.image    Image files (gif, jpg, png)
-file.dem    DEM files
-file.text    Text or HTML files
-file.pointtext    Text Point Data files
-file.location    Locations
-file.imagemovie    Image Movie Index
-text.front    Front Bulletins
-file.drawing    Drawing files
-file.imagexml    Image XML files
-movie    Movies
-file.tiff    TIFF files
-cached    Cached data source
-file.audio    Audio File
-file.chatlog    Chat Log file
-file.addetext    Adde Text
-netcdf.sweep    netCDF Radar Sweep files
-netcdf.metar    netCDF METAR/Synoptic files
-file.profiler    EOL netCDF Profiler files
-file.level2radar    Level II Radar files
-file.any    I'm Still Feeling Lucky
+<html><head> 
+  <title>Data Source Types</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+<table>
+
+<tr><td>DODS.GRID,OPENDAP.GRID</td><td>
+Grids from an OPeNDAP server
+</td></tr>
+
+<tr><td>DODS,OPENDAP</td><td>
+Data from an OPeNDAP server
+</td></tr>
+
+<tr><td>ADDE.IMAGE</td><td>
+Images from an ADDE server
+</td></tr>
+
+<tr><td>RAOB</td><td>
+Point data from an ADDE server
+</td></tr>
+
+<tr><td>ADDE.PROFILER</td><td>
+Wind Profiler Data
+</td></tr>
+
+<tr><td>FILE.TRACK, OPENDAP.TRACK, OPENDAP.TRAJECTORY</td><td>
+Track files
+</td></tr>
+
+<tr><td>DB.POINT</td><td>
+Point data database
+</td></tr>
+
+<tr><td>DB.TRAJECTORY</td><td>
+Trajectory database
+</td></tr>
+
+<tr><td>EOL.TRACKDB</td><td>
+Eol Track Database
+</td></tr>
+
+<tr><td>FILE.SONDE</td><td>
+Upsonde/Dropsonde files
+</td></tr>
+
+<tr><td>NetCDF.POINT</td><td>
+netCDF Point Data files
+</td></tr>
+
+<tr><td>NetCDF.Grid,HTTPServer.Grid, File.Grid</td><td>
+Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)    
+</td></tr>
+
+<tr><td>aggregated.NetCDF.Grid</td><td>
+Aggregate Grids by Time
+</td></tr>
+
+<tr><td>FILE.NETCDF</td><td>
+netCDF files 
+</td></tr>
+
+<tr><td>FILE.RADAR</td><td>
+NEXRAD Radar files
+</td></tr>
+
+<tr><td>OPENDAP.Radial</td><td>
+OPeNDAP Radar files
+</td></tr>
+
+<tr><td>FILE.DORADERADAR</td><td>
+DORADE Radar files
+</td></tr>
+
+<tr><td>WMS</td><td>
+WMS image data
+</td></tr>
+
+<tr><td>KML</td><td>
+Google Earth Files KML/KMZ
+</td></tr>
+
+<tr><td>ISER</td><td>
+IDV Serialized Data
+</td></tr>
+
+<tr><td>FILE.VIS5D</td><td>
+Vis5D files
+</td></tr>
+
+<tr><td>FILE.AREAFILE</td><td>
+McIDAS AREA files
+</td></tr>
+
+<tr><td>FILE.SHAPEFILE</td><td>
+Map files 
+</td></tr>
+
+<tr><td>FILE.MAPFILE</td><td>
+Map files
+</td></tr>
+
+<tr><td>FILE.IMAGE</td><td>
+Image files (gif, jpg, png)
+</td></tr>
+
+<tr><td>FILE.DEM</td><td>
+DEM files
+</td></tr>
+
+<tr><td>PRODUCT.ADDE</td><td>
+Weather Text Products (from s
+</td></tr>erver)
+
+<tr><td>PRODUCT.GEMPAK</td><td>
+Weather Text Products (from NWX
+</td></tr> files)
+
+<tr><td>STORM.ATCF</td><td>
+ATCF Tropical Storm Data
+</td></tr>
+
+<tr><td>FILE.TEXT</td><td>
+Text or HTML files
+</td></tr>
+
+<tr><td>FILE.POINTTEXT</td><td>
+Text Point Data files
+</td></tr>
+
+<tr><td>FILE.POINTTRACKTEXT</td><td>
+Text Point and Trajectory Data files
+</td></tr>
+
+<tr><td>FILE.LOCATION</td><td>
+Locations
+</td></tr>
+
+<tr><td>FILE.IMAGEMOVIE</td><td>
+Image Movie Index
+</td></tr>
+
+<tr><td>FILE.DRAWING</td><td>
+Drawing files
+</td></tr>
+
+<tr><td>FILE.IMAGEXML</td><td>
+Image XML files
+</td></tr>
+
+<tr><td>MOVIE</td><td>
+Movies
+</td></tr>
+
+<tr><td>FILE.TIFF</td><td>
+TIFF files
+</td></tr>
+
+<tr><td>CACHED</td><td>
+Cached data source
+</td></tr>
+
+<tr><td>FILE.AUDIO</td><td>
+Audio File
+</td></tr>
+
+<tr><td>FILE.CHATLOG</td><td>
+Chat Log file
+</td></tr>
+
+<tr><td>FILE.ADDETEXT</td><td>
+Adde Text
+</td></tr>
+
+<tr><td>TEXT.FRONT</td><td>
+Front Bulletins
+</td></tr>
+
+<tr><td></td><td>
+FILE.ANY
+</td></tr>
+I'm Still Feeling Lucky
+
+
+
