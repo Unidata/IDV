@@ -655,19 +655,24 @@ public class TextPointDataSource extends PointDataSource {
         try {
             JTextField typeFld = new JTextField(lastType,30);
             JTextField labelFld = new JTextField(lastLabel,30);
+            JCheckBox trajectoryCbx = new JCheckBox("Is trajectory data",false);
             JComponent contents = GuiUtils.formLayout(new Object[]{
                 "Type:",            typeFld,
-                "Label:",           labelFld});
+                "Label:",           labelFld,
+                new JLabel(""),trajectoryCbx});
             if(!GuiUtils.showOkCancelDialog(null,"Data Source Type Plugin",  contents,null)) return;
             lastType = typeFld.getText().trim();
             lastLabel = labelFld.getText().trim();
             String[]tmp = makeMetadataHeader();
             if(tmp==null) return;
+            String trajectory = (trajectoryCbx.isSelected()?"true":"false");
             String xml = DataManager.getDatasourceXml(lastType, lastLabel, getClass(),Misc.newHashtable(new Object[]{PROP_HEADER_MAP,
                                                                                                         tmp[0],
                                                                                                         PROP_HEADER_PARAMS,tmp[1],
                                                                                                         PROP_HEADER_SKIP,
                                                                                                         ""+skipRows,
+                                                                                                                     "dataistrajectory",
+                                                                                                                     trajectory,
                                                                                                         PROP_HEADER_BLOB,
                                                                                                         getDataContext().getIdv().encodeObject(metaDataFields,false)}));
             getDataContext().getIdv().getPluginManager().addText(xml, lastType+"datasource.xml");
