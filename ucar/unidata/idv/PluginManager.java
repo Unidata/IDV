@@ -1612,6 +1612,8 @@ public class PluginManager extends IdvManager {
             return;
         }
 
+
+
         if (getArgsManager().isRbiFile(filename)) {
             if (topLevel) {
                 addPluginToList(filename);
@@ -1696,7 +1698,6 @@ public class PluginManager extends IdvManager {
                 IOUtil.writeBytes(newFile, bytes);
                 jarFilePath = newFile.toString();
             }
-
             String jarLabel = IOUtil.getFileTail(decode(jarFilePath));
             String prefix   = jarFilePath + "!/";
             PluginClassLoader cl = new PluginClassLoader(jarFilePath,
@@ -1743,13 +1744,21 @@ public class PluginManager extends IdvManager {
                 if (getArgsManager().isRbiFile(entry)) {
                     loadPlugin(entry, prefix, false);
                 }
+                
             }
 
             //Now load in everything else
             for (int i = 0; i < entries.size(); i++) {
                 String entry = (String) entries.get(i);
                 if ( !getArgsManager().isRbiFile(entry)) {
-                    loadPlugin(entry, prefix, false, "From: " + jarLabel);
+                    if (entry.endsWith(".jar")) {
+                        //Here we have a jar file inside a jar file.
+                        String jarFile = prefix + entry;
+                        //                        System.err.println ("loading jar file:" + jarFile);
+                        loadJar(jarFile);
+                    } else {
+                        loadPlugin(entry, prefix, false, "From: " + jarLabel);
+                    }
                 }
             }
         } catch (Exception exc) {
