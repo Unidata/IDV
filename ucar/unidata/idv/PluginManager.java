@@ -50,6 +50,7 @@ import ucar.unidata.ui.symbol.StationModel;
 
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.PluginClassLoader;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -1402,7 +1403,7 @@ public class PluginManager extends IdvManager {
      */
     protected void closeResources() {
         for (int i = 0; i < pluginClassLoaders.size(); i++) {
-            ((MyClassLoader) pluginClassLoaders.get(i)).closeJar();
+            ((PluginClassLoader) pluginClassLoaders.get(i)).closeJar();
         }
     }
 
@@ -1440,7 +1441,7 @@ public class PluginManager extends IdvManager {
      * @param message msg
      * @param exc exception
      */
-    private void addError(String message, Throwable exc) {
+    protected void addError(String message, Throwable exc) {
         pluginErrorExceptions.add(exc);
         pluginErrorMessages.add(message);
     }
@@ -1670,8 +1671,6 @@ public class PluginManager extends IdvManager {
 
 
 
-
-
     /**
      * Load the jar file
      *
@@ -1698,12 +1697,44 @@ public class PluginManager extends IdvManager {
                 jarFilePath = newFile.toString();
             }
 
-
-
             String jarLabel = IOUtil.getFileTail(decode(jarFilePath));
             String prefix   = jarFilePath + "!/";
-            MyClassLoader cl = new MyClassLoader(this, jarFilePath,
-                                   getClass().getClassLoader());
+            PluginClassLoader cl = new PluginClassLoader(jarFilePath,
+                                                         getClass().getClassLoader()) {
+                    protected void handleError(String msg, Throwable exc) {
+                        PluginManager.this.addError(msg,exc);
+                    }
+
+                    protected void checkClass(Class c) throws Exception {
+                        IdvBase.addPluginClass(c);
+                        if (java.text.DateFormat.class.isAssignableFrom(c)) {
+                            visad.DateTime.setDateFormatClass(c);
+                        } else if (ucar.nc2.iosp.IOServiceProvider.class.isAssignableFrom(
+                                                                                          c)) {
+                            ucar.nc2.NetcdfFile.registerIOProvider(c);
+                        } else if (ucar.nc2.dataset.CoordSysBuilderIF.class
+                                   .isAssignableFrom(c)) {
+                            ucar.nc2.dataset.CoordSysBuilderIF csbi =
+                                (ucar.nc2.dataset.CoordSysBuilderIF) c.newInstance();
+                            ucar.nc2.dataset.CoordSysBuilder.registerConvention(
+                                                                                csbi.getConventionUsed(), c);
+                        } else if (ucar.nc2.dataset.CoordTransBuilderIF.class
+                                   .isAssignableFrom(c)) {
+                            ucar.nc2.dataset.CoordTransBuilderIF csbi =
+                                (ucar.nc2.dataset
+                                 .CoordTransBuilderIF) c.newInstance();
+                            ucar.nc2.dataset.CoordTransBuilder.registerTransform(
+                                                                                 csbi.getTransformName(), c);
+                        } else if (ucar.nc2.dt.TypedDatasetFactoryIF.class
+                                   .isAssignableFrom(c)) {
+                            ucar.nc2.dt.TypedDatasetFactoryIF tdfi =
+                                (ucar.nc2.dt.TypedDatasetFactoryIF) c.newInstance();
+                            ucar.nc2.dt.TypedDatasetFactory.registerFactory(
+                                                                            tdfi.getScientificDataType(), c);
+                        }
+
+                    }
+                };
             pluginClassLoaders.add(cl);
             Misc.addClassLoader(cl);
             List entries = cl.getEntryNames();
@@ -2390,318 +2421,6 @@ public class PluginManager extends IdvManager {
             GuiUtils.showDialogNearSrc(null, pluginWindow);
         } else {
             pluginWindow.setVisible(true);
-        }
-    }
-
-
-    /**
-     * Class MyClassLoader. Loads plugin classes
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.54 $
-     */
-    private static class MyClassLoader extends ClassLoader {
-
-        /** Mapping from path name to class */
-        private Hashtable loadedClasses = new Hashtable();
-
-        /** The jar file we are loading from */
-        private JarFile myJarFile;
-
-        /** path to jar file */
-        private String jarFilePath;
-
-        /** Mapping of resource name to jar entry */
-        Hashtable canonicalNames = new Hashtable();
-
-        /** For handling getResource */
-        private URLStreamHandler urlStreamHandler;
-
-        /** List of non class jar entry names */
-        private List entryNames = new ArrayList();
-
-
-        /** The parent class loader */
-        private ClassLoader parent;
-
-        /** the plugin manager */
-        private PluginManager pluginManager;
-
-        /**
-         * ctor
-         *
-         *
-         * @param pluginManager the plugin manager
-         * @param jarFilePath Where the jar file is
-         * @param parent  parent
-         *
-         * @throws IOException On badness
-         */
-        public MyClassLoader(PluginManager pluginManager, String jarFilePath,
-                             ClassLoader parent)
-                throws IOException {
-            super(parent);
-            this.jarFilePath = jarFilePath;
-            this.parent      = parent;
-
-            myJarFile        = new JarFile(jarFilePath);
-            urlStreamHandler = new URLStreamHandler() {
-                protected URLConnection openConnection(URL u)
-                        throws IOException {
-                    return openURLConnection(u);
-                }
-            };
-            List entries = Misc.toList(myJarFile.entries());
-            //First load in the class files
-            for (int i = 0; i < entries.size(); i++) {
-                JarEntry entry = (JarEntry) entries.get(i);
-                if (entry.isDirectory()) {
-                    continue;
-                }
-                String name = entry.getName();
-                if (name.endsWith(".class")) {
-                    //System.err.println ("class:"+entry.getName());
-                    try {
-                        Class c = loadClassFromJar(entry.getName());
-                        IdvBase.addPluginClass(c);
-                    } catch (java.lang.LinkageError jlle) {
-                        pluginManager.addError("Error loading plugin class:"
-                                + entry.getName(), jlle);
-                    }
-                } else {
-                    defineResource(entry);
-                    entryNames.add(entry.getName());
-                }
-            }
-
-        }
-
-
-        /**
-         * Close the jar file
-         */
-        protected void closeJar() {
-            try {
-                if (myJarFile != null) {
-                    myJarFile.close();
-                }
-                myJarFile = null;
-            } catch (IOException exc) {}
-        }
-
-        /**
-         * Get the list of (String) names of the non-class files in the jar
-         *
-         * @return List of jar entries
-         */
-        public List getEntryNames() {
-            return entryNames;
-        }
-
-        /**
-         * Create our own URLConnection for handling getResource
-         *
-         * @param u The url
-         *
-         * @return The connectio
-         *
-         * @throws IOException On badness
-         */
-        private URLConnection openURLConnection(final URL u)
-                throws IOException {
-            return new URLConnection(u) {
-                public void connect() throws IOException {}
-
-                public InputStream getInputStream() throws IOException {
-                    return getResourceAsStream(u.getFile());
-                }
-            };
-        }
-
-        /**
-         * Create if needed and return the jar file
-         *
-         * @return jar file
-         */
-        private JarFile getJarFile() {
-            if (myJarFile == null) {
-                try {
-                    myJarFile = new JarFile(jarFilePath);
-                } catch (Exception exc) {
-                    System.err.println("caught exception:" + exc);
-                    throw new WrapperException("Opening jar file:"
-                            + jarFilePath, exc);
-                }
-            }
-            return myJarFile;
-        }
-
-        /**
-         * Load in the class from the jar.
-         *
-         *
-         * @param entryName Name of entry
-         *
-         * @return The class.
-         */
-        private Class loadClassFromJar(String entryName) {
-            try {
-                JarEntry jarEntry = getJarFile().getJarEntry(entryName);
-                Class    c = (Class) loadedClasses.get(jarEntry.getName());
-                if (c != null) {
-                    return c;
-                }
-                InputStream  is    = getJarFile().getInputStream(jarEntry);
-                final byte[] bytes = IOUtil.readBytes(is);
-                is.close();
-                c = loadClass(bytes);
-                loadedClasses.put(jarEntry.getName(), c);
-                if (java.text.DateFormat.class.isAssignableFrom(c)) {
-                    visad.DateTime.setDateFormatClass(c);
-                } else if (ucar.nc2.iosp.IOServiceProvider.class.isAssignableFrom(
-                        c)) {
-                    ucar.nc2.NetcdfFile.registerIOProvider(c);
-                } else if (ucar.nc2.dataset.CoordSysBuilderIF.class
-                        .isAssignableFrom(c)) {
-                    ucar.nc2.dataset.CoordSysBuilderIF csbi =
-                        (ucar.nc2.dataset.CoordSysBuilderIF) c.newInstance();
-                    ucar.nc2.dataset.CoordSysBuilder.registerConvention(
-                        csbi.getConventionUsed(), c);
-                } else if (ucar.nc2.dataset.CoordTransBuilderIF.class
-                        .isAssignableFrom(c)) {
-                    ucar.nc2.dataset.CoordTransBuilderIF csbi =
-                        (ucar.nc2.dataset
-                            .CoordTransBuilderIF) c.newInstance();
-                    ucar.nc2.dataset.CoordTransBuilder.registerTransform(
-                        csbi.getTransformName(), c);
-                } else if (ucar.nc2.dt.TypedDatasetFactoryIF.class
-                        .isAssignableFrom(c)) {
-                    ucar.nc2.dt.TypedDatasetFactoryIF tdfi =
-                        (ucar.nc2.dt.TypedDatasetFactoryIF) c.newInstance();
-                    ucar.nc2.dt.TypedDatasetFactory.registerFactory(
-                        tdfi.getScientificDataType(), c);
-                }
-
-
-                return c;
-            } catch (Exception exc) {
-                throw new IllegalArgumentException("Could not load class:"
-                        + entryName + "\n" + exc);
-            }
-        }
-
-        /**
-         * Overwrite base class method to load in a class by name
-         *
-         * @param name class name
-         *
-         * @return The class
-         *
-         * @throws ClassNotFoundException On badness
-         */
-        public Class loadClass(String name) throws ClassNotFoundException {
-            //Check if we have such a class as a jar entry
-            String fileName = StringUtil.replace(name, ".", "/");
-            fileName += ".class";
-            JarEntry jarEntry = getJarFile().getJarEntry(fileName);
-            if (jarEntry != null) {
-                return loadClassFromJar(jarEntry.getName());
-            } else {
-                return super.loadClass(name);
-            }
-        }
-
-        /**
-         * Associate the resource name with the jar entry
-         *
-         * @param jarEntry THe entry
-         */
-        private void defineResource(JarEntry jarEntry) {
-            String entryName = jarEntry.getName();
-            String name      = jarEntry.getName();
-            canonicalNames.put("/" + name, entryName);
-            canonicalNames.put(jarFilePath + "!" + name, entryName);
-            name = "/" + name;
-            canonicalNames.put(jarFilePath + "!" + name, entryName);
-            canonicalNames.put(PLUGIN_PROTOCOL + ":" + jarFilePath + "!"
-                               + name, entryName);
-            canonicalNames.put(PLUGIN_PROTOCOL + ":" + name, entryName);
-        }
-
-
-        /**
-         * Get the actual name that is used in the jar file
-         * The resource might have teh PLUGIN_PROTOCOL prepended to it, etc.
-         *
-         * @param resource the resource
-         *
-         * @return jar name
-         */
-        private String getCanonicalName(String resource) {
-            return (String) canonicalNames.get(resource);
-        }
-
-        /**
-         * Open the resource as a URL
-         *
-         * @param resource The resource
-         *
-         * @return The URL
-         */
-        public URL getResource(String resource) {
-            String name = getCanonicalName(resource);
-            if (resource.indexOf("testitout") >= 0) {
-                //              System.err.println(jarFilePath+" getResource:" + resource + " name=" +name );
-                //              System.err.println("names:" + canonicalNames);
-            }
-            if (name == null) {
-                return super.getResource(resource);
-            }
-            try {
-                return new URL(PLUGIN_PROTOCOL, "", -1, resource,
-                               urlStreamHandler);
-            } catch (Exception exc) {
-                return null;
-            }
-        }
-
-
-        /**
-         * Open the resource as a istream if we have it
-         *
-         * @param resource The resource
-         *
-         * @return The istream
-         */
-        public InputStream getResourceAsStream(String resource) {
-            String jarEntryName = getCanonicalName(resource);
-            if (jarEntryName != null) {
-                try {
-                    JarFile jarFile = getJarFile();
-                    return jarFile.getInputStream(
-                        jarFile.getJarEntry(jarEntryName));
-                } catch (Exception exc) {}
-            }
-            return null;
-        }
-
-
-        /**
-         * Load class bytes
-         *
-         * @param bytes class bytes
-         *
-         * @return New class
-         */
-        private Class loadClass(byte[] bytes) {
-            PermissionCollection pc = new Permissions();
-            pc.add(new AllPermission());
-            CodeSource codeSource =
-                new CodeSource((URL) null,
-                               (java.security.cert.Certificate[]) null);
-            ProtectionDomain pd = new ProtectionDomain(codeSource, pc);
-            return defineClass((String) null, bytes, 0, bytes.length, pd);
         }
     }
 
