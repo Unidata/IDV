@@ -1036,14 +1036,13 @@ public class HtmlUtil {
      */
     public static String select(String name, List values, String selected,
                                 String extra, int maxLength) {
-        return select(name, values, (List<String>)Misc.newList(selected), extra, maxLength);
+        List<String> selectedList = null;
+        if(selected!=null && selected.length()>0) {
+            selectedList = (List<String>)Misc.newList(selected);
+        }
+        return select(name, values, selectedList, extra, maxLength);
     }
 
-
-
-    public static String inset(String html, int space) {
-        return div(html,style("margin:" + space +"px;"));
-    }
 
     public static String select(String name, List values, List<String> selected,
                                 String extra, int maxLength) {
@@ -1075,6 +1074,10 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+
+    public static String inset(String html, int space) {
+        return div(html,style("margin:" + space +"px;"));
+    }
 
     /**
      * _more_
