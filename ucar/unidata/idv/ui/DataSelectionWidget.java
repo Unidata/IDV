@@ -472,10 +472,6 @@ public class DataSelectionWidget {
                     GuiUtils.topCenter(
                         GuiUtils.inset(GuiUtils.right(areaCbx), 0),
                         areaComponent));
-                areaTab.add(
-                    GuiUtils.topCenter(
-                        GuiUtils.inset(GuiUtils.right(areaCbx), 0),
-                        areaComponent));
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
