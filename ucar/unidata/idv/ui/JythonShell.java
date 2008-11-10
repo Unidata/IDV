@@ -198,13 +198,19 @@ public class JythonShell extends InteractiveShell {
 
         }
 
-        items.add(GuiUtils.makeMenu("Insert Display Type",
-                                    getDisplayMenuItems()));
         items.add(
             GuiUtils.makeMenu(
                 "Insert Procedure Call",
                 idv.getJythonManager().makeProcedureMenu(
                     this, "insertText", t)));
+
+        JMenu dataMenu = GuiUtils.makeMenu("Insert Data Source Type",
+                                           getDataMenuItems());
+        GuiUtils.limitMenuSize(dataMenu,"Data Source Types",10);
+        items.add(dataMenu);
+        items.add(GuiUtils.makeMenu("Insert Display Type",
+                                    getDisplayMenuItems()));
+
 
         items.add(
             GuiUtils.makeMenu(
@@ -409,6 +415,21 @@ public class JythonShell extends InteractiveShell {
                     "insert", "'" + cd.getControlId() + "'"));
         }
         return displayMenuItems;
+    }
+
+
+    protected List getDataMenuItems() {
+        List      items= new ArrayList();
+        for (DataSourceDescriptor descriptor: idv.getDataManager().getDescriptors()) {
+            List ids = StringUtil.split(descriptor.getId(),",",true,true);
+            String label = descriptor.getLabel();
+            if(label==null || label.trim().length()==0) {
+                label = ""+ids.get(0);
+            }
+            items.add(GuiUtils.makeMenuItem(label, this,
+                    "insert", "'" + ids.get(0) + "'"));
+        }
+        return items;
     }
 
 
