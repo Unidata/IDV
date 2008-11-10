@@ -241,8 +241,10 @@ public class GeoSelectionPanel extends JPanel {
             if (mapPanel.getProjectionImpl().equals(
                     p.mapPanel.getProjectionImpl())) {
                 NavigatedPanel np = mapPanel.getNavigatedPanel();
-                np.setSelectedRegion(
-                    p.mapPanel.getNavigatedPanel().getSelectedRegion());
+                if(p.mapPanel.getNavigatedPanel().getSelectedRegion()!=null) {
+                    np.setSelectedRegion(
+                                         p.mapPanel.getNavigatedPanel().getSelectedRegion());
+                }
                 mapPanel.repaint();
             }
 
@@ -338,6 +340,8 @@ public class GeoSelectionPanel extends JPanel {
             } else {
                 //                mapPanel.setPreferredSize(new Dimension(200, 200));
             }
+
+
             if (geoSelection.getBoundingBox() != null) {
                 GeoLocationInfo bb = geoSelection.getBoundingBox();
                 selectedRegionChanged(bb.getLatLonRect());
@@ -559,6 +563,7 @@ public class GeoSelectionPanel extends JPanel {
      */
     protected void selectedRegionChanged(LatLonRect llr) {
         if (ulLatLon == null) {
+            //            System.err.println("region changed ullatlon is null" );
             return;
         }
         GuiUtils.enableTree(latLonPanel, llr != null);
@@ -609,6 +614,8 @@ public class GeoSelectionPanel extends JPanel {
             super(true, fullVersion);
             this.geoPanel = geoPanel;
             NavigatedPanel np = getNavigatedPanel();
+
+
             if (sampleProjection != null) {
                 setProjectionImpl(sampleProjection);
                 ProjectionRect r = sampleProjection.getDefaultMapArea();
@@ -623,6 +630,7 @@ public class GeoSelectionPanel extends JPanel {
                 //                System.err.println ("Points:" + points);
             }
             np.setSelectRegionMode(true);
+
             if (geoPanel.geoSelection.getBoundingBox() != null) {
                 np.setSelectedRegion(
                     geoPanel.geoSelection.getBoundingBox().getLatLonRect());
