@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -241,6 +242,8 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         }
 
         if ((range == null) && (getGridDataInstance() != null)) {
+            range = getDataRangeInColorUnits();
+            /*
             range = getGridDataInstance().getRange(getColorRangeIndex());
             Unit u = getGridDataInstance().getRawUnit(getColorRangeIndex());
             if ( !Misc.equals(u, colorUnit)
@@ -248,6 +251,30 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                 range = new Range(colorUnit.toThis(range.getMin(), u),
                                   colorUnit.toThis(range.getMax(), u));
             }
+            */
+        }
+        return range;
+    }
+
+    /**
+     * Get the range of the data in color units.
+     * @return the range or null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected Range getDataRangeInColorUnits()
+            throws RemoteException, VisADException {
+        if (getGridDataInstance() == null) {
+            return null;
+        }
+        Unit  colorUnit = getColorUnit();
+        Range range     =
+            getGridDataInstance().getRange(getColorRangeIndex());
+        Unit  u = getGridDataInstance().getRawUnit(getColorRangeIndex());
+        if ( !Misc.equals(u, colorUnit) && Unit.canConvert(u, colorUnit)) {
+            range = new Range(colorUnit.toThis(range.getMin(), u),
+                              colorUnit.toThis(range.getMax(), u));
         }
         return range;
     }

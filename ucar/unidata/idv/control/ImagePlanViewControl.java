@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -151,8 +152,19 @@ public class ImagePlanViewControl extends PlanViewControl {
             range = getDisplayConventions().getParamRange("image",
                     getDisplayUnit());
         }
+        // check to see if the range of the data is outside the range
+        // of the data
+        if ((range != null) && (getGridDataInstance() != null)) {
+            Range dataRange = getDataRangeInColorUnits();
+            if (dataRange != null) {
+                if ((range.getMin() > dataRange.getMin())
+                        || (range.getMax() < dataRange.getMax())) {
+                    range = dataRange;
+                }
+            }
+        }
         if (range == null) {
-        //    return new Range(0, 255);
+            //    return new Range(0, 255);
             range = super.getInitialRange();
         }
         return range;
@@ -193,9 +205,13 @@ public class ImagePlanViewControl extends PlanViewControl {
         return "Use Native Image Projection";
     }
 
+    /**
+     * Is this a raster display
+     *
+     * @return true
+     */
     public boolean getIsRaster() {
         return true;
     }
 
 }
-
