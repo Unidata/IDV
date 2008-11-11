@@ -273,7 +273,9 @@ public class DisplayConventions extends IdvManager {
      * @return The formatted version
      */
     public String formatDistance(double d) {
-        if(d>1000) return ""+(int)d;
+        if (d > 1000) {
+            return "" + (int) d;
+        }
         return distanceFormat.format(d);
     }
 
@@ -455,11 +457,11 @@ public class DisplayConventions extends IdvManager {
                 clInterval = (float) rint;
                 clMin      = clBase = clInterval * ((int) (min / clInterval));
                 clMax      = clInterval * (1 + (int) (max / clInterval));
-            } else if (span <= 5.0) {  /* for max-min less than 5 */
+            } else if (span <= 5.0) {    // for max-min less than 5
                 clInterval = (float) rint;
                 clMin      = clBase = min;
                 clMax      = max;
-            } else { /* for really big ranges, span > 300 */
+            } else {                     // for really big ranges, span > 300 
                 clInterval = (float) rint;
                 clMin      = clBase = (float) ((int) min);
                 clMax      = (float) ((int) max);
@@ -794,7 +796,7 @@ public class DisplayConventions extends IdvManager {
                 //Pressure
                 "millibar", "hectoPascal",
                 //Distance
-                "m", "km", "miles", "feet", "inches",
+                "m", "km", "miles", "feet", "inches", "cm", "mm",
                 //speed
                 "m/s", "mi/hr", "knot", "km/hr"
             };
