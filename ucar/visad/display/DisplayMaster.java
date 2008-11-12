@@ -465,9 +465,10 @@ abstract public class DisplayMaster {
         displayableDisplayListener    = null;
 
         try {
-            display.destroy();
+        display.destroy();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("DisplayMaster.destroy",e);
+            //e.printStackTrace();
         }
 
         animationWidget = null;
