@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.data.radar;
 
 
@@ -1582,8 +1580,14 @@ public class CDMRadarAdapter implements RadarAdapter {
 
                 if (subset != null) {
                     Object o = subset.getFromLevel();
-                    if ((o != null) && (o instanceof Real)) {
-                        level = (Real) o;
+                    if (o != null) {
+                        Object newO = o;
+                        if (o instanceof TwoFacedObject) {
+                            newO = ((TwoFacedObject) o).getId();
+                        }
+                        if (newO instanceof Real) {
+                            level = ((Real) newO);
+                        }
                     }
                 }
                 if (level == null) {
