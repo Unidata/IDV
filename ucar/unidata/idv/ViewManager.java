@@ -2099,7 +2099,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         XmlObjectStore store        = getStore();
         if (booleanPropertiesForPersistence != null) {
             booleanPropertiesForPersistence =
-                getStateManager().processPropertyTable(
+                stateManager.processPropertyTable(
                     booleanPropertiesForPersistence);
         }
         for (int i = 0; i < props.size(); i++) {
@@ -4019,8 +4019,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     master.removeDisplayable(displayListDisplayables);
                 }
                 master.destroy();
-            } catch (Exception exp) {
-                logException("destroy", exp);
+            } catch (Throwable exp) {
+                logException("Destroying the View Manager", exp);
+            } finally {
             }
             master = null;
         }
@@ -4524,6 +4525,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             final int myComponentResizeCnt = ++componentResizeCnt;
             Misc.runInABit(200, new Runnable() {
                 public void run() {
+                    if(isDestroyed) return;
                     if (myComponentResizeCnt == componentResizeCnt) {
                         updateDisplayList();
                     }
@@ -5140,7 +5142,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param msg The error message
      * @param exc The exception
      */
-    public void logException(String msg, Exception exc) {
+    public void logException(String msg, Throwable exc) {
         LogUtil.printException(log_, msg, exc);
     }
 
