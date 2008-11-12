@@ -934,17 +934,25 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             } catch (VisADException ve) {
                 ;
             }
-            boolean oldValue = ignoreIndicatorEvents;
-            ignoreIndicatorEvents = true;
-            synchronized (indicatorMutex) {
-                indicator.setSelectedItem(time);
-            }
-            if (boxPanel != null) {
-                boxPanel.setOnIndex(anime.getCurrent());
-            }
-            indicator.repaint();
-            shareValue();
-            ignoreIndicatorEvents = oldValue;
+            final DateTime theDateTime = time;
+            final int theIndex  = (anime!=null?anime.getCurrent():-1);
+            SwingUtilities.invokeLater(new Runnable(){
+                    public void run() {
+                        boolean oldValue = ignoreIndicatorEvents;
+                        try {
+                        ignoreIndicatorEvents = true;
+                        //                        synchronized (indicatorMutex) {
+                        indicator.setSelectedItem(theDateTime);
+                        //                        }
+                        if (boxPanel != null && theIndex>=0) {
+                            boxPanel.setOnIndex(theIndex);
+                        }
+                        indicator.repaint();
+                        shareValue();
+                        } finally {
+                            ignoreIndicatorEvents = oldValue;
+                        }
+                    }});
         } else if (evt.getPropertyName().equals(Animation.ANI_SET)) {
             if (ignoreAnimationSetChange) {
                 return;
@@ -997,11 +1005,11 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void updateIndicator(final Set timeSet) {
         //Call the updateIndicatorInner insode a thread to
         //prevent possible deadlock around the Swing component tree
-        Misc.run(new Runnable() {
-            public void run() {
+        //        Misc.run(new Runnable() {
+        //            public void run() {
                 updateIndicatorInner(timeSet, false);
-            }
-        });
+                //            }
+                //        });
     }
 
 
@@ -1052,23 +1060,30 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     private void updateIndicatorInner(Set timeSet, boolean timeSetChange) {
         //      timeSet  = checkAnimationSet(timeSet);
         timesArray = Animation.getDateTimeArray(timeSet);
-        boolean oldValue = ignoreIndicatorEvents;
-        ignoreIndicatorEvents = true;
-        synchronized (indicatorMutex) {
-            GuiUtils.setListData(indicator, timesArray);
-        }
 
         //Stop running if there are no times
-        if ((timesArray.length == 0) && timeSetChange) {
+        if (timesArray.length == 0 && timeSetChange) {
             setRunning(false);
         }
 
-        synchronized (indicatorMutex) {
-            indicator.setVisible((timesArray != null)
-                                 && (indicator.getItemCount() > 0));
-        }
-        updateRunButton();
-        ignoreIndicatorEvents = oldValue;
+        SwingUtilities.invokeLater(new Runnable(){
+                public void run() {
+                    boolean oldValue = ignoreIndicatorEvents;
+                    try {
+                        ignoreIndicatorEvents = true;
+                        //        synchronized (indicatorMutex) {
+                        GuiUtils.setListData(indicator, timesArray);
+                        //        }
+
+                        //        synchronized (indicatorMutex) {
+                        indicator.setVisible((timesArray != null)
+                                             && (indicator.getItemCount() > 0));
+                        //        }
+                        updateRunButton();
+                    } finally {
+                        ignoreIndicatorEvents = oldValue;
+                    }
+                }});
         updateBoxPanel(timesArray);
     }
 
