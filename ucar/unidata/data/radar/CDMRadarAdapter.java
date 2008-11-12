@@ -2631,7 +2631,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         //int[] sortedAzs = QuickSort.sort(azimuths);
 
         int[] sortedAzs;
-        if (azis >= 355) {
+        if (azis >= 300) {
             sortedAzs = QuickSort.sort(azimuths);
         } else {
             sortedAzs = new int[azimuths.length];
