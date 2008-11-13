@@ -2480,13 +2480,15 @@ public class XmlUi implements ActionListener, ItemListener {
             }
             HyperlinkListener linkListener = new HyperlinkListener() {
                 public void hyperlinkUpdate(HyperlinkEvent e) {
-                    String url;
-                    if (e.getURL() == null) {
-                        url = e.getDescription();
-                    } else {
-                        url = e.getURL().toString();
+                    if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        String url;
+                        if (e.getURL() == null) {
+                            url = e.getDescription();
+                        } else {
+                            url = e.getURL().toString();
+                        }
+                        actionPerformed(new ActionEvent(this, 0, url));
                     }
-                    actionPerformed(new ActionEvent(this, 0, url));
                 }
             };
             Component[] comps = GuiUtils.getHtmlComponent(text, linkListener,
