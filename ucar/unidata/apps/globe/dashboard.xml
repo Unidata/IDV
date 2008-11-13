@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin mainwindow="false" windowtitle="Globe Dashboard" embedded="true">
+  <ui>
+    <panel layout="border">
+      <html place="Center" url="/ucar/unidata/apps/globe/intro.qhtml" width="400" height="400"/> 
+    </panel>
+  </ui>
+</skin>

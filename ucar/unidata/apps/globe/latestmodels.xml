@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" name="Latest Unidata IDD Model Data" version="1.0">
+  <service name="latest" serviceType="Resolver" base="http://motherlode.ucar.edu:8080/thredds/dqc/latestModel-InvCat1.0" />
+  <dataset name="Unidata Latest Models" collectionType="TimeSeries" ID="ucar.unidata.idd.model">
+    <dataset name="NCEP NAM 80km CONUS model data" urlPath="?nam_211">
+      <serviceName>latest</serviceName>
+    </dataset>
+      <dataset name="NCEP GFS 80km CONUS model data" urlPath="?gfs_211">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP GFS Global 5.0 x 2.5 degree model data" urlPath="?gfs_37-44">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP GFS Extended Global 5.0x5.0 degree model data" urlPath="?gfs_25-26">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP RUC 80km CONUS model data" urlPath="?ruc_211">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP RUC2 40km CONUS model data" urlPath="?ruc2_236">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP SST Global 5.0x2.5 degree model data" urlPath="?sst_21-24">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP SST Global 2.0x2.0 degree model data" urlPath="?sst_61-64">
+        <serviceName>latest</serviceName>
+      </dataset>
+      <dataset name="NCEP Wind-Wave Global 5.0x2.5 degree model data" urlPath="?ocean_21-24">
+        <serviceName>latest</serviceName>
+      </dataset>
+  </dataset>
+</catalog>
+

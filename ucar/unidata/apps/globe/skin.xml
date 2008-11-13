@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin embedded="true" windowtitle="Main Display">
+  <ui>
+     <panel layout="border">
+        <panel layout="border" place="North">
+        <panel layout="flow" place="West">
+          <button label="Load Satellite Data" action="jython:idv.doOpen('/ucar/unidata/apps/globe/satellite.xidv')"/>
+          <button label="Load Model Data" action="jython:idv.doOpen('/ucar/unidata/apps/globe/model.xidv')"/>
+          <button label="Load Observation Data" action="jython:idv.doOpen('/ucar/unidata/apps/globe/point.xidv')"/>
+        </panel>
+        <button label="Exit" action="action:exit" place="East"/>
+        </panel>
+        <idv.view  place="Center" class="ucar.unidata.idv.MapViewManager" properties="use3D=false;"/>
+        <idv.statusbar place="South"/>
+      </panel>
+  </ui>
+</skin>
