@@ -210,10 +210,9 @@ public class StationLocationMap extends JPanel {
         this.mapRender      = theMapRender;
         this.multipleSelect = multipleSelect;
 
-        propertySet         = new PropertySet();
-        propertySet.addProperty(selectedStationProperty =
+        getPropertySet().addProperty(selectedStationProperty =
             new NonVetoableProperty(this, SELECTED_PROPERTY));
-        propertySet.addProperty(unselectedStationProperty =
+        getPropertySet().addProperty(unselectedStationProperty =
             new NonVetoableProperty(this, UNSELECTED_PROPERTY));
 
         // here's where the map will be drawn:
@@ -477,7 +476,7 @@ public class StationLocationMap extends JPanel {
      * Get the isFocusTransverable property
      * @return true if we can transverse focus
      */
-    public boolean isFocusTraversable() {
+    public boolean isFocusable() {
         return true;
     }
 
@@ -678,7 +677,7 @@ public class StationLocationMap extends JPanel {
      * @param listener          The property change listener.
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertySet.addPropertyChangeListener(listener);
+        getPropertySet().addPropertyChangeListener(listener);
     }
 
     /**
@@ -688,7 +687,7 @@ public class StationLocationMap extends JPanel {
      */
     public void removePropertyChangeListener(
             PropertyChangeListener listener) {
-        propertySet.removePropertyChangeListener(listener);
+        getPropertySet().removePropertyChangeListener(listener);
     }
 
     /**
@@ -699,7 +698,7 @@ public class StationLocationMap extends JPanel {
      */
     public void addPropertyChangeListener(String name,
                                           PropertyChangeListener listener) {
-        propertySet.addPropertyChangeListener(name, listener);
+        getPropertySet().addPropertyChangeListener(name, listener);
     }
 
     /**
@@ -710,7 +709,7 @@ public class StationLocationMap extends JPanel {
      */
     public void removePropertyChangeListener(
             String name, PropertyChangeListener listener) {
-        propertySet.removePropertyChangeListener(name, listener);
+        getPropertySet().removePropertyChangeListener(name, listener);
     }
 
     /**
@@ -760,7 +759,7 @@ public class StationLocationMap extends JPanel {
         });
         frame.getContentPane().add(slm);
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
     }
 
     /**
@@ -772,5 +771,19 @@ public class StationLocationMap extends JPanel {
         return wasDoubleClick;
     }
 
+    /**
+     * Returns the PropertyChangeListener-s of this instance.
+     * @return                  The PropertyChangeListener-s.
+     */
+    private PropertySet getPropertySet() {
+        if (propertySet == null) {
+            synchronized (this) {
+                if (propertySet == null) {
+                    propertySet = new PropertySet();
+                }
+            }
+        }
+        return propertySet;
+    }
 
 }
