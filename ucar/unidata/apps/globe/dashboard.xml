@@ -3,6 +3,9 @@
   <ui>
     <panel layout="border">
       <html place="Center" url="/ucar/unidata/apps/globe/intro.qhtml" width="400" height="400"/> 
+      <panel layout="border" place="South">
+         <button action="action:plugins.manage" label="Plugins" place="West"/>
+     </panel>
     </panel>
   </ui>
 </skin>
