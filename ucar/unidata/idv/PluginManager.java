@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -50,19 +51,19 @@ import ucar.unidata.ui.symbol.StationModel;
 
 
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.PluginClassLoader;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.MenuUtil;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.ObjectPair;
+import ucar.unidata.util.PluginClassLoader;
 import ucar.unidata.util.Prototypable;
 import ucar.unidata.util.PrototypeManager;
 import ucar.unidata.util.ResourceCollection;
@@ -500,6 +501,13 @@ public class PluginManager extends IdvManager {
             if (jarFile == null) {
                 return;
             }
+        } else {
+            // make sure there is a .jar on the end of it.
+            String tail = IOUtil.getFileTail(jarFile);
+            if (tail.indexOf(".") < 0) {
+                jarFile = jarFile + ".jar";
+            }
+
         }
 
         try {
@@ -668,7 +676,7 @@ public class PluginManager extends IdvManager {
             }
 
             //            System.err.println("files:" + files);
-            IOUtil.writeJarFile(jarFile, files,null,true);
+            IOUtil.writeJarFile(jarFile, files, null, true);
             if (autoInstallCbx.isSelected()) {
                 installPlugin(jarFile, true);
                 updatePlugins();
@@ -732,9 +740,13 @@ public class PluginManager extends IdvManager {
     }
 
 
+    /**
+     * Apply preferences
+     */
     public void applyPreferences() {
-        if(createFileChooser!=null) {
-            createFileChooser.setFileHidingEnabled(FileManager.getFileHidingEnabled());
+        if (createFileChooser != null) {
+            createFileChooser.setFileHidingEnabled(
+                FileManager.getFileHidingEnabled());
         }
     }
 
@@ -768,22 +780,30 @@ public class PluginManager extends IdvManager {
         addCreateFile(file, null);
     }
 
+    /**
+     * Get the bundle component
+     *
+     * @param name  name of the component
+     *
+     * @return  the component or null
+     */
     private JComponent getBundleComponent(String name) {
         if (categoryBox == null) {
             categoryBox = getPersistenceManager().makeCategoryBox();
         }
-            
+
         Object selected = categoryBox.getSelectedItem();
         GuiUtils.setListData(
-                             categoryBox, getPersistenceManager().getFavoritesCategories());
+            categoryBox, getPersistenceManager().getFavoritesCategories());
         if (selected != null) {
             categoryBox.setSelectedItem(selected);
         }
-        if(name!=null)
+        if (name != null) {
             nameFld.setText(name);
-        return
-            GuiUtils.top(GuiUtils.vbox(new JLabel("Name:"), nameFld,
-                                       new JLabel("Category:"), categoryBox));
+        }
+        return GuiUtils.top(GuiUtils.vbox(new JLabel("Name:"), nameFld,
+                                          new JLabel("Category:"),
+                                          categoryBox));
 
     }
 
@@ -794,10 +814,13 @@ public class PluginManager extends IdvManager {
      * @param label label
      */
     private void addCreateFile(String file, String label) {
-        if(getArgsManager().isBundleFile(file)) {
+        if (getArgsManager().isBundleFile(file)) {
             String name = IOUtil.getFileTail(IOUtil.stripExtension(file));
-            if(!GuiUtils.showOkCancelDialog(null,"Favorite Bundle Category",
-                                            GuiUtils.inset(getBundleComponent(name),10), null)) return;
+            if ( !GuiUtils.showOkCancelDialog(null,
+                    "Favorite Bundle Category",
+                    GuiUtils.inset(getBundleComponent(name), 10), null)) {
+                return;
+            }
 
             makeSavedBundle(file);
             return;
@@ -894,14 +917,14 @@ public class PluginManager extends IdvManager {
             if (multiples) {
                 menu.add(theMenu = new JMenu("Displays"));
             }
-            initializeMenu(theMenu, displays,"Display Favorites");
+            initializeMenu(theMenu, displays, "Display Favorites");
         }
         theMenu = menu;
         if (data.size() > 0) {
             if (multiples) {
                 menu.add(theMenu = new JMenu("Data"));
             }
-            initializeMenu(theMenu, data,"Data Favorites");
+            initializeMenu(theMenu, data, "Data Favorites");
         }
         GuiUtils.limitMenuSize(menu, "Favorites", 20);
     }
@@ -912,7 +935,8 @@ public class PluginManager extends IdvManager {
      * @param menu the menu
      */
     public void initializeFormulasMenu(JMenu menu) {
-        initializeMenu(menu, getIdv().getJythonManager().getDescriptors(),"Formulas");
+        initializeMenu(menu, getIdv().getJythonManager().getDescriptors(),
+                       "Formulas");
     }
 
 
@@ -921,10 +945,10 @@ public class PluginManager extends IdvManager {
      * Load bundles from disk
      */
     public void loadBundlesFromDisk() {
-        String file =
-            FileManager.getReadFileOrURL("Bundle to load into plugin",
-                                         getArgsManager().getBundleFileFilters(),
-                                         getBundleComponent(null));
+        String file = FileManager.getReadFileOrURL(
+                          "Bundle to load into plugin",
+                          getArgsManager().getBundleFileFilters(),
+                          getBundleComponent(null));
         if (file == null) {
             return;
         }
@@ -937,6 +961,11 @@ public class PluginManager extends IdvManager {
 
     }
 
+    /**
+     * Make a saved bundle
+     *
+     * @param file the file name
+     */
     private void makeSavedBundle(String file) {
         String name = nameFld.getText().trim();
         if (name.length() == 0) {
@@ -963,7 +992,8 @@ public class PluginManager extends IdvManager {
      */
     public void initializeParamDefaultsMenu(JMenu menu) {
         initializeMenu(menu,
-                       getIdv().getParamDefaultsEditor().getParamInfos(true),"Param Defaults");
+                       getIdv().getParamDefaultsEditor().getParamInfos(true),
+                       "Param Defaults");
     }
 
 
@@ -989,6 +1019,7 @@ public class PluginManager extends IdvManager {
      *
      * @param menu the menu
      * @param list List of entries
+     * @param name name of the sub menu
      */
     public void initializeMenu(JMenu menu, List list, String name) {
         List items = new ArrayList();
@@ -1004,7 +1035,7 @@ public class PluginManager extends IdvManager {
         }
 
         MenuUtil.makeMenu(menu, items);
-        GuiUtils.limitMenuSize(menu,name,20);
+        GuiUtils.limitMenuSize(menu, name, 20);
     }
 
     /**
@@ -1701,41 +1732,43 @@ public class PluginManager extends IdvManager {
             String jarLabel = IOUtil.getFileTail(decode(jarFilePath));
             String prefix   = jarFilePath + "!/";
             PluginClassLoader cl = new PluginClassLoader(jarFilePath,
-                                                         getClass().getClassLoader()) {
-                    protected void handleError(String msg, Throwable exc) {
-                        PluginManager.this.addError(msg,exc);
+                                       getClass().getClassLoader()) {
+                protected void handleError(String msg, Throwable exc) {
+                    PluginManager.this.addError(msg, exc);
+                }
+
+                protected void checkClass(Class c) throws Exception {
+                    IdvBase.addPluginClass(c);
+                    if (java.text.DateFormat.class.isAssignableFrom(c)) {
+                        visad.DateTime.setDateFormatClass(c);
+                    } else if (ucar.nc2.iosp.IOServiceProvider.class
+                            .isAssignableFrom(c)) {
+                        ucar.nc2.NetcdfFile.registerIOProvider(c);
+                    } else if (ucar.nc2.dataset.CoordSysBuilderIF.class
+                            .isAssignableFrom(c)) {
+                        ucar.nc2.dataset.CoordSysBuilderIF csbi =
+                            (ucar.nc2.dataset
+                                .CoordSysBuilderIF) c.newInstance();
+                        ucar.nc2.dataset.CoordSysBuilder.registerConvention(
+                            csbi.getConventionUsed(), c);
+                    } else if (ucar.nc2.dataset.CoordTransBuilderIF.class
+                            .isAssignableFrom(c)) {
+                        ucar.nc2.dataset.CoordTransBuilderIF csbi =
+                            (ucar.nc2.dataset
+                                .CoordTransBuilderIF) c.newInstance();
+                        ucar.nc2.dataset.CoordTransBuilder.registerTransform(
+                            csbi.getTransformName(), c);
+                    } else if (ucar.nc2.dt.TypedDatasetFactoryIF.class
+                            .isAssignableFrom(c)) {
+                        ucar.nc2.dt.TypedDatasetFactoryIF tdfi =
+                            (ucar.nc2.dt
+                                .TypedDatasetFactoryIF) c.newInstance();
+                        ucar.nc2.dt.TypedDatasetFactory.registerFactory(
+                            tdfi.getScientificDataType(), c);
                     }
 
-                    protected void checkClass(Class c) throws Exception {
-                        IdvBase.addPluginClass(c);
-                        if (java.text.DateFormat.class.isAssignableFrom(c)) {
-                            visad.DateTime.setDateFormatClass(c);
-                        } else if (ucar.nc2.iosp.IOServiceProvider.class.isAssignableFrom(
-                                                                                          c)) {
-                            ucar.nc2.NetcdfFile.registerIOProvider(c);
-                        } else if (ucar.nc2.dataset.CoordSysBuilderIF.class
-                                   .isAssignableFrom(c)) {
-                            ucar.nc2.dataset.CoordSysBuilderIF csbi =
-                                (ucar.nc2.dataset.CoordSysBuilderIF) c.newInstance();
-                            ucar.nc2.dataset.CoordSysBuilder.registerConvention(
-                                                                                csbi.getConventionUsed(), c);
-                        } else if (ucar.nc2.dataset.CoordTransBuilderIF.class
-                                   .isAssignableFrom(c)) {
-                            ucar.nc2.dataset.CoordTransBuilderIF csbi =
-                                (ucar.nc2.dataset
-                                 .CoordTransBuilderIF) c.newInstance();
-                            ucar.nc2.dataset.CoordTransBuilder.registerTransform(
-                                                                                 csbi.getTransformName(), c);
-                        } else if (ucar.nc2.dt.TypedDatasetFactoryIF.class
-                                   .isAssignableFrom(c)) {
-                            ucar.nc2.dt.TypedDatasetFactoryIF tdfi =
-                                (ucar.nc2.dt.TypedDatasetFactoryIF) c.newInstance();
-                            ucar.nc2.dt.TypedDatasetFactory.registerFactory(
-                                                                            tdfi.getScientificDataType(), c);
-                        }
-
-                    }
-                };
+                }
+            };
             pluginClassLoaders.add(cl);
             Misc.addClassLoader(cl);
             List entries = cl.getEntryNames();
@@ -1744,7 +1777,7 @@ public class PluginManager extends IdvManager {
                 if (getArgsManager().isRbiFile(entry)) {
                     loadPlugin(entry, prefix, false);
                 }
-                
+
             }
 
             //Now load in everything else
@@ -1938,9 +1971,9 @@ public class PluginManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Install a plugin from a file
      *
-     * @param filename _more_
+     * @param filename  file name
      */
     public void installPluginFromFile(String filename) {
         try {
