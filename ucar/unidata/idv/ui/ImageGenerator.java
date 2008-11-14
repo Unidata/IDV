@@ -1775,8 +1775,10 @@ public class ImageGenerator extends IdvManager {
         }
 
         if (applyMacros(node, ATTR_WAIT, true)) {
+            debug("Waiting for displays to render");
             getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                 getIdv().getIdvUIManager());
+            debug("Done waiting for displays to render");
         }
         getPersistenceManager().clearFileMapping();
 
