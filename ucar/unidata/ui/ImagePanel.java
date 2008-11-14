@@ -212,20 +212,30 @@ public class ImagePanel extends JPanel implements ImageObserver, MouseListener,M
             loadingImage = null;
             setImage(null);
         } else {
-            long t1 = System.currentTimeMillis();
-            try {
-                //fileList.setSelectedIndex(theIndex);
-                loadingImage = ImageUtils.getImageFile(theFile);
-                loadingImage.getWidth(this);
-            } catch (Exception exc) {
-                LogUtil.logException("Error loading image", exc);
-            }
-            long t2 = System.currentTimeMillis();
-            //            System.err.println ("time:" + (t2-t1));
+            loadFile(theFile);
         }
-
     }
 
+
+    /**
+     * Load the file into the preview. This uses the local loadingImage image object and listens
+     * for changes on it. When its ready to load we then load it into the panel
+     *
+     * @param theFile The image file (or url) to load
+     */
+    public void loadFile(String theFile) {
+        long t1 = System.currentTimeMillis();
+        try {
+            //fileList.setSelectedIndex(theIndex);
+            loadingImage = ImageUtils.getImageFile(theFile);
+            loadingImage.getWidth(this);
+        } catch (Exception exc) {
+            LogUtil.logException("Error loading image", exc);
+        }
+        long t2 = System.currentTimeMillis();
+        //            System.err.println ("time:" + (t2-t1));
+
+    }
 
     public void setFiles(List list) {
         files = new ArrayList(list);
