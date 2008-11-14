@@ -333,6 +333,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Button  to delete a frame */
     JButton deleteFrameButton;
 
+    JTextField previewRateFld;
+
     /** Button  to play preview */
     JButton playButton;
 
@@ -806,6 +808,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             if (previewIndex < 0) {
                 previewIndex = 0;
             }
+
+
             boolean haveImages = images.size() > 0;
             prevButton.setEnabled(haveImages);
             nextButton.setEnabled(haveImages);
@@ -814,9 +818,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             if (haveImages) {
                 String current = images.get(previewIndex).toString();
                 if ( !Misc.equals(current, lastPreview)) {
-                    Image image =
+                    previewPanel.loadFile(current);
+                    /*                    Image image =
                         Toolkit.getDefaultToolkit().createImage(current);
-                    previewPanel.setImage(image);
+                        previewPanel.setImage(image);*/
                     /*
                     ImageIcon icon = new ImageIcon(image);
                     previewImage.setIcon(icon);
@@ -854,6 +859,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             stopIcon   = GuiUtils.getImageIcon(imgp + "Stop16.gif");
 
 
+            previewRateFld = new JTextField("1", 3);
+            ChangeListener rateListener = new ChangeListener() {
+                    public void stateChanged(ChangeEvent e) {
+                        JSlider slide = (JSlider) e.getSource();
+                        if (slide.getValueIsAdjusting()) {
+                            //                      return;
+                        }
+                        double value = slide.getValue()/4.0;
+                        previewRateFld.setText(""+value);
+                    }
+                };
+            JComponent[] comps = GuiUtils.makeSliderPopup(1, 20, 4, rateListener);
+            JComponent sliderBtn = comps[0];
+
             playButton = makeButton(playIcon, CMD_PREVIEW_PLAY, "Play/Stop");
 
 
@@ -866,8 +885,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
             deleteFrameButton = makeButton("Delete this frame",
                                            CMD_PREVIEW_DELETE);
-            JPanel buttons = GuiUtils.hflow(Misc.newList(prevButton,
-                                 playButton, nextButton, deleteFrameButton));
+            List buttonList = Misc.newList(prevButton,
+                                           playButton, nextButton);
+            buttonList.add(GuiUtils.filler(20,5));
+            buttonList.add(new JLabel(" Delay: "));
+            buttonList.add(previewRateFld);
+            buttonList.add(new JLabel("(s)  "));
+            buttonList.add(sliderBtn);
+            JPanel buttons = GuiUtils.hflow(buttonList);
 
             buttons      = GuiUtils.inset(buttons, 5);
 
@@ -880,12 +905,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             setPreviewImage();
             //previewImage.setBorder(BorderFactory.createEtchedBorder());
             previewPanel.setBorder(BorderFactory.createEtchedBorder());
+            JComponent topComp = GuiUtils.leftRight(buttons,
+                                                    GuiUtils.hbox(deleteFrameButton,previewLbl));
             JPanel contents =
-                GuiUtils.topCenterBottom(GuiUtils.hflow(Misc.newList(buttons,
-                    //previewLbl)), previewImage,
-                    previewLbl)), previewPanel,
-                                  GuiUtils.wrap(makeButton("Close",
-                                      CMD_PREVIEW_CLOSE)));
+                GuiUtils.topCenterBottom(topComp, previewPanel,
+                                         GuiUtils.wrap(makeButton("Close",
+                                                                  CMD_PREVIEW_CLOSE)));
             GuiUtils.packDialog(previewDialog, contents);
         }
         previewDialog.setVisible(true);
@@ -1129,7 +1154,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         while (isPlaying && (ts == timestamp) && (images.size() > 0)) {
             previewNext();
             try {
-                Misc.sleep(1000);
+                double sleepTime = 1;
+                try {
+                    sleepTime = new Double(previewRateFld.getText().trim()).doubleValue();
+                } catch(Exception noop) {}
+                Misc.sleep((long)(sleepTime*1000));
             } catch (Exception exc) {}
             if (previewIndex >= images.size() - 1) {
                 isPlaying = false;
