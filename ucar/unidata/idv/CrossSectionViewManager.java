@@ -293,8 +293,10 @@ public class CrossSectionViewManager extends ViewManager {
      * @param titlePart The suffix
      */
     public void setDisplayTitle(String titlePart) {
-        csBorderTitle.setTitle(getXSDisplay().getName() + " " + titlePart);
-        getContents().repaint();
+        if(csBorderTitle!=null) {
+            csBorderTitle.setTitle(getXSDisplay().getName() + " " + titlePart);
+            getContents().repaint();
+        }
     }
 
     /**

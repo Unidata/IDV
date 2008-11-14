@@ -1739,7 +1739,12 @@ public class ImageGenerator extends IdvManager {
         String  bundleFile = applyMacros(node, ATTR_FILE, (String) null);
         boolean doRemove   = applyMacros(node, ATTR_CLEAR, true);
         if (doRemove) {
-            cleanup();
+            //            try {
+                cleanup();
+                //            } catch(Exception exc) {
+                //                System.err.println ("Error cleanup");
+                //                System.exit(1);
+                //            }
         }
         getIdv().getStateManager().setAlwaysLoadBundlesSynchronously(true);
         Hashtable bundleProperties = new Hashtable();
@@ -1800,6 +1805,8 @@ public class ImageGenerator extends IdvManager {
         getIdv().removeAllDataSources();
         idToDataSource = new Hashtable();
         ucar.unidata.util.CacheManager.clearCache();
+
+        //        getIdv().getIdvUIManager().disposeAllWindows();
         if (getIdv().getArgsManager().getIsOffScreen()) {
             getIdv().getVMManager().removeAllViewManagers(true);
         }
