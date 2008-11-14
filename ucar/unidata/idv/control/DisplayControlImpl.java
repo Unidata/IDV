@@ -5127,6 +5127,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
         JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
                                       buttons), 5);
+        Msg.translateTree(jtp, true);
         propertiesDialog.getContentPane().add(propContents);
         propertiesDialog.pack();
         if (f != null) {
