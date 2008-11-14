@@ -161,6 +161,14 @@ public class RovingProgress extends JPanel {
 
 
     /**
+     * Reset the state of the progress bar to the beginning
+     */
+    public void reset() {
+        percent = 0.0;
+        repaint(1);
+    }
+
+    /**
      * _more_
      */
     private void tick() {
