@@ -1018,12 +1018,25 @@ public abstract class Displayable {
                             template.getDisplayScalar());
     }
 
+
+    /**
+     * Calls firePropertyChangeEventInThread so we break up potential deadlocks
+     * @param event             The PropertyChangeEvent.
+     */
+    protected void firePropertyChange(final PropertyChangeEvent event) {
+        Misc.run(new Runnable() {
+                public void run() {
+                    firePropertyChangeInThread(event);
+                }
+            });
+    }
+
+
     /**
      * Fires a PropertyChangeEvent.
      * @param event             The PropertyChangeEvent.
      */
-    protected void firePropertyChange(PropertyChangeEvent event) {
-
+    private void firePropertyChangeInThread(PropertyChangeEvent event) {
         if (propertyListeners != null) {
             propertyListeners.firePropertyChange(event);
         }

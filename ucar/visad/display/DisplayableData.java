@@ -437,9 +437,8 @@ public class DisplayableData extends Displayable {
      * @throws VisADException     VisAD failure.
      * @throws RemoteException    Java RMI failure.
      */
-    protected final synchronized void myRemoveDataReferences()
+    protected final  void myRemoveDataReferences()
             throws VisADException, RemoteException {
-
         if (refAdded) {
             getDisplay().removeReference(reference);
             refAdded           = false;
@@ -804,9 +803,7 @@ public class DisplayableData extends Displayable {
 
         synchronized (this) {
             oldValue = myPointSize;
-
             addConstantMap(new ConstantMap(pointSize, Display.PointSize));
-
             myPointSize = pointSize;
         }
 
