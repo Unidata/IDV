@@ -40,6 +40,7 @@ import ucar.unidata.ui.AnimatedGifEncoder;
 import ucar.unidata.ui.ImageUtils;
 
 import ucar.unidata.ui.JpegImagesToMovie;
+import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.util.FileManager;
 
 import ucar.unidata.util.GuiUtils;
@@ -261,7 +262,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     String lastPreview;
 
     /** Where we show the preview */
-    JLabel previewImage;
+    //JLabel previewImage;
+    ImagePanel previewPanel;
 
     /** The label for showing previews */
     JLabel previewLbl;
@@ -792,7 +794,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Load in the current preview image into the gui
      */
     private void setPreviewImage() {
-        if (previewImage == null) {
+        //if (previewImage == null) {
+        if (previewPanel == null) {
             return;
         }
 
@@ -813,17 +816,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 if ( !Misc.equals(current, lastPreview)) {
                     Image image =
                         Toolkit.getDefaultToolkit().createImage(current);
+                    previewPanel.setImage(image);
+                    /*
                     ImageIcon icon = new ImageIcon(image);
                     previewImage.setIcon(icon);
                     previewImage.setText(null);
+                    */
                     lastPreview = current;
                 }
                 previewLbl.setText("  Frame: " + (previewIndex + 1) + "/"
                                    + images.size());
             } else {
+                previewLbl.setText("   No images   ");
+                previewPanel.setImage(null);
+                /*
                 previewLbl.setText("  Frame:        ");
                 previewImage.setText("   No images   ");
                 previewImage.setIcon(null);
+                */
                 lastPreview = null;
             }
         }
@@ -862,14 +872,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             buttons      = GuiUtils.inset(buttons, 5);
 
             previewLbl   = new JLabel("  ");
-            previewImage = new JLabel();
+            //previewImage = new JLabel();
+            previewPanel = new ImagePanel();
+            previewPanel.setPreferredSize(new Dimension(640,480));
             lastPreview  = null;
             previewIndex = 0;
             setPreviewImage();
-            previewImage.setBorder(BorderFactory.createEtchedBorder());
+            //previewImage.setBorder(BorderFactory.createEtchedBorder());
+            previewPanel.setBorder(BorderFactory.createEtchedBorder());
             JPanel contents =
                 GuiUtils.topCenterBottom(GuiUtils.hflow(Misc.newList(buttons,
-                    previewLbl)), previewImage,
+                    //previewLbl)), previewImage,
+                    previewLbl)), previewPanel,
                                   GuiUtils.wrap(makeButton("Close",
                                       CMD_PREVIEW_CLOSE)));
             GuiUtils.packDialog(previewDialog, contents);
