@@ -2663,11 +2663,25 @@ public class XmlUi implements ActionListener, ItemListener {
 
 
     /**
+     * handle event. This calls actionPerformedInner in a non-swing thread
+     *
+     * @param event event
+     */
+    public void actionPerformed(final ActionEvent event) {
+        Misc.run(new Runnable(){
+                public void run() {
+                    actionPerformedInner(event);
+                }
+            });
+    }
+
+
+    /**
      * handle event
      *
      * @param event event
      */
-    public void actionPerformed(ActionEvent event) {
+    private void actionPerformedInner(ActionEvent event) {
         Object source = event.getSource();
         String cmd    = null;
 
