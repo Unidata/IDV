@@ -235,7 +235,7 @@ or:
 
 
 
-[isl::tagdef overlay {Annotate an image with text or a logo} -attrs {image {file or url to image} text {text to draw} place {rectangle point on base image} anchor {rectangle point on overlay} fontsize {font size for text} fontface {font face for text} color {color for text} transparency {transparency percentage 0-1.0}]
+[isl::tagdef overlay {Annotate an image with text or a logo} -attrs {image {file or url to image} text {text to draw} place {rectangle point on base image} anchor {rectangle point on overlay} fontsize {font size for text} fontface {font face for text} color {color for text} transparency {transparency percentage 0-1.0}}]
 The [isl::tag overlay] tag allows you to add an icon or text as an image overlay.
 You can either specify and image or text.
 The [isl::attr place] and [isl::attr anchor] tags specify the location of the overlay.
@@ -268,7 +268,19 @@ of the image you do:
 <pre>
    place="M" anchor="UR"
 </pre> 
+[isl::xml {
+<image file="test.gif">
+   ...
+  <show message="Here is the image"/>
+  ...
+</image>
+}]
 
+
+[isl::tagdef show {Show the current image in a dialog} -attrs {message {optional message to show}}]
+You can use the [isl::tag show] tag inside an [isl::tag image] or [isl::tag movie] tag to show
+the current image in a dialog. This allows you to see what is going on and debug your isl image
+generation.
 
 
 [isl::tagdef resize {Resize an image} -attrs {width {pixels or percent} height {pixels or percent}}]

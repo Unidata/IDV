@@ -103,8 +103,21 @@ You can also use &quot;time:&quot; to use the current animation time as the time
 
 
 
+
+
 [isl::tagdef append {Append to a property} -attrs {name+ {property name} value {property value} fromfile {filename to read contents from}}]
 This is just like the [isl::tag property] tag but it appends the value.
+
+
+[isl::tagdef idvproperty {Define one of the IDV  properties} -attrs {name+ {property name} value {property value} fromfile {filename to read contents from} global {true/false}}]
+This allows you to set properties in the IDV that may affect image capture behavior, etc.
+For example, doing:
+[isl::xml {
+  <idvproperty name="idv.capture.sleep" value="1000"/>
+}]
+sets the pause between each movie frame capture to be 1000 milliseconds.
+
+
 
 
 [isl::tagdef echo {Print a message} -attrs {message+ {text to print out}}]
