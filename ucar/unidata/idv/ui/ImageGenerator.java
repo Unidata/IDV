@@ -234,6 +234,8 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_MATTE = "matte";
 
+    public static final String TAG_SHOW = "show";
+
     /** isl tag */
     public static final String TAG_OUTPUT = "output";
 
@@ -1101,16 +1103,8 @@ public class ImageGenerator extends IdvManager {
         return false;
     }
 
-    /**
-     * process the given node
-     *
-     * @param node Node to process
-     *
-     * @return keep going
-     *
-     * @throws Throwable On badness
-     */
-    protected boolean processTagProperty(Element node) throws Throwable {
+
+    protected String[] getPropertyValue(Element node) throws Throwable {
         String name  = (String) applyMacros(node, ATTR_NAME);
         String value = null;
         if (XmlUtil.hasAttribute(node, ATTR_VALUE)) {
@@ -1126,7 +1120,29 @@ public class ImageGenerator extends IdvManager {
             }
             value = applyMacros(value);
         }
-        putProperty(applyMacros(name), value,
+        return new String[]{name,value};
+    }
+
+    protected boolean processTagIdvproperty(Element node) throws Throwable {
+        String[]tuple = getPropertyValue(node);
+        debug("setting idv property: " + tuple[0] + " =" + tuple[1]);
+        getIdv().getStateManager().putProperty(applyMacros(tuple[0]),applyMacros(tuple[1]));
+        return true;
+    }
+
+
+    /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagProperty(Element node) throws Throwable {
+        String[]tuple = getPropertyValue(node);
+        putProperty(applyMacros(tuple[0]), tuple[1],
                     applyMacros(node, ATTR_GLOBAL, false));
         return true;
     }
@@ -3329,7 +3345,6 @@ public class ImageGenerator extends IdvManager {
                     new VectorGraphicsRenderer(viewManager);
                 vectorRenderer.renderTo(loopFilename);
             } else {
-
                 lastImage = viewManager.getMaster().getImage(false);
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
@@ -3710,6 +3725,15 @@ public class ImageGenerator extends IdvManager {
                 } else {}
                 newImage = ImageUtils.makeColorTransparent(image, redRange,
                         greenRange, blueRange);
+            } else if (tagName.equals(TAG_SHOW)) {
+                JComponent contents = new JLabel(new ImageIcon(image));
+                String message = applyMacros(child, ATTR_MESSAGE,(String) null);
+                if(message!=null) {
+                    contents = GuiUtils.topCenter(new JLabel(message), contents);
+                }
+                if(!GuiUtils.askOkCancel("Continue?",contents)) {
+                    throw new MyQuitException();
+                }
             } else if (tagName.equals(TAG_MATTE)) {
                 int   space  = applyMacros(child, ATTR_SPACE, 0);
                 int   hspace = applyMacros(child, ATTR_HSPACE, space);
@@ -4030,6 +4054,7 @@ public class ImageGenerator extends IdvManager {
 
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
+
             getProperties().put(PROP_VIEWINDEX, new Integer(i));
             String name = viewManager.getName();
             if (name == null) {
@@ -4037,15 +4062,16 @@ public class ImageGenerator extends IdvManager {
             }
             getProperties().put(PROP_VIEWNAME, name);
 
-            JFrame frame = GuiUtils.getFrame(viewManager.getContents());
-            if (frame != null) {
-                LogUtil.registerWindow(frame);
-                frame.show();
-                GuiUtils.toFront(frame);
-                frame.setLocation(50, 50);
-                Misc.sleep(50);
+            if (!getIdv().getArgsManager().getIsOffScreen()) {
+                JFrame frame = GuiUtils.getFrame(viewManager.getContents());
+                if (frame != null) {
+                    LogUtil.registerWindow(frame);
+                    frame.show();
+                    GuiUtils.toFront(frame);
+                    frame.setLocation(50, 50);
+                    Misc.sleep(50);
+                }
             }
-
             String loopFilename = applyMacros(filename);
             debug("Making movie:" + loopFilename);
             ImageSequenceGrabber isg = new ImageSequenceGrabber(viewManager,
@@ -4056,6 +4082,7 @@ public class ImageGenerator extends IdvManager {
             } catch (Exception exc) {
                 logException("Doing the captureMovie wait", exc);
             }
+            debug("Done making movie:" + loopFilename);
         }
     }
 
@@ -4289,6 +4316,8 @@ public class ImageGenerator extends IdvManager {
      */
     protected static class MyReturnException extends Exception {}
 
+
+    protected static class MyQuitException extends Exception {}
 
     /**
      * Class BadIslException is used to handle bad isl errors

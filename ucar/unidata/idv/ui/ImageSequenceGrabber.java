@@ -970,11 +970,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         checkEnabled();
         //Run the imageGrab in another thread because visad errors when the getImage
         //is called from the awt event thread
+        //        runAnimationCapture(++captureTimeStamp);
         Misc.run(new Runnable() {
             public void run() {
                 runAnimationCapture(++captureTimeStamp);
             }
-        });
+            });
     }
 
     /**
@@ -1001,10 +1002,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void runAnimationCapture(int timestamp) {
         try {
             anime.setAnimating(false);
-            if (animationResetCbx.isSelected()) {
+            if (animationResetCbx!=null && animationResetCbx.isSelected()) {
                 animationWidget.gotoBeginning();
             }
-
             int sleepTime =
                 idv.getStateManager().getProperty("idv.capture.sleep",
                     SLEEP_TIME);
@@ -1049,8 +1049,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else {
-                int start = anime.getCurrent();
-                while (true) {
+               animationWidget.gotoBeginning();
+               int start = anime.getCurrent();
+               while (true) {
                     //Sleep for a bit  to allow for the display to redraw itself
                     try {
                         Misc.sleep(sleepTime);
@@ -1536,7 +1537,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
-
         if(beepCbx!=null && beepCbx.isSelected()) {
             Toolkit.getDefaultToolkit().beep();
         }
@@ -1546,7 +1546,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 if (viewManager != null) {
                     if (viewManager.useDisplay()) {
                         //Sleep a bit to let the display get updated
-                        Misc.sleep(500);
+                        //TODO???  Misc.sleep(500);
                     }
                 }
 
@@ -1584,13 +1584,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     Misc.sleep(50);
                     ImageUtils.writeImageToFile(alternateComponent, path);
                 } else {
-                    viewManager.toFront();
-                    Misc.sleep(100);
+                    if (!idv.getArgsManager().getIsOffScreen()) {
+                        viewManager.toFront();
+                        Misc.sleep(100);
+                    }
                     if (imageGenerator != null) {
-                        //                        System.err.println ("Calling getImage");
-                        BufferedImage image =
-                            viewManager.getMaster().getImage(false);
-                        //                        System.err.println ("After Calling getImage");
+                        BufferedImage image = viewManager.getMaster().getImage(false);
                         Hashtable props = new Hashtable();
                         props.put(ImageGenerator.PROP_IMAGEPATH, path);
                         props.put(ImageGenerator.PROP_IMAGEFILE,
