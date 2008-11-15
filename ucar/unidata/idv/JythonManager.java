@@ -755,6 +755,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 }
 
                 JPopupMenu popup = GuiUtils.makePopupMenu(items);
+                if(popup==null) return;
                 popup.show(jythonEditor.getTextComponent(), e.getX(),
                            e.getY());
             }
