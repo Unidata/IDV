@@ -1390,6 +1390,9 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         popup.add(GuiUtils.makeMenuItem("Replicate Color Table", this,
                                         "replicate"));
 
+        popup.add(GuiUtils.makeMenuItem("Invert Color Table", this,
+                                        "invert"));
+
         popup.show(this, event.getX(), event.getY());
 
     }
@@ -1892,6 +1895,28 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         }
 
 
+    }
+
+
+
+    /**
+     * invert the color table
+     */
+    public void invert() {
+        prepColorChange();
+        List tmpColors = new ArrayList(colorList);
+        List tmpScales = new ArrayList(scales);
+        colorList = new ArrayList();
+        scales = new ArrayList();
+        for (int i = 0; i < tmpColors.size(); i++) {
+            colorList.add(0, tmpColors.get(i));
+        }
+
+        for (int i = 0; i < tmpScales.size(); i++) {
+            scales.add(0,tmpScales.get(i));
+        }
+        colorsChanged();
+        repaint();
     }
 
 
