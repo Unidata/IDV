@@ -647,11 +647,22 @@ public class ObsListControl extends ObsDisplayControl {
 
 
 
+    JCheckBox includeHeaderCbx;
     /**
      * Export table as csv
      */
     public void exportTable() {
-        GuiUtils.exportAsCsv(makeFileHeader(sorter), sorter);
+        if(includeHeaderCbx==null) {
+            includeHeaderCbx = new JCheckBox("Include metadata header", true);
+            includeHeaderCbx.setToolTipText("Should the IDV metadata header be included in the CSV file?");
+        }
+        String filename =
+            FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
+                FileManager.FILTER_XLS), FileManager.SUFFIX_CSV,GuiUtils.top(includeHeaderCbx));
+        if (filename == null) {
+            return;
+        }
+        GuiUtils.exportAsCsv(includeHeaderCbx.isSelected()?makeFileHeader(sorter):"", sorter,filename);
     }
 
 
