@@ -260,6 +260,8 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_TRANSPARENT = "transparent";
 
+    public static final String ATTR_TRANSPARENCY = "transparency";
+
     /** isl tag */
     public static final String TAG_WRITE = "write";
 
@@ -3833,6 +3835,7 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_KMZFILE)) {
                 //NOOP
             } else if (tagName.equals(TAG_OVERLAY)) {
+                double transparency = applyMacros(child,ATTR_TRANSPARENCY,0.0);
                 Graphics2D g = (Graphics2D) image.getGraphics();
                 String imagePath = applyMacros(child, ATTR_IMAGE,
                                        (String) null);
@@ -3847,8 +3850,14 @@ public class ImageGenerator extends IdvManager {
                                        ATTR_ANGLE, 0.0));
                     text = applyMacros(text);
                     Color c = applyMacros(child, ATTR_COLOR, Color.white);
+                    if(c!=null && transparency>0) {
+                        c = new Color(c.getRed(),c.getGreen(),c.getBlue(), ImageUtils.toAlpha(transparency));
+                    }
                     Color bg = applyMacros(child, ATTR_BACKGROUND,
                                            (Color) null);
+                    if(bg!=null && transparency>0) {
+                        bg = new Color(bg.getRed(),bg.getGreen(),bg.getBlue(), ImageUtils.toAlpha(transparency));
+                    }
                     setFont(g, child);
                     FontMetrics fm     = g.getFontMetrics();
                     Rectangle2D rect   = fm.getStringBounds(text, g);
@@ -3874,6 +3883,9 @@ public class ImageGenerator extends IdvManager {
                 if (imagePath != null) {
                     Image overlay = ImageUtils.readImage(imagePath);
                     if (overlay != null) {
+                        if(transparency>0) {
+                            overlay = ImageUtils.setAlpha(overlay, transparency);
+                        }
                         int width  = overlay.getWidth(null);
                         int height = overlay.getHeight(null);
                         Point ap = ImageUtils.parsePoint(applyMacros(child,
