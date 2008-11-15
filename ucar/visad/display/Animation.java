@@ -840,7 +840,8 @@ public class Animation extends Displayable {
                     nextIndex = getNumSteps() - 1;
                 }
             }
-            setCurrent(clipIndex(nextIndex, direction == FORWARD));
+            int newIndex = clipIndex(nextIndex, direction == FORWARD);
+            setCurrent(newIndex);
         } catch (Exception ve) {
             LogUtil.logException("takeStep", ve);
         }
@@ -1079,7 +1080,7 @@ public class Animation extends Displayable {
             }
             return false;
         }
-        return (current == getNumSteps() - 1);
+        return (current < getNumSteps() - 1);
     }
 
     /**
@@ -1097,7 +1098,7 @@ public class Animation extends Displayable {
             }
             return false;
         }
-        return (current == 0);
+        return !(current == 0);
     }
 
     /**
