@@ -362,6 +362,57 @@ public class ImageUtils {
 
 
     /**
+     * Change the transparency percentage into an int alpha value
+     *
+     * @param percent the percent transparent 0-1.0
+     * 
+     * @return the alpha value
+     */
+    public static int toAlpha(double percent) {
+        percent = 1.0-percent;
+        return  (int)(0xFF*percent);
+    }
+
+
+    /**
+     * Set the alpha channel to the given transparency percent
+     * @param percent Percent transparent 0-1.0
+     *
+     * @return munged image
+     */
+    public static BufferedImage setAlpha(Image im, double percent) {
+        int t = toAlpha(percent);
+        final int  mask = 0x00FFFFFF | (t<<24);
+        if(im==null) return null;
+        BufferedImage image = toBufferedImage(im,
+                                              BufferedImage.TYPE_INT_ARGB);
+        int w = image.getWidth(null);
+        int h = image.getHeight(null);
+        for(int x=0;x<w;x++) {
+            for(int y=0;y<h;y++) {
+                int rgb = image.getRGB(x,y);
+                rgb&=mask;
+                image.setRGB(x,y,rgb);
+            }
+        }
+        if(true) return image;
+
+        /*
+        ImageFilter filter = new RGBImageFilter() {
+            public final int filterRGB(int x, int y, int rgb) {
+                return mask & rgb;
+            }
+        };
+        ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
+        im = Toolkit.getDefaultToolkit().createImage(ip);
+        BufferedImage bim = toBufferedImage(im);
+        return bim;*/
+        return null;
+    }
+
+
+
+    /**
      * convenience to convert to a Point
      *
      * @param p point
@@ -1038,6 +1089,11 @@ public class ImageUtils {
      * @throws Exception  problem with this
      */
     public static void main(String[] args) throws Exception {
+        setAlpha(null,0.0);
+        setAlpha(null,0.5);
+        setAlpha(null,0.75);
+        setAlpha(null,1);
+        if(true) return;
         /*
         com.drew.metadata.Metadata metadata = com.drew.imaging.jpeg.JpegMetadataReader.readMetadata(new File(args[0]));
         Iterator directories = metadata.getDirectoryIterator(); 
