@@ -137,8 +137,7 @@ public class TrackControl extends GridDisplayControl {
     /** Shows the width */
     private JLabel widthLabel;
 
-    /** widget */
-    private JButton changeButton;
+    protected LayoutModelWidget layoutModelWidget;
 
     /** Entire track type */
     private static final String CMD_ALL = TrackDataSource.ID_WHOLETRACE;
@@ -589,6 +588,25 @@ public class TrackControl extends GridDisplayControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         JComponent contents = (JComponent) super.doMakeContents();
+        if (trackType.equals(CMD_RANGE)) {
+            JTabbedPane jtp = new JTabbedPane();
+            jtp.add("Layout",GuiUtils.topLeft(contents));
+            
+            List timeWidgets = new ArrayList();
+            timeWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Times to Use:"),
+                    doMakeTimeOptionWidget(), null));
+            super.addTimeModeWidget(timeWidgets);
+            List widgetComponents = ControlWidget.fillList(timeWidgets);
+            GuiUtils.tmpInsets = new Insets(4, 8, 4, 8);
+            GuiUtils.tmpFill   = GridBagConstraints.HORIZONTAL;
+            JPanel timesComp = GuiUtils.doLayout(widgetComponents, 2, GuiUtils.WT_NY,
+                                         GuiUtils.WT_N);
+            jtp.add("Times", GuiUtils.topLeft(timesComp));
+            return jtp;
+        }
+
+
         return GuiUtils.top(contents);
     }
 
@@ -660,11 +678,13 @@ public class TrackControl extends GridDisplayControl {
 
         super.getControlWidgets(controlWidgets);
 
+/*
         if (trackType.equals(CMD_RANGE)) {
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Times to Use:"),
                     doMakeTimeOptionWidget(), null));
         }
+        */
 
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Marker:"),
@@ -680,6 +700,10 @@ public class TrackControl extends GridDisplayControl {
                         false)));
 
 
+    }
+
+    protected void addTimeModeWidget(List controlWidgets) {
+        //noop
     }
 
     /**
@@ -1046,13 +1070,18 @@ public class TrackControl extends GridDisplayControl {
                 LogUtil.userErrorMessage("Unable to find layout model: "
                                          + name + ". Using default");
             }
+            
         }
 
         if (layout == null) {
             layout =
                 getControlContext().getStationModelManager()
                     .getDefaultStationModel();
+         }
+        if (layoutModelWidget != null) {
+            layoutModelWidget.setLayoutModel(layout);
         }
+
         return layout;
     }
 
@@ -1351,58 +1380,31 @@ public class TrackControl extends GridDisplayControl {
         return markerVisible;
     }
 
+    public void setStationModelFromWidget(final StationModel sm) {
+        Misc.run(new Runnable() {
+                public void run() {
+                    showWaitCursor();
+                    try {
+                        setMarkerLayout(sm);
+                    } catch (Exception exc) {
+                        logException("Changing station model",
+                                     exc);
+                    }
+                    showNormalCursor();
+                }});
+    }
+
     /**
      * Make the gui widget for setting the layout model
      *
      * @return the widget
      */
     protected JPanel makeLayoutModelWidget() {
-        final JButton editButton =
-            GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
-                                    getClass());
-        editButton.setToolTipText("Show the layout model editor");
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                editLayoutModel();
-            }
-        });
-        editButton.setEnabled(markerVisible);
-
         StationModel marker = getMarkerLayout();
-
-        changeButton = new JButton(getMarkerLayout().getDisplayName());
-        changeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                StationModelManager smm =
-                    getControlContext().getStationModelManager();
-                ObjectListener listener = new ObjectListener(null) {
-                    public void actionPerformed(ActionEvent ae) {
-                        Misc.run(new Runnable() {
-                            public void run() {
-                                showWaitCursor();
-                                try {
-                                    setMarkerLayout((StationModel) theObject);
-                                    changeButton.setText(
-                                        getMarkerLayout().getDisplayName());
-                                } catch (Exception exc) {
-                                    logException("Changing station model",
-                                            exc);
-                                }
-                                showNormalCursor();
-                            }
-                        });
-                    }
-                };
-
-                JPopupMenu popup =
-                    GuiUtils.makePopupMenu(
-                        StationModelCanvas.makeStationModelMenuItems(
-                            smm.getStationModels(), listener, smm));
-                popup.show(changeButton, changeButton.getSize().width / 2,
-                           changeButton.getSize().height);
-            }
-        });
-        changeButton.setEnabled(markerVisible);
+        layoutModelWidget =
+            new LayoutModelWidget(
+                                  this, this, "setStationModelFromWidget",
+                                  layoutModel);
 
 
         final ValueSliderWidget vsw = new ValueSliderWidget(this, 0, 50,
@@ -1412,27 +1414,26 @@ public class TrackControl extends GridDisplayControl {
         final JLabel vswLabel = GuiUtils.rLabel("   Scale: ");
         vswLabel.setEnabled(markerVisible);
 
+        final JPanel markerComp = GuiUtils.doLayout(new Component[]{
+            layoutModelWidget,vswLabel,  vsw.getContents(false)},3,
+                                              GuiUtils.WT_N,
+                                              GuiUtils.WT_N);
+
         JCheckBox showMarker = new JCheckBox("", markerVisible);
         showMarker.setToolTipText("Show the marker");
         showMarker.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean isVisible = ((JCheckBox) e.getSource()).isSelected();
                 setMarkerVisible(isVisible);
-                changeButton.setEnabled(isVisible);
-                editButton.setEnabled(isVisible);
-                vsw.setEnabled(isVisible);
-                vswLabel.setEnabled(isVisible);
+                GuiUtils.enableTree(markerComp, isVisible);
             }
         });
-        JPanel layoutModelPanel = GuiUtils.hflow(Misc.newList(showMarker,
-                                      changeButton, editButton), 4, 0);
+        GuiUtils.enableTree(markerComp, markerVisible);
 
-        JPanel layout = GuiUtils.hbox(layoutModelPanel, vswLabel,
-                                      vsw.getContents(false));
+        return GuiUtils.left(GuiUtils.doLayout(new Component[] {showMarker,GuiUtils.inset(markerComp,new Insets(0,8,0,0)),},3,
+                                 GuiUtils.WT_N,
+                                 GuiUtils.WT_N));
 
-
-
-        return layout;
 
     }
 

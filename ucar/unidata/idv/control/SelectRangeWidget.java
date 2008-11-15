@@ -149,7 +149,7 @@ public class SelectRangeWidget extends ControlWidget {
      */
     public void fillList(List l, int columns) {
         l.add(label);
-        l.add(GuiUtils.doLayout(new Component[] { enabledCbx, button,
+        l.add(GuiUtils.doLayout(new Component[] { enabledCbx, GuiUtils.inset(button, new Insets(0,8,0,0)),
                 new Label(" "), rhLabel }, 4, GuiUtils.WT_NNNY,
                                            GuiUtils.WT_N));
     }

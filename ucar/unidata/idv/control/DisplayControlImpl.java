@@ -6951,16 +6951,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         if (checkFlag(FLAG_TIMERANGE)) {
-            JPanel timeModePanel =
-                GuiUtils.leftCenter(
-                    GuiUtils.wrap(
-                        GuiUtils.makeImageButton(
-                            "/ucar/unidata/idv/images/edit.gif", this,
-                            "showTimeRangeDialog")), GuiUtils.inset(
-                                getDataTimeRange(true).getTimeModeLabel(),
-                                new Insets(0, 10, 0, 0)));
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel("Time Mode:"), timeModePanel));
+            addTimeModeWidget(controlWidgets);
         }
 
         if (checkFlag(FLAG_LINEWIDTH)) {
@@ -6976,6 +6967,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
     }
+
+    /**
+     * Add in the time mode widget to the list of control widgets
+     *
+     * @param controlWidgets List to add to
+     */
+    protected void addTimeModeWidget(List controlWidgets) {
+            JPanel timeModePanel =
+                GuiUtils.leftCenter(
+                    GuiUtils.wrap(
+                        GuiUtils.makeImageButton(
+                            "/ucar/unidata/idv/images/edit.gif", this,
+                            "showTimeRangeDialog")), GuiUtils.inset(
+                                getDataTimeRange(true).getTimeModeLabel(),
+                                new Insets(0, 10, 0, 0)));
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Time Mode:"), timeModePanel));
+
+    }
+
 
     /**
      * Return the label that is to be used for the color widget
