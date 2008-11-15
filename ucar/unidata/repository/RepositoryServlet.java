@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -30,7 +31,7 @@ import org.apache.commons.fileupload.disk.*;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import ucar.unidata.plaza.error.ExceptionLogger;
+//import ucar.unidata.plaza.error.ExceptionLogger;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -66,13 +67,14 @@ import javax.servlet.http.*;
 public class RepositoryServlet extends HttpServlet {
 
     /** ExceptionLogger to handle any runtime exceptions */
-    private static ExceptionLogger ex = new ExceptionLogger();
+    //    private static ExceptionLogger ex = new ExceptionLogger();
 
     /** Repository object that will be instantiated */
     private static Repository repository;
 
 
 
+    /** _more_          */
     private Object MUTEX = new Object();
 
 
@@ -86,12 +88,12 @@ public class RepositoryServlet extends HttpServlet {
     private void createRepository(HttpServletRequest request)
             throws Exception {
         //Have  a local variable here so we can create and initialize it
-        Repository tmp = new Repository(getInitParams(), 
+        Repository tmp = new Repository(getInitParams(),
                                         request.getServerPort(), true);
         tmp.init(null);
 
         //Now set it
-        repository  = tmp;
+        repository = tmp;
     }
 
 
@@ -131,7 +133,7 @@ public class RepositoryServlet extends HttpServlet {
                 repository.close();
             } catch (Exception e) {
                 try {
-                    ex.logException(ex.getStackTrace(e), "");
+                    logException(e, null);
                 } catch (Exception noop) {}
             }
         }
@@ -155,14 +157,15 @@ public class RepositoryServlet extends HttpServlet {
 
         // there can be only one
         if (repository == null) {
-            synchronized(MUTEX) {
+            synchronized (MUTEX) {
                 if (repository == null) {
                     try {
                         createRepository(request);
                     } catch (Exception e) {
-                        ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+                        logException(e, request);
                         response.sendError(response.SC_INTERNAL_SERVER_ERROR,
-                                           "An error has occurred:" + e.getMessage());
+                                           "An error has occurred:"
+                                           + e.getMessage());
                         return;
                     }
                 }
@@ -190,7 +193,7 @@ public class RepositoryServlet extends HttpServlet {
         } catch (Throwable e) {
             e = LogUtil.getInnerException(e);
             repository.log("Error:" + e, e);
-            ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+            logException(e, request);
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                e.getMessage());
         }
@@ -215,8 +218,7 @@ public class RepositoryServlet extends HttpServlet {
                 try {
                     response.sendRedirect(repositoryResult.getRedirectUrl());
                 } catch (Exception e) {
-                    ex.logException(ex.getStackTrace(e),
-                                    request.getRemoteAddr());
+                    logException(e, request);
                 }
             } else if (repositoryResult.getInputStream() != null) {
                 try {
@@ -226,8 +228,7 @@ public class RepositoryServlet extends HttpServlet {
                     IOUtil.writeTo(repositoryResult.getInputStream(), output);
                     output.close();
                 } catch (Exception e) {
-                    ex.logException(ex.getStackTrace(e),
-                                    request.getRemoteAddr());
+                    logException(e, request);
                 }
             } else {
                 try {
@@ -237,8 +238,7 @@ public class RepositoryServlet extends HttpServlet {
                     output.write(repositoryResult.getContent());
                     output.close();
                 } catch (Exception e) {
-                    ex.logException(ex.getStackTrace(e),
-                                    request.getRemoteAddr());
+                    logException(e, request);
                 }
             }
         }
@@ -319,8 +319,7 @@ public class RepositoryServlet extends HttpServlet {
                         }
                     }
                 } catch (FileUploadException e) {
-                    ex.logException(ex.getStackTrace(e),
-                                    request.getRemoteAddr());
+                    logException(e, request);
                 }
             } else {
                 // Map containing parameter names as keys and parameter values as map values. 
@@ -354,6 +353,17 @@ public class RepositoryServlet extends HttpServlet {
 
 
         /**
+         * _more_
+         *
+         * @param exception _more_
+         * @param foo _more_
+         */
+        private void logException(Throwable exception, Object foo) {
+            exception.printStackTrace();
+            //                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+        }
+
+        /**
          * Process any files uploaded with the form input.
          *
          * @param item - a file item that was received within a multipart/form-data POST request
@@ -369,7 +379,7 @@ public class RepositoryServlet extends HttpServlet {
             try {
                 repository.checkFilePath(fileName);
             } catch (Exception e) {
-                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+                logException(e, request);
                 return;
             }
             String contentType = item.getContentType();
@@ -378,7 +388,7 @@ public class RepositoryServlet extends HttpServlet {
             try {
                 item.write(uploadedFile);
             } catch (Exception e) {
-                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+                logException(e, request);
                 return;
             }
             fileUploads.put(fieldName, uploadedFile.toString());
