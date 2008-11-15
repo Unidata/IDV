@@ -282,6 +282,7 @@ public class ControlDescriptor {
         controlClass = Misc.findClass(XmlUtil.getAttribute(node, ATTR_CLASS));
         label           = XmlUtil.getAttribute(node, ATTR_LABEL, "");
         description     = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, label);
+        if(label.length()==0) label = description;
         code            = XmlUtil.getAttribute(node, ATTR_CODE,
                 (String) null);
 
@@ -310,6 +311,9 @@ public class ControlDescriptor {
         properties.putAll(
             StringUtil.parsePropertiesString(
                 XmlUtil.getAttribute(node, ATTR_PROPERTIES, "")));
+        if(properties.get("displayName")==null) {
+            properties.put("displayName", label);
+        }
         List nodes = XmlUtil.findChildren(node, TAG_PROPERTY);
         for (int i = 0; i < nodes.size(); i++) {
             Element propertyNode = (Element) nodes.get(i);
