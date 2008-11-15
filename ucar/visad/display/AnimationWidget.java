@@ -256,6 +256,11 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             setProperties(info);
             animationInfo.setRunning(info.getRunning());
         }
+
+        boxPanel = new AnimationBoxPanel(this);
+        if (timesArray != null) {
+            updateBoxPanel(timesArray);
+        }
     }
 
 
@@ -417,13 +422,15 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         }
 
         JComponent contents = GuiUtils.hflow(buttonList, 1, 0);
-        boxPanel = new AnimationBoxPanel(this);
+        if(boxPanel == null) {
+            boxPanel = new AnimationBoxPanel(this);
+            if (timesArray != null) {
+                updateBoxPanel(timesArray);
+            }
+        }
         boxPanel.addKeyListener(listener);
         if ( !getBoxPanelVisible()) {
             boxPanel.setVisible(false);
-        }
-        if (timesArray != null) {
-            updateBoxPanel(timesArray);
         }
         contents = GuiUtils.doLayout(new Component[] { boxPanel, contents },
                                      1, GuiUtils.WT_Y, GuiUtils.WT_N);
@@ -838,7 +845,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      *
      * @param index   index into the animation set
      */
-    protected void gotoIndex(int index) {
+    public void gotoIndex(int index) {
         if (anime != null) {
             setRunning(false);
             anime.setCurrent(index, false);
@@ -1135,8 +1142,12 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void setBoxPanelVisible(boolean value) {
         boxPanelVisible = value;
         if (boxPanel != null) {
-            boxPanel.setVisible(boxPanelVisible);
-            boxPanel.getParent().doLayout();
+            if(boxPanel.isVisible()!= boxPanelVisible) {
+                boxPanel.setVisible(boxPanelVisible);
+                if(boxPanel.getParent()!=null) {
+                    boxPanel.getParent().doLayout();
+                }
+            }
         }
     }
 
