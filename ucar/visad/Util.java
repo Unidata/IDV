@@ -2072,12 +2072,21 @@ public final class Util {
      * dddd
      * dddd unit
      * dddd[unit]
+     * dddd(unit)
+     * dddd{unit}
+     * dddd<unit>
      * </pre>
      * @param value The string value
      * @return The real or null if it could not convert the given value
      * @throws Exception  problem with unit spec or parsing.
      */
     public static Real toReal(String value) throws Exception {
+        if(value.indexOf("(")>=0 &&  value.indexOf(")")>=0)
+            return toReal(value, "(",")");
+        if(value.indexOf("{")>=0 &&  value.indexOf("}")>=0)
+            return toReal(value, "{","}");
+        if(value.indexOf("<")>=0 &&  value.indexOf(">")>=0)
+            return toReal(value, "<",">");
         return toReal(value, "[","]");
     }
 
