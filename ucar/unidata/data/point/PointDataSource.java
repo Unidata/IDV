@@ -1091,6 +1091,10 @@ public abstract class PointDataSource extends FilesDataSource {
             StringBuffer params = new StringBuffer(comps.length
                                       + " Fields:<ul>");
             String dataSourceName = getName();
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Time","Time"));
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Latitude","Latitude"));
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Altitude","Altitude"));
+
             for (int i = 0; i < comps.length; i++) {
                 params.append("<li>");
                 String paramName =
