@@ -241,9 +241,6 @@ public class StormTrackControl extends DisplayControlImpl {
      * Create a new Track Control; set the attribute flags
      */
     public StormTrackControl() {
-        DataChoice.addCurrentName(new TwoFacedObject("Forecast Hour","fhour"));
-        DataChoice.addCurrentName(new TwoFacedObject("Forecast Time","rhour"));
-        DataChoice.addCurrentName(new TwoFacedObject("Forecast STI Time","shour"));
         setAttributeFlags(FLAG_COLORTABLE);
     }
 
@@ -287,6 +284,10 @@ public class StormTrackControl extends DisplayControlImpl {
      */
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
+
+        DataChoice.addCurrentName(new TwoFacedObject("Storm Track>Forecast Hour","fhour"));
+        DataChoice.addCurrentName(new TwoFacedObject("Storm Track>Forecast Time","rhour"));
+        DataChoice.addCurrentName(new TwoFacedObject("Storm Track>Forecast STI Time","shour"));
 
         placeHolder = new CompositeDisplayable("Place holder");
         addDisplayable(placeHolder);
