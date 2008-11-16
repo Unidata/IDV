@@ -152,6 +152,15 @@ public class PolyGlyph extends LineGlyph {
          */
     }
 
+    public void doDeletePoint(DisplayEvent event)
+        throws VisADException, RemoteException {
+        if ((stretchIndex < 0) || (stretchIndex >= points.size())) {
+            return;
+        }
+        points.remove(stretchIndex);
+        updateLocation();
+    }
+
     /**
      * Stretch this glyph
      *
@@ -162,6 +171,15 @@ public class PolyGlyph extends LineGlyph {
      */
     public void doStretch(DisplayEvent event)
             throws VisADException, RemoteException {
+        InputEvent inputEvent = event.getInputEvent();
+        if ((inputEvent instanceof KeyEvent)) {
+            KeyEvent keyEvent = (KeyEvent) inputEvent;
+            if ((keyEvent.getKeyCode() == KeyEvent.VK_DELETE)) {
+                doDeletePoint(event);
+                return;
+            }
+        }
+
         if ( !smooth || (event.getModifiers() & event.CTRL_MASK) != 0) {
             super.doStretch(event);
             return;

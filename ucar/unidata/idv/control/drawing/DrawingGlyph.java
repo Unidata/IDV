@@ -1817,6 +1817,11 @@ public abstract class DrawingGlyph {
         updateLocation();
     }
 
+    public void doDeletePoint(DisplayEvent event)
+        throws VisADException, RemoteException {
+    }
+
+
 
     /**
      * Move this glyph

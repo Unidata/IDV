@@ -923,6 +923,15 @@ public class DrawingControl extends DisplayControlImpl {
                         }
                         return;
                     }
+
+                    if (keyEvent.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (currentGlyph!=null && currentCmd.equals(CMD_STRETCH)) {
+                            setSelection(currentGlyph);
+                            currentGlyph.doDeletePoint(event);
+                        }
+                    }
+
+
                     if ((keyEvent.getKeyCode() == KeyEvent.VK_P)
                             && keyEvent.isControlDown()) {
                         doProperties(selectedGlyphs);
