@@ -1526,9 +1526,13 @@ public class DrawingControl extends DisplayControlImpl {
         JTabbedPane tabbedPane = new JTabbedPane();
         if(frontDisplay) {
             tabbedPane.add("Fronts", doMakeShapesPanel());
+        } else if(!editable) {
+            return GuiUtils.topCenter(doMakeControlsPanel(), doMakeShapesPanel());
         } else {
             tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
-            tabbedPane.add("Style", GuiUtils.top(doMakeStylePanel()));
+            if(editable) {
+                tabbedPane.add("Style", GuiUtils.top(doMakeStylePanel()));
+            }
             tabbedPane.add("Shapes", doMakeShapesPanel());
         }
         return GuiUtils.centerBottom(tabbedPane, msgLabel);
