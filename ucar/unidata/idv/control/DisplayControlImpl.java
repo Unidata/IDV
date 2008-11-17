@@ -3395,7 +3395,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Update the display list data
      */
     protected void updateDisplayList() {
-        if ( !haveInitialized) {
+        if (!haveInitialized) {
             return;
         }
         Data d = getDisplayListData();
@@ -3433,9 +3433,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             String template = applyMacrosToTemplate(getDisplayListTemplate(),
                                   false);
-            if (firstTime == null) {
-                checkTimestampLabel(null);
-            }
             Set      s  = getDataTimeSet();
             TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
             if (s != null) {
@@ -3487,6 +3484,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 displayListDisplayable = createDisplayListDisplayable(view);
                 displayListTable.put(view, displayListDisplayable);
             }
+            checkTimestampLabel(null);
+            updateDisplayList();
             setDisplayListProperties(displayListDisplayable, view);
         } catch (VisADException ve) {
             logException("Getting display list displayable", ve);
@@ -3858,6 +3857,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         dt.setColor(displayListColor);
         dt.setVisible(getDisplayVisibility());
+
+        if (firstTime == null) {
+            checkTimestampLabel(null);
+        }
+
         Data d = getDisplayListData();
         if (d != null) {
             dt.setData(d);
@@ -7521,6 +7525,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return true if the time is in the label
      */
     private boolean checkTimestampLabel(Real time) {
+
         boolean hasTimestamp = shouldAddAnimationListener();
 
         if ( !hasTimestamp) {
@@ -7535,8 +7540,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 logException("Getting animation", exc);
                 return false;
             }
-
         }
+
+
         if (time == null) {
             return false;
         }
@@ -7577,6 +7583,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             logException("Setting time string", exc);
 
         }
+
         return true;
     }
 
@@ -7590,6 +7597,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !getHaveInitialized() || !getActive()) {
             return;
         }
+
         if (checkTimestampLabel(time)) {
             updateLegendLabel();
         }
@@ -7597,6 +7605,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (timeLabels == null) {
             return;
         }
+
+
         /*
        String tmpLabel = (String) timeLabels.get(time);
         //      System.err.println ("timeLabel: " + tmpLabel);
