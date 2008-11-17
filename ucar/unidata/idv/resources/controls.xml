@@ -244,6 +244,8 @@ example:
      displaycategory="Trajectory"
      properties="windowVisible=true;"/>
 
+<!--
+Since this is confusing and needs more work lets remove this for now
   <control
      id="stormtrackcontrollatest"
      categories="stormtrack"
@@ -252,6 +254,7 @@ example:
      label="Latest Storm Track"
      displaycategory="Trajectory"
      properties="startTime=-1 month;endTime=now;windowVisible=true;"/>
+-->
 
 
   <control

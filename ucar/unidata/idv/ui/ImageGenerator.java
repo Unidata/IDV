@@ -1799,22 +1799,20 @@ public class ImageGenerator extends IdvManager {
             debug("Done waiting for displays to render");
         }
         getPersistenceManager().clearFileMapping();
-
-        if (XmlUtil.hasAttribute(node, ATTR_COLOR)) {
-            Color c = applyMacros(node, ATTR_COLOR, Color.black);
-            if (c != null) {
-                List viewManagers = getVMManager().getViewManagers();
-                for (int i = 0; i < viewManagers.size(); i++) {
-                    ViewManager viewManager =
-                        (ViewManager) viewManagers.get(i);
-                    viewManager.setColors(null, c);
-                }
+        Color c = applyMacros(node, ATTR_COLOR, (Color) null);
+        List viewManagers = getVMManager().getViewManagers();
+        for (int i = 0; i < viewManagers.size(); i++) {
+            ViewManager viewManager =
+                (ViewManager) viewManagers.get(i);
+            if(c!=null) {
+                viewManager.setColors(null, c);
             }
+            viewManager.updateDisplayList();
         }
-
+        //One more pause for the display lists
+        getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
+                                                            getIdv().getIdvUIManager());
         return true;
-
-
     }
 
     /**

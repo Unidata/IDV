@@ -1496,6 +1496,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
+
+
     /**
      * This gets called when the initial guis (windows, etc) have been created and shown
      */
@@ -1954,8 +1956,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Populate the display list
      */
     public void updateDisplayList() {
-        //        if(true) return;
-
         try {
             synchronized (MUTEX_DISPLAYLIST) {
                 if ( !hasDisplayMaster()) {
@@ -3845,10 +3845,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
-
-
-
-
     /**
      * Return the {@link ucar.visad.display.Animation}
      * that is used. May be null. This is the
@@ -4316,7 +4312,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     Trace.call1("ViewManager.getMaster master.draw");
                     master.draw();
                     Trace.call2("ViewManager.getMaster master.draw");
-
                     Trace.call1("ViewManager.getMaster updateDisplayList");
                     updateDisplayList();
                     Trace.call2("ViewManager.getMaster updateDisplayList");
