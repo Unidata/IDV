@@ -1722,7 +1722,7 @@ public class PluginManager extends IdvManager {
                 String tmpDir   = getStore().getUserTmpDirectory().toString();
                 tmpDir = IOUtil.joinDir(tmpDir, "plugins");
                 IOUtil.makeDir(tmpDir);
-                File newFile = new File(IOUtil.joinDir(tmpDir, fileName));
+                File newFile = new File(IOUtil.joinDir(tmpDir, Misc.getUniqueId()+".jar"));
                 byte[] bytes =
                     IOUtil.readBytes(IOUtil.getInputStream(jarFilePath,
                         getClass()));
