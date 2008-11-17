@@ -257,7 +257,9 @@ public abstract class PointDataSource extends FilesDataSource {
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    private class GridParameters extends DataSelectionComponent {
+    private static class GridParameters extends DataSelectionComponent {
+
+        PointDataSource pointDataSource;
 
         /** gui component */
         private JCheckBox useDefaultCbx = new JCheckBox("Use Default", true);
@@ -298,14 +300,15 @@ public abstract class PointDataSource extends FilesDataSource {
         /**
          * ctor
          */
-        public GridParameters() {
+        public GridParameters(PointDataSource pointDataSource) {
             super("Grid Parameters");
-            gridXFld     = new JTextField("" + gridX, 4);
-            gridYFld     = new JTextField("" + gridY, 4);
+            this.pointDataSource = pointDataSource;
+            gridXFld     = new JTextField("" + pointDataSource.gridX, 4);
+            gridYFld     = new JTextField("" + pointDataSource.gridY, 4);
             gridUnitCmbx = new JComboBox();
             tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
             GuiUtils.setListData(gridUnitCmbx, tfos);
-            gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(gridUnit,
+            gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(pointDataSource.gridUnit,
                     tfos));
             gridUnitCmbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -318,17 +321,17 @@ public abstract class PointDataSource extends FilesDataSource {
                     }
                 }
             });
-            gainComp = new ValueSliderComponent(PointDataSource.this, 0, 1,
+            gainComp = new ValueSliderComponent(pointDataSource, 0, 1,
                     "gridGain", "Gain", 10, false);
-            searchComp = new ValueSliderComponent(PointDataSource.this, 0,
+            searchComp = new ValueSliderComponent(pointDataSource, 0,
                     20, "gridSearchRadius", "Search Radius", 1, false);
 
-            numGridPassesFld = new JTextField("" + numGridPasses, 4);
+            numGridPassesFld = new JTextField("" + pointDataSource.numGridPasses, 4);
             comps.add(GuiUtils.rLabel("Spacing:"));
             comps.add(GuiUtils.left(gridUnitCmbx));
             comps.add(GuiUtils.rLabel("Grid Size:"));
             sizeComp = GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
-                    gridXFld, new JLabel("  Y: "), gridYFld));
+                                                   gridXFld, new JLabel("  Y: "), gridYFld));
             comps.add(sizeComp);
             comps.add(GuiUtils.rLabel("Passes:"));
             comps.add(GuiUtils.left(numGridPassesFld));
@@ -520,7 +523,7 @@ public abstract class PointDataSource extends FilesDataSource {
         if ( !(dataChoice.getId() instanceof List)) {
             return;
         }
-        components.add(new GridParameters());
+        components.add(new GridParameters(this));
     }
 
 
@@ -605,7 +608,7 @@ public abstract class PointDataSource extends FilesDataSource {
     public void addPropertiesTabs(JTabbedPane tabbedPane) {
         super.addPropertiesTabs(tabbedPane);
         List comps = new ArrayList();
-        gridProperties    = new GridParameters();
+        gridProperties    = new GridParameters(this);
         makeGridFieldsCbx = new JCheckBox("Make Grid Fields", makeGridFields);
         comps.add(GuiUtils.filler());
         comps.add(GuiUtils.left(makeGridFieldsCbx));
