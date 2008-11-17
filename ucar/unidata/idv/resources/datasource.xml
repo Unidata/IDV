@@ -175,7 +175,16 @@
      factory="ucar.unidata.data.gis.KmlDataSource"
      fileselection="true"
      label="Google Earth Files KML/KMZ"
-     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"/>
+     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"
+/>
+
+  <datasource
+     id="GRX PLACEFILE"
+     factory="ucar.unidata.data.gis.PlaceFileDataSource"
+     fileselection="true"
+     label="GRX Place file"
+     patterns="/grx/"
+/>
 
   <datasource
      id="ISER"
