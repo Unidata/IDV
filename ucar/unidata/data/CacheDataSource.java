@@ -508,9 +508,8 @@ public class CacheDataSource extends DataSourceImpl {
         Data   data     = (Data) getCache(cacheKey);
         if (data == null) {
             File f = getCachedDataFile(cacheKey);
-            if (f.exists()) {
+            if (f!=null && f.exists()) {
                 try {
-                    //                    System.err.println("Reading data from serialized cache");
                     data = (Data) Misc.deserialize(
                         IOUtil.readBytes(
                             IOUtil.getInputStream(f.toString(), getClass())));
