@@ -296,6 +296,7 @@ public  class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public String getLabel(String s) {
+        if(s.length()==0) return "No label";
         s = s.replace("_", " ");
         s = s.replace(".", " ");
         s = s.substring(0, 1).toUpperCase() + s.substring(1);

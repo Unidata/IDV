@@ -720,10 +720,14 @@ public class MetadataManager extends RepositoryManager {
                 }
             }
             for (String name : groups) {
-                sb.append(header(name));
-                sb.append("<ul>");
-                sb.append(groupMap.get(name));
-                sb.append("</ul>");
+                //                sb.append(header(name));
+                StringBuffer tmp = new StringBuffer();
+                tmp.append("<ul>");
+                tmp.append(groupMap.get(name));
+                tmp.append("</ul>");
+                sb.append(getRepository().makeShowHideBlock(request, name,
+                                                            tmp, false));
+
             }
         } else {
             String type = request.getString(ARG_TYPE, BLANK);

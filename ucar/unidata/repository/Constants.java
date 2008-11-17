@@ -147,6 +147,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ERROR = "/icons/error.png";
 
+    public static final String ICON_PLUS = "/icons/plus.gif";
+
     /** _more_ */
     public static final String ICON_QUESTION = "/icons/question.png";
 
@@ -183,11 +185,11 @@ public interface Constants {
     /** _more_          */
     public static final String ICON_SUBSET = "/icons/subset.gif";
 
-    /** _more_ */
-    public static final String ICON_PLUS = "/icons/plus.gif";
 
     /** _more_ */
     public static final String ICON_MINUS = "/icons/minus.gif";
+
+    public static final String ICON_ADD = "/icons/add.gif";
 
     /** _more_ */
     public static final String ICON_DELETE = "/icons/delete.gif";

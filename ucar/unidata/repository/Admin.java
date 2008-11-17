@@ -217,7 +217,7 @@ public class Admin extends RepositoryManager {
             title = "Installation";
             sb.append(HtmlUtil.formTable());
             sb.append(
-                "Here is the local file system directory where data is stored and the database information.<br>Now would be a good time to change these settings and restart RAMADDA if this is not what you want.<br>See <a target=\"other\" href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/install.html\">here</a> for installation instructions.");
+                "Here is the local file system directory where data is stored and the database information.<br>Now would be a good time to change these settings and restart RAMADDA if this is not what you want.<br>See <a target=\"other\" href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/installing.html\">here</a> for installation instructions.");
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
             sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Next"))));

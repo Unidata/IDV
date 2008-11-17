@@ -79,6 +79,18 @@ public class RepositoryServlet extends HttpServlet {
 
 
     /**
+     * _more_
+     *
+     * @param exception _more_
+     * @param foo _more_
+     */
+    private void logException(Throwable exception, HttpServletRequest request) {
+        exception.printStackTrace();
+        //                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+    }
+
+
+    /**
      * Create the repository
      *
      * @param request - an HttpServletRequest object that contains the request the client has made of the servlet
@@ -352,16 +364,6 @@ public class RepositoryServlet extends HttpServlet {
         }
 
 
-        /**
-         * _more_
-         *
-         * @param exception _more_
-         * @param foo _more_
-         */
-        private void logException(Throwable exception, Object foo) {
-            exception.printStackTrace();
-            //                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
-        }
 
         /**
          * Process any files uploaded with the form input.

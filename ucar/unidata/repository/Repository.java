@@ -3859,12 +3859,13 @@ public class Repository extends RepositoryBase implements
                 request.form(
                     getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getId()));
-            sb.append(HtmlUtil.submit(msg("Import a catalog:")));
+            sb.append(msgLabel("Import a catalog"));
             sb.append(HtmlUtil.space(1));
             sb.append(HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
                       + HtmlUtil.space(1)
                       + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
                       + " Recurse");
+            sb.append(HtmlUtil.submit(msg("Go")));
 
 
             sb.append(HtmlUtil.formClose());
@@ -3890,9 +3891,11 @@ public class Repository extends RepositoryBase implements
         sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
         sb.append(request.form(URL_ENTRY_FORM));
-        sb.append(HtmlUtil.submit("Create a:"));
+        sb.append(msgLabel("Create a"));
         sb.append(HtmlUtil.space(1));
         sb.append(makeTypeSelect(request, false,"",true));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.submit("Go"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));

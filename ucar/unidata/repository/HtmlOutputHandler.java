@@ -635,6 +635,9 @@ public class HtmlOutputHandler extends OutputHandler {
         List<MetadataHandler> metadataHandlers =
             getMetadataManager().getMetadataHandlers();
 
+        boolean canEdit = getAccessManager().canDoAction(request, entry,
+                                                         Permission.ACTION_EDIT);
+        boolean didone = false;
         for (Metadata metadata : metadataList) {
             for (MetadataHandler metadataHandler : metadataHandlers) {
                 if ( !metadataHandler.canHandle(metadata)) {
@@ -666,6 +669,20 @@ public class HtmlOutputHandler extends OutputHandler {
                     if (decorate) {
                         sb.append(
                             "<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"3\">\n");
+                    }
+                    if(canEdit) {
+                        if(decorate)
+                            sb.append("<tr><td></td><td>");
+                        sb.append(
+                                  new Link(
+                                           request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
+                                           getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
+                        sb.append(
+                                  new Link(
+                                           request.entryUrl(getRepository().getMetadataManager().URL_METADATA_ADDFORM, entry),
+                                           getRepository().fileUrl(ICON_ADD), msg("Add Metadata")));
+                        if(decorate)
+                            sb.append("</td></tr>");
                     }
                 }
                 String theClass = HtmlUtil.cssClass("listrow" + rowNum);
