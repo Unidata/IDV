@@ -1648,11 +1648,15 @@ Misc.run(new Runnable() {
      * @param dataSource The data source to remove
      */
     public void removeDataSource(DataSource dataSource) {
-        dataManager.removeDataSource(dataSource);
-        if (collabManager != null) {
-            collabManager.writeRemoveDataSource(dataSource);
+        try {
+            dataManager.removeDataSource(dataSource);
+            if (collabManager != null) {
+                collabManager.writeRemoveDataSource(dataSource);
+            }
+            getIdvUIManager().removeDataSource(dataSource);
+        } catch(Exception exc) {
+            logException ("Removing data source:" + dataSource, exc);
         }
-        getIdvUIManager().removeDataSource(dataSource);
     }
 
 
