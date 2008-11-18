@@ -266,6 +266,18 @@ public class ImageGenerator extends IdvManager {
 
     public static final String ATTR_TRANSPARENCY = "transparency";
 
+    public static final String ATTR_TOP= "top";
+
+
+
+    public static final String ATTR_SPACE_LEFT = "space_left";
+    public static final String ATTR_SPACE_RIGHT = "space_right";
+    public static final String ATTR_SPACE_TOP = "space_top";
+    public static final String ATTR_SPACE_BOTTOM = "space_bottom";
+
+
+
+
     /** isl tag */
     public static final String TAG_WRITE = "write";
 
@@ -417,9 +429,6 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_LOOP = "loop";
 
     /** isl tag */
-    public static final String ATTR_BOTTOM = "bottom";
-
-    /** isl tag */
     public static final String ATTR_ENTRY = "entry";
 
     /** isl tag */
@@ -456,7 +465,9 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_VSPACE = "vspace";
 
     /** isl tag */
-    public static final String ATTR_TOP = "top";
+    public static final String ATTR_BOTTOM = "bottom";
+
+    public static final String ATTR_VALIGN = "valign";
 
     /** isl tag */
     public static final String ATTR_TEXT = "text";
@@ -3497,7 +3508,9 @@ public class ImageGenerator extends IdvManager {
                 if(viewManager!=null) {
                     newImage = ImageUtils.toBufferedImage(image);
                     Graphics g = newImage.getGraphics();
-                    viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight);
+                    String valign = applyMacros(child,ATTR_VALIGN,VALUE_BOTTOM);
+                    viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight,
+                                                 valign.equals(VALUE_BOTTOM));
                 }
             } else if (tagName.equals(TAG_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
@@ -3819,10 +3832,29 @@ public class ImageGenerator extends IdvManager {
                     lr = new int[] {
                         (int) toDouble(child, ATTR_RIGHT, imageWidth),
                         (int) toDouble(child, ATTR_BOTTOM, imageHeight) };
+                } else if (viewManager != null) {
+                    //TODO: Clip on visad coordinates
+                    NavigatedDisplay display =
+                        (NavigatedDisplay) viewManager.getMaster();
+                    ul = display.getScreenCoordinates(new double[]{-1,1,0});
+                    lr= display.getScreenCoordinates(new double[]{1,-1,0});
+                    int space = applyMacros(child,ATTR_SPACE,0);
+                    int hspace = applyMacros(child,ATTR_HSPACE,space);
+                    int vspace = applyMacros(child,ATTR_VSPACE,space);
+                    ul[0] -= applyMacros(child,ATTR_SPACE_LEFT,hspace);
+                    ul[1] -= applyMacros(child,ATTR_SPACE_TOP,vspace);
+                    lr[0] += applyMacros(child,ATTR_SPACE_RIGHT,hspace);
+                    lr[1] += applyMacros(child,ATTR_SPACE_BOTTOM,vspace);
                 } else {
                     continue;
-                    //TODO: Clip on visad coordinates
                 }
+                ul[0] = Math.max(0, ul[0]);
+                ul[1] = Math.max(0, ul[1]);
+                
+                lr[0] = Math.min(lr[0],imageWidth);
+                lr[1] = Math.min(lr[1],imageHeight);
+
+
                 newImage = ImageUtils.clip(image, ul, lr);
             } else if (tagName.equals(TAG_SPLIT)) {
                 shouldIterateChildren = false;

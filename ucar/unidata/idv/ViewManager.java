@@ -5087,7 +5087,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    public void paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls,int width, int height)             throws VisADException, RemoteException {
+    public void paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls,int width, int height, boolean bottom)             
+        throws VisADException, RemoteException {
         if(displayControls==null)
              displayControls = getControls();
 
@@ -5096,6 +5097,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
         graphics.setFont(f);
         FontMetrics fm         = graphics.getFontMetrics();
         int         lineHeight = fm.getAscent() + fm.getDescent();
+        int startY;
+        int offsetY;
+        if(bottom) {
+            startY = height - 4;
+            offsetY = - (lineHeight + 1);
+        } else {
+            startY = 2+lineHeight;
+            offsetY =  (lineHeight + 1);
+        }
+
         for (DisplayControl control : displayControls) {
             if ( !control.getShowInDisplayList()) {
                 continue;
@@ -5137,8 +5148,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             graphics.setColor(c);
             int lineWidth = fm.stringWidth(text);
             graphics.drawString(text, width / 2 - lineWidth / 2,
-                                height - 2
-                                - ((lineHeight + 1) * cnt));
+                                startY+ offsetY* cnt);
             cnt++;
         }
 
