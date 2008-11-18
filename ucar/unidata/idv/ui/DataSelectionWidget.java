@@ -26,6 +26,9 @@
 package ucar.unidata.idv.ui;
 
 
+
+import ucar.unidata.ui.Timeline;
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSelectionComponent;
@@ -37,10 +40,12 @@ import ucar.unidata.data.GeoSelectionPanel;
 
 
 import ucar.unidata.idv.*;
+import ucar.unidata.idv.chooser.TimesChooser;
 
 
 import ucar.unidata.idv.control.DisplaySetting;
 
+import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -54,6 +59,7 @@ import ucar.visad.Util;
 
 
 import visad.VisADException;
+import visad.DateTime;
 
 
 
@@ -779,6 +785,8 @@ public class DataSelectionWidget {
     }
 
 
+
+
     /**
      * Create the GUI for the times list. (i.e., all times button and the
      * times JList)
@@ -788,15 +796,16 @@ public class DataSelectionWidget {
      */
     public JComponent getTimesList(String cbxLabel) {
         if (timesListInfo == null) {
-            timesListInfo  = makeTimesListAndPanel(cbxLabel);
+            timesListInfo  = makeTimesListAndPanel(cbxLabel,null);
             timesList      = (JList) timesListInfo[0];
             allTimesButton = (JCheckBox) timesListInfo[1];
+
         }
         return timesListInfo[2];
     }
 
 
-
+    private Timeline timeline;
 
 
     /**
@@ -872,10 +881,11 @@ public class DataSelectionWidget {
      * @param cbxLabel Label to use for the checkbox. (Use All or Use Default).
      * @return A triple: JList, all times button and the JPanel that wraps this.
      */
-    private static JComponent[] makeTimesListAndPanel(String cbxLabel) {
+    private  JComponent[] makeTimesListAndPanel(String cbxLabel, JComponent extra) {
         final JList timesList = new JList();
         timesList.setBorder(null);
-        GuiUtils.configureStepSelection(timesList);
+        //        timeline = new Timeline();
+        TimesChooser.addTimeSelectionListener(timesList,timeline);
         timesList.setToolTipText("Right click to show selection menu");
         timesList.setSelectionMode(
             ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -889,7 +899,12 @@ public class DataSelectionWidget {
 
         //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
         //                                            allTimesButton);
-        JComponent top = GuiUtils.right(allTimesButton);
+        JComponent top;
+        if(extra!=null) {
+            top = GuiUtils.leftRight(extra, allTimesButton);
+        } else {
+            top = GuiUtils.right(allTimesButton);
+        }
 
         //NEW
         //        JComponent top      = GuiUtils.left(new JLabel("Times"));
