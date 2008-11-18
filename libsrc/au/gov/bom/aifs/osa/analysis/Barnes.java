@@ -1120,14 +1120,28 @@ public class Barnes
 		scaleLengthDeg = randomDataSpacing * degreesPerKmX;
 		double gridSpace = randomDataSpacing * 0.3d;
 
-		// round to nearest 0.01 deg
-		double gridSpaceDegX =
-			(Math.round(gridSpace * degreesPerKmX * 100.0d)) / 100.0d;
+
+		// try rounding to  nearest 0.01 deg, then 0.001 deg, 0.0001 deg, etc.
+		double gridSpaceDegX =0;
+                double roundTo = 100.0;
+                for(int i=0;i<10;i++) {
+                    gridSpaceDegX =      (Math.round(gridSpace * degreesPerKmX * roundTo)) / roundTo;
+                    roundTo*=10;
+                    if(gridSpaceDegX!=0) break;
+                }
+
+
 		double gridX = gridSpaceDegX;
 
-		// round to nearest 0.01 deg
-		double gridSpaceDegY =
-			(Math.round(gridSpace * degreesPerKmY * 100.0d)) / 100.0d;
+		// try rounding to  nearest 0.01 deg, then 0.001 deg, 0.0001 deg, etc.
+		double gridSpaceDegY = 0;
+                roundTo = 100.0;
+                for(int i=0;i<10;i++) {
+                    gridSpaceDegY = (Math.round(gridSpace * degreesPerKmY * roundTo)) / roundTo;
+                    if(gridSpaceDegY!=0) break;
+                    roundTo*=10;
+                }
+
 		double gridY = gridSpaceDegY;
 
 		double scaleLengthGU = scaleLengthDeg / gridX;
@@ -1142,6 +1156,7 @@ public class Barnes
 
 		// ap.actualStationSpacing = actualStationSpacing;
 		// ap.NUR = NUR;
+
 		float[] faLonGrid =
 			getRecommendedGridX(fLonMin, fLonMax, (float)gridX);
 		float[] faLatGrid =
