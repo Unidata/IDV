@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -3395,7 +3396,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Update the display list data
      */
     protected void updateDisplayList() {
-        if (!haveInitialized) {
+        if ( !haveInitialized) {
             return;
         }
         Data d = getDisplayListData();
@@ -4407,7 +4408,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         //                            hide();
                     }
                 } catch (Exception exc) {
-                    System.err.println ("ERROR:" + hasBeenRemoved);
+                    System.err.println("ERROR:" + hasBeenRemoved);
                     System.err.println("oops: " + exc);
                     exc.printStackTrace();
                 }
@@ -6978,16 +6979,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param controlWidgets List to add to
      */
     protected void addTimeModeWidget(List controlWidgets) {
-            JPanel timeModePanel =
-                GuiUtils.leftCenter(
-                    GuiUtils.wrap(
-                        GuiUtils.makeImageButton(
-                            "/ucar/unidata/idv/images/edit.gif", this,
-                            "showTimeRangeDialog")), GuiUtils.inset(
-                                getDataTimeRange(true).getTimeModeLabel(),
-                                new Insets(0, 10, 0, 0)));
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel("Time Mode:"), timeModePanel));
+        JPanel timeModePanel =
+            GuiUtils.leftCenter(
+                GuiUtils.wrap(
+                    GuiUtils.makeImageButton(
+                        "/ucar/unidata/idv/images/edit.gif", this,
+                        "showTimeRangeDialog")), GuiUtils.inset(
+                            getDataTimeRange(true).getTimeModeLabel(),
+                            new Insets(0, 10, 0, 0)));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Time Mode:"),
+                                             timeModePanel));
 
     }
 
@@ -9893,6 +9895,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void setDefaultSamplingMode(String newMode) {
         defaultSamplingMode = newMode;
     }
+
+    /**
+     * Get the sampling mode
+     *
+     * @return sampling mode
+     */
+    public int getSamplingModeValue() {
+        return getSamplingModeValue(defaultSamplingMode);
+    }
+
 
     /**
      * Get the integer value for the sampling mode supplied
