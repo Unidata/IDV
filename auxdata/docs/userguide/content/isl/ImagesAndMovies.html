@@ -189,6 +189,8 @@ The original image is then matted and written out as test.png.
 The [isl::tag clip] tag allows you to clip the image. The clipping can either be defined
 in lat/lon  coordinates, with x/y image coordinates or from the projection used from a display. 
 The image coordinates can be specified as percentages.
+If no arguments are given then we clip the image at the box.
+
 
 [isl::xml {
 Clip in image space:
@@ -196,6 +198,23 @@ Clip in image space:
 
 Clip in lat/lon space:
 <clip north="40" south="30" east="-80" west="-90"/>
+Note: The view should be in a lat/lon projection and an overhead view for clipping in lat/lon
+space to be accurate.
+
+
+Clip at the 3D box:
+<clip/>
+
+Clip at the 3D box with 10 pixel padding
+<clip space="10"/>
+
+Clip at the 3D box with horizontal spacing of 10 pixels and vertical spacing of 30
+	<clip hspace="10" vspace="30"/>
+
+Clip with left/right/bottom/right spacing
+	<clip space_left="5" space_right="40" space_bottom="10" space_top="-10"/>
+
+
 }]
 
 If there is a [isl::attr display] attribute defined then we get the lat/lon bounds of its data to clip with.
@@ -232,6 +251,7 @@ or a comma separated list of red/green/blue values:
 or:
 <matte top="100"  background="red,green,blue values"/>
 }]
+
 
 
 
@@ -275,6 +295,17 @@ of the image you do:
   ...
 </image>
 }]
+
+
+[isl::tagdef displaylist {Render the display list} -attrs {} ]
+The [isl::tag displaylist] tag renders the display list (normally shown at the bottom of the view)
+directly into the image. The text rendering is a bit higher quality because we are using
+direct Java drawing code and not the 3D rendering. Also, you can matte an image and then render
+the list of displays in the matted area.
+<p>
+You will want to turn off the visibility of the display list for the view (under View-&gt;Show-&gt;Display List menu)
+when you save the bundle.
+
 
 
 [isl::tagdef show {Show the current image in a dialog} -attrs {message {optional message to show}}]
