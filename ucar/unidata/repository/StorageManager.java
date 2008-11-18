@@ -98,8 +98,8 @@ public class StorageManager extends RepositoryManager {
     public static final String PROP_DIRRANGE = "ramadda.storage.dirrange";
 
 
-    private int dirDepth = 3;
-    private int dirRange = 100;
+    private int dirDepth = 2;
+    private int dirRange = 10;
 
 
     /** _more_ */
@@ -383,6 +383,18 @@ public class StorageManager extends RepositoryManager {
             throws Exception {
         String targetName = prefix + original.getName();
         String storageDir = getStorageDir();
+
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        cal.setTime(new Date());
+        
+        storageDir = IOUtil.joinDir(storageDir,"y"+ cal.get(cal.YEAR));
+        IOUtil.makeDir(storageDir);
+        storageDir = IOUtil.joinDir(storageDir,"m"+ (cal.get(cal.MONTH)+1));
+        IOUtil.makeDir(storageDir);
+        storageDir = IOUtil.joinDir(storageDir,"d"+ cal.get(cal.DAY_OF_MONTH));
+        IOUtil.makeDir(storageDir);
+
+
         for(int depth=0;depth<dirDepth;depth++) {
             int index=(int)(dirRange*Math.random());
             storageDir = IOUtil.joinDir(storageDir,"data" + index);
