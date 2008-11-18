@@ -2117,6 +2117,23 @@ public class GuiUtils extends LayoutUtil {
         if ( !list.isEnabled()) {
             return;
         }
+        List  items     = new ArrayList();
+        getConfigureStepSelectionItems(list, items);
+        JPopupMenu popup = makePopupMenu(items);
+        popup.show(list, e.getX(), e.getY());
+    }
+
+
+    /**
+     * popup a menu to select strides
+     *
+     * @param e mouse click
+     * @param list JList
+     */
+    public static void getConfigureStepSelectionItems(final JList list, List items) {
+        if ( !list.isEnabled()) {
+            return;
+        }
         final int size   = list.getModel().getSize();
         int[]     steps  = {
             1, 2, 3, 4, 5, 10, 20
@@ -2125,7 +2142,6 @@ public class GuiUtils extends LayoutUtil {
             "all", "every other one", "every third one", "every fourth one",
             "every fifth one", "every tenth one", "every twentieth one"
         };
-        List  items     = new ArrayList();
         JMenu rangeMenu = new JMenu("Select Range");
         items.add(rangeMenu);
         for (int i = 0; (i < 20) && (i < list.getModel().getSize()); i++) {
@@ -2141,8 +2157,6 @@ public class GuiUtils extends LayoutUtil {
                 }
             });
         }
-
-
 
 
         JMenuItem selectStrideMenuItem = new JMenuItem("Choose Interval");
@@ -2200,8 +2214,6 @@ public class GuiUtils extends LayoutUtil {
             });
             items.add(item);
         }
-        JPopupMenu popup = makePopupMenu(items);
-        popup.show(list, e.getX(), e.getY());
     }
 
 
