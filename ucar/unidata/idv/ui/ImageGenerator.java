@@ -1753,6 +1753,7 @@ public class ImageGenerator extends IdvManager {
                 }
             }
             fileList.add(files);
+            debug("Adding a file override id=" + dataSourceId + " files=" + files);
         }
         if (ids.size() > 0) {
             getPersistenceManager().setFileMapping(ids, fileList);
