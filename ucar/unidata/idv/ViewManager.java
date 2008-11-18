@@ -5087,6 +5087,64 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    public void paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls,int width, int height)             throws VisADException, RemoteException {
+        if(displayControls==null)
+             displayControls = getControls();
+
+        int  cnt = 0;
+        Font f   = getDisplayListFont();
+        graphics.setFont(f);
+        FontMetrics fm         = graphics.getFontMetrics();
+        int         lineHeight = fm.getAscent() + fm.getDescent();
+        for (DisplayControl control : displayControls) {
+            if ( !control.getShowInDisplayList()) {
+                continue;
+            }
+            Data data = control.getDataForDisplayList();
+            if (data == null) {
+                continue;
+            }
+            String text = null;
+            if (data instanceof visad.Text) {
+                text = ((visad.Text) data).getValue();
+            } else if (data instanceof FieldImpl) {
+                Animation anime = getAnimation();
+                if (anime != null) {
+                    Real now = anime.getCurrentAnimationValue();
+                    if (now != null) {
+                        FieldImpl fi = (FieldImpl) data;
+                        Data rangeValue = fi.evaluate(now,
+                                                      Data.NEAREST_NEIGHBOR,
+                                                      Data.NO_ERRORS);
+                        if ((rangeValue != null)
+                            && (rangeValue
+                                instanceof visad.Text)) {
+                            text = ((visad.Text) rangeValue)
+                                .getValue();
+                        }
+                    }
+                }
+            }
+            if ((text == null) || (text.length() == 0)) {
+                continue;
+            }
+            Color c = getDisplayListColor();
+            if (c == null) {
+                c = ((ucar.unidata.idv.control
+                      .DisplayControlImpl) control)
+                    .getDisplayListColor();
+            }
+            graphics.setColor(c);
+            int lineWidth = fm.stringWidth(text);
+            graphics.drawString(text, width / 2 - lineWidth / 2,
+                                height - 2
+                                - ((lineHeight + 1) * cnt));
+            cnt++;
+        }
+
+    }
+
+
 
 
     /**

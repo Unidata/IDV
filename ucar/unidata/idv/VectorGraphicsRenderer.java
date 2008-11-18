@@ -287,51 +287,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
                 graphics.setFont(f);
                 FontMetrics fm         = graphics.getFontMetrics();
                 int         lineHeight = fm.getAscent() + fm.getDescent();
-                for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                    if ( !control.getShowInDisplayList()) {
-                        continue;
-                    }
-                    Data data = control.getDataForDisplayList();
-                    if (data == null) {
-                        continue;
-                    }
-                    String text = null;
-                    if (data instanceof visad.Text) {
-                        text = ((visad.Text) data).getValue();
-                    } else if (data instanceof FieldImpl) {
-                        Animation anime = viewManager.getAnimation();
-                        if (anime != null) {
-                            Real now = anime.getCurrentAnimationValue();
-                            if (now != null) {
-                                FieldImpl fi = (FieldImpl) data;
-                                Data rangeValue = fi.evaluate(now,
-                                                      Data.NEAREST_NEIGHBOR,
-                                                      Data.NO_ERRORS);
-                                if ((rangeValue != null)
-                                        && (rangeValue
-                                            instanceof visad.Text)) {
-                                    text = ((visad.Text) rangeValue)
-                                        .getValue();
-                                }
-                            }
-                        }
-                    }
-                    if ((text == null) || (text.length() == 0)) {
-                        continue;
-                    }
-                    Color c = viewManager.getDisplayListColor();
-                    if (c == null) {
-                        c = ((ucar.unidata.idv.control
-                            .DisplayControlImpl) control)
-                                .getDisplayListColor();
-                    }
-                    graphics.setColor(c);
-                    int lineWidth = fm.stringWidth(text);
-                    graphics.drawString(text, width / 2 - lineWidth / 2,
-                                        height - 2
-                                        - ((lineHeight + 1) * cnt));
-                    cnt++;
-                }
+                viewManager.paintDisplayList(graphics,  (List<DisplayControl>) onDisplays, width, height);
                 viewManager.setShowDisplayList(true);
             }
 
