@@ -102,14 +102,18 @@ public class PropertyFilter {
     /** _more_ */
     public static final int OP_STRNOTCONTAINS_NOCASE = 11;
 
+    /** _more_ */
+    public static final int OP_STRCONTAINEDIN = 12;
 
+    /** _more_ */
+    public static final int OP_STRCONTAINEDIN_NOCASE = 13;
 
     /** _more_          */
     public static final int[] OPERATORS = {
         OP_GREATERTHAN, OP_LESSTHAN, OP_EQUALS, OP_NOTEQUALS, OP_STREQUALS,
         OP_STRNOTEQUALS, OP_STRCONTAINS, OP_STRCONTAINS_NOCASE,
         OP_STRNOTCONTAINS, OP_STRNOTCONTAINS_NOCASE, OP_STRMATCH,
-        OP_STRNOTMATCH
+        OP_STRNOTMATCH, OP_STRCONTAINEDIN, OP_STRCONTAINEDIN_NOCASE
     };
 
 
@@ -118,7 +122,8 @@ public class PropertyFilter {
     public static final String[] OP_LABELS = {
         ">", "<", "=", "!=", "String equals", "String not equals",
         "Contains string", "Contains string (no case)", "Not contains",
-        "Not contains (no case)", "String matches", "Not string matches"
+        "Not contains (no case)", "String matches", "Not string matches",
+        "Is contained in", "Is contained in (no case)"
     };
 
 
@@ -224,6 +229,12 @@ public class PropertyFilter {
         } else if (operator == OP_STRNOTMATCH) {
             return !StringUtil.stringMatch(inValue.toString().trim(),
                                            myValue.toString());
+        } else if (operator == OP_STRCONTAINEDIN) {
+            return myValue.toString().indexOf(inValue.toString().trim()) >= 0;
+
+        } else if (operator == OP_STRCONTAINEDIN_NOCASE) {
+            return myValue.toString().toLowerCase().
+                        indexOf(inValue.toString().toLowerCase().trim()) >= 0;
         }
 
         try {
