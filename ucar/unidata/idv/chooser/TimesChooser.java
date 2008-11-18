@@ -32,6 +32,7 @@ import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.ui.ChooserList;
 import ucar.unidata.ui.ChooserPanel;
+import ucar.unidata.ui.Timeline;
 import ucar.unidata.idv.ui.IdvTimeline;
 
 import ucar.unidata.util.DateSelection;
@@ -43,6 +44,8 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
+
+import ucar.visad.Util;
 
 import visad.CommonUnit;
 import visad.DateTime;
@@ -717,7 +720,7 @@ public class TimesChooser extends IdvChooser {
      * @return List of DatedThings
      *
      */
-    protected List makeDatedObjects(List items) {
+    protected  List makeDatedObjects(List items) {
         List datedThings = new ArrayList();
         try {
             for (int i = 0; i < items.size(); i++) {
@@ -997,6 +1000,139 @@ public class TimesChooser extends IdvChooser {
 
 
     }
+
+
+
+
+    /**
+     * Add a listener to the JList that pops up a menu on a right
+     * click that allos for the selection of different strides.
+     *
+     * @param list list to popup on
+     */
+    public static void addTimeSelectionListener(final JList list, final Timeline timeline) {
+        list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    popupTimeSelection(e, list, timeline);
+                }
+            }
+        });
+        if (list.getToolTipText() == null) {
+            list.setToolTipText(
+                "Right mouse to show range select popup menu");
+        }
+
+    }
+
+    /**
+     * popup a menu to select strides
+     *
+     * @param e mouse click
+     * @param list JList
+     */
+    private static void popupTimeSelection(MouseEvent e,
+            final JList list,final Timeline timeline) {
+        if ( !list.isEnabled()) {
+            return;
+        }
+        List  items     = new ArrayList();
+        List dates = GuiUtils.getItems(list);
+        if(dates.size()>0 && (dates.get(0) instanceof DateTime)) {
+            JMenuItem menuItem = new JMenuItem("Show Timeline");
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        showTimelineDialog(list,timeline);
+                    }
+                });
+            items.add(menuItem);
+        }
+        GuiUtils.getConfigureStepSelectionItems(list, items);
+        JPopupMenu popup = GuiUtils.makePopupMenu(items);
+        popup.show(list, e.getX(), e.getY());
+    }
+
+
+    private static void showTimelineDialog(JList list, Timeline timeline) {
+        try {
+            if(timeline==null) timeline = new Timeline();
+            List selected = new ArrayList();
+            Object[]tmp = list.getSelectedValues();
+            for(int i=0;i<tmp.length;i++) {
+                selected.add(new DatedObject(Util.makeDate((DateTime) tmp[i])));
+            }
+
+            final JDialog dialog = GuiUtils.createDialog(GuiUtils.getWindow(list), "", true);
+            dialog.setUndecorated(true);
+            final boolean[]ok={false};
+            List dates = GuiUtils.getItems(list);
+            List datedThings = new ArrayList();
+            for(DateTime dttm: (List<DateTime>)dates) {
+                datedThings.add(new DatedObject(Util.makeDate(dttm)));
+            }
+
+            timeline.setDatedThings(datedThings,true);
+            DateSelection dateSelection;
+            if(selected.size() == dates.size()) {
+                dateSelection =new DateSelection(timeline.getStartDate(),
+                                                 timeline.getEndDate());
+            } else if(selected.size()==0) {
+                Date end  = new Date(timeline.getStartDate().getTime()+1000*60*60);
+                dateSelection =new DateSelection(timeline.getStartDate(),
+                                                 end);
+
+            } else {
+                dateSelection =new DateSelection(((DatedObject)selected.get(0)).getDate(),
+                                                 ((DatedObject)selected.get(selected.size()-1)).getDate());
+
+            }
+
+
+
+            timeline.setSelected(selected);
+            timeline.setUseDateSelection(true);
+            timeline.setDateSelection(dateSelection);
+
+            ActionListener listener =new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        if(ae.getActionCommand().equals(GuiUtils.CMD_OK)) {
+                            ok[0] = true;
+                        }
+                        dialog.dispose();
+                    }
+                };
+            JComponent buttons = GuiUtils.makeOkCancelButtons(listener);
+            JComponent contents = GuiUtils.centerBottom(timeline,buttons);
+            buttons.setBorder(BorderFactory.createMatteBorder(1,1, 1, 1,
+                                                              Color.black));
+            contents.setBorder(BorderFactory.createMatteBorder(1,1, 1, 1,
+                                                               Color.black));
+            dialog.getContentPane().add(contents);
+
+            dialog.pack();
+            Point loc = list.getLocationOnScreen();
+            //            loc.y += timelineBtn.getSize().height;
+            dialog.setLocation(loc);
+            GuiUtils.positionAndFitToScreen(dialog,dialog.getBounds());
+            dialog.show();
+            if(ok[0]) {
+                selected = new ArrayList();
+                for(Date dttm: (List<Date>)DatedObject.unwrap(timeline.getSelected())) {
+                    selected.add(new DateTime(dttm));
+                }
+                if(selected.size()==0) {
+                    list.setSelectedIndices(new int[]{});
+                } else {
+                    GuiUtils.setSelectedItems( list, selected);
+                }
+            }
+
+        } catch(Exception exc) {
+            LogUtil.logException("Showing timeline dialog", exc);
+        }
+    }
+
+
 
 
 }
