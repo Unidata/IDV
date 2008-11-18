@@ -169,7 +169,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
             return null;
         }
         List result = new ArrayList();
-        Real r      = GridUtil.sampleToReal(field, el, animationValue);
+        Real r      = GridUtil.sampleToReal(field, el, animationValue,getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
         if ((r != null) && !r.isMissing()) {
             result.add("<tr><td>" + getMenuLabel()
                        + ":</td><td align=\"right\">"
