@@ -150,7 +150,7 @@ public class DisplayConventions extends IdvManager {
         }
         buf.append(" Lon: ");
         try {
-            buf.append(formatLatLon(llp.getLongitude().getValue()));
+            buf.append(formatLatLon(Misc.normalizeLongitude(llp.getLongitude().getValue())));
         } catch (Exception e) {
             buf.append(" ");
         }
@@ -237,6 +237,7 @@ public class DisplayConventions extends IdvManager {
         if (Double.isNaN(d)) {
             return "missing";
         }
+
         latLonFormat.applyPattern(getStore().get(PREF_LATLON_FORMAT,
                 DEFAULT_FORMAT));
         return latLonFormat.format(d);

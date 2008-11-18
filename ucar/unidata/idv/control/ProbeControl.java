@@ -539,9 +539,9 @@ public class ProbeControl extends DisplayControlImpl {
         latLonWidget.setLat(
             getDisplayConventions().formatLatLon(
                 llp.getLatitude().getValue()));
+        double lon = Misc.normalizeLongitude(llp.getLongitude().getValue());
         latLonWidget.setLon(
-            getDisplayConventions().formatLatLon(
-                llp.getLongitude().getValue()));
+            getDisplayConventions().formatLatLon(lon));
         latLonWidget.setAlt(
             getDisplayConventions().formatAltitude(elt.getAltitude()));
     }
