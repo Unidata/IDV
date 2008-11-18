@@ -236,6 +236,8 @@ public class ImageGenerator extends IdvManager {
 
     public static final String TAG_SHOW = "show";
 
+    public static final String TAG_DISPLAYLIST = "displaylist";
+
     /** isl tag */
     public static final String TAG_OUTPUT = "output";
 
@@ -3491,6 +3493,12 @@ public class ImageGenerator extends IdvManager {
                 //ignore
             } else if (tagName.equals(TAG_OUTPUT)) {
                 processTagOutput(child);
+            } else if (tagName.equals(TAG_DISPLAYLIST)) {
+                if(viewManager!=null) {
+                    newImage = ImageUtils.toBufferedImage(image);
+                    Graphics g = newImage.getGraphics();
+                    viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight);
+                }
             } else if (tagName.equals(TAG_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
 
