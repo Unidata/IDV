@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -713,6 +714,27 @@ public class GridUtil {
     public static Real sampleToReal(FieldImpl grid, EarthLocation el,
                                     Real animationValue)
             throws VisADException, RemoteException {
+
+        return sampleToReal(grid, el, animationValue, Data.NEAREST_NEIGHBOR);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     * @param el _more_
+     * @param animationValue _more_
+     * @param samplingMode _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static Real sampleToReal(FieldImpl grid, EarthLocation el,
+                                    Real animationValue, int samplingMode)
+            throws VisADException, RemoteException {
         if (is3D(grid) && !isVolume(grid)) {
             grid = make2DGridFromSlice(grid, false);
         }
@@ -723,8 +745,8 @@ public class GridUtil {
         } else {
             sampleAtLocation = GridUtil.sample(grid, el.getLatLonPoint());
         }
-        Data data = sampleAtLocation.evaluate(animationValue,
-                        Data.NEAREST_NEIGHBOR, Data.NO_ERRORS);
+        Data data = sampleAtLocation.evaluate(animationValue, samplingMode,
+                        Data.NO_ERRORS);
 
         while ((data != null) && !(data instanceof Real)) {
             if (data instanceof FieldImpl) {
@@ -3742,14 +3764,24 @@ public class GridUtil {
      */
     public static int[][] findContainedIndices(float[][] latlon, UnionSet map)
             throws VisADException {
-        long t1 = System.currentTimeMillis();
-        int[][]indices = findContainedIndices(latlon, map,true);
-        long t2 = System.currentTimeMillis();
-        System.err.println("indices time:" + (t2-t1));
+        long    t1      = System.currentTimeMillis();
+        int[][] indices = findContainedIndices(latlon, map, true);
+        long    t2      = System.currentTimeMillis();
+        System.err.println("indices time:" + (t2 - t1));
         return indices;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param domain _more_
+     * @param map _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     public static int[][] findNotContainedIndices(GriddedSet domain,
             UnionSet map)
             throws VisADException {
@@ -3766,24 +3798,38 @@ public class GridUtil {
      *
      * @throws VisADException  problem sampling
      */
-    public static int[][] findNotContainedIndices(float[][] latlon, UnionSet map)
+    public static int[][] findNotContainedIndices(float[][] latlon,
+            UnionSet map)
             throws VisADException {
-        long t1 = System.currentTimeMillis();
-        int[][]indices = findContainedIndices(latlon, map,false);
-        long t2 = System.currentTimeMillis();
-        System.err.println("indices time:" + (t2-t1));
+        long    t1      = System.currentTimeMillis();
+        int[][] indices = findContainedIndices(latlon, map, false);
+        long    t2      = System.currentTimeMillis();
+        System.err.println("indices time:" + (t2 - t1));
         return indices;
     }
 
 
 
 
-    private static int[][] findContainedIndices(float[][] latlon, UnionSet map, boolean inside)
+    /**
+     * _more_
+     *
+     * @param latlon _more_
+     * @param map _more_
+     * @param inside _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    private static int[][] findContainedIndices(float[][] latlon,
+            UnionSet map, boolean inside)
             throws VisADException {
+
         int numPoints = latlon[0].length;
-        if(map==null) {
+        if (map == null) {
             int[][] indices = new int[1][numPoints];
-            for(int i=0;i<numPoints;i++) {
+            for (int i = 0; i < numPoints; i++) {
                 indices[0][i] = i;
             }
             return indices;
@@ -3827,14 +3873,16 @@ public class GridUtil {
                 continue;
             }
             for (int mapIdx = 0; mapIdx < sets.length; mapIdx++) {
-                if(inside) {
+                if (inside) {
                     if ((lon < lonLow[mapIdx]) || (lon > lonHi[mapIdx])
-                        || (lat < latLow[mapIdx]) || (lat > latHi[mapIdx])) {
+                            || (lat < latLow[mapIdx])
+                            || (lat > latHi[mapIdx])) {
                         continue;
                     }
                 } else {
                     if ((lon >= lonLow[mapIdx]) && (lon <= lonHi[mapIdx])
-                        && (lat >= latLow[mapIdx]) && (lat <= latHi[mapIdx])) {
+                            && (lat >= latLow[mapIdx])
+                            && (lat <= latHi[mapIdx])) {
                         //                        System.out.println("Inside " + lon +  " " + lat);
                         continue;
                     } else {
@@ -3842,14 +3890,17 @@ public class GridUtil {
                         //                                           latLow[mapIdx]+" "+latHi[mapIdx]+")");
                     }
                 }
-                    
-                boolean pointInside = DelaunayCustom.inside((float[][]) pts.get(mapIdx),
+
+                boolean pointInside =
+                    DelaunayCustom.inside((float[][]) pts.get(mapIdx),
                                           (latLonOrder
                                            ? lat
                                            : lon), (latLonOrder
                         ? lon
-                                                    : lat));
-                boolean ok =(inside?pointInside:!pointInside);
+                        : lat));
+                boolean ok = (inside
+                              ? pointInside
+                              : !pointInside);
                 if (ok) {
                     if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList();
@@ -3877,42 +3928,84 @@ public class GridUtil {
         //        System.err.println ("find indices  #pts:" + numPoints+" time:" + (t2-t1)+ "   points:" + cnt1 + " " + cnt2);
         return indices;
 
+
     }
 
-    public static int[][] findIndicesInsideRange(float[][] values, float min, float max)
+    /**
+     * _more_
+     *
+     * @param values _more_
+     * @param min _more_
+     * @param max _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static int[][] findIndicesInsideRange(float[][] values, float min,
+            float max)
             throws VisADException {
-        return findIndicesInRange(values,min,max,true);
+        return findIndicesInRange(values, min, max, true);
     }
 
 
-    public static int[][] findIndicesOutsideRange(float[][] values, float min, float max)
+    /**
+     * _more_
+     *
+     * @param values _more_
+     * @param min _more_
+     * @param max _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static int[][] findIndicesOutsideRange(float[][] values,
+            float min, float max)
             throws VisADException {
-        return findIndicesInRange(values,min,max,false);
+        return findIndicesInRange(values, min, max, false);
     }
 
 
-    private static int[][] findIndicesInRange(float[][] values, float min, float max, boolean inside)
+    /**
+     * _more_
+     *
+     * @param values _more_
+     * @param min _more_
+     * @param max _more_
+     * @param inside _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    private static int[][] findIndicesInRange(float[][] values, float min,
+            float max, boolean inside)
             throws VisADException {
-        int numPoints = values[0].length;
-        int cnt=0;
-        int[]indices = new int[1000];
+        int   numPoints = values[0].length;
+        int   cnt       = 0;
+        int[] indices   = new int[1000];
         for (int i = 0; i < numPoints; i++) {
-            float value = values[0][i];
-            boolean ok = (inside?(value>=min && value<=max):(value<min || value>max));
-            if(ok) {
+            float   value = values[0][i];
+            boolean ok    = (inside
+                             ? ((value >= min) && (value <= max))
+                             : ((value < min) || (value > max)));
+            if (ok) {
                 cnt++;
-                if(cnt>=indices.length) {
-                    int[]tmp = indices;
-                    indices = new int[tmp.length*2];
-                    System.arraycopy(tmp,0,indices,0,cnt);
+                if (cnt >= indices.length) {
+                    int[] tmp = indices;
+                    indices = new int[tmp.length * 2];
+                    System.arraycopy(tmp, 0, indices, 0, cnt);
                 }
                 indices[cnt] = i;
             }
         }
-        int[]tmp = indices;
+        int[] tmp = indices;
         indices = new int[cnt];
-        System.arraycopy(tmp,0,indices,0,cnt);
-        return new int[][]{indices};
+        System.arraycopy(tmp, 0, indices, 0, cnt);
+        return new int[][] {
+            indices
+        };
     }
 
     /**
