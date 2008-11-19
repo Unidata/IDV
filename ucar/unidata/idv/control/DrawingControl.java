@@ -382,6 +382,7 @@ public class DrawingControl extends DisplayControlImpl {
         if (dataChoice != null) {
             Data data = dataChoice.getData(null);
             if (data != null) {
+                editable = false;
                 displayOnly = true;
                 processData(data);
             }
@@ -478,6 +479,21 @@ public class DrawingControl extends DisplayControlImpl {
             if (root != null) {
                 processXml(root, true);
                 checkGlyphTimes();
+            }
+        }
+    }
+
+
+    /**
+     * respond to the reload data call
+     */
+    protected void resetData() throws VisADException, RemoteException {
+        DataChoice dataChoice = getDataChoice();
+        if (dataChoice != null) {
+            removeAllGlyphs();
+            Data data = dataChoice.getData(null);
+            if (data != null) {
+                processData(data);
             }
         }
     }
@@ -2727,7 +2743,11 @@ public class DrawingControl extends DisplayControlImpl {
          * @return num cols
          */
         public int getColumnCount() {
-            return 4;
+            if(!editable) {
+                return 3;
+            } else {
+                return 4;
+            }
         }
 
         /**
@@ -2752,6 +2772,9 @@ public class DrawingControl extends DisplayControlImpl {
             }
             if (column == 1) {
                 return glyph.getDescription();
+            }
+            if(!editable) {
+                return glyph.getExtraDescription();
             }
             if (column == 2) {
                 int type = glyph.getCoordType();
@@ -2780,6 +2803,7 @@ public class DrawingControl extends DisplayControlImpl {
             if (column == 1) {
                 return "Type";
             }
+            if(!editable) return "";
             if (column == 2) {
                 return "Coordinates";
             }

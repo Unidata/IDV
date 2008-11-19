@@ -130,8 +130,8 @@ public class HighLowGlyph extends DrawingGlyph {
      */
     public String getExtraDescription() {
         return (high
-                ? "High"
-                : "Low");
+                ? "High " +pressure
+                : "Low " + pressure);
     }
 
 
