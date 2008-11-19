@@ -297,7 +297,7 @@ of the image you do:
 }]
 
 
-[isl::tagdef displaylist {Render the display list} -attrs {valign {'bottom' or 'top'}} ]
+[isl::tagdef displaylist {Render the display list} -attrs {valign {'bottom' or 'top'} mattebg {<color> If defined then we matte the image with the given color the size that the display list takes up} fontsize {optional font size}  fontface {optional font face}} ]
 The [isl::tag displaylist] tag renders the display list (normally shown at the bottom of the view)
 directly into the image. The text rendering is a bit higher quality because we are using
 direct Java drawing code and not the 3D rendering. Also, you can matte an image and then render
