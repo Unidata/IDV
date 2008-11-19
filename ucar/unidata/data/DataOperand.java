@@ -161,6 +161,9 @@ public class DataOperand {
     public String getDescription() {
         String desc = (String) properties.get(PROP_DESCRIPTION);
         if (desc == null) {
+            desc = (String) properties.get(PROP_LABEL);
+        }
+        if (desc == null) {
             return getParamName();
         }
         return desc;
