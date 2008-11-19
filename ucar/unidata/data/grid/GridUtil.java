@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -720,17 +721,17 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * This samples the given grid in both time and space and trys to return a Real value
      *
-     * @param grid _more_
-     * @param el _more_
-     * @param animationValue _more_
-     * @param samplingMode _more_
+     * @param grid The grid
+     * @param el Location
+     * @param animationValue Time
+     * @param samplingMode mode to use
      *
-     * @return _more_
+     * @return Real at the given location and time
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public static Real sampleToReal(FieldImpl grid, EarthLocation el,
                                     Real animationValue, int samplingMode)
@@ -741,9 +742,10 @@ public class GridUtil {
 
         FieldImpl sampleAtLocation;
         if (is3D(grid)) {
-            sampleAtLocation = sample(grid, el);
+            sampleAtLocation = GridUtil.sample(grid, el, samplingMode);
         } else {
-            sampleAtLocation = GridUtil.sample(grid, el.getLatLonPoint());
+            sampleAtLocation = GridUtil.sample(grid, el.getLatLonPoint(),
+                    samplingMode);
         }
         Data data = sampleAtLocation.evaluate(animationValue, samplingMode,
                         Data.NO_ERRORS);
