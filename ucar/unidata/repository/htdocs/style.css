@@ -94,6 +94,7 @@ a.header  {
 }
 
 
+
 .subnavoffcomp  a {
    color:#000000;
 }
@@ -108,6 +109,53 @@ a.subnavoffcomp  {
 
 
 .subnavoffcomp a:hover {
+   color:red;
+}
+
+
+
+.subnav2 {
+   font-size: 12pt;
+   xpadding-left:5;   
+   padding-top:5;   
+   background-color : #c3d9ff;
+   font-weight: bold;
+   color: black;
+   xborder-bottom : 1px #666666 solid;
+}
+
+
+
+.subnavoncomp2  {
+   padding-left:5;   
+   xborder-bottom : 1px #ffffff solid;
+   background-color : #ffffff;
+   color:#000000;
+}
+
+.subnavoffcomp2  {
+   padding-left:5;   
+   color:#000000;
+   xpadding-left:7;   
+   xpadding-right:7;   
+}
+
+
+
+.subnavoffcomp2  a {
+   color:#000000;
+}
+
+a.subnavoffcomp2  {
+   color:#000000;
+}
+
+.subnavoffcomp2 a:visited {
+   color:#000000;
+}
+
+
+.subnavoffcomp2 a:hover {
    color:red;
 }
 

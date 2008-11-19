@@ -660,27 +660,26 @@ public class OutputHandler extends RepositoryManager {
     protected List getHeader(Request request, OutputType output,
                              List<OutputType> outputTypes)
             throws Exception {
-        int    cnt            = 0;
+
         List   items          = new ArrayList();
         String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
-        String l = HtmlUtil.img(getRepository().fileUrl(ICON_LCURVE), "",
-                                "  class=\"curve\"");
-        String r = HtmlUtil.img(getRepository().fileUrl(ICON_RCURVE), "",
-                                " class=\"curve\"  ");
-
-        String offextra = " class=\"subnavoffcomp\" ";
-        String onextra  = " class=\"subnavoncomp\" ";
+        String onLinkTemplate = getRepository().getProperty("ramadda.html.sublink.on","");
+        String offLinkTemplate = getRepository().getProperty("ramadda.html.sublink.off","");
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, outputType);
+            String url = outputType.assembleUrl(request);
+            String label = msg(outputType.getLabel());
+            String template;
             if (outputType.equals(output)) {
-                items.add(HtmlUtil.span(l + msg(outputType.getLabel()) + r,
-                                        onextra));
+                template = onLinkTemplate;
             } else {
-                String url = outputType.assembleUrl(request);
-                items.add(HtmlUtil.span(HtmlUtil.href(url,
-                        msg(outputType.getLabel())), offextra));
+                template = offLinkTemplate;
             }
+            String html = template.replace("${label}", label);
+            html = html.replace("${url}", url);
+            html = html.replace("${root}", getRepository().getUrlBase());
+            items.add(html);
         }
         request.put(ARG_OUTPUT, initialOutput);
         if (initialMessage != null) {

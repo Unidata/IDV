@@ -934,11 +934,6 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserList(Request request) throws Exception {
 
-
-
-
-
-
         StringBuffer usersHtml = new StringBuffer();
 
 
@@ -1495,13 +1490,13 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
         sb.append(HtmlUtil.formClose());
 
+        sb.append(HtmlUtil.formTable());
         String roles = user.getRolesAsString("<br>").trim();
         sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), ""));
         if (roles.length() == 0) {
             roles = "--none--";
         }
         sb.append(HtmlUtil.formEntryTop(msgLabel("Roles"), roles));
-
         sb.append(HtmlUtil.formTableClose());
         return makeResult(request, msg("User Settings"), sb);
     }

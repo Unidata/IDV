@@ -2017,9 +2017,10 @@ public class Repository extends RepositoryBase implements
 
         html = StringUtil.replace(html, "${links}", linksHtml);
         if (sublinksHtml.length() > 0) {
-            html = StringUtil.replace(html, "${sublinks}",
-                                      "<div class=\"subnav\">" + sublinksHtml
-                                      + "</div>");
+            //            html = StringUtil.replace(html, "${sublinks}",
+            //                                      "<div class=\"subnav\">" + sublinksHtml
+            //                                      + "</div>");
+            html = StringUtil.replace(html, "${sublinks}", sublinksHtml);
         } else {
             html = StringUtil.replace(html, "${sublinks}", BLANK);
         }
@@ -3139,28 +3140,27 @@ public class Repository extends RepositoryBase implements
     protected List getSubNavLinks(Request request, RequestUrl[] urls,
                                   String arg) {
         List   links    = new ArrayList();
-        String offextra = " class=\"subnavoffcomp\" ";
-        String onextra  = " class=\"subnavoncomp\" ";
         String type     = request.getRequestPath();
-
-        String l = HtmlUtil.img(fileUrl(ICON_LCURVE), "",
-                                "  class=\"curve\"");
-        String r = HtmlUtil.img(fileUrl(ICON_RCURVE), "",
-                                " class=\"curve\"  ");
-
+        String onLinkTemplate = getProperty("ramadda.html.sublink.on","");
+        String offLinkTemplate = getProperty("ramadda.html.sublink.off","");
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
             label = msg(label);
             if (label == null) {
                 label = urls[i].toString();
             }
+            String url = request.url(urls[i]) + arg;
+            String template;
 
             if (type.endsWith(urls[i].getPath())) {
-                links.add(HtmlUtil.span(l + label + r, onextra));
+                template = onLinkTemplate;
             } else {
-                links.add(HtmlUtil.href(request.url(urls[i]) + arg, label,
-                                        offextra));
+                template = offLinkTemplate;
             }
+            String html = template.replace("${label}", label);
+            html = html.replace("${url}", url);
+            html = html.replace("${root}", getRepository().getUrlBase());
+            links.add(html);
         }
         return links;
     }
@@ -4395,11 +4395,10 @@ public class Repository extends RepositoryBase implements
         if (canComment) {
             sb.append(request.form(URL_COMMENTS_ADD, BLANK));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-            sb.append(HtmlUtil.formEntry(BLANK,
-                                         HtmlUtil.submit("Add Comment",
-                                             ARG_ADD)));
+            sb.append(HtmlUtil.submit("Add Comment", ARG_ADD));
             sb.append(HtmlUtil.formClose());
         }
+
 
         if (comments.size() == 0) {
             sb.append("<br>");

@@ -95,7 +95,7 @@ public class CatalogOutputHandler extends OutputHandler {
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
 
     /** _more_ */
-    public static final OutputType OUTPUT_CATALOG = new OutputType("THREDDS Catalog", "thredds.catalog");
+    public static final OutputType OUTPUT_CATALOG = new OutputType("Catalog", "thredds.catalog");
 
 
     /** _more_ */
