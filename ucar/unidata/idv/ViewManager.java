@@ -5087,24 +5087,29 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    public void paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls,int width, int height, boolean bottom)             
+
+    public int paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls,int width, int height, boolean bottom, Color color, Font font)             
         throws VisADException, RemoteException {
-        if(displayControls==null)
+        if(displayControls==null) {
              displayControls = getControls();
+        }
 
         int  cnt = 0;
-        Font f   = getDisplayListFont();
+        Font f   = (font!=null?font:getDisplayListFont());
         graphics.setFont(f);
         FontMetrics fm         = graphics.getFontMetrics();
         int         lineHeight = fm.getAscent() + fm.getDescent();
         int startY;
         int offsetY;
+        int totalHeight = 0;
         if(bottom) {
             startY = height - 4;
             offsetY = - (lineHeight + 1);
+            totalHeight=4;
         } else {
             startY = 2+lineHeight;
             offsetY =  (lineHeight + 1);
+            totalHeight = lineHeight;
         }
 
         for (DisplayControl control : displayControls) {
@@ -5139,7 +5144,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if ((text == null) || (text.length() == 0)) {
                 continue;
             }
-            Color c = getDisplayListColor();
+            Color c = (color!=null?color:getDisplayListColor());
             if (c == null) {
                 c = ((ucar.unidata.idv.control
                       .DisplayControlImpl) control)
@@ -5149,9 +5154,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
             int lineWidth = fm.stringWidth(text);
             graphics.drawString(text, width / 2 - lineWidth / 2,
                                 startY+ offsetY* cnt);
+            totalHeight+= Math.abs(offsetY);
             cnt++;
         }
-
+        return totalHeight;
     }
 
 

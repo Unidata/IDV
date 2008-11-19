@@ -287,7 +287,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
                 graphics.setFont(f);
                 FontMetrics fm         = graphics.getFontMetrics();
                 int         lineHeight = fm.getAscent() + fm.getDescent();
-                viewManager.paintDisplayList(graphics,  (List<DisplayControl>) onDisplays, width, height,true);
+                viewManager.paintDisplayList(graphics,  (List<DisplayControl>) onDisplays, width, height,true,null,null);
                 viewManager.setShowDisplayList(true);
             }
 
