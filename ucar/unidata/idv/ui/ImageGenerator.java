@@ -446,6 +446,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_MESSAGE = "message";
 
+    public static final String ATTR_MATTEBG = "mattebg";
     /** isl tag */
     public static final String ATTR_NAME = "name";
 
@@ -3507,11 +3508,25 @@ public class ImageGenerator extends IdvManager {
                 processTagOutput(child);
             } else if (tagName.equals(TAG_DISPLAYLIST)) {
                 if(viewManager!=null) {
-                    newImage = ImageUtils.toBufferedImage(image);
+                    newImage = ImageUtils.toBufferedImage(image,true);
                     Graphics g = newImage.getGraphics();
                     String valign = applyMacros(child,ATTR_VALIGN,VALUE_BOTTOM);
+                    Font font = getFont(child);
+                    if(XmlUtil.hasAttribute(child,ATTR_MATTEBG)) {
+                        int height = viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight,
+                                                                  valign.equals(VALUE_BOTTOM),null,font);
+
+                        int top = (valign.equals(VALUE_TOP)?height:0);
+                        int bottom = (valign.equals(VALUE_BOTTOM)?height:0);
+                        newImage = ImageUtils.matte(image, top, bottom, 0, 0,
+                                                    applyMacros(child,ATTR_MATTEBG,Color.white));
+                        g = newImage.getGraphics();
+                        imageHeight+=height;
+                    }
+
+                    Color c = applyMacros(child, ATTR_COLOR, (Color)null);
                     viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight,
-                                                 valign.equals(VALUE_BOTTOM));
+                                                 valign.equals(VALUE_BOTTOM),c,font);
                 }
             } else if (tagName.equals(TAG_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
@@ -4037,6 +4052,16 @@ public class ImageGenerator extends IdvManager {
         Font f = new Font(applyMacros(node, ATTR_FONTFACE, "dialog"),
                           Font.PLAIN, fontSize);
         g.setFont(f);
+    }
+
+
+    private Font getFont(Element node) {
+        if(XmlUtil.hasAttribute(node, ATTR_FONTSIZE) || XmlUtil.hasAttribute(node, ATTR_FONTFACE)) {
+            int fontSize = applyMacros(node, ATTR_FONTSIZE, 12);
+            return  new Font(applyMacros(node, ATTR_FONTFACE, "dialog"),
+                             Font.PLAIN, fontSize);
+        }
+        return null;
     }
 
 
