@@ -465,8 +465,6 @@ public class ImageUtils {
 
 
 
-    // This method returns a buffered image with the contents of an image
-
     /**
      * This method returns a buffered image with the contents of an image
      *
@@ -475,7 +473,11 @@ public class ImageUtils {
      * @return  a buffered image
      */
     public static BufferedImage toBufferedImage(Image image) {
-        if (image instanceof BufferedImage) {
+        return toBufferedImage(image,false);
+    }
+
+    public static BufferedImage toBufferedImage(Image image, boolean force) {
+        if (!force && (image instanceof BufferedImage)) {
             return (BufferedImage) image;
         }
 
