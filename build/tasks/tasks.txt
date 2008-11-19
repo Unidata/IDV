@@ -1,0 +1,6 @@
+- Stop loads doesn't really stop loads, needs to do more better (Jeff)
+- loading stations when zoomed has scaling issues (Jeff)
+
+
+Drawing Control
+- Add a circle shape and other shapes as well (Jeff)

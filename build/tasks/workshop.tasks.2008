@@ -9,7 +9,7 @@ Bugs:
 - Just displays bundle - selecting a different level doesn't get passed through (Jeff)
 - Satellite does not show in NEXRCOMP projection (Don)
 - Copying data dialog doesn't go away (Jeff) DONE!
-- Saving a local file dialog says saving remote data. (Jeff)  
+- Saving a local file dialog says saving remote data. (Jeff)    DONE!
 - Check point data spatial subset (Yuan)
 - Math.atan2 hang in Bearing (Jeff) DONE!
 - Upper Air data - chooser selected level doesn't get set in the levels data subset panel (Don)
@@ -18,17 +18,15 @@ Bugs:
 - Dashboard covers view window in isl (Jeff)   DONE!
 - user/password not used with bundles (opendapguest/opendapguest) (Jeff) DONE (Mattias is looking into it on his end)
 - probe autoscaling did not work (Don)
-- Stop loads doesn't really stop loads, needs to do more better (Jeff)
 - Animation wierdness (Jeff) DONE
 - .5 degree data choice for Level II radar gave wierd display (Yuan)
-- loading stations when zoomed has scaling issues (Jeff)
 - incorrect unit specification in station data filtering (using () or {})   gives a nasty message (Jeff) DONE!
-- Transect lines don't match up (Jeff)
-- When you change data binning and check reload displays, it doesn't work  very well (Jeff)
-- Reloading front data doesn't update the displays (Jeff)
-- Blue Marble vertical position? (Jeff)
+- Transect lines don't match up (Jeff) DONE! (Well, I cannot replicate this)
+- When you change data binning and check reload displays, it doesn't work  very well (Jeff) ??? Not sure what this refers to
+- Reloading front data doesn't update the displays (Jeff)  DONE!
+- Blue Marble vertical position? (Jeff) ????
 - Right click in Jython Editor not on a procedure gives a NullPointerEx (Jeff) DONE!
-- In derived quantities exercise, Fields dialog not picking up the Label (still showing D1, D2) (Jeff)
+- In derived quantities exercise, Fields dialog not picking up the Label (still showing D1, D2) (Jeff) DONE!
 - Category box in Color Table editor doesn't  apply without a return first (Jeff) DONE! (That is just the way it works, a swing thing)
 - Add .jar to plugin name in creator (Don) DONE!
 - List resources in Resource Manager isn't updated with new resources 
@@ -58,15 +56,14 @@ the Displays section of the Dashboard (Don)
 - Decluttering of stations needs a lower setting.  The default
 is to cluttered (Don)
 - Add hectares for drawing control (Jeff) DONE!
-- Make pallets for different kinds of shapes in the drawing control - ala NMAP  (Jeff)
-- Add a circle shape (Jeff)
+- Make pallets for different kinds of shapes in the drawing control - ala NMAP  (Jeff) 
 - allow user to pick multiple levels for profiler plots (John)
-- Better error messages from ISL (Jeff) 
+- Better error messages from ISL (Jeff) DONE! (I'm just going to leave the stack trace for now) 
 - allow overlay of transparent images (logos) in isl (Jeff) DONE!
 - add animation speed control to movie preview window (Don)  DONE!
 - scale images with window size in preview window (Don) 
 - undock quicktime movie control by default (Yuan/Don)
-- when publishing to ramadda, need better handling of lat/lon bounds when display is globe display (Jeff) 
+- when publishing to ramadda, need better handling of lat/lon bounds when display is globe display (Jeff) ????  Not sure what to do here for the globe display 
 - Simple plugin needs to be updated (Yuan)
    - resource viewer
    - TDS radar chooser
@@ -99,13 +96,13 @@ is to cluttered (Don)
 
 Docs:
 
-- Bad "Documentation" link (Jeff)
+- Bad "Documentation" link (Jeff) ???
 - Bundles: Add a section on relative path selection (Jeff)
 - Point Data - show how to use the preference that they
 created.(Yuan)
 - Enhance Barnes analysis docs (Don)
 - 3.8.0  Transect  - Misc Data to Sample Data (Don)
-- performance tuning (Jeff)
+- Performance tuning (Jeff)
 - 5.0.2 - update the list of jars that go into external.jar (Don)  DONE!
 - Example idv.properties needs to be updated (Don) DONE!
 - Bad link to download  zip in building from source (Don) DONE!
@@ -126,7 +123,7 @@ created.(Yuan)
 - Section 4.6.8 - Save vs. Apply (Yuan)
 - Xvfb docs (Don)
 - remove ucar.unidata.ui.imagery from developer package docs (Don)
-- Change idv.rbi to example.rbi in developer docs (Jeff)
+- Change idv.rbi to example.rbi in developer docs (Jeff) ??? Not sure where this is
 - choosers.xml needs to be update in developer docs (Don)
 
 
