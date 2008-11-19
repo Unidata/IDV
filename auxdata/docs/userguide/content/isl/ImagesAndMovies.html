@@ -184,7 +184,7 @@ set the color black to be transparent and then write it out as clippedimage.gif.
 The original image is then matted and written out as test.png.
 
 
-[isl::tagdef clip {Clip an image} -attrs {north {latitude} south {latitude} east longitude west longitude top {pixels or %} bottom {pixels or %} left {pixels or %} right {pixels or %}  display {The id of a display which we use its data's map projection to clip with}} ]
+[isl::tagdef clip {Clip an image} -attrs {north {latitude} south {latitude} east longitude west longitude top {pixels or %} bottom {pixels or %} left {pixels or %} right {pixels or %}  display {The id of a display which we use its data's map projection to clip with}  space {<pixels> when clipping at the box pad outwards this number of pixels}   hspace {<pixels>  when clipping at the box  pad horiz.} vspace {<pixels> when clipping at the box pad vertically} {space_left, space_right, space_top, space_bottom} padding } ]
 
 The [isl::tag clip] tag allows you to clip the image. The clipping can either be defined
 in lat/lon  coordinates, with x/y image coordinates or from the projection used from a display. 
@@ -297,7 +297,7 @@ of the image you do:
 }]
 
 
-[isl::tagdef displaylist {Render the display list} -attrs {} ]
+[isl::tagdef displaylist {Render the display list} -attrs {valign {'bottom' or 'top'}} ]
 The [isl::tag displaylist] tag renders the display list (normally shown at the bottom of the view)
 directly into the image. The text rendering is a bit higher quality because we are using
 direct Java drawing code and not the 3D rendering. Also, you can matte an image and then render
