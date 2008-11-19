@@ -2140,7 +2140,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             if (dataSource.canSaveDataToLocalDisk()) {
                 copyDataSources.add(dsc);
                 dsc.cbx.setText(dataSourceName);
-
                 copyComps.add(dsc.cbx);
             } else {
                 if ((files == null) || (files.size() == 0)) {
@@ -2179,17 +2178,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             return new ArrayList();
         }
 
-
-
-
         List comps = new ArrayList();
+
+        copyComps.addAll(fileComps);
+
         if (copyComps.size() > 0) {
             copyComps.add(
                 0, new JLabel(
-                    "Remote data to be copied over and included:"));
+                    "Select the data sources to include:"));
             comps.add(GuiUtils.vbox(copyComps));
         }
 
+        /*
         if (fileDataSources.size() > 0) {
             if (comps.size() > 0) {
                 comps.add(new JLabel(" "));
@@ -2201,7 +2201,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                             .doLayout(
                                 fileComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N)));
-        }
+                                }*/
 
         if(notSavedLabels.size()>0) {
             if (copyComps.size() ==0 && 
