@@ -22,11 +22,15 @@
 
 
 
+
 package ucar.unidata.util;
 
 
-
 import java.awt.event.*;
+
+
+
+import javax.swing.event.*;
 
 
 
@@ -42,7 +46,7 @@ import java.awt.event.*;
 
 public class ObjectListener implements MouseListener, ActionListener,
                                        KeyListener, WindowListener,
-                                       ItemListener {
+                                       ItemListener, ChangeListener {
 
     /**
      *  This is the object that this  class is instantiated with.
@@ -67,9 +71,14 @@ public class ObjectListener implements MouseListener, ActionListener,
         return theObject;
     }
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     */
     public void setObject(Object object) {
         this.theObject = object;
-    } 
+    }
 
     /**
      *  A  helper constructor  that convert the array of objects into an ObjectArray object.
@@ -129,6 +138,15 @@ public class ObjectListener implements MouseListener, ActionListener,
      * @param ev
      */
     public void actionPerformed(ActionEvent ev) {}
+
+
+    /**
+     * _more_
+     *
+     * @param e the event
+     */
+
+    public void stateChanged(ChangeEvent e) {}
 
     /**
      * _more_
