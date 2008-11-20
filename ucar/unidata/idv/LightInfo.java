@@ -25,6 +25,8 @@
 package ucar.unidata.idv;
 
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.ObjectListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +61,13 @@ public class LightInfo {
     private Point3d location;
 
     private     JCheckBox visibleCbx;
-    private     GuiUtils.ColorSwatch  colorSwatch;
     private     JSlider slider;
+    private JTextField directionXFld;
+    private JTextField directionYFld;
+    private JTextField directionZFld;
+    private JTextField locationXFld;
+    private JTextField locationYFld;
+    private JTextField locationZFld;
 
 
     public LightInfo() {
@@ -84,25 +91,60 @@ public class LightInfo {
         updateLight();
     }
 
-    public void getPropertyComponents(List comps) {
-        visibleCbx= new JCheckBox("Visible", visible);
+    public void getPropertyComponents(List comps,final ObjectListener listener) {
+        visibleCbx= new JCheckBox(getName(), visible);
         float[]rgb = color.get().getRGBComponents(null);
         slider = new JSlider(0,100,(int)(rgb[0]*100));
-        comps.add(new JLabel(name));
+
+
+        
+        float[]xyz = new float[3];
+        direction.get(xyz);
+        directionXFld = makeField(""+xyz[0],listener);
+        directionYFld = makeField(""+xyz[1],listener);
+        directionZFld = makeField(""+xyz[2],listener);
+
+        double[]pxyz = new double[3];        
+        location.get(pxyz);
+        locationXFld = makeField(""+pxyz[0],listener);
+        locationYFld = makeField(""+pxyz[1],listener);
+        locationZFld = makeField(""+pxyz[2],listener);
+
+        List fldComps = Misc.newList(GuiUtils.rLabel("Direction:"),directionXFld,directionYFld,directionZFld);
+        fldComps.addAll(Misc.newList(GuiUtils.rLabel("Location:"),locationXFld,locationYFld,locationZFld));
+
         comps.add(visibleCbx);
-        comps.add(slider);
-//        colorSwatch = new GuiUtils.ColorSwatch(color.get(),"Light color");
-//        return GuiUtils.hbox(visibleCbx, slider);
+        GuiUtils.tmpInsets = new Insets(0,2,0,0);
+        comps.add(GuiUtils.vbox(slider, GuiUtils.left(GuiUtils.doLayout(fldComps,4,GuiUtils.WT_N,GuiUtils.WT_N))));
+
+        if(listener!=null) {
+            visibleCbx.addActionListener(listener);
+            slider.addChangeListener(listener);
+        }
+
     }
+
+    private JTextField makeField(String s, ObjectListener listener) {
+        JTextField fld =  new JTextField(s,3);
+        if(listener!=null)
+            fld.addActionListener(listener);
+        return fld;
+    }
+
 
     public void applyProperties() {
         visible = visibleCbx.isSelected();
         float f = (float)(slider.getValue()/100.0f);
         color = new Color3f(f,f,f);
-        /*
-        Color c = colorSwatch.getBackground();
-        float[]rgb = c.getRGBComponents(null);
-        */
+        location = new Point3d(new Double(locationXFld.getText()).doubleValue(),
+                               new Double(locationYFld.getText()).doubleValue(),
+                               new Double(locationZFld.getText()).doubleValue());
+
+        direction = new Vector3f(new Float(directionXFld.getText()).floatValue(),
+                               new Float(directionYFld.getText()).floatValue(),
+                               new Float(directionZFld.getText()).floatValue());
+
+
         updateLight();
     }
 
@@ -139,6 +181,7 @@ public class LightInfo {
         getLight().setEnable(visible);
         getLight().setColor(color);
         getLight().setDirection(direction);
+        getLight().setInfluencingBounds(new BoundingSphere(location, Double.POSITIVE_INFINITY));
     }
 
 
@@ -178,6 +221,16 @@ public class LightInfo {
 	return direction;
     }
 
+    public void setColor (Color3f value, boolean updateGui) {
+        setColor(value);
+        if(updateGui && slider!=null) {
+            float[]rgb = getColor().get().getRGBComponents(null);
+            int sliderValue = (int)(100*rgb[0]);
+            slider.setValue(sliderValue);
+        }
+    }
+
+
     /**
        Set the Color property.
 
@@ -195,6 +248,15 @@ public class LightInfo {
     public Color3f getColor () {
 	return color;
     }
+
+    public void setVisible (boolean value, boolean updateGui) {
+        setVisible(value);
+        if(updateGui && visibleCbx!=null) {
+            visibleCbx.setSelected(visible);
+        }
+    }
+
+
 
     /**
        Set the Visible property.

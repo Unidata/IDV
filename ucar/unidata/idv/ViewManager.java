@@ -45,6 +45,7 @@ import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.ui.drawing.Glyph;
 
+
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
@@ -316,9 +317,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** For full screen properties */
     private JTextField fullScreenHeightFld;
 
-    private LightInfo allLightInfo;
-    private JRadioButton allLightsBtn;
-    private JRadioButton someLightsBtn;
+    private boolean ignoreLightChanges = false;
+    private JToggleButton lockLightsBtn;
+
+
 
 
 
@@ -1101,7 +1103,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Show the properties dialog
      */
     public void showPropertiesDialog() {
-        propertiesDialog = GuiUtils.createDialog("Properties", true);
+        //        propertiesDialog = GuiUtils.createDialog("Properties", true);
+        propertiesDialog = GuiUtils.createDialog("Properties", false);
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String cmd = event.getActionCommand();
@@ -1229,6 +1232,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+
+
+
     /**
      * Add a JTabbedPane to the properties component
      *
@@ -1243,32 +1249,63 @@ public class ViewManager extends SharableImpl implements ActionListener,
             GuiUtils.inset(GuiUtils.top(getAspectPropertiesComponent()), 5));
         if(lights!=null) {
             try {
-                if(allLightInfo==null) {
-                    allLightInfo = new LightInfo("All",null,null);
-                    allLightsBtn = new JRadioButton("Set All",true);
-                    someLightsBtn = new JRadioButton("Set Individually",false);
-                    GuiUtils.buttonGroup(allLightsBtn, someLightsBtn);
+
+
+                if(lockLightsBtn==null) {
+                    lockLightsBtn =
+                        GuiUtils.getToggleButton("/auxdata/ui/icons/Unlinked.gif", 0,
+                                                 0);
+                    lockLightsBtn.setContentAreaFilled(false);
+                    lockLightsBtn.setSelectedIcon(
+                                                 GuiUtils.getImageIcon(
+                                                                       "/auxdata/ui/icons/Linked.gif", getClass()));
+                    lockLightsBtn.setSelected(false);
+                    lockLightsBtn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+                    lockLightsBtn.setToolTipText("Link stride changes between x & y");
                 }
 
                 List comps = new ArrayList();
                 for(LightInfo lightInfo: lights) {
-                    lightInfo.getPropertyComponents(comps);
+                    ObjectListener listener = new ObjectListener(lightInfo) {
+                            public void actionPerformed(ActionEvent ae) {
+                                
+                                LightInfo theLight = (LightInfo) theObject;
+                                if(ignoreLightChanges) return;
+                                ignoreLightChanges  =true;
+                                theLight.applyProperties();
+                                if(lockLightsBtn.isSelected()) {
+                                    for(LightInfo light: lights) {
+                                        if(light==theLight) continue;
+                                        light.setVisible(theLight.getVisible(),true);
+                                        light.updateLight();
+                                    }
+                                } 
+
+                                ignoreLightChanges= false;
+                            }
+                            public void stateChanged(ChangeEvent e) {
+                                JSlider slider = (JSlider) e.getSource();
+                                if(ignoreLightChanges || slider.getValueIsAdjusting()) return;
+                                LightInfo theLight = (LightInfo) theObject;
+                                ignoreLightChanges  =true;
+                                theLight.applyProperties();
+                                if(lockLightsBtn.isSelected()) {
+                                    for(LightInfo light: lights) {
+                                        if(light==theLight) continue;
+                                        light.setColor(theLight.getColor(),true);
+                                        light.updateLight();
+                                    }
+
+                                } 
+                                ignoreLightChanges  =false;
+                            }
+                            
+                        };
+                    lightInfo.getPropertyComponents(comps,listener);
                 }
-                JComponent someLightsComp = GuiUtils.doLayout(comps,3, GuiUtils.WT_NNY,GuiUtils.WT_N);
-                comps = new ArrayList();
-                allLightInfo.getPropertyComponents(comps);
-                JComponent allLightsComp = GuiUtils.doLayout(comps,3, GuiUtils.WT_NNY,GuiUtils.WT_N);
 
-                comps = new ArrayList();
-
-                List lightComps = new ArrayList();
-                Insets insets = new  Insets(0,20,0,0);
-
-                lightComps.add(allLightsBtn);
-                lightComps.add(GuiUtils.inset(allLightsComp,insets));
-                lightComps.add(someLightsBtn);
-                lightComps.add(GuiUtils.inset(someLightsComp,insets));
-                tabbedPane.add("Lighting",GuiUtils.top(GuiUtils.vbox(lightComps)));
+                JComponent lightsComp = GuiUtils.formLayout(comps);
+                tabbedPane.add("Lighting",GuiUtils.inset(GuiUtils.top(GuiUtils.vbox(lightsComp, GuiUtils.left(lockLightsBtn))),5));
             } catch(Exception exc) {
                 logException("",exc);
             }
@@ -1332,21 +1369,24 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+
     private void   createInitialLights() {
-        Vector3f[] directions = new Vector3f[]{new Vector3f(0.0f, 0.0f, -1.0f),
-                                               new Vector3f(0.0f, 0.0f, 1.0f),
-                                               new Vector3f(0.0f, 1.0f, 0.0f),
+        Point3d[] locations = new Point3d[]{new Point3d(0.0, 0.0, 0.0),
+                                            new Point3d(0.0, 0.0, 0.0),
+                                            new Point3d(0.0, 0.0, 0.0),
+                                            new Point3d(0.0, 0.0, 0.0),
+                                            new Point3d(0.0, 0.0, 0.0),
+                                            new Point3d(0.0, 0.0, 0.0)};
+
+        Vector3f[] directions = new Vector3f[]{new Vector3f(0.0f, 0.0f, 1.0f),
+                                               new Vector3f(0.0f, 0.0f, -1.0f),
                                                new Vector3f(0.0f, -1.0f, 0.0f),
+                                               new Vector3f(0.0f, 1.0f, 0.0f),
                                                new Vector3f(1.0f, 0.0f, 0.0f),
                                                new Vector3f(-1.0f, 0.0f, 0.0f)};
-        Point3d[] locations = new Point3d[]{new Point3d(0.0, 0.0, 100.0),
-                                            new Point3d(0.0, 0.0, -100.0),
-                                            new Point3d(0.0, 100.0, 0.0),
-                                            new Point3d(0.0, -100.0, 0.0),
-                                            new Point3d(100.0, 0.0, 0.0),
-                                            new Point3d(-100.0, 0.0, 0.0)};
 
-        String [] names = {"Top","Bottom","North","South","East","West"};
+
+        String [] names = {"Over","Under","Top","Bottom","Right","Left"};
         Color3f color =  new Color3f(0.5f, 0.5f, 0.5f);
         for(int i=0;i<directions.length;i++) {
             lights.add(new LightInfo(names[i],locations[i],directions[i]));
@@ -1405,15 +1445,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public boolean applyProperties() {
         if(lights!=null) {
-            if(allLightsBtn.isSelected()) {
-                allLightInfo.applyProperties();
-                for(LightInfo lightInfo: lights) {
-                    lightInfo.initWith(allLightInfo);
-                }
-            } else {
-                for(LightInfo lightInfo: lights) {
-                    lightInfo.applyProperties();
-                }
+            for(LightInfo lightInfo: lights) {
+                lightInfo.applyProperties();
             }
         }
 
@@ -6332,7 +6365,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
        @param value The new value for Lights
     **/
     public void setLights (List<LightInfo> value) {
-        lights = value;
+        //        lights = value;
     }
 
     /**
