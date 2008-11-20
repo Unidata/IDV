@@ -1503,17 +1503,20 @@ public class STIStormDataSource extends StormDataSource {
             //            userName = "jeff";
             //            password = "mypassword";
             try {
-                System.err.println(url);
-                connection = DriverManager.getConnection(url);
-                //                connection = DriverManager.getConnection(url, userName,
-                //                        password);
+                //System.err.println(url);
+                if(url.indexOf("user")>0 && url.indexOf("password")>0)
+                    connection = DriverManager.getConnection(url);
+                else
+                    connection = DriverManager.getConnection(url, userName,
+                                        password);
+
                 return connection;
-            } catch (SQLException sqe) {
-                if ((sqe.toString()
-                        .indexOf("role \"" + userName
-                                 + "\" does not exist") >= 0) || (sqe
-                                     .toString()
-                                     .indexOf("user name specified") >= 0)) {
+            } catch (Exception sqe) {
+              //  System.out.println(sqe);
+                String msg = sqe.toString();
+                if (msg.indexOf("Access denied")>=0 ||
+                            (msg.indexOf("role \"" + userName
+                                 + "\" does not exist") >= 0) || (msg.indexOf("user name specified") >= 0)) {
                     String label;
                     if (cnt == 0) {
                         label =
