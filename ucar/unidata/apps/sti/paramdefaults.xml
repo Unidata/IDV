@@ -12,4 +12,39 @@ specified  -->
      range_min="0"
      range_max="500"
      unit="km"/>
+  <param
+     name="Max_Windspeed"
+     range_min="10"
+     range_max="80"
+     unit="m/s"/>
+  <param
+     name="Min_Pressuree"
+     range_min="800"
+     range_max="1000"
+     unit="mb"/>
+  <param
+     name="Moderate.*"
+     range_min="0"
+     range_max="300"
+     unit="km"/>
+  <param
+     name="Whole.*"
+     range_min="0"
+     range_max="500"
+     unit="km"/>
+  <param
+     name="Storm_Direction"
+     range_min="0"
+     range_max="360"
+     unit="km"/>
+  <param
+     name="Storm_Speed"
+     range_min="10"
+     range_max="50"
+     unit="m/s"/>
+   <param
+     name="Distance_Error"
+     range_min="0"
+     range_max="500"
+     unit="km"/>
 </params>
