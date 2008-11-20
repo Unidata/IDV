@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -631,24 +632,29 @@ public class GuiUtils extends LayoutUtil {
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     Misc.run(new Runnable() {
-                            public void run() {
-                                showColorChooser();
-                            }});
+                        public void run() {
+                            showColorChooser();
+                        }
+                    });
                 }
             });
         }
 
+        /**
+         * _more_
+         */
         private void showColorChooser() {
-            Color         oldColor = this.getBackground();
+            Color         oldColor    = this.getBackground();
             int           alpha       = oldColor.getAlpha();
             JColorChooser chooser     = new JColorChooser(oldColor);
             JSlider       alphaSlider = new JSlider(0, 255, alpha);
             JComponent    contents;
             if (doAlpha) {
-                contents = centerBottom(chooser,
-                                        inset(hbox(new JLabel("Transparency:"),
-                                                   alphaSlider), new Insets(5, 5, 5,
-                                                                            5)));
+                contents =
+                    centerBottom(chooser,
+                                 inset(hbox(new JLabel("Transparency:"),
+                                            alphaSlider), new Insets(5, 5, 5,
+                                                5)));
             } else {
                 contents = chooser;
             }
@@ -660,8 +666,7 @@ public class GuiUtils extends LayoutUtil {
             //                                                              oldColor);
             Color newColor = chooser.getColor();
             if (newColor != null) {
-                newColor = new Color(newColor.getRed(),
-                                     newColor.getGreen(),
+                newColor = new Color(newColor.getRed(), newColor.getGreen(),
                                      newColor.getBlue(), alpha);
                 this.setBackground(newColor);
             }
@@ -673,7 +678,7 @@ public class GuiUtils extends LayoutUtil {
          */
         private void setColorFromChooser() {
             Color newColor = JColorChooser.showDialog(null, label,
-                                                      this.getBackground());
+                                 this.getBackground());
             if (newColor != null) {
                 ColorSwatch.this.setBackground(newColor);
             }
@@ -1353,6 +1358,32 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param objects _more_
+     *
+     * @return _more_
+     */
+    public static JComponent formLayout(List objects) {
+        Component[] comps = new Component[objects.size()];
+        for (int i = 0; i < objects.size(); i++) {
+            Component comp   = null;
+            Object    object = objects.get(i);
+            if ( !(object instanceof Component)) {
+                comp = rLabel(object.toString());
+            } else {
+                comp = (Component) object;
+            }
+            comps[i] = comp;
+        }
+
+        LayoutUtil.tmpInsets = INSETS_5;
+        return doLayout(comps, 2, WT_NY, WT_N);
+
+
+    }
+
 
     /**
      * This does a doLayout with 2 columns. If any of the objects are not a Component
@@ -1361,20 +1392,8 @@ public class GuiUtils extends LayoutUtil {
      * @param objects array of components to layout
      * @return component
      */
-    public static JComponent formLayout(Object[]objects) {
-        Component[]comps = new Component[objects.length];
-        for(int i=0;i<objects.length;i++) {
-            Component comp = null;
-            if(!(objects[i] instanceof Component)) {
-                comp = rLabel(objects[i].toString());
-            } else {
-                comp = (Component) objects[i];
-            }
-            comps[i] = comp;
-        }
-
-        LayoutUtil.tmpInsets =INSETS_5;
-        return  doLayout(comps, 2, WT_NY,WT_N);
+    public static JComponent formLayout(Object[] objects) {
+        return formLayout(Misc.toList(objects));
     }
 
 
@@ -2117,7 +2136,7 @@ public class GuiUtils extends LayoutUtil {
         if ( !list.isEnabled()) {
             return;
         }
-        List  items     = new ArrayList();
+        List items = new ArrayList();
         getConfigureStepSelectionItems(list, items);
         JPopupMenu popup = makePopupMenu(items);
         popup.show(list, e.getX(), e.getY());
@@ -2129,8 +2148,10 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param e mouse click
      * @param list JList
+     * @param items _more_
      */
-    public static void getConfigureStepSelectionItems(final JList list, List items) {
+    public static void getConfigureStepSelectionItems(final JList list,
+            List items) {
         if ( !list.isEnabled()) {
             return;
         }
@@ -2217,18 +2238,6 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
-
-    /**
-     * Do a 2 column layout. Right align the first column. Make the width of the
-     * first column non-stretcy, second column stretchy.
-     *
-     * @param comps Components to layout
-     *
-     * @return Panel containing form
-     */
-    public static JComponent formLayout(List comps) {
-        return formLayout(comps, WT_NY, WT_N, true);
-    }
 
     /**
      * Do a 2 column layout. Right align the first column. Make the width of the
@@ -6147,5 +6156,6 @@ public class GuiUtils extends LayoutUtil {
     }
 
 }
+
 
 
