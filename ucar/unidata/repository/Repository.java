@@ -109,7 +109,6 @@ public class Repository extends RepositoryBase implements
     public static final String GROUP_TOP = "Top";
 
 
-
     /** _more_ */
     protected RequestUrl[] entryEditUrls = {
         URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
@@ -127,29 +126,26 @@ public class Repository extends RepositoryBase implements
     /** _more_ */
     private static final int ENTRY_CACHE_LIMIT = 5000;
 
+
     /** _more_ */
     public static final OutputType OUTPUT_DELETER = new OutputType("Delete Entry", "repository.delete");
-
 
 
     /** _more_ */
     private List<EntryListener> entryListeners =
         new ArrayList<EntryListener>();
 
-
     /** _more_ */
     private Properties mimeTypes;
-
 
     /** _more_ */
     private Properties namesMap;
 
 
-
     /** _more_ */
     private Properties properties = new Properties();
 
-    Map<String, String> systemEnv;
+    private Map<String, String> systemEnv;
 
     /** _more_ */
     private Properties dbProperties = new Properties();
@@ -157,9 +153,6 @@ public class Repository extends RepositoryBase implements
 
     /** _more_ */
     private long baseTime = System.currentTimeMillis();
-
-    /** _more_ */
-    private int keyCnt = 0;
 
 
     /** _more_ */

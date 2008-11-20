@@ -27,7 +27,7 @@ a:hover {
 
 
 .header {
-  xxxborder-bottom : 1px #999999 solid;
+  xxborder-bottom : 1px #999999 solid;
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;
@@ -69,11 +69,12 @@ a.header  {
 .subnav {
    font-size: 12pt;
    padding-left:5;   
-   padding-top:5;   
+   padding-top:8;   
    background-color : #c3d9ff;
    font-weight: bold;
    color: black;
    border-bottom : 1px #666666 solid;
+   xborder-bottom : 1px #FFFF61 solid;
 }
 
 
@@ -82,8 +83,10 @@ a.header  {
 }
 
 .subnavoncomp  {
-   border-bottom : 1px #ffffff solid;
    background-color : #ffffff;
+   border-bottom : 1px #FFFFff solid;
+   xxborder-bottom : 1px #FFFF61 solid;
+   xxbackground-color : #FFFFAD;
    color:#000000;
 }
 
@@ -405,10 +408,6 @@ a.menulink {
    border: 1px #666666 solid;   
    background-color : #FFFFCC;
 }
-
-
-
-
 
 
 
