@@ -122,6 +122,10 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 
 
+import javax.media.j3d.*;
+import javax.vecmath.*;
+
+
 //import org.apache.batik.svggen.SVGGraphics2D;
 
 
@@ -311,6 +315,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** For full screen properties */
     private JTextField fullScreenHeightFld;
+
+    private LightInfo allLightInfo;
+    private JRadioButton allLightsBtn;
+    private JRadioButton someLightsBtn;
+
+
 
     /** The inner gui */
     protected JComponent innerContents;
@@ -1231,6 +1241,38 @@ public class ViewManager extends SharableImpl implements ActionListener,
         tabbedPane.add(
             "Aspect Ratio",
             GuiUtils.inset(GuiUtils.top(getAspectPropertiesComponent()), 5));
+        if(lights!=null) {
+            try {
+                if(allLightInfo==null) {
+                    allLightInfo = new LightInfo("All",null,null);
+                    allLightsBtn = new JRadioButton("Set All",true);
+                    someLightsBtn = new JRadioButton("Set Individually",false);
+                    GuiUtils.buttonGroup(allLightsBtn, someLightsBtn);
+                }
+
+                List comps = new ArrayList();
+                for(LightInfo lightInfo: lights) {
+                    lightInfo.getPropertyComponents(comps);
+                }
+                JComponent someLightsComp = GuiUtils.doLayout(comps,3, GuiUtils.WT_NNY,GuiUtils.WT_N);
+                comps = new ArrayList();
+                allLightInfo.getPropertyComponents(comps);
+                JComponent allLightsComp = GuiUtils.doLayout(comps,3, GuiUtils.WT_NNY,GuiUtils.WT_N);
+
+                comps = new ArrayList();
+
+                List lightComps = new ArrayList();
+                Insets insets = new  Insets(0,20,0,0);
+
+                lightComps.add(allLightsBtn);
+                lightComps.add(GuiUtils.inset(allLightsComp,insets));
+                lightComps.add(someLightsBtn);
+                lightComps.add(GuiUtils.inset(someLightsComp,insets));
+                tabbedPane.add("Lighting",GuiUtils.top(GuiUtils.vbox(lightComps)));
+            } catch(Exception exc) {
+                logException("",exc);
+            }
+        }
     }
 
 
@@ -1259,6 +1301,61 @@ public class ViewManager extends SharableImpl implements ActionListener,
             aspectLbls[i].setText("" + aspectRatio[i]);
         }
     }
+
+
+    private List<LightInfo> lights; 
+
+    private void   initLights(DisplayRendererJ3D renderer) {
+        if(lights == null) {
+            lights = new ArrayList<LightInfo>();
+            createInitialLights();
+        }
+        BranchGroup lightsNode = new BranchGroup();
+        lightsNode.setCapability(BranchGroup.ALLOW_DETACH);
+        lightsNode.setCapability(Group.ALLOW_CHILDREN_READ);
+        lightsNode.setCapability(Group.ALLOW_CHILDREN_WRITE);
+        lightsNode.setCapability(Group.ALLOW_CHILDREN_EXTEND);
+
+
+        for(LightInfo lightInfo: lights) {
+            lightsNode.addChild(lightInfo.getLight());
+        }
+        renderer.getRoot().addChild(lightsNode);
+
+    }
+
+
+    public void brighter() {
+        if(lights==null) return;
+        for(LightInfo lightInfo: lights) {
+            lightInfo.brighter();
+        }
+    }
+
+    private void   createInitialLights() {
+        Vector3f[] directions = new Vector3f[]{new Vector3f(0.0f, 0.0f, -1.0f),
+                                               new Vector3f(0.0f, 0.0f, 1.0f),
+                                               new Vector3f(0.0f, 1.0f, 0.0f),
+                                               new Vector3f(0.0f, -1.0f, 0.0f),
+                                               new Vector3f(1.0f, 0.0f, 0.0f),
+                                               new Vector3f(-1.0f, 0.0f, 0.0f)};
+        Point3d[] locations = new Point3d[]{new Point3d(0.0, 0.0, 100.0),
+                                            new Point3d(0.0, 0.0, -100.0),
+                                            new Point3d(0.0, 100.0, 0.0),
+                                            new Point3d(0.0, -100.0, 0.0),
+                                            new Point3d(100.0, 0.0, 0.0),
+                                            new Point3d(-100.0, 0.0, 0.0)};
+
+        String [] names = {"Top","Bottom","North","South","East","West"};
+        Color3f color =  new Color3f(0.5f, 0.5f, 0.5f);
+        for(int i=0;i<directions.length;i++) {
+            lights.add(new LightInfo(names[i],locations[i],directions[i]));
+        }
+    }
+
+
+
+
 
     /**
      * Get the aspect properties component
@@ -1300,12 +1397,26 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
+
     /**
      * Apply properties
      *
      * @return true if successful
      */
     public boolean applyProperties() {
+        if(lights!=null) {
+            if(allLightsBtn.isSelected()) {
+                allLightInfo.applyProperties();
+                for(LightInfo lightInfo: lights) {
+                    lightInfo.initWith(allLightInfo);
+                }
+            } else {
+                for(LightInfo lightInfo: lights) {
+                    lightInfo.applyProperties();
+                }
+            }
+        }
+
         int width  = 0;
         int height = 0;
         if (fullScreenWidthFld.getText().trim().equals("")
@@ -4292,6 +4403,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     parseProperties(tmp);
                 }
                 master = doMakeDisplayMaster();
+                DisplayRenderer renderer = master.getDisplay().getDisplayRenderer();
+                if(renderer instanceof DisplayRendererJ3D) {
+                    initLights((DisplayRendererJ3D) renderer);
+                }
+
                 if ( !getIdv().getInteractiveMode()) {
                     master.setDisplayInactive();
                 } else {
@@ -6209,6 +6325,27 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public CoordinateSystem getDisplayCoordinateSystem() {
         return null;
     }
+
+    /**
+       Set the Lights property.
+
+       @param value The new value for Lights
+    **/
+    public void setLights (List<LightInfo> value) {
+        lights = value;
+    }
+
+    /**
+       Get the Lights property.
+
+       @return The Lights
+    **/
+    public List<LightInfo> getLights () {
+	return lights;
+    }
+
+
+
 
 }
 
