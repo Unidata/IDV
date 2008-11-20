@@ -104,7 +104,7 @@ public class STIDatabaseChooser extends IdvChooser {
         portbox = prefportList.createComboBox(CMD_LOAD, this);
         dbbox = prefdbList.createComboBox(CMD_LOAD, this);
 
-        Object [] obList = new Object[]{"Server:", urlbox,
+        Object [] obList = new Object[]{"Server:", GuiUtils.left(urlbox),
                                         "Port:" , GuiUtils.left(portbox),
                                         "Database Name:", GuiUtils.left(dbbox)};
 
@@ -144,6 +144,9 @@ public class STIDatabaseChooser extends IdvChooser {
         Hashtable ht = new Hashtable();
 
 
+        prefurlList.saveState(urlbox);
+        prefportList.saveState(portbox);
+        prefdbList.saveState(dbbox);
         makeDataSource(urls, "DB.STORMTRACK", ht);
     }
 
