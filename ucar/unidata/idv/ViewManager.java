@@ -28,6 +28,8 @@ package ucar.unidata.idv;
 import org.w3c.dom.*;
 
 
+import ucar.unidata.java3d.LightInfo;
+
 import ucar.unidata.collab.*;
 import ucar.unidata.data.GeoLocationInfo;
 

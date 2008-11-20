@@ -22,7 +22,7 @@
 
 
 
-package ucar.unidata.idv;
+package ucar.unidata.java3d;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
