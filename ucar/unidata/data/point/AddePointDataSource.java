@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -551,8 +550,8 @@ public class AddePointDataSource extends PointDataSource {
     protected List getDefaultLevels() {
         List retList = new ArrayList();
         Object level =
-            (Object) getProperty(ucar.unidata.idv.chooser.adde
-                .AddePointDataChooser.SELECTED_LEVEL, null);
+            getProperty(ucar.unidata.idv.chooser.adde.AddePointDataChooser
+                .SELECTED_LEVEL);
         if (level != null) {
             retList.add(level);
         }
