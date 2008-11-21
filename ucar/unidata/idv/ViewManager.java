@@ -1369,7 +1369,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         for(LightInfo lightInfo: lights) {
             lightsNode.addChild(lightInfo.getLight());
         }
-        renderer.getRoot().addChild(lightsNode);
+
+        renderer.getTrans().addChild(lightsNode);
+        //        renderer.getRoot().addChild(lightsNode);
 
     }
 
