@@ -23,11 +23,9 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
-
-
-import ucar.unidata.ui.Timeline;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
@@ -45,6 +43,10 @@ import ucar.unidata.idv.chooser.TimesChooser;
 
 import ucar.unidata.idv.control.DisplaySetting;
 
+
+
+import ucar.unidata.ui.Timeline;
+
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -56,10 +58,11 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 
+import visad.DateTime;
+
 
 
 import visad.VisADException;
-import visad.DateTime;
 
 
 
@@ -160,9 +163,10 @@ public class DataSelectionWidget {
     /** Current list of levels */
     private List levels;
 
+    /** levels from display */
     private List levelsFromDisplay;
 
-    /** _more_ */
+    /** default level to first */
     private boolean defaultLevelToFirst = true;
 
 
@@ -179,13 +183,14 @@ public class DataSelectionWidget {
     /** Last data source we were displaying for */
     private DataSource lastDataSource;
 
+    /** last DataChoice */
     private DataChoice lastDataChoice;
 
     /** Keeps track of the tab label so we can reselect that tab when we update */
     private String currentLbl;
 
 
-    /** _more_ */
+    /** list of data selection components */
     private List<DataSelectionComponent> dataSelectionComponents;
 
     /**
@@ -268,10 +273,13 @@ public class DataSelectionWidget {
         int[] selected = levelsList.getSelectedIndices();
         //None selected or the 'All Levels'
         if ((selected.length == 0)
-                || ((selected.length == 1) && (selected[0] == 0) && levelsFromDisplay==null)) {
+                || ((selected.length == 1) && (selected[0] == 0)
+                    && (levelsFromDisplay == null))) {
             return NO_LEVELS;
         }
-        int indexOffset = (levelsFromDisplay==null?1:0);
+        int indexOffset = ((levelsFromDisplay == null)
+                           ? 1
+                           : 0);
         if (selected.length == 1) {
             lastLevel = levels.get(selected[0] - indexOffset);
             //            idv.getStore().put("idv.dataselector.level", lastLevel);
@@ -295,7 +303,8 @@ public class DataSelectionWidget {
             return NO_LEVELS;
         }
 
-        return new Object[] { levels.get(first - indexOffset), levels.get(last - indexOffset) };
+        return new Object[] { levels.get(first - indexOffset),
+                              levels.get(last - indexOffset) };
     }
 
 
@@ -346,7 +355,7 @@ public class DataSelectionWidget {
      * @param dataSource  data source
      * @param dc  The data choice
      *
-     * @return _more_
+     * @return true if successful
      */
     protected boolean updateSelectionTab(DataSource dataSource,
                                          DataChoice dc) {
@@ -396,7 +405,10 @@ public class DataSelectionWidget {
         }
 
 
-        levels = (levelsFromDisplay!=null?levelsFromDisplay:dc.getAllLevels(new DataSelection(GeoSelection.STRIDE_BASE)));
+        levels = ((levelsFromDisplay != null)
+                  ? levelsFromDisplay
+                  : dc.getAllLevels(
+                      new DataSelection(GeoSelection.STRIDE_BASE)));
         if ((levels != null) && (levels.size() > 1)) {
             if (levelsList == null) {
                 levelsList = new JList();
@@ -409,8 +421,9 @@ public class DataSelectionWidget {
                 levelsTab = levelsScroller;
             }
             Vector levelsForGui = new Vector();
-            if(levelsFromDisplay==null)
+            if (levelsFromDisplay == null) {
                 levelsForGui.add(new TwoFacedObject("All Levels", null));
+            }
             for (int i = 0; i < levels.size(); i++) {
                 Object o = levels.get(i);
                 if (o instanceof visad.Real) {
@@ -421,8 +434,14 @@ public class DataSelectionWidget {
                 }
             }
 
-
             Object[] selectedLevels = levelsList.getSelectedValues();
+            if ((selectedLevels == null) || (selectedLevels.length == 0)) {
+                List dcLevels =
+                    (List) dc.getProperty(DataSelection.PROP_DEFAULT_LEVELS);
+                if ((dcLevels != null) && !dcLevels.isEmpty()) {
+                    selectedLevels = dcLevels.toArray();
+                }
+            }
             levelsList.setListData(levelsForGui);
             ListSelectionModel lsm    = levelsList.getSelectionModel();
             boolean            didone = false;
@@ -708,6 +727,11 @@ public class DataSelectionWidget {
     }
 
 
+    /**
+     * Get selected times in the list
+     *
+     * @return  list of times
+     */
     private List getSelectedDateTimesInList() {
         if (timesList == null) {
             return new ArrayList();
@@ -747,7 +771,7 @@ public class DataSelectionWidget {
     public void setTimes(List all, List selected) {
         //if we are not using defaults and the new list is the same as the old list
         //then keep around the currently selected times
-        if(!getUseAllTimes() && Misc.equals(allDateTimes, all)) {
+        if ( !getUseAllTimes() && Misc.equals(allDateTimes, all)) {
             selected = getSelectedDateTimesInList();
         }
         setTimes(timesList, allTimesButton, all, selected);
@@ -762,8 +786,13 @@ public class DataSelectionWidget {
     }
 
 
+    /**
+     * Set the use all times flag
+     *
+     * @param useAllTimes  true to use all times
+     */
     public void setUseAllTimes(boolean useAllTimes) {
-        if(allTimesButton!=null) {
+        if (allTimesButton != null) {
             allTimesButton.setSelected(useAllTimes);
             timesList.setEnabled( !allTimesButton.isSelected());
         }
@@ -796,7 +825,7 @@ public class DataSelectionWidget {
      */
     public JComponent getTimesList(String cbxLabel) {
         if (timesListInfo == null) {
-            timesListInfo  = makeTimesListAndPanel(cbxLabel,null);
+            timesListInfo  = makeTimesListAndPanel(cbxLabel, null);
             timesList      = (JList) timesListInfo[0];
             allTimesButton = (JCheckBox) timesListInfo[1];
 
@@ -805,6 +834,7 @@ public class DataSelectionWidget {
     }
 
 
+    /** timeline */
     private Timeline timeline;
 
 
@@ -879,13 +909,15 @@ public class DataSelectionWidget {
      *
      *
      * @param cbxLabel Label to use for the checkbox. (Use All or Use Default).
+     * @param extra  extra component
      * @return A triple: JList, all times button and the JPanel that wraps this.
      */
-    private  JComponent[] makeTimesListAndPanel(String cbxLabel, JComponent extra) {
+    private JComponent[] makeTimesListAndPanel(String cbxLabel,
+            JComponent extra) {
         final JList timesList = new JList();
         timesList.setBorder(null);
         //        timeline = new Timeline();
-        TimesChooser.addTimeSelectionListener(timesList,timeline);
+        TimesChooser.addTimeSelectionListener(timesList, timeline);
         timesList.setToolTipText("Right click to show selection menu");
         timesList.setSelectionMode(
             ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -900,7 +932,7 @@ public class DataSelectionWidget {
         //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
         //                                            allTimesButton);
         JComponent top;
-        if(extra!=null) {
+        if (extra != null) {
             top = GuiUtils.leftRight(extra, allTimesButton);
         } else {
             top = GuiUtils.right(allTimesButton);
@@ -915,10 +947,15 @@ public class DataSelectionWidget {
     }
 
 
+    /**
+     * Set levels from the display
+     *
+     * @param levels  the list of levels
+     */
     public void setLevelsFromDisplay(List levels) {
-        if(!Misc.equals(levelsFromDisplay, levels)) {
+        if ( !Misc.equals(levelsFromDisplay, levels)) {
             levelsFromDisplay = levels;
-            updateSelectionTab(lastDataSource,lastDataChoice);
+            updateSelectionTab(lastDataSource, lastDataChoice);
         }
     }
 
