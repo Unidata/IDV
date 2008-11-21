@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -259,6 +260,7 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     private static class GridParameters extends DataSelectionComponent {
 
+        /** _more_          */
         PointDataSource pointDataSource;
 
         /** gui component */
@@ -299,17 +301,19 @@ public abstract class PointDataSource extends FilesDataSource {
 
         /**
          * ctor
+         *
+         * @param pointDataSource _more_
          */
         public GridParameters(PointDataSource pointDataSource) {
             super("Grid Parameters");
             this.pointDataSource = pointDataSource;
-            gridXFld     = new JTextField("" + pointDataSource.gridX, 4);
-            gridYFld     = new JTextField("" + pointDataSource.gridY, 4);
-            gridUnitCmbx = new JComboBox();
+            gridXFld = new JTextField("" + pointDataSource.gridX, 4);
+            gridYFld = new JTextField("" + pointDataSource.gridY, 4);
+            gridUnitCmbx         = new JComboBox();
             tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
             GuiUtils.setListData(gridUnitCmbx, tfos);
-            gridUnitCmbx.setSelectedItem(TwoFacedObject.findId(pointDataSource.gridUnit,
-                    tfos));
+            gridUnitCmbx.setSelectedItem(
+                TwoFacedObject.findId(pointDataSource.gridUnit, tfos));
             gridUnitCmbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     TwoFacedObject tfo =
@@ -323,15 +327,16 @@ public abstract class PointDataSource extends FilesDataSource {
             });
             gainComp = new ValueSliderComponent(pointDataSource, 0, 1,
                     "gridGain", "Gain", 10, false);
-            searchComp = new ValueSliderComponent(pointDataSource, 0,
-                    20, "gridSearchRadius", "Search Radius", 1, false);
+            searchComp = new ValueSliderComponent(pointDataSource, 0, 20,
+                    "gridSearchRadius", "Search Radius", 1, false);
 
-            numGridPassesFld = new JTextField("" + pointDataSource.numGridPasses, 4);
+            numGridPassesFld = new JTextField(""
+                    + pointDataSource.numGridPasses, 4);
             comps.add(GuiUtils.rLabel("Spacing:"));
             comps.add(GuiUtils.left(gridUnitCmbx));
             comps.add(GuiUtils.rLabel("Grid Size:"));
             sizeComp = GuiUtils.left(GuiUtils.hbox(new JLabel("X: "),
-                                                   gridXFld, new JLabel("  Y: "), gridYFld));
+                    gridXFld, new JLabel("  Y: "), gridYFld));
             comps.add(sizeComp);
             comps.add(GuiUtils.rLabel("Passes:"));
             comps.add(GuiUtils.left(numGridPassesFld));
@@ -738,6 +743,7 @@ public abstract class PointDataSource extends FilesDataSource {
      * Make the <code>DataChoices</code> for this <code>DataSource</code>.
      */
     public void doMakeDataChoices() {
+
         if (sources == null) {
             return;
         }
@@ -746,6 +752,10 @@ public abstract class PointDataSource extends FilesDataSource {
                                    "/auxdata/ui/icons/Placemark16.gif");
         if (stationModelName != null) {
             properties.put(PROP_STATIONMODELNAME, stationModelName);
+        }
+        if ( !getDefaultLevels().isEmpty()) {
+            properties.put(DataSelection.PROP_DEFAULT_LEVELS,
+                           getDefaultLevels());
         }
         DataChoice uberChoice = null;
         /*  Might want to do this someday
@@ -834,6 +844,7 @@ public abstract class PointDataSource extends FilesDataSource {
                 throw new WrapperException("Making grid parameters", exc);
             }
         }
+
     }
 
 
@@ -1094,9 +1105,12 @@ public abstract class PointDataSource extends FilesDataSource {
             StringBuffer params = new StringBuffer(comps.length
                                       + " Fields:<ul>");
             String dataSourceName = getName();
-            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Time","Time"));
-            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Latitude","Latitude"));
-            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Altitude","Altitude"));
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data>Time",
+                    "Time"));
+            DataChoice.addCurrentName(
+                new TwoFacedObject("Point Data>Latitude", "Latitude"));
+            DataChoice.addCurrentName(
+                new TwoFacedObject("Point Data>Altitude", "Altitude"));
 
             for (int i = 0; i < comps.length; i++) {
                 params.append("<li>");
@@ -1158,6 +1172,14 @@ public abstract class PointDataSource extends FilesDataSource {
      throws Exception;
 
 
+    /**
+     * Get a list of selected levels.  Subclasses should override
+     * if they have levels.
+     * @return list of levels (may be empty)
+     */
+    protected List getDefaultLevels() {
+        return new ArrayList();
+    }
 
 
     /**

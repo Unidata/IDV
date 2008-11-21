@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -35,13 +36,16 @@ import java.util.List;
 
 /**
  * A class that represents some selection of data.
- * @author Jeff McWhirter
+ * @author IDV Development Team
  * @version $Revision: 1.43 $
  */
 public class DataSelection {
 
     /** Null DataSelection */
     public static final DataSelection NULL = null;
+
+    /** Property for selected levels */
+    public static final String PROP_DEFAULT_LEVELS = "default_levels";
 
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
