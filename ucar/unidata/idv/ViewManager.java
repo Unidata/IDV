@@ -1106,7 +1106,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void showPropertiesDialog() {
         //        propertiesDialog = GuiUtils.createDialog("Properties", true);
-        propertiesDialog = GuiUtils.createDialog("Properties", false);
+        //Make the dialog non-modal
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String cmd = event.getActionCommand();
@@ -1120,7 +1120,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_CANCEL)) {
                     propertiesDialog.dispose();
-                    propertiesDialog = null;
+                    //                    propertiesDialog = null;
                 }
             }
         };
@@ -1130,9 +1130,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JComponent comp =
             GuiUtils.inset(GuiUtils.centerBottom(getPropertiesComponent(),
                 buttons), 5);
+        boolean newOne = false;
+        if(propertiesDialog==null) {
+            propertiesDialog = GuiUtils.createDialog("Properties", false);
+            newOne = true;
+        }
+        propertiesDialog.getContentPane().removeAll();
         propertiesDialog.getContentPane().add(comp);
         propertiesDialog.pack();
-        GuiUtils.showDialogNearSrc(viewMenu, propertiesDialog);
+        if(newOne) {
+            GuiUtils.showDialogNearSrc(viewMenu, propertiesDialog);
+        } else {
+            propertiesDialog.show();
+        }
         //        propertiesDialog.show();
     }
 
@@ -1598,6 +1608,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 addViewDescriptor(vd);
             }
             this.properties.putAll(that.properties);
+
+
+            if(that.lights!=null) {
+                this.lights = new ArrayList<LightInfo>();
+                for(LightInfo lightInfo: that.lights) {
+                    this.lights.add(new LightInfo(lightInfo));
+                }
+            }
+
+
         }
 
         if ((that.name != null) && (that.name.trim().length() > 0)) {
@@ -4148,6 +4168,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         if (timelineDialog != null) {
             timelineDialog.dispose();
+            timelineDialog=null;
+        }
+
+        if(propertiesDialog!=null) {
+            propertiesDialog.dispose();
+            propertiesDialog = null;
         }
 
         if (animationWidget != null) {
@@ -6367,7 +6393,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
        @param value The new value for Lights
     **/
     public void setLights (List<LightInfo> value) {
-        //        lights = value;
+        lights = value;
     }
 
     /**
