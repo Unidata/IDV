@@ -128,6 +128,8 @@ import javax.swing.*;
 public class GeoGridDataSource extends GridDataSource {
 
 
+    private static final int SIZE_THRESHOLD = 500000000;
+
     /** The prefix we hack onto the u and v  variables */
     private static final String PREFIX_GRIDRELATIVE = "GridRelative_";
 
@@ -901,8 +903,11 @@ public class GeoGridDataSource extends GridDataSource {
                              + dataChoice.getDescription() + "</td><td>"
                              + sizeEntry + "</td><td>");
                 if (timeSize != null) {
-                    total *= timeSize.intValue();
-                    theSb.append("" + timeSize);
+                    int times = timeSize.intValue();
+                    if(times>0) {
+                        total *= timeSize.intValue();
+                        theSb.append("" + timeSize);
+                    }
                 }
                 theSb.append("</td>");
                 theSb.append("<td>" + total + "</td></tr>");
@@ -1293,6 +1298,14 @@ public class GeoGridDataSource extends GridDataSource {
             int fromLevelIndex, int toLevelIndex)
             throws VisADException {
 
+        boolean readingFullGrid = true;
+        int numLevels = -1;
+        if(fromLevelIndex>=0 && toLevelIndex>=0) {
+            numLevels = Math.abs(toLevelIndex-fromLevelIndex)+1;
+        }
+
+
+
         GridDataset myDataset = getDataset();
         if (myDataset == null) {
             return null;
@@ -1324,6 +1337,8 @@ public class GeoGridDataSource extends GridDataSource {
             }
 
             if ((geoSelection != null) && geoSelection.getHasValidState()) {
+                //TODO: We should determine the size of the subset grid and use that.
+                readingFullGrid = false;
                 //System.err.println("subsetting using:" + geoSelection.getLatLonRect());
                 extraCacheKey = geoSelection;
                 if (levelRange != null) {
@@ -1354,6 +1369,26 @@ public class GeoGridDataSource extends GridDataSource {
             throw new IllegalArgumentException("Invalid range:" + ire);
         }
 
+
+        if(readingFullGrid) {
+            ThreeDSize size =
+                (ThreeDSize) dataChoice.getProperty(PROP_GRIDSIZE);
+            if (size != null) {
+                long    total     = size.getSizeY() * size.getSizeX();
+                if (size.getSizeZ() > 1) {
+                    if(numLevels>0) {
+                        total *= numLevels;
+                    } else {
+                        total *= size.getSizeZ();
+                    }
+                }
+                if(total>SIZE_THRESHOLD) {
+                    double mb = (total*4);
+                    mb = (mb/1000000.0);
+                    throw new BadDataException("You are requesting a grid with "+ total +" points which is " + Misc.format(mb) +" (MB) of data.\nPlease subset the grid"); 
+                }
+            }
+        }
 
 
         GeoGridAdapter adapter = new GeoGridAdapter(this, geoGrid,
@@ -1421,6 +1456,7 @@ public class GeoGridDataSource extends GridDataSource {
         Trace.call1("GeoGridDataSource.makeField");
 
 
+
         Object fromLevel      = givenDataSelection.getFromLevel();
         Object toLevel        = givenDataSelection.getToLevel();
         int    fromLevelIndex = -1;
@@ -1479,6 +1515,9 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
         Trace.call2("GeoGridDataSource.make times");
+
+
+
 
         Trace.call1("GeoGridDataSource.getSequence");
         Object loadId = JobManager.getManager().startLoad("GeoGrid");
