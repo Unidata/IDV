@@ -37,6 +37,17 @@ example:
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
+     id="gridtablecontrol"
+     categories="GRID-2D-*;IMAGE-*-*;GRID-3D-*;RADAR-3D-*"
+     class="ucar.unidata.idv.control.GridTableControl"
+     label="Grid Table"
+     displaycategory="Misc."
+     properties="">
+    </control>
+
+
+
+  <control
      id="imagedisplayoverz"
      categories="IMAGE-*-*"
      class="ucar.unidata.idv.control.ImagePlanViewControl"
@@ -451,6 +462,9 @@ Since this is confusing and needs more work lets remove this for now
      properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+
+
  
   <control
      id="isosurfacebyanother"
