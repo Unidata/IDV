@@ -53,15 +53,15 @@ import javax.vecmath.*;
  */
 
 public class LightInfo {
-    private     DirectionalLight light;
-    private     String name;
-    private     Vector3f direction;
-    private     Color3f color; 
-    private     boolean visible = true;
+    private DirectionalLight light;
+    private String name;
+    private Vector3f direction;
+    private Color3f color; 
+    private boolean visible = true;
     private Point3d location;
 
-    private     JCheckBox visibleCbx;
-    private     JSlider slider;
+    private JCheckBox visibleCbx;
+    private JSlider slider;
     private JTextField directionXFld;
     private JTextField directionYFld;
     private JTextField directionZFld;
@@ -71,6 +71,18 @@ public class LightInfo {
 
 
     public LightInfo() {
+    }
+
+    public LightInfo(LightInfo that) {
+        this.name = that.name;
+        this.direction = that.direction;
+        this.location = that.location;
+        this.color = that.color;
+        if(direction==null)
+            direction = new Vector3f(0.0f, 0.0f, 1.0f);
+        if(location==null) 
+            location = new Point3d(0.0,0.0,0.0);
+        getLight();
     }
 
     public LightInfo(String name,     Point3d location, Vector3f direction) {
@@ -100,18 +112,18 @@ public class LightInfo {
         
         float[]xyz = new float[3];
         direction.get(xyz);
-        directionXFld = makeField(""+xyz[0],listener);
-        directionYFld = makeField(""+xyz[1],listener);
-        directionZFld = makeField(""+xyz[2],listener);
+        directionXFld = makeField(""+xyz[0],listener,"X Direction");
+        directionYFld = makeField(""+xyz[1],listener,"Y Direction");
+        directionZFld = makeField(""+xyz[2],listener,"Z Direction");
 
         double[]pxyz = new double[3];        
         location.get(pxyz);
-        locationXFld = makeField(""+pxyz[0],listener);
-        locationYFld = makeField(""+pxyz[1],listener);
-        locationZFld = makeField(""+pxyz[2],listener);
+        locationXFld = makeField(""+pxyz[0],listener,"");
+        locationYFld = makeField(""+pxyz[1],listener,"");
+        locationZFld = makeField(""+pxyz[2],listener,"");
 
         List fldComps = Misc.newList(GuiUtils.rLabel("Direction:"),directionXFld,directionYFld,directionZFld);
-        fldComps.addAll(Misc.newList(GuiUtils.rLabel("Location:"),locationXFld,locationYFld,locationZFld));
+        //        fldComps.addAll(Misc.newList(GuiUtils.rLabel("Location:"),locationXFld,locationYFld,locationZFld));
 
         comps.add(visibleCbx);
         GuiUtils.tmpInsets = new Insets(0,2,0,0);
@@ -124,10 +136,11 @@ public class LightInfo {
 
     }
 
-    private JTextField makeField(String s, ObjectListener listener) {
+    private JTextField makeField(String s, ObjectListener listener, String tip) {
         JTextField fld =  new JTextField(s,3);
         if(listener!=null)
             fld.addActionListener(listener);
+        fld.setToolTipText(tip);
         return fld;
     }
 
