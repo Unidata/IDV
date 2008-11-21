@@ -83,35 +83,42 @@ public class FlatFieldTable extends JTable {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public FlatFieldTable(FlatField ff)
+    public FlatFieldTable(FlatField ff, boolean showNativeCoordinates)
             throws VisADException, RemoteException {
-        SampledSet ss        = GridUtil.getSpatialDomain(ff);
-        SampledSet latLonSet = null;
-        if (ss.getCoordinateSystem() != null) {
-            latLonSet = ucar.visad.Util.convertDomain(ss,
-                    ss.getCoordinateSystem().getReference(), null);
-        } else {
-            latLonSet = ss;
-        }
 
-        domainData     = latLonSet.getSamples(false);
         rangeData      = ff.getValues(false);
+
+        SampledSet ss        = GridUtil.getSpatialDomain(ff);
+        
+        domainData = ss.getSamples(true);
         numDomainCols  = domainData.length;
         numRangeCols   = rangeData.length;
-
-
         columnNames    = new String[numDomainCols + numRangeCols];
-        columnNames[0] = "Latitude";
-        columnNames[1] = "Longitude";
-        //TODO: Add units in header names
-        if (domainData.length > 2) {
-            columnNames[2] = "Altitude";
+
+        if (ss.getCoordinateSystem() != null && !showNativeCoordinates) {
+            domainData = ss.getCoordinateSystem().toReference(domainData);
+            columnNames[0] = "Latitude";
+            columnNames[1] = "Longitude";
+            if (domainData.length > 2) {
+                columnNames[2] = "Altitude";
+            }
+        }  else {
+            SetType t = (SetType)ss.getType();
+            RealTupleType rtt = t.getDomain();
+            MathType[] comps = rtt.getComponents();
+            columnNames[0] = ucar.visad.Util.cleanTypeName(comps[0]);
+            columnNames[1] = ucar.visad.Util.cleanTypeName(comps[1]);
+            if (domainData.length > 2) {
+                columnNames[2] = ucar.visad.Util.cleanTypeName(comps[2]);
+            }
         }
+
+
 
         RealType[] comps = ((FunctionType) ff.getType()).getRealComponents();
         for (int i = 0; i < comps.length; i++) {
             columnNames[numDomainCols + i] =
-                ucar.visad.Util.cleanTypeName(comps[i]);
+                ucar.visad.Util.cleanTypeName(comps[i]) +" [" + comps[i].getDefaultUnit()+"]";
         }
 
         TableSorter sorter = new TableSorter(model = new MyFlatField());

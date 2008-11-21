@@ -56,6 +56,7 @@ import java.awt.event.*;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -79,7 +80,11 @@ public class GridTableControl extends GridDisplayControl {
     private FieldImpl field;
 
     /** _more_          */
-    JTabbedPane tabbedPane = new JTabbedPane();
+    private     GuiUtils.CardLayoutPanel cardLayoutPanel = new GuiUtils.CardLayoutPanel();
+
+    private JCheckBox nativeCoordsCbx;
+
+    private boolean showNativeCoordinates = false;
 
     /**
      * Default constructor; does nothing.  See init() for class initialization
@@ -136,7 +141,8 @@ public class GridTableControl extends GridDisplayControl {
      * @throws VisADException _more_
      */
     private void createTables() throws VisADException, RemoteException {
-        tabbedPane.removeAll();
+        List dates = new ArrayList();
+        cardLayoutPanel.removeAll();
         if (GridUtil.isTimeSequence(field)) {
             SampledSet timeSet  = (SampledSet) GridUtil.getTimeSet(field);
             double[][] times    = timeSet.getDoubles(false);
@@ -148,12 +154,25 @@ public class GridTableControl extends GridDisplayControl {
                 if (ff == null) {
                     continue;
                 }
-                FlatFieldTable table = new FlatFieldTable(ff);
-                tabbedPane.addTab("" + dt, new JScrollPane(table));
+                dates.add(dt);
+                FlatFieldTable table = new FlatFieldTable(ff,showNativeCoordinates);
+                cardLayoutPanel.addCard(new JScrollPane(table));
             }
         }
+        setAnimationSet(dates);
     }
 
+
+    public void timeChanged(Real time) {
+        try {
+            super.timeChanged(time);
+            int current = getAnimation(true).getCurrent();
+            if(current>=0) 
+                cardLayoutPanel.show(current);
+        } catch(Exception exc) {
+            logException("Time changed", exc);
+        }
+    }
 
     /**
      * _more_
@@ -166,12 +185,38 @@ public class GridTableControl extends GridDisplayControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         createTables();
-        return tabbedPane;
-        //        return new JLabel("");
+        nativeCoordsCbx = new JCheckBox("Show native coordinates", getShowNativeCoordinates());
+        nativeCoordsCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    showNativeCoordinates = nativeCoordsCbx.isSelected();
+                    try {
+                    createTables();
+                    } catch(Exception exc) {
+                        logException("Creating tables", exc);
+                    }
+                }
+            });
+        return GuiUtils.topCenter(GuiUtils.leftRight(getAnimationWidget().getContents(),nativeCoordsCbx),cardLayoutPanel);
     }
 
 
+    /**
+       Set the ShowNativeCoordinates property.
 
+       @param value The new value for ShowNativeCoordinates
+    **/
+    public void setShowNativeCoordinates (boolean value) {
+	showNativeCoordinates = value;
+    }
+
+    /**
+       Get the ShowNativeCoordinates property.
+
+       @return The ShowNativeCoordinates
+    **/
+    public boolean getShowNativeCoordinates () {
+	return showNativeCoordinates;
+    }
 
 
 }

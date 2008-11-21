@@ -36,14 +36,6 @@ example:
      properties="windowVisible=true;">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-  <control
-     id="gridtablecontrol"
-     categories="GRID-2D-*;IMAGE-*-*;GRID-3D-*;RADAR-3D-*"
-     class="ucar.unidata.idv.control.GridTableControl"
-     label="Grid Table"
-     displaycategory="Misc."
-     properties="">
-    </control>
 
 
 
@@ -971,6 +963,17 @@ Example of how to make an image movie control with a fixed table of contents
      properties="">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+
+  <control
+     id="gridtablecontrol"
+     categories="trace;GRID-2D-*;IMAGE-*-*;GRID-3D-*;RADAR-3D-*"
+     class="ucar.unidata.idv.control.GridTableControl"
+     label="Grid Table"
+     displaycategory="General"
+     properties="">
+    </control>
+
 
 
   <control
