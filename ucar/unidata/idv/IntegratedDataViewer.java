@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -87,8 +88,9 @@ import java.awt.event.*;
 
 import java.io.*;
 
-import java.lang.reflect.*;
 import java.lang.management.*;
+
+import java.lang.reflect.*;
 
 import java.net.Socket;
 
@@ -170,7 +172,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
     private List historyList = null;
 
-    /** _more_          */
+    /** mutex for accessing the history list */
     private Object MUTEX_HISTORY = new Object();
 
 
@@ -195,7 +197,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     private OneInstanceServer oneInstanceServer;
 
     /** The http based monitor to dump stack traces and shutdown the IDV */
-    private  IdvMonitor idvMonitor;
+    private IdvMonitor idvMonitor;
 
 
     /** The list of background image wmsselections */
@@ -291,7 +293,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             });*/
         super.setIdv(this);
 
-        if (!interactiveMode) {
+        if ( !interactiveMode) {
             getArgsManager().setIsOffScreen(true);
         }
 
@@ -631,7 +633,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
 
         //Create the chooser so it is snappy when  it is first requested
-        if (!getArgsManager().isScriptingMode()) {
+        if ( !getArgsManager().isScriptingMode()) {
             getIdvChooserManager();
         }
 
@@ -643,14 +645,14 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
 
 
-        if (!getArgsManager().isScriptingMode()) {
+        if ( !getArgsManager().isScriptingMode()) {
             ucar.unidata.ui.HelpActionLabel.setActionListener(
-                                                              new ActionListener() {
-                                                                  public void actionPerformed(ActionEvent ae) {
-                                                                      handleAction(ae.getActionCommand(), null);
-                                                                  }
+                new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    handleAction(ae.getActionCommand(), null);
+                }
 
-                                                              });
+            });
         }
 
 
@@ -702,19 +704,27 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * http://localhost:8788/shutdown.html
      */
     protected void startMonitor() {
-        if(idvMonitor!=null) return;
-        final String monitorPort = getProperty(PROP_MONITORPORT,"");
-        if(monitorPort!=null && monitorPort.trim().length()>0 && !monitorPort.trim().equals("none")) {
+        if (idvMonitor != null) {
+            return;
+        }
+        final String monitorPort = getProperty(PROP_MONITORPORT, "");
+        if ((monitorPort != null) && (monitorPort.trim().length() > 0)
+                && !monitorPort.trim().equals("none")) {
             Misc.run(new Runnable() {
-                    public void run() {
-                        try {
-                            idvMonitor = new IdvMonitor(IntegratedDataViewer.this,new Integer(monitorPort).intValue());
-                            idvMonitor.init();
-                        }    catch (Exception exc) {
-                            LogUtil.consoleMessage("Unable to start IDV monitor on port:" + monitorPort);
-                            LogUtil.consoleMessage("Error:" + exc);
-                        }
-                    }});
+                public void run() {
+                    try {
+                        idvMonitor = new IdvMonitor(
+                            IntegratedDataViewer.this,
+                            new Integer(monitorPort).intValue());
+                        idvMonitor.init();
+                    } catch (Exception exc) {
+                        LogUtil.consoleMessage(
+                            "Unable to start IDV monitor on port:"
+                            + monitorPort);
+                        LogUtil.consoleMessage("Error:" + exc);
+                    }
+                }
+            });
         }
         /*
         final Object test1 = new Object();
@@ -1317,9 +1327,16 @@ Misc.run(new Runnable() {
         return new ArrayList(displayControls);
     }
 
+    /**
+     * Have all of the displays been initialixed
+     *
+     * @return all displays initialized
+     */
     public boolean getAllDisplaysIntialized() {
-        for(DisplayControl control: (List<DisplayControl>) getDisplayControls()) {
-            if(!control.isInitDone()) return false;
+        for (DisplayControl control : (List<DisplayControl>) getDisplayControls()) {
+            if ( !control.isInitDone()) {
+                return false;
+            }
         }
         return true;
     }
@@ -1654,8 +1671,8 @@ Misc.run(new Runnable() {
                 collabManager.writeRemoveDataSource(dataSource);
             }
             getIdvUIManager().removeDataSource(dataSource);
-        } catch(Exception exc) {
-            logException ("Removing data source:" + dataSource, exc);
+        } catch (Exception exc) {
+            logException("Removing data source:" + dataSource, exc);
         }
     }
 
@@ -1752,8 +1769,13 @@ Misc.run(new Runnable() {
         return makeDataSource(definingObject, dataType, properties, true);
     }
 
+    /**
+     * Make the data source. This is a data source that does not need urls or files
+     *
+     * @param descriptor descriptor
+     */
     public void makeDataSource(DataSourceDescriptor descriptor) {
-        makeDataSource("",descriptor.getId(),new Hashtable());
+        makeDataSource("", descriptor.getId(), new Hashtable());
     }
 
     /**
@@ -2694,6 +2716,29 @@ Misc.run(new Runnable() {
 
 
     /**
+     * Did the user select to change the  data paths when loading in a bundle
+     *
+     * @return change data in loaded bundles
+     */
+    public boolean getChangeDataPaths() {
+        return getChangeDataPathCbx().isSelected();
+    }
+
+    /**
+     * Get the checkbox to show to change data
+     *
+     * @return change data cbx
+     */
+    public JCheckBox getChangeDataPathCbx() {
+        if (overwriteDataCbx == null) {
+            overwriteDataCbx = new JCheckBox("Change data paths", false);
+            overwriteDataCbx.setToolTipText(
+                "Change the file paths that the data sources use");
+        }
+        return overwriteDataCbx;
+    }
+
+    /**
      * Have the user select an xidv file. If andRemove is
      * true then we remove all data sources and displays.
      * Then we open the unpersist the bundle in the xidv  file
@@ -2707,19 +2752,13 @@ Misc.run(new Runnable() {
                                 boolean andRemove) {
         boolean overwriteData = false;
         if (filename == null) {
-            if (overwriteDataCbx == null) {
-                overwriteDataCbx = new JCheckBox("Change data paths", false);
-                overwriteDataCbx.setToolTipText(
-                    "Change the file paths that the data sources use");
-            }
-
             filename = FileManager.getReadFile("Open File",
                     Misc.newList(getArgsManager().getXidvZidvFileFilter()),
-                    GuiUtils.top(overwriteDataCbx));
+                    GuiUtils.top(getChangeDataPathCbx()));
             if (filename == null) {
                 return;
             }
-            overwriteData = overwriteDataCbx.isSelected();
+            overwriteData = getChangeDataPathCbx().isSelected();
         }
 
         if (getArgsManager().isXidvFile(filename)) {
@@ -2983,7 +3022,7 @@ Misc.run(new Runnable() {
 
 
     /**
-     * _more_
+     * Remove all state, etc.
      */
     public void cleanup() {
         getStore().cleanupTmpFiles();

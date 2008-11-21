@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -791,16 +792,19 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         }
         widgets.put(PREF_LOOKANDFEEL, lookAndFeelBox);
 
-        
+
         GuiUtils.setHFill();
-        JComponent editorComp = GuiUtils.doLayout(new Component[]{jythonEditorField,
-                                                                  GuiUtils.makeFileBrowseButton(jythonEditorField)},2, GuiUtils.WT_YN, GuiUtils.WT_N);
+        JComponent editorComp = GuiUtils.doLayout(new Component[] {
+                                    jythonEditorField,
+                                    GuiUtils.makeFileBrowseButton(
+                                        jythonEditorField) }, 2,
+                                            GuiUtils.WT_YN, GuiUtils.WT_N);
 
         JComponent topPanel = GuiUtils.formLayout(new Component[] {
             GuiUtils.rLabel("Resource Sitepath:"),
             GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
-            GuiUtils.left(editorComp),
-            GuiUtils.rLabel("Look & Feel:"), GuiUtils.left(lookAndFeelBox)
+            GuiUtils.left(editorComp), GuiUtils.rLabel("Look & Feel:"),
+            GuiUtils.left(lookAndFeelBox)
         });
         Object[][] prefs1 = {
             { "General:", null },
@@ -1214,6 +1218,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
      *
      * @param name The bundle name - may be null.
      * @return Element 0- did user hit cancel. Element 1 - Should remove data and displays.
+     * Element 2 Should merge
+     * element 3 did we ask the user
      */
     public boolean[] getDoRemoveBeforeOpening(String name) {
         boolean shouldAsk    = getStore().get(PREF_OPEN_ASK, true);
@@ -1234,17 +1240,23 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
 
-            JPanel btnPanel = GuiUtils.left(removeCbx);
+            JCheckBox changeDataCbx = getIdv().getChangeDataPathCbx();
+
+            JPanel    btnPanel      = GuiUtils.left(removeCbx);
 
             JCheckBox mergeCbx =
                 new JCheckBox("Try to add displays to current windows",
                               shouldMerge);
-            JPanel inner =
-                GuiUtils.vbox(
-                    Misc.newList(
-                        btnPanel, mergeCbx, GuiUtils.filler(10, 10), askCbx,
-                        new JLabel(
-                            "Note: This can be reset in the preferences window ")));
+            JPanel inner = GuiUtils.vbox(new Component[] {
+                btnPanel, mergeCbx, 
+                //                GuiUtils.filler(10,10),
+                changeDataCbx,
+                GuiUtils.filler(10, 10), 
+                askCbx
+                //                new JLabel(
+                //                    "Note: This can be reset in the preferences window "),
+
+            });
 
             inner = GuiUtils.leftCenter(new JLabel("     "), inner);
 
@@ -1265,7 +1277,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             panel = GuiUtils.inset(panel, 5);
             if ( !GuiUtils.showOkCancelDialog(null, "Open bundle", panel,
                     null)) {
-                return new boolean[] { false, false };
+                return new boolean[] { false, false, false, shouldAsk };
             }
 
             shouldRemove = removeCbx.isSelected();
@@ -1277,7 +1289,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             getStore().put(PREF_OPEN_ASK, !askCbx.isSelected());
             getStore().save();
         }
-        return new boolean[] { true, shouldRemove, shouldMerge };
+        return new boolean[] { true, shouldRemove, shouldMerge, shouldAsk };
     }
 
 
