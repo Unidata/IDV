@@ -12,7 +12,7 @@ Bugs:
 - Saving a local file dialog says saving remote data. (Jeff)    DONE!
 - Check point data spatial subset (Yuan)
 - Math.atan2 hang in Bearing (Jeff) DONE!
-- Upper Air data - chooser selected level doesn't get set in the levels data subset panel (Don)
+- Upper Air data - chooser selected level doesn't get set in the levels data subset panel (Don) DONE!
 - \n in isl doesn't work (Jeff)   DONE!
 - offscreen image capter hangs from isl (Jeff)   DONE!
 - Dashboard covers view window in isl (Jeff)   DONE!
