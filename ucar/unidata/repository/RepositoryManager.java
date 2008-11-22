@@ -94,7 +94,6 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
-
     /** _more_ */
     protected Repository repository;
 
@@ -132,6 +131,9 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
+    public String fileUrl(String url) {
+        return getRepository().fileUrl(url);
+    }
 
     /**
      * _more_
@@ -371,6 +373,10 @@ public class RepositoryManager implements RepositorySource, Constants,
      */
     protected AccessManager getAccessManager() {
         return repository.getAccessManager();
+    }
+
+    protected EntryManager getEntryManager() {
+        return repository.getEntryManager();
     }
 
     /**

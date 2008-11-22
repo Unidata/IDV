@@ -559,7 +559,7 @@ public class PatternHarvester extends Harvester {
                 if(!getTestMode()) {
                     if (entries.size() > 1000) {
                         List uniqueEntries =
-                            getRepository().getUniqueEntries(entries);
+                            getEntryManager().getUniqueEntries(entries);
                         newEntryCnt += uniqueEntries.size();
                         needToAdd.addAll(uniqueEntries);
                         entries = new ArrayList();
@@ -567,10 +567,10 @@ public class PatternHarvester extends Harvester {
                     if (needToAdd.size() > 1000) {
                         if ( !getTestMode()) {
                             if (getAddMetadata()) {
-                                getRepository().addInitialMetadata(null,
+                                getEntryManager().addInitialMetadata(null,
                                                                    needToAdd);
                             }
-                            getRepository().insertEntries(needToAdd, true, true);
+                            getEntryManager().insertEntries(needToAdd, true, true);
                         }
                         needToAdd = new ArrayList<Entry>();
                     }
@@ -585,14 +585,14 @@ public class PatternHarvester extends Harvester {
 
         if ( !getTestMode()) {
             List uniqueEntries =
-                getRepository().getUniqueEntries(entries);
+                getEntryManager().getUniqueEntries(entries);
             newEntryCnt += uniqueEntries.size();
             needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
                 if (getAddMetadata()) {
-                    getRepository().addInitialMetadata(null, needToAdd);
+                    getEntryManager().addInitialMetadata(null, needToAdd);
                 }
-                getRepository().insertEntries(needToAdd, true, true);
+                getEntryManager().insertEntries(needToAdd, true, true);
             }
         }
     }
@@ -620,17 +620,17 @@ public class PatternHarvester extends Harvester {
         for (int i = 0; i < dirToks.size(); i++) {
             String filename = (String) dirToks.get(i);
             File   file     = new File(parentFile + "/" + filename);
-            Entry  template = getRepository().getTemplateEntry(file);
+            Entry  template = getEntryManager().getTemplateEntry(file);
             String name     = ((template != null)
                                ? template.getName()
                                : filename);
             if (makeGroup && (parentGroup != null)) {
-                Group group = getRepository().findGroupFromName(
+                Group group = getEntryManager().findGroupFromName(
                                   parentGroup.getFullName()
                                   + Group.PATHDELIMITER + name, getUser(),
                                       false);
                 if (group == null) {
-                    group = getRepository().makeNewGroup(parentGroup, name,
+                    group = getEntryManager().makeNewGroup(parentGroup, name,
                             getUser(), template);
                 }
                 parentGroup = group;
@@ -698,10 +698,10 @@ public class PatternHarvester extends Harvester {
 
         Group baseGroup = null;
         if ((baseGroupName != null) && (baseGroupName.length() > 0)) {
-            baseGroup = getRepository().findGroupFromName(baseGroupName,
+            baseGroup = getEntryManager().findGroupFromName(baseGroupName,
                     getUser(), true);
         } else {
-            //            baseGroup =  getRepository().findGroupFromName(GROUP_TOP,
+            //            baseGroup =  getEntryManager().findGroupFromName(GROUP_TOP,
             //                                                      getUser(),
             //                                                      false);
         }
@@ -809,7 +809,7 @@ public class PatternHarvester extends Harvester {
             groupName = baseGroup.getFullName() + Group.PATHDELIMITER
                         + groupName;
         }
-        Group group = getRepository().findGroupFromName(groupName, getUser(),
+        Group group = getEntryManager().findGroupFromName(groupName, getUser(),
                           true);
         if(getTestMode()) {
             debug("\tname: " + name + "\n\tgroup:" + group.getFullName()+ "\n\tfromdate:" + getRepository().formatDate(fromDate));

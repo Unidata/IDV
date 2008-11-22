@@ -128,9 +128,9 @@ public class CatalogHarvester extends Harvester {
     protected void runInner() throws Exception {
         groups = new ArrayList();
         importCatalog(topUrl, topGroup, 0);
-        //        repository.processEntries(this, null, entries,false);
+        //getEntryManager().processEntries(this, null, entries,false);
         if (entries.size() > 0) {
-            repository.processEntries(this, null, entries,false);
+            getEntryManager().processEntries(this, null, entries,false);
         }
         entries = new ArrayList<Entry>();
     }
@@ -322,7 +322,7 @@ public class CatalogHarvester extends Harvester {
             }
 
             if (entries.size() > 100) {
-                repository.processEntries(this, null, entries,false);
+                getEntryManager().processEntries(this, null, entries,false);
                 entries = new ArrayList<Entry>();
             }
             return;
@@ -331,13 +331,13 @@ public class CatalogHarvester extends Harvester {
         name = name.replace(Group.IDDELIMITER, "--");
         name = name.replace("'", "");
         Group group    = null;
-        Entry newGroup = repository.findEntryWithName(null, parent, name);
+        Entry newGroup = getEntryManager().findEntryWithName(null, parent, name);
         if ((newGroup != null) && newGroup.isGroup()) {
             group = (Group) newGroup;
         }
         if (group == null) {
             //            System.err.println("Making new group:" + name);
-            group = repository.makeNewGroup(parent, name, user);
+            group = getEntryManager().makeNewGroup(parent, name, user);
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(repository, metadataList,
                     node);
@@ -349,7 +349,7 @@ public class CatalogHarvester extends Harvester {
                                           catalogUrlPath, "", ""));
 
             insertMetadata(group, metadataList);
-            String crumbs = repository.getBreadCrumbs(null, group, true, 
+            String crumbs = getEntryManager().getBreadCrumbs(null, group, true, 
                                                       topGroup)[1];
             crumbs = crumbs.replace("class=", "xclass=");
             groups.add(crumbs);

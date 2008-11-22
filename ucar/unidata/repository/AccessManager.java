@@ -165,7 +165,7 @@ public class AccessManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_ID)) {
-            Entry entry = getRepository().getEntry(request,
+            Entry entry = getEntryManager().getEntry(request,
                               request.getString(ARG_ID, ""), false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
@@ -177,7 +177,7 @@ public class AccessManager extends RepositoryManager {
         if (request.exists(ARG_IDS)) {
             for (String id : StringUtil.split(request.getString(ARG_IDS, ""),
                     ",", true, true)) {
-                Entry entry = getRepository().getEntry(request, id, false);
+                Entry entry = getEntryManager().getEntry(request, id, false);
                 if (entry == null) {
                     throw new IllegalArgumentException(
                         "Could not find entry:" + id);
@@ -190,7 +190,7 @@ public class AccessManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_GROUP)) {
-            Group group = getRepository().findGroup(request);
+            Group group = getEntryManager().findGroup(request);
             if (group == null) {
                 throw new IllegalArgumentException("Could not find group:"
                         + request.getString(ARG_GROUP, ""));
@@ -202,11 +202,11 @@ public class AccessManager extends RepositoryManager {
             Clause clause = Clause.eq(Tables.ASSOCIATIONS.COL_ID,
                                       request.getString(ARG_ASSOCIATION, ""));
             List<Association> associations =
-                getRepository().getAssociations(request, clause);
+                getEntryManager().getAssociations(request, clause);
             if (associations.size() == 1) {
-                Entry fromEntry = getRepository().getEntry(request,
+                Entry fromEntry = getEntryManager().getEntry(request,
                                       associations.get(0).getFromId());
-                Entry toEntry = getRepository().getEntry(request,
+                Entry toEntry = getEntryManager().getEntry(request,
                                     associations.get(0).getToId());
                 if (canDoAction(request, fromEntry, action)) {
                     return true;
@@ -283,7 +283,7 @@ public class AccessManager extends RepositoryManager {
                 break;
             }
             
-            entry = repository.getEntry(request, entry.getParentGroupId());
+            entry = getEntryManager().getEntry(request, entry.getParentGroupId());
         }
         return false;
     }
@@ -441,7 +441,7 @@ public class AccessManager extends RepositoryManager {
         }
         sb.append(HtmlUtil.rowTop(cols.toString()));
         listAccess(request,
-                   repository.getEntry(request, entry.getParentGroupId()),
+                   getEntryManager().getEntry(request, entry.getParentGroupId()),
                    sb);
     }
 
@@ -548,8 +548,8 @@ public class AccessManager extends RepositoryManager {
      */
     public Result processAccessForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry        entry = getRepository().getEntry(request);
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        Entry        entry = getEntryManager().getEntry(request);
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
         if (request.exists(ARG_MESSAGE)) {
             sb.append(
                 getRepository().note(
@@ -621,7 +621,7 @@ public class AccessManager extends RepositoryManager {
         sb.append(HtmlUtil.submit("Change Access"));
         sb.append(HtmlUtil.formClose());
 
-        return getRepository().makeEntryEditResult(request, entry,
+        return getEntryManager().makeEntryEditResult(request, entry,
                 "Edit Access", sb);
 
     }
@@ -637,7 +637,7 @@ public class AccessManager extends RepositoryManager {
      */
     public Result processAccessChange(Request request) throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            Entry            entry       = getRepository().getEntry(request);
+            Entry            entry       = getEntryManager().getEntry(request);
             String           message     = "Access Changed";
 
             List<Permission> permissions = new ArrayList<Permission>();

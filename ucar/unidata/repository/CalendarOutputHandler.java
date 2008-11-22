@@ -152,7 +152,7 @@ public class CalendarOutputHandler extends OutputHandler {
         showNext(request, subGroups, entries, sb);
         entries.addAll(subGroups);
         Result result;
-        sb.append(getRepository().makeEntryHeader(request, group));
+        sb.append(getEntryManager().makeEntryHeader(request, group));
         if (output.equals(OUTPUT_GRID)) {
             result = outputDateGrid(request, group, entries, sb);
         } else {
@@ -220,7 +220,7 @@ public class CalendarOutputHandler extends OutputHandler {
                 colSB = new StringBuffer();
                 contents.put(key, colSB);
             }
-            colSB.append(getRepository().getAjaxLink(request, entry, time, true));
+            colSB.append(getEntryManager().getAjaxLink(request, entry, time, true));
             colSB.append(HtmlUtil.br());
         }
 
@@ -441,7 +441,7 @@ public class CalendarOutputHandler extends OutputHandler {
                     if (label.length() > 20) {
                         label = label.substring(0, 19) + "...";
                     }
-                    dayList.add(HtmlUtil.nobr(getRepository().getAjaxLink(request, entry,
+                    dayList.add(HtmlUtil.nobr(getEntryManager().getAjaxLink(request, entry,
                             label, true)));
                 }
                 didone = true;

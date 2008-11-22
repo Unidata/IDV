@@ -411,7 +411,7 @@ public class TypeHandler extends RepositoryManager {
         Entry  entry = createEntry(id);
         entry.initEntry(
             results.getString(col++), results.getString(col++),
-            getRepository().findGroup(null, results.getString(col++)),
+            getEntryManager().findGroup(null, results.getString(col++)),
             getUserManager().findUser(results.getString(col++), true),
             new Resource(getStorageManager().resourceFromDB(results.getString(col++)), 
                          results.getString(col++)),
@@ -662,7 +662,7 @@ public class TypeHandler extends RepositoryManager {
                             "Download file" + size);
         } else {
             String fileTail = getStorageManager().getFileTail(entry);
-            return new Link(getRepository().getEntryResourceUrl(request,
+            return new Link(getEntryManager().getEntryResourceUrl(request,
                     entry), getRepository().fileUrl(ICON_FETCH),
                             "Download file" + size);
         }
@@ -715,7 +715,7 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(
                               HtmlUtil.formEntry(
                                                  msgLabel("Description"),
-                                                 getRepository().getEntryText(request, entry, desc)));
+                                                 getEntryManager().getEntryText(request, entry, desc)));
                 }
             }
             String userSearchLink =
@@ -744,7 +744,7 @@ public class TypeHandler extends RepositoryManager {
                     }
                     if(getAccessManager().canDownload(request, entry)) {
                         resourceLink = HtmlUtil.href(
-                                                     getRepository().getEntryResourceUrl(request, entry),
+                                                     getEntryManager().getEntryResourceUrl(request, entry),
                                                      resourceLink);
                         
                         resourceLink = resourceLink +HtmlUtil.space(2) +
@@ -841,7 +841,7 @@ public class TypeHandler extends RepositoryManager {
                         HtmlUtil.formEntryTop(
                             msgLabel("Image"),
                             HtmlUtil.img(
-                                getRepository().getEntryResourceUrl(
+                                getEntryManager().getEntryResourceUrl(
                                     request, entry), "", "width=600")));
 
 
@@ -1373,7 +1373,7 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        List<Group> collectionGroups = getRepository().getTopGroups(request);
+        List<Group> collectionGroups = getEntryManager().getTopGroups(request);
         List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
         collections.add(new TwoFacedObject("All", ""));
         for (Group group : collectionGroups) {
@@ -1430,7 +1430,7 @@ public class TypeHandler extends RepositoryManager {
                                                 + ")";
             if (groupArg.length() > 0) {
                 advancedSB.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
-                Group group = getRepository().findGroup(request, groupArg);
+                Group group = getEntryManager().findGroup(request, groupArg);
                 if (group != null) {
                     advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             group.getFullName() + "&nbsp;" + searchChildren));
@@ -1620,7 +1620,7 @@ public class TypeHandler extends RepositoryManager {
 
         /**
         if (request.defined(ARG_COLLECTION)) {
-            Entry collectionEntry = getRepository().getEntry(request,
+            Entry collectionEntry = getEntryManager().getEntry(request,
                                         request.getString(ARG_COLLECTION,
                                             ""));
             if (collectionEntry != null) {
@@ -1656,14 +1656,14 @@ public class TypeHandler extends RepositoryManager {
                 groupId = groupId.substring(1);
             }
             if (groupId.endsWith("%")) {
-                Group group = getRepository().findGroup(request,
+                Group group = getEntryManager().findGroup(request,
                                   groupId.substring(0, groupId.length() - 1));
                 if (group != null) {
                     addCriteria(searchCriteria, "Group=", group.getName());
                 }
                 where.add(Clause.like(Tables.ENTRIES.COL_PARENT_GROUP_ID, groupId));
             } else {
-                Group group = getRepository().findGroup(request);
+                Group group = getEntryManager().findGroup(request);
                 if (group == null) {
                     throw new IllegalArgumentException(
                         msgLabel("Could not find group") + groupId);

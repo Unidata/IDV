@@ -380,7 +380,7 @@ public class WebHarvester extends Harvester {
                 if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
                 }
-                String crumbs = getRepository().makeEntryHeader(null, entry);
+                String crumbs = getEntryManager().makeEntryHeader(null, entry);
                 crumbs = crumbs.replace("class=", "xclass=");
                 statusMessages.add(crumbs);
                 entryCnt++;
@@ -388,7 +388,7 @@ public class WebHarvester extends Harvester {
         }
 
         newEntryCnt += entries.size();
-        repository.insertEntries(entries, true, true);
+        getEntryManager().insertEntries(entries, true, true);
     }
 
 
@@ -445,7 +445,7 @@ public class WebHarvester extends Harvester {
         desc = desc.replace("${todate}", getRepository().formatDate(toDate));
         desc = desc.replace("${name}", name);
 
-        Group group = repository.findGroupFromName(groupName, getUser(),
+        Group group = getEntryManager().findGroupFromName(groupName, getUser(),
                           true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
         Resource resource = new Resource(newFile.toString(),

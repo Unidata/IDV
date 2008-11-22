@@ -976,10 +976,10 @@ public class Admin extends RepositoryManager {
                 String parentId = results.getString(2);
                 cnt++;
                 if (parentId != null) {
-                    Group group = getRepository().findGroup(request,
+                    Group group = getEntryManager().findGroup(request,
                                       parentId);
                     if (group == null) {
-                        Entry entry = getRepository().getEntry(request, id);
+                        Entry entry = getEntryManager().getEntry(request, id);
                         sb.append("bad parent:" + entry.getName()
                                   + " parent id=" + parentId + "<br>");
                         badEntries.add(entry);
@@ -989,7 +989,7 @@ public class Admin extends RepositoryManager {
         }
         sb.append("Scanned " + cnt + " entries");
         if (delete) {
-            getRepository().deleteEntries(request, badEntries, null);
+            getEntryManager().deleteEntries(request, badEntries, null);
             return makeResult(request, msg("Scan"),
                               new StringBuffer("Deleted"));
         }
@@ -1096,7 +1096,7 @@ public class Admin extends RepositoryManager {
                         System.err.print(".");
                     }
                     if (entries.size() > 1000) {
-                        getRepository().deleteEntries(request, entries, null);
+                        getEntryManager().deleteEntries(request, entries, null);
                         entries   = new ArrayList<Entry>();
                         deleteCnt += 1000;
                         cleanupStatus = new StringBuffer("Removed "
@@ -1109,7 +1109,7 @@ public class Admin extends RepositoryManager {
                 }
             }
             if (runningCleanup) {
-                getRepository().deleteEntries(request, entries, null);
+                getEntryManager().deleteEntries(request, entries, null);
                 deleteCnt += entries.size();
                 cleanupStatus = new StringBuffer(msg("Done running cleanup")
                         + "<br>" + msg("Removed") + HtmlUtil.space(1)

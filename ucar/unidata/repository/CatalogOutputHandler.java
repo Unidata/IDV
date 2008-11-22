@@ -370,7 +370,7 @@ public class CatalogOutputHandler extends OutputHandler {
         if (doingLatest) {
             topDataset = root;
             boolean didone = false;
-            entries = getRepository().sortEntriesOnDate(entries, true);
+            entries = getEntryManager().sortEntriesOnDate(entries, true);
             for (Entry entry : entries) {
                 if (canDataLoad(request, entry)) {
                     outputEntry(entry, request, catalogInfo, root);

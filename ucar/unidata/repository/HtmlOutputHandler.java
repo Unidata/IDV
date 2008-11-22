@@ -158,7 +158,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         request.put(ARG_OUTPUT, OUTPUT_HTML);
-        String links = getRepository().getEntryLinksHtml(request, entry,
+        String links = getEntryManager().getEntryLinksHtml(request, entry,
                            false);
         boolean didOne = false;
         sb.append(links);
@@ -203,7 +203,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
-        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+        String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
                               false);
         StringBuffer sb = new StringBuffer();
         sb.append(crumbs[1]);
@@ -235,7 +235,7 @@ public class HtmlOutputHandler extends OutputHandler {
         treeShown.add(false);
 
         tabTitles.add("Actions");
-        tabContent.add(getRepository().getEntryLinksList(request, entry));
+        tabContent.add(getEntryManager().getEntryLinksList(request, entry));
         treeShown.add(false);
 
         addDescription(request, entry, sb);
@@ -266,7 +266,7 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean canEdit = getAccessManager().canDoAction(request, entry,
                               Permission.ACTION_EDIT);
         List<Association> associations =
-            getRepository().getAssociations(request, entry);
+            getEntryManager().getAssociations(request, entry);
         if (associations.size() == 0) {
             return sb;
         }
@@ -277,13 +277,13 @@ public class HtmlOutputHandler extends OutputHandler {
             if (association.getFromId().equals(entry.getId())) {
                 fromEntry = entry;
             } else {
-                fromEntry = getRepository().getEntry(request,
+                fromEntry = getEntryManager().getEntry(request,
                         association.getFromId());
             }
             if (association.getToId().equals(entry.getId())) {
                 toEntry = entry;
             } else {
-                toEntry = getRepository().getEntry(request,
+                toEntry = getEntryManager().getEntry(request,
                         association.getToId());
             }
             if ((fromEntry == null) || (toEntry == null)) {
@@ -305,7 +305,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<td>");
             sb.append(((fromEntry == entry)
                        ? fromEntry.getLabel()
-                       : getRepository().getEntryLink(request, fromEntry,
+                       : getEntryManager().getEntryLink(request, fromEntry,
                        args)));
             sb.append("&nbsp;&nbsp;");
             sb.append("</td><td>");
@@ -316,7 +316,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("</td><td>");
             sb.append(((toEntry == entry)
                        ? toEntry.getLabel()
-                       : getRepository().getEntryLink(request, toEntry,
+                       : getEntryManager().getEntryLink(request, toEntry,
                        args)));
             sb.append("</td></tr>");
         }
@@ -336,7 +336,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @return _more_
      */
     protected String getEntryLink(Request request, Entry entry) {
-        return repository.getEntryLink(request, entry);
+        return getEntryManager().getEntryLink(request, entry);
     }
 
 
@@ -505,7 +505,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<ul>");
         }
         TypeHandler typeHandler  = getRepository().getTypeHandler(request);
-        String[]    associations = getRepository().getAssociations(request);
+        String[]    associations = getEntryManager().getAssociations(request);
 
 
         if (associations.length == 0) {
@@ -547,7 +547,7 @@ public class HtmlOutputHandler extends OutputHandler {
             int    count       = counts.get(i).intValue();
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li> ");
-                sb.append(getRepository().getAssociationLinks(request,
+                sb.append(getEntryManager().getAssociationLinks(request,
                         association));
                 sb.append(" ");
                 sb.append(association);
@@ -600,7 +600,7 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getRepository().getComments(request, entry);
         if (comments.size() > 0) {
-            sb.append(getRepository().getCommentHtml(request, entry));
+            sb.append(getEntryManager().getCommentHtml(request, entry));
         }
         return sb;
 
@@ -738,7 +738,7 @@ public class HtmlOutputHandler extends OutputHandler {
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
             sb.append("<li>");
-            String groupLink = getRepository().getAjaxLink(request, subGroup);
+            String groupLink = getEntryManager().getAjaxLink(request, subGroup);
             sb.append(groupLink);
             sb.append(
                 "<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
@@ -747,7 +747,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         for (Entry entry : entries) {
             sb.append("<li>");
-            sb.append(getRepository().getAjaxLink(request, entry));
+            sb.append(getEntryManager().getAjaxLink(request, entry));
         }
 
         if ((subGroups.size() == 0) && (entries.size() == 0)) {
@@ -852,7 +852,7 @@ public class HtmlOutputHandler extends OutputHandler {
         showNext(request, subGroups, entries, sb);
 
         if ( !group.isDummy()) {
-            String[] crumbs = getRepository().getBreadCrumbs(request, group,
+            String[] crumbs = getEntryManager().getBreadCrumbs(request, group,
                                   false);
             title = crumbs[0];
             sb.append(crumbs[1]);
@@ -902,7 +902,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 tabContent.add(getAssociationBlock(request, group));
                 treeShown.add(request.get(ARG_SHOW_ASSOCIATIONS, false));
                 tabTitles.add("Actions");
-                tabContent.add(getRepository().getEntryLinksList(request,
+                tabContent.add(getEntryManager().getEntryLinksList(request,
                         group));
                 treeShown.add(false);
             }
@@ -937,7 +937,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 List<Metadata> metadataList =
                     getMetadataManager().getMetadata(subGroup);
                 groupsSB.append("<li>");
-                String groupLink = getRepository().getAjaxLink(request, subGroup);
+                String groupLink = getEntryManager().getAjaxLink(request, subGroup);
                 groupsSB.append(groupLink);
                 groupsSB.append(
                     "<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id="

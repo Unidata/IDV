@@ -379,7 +379,7 @@ public class RepositoryServlet extends HttpServlet {
             String fieldName = item.getFieldName();
             String fileName  = item.getName();
             try {
-                repository.checkFilePath(fileName);
+                RepositoryUtil.checkFilePath(fileName);
             } catch (Exception e) {
                 logException(e, request);
                 return;

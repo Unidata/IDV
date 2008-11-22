@@ -203,7 +203,7 @@ public class XmlOutputHandler extends OutputHandler {
         sb.append(XmlUtil.openTag(TAG_ASSOCIATIONS));
         TypeHandler   typeHandler  = repository.getTypeHandler(request);
 
-        String[]      associations = getRepository().getAssociations(request);
+        String[]      associations = getEntryManager().getAssociations(request);
 
 
         List<String>  names        = new ArrayList<String>();

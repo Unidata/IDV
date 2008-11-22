@@ -175,9 +175,9 @@ public class DirectoryHarvester extends Harvester  {
             return;
         }
         if(baseGroupName.length()==0) {
-            baseGroupName  = getRepository().GROUP_TOP;
+            baseGroupName  = getEntryManager().GROUP_TOP;
         }
-        Group group = getRepository().findGroupFromName(baseGroupName, getUser(),
+        Group group = getEntryManager().findGroupFromName(baseGroupName, getUser(),
                                                    true);
         walkTree(rootDir, group);
     }
@@ -186,10 +186,10 @@ public class DirectoryHarvester extends Harvester  {
    protected void walkTree(File dir, Group parentGroup) throws Exception {
         String name  =dir.getName();
         File xmlFile = new File(IOUtil.joinDir(dir.getParentFile(),"." + name +".ramadda"));
-        Entry fileInfoEntry = getRepository().getTemplateEntry(dir);
-        Group group = getRepository().findGroupFromName(parentGroup.getFullName()+"/"+name, getUser(),false);
+        Entry fileInfoEntry = getEntryManager().getTemplateEntry(dir);
+        Group group = getEntryManager().findGroupFromName(parentGroup.getFullName()+"/"+name, getUser(),false);
         if(group == null) {
-            group = getRepository().makeNewGroup(parentGroup,name,getUser(),fileInfoEntry);
+            group = getEntryManager().makeNewGroup(parentGroup,name,getUser(),fileInfoEntry);
         }
         File[]files  = dir.listFiles();
         for(int i=0;i<files.length;i++) {

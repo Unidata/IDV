@@ -457,7 +457,7 @@ public class StorageManager extends RepositoryManager {
             throws Exception {
         String filePath = entry.getResource().getPath();
         filePath = filePath.replace("\\", "/");
-        getRepository().checkFilePath(filePath);
+        RepositoryUtil.checkFilePath(filePath);
         if (entry.getIsLocalFile()) {
             return true;
         }

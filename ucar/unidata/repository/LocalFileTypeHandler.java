@@ -222,7 +222,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                         ? (Entry) new Group(synthId, handler)
                         : new Entry(synthId, handler));
 
-        Entry templateEntry =  getRepository().getTemplateEntry(targetFile);
+        Entry templateEntry =  getEntryManager().getTemplateEntry(targetFile);
         String name = null;
         List<String> names = get(values,COL_NAMES);
         for(String pair: names) {
@@ -252,7 +252,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             parent = (Group) parentEntry;
         } else {
             String parentId = getSynthId(parentEntry, rootDir.toString(), targetFile.getParentFile());
-            parent = (Group) getRepository().getEntry(request, parentId,false,false);
+            parent = (Group) getEntryManager().getEntry(request, parentId,false,false);
         }
 
         entry.initEntry(name, "", parent, 

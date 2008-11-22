@@ -580,14 +580,14 @@ public class DataOutputHandler extends OutputHandler {
 
 
         StringBuffer sb = new StringBuffer();
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
         if (request.get(ARG_ADDMETADATA, false)) {
             if (getRepository().getAccessManager().canDoAction(request,
                     entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
                 List<Entry> entries = (List<Entry>) Misc.newList(entry);
-                getRepository().addInitialMetadata(request, entries);
-                getRepository().insertEntries(entries, false);
+                getEntryManager().addInitialMetadata(request, entries);
+                getEntryManager().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
                 return makeLinksResult(request, "CDL", sb, new State(entry));
             }
@@ -808,10 +808,10 @@ public class DataOutputHandler extends OutputHandler {
                             newEntry.clearArea();
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
-                            getRepository().addInitialMetadata(request,
+                            getEntryManager().addInitialMetadata(request,
                                     entries);
                         }
-                        getRepository().insertEntries(Misc.newList(newEntry),
+                        getEntryManager().insertEntries(Misc.newList(newEntry),
                                 true);
                         return new Result(
                             request.entryUrl(
@@ -825,7 +825,7 @@ public class DataOutputHandler extends OutputHandler {
             }
         }
 
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
         String fileName = IOUtil.stripExtension(entry.getName())
                           + "_subset.nc";
@@ -1017,7 +1017,7 @@ public class DataOutputHandler extends OutputHandler {
         File            file = entry.getResource().getFile();
         PointObsDataset pod  = getPointDataset(file);
         StringBuffer    sb   = new StringBuffer();
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
         synchronized (pod) {
             List         vars = pod.getDataVariables();
             int          skip = request.get(ARG_SKIP, 0);
@@ -1254,7 +1254,7 @@ public class DataOutputHandler extends OutputHandler {
         File                 file = entry.getResource().getFile();
         TrajectoryObsDataset tod  = getTrajectoryDataset(file);
         StringBuffer         sb   = new StringBuffer();
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
         synchronized (tod) {
             StringBuffer js           = new StringBuffer();
             List         trajectories = tod.getTrajectories();

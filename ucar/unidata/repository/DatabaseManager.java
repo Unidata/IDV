@@ -948,6 +948,28 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param tableName _more_
+     * @param column _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected boolean tableContains(String id, String tableName,
+                                    String column)
+            throws Exception {
+        Statement statement = select(column, tableName,
+                                     Clause.eq(column, id));
+
+        ResultSet results = statement.getResultSet();
+        return results.next();
+    }
+
+
 
 }
 

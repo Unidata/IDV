@@ -307,7 +307,7 @@ public class ImageOutputHandler extends OutputHandler {
                                           repository.getUrlBase());
             sb = new StringBuffer(template);
         }
-        String[] crumbs = getRepository().getBreadCrumbs(request, group,
+        String[] crumbs = getEntryManager().getBreadCrumbs(request, group,
                               false);
         StringBuffer finalSB = new StringBuffer();
         finalSB.append(crumbs[1]);

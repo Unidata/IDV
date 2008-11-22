@@ -144,7 +144,7 @@ public class MapOutputHandler extends OutputHandler {
         List<Entry> entriesToUse = new ArrayList<Entry>();
         entriesToUse.add(entry);
         StringBuffer sb = new StringBuffer();
-        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+        String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
                               false);
         sb.append(crumbs[1]);
         getMap(request, entriesToUse, sb, 700, 500, true);
@@ -172,7 +172,7 @@ public class MapOutputHandler extends OutputHandler {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);
         StringBuffer sb = new StringBuffer();
-        String[] crumbs = getRepository().getBreadCrumbs(request, group,
+        String[] crumbs = getEntryManager().getBreadCrumbs(request, group,
                               false);
         sb.append(crumbs[1]);
         if (entriesToUse.size() == 0) {

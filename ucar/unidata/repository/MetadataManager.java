@@ -458,7 +458,7 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataChange(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
-            Entry entry = getRepository().getEntry(request);
+            Entry entry = getEntryManager().getEntry(request);
 
             if (request.exists(ARG_DELETE)) {
                 Hashtable args = request.getArgs();
@@ -608,7 +608,7 @@ public class MetadataManager extends RepositoryManager {
 
 
     public Result processMetadataView(Request request) throws Exception {
-        Entry        entry = getRepository().getEntry(request);
+        Entry        entry = getEntryManager().getEntry(request);
         List<Metadata> metadataList = getMetadata(entry);
         Metadata metadata = findMetadata(entry, request.getString(ARG_METADATA_ID,""));
         if(metadata==null) {
@@ -631,9 +631,9 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry        entry = getRepository().getEntry(request);
+        Entry        entry = getEntryManager().getEntry(request);
 
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
 
         List<Metadata> metadataList = getMetadata(entry);
         sb.append(HtmlUtil.p());
@@ -672,7 +672,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.formClose());
         }
 
-        return getRepository().makeEntryEditResult(request, entry,
+        return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Edit Metadata"), sb);
 
     }
@@ -690,8 +690,8 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry        entry = getRepository().getEntry(request);
-        sb.append(getRepository().makeEntryHeader(request, entry));
+        Entry        entry = getEntryManager().getEntry(request);
+        sb.append(getEntryManager().makeEntryHeader(request, entry));
         sb.append(HtmlUtil.p());
         if ( !request.exists(ARG_TYPE)) {
             List<String> groups   = new ArrayList<String>();
@@ -741,7 +741,7 @@ public class MetadataManager extends RepositoryManager {
             }
             sb.append(HtmlUtil.formTableClose());
         }
-        return getRepository().makeEntryEditResult(request, entry,
+        return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Add Metadata"), sb);
     }
 
@@ -760,7 +760,7 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataAdd(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
-            Entry entry = getRepository().getEntry(request);
+            Entry entry = getEntryManager().getEntry(request);
             if (request.exists(ARG_CANCEL)) {
                 return new Result(request.url(URL_METADATA_ADDFORM, ARG_ID,
                         entry.getId()));

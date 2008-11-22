@@ -400,7 +400,7 @@ public class OutputHandler extends RepositoryManager {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return outputGroup(request, getRepository().getDummyGroup(),
+        return outputGroup(request, getEntryManager().getDummyGroup(),
                            new ArrayList<Group>(), entries);
     }
 
@@ -608,12 +608,12 @@ public class OutputHandler extends RepositoryManager {
                 String img = HtmlUtil.img(getRepository().getIconUrl(entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
-                String crumbs = getRepository().getBreadCrumbs(request,
+                String crumbs = getEntryManager().getBreadCrumbs(request,
                                     entry);
 
                 sb.append(crumbs);
             } else {
-                sb.append(getRepository().getAjaxLink(request, entry, entry.getLabel(),
+                sb.append(getEntryManager().getAjaxLink(request, entry, entry.getLabel(),
                                       true));
                 //                sb.append(getEntryLink(request, entry));
             }
@@ -640,7 +640,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     protected String getEntryLink(Request request, Entry entry) throws Exception {
-        return getRepository().getAjaxLink(request, entry, entry.getLabel(), false);
+        return getEntryManager().getAjaxLink(request, entry, entry.getLabel(), false);
     }
 
 

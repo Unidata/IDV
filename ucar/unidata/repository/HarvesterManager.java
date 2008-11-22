@@ -365,7 +365,7 @@ public class HarvesterManager extends RepositoryManager {
             sb.append(
                 getRepository().question(
                     msg("Are you sure you want to delete the harvester"),
-                    getRepository().buttons(
+                    RepositoryUtil.buttons(
                         HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
                         HtmlUtil.submit(msg("Cancel"), ARG_CANCEL_DELETE))));
         } else {
@@ -430,7 +430,7 @@ public class HarvesterManager extends RepositoryManager {
                 harvesters.remove(harvester);
             } else if (action.equals(ACTION_START)) {
                 if ( !harvester.getActive()) {
-                    getRepository().clearSeenResources();
+                    getEntryManager().clearSeenResources();
                     harvester.clearCache();
                     harvester.setActive(true);
                     Misc.run(harvester, "run");
@@ -497,10 +497,10 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processImportCatalog(Request request) throws Exception {
-        Group        group   = getRepository().findGroup(request);
+        Group        group   = getEntryManager().findGroup(request);
         boolean      recurse = request.get(ARG_RECURSE, false);
         StringBuffer sb      = new StringBuffer();
-        sb.append(getRepository().makeEntryHeader(request, group));
+        sb.append(getEntryManager().makeEntryHeader(request, group));
         sb.append("<p>");
         String catalog = request.getString(ARG_CATALOG, "").trim();
         sb.append(request.form(URL_HARVESTERS_IMPORTCATALOG));
@@ -548,7 +548,7 @@ public class HarvesterManager extends RepositoryManager {
         for (Harvester harvester : harvesters) {
             Entry entry = harvester.processFile(typeHandler, filepath);
             if (entry != null) {
-                getRepository().addNewEntry(entry);
+                getEntryManager().addNewEntry(entry);
                 return new Result(BLANK, new StringBuffer("OK"),
                                   "text/plain");
             }

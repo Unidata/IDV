@@ -211,12 +211,12 @@ public class UserManager extends RepositoryManager {
                     if (toks.length == 2) {
                         user = findUser(toks[0], false);
                         if (user == null) {
-                            throw new Repository.AccessException(
+                            throw new RepositoryUtil.AccessException(
                                 msgLabel("Unknown user") + toks[0]);
                         }
                         if ( !user.getPassword().equals(
                                 hashPassword(toks[1]))) {
-                            throw new Repository.AccessException(
+                            throw new RepositoryUtil.AccessException(
                                 msg("Incorrect password"));
                         }
                     }
@@ -519,7 +519,7 @@ public class UserManager extends RepositoryManager {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        if (getRepository().tableContains(user.getId(), Tables.USERS.NAME,
+        if (getDatabaseManager().tableContains(user.getId(), Tables.USERS.NAME,
                                           Tables.USERS.COL_ID)) {
             if ( !updateIfNeeded) {
                 throw new IllegalArgumentException(
@@ -705,7 +705,7 @@ public class UserManager extends RepositoryManager {
             sb.append(
                 getRepository().question(
                     msg("Are you sure you want to delete the user?"),
-                    getRepository().buttons(
+                    RepositoryUtil.buttons(
                         HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM),
                         HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL))));
         } else {
@@ -1094,7 +1094,7 @@ public class UserManager extends RepositoryManager {
         if (action.equals(ACTION_CLEAR)) {
             getCart(request).clear();
         } else if (action.equals(ACTION_ADD)) {
-            Entry entry = getRepository().getEntry(request,
+            Entry entry = getEntryManager().getEntry(request,
                               request.getId(""));
             if (entry == null) {
                 throw new IllegalArgumentException(
@@ -1135,7 +1135,7 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.p());
             boolean haveFrom = request.defined(ARG_FROM);
             if (haveFrom) {
-                Entry fromEntry = getRepository().getEntry(request,
+                Entry fromEntry = getEntryManager().getEntry(request,
                                       request.getString(ARG_FROM, ""));
                 sb.append(HtmlUtil.br());
                 sb.append(msgLabel("Pick an entry  to associate with")

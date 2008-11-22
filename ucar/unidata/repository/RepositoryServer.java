@@ -169,7 +169,7 @@ public class RepositoryServer extends HttpServer implements Constants {
                                         Hashtable props, Hashtable args,
                                         MultipartStream multipartStream)
                 throws Exception {
-            Repository.checkFilePath(filename);
+            RepositoryUtil.checkFilePath(filename);
             int cnt = 0;
             File f =
                 repository.getStorageManager().getUploadFilePath(filename);

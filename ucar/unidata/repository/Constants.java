@@ -81,6 +81,7 @@ public interface Constants {
 
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
+    public static final String ICON_HEADER = "/header.jpg";
 
     /** _more_ */
     public static final String ICON_RCURVE = "/icons/brc.gif";
@@ -1118,6 +1119,13 @@ public interface Constants {
 
 
     public static final String ARG_RESPONSETYPE = "responsetype";
+
+
+    public static final String ID_PREFIX_SYNTH = "synth:";
+
+    /** _more_ */
+    public static final int ENTRY_CACHE_LIMIT = 5000;
+
 
 }
 

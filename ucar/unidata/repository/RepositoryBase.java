@@ -243,10 +243,10 @@ public class RepositoryBase implements Constants, RepositorySource {
     protected SimpleDateFormat sdf;
 
     /** _more_ */
-    protected SimpleDateFormat dateSdf = makeDateFormat("yyyy-MM-dd");
+    protected SimpleDateFormat dateSdf = RepositoryUtil.makeDateFormat("yyyy-MM-dd");
 
     /** _more_ */
-    protected SimpleDateFormat timeSdf = makeDateFormat("HH:mm:ss z");
+    protected SimpleDateFormat timeSdf = RepositoryUtil.makeDateFormat("HH:mm:ss z");
 
     protected List<SimpleDateFormat> formats;
 
@@ -280,31 +280,15 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param path _more_
-     */
-    public static void checkFilePath(String path) {
-        if (path.indexOf("..") >= 0) {
-            throw new IllegalArgumentException("bad file path:" + path);
-        }
-    }
-
-
 
     /**
      * _more_
-     *
-     * @param formatString _more_
      *
      * @return _more_
      */
-    protected SimpleDateFormat makeDateFormat(String formatString) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat();
-        dateFormat.setTimeZone(DateUtil.TIMEZONE_GMT);
-        dateFormat.applyPattern(formatString);
-        return dateFormat;
+    protected long currentTime() {
+        return new Date().getTime();
+
     }
 
 
@@ -429,6 +413,95 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public int getPort() {
         return port;
+    }
+
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    public   String note(String h) {
+        return getMessage(h, Constants.ICON_INFORMATION, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    public   String progress(String h) {
+        return getMessage(h, Constants.ICON_PROGRESS, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    public   String warning(String h) {
+        return getMessage(h, Constants.ICON_WARNING, true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     * @param buttons _more_
+     *
+     * @return _more_
+     */
+    public   String question(String h, String buttons) {
+        return getMessage(h + "<p><hr>" + buttons, Constants.ICON_QUESTION, false);
+    }
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    public   String error(String h) {
+        return getMessage(h, Constants.ICON_ERROR, true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     * @param icon _more_
+     * @param showClose _more_
+     *
+     * @return _more_
+     */
+    public   String getMessage(String h, String icon, boolean showClose) {
+        String close =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("hide('messageblock')"),
+                            HtmlUtil.img(fileUrl(Constants.ICON_CLOSE)));
+        if ( !showClose) {
+            close = "&nbsp;";
+        }
+        h = "<div class=\"innernote\"><table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
+            + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2)
+            + "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
+            + "</span></td></tr></table></div>";
+        return "\n<table border=\"0\" id=\"messageblock\"><tr><td><div class=\"note\"><table><tr valign=top><td>"
+               + h + "</td><td>" + close + "</td></tr></table>"
+               + "</div></td></tr></table>\n";
     }
 
 
