@@ -1401,7 +1401,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         String [] names = {"Over","Under","Top","Bottom","Right","Left"};
-        Color3f color =  new Color3f(0.5f, 0.5f, 0.5f);
         for(int i=0;i<directions.length;i++) {
             lights.add(new LightInfo(names[i],locations[i],directions[i]));
         }
