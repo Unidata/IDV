@@ -93,7 +93,7 @@ public class LightInfo {
             location = new Point3d(0.0,0.0,0.0);
         this.direction = direction;
         this.location = location;
-        this.color = new Color3f(0.1f,0.1f,0.1f);
+        this.color = new Color3f(0.0f,0.0f,0.0f);
         getLight();
     }
 
