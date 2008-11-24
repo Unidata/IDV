@@ -247,10 +247,10 @@ public class ImageOutputHandler extends OutputHandler {
                 }
                 String url =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + entry.getName(), ARG_ID, entry.getId());
+                                 + entry.getName(), ARG_ENTRYID, entry.getId());
                 String thumburl =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + entry.getName(), ARG_ID, entry.getId(),
+                                 + entry.getName(), ARG_ENTRYID, entry.getId(),
                                      ARG_IMAGEWIDTH, "" + 50);
                 String entryUrl = getEntryLink(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
@@ -339,7 +339,7 @@ public class ImageOutputHandler extends OutputHandler {
         }
 
         return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                            + entry.getName(), ARG_ID, entry.getId());
+                            + entry.getName(), ARG_ENTRYID, entry.getId());
     }
 
 }

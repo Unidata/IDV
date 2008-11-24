@@ -184,7 +184,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry) {
-        return entryUrl(theUrl, entry, ARG_ID);
+        return entryUrl(theUrl, entry, ARG_ENTRYID);
     }
 
     /**
@@ -1041,7 +1041,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getId(String dflt) {
-        return getString(ARG_ID, dflt);
+        return getString(ARG_ENTRYID, dflt);
     }
 
 
@@ -1053,7 +1053,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getIds(String dflt) {
-        return getString(ARG_IDS, dflt);
+        return getString(ARG_ENTRYIDS, dflt);
     }
 
     /**

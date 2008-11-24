@@ -258,7 +258,7 @@ public class IdvOutputHandler extends OutputHandler {
         if (!request.exists("doimage")) {
             //TODO: the id is wrong if we are a search result
             String url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW
-                                      + "/" + theEntry.getId() +"_preview.gif", ARG_ID,
+                                      + "/" + theEntry.getId() +"_preview.gif", ARG_ENTRYID,
                                       id, ARG_OUTPUT,
                                           OUTPUT_IDV_GRID, "doimage", "true");
 

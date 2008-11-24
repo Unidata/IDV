@@ -164,18 +164,18 @@ public class AccessManager extends RepositoryManager {
             return true;
         }
 
-        if (request.exists(ARG_ID)) {
+        if (request.exists(ARG_ENTRYID)) {
             Entry entry = getEntryManager().getEntry(request,
-                              request.getString(ARG_ID, ""), false);
+                              request.getString(ARG_ENTRYID, ""), false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
-                        + request.getString(ARG_ID, ""));
+                        + request.getString(ARG_ENTRYID, ""));
             }
             return canDoAction(request, entry, action);
         }
 
-        if (request.exists(ARG_IDS)) {
-            for (String id : StringUtil.split(request.getString(ARG_IDS, ""),
+        if (request.exists(ARG_ENTRYIDS)) {
+            for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS, ""),
                     ",", true, true)) {
                 Entry entry = getEntryManager().getEntry(request, id, false);
                 if (entry == null) {
@@ -418,7 +418,7 @@ public class AccessManager extends RepositoryManager {
             return;
         }
         List<Permission> permissions = getPermissions(request, entry);
-        String entryUrl = HtmlUtil.href(request.url(URL_ACCESS_FORM, ARG_ID,
+        String entryUrl = HtmlUtil.href(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
                               entry.getId()), entry.getName());
 
         Hashtable map = new Hashtable();
@@ -580,7 +580,7 @@ public class AccessManager extends RepositoryManager {
         }
         sb.append(request.form(URL_ACCESS_CHANGE, ""));
 
-        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.submit("Change Access"));
         sb.append("<p>");
         //        sb.append("<table><tr valign=\"top\"><td>");
@@ -655,7 +655,7 @@ public class AccessManager extends RepositoryManager {
             insertPermissions(request, entry, permissions);
 
 
-            return new Result(request.url(URL_ACCESS_FORM, ARG_ID,
+            return new Result(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
                                           entry.getId(), ARG_MESSAGE,
                                           message));
         }

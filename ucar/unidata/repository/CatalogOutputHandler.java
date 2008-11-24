@@ -391,7 +391,7 @@ public class CatalogOutputHandler extends OutputHandler {
             if ( !group.isDummy()
                     && (catalogInfo.serviceMap.get(SERVICE_OPENDAP)
                         != null)) {
-                String urlPath = HtmlUtil.url("/latest", ARG_ID,
+                String urlPath = HtmlUtil.url("/latest", ARG_ENTRYID,
                                      group.getId(), ARG_LATESTOPENDAP,
                                      "true", ARG_OUTPUT, OUTPUT_CATALOG);
                 addService(catalogInfo, SERVICE_LATEST,
@@ -514,7 +514,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (entry.getTypeHandler().canDownload(request, entry)) {
-            String urlPath = HtmlUtil.url("/" + getStorageManager().getFileTail(entry), ARG_ID,
+            String urlPath = HtmlUtil.url("/" + getStorageManager().getFileTail(entry), ARG_ENTRYID,
                                           entry.getId());
             addService(catalogInfo, SERVICE_HTTP,
                        getRepository().URL_ENTRY_GET.getFullUrl());
@@ -650,7 +650,7 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
-                request.url(repository.URL_ENTRY_SHOW, ARG_ID, group.getId(),
+                request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID, group.getId(),
                             ARG_OUTPUT, OUTPUT_CATALOG);
 
             Element ref = XmlUtil.create(catalogInfo.doc, TAG_CATALOGREF,

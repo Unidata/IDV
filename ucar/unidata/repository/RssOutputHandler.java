@@ -223,7 +223,7 @@ public class RssOutputHandler extends OutputHandler {
             sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", entry.getName()));
             String url =
                 repository.absoluteUrl(request.url(repository.URL_ENTRY_SHOW,
-                    ARG_ID, entry.getId()));
+                    ARG_ENTRYID, entry.getId()));
             sb.append(XmlUtil.tag(TAG_RSS_LINK, "", url));
             sb.append(XmlUtil.tag(TAG_RSS_GUID, "", url));
 

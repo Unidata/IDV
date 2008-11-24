@@ -705,7 +705,7 @@ public class TypeHandler extends RepositoryManager {
             String nameString = entry.getName();
             nameString = HtmlUtil.href(
                                        HtmlUtil.url(
-                                                    request.url(getRepository().URL_ENTRY_SHOW), ARG_ID,
+                                                    request.url(getRepository().URL_ENTRY_SHOW), ARG_ENTRYID,
                                                     entry.getId()), nameString);
             
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), nameString));

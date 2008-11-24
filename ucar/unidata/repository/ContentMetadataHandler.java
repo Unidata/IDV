@@ -158,13 +158,13 @@ public class ContentMetadataHandler extends MetadataHandler {
         Metadata.Type type    = getType(metadata.getType());
         String extra = (forLink?" width=\"75\" ":"");
         if(ImageUtils.isImage(f.toString())) {
-            return  HtmlUtil.img(request.url(getRepository().getMetadataManager().URL_METADATA_VIEW, ARG_ID,
+            return  HtmlUtil.img(request.url(getRepository().getMetadataManager().URL_METADATA_VIEW, ARG_ENTRYID,
                                              metadata.getEntryId(),
                                              ARG_METADATA_ID,
                                              metadata.getId()),"thumbnail",extra);
         }  else if(f.exists()) {
             String name  =getRepository().getStorageManager().getFileTail(f.getName());
-            return  HtmlUtil.href(request.url(getRepository().getMetadataManager().URL_METADATA_VIEW, ARG_ID,
+            return  HtmlUtil.href(request.url(getRepository().getMetadataManager().URL_METADATA_VIEW, ARG_ENTRYID,
                                              metadata.getEntryId(),
                                              ARG_METADATA_ID,
                                               metadata.getId()), name);

@@ -436,7 +436,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         request.url(
-                            getRepository().URL_GRAPH_VIEW, ARG_ID, tag.getName(),
+                            getRepository().URL_GRAPH_VIEW, ARG_ENTRYID, tag.getName(),
                             ARG_NODETYPE, TYPE_TAG), tag.getName(), extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
@@ -565,7 +565,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         request.url(
-                            getRepository().URL_GRAPH_VIEW, ARG_ID,
+                            getRepository().URL_GRAPH_VIEW, ARG_ENTRYID,
                             association, ARG_NODETYPE,
                             TYPE_ASSOCIATION), association, extra));
                 sb.append("</span>");
@@ -598,7 +598,7 @@ public class HtmlOutputHandler extends OutputHandler {
     public StringBuffer getCommentBlock(Request request, Entry entry)
             throws Exception {
         StringBuffer  sb       = new StringBuffer();
-        List<Comment> comments = getRepository().getComments(request, entry);
+        List<Comment> comments = getEntryManager().getComments(request, entry);
         if (comments.size() > 0) {
             sb.append(getEntryManager().getCommentHtml(request, entry));
         }
@@ -799,7 +799,7 @@ public class HtmlOutputHandler extends OutputHandler {
     private void addDescription(Request request, Entry entry, StringBuffer sb) {
         String desc= entry.getDescription();
         if (desc.length() > 0) {
-            desc = getRepository().processText(request, entry, desc);
+            desc = getEntryManager().processText(request, entry, desc);
             StringBuffer descSB = new StringBuffer("\n<div class=\"description\">\n");
             descSB.append(desc);
             descSB.append("</div>\n");
@@ -1016,7 +1016,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tmp = StringUtil.replace(
             tmp, "%loadurl%",
             request.url(
-                getRepository().URL_ENTRY_GETENTRIES, ARG_IDS, "%ids%",
+                getRepository().URL_ENTRY_GETENTRIES, ARG_ENTRYIDS, "%ids%",
                 ARG_OUTPUT, OUTPUT_HTML));
         return tmp;
 

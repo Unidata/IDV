@@ -180,11 +180,11 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryShow(Request request) throws Exception {
         Entry entry;
-        if (request.defined(ARG_ID)) {
+        if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
             if (entry == null) {
                 Entry tmp = getEntry(request,
-                                     request.getString(ARG_ID, BLANK), false);
+                                     request.getString(ARG_ENTRYID, BLANK), false);
                 if (tmp != null) {
                     throw new IllegalArgumentException(
                         "You do not have access to this entry");
@@ -228,7 +228,7 @@ public class EntryManager extends RepositoryManager {
             }
             //Do a redirect
             if (nextId != null) {
-                return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ID, nextId,
+                return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, nextId,
                         ARG_OUTPUT,
                         request.getString(ARG_OUTPUT,
                                           OutputHandler.OUTPUT_HTML.getId().toString())));
@@ -266,7 +266,7 @@ public class EntryManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         //        sb.append(makeTabs(Misc.newList("title1","title2","title3"),
         //                           Misc.newList("contents1","contents2","contents3")));
-        if (request.defined(ARG_ID)) {
+        if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
             /*
             if (entry.isTopGroup()) {
@@ -360,7 +360,7 @@ public class EntryManager extends RepositoryManager {
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons
                     + topLevelCheckbox, 2)));
             if (entry != null) {
-                sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+                sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
             } else {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
@@ -426,7 +426,7 @@ public class EntryManager extends RepositoryManager {
         Entry       entry       = null;
         TypeHandler typeHandler = null;
         boolean     newEntry    = true;
-        if (request.defined(ARG_ID)) {
+        if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
             if (entry.getIsLocalFile()) {
                 return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
@@ -848,7 +848,7 @@ public class EntryManager extends RepositoryManager {
         fb.append(request.form(getRepository().URL_ENTRY_DELETE, BLANK));
         fb.append(RepositoryUtil.buttons(HtmlUtil.submit(msg("OK"), ARG_DELETE_CONFIRM),
                           HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
-        fb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        fb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         fb.append(HtmlUtil.formClose());
         sb.append(getRepository().question(inner.toString(), fb.toString()));
         return makeEntryEditResult(request, entry,
@@ -869,7 +869,7 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryListDelete(Request request) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        for (String id : StringUtil.split(request.getString(ARG_IDS, ""),
+        for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS, ""),
                                           ",", true, true)) {
             Entry entry = getEntry(request, id, false);
             if (entry == null) {
@@ -905,7 +905,7 @@ public class EntryManager extends RepositoryManager {
                 return new Result(request.url(getRepository().URL_ENTRY_SHOW));
             }
             String id = entries.get(0).getParentGroupId();
-            return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ID, id));
+            return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, id));
         }
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
@@ -927,7 +927,7 @@ public class EntryManager extends RepositoryManager {
         msgSB.append(
             msg("Are you sure you want to delete all of the entries?"));
         sb.append(request.form(getRepository().URL_ENTRY_DELETELIST));
-        String hidden = HtmlUtil.hidden(ARG_IDS, idBuffer.toString());
+        String hidden = HtmlUtil.hidden(ARG_ENTRYIDS, idBuffer.toString());
         String form = RepositoryUtil.makeOkCancelForm(request, getRepository().URL_ENTRY_DELETELIST,
                                        ARG_DELETE_CONFIRM, hidden);
         sb.append(getRepository().question(msgSB.toString(), form));
@@ -993,7 +993,7 @@ public class EntryManager extends RepositoryManager {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request, getRepository().entryEditUrls,
-                                          "?" + ARG_ID + "="
+                                          "?" + ARG_ENTRYID + "="
                                           + entry.getId()));
         return result;
     }
@@ -1217,7 +1217,7 @@ public class EntryManager extends RepositoryManager {
         String entryId = (String) request.getId((String) null);
         
         if (entryId == null) {
-            throw new IllegalArgumentException("No " + ARG_ID + " given");
+            throw new IllegalArgumentException("No " + ARG_ENTRYID + " given");
         }
         Entry entry = getEntry(request, entryId);
         if (entry == null) {
@@ -1505,7 +1505,7 @@ public class EntryManager extends RepositoryManager {
                 connection.commit();
                 connection.setAutoCommit(true);
                 getRepository().clearCache();
-                return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ID,
+                return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
                         fromEntry.getId()));
             }
         } finally {
@@ -1870,6 +1870,51 @@ public class EntryManager extends RepositoryManager {
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Comment> getComments(Request request, Entry entry)
+            throws Exception {
+        if (entry.getComments() != null) {
+            return entry.getComments();
+        }
+        if (entry.isDummy()) {
+            return new ArrayList<Comment>();
+        }
+        Statement stmt = getDatabaseManager().select(Tables.COMMENTS.COLUMNS,
+                             Tables.COMMENTS.NAME,
+                             Clause.eq(Tables.COMMENTS.COL_ENTRY_ID, entry.getId()),
+                             " order by " + Tables.COMMENTS.COL_DATE + " asc ");
+        SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
+        List<Comment>    comments = new ArrayList();
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                comments
+                    .add(new Comment(results
+                        .getString(1), entry, getUserManager()
+                        .findUser(results
+                                  .getString(3), true), 
+                                     getDatabaseManager().getDate(results,4),
+                                     results.getString(5), results.getString(6)));
+            }
+        }
+        entry.setComments(comments);
+        return comments;
+    }
+
+
+
+
+
     /**
      * _more_
      *
@@ -1886,7 +1931,7 @@ public class EntryManager extends RepositoryManager {
                                  request.getUnsafeString(ARG_COMMENT_ID,
                                      BLANK)));
         entry.setComments(null);
-        return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ID,
+        return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
                                       entry.getId(), ARG_MESSAGE,
                                       "Comment deleted"));
     }
@@ -1912,7 +1957,7 @@ public class EntryManager extends RepositoryManager {
 
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ID,
+            return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
                                           entry.getId()));
         }
 
@@ -1934,14 +1979,14 @@ public class EntryManager extends RepositoryManager {
             insert.execute();
             insert.close();
             entry.setComments(null);
-            return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ID,
+            return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
                                           entry.getId(), ARG_MESSAGE,
                                           "Comment added"));
         }
 
         sb.append(msgLabel("Add comment for") + getEntryLink(request, entry));
         sb.append(request.form(getRepository().URL_COMMENTS_ADD, BLANK));
-        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("Subject"),
                                      HtmlUtil.input(ARG_SUBJECT, subject,
@@ -1980,11 +2025,11 @@ public class EntryManager extends RepositoryManager {
                                  Permission.ACTION_COMMENT);
 
         StringBuffer  sb       = new StringBuffer();
-        List<Comment> comments = getRepository().getComments(request, entry);
+        List<Comment> comments = getComments(request, entry);
 
         if (canComment) {
             sb.append(request.form(getRepository().URL_COMMENTS_ADD, BLANK));
-            sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+            sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
             sb.append(HtmlUtil.submit("Add Comment", ARG_ADD));
             sb.append(HtmlUtil.formClose());
         }
@@ -2004,7 +2049,7 @@ public class EntryManager extends RepositoryManager {
                                   : HtmlUtil
                                       .href(request
                                           .url(getRepository().URL_COMMENTS_EDIT, ARG_DELETE,
-                                              "true", ARG_ID, entry.getId(),
+                                              "true", ARG_ENTRYID, entry.getId(),
                                               ARG_COMMENT_ID,
                                               comment.getId()), HtmlUtil
                                                   .img(getRepository().fileUrl(ICON_DELETE),
@@ -2102,7 +2147,7 @@ public class EntryManager extends RepositoryManager {
         String entryId = entry.getId();
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
-            String  icon     = getRepository().getIconUrl(entry);
+            String  icon     = getIconUrl(entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
             String event = (entry.isGroup()
@@ -2480,17 +2525,17 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected Entry getEntry(Request request) throws Exception {
-        String entryId = request.getString(ARG_ID, BLANK);
+        String entryId = request.getString(ARG_ENTRYID, BLANK);
         Entry  entry   = getEntry(request, entryId);
         if (entry == null) {
-            Entry tmp = getEntry(request, request.getString(ARG_ID, BLANK),
+            Entry tmp = getEntry(request, request.getString(ARG_ENTRYID, BLANK),
                                  false);
             if (tmp != null) {
                 throw new RepositoryUtil.AccessException(
                     "You do not have access to this entry");
             }
             throw new RepositoryUtil.MissingEntryException("Could not find entry:"
-                    + request.getString(ARG_ID, BLANK));
+                    + request.getString(ARG_ENTRYID, BLANK));
         }
         return entry;
     }
@@ -3061,7 +3106,7 @@ public class EntryManager extends RepositoryManager {
     public String getEntryResourceUrl(Request request, Entry entry) {
         String fileTail = getStorageManager().getFileTail(entry);
         return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                            + fileTail, ARG_ID, entry.getId());
+                            + fileTail, ARG_ENTRYID, entry.getId());
     }
 
 
@@ -3746,6 +3791,48 @@ public class EntryManager extends RepositoryManager {
     /**
      * _more_
      *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public String getIconUrl(Entry entry) {
+        Resource resource = entry.getResource();
+        String   path     = resource.getPath();
+        if (entry.isGroup()) {
+            return fileUrl(ICON_FOLDER_CLOSED);
+        }
+        String img = ICON_FILE;
+        if (path != null) {
+            String suffix = IOUtil.getFileExtension(path.toLowerCase());
+            String prop   = getRepository().getProperty("icon" + suffix);
+            if (prop != null) {
+                img = prop;
+            }
+        }
+        return fileUrl(img);
+    }
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    protected String getPathFromEntry(Entry entry) {
+        String name = entry.getName();
+        name = name.toLowerCase();
+        name = name.replace(" ", "_");
+        name = name.replace(">", "_");
+        return name;
+    }
+
+
+
+
+    /**
+     * _more_
+     *
      * @throws Exception _more_
      */
     protected void initGroups() throws Exception {
@@ -4139,6 +4226,25 @@ public class EntryManager extends RepositoryManager {
                 SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME), where, ""), 1);
     }
 
+
+
+    public String processText(Request request, Entry entry, String text) {
+        int idx = text.indexOf("<more>");
+        if(idx>=0) {
+            String first = text.substring(0,idx);
+            String base = ""+(Repository.blockCnt++);
+            String divId = "morediv_" + base;
+            String linkId = "morelink_" + base;
+            String second = text.substring(idx+"<more>".length());
+            String moreLink  = "javascript:showMore(" + HtmlUtil.squote(base) +")";
+            String lessLink  = "javascript:hideMore(" + HtmlUtil.squote(base) +")";
+            text = first+"<br><a " + HtmlUtil.id(linkId) +" href=" + HtmlUtil.quote(moreLink) +">More...</a><div style=\"\" class=\"moreblock\" " + HtmlUtil.id(divId)+">" + second +
+                "<br>" +
+                "<a href=" + HtmlUtil.quote(lessLink) +">...Less</a>" +
+                "</div>";
+        }
+        return text;
+    }
 
 
 

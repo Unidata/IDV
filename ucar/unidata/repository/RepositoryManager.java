@@ -336,7 +336,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @return _more_
      */
     protected String header(String h) {
-        return repository.header(h);
+        return RepositoryUtil.header(h);
     }
 
     /**

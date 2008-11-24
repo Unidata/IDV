@@ -84,6 +84,8 @@ public class GraphOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph","graph.graph");
 
+
+
     /**
      * _more_
      *
@@ -265,7 +267,7 @@ public class GraphOutputHandler extends OutputHandler {
         if (ImageUtils.isImage(resource)) {
             String imageUrl =
                 HtmlUtil.url(getRepository().URL_ENTRY_GET + entryId
-                             + IOUtil.getFileExtension(resource), ARG_ID,
+                             + IOUtil.getFileExtension(resource), ARG_ENTRYID,
                                  entryId, ARG_IMAGEWIDTH, "75");
             attrs = attrs + " " + XmlUtil.attr("image", imageUrl);
         }

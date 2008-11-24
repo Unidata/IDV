@@ -139,7 +139,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
            entry.getResource().getPath().endsWith(".zidv")) {
 
             String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                      + entry.getName(), ARG_ID, entry.getId());
+                                      + entry.getName(), ARG_ENTRYID, entry.getId());
             url = getRepository().absoluteUrl(url);
             jnlp = jnlp.replace("%ARG%","-bundle");
             jnlp = jnlp.replace("%URL%",url);

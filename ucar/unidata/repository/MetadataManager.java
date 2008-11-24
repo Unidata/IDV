@@ -486,7 +486,7 @@ public class MetadataManager extends RepositoryManager {
                 }
             }
             entry.setMetadata(null);
-            return new Result(request.url(URL_METADATA_FORM, ARG_ID,
+            return new Result(request.url(URL_METADATA_FORM, ARG_ENTRYID,
                                           entry.getId()));
         }
     }
@@ -642,7 +642,7 @@ public class MetadataManager extends RepositoryManager {
                 getRepository().note(msg("No metadata defined for entry")));
         } else {
             sb.append(HtmlUtil.uploadForm(request.url(URL_METADATA_CHANGE),""));
-            sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+            sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
             sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
@@ -709,7 +709,7 @@ public class MetadataManager extends RepositoryManager {
                         }
                     }
                     groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
-                    groupSB.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+                    groupSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
                     groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
                     groupSB.append(HtmlUtil.submit(msg("Add")));
                     groupSB.append(HtmlUtil.space(1)
@@ -762,7 +762,7 @@ public class MetadataManager extends RepositoryManager {
         synchronized (MUTEX_METADATA) {
             Entry entry = getEntryManager().getEntry(request);
             if (request.exists(ARG_CANCEL)) {
-                return new Result(request.url(URL_METADATA_ADDFORM, ARG_ID,
+                return new Result(request.url(URL_METADATA_ADDFORM, ARG_ENTRYID,
                         entry.getId()));
             }
             List<Metadata> newMetadata = new ArrayList<Metadata>();
@@ -774,7 +774,7 @@ public class MetadataManager extends RepositoryManager {
                 insertMetadata(metadata);
             }
             entry.setMetadata(null);
-            return new Result(request.url(URL_METADATA_FORM, ARG_ID,
+            return new Result(request.url(URL_METADATA_FORM, ARG_ENTRYID,
                                           entry.getId()));
 
         }

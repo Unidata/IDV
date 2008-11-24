@@ -548,10 +548,10 @@ public interface Constants {
     public static final String ARG_SEARCHMETADATA = "searchmetadata";
 
     /** _more_ */
-    public static final String ARG_ID = "id";
+    public static final String ARG_ENTRYID = "entryid";
 
     /** _more_ */
-    public static final String ARG_IDS = "ids";
+    public static final String ARG_ENTRYIDS = "entryids";
 
     /** _more_ */
     public static final String ARG_METADATA_ID = "metadata.id";
@@ -852,10 +852,6 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_DB_DESCRIPTION = "description";
 
-
-
-
-
     /** _more_ */
     public static final String ARG_NODETYPE = "nodetype";
 
@@ -870,6 +866,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String NODETYPE_GROUP = "group";
+
+
 
     /** _more_ */
     public static final String TAG_CATALOGREF = "catalogRef";

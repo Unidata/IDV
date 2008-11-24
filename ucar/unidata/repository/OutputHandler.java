@@ -451,7 +451,7 @@ public class OutputHandler extends RepositoryManager {
         String linkText = group.getLabel();
         StringBuffer sb = new StringBuffer();
         String entryId = group.getId();
-        String  icon     = getRepository().getIconUrl(group);
+        String  icon     = getEntryManager().getIconUrl(group);
         String event = (group.isGroup()
                         ? HtmlUtil.onMouseClick("folderClick(" + HtmlUtil.squote(entryId) + 
                                                 ",'selectxml'," + HtmlUtil.squote(ATTR_TARGET+"=" + target)+")")
@@ -605,7 +605,7 @@ public class OutputHandler extends RepositoryManager {
             }
 
             if (showCrumbs) {
-                String img = HtmlUtil.img(getRepository().getIconUrl(entry));
+                String img = HtmlUtil.img(getEntryManager().getIconUrl(entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
                 String crumbs = getEntryManager().getBreadCrumbs(request,

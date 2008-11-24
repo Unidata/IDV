@@ -696,7 +696,7 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        sb.append(getRepository().header(msgLabel("User") + HtmlUtil.space(1)
+        sb.append(RepositoryUtil.header(msgLabel("User") + HtmlUtil.space(1)
                                          + user.getLabel()));
         sb.append(HtmlUtil.p());
         sb.append(request.form(getRepositoryBase().URL_USER_EDIT));
@@ -1395,7 +1395,7 @@ public class UserManager extends RepositoryManager {
                                          List<Link> links, boolean forHeader)
                     throws Exception {
                 links.add(new Link(request.url(getRepository().URL_USER_CART,
-                        ARG_ACTION, ACTION_ADD, ARG_ID,
+                        ARG_ACTION, ACTION_ADD, ARG_ENTRYID,
                         entry.getId()), getRepository().fileUrl(ICON_CART),
                                         msg("Add to cart")));
             }

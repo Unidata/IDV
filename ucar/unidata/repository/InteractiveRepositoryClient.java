@@ -329,7 +329,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                 GuiUtils.setCursor(groupTree, GuiUtils.waitCursor);
                 String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),
                                           new String[] {
-                    ARG_ID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID,
+                    ARG_ENTRYID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID,
                     getSessionId()
                 });
                 String xml = IOUtil.readContents(url, getClass());

@@ -339,7 +339,7 @@ public class DataOutputHandler extends OutputHandler {
                             request.getRequestPath() + "/"
                             + IOUtil.stripExtension(entry.getName())
                             + ".csv", Misc.newList(
-                                ARG_ID, entry.getId(), ARG_OUTPUT,
+                                ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
                                 OUTPUT_POINT_CSV)), getRepository().fileUrl(
                                     ICON_CSV), "Point Data as CSV"));
             }
@@ -351,7 +351,7 @@ public class DataOutputHandler extends OutputHandler {
                             request.getRequestPath() + "/"
                             + IOUtil.stripExtension(entry.getName())
                             + ".kml", Misc.newList(
-                                ARG_ID, entry.getId(), ARG_OUTPUT,
+                                ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
                                 OUTPUT_POINT_KML)), getRepository().fileUrl(
                                     ICON_KML), "Point Data as KML"));
             }
@@ -416,7 +416,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
-               + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID + ":"
+               + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID + ":"
                + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
@@ -430,7 +430,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public String getFullTdsUrl(Entry entry) {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
-               + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ID
+               + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
                + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
@@ -851,7 +851,7 @@ public class DataOutputHandler extends OutputHandler {
         sb.append(submitExtra);
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.hidden(ARG_OUTPUT, OUTPUT_GRIDSUBSET));
-        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.formTable());
 
         sb.append(HtmlUtil.formEntry(msgLabel("Horizontal Stride"),
@@ -1134,7 +1134,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(), ARG_ID,
+                        ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
                         entry.getId(), ARG_SKIP, "" + (skip - max), ARG_MAX,
                         "" + max
                     }), msg("Previous")));
@@ -1146,7 +1146,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(), ARG_ID,
+                        ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
                         entry.getId(), ARG_SKIP, "" + (skip + max), ARG_MAX,
                         "" + max
                     }), msg("Next")));
@@ -1159,7 +1159,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(), ARG_ID,
+                        ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
                         entry.getId(), ARG_SKIP, "" + 0, ARG_MAX, "" + total
                     }), msg("All")));
 

@@ -194,6 +194,16 @@ public class RepositoryUtil {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    protected static String header(String h) {
+        return "<div class=\"pageheading\">" + h + "</div>";
+    }
 
 }
 

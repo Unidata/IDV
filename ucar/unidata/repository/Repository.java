@@ -117,6 +117,9 @@ public class Repository extends RepositoryBase implements
     public static final String MACRO_BOTTOM=            "bottom"; 
     public static final String MACRO_CONTENT=           "content";
 
+    /** _more_ */
+    public static int blockCnt = 0;
+
 
     /** _more_ */
     public static final String MSG_PREFIX = "<msg ";
@@ -286,7 +289,6 @@ public class Repository extends RepositoryBase implements
 
 
 
-
     /**
      * _more_
      *
@@ -320,30 +322,6 @@ public class Repository extends RepositoryBase implements
         return inTomcat;
     }
 
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    public String getIconUrl(Entry entry) {
-        Resource resource = entry.getResource();
-        String   path     = resource.getPath();
-        if (entry.isGroup()) {
-            return fileUrl(ICON_FOLDER_CLOSED);
-        }
-        String img = ICON_FILE;
-        if (path != null) {
-            String suffix = IOUtil.getFileExtension(path.toLowerCase());
-            String prop   = getProperty("icon" + suffix);
-            if (prop != null) {
-                img = prop;
-            }
-        }
-        return fileUrl(img);
-    }
 
 
     /**
@@ -404,6 +382,192 @@ public class Repository extends RepositoryBase implements
     /**
      * _more_
      *
+     *
+     * @param contextProperties _more_
+     * @throws Exception _more_
+     */
+    protected void initProperties(Properties contextProperties)
+            throws Exception {
+
+        /*
+          order in which we load properties files
+          system
+          context (e.g., from tomcat web-inf)
+          cmd line args (both -Dname=value and .properties files)
+          (We load the above so we can define an alternate repository dir)
+          local repository directory
+          (Now load in the cmd line again because they have precedence over anything else);
+          cmd line
+         */
+
+        properties = new Properties();
+        properties.load(
+            IOUtil.getInputStream(
+                "/ucar/unidata/repository/resources/repository.properties",
+                getClass()));
+
+        Properties   argProperties       = new Properties();
+        for (int i = 0; i < args.length; i++) {
+            if(checkFile(args[i])) {
+                continue;
+            }
+            if (args[i].endsWith(".properties")) {
+                argProperties.load(IOUtil.getInputStream(args[i],
+                        getClass()));
+            } else if (args[i].equals("-dump")) {
+                dumpFile = args[i + 1];
+                i++;
+            } else if (args[i].equals("-load")) {
+                loadFiles.add(args[i + 1]);
+                i++;
+            } else if (args[i].equals("-admin")) {
+                User user = new User(args[i + 1], true);
+                user.setPassword(UserManager.hashPassword(args[i + 2]));
+                cmdLineUsers.add(user);
+                i += 2;
+            } else if (args[i].equals("-port")) {
+                //skip
+                i++;
+            } else if (args[i].startsWith("-D")) {
+                String       s    = args[i].substring(2);
+                List<String> toks = StringUtil.split(s, "=", true, true);
+                if (toks.size() != 2) {
+                    throw new IllegalArgumentException("Bad argument:"
+                            + args[i]);
+                }
+                argProperties.put(toks.get(0), toks.get(1));
+            } else {
+                usage("Unknown argument: " + args[i]);
+            }
+        }
+
+        //Load the context and the command line properties now 
+        //so the storage manager can get to them
+        if (contextProperties != null) {
+            properties.putAll(contextProperties);
+        }
+        properties.putAll(argProperties);
+
+
+        //Call the storage manager so it can figure out the home dir
+        getStorageManager();
+
+        try {
+            //Now load in the local properties file
+            String localPropertyFile =
+                IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+                               "repository.properties");
+            properties.load(IOUtil.getInputStream(localPropertyFile,
+                    getClass()));
+        } catch (Exception exc) {}
+        //Now put back any of the cmd line arg properties because they have precedence
+        properties.putAll(argProperties);
+
+        initPlugins();
+
+        apiDefFiles.addAll(0,getResourcePaths(PROP_API));
+        typeDefFiles.addAll(0, getResourcePaths(PROP_TYPES));
+        outputDefFiles.addAll(0, getResourcePaths(PROP_OUTPUTHANDLERS));
+        metadataDefFiles.addAll(0, getResourcePaths(PROP_METADATAHANDLERS));
+
+        debug = getProperty(PROP_DEBUG, false);
+        //        System.err.println ("debug:" + debug);
+
+        setUrlBase((String) properties.get(PROP_HTML_URLBASE));
+        if (getUrlBase() == null) {
+            setUrlBase(BLANK);
+        }
+
+        logFile =
+            new File(IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+                                    "repository.log"));
+        //TODO: Roll the log file
+        logFOS = new FileOutputStream(logFile, true);
+
+        String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
+        if (derbyHome != null) {
+            derbyHome = getStorageManager().localizePath(derbyHome);
+            File dir = new File(derbyHome);
+            IOUtil.makeDirRecursive(dir);
+            System.setProperty("derby.system.home", derbyHome);
+        }
+
+        mimeTypes = new Properties();
+        for (String path : getResourcePaths(PROP_HTML_MIMEPROPERTIES)) {
+            try {
+                InputStream is = IOUtil.getInputStream(path, getClass());
+                mimeTypes.load(is);
+            } catch (Exception exc) {
+                //noop
+            }
+        }
+
+        sdf = RepositoryUtil.makeDateFormat(getProperty(PROP_DATEFORMAT,
+                                         DEFAULT_TIME_FORMAT));
+        TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
+
+
+        //This will end up being from the properties
+        htdocRoots.addAll(
+            StringUtil.split(
+                getProperty("ramadda.html.htdocroots", BLANK), ";", true,
+                true));
+
+        String hostname = getProperty(PROP_HOSTNAME,(String)null);
+        if(hostname!=null) {
+            this.hostname = hostname;
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void initServer() throws Exception {
+        getDatabaseManager().init();
+        initTypeHandlers();
+        initSchema();
+
+        for (String sqlFile : (List<String>) loadFiles) {
+            String     sql        = IOUtil.readContents(sqlFile, getClass());
+            Connection connection = getDatabaseManager().getNewConnection();
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
+            SqlUtil.loadSql(sql, statement, false, true);
+            connection.commit();
+            connection.setAutoCommit(true);
+            connection.close();
+        }
+        readGlobals();
+
+        checkVersion();
+
+        initOutputHandlers();
+        getMetadataManager().initMetadataHandlers(metadataDefFiles);
+        initApi();
+
+        initUsers();
+        getEntryManager().initGroups();
+        getHarvesterManager().initHarvesters();
+        initLanguages();
+
+        setLocalFilePaths();
+
+        if (dumpFile != null) {
+            FileOutputStream fos = new FileOutputStream(dumpFile);
+            getDatabaseManager().makeDatabaseCopy(fos, true);
+            fos.close();
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @return _more_
      */
     public Repository getRepository() {
@@ -411,16 +575,6 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    /**
-     * _more_
-     *
-     * @param h _more_
-     *
-     * @return _more_
-     */
-    protected static String header(String h) {
-        return "<div class=\"pageheading\">" + h + "</div>";
-    }
 
 
 
@@ -671,50 +825,6 @@ public class Repository extends RepositoryBase implements
      *
      * @throws Exception _more_
      */
-    protected void initServer() throws Exception {
-        getDatabaseManager().init();
-        initTypeHandlers();
-        initSchema();
-
-        for (String sqlFile : (List<String>) loadFiles) {
-            String     sql        = IOUtil.readContents(sqlFile, getClass());
-            Connection connection = getDatabaseManager().getNewConnection();
-            connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
-            SqlUtil.loadSql(sql, statement, false, true);
-            connection.commit();
-            connection.setAutoCommit(true);
-            connection.close();
-        }
-        readGlobals();
-
-        checkVersion();
-
-        initOutputHandlers();
-        getMetadataManager().initMetadataHandlers(metadataDefFiles);
-        initApi();
-
-        initUsers();
-        getEntryManager().initGroups();
-        getHarvesterManager().initHarvesters();
-        initLanguages();
-
-        setLocalFilePaths();
-
-
-
-        if (dumpFile != null) {
-            FileOutputStream fos = new FileOutputStream(dumpFile);
-            getDatabaseManager().makeDatabaseCopy(fos, true);
-            fos.close();
-        }
-    }
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
     protected void initLanguages() throws Exception {
         List sourcePaths =
             Misc.newList(
@@ -845,149 +955,6 @@ public class Repository extends RepositoryBase implements
         }
         return true;
     }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param contextProperties _more_
-     * @throws Exception _more_
-     */
-    protected void initProperties(Properties contextProperties)
-            throws Exception {
-
-        /*
-          order in which we load properties files
-          system
-          context (e.g., from tomcat web-inf)
-          cmd line args (both -Dname=value and .properties files)
-          (We load the above so we can define an alternate repository dir)
-          local repository directory
-          (Now load in the cmd line again because they have precedence over anything else);
-          cmd line
-         */
-
-        properties = new Properties();
-        properties.load(
-            IOUtil.getInputStream(
-                "/ucar/unidata/repository/resources/repository.properties",
-                getClass()));
-
-        Properties   argProperties       = new Properties();
-        for (int i = 0; i < args.length; i++) {
-            if(checkFile(args[i])) {
-                continue;
-            }
-            if (args[i].endsWith(".properties")) {
-                argProperties.load(IOUtil.getInputStream(args[i],
-                        getClass()));
-            } else if (args[i].equals("-dump")) {
-                dumpFile = args[i + 1];
-                i++;
-            } else if (args[i].equals("-load")) {
-                loadFiles.add(args[i + 1]);
-                i++;
-            } else if (args[i].equals("-admin")) {
-                User user = new User(args[i + 1], true);
-                user.setPassword(UserManager.hashPassword(args[i + 2]));
-                cmdLineUsers.add(user);
-                i += 2;
-            } else if (args[i].equals("-port")) {
-                //skip
-                i++;
-            } else if (args[i].startsWith("-D")) {
-                String       s    = args[i].substring(2);
-                List<String> toks = StringUtil.split(s, "=", true, true);
-                if (toks.size() != 2) {
-                    throw new IllegalArgumentException("Bad argument:"
-                            + args[i]);
-                }
-                argProperties.put(toks.get(0), toks.get(1));
-            } else {
-                usage("Unknown argument: " + args[i]);
-            }
-        }
-
-        //Load the context and the command line properties now 
-        //so the storage manager can get to them
-        if (contextProperties != null) {
-            properties.putAll(contextProperties);
-        }
-        properties.putAll(argProperties);
-
-
-        //Call the storage manager so it can figure out the home dir
-        getStorageManager();
-
-        try {
-            //Now load in the local properties file
-            String localPropertyFile =
-                IOUtil.joinDir(getStorageManager().getRepositoryDir(),
-                               "repository.properties");
-            properties.load(IOUtil.getInputStream(localPropertyFile,
-                    getClass()));
-        } catch (Exception exc) {}
-        //Now put back any of the cmd line arg properties because they have precedence
-        properties.putAll(argProperties);
-
-        initPlugins();
-
-        apiDefFiles.addAll(0,getResourcePaths(PROP_API));
-        typeDefFiles.addAll(0, getResourcePaths(PROP_TYPES));
-        outputDefFiles.addAll(0, getResourcePaths(PROP_OUTPUTHANDLERS));
-        metadataDefFiles.addAll(0, getResourcePaths(PROP_METADATAHANDLERS));
-
-        debug = getProperty(PROP_DEBUG, false);
-        //        System.err.println ("debug:" + debug);
-
-        setUrlBase((String) properties.get(PROP_HTML_URLBASE));
-        if (getUrlBase() == null) {
-            setUrlBase(BLANK);
-        }
-
-        logFile =
-            new File(IOUtil.joinDir(getStorageManager().getRepositoryDir(),
-                                    "repository.log"));
-        //TODO: Roll the log file
-        logFOS = new FileOutputStream(logFile, true);
-
-        String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
-        if (derbyHome != null) {
-            derbyHome = getStorageManager().localizePath(derbyHome);
-            File dir = new File(derbyHome);
-            IOUtil.makeDirRecursive(dir);
-            System.setProperty("derby.system.home", derbyHome);
-        }
-
-        mimeTypes = new Properties();
-        for (String path : getResourcePaths(PROP_HTML_MIMEPROPERTIES)) {
-            try {
-                InputStream is = IOUtil.getInputStream(path, getClass());
-                mimeTypes.load(is);
-            } catch (Exception exc) {
-                //noop
-            }
-        }
-
-        sdf = RepositoryUtil.makeDateFormat(getProperty(PROP_DATEFORMAT,
-                                         DEFAULT_TIME_FORMAT));
-        TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
-
-
-        //This will end up being from the properties
-        htdocRoots.addAll(
-            StringUtil.split(
-                getProperty("ramadda.html.htdocroots", BLANK), ";", true,
-                true));
-
-        String hostname = getProperty(PROP_HOSTNAME,(String)null);
-        if(hostname!=null) {
-            this.hostname = hostname;
-        }
-
-    }
-
 
 
     /**
@@ -1408,7 +1375,7 @@ public class Repository extends RepositoryBase implements
                     idBuffer.append(",");
                     idBuffer.append(entry.getId());
                 }
-                return new Result(request.url(URL_ENTRY_DELETELIST, ARG_IDS,
+                return new Result(request.url(URL_ENTRY_DELETELIST, ARG_ENTRYIDS,
                         idBuffer.toString()));
             }
         };
@@ -1554,7 +1521,7 @@ public class Repository extends RepositoryBase implements
         topGroups.add(getEntryManager().getTopGroup());
         //        System.err.println ("incoming:" + incoming);
         for (Group group : topGroups) {
-            String name = "/" + getPathFromEntry(group);
+            String name = "/" + getEntryManager().getPathFromEntry(group);
             //            System.err.println ("\t" + name);
             if (incoming.startsWith(name + "/")) {
                 //                request.setCollectionEntry(group);
@@ -1719,20 +1686,6 @@ public class Repository extends RepositoryBase implements
         return result;
     }
 
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    protected String getPathFromEntry(Entry entry) {
-        String name = entry.getName();
-        name = name.toLowerCase();
-        name = name.replace(" ", "_");
-        name = name.replace(">", "_");
-        return name;
-    }
 
     /**
      * _more_
@@ -2408,8 +2361,6 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    /** _more_ */
-    public static int blockCnt = 0;
 
     /**
      * _more_
@@ -3378,53 +3329,6 @@ public class Repository extends RepositoryBase implements
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List<Comment> getComments(Request request, Entry entry)
-            throws Exception {
-        if (entry.getComments() != null) {
-            return entry.getComments();
-        }
-        if (entry.isDummy()) {
-            return new ArrayList<Comment>();
-        }
-        Statement stmt = getDatabaseManager().select(Tables.COMMENTS.COLUMNS,
-                             Tables.COMMENTS.NAME,
-                             Clause.eq(Tables.COMMENTS.COL_ENTRY_ID, entry.getId()),
-                             " order by " + Tables.COMMENTS.COL_DATE + " asc ");
-        SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
-        List<Comment>    comments = new ArrayList();
-        ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                comments
-                    .add(new Comment(results
-                        .getString(1), entry, getUserManager()
-                        .findUser(results
-                                  .getString(3), true), 
-                                     getDatabaseManager().getDate(results,4),
-                                     results.getString(5), results.getString(6)));
-            }
-        }
-        entry.setComments(comments);
-        return comments;
-    }
-
-
-
-
-
-
-
-
 
     /**
      * _more_
@@ -3450,10 +3354,6 @@ public class Repository extends RepositoryBase implements
         }
         return getOutputHandler(request).outputEntry(request, entry);
     }
-
-
-
-
 
 
 
@@ -3493,27 +3393,6 @@ public class Repository extends RepositoryBase implements
             }
             Misc.sleep(1000);
         }
-    }
-
-
-
-
-    public String processText(Request request, Entry entry, String text) {
-        int idx = text.indexOf("<more>");
-        if(idx>=0) {
-            String first = text.substring(0,idx);
-            String base = ""+(blockCnt++);
-            String divId = "morediv_" + base;
-            String linkId = "morelink_" + base;
-            String second = text.substring(idx+"<more>".length());
-            String moreLink  = "javascript:showMore(" + HtmlUtil.squote(base) +")";
-            String lessLink  = "javascript:hideMore(" + HtmlUtil.squote(base) +")";
-            text = first+"<br><a " + HtmlUtil.id(linkId) +" href=" + HtmlUtil.quote(moreLink) +">More...</a><div style=\"\" class=\"moreblock\" " + HtmlUtil.id(divId)+">" + second +
-                "<br>" +
-                "<a href=" + HtmlUtil.quote(lessLink) +">...Less</a>" +
-                "</div>";
-        }
-        return text;
     }
 
 
@@ -3574,6 +3453,7 @@ public class Repository extends RepositoryBase implements
                                           HtmlUtil.SIZE_15 + " title=\""
                                           + timeHelp + "\"");
     }
+
 
     /** _more_          */
     private static final String MAP_JS_MICROSOFT =

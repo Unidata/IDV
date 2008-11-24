@@ -346,7 +346,7 @@ public class GenericTypeHandler extends TypeHandler {
         StringBuffer sb     = new StringBuffer();
         OutputType       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
-            sb.append(repository.header(title));
+            sb.append(RepositoryUtil.header(title));
             sb.append("<ul>");
         } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");

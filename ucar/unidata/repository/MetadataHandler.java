@@ -547,7 +547,7 @@ public  class MetadataHandler extends RepositoryManager {
             return;
         }
         sb.append(request.uploadForm(getMetadataManager().URL_METADATA_ADD,""));
-        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(html[1]);
         sb.append(HtmlUtil.formClose());
     }

@@ -279,7 +279,7 @@ public class HarvesterManager extends RepositoryManager {
         }
 
 
-        sb.append(Repository.header("Create new harvester"));
+        sb.append(RepositoryUtil.header("Create new harvester"));
 
         sb.append(request.formPost(URL_HARVESTERS_NEW));
         sb.append(HtmlUtil.formTable());
