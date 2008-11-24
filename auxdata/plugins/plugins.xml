@@ -4,7 +4,7 @@
 <plugin name="Workshop IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/workshop.jar" description="Workshop specific configuration" category="Customized IDVs"/>
 <plugin name="Simple IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/simpleidv.jar" description="A simpler user interface for the IDV" category="Customized IDVs"/>
 <plugin name="TC IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/tcidv.jar" description="Shanghai Typhoon Institute IDV" category="Customized IDVs"/>
-<plugin name="GEON IDV" url="http://geon.unavco.org/unavco/geonidv_plugin/geonidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
+<plugin name="GEON IDV" url="http://geon.unavco.org/unavco/geonidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
 <plugin name="T-Rex IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
 
 <plugin name="Example Globe IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/globeidv.jar" description="An example showing a stripped down version of the IDV" category="Customized IDVs"/>
@@ -36,6 +36,7 @@
 <plugin name="European Maps" description="Map" size="381433" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/europemaps.jar" category="Maps"/>
 <plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
 <plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico.jar" category="Maps"/>
+<plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
 
 <!-- Misc -->
 <plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
