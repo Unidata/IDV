@@ -753,6 +753,8 @@ public class HtmlOutputHandler extends OutputHandler {
         if ((subGroups.size() == 0) && (entries.size() == 0)) {
             sb.append("No sub-groups");
         }
+
+
         StringBuffer xml = new StringBuffer("<content>\n");
         XmlUtil.appendCdata(xml,
                             getRepository().translate(request,

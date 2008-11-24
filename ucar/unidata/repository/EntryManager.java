@@ -1460,17 +1460,18 @@ public class EntryManager extends RepositoryManager {
                 String oldId = fromEntry.getId();
                 String newId = oldId;
                 //TODO: critical section around new group id
-                if (fromEntry.isGroup()) {
+                //Don't do this for now
+                if (false && fromEntry.isGroup()) {
                     newId = getGroupId(toGroup);
                     fromEntry.setId(newId);
                     String[] info = {
-                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
-                        Tables.ENTRIES.COL_PARENT_GROUP_ID, Tables.METADATA.NAME,
-                        Tables.METADATA.COL_ENTRY_ID, Tables.COMMENTS.NAME,
-                        Tables.COMMENTS.COL_ENTRY_ID, Tables.ASSOCIATIONS.NAME,
-                        Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, Tables.ASSOCIATIONS.NAME,
-                        Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, Tables.PERMISSIONS.NAME,
-                        Tables.PERMISSIONS.COL_ENTRY_ID
+                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID, 
+                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_PARENT_GROUP_ID, 
+                        Tables.METADATA.NAME, Tables.METADATA.COL_ENTRY_ID, 
+                        Tables.COMMENTS.NAME, Tables.COMMENTS.COL_ENTRY_ID, 
+                        Tables.ASSOCIATIONS.NAME, Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, 
+                        Tables.ASSOCIATIONS.NAME, Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, 
+                        Tables.PERMISSIONS.NAME,  Tables.PERMISSIONS.COL_ENTRY_ID
                     };
 
 
@@ -3577,6 +3578,9 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected String getGroupId(Group parent) throws Exception {
+        //FOr now just use regular ids for groups
+        if(true) return getRepository().getGUID();
+
         int    baseId = 0;
         Clause idClause;
         String idWhere;

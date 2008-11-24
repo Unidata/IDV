@@ -384,7 +384,7 @@ function Tooltip () {
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
         //        util.setPosition(obj, x,y);
-        url = "${urlroot}/entry/show?id=" + id +"&output=metadataxml";
+        url = "${urlroot}/entry/show?entryid=" + id +"&output=metadataxml";
 	util.loadXML( url, handleTooltip,obj);
     }
 
@@ -475,7 +475,7 @@ function folderClick(id, output,args) {
         block.obj.isOpen = 1;
         showObject(block);
         if(img) img.obj.src = "${urlroot}/icons/progress.gif";
-        url = "${urlroot}/entry/show?id=" + id +"&output=" + output+args;
+        url = "${urlroot}/entry/show?entryid=" + id +"&output=" + output+args;
 	util.loadXML( url, handleFolderList,id);
     } else {
         if(img) img.obj.src = "${urlroot}/icons/folderclosed.gif";

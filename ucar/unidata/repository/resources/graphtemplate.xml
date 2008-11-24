@@ -23,7 +23,7 @@
 
 
 <nodetype    name="group" parent="Node" fillcolor="#cccccc">
-  <command label="View group" command="url(,${root}/entry/show?id=%id%)"/>
+  <command label="View group" command="url(,${root}/entry/show?entryid=%id%)"/>
   <command label="Search group" command="url(,${root}/entry/searchform?group=%id%)"/>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
@@ -41,7 +41,7 @@
 
 
 <nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="${root}/file.gif">
-  <command label="View entry" command="url(,${root}/entry/show?id=%id%)"/>
+  <command label="View entry" command="url(,${root}/entry/show?entryid=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
@@ -56,7 +56,7 @@
 </nodetype>
 
 <nodetype    name="imageentry" parent="Node" fillcolor="255,255,153" >
-  <command label="View entry" command="url(,${root}/entry/show?id=%id%)"/>
+  <command label="View entry" command="url(,${root}/entry/show?entryid=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
