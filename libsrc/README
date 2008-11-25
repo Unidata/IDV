@@ -1,0 +1,8 @@
+mailapi.jar and smtp.jar:
+from: http://java.sun.com/products/javamail/ 
+These are from the Java Mail package and are used by RAMADDA
+Note: They were originally signed jars. To make them into the 
+jar of jars they need to be unjarred and the META_INF directory
+removed.
+
+
