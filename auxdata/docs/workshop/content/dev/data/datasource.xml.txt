@@ -42,12 +42,46 @@
    <datasource id="ADDE.RADAR" factory="ucar.unidata.data.imagery.AddeImageDataSource" />
  -->
   <datasource
-     id="FILE.TRACK"
+     id="FILE.TRACK,OPENDAP.TRACK,OPENDAP.TRAJECTORY"
      factory="ucar.unidata.data.sounding.TrackDataSource"
-     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$"
+     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$,wetPrf_.*_nc$"
      fileselection="true"
      doesmultiples="true"
      label="Track files"/>
+
+
+  <datasource
+     id="DB.POINT"
+     fileselection="true"
+     factory="ucar.unidata.data.point.DbPointDataSource"
+     label="Point data database"/>
+
+<!--
+  <datasource
+     id="DB.STORMTRACK"
+     fileselection="true"
+     factory="ucar.unidata.data.storm.STIStormDataSource"
+     label="STI Storm Data"/>
+-->
+
+
+  <datasource
+     id="DB.TRAJECTORY"
+     fileselection="true"
+     factory="ucar.unidata.data.sounding.DbTrajectoryDataSource"
+     label="Trajectory database"/>
+
+
+
+  <datasource
+     id="EOL.TRACKDB"
+     factory="ucar.unidata.data.sounding.TrackDataSource"
+     patterns="^jdbc:.*"
+     label="Eol Track Database"/>
+
+
+
+
 
   <datasource
      id="FILE.SONDE"
@@ -66,12 +100,12 @@
      label="netCDF Point Data files"/>
 
   <datasource
-     id="NetCDF.Grid"
+     id="NetCDF.Grid,HTTPServer.Grid,File.Grid"
      factory="ucar.unidata.data.grid.GeoGridDataSource"
-     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$"
+     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$"
      fileselection="true"
      doesmultiples="false"
-     label="Grid files (netCDF/GRIB/OPeNDAP)">
+     label="Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)">
     <property
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
@@ -83,7 +117,7 @@
      xxxpatterns="If we use any patterns here is will screw up adding multiple grid files as separate data sources"
      fileselection="true"
      doesmultiples="true"
-     label="Aggregated Grid files">
+     label="Aggregate Grids by Time">
     <property
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
@@ -141,7 +175,23 @@
      factory="ucar.unidata.data.gis.KmlDataSource"
      fileselection="true"
      label="Google Earth Files KML/KMZ"
-     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"/>
+     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"
+/>
+
+  <datasource
+     id="GRX PLACEFILE"
+     factory="ucar.unidata.data.gis.PlaceFileDataSource"
+     fileselection="true"
+     label="GRX Place file"
+     patterns="/grx/"
+/>
+
+  <datasource
+     id="ISER"
+     factory="ucar.unidata.data.SerializedDataSource"
+     fileselection="true"
+     label="IDV Serialized Data"
+     patterns="\.iser$,\.ISER$"/>
 
   <datasource
      id="FILE.VIS5D"
@@ -153,7 +203,7 @@
   <datasource
      id="FILE.AREAFILE"
      factory="ucar.unidata.data.imagery.McIDASImageDataSource"
-     patterns=".*AREA....$,.*\.gempak\.images\.sat.*,.*goes8.*,.*\.area$,.*Mcidas_MSG.*"
+     patterns=".*AREA....$,.*\.gempak\.images\.sat.*,.*goes8.*,.*\.area$,.*Mcidas_MSG.*,goes.*BAND_"
      doesmultiples="true"
      fileselection="true"
      label="McIDAS AREA files"></datasource>
@@ -163,10 +213,18 @@
      patterns="\.shp$,\.zip$"
      fileselection="true"
      factory="ucar.unidata.data.gis.ShapeFileDataSource"
-     label="Shape files">
+     label="Map files">
     <property
        name="default_display"
        value="shapefilecontrol"/>
+  </datasource>
+
+  <datasource
+     id="FILE.MAPFILE"
+     patterns="\.shp$,\.zip$"
+     fileselection="false"
+     factory="ucar.unidata.data.gis.ShapeFileDataSource"
+     label="Map files">
   </datasource>
 
   <datasource
@@ -184,6 +242,36 @@
      label="DEM files"/>
 
   <datasource
+     id="PRODUCT.ADDE"
+     factory="ucar.unidata.data.text.AddeTextProductDataSource"
+     standalone="true"
+     fileselection="true"
+     label="Weather Text Products (from server)">
+    <property
+       name="default_display"
+       value="textproductcontrol"/>
+  </datasource>
+
+  <datasource
+     id="PRODUCT.GEMPAK"
+     factory="ucar.unidata.data.text.NwxTextProductDataSource"
+     fileselection="true"
+     standalone="true"
+     label="Weather Text Products (from NWX files)">
+    <property
+       name="default_display"
+       value="textproductcontrol"/>
+  </datasource>
+
+  <datasource
+     id="STORM.ATCF"
+     fileselection="true"
+     standalone="true"
+     factory="ucar.unidata.data.storm.AtcfStormDataSource"
+     label="ATCF Tropical Storm Data"/>
+
+
+  <datasource
      id="FILE.TEXT"
      factory="ucar.unidata.data.text.TextDataSource"
      patterns="\.htm$,\.html$,\.txt$,\.text$,\.php$,\/$"
@@ -197,12 +285,25 @@
        value="textdisplay"/>
   </datasource>
 
+
   <datasource
      id="FILE.POINTTEXT"
      factory="ucar.unidata.data.point.TextPointDataSource"
      patterns="\.csv$,\.tsv$,\.txt$"
      fileselection="true"
      label="Text Point Data files"/>
+
+
+  <datasource
+     id="FILE.POINTTRACKTEXT"
+     factory="ucar.unidata.data.point.TextPointDataSource"
+     patterns="\.csv$,\.tsv$,\.txt$"
+     fileselection="true"
+     label="Text Point and Trajectory Data files">
+    <property
+       name="dataistrajectory"
+       value="true"/>
+</datasource>
 
   <datasource
      id="FILE.LOCATION"
@@ -320,9 +421,11 @@
      patterns="^adde://.*text.*"
      fileselection="false"
      label="Adde Text">
+<!--
     <property
        name="show_in_tree"
-       value="true"/>
+       value="false"/>
+-->
     <property
        name="default_display"
        value="textdisplay"/>
@@ -369,7 +472,7 @@
      fileselection="false"
      doesmultiples="false"
      label="EOL netCDF Profiler files"/>
-
+<!--
   <datasource
      id="FILE.LEVEL2RADAR"
      patterns=".*6500KHGX.*$,.*NEXRAD.*$,.*\.raw$"
@@ -377,6 +480,7 @@
      doesmultiples="true"
      factory="ucar.unidata.data.radar.Level2RadarDataSource"
      label="Level II Radar files"></datasource>
+-->
 
 <!-- This needs to be last  -->
   <datasource

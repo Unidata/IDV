@@ -21,24 +21,46 @@ example:
     label="Profiler Station Plot" 
         appears as the "Displays" panel in Data Selector window
 
-    properties="windowVisible=true;displayName=Time-height Plot;" />
+    properties="windowVisible=true;" />
         displayName is part of the legend label in the main IDV display,
         and as part of top bar title on control window.  Property list
         must end with a semicolon (;)
  -->
   <control
+     id="imagedisplay"
+     categories="IMAGE-*-*"
+     class="ucar.unidata.idv.control.ImagePlanViewControl"
+     label="Image Display"
+     icon="/ucar/unidata/idv/images/planview.png"
+     displaycategory="Imagery"
+     properties="windowVisible=true;">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+
+
+
+  <control
+     id="imagedisplayoverz"
+     categories="IMAGE-*-*"
+     class="ucar.unidata.idv.control.ImagePlanViewControl"
+     label="Image Display Over Topography"
+     icon="/ucar/unidata/idv/images/planview.png"
+     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation])"
+     displaycategory="Imagery"
+     properties="windowVisible=true;multipleIsTopography=true">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
      id="imagesequence"
      categories="IMAGE-2D-*"
      class="ucar.unidata.idv.control.ImageSequenceControl"
-     description="Image display"
-     label="Image Display"
+     label="Image Sequence Display"
      displaycategory="Imagery"
      properties="windowVisible=true;"/>
   <control
      id="planviewcontour"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
-     description="Plan view contour plot"
      doeslevels="true"
      icon="/ucar/unidata/idv/images/planviewcontour.png"
      label="Contour Plan View"
@@ -49,9 +71,8 @@ example:
      id="planviewcontourfilled"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
-     description="Color-filled contour plan view"
-     doeslevels="true"
      label="Color-Filled Contour Plan View"
+     doeslevels="true"
      icon="/ucar/unidata/idv/images/planview.png"
      displaycategory="Plan Views"
      properties="colorFill=true;">
@@ -61,7 +82,6 @@ example:
      id="planviewcolor"
      categories="GRID-2D-*;GRID-3D-*;IMAGE-RASTER"
      class="ucar.unidata.idv.control.ColorPlanViewControl"
-     description="Plan view color-shaded image"
      doeslevels="true"
      label="Color-Shaded Plan View"
      icon="/ucar/unidata/idv/images/planview.png"
@@ -70,13 +90,22 @@ example:
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
+     id="valuedisplay"
+     categories="GRID-*-*;"
+     class="ucar.unidata.idv.control.ValuePlanViewControl"
+     label="Value Plots"
+     icon="/ucar/unidata/idv/images/planview.png"
+     displaycategory="Plan Views"
+     properties="windowVisible=true;">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
      id="imagecontrol"
      categories="RGBIMAGE"
      class="ucar.unidata.idv.control.ImageControl"
-     description="3 Color (RGB) Image"
      label="3 Color (RGB) Image"
      displaycategory="Imagery"
-     properties="displayName= 3 Color Image View;">
+     properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
@@ -84,126 +113,151 @@ example:
      categories="SWEEP-*-*;RADAR-*"
      doeslevels="true"
      class="ucar.unidata.idv.control.RadarSweepControl"
-     description="Radar sweep view in 2D"
      label="Radar Sweep View in 2D"
-     displaycategory="Radar Views"
-     properties="displayName=2D Radar Sweep View;smoothed=false;use3D=false;allowSmoothing=false"/>
+     displaycategory="Radar Displays"
+     properties="smoothed=false;use3D=false;allowSmoothing=false"/>
   <control
      id="radarsweep3d"
      categories="SWEEP-*-*;RADAR-*"
      doeslevels="true"
      class="ucar.unidata.idv.control.RadarSweepControl"
-     description="Radar sweep view in 3D"
      label="Radar Sweep View in 3D"
-     displaycategory="Radar Views"
-     properties="displayName=3D Radar Sweep View;smoothed=false;use3D=true;allowSmoothing=false"/>
+     displaycategory="Radar Displays"
+     properties="smoothed=false;use3D=true;allowSmoothing=false"/>
   <control
      id="rhi"
      categories="RHI"
      class="ucar.unidata.idv.control.ColorRhiControl"
-     description="RHI"
      label="RHI"
-     displaycategory="Radar Views"
-     properties="displayName=RHI;smoothed=false;windowVisible=true;allowSmoothing=false,setAutoScaleYAxis=false"/>
+     displaycategory="Radar Displays"
+     properties="smoothed=false;windowVisible=true;allowSmoothing=false,setAutoScaleYAxis=false"/>
   <control
      id="level2CAPPI"
      categories="RADAR_VOLUME"
      class="ucar.unidata.idv.control.CappiControl"
-     description="CAPPI"
      label="CAPPI"
+     doeslevels="true"
+     levels="1000[m],2000[m],3000[m],4000[m],5000[m],6000[m],7000[m],8000[m],9000[m],10000[m],12000[m],14000[m],16000[m]"
      xxxicon="/ucar/unidata/idv/images/planview.png"
-     displaycategory="Radar Views"
-     properties="displayName=CAPPI;smoothed=false;allowSmoothing=false"/>
+     displaycategory="Radar Displays"
+     properties="smoothed=false;allowSmoothing=false"/>
+
+  <control
+     id="radareditor"
+     categories="SWEEP-*-*;RADAR-*"
+     class="ucar.unidata.idv.control.editor.RadarEditor"
+     doeslevels="true"
+     label="Radar Editor"
+     displaycategory="Radar Displays"
+     properties="windowVisible=true;">
+    </control>
+
+
+
+
 <!--
   <control
     id="level2VADWP" 
     categories="RADAR_VOLUME" 
     class="ucar.unidata.idv.control.RadarVWPControl" 
-    description="VAD Wind Profile" 
     label="VAD Wind Profile" 
-    displaycategory="Radar Views"
-    properties="displayName=VAD Wind Profile;windowVisible=true;smoothed=false;"  />
+    displaycategory="Radar Displays"
+    properties="windowVisible=true;smoothed=false;"  />
 
   <control
     id="level2timeheight" 
     categories="RADAR_VOLUME" 
     class="ucar.unidata.idv.control.Level2TimeHeightControl" 
-    description="Time/Height Display" 
     label="Time/Height Display" 
-    displaycategory="Radar Views"
-    properties="windowVisible=true;displayName=Time/Height Display;" />
+    displaycategory="Radar Displays"
+    properties="windowVisible=true;" />
 
   <control
-    id="level2colorxs" 
+    id="radarcolorxs" 
     categories="RADAR_VOLUME" 
-    class="ucar.unidata.idv.control.Level2ColorCrossSectionControl" 
-    description="Color-shaded cross section" 
-    label="Color-Shaded Vertical Cross Section" 
+    class="ucar.unidata.idv.control.RadarColorCrossSectionControl" 
+    label="Color-Shaded Radar Cross Section" 
     xxxicon="/ucar/unidata/idv/images/crosssection.png"
-    displaycategory="Radar Views"
-    properties="displayName=Color-Shaded Cross Section;windowVisible=true;smoothed=false;" />
+    displaycategory="Radar Displays"
+    properties="windowVisible=true;smoothed=false;" />
  -->
+
   <control
      id="radarvolumescan"
      categories="RADAR_VOLUME"
      class="ucar.unidata.idv.control.ColorRadarVolumeControl"
-     description="Volume Scan"
-     label="Volume Scan (all sweeps)"
-     displaycategory="Radar Views"
-     properties="displayName=Volume Scan"/>
+     label="Volume Scan"
+     displaycategory="Radar Displays"
+     properties=""/>
   <control
      id="radarisosurface"
      categories="RADAR_ISOSURFACE"
      class="ucar.unidata.idv.control.ThreeDSurfaceControl"
-     description="Radar Isosurface"
      label="Radar Isosurface"
-     displaycategory="Radar Views"
-     properties="displayName=Radar Isosurface;"/>
+     displaycategory="Radar Displays"
+     properties=""/>
   <control
      id="contourxs"
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ContourCrossSectionControl"
-     description="Contour cross section"
-     label="Contour Vertical Cross Section"
+     label="Contour Cross Section"
      icon="/ucar/unidata/idv/images/crosssection.jpg"
      displaycategory="Cross sections"
-     properties="displayName=Contour Cross Section;windowVisible=true;autoScaleYAxis=true;"/>
+     properties="windowVisible=true;autoScaleYAxis=true;"/>
   <control
      id="contourxsfilled"
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ContourCrossSectionControl"
-     description="Color-filled contour cross section"
-     label="Color-Filled Contour Vertical Cross Section"
+     label="Color-Filled Contour Cross Section"
      xxxicon="/ucar/unidata/idv/images/crosssection.jpg"
      displaycategory="Cross sections"
-     properties="displayName=Color-Filled Contour Cross Section;windowVisible=true;colorFill=true;autoScaleYAxis=true;"/>
+     properties="windowVisible=true;colorFill=true;autoScaleYAxis=true;"/>
   <control
      id="colorxs"
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ColorCrossSectionControl"
-     description="Color-shaded cross section"
-     label="Color-Shaded Vertical Cross Section"
+     label="Color-Shaded Cross Section"
      xxxicon="/ucar/unidata/idv/images/crosssection.jpg"
      displaycategory="Cross sections"
-     properties="displayName=Color-Shaded Cross Section;windowVisible=true;smoothed=false;autoScaleYAxis=true;"/>
+     properties="windowVisible=true;smoothed=false;autoScaleYAxis=true;"/>
   <control
      id="dataxs"
-     categories="GRID-2D-*;IMAGE-2D-*;SWEEP-2D-*"
+     categories="GRID-2D-*;IMAGE-*-*;SWEEP-2D-*"
      class="ucar.unidata.idv.control.DataTransectControl"
-     description="Data Transect"
      label="Data Transect"
      displaycategory="Cross sections"
-     properties="displayName=Data Transect;windowVisible=true;autoScaleYAxis=false;"/>
+     properties="windowVisible=true;autoScaleYAxis=false;"/>
 
   <control
      id="trackcontrol"
      categories="trace"
      class="ucar.unidata.idv.control.TrackControl"
-     description="Track Colored By Parameter"
      canstandalone="false"
      label="Track Colored By Parameter"
      displaycategory="Trajectory"
-     properties="displayName=Track Control;windowVisible=false;"/>
+     properties="windowVisible=false;"/>
+
+
+  <control
+     id="stormtrackcontrol"
+     categories="stormtrack"
+     class="ucar.unidata.idv.control.storm.StormTrackControl"
+     canstandalone="false"
+     label="Storm Track"
+     displaycategory="Trajectory"
+     properties="windowVisible=true;"/>
+
+<!--
+Since this is confusing and needs more work lets remove this for now
+  <control
+     id="stormtrackcontrollatest"
+     categories="stormtrack"
+     class="ucar.unidata.idv.control.storm.StormTrackControl"
+     canstandalone="false"
+     label="Latest Storm Track"
+     displaycategory="Trajectory"
+     properties="startTime=-1 month;endTime=now;windowVisible=true;"/>
+-->
 
 
   <control
@@ -211,10 +265,9 @@ example:
      categories="none"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="General"
-     description="Multiple Displays"
      canstandalone="true"
      label="Multiple Displays"
-     properties="displayName=Multiple Displays;windowVisible=true;"/>
+     properties="windowVisible=true;"/>
 
 
   <control
@@ -222,40 +275,36 @@ example:
      categories="trace"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="Charts"
-     description="Time Series Chart"
      canstandalone="false"
      label="Time Series Chart"
-     properties="displayName=Multiple Displays;windowVisible=true;initialComponentClass=TimeSeriesChartWrapper;"/>
+     properties="windowVisible=true;initialComponentClass=TimeSeriesChartWrapper;"/>
 
   <control
      id="multidisplay.scatterplot"
-     categories="trace;IMAGE-2D"
+     categories="trace;IMAGE-2D;IMAGE-BAND;"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="Charts"
-     description="Scatter Plot Chart"
      canstandalone="false"
      label="Scatter Plot Chart"
-     properties="displayName=Multiple Displays;windowVisible=true;initialComponentClass=ScatterPlotChartWrapper;"/>
+     properties="windowVisible=true;initialComponentClass=ScatterPlotChartWrapper;"/>
 
   <control
      id="multidisplay.statistics"
      categories="trace;"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="Charts"
-     description="Statistics Chart"
      canstandalone="false"
      label="Statistics Chart"
-     properties="displayName=Multiple Displays;windowVisible=true;initialComponentClass=StatisticsChartWrapper;"/>
+     properties="windowVisible=true;initialComponentClass=StatisticsChartWrapper;"/>
 
   <control
      id="multidisplay.histogram"
-     categories="trace;IMAGE-2D;"
+     categories="trace;IMAGE-2D;;IMAGE-BAND;"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="Charts"
-     description="Histogram"
      canstandalone="false"
      label="Histogram"
-     properties="displayName=Histogram;windowVisible=true;initialComponentClass=HistogramWrapper;"/>
+     properties="windowVisible=true;initialComponentClass=HistogramWrapper;"/>
 
 
   <control
@@ -263,31 +312,28 @@ example:
      categories="trace;"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="Charts"
-     description="Table"
      canstandalone="false"
      label="Table Chart"
-     properties="displayName=Multiple Displays;windowVisible=true;initialComponentClass=TableChartWrapper;"/>
+     properties="windowVisible=true;initialComponentClass=TableChartWrapper;"/>
 
   <control
      id="multidisplay.readouttable"
      categories="trace;"
      class="ucar.unidata.idv.control.multi.MultiDisplayHolder"
      displaycategory="Charts"
-     description="Readout Table"
      canstandalone="false"
      label="Readout Table"
-     properties="displayName=Multiple Displays;windowVisible=true;initialComponentClass=ReadoutTable;"/>
+     properties="windowVisible=true;initialComponentClass=ReadoutTable;"/>
 
 <!-- Begin Flow Displays -->
   <control
      id="planviewflow"
      categories="*-flowvector-*"
      class="ucar.unidata.idv.control.FlowPlanViewControl"
-     description="Plan view of flow vectors"
      label="Vector Plan View"
      doeslevels="true"
      displaycategory="Flow Displays"
-     properties="streamlines=false;displayName=Vector Plan View;">
+     properties="streamlines=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -299,7 +345,7 @@ example:
      label="Streamline Plan View"
      doeslevels="true"
      displaycategory="Flow Displays"
-     properties="streamlines=true;displayName=Steamline Plan View;">
+     properties="streamlines=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
   <control
@@ -309,7 +355,7 @@ example:
      description="Plan view of 3D flow vectors"
      label="3D Vector Plan View"
      displaycategory="Flow Displays"
-     properties="streamlines=false;displayName=3D Vector Plan View;isThreeComponents=true">
+     properties="streamlines=false;isThreeComponents=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -321,7 +367,7 @@ example:
      label="Wind Barb Plan View"
      doeslevels="true"
      displaycategory="Flow Displays"
-     properties="windbarbs=true; displayName=Wind Barb Plan View;">
+     properties="windbarbs=true; ">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -332,7 +378,7 @@ example:
      description="Cross-section of flow vectors"
      label="Vector Cross Section"
      displaycategory="Flow Displays"
-     properties="displayName=Vector Cross Section;windowVisible=true;"/>
+     properties="windowVisible=true;"/>
 
   <control
      id="flowxs3d"
@@ -341,7 +387,7 @@ example:
      description="Cross-section of 3-D flow vectors"
      label="3D Vector Cross Section"
      displaycategory="Flow Displays"
-     properties="displayName=Vector Cross Section;windowVisible=true;isThreeComponents=true"/>
+     properties="windowVisible=true;isThreeComponents=true"/>
 
   <control
      id="windbarbxs"
@@ -350,40 +396,38 @@ example:
      description="Cross-section of wind barbs"
      label="Wind Barb Cross Section"
      displaycategory="Flow Displays"
-     properties="displayName=Wind Barb Cross Section;windowVisible=true;windbarbs=true"/>
+     properties="windowVisible=true;windbarbs=true"/>
+
+  <control
+    id="flowoverz" 
+    categories="*-flowvector-*" 
+    class="ucar.unidata.idv.control.FlowPlanViewControl" 
+    description="Flow vectors over topography" 
+    label="Vectors Over Topography" 
+    doeslevels="true"
+    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
+    displaycategory="3D Surface"
+    properties="multipleIsTopography=true" />
+
+  <control
+    id="barbsoverz" 
+    categories="*-flowvector-*" 
+    class="ucar.unidata.idv.control.FlowPlanViewControl" 
+    label="Wind Barbs Over Topography" 
+    doeslevels="true"
+    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
+    displaycategory="3D Surface"
+    properties="multipleIsTopography=true;windbarbs=true" />
 
   <control
     id="streamlinesoverz" 
     categories="*-flowvector-*" 
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Streamlines over topography" 
     label="Streamlines Over Topography" 
+    doeslevels="true"
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
-    properties="streamlines=true;windbarbs=true;displayName=Streamlines Over Topography;multipleIsTopography=true" />
-
-<!--
-  <control
-    id="planviewflowoverz" 
-    categories="*-flowvector-*" 
-    class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Plan view of flow vectors over topography" 
-    label="Vector Plan View Over Topography" 
-    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
-    displaycategory="3D Surface"
-    properties="displayName=Vector Plan View Over Topography;multipleIsTopography=true" />
-
-  <control
-    id="windbarbplanoverz" 
-    categories="*-flowvector-*" 
-    class="ucar.unidata.idv.control.FlowPlanViewControl" 
-    description="Wind barb plan view of flow vectors over topography" 
-    label="Wind Barb Plan View Over Topography" 
-    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
-    displaycategory="3D Surface"
-    properties="windbarbs=true;displayName=Wind Barb Plan View Over Topography;multipleIsTopography=true" />
-
--->
+    properties="streamlines=true;multipleIsTopography=true" />
 
 <!-- End Flow Displays -->
 
@@ -393,11 +437,10 @@ example:
      id="topography"
      categories="param:ALTITUDE;param:Elevation"
      class="ucar.unidata.idv.control.TopographyControl"
-     description="Topography"
      label="Topography"
      icon="/ucar/unidata/idv/images/surface.png"
      displaycategory="3D Surface"
-     properties="displayName=Topography;smoothed=true;">
+     properties="smoothed=true;isRaster=true">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 
@@ -405,24 +448,25 @@ example:
      id="isosurface"
      categories="GRID-3D-*;RADAR-3D-*"
      class="ucar.unidata.idv.control.ThreeDSurfaceControl"
-     description="3-D Isosurface"
      label="Isosurface"
      icon="/ucar/unidata/idv/images/surface.png"
      displaycategory="3D Surface"
-     properties="displayName=Isosurface;">
+     properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+
+
  
   <control
      id="isosurfacebyanother"
      categories="GRID-3D-*;RADAR-3D-*"
      class="ucar.unidata.idv.control.ThreeDSurfaceControl"
-     description="Isosurface colored by another parameter"
      label="Isosurface colored by another parameter"
      icon="/ucar/unidata/idv/images/surface.png"
      code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
      displaycategory="3D Surface"
-     properties="displayName=Isosurface colored by another parameter;">     
+     properties="">     
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -430,12 +474,12 @@ example:
      id="planviewcontouroverz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
-     description="Plan view contour plot on topography"
+     doeslevels="true"
      icon="/ucar/unidata/idv/images/planview.png"
-     label="Contour Plan View Over Topography"
+     label="Contours Over Topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
-     properties="displayName=Contour Plan View Over Topography;multipleIsTopography=true">
+     properties="multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -443,11 +487,11 @@ example:
      id="planviewcontourfilledoverz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
-     description="Color-filled contour plan view on topography"
-     label="Color-Filled Contour Plan View Over Topography"
+     label="Color-Filled Contours Over Topography"
+     doeslevels="true"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
-     properties="displayName=Color-Filled Contour Plan View Over Topography;colorFill=true;multipleIsTopography=true">
+     properties="colorFill=true;multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -455,11 +499,11 @@ example:
      id="planviewcoloroverz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ColorPlanViewControl"
-     description="Plan view color-shaded image on topography"
-     label="Color-Shaded Plan View Over Topography"
+     doeslevels="true"
+     label="Color-Shaded Image Over Topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
-     properties="displayName=Color-Shaded Plan View Over Topography;smoothed=false;multipleIsTopography=true">
+     properties="smoothed=false;multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -469,11 +513,10 @@ example:
      id="imagecontroloverz"
      categories="RGBIMAGE"
      class="ucar.unidata.idv.control.ImageControl"
-     description="3 Color (RGB) Image over topography"
      label="3 Color (RGB) Image over topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation])"
      displaycategory="Imagery"
-     properties="displayName= 3 Color Image Over Topography View;multipleIsTopography=true">
+     properties="multipleIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -484,77 +527,81 @@ example:
      id="profile"
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.ProfileControl"
-     description="Vertical Profile"
      label="Vertical Profile"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Vertical Profile;"/>
+     properties="windowVisible=true;"/>
 -->
 
   <control
      id="vprofile"
      categories="GRID-3D-*"
      class="ucar.unidata.idv.control.VerticalProfileControl"
-     description="Vertical Profile"
      label="Vertical Profile"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Vertical Profile;showThumbNail=true"/>
+     properties="windowVisible=true;showThumbNail=true"/>
+
+  <control
+     id="stationmodelcontrol"
+     categories="POINT;StationPlot;PointPlot"
+     class="ucar.unidata.idv.control.StationModelControl"
+     canstandalone="false"
+     doeslevels="true"
+     label="Point Data Plot"
+     displaycategory="Point Data"
+     properties="windowVisible=false;showThumbNail=true">
+    </control>
+
+  <control
+     id="obslistcontrol"
+     categories="POINT;StationPlot;PointPlot"
+     class="ucar.unidata.idv.control.ObsListControl"
+     canstandalone="false"
+     label="Point Data List"
+     displaycategory="Point Data"
+     properties="windowVisible=true;"/>
+
+
 
   <control
      id="probe"
-     categories="*-3D-*;*-2D-*;RGBIMAGE;"
+     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot"
      class="ucar.unidata.idv.control.ProbeControl"
-     description="Data Probe/Time Series"
      label="Data Probe/Time Series"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Probe/Time Series;showThumbNail=true"/>
+     properties="windowVisible=true;showThumbNail=true"/>
 
   <control
      id="timeheight"
      categories="GRID-3D-TIME-*"
      class="ucar.unidata.idv.control.TimeHeightControl"
-     description="Time/Height Display (Contours)"
      label="Time/Height Display (Contours)"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Time/Height Display (Contours);showAsContours=true;"/>
+     properties="windowVisible=true;showAsContours=true;"/>
 
   <control
      id="timeheightshade"
      categories="GRID-3D-TIME-*"
      class="ucar.unidata.idv.control.TimeHeightControl"
-     description="Time/Height Display (Color Shaded)"
      label="Time/Height Display (Color Shaded)"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Time/Height Display (Color Shaded);showAsContours=false;"/>
+     properties="windowVisible=true;showAsContours=false;"/>
 
   <control
      id="timeheightflow"
      categories="*-flowvector-*" 
      class="ucar.unidata.idv.control.FlowTimeHeightControl"
-     description="Flow Time/Height Display"
      label="Flow Time/Height Display"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Flow Time/Height Display;showAsContours=false;"/>
+     properties="windowVisible=true;showAsContours=false;"/>
 
   <control
      id="timeheightbarb"
      categories="*-flowvector-*" 
      class="ucar.unidata.idv.control.FlowTimeHeightControl"
-     description="Wind Barb Time/Height Display"
      label="Wind Barb Time/Height Display"
      displaycategory="Probes"
-     properties="windowVisible=true;displayName=Wind Barb Time/Height Display;showAsContours=false;windbarbs=true;"/>
+     properties="windowVisible=true;showAsContours=false;windbarbs=true;"/>
 
-<!--
-  <control
-     id="timeseries"
-     categories="*-2D-TIME-*;SWEEP-3D-TIME;IMAGE-RASTER-TIME"
-     class="ucar.unidata.idv.control.ProbeControl"
-     valid="true"
-     description="Time Series Display"
-     label="Time Series"
-     displaycategory="Probes"
-     properties="windowVisible=true;displayName=Time Series;"/>
--->
 
 <!-- End Probe Displays -->
 
@@ -565,7 +612,7 @@ example:
      description="Skew-T for RAOB data"
      label="Skew-T"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Skew-T;displayType=skewT;"/>
+     properties="windowVisible=true;displayType=skewT;"/>
   <control
      id="raob_stuve"
      categories="RAOB_SOUNDING"
@@ -573,7 +620,7 @@ example:
      description="Stuve for RAOB data"
      label="Stuve"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Stuve;displayType=stuve;"/>
+     properties="windowVisible=true;displayType=stuve;"/>
   <control
      id="raob_emagram"
      categories="RAOB_SOUNDING"
@@ -581,24 +628,22 @@ example:
      description="Emagram for RAOB data"
      label="Emagram"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Emagram;displayType=emagram;"/>
+     properties="windowVisible=true;displayType=emagram;"/>
   <control
      id="profiler_timeheight"
      categories="PROFILER_ONESTA"
      class="ucar.unidata.idv.control.ProfilerTimeHeightControl"
-     description="Time/Height Display"
      label="Time/Height Display"
      displaycategory="Profiler"
-     properties="windowVisible=true;displayName=Time/Height Display;"/>
+     properties="windowVisible=true;"/>
 
   <control
      id="profiler_planview"
      categories="PROFILER_PLANVIEW"
      class="ucar.unidata.idv.control.ProfilerMultiStationControl"
-     description="Plan View"
      label="Profiler Station Plot"
      displaycategory="Profiler"
-     properties="windowVisible=true;displayName=Profiler Station Plot;isPlanView=true;">
+     properties="windowVisible=true;isPlanView=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -606,10 +651,9 @@ example:
      id="profiler_3d"
      categories="PROFILER_3D"
      class="ucar.unidata.idv.control.ProfilerMultiStationControl"
-     description="3D View"
      label="3D View"
      displaycategory="Profiler"
-     properties="windowVisible=true;displayName=3D View;isPlanView=false;"/>
+     properties="windowVisible=true;isPlanView=false;"/>
   <control
      id="track_skewt"
      categories="TRACK_SOUNDING"
@@ -617,7 +661,7 @@ example:
      description="Skew-T for tracks"
      label="Track Skew-T"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Skew-T;displayType=skewT;"/>
+     properties="windowVisible=true;displayType=skewT;"/>
   <control
      id="track_stuve"
      categories="TRACK_SOUNDING"
@@ -625,7 +669,7 @@ example:
      description="Stuve for tracks"
      label="Track Stuve"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Stuve;displayType=stuve;"/>
+     properties="windowVisible=true;displayType=stuve;"/>
   <control
      id="track_emagram"
      categories="TRACK_SOUNDING"
@@ -633,7 +677,7 @@ example:
      description="Emagram for tracks"
      label="Track Emagram"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Emagram;displayType=emagram;"/>
+     properties="windowVisible=true;displayType=emagram;"/>
   <control
      id="grid_skewt"
      categories="GRID_SOUNDING"
@@ -641,7 +685,7 @@ example:
      description="Skew-T for grids"
      label="Grid Skew-T"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Skew-T;displayType=skewT;"/>
+     properties="windowVisible=true;displayType=skewT;"/>
   <control
      id="grid_stuve"
      categories="GRID_SOUNDING"
@@ -649,7 +693,7 @@ example:
      description="Stuve display for grids"
      label="Grid Stuve Display"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Stuve;displayType=stuve;"/>
+     properties="windowVisible=true;displayType=stuve;"/>
   <control
      id="grid_emegram"
      categories="GRID_SOUNDING"
@@ -657,67 +701,42 @@ example:
      description="Emagram display for grids"
      label="Grid Emagram Display"
      displaycategory="Soundings"
-     properties="windowVisible=true;displayName=Emagram;displayType=emagram;"/>
+     properties="windowVisible=true;displayType=emagram;"/>
 
   <control
      id="textdisplay"
      categories="text;html"
      class="ucar.unidata.idv.control.TextDisplayControl"
-     description="Text/HTML display"
      label="Text/HTML display"
      displaycategory="General"
-     properties="windowVisible=true; displayName=Text/HTML display; showInTabs=false;"/>
+     properties="windowVisible=true; showInTabs=false;"/>
 
 
   <control
      id="chatlogdisplay"
      categories="text"
      class="ucar.unidata.idv.control.ChatLogControl"
-     description="Chat Log Display"
      label="Chat Log Display"
      displaycategory="General"
-     properties="windowVisible=true; displayName=Chat Log display;"/>
+     properties="windowVisible=true; "/>
 
   <control
      id="moviedisplay"
      categories="movie"
      class="ucar.unidata.idv.control.MovieDisplayControl"
-     description="Movie Display"
      label="Movie Display"
      displaycategory="General"
-     properties="windowVisible=true; displayName=Movie Display;"/>
+     properties="windowVisible=true; showInTabs=false;windowVisible=true;"/>
 
-  <control
-     id="stationmodelcontrol"
-     categories="POINT;StationPlot;PointPlot"
-     class="ucar.unidata.idv.control.StationModelControl"
-     description="Point Data Plot"
-     canstandalone="false"
-     doeslevels="true"
-     label="Point Data Plot"
-     displaycategory="Point Data"
-     properties="displayName=Point Data Plot Control;windowVisible=false;showThumbNail=true">
-    </control>
-
-  <control
-     id="obslistcontrol"
-     categories="POINT;StationPlot;PointPlot"
-     class="ucar.unidata.idv.control.ObsListControl"
-     description="Point Data List"
-     canstandalone="false"
-     label="Point Data List"
-     displaycategory="Point Data"
-     properties="displayName=Point Data List;windowVisible=true;"/>
 
 <!--
   <control
      id="obsprobe"
      categories="POINT;StationPlot;PointPlot"
      class="ucar.unidata.idv.control.ProbeControl"
-     description="Obs Data Probe"
      label="Obs Data Probe"
      displaycategory="Point Data"
-     properties="windowVisible=true;displayName=Obs Data Probe;showThumbNail=true"/>
+     properties="windowVisible=true;showThumbNail=true"/>
 -->
 
 
@@ -725,11 +744,10 @@ example:
      id="shapefilecontrol"
      categories="GIS-SHAPEFILE"
      class="ucar.unidata.idv.control.ShapefileControl"
-     description="A shape file display control"
      canstandalone="false"
      label="Shapefile Display"
      displaycategory="GIS"
-     properties="displayName=Shapefile Display;windowVisible=false;">
+     properties="windowVisible=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -743,7 +761,7 @@ example:
      canstandalone="true"
      label="Range Rings"
      displaycategory="General"
-     properties="displayName=Range Rings;">
+     properties="">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -755,16 +773,26 @@ example:
      canstandalone="true"
      label="Range and Bearing"
      displaycategory="General"
-     properties="displayName=Range and Bearing;windowVisible=true;"/>
+     properties="windowVisible=true;"/>
+
+
+  <control
+     id="animationtext"
+     categories="none"
+     class="ucar.unidata.idv.control.AnimationTextControl"
+     description="Synchronized text display"
+     canstandalone="true"
+     label="Animation Text"
+     displaycategory="General"
+     properties=""/>
 
   <control
      id="mapdisplay"
      categories="MAP"
      class="ucar.unidata.idv.control.MapDisplayControl"
-     description="Map Display"
      label="Map Display"
      displaycategory="Maps"
-     properties="displayName=Map display;initialMap=/auxdata/maps/OUTLSUPW;initialMapDescription=World Coastlines;">
+     properties="initialMap=/auxdata/maps/OUTLSUPW;initialMapDescription=World Coastlines;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     <property name="showInDisplayList" value="false"/>
     </control>
@@ -774,11 +802,10 @@ example:
      id="notecontrol"
      categories="none"
      class="ucar.unidata.idv.control.NoteControl"
-     description="A text note"
      canstandalone="true"
      label="Text Note"
      displaycategory="General"
-     properties="displayName=Text Note;windowVisible=true;expandedInTabs=true;"/>
+     properties="windowVisible=true;expandedInTabs=true;showInTabs=false"/>
 
   <control
      id="locationcontrol"
@@ -787,77 +814,85 @@ example:
      description="A display of station locations"
      label="Locations"
      displaycategory="General"
-     properties="displayName=Locations;expandedInTabs=true;centerOnClick=false;">
+     properties="expandedInTabs=true;centerOnClick=false;">
     </control>
 
   <control
      id="curvecontrol"
      categories="none"
      class="ucar.unidata.idv.control.DrawingControl"
-     description="A drawing control"
      label="Drawing Control"
      displaycategory="General"
-     properties="displayName=Drawing Control;windowVisible=true;showInTabs=false;showFronts=true;"/>
+     properties="windowVisible=true;showInTabs=false;showFronts=true;"/>
 
   <control
      id="drawingcontrol"
      xxxcategories="xgrf"
      class="ucar.unidata.idv.control.DrawingControl"
-     description="A drawing control"
      canstandalone="true"
      label="Drawing Control"
      displaycategory="General"
-     properties="displayName=Drawing Control;windowVisible=true;showInTabs=false;showFronts=true;"/>
+     properties="windowVisible=true;showInTabs=false;showFronts=true;"/>
+
+
+
+  <control
+     id="textproductcontrol"
+     categories="textproducts"
+     class="ucar.unidata.idv.control.TextProductControl"
+     label="Weather Text Product Display"
+     displaycategory="General"
+     properties="windowVisible=true;showInTabs=false"/>
+
 
   <control
      id="frontdrawingcontrol"
      categories="fronts"
      class="ucar.unidata.idv.control.DrawingControl"
-     description="Front display"
      label="Front Display"
      displaycategory="General"
-     properties="displayName=Front Display;windowVisible=true;showInTabs=true"/>
+     properties="windowVisible=true;showInTabs=true">
+    <property name="displayListTemplate" value="%displayname% %timestamp%"/>
+</control>
 
   <control
      id="filedrawingcontrol"
      categories="xgrf"
      class="ucar.unidata.idv.control.DrawingControl"
-     description="A drawing control"
      canstandalone="false"
      label="Drawing Control"
      displaycategory="General"
-     properties="displayName=Drawing Control;windowVisible=true;showInTabs=true"/>
+     properties="windowVisible=true;showInTabs=true"/>
 
   <control
      id="transectdrawingcontrol"
      categories="none"
      class="ucar.unidata.idv.control.TransectDrawingControl"
-     description="Transect drawing control"
      canstandalone="true"
      label="Transect Drawing Control"
      displaycategory="General"
-     properties="displayName=Transect Drawing Control;windowVisible=true;showInTabs=false;">
+     properties="windowVisible=true;showInTabs=false;">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+
 
   <control
      id="locationindicatorcontrol"
      categories="none"
      class="ucar.unidata.idv.control.LocationIndicatorControl"
-     description="A locationindicator"
      canstandalone="true"
      label="Location Indicator"
      displaycategory="General"
-     properties="displayName=Location Indicator;windowVisible=true;"/>
+     properties="windowVisible=true;"/>
 
   <control
      id="wmscontrol"
      categories="GIS-WMS"
      class="ucar.unidata.idv.control.WMSControl"
-     description="WMS Control"
      label="WMS Control"
      displaycategory="Maps"
-     properties="displayName=WMS Control;windowVisible=true;">
+     properties="windowVisible=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -867,10 +902,9 @@ example:
      categories="none"
      class="ucar.unidata.idv.control.WMSControl"
      canstandalone="false"
-     description="Background Image"
      label="Background Image"
      displaycategory="Maps"
-     properties="displayName=Background Image;windowVisible=true;">
+     properties="windowVisible=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -878,31 +912,42 @@ example:
   <control
      id="imagemoviecontrol"
      class="ucar.unidata.idv.control.ImageMovieControl"
-     description="WebCam display"
      canstandalone="true"
      label="WebCam Display"
      displaycategory="General"
-     properties="displayName=WebCam Display;windowVisible=true;expandedInTabs=true;showImageInDisplay=true;"/>
+     properties="windowVisible=true;expandedInTabs=true;showImageInDisplay=true;"/>
 
   <control
      id="imagemoviecontrol2"
      categories="imagemovieindex"
      class="ucar.unidata.idv.control.ImageMovieControl"
-     description="Image Collection"
      label="Image Collection"
      displaycategory="General"
-     properties="displayName=Image Collection;windowVisible=true;"/>
+     properties="windowVisible=true;showInTabs=false"/>
+
+<!--
+Example of how to make an image movie control with a fixed table of contents
+  <control
+     id="pacdeximagemoviecontrol"
+     canstandalone="true"
+     class="ucar.unidata.idv.control.ImageMovieControl"
+     label="Pacdex Catalog Images"
+     displaycategory="General"
+     properties="windowVisible=true;">
+    <property name="tocFiles" value="http://www.unidata.ucar.edu/software/idv/data/pacdex/images/products.xml"/>
+    </control>
+-->
+
 
 
   <control
      id="worldwind"
      categories="none"
      class="ucar.unidata.idv.control.WorldWindControl"
-     description="WorldWind Locations"
      label="WorldWind Locations"
      canstandalone="true"
      displaycategory="General"
-     properties="windowVisible=true; displayName=WorldWind locations;">
+     properties="windowVisible=true; ">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -915,9 +960,20 @@ example:
      label="Volume Rendering"
      icon="/ucar/unidata/idv/images/volume.png"
      displaycategory="Volume Rendering"
-     properties="displayName=Volume Rendering;">
+     properties="">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+
+  <control
+     id="gridtablecontrol"
+     categories="trace;GRID-2D-*;IMAGE-*-*;GRID-3D-*;RADAR-3D-*"
+     class="ucar.unidata.idv.control.GridTableControl"
+     label="Grid Table"
+     displaycategory="General"
+     properties="">
+    </control>
+
 
 
   <control
@@ -927,7 +983,7 @@ example:
      description="A Visad spreadsheet display"
      label="Omni Control"
      displaycategory="General"
-     properties="windowVisible=true;displayName=Omni Display;expandedInTabs=true"/>
+     properties="windowVisible=true;expandedInTabs=true"/>
 
 
 </controls>

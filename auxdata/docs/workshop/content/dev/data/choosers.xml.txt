@@ -50,7 +50,7 @@ for UrlChooser:
 	url_label="the label to be used in front of the text field"
 
 This is an example of how one would add in a chooser into the gui.
-By default if you include an xml file this in your unidata/idv directory:
+By default if you include an xml file this in your idvhome directory:
 ~/.unidata/idv/DefaultIdv/choosers.xml
 the Idv will include this in the chooser ui. 
 This is inclusive so whatever is in your own file will be added to
@@ -73,18 +73,26 @@ This file allows you to override the resources that are read in. Add in an entry
 
 The loadmore="false" tells the Idv not to load in any system resources.
   -->
+
+<!--
+If using the tree panel you can define components that are displayed when a category tree node is selected:
+  <label text="label test" category="General" categorycomponent="true"/>
+-->
+
   <chooser
      id="chooser.file"
      title="Files"
+     category="General"
      menutitle="From the File System"
      showinmenu="true"
      helppath="idv.data.choosers.filechooser"
      class="ucar.unidata.idv.chooser.FileChooser"
      showpolling="false"
      filepattern=".*\.nc"
-     filters=".*\.xidv:IDV files (*.xidv);"/>
+     filters=".*\.xidv$,.*\.zidv$:IDV bundles (*.xidv,*.zidv);"/>
   <panel
      title="URLs"
+     category="General"
      layout="border"
      tabTooltip="For accessing URLs"
      mnemonic="U">
@@ -98,6 +106,7 @@ The loadmore="false" tells the Idv not to load in any system resources.
   </panel>
   <panel
      title="Catalogs"
+     category="General"
      layout="border"
      tabTooltip="For accessing remote gridded data"
      mnemonic="C">
@@ -110,6 +119,7 @@ The loadmore="false" tells the Idv not to load in any system resources.
   </panel>
   <panel
      title="Images"
+     category="Sat &amp; Radar"
      layout="border"
      tabtooltip="For accessing satellite imagery"
      mnemonic="I">
@@ -119,10 +129,16 @@ The loadmore="false" tells the Idv not to load in any system resources.
        menutitle="Satellite Imagery"
        helppath="idv.data.choosers.imagechooser"
        showdetails="true"
-       class="ucar.unidata.idv.chooser.ImageChooser"/>
+       includeNavComp="true"
+       class="ucar.unidata.idv.chooser.adde.AddeImageChooser"/>
   </panel>
+
+
+
+
   <panel
      title="Radar"
+     category="Sat &amp; Radar"
      layout="border"
      tabtooltip="For accessing Level-II and Level-III radar data"
      mnemonic="R">
@@ -135,18 +151,39 @@ The loadmore="false" tells the Idv not to load in any system resources.
          menutitle="Level III Radar"
          helppath="idv.data.choosers.radarchooser"
          showdetails="true"
-         class="ucar.unidata.idv.chooser.RadarChooser"/>
+         class="ucar.unidata.idv.chooser.adde.AddeRadarChooser"/>
       <chooser
          id="chooser.radar.level2"
-         title="Level II"
-         menutitle="Level II Radar"
+         title="NEXRAD - Local"
+         menutitle="NEXRAD Radar"
          helppath="idv.data.choosers.level2chooser"
+         xxx.idv.chooser.projection.bounds="50,-100,50,20"
+         xxx.idv.chooser.maps="semi-colon delimited list of maps, e.g., /auxdata/maps/OUTLUSAM"
          class="ucar.unidata.idv.chooser.Level2RadarChooser"
          showdatasourcemenu="false"/>
+      <chooser
+         id="chooser.tdsradar"
+         title="NEXRAD - Remote"
+         menutitle="TDS NEXRAD Radar"
+         helppath="idv.data.choosers.radarchooser"
+         class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
+<!--       <chooser
+         id="chooser.tdsradar1"
+         title="NEXRAD - Remote"
+         menutitle="TDS Nexard Radar"
+         helppath="idv.data.choosers.radarchooser"
+         class="ucar.unidata.idv.chooser.TDSRadarChooser1"/>
+        -->
     </tabbedpane>
   </panel>
+
+
+
+
+
   <panel
      title="Point"
+     category="Observations"
      layout="border"
      tabtooltip="For accessing surface observations"
      mnemonic="P">
@@ -158,25 +195,30 @@ The loadmore="false" tells the Idv not to load in any system resources.
          title="Surface"
          menutitle="Surface Observations"
          helppath="idv.data.choosers.pointchooser"
-         class="ucar.unidata.idv.chooser.PointChooser"/>
+         class="ucar.unidata.idv.chooser.adde.AddePointDataChooser"/>
       <chooser
          id="chooser.raob.singlelevel"
          title="Upper Air"
          menutitle="Upper Air Observations"
          helppath="idv.data.choosers.raobchooser"
-         class="ucar.unidata.idv.chooser.RaobPointChooser"
+         class="ucar.unidata.idv.chooser.adde.AddeRaobPointDataChooser"
          showserver="true"/>
+
+<!--
+-->
       <chooser
          id="chooser.lightning"
          title="Lightning"
          menutitle="Lightning Strikes"
          helppath="idv.data.choosers.lightningchooser"
-         class="ucar.unidata.idv.chooser.LightningChooser"
+         class="ucar.unidata.idv.chooser.adde.AddeLightningDataChooser"
          showserver="true"/>
+
       </tabbedpane>
   </panel>
   <panel
      title="RAOB"
+     category="Observations"
      layout="border"
      tabtooltip="For accessing RAOB data"
      mnemonic="B">
@@ -203,7 +245,7 @@ The loadmore="false" tells the Idv not to load in any system resources.
          title="Single Level"
          menutitle="Sounding Data-Single Level"
          helppath="idv.data.choosers.raobchooser"
-         class="ucar.unidata.idv.chooser.RaobPointChooser"
+         class="ucar.unidata.idv.chooser.adde.AddeRaobPointDataChooser"
          showserver="true"/>
        -->
     </tabbedpane>
@@ -218,11 +260,12 @@ The loadmore="false" tells the Idv not to load in any system resources.
        title="Fronts"
        menutitle="Fronts"
        helppath="idv.data.choosers.frontchooser"
-       class="ucar.unidata.idv.chooser.FrontChooser"/>
+       class="ucar.unidata.idv.chooser.adde.AddeFrontChooser"/>
   </panel>
 
   <panel
      title="Profiler"
+     category="Observations"
      layout="border"
      tabtooltip="For accessing profiler data"
      mnemonic="O">
@@ -231,11 +274,12 @@ The loadmore="false" tells the Idv not to load in any system resources.
        title="Profiler Winds"
        menutitle="Profiler Winds"
        helppath="idv.data.choosers.profilerchooser"
-       class="ucar.unidata.idv.chooser.ProfilerChooser"/>
+       class="ucar.unidata.idv.chooser.adde.AddeProfilerDataChooser"/>
   </panel>
   <chooser
      id="chooser.polling.dir"
      title="Directory"
+     category="General"
      showinmenu="true"
        helppath="idv.data.choosers.directorychooser"
      class="ucar.unidata.idv.chooser.PollingFileChooser"
@@ -251,6 +295,22 @@ The loadmore="false" tells the Idv not to load in any system resources.
        fontface="Dialog"
        fontstyle="PLAIN"/>
   </styles>
+  <properties>
+<!-- 
+The IdvChooserManager looks for the following 2 properties to get the xmlui strings
+for wrapping all of the top level chooser components
+Uncomment the following to use the treepanel
+-->
+<!--
+    <property
+       name="idv.chooser.toptag.open"
+       value="&lt;treepanel icon=&quot;/auxdata/ui/icons/DataChooser16.gif&quot;&gt;"/>
+    <property
+       name="idv.chooser.toptag.close"
+       value="&lt;/treepanel&gt;"/>
+-->
+  </properties>
+
 <!--
     <chooser title="ADDE Images"      class="ucar.unidata.idv.chooser.McidasImageChooser" />
   -->
