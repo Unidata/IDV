@@ -39,7 +39,6 @@ Enhancements:
 - Default display list label for fronts should include time. (Jeff) DONE!
 - Just Displays bundle needs to show what the bundle is in the title bar. (Jeff) DONE!
 - Subset levels when saving data locally
-- Set the station model in the data subset panel
 - Save NEXRAD/TDS radar data in a bundle  (Yuan)
 - HTML control needs some sort of name for the tab in
 the Displays section of the Dashboard (Don)
@@ -61,14 +60,14 @@ is to cluttered (Don)
 - Better error messages from ISL (Jeff) DONE! (I'm just going to leave the stack trace for now) 
 - allow overlay of transparent images (logos) in isl (Jeff) DONE!
 - add animation speed control to movie preview window (Don)  DONE!
-- scale images with window size in preview window (Don) 
-- undock quicktime movie control by default (Yuan/Don)
+- scale images with window size in preview window (Don)  DONE!
+- undock quicktime movie control by default (Yuan/Don) DONE!
 - when publishing to ramadda, need better handling of lat/lon bounds when display is globe display (Jeff) ????  Not sure what to do here for the globe display 
 - Simple plugin needs to be updated (Yuan)
    - resource viewer
    - TDS radar chooser
 - Dave F mentioned having nicer color bars showing in the PDF.
-- Move license files to a subdirectory (Don)
+- Move license files to a subdirectory (Don) DONE!
 - Support UTM coordinates in shapefiles (and elsewhere) (Don)
 - Labels for lat/lon lines (Don)
 - Allow for copy in Drag and Drop (Don)
@@ -96,12 +95,12 @@ is to cluttered (Don)
 
 Docs:
 
-- Bad "Documentation" link (Jeff) ???
+- Bad "Documentation" link (Jeff) DONE!
 - Bundles: Add a section on relative path selection (Jeff)
 - Point Data - show how to use the preference that they
 created.(Yuan)
 - Enhance Barnes analysis docs (Don)
-- 3.8.0  Transect  - Misc Data to Sample Data (Don)
+- 3.8.0  Transect  - Misc Data to Sample Data (Don)  DONE!
 - Performance tuning (Jeff)
 - 5.0.2 - update the list of jars that go into external.jar (Don)  DONE!
 - Example idv.properties needs to be updated (Don) DONE!
@@ -110,7 +109,7 @@ created.(Yuan)
 - miscellaneous is misspelled int data type page (Don)  DONE!
 - Add a section for adding your own maps, go over the settings tab (Yuan)
 - Add "Cache to Disk" docs to User Guide (Jeff)
-- put Performance Tuning link in large grids to new tab (Don)
+- put Performance Tuning link in large grids to new tab (Don) DONE!
 - Better docs for "What data should I use"  (Jeff W)
 - Update docs for all controls to tell how to create the display (Don)
 - Add docs to user guide for Storm stuff (Jeff/Yuan)
@@ -122,8 +121,9 @@ created.(Yuan)
 - Don't use MADIS data for layout model exercise (Yuan)
 - Section 4.6.8 - Save vs. Apply (Yuan)
 - Xvfb docs (Don)
-- remove ucar.unidata.ui.imagery from developer package docs (Don)
+- remove ucar.unidata.ui.imagery from developer package docs (Don) DONE!
 - Change idv.rbi to example.rbi in developer docs (Jeff) ??? Not sure where this is
-- choosers.xml needs to be update in developer docs (Don)
+- choosers.xml needs to be update in developer docs (Don) DONE!
+- add Display Settings section to the User Guide (Jeff)
 
 
