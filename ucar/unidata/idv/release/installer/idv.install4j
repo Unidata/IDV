@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.1.5" transformSequenceNumber="2">
   <directoryPresets config="/usr/java/jdk1.6.0_07-j3d1.3.1" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.6b2" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.6" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -21,10 +21,16 @@
     <filesets />
     <roots />
     <mountPoints>
+      <mountPoint id="175" root="" location="licenses" mode="755" />
       <mountPoint id="1" root="" location="" mode="755" />
-      <mountPoint id="124" root="" location="license" mode="755" />
     </mountPoints>
     <entries>
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jdom" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jpeg2000" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jython" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.visad" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="175" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/idv.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/auxdata.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/external.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
@@ -39,17 +45,12 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
-      <fileEntry mountPoint="124" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.apache" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="124" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jdom" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="124" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jpeg2000" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="124" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.jython" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="124" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE.visad" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="124" file="${compiler:SRCDIR}/ucar/unidata/idv/release/licenses/LICENSE" overwrite="4" shared="false" mode="644" uninstallMode="0" />
     </entries>
     <components>
       <component name="IDV Components" id="67" displayDescription="false" selected="true" mandatory="true" downloadable="false">
         <description />
         <include all="false">
+          <entry location="licenses" fileType="regular" />
           <entry location="idv.jar" fileType="regular" />
           <entry location="auxdata.jar" fileType="regular" />
           <entry location="external.jar" fileType="regular" />
@@ -58,12 +59,6 @@
           <entry location="jython.jar" fileType="regular" />
           <entry location="ncIdv.jar" fileType="regular" />
           <entry location="simpleidv.jar" fileType="regular" />
-          <entry location="LICENSE" fileType="regular" />
-          <entry location="LICENSE.apache" fileType="regular" />
-          <entry location="LICENSE.jdom" fileType="regular" />
-          <entry location="LICENSE.jpeg2000" fileType="regular" />
-          <entry location="LICENSE.jython" fileType="regular" />
-          <entry location="LICENSE.visad" fileType="regular" />
           <entry location="NOTICE" fileType="regular" />
           <entry location="idv.gif" fileType="regular" />
         </include>
@@ -500,7 +495,7 @@
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true">
-    <mediaSet refId="83" />
+    <mediaSet refId="3" />
   </buildIds>
 </install4j>
 
