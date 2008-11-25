@@ -1916,12 +1916,12 @@ proc ht::attrs {args} {
 proc gen::processFaq {content} {
     set faqCnt 0
     set processed ""
+
     while {1} {
         set idx1 [string first {<faq} $content]
         if {$idx1<0} {break}
         set idx2 [string first {</faq>} $content $idx1]
         if {$idx2<0} {break}
-
         append processed [string range $content 0 [expr {$idx1-1}]]
         set faq [string range $content $idx1 $idx2]
         set content   [string range $content [expr {$idx2+6}] end]
@@ -1933,7 +1933,7 @@ proc gen::processFaq {content} {
 
 
 proc gen::processFaqInner {faq faqCnt} {
-    set qlabel "Q."
+    set qlabel ""
     regexp {<faq[^>]*qlabel=\"([^\"]+)\"} $faq match qlabel
     set alabel "A."
     regexp {<faq[^>]*alabel=\"([^\"]+)\"} $faq match alabel
@@ -1971,6 +1971,7 @@ proc gen::processFaqInner {faq faqCnt} {
     set faqTop ""
     set faqBottom "<p><hr><p>"
     set catCnt 0
+    set total 0
     foreach cat $cats {
         incr catCnt
         set catTop  ""
@@ -1978,15 +1979,16 @@ proc gen::processFaqInner {faq faqCnt} {
         set catPrefix "${prefix}cat${catCnt}_"
         set didOne 0
         foreach {q a name faqid} $faqitems($cat) {
+	    incr total
             set didOne 1
             if {$faqid==""} {
                 set faqid "$catPrefix$cnt"
             } 
-            append catTop "<div class=\"faq-question\"> <li> <a class=\"faq-question-link\" href=\"\#$faqid\">$q</a></div>\n"
+            append catTop "<div class=\"faq-question\"> <b>\#${total}.</b> <a class=\"faq-question-link\" href=\"\#$faqid\">$q</a></div>\n"
             if {$name!=""} {
                 append catBottom "<a name=\"$name\"></a>\n"
             }
-            append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4>$qlabel $q</h4></div>\n"
+            append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4> $qlabel \#${total}. $q</h4></div>\n"
             append catBottom "</a><div class=\"faq-answer\"><b>$alabel</b> $a</div>\n"
             append catBottom "<p><hr align=\"center\" width=\"10%\"><p>"
             incr cnt
