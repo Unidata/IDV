@@ -903,6 +903,19 @@ public class Request implements Constants {
 
 
 
+    public static String HTMLEntityEncode( String input ) {
+        StringBuffer sb = new StringBuffer();
+        for ( int i = 0; i < input.length(); ++i ) {
+            char ch = input.charAt( i );
+            if ( ch>='a' && ch<='z' || ch>='A' && ch<='Z' || ch>='0' && ch<='9' ) {
+                sb.append( ch );
+            } else {
+                sb.append( "&#" + (int)ch + ";" );
+            }
+        }
+        return sb.toString();
+    }
+
 
     /**
      * _more_
@@ -932,6 +945,8 @@ public class Request implements Constants {
             throw new BadInputException("Incorrect input for:" + key
                                         + " value:" + v + ":");
         }
+
+        //        v = HTMLEntityEncode(v);
         //TODO:Check the value
         return v;
         //        return repository.getDatabaseManager().escapeString(v);

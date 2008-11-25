@@ -63,6 +63,10 @@ import java.util.Properties;
 
 
 
+import  javax.mail.internet.MimeMessage;
+import  javax.mail.Message;
+import  javax.mail.Transport;
+
 
 /**
  * Class TypeHandler _more_
@@ -1291,6 +1295,39 @@ public class UserManager extends RepositoryManager {
         }
         return makeResult(request, "User Home", sb);
     }
+
+
+
+
+
+    public Result processSendInfo(Request request) throws Exception {
+        String smtpServer = getRepository().getProperty("ramadda.smtpserver",(String)null);
+        String serverAdmin = getRepository().getProperty("ramadda.contact",(String)null);
+        serverAdmin = "jeffmc@ucar.edu";
+        smtpServer = "smtphost.unidata.ucar.edu";
+
+        String toUser = "jeffmc@unidata.ucar.edu";
+
+        if(serverAdmin==null || smtpServer == null) {
+            return makeResult(request, "User Information",  new StringBuffer("This RAMADDA server has not been configured to for email"));
+        }
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "my-mail-server");
+        props.put("mail.from", "me@example.com");
+        javax.mail.Session session = javax.mail.Session.getInstance(props, null);
+        MimeMessage msg = new MimeMessage(session);
+        msg.setFrom();
+        msg.setRecipients(Message.RecipientType.TO,
+                          toUser);
+        msg.setSubject("JavaMail hello world example");
+        msg.setSentDate(new Date());
+        msg.setText("Hello, world!\n");
+        Transport.send(msg);
+
+        StringBuffer sb = new StringBuffer("Instructions on how to reset your password have been sent to the email address we have recorded for you");
+        return makeResult(request, "User Information",  sb);
+    }
+
 
 
     /**

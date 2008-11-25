@@ -169,6 +169,8 @@
         <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/mailapi.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/smtp.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
