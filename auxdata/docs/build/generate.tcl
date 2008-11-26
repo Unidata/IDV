@@ -1994,7 +1994,7 @@ proc gen::processFaqInner {faq faqCnt} {
             if {$name!=""} {
                 append catBottom "<a name=\"$name\"></a>\n"
             }
-            append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4> $qlabel ${entry}. $q</h4></div>\n"
+            append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4> ${entry}. $qlabel $q</h4></div>\n"
             append catBottom "</a><div class=\"faq-answer\"><b>$alabel</b> $a</div>\n"
             append catBottom "<p><hr align=\"center\" width=\"10%\"><p>"
             incr cnt
