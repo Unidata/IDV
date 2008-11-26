@@ -1739,7 +1739,7 @@ public class Repository extends RepositoryBase implements
                                         links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
-        String sublinksHtml = BLANK;
+        String sublinksHtml = "&nbsp";
         if (sublinks != null) {
             sublinksHtml = StringUtil.join(getProperty("ramadda.html.sublink.separator",""), sublinks);
         }
@@ -1800,7 +1800,6 @@ public class Repository extends RepositoryBase implements
      * @return _more_
      */
     public String translate(Request request, String s) {
-
         User       user     = request.getUser();
         String     language = user.getLanguage();
         Properties map      = (Properties) languageMap.get(language);

@@ -61,9 +61,13 @@ import java.util.List;
 import java.util.Properties;
 
 
+import  javax.mail.internet.MimeMessage;
+import  javax.mail.internet.InternetAddress;
+import  javax.mail.Message;
+import  javax.mail.Transport;
 
 /**
- * Class SqlUtil _more_
+ * Class Admin 
  *
  *
  * @author IDV Development Team
@@ -594,7 +598,19 @@ public class Admin extends RepositoryManager {
         sb.append(
             HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
 
-        sb.append(tableSubHeader(msg("Display")));
+        sb.append(tableSubHeader(formHeader(msg("Contact"))));
+        sb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
+                                     HtmlUtil.input(PROP_ADMIN_EMAIL,
+                                         getProperty(PROP_ADMIN_EMAIL,
+                                             ""), size)));
+
+        sb.append(HtmlUtil.formEntry(msgLabel("Mail Server"),
+                                     HtmlUtil.input(PROP_ADMIN_SMTP,
+                                         getProperty(PROP_ADMIN_SMTP,
+                                             ""), size)+" " +msg("For sending password reset messages")));
+
+
+        sb.append(tableSubHeader(formHeader(msg("Display"))));
         sb.append(HtmlUtil.formEntry(msgLabel("Title"),
                                      HtmlUtil.input(PROP_REPOSITORY_NAME,
                                          getProperty(PROP_REPOSITORY_NAME,
@@ -604,12 +620,15 @@ public class Admin extends RepositoryManager {
                                             getProperty(PROP_HTML_FOOTER,
                                                 ""), 5, 40)));
 
+
+
+
         sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
                 + HtmlUtil.textArea(PROP_GOOGLEAPIKEYS, getProperty(PROP_GOOGLEAPIKEYS, ""), 5, 80)
                 + "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
 
 
-        sb.append(tableSubHeader(msg("Access")));
+        sb.append(tableSubHeader(formHeader(msg("Access"))));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
                                          "true",
@@ -637,7 +656,7 @@ public class Admin extends RepositoryManager {
 
 
 
-        sb.append(tableSubHeader(msg("Available Output Types")));
+        sb.append(tableSubHeader(formHeader(msg("Available Output Types"))));
 
         StringBuffer outputSB = new StringBuffer();
         List<OutputType> types = getRepository().getOutputTypes();
@@ -651,7 +670,7 @@ public class Admin extends RepositoryManager {
                     outputSB.append(HtmlUtil.p());
                 }
                 lastGroupName= type.getGroupName();
-                outputSB.append("<div class=\"formgroupheader\">" + lastGroupName+"</div>\n<div style=\"margin-left:10px\">");
+                outputSB.append("<div class=\"pagesubheading\">" + lastGroupName+"</div>\n<div style=\"margin-left:20px\">");
             }
             outputSB.append(HtmlUtil.checkbox("outputtype." + type.getId(),"true",ok));
             outputSB.append(type.getLabel());
@@ -686,6 +705,37 @@ public class Admin extends RepositoryManager {
         return makeResult(request, msg("Settings"), sb);
     }
 
+    public boolean isEmailCapable() {
+        String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,"").trim();
+        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,"").trim();
+        if(serverAdmin.length()==0 || smtpServer.length() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public void sendEmail(String to, String subject, String contents, boolean asHtml) throws Exception {
+        if(!isEmailCapable()) {
+            throw new IllegalStateException("This RAMADDA server has not been configured to send email");
+        }
+        String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,"").trim();
+        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,"").trim();
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", smtpServer);
+        props.put("mail.from", serverAdmin);
+        javax.mail.Session session = javax.mail.Session.getInstance(props, null);
+        MimeMessage msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(serverAdmin));
+        msg.setRecipients(Message.RecipientType.TO,
+                          to);
+        msg.setSubject(subject);
+        msg.setSentDate(new Date());
+        msg.setContent(contents,(asHtml?"text/html":"text/plain"));
+        Transport.send(msg);
+    }
+
+
     /**
      * _more_
      *
@@ -696,6 +746,14 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSettingsDo(Request request) throws Exception {
+
+        getRepository().writeGlobal(
+                                    PROP_ADMIN_EMAIL,
+                                    request.getString(PROP_ADMIN_EMAIL, ""));
+        getRepository().writeGlobal(
+                                    PROP_ADMIN_SMTP,
+                                    request.getString(PROP_ADMIN_SMTP, ""));
+
         if (request.exists(PROP_REPOSITORY_NAME)) {
             getRepository().writeGlobal(
                 PROP_REPOSITORY_NAME,

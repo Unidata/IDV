@@ -180,6 +180,13 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_USER_LOGIN = new RequestUrl(this,
                                                  "/user/login");
 
+    /** _more_ */
+    public final RequestUrl URL_USER_RESETPASSWORD = new RequestUrl(this,
+                                                 "/user/resetpassword");
+
+    public final RequestUrl URL_USER_FINDUSERID = new RequestUrl(this,
+                                                 "/user/finduserid");
+
 
     /** _more_ */
     public final RequestUrl URL_USER_LOGOUT = new RequestUrl(this,

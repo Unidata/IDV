@@ -674,6 +674,10 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    public static final String PROP_ADMIN_EMAIL = "ramadda.admin.email";
+    public static final String PROP_ADMIN_SMTP = "ramadda.admin.smtp";
+
+
     public static final String PROP_VERSION = "ramadda.version";
 
     /** _more_ */
@@ -1006,6 +1010,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ROLES = "user.roles";
 
+
+    public static final String ARG_USER_PASSWORDKEY = "user.passwordkey";
+
+
     /** _more_ */
     public static final String ARG_USER_PASSWORD = "user.password";
 
@@ -1029,6 +1037,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_USER_ADMIN = "user.admin";
+
+    public static final String ARG_USER_BULK = "user.bulk";
 
 
     /** _more_ */

@@ -63,9 +63,7 @@ import java.util.Properties;
 
 
 
-import  javax.mail.internet.MimeMessage;
-import  javax.mail.Message;
-import  javax.mail.Transport;
+
 
 
 /**
@@ -163,7 +161,7 @@ public class UserManager extends RepositoryManager {
                 Session session = sessionMap.get(request.getSessionId());
                 if (session != null) {
                     session.lastActivity = new Date();
-                    user                 = session.user;
+                    user = session.user =  getCurrentUser(session.user);
                     break;
                 }
             }
@@ -175,7 +173,7 @@ public class UserManager extends RepositoryManager {
                 sessionMap.get(request.getString(ARG_SESSIONID));
             if (session != null) {
                 session.lastActivity = new Date();
-                user                 = session.user;
+                user = session.user =  getCurrentUser(session.user);
             }
         }
 
@@ -251,13 +249,22 @@ public class UserManager extends RepositoryManager {
             //            request.setSessionId(getSessionId());
         }
 
+        //Make sure we have the current user state
+        user = getCurrentUser(user);
 
         if (user == null) {
             user = getUserManager().getAnonymousUser();
         }
 
-        request.setUser(user);
 
+        request.setUser(user);
+    }
+
+    private User getCurrentUser(User user) {
+        if(user==null) return null;
+        User currentUser = userMap.get(user.getId());
+        if(currentUser!=null) return currentUser;
+        return user;
     }
 
     /**
@@ -430,9 +437,19 @@ public class UserManager extends RepositoryManager {
         sb.append(extra);
 
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Login"))));
-
-        sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
+        sb.append(HtmlUtil.formTableClose());
+
+        if(getAdmin().isEmailCapable()) {
+            sb.append(HtmlUtil.p());
+            sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_FINDUSERID),
+                                    msg("Forget your user ID?")));
+            sb.append(HtmlUtil.br());
+            sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_RESETPASSWORD),
+                                    msg("Forget your password?")));
+        }
+
+
         return sb.toString();
     }
 
@@ -512,6 +529,17 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    protected User findUserFromEmail(String email) throws Exception {
+        Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+                             Tables.USERS.NAME, Clause.eq(Tables.USERS.COL_EMAIL, email));
+        ResultSet results = stmt.getResultSet();
+        if ( !results.next()) {
+            return null;
+        } 
+        return getUser(results);
+    }
+
+
 
     /**
      * _more_
@@ -541,6 +569,7 @@ public class UserManager extends RepositoryManager {
                         ? new Integer(1)
                         : new Integer(0), user.getLanguage()
             });
+            userMap.put(user.getId(), user);
             return;
         }
 
@@ -549,6 +578,8 @@ public class UserManager extends RepositoryManager {
             user.getAnswer(), user.getPassword(),
             new Boolean(user.getAdmin()), user.getLanguage()
         });
+
+        userMap.put(user.getId(), user);
     }
 
 
@@ -819,6 +850,56 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb          = new StringBuffer();
 
         StringBuffer errorBuffer = new StringBuffer();
+
+        if (request.exists(ARG_USER_BULK)) {
+            List<User> users = new ArrayList<User>();
+            boolean ok = true;
+            for(String line: (List<String>)StringUtil.split(request.getString(ARG_USER_BULK,""),"\n",true,true)) {
+                if(line.startsWith("#")) continue;
+                List<String> toks = (List<String>)StringUtil.split(line,",",true,true);
+                if(toks.size()==0) continue;
+                if(toks.size()<2) {
+                    ok = false;
+                    sb.append(getRepository().error("Bad line:" + line));
+                    break;
+                }
+                id = toks.get(0);
+                password1 = toks.get(1);
+                name = (toks.size()>=3?toks.get(2):id);
+                email = (toks.size()>=4?toks.get(3):"");
+                if(findUser(id)!=null) {
+                    ok = false;
+                    sb.append(getRepository().error(msg("User already exists") +": "+ id));
+                    break;
+                }
+                users.add(new User(id, name, email, "", "",
+                                   hashPassword(password1), false,
+                                   ""));
+            }
+            if(ok) {
+                for(User user: users) {
+                    makeOrUpdateUser(user, false);
+                    sb.append(msgLabel("Created user"));
+                    sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_EDIT,
+                                                        ARG_USER_ID, user.getId()),user.getId()));
+                    sb.append(HtmlUtil.br());
+                }
+                if(users.size()==0) {
+                    sb.append(getRepository().note(msg("No users created")));
+                    makeBulkForm(request, sb, request.getString(ARG_USER_BULK,null));
+                }
+            } else {
+                makeBulkForm(request, sb, request.getString(ARG_USER_BULK,""));
+            }
+            Result result = new Result(msg("New User"), sb);
+            result.putProperty(PROP_NAVSUBLINKS,
+                               getRepository().getSubNavLinks(request,
+                                                              getAdmin().adminUrls));
+
+            return result;
+        }
+
+
         if (request.exists(ARG_USER_ID)) {
             id        = request.getString(ARG_USER_ID, "").trim();
             name      = request.getString(ARG_USER_NAME, name).trim();
@@ -886,14 +967,33 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit(msg("Create User"),
                                          ARG_USER_NEW)));
-        sb.append("</table>");
-        sb.append("\n</form>\n");
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.formClose());
+
+
+
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.hr());
+        makeBulkForm(request, sb, null);
         Result result = new Result(msg("New User"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
                                getAdmin().adminUrls));
         return result;
     }
+
+    private void makeBulkForm(Request request, StringBuffer sb, String init) {
+        if(init == null)
+            init  = "#one per line\n#user id, password, name, email";
+        sb.append(msgHeader("Bulk User Create"));
+        sb.append(request.form(getRepositoryBase().URL_USER_NEW));
+        sb.append(HtmlUtil.textArea(ARG_USER_BULK,init,10,60));
+        sb.append(HtmlUtil.br());
+        sb.append(HtmlUtil.submit("Submit"));
+        sb.append("\n</form>\n");
+
+    }
+
 
     /**
      * _more_
@@ -1299,33 +1399,137 @@ public class UserManager extends RepositoryManager {
 
 
 
-
-    public Result processSendInfo(Request request) throws Exception {
-        String smtpServer = getRepository().getProperty("ramadda.smtpserver",(String)null);
-        String serverAdmin = getRepository().getProperty("ramadda.contact",(String)null);
-        serverAdmin = "jeffmc@ucar.edu";
-        smtpServer = "smtphost.unidata.ucar.edu";
-
-        String toUser = "jeffmc@unidata.ucar.edu";
-
-        if(serverAdmin==null || smtpServer == null) {
-            return makeResult(request, "User Information",  new StringBuffer("This RAMADDA server has not been configured to for email"));
+    private static class PasswordReset {
+        String user;
+        Date dttm;
+        public PasswordReset(String user, Date dttm) {
+            this.user = user;
+            this.dttm  = dttm;
         }
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "my-mail-server");
-        props.put("mail.from", "me@example.com");
-        javax.mail.Session session = javax.mail.Session.getInstance(props, null);
-        MimeMessage msg = new MimeMessage(session);
-        msg.setFrom();
-        msg.setRecipients(Message.RecipientType.TO,
-                          toUser);
-        msg.setSubject("JavaMail hello world example");
-        msg.setSentDate(new Date());
-        msg.setText("Hello, world!\n");
-        Transport.send(msg);
+    }
 
-        StringBuffer sb = new StringBuffer("Instructions on how to reset your password have been sent to the email address we have recorded for you");
+    public Result processFindUserId(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if(!getAdmin().isEmailCapable()) {
+            return makeResult(request, "User Information",  
+                              new StringBuffer(getRepository().warning(msg("This RAMADDA server has not been configured to send email"))));
+        }
+
+        String email = request.getString(ARG_USER_EMAIL,"").trim();
+        if(email.length()>0) {
+            User user = findUserFromEmail(email);
+            if(user !=null) {
+                StringBuffer  contents  = new StringBuffer(translateMsg(request,"Your RAMADDA user ID is")+":" + user.getId());
+                contents.append("<p>");
+                contents.append(HtmlUtil.href(getRepository().URL_USER_LOGIN.getFullUrl(""),translateMsg(request,"Login")));
+                String subject  = translateMsg(request,"Your RAMADDA user ID");
+                getAdmin().sendEmail(user.getEmail(),subject, contents.toString(),true);
+                sb.append(getRepository().note(msg("You user id has been sent to your registered email")));
+                sb.append(makeLoginForm(request));
+                return makeResult(request, "User Information",  sb);
+            } 
+            sb.append(getRepository().error(msg("No user is registered with the given email address")));
+        }
+
+        sb.append(request.form(getRepositoryBase().URL_USER_FINDUSERID));
+        sb.append(msgLabel("Your Email:"));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.input(ARG_USER_EMAIL,email,HtmlUtil.SIZE_30));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.submit("Submit"));
+        sb.append(HtmlUtil.formClose());
         return makeResult(request, "User Information",  sb);
+    }
+
+
+    private Hashtable passwordResets = new Hashtable();
+
+    public Result processResetPassword(Request request) throws Exception {
+
+        String key = request.getString(ARG_USER_PASSWORDKEY,(String)null);
+        PasswordReset resetInfo=null;
+        StringBuffer sb = new StringBuffer();
+        if(key !=null) {
+            resetInfo = (PasswordReset) passwordResets.get(key);
+            if(resetInfo!=null) {
+                if(new Date().getTime()>resetInfo.dttm.getTime()) {
+                    sb.append(getRepository().error(msg("Password reset has timed out")+"<br>"+msg("Please try again")));
+                    resetInfo = null;
+                    passwordResets.remove(key);
+                }
+            } else {
+                sb.append(getRepository().error(msg("Password reset has timed out")+"<br>"+msg("Please try again")));
+            }
+        }
+        
+        User  user = (resetInfo!=null?findUser(resetInfo.user,false):null);
+        if(user!=null) {
+            if(request.exists(ARG_USER_PASSWORD1)) {
+                if(checkPasswords(request, user)) {
+                    applyState(request, user, false);
+                    sb.append(getRepository().note(msg("Your password has been reset")));
+                    sb.append(makeLoginForm(request));
+                    return makeResult(request, "Password Reset",  sb);
+                }
+                sb.append(getRepository().warning("Incorrect passwords"));
+            } 
+            sb.append(request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
+            sb.append(HtmlUtil.hidden(ARG_USER_PASSWORDKEY,key));
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.formEntry(msgLabel("User"),
+                                         user.getId()));
+            sb.append(HtmlUtil.formEntry(msgLabel("Password"),
+                                         HtmlUtil.input(ARG_USER_PASSWORD1, "")));
+            sb.append(HtmlUtil.formEntry(msgLabel("Password Again"),
+                                         HtmlUtil.input(ARG_USER_PASSWORD2, "")));
+            sb.append(HtmlUtil.formEntry("",
+                                         HtmlUtil.submit("Submit")));
+
+            sb.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.formClose());
+            return makeResult(request, "Password Reset",  sb);
+        }
+
+        if(!getAdmin().isEmailCapable()) {
+            return makeResult(request, "Password Reset",  
+                              new StringBuffer(getRepository().warning(msg("This RAMADDA server has not been configured to send email"))));
+        }
+
+
+        if(user == null) {
+            user =  findUser(request.getString(ARG_USER_NAME,""), false);
+        }
+        if(user == null) {
+            if(request.exists(ARG_USER_NAME)) {
+                sb.append(getRepository().error("Not a registered user"));
+                sb.append(HtmlUtil.p());
+            }
+            sb.append(msgHeader("Please enter your user ID"));
+            sb.append(HtmlUtil.p());
+            sb.append(request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
+            sb.append(msgLabel("User ID"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(HtmlUtil.input(ARG_USER_NAME,request.getString(ARG_USER_NAME,""),HtmlUtil.SIZE_20));
+            sb.append(HtmlUtil.space(1));
+            sb.append(HtmlUtil.submit(msg("Submit")));
+            sb.append(HtmlUtil.formClose());
+            return makeResult(request, "Password Reset",  sb);
+        }
+
+        key = getRepository().getGUID()+"_"+Math.random();
+        //Time out is 1 hour
+        resetInfo = new PasswordReset(user.getId(), new Date(new Date().getTime()+1000*60*60));
+        passwordResets.put(key, resetInfo);
+        String toUser = user.getEmail();
+        String url =
+            getRepository().URL_USER_RESETPASSWORD.getFullUrl("?" + ARG_USER_PASSWORDKEY+"=" + key);
+        StringBuffer contents = new StringBuffer(translateMsg(request,"A request has been made to reset your RAMADDA password"));
+        contents.append(HtmlUtil.p());
+        contents.append(HtmlUtil.href(url,translateMsg(request,"Click to reset")));
+        String subject = translateMsg(request,"RAMADDA password reset");
+        getAdmin().sendEmail(toUser,subject, contents.toString(),true);
+        sb.append(getRepository().note(msg("Instructions on how to reset your password have been sent to your registered email address")));
+        return makeResult(request, "Password Reset",  sb);
     }
 
 

@@ -183,6 +183,9 @@ public class RepositoryManager implements RepositorySource, Constants,
         return Repository.msg(msg);
     }
 
+    public String translateMsg(Request request, String s) {
+        return getRepository().translate(request,msg(s));
+    }
 
 
     /**
@@ -228,6 +231,11 @@ public class RepositoryManager implements RepositorySource, Constants,
      */
     public static String subHeader(String s) {
         return HtmlUtil.div(s, HtmlUtil.cssClass("pagesubheading"));
+    }
+
+
+    public static String formHeader(String s) {
+        return HtmlUtil.div(s, HtmlUtil.cssClass("formgroupheader"));
     }
 
 

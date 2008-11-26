@@ -66,9 +66,12 @@
       <api request="/user/home"     method="processHome"     admin="false"/>
       <api request="/user/settings" method="processSettings" admin="false"/>
       <api request="/user/cart"     method="processCart"     admin="false"/>
+      <api request="/user/resetpassword"      method="processResetPassword"    admin="false"/>
+      <api request="/user/finduserid"      method="processFindUserId"    admin="false"/>
       <api request="/user/list"     method="adminUserList"   admin="true"/>
       <api request="/user/edit"     method="adminUserEdit"   admin="true"/>
       <api request="/user/new"      method="adminUserNew"    admin="true"/>
+
   </group>
 
   <group handler="admin">
