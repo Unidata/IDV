@@ -1432,7 +1432,7 @@ public class UserManager extends RepositoryManager {
         }
 
         sb.append(request.form(getRepositoryBase().URL_USER_FINDUSERID));
-        sb.append(msgLabel("Your Email:"));
+        sb.append(msgLabel("Your Email"));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.input(ARG_USER_EMAIL,email,HtmlUtil.SIZE_30));
         sb.append(HtmlUtil.space(1));
@@ -1479,9 +1479,9 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.formEntry(msgLabel("User"),
                                          user.getId()));
             sb.append(HtmlUtil.formEntry(msgLabel("Password"),
-                                         HtmlUtil.input(ARG_USER_PASSWORD1, "")));
+                                         HtmlUtil.password(ARG_USER_PASSWORD1)));
             sb.append(HtmlUtil.formEntry(msgLabel("Password Again"),
-                                         HtmlUtil.input(ARG_USER_PASSWORD2, "")));
+                                         HtmlUtil.password(ARG_USER_PASSWORD2)));
             sb.append(HtmlUtil.formEntry("",
                                          HtmlUtil.submit("Submit")));
 

@@ -718,6 +718,7 @@ public class Admin extends RepositoryManager {
         if(!isEmailCapable()) {
             throw new IllegalStateException("This RAMADDA server has not been configured to send email");
         }
+        System.err.println ("send email top");
         String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,"").trim();
         String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,"").trim();
 
@@ -732,7 +733,9 @@ public class Admin extends RepositoryManager {
         msg.setSubject(subject);
         msg.setSentDate(new Date());
         msg.setContent(contents,(asHtml?"text/html":"text/plain"));
+        System.err.println ("before sending");
         Transport.send(msg);
+        System.err.println ("after sending");
     }
 
 
