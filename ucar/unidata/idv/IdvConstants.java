@@ -133,6 +133,8 @@ public interface IdvConstants {
     /** is isl scripting interactive or batch */
     public static final String ARG_ISLINTERACTIVE = "-islinteractive";
 
+    public static final String ARG_B64ISL = "-b64isl";
+
     /** an isl file */
     public static final String ARG_ISLFILE = "-islfile";
 

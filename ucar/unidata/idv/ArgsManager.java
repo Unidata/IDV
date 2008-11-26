@@ -927,9 +927,15 @@ public class ArgsManager extends IdvManager {
             }
         } else if (arg.equals(ARG_LISTRESOURCES)) {
             listResources = true;
+        } else if (checkArg(arg, ARG_B64ISL, args, idx, 1)) {
+            scriptingFiles.add("b64:" +args[idx++]);
+            islInteractive = true;
+            setIsOffScreen(false);
         } else if (arg.equals(ARG_ISLINTERACTIVE)) {
             islInteractive = true;
             setIsOffScreen(false);
+            
+            scriptingFiles.add(arg);
         } else if (isIslFile(arg)) {
             scriptingFiles.add(arg);
             if ( !islInteractive) {

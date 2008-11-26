@@ -617,6 +617,8 @@ public class ImageGenerator extends IdvManager {
     public void processScriptFiles(List scriptFiles) {
         for (int fileIdx = 0; fileIdx < scriptFiles.size(); fileIdx++) {
             String filename = (String) scriptFiles.get(fileIdx);
+            if(filename.startsWith("b64:")) {
+            }
             if ( !processScriptFile(filename)) {
                 return;
             }
