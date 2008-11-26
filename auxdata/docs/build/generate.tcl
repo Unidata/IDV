@@ -1978,24 +1978,30 @@ proc gen::processFaqInner {faq faqCnt} {
         set catBottom  ""
         set catPrefix "${prefix}cat${catCnt}_"
         set didOne 0
+	set entryCnt 0
         foreach {q a name faqid} $faqitems($cat) {
 	    incr total
+	    incr entryCnt
             set didOne 1
             if {$faqid==""} {
                 set faqid "$catPrefix$cnt"
             } 
-            append catTop "<div class=\"faq-question\"> <b>\#${total}.</b> <a class=\"faq-question-link\" href=\"\#$faqid\">$q</a></div>\n"
+	    set entry $entryCnt
+	    if {$cat !=""} {
+	      set entry $catCnt.$entryCnt
+	    }
+            append catTop "<div class=\"faq-question\"> <b>${entry}.</b> <a class=\"faq-question-link\" href=\"\#$faqid\">$q</a></div>\n"
             if {$name!=""} {
                 append catBottom "<a name=\"$name\"></a>\n"
             }
-            append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4> $qlabel \#${total}. $q</h4></div>\n"
+            append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4> $qlabel ${entry}. $q</h4></div>\n"
             append catBottom "</a><div class=\"faq-answer\"><b>$alabel</b> $a</div>\n"
             append catBottom "<p><hr align=\"center\" width=\"10%\"><p>"
             incr cnt
         }
         if {$cat !=""} {
-            append faqTop [ht::div "<a class=\"faq-category-link\" href=\"#$catPrefix\">$cat</a>" faq-category-title]
-            append faqBottom [ht::div "<a name=\"$catPrefix\"></a>$cat" faq-category-title]
+            append faqTop [ht::div "<a class=\"faq-category-link\" href=\"#$catPrefix\">$catCnt.0 $cat</a>" faq-category-title]
+            append faqBottom [ht::div "<a name=\"$catPrefix\"></a>$catCnt.0 $cat" faq-category-title]
         } 
         if {$didOne} {
             append faqTop [ht::div $catTop faq-category]
