@@ -1504,11 +1504,15 @@ public class STIStormDataSource extends StormDataSource {
             //            password = "mypassword";
             try {
                 //System.err.println(url);
-                if(url.indexOf("user")>0 && url.indexOf("password")>0)
-                    connection = DriverManager.getConnection(url);
-                else
-                    connection = DriverManager.getConnection(url, userName,
-                                        password);
+                if (useDerby()) {
+                        connection = DriverManager.getConnection(url);
+                } else {
+                    if(url.indexOf("user")>0 && url.indexOf("password")>0)
+                        connection = DriverManager.getConnection(url);
+                    else
+                        connection = DriverManager.getConnection(url, userName,
+                                                                 password);
+                }
 
                 return connection;
             } catch (Exception sqe) {
