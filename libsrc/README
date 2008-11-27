@@ -6,3 +6,9 @@ jar of jars they need to be unjarred and the META_INF directory
 removed.
 
 
+jetty.jar jetty-util.jar:
+These are from the Jetty project: http://www.mortbay.org/jetty/
+and provide a embeddable web server used by RAMADDA
+
+
+
