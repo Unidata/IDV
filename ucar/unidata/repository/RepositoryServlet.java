@@ -1,5 +1,5 @@
 /**
- * $Id: MetadataServlet.java,v 1.90 2008/02/21 17:02:27 oxelson Exp $
+ * $Id: RepositoryServlet.java,v 1.90 2008/02/21 17:02:27 oxelson Exp $
  *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -31,10 +30,12 @@ import org.apache.commons.fileupload.disk.*;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-//import ucar.unidata.plaza.error.ExceptionLogger;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
+
+
+
+import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
@@ -52,6 +53,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Properties;
+
 import java.util.StringTokenizer;
 
 import javax.servlet.*;
@@ -67,27 +70,12 @@ import javax.servlet.http.*;
 public class RepositoryServlet extends HttpServlet {
 
     /** ExceptionLogger to handle any runtime exceptions */
-    //    private static ExceptionLogger ex = new ExceptionLogger();
+
+    //    private  ucar.unidata.plaza.error.ExceptionLogger logger = new ucar.unidata.plaza.error.ExceptionLogger();
 
     /** Repository object that will be instantiated */
     private static Repository repository;
 
-
-
-    /** _more_          */
-    private Object MUTEX = new Object();
-
-
-    /**
-     * _more_
-     *
-     * @param exception _more_
-     * @param foo _more_
-     */
-    private void logException(Throwable exception, HttpServletRequest request) {
-        exception.printStackTrace();
-        //                ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
-    }
 
 
     /**
@@ -99,13 +87,17 @@ public class RepositoryServlet extends HttpServlet {
      */
     private void createRepository(HttpServletRequest request)
             throws Exception {
-        //Have  a local variable here so we can create and initialize it
-        Repository tmp = new Repository(getInitParams(),
-                                        request.getServerPort(), true);
-        tmp.init(null);
+        repository = new Repository(getInitParams(), 
+                                    request.getServerPort(), true);
+        String      propertyFile     = "/WEB-INF/repository.properties";
+        Properties  webAppProperties = new Properties();
+        InputStream is =
+            getServletContext().getResourceAsStream(propertyFile);
+        if (is != null) {
+            webAppProperties.load(is);
+        }
+        repository.init(webAppProperties);
 
-        //Now set it
-        repository = tmp;
     }
 
 
@@ -144,9 +136,7 @@ public class RepositoryServlet extends HttpServlet {
             try {
                 repository.close();
             } catch (Exception e) {
-                try {
-                    logException(e, null);
-                } catch (Exception noop) {}
+                logException(e);
             }
         }
         repository = null;
@@ -169,22 +159,18 @@ public class RepositoryServlet extends HttpServlet {
 
         // there can be only one
         if (repository == null) {
-            synchronized (MUTEX) {
-                if (repository == null) {
-                    try {
-                        createRepository(request);
-                    } catch (Exception e) {
-                        logException(e, request);
-                        response.sendError(response.SC_INTERNAL_SERVER_ERROR,
-                                           "An error has occurred:"
-                                           + e.getMessage());
-                        return;
-                    }
-                }
+            try {
+                createRepository(request);
+            } catch (Exception e) {
+                logException(e, request);
+                response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                                   "An error has occurred:" + e.getMessage());
+                return;
             }
         }
 
         RequestHandler handler          = new RequestHandler(request);
+
         Result         repositoryResult = null;
         try {
             // need to support HTTP HEAD request since we are overriding HttpServlet doGet   
@@ -193,9 +179,12 @@ public class RepositoryServlet extends HttpServlet {
             }
 
             // create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object
+
             Request repositoryRequest = new Request(repository,
                                             request.getRequestURI(),
-                                            handler.formArgs);
+                                            handler.formArgs, request,
+                                            response, this);
+            //            System.err.println ("request:" +   request.getRequestURI());
             repositoryRequest.setIp(request.getRemoteAddr());
             repositoryRequest.setOutputStream(response.getOutputStream());
             repositoryRequest.setFileUploads(handler.fileUploads);
@@ -212,6 +201,7 @@ public class RepositoryServlet extends HttpServlet {
         if (repositoryResult == null) {
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                "Unknown request:" + request.getRequestURI());
+            return;
         }
         if (repositoryResult.getNeedToWrite()) {
             List<String> args = repositoryResult.getHttpHeaderArgs();
@@ -222,8 +212,6 @@ public class RepositoryServlet extends HttpServlet {
                     response.setHeader(name, value);
                 }
             }
-
-
 
 
             if (repositoryResult.getRedirectUrl() != null) {
@@ -352,6 +340,7 @@ public class RepositoryServlet extends HttpServlet {
         }
 
 
+
         /**
          * Process any form input.
          *
@@ -362,7 +351,6 @@ public class RepositoryServlet extends HttpServlet {
             String value = item.getString();
             formArgs.put(name, value);
         }
-
 
 
         /**
@@ -386,7 +374,10 @@ public class RepositoryServlet extends HttpServlet {
             }
             String contentType = item.getContentType();
             File uploadedFile =
-                repository.getStorageManager().getUploadFilePath(fileName);
+                new File(
+                    IOUtil.joinDir(
+                        repository.getStorageManager().getUploadDir(),
+                        repository.getGUID() + "_" + fileName));
             try {
                 item.write(uploadedFile);
             } catch (Exception e) {
@@ -413,6 +404,39 @@ public class RepositoryServlet extends HttpServlet {
         }
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param exc _more_
+     */
+    protected void logException(Throwable exc) {
+        logException(exc, null);
+    }
+
+    /**
+     * _more_
+     *
+     * @param exc _more_
+     * @param request _more_
+     */
+    protected void logException(Throwable exc, HttpServletRequest request) {
+        try {
+            String address = "";
+            if (request != null) {
+                address = request.getRemoteAddr();
+            }
+            //            logger.logException(logger.getStackTrace(exc), address);
+            System.err.println("Exception: " + exc);
+            exc.printStackTrace();
+        } catch (Exception ioe) {
+            System.err.println("Exception in logging exception:" + ioe);
+        }
+
+    }
+
+
 
 }
 

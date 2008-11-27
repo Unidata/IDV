@@ -1545,7 +1545,9 @@ public class DataOutputHandler extends OutputHandler {
             }
         };
 
-        servlet.init(request.getHttpServlet().getServletConfig());
+        if(request.getHttpServlet()!=null && request.getHttpServlet().getServletConfig()!=null) {
+            servlet.init(request.getHttpServlet().getServletConfig());
+        }
 
 
         servlet.doGet(request.getHttpServletRequest(),

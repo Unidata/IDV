@@ -303,12 +303,9 @@ public class RepositoryServer extends HttpServer implements Constants {
      */
     public static void main(String[] args) throws Throwable {
         try {
-            for(int i=0;i<20;i++) {
-//                System.err.println(java.util.UUID.randomUUID().toString());
-            }
-
-            RepositoryServer mds = new RepositoryServer(args);
-            mds.init();
+            JettyServer server = new JettyServer(args);
+            //            RepositoryServer mds = new RepositoryServer(args);
+            //            mds.init();
         } catch (Exception exc) {
             LogUtil.printExceptionNoGui(null, "Error in main",
                                         LogUtil.getInnerException(exc));

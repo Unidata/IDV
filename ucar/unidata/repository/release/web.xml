@@ -24,13 +24,13 @@ Configure RAMADDA
 
 
   <servlet>
-    <servlet-name>MetadataServlet</servlet-name>
-    <servlet-class>ucar.unidata.repository.MetadataServlet</servlet-class>
+    <servlet-name>RepositoryServlet</servlet-name>
+    <servlet-class>ucar.unidata.repository.RepositoryServlet</servlet-class>
   </servlet>
 
    <!-- The mapping for the default servlet -->
    <servlet-mapping>
-      <servlet-name>MetadataServlet</servlet-name>
+      <servlet-name>RepositoryServlet</servlet-name>
       <url-pattern>/*</url-pattern>
    </servlet-mapping>
 

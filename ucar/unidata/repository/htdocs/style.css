@@ -70,6 +70,7 @@ a.header  {
 .subnav {
    font-size: 12pt;
    padding-top:4;   
+   padding-left:4;   
    background-color : #c3d9ff;
    font-weight: bold;
    color: black;
