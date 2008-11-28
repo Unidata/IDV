@@ -899,6 +899,13 @@ public class Request implements Constants {
     }
 
 
+    public String getEncodedString(String key, String dflt) {
+        String s = getString(key,dflt);
+        if(s!=null) {
+            s = HTMLEntityEncode(s);
+        }
+        return s;
+    }
 
 
 

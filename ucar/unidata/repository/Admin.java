@@ -946,7 +946,6 @@ public class Admin extends RepositoryManager {
         if ((sqlFile != null) && (sqlFile.length() > 0)
                 && new File(sqlFile).exists()) {
             query = IOUtil.readContents(sqlFile, getClass());
-            System.err.println("query:" + query);
             if ((query != null) && (query.trim().length() > 0)) {
                 bulkLoad = true;
             }

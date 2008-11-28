@@ -1964,21 +1964,20 @@ public class EntryManager extends RepositoryManager {
 
         String subject = BLANK;
         String comment = BLANK;
-        subject = request.getString(ARG_SUBJECT, BLANK).trim();
-        comment = request.getString(ARG_COMMENT, BLANK).trim();
+        subject = request.getEncodedString(ARG_SUBJECT, BLANK).trim();
+        comment = request.getEncodedString(ARG_COMMENT, BLANK).trim();
         if (comment.length() == 0) {
             sb.append(getRepository().warning(msg("Please enter a comment")));
         } else {
-            PreparedStatement insert = getDatabaseManager().getPreparedStatement(Tables.COMMENTS.INSERT);
-            int col = 1;
-            insert.setString(col++, getRepository().getGUID());
-            insert.setString(col++, entry.getId());
-            insert.setString(col++, request.getUser().getId());
-            getDatabaseManager().setDate(insert, col++, getRepository().currentTime());
-            insert.setString(col++, subject);
-            insert.setString(col++, request.getString(ARG_COMMENT, BLANK));
-            insert.execute();
-            insert.close();
+            getDatabaseManager().executeInsert(Tables.COMMENTS.INSERT,
+                                               new Object[]{
+                                                   getRepository().getGUID(),
+                                                   entry.getId(),
+                                                   request.getUser().getId(),
+                                                   new Date(),
+                                                   subject,
+                                                   comment});
+            //Now clear out the comments in the cached entry
             entry.setComments(null);
             return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
                                           entry.getId(), ARG_MESSAGE,
@@ -2074,6 +2073,7 @@ public class EntryManager extends RepositoryManager {
                             + HtmlUtil.space(1) + deleteLink;
             //            content.append(HtmlUtil.formEntry("By:",
             //                                         ));
+            //            System.err.println("Comment: " + comment.getComment());
             content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
             sb.append(HtmlUtil.div(getRepository().makeShowHideBlock(request,

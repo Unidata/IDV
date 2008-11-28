@@ -1329,30 +1329,37 @@ public class UserManager extends RepositoryManager {
      */
     public String getUserLinks(Request request) {
         User   user = request.getUser();
-        String userLink;
-        String cartEntry =
-            HtmlUtil.href(request.url(getRepositoryBase().URL_USER_CART),
-                          HtmlUtil.img(getRepository().fileUrl(ICON_CART),
-                                       msg("Data Cart")));
+        String template = getProperty("ramadda.html.link.wrapper","");
+        template = getProperty("ramadda.html.userlink.wrapper",template);
+        String separator = getProperty("ramadda.html.link.separator","");
+        separator = getProperty("ramadda.html.userlink.separator",separator);
+
+        List urls = new ArrayList();
+        List labels = new ArrayList();
+
+        urls.add(request.url(getRepositoryBase().URL_USER_CART));
+        labels.add(HtmlUtil.img(getRepository().fileUrl(ICON_CART),
+                                msg("Data Cart")));
         if (user.getAnonymous()) {
             String redirect =
                 XmlUtil.encodeBase64(request.getUrl().getBytes());
-            userLink =
-                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_LOGIN,
+            urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
                                           ARG_REDIRECT,
-                                          redirect), msg("Login"),
-                                              " class=\"navlink\" ");
+                                 redirect));
+            labels.add(msg("Login"));
         } else {
-            userLink = HtmlUtil.href(
-                request.url(getRepositoryBase().URL_USER_LOGOUT),
-                msg("Logout"), " class=\"navlink\" ") + HtmlUtil.space(1)
-                    + "|" + HtmlUtil.space(1)
-                    + HtmlUtil.href(
-                        request.url(getRepositoryBase().URL_USER_SETTINGS),
-                        user.getLabel(),
-                        " class=\"navlink\" ") + HtmlUtil.space(1);
+            urls.add(request.url(getRepositoryBase().URL_USER_LOGOUT));
+            labels.add(msg("Logout"));
+            urls.add(request.url(getRepositoryBase().URL_USER_SETTINGS));
+            labels.add(user.getLabel());
         }
-        return cartEntry + HtmlUtil.space(2) + userLink;
+        List links = new ArrayList();
+        for(int i=0;i<urls.size();i++) {
+            String link = template.replace("${label}", labels.get(i).toString());
+            link = link.replace("${url}", urls.get(i).toString());
+            links.add(link);
+        }
+        return StringUtil.join(separator,links);
     }
 
 

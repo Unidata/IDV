@@ -353,6 +353,8 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+
+
     /**
      * _more_
      *
@@ -693,6 +695,29 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    public void setValues(PreparedStatement stmt,Object[]values) throws Exception {
+        setValues(stmt, values,1);
+    }
+
+    public void setValues(PreparedStatement stmt,Object[]values, int startIdx) throws Exception {
+        for(int i=0;i<values.length;i++) {
+            if (values[i] == null) {
+                stmt.setNull(i + startIdx, java.sql.Types.VARCHAR);
+            } else  if(values[i] instanceof Date) {
+                setDate(stmt, i+startIdx, (Date) values[i]);
+            } else if (values[i] instanceof Boolean) {
+                boolean b = ((Boolean) values[i]).booleanValue();
+                stmt.setInt(i + startIdx, (b
+                                     ? 1
+                                     : 0));
+            } else {
+                //                System.err.println ("DB insert value:" + values[i]);
+                stmt.setObject(i + startIdx, values[i]);
+            }
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -704,21 +729,7 @@ public class DatabaseManager extends RepositoryManager {
     protected void executeInsert(String insert, Object[] values)
             throws Exception {
         PreparedStatement pstmt = getPreparedStatement(insert);
-        for (int i = 0; i < values.length; i++) {
-            //Assume null is a string
-            if (values[i] == null) {
-                pstmt.setNull(i + 1, java.sql.Types.VARCHAR);
-            } else if (values[i] instanceof Date) {
-                setDate(pstmt,i+1,(Date) values[i]);
-            } else if (values[i] instanceof Boolean) {
-                boolean b = ((Boolean) values[i]).booleanValue();
-                pstmt.setInt(i + 1, (b
-                                     ? 1
-                                     : 0));
-            } else {
-                pstmt.setObject(i + 1, values[i]);
-            }
-        }
+        setValues(pstmt, values);
         try {
             pstmt.execute();
             pstmt.close();
