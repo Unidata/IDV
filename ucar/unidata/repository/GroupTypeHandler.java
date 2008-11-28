@@ -92,12 +92,14 @@ public class GroupTypeHandler extends TypeHandler {
 
 
         if ( !entry.getIsLocalFile()) {
+            /*
             links.add(
                 new Link(
                     request.url(
                         getRepository().URL_SEARCH_FORM, ARG_GROUP,
                         entry.getId()), getRepository().fileUrl(ICON_SEARCH),
                                         "Search in Group"));
+            */
         }
 
 

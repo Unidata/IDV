@@ -227,9 +227,13 @@ public class RepositoryServlet extends HttpServlet {
                     OutputStream output = response.getOutputStream();
                     IOUtil.writeTo(repositoryResult.getInputStream(), output);
                     output.close();
+                } catch (IOException e) {
+                    //We'll ignore any ioexception
                 } catch (Exception e) {
                     logException(e, request);
                 }
+
+
             } else {
                 try {
                     response.setStatus(repositoryResult.getResponseCode());

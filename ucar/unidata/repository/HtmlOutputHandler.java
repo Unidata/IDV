@@ -366,6 +366,7 @@ public class HtmlOutputHandler extends OutputHandler {
         for (TypeHandler theTypeHandler : typeHandlers) {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>");
+                /*
                 sb.append(
                     HtmlUtil.href(
                         request.url(
@@ -373,7 +374,7 @@ public class HtmlOutputHandler extends OutputHandler {
                             theTypeHandler.getType()), HtmlUtil.img(
                                 getRepository().fileUrl(ICON_SEARCH),
                                 msg("Search in Group"))));
-                sb.append(" ");
+                                sb.append(" ");*/
                 sb.append(HtmlUtil
                     .href(request
                         .url(getRepository().URL_LIST_HOME, ARG_TYPE,

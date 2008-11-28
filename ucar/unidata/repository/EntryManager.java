@@ -2311,6 +2311,11 @@ public class EntryManager extends RepositoryManager {
      */
     public String getBreadCrumbs(Request request, Entry entry)
             throws Exception {
+        return getBreadCrumbs(request, entry,null);
+    }
+
+    public String getBreadCrumbs(Request request, Entry entry, RequestUrl requestUrl)
+            throws Exception {
         List breadcrumbs = new ArrayList();
         if (entry == null) {
             return BLANK;
@@ -2327,13 +2332,19 @@ public class EntryManager extends RepositoryManager {
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            String link =  getAjaxLink(request, parent, name, false);
+            String link =  (requestUrl==null?
+                            getAjaxLink(request, parent, name, false):
+                            HtmlUtil.href(request.entryUrl(requestUrl,parent),name));
             breadcrumbs.add(0, link);
             //            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
             //                    parent), name));
             parent = findGroup(request, parent.getParentGroupId());
         }
-        breadcrumbs.add(getAjaxLink(request, entry, entry.getLabel(), false));
+        if(requestUrl==null) {
+            breadcrumbs.add(getAjaxLink(request, entry, entry.getLabel(), false));
+        } else {
+            breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,entry),entry.getLabel()));
+        }
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,

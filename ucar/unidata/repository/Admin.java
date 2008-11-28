@@ -118,11 +118,16 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats",
                                             "Statistics");
 
+    /** _more_ */
+    public RequestUrl URL_ADMIN_ACCESS = new RequestUrl(this, "/admin/access",
+                                            "Access");
+
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
         URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
-        URL_ADMIN_STATS, getHarvesterManager().URL_HARVESTERS_LIST,
+        URL_ADMIN_STATS, URL_ADMIN_ACCESS,
+        getHarvesterManager().URL_HARVESTERS_LIST,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
         URL_ADMIN_SQL, URL_ADMIN_CLEANUP
@@ -810,6 +815,56 @@ public class Admin extends RepositoryManager {
 
 
 
+
+    public Result adminAccess(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(msgHeader("Access Overview"));
+
+        Statement stmt = getDatabaseManager().execute("select "
+                                                      + SqlUtil.comma(Tables.PERMISSIONS.COL_ENTRY_ID,
+                                                                      Tables.PERMISSIONS.COL_ACTION,
+                                                                      Tables.PERMISSIONS.COL_ROLE)
+                                                      + " from "
+                                                      + Tables.PERMISSIONS.NAME, 10000000, 0);
+
+        Hashtable<String,List> idToPermissions = new Hashtable<String,List>();
+
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        List<String> ids = new ArrayList<String>();
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String id       = results.getString(1);
+                String action   = results.getString(2);
+                String role     = results.getString(3);
+                List permissions = idToPermissions.get(id);
+                if(permissions == null) {
+                    idToPermissions.put(id,permissions = new ArrayList());
+                    ids.add(id);
+                }
+                permissions.add(new Permission(action,role));
+            }
+        }
+            
+        sb.append("<table cellspacing=\"0\" cellpadding=\"0\">");
+        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.space(10),
+                                             HtmlUtil.b("Action")+HtmlUtil.space(3),
+                                             HtmlUtil.b("Role"))));
+        for(String id:ids) {
+            Entry entry = getEntryManager().getEntry(request, id);
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(getEntryManager().getBreadCrumbs(request, entry,getRepository().URL_ACCESS_FORM),3)));
+            List<Permission> permissions = (List<Permission>) idToPermissions.get(id);
+            for(Permission permission:permissions) {
+                sb.append(HtmlUtil.row(HtmlUtil.cols("",permission.getAction(),
+                                                     permission.getRoles().get(0))));
+                                                     
+            }
+            sb.append(HtmlUtil.row(HtmlUtil.colspan("<hr>",3)));
+        }
+        sb.append("</table>");
+
+        return makeResult(request, msg("Access Overview"), sb);
+    }
 
     /**
      * _more_

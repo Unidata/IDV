@@ -266,7 +266,6 @@ public class AccessManager extends RepositoryManager {
         //        System.err.println ("can do: " + action);
         while (entry != null) {
             List permissions = getPermissions(request, entry);
-
             List roles       = getRoles(request, entry, action);
             if (roles != null) {
                 for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
@@ -275,6 +274,14 @@ public class AccessManager extends RepositoryManager {
                     if (role.startsWith("!")) {
                         doNot = true;
                         role  = role.substring(1);
+                    }
+                    if(role.startsWith("ip:")) {
+                        String ip = role.substring(3);
+                        if(request.getIp().startsWith(ip)) {
+                            if(doNot) return false;
+                        } else {
+                            return true;
+                        }
                     }
                     if (user.isRole(role)) {
                         return !doNot;

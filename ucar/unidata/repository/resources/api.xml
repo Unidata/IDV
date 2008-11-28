@@ -83,6 +83,7 @@
       <api request="/admin/dumpdb"       method="adminDbDump"        admin="true"/>
       <api request="/admin/actions"      method="adminActions"       admin="true"/>
       <api request="/admin/stats"        method="adminStats"         admin="true"/>
+      <api request="/admin/access"       method="adminAccess"         admin="true"/>
       <api request="/admin/cleanup"      method="adminCleanup"       admin="true"/>
       <api request="/admin/scan"         method="adminScanForBadParents" admin="true"/>
   </group>

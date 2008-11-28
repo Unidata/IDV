@@ -65,9 +65,7 @@ import java.util.Properties;
 
 
 
-
 /**
- * Class TypeHandler _more_
  *
  *
  * @author IDV Development Team
