@@ -617,8 +617,6 @@ public class ImageGenerator extends IdvManager {
     public void processScriptFiles(List scriptFiles) {
         for (int fileIdx = 0; fileIdx < scriptFiles.size(); fileIdx++) {
             String filename = (String) scriptFiles.get(fileIdx);
-            if(filename.startsWith("b64:")) {
-            }
             if ( !processScriptFile(filename)) {
                 return;
             }
@@ -640,7 +638,6 @@ public class ImageGenerator extends IdvManager {
                 pushProperties();
                 String islPath = IOUtil.getFileRoot(islFile);
                 putProperty("islpath", islPath);
-
                 String            jythonCode = IOUtil.readContents(islFile);
                 PythonInterpreter interp     = getInterpreter();
                 if (getIdv().getJythonManager().getInError()) {
@@ -666,6 +663,10 @@ public class ImageGenerator extends IdvManager {
                 if (islFile.startsWith("xml:")) {
                     String xml = islFile.substring(4);
                     is = new ByteArrayInputStream(xml.getBytes());
+                    islFile = "Inline isl";
+                } else if(islFile.startsWith("b64:")) {
+                    is = new ByteArrayInputStream(XmlUtil.decodeBase64(islFile.substring(4)));
+                    islFile = "Inline base 64 encoded isl";
                 } else {
                     is = IOUtil.getInputStream(islFile, getClass());
                 }
