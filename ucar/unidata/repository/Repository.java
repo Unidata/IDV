@@ -2142,6 +2142,9 @@ public class Repository extends RepositoryBase implements
      * @throws Exception _more_
      */
     public OutputHandler getOutputHandler(String type) throws Exception {
+        if(type == null || type.length()==0) {
+            type = OutputHandler.OUTPUT_HTML.getId();
+        }
         OutputType output = new OutputType("",type);
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
@@ -3353,7 +3356,6 @@ public class Repository extends RepositoryBase implements
     }
 
 
-
     /**
      * _more_
      *
@@ -3374,6 +3376,8 @@ public class Repository extends RepositoryBase implements
             }
         }
     }
+
+
 
 
     /**

@@ -31,20 +31,15 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.PluginClassLoader;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
 
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -55,8 +50,6 @@ import java.io.*;
 
 import java.io.File;
 import java.io.InputStream;
-
-import java.lang.reflect.*;
 
 
 
@@ -71,29 +64,24 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.text.SimpleDateFormat;
 
-import java.util.jar.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
-
-
 
 import java.util.regex.*;
+
 import java.util.zip.*;
 
 
-import javax.swing.*;
+
 
 
 /**
@@ -235,12 +223,27 @@ public class EntryManager extends RepositoryManager {
             }
         }
 
+        String output = request.getString(ARG_OUTPUT,(String)"");
+        Result result;
         if (entry.isGroup()) {
-            return processGroupShow(request, (Group) entry);
+            result =  processGroupShow(request, (Group) entry);
+        } else {
+            result =  getRepository().getOutputHandler(request).outputEntry(request, entry);
         }
 
-
-        return getRepository().getOutputHandler(request).outputEntry(request, entry);
+        
+        if(result.getShouldDecorate()) {
+            request.put(ARG_OUTPUT,output);
+            StringBuffer sb = new StringBuffer();
+            if (!entry.isGroup() || !((Group)entry).isDummy()) {
+                String[] crumbs = getBreadCrumbs(request, entry, false);
+                sb.append(crumbs[1]);
+                sb.append(new String(result.getContent()));
+                result.setContent(sb.toString().getBytes());
+                result.setTitle(result.getTitle() + ": " + crumbs[0]);
+            } 
+        }
+        return result;
     }
 
 
@@ -1864,10 +1867,8 @@ public class EntryManager extends RepositoryManager {
         }
         sb.append(makeEntryHeader(request, entry));
         sb.append("<p>");
-        //        sb.append(msg("Comments"));
-        sb.append("<p>");
         sb.append(getCommentHtml(request, entry));
-        return new Result(msg("Entry Comments"), sb, Result.TYPE_HTML);
+        return  new OutputHandler(getRepository(),"tmp").makeLinksResult(request, msg("Entry Comments"), sb, new OutputHandler.State(entry));
     }
 
 
@@ -1950,17 +1951,17 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processCommentsAdd(Request request) throws Exception {
         Entry        entry = getEntry(request);
-        StringBuffer sb    = new StringBuffer();
-
-        if (request.exists(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
-        }
-
-
         if (request.exists(ARG_CANCEL)) {
             return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
                                           entry.getId()));
         }
+
+        StringBuffer sb    = new StringBuffer();
+        sb.append(makeEntryHeader(request, entry));
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
+        }
+
 
         String subject = BLANK;
         String comment = BLANK;
@@ -2002,7 +2003,7 @@ public class EntryManager extends RepositoryManager {
                     HtmlUtil.submit(msg("Cancel"), ARG_CANCEL))));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
-        return new Result(msg("Entry Comments"), sb, Result.TYPE_HTML);
+        return new OutputHandler(getRepository(),"tmp").makeLinksResult(request, msg("Entry Comments"), sb, new OutputHandler.State(entry));
     }
 
 
@@ -2026,6 +2027,7 @@ public class EntryManager extends RepositoryManager {
 
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getComments(request, entry);
+
 
         if (canComment) {
             sb.append(request.form(getRepository().URL_COMMENTS_ADD, BLANK));
@@ -2316,10 +2318,10 @@ public class EntryManager extends RepositoryManager {
 
     public String getBreadCrumbs(Request request, Entry entry, RequestUrl requestUrl)
             throws Exception {
-        List breadcrumbs = new ArrayList();
         if (entry == null) {
             return BLANK;
         }
+        List breadcrumbs = new ArrayList();
         Group parent = findGroup(request, entry.getParentGroupId());
         int   length = 0;
         while (parent != null) {
@@ -2349,6 +2351,7 @@ public class EntryManager extends RepositoryManager {
         //                entry), entry.getLabel()));
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
+        String separator = getProperty("ramadda.breadcrumbs.separator","");
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -2420,33 +2423,21 @@ public class EntryManager extends RepositoryManager {
             }
             length += name.length();
             titleList.add(0, name);
-            String link;
-            if (request != null) {
-                link =  getAjaxLink(request, parent, name, false);
-                //                link = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW, parent,
-                //                        ARG_OUTPUT, output.getId()), name);
-            } else {
-                link =  getAjaxLink(request, parent, name, false);
-                //                link = HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW.toString(),
-                //                        ARG_OUTPUT, output.getId()), name);
-            }
+            String link =  getAjaxLink(request, parent, name, false);
             breadcrumbs.add(0, link);
             parent = findGroup(request, parent.getParentGroupId());
         }
         titleList.add(entry.getLabel());
         String nav;
-
-        String separator = HtmlUtil.span(HtmlUtil.pad("&gt;"),
-                                         "class=separator");
-
-        String entryLink = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                               entry, ARG_OUTPUT, output.getId()), entry.getLabel());
+        String separator = getProperty("ramadda.breadcrumbs.separator","");
+        String entryLink =  getAjaxLink(request, entry, entry.getLabel(), false);
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
+            /***
             StringBuffer menu = new StringBuffer();
             menu.append(
                 HtmlUtil.div(
@@ -2471,16 +2462,16 @@ public class EntryManager extends RepositoryManager {
                                   HtmlUtil.img(getRepository().fileUrl(ICON_GRAYRECT),
                                       msg("Show menu"), HtmlUtil.id(compId)));
 
-            //            String linkHtml = "";
+            ***/
             String linkHtml = getEntryLinksHtml(request, entry, true);
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink
-                                     + menuLink + "</td><td align=\"right\">"
+                                     + "</td><td align=\"right\">"
                                      + linkHtml + "</td>") + "</table>";
             nav = HtmlUtil.div(
                 HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")) + header,
-                HtmlUtil.cssClass("entryheader")) + menu;
+                HtmlUtil.cssClass("entryheader"));
 
         }
         String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
@@ -3032,8 +3023,11 @@ public class EntryManager extends RepositoryManager {
         }
 
         connection.close();
-        Misc.run(this, "checkNewEntries", entries);
+        Misc.run(getRepository(), "checkNewEntries", entries);
     }
+
+
+
 
 
     /** _more_ */

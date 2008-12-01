@@ -156,7 +156,6 @@ public class AccessManager extends RepositoryManager {
     public boolean canDoAction(Request request, String action)
             throws Exception {
 
-
         User user = request.getUser();
         //The admin can do anything
 

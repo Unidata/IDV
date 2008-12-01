@@ -152,7 +152,6 @@ public class CalendarOutputHandler extends OutputHandler {
         showNext(request, subGroups, entries, sb);
         entries.addAll(subGroups);
         Result result;
-        sb.append(getEntryManager().makeEntryHeader(request, group));
         if (output.equals(OUTPUT_GRID)) {
             result = outputDateGrid(request, group, entries, sb);
         } else {
@@ -180,7 +179,6 @@ public class CalendarOutputHandler extends OutputHandler {
     private Result outputDateGrid(Request request, Group group,
                                   List<Entry> entries, StringBuffer sb)
             throws Exception {
-        String           title    = group.getFullName();
         List             types    = new ArrayList();
         List             days     = new ArrayList();
         Hashtable        dayMap   = new Hashtable();
@@ -256,9 +254,7 @@ public class CalendarOutputHandler extends OutputHandler {
             sb.append("</tr>");
         }
         sb.append("</table>");
-
-        Result result = new Result(title, sb);
-        return result;
+        return  new Result(msg("Date Grid"), sb);
 
     }
 
@@ -659,9 +655,7 @@ public class CalendarOutputHandler extends OutputHandler {
         request.remove(ARG_MONTH);
         request.remove(ARG_YEAR);
 
-        Result result = new Result(group.getFullName(), sb);
-        return result;
-
+        return  new Result(msg("Calendar"), sb);
     }
 
 

@@ -170,9 +170,6 @@ public class ExampleOutputHandler extends OutputHandler {
         //The stringbuffer holds the content we are creating
         StringBuffer sb     = new StringBuffer();
 
-        //This adds the main entry header (e.g., breadcrumbs, etc)
-        sb.append(getEntryManager().makeEntryHeader(request, group));
-
         //Lets just make a list of links to the children
         //All access urls are defined using the RequestUrl class
         //URL_ENTRY_SHOW is used for showing all content through the output handlers
@@ -215,10 +212,6 @@ public class ExampleOutputHandler extends OutputHandler {
 
         //Here output should be example2
         StringBuffer sb     = new StringBuffer();
-
-        //Add the header
-        sb.append(getEntryManager().makeEntryHeader(request, entry));
-
 
         /* 
            Accessing arguments.
@@ -270,8 +263,6 @@ public class ExampleOutputHandler extends OutputHandler {
 
     public Result outputExample3(Request request, Entry entry) throws Exception {
         StringBuffer sb     = new StringBuffer();
-        sb.append(getEntryManager().makeEntryHeader(request, entry));
-
         sb.append("Here is the content for example3");
         sb.append(HtmlUtil.p());
         sb.append("Name:");

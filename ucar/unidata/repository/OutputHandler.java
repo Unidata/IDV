@@ -373,7 +373,17 @@ public class OutputHandler extends RepositoryManager {
                                  List<Link> links, boolean forHeader)
             throws Exception {}
 
+    protected void addOutputLink(Request request, Entry entry,List<Link> links,OutputType type) throws Exception {
+        if (getRepository().isOutputTypeOK(type)) {
+                links.add(
+                    new Link(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW, entry,
+                            ARG_OUTPUT,
+                            type), getRepository().fileUrl(type.getIcon()), type.getLabel()));
 
+        }
+    }
 
     /**
      * _more_
@@ -522,23 +532,6 @@ public class OutputHandler extends RepositoryManager {
     public void applySettings(Request request) throws Exception {}
 
 
-    /**
-     * _more_
-     *
-     * @param sb _more_
-     * @param entries _more_
-     * @param request _more_
-     * @param doForm _more_
-     * @param dfltSelected _more_
-     *
-     * @throws Exception _more_
-     */
-    public void xxxgetEntryHtml(StringBuffer sb, List<Entry> entries,
-                                Request request, boolean doForm,
-                                boolean dfltSelected)
-            throws Exception {
-        notImplemented("getEntryHtml");
-    }
 
 
     /**
@@ -608,16 +601,11 @@ public class OutputHandler extends RepositoryManager {
                 String img = HtmlUtil.img(getEntryManager().getIconUrl(entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
-                String crumbs = getEntryManager().getBreadCrumbs(request,
-                                    entry);
-
-                sb.append(crumbs);
+                sb.append(getEntryManager().getBreadCrumbs(request,  entry));
             } else {
                 sb.append(getEntryManager().getAjaxLink(request, entry, entry.getLabel(),
                                       true));
-                //                sb.append(getEntryLink(request, entry));
             }
-            //            sb.append(HtmlUtil.br());
         }
         if (doForm) {
             sb.append("</ul>");

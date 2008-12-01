@@ -144,13 +144,9 @@ public class MapOutputHandler extends OutputHandler {
         List<Entry> entriesToUse = new ArrayList<Entry>();
         entriesToUse.add(entry);
         StringBuffer sb = new StringBuffer();
-        String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
-                              false);
-        sb.append(crumbs[1]);
         getMap(request, entriesToUse, sb, 700, 500, true);
-        return makeLinksResult(request, "Results", sb, new State(entry));
+        return makeLinksResult(request, msg("Map"), sb, new State(entry));
     }
-
 
 
 
@@ -172,12 +168,9 @@ public class MapOutputHandler extends OutputHandler {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);
         StringBuffer sb = new StringBuffer();
-        String[] crumbs = getEntryManager().getBreadCrumbs(request, group,
-                              false);
-        sb.append(crumbs[1]);
         if (entriesToUse.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
-            return makeLinksResult(request, "Results", sb,
+            return makeLinksResult(request, msg("Map"), sb,
                                    new State(group, subGroups, entries));
         }
 
@@ -195,7 +188,7 @@ public class MapOutputHandler extends OutputHandler {
             }
         }
         sb.append("</td></tr></table>");
-        return makeLinksResult(request, "Results", sb,
+        return makeLinksResult(request, msg("Map"), sb,
                                new State(group, subGroups, entries));
     }
 

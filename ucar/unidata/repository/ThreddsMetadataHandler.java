@@ -833,9 +833,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_VARIABLE)) {
             content = formEntry(new String[] { submit, msgLabel("Variable"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                    msgLabel("Role"),
-                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+                                               HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                                               msgLabel("Long Name"),
+                                               HtmlUtil.input(arg2, metadata.getAttr2(), size),
+                                               msgLabel("Units"),
+                                               HtmlUtil.input(arg3, metadata.getAttr3(), size) });
         } else if (type.equals(TYPE_PROPERTY)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size),

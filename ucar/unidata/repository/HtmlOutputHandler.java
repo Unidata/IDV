@@ -203,11 +203,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
-        String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
-                              false);
         StringBuffer sb = new StringBuffer();
-        sb.append(crumbs[1]);
-
         StringBuffer infoSB = typeHandler.getEntryContent(entry, request, false,
                                   true);
 
@@ -243,7 +239,7 @@ public class HtmlOutputHandler extends OutputHandler {
         getMetadataManager().decorateEntry(request, entry, sb,false);
         sb.append(HtmlUtil.br());
         sb.append(getRepository().makeTabs(tabTitles, tabContent, true));
-        return makeLinksResult(request, msgLabel("Entry") + entry.getLabel(),
+        return makeLinksResult(request, msg("Entry"),
                                sb, new State(entry));
     }
 
@@ -738,17 +734,17 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb     = new StringBuffer();
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
-            sb.append("<li>");
             String groupLink = getEntryManager().getAjaxLink(request, subGroup);
             sb.append(groupLink);
+            sb.append(HtmlUtil.br());
             sb.append(
-                "<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
-                + HtmlUtil.quote("block_" + subGroup.getId()) + "></ul>");
+                "<div style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
+                + HtmlUtil.quote("block_" + subGroup.getId()) + "></div>");
         }
 
         for (Entry entry : entries) {
-            sb.append("<li>");
             sb.append(getEntryManager().getAjaxLink(request, entry));
+            sb.append(HtmlUtil.br());
         }
 
         if ((subGroups.size() == 0) && (entries.size() == 0)) {
@@ -761,7 +757,6 @@ public class HtmlOutputHandler extends OutputHandler {
                             getRepository().translate(request,
                                 sb.toString()));
         xml.append("\n</content>");
-        //        System.err.println(xml);
         return new Result("", xml, "text/xml");
     }
 
@@ -773,7 +768,6 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb     = new StringBuffer();
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
-            //            sb.append("<li>");
             String groupLink = getSelectLink(request, subGroup,target);
             sb.append(groupLink);
             sb.append("<br>");
@@ -828,7 +822,6 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_GROUPXML)) {
             return getChildrenXml(request, subGroups, entries);
@@ -844,7 +837,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
         boolean      showApplet = output.equals(OUTPUT_TIMELINE);
 
-        String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
         if (request.exists(ARG_MESSAGE)) {
             sb.append(
@@ -854,13 +846,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
         showNext(request, subGroups, entries, sb);
 
-        if ( !group.isDummy()) {
-            String[] crumbs = getEntryManager().getBreadCrumbs(request, group,
-                                  false);
-            title = crumbs[0];
-            sb.append(crumbs[1]);
-        } else {
-            title = group.getName();
+        if (group.isDummy()) {
             if ((subGroups.size() == 0) && (entries.size() == 0)) {
                 sb.append(getRepository().note(msg("No entries found")));
             }
@@ -923,8 +909,7 @@ public class HtmlOutputHandler extends OutputHandler {
             treeShown  = new ArrayList<Boolean>();
 
             if ( !group.isDummy()) {
-                tabContent.add(HtmlUtil.div(tmp,
-                                            " style=\"margin-left:15px;\" "));
+                tabContent.add(HtmlUtil.div(tmp,HtmlUtil.style("margin-left:15px;")));
                 tabTitles.add("Information");
                 treeShown.add( !((subGroups.size() > 0)
                                  || (entries.size() > 0)));
@@ -933,20 +918,16 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (subGroups.size() > 0) {
             StringBuffer groupsSB = new StringBuffer();
-            groupsSB.append(
-                "<div><ul class=\"folderblock\" style=\"list-style-image : url("
-                + getRepository().fileUrl(ICON_BLANK) + ")\">");
+            groupsSB.append("<div " + HtmlUtil.cssClass("folderblock") +">");
             for (Group subGroup : subGroups) {
-                List<Metadata> metadataList =
-                    getMetadataManager().getMetadata(subGroup);
-                groupsSB.append("<li>");
-                String groupLink = getEntryManager().getAjaxLink(request, subGroup);
-                groupsSB.append(groupLink);
-                groupsSB.append(
-                    "<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
-                    + HtmlUtil.quote("block_" + subGroup.getId()) + "></ul>");
+                groupsSB.append(getEntryManager().getAjaxLink(request, subGroup));
+                groupsSB.append(HtmlUtil.br());
+                groupsSB.append(HtmlUtil.div("",
+                                             HtmlUtil.style("display:none;visibility:hidden") +
+                                             HtmlUtil.cssClass("folderblock") +
+                                             HtmlUtil.id("block_" + subGroup.getId())));
             }
-            groupsSB.append("</ul></div>");
+            groupsSB.append("</div>");
             tabTitles.add("Groups");
             tabContent.add(groupsSB);
             treeShown.add(true);
@@ -954,14 +935,12 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (entries.size() > 0) {
             StringBuffer entriesSB = new StringBuffer();
-
             String link = getEntryHtml(entriesSB, entries, request, true,
                                        false, group.isDummy());
             tabTitles.add("Entries" + link);
             tabContent.add(entriesSB.toString());
             treeShown.add(true);
         }
-
 
         for (int i = 0; i < tabTitles.size(); i++) {
             String tabTitle = tabTitles.get(i).toString();
@@ -981,7 +960,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 + "</td></tr></table>");
         }
 
-        return makeLinksResult(request, title, sb,
+        return makeLinksResult(request, msg("Group"), sb,
                                new State(group, subGroups, entries));
 
     }

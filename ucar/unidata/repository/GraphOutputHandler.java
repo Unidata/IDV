@@ -158,16 +158,8 @@ public class GraphOutputHandler extends OutputHandler {
         html = StringUtil.replace(html, "${type}",
                                   getRepository().encode(type));
         StringBuffer sb = new StringBuffer();
-        String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
-                              false);
-
-        String title = crumbs[0];
-        sb.append(crumbs[1]);
-        sb.append("<br>");
         sb.append(html);
-
-
-        Result result = new Result(msg("Graph View") + title, sb);
+        Result result = new Result(msg("Graph"), sb);
         addLinks(request, result, new State(entry));
         return result;
 

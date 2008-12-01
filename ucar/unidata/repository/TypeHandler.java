@@ -547,7 +547,6 @@ public class TypeHandler extends RepositoryManager {
                                         "New Entry or Group"));
         }
 
-
         if (getAccessManager().canEditEntry(request, entry)) {
             links.add(
                 new Link(

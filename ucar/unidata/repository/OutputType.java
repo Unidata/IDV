@@ -90,6 +90,8 @@ public class OutputType  {
 
     private String groupName  ="";
 
+    private String icon;
+
     public OutputType(String id) {
         this.id  =id;
         this.label = id;
@@ -103,9 +105,15 @@ public class OutputType  {
      * @param suffix _more_
      */
     public OutputType(String label, String id, String suffix) {
+        this(label,id,suffix,null);
+    }
+
+
+    public OutputType(String label, String id, String suffix, String icon) {
         this.label =label;
         this.id = id;
         this.suffix = suffix;
+        this.icon = icon;
     }
 
     /**
@@ -119,6 +127,7 @@ public class OutputType  {
     }
 
     public OutputType(OutputType that) {
+        this.icon = that.icon;
         this.label  = that.label;
         this.id  = that.id;
         this.suffix  = that.suffix;
@@ -129,6 +138,9 @@ public class OutputType  {
         this.suffix  = suffix;
     }
 
+    public String getIcon() {
+        return icon;
+    }
     public String getId() {
         return id;
     }

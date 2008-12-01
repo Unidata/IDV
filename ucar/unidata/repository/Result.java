@@ -355,6 +355,9 @@ public class Result {
      * @return The ShouldDecorate
      */
     public boolean getShouldDecorate() {
+        if(shouldDecorate && mimeType!=null && mimeType.length()>0 && mimeType.indexOf("html")<0) {
+            return false;
+        }
         return shouldDecorate;
     }
 
