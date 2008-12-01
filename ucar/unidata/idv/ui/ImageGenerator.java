@@ -633,9 +633,13 @@ public class ImageGenerator extends IdvManager {
      * @return Was it successful
      */
     public synchronized boolean processScriptFile(String islFile) {
+        procs           = new Hashtable();
+        idToDataSource  = new Hashtable();
+        propertiesStack = new ArrayList();
+        pushProperties();
+
         if (islFile.endsWith(".jy") || islFile.endsWith(".py")) {
             try {
-                pushProperties();
                 String islPath = IOUtil.getFileRoot(islFile);
                 putProperty("islpath", islPath);
                 String            jythonCode = IOUtil.readContents(islFile);
@@ -687,10 +691,7 @@ public class ImageGenerator extends IdvManager {
             return error("Could not load script file:" + islFile);
         }
         try {
-            procs           = new Hashtable();
-            idToDataSource  = new Hashtable();
-            propertiesStack = new ArrayList();
-            pushProperties();
+
             String islPath = IOUtil.getFileRoot(islFile);
             putProperty("islpath", islPath);
             processNode(root);
