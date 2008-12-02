@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -119,6 +120,8 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
+
+
 
 
 
@@ -321,7 +324,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** last load event time */
     private long lastTimeLoadDataWasCalled;
 
-    /** For loadDataInAWhile       */
+    /** For loadDataInAWhile */
     private Object LOADDATA_MUTEX = new Object();
 
     /** locking object */
@@ -2804,11 +2807,33 @@ public class StationModelControl extends ObsDisplayControl {
                                             getChart(), "saveImage"));
         }
 
+        //        items.add(GuiUtils.makeMenuItem("Export to NetCDF...",
+        //                                        this, "exportAsNetcdf"));
+
         if ((table != null) && (table.getModel().getRowCount() > 0)) {
             items.add(GuiUtils.makeMenuItem("Export Selected Observation...",
                                             this, "exportAsCsv"));
         }
     }
+
+    /**
+     * _more_
+     */
+    public void exportAsNetcdf() {
+        try {
+            String filename =
+                FileManager.getWriteFile(FileManager.FILTER_NETCDF, ".nc");
+            if (filename == null) {
+                return;
+            }
+            PointDataInstance pdi = (PointDataInstance) getDataInstance();
+            PointObFactory.writeToNetcdf(new java.io.File(filename),
+                                         pdi.getTimeSequence());
+        } catch (Exception exc) {
+            logException("Exporting point data to netcdf", exc);
+        }
+    }
+
 
     /**
      * Export the table as csv
@@ -3497,7 +3522,7 @@ public class StationModelControl extends ObsDisplayControl {
                 return;
             }
             waitingToLoad = true;
-            dataLoader = new DataLoader();
+            dataLoader    = new DataLoader();
         }
         Misc.runInABit(SLEEPTIME_MS, dataLoader);
     }
@@ -3511,7 +3536,7 @@ public class StationModelControl extends ObsDisplayControl {
      */
     private class DataLoader implements Runnable {
 
-        /** Last time we checked        */
+        /** Last time we checked */
         long lastCheckLoadTime;
 
         /**
