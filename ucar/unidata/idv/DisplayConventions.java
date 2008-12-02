@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -140,17 +141,37 @@ public class DisplayConventions extends IdvManager {
      * @return The formatted LatLonPoint
      */
     public String formatLatLonPoint(LatLonPoint llp) {
+        return formatLatLonPoint(llp, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param llp _more_
+     * @param includeLabel _more_
+     *
+     * @return _more_
+     */
+    public String formatLatLonPoint(LatLonPoint llp, boolean includeLabel) {
 
         StringBuffer buf = new StringBuffer();
-        buf.append("Lat: ");
+        if (includeLabel) {
+            buf.append("Lat: ");
+        }
         try {
             buf.append(formatLatLon(llp.getLatitude().getValue()));
         } catch (Exception e) {
             buf.append(" ");
         }
-        buf.append(" Lon: ");
+        if (includeLabel) {
+            buf.append(" Lon: ");
+        } else {
+            buf.append("/");
+        }
         try {
-            buf.append(formatLatLon(Misc.normalizeLongitude(llp.getLongitude().getValue())));
+            buf.append(
+                formatLatLon(
+                    Misc.normalizeLongitude(llp.getLongitude().getValue())));
         } catch (Exception e) {
             buf.append(" ");
         }
@@ -168,14 +189,33 @@ public class DisplayConventions extends IdvManager {
      * @return The formatted lat/lon/alt
      */
     public String formatEarthLocation(EarthLocation el, boolean includeAlt) {
+        return formatEarthLocation(el, includeAlt, true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param includeAlt _more_
+     * @param includeLabel _more_
+     *
+     * @return _more_
+     */
+    public String formatEarthLocation(EarthLocation el, boolean includeAlt,
+                                      boolean includeLabel) {
         StringBuffer buf = new StringBuffer();
         try {
-            buf.append(formatLatLonPoint(el.getLatLonPoint()));
+            buf.append(formatLatLonPoint(el.getLatLonPoint(), includeLabel));
         } catch (Exception e) {
             return "";
         }
         if (includeAlt) {
-            buf.append(" Alt: ");
+            if (includeLabel) {
+                buf.append(" Alt: ");
+            } else {
+                buf.append(" ");
+            }
             try {
                 buf.append(formatDistance(el.getAltitude().getValue()));
             } catch (Exception e) {
@@ -458,11 +498,11 @@ public class DisplayConventions extends IdvManager {
                 clInterval = (float) rint;
                 clMin      = clBase = clInterval * ((int) (min / clInterval));
                 clMax      = clInterval * (1 + (int) (max / clInterval));
-            } else if (span <= 5.0) {    // for max-min less than 5
+            } else if (span <= 5.0) {               // for max-min less than 5
                 clInterval = (float) rint;
                 clMin      = clBase = min;
                 clMax      = max;
-            } else {                     // for really big ranges, span > 300 
+            } else {                                // for really big ranges, span > 300 
                 clInterval = (float) rint;
                 clMin      = clBase = (float) ((int) min);
                 clMax      = (float) ((int) max);

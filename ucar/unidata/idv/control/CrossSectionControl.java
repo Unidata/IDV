@@ -1701,16 +1701,19 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * Called when a change in position occurs
      */
     protected void updateLocationLabel() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getDisplayConventions().formatEarthLocation(startLocation,
+                                                               false,false));
+        buf.append("  to  ");
+        buf.append(getDisplayConventions().formatEarthLocation(endLocation,
+                                                               false,false));
+
+        positionText = buf.toString();
         if (locationLabel == null) {
             return;
         }
-        StringBuffer buf = new StringBuffer();
-        buf.append(getDisplayConventions().formatEarthLocation(startLocation,
-                false));
-        buf.append("  to  ");
-        buf.append(getDisplayConventions().formatEarthLocation(endLocation,
-                false));
-        locationLabel.setText(positionText = buf.toString());
+
+        locationLabel.setText(positionText);
     }
 
     /**
