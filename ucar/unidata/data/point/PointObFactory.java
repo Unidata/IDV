@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -36,6 +37,8 @@ import ucar.ma2.Index0D;
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
 
+import ucar.nc2.Attribute;
+
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
@@ -43,6 +46,9 @@ import ucar.nc2.dt.Station;
 import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.*;
+
+import ucar.nc2.ft.point.writer.CFPointObWriter;
+import ucar.nc2.ft.point.writer.PointObVar;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
@@ -61,9 +67,17 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.Util;
+
 import visad.*;
 
 import visad.georef.*;
+
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+
+import java.io.IOException;
 
 import java.rmi.RemoteException;
 
@@ -300,6 +314,128 @@ public class PointObFactory {
         //            (System.currentTimeMillis() - t1) + " ms");
         return subSet;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static List<PointOb> getPointObs(FieldImpl field)
+            throws VisADException, RemoteException {
+        List<PointOb> obs            = new ArrayList<PointOb>();
+        boolean       isTimeSequence = GridUtil.isTimeSequence(field);
+        if (isTimeSequence) {
+            Set timeSet  = field.getDomainSet();
+            int numTimes = timeSet.getLength();
+            for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+                FieldImpl oneTime = (FieldImpl) field.getSample(timeIdx);
+                int       numObs  = oneTime.getDomainSet().getLength();
+                for (int obIdx = 0; obIdx < numObs; obIdx++) {
+                    obs.add((PointOb) oneTime.getSample(obIdx));
+                }
+            }
+        } else {
+            FieldImpl oneTime = field;
+            int       numObs  = oneTime.getDomainSet().getLength();
+            for (int obIdx = 0; obIdx < numObs; obIdx++) {
+                obs.add((PointOb) oneTime.getSample(obIdx));
+            }
+
+        }
+        return obs;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param field _more_
+     *
+     * @throws IOException _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static void writeToNetcdf(File file, FieldImpl field)
+            throws VisADException, RemoteException, IOException {
+        List<PointOb> obs = getPointObs(field);
+        if (obs.size() == 0) {
+            throw new IllegalArgumentException(
+                "No point observations to write");
+        }
+        List<Attribute>  attrs    = new ArrayList<Attribute>();
+        List<PointObVar> dataVars = new ArrayList<PointObVar>();
+        DataOutputStream dos =
+            new DataOutputStream(new FileOutputStream(file));
+        CFPointObWriter writer    = null;
+        int             numFloat  = 0;
+        int             numString = 0;
+        for (PointOb ob : obs) {
+            EarthLocation el    = ob.getEarthLocation();
+            Real          alt   = el.getAltitude();
+            LatLonPoint   llp   = el.getLatLonPoint();
+            Tuple         tuple = (Tuple) ob.getData();
+            TupleType     type  = (TupleType) tuple.getType();
+            MathType[]    types = type.getComponents();
+            if (writer == null) {
+                for (int i = 0; i < types.length; i++) {
+                    if (types[i] instanceof TextType) {
+                        continue;
+                    }
+                    PointObVar pointObVar = new PointObVar();
+                    pointObVar.setName(Util.cleanTypeName(types[i]));
+                    pointObVar.setUnits(
+                        ((RealType) types[i]).getDefaultUnit() + "");
+                    pointObVar.setDataType(DataType.DOUBLE);
+                    dataVars.add(pointObVar);
+                    numFloat++;
+                }
+                for (int i = 0; i < types.length; i++) {
+                    if ( !(types[i] instanceof TextType)) {
+                        continue;
+                    }
+                    PointObVar pointObVar = new PointObVar();
+                    pointObVar.setName(Util.cleanTypeName(types[i]));
+                    pointObVar.setDataType(DataType.STRING);
+                    dataVars.add(pointObVar);
+                    numString++;
+                }
+                writer = new CFPointObWriter(dos, attrs, ((alt != null)
+                        ? alt.getUnit().toString()
+                        : null), dataVars);
+            }
+
+            double[] dvals = new double[numFloat];
+            String[] svals = new String[numString];
+            int      dcnt  = 0;
+            int      scnt  = 0;
+            Data[]   data  = tuple.getComponents();
+            for (int i = 0; i < types.length; i++) {
+                if (types[i] instanceof TextType) {
+                    svals[scnt++] = ((Text) data[i]).getValue();
+                } else {
+                    dvals[dcnt++] = ((Real) data[i]).getValue();
+                }
+            }
+
+            writer.addPoint(llp.getLatitude().getValue(),
+                            llp.getLongitude().getValue(), ((alt != null)
+                    ? alt.getValue()
+                    : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
+                            dvals, svals);
+        }
+
+
+        writer.finish();
+        dos.close();
+    }
+
 
     /**
      * Find the intersection of a field of PointObs and the lat/lon bounds
@@ -1426,7 +1562,7 @@ public class PointObFactory {
                    + " gain = " + gain);
 
         float[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
-                                     scaleLength, gain, numPasses);
+                                    scaleLength, gain, numPasses);
 
         float[][] faaDomainSet =
             new float[2][faGridX.length * faGridY.length];
