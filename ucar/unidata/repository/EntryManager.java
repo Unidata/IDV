@@ -162,7 +162,14 @@ public class EntryManager extends RepositoryManager {
 
         String url = request.getString(ARG_CATALOG,(String) null);
         if(url == null) {
-            sb.append("No catalog argument given");
+            sb.append(HtmlUtil.p());
+            sb.append(HtmlUtil.form("/repository/catalog"));
+            sb.append(msgLabel("Catalog URL"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(HtmlUtil.input(ARG_CATALOG,"http://dataportal.ucar.edu/metadata/browse/human_dimensions.thredds.xml",HtmlUtil.SIZE_60));
+            sb.append(HtmlUtil.submit("View"));
+            sb.append(HtmlUtil.formClose());
+            //            sb.append("No catalog argument given");
             return new Result(title, sb);
         }
         return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, CatalogTypeHandler.getCatalogId(url)));
