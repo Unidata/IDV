@@ -308,6 +308,8 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_TYPE = "type";
 
+    public static final String ARG_DATASET = "dataset";
+
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
@@ -1041,15 +1043,6 @@ public interface Constants {
     public static final String ARG_USER_BULK = "user.bulk";
 
 
-    /** _more_ */
-    public static final String TYPE_ANY = "any";
-
-    /** _more_ */
-    public static final String TYPE_FILE = "file";
-
-    /** _more_ */
-    public static final String TYPE_GROUP = "group";
-
 
 
     /** _more_ */
@@ -1133,6 +1126,22 @@ public interface Constants {
 
     /** _more_ */
     public static final int ENTRY_CACHE_LIMIT = 5000;
+
+
+
+
+    /** _more_ */
+    public static final String TYPE_ANY = "any";
+
+    /** _more_ */
+    public static final String TYPE_FILE = "file";
+
+    /** _more_ */
+    public static final String TYPE_GROUP = "group";
+
+    /** _more_ */
+    public static final String TYPE_CATALOG = "catalog";
+
 
 
 }

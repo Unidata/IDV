@@ -261,7 +261,6 @@ public class CatalogHarvester extends Harvester {
         }
 
 
-
         boolean haveChildDatasets = false;
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
@@ -277,13 +276,7 @@ public class CatalogHarvester extends Harvester {
                                       false, null);
             if (serviceNode != null) {
                 String path = XmlUtil.getAttribute(serviceNode, "base");
-                if (path.startsWith("/")) {
-                    path = catalogUrl.getProtocol() + "://"
-                           + catalogUrl.getHost() + ":"
-                           + catalogUrl.getPort() + path;
-                }
-                //TODO: handle the base when it does not start with '/'
-                urlPath = path + urlPath;
+                urlPath = new URL(catalogUrl, path+urlPath).toString();
             }
 
             TypeHandler typeHandler =

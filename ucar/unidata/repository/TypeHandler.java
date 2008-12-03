@@ -68,6 +68,20 @@ import java.util.Properties;
 public class TypeHandler extends RepositoryManager {
 
     /** _more_ */
+    public static final String TYPE_ANY = Constants.TYPE_ANY;
+
+    /** _more_ */
+    public static final String TYPE_FILE = Constants.TYPE_FILE;
+
+    /** _more_ */
+    public static final String TYPE_GROUP = Constants.TYPE_GROUP;
+
+    /** _more_ */
+    public static final String TYPE_CATALOG = Constants.TYPE_CATALOG;
+
+
+
+    /** _more_ */
     public static final String TAG_COLUMN = "column";
 
     /** _more_ */

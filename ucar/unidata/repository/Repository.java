@@ -1738,7 +1738,7 @@ public class Repository extends RepositoryBase implements
                                         links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
-        String sublinksHtml = "&nbsp";
+        String sublinksHtml = "";
         if (sublinks != null) {
             sublinksHtml = StringUtil.join(getProperty("ramadda.html.sublink.separator",""), sublinks);
         }

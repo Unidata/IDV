@@ -314,7 +314,7 @@ public class GraphOutputHandler extends OutputHandler {
         }
         TypeHandler  typeHandler = getRepository().getTypeHandler(request);
         StringBuffer sb          = new StringBuffer();
-        if ( !type.equals(TYPE_GROUP)) {
+        if ( !type.equals(TypeHandler.TYPE_GROUP)) {
             Statement stmt = typeHandler.select(
                                  request,
                                  SqlUtil.comma(

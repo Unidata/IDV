@@ -21,7 +21,9 @@
       <api request="/entry/comments/edit"    method="processCommentsEdit"     actions="edit"/>
       <api request="/association/add"        method="processAssociationAdd"/>
       <api request="/association/delete"     method="processAssociationDelete"   actions="edit"/>
+      <api request="/catalog"                method="processCatalog"/>
   </group>
+
 
 
   <group handler="searchmanager">

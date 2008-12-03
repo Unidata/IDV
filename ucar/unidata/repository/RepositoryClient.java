@@ -239,7 +239,7 @@ public class RepositoryClient extends RepositoryBase {
                                           new String[] {});
             Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
                                     new String[] {
-                ATTR_ID, "1234", ATTR_TYPE, TYPE_GROUP, ATTR_PARENT, parentId,
+                ATTR_ID, "1234", ATTR_TYPE, TypeHandler.TYPE_GROUP, ATTR_PARENT, parentId,
                 ATTR_NAME, name
             });
 

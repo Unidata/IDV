@@ -156,6 +156,53 @@ public class EntryManager extends RepositoryManager {
 
 
 
+    public Result processCatalog(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        String title = msg("Catalog View");
+
+        String url = request.getString(ARG_CATALOG,(String) null);
+        if(url == null) {
+            sb.append("No catalog argument given");
+            return new Result(title, sb);
+        }
+        return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, CatalogTypeHandler.getCatalogId(url)));
+                          /*
+
+        Element root = XmlUtil.getRoot(url, getClass());
+        if (root == null) {
+            sb.append("Could not load catalog: " + url);
+            return new Result(title, sb);
+        } 
+        Element child = (Element)XmlUtil.findChild(root,
+                                       CatalogOutputHandler.TAG_DATASET);
+
+        if(child!=null) root = child;
+        String name = XmlUtil.getAttribute(root, ATTR_NAME,"");
+        sb.append(name);
+        sb.append("<ul>");
+        recurseCatalog(request, root,sb);
+        sb.append("</ul>");
+        return new Result(title, sb);
+                          */
+    }
+
+    private void recurseCatalog(Request request, Element node, StringBuffer sb) {
+        NodeList elements = XmlUtil.getElements(node);
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element child = (Element) elements.item(i);
+            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+                String name = XmlUtil.getAttribute(child, ATTR_NAME,"");
+                sb.append("<li>");
+                sb.append(name);
+                sb.append("<ul>");
+                recurseCatalog(request,child,sb);
+                sb.append("</ul>");
+            }
+        }
+        
+
+    }
+
 
     /**
      * _more_
@@ -2580,7 +2627,11 @@ public class EntryManager extends RepositoryManager {
             return getAccessManager().filterEntry(request, entry);
         }
 
-        if (isSynthEntry(entryId)) {
+        //catalog:url:dataset:datasetid
+        if(entryId.startsWith("catalog:")) {
+            CatalogTypeHandler typeHandler = (CatalogTypeHandler) getRepository().getTypeHandler(TypeHandler.TYPE_CATALOG);
+            entry = typeHandler.makeSynthEntry(request, null, entryId);
+        } else  if (isSynthEntry(entryId)) {
             String[] pair = getSynthId(entryId);
             String parentEntryId = pair[0];
             Entry parentEntry = getEntry(request, parentEntryId, andFilter, abbreviated);
@@ -3149,15 +3200,19 @@ public class EntryManager extends RepositoryManager {
             List<Clause> where)
             throws Exception {
         List<String> ids = new ArrayList<String>();
+
+
         boolean isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
-            String synthId =null;
+            String synthId =group.getId();
             if(isSynthEntry) {
                 String[] pair = getSynthId(group.getId());
                 String entryId = pair[0];
                 synthId = pair[1];
                 group = (Group)getEntry(request, entryId, false, false);
-                if(group == null) return ids; 
+                if(group == null) {
+                    return ids; 
+                }
             } 
             return group.getTypeHandler().getSynthIds(request, group, synthId);
         }
@@ -3224,6 +3279,7 @@ public class EntryManager extends RepositoryManager {
                 }
             }
         } catch (Exception exc) {
+            exc.printStackTrace();
             request.put(ARG_MESSAGE,
                         "Error finding children:" + exc.getMessage());
         }
@@ -3386,7 +3442,7 @@ public class EntryManager extends RepositoryManager {
             return group;
         }
 
-        if (isSynthEntry(id)) {
+        if (isSynthEntry(id) || id.startsWith("catalog:")) {
             return (Group) getEntry(request, id);
         }
 
@@ -3907,7 +3963,7 @@ public class EntryManager extends RepositoryManager {
                     String resourceType = results.getString(col++);
                     children.add(new String[] { childId, childType, resource,
                             resourceType });
-                    if (childType.equals(TYPE_GROUP)) {
+                    if (childType.equals(TypeHandler.TYPE_GROUP)) {
                         children.addAll(getDescendents(request,
                                 (List<Entry>) Misc.newList(findGroup(request,
                                     childId)), connection, false));
