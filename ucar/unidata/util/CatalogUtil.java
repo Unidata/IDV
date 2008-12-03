@@ -262,6 +262,15 @@ public class CatalogUtil {
 
 
 
+    public static boolean haveChildDatasets(Element node) {
+        return XmlUtil.findChild(node, TAG_DATASET)!=null;
+    }
+
+    public static boolean haveChildCatalogs(Element node) {
+        return XmlUtil.findChild(node, TAG_CATALOGREF)!=null;
+    }
+
+
 
     /**
      *  Find the service type attribute for the given service node. This is thredds version
