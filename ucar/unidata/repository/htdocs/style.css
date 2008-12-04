@@ -296,6 +296,12 @@ ul {
    border-bottom : 1px #000000 solid;
 }
 
+.tabcontents_noborder {
+   xborder-left : 1px #000000 solid;
+   xborder-right : 1px #000000 solid;
+   xborder-bottom : 1px #000000 solid;
+}
+
 .tabcontent_fixedheight {
    min-height: 100px;
    max-height: 200px; 
@@ -305,9 +311,10 @@ ul {
 
 
 .tabcontent {
-   min-height: 100px;
+   xxxmin-height: 100px;
    padding:2;
 }
+
 
 .tabtitleon {
    background-color:red;
@@ -342,7 +349,6 @@ ul {
 }
 
 
-
 .tooltip-inner {
    border : 1px black solid;
    background-color : #FFFFCC;
@@ -350,7 +356,9 @@ ul {
 }
 
 .tooltip-link-inner {
+   border : 1px black solid;
    margin:2px;
+   background-color : #FFFFCC;
 }
 
 .tooltip-outer {

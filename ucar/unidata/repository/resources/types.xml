@@ -13,7 +13,8 @@
 
 
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.CatalogTypeHandler">
-     <property name="form.show.resource" value="false"/>
+     <property name="form.show.file" value="false"/>
+     <property name="form.show.url" value="true"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.date" value="false"/>
   </type>

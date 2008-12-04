@@ -26,6 +26,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -230,10 +231,15 @@ public class CatalogOutputHandler extends OutputHandler {
                 }
                 if (XmlUtil.hasAttribute(child, "xlink:href")) {
                     String url = XmlUtil.getAttribute(child, "xlink:href");
-                    Element root = XmlUtil.getRoot(url,
-                                       CatalogOutputHandler.class);
-                    if (root != null) {
-                        collectMetadata(repository, metadataList, root,tab+"  ");
+                    try {
+                        Element root = XmlUtil.getRoot(url,
+                                                       CatalogOutputHandler.class);
+                        if (root != null) {
+                            collectMetadata(repository, metadataList, root,tab+"  ");
+                        }
+                    } catch(Exception exc) {
+                        //ignore exceptions here
+                        System.err.println ("Error reading metadata:" + url+"\n" + exc);
                     }
                 } else {
                     collectMetadata(repository, metadataList, child,tab+"  ");
@@ -653,10 +659,10 @@ public class CatalogOutputHandler extends OutputHandler {
                 request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID, group.getId(),
                             ARG_OUTPUT, OUTPUT_CATALOG);
 
-            Element ref = XmlUtil.create(catalogInfo.doc, TAG_CATALOGREF,
+            Element ref = XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_CATALOGREF,
                                          parent,
-                                         new String[] { ATTR_XLINKTITLE,
-                    group.getName(), ATTR_XLINKHREF, url });
+                                         new String[] { CatalogUtil.ATTR_XLINK_TITLE,
+                    group.getName(), CatalogUtil.ATTR_XLINK_HREF, url });
         }
 
         EntryGroup entryGroup = new EntryGroup("");

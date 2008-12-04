@@ -72,6 +72,14 @@ import java.util.Properties;
 public class CatalogTypeHandler extends GenericTypeHandler {
 
 
+    /** _more_          */
+    static Hashtable<String,DomHolder> domCache = new Hashtable();
+
+    /** _more_          */
+    private Hashtable childIdToParent = new Hashtable();
+
+
+
     /**
      * _more_
      *
@@ -169,8 +177,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
     }
 
 
-    /** _more_          */
-    static Hashtable domCache = new Hashtable();
+
 
     /**
      * _more_
@@ -182,10 +189,19 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     private Element getDom(String url) throws Exception {
-        Element root = (Element) domCache.get(url);
+        Element root = null;
+        DomHolder holder = domCache.get(url);
+        if(holder!=null) {
+            if(holder.isValid()) {
+                root = holder.root;
+            } else {
+                domCache.remove(url);
+            }
+        }
+
         if (root == null) {
             root = XmlUtil.getRoot(url, getClass());
-            domCache.put(url, root);
+            domCache.put(url, new DomHolder(root));
         }
         return root;
     }
@@ -236,6 +252,11 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         String       catalogUrl = request.getString(ARG_CATALOG, null);
         List<String> ids        = new ArrayList<String>();
         String       url        = loc[0];
+        String       nodeId     = loc[1];
+        if(!id.startsWith("catalog:")) {
+            url = parentEntry.getResource().getPath();
+            nodeId = null;
+        }
         URL          baseUrl    = new URL(url);
 
         Element      root       = getDom(url);
@@ -249,16 +270,16 @@ public class CatalogTypeHandler extends GenericTypeHandler {
             root = dataset;
         }
 
-        String    parentId = getId(loc[0], loc[1]);
+        String    parentId = getId(url, nodeId);
 
         Hashtable idMap    = new Hashtable();
         walkTree(dataset, idMap);
-        if (loc[1] != null) {
-            dataset = (Element) idMap.get(loc[1]);
+        if (nodeId != null) {
+            dataset = (Element) idMap.get(nodeId);
         }
         if (dataset == null) {
             throw new IllegalArgumentException("Could not find dataset:"
-                    + loc[1] + " in catalog:" + loc[0]);
+                    + nodeId + " in catalog:" + url);
         }
 
 
@@ -271,7 +292,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
                 childIdToParent.put(entryId, parentId);
                 ids.add(entryId);
             } else if (child.getTagName().equals(
-                    CatalogOutputHandler.TAG_CATALOGREF)) {
+                    CatalogUtil.TAG_CATALOGREF)) {
                 String href = XmlUtil.getAttribute(child,
                                   CatalogUtil.ATTR_XLINK_HREF);
                 String catUrl    = new URL(baseUrl, href).toString();
@@ -295,10 +316,21 @@ public class CatalogTypeHandler extends GenericTypeHandler {
 
 
 
+    public static class DomHolder {
+        Element root;
+        Date dttm;
+        public DomHolder(Element root) {
+            this.root = root;
+            dttm  = new Date();
+        }
+        public boolean isValid() {
+            Date now = new Date();
+            //Only keep around catalogs for 5 minutes
+            if((now.getTime()-dttm.getTime())>1000*60*5) return false;
+            return true;
+        }
+    }
 
-
-    /** _more_          */
-    private Hashtable childIdToParent = new Hashtable();
 
 
     /**

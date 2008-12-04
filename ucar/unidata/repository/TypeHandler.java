@@ -1097,26 +1097,37 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (okToShowInForm(ARG_RESOURCE)) {
+            List tabTitles = new ArrayList();
+            List tabContent = new ArrayList();
             if (entry == null) {
-                String addMetadata = HtmlUtil.space(2)
-                                     + HtmlUtil.checkbox(ARG_ADDMETADATA,
-                                         "true", false) + HtmlUtil.space(1)
-                                             + msg("Add Metadata");
+                String urlLabel = "URL";
+                if (okToShowInForm(ARG_FILE)) {
+                    String addMetadata = HtmlUtil.space(2)
+                        + HtmlUtil.checkbox(ARG_ADDMETADATA,
+                                            "true", false) + HtmlUtil.space(1)
+                        + msg("Add Metadata");
 
-                sb.append(
-                    HtmlUtil.formEntry(
-                        msgLabel("File"),
-                        HtmlUtil.fileInput(ARG_FILE, size)
-                        + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true", false)
-                        + HtmlUtil.space(1) + msg("Unzip archive")
-                        + addMetadata));
-                String download = HtmlUtil.space(1)
-                                  + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD,
-                                      "true", false) + HtmlUtil.space(1)
-                                          + msg("Download");
-                sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
-                                             HtmlUtil.input(ARG_RESOURCE,
-                                                 BLANK, size) + download));
+                    tabTitles.add(msg("File"));
+                    tabContent.add(
+                                   HtmlUtil.inset(msgLabel("File")+
+                                   HtmlUtil.fileInput(ARG_FILE, size)
+                                   + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true", false)
+                                   + HtmlUtil.space(1) + msg("Unzip archive")
+                                   + addMetadata,5));
+                }
+                if (okToShowInForm(ARG_URL)) {
+                    String download = HtmlUtil.space(1)
+                        + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD,
+                                            "true", false) + HtmlUtil.space(1)
+                        + msg("Download");
+                    tabTitles.add("URL");
+                    tabContent.add(HtmlUtil.inset(msgLabel(urlLabel)+
+                                   HtmlUtil.input(ARG_URL,
+                                                  BLANK, size) + download+HtmlUtil.br()+HtmlUtil.space(1),5));
+                }
+                sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                             getRepository().makeTabs(tabTitles, tabContent, true,"tabcontent","tabcontents_noborder")));
+
             } else {
                 sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                                              entry.getResource().getPath()));
@@ -1184,7 +1195,6 @@ public class TypeHandler extends RepositoryManager {
                 for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
                     datePatterns.add(DateUtil.DATE_FORMATS[i]);
                 }
-
                 if (okToShowInForm(ARG_RESOURCE)) {
                     sb.append(HtmlUtil.formEntry("Date Pattern:",
                             HtmlUtil.select(ARG_DATE_PATTERN, datePatterns)

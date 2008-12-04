@@ -542,7 +542,7 @@ public class EntryManager extends RepositoryManager {
             if (entry == null) {
                 List<String> resources    = new ArrayList();
                 List<String> origNames    = new ArrayList();
-                String       resource = request.getString(ARG_RESOURCE,
+                String       resource = request.getString(ARG_URL,
                                             BLANK);
                 String       filename     = request.getUploadedFile(ARG_FILE);
                 boolean      unzipArchive = false;
@@ -787,9 +787,9 @@ public class EntryManager extends RepositoryManager {
                 entry.setDescription(request.getString(ARG_DESCRIPTION,
                         entry.getDescription()));
                 entry.setDataType(dataType);
-                if (request.defined(ARG_RESOURCE)) {
+                if (request.defined(ARG_URL)) {
                     entry.setResource(
-                        new Resource(request.getString(ARG_RESOURCE, BLANK)));
+                        new Resource(request.getString(ARG_URL, BLANK)));
                 }
 
                 //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);

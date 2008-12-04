@@ -360,7 +360,7 @@ public class CatalogHarvester extends Harvester {
                 recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
                                recurseDepth);
             } else if (child.getTagName().equals(
-                    CatalogOutputHandler.TAG_CATALOGREF)) {
+                    CatalogUtil.TAG_CATALOGREF)) {
                 if ( !recurse) {
                     continue;
                 }

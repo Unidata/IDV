@@ -2441,6 +2441,11 @@ public class Repository extends RepositoryBase implements
         return makeTabs(titles, contents, skipEmpty, "tabcontent");
     }
 
+    public String makeTabs(List titles, List contents, boolean skipEmpty,
+                           String tabContentClass) {
+        return makeTabs(titles, contents, skipEmpty, tabContentClass, "tabcontents");
+    }
+
     /**
      * _more_
      *
@@ -2452,7 +2457,8 @@ public class Repository extends RepositoryBase implements
      * @return _more_
      */
     public String makeTabs(List titles, List contents, boolean skipEmpty,
-                           String tabContentClass) {
+                           String tabContentClass,
+                           String wrapperClass) {
 
         String id  = "tab_" + (tabCnt++);
         String ids = "tab_" + (tabCnt++) + "_ids";
@@ -2502,7 +2508,7 @@ public class Repository extends RepositoryBase implements
                    titleSB.toString(),
                    HtmlUtil.cssClass("tabtitles")) + HtmlUtil.div(
                        contentSB.toString(),
-                       HtmlUtil.cssClass("tabcontents")) + HtmlUtil.script(
+                       HtmlUtil.cssClass(wrapperClass)) + HtmlUtil.script(
                            "var " + id + "=new Tab(" + ids + ");\n");
     }
 

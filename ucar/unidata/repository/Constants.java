@@ -874,22 +874,12 @@ public interface Constants {
     public static final String NODETYPE_GROUP = "group";
 
 
-
-    /** _more_ */
-    public static final String TAG_CATALOGREF = "catalogRef";
-
-    /** _more_ */
-    public static final String ATTR_XLINKTITLE = "xlink:title";
-
-    /** _more_ */
-    public static final String ATTR_XLINKHREF = "xlink:href";
-
-
     /** _more_ */
     public static final String ARG_WIDTH = "width";
 
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
+    public static final String ARG_URL = "url";
 
     /** _more_ */
     public static final String ARG_RESOURCE_DOWNLOAD = "resource.dowload";
