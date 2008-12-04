@@ -508,7 +508,7 @@ public class Clause {
             sb.append(SqlUtil.group(column + " is null "));
         } else if (expr.equals(EXPR_JOIN)) {
             sb.append(SqlUtil.group(column + " =  " + value));
-        } else if (expr.equals(EXPR_ISNULL)) {
+        } else if (expr.equals(EXPR_NOTLIKE)) {
             sb.append(SqlUtil.group("NOT " + column + " is like ?"));
         } else {
             if(SqlUtil.debug)
