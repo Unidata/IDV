@@ -82,6 +82,14 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         return request.getUser().getAdmin();
     }
 
+    public String getIconUrl(Entry entry) {
+        if (entry.isGroup()) {
+            return fileUrl(ICON_FOLDER_CLOSED);
+        }
+        return super.getIconUrl(entry);
+    }
+
+
     public boolean isSynthType() {
         return true;
     }

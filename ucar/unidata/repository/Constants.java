@@ -882,7 +882,7 @@ public interface Constants {
     public static final String ARG_URL = "url";
 
     /** _more_ */
-    public static final String ARG_RESOURCE_DOWNLOAD = "resource.dowload";
+    public static final String ARG_RESOURCE_DOWNLOAD = "resource.download";
 
     /** _more_ */
     public static final String ARG_FILE = "file";

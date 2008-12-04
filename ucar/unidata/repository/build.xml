@@ -26,6 +26,14 @@
         </delete>
     </target>
 
+    <target name="runserver" depends="init">
+      <java classname="ucar.unidata.repository.RepositoryServer" maxmemory="512mb">
+          <classpath>
+             <pathelement path="${classpath}"/>
+             <pathelement location=""/>
+         </classpath>
+     </java>
+   </target>
 
     <target name="all" depends="repositoryjar,repositorywar">
     </target>

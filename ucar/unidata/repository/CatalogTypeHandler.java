@@ -93,6 +93,15 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         super(repository, entryNode);
     }
 
+
+    public String getIconUrl(Entry entry) {
+        if (entry.isGroup()) {
+            return fileUrl(ICON_FOLDER_CLOSED);
+        }
+        return super.getIconUrl(entry);
+    }
+
+
     /**
      * _more_
      *
@@ -248,6 +257,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
     public List<String> getSynthIds(Request request, Group parentEntry,
                                     String id)
             throws Exception {
+        if(id == null) id = parentEntry.getId();
         String[]     loc        = parseId(id);
         String       catalogUrl = request.getString(ARG_CATALOG, null);
         List<String> ids        = new ArrayList<String>();

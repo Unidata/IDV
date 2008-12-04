@@ -27,7 +27,7 @@ a:hover {
 
 
 .header {
-  xxborder-bottom : 1px #999999 solid;
+  border-bottom : 1px black solid;
   background-repeat: no-repeat;
   background-color:#006699;
   color: white;

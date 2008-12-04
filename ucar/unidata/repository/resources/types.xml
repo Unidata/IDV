@@ -15,6 +15,9 @@
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.CatalogTypeHandler">
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>
+     <property name="form.label.url" value="Catalog URL"/>
+     <property name="form.show.resource.download" value="false"/>
+     <property name="form.show.datatype" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.date" value="false"/>
   </type>

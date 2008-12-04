@@ -1049,7 +1049,7 @@ public class EntryManager extends RepositoryManager {
                                          String title, StringBuffer sb) {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, getRepository().entryEditUrls,
+                           getRepository().getSubNavLinks(request, (entry.isGroup()?getRepository().groupEditUrls:getRepository().entryEditUrls),
                                           "?" + ARG_ENTRYID + "="
                                           + entry.getId()));
         return result;
@@ -1256,7 +1256,8 @@ public class EntryManager extends RepositoryManager {
         */
 
 
-        return new Result("New Form", sb, Result.TYPE_HTML);
+        return makeEntryEditResult(request, group, "Create Entry", sb);
+        //        return new Result("New Form", sb, Result.TYPE_HTML);
     }
 
 
@@ -3211,7 +3212,7 @@ public class EntryManager extends RepositoryManager {
 
         boolean isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
-            String synthId =group.getId();
+            String synthId =null;
             if(isSynthEntry) {
                 String[] pair = getSynthId(group.getId());
                 String entryId = pair[0];
@@ -3843,6 +3844,10 @@ public class EntryManager extends RepositoryManager {
         String groupNameOrId = (String) request.getString(ARG_GROUP,
                                    (String) null);
         if (groupNameOrId == null) {
+            groupNameOrId = (String) request.getString(ARG_ENTRYID,
+                                                       (String) null);
+        }
+        if (groupNameOrId == null) {
             throw new IllegalArgumentException("No group specified");
         }
         Entry entry = getEntry(request, groupNameOrId, false);
@@ -3868,20 +3873,7 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     public String getIconUrl(Entry entry) {
-        Resource resource = entry.getResource();
-        String   path     = resource.getPath();
-        if (entry.isGroup()) {
-            return fileUrl(ICON_FOLDER_CLOSED);
-        }
-        String img = ICON_FILE;
-        if (path != null) {
-            String suffix = IOUtil.getFileExtension(path.toLowerCase());
-            String prop   = getRepository().getProperty("icon" + suffix);
-            if (prop != null) {
-                img = prop;
-            }
-        }
-        return fileUrl(img);
+        return entry.getTypeHandler().getIconUrl(entry);
     }
 
     /**

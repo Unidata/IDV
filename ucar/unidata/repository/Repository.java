@@ -136,6 +136,14 @@ public class Repository extends RepositoryBase implements
         //        URL_ENTRY_SHOW
     };
 
+    protected RequestUrl[] groupEditUrls = {
+        URL_ENTRY_NEW, URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
+        getMetadataManager().URL_METADATA_ADDFORM,
+        URL_ACCESS_FORM  //,
+        //        URL_ENTRY_DELETE
+        //        URL_ENTRY_SHOW
+    };
+
 
 
     /** _more_ */
@@ -1740,8 +1748,11 @@ public class Repository extends RepositoryBase implements
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = "";
         if (sublinks != null) {
+            String sublinksTemplate = getProperty("ramadda.html.sublink.wrapper","");
             sublinksHtml = StringUtil.join(getProperty("ramadda.html.sublink.separator",""), sublinks);
+            sublinksHtml = sublinksTemplate.replace("${sublinks}", sublinksHtml);
         }
+
 
         String content = new String(result.getContent());
         String html = template;

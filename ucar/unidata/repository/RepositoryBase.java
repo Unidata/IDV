@@ -164,7 +164,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_NEW = new RequestUrl(this,
-                                                "/entry/new");
+                                                           "/entry/new","New Entry");
 
 
     /** _more_ */
