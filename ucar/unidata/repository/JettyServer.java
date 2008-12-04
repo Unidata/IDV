@@ -84,7 +84,7 @@ public class JettyServer  extends RepositoryServlet  {
         }
         Server server = new Server(port);
         Context context = new Context(server,"/",Context.SESSIONS);
-        context.addServlet(new ServletHolder(new RepositoryServlet()), "/*");
+        context.addServlet(new ServletHolder(new RepositoryServlet(args)), "/*");
         server.start();
         server.join();
     }

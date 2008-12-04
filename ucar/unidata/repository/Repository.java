@@ -443,6 +443,7 @@ public class Repository extends RepositoryBase implements
                     throw new IllegalArgumentException("Bad argument:"
                             + args[i]);
                 }
+
                 argProperties.put(toks.get(0), toks.get(1));
             } else {
                 usage("Unknown argument: " + args[i]);
@@ -455,6 +456,7 @@ public class Repository extends RepositoryBase implements
             properties.putAll(contextProperties);
         }
         properties.putAll(argProperties);
+
 
 
         //Call the storage manager so it can figure out the home dir
@@ -1887,6 +1889,18 @@ public class Repository extends RepositoryBase implements
         }
         String prop = null;
         
+        String test = (String)properties.get("ramadda.testproperties");
+        if(test!=null && test.equals("true")) {
+            try {
+                properties.load(
+                                IOUtil.getInputStream(
+                                                      "/ucar/unidata/repository/resources/repository.properties",
+                                                      getClass()));
+            } catch(Exception exc) {
+                
+            }
+        }
+
         //Look at the repository.properties first
         if(prop == null)
             prop =(String) properties.get(name);

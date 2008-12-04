@@ -69,6 +69,8 @@ import javax.servlet.http.*;
  */
 public class RepositoryServlet extends HttpServlet {
 
+    private String[]args;
+
     /** ExceptionLogger to handle any runtime exceptions */
 
     //    private  ucar.unidata.plaza.error.ExceptionLogger logger = new ucar.unidata.plaza.error.ExceptionLogger();
@@ -76,6 +78,13 @@ public class RepositoryServlet extends HttpServlet {
     /** Repository object that will be instantiated */
     private static Repository repository;
 
+
+    public RepositoryServlet() {
+    }
+
+    public RepositoryServlet(String[]args) {
+        this.args = args;
+    }
 
 
     /**
@@ -109,6 +118,7 @@ public class RepositoryServlet extends HttpServlet {
      * @return - an String[] containing the initialization parameters required for repository startup
      */
     private String[] getInitParams() {
+        if(args!=null) return args;
         List<String> tokens = new ArrayList<String>();
         for (Enumeration params =
                 this.getServletContext().getInitParameterNames();

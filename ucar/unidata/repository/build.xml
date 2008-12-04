@@ -28,6 +28,10 @@
 
     <target name="runserver" depends="init">
       <java classname="ucar.unidata.repository.RepositoryServer" maxmemory="512mb">
+          <arg value="-port"/>
+          <arg value="8080"/>
+          <arg value="-Dramadda.testproperties=true"/>
+
           <classpath>
              <pathelement path="${classpath}"/>
              <pathelement location=""/>
@@ -211,6 +215,7 @@
             <include name="ucar/**"/>
             <include name="lib/repositorylib.jar"/>
             <include name="lib/repositorytds.jar"/>
+            <include name="lib/servlet-api.jar"/>
             <exclude name="ucar/**/CVS/**"/>
             <exclude name="ucar/**/*.class"/>
             <exclude name="ucar/**/*.map"/>
