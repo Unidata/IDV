@@ -626,6 +626,12 @@ public class Admin extends RepositoryManager {
                                                 ""), 5, 40)));
 
 
+        String phrases = getProperty(PROP_ADMIN_PHRASES,(String)null);
+        if(phrases==null) {
+            phrases = "#label=new label to use\n#e.g.: Groups=Projects";
+        }
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Translations"),
+                                        HtmlUtil.textArea(PROP_ADMIN_PHRASES,phrases, 5, 40)));
 
 
         sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
@@ -766,6 +772,12 @@ public class Admin extends RepositoryManager {
             getRepository().writeGlobal(
                 PROP_REPOSITORY_NAME,
                 request.getString(PROP_REPOSITORY_NAME, ""));
+        }
+
+        if (request.exists(PROP_ADMIN_PHRASES)) {
+            getRepository().writeGlobal(PROP_ADMIN_PHRASES,
+                                        request.getString(PROP_ADMIN_PHRASES,
+                                            ""));
         }
 
         if (request.exists(PROP_HTML_FOOTER)) {

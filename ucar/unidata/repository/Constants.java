@@ -676,6 +676,8 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    public static final String PROP_ADMIN_PHRASES = "ramadda.admin.phrases";
+
     public static final String PROP_ADMIN_EMAIL = "ramadda.admin.email";
     public static final String PROP_ADMIN_SMTP = "ramadda.admin.smtp";
 

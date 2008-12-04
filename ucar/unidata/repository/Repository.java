@@ -193,6 +193,9 @@ public class Repository extends RepositoryBase implements
     private List<TwoFacedObject> languages = new ArrayList<TwoFacedObject>();
 
 
+    private Properties phraseMap;
+
+
     /** _more_ */
     private Hashtable theTypeHandlersMap = new Hashtable();
 
@@ -852,29 +855,13 @@ public class Repository extends RepositoryBase implements
                 if (content == null) {
                     continue;
                 }
-                List<String> lines = StringUtil.split(content, "\n", true,
-                                         true);
-                Properties properties = new Properties();
-                String     type       = null;
-                String     name       = null;
-                for (String line : lines) {
-                    if (line.startsWith("#")) {
-                        continue;
-                    }
-                    List toks = StringUtil.split(line, "=", true, true);
-                    if (toks.size() != 2) {
-                        continue;
-                    }
-                    String key   = (String) toks.get(0);
-                    String value = (String) toks.get(1);
-                    if (key.equals("language.type")) {
-                        type = value;
-                    } else if (key.equals("language.name")) {
-                        name = value;
-                    } else {
-                        properties.put(key, value);
-                    }
-                }
+                
+
+
+                Object[] result  = parsePhrases(content);
+                String     type       = (String)result[0];
+                String     name       = (String)result[1];
+                Properties properties = (Properties)result[2];
                 if (type != null) {
                     if (name == null) {
                         name = type;
@@ -887,6 +874,34 @@ public class Repository extends RepositoryBase implements
             }
         }
     }
+
+    private Object[] parsePhrases(String content) {
+        List<String> lines = StringUtil.split(content, "\n", true,
+                                              true);
+        Properties properties = new Properties();
+        String     type       = null;
+        String     name       = null;
+        for (String line : lines) {
+            if (line.startsWith("#")) {
+                continue;
+            }
+            List toks = StringUtil.split(line, "=", true, true);
+            if (toks.size() != 2) {
+                continue;
+            }
+            String key   = (String) toks.get(0);
+            String value = (String) toks.get(1);
+            if (key.equals("language.type")) {
+                type = value;
+            } else if (key.equals("language.name")) {
+                name = value;
+            } else {
+                properties.put(key, value);
+            }
+        }
+        return new Object[]{type,name,properties};
+    }
+
 
     /**
      * _more_
@@ -1813,11 +1828,35 @@ public class Repository extends RepositoryBase implements
     public String translate(Request request, String s) {
         User       user     = request.getUser();
         String     language = user.getLanguage();
-        Properties map      = (Properties) languageMap.get(language);
-        if (map == null) {
-            map = (Properties) languageMap.get(getProperty(PROP_LANGUAGE,
-                    BLANK));
+        Properties tmpMap;
+        Properties map      = (Properties) languageMap.get("default");
+        if(map==null) {
+            map = new Properties();
         }
+        tmpMap = (Properties) languageMap.get(getProperty(PROP_LANGUAGE,
+                    BLANK));
+        if(tmpMap!=null) {
+            map.putAll(tmpMap);
+        }
+        tmpMap      = (Properties) languageMap.get(language);
+
+        if(tmpMap!=null) {
+            map.putAll(tmpMap);
+        }
+
+        if(phraseMap==null) {
+            String phrases = getProperty(PROP_ADMIN_PHRASES,(String)null);
+            if(phrases!=null) {
+                Object[] result  = parsePhrases(phrases);
+                phraseMap =  (Properties)result[2];
+            }
+        }
+
+        if(phraseMap!=null) {
+            map.putAll(phraseMap);
+        }
+
+
         StringBuffer stripped     = new StringBuffer();
         int          prefixLength = MSG_PREFIX.length();
         int          suffixLength = MSG_PREFIX.length();
@@ -2067,6 +2106,7 @@ public class Repository extends RepositoryBase implements
                 value });
         dbProperties.put(name, value);
         properties.put(name, value);
+        phraseMap = null;
     }
 
 

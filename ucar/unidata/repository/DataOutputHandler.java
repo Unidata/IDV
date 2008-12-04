@@ -315,7 +315,7 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (canLoadAsPoint(entry)) {
-            addOutputLink(request, entry,links,OUTPUT_TRAJECTORY_MAP);
+            addOutputLink(request, entry,links,OUTPUT_POINT_MAP);
             if (getRepository().isOutputTypeOK(OUTPUT_POINT_CSV)) {
                 links.add(
                     new Link(
@@ -398,6 +398,22 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    private boolean canLoadEntry(Entry entry) {
+        if(entry.isGroup()) return false;
+        if(entry.getResource().isFileType()) {
+            return entry.getResource().getFile().exists();
+        }
+        if(!entry.getResource().isUrl()) {
+            return false;
+        }
+        String url = entry.getResource().getPath();
+        if(url == null) return false;
+        if(url.indexOf("dods")>=0) return true;
+        if(url.endsWith("das")) return true;
+        return false;
+
+    }
+
     /**
      * Can the given entry be served by the tds
      *
@@ -411,18 +427,16 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            if (entry.isGroup()) {
-                ok = false;
-            } else if ( !entry.getResource().isFile()) {
-                ok = false;
-            } else {
+            if (canLoadEntry(entry)) {
                 try {
-                    String file = entry.getResource().getFile().toString();
+                    String path = entry.getResource().getPath();
                     //Exclude zip files becase canOpen tries to unzip them (?)
-                    if ( !(file.endsWith(".zip"))) {
-                        ok = NetcdfDataset.canOpen(file);
+                    if ( !(path.endsWith(".zip"))) {
+                        ok = NetcdfDataset.canOpen(path);
                     }
-                } catch (Exception ignoreThis) {}
+                } catch (Exception ignoreThis) {
+                    //                    System.err.println("error:" + ignoreThis);
+                }
             }
             b = new Boolean(ok);
             checkedEntries.put(entry.getId(), b);
@@ -442,15 +456,12 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = pointEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            if (entry.isGroup()) {
-                ok = false;
-            } else if ( !entry.getResource().isFile()) {
+            if (!canLoadEntry(entry)) {
                 ok = false;
             } else {
                 try {
                     StringBuilder buf  = new StringBuilder();
-                    File          file = entry.getResource().getFile();
-                    if (getPointDataset(file) != null) {
+                    if (getPointDataset(entry.getResource().getPath()) != null) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -472,15 +483,9 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = trajectoryEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            if (entry.isGroup()) {
-                ok = false;
-            } else if ( !entry.getResource().isFile()) {
-                ok = false;
-            } else {
+            if (canLoadEntry(entry)) {
                 try {
-                    StringBuilder buf  = new StringBuilder();
-                    File          file = entry.getResource().getFile();
-                    if (getTrajectoryDataset(file) != null) {
+                    if (getTrajectoryDataset(entry.getResource().getPath()) != null) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -505,9 +510,7 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = gridEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            if (entry.isGroup()) {
-                ok = false;
-            } else if ( !entry.getResource().isFile()) {
+            if (!canLoadEntry(entry)) {
                 ok = false;
             } else {
                 try {
@@ -596,8 +599,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public PointObsDataset getPointDataset(File file) throws Exception {
-        String          path = file.toString();
+    public PointObsDataset getPointDataset(String path) throws Exception {
         PointObsDataset pds  = (PointObsDataset) pointCache.get(path);
         if (pds == null) {
             pds = (PointObsDataset) TypedDatasetFactory.open(
@@ -617,8 +619,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public GridDataset getGridDataset(File file) throws Exception {
-        String      path = file.toString();
+    public GridDataset getGridDataset(String path) throws Exception {
         GridDataset gds  = (GridDataset) gridCache.get(path);
         if (gds == null) {
             gridCache.put(path, gds = GridDataset.open(path));
@@ -656,14 +657,14 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public TrajectoryObsDataset getTrajectoryDataset(File file)
+    public TrajectoryObsDataset getTrajectoryDataset(String path)
             throws Exception {
-        String path = file.toString();
         TrajectoryObsDataset pds =
             (TrajectoryObsDataset) trajectoryCache.get(path);
         if (pds == null) {
             pds = (TrajectoryObsDataset) TypedDatasetFactory.open(
-                FeatureType.TRAJECTORY, path, null, new StringBuilder());
+                                                                  FeatureType.TRAJECTORY, path, null, new StringBuilder());
+            if(pds == null) return null;
             trajectoryCache.put(path, pds);
         }
         return pds;
@@ -690,7 +691,7 @@ public class DataOutputHandler extends OutputHandler {
             && getRepository().getAccessManager().canDoAction(request,
                 entry.getParentGroup(), Permission.ACTION_NEW);
 
-        File         file   = entry.getResource().getFile();
+        String path   = entry.getResource().getPath();
         StringBuffer sb     = new StringBuffer();
         String       prefix = ARG_VARIABLE + ".";
         OutputType   output = request.getOutput();
@@ -735,7 +736,7 @@ public class DataOutputHandler extends OutputHandler {
                 File f =
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
-                GridDataset gds = getGridDataset(file);
+                GridDataset gds = getGridDataset(path);
                 synchronized (gds) {
                     writer.makeFile(f.toString(), gds, varNames, llr,
                                     ((dates[0] == null)
@@ -827,7 +828,7 @@ public class DataOutputHandler extends OutputHandler {
         List<Date>   dates     = null;
 
 
-        GridDataset  dataset   = getGridDataset(file);
+        GridDataset  dataset   = getGridDataset(entry.getResource().getPath());
         StringBuffer varSB     = new StringBuffer();
         synchronized (dataset) {
             for (VariableSimpleIF var : dataset.getDataVariables()) {
@@ -973,8 +974,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointMap(Request request, Entry entry)
             throws Exception {
 
-        File            file = entry.getResource().getFile();
-        PointObsDataset pod  = getPointDataset(file);
+        PointObsDataset pod  = getPointDataset(entry.getResource().getPath());
         StringBuffer    sb   = new StringBuffer();
         synchronized (pod) {
             List         vars = pod.getDataVariables();
@@ -1208,8 +1208,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputTrajectoryMap(Request request, Entry entry)
             throws Exception {
-        File                 file = entry.getResource().getFile();
-        TrajectoryObsDataset tod  = getTrajectoryDataset(file);
+        TrajectoryObsDataset tod  = getTrajectoryDataset(entry.getResource().getPath());
         StringBuffer         sb   = new StringBuffer();
         synchronized (tod) {
             StringBuffer js           = new StringBuffer();
@@ -1307,8 +1306,8 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
-        File            file = entry.getResource().getFile();
-        PointObsDataset pod  = getPointDataset(file);
+
+        PointObsDataset pod  = getPointDataset(entry.getResource().getPath());
         StringBuffer    sb   = new StringBuffer();
         synchronized (pod) {
             List     vars         = pod.getDataVariables();
@@ -1385,8 +1384,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        File            file = entry.getResource().getFile();
-        PointObsDataset pod  = getPointDataset(file);
+        PointObsDataset pod  = getPointDataset(entry.getResource().getPath());
         synchronized (pod) {
             Element  root         = KmlUtil.kml(entry.getName());
             Element  docNode      = KmlUtil.document(root, entry.getName());

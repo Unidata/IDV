@@ -222,15 +222,15 @@ public class HtmlOutputHandler extends OutputHandler {
             treeShown.add(false);
         }
 
-        tabTitles.add("Comments");
+        tabTitles.add(msg("Comments"));
         tabContent.add(getCommentBlock(request, entry));
         treeShown.add(false);
 
-        tabTitles.add("Associations");
+        tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
         treeShown.add(false);
 
-        tabTitles.add("Actions");
+        tabTitles.add(msg("Actions"));
         tabContent.add(getEntryManager().getEntryLinksList(request, entry));
         treeShown.add(false);
 
@@ -884,13 +884,13 @@ public class HtmlOutputHandler extends OutputHandler {
                     tabContent.add(tfo.getId());
                     treeShown.add(false);
                 }
-                tabTitles.add("Comments");
+                tabTitles.add(msg("Comments"));
                 tabContent.add(getCommentBlock(request, group));
                 treeShown.add(false);
-                tabTitles.add("Associations");
+                tabTitles.add(msg("Associations"));
                 tabContent.add(getAssociationBlock(request, group));
                 treeShown.add(request.get(ARG_SHOW_ASSOCIATIONS, false));
-                tabTitles.add("Actions");
+                tabTitles.add(msg("Actions"));
                 tabContent.add(getEntryManager().getEntryLinksList(request,
                         group));
                 treeShown.add(false);
@@ -910,7 +910,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
             if ( !group.isDummy()) {
                 tabContent.add(HtmlUtil.div(tmp,HtmlUtil.style("margin-left:15px;")));
-                tabTitles.add("Information");
+                tabTitles.add(msg("Information"));
                 treeShown.add( !((subGroups.size() > 0)
                                  || (entries.size() > 0)));
             }
@@ -928,7 +928,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                              HtmlUtil.id("block_" + subGroup.getId())));
             }
             groupsSB.append("</div>");
-            tabTitles.add("Groups");
+            tabTitles.add(msg("Groups"));
             tabContent.add(groupsSB);
             treeShown.add(true);
         }
@@ -937,7 +937,7 @@ public class HtmlOutputHandler extends OutputHandler {
             StringBuffer entriesSB = new StringBuffer();
             String link = getEntryHtml(entriesSB, entries, request, true,
                                        false, group.isDummy());
-            tabTitles.add("Entries" + link);
+            tabTitles.add(msg("Entries") + link);
             tabContent.add(entriesSB.toString());
             treeShown.add(true);
         }

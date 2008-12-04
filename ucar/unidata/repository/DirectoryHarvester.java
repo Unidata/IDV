@@ -175,7 +175,7 @@ public class DirectoryHarvester extends Harvester  {
             return;
         }
         if(baseGroupName.length()==0) {
-            baseGroupName  = getEntryManager().GROUP_TOP;
+            baseGroupName  = getEntryManager().getTopGroup().getName();
         }
         Group group = getEntryManager().findGroupFromName(baseGroupName, getUser(),
                                                    true);

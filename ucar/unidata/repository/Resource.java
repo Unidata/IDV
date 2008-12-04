@@ -155,6 +155,15 @@ public class Resource {
         return false;
     }
 
+    public boolean isFileType() {
+        if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE)
+                || type.equals(TYPE_LOCAL_FILE)) {
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * _more_
      *

@@ -102,7 +102,7 @@ public class EntryManager extends RepositoryManager {
     public Object MUTEX_GROUP = new Object();
 
     /** _more_ */
-    public static final String GROUP_TOP = "Top";
+    private static final String GROUP_TOP = "Top";
 
     /** _more_ */
     private Group topGroup;
@@ -3540,9 +3540,10 @@ public class EntryManager extends RepositoryManager {
                                     boolean createIfNeeded, boolean isTop)
             throws Exception {
         synchronized (MUTEX_GROUP) {
-            if ( !name.equals(GROUP_TOP)
-                    && !name.startsWith(GROUP_TOP + Group.PATHDELIMITER)) {
-                name = GROUP_TOP + Group.PATHDELIMITER + name;
+            String topGroupName = (topGroup!=null?topGroup.getName():GROUP_TOP);
+            if ( !name.equals(topGroupName)
+                    && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
+                name = topGroupName + Group.PATHDELIMITER + name;
             }
             Group group = groupCache.get(name);
             if (group != null) {
@@ -3900,9 +3901,18 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initGroups() throws Exception {
-        topGroup = findGroupFromName(GROUP_TOP,
-                                     getUserManager().getDefaultUser(),
-                                     false);
+        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                                                          Tables.ENTRIES.NAME,
+                                                          Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
+
+
+        
+
+        List<Group> groups = readGroups(statement);
+        if(groups.size()>0) {
+            topGroup = groups.get(0);
+        }
+
         //Make the top group if needed
         if (topGroup == null) {
             topGroup = findGroupFromName(GROUP_TOP,
