@@ -1,0 +1,77 @@
+<center>
+    <APPLET 
+        CODE="com.infocetera.chat.ChatApplet"
+	WIDTH="600"
+	HEIGHT="600" 
+	CODEBASE="/repository"
+	ARCHIVE="/repository/chat.jar">
+    This form needs to be viewed using a Java enabled browser!
+<!-- Chats are divided up by a channel identifier -->
+<!-- Within the context of Infocetera this channel id is the directory -->
+    <PARAM NAME="channel" VALUE="what chat channel">
+
+<!-- 
+The user's session id. This should securely identify the user 
+otherwise it would be possible for a rogue client to spoof being a user.
+-->
+    <PARAM NAME="sessionid" VALUE="some session id">
+
+<!-- Turn on debuggin -->
+    <PARAM NAME="debug"  VALUE="true">
+    <PARAM NAME="whiteboard.bgimage"  VALUE="http://localhost:8080/repository/entry/get/image_1_2008_11_15_15_00_00Z.jpg?entryid=cc81eb7f-3ce9-4a2a-a877-603ac7525a8d">
+
+
+<!-- Is the chat in polling mode -->
+    <PARAM NAME="polling" VALUE="true">
+
+<!-- How many milliseconds to sleep between polling -->
+    <PARAM NAME="pollinterval" VALUE="5000">
+
+<!-- 
+The following macros are substituted with the appropriate value in the following two
+urls to do the poll based write and read.
+%MESSAGE%
+%LASTMESSAGEID% (the value (if there is one) of the last messageid message attribute found)
+%SESSIONID%
+%USERID%
+%CHANNEL%
+-->
+
+<!-- 
+This is the url to write messages to. The above macros will be substituted
+The message body is also written as  POST data:
+MESSAGE=...
+-->
+    <PARAM NAME="pollwriteurl"
+           VALUE="http://localhost/ifc/chatin?SESSIONID=%SESSIONID%&CHANNEL=%CHANNEL%">
+
+<!--This is the url that is polled. This too is "macroized" -->
+    <PARAM NAME="pollreadurl"
+           VALUE="http://localhost/ifc/chatout?SESSIONID=%SESSIONID%&CHANNEL=%CHANNEL%">    
+
+<!-- For non-polling mode this is the port to connect to -->
+    <PARAM NAME="port"  VALUE="81">
+
+<!-- The http port to connect to when doing normal url things (e.g.,  downloading images-->
+    <PARAM NAME="httpport"  VALUE="80">
+
+<!-- 
+Gui settings. Color can either be a single value or r,g,b
+-->
+<!--
+    <PARAM NAME="foregroundcolor" VALUE="188">
+    <PARAM NAME="backgroundcolor".red VALUE="0">
+    <PARAM NAME="backgroundcolor".green VALUE="0">
+    <PARAM NAME="backgroundcolor".blue VALUE="0">
+-->
+
+<!-- Can sessions be saved -->
+<PARAM NAME="showsavesession" value="false">
+
+<!-- Can files be loaded -->
+<PARAM NAME="showfiles" value="false">
+
+
+</APPLET>
+
+</center>
