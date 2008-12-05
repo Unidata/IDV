@@ -1336,10 +1336,13 @@ public class UserManager extends RepositoryManager {
 
         List urls = new ArrayList();
         List labels = new ArrayList();
+        List tips = new ArrayList();
 
         urls.add(request.url(getRepositoryBase().URL_USER_CART));
         labels.add(HtmlUtil.img(getRepository().fileUrl(ICON_CART),
                                 msg("Data Cart")));
+        tips.add(msg("View data cart"));
+        
         if (user.getAnonymous()) {
             String redirect =
                 XmlUtil.encodeBase64(request.getUrl().getBytes());
@@ -1347,16 +1350,20 @@ public class UserManager extends RepositoryManager {
                                           ARG_REDIRECT,
                                  redirect));
             labels.add(msg("Login"));
+            tips.add(msg("Login"));
         } else {
             urls.add(request.url(getRepositoryBase().URL_USER_LOGOUT));
             labels.add(msg("Logout"));
+            tips.add(msg("Logout"));
             urls.add(request.url(getRepositoryBase().URL_USER_SETTINGS));
             labels.add(user.getLabel());
+            tips.add(msg("Go to user settings"));
         }
         List links = new ArrayList();
         for(int i=0;i<urls.size();i++) {
             String link = template.replace("${label}", labels.get(i).toString());
             link = link.replace("${url}", urls.get(i).toString());
+            link = link.replace("${tooltip}", tips.get(i).toString());
             links.add(link);
         }
         return StringUtil.join(separator,links);
