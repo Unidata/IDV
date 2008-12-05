@@ -40,6 +40,15 @@
 
 
 
+  <type name="chatroom"  description="Chat Room">
+     <property name="icon" value="/icons/chat.gif"/>
+     <property name="form.rows.desc" value="10"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+  </type>
+
+
   <type name="model"  description="Model" datatype="model" >
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>

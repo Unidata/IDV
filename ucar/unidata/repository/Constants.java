@@ -815,6 +815,9 @@ public interface Constants {
     public static final String PROP_HTML_GRAPHAPPLET =
         "ramadda.html.graphapplet";
 
+    public static final String PROP_HTML_CHATAPPLET =
+        "ramadda.html.chatapplet";
+
     /** _more_ */
     public static final String PROP_HTML_GRAPHTEMPLATE =
         "ramadda.html.graphtemplate";

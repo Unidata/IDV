@@ -3,6 +3,7 @@
   <outputhandler class="ucar.unidata.repository.MapOutputHandler" name="Map"/>
   <outputhandler class="ucar.unidata.repository.CalendarOutputHandler" name="Calendar"/>
   <outputhandler class="ucar.unidata.repository.ImageOutputHandler" name="Image"/>
+  <outputhandler class="ucar.unidata.repository.ChatOutputHandler" name="Chat Room"/>
 
 
   <outputhandler class="ucar.unidata.repository.CatalogOutputHandler" name="THREDDS Catalog"/>
