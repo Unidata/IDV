@@ -214,11 +214,11 @@ public class IdvOutputHandler extends OutputHandler {
 
     public Result outputGridForm(final Request request, Entry entry) throws Exception {
         StringBuffer sb = new StringBuffer();
-        File         file   = entry.getResource().getFile();
+        String path   = entry.getResource().getPath();
         String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
                                                          false);
         sb.append(crumbs[1]);
-        GridDataset dataset = getDataOutputHandler().getGridDataset(file);
+        GridDataset dataset = getDataOutputHandler().getGridDataset(path);
         synchronized(dataset) {
             for (GridDatatype     grid: getDataOutputHandler().sortGrids(dataset)) {
                 VariableEnhanced var  = grid.getVariable();
