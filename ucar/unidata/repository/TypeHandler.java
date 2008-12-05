@@ -76,9 +76,6 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TYPE_GROUP = Constants.TYPE_GROUP;
 
-    /** _more_ */
-    public static final String TYPE_CATALOG = Constants.TYPE_CATALOG;
-
 
 
     /** _more_ */

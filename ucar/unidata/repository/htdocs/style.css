@@ -357,7 +357,8 @@ ul {
 
 .tooltip-link-inner {
    border : 1px black solid;
-   margin:2px;
+   margin:0px;
+   padding:1px;
    background-color : #FFFFCC;
 }
 

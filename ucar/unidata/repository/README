@@ -1,3 +1,12 @@
 
 See the installation docs at:
 http://www.unidata.ucar.edu/software/ramadda/docs/developer/
+
+To build and run ramadda just do:
+ant compile runserver
+
+This compiles the local ramadda source and runs the server on
+port 8080
+
+
+

@@ -303,6 +303,8 @@ function Tooltip () {
     var lastMove = 0;
     var state = STATE_INIT;
     var currentID;
+    var hideDelay = 1000;
+    var showDelay = 500;
 
     this.debug = function(msg) {
         //        util.print(msg);
@@ -319,14 +321,14 @@ function Tooltip () {
         lastMove++;
         if(state!=STATE_INIT) return;
         event = util.getEvent(event);
-        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", 1000);
+        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", showDelay);
     }
 
     this.onMouseOut = function (event,id) {
         lastMove++;
         if(state !=STATE_LINK) return;
         this.debug('on mouse out ' + id);
-        setTimeout("tooltip.checkHide(" + lastMove+ ")", 1000);
+        setTimeout("tooltip.checkHide(" + lastMove+ ")", hideDelay);
     }
 
 
@@ -340,7 +342,7 @@ function Tooltip () {
         }
         lastMove++;
         if(state!=STATE_INIT) return;
-        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", 1000);
+        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", showDelay);
     }
 
 

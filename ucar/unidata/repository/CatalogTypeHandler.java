@@ -71,6 +71,10 @@ import java.util.Properties;
  */
 public class CatalogTypeHandler extends GenericTypeHandler {
 
+    /** _more_ */
+    public static final String TYPE_CATALOG = Constants.TYPE_CATALOG;
+
+
 
     /** _more_          */
     static Hashtable<String,DomHolder> domCache = new Hashtable();
