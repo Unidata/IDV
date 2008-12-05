@@ -1075,6 +1075,14 @@ public class HtmlUtil {
     }
 
 
+    public static String inset(String html, int top,int left,int bottom, int right) {
+        return span(html,style((top==0?"":"margin-top:" + top +"px;")+
+                               (left==0?"":"margin-left:" + left +"px;")+
+                               (bottom==0?"":"margin-bottom:" + bottom +"px;") +
+                               (right==0?"":"margin-right:" + top +"px;")));
+    }
+
+
     public static String inset(String html, int space) {
         return div(html,style("margin:" + space +"px;"));
     }
