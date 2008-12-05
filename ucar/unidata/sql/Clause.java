@@ -80,7 +80,7 @@ public class Clause {
     public static final String EXPR_LIKE = "LIKE";
 
     /** _more_ */
-    public static final String EXPR_NOTLIKE = "LIKE";
+    public static final String EXPR_NOTLIKE = "NOTLIKE";
 
     /** _more_ */
     public static final String EXPR_ISNULL = "is null";
@@ -508,8 +508,10 @@ public class Clause {
             sb.append(SqlUtil.group(column + " is null "));
         } else if (expr.equals(EXPR_JOIN)) {
             sb.append(SqlUtil.group(column + " =  " + value));
+        } else if (expr.equals(EXPR_LIKE)) {
+            sb.append(SqlUtil.group(column + "  like ?"));
         } else if (expr.equals(EXPR_NOTLIKE)) {
-            sb.append(SqlUtil.group("NOT " + column + " is like ?"));
+            sb.append(SqlUtil.group("NOT " + column + "  like ?"));
         } else {
             if(SqlUtil.debug)
                 System.err.println (toString());
