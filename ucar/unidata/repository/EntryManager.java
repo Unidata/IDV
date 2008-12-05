@@ -2354,6 +2354,18 @@ public class EntryManager extends RepositoryManager {
     }
 
 
+    protected String getEntryLinksToolbar(Request request, Entry entry)
+        throws Exception {
+        List<Link>   links = getEntryLinks(request, entry, false);
+        StringBuffer sb  = new StringBuffer();
+        for (Link link : links) {
+            String href = HtmlUtil.href(link.getUrl(), HtmlUtil.img(link.getIcon(), link.getLabel(),link.getLabel()));
+            sb.append(HtmlUtil.inset(href,0,3,0,0));
+        }
+        return sb.toString();
+    }
+
+
 
 
     /**
@@ -2492,6 +2504,7 @@ public class EntryManager extends RepositoryManager {
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
+            String toolbar = getEntryLinksToolbar(request, entry);
             /***
             StringBuffer menu = new StringBuffer();
             menu.append(
@@ -2519,6 +2532,7 @@ public class EntryManager extends RepositoryManager {
 
             ***/
             String linkHtml = getEntryLinksHtml(request, entry, true);
+            linkHtml = toolbar;
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink
