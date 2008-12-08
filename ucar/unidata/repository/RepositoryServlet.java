@@ -82,9 +82,11 @@ public class RepositoryServlet extends HttpServlet {
     public RepositoryServlet() {
     }
 
-    public RepositoryServlet(String[]args) {
+    public RepositoryServlet(String[]args, int port) throws Exception {
         this.args = args;
+        createRepository(port, new Properties());
     }
+
 
 
     /**
@@ -96,17 +98,22 @@ public class RepositoryServlet extends HttpServlet {
      */
     private void createRepository(HttpServletRequest request)
             throws Exception {
-        repository = new Repository(getInitParams(), 
-                                    request.getServerPort(), true);
-        String      propertyFile     = "/WEB-INF/repository.properties";
         Properties  webAppProperties = new Properties();
-        InputStream is =
-            getServletContext().getResourceAsStream(propertyFile);
-        if (is != null) {
-            webAppProperties.load(is);
+        ServletContext context =getServletContext();
+        if(context!=null) {
+            String      propertyFile     = "/WEB-INF/repository.properties";
+            InputStream is =context.getResourceAsStream(propertyFile);
+            if (is != null) {
+                webAppProperties.load(is);
+            }
         }
-        repository.init(webAppProperties);
+        createRepository(request.getServerPort(),webAppProperties);
+    }
 
+    private void createRepository(int port,Properties webAppProperties)
+            throws Exception {
+        repository = new Repository(getInitParams(),   port, true);
+        repository.init(webAppProperties);
     }
 
 

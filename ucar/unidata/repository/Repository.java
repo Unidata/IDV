@@ -1916,6 +1916,16 @@ public class Repository extends RepositoryBase implements
         return getProperty(PROP_DB_CANCACHE, true);
     }
 
+    public boolean cacheResources() {
+        String test = (String)properties.get("ramadda.cacheresources");
+        if(test == null) return true;
+        if(test!=null) {
+            return test.equals("true");
+        }
+        return true;
+    }
+
+
     /**
      * _more_
      *
@@ -1928,9 +1938,7 @@ public class Repository extends RepositoryBase implements
             systemEnv  = System.getenv();
         }
         String prop = null;
-        
-        String test = (String)properties.get("ramadda.testproperties");
-        if(test!=null && test.equals("true")) {
+        if(!cacheResources()) {
             try {
                 properties.load(
                                 IOUtil.getInputStream(
@@ -2971,8 +2979,8 @@ public class Repository extends RepositoryBase implements
                 IOUtil.readContents(getStorageManager().localizePath(id),
                                     getClass());
         }
-        if (resource != null) {
-            //            resources.put(id,resource);
+        if(cacheResources() && resource != null) {
+            resources.put(id,resource);
         }
         return resource;
     }

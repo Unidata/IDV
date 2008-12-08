@@ -246,11 +246,14 @@ public class AccessManager extends RepositoryManager {
             }
         }
 
+        String requestIp = null;
+        User user = null;
         if (request == null) {
-            return false;
+            user = getUserManager().getAnonymousUser();
+        } else {
+            user = request.getUser();
+            requestIp = request.getIp();
         }
-
-        User user = request.getUser();
         //        System.err.println ("cando:" + user + " " + user.getAdmin());
         //The admin can do anything
         if (user.getAdmin()) {
@@ -264,8 +267,8 @@ public class AccessManager extends RepositoryManager {
 
         //        System.err.println ("can do: " + action);
         while (entry != null) {
-            List permissions = getPermissions(request, entry);
-            List roles       = getRoles(request, entry, action);
+            List permissions = getPermissions(entry);
+            List roles       = getRoles(entry, action);
             if (roles != null) {
                 for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
                     String  role  = (String) roles.get(roleIdx);
@@ -276,7 +279,7 @@ public class AccessManager extends RepositoryManager {
                     }
                     if(role.startsWith("ip:")) {
                         String ip = role.substring(3);
-                        if(request.getIp().startsWith(ip)) {
+                        if(requestIp!=null && requestIp.startsWith(ip)) {
                             if(doNot) return false;
                         } else {
                             return true;
@@ -288,7 +291,6 @@ public class AccessManager extends RepositoryManager {
                 }
                 break;
             }
-            
             entry = getEntryManager().getEntry(request, entry.getParentGroupId());
         }
         return false;
@@ -307,10 +309,10 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List getRoles(Request request, Entry entry, String action)
+    public List getRoles(Entry entry, String action)
             throws Exception {
         //Make sure we call getPermissions first which forces the instantation of the roles
-        getPermissions(request, entry);
+        getPermissions(entry);
         return entry.getRoles(action);
     }
 
@@ -423,7 +425,7 @@ public class AccessManager extends RepositoryManager {
         if (entry == null) {
             return;
         }
-        List<Permission> permissions = getPermissions(request, entry);
+        List<Permission> permissions = getPermissions(entry);
         String entryUrl = HtmlUtil.href(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
                               entry.getId()), entry.getName());
 
@@ -493,7 +495,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List<Permission> getPermissions(Request request, Entry entry)
+    protected List<Permission> getPermissions(Entry entry)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
             if (false) {
@@ -579,7 +581,7 @@ public class AccessManager extends RepositoryManager {
 
 
         Hashtable        map         = new Hashtable();
-        List<Permission> permissions = getPermissions(request, entry);
+        List<Permission> permissions = getPermissions(entry);
         for (Permission permission : permissions) {
             map.put(permission.getAction(),
                     StringUtil.join("\n", permission.getRoles()));

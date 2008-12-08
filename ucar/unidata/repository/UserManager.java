@@ -141,6 +141,12 @@ public class UserManager extends RepositoryManager {
 
 
 
+    public Session getSession(String sessionId) {
+        System.err.println ("map:" + sessionMap);
+        return sessionMap.get(sessionId);
+    }
+
+
     /**
      * _more_
      *
@@ -1789,6 +1795,11 @@ public class UserManager extends RepositoryManager {
             this.createDate = createDate;
             lastActivity    = new Date();
         }
+
+        public User getUser() {
+            return user;
+        }
+
     }
 
 
