@@ -1,0 +1,245 @@
+<!--
+This is the default skin xml for the Infocetera chat/whiteboard applet.
+See the documentation in /com/infocetera/util/XmlUi.java on how to change
+the UI through the skin.
+
+The chat applet reads an applet property called "skinurl"
+which is the url pointing to the skin file to use.
+
+-->
+
+<skin>
+  <ui>
+    <panel  hspace="4" vspace="4" layout="border" fontsize="12" fontface="Dialog">
+      <component idref="verytop" place="North"/>
+      <panel layout="grid" cols="1" place="Center">
+        <component idref="toppanel" />    
+        <panel layout="border" id="bottompanel">
+          <component idref="whiteboardpanel" place="Center"/>
+          <panel layout="gridbag" cols="5" place="South" colwidths="0,0,0,1,0" >
+	    <checkbox label="Share cursor"   action="wb.cursor.share" />
+	    <checkbox label="Accept shared cursor"  action="wb.cursor.accept" value="true" />
+	    <checkbox label="Send changes live"  action="wb.sendlive" />
+	    <label label=" "  />	    	    
+	    <button label="Update others"  action="wb.sendstate" />	    	    
+          </panel>
+	</panel>
+      </panel>
+    </panel>
+  </ui>
+
+<!-- 
+All top level tags under components can be referred to by other xml (either in the ui section above
+or by other components) using the idref="..." attribute.
+-->
+  <components>
+    <!-- The very top panel. It contains a single child panel that is placed to the West -->
+      <panel id="verytop" layout="border" >
+        <panel   place="West" layout="gridbag" cols="2">
+          <panel layout="gridbag" colwidths="0,1" cols="2" hspace="2" vspace="2">
+            <panel layout="gridbag" cols="2" colheights="0">
+              <button action="popup(filemenu)" label="File"  border="true"/>
+              <button action="popup(viewmenu)" label="View"  border="true"/>	      
+            </panel>
+            <label label="" />
+          </panel>
+        </panel>
+      </panel>
+
+      <panel layout="border" id="whiteboardpanel">
+        <component id="whiteboard" place="Center"/>
+      </panel>
+
+      <panel id="toppanel" layout="border">
+        <component idref="usersfiles"  place="West"/>      
+          <panel  layout="border" place="Center">
+            <panel id="topbuttons" layout="grid" rows="1" cols="0" place="North" >
+              <button label="Clear text"  id="clearbtn" action="chat.cleartext" />
+              <button label="Toggle text view" action="ui.flip(textpanel);" />
+            </panel>
+      
+            <panel layout="border" place="Center">
+              <panel layout="inset" hspace="2" vspace="2" place="Center">
+                 <panel id="textpanel" layout="card" default="chattext_wrapper">
+                   <component id="chattext_wrapper" />
+                   <component id="chatavatar_wrapper"/>
+                   <component id="chattextarea"/>		   
+                  </panel>
+              </panel>
+              <component idref="textinput"/>
+            </panel>
+          </panel>
+        </panel>
+
+
+<!-- The vertical stack of "Users" label, userlist, "Files/Urls" popup menu btn, filelist -->
+
+      <panel id="usersfiles" layout="grid"   vspace="2" cols="1">
+        <panel layout="border">
+          <label place="North" label="Users:" align="LEFT" />
+          <component id="userlist"  place="Center"/>
+        </panel>
+        <panel layout="border">
+          <button label="Files/Urls"  place="North" action="popup(filesmenu)" />
+          <component id="filelist"  place="Center" />
+        </panel>
+      </panel>
+
+
+      <panel id="textinput" layout="card" place="South">
+        <panel layout="border">
+          <panel layout="gridbag" colwidths="0,1,0" rowheights="0" place="North" cols="3">
+            <panel layout="border">
+              <button place="North" label="Send:" action="chat.input(inputfld1)" />
+            </panel>
+            <textinput id="inputfld1" action="chat.input"/>
+            <image  place="North"  border="true"  image="resource:/com/infocetera/images/smile1.gif" action="popup(textmenu)"/>
+          </panel>
+          <label label=" " place="Center"/>
+        </panel>	  
+
+        <panel layout="gridbag" colwidths="0,1,0" rowheights="0" place="South" cols="3">
+          <panel layout="border">
+            <button place="North" label="Send:" action="chat.input(inputfld2)" />
+          </panel>
+          <textinput id="inputfld2" action="chat.input" rows="3"/>	   
+          <panel layout="border">
+            <label label=" " place="Center" />
+            <image  place="North"  border="true"  image="resource:/com/infocetera/images/smile1.gif" action="popup(textmenu)"/>
+	  </panel>
+        </panel>   		
+      </panel>   
+      
+    <menu id="commandmenu">
+      <menuitem label="Clear text"  action="chat.cleartext" />
+      <menuitem label="Toggle text view" action="ui.flip(textpanel);" />      
+      <menuitem label="Float/embed" action="ui.float" />
+      <menuitem label="Save session" action="chat.savesession" />
+      <menuitem label="Change room" action="chat.changeroom" />
+    </menu>
+
+    <menu   id="filesmenu">
+      <menuitem action="files.select" label ="Add new url" />
+      <menuitem action="files.upload" label ="Select file from server" />
+      <menuitem action="files.remove" label ="Remove selected" />
+      <menuitem action="files.share" label ="Share selected" />
+    </menu>
+
+    <menu id="textmenu" actiontemplate="ui.write(inputfld1,%value%)">
+       <menuitem label="Toggle" action="ui.flip(textinput);" />      	      
+       <menu label="Prefix">
+          <menuitem label="Set as prefix" action="chat.setprefix(inputfld1)"/>
+          <menuitem label="Show prefix" action="chat.showprefix(inputfld1)"/>		 
+          <menuitem label="Clear prefix" action="chat.clearprefix"/>
+       </menu>
+        <menu id="iconmenu" label="Icons">
+          <menuitem label="smiley"   value="*smiley*" />
+          <menuitem label="caution"  value="*caution*" />	      
+          <menuitem label="grin"     value="*grin*" />
+          <menuitem label="!"        value="*!*" />
+          <menuitem label="rhand"    value="*rhand*" />
+          <menuitem label="lhand"    value="*lhand*" />
+          <menuitem label="rarrow"   value="*rarrow*" />
+          <menuitem label="larrow"   value="*larrow*" />	      
+          <menuitem label="construction"  value="*construction*" />
+          <menuitem label="fire"     value="*fire*" />
+	</menu>
+        <menu id="alignmenu" label="Align">
+          <menuitem label="left"     value="*left*" />
+          <menuitem label="center"     value="*center*" />
+          <menuitem label="right"     value="*right*" />	  
+	</menu>
+        <menu id="fontmenu" label="Font styles">
+          <menuitem label="bold"     value="&lt;b&gt;" />
+          <menuitem label="italic"     value="&lt;i&gt;" />
+	</menu>
+        <menu id="sizemenu" label="Font sizes">
+          <menuitem label="6"    value="&lt;font size=6&gt;" />
+          <menuitem label="10"   value="&lt;font size=10&gt;" />
+          <menuitem label="14"   value="&lt;font size=14&gt;" />
+          <menuitem label="18"   value="&lt;font size=18&gt;" />
+          <menuitem label="22"   value="&lt;font size=22&gt;" />
+          <menuitem label="26"   value="&lt;font size=26&gt;" />	  	  
+	</menu>	
+        <menu id="colormenu" label="Font colors">
+          <menuitem label="red"     value="&lt;font color=red&gt;" />
+          <menuitem label="green"   value="&lt;font color=green&gt;" />
+          <menuitem label="blue"    value="&lt;font color=blue&gt;" />
+          <menuitem label="orange"  value="&lt;font color=orange&gt;" />	  	  	  
+          <menuitem label="gray"    value="&lt;font color=gray&gt;" />
+          <menuitem label="black"   value="&lt;font  color=black&gt;" />
+        </menu>
+       <menuitem label="Show text" action="ui.show(chattext)"/>
+    </menu>
+
+
+        <menu id="filemenu">
+           <menuitem label="Save session" action="chat.savesession" />
+           <separator/>
+           <menuitem label="Show/hide top" action="ui.toggle(toppanel)" />
+           <menuitem label="Show/hide bottom" action="ui.toggle(bottompanel)" />
+           <menuitem label="Float/embed" action="ui.float" />
+           <menuitem label="Change room" action="chat.changeroom" />
+        </menu>
+
+        <menu event="onpress" label="View"  border="true" id="viewmenu">
+           <menuitem label="Clear text"  action="chat.cleartext" />
+           <menuitem label="Toggle text view" action="ui.flip(textpanel);" />      
+        </menu>
+
+  </components>
+
+
+<!-- 
+When the user types in the name we replace it with the value
+We use this to substitute shortcuts with html graphics, styles, etc
+You can also use this to implement filtering, e.g., "shit" turns into "coprolite". 
+Note: this does a straight string substitution so it will replace anything that
+matches (e.g., shitty turns into coprolitety)
+-->
+  <replacements>
+    <replace from="shit"     to= "coprolite" />
+    <replace from="*left*"   to= "&lt;div align=left&gt;" />
+    <replace from="*center*" to= "&lt;div align=center&gt;" />
+    <replace from="*right*"  to= "&lt;div align=right&gt;" />        
+
+    <replace from="*smiley*" to= "&lt;img src=resource:/com/infocetera/images/smile1.gif&gt;" />
+    <replace from="*caution*" to= "&lt;img src=resource:/com/infocetera/chat/images/caution.gif&gt;" />
+    <replace from="*construction*" to= "&lt;img src=resource:/com/infocetera/chat/images/construction.gif&gt;" />
+    <replace from="*X*" to= "&lt;img src=resource:/com/infocetera/chat/images/crossbones.gif&gt;" />
+    <replace from="*!*" to= "&lt;img src=resource:/com/infocetera/chat/images/excl.gif&gt;" />
+    <replace from="*fire*" to= "&lt;img src=resource:/com/infocetera/chat/images/fire.gif&gt;" />
+    <replace from="*grin*" to= "&lt;img src=resource:/com/infocetera/chat/images/grin.gif&gt;" />
+    <replace from="*larrow*" to= "&lt;img src=resource:/com/infocetera/chat/images/larrow.gif&gt;" />
+    <replace from="*lhand*" to= "&lt;img src=resource:/com/infocetera/chat/images/lhand.gif&gt;" />
+    <replace from="*rarrow*" to= "&lt;img src=resource:/com/infocetera/chat/images/rarrow.gif&gt;" />
+    <replace from="*rhand*" to= "&lt;img src=resource:/com/infocetera/chat/images/rhand.gif&gt;" />
+    <replace from="*big*" to= "&lt;font size=18&gt;" />
+    <replace from="*medium*" to= "&lt;font size=14&gt;" />
+    <replace from="*small*" to= "&lt;font size=8&gt;" />            
+  </replacements>
+
+
+
+  <properties>
+<!--Set the bgcolor of the chat text directly as a property (instead
+of a bgcolor= in the component tag above) because the component
+which is id'ed as chattext is really a panel that holds the chattext-->
+      <property name="chattext.bgcolor" value="240,240,240" />
+
+<!-- line1color and line2color  are the two lines shown between each  message
+If not defined here they are not drawn -->
+      <property name="chattext.line1color" value="gray" />
+      <property name="chattext.line2color" value="white" />
+      <property name="whiteboard.bgcolor" value="white" />                  
+<!--PROPERTIES-->
+</properties>
+
+<!-- The messages section allows you to have preddefined messages
+sent to a user at startup time. 
+-->
+<messages>
+<!--MESSAGES-->
+</messages>
+
+</skin>
