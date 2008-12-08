@@ -200,11 +200,14 @@ public class ChatOutputHandler extends OutputHandler {
             }  
         }
 
-        protected void  connectionClosed() {
+        protected void  connectionClosed()  {
+            try {
             StringBuffer sb = new StringBuffer();
             sb.append("<user id=\"" + this.connectionId +"\" name=\"" + this.user.getName()+"\"/>\n");
             writeExcept(message("USERREMOVE","",sb.toString()),this,this);
             removeConnection(this);
+            } catch(Exception exc) {
+            }
         }
 
 
