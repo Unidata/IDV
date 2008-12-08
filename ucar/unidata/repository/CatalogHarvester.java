@@ -130,7 +130,7 @@ public class CatalogHarvester extends Harvester {
         importCatalog(topUrl, topGroup, 0);
         //getEntryManager().processEntries(this, null, entries,false);
         if (entries.size() > 0) {
-            getEntryManager().processEntries(this, null, entries,false);
+            getEntryManager().processEntries(this, null, entries, false);
         }
         entries = new ArrayList<Entry>();
     }
@@ -235,11 +235,12 @@ public class CatalogHarvester extends Harvester {
             throws Exception {
 
         String tab = "";
-        for(int i=0;i<xmlDepth;i++ )
-            tab  =tab+"  ";
+        for (int i = 0; i < xmlDepth; i++) {
+            tab = tab + "  ";
+        }
         URL catalogUrl = new URL(catalogUrlPath);
         //        if (xmlDepth > 1) {
-            //            return;
+        //            return;
         //        }
 
 
@@ -276,7 +277,7 @@ public class CatalogHarvester extends Harvester {
                                       false, null);
             if (serviceNode != null) {
                 String path = XmlUtil.getAttribute(serviceNode, "base");
-                urlPath = new URL(catalogUrl, path+urlPath).toString();
+                urlPath = new URL(catalogUrl, path + urlPath).toString();
             }
 
             TypeHandler typeHandler =
@@ -293,7 +294,7 @@ public class CatalogHarvester extends Harvester {
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
                         DFLT_INHERITED, ext, "", "", ""));
             }
-            entry.initEntry(name, "", parent,  user,
+            entry.initEntry(name, "", parent, user,
                             new Resource(urlPath, Resource.TYPE_URL), "",
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);
@@ -315,7 +316,7 @@ public class CatalogHarvester extends Harvester {
             }
 
             if (entries.size() > 100) {
-                getEntryManager().processEntries(this, null, entries,false);
+                getEntryManager().processEntries(this, null, entries, false);
                 entries = new ArrayList<Entry>();
             }
             return;
@@ -323,8 +324,9 @@ public class CatalogHarvester extends Harvester {
 
         name = name.replace(Group.IDDELIMITER, "--");
         name = name.replace("'", "");
-        Group group    = null;
-        Entry newGroup = getEntryManager().findEntryWithName(null, parent, name);
+        Group group = null;
+        Entry newGroup = getEntryManager().findEntryWithName(null, parent,
+                             name);
         if ((newGroup != null) && newGroup.isGroup()) {
             group = (Group) newGroup;
         }
@@ -342,8 +344,8 @@ public class CatalogHarvester extends Harvester {
                                           catalogUrlPath, "", ""));
 
             insertMetadata(group, metadataList);
-            String crumbs = getEntryManager().getBreadCrumbs(null, group, true, 
-                                                      topGroup)[1];
+            String crumbs = getEntryManager().getBreadCrumbs(null, group,
+                                true, topGroup)[1];
             crumbs = crumbs.replace("class=", "xclass=");
             groups.add(crumbs);
             groupCnt++;

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -62,8 +61,8 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -135,6 +134,7 @@ public class PatternHarvester extends Harvester {
     private int newEntryCnt = 0;
 
 
+    /** _more_          */
     private long lastRunTime = 0;
 
     /**
@@ -223,7 +223,7 @@ public class PatternHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
-        lastRunTime= 0;
+        lastRunTime = 0;
         filePatternString = request.getUnsafeString(ATTR_FILEPATTERN,
                 filePatternString);
         filePattern = null;
@@ -321,13 +321,14 @@ public class PatternHarvester extends Harvester {
         if (sdf == null) {
             sdf = new ArrayList<SimpleDateFormat>();
             if ((dateFormat != null) && (dateFormat.length() > 0)) {
-                for(String tok :(List<String>) StringUtil.split(dateFormat,",",true,true)) {
+                for (String tok : (List<String>) StringUtil.split(dateFormat,
+                        ",", true, true)) {
                     sdf.add(new SimpleDateFormat(tok));
                 }
             } else {
                 sdf.add(new SimpleDateFormat("yyyyMMdd_HHmm"));
             }
-            for(SimpleDateFormat format : sdf) {
+            for (SimpleDateFormat format : sdf) {
                 format.setTimeZone(DateUtil.TIMEZONE_GMT);
             }
         }
@@ -542,9 +543,9 @@ public class PatternHarvester extends Harvester {
                     }
                     continue;
                 }
-                long fileTime =  f.lastModified();
-                if((fileTime-lastRunTime)<1000)  {
-                    debug("We've seen this file:"  + f);
+                long fileTime = f.lastModified();
+                if ((fileTime - lastRunTime) < 1000) {
+                    debug("We've seen this file:" + f);
                     continue;
                 }
                 Entry entry = processFile(f);
@@ -553,10 +554,10 @@ public class PatternHarvester extends Harvester {
                 }
                 entries.add(entry);
                 entryCnt++;
-                if(getTestMode() && entryCnt>=getTestCount()) {
+                if (getTestMode() && (entryCnt >= getTestCount())) {
                     return;
                 }
-                if(!getTestMode()) {
+                if ( !getTestMode()) {
                     if (entries.size() > 1000) {
                         List uniqueEntries =
                             getEntryManager().getUniqueEntries(entries);
@@ -568,9 +569,10 @@ public class PatternHarvester extends Harvester {
                         if ( !getTestMode()) {
                             if (getAddMetadata()) {
                                 getEntryManager().addInitialMetadata(null,
-                                                                   needToAdd);
+                                        needToAdd);
                             }
-                            getEntryManager().insertEntries(needToAdd, true, true);
+                            getEntryManager().insertEntries(needToAdd, true,
+                                    true);
                         }
                         needToAdd = new ArrayList<Entry>();
                     }
@@ -584,8 +586,7 @@ public class PatternHarvester extends Harvester {
         }
 
         if ( !getTestMode()) {
-            List uniqueEntries =
-                getEntryManager().getUniqueEntries(entries);
+            List uniqueEntries = getEntryManager().getUniqueEntries(entries);
             newEntryCnt += uniqueEntries.size();
             needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
@@ -642,23 +643,40 @@ public class PatternHarvester extends Harvester {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Date parseDate(String value) throws Exception {
         Exception lastException = null;
-        for(SimpleDateFormat sdf: getSDF()) {
+        for (SimpleDateFormat sdf : getSDF()) {
             try {
                 return sdf.parse(value);
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 lastException = exc;
             }
         }
-        if(lastException!=null) throw lastException;
+        if (lastException != null) {
+            throw lastException;
+        }
         return null;
     }
 
 
 
-    public static void main(String[]args) {
-        StringUtil.replaceDate("hello ${fromdate:yyyy-mm-dd}", "fromdate", new Date());
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        StringUtil.replaceDate("hello ${fromdate:yyyy-mm-dd}", "fromdate",
+                               new Date());
     }
 
     /**
@@ -730,7 +748,7 @@ public class PatternHarvester extends Harvester {
             String dataName = patternNames.get(dataIdx);
             Object value    = matcher.group(dataIdx + 1);
             if (dataName.equals("fromdate")) {
-                value = fromDate = parseDate((String)value);
+                value = fromDate = parseDate((String) value);
             } else if (dataName.equals("todate")) {
                 value = toDate = parseDate((String) value);
             } else {
@@ -742,15 +760,15 @@ public class PatternHarvester extends Harvester {
                 map.put(dataName, value);
             }
         }
-        
+
 
 
 
 
         //        System.err.println("values:");
         //        System.err.println("map:" + map);
-        Object[] values = typeHandler.makeValues(map);
-        Date createDate = new Date();
+        Object[] values     = typeHandler.makeValues(map);
+        Date     createDate = new Date();
         if (fromDate == null) {
             fromDate = toDate;
         }
@@ -770,51 +788,54 @@ public class PatternHarvester extends Harvester {
         if (ext.startsWith(".")) {
             ext = ext.substring(1);
         }
-        tag       = tag.replace("${extension}", ext);
-        
+        tag = tag.replace("${extension}", ext);
+
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.setTime(fromDate);
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
-        int day = cal.get(cal.DAY_OF_MONTH);
-        int month =(cal.get(cal.MONTH)+1);
-        String[]macros = {"fromdate", getRepository().formatDate(fromDate),
-                          "todate",  getRepository().formatDate(toDate),
-                          "year",""+cal.get(cal.YEAR),
-                          "month",(month<10?"0":"")+month,
-                          "monthname",DateUtil.MONTH_NAMES[cal.get(cal.MONTH)],
-                          "day",(day<10?"0":"")+day,
-                          "filename", f.getName()
+        int      day    = cal.get(cal.DAY_OF_MONTH);
+        int      month  = (cal.get(cal.MONTH) + 1);
+        String[] macros = {
+            "fromdate", getRepository().formatDate(fromDate), "todate",
+            getRepository().formatDate(toDate), "year",
+            "" + cal.get(cal.YEAR), "month", ((month < 10)
+                    ? "0"
+                    : "") + month, "monthname",
+            DateUtil.MONTH_NAMES[cal.get(cal.MONTH)], "day", ((day < 10)
+                    ? "0"
+                    : "") + day, "filename", f.getName()
         };
 
 
-        for(int i=0;i<macros.length;i+=2) {
-            String macro = "${" +macros[i]+"}";
-            String value = macros[i+1];
+        for (int i = 0; i < macros.length; i += 2) {
+            String macro = "${" + macros[i] + "}";
+            String value = macros[i + 1];
             groupName = groupName.replace(macro, value);
-            name = name.replace(macro, value);
-            desc = desc.replace(macro, value);
+            name      = name.replace(macro, value);
+            desc      = desc.replace(macro, value);
         }
 
-        groupName = StringUtil.replaceDate(groupName,"fromdate",fromDate);
-        groupName = StringUtil.replaceDate(groupName,"todate",toDate);
-        name = StringUtil.replaceDate(name,"fromdate",fromDate);
-        name = StringUtil.replaceDate(name,"todate",toDate);
-        desc = StringUtil.replaceDate(desc,"fromdate",fromDate);
-        desc = StringUtil.replaceDate(desc,"todate",toDate);
+        groupName = StringUtil.replaceDate(groupName, "fromdate", fromDate);
+        groupName = StringUtil.replaceDate(groupName, "todate", toDate);
+        name      = StringUtil.replaceDate(name, "fromdate", fromDate);
+        name      = StringUtil.replaceDate(name, "todate", toDate);
+        desc      = StringUtil.replaceDate(desc, "fromdate", fromDate);
+        desc      = StringUtil.replaceDate(desc, "todate", toDate);
 
-        desc = desc.replace("${name}", name);
+        desc      = desc.replace("${name}", name);
 
         if (baseGroup != null) {
             groupName = baseGroup.getFullName() + Group.PATHDELIMITER
                         + groupName;
         }
-        Group group = getEntryManager().findGroupFromName(groupName, getUser(),
-                          true);
-        if(getTestMode()) {
-            debug("\tname: " + name + "\n\tgroup:" + group.getFullName()+ "\n\tfromdate:" + getRepository().formatDate(fromDate));
-            if(values!=null) {
-                for(int i=0;i<values.length;i++) {
+        Group group = getEntryManager().findGroupFromName(groupName,
+                          getUser(), true);
+        if (getTestMode()) {
+            debug("\tname: " + name + "\n\tgroup:" + group.getFullName()
+                  + "\n\tfromdate:" + getRepository().formatDate(fromDate));
+            if (values != null) {
+                for (int i = 0; i < values.length; i++) {
                     debug("\tvalue: " + values[i]);
                 }
             }
@@ -831,9 +852,9 @@ public class PatternHarvester extends Harvester {
         } else {
             resource = new Resource(fileName, Resource.TYPE_FILE);
         }
-        entry.initEntry(name, desc, group, 
-                        getUser(), resource, "", createDate.getTime(),
-                        fromDate.getTime(), toDate.getTime(), values);
+        entry.initEntry(name, desc, group, getUser(), resource, "",
+                        createDate.getTime(), fromDate.getTime(),
+                        toDate.getTime(), values);
         if (tag.length() > 0) {
             List tags = StringUtil.split(tag, ",", true, true);
             for (int i = 0; i < tags.size(); i++) {

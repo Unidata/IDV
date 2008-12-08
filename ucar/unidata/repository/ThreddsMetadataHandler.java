@@ -168,7 +168,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         new Metadata.Type("thredds.cdl", "CDL", "CDL");
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String NCATTR_STANDARD_NAME = "standard_name";
 
 
@@ -341,14 +341,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    Hashtable extra) {
 
         NetcdfDataset dataset = null;
-        File file = entry.getResource().getFile();
+        File          file    = entry.getResource().getFile();
         try {
             super.getInitialMetadata(request, entry, metadataList, extra);
             if ( !getDataOutputHandler().canLoadAsCdm(entry)) {
                 return;
             }
-            dataset =
-                NetcdfDataset.openDataset(file.toString());
+            dataset = NetcdfDataset.openDataset(file.toString());
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
             for (Attribute attr : attrs) {
@@ -407,24 +406,30 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (var instanceof CoordinateAxis) {
                     CoordinateAxis ca       = (CoordinateAxis) var;
                     AxisType       axisType = ca.getAxisType();
-                    if(axisType == null) continue;
+                    if (axisType == null) {
+                        continue;
+                    }
                     if (axisType.equals(AxisType.Lat)) {
                         double[] minmax = getRange(var, ca.read(),
                                               visad.CommonUnit.degree);
                         //                        System.err.println("\t" +"lat range:" + minmax[0] + " " + minmax[1]);
-                        if(extra.get(ARG_MINLAT)==null)
+                        if (extra.get(ARG_MINLAT) == null) {
                             extra.put(ARG_MINLAT, minmax[0]);
-                        if(extra.get(ARG_MAXLAT)==null)
+                        }
+                        if (extra.get(ARG_MAXLAT) == null) {
                             extra.put(ARG_MAXLAT, minmax[1]);
+                        }
                         haveBounds = true;
                     } else if (axisType.equals(AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
-                                                   visad.CommonUnit.degree);
+                                              visad.CommonUnit.degree);
                         //                        System.err.println("\t"+" lon range:" + minmax[0] + " " + minmax[1]);
-                        if(extra.get(ARG_MINLON)==null)
+                        if (extra.get(ARG_MINLON) == null) {
                             extra.put(ARG_MINLON, minmax[0]);
-                        if(extra.get(ARG_MAXLON)==null)
+                        }
+                        if (extra.get(ARG_MAXLON) == null) {
                             extra.put(ARG_MAXLON, minmax[1]);
+                        }
                         haveBounds = true;
                     } else if (axisType.equals(AxisType.Time)) {
                         Date[] dates = getMinMaxDates(var, ca);
@@ -454,8 +459,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     metadata = new Metadata(getRepository().getGUID(),
                                             entry.getId(), TYPE_VARIABLE,
                                             DFLT_INHERITED, varName,
-                                            var.getName(), var.getUnitsString(),
-                                            "");
+                                            var.getName(),
+                                            var.getUnitsString(), "");
                     entry.addMetadata(metadata, true);
                 }
 
@@ -465,7 +470,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
-            if (!haveBounds) {
+            if ( !haveBounds) {
                 for (CoordinateSystem coordSys : (List<CoordinateSystem>) dataset
                         .getCoordinateSystems()) {
                     ProjectionImpl proj = coordSys.getProjection();
@@ -474,7 +479,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     }
                     LatLonRect llr = proj.getDefaultMapAreaLL();
                     haveBounds = true;
-                    if(extra.get(ARG_MINLAT)==null) {
+                    if (extra.get(ARG_MINLAT) == null) {
                         //                        System.err.println("\t"  +" bounds from cs:" + llr);
                         extra.put(ARG_MINLAT, llr.getLatMin());
                         extra.put(ARG_MAXLAT, llr.getLatMax());
@@ -490,10 +495,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             //            exc.printStackTrace();
         } finally {
             try {
-                if(dataset!=null) {
+                if (dataset != null) {
                     dataset.close();
                 }
-            } catch(Exception ignore){}
+            } catch (Exception ignore) {}
         }
     }
 
@@ -610,6 +615,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      *
      * @param request _more_
+     * @param entry _more_
      * @param metadata _more_
      *
      * @return _more_
@@ -761,7 +767,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @param cols _more_
      *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param forEdit _more_
+     *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
 
 
@@ -832,12 +845,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     msgLabel("Role"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_VARIABLE)) {
-            content = formEntry(new String[] { submit, msgLabel("Variable"),
-                                               HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                                               msgLabel("Long Name"),
-                                               HtmlUtil.input(arg2, metadata.getAttr2(), size),
-                                               msgLabel("Units"),
-                                               HtmlUtil.input(arg3, metadata.getAttr3(), size) });
+            content = formEntry(new String[] {
+                submit, msgLabel("Variable"),
+                HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                msgLabel("Long Name"),
+                HtmlUtil.input(arg2, metadata.getAttr2(), size),
+                msgLabel("Units"),
+                HtmlUtil.input(arg3, metadata.getAttr3(), size)
+            });
         } else if (type.equals(TYPE_PROPERTY)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size),

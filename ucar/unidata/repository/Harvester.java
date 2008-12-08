@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -87,7 +86,7 @@ public class Harvester extends RepositoryManager {
 
     public static final String TAG_HARVESTER = "harvester";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_HARVESTERS = "harvesters";
 
     /** _more_ */
@@ -108,10 +107,10 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ACTIVEONSTART = "activeonstart";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TESTCOUNT = "testcount";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TESTMODE = "testmode";
 
     /** _more_ */
@@ -202,10 +201,10 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     User user;
 
-    /** _more_          */
+    /** _more_ */
     private boolean testMode = false;
 
-    /** _more_          */
+    /** _more_ */
     private int testCount = 100;
 
 
@@ -836,8 +835,8 @@ public class Harvester extends RepositoryManager {
     public void debug(String msg) {
         if (getTestMode()) {
             System.err.println(msg);
-            msg = msg.replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-            msg = msg.replace("\n","<br>");
+            msg = msg.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            msg = msg.replace("\n", "<br>");
             status.append(msg);
             status.append(HtmlUtil.br());
         }

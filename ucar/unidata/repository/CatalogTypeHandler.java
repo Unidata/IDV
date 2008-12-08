@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -76,10 +75,10 @@ public class CatalogTypeHandler extends GenericTypeHandler {
 
 
 
-    /** _more_          */
-    static Hashtable<String,DomHolder> domCache = new Hashtable();
+    /** _more_ */
+    static Hashtable<String, DomHolder> domCache = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable childIdToParent = new Hashtable();
 
 
@@ -98,6 +97,13 @@ public class CatalogTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getIconUrl(Entry entry) {
         if (entry.isGroup()) {
             return fileUrl(ICON_FOLDER_CLOSED);
@@ -202,10 +208,10 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     private Element getDom(String url) throws Exception {
-        Element root = null;
+        Element   root   = null;
         DomHolder holder = domCache.get(url);
-        if(holder!=null) {
-            if(holder.isValid()) {
+        if (holder != null) {
+            if (holder.isValid()) {
                 root = holder.root;
             } else {
                 domCache.remove(url);
@@ -239,7 +245,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      *
      * @return _more_
      */
-    public static  String getId(String url, String subid) {
+    public static String getId(String url, String subid) {
         if (subid == null) {
             return getCatalogId(url);
         }
@@ -261,19 +267,21 @@ public class CatalogTypeHandler extends GenericTypeHandler {
     public List<String> getSynthIds(Request request, Group parentEntry,
                                     String id)
             throws Exception {
-        if(id == null) id = parentEntry.getId();
+        if (id == null) {
+            id = parentEntry.getId();
+        }
         String[]     loc        = parseId(id);
         String       catalogUrl = request.getString(ARG_CATALOG, null);
         List<String> ids        = new ArrayList<String>();
         String       url        = loc[0];
         String       nodeId     = loc[1];
-        if(!id.startsWith("catalog:")) {
-            url = parentEntry.getResource().getPath();
+        if ( !id.startsWith("catalog:")) {
+            url    = parentEntry.getResource().getPath();
             nodeId = null;
         }
-        URL          baseUrl    = new URL(url);
+        URL     baseUrl = new URL(url);
 
-        Element      root       = getDom(url);
+        Element root    = getDom(url);
         if (root == null) {
             throw new IllegalArgumentException("Could not load catalog:"
                     + url);
@@ -330,17 +338,42 @@ public class CatalogTypeHandler extends GenericTypeHandler {
 
 
 
+    /**
+     * Class DomHolder _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class DomHolder {
+
+        /** _more_          */
         Element root;
+
+        /** _more_          */
         Date dttm;
+
+        /**
+         * _more_
+         *
+         * @param root _more_
+         */
         public DomHolder(Element root) {
             this.root = root;
-            dttm  = new Date();
+            dttm      = new Date();
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isValid() {
             Date now = new Date();
             //Only keep around catalogs for 5 minutes
-            if((now.getTime()-dttm.getTime())>1000*60*5) return false;
+            if ((now.getTime() - dttm.getTime()) > 1000 * 60 * 5) {
+                return false;
+            }
             return true;
         }
     }
@@ -429,14 +462,11 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         }
 
         List<Metadata> metadataList = new ArrayList<Metadata>();
-        CatalogOutputHandler.collectMetadata(repository, metadataList,
-                                             root);
-        metadataList.add(new Metadata(repository.getGUID(),
-                                      entry.getId(),
+        CatalogOutputHandler.collectMetadata(repository, metadataList, root);
+        metadataList.add(new Metadata(repository.getGUID(), entry.getId(),
                                       ThreddsMetadataHandler.TYPE_LINK,
                                       DFLT_INHERITED,
-                                      "Imported from catalog",
-                                      url, "", ""));
+                                      "Imported from catalog", url, "", ""));
         for (Metadata metadata : metadataList) {
             metadata.setEntryId(entry.getId());
             entry.addMetadata(metadata);

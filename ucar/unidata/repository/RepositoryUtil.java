@@ -112,7 +112,7 @@ public class RepositoryUtil {
      *
      * @return _more_
      */
-    public static  String buttons(String b1, String b2, String b3) {
+    public static String buttons(String b1, String b2, String b3) {
         return b1 + HtmlUtil.space(2) + b2 + HtmlUtil.space(2) + b3;
     }
 
@@ -128,7 +128,7 @@ public class RepositoryUtil {
      * @return _more_
      */
     public static String makeOkCancelForm(Request request, RequestUrl url,
-                                   String okArg, String extra) {
+                                          String okArg, String extra) {
         StringBuffer fb = new StringBuffer();
         fb.append(request.form(url));
         fb.append(extra);
@@ -169,8 +169,21 @@ public class RepositoryUtil {
     }
 
 
+    /**
+     * Class MissingEntryException _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class MissingEntryException extends Exception {
-        public MissingEntryException (String msg) {
+
+        /**
+         * _more_
+         *
+         * @param msg _more_
+         */
+        public MissingEntryException(String msg) {
             super(msg);
         }
     }

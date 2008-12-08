@@ -164,7 +164,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_NEW = new RequestUrl(this,
-                                                           "/entry/new","New Entry");
+                                                "/entry/new", "New Entry");
 
 
     /** _more_ */
@@ -181,11 +181,12 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                  "/user/login");
 
     /** _more_ */
-    public final RequestUrl URL_USER_RESETPASSWORD = new RequestUrl(this,
-                                                 "/user/resetpassword");
+    public final RequestUrl URL_USER_RESETPASSWORD =
+        new RequestUrl(this, "/user/resetpassword");
 
+    /** _more_          */
     public final RequestUrl URL_USER_FINDUSERID = new RequestUrl(this,
-                                                 "/user/finduserid");
+                                                      "/user/finduserid");
 
 
     /** _more_ */
@@ -250,11 +251,14 @@ public class RepositoryBase implements Constants, RepositorySource {
     protected SimpleDateFormat sdf;
 
     /** _more_ */
-    protected SimpleDateFormat dateSdf = RepositoryUtil.makeDateFormat("yyyy-MM-dd");
+    protected SimpleDateFormat dateSdf =
+        RepositoryUtil.makeDateFormat("yyyy-MM-dd");
 
     /** _more_ */
-    protected SimpleDateFormat timeSdf = RepositoryUtil.makeDateFormat("HH:mm:ss z");
+    protected SimpleDateFormat timeSdf =
+        RepositoryUtil.makeDateFormat("HH:mm:ss z");
 
+    /** _more_          */
     protected List<SimpleDateFormat> formats;
 
     /**
@@ -272,7 +276,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @throws Exception _more_
      */
     public RepositoryBase(int port) throws Exception {
-        this.port     = port;
+        this.port = port;
     }
 
 
@@ -299,6 +303,13 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param format _more_
+     *
+     * @return _more_
+     */
     private SimpleDateFormat makeSDF(String format) {
         SimpleDateFormat sdf = new SimpleDateFormat();
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
@@ -334,7 +345,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @throws java.text.ParseException _more_
      */
     public Date parseDate(String dttm) throws java.text.ParseException {
-        if(formats==null) {
+        if (formats == null) {
             formats = new ArrayList<SimpleDateFormat>();
             formats.add(makeSDF("yyyy-MM-dd HH:mm:ss z"));
             formats.add(makeSDF("yyyy-MM-dd HH:mm:ss"));
@@ -343,12 +354,12 @@ public class RepositoryBase implements Constants, RepositorySource {
         }
 
 
-        for(SimpleDateFormat fmt: formats) {
+        for (SimpleDateFormat fmt : formats) {
             try {
                 return fmt.parse(dttm);
-            } catch(Exception noop){}
+            } catch (Exception noop) {}
         }
-        throw new IllegalArgumentException("Unable to parse date:" +dttm);
+        throw new IllegalArgumentException("Unable to parse date:" + dttm);
     }
 
     /**
@@ -434,7 +445,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public   String note(String h) {
+    public String note(String h) {
         return getMessage(h, Constants.ICON_INFORMATION, true);
     }
 
@@ -445,7 +456,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public   String progress(String h) {
+    public String progress(String h) {
         return getMessage(h, Constants.ICON_PROGRESS, false);
     }
 
@@ -457,7 +468,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public   String warning(String h) {
+    public String warning(String h) {
         return getMessage(h, Constants.ICON_WARNING, true);
     }
 
@@ -470,8 +481,9 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public   String question(String h, String buttons) {
-        return getMessage(h + "<p><hr>" + buttons, Constants.ICON_QUESTION, false);
+    public String question(String h, String buttons) {
+        return getMessage(h + "<p><hr>" + buttons, Constants.ICON_QUESTION,
+                          false);
     }
 
     /**
@@ -481,7 +493,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public   String error(String h) {
+    public String error(String h) {
         return getMessage(h, Constants.ICON_ERROR, true);
     }
 
@@ -495,7 +507,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public   String getMessage(String h, String icon, boolean showClose) {
+    public String getMessage(String h, String icon, boolean showClose) {
         String close =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("hide('messageblock')"),
                             HtmlUtil.img(fileUrl(Constants.ICON_CLOSE)));

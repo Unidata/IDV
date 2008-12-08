@@ -20,12 +20,15 @@
  */
 
 package ucar.unidata.repository;
-import ucar.unidata.ui.ImageUtils;
+
 
 import org.w3c.dom.*;
 
+import ucar.unidata.sql.*;
+
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -45,8 +48,6 @@ import java.io.InputStream;
 
 
 import java.net.*;
-
-import ucar.unidata.sql.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -82,7 +83,8 @@ import java.util.zip.*;
 public class GraphOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph","graph.graph");
+    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
+                                                      "graph.graph");
 
 
 
@@ -121,11 +123,11 @@ public class GraphOutputHandler extends OutputHandler {
             return;
         }
 
-        if(getRepository().isOutputTypeOK(OUTPUT_GRAPH)) {
-        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                      ARG_OUTPUT, OUTPUT_GRAPH);
-        links.add(new Link(url, getRepository().fileUrl(ICON_GRAPH),
-                           "Show in graph"));
+        if (getRepository().isOutputTypeOK(OUTPUT_GRAPH)) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                          entry, ARG_OUTPUT, OUTPUT_GRAPH);
+            links.add(new Link(url, getRepository().fileUrl(ICON_GRAPH),
+                               "Show in graph"));
         }
     }
 
@@ -197,15 +199,18 @@ public class GraphOutputHandler extends OutputHandler {
     protected void getAssociationsGraph(Request request, String id,
                                         StringBuffer sb)
             throws Exception {
-        List<Association> associations = getEntryManager().getAssociations(request, id);
+        List<Association> associations =
+            getEntryManager().getAssociations(request, id);
         for (Association association : associations) {
             Entry   other  = null;
             boolean isTail = true;
             if (association.getFromId().equals(id)) {
-                other  = getEntryManager().getEntry(request, association.getToId());
+                other = getEntryManager().getEntry(request,
+                        association.getToId());
                 isTail = true;
             } else {
-                other  = getEntryManager().getEntry(request, association.getFromId());
+                other = getEntryManager().getEntry(request,
+                        association.getFromId());
                 isTail = false;
             }
 
@@ -243,12 +248,13 @@ public class GraphOutputHandler extends OutputHandler {
      */
     protected String getEntryNodeXml(Request request, ResultSet results)
             throws Exception {
-        int         col         = 1;
-        String      entryId     = results.getString(col++);
-        String      name        = results.getString(col++);
-        String      fileType    = results.getString(col++);
-        String      groupId     = results.getString(col++);
-        String      resource    = getStorageManager().resourceFromDB(results.getString(col++));
+        int    col      = 1;
+        String entryId  = results.getString(col++);
+        String name     = results.getString(col++);
+        String fileType = results.getString(col++);
+        String groupId  = results.getString(col++);
+        String resource =
+            getStorageManager().resourceFromDB(results.getString(col++));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         String      nodeType    = typeHandler.getNodeType();
         if (ImageUtils.isImage(resource)) {
@@ -257,10 +263,11 @@ public class GraphOutputHandler extends OutputHandler {
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, entryId,
                                      ATTR_TITLE, name);
         if (ImageUtils.isImage(resource)) {
-            String imageUrl =
-                HtmlUtil.url(getRepository().URL_ENTRY_GET + entryId
-                             + IOUtil.getFileExtension(resource), ARG_ENTRYID,
-                                 entryId, ARG_IMAGEWIDTH, "75");
+            String imageUrl = HtmlUtil.url(
+                                  getRepository().URL_ENTRY_GET + entryId
+                                  + IOUtil.getFileExtension(
+                                      resource), ARG_ENTRYID, entryId,
+                                          ARG_IMAGEWIDTH, "75");
             attrs = attrs + " " + XmlUtil.attr("image", imageUrl);
         }
         //        System.err.println (XmlUtil.tag(TAG_NODE,attrs));
@@ -281,16 +288,17 @@ public class GraphOutputHandler extends OutputHandler {
      */
     public Result processGraphGet(Request request) throws Exception {
 
-        String  graphXmlTemplate = getRepository().getResource(PROP_HTML_GRAPHTEMPLATE);
-        String  id               = (String) request.getId((String) null);
-        String  originalId       = id;
+        String graphXmlTemplate =
+            getRepository().getResource(PROP_HTML_GRAPHTEMPLATE);
+        String  id         = (String) request.getId((String) null);
+        String  originalId = id;
         String  type = (String) request.getString(ARG_NODETYPE,
                            (String) null);
-        int     cnt              = 0;
-        int     actualCnt        = 0;
+        int     cnt        = 0;
+        int     actualCnt  = 0;
 
-        int     skip             = request.get(ARG_SKIP, 0);
-        boolean haveSkip         = false;
+        int     skip       = request.get(ARG_SKIP, 0);
+        boolean haveSkip   = false;
 
         if (id.startsWith("skip_")) {
             haveSkip = true;
@@ -318,7 +326,8 @@ public class GraphOutputHandler extends OutputHandler {
             Statement stmt = typeHandler.select(
                                  request,
                                  SqlUtil.comma(
-                                     Tables.ENTRIES.COL_ID, Tables.ENTRIES.COL_NAME,
+                                     Tables.ENTRIES.COL_ID,
+                                     Tables.ENTRIES.COL_NAME,
                                      Tables.ENTRIES.COL_TYPE,
                                      Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                      Tables.ENTRIES.COL_RESOURCE), Clause.eq(
@@ -331,7 +340,8 @@ public class GraphOutputHandler extends OutputHandler {
             sb.append(getEntryNodeXml(request, results));
             getAssociationsGraph(request, id, sb);
 
-            Group group = getEntryManager().findGroup(request, results.getString(4));
+            Group group = getEntryManager().findGroup(request,
+                              results.getString(4));
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                       ATTR_ID, group.getId(), ATTR_TOOLTIP,
@@ -345,7 +355,8 @@ public class GraphOutputHandler extends OutputHandler {
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
 
-            xml = StringUtil.replace(xml, "${root}", getRepository().getUrlBase());
+            xml = StringUtil.replace(xml, "${root}",
+                                     getRepository().getUrlBase());
             //            System.err.println(xml);
             return new Result(BLANK, new StringBuffer(xml),
                               getRepository().getMimeTypeFromSuffix(".xml"));
@@ -353,7 +364,8 @@ public class GraphOutputHandler extends OutputHandler {
 
         Group group = getEntryManager().findGroup(request, id);
         if (group == null) {
-            throw new RepositoryUtil.MissingEntryException("Could not find group:" + id);
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find group:" + id);
         }
         sb.append(
             XmlUtil.tag(
@@ -363,12 +375,15 @@ public class GraphOutputHandler extends OutputHandler {
                     ATTR_TOOLTIP, group.getName(), ATTR_TITLE,
                     getGraphNodeTitle(group.getName()))));
         getAssociationsGraph(request, id, sb);
-        List<Group> subGroups =
-            getEntryManager().getGroups(request,
-                      Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, group.getId()));
+        List<Group> subGroups = getEntryManager().getGroups(
+                                    request,
+                                    Clause.eq(
+                                        Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                        group.getId()));
 
 
-        Group parent = getEntryManager().findGroup(request, group.getParentGroupId());
+        Group parent = getEntryManager().findGroup(request,
+                           group.getParentGroupId());
         if (parent != null) {
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
@@ -425,8 +440,8 @@ public class GraphOutputHandler extends OutputHandler {
                 Tables.ENTRIES.COL_NAME, Tables.ENTRIES.COL_TYPE,
                 Tables.ENTRIES.COL_PARENT_GROUP_ID,
                 Tables.ENTRIES.COL_RESOURCE), Tables.ENTRIES.NAME,
-                                       Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
-                                           group.getId()));
+                    Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                              group.getId()));
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
         cnt       = 0;
@@ -465,7 +480,8 @@ public class GraphOutputHandler extends OutputHandler {
 
         String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                         sb.toString());
-        xml = StringUtil.replace(xml, "${root}", getRepository().getUrlBase());
+        xml = StringUtil.replace(xml, "${root}",
+                                 getRepository().getUrlBase());
         //        System.err.println(xml);
         return new Result(BLANK, new StringBuffer(xml),
                           getRepository().getMimeTypeFromSuffix(".xml"));

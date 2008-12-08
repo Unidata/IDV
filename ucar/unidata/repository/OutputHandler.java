@@ -28,13 +28,13 @@ import org.w3c.dom.*;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -81,11 +81,14 @@ import java.util.zip.*;
 public class OutputHandler extends RepositoryManager {
 
     /** _more_ */
-    public static final OutputType OUTPUT_HTML = new OutputType("Entry", "default.html");
+    public static final OutputType OUTPUT_HTML = new OutputType("Entry",
+                                                     "default.html");
 
 
+    /** _more_          */
     private String name;
 
+    /** _more_          */
     private List<OutputType> types = new ArrayList<OutputType>();
 
 
@@ -93,10 +96,12 @@ public class OutputHandler extends RepositoryManager {
      * _more_
      *
      * @param repository _more_
+     * @param name _more_
      *
      * @throws Exception _more_
      */
-    public OutputHandler(Repository repository, String name) throws Exception {
+    public OutputHandler(Repository repository, String name)
+            throws Exception {
         super(repository);
         this.name = name;
     }
@@ -111,43 +116,56 @@ public class OutputHandler extends RepositoryManager {
      */
     public OutputHandler(Repository repository, Element element)
             throws Exception {
-        this(repository,XmlUtil.getAttribute(element, ATTR_NAME,(String) null));
+        this(repository,
+             XmlUtil.getAttribute(element, ATTR_NAME, (String) null));
     }
 
-    public void init() {
-    }
+    /**
+     * _more_
+     */
+    public void init() {}
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     protected void addType(OutputType type) {
         type.setGroupName(name);
         types.add(type);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<OutputType> getTypes() {
         return types;
     }
 
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	name = value;
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
     }
 
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-        if(name == null) {
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        if (name == null) {
             name = Misc.getClassName(getClass());
         }
-	return name;
+        return name;
     }
 
 
@@ -197,11 +215,15 @@ public class OutputHandler extends RepositoryManager {
      *
      * @param request _more_
      *
+     * @param output _more_
+     *
      * @return _more_
      */
     public boolean canHandleOutput(OutputType output) {
-        for(OutputType type: types) {
-            if(type.equals(output)) return true;
+        for (OutputType type : types) {
+            if (type.equals(output)) {
+                return true;
+            }
         }
         return false;
     }
@@ -373,14 +395,26 @@ public class OutputHandler extends RepositoryManager {
                                  List<Link> links, boolean forHeader)
             throws Exception {}
 
-    protected void addOutputLink(Request request, Entry entry,List<Link> links,OutputType type) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     * @param type _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void addOutputLink(Request request, Entry entry,
+                                 List<Link> links, OutputType type)
+            throws Exception {
         if (getRepository().isOutputTypeOK(type)) {
-                links.add(
-                    new Link(
-                        request.entryUrl(
-                            getRepository().URL_ENTRY_SHOW, entry,
-                            ARG_OUTPUT,
-                            type), getRepository().fileUrl(type.getIcon()), type.getLabel()));
+            links.add(
+                new Link(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                        type), getRepository().fileUrl(type.getIcon()),
+                               type.getLabel()));
 
         }
     }
@@ -452,32 +486,64 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-    protected static String getGroupSelect(Request request,String elementId) throws Exception {
-        String event = "selectInitialClick(event," +HtmlUtil.squote(elementId) +")";
-        return HtmlUtil.mouseClickHref(event,"Select",HtmlUtil.id(elementId+".selectlink"));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param elementId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected static String getGroupSelect(Request request, String elementId)
+            throws Exception {
+        String event = "selectInitialClick(event,"
+                       + HtmlUtil.squote(elementId) + ")";
+        return HtmlUtil.mouseClickHref(event, "Select",
+                                       HtmlUtil.id(elementId
+                                           + ".selectlink"));
     }
 
-    protected String getSelectLink(Request request, Group group, String target) throws Exception {
-        String linkText = group.getLabel();
-        StringBuffer sb = new StringBuffer();
-        String entryId = group.getId();
-        String  icon     = getEntryManager().getIconUrl(group);
-        String event = (group.isGroup()
-                        ? HtmlUtil.onMouseClick("folderClick(" + HtmlUtil.squote(entryId) + 
-                                                ",'selectxml'," + HtmlUtil.squote(ATTR_TARGET+"=" + target)+")")
-                        : "");
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param target _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected String getSelectLink(Request request, Group group,
+                                   String target)
+            throws Exception {
+        String       linkText = group.getLabel();
+        StringBuffer sb       = new StringBuffer();
+        String       entryId  = group.getId();
+        String       icon     = getEntryManager().getIconUrl(group);
+        String       event    = (group.isGroup()
+                                 ? HtmlUtil.onMouseClick("folderClick("
+                                     + HtmlUtil.squote(entryId)
+                                     + ",'selectxml',"
+                                     + HtmlUtil.squote(ATTR_TARGET + "="
+                                         + target) + ")")
+                                 : "");
         String img = HtmlUtil.img(icon, (group.isGroup()
                                          ? "Click to open group; "
-                                         : ""), " id=" + HtmlUtil.quote("img_" + entryId)
-                                  + event);
+                                         : ""), " id="
+                                             + HtmlUtil.quote("img_"
+                                                 + entryId) + event);
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 
         String elementId = group.getId();
-        String value = group.getFullName();
-        sb.append(
-                  HtmlUtil.mouseClickHref("selectClick(" + HtmlUtil.squote(target) +"," + HtmlUtil.squote(value)+")",
-                                          linkText));
+        String value     = group.getFullName();
+        sb.append(HtmlUtil.mouseClickHref("selectClick("
+                                          + HtmlUtil.squote(target) + ","
+                                          + HtmlUtil.squote(value)
+                                          + ")", linkText));
         return sb.toString();
     }
 
@@ -556,14 +622,16 @@ public class OutputHandler extends RepositoryManager {
         String link = "";
         if (doForm) {
             StringBuffer formSB = new StringBuffer();
-            formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
-                                       "getentries"));
+            formSB.append(
+                request.formPost(
+                    getRepository().URL_ENTRY_GETENTRIES, "getentries"));
             //            formSB.append(HtmlUtil.space(1));
             List<OutputType> outputList =
                 getRepository().getOutputTypes(request, new State(entries));
             List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-            for(OutputType outputType: outputList) {
-                tfos.add(new TwoFacedObject(outputType.getLabel(), outputType.getId()));
+            for (OutputType outputType : outputList) {
+                tfos.add(new TwoFacedObject(outputType.getLabel(),
+                                            outputType.getId()));
             }
             sb.append("\n");
             formSB.append(HtmlUtil.space(4));
@@ -598,13 +666,14 @@ public class OutputHandler extends RepositoryManager {
             }
 
             if (showCrumbs) {
-                String img = HtmlUtil.img(getEntryManager().getIconUrl(entry));
+                String img =
+                    HtmlUtil.img(getEntryManager().getIconUrl(entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
-                sb.append(getEntryManager().getBreadCrumbs(request,  entry));
+                sb.append(getEntryManager().getBreadCrumbs(request, entry));
             } else {
-                sb.append(getEntryManager().getAjaxLink(request, entry, entry.getLabel(),
-                                      true));
+                sb.append(getEntryManager().getAjaxLink(request, entry,
+                        entry.getLabel(), true));
             }
         }
         if (doForm) {
@@ -626,9 +695,13 @@ public class OutputHandler extends RepositoryManager {
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    protected String getEntryLink(Request request, Entry entry) throws Exception {
-        return getEntryManager().getAjaxLink(request, entry, entry.getLabel(), false);
+    protected String getEntryLink(Request request, Entry entry)
+            throws Exception {
+        return getEntryManager().getAjaxLink(request, entry,
+                                             entry.getLabel(), false);
     }
 
 
@@ -652,11 +725,13 @@ public class OutputHandler extends RepositoryManager {
         List   items          = new ArrayList();
         String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
-        String onLinkTemplate = getRepository().getProperty("ramadda.html.sublink.on","");
-        String offLinkTemplate = getRepository().getProperty("ramadda.html.sublink.off","");
+        String onLinkTemplate =
+            getRepository().getProperty("ramadda.html.sublink.on", "");
+        String offLinkTemplate =
+            getRepository().getProperty("ramadda.html.sublink.off", "");
         for (OutputType outputType : outputTypes) {
             request.put(ARG_OUTPUT, outputType);
-            String url = outputType.assembleUrl(request);
+            String url   = outputType.assembleUrl(request);
             String label = msg(outputType.getLabel());
             String template;
             if (outputType.equals(output)) {

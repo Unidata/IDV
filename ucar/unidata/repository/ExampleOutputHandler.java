@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository;
 
+
 import org.w3c.dom.*;
 
 
@@ -51,13 +52,16 @@ import java.util.List;
 public class ExampleOutputHandler extends OutputHandler {
 
     /** example1 */
-    public static final OutputType OUTPUT_EXAMPLE1 = new OutputType("Example 1","example.example1");
+    public static final OutputType OUTPUT_EXAMPLE1 =
+        new OutputType("Example 1", "example.example1");
 
     /** example2 */
-    public static final OutputType OUTPUT_EXAMPLE2 = new OutputType("Example 2","example.example2");
+    public static final OutputType OUTPUT_EXAMPLE2 =
+        new OutputType("Example 2", "example.example2");
 
     /** example3 */
-    public static final OutputType OUTPUT_EXAMPLE3 = new OutputType("Example 3","example.example3");
+    public static final OutputType OUTPUT_EXAMPLE3 =
+        new OutputType("Example 3", "example.example3");
 
 
     /**
@@ -86,7 +90,7 @@ public class ExampleOutputHandler extends OutputHandler {
 
 
     /**
-     * This method gets called to add in to the types list the OutputTypes that are applicable 
+     * This method gets called to add in to the types list the OutputTypes that are applicable
      * to the given State.  The State can be viewing a single Entry (state.entry non-null),
      * viewing a Group (state.group non-null). These would show up along the top navigation bar.
      *
@@ -122,13 +126,22 @@ public class ExampleOutputHandler extends OutputHandler {
 
     /**
      * This adds in the links that show up in the drop down list and in the Actions tab
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     * @param forHeader _more_
+     *
+     * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
 
         //Only do example3 links for non-groups
-        if(entry.isGroup()) return;
+        if (entry.isGroup()) {
+            return;
+        }
 
         //Links have an icon and a label
         String label = "Show example 3";
@@ -139,12 +152,11 @@ public class ExampleOutputHandler extends OutputHandler {
         //The request.entryUrl creates a url for the given entry.
         //URL_ENTRY_SHOW is the main entry viewing url
         //We also pass in the OUTPUT_EXAMPLE3 as the output argument
-        String  url  =  request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                         ARG_OUTPUT,
-                                         OUTPUT_EXAMPLE3);
+        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                      ARG_OUTPUT, OUTPUT_EXAMPLE3);
 
         //Now add in the Link
-        links.add(new Link(url,icon, label));
+        links.add(new Link(url, icon, label));
     }
 
 
@@ -156,7 +168,7 @@ public class ExampleOutputHandler extends OutputHandler {
      * @param subGroups Children groups
      * @param entries Children entries
      *
-     * @return A Result object that holds the content 
+     * @return A Result object that holds the content
      *
      * @throws Exception On badness
      */
@@ -165,28 +177,34 @@ public class ExampleOutputHandler extends OutputHandler {
             throws Exception {
 
         //Here output should be example1
-        OutputType       output = request.getOutput();
+        OutputType output = request.getOutput();
 
         //The stringbuffer holds the content we are creating
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
         //Lets just make a list of links to the children
         //All access urls are defined using the RequestUrl class
         //URL_ENTRY_SHOW is used for showing all content through the output handlers
-        if(subGroups.size()>0) {
+        if (subGroups.size() > 0) {
             sb.append("Sub-groups:<br>");
-            for(Group childGroup: subGroups) {
-                sb.append(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW, childGroup),
-                                        childGroup.getName()));
+            for (Group childGroup : subGroups) {
+                sb.append(
+                    HtmlUtil.href(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW,
+                            childGroup), childGroup.getName()));
                 sb.append(HtmlUtil.br());
             }
         }
 
-        if(entries.size()>0) {
+        if (entries.size() > 0) {
             sb.append("<p>Sub-entries:<br>");
-            for(Entry entry: entries) {
-                sb.append(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
-                                        entry.getName()));
+            for (Entry entry : entries) {
+                sb.append(
+                    HtmlUtil.href(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW,
+                            entry), entry.getName()));
                 sb.append(HtmlUtil.br());
             }
         }
@@ -202,38 +220,48 @@ public class ExampleOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        OutputType       output = request.getOutput();
+        OutputType output = request.getOutput();
 
         //Check if we are doing example3
-        if(output.equals(OUTPUT_EXAMPLE3)) {
+        if (output.equals(OUTPUT_EXAMPLE3)) {
             return outputExample3(request, entry);
         }
 
         //Here output should be example2
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-        /* 
+        /*
            Accessing arguments.
 
            The request allows you to access url arguments:
-           
+
            request.defined("argname") Returns true if argname exists and is a non-0 length string
            request.getString("argname")  Returns the string value or "" if not exists
            request.getString("argname")  Returns the string value or "" if not exists
            Returns an int, double, Date or boolean:
-           int intValue = request.getString("argname", int dflt)  
-           double doubleValue = request.getString("argname", double dflt)  
-           Date dateValue = request.getString("argname", Date dflt)  
-           boolean booleanValue = request.getString("argname", boolean dflt)  
+           int intValue = request.getString("argname", int dflt)
+           double doubleValue = request.getString("argname", double dflt)
+           Date dateValue = request.getString("argname", Date dflt)
+           boolean booleanValue = request.getString("argname", boolean dflt)
          */
 
 
         //Now, we just append html to the sb
         sb.append("Example 2 content");
 
-        
-        /* 
+
+        /*
           Returning a result
 
           If you wanted to return something (e.g., xml) that is not html you could do:
@@ -261,8 +289,19 @@ public class ExampleOutputHandler extends OutputHandler {
 
 
 
-    public Result outputExample3(Request request, Entry entry) throws Exception {
-        StringBuffer sb     = new StringBuffer();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputExample3(Request request, Entry entry)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
         sb.append("Here is the content for example3");
         sb.append(HtmlUtil.p());
         sb.append("Name:");

@@ -31,7 +31,6 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.PluginClassLoader;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -41,6 +40,7 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.PluginClassLoader;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -73,8 +73,6 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
-import java.util.jar.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -86,6 +84,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+
+import java.util.jar.*;
 
 
 
@@ -104,6 +104,11 @@ import javax.swing.*;
  */
 public class SearchManager extends RepositoryManager {
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public SearchManager(Repository repository) {
         super(repository);
     }
@@ -125,15 +130,16 @@ public class SearchManager extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(
             HtmlUtil.form(
-                request.url(getRepository().URL_ENTRY_SEARCH, ARG_NAME, WHAT_ENTRIES),
-                " name=\"searchform\" "));
+                request.url(
+                    getRepository().URL_ENTRY_SEARCH, ARG_NAME,
+                    WHAT_ENTRIES), " name=\"searchform\" "));
 
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
         sb.append(HtmlUtil.submitImage(fileUrl(ICON_BLANK), "submit"));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
-        OutputType     output    =  request.getOutput(BLANK);
+        OutputType  output      = request.getOutput(BLANK);
         String      buttons     = HtmlUtil.submit(msg("Search"), "submit");
         sb.append("<table width=\"90%\" border=0><tr><td>");
         typeHandler.addTextSearch(request, sb);
@@ -142,7 +148,8 @@ public class SearchManager extends RepositoryManager {
         sb.append(buttons);
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
-        return getRepository().makeResult(request, msg("Search Form"), sb, getRepository().searchUrls);
+        return getRepository().makeResult(request, msg("Search Form"), sb,
+                                          getRepository().searchUrls);
     }
 
 
@@ -166,8 +173,9 @@ public class SearchManager extends RepositoryManager {
 
         sb.append(
             HtmlUtil.form(
-                request.url(getRepository().URL_ENTRY_SEARCH, ARG_NAME, WHAT_ENTRIES),
-                " name=\"searchform\" "));
+                request.url(
+                    getRepository().URL_ENTRY_SEARCH, ARG_NAME,
+                    WHAT_ENTRIES), " name=\"searchform\" "));
 
 
         //Put in an empty submit button so when the user presses return 
@@ -182,9 +190,10 @@ public class SearchManager extends RepositoryManager {
 
 
 
-        String buttons = RepositoryUtil.buttons(HtmlUtil.submit(msg("Search"), "submit"),
-                                 HtmlUtil.submit(msg("Search Subset"),
-                                     "submit_subset"));
+        String buttons =
+            RepositoryUtil.buttons(HtmlUtil.submit(msg("Search"), "submit"),
+                                   HtmlUtil.submit(msg("Search Subset"),
+                                       "submit_subset"));
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);
@@ -204,15 +213,16 @@ public class SearchManager extends RepositoryManager {
         metadataSB.append(HtmlUtil.formTable());
         getMetadataManager().addToSearchForm(request, metadataSB);
         metadataSB.append(HtmlUtil.formTableClose());
-        sb.append(getRepository().makeShowHideBlock(request, msg("Metadata"), metadataSB,
-                                    false));
+        sb.append(getRepository().makeShowHideBlock(request, msg("Metadata"),
+                metadataSB, false));
 
 
 
         StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
         if (request.defined(ARG_OUTPUT)) {
-            OutputType output =  request.getOutput(BLANK);
-            outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output.getId().toString()));
+            OutputType output = request.getOutput(BLANK);
+            outputForm.append(HtmlUtil.hidden(ARG_OUTPUT,
+                    output.getId().toString()));
         }
 
         List orderByList = new ArrayList();
@@ -235,15 +245,16 @@ public class SearchManager extends RepositoryManager {
 
 
 
-        sb.append(getRepository().makeShowHideBlock(request, msg("Output"), outputForm,
-                                    false));
+        sb.append(getRepository().makeShowHideBlock(request, msg("Output"),
+                outputForm, false));
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
 
-        return getRepository().makeResult(request, msg("Search Form"), sb, getRepository().searchUrls);
+        return getRepository().makeResult(request, msg("Search Form"), sb,
+                                          getRepository().searchUrls);
 
     }
 
@@ -280,7 +291,8 @@ public class SearchManager extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         getMetadataManager().addToBrowseSearchForm(request, sb);
-        return getRepository().makeResult(request, msg("Search Form"), sb, getRepository().searchUrls);
+        return getRepository().makeResult(request, msg("Search Form"), sb,
+                                          getRepository().searchUrls);
     }
 
 
@@ -324,7 +336,7 @@ public class SearchManager extends RepositoryManager {
         StringBuffer searchCriteriaSB = new StringBuffer();
 
         Group        theGroup         = null;
-        List[]       pair             = getEntryManager().getEntries(request, searchCriteriaSB);
+        List[] pair = getEntryManager().getEntries(request, searchCriteriaSB);
         if (request.defined(ARG_GROUP)) {
             String groupId = (String) request.getString(ARG_GROUP, "").trim();
             //            System.err.println("group:" + groupId);
@@ -347,8 +359,8 @@ public class SearchManager extends RepositoryManager {
         if (theGroup == null) {
             theGroup = getEntryManager().getDummyGroup();
         }
-        return getRepository().getOutputHandler(request).outputGroup(request, theGroup,
-                                (List<Group>) pair[0], (List<Entry>) pair[1]);
+        return getRepository().getOutputHandler(request).outputGroup(request,
+                theGroup, (List<Group>) pair[0], (List<Entry>) pair[1]);
     }
 
 
@@ -381,8 +393,10 @@ public class SearchManager extends RepositoryManager {
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
-                item = HtmlUtil.href(request.url(getRepository().URL_SEARCH_FORM, ARG_WHAT,
-                        whats[i], ARG_FORM_TYPE, formType), names[i], extra2);
+                item = HtmlUtil.href(
+                    request.url(
+                        getRepository().URL_SEARCH_FORM, ARG_WHAT, whats[i],
+                        ARG_FORM_TYPE, formType), names[i], extra2);
             }
             if (i == 0) {
                 item = "<span " + extra1
@@ -396,9 +410,12 @@ public class SearchManager extends RepositoryManager {
             if (tfo.getId().equals(what)) {
                 links.add(HtmlUtil.span(tfo.toString(), extra1));
             } else {
-                links.add(HtmlUtil.href(request.url(getRepository().URL_SEARCH_FORM,
-                        ARG_WHAT, BLANK + tfo.getId(), ARG_TYPE,
-                        typeHandler.getType()), tfo.toString(), extra2));
+                links.add(
+                    HtmlUtil.href(
+                        request.url(
+                            getRepository().URL_SEARCH_FORM, ARG_WHAT,
+                            BLANK + tfo.getId(), ARG_TYPE,
+                            typeHandler.getType()), tfo.toString(), extra2));
             }
         }
 

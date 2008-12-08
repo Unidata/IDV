@@ -92,14 +92,15 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
             return;
         }
         Object[] values = entry.getValues();
-        if(values.length>=2 && values[0]!=null && values[1]!=null) {
+        if ((values.length >= 2) && (values[0] != null)
+                && (values[1] != null)) {
             links.add(
-                      new Link(
-                               HtmlUtil.url(
-                                            "http://radar.weather.gov/radar.php", "rid",
-                                            (String) entry.getValues()[0], "product",
-                                            (String) entry.getValues()[1]), repository.fileUrl(
-                                                                                               "/icons/radar.gif"), "Show NWS Radar Site"));
+                new Link(
+                    HtmlUtil.url(
+                        "http://radar.weather.gov/radar.php", "rid",
+                        (String) entry.getValues()[0], "product",
+                        (String) entry.getValues()[1]), repository.fileUrl(
+                            "/icons/radar.gif"), "Show NWS Radar Site"));
         }
     }
 

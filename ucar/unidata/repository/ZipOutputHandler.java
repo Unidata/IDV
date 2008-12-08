@@ -80,7 +80,8 @@ public class ZipOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_ZIP = new OutputType("Zip File","zip.zip");
+    public static final OutputType OUTPUT_ZIP = new OutputType("Zip File",
+                                                    "zip.zip");
 
 
     /**
@@ -115,14 +116,14 @@ public class ZipOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if(getRepository().isOutputTypeOK(OUTPUT_ZIP)) {
-        if ( !entry.isGroup()) {
+        if (getRepository().isOutputTypeOK(OUTPUT_ZIP)) {
+            if ( !entry.isGroup()) {
 
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry, ARG_OUTPUT, OUTPUT_ZIP);
-            links.add(new Link(url, getRepository().fileUrl(ICON_ZIP),
-                               "Zip file"));
-        }
+                String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                 entry, ARG_OUTPUT, OUTPUT_ZIP);
+                links.add(new Link(url, getRepository().fileUrl(ICON_ZIP),
+                                   "Zip file"));
+            }
         }
     }
 
@@ -171,8 +172,9 @@ public class ZipOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
-        StringBuffer sb = typeHandler.getEntryContent(entry, request, true, true);
+        TypeHandler typeHandler = repository.getTypeHandler(entry.getType());
+        StringBuffer sb = typeHandler.getEntryContent(entry, request, true,
+                              true);
         return new Result("Entry: " + entry.getName(), sb,
                           getMimeType(request.getOutput()));
     }

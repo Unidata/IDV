@@ -77,24 +77,34 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputType  {
+public class OutputType {
 
     /** _more_ */
     private String suffix = "";
 
+    /** _more_          */
     private String id;
 
+    /** _more_          */
     private String label;
 
+    /** _more_          */
     private boolean forUser = true;
 
-    private String groupName  ="";
+    /** _more_          */
+    private String groupName = "";
 
+    /** _more_          */
     private String icon;
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public OutputType(String id) {
-        this.id  =id;
-        this.label = id;
+        this.id      = id;
+        this.label   = id;
         this.forUser = false;
     }
 
@@ -102,18 +112,29 @@ public class OutputType  {
      * _more_
      *
      * @param output _more_
+     *
+     * @param label _more_
+     * @param id _more_
      * @param suffix _more_
      */
     public OutputType(String label, String id, String suffix) {
-        this(label,id,suffix,null);
+        this(label, id, suffix, null);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param id _more_
+     * @param suffix _more_
+     * @param icon _more_
+     */
     public OutputType(String label, String id, String suffix, String icon) {
-        this.label =label;
-        this.id = id;
+        this.label  = label;
+        this.id     = id;
         this.suffix = suffix;
-        this.icon = icon;
+        this.icon   = icon;
     }
 
     /**
@@ -121,29 +142,60 @@ public class OutputType  {
      *
      * @param name _more_
      * @param output _more_
+     *
+     * @param label _more_
+     * @param id _more_
      */
     public OutputType(String label, String id) {
         this(label, id, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param that _more_
+     */
     public OutputType(OutputType that) {
-        this.icon = that.icon;
+        this.icon   = that.icon;
         this.label  = that.label;
-        this.id  = that.id;
-        this.suffix  = that.suffix;
+        this.id     = that.id;
+        this.suffix = that.suffix;
     }
 
+    /**
+     * _more_
+     *
+     * @param that _more_
+     * @param suffix _more_
+     */
     public OutputType(OutputType that, String suffix) {
         this(that);
-        this.suffix  = suffix;
+        this.suffix = suffix;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getIcon() {
         return icon;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getId() {
         return id;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getLabel() {
         return label;
     }
@@ -189,6 +241,13 @@ public class OutputType  {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param other _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object other) {
         if ( !(other instanceof OutputType)) {
             return false;
@@ -198,41 +257,41 @@ public class OutputType  {
     }
 
     /**
-       Set the ForUser property.
-
-       @param value The new value for ForUser
-    **/
-    public void setForUser (boolean value) {
-	forUser = value;
+     *  Set the ForUser property.
+     *
+     *  @param value The new value for ForUser
+     */
+    public void setForUser(boolean value) {
+        forUser = value;
     }
 
     /**
-       Get the ForUser property.
-
-       @return The ForUser
-    **/
-    public boolean getForUser () {
-	return forUser;
+     *  Get the ForUser property.
+     *
+     *  @return The ForUser
+     */
+    public boolean getForUser() {
+        return forUser;
     }
 
 
-/**
-Set the GroupName property.
+    /**
+     * Set the GroupName property.
+     *
+     * @param value The new value for GroupName
+     */
+    public void setGroupName(String value) {
+        groupName = value;
+    }
 
-@param value The new value for GroupName
-**/
-public void setGroupName (String value) {
-	groupName = value;
-}
-
-/**
-Get the GroupName property.
-
-@return The GroupName
-**/
-public String getGroupName () {
-	return groupName;
-}
+    /**
+     * Get the GroupName property.
+     *
+     * @return The GroupName
+     */
+    public String getGroupName() {
+        return groupName;
+    }
 
 
 }

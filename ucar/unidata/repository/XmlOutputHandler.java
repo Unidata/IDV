@@ -80,7 +80,8 @@ import java.util.zip.*;
 public class XmlOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final OutputType OUTPUT_XML = new OutputType("XML", "xml.xml");
+    public static final OutputType OUTPUT_XML = new OutputType("XML",
+                                                    "xml.xml");
 
 
 
@@ -120,7 +121,7 @@ public class XmlOutputHandler extends OutputHandler {
                                List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        OutputType      output = request.getOutput();
+        OutputType   output = request.getOutput();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_TYPES));
         for (TypeHandler theTypeHandler : typeHandlers) {
@@ -198,16 +199,17 @@ public class XmlOutputHandler extends OutputHandler {
     protected Result listAssociations(Request request) throws Exception {
 
         StringBuffer sb     = new StringBuffer();
-        OutputType       output = request.getOutput();
+        OutputType   output = request.getOutput();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_ASSOCIATIONS));
-        TypeHandler   typeHandler  = repository.getTypeHandler(request);
+        TypeHandler   typeHandler = repository.getTypeHandler(request);
 
-        String[]      associations = getEntryManager().getAssociations(request);
+        String[] associations     =
+            getEntryManager().getAssociations(request);
 
 
-        List<String>  names        = new ArrayList<String>();
-        List<Integer> counts       = new ArrayList<Integer>();
+        List<String>  names       = new ArrayList<String>();
+        List<Integer> counts      = new ArrayList<Integer>();
         ResultSet     results;
         int           max = -1;
         int           min = -1;
@@ -267,9 +269,9 @@ public class XmlOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        OutputType   output = request.getOutput();
-        Document doc    = XmlUtil.makeDocument();
-        Element  root   = getGroupTag(request, group, doc, null);
+        OutputType output = request.getOutput();
+        Document   doc    = XmlUtil.makeDocument();
+        Element    root   = getGroupTag(request, group, doc, null);
         for (Group subgroup : subGroups) {
             getGroupTag(request, subgroup, doc, root);
         }

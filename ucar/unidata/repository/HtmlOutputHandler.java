@@ -82,23 +82,29 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_TIMELINE = new OutputType("Timeline","default.timeline");
+    public static final OutputType OUTPUT_TIMELINE =
+        new OutputType("Timeline", "default.timeline");
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph","default.graph");
+    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
+                                                      "default.graph");
 
     /** _more_ */
-    public static final OutputType OUTPUT_CLOUD = new OutputType("Cloud","default.cloud");
+    public static final OutputType OUTPUT_CLOUD = new OutputType("Cloud",
+                                                      "default.cloud");
 
     /** _more_ */
-    public static final OutputType OUTPUT_GROUPXML = new OutputType("groupxml");
+    public static final OutputType OUTPUT_GROUPXML =
+        new OutputType("groupxml");
 
     /** _more_ */
-    public static final OutputType OUTPUT_SELECTXML = new OutputType("selectxml");
+    public static final OutputType OUTPUT_SELECTXML =
+        new OutputType("selectxml");
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_METADATAXML = new OutputType("metadataxml");
+    public static final OutputType OUTPUT_METADATAXML =
+        new OutputType("metadataxml");
 
 
 
@@ -160,24 +166,39 @@ public class HtmlOutputHandler extends OutputHandler {
         request.put(ARG_OUTPUT, OUTPUT_HTML);
         String links = getEntryManager().getEntryLinksHtml(request, entry,
                            false);
+        String linksList = getEntryManager().getEntryLinksList(request,
+                               entry);
+
+
         boolean didOne = false;
-        sb.append(links);
         sb.append("<table>");
+        sb.append(HtmlUtil.formEntry(msgLabel("Actions"), links));
+        //        sb.append(links);
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
-                OutputHandler.OUTPUT_HTML, true,false, true));
-        for (TwoFacedObject tfo : getMetadataHtml(request, entry, false)) {
+                OutputHandler.OUTPUT_HTML, true, false, true));
+        for (TwoFacedObject tfo : getMetadataHtml(request, entry, false,
+                false)) {
             sb.append(tfo.getId().toString());
         }
 
 
 
-
         sb.append("</table>");
-        StringBuffer xml = new StringBuffer("<content>\n");
 
+        /*
+        List          tabTitles  = new ArrayList<String>();
+        List          tabContents = new ArrayList<String>();
+        tabTitles.add(msg("Information"));
+        tabContents.add(sb.toString());
+        tabTitles.add(msg("Actions"));
+        tabContents.add(linksList);
+        */
+        //        String contents =  getRepository().makeTabs(tabTitles, tabContents, true);
+        String       contents = sb.toString();
+
+        StringBuffer xml      = new StringBuffer("<content>\n");
         XmlUtil.appendCdata(xml,
-                            getRepository().translate(request,
-                                sb.toString()));
+                            getRepository().translate(request, contents));
         xml.append("\n</content>");
         //        System.err.println(xml);
         return new Result("", xml, "text/xml");
@@ -204,19 +225,31 @@ public class HtmlOutputHandler extends OutputHandler {
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
         StringBuffer sb = new StringBuffer();
-        StringBuffer infoSB = typeHandler.getEntryContent(entry, request, false,
-                                  true);
+        StringBuffer infoSB = typeHandler.getEntryContent(entry, request,
+                                  false, true);
 
-        List          tabTitles  = new ArrayList<String>();
-        List          tabContent = new ArrayList<String>();
-        List<Boolean> treeShown  = new ArrayList<Boolean>();
+        List          tabTitles     = new ArrayList<String>();
+        List          tabContent    = new ArrayList<String>();
+        List<Boolean> treeShown     = new ArrayList<Boolean>();
+
+
+        boolean       showInfoBlock = false;
+        String        desc          = entry.getDescription();
+        if (desc.length() > 0) {
+            showInfoBlock = true;
+            tabTitles.add("Description");
+            desc = getEntryManager().processText(request, entry, desc);
+            tabContent.add(desc);
+            treeShown.add(true);
+        }
 
 
         tabTitles.add(msg("Basic"));
         tabContent.add(infoSB);
         treeShown.add(true);
 
-        for (TwoFacedObject tfo : getMetadataHtml(request, entry, true)) {
+        for (TwoFacedObject tfo : getMetadataHtml(request, entry, true,
+                true)) {
             tabTitles.add(tfo.toString());
             tabContent.add(tfo.getId());
             treeShown.add(false);
@@ -234,13 +267,11 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getEntryManager().getEntryLinksList(request, entry));
         treeShown.add(false);
 
-        addDescription(request, entry, sb);
-
-        getMetadataManager().decorateEntry(request, entry, sb,false);
+        //        addDescription(request, entry, sb);
+        getMetadataManager().decorateEntry(request, entry, sb, false);
         sb.append(HtmlUtil.br());
         sb.append(getRepository().makeTabs(tabTitles, tabContent, true));
-        return makeLinksResult(request, msg("Entry"),
-                               sb, new State(entry));
+        return makeLinksResult(request, msg("Entry"), sb, new State(entry));
     }
 
 
@@ -353,7 +384,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        OutputType    output = request.getOutput();
+        OutputType   output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             //            appendListHeader(request, output, WHAT_TYPE, sb);
             sb.append("<ul>");
@@ -496,7 +527,7 @@ public class HtmlOutputHandler extends OutputHandler {
     protected Result listAssociations(Request request) throws Exception {
 
         StringBuffer sb     = new StringBuffer();
-        OutputType      output = request.getOutput();
+        OutputType   output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             //            appendListHeader(request, output, WHAT_ASSOCIATION, sb);
             sb.append("<ul>");
@@ -595,7 +626,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public StringBuffer getCommentBlock(Request request, Entry entry)
             throws Exception {
         StringBuffer  sb       = new StringBuffer();
-        List<Comment> comments = getEntryManager().getComments(request, entry);
+        List<Comment> comments = getEntryManager().getComments(request,
+                                     entry);
         if (comments.size() > 0) {
             sb.append(getEntryManager().getCommentHtml(request, entry));
         }
@@ -611,14 +643,16 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param entry _more_
      * @param sb _more_
      * @param decorate _more_
+     * @param addLink _more_
      *
      *
      * @return _more_
      * @throws Exception _more_
      */
     private List<TwoFacedObject> getMetadataHtml(Request request,
-            Entry entry, boolean decorate)
+            Entry entry, boolean decorate, boolean addLink)
             throws Exception {
+
         List<TwoFacedObject> result = new ArrayList<TwoFacedObject>();
         boolean showMetadata        = request.get(ARG_SHOWMETADATA, false);
         List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
@@ -633,14 +667,16 @@ public class HtmlOutputHandler extends OutputHandler {
             getMetadataManager().getMetadataHandlers();
 
         boolean canEdit = getAccessManager().canDoAction(request, entry,
-                                                         Permission.ACTION_EDIT);
+                              Permission.ACTION_EDIT);
+
         boolean didone = false;
         for (Metadata metadata : metadataList) {
             for (MetadataHandler metadataHandler : metadataHandlers) {
                 if ( !metadataHandler.canHandle(metadata)) {
                     continue;
                 }
-                String[] html = metadataHandler.getHtml(request, entry, metadata);
+                String[] html = metadataHandler.getHtml(request, entry,
+                                    metadata);
                 if (html == null) {
                     continue;
                 }
@@ -667,19 +703,23 @@ public class HtmlOutputHandler extends OutputHandler {
                         sb.append(
                             "<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"3\">\n");
                     }
-                    if(canEdit) {
-                        if(decorate)
+                    if (addLink && canEdit) {
+                        if (decorate) {
                             sb.append("<tr><td></td><td>");
+                        }
                         sb.append(
-                                  new Link(
-                                           request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
-                                           getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
-                        sb.append(
-                                  new Link(
-                                           request.entryUrl(getRepository().getMetadataManager().URL_METADATA_ADDFORM, entry),
-                                           getRepository().fileUrl(ICON_ADD), msg("Add Metadata")));
-                        if(decorate)
+                            new Link(
+                                request.entryUrl(
+                                    getRepository().URL_ENTRY_FORM,
+                                    entry), getRepository().fileUrl(
+                                        ICON_EDIT), msg("Edit Entry")));
+                        sb.append(new Link(request
+                            .entryUrl(getRepository().getMetadataManager()
+                                .URL_METADATA_ADDFORM, entry), getRepository()
+                                    .fileUrl(ICON_ADD), msg("Add Metadata")));
+                        if (decorate) {
                             sb.append("</td></tr>");
+                        }
                     }
                 }
                 String theClass = HtmlUtil.cssClass("listrow" + rowNum);
@@ -714,6 +754,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         return result;
+
     }
 
 
@@ -734,7 +775,8 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb     = new StringBuffer();
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
-            String groupLink = getEntryManager().getAjaxLink(request, subGroup);
+            String groupLink = getEntryManager().getAjaxLink(request,
+                                   subGroup);
             sb.append(groupLink);
             sb.append(HtmlUtil.br());
             sb.append(
@@ -761,14 +803,25 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result getSelectXml(Request request, List<Group> subGroups,
-                                 List<Entry> entries)
+                               List<Entry> entries)
             throws Exception {
-        String target = request.getString(ATTR_TARGET,"");
+        String       target = request.getString(ATTR_TARGET, "");
         StringBuffer sb     = new StringBuffer();
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
-            String groupLink = getSelectLink(request, subGroup,target);
+            String groupLink = getSelectLink(request, subGroup, target);
             sb.append(groupLink);
             sb.append("<br>");
             sb.append(
@@ -793,15 +846,24 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-    private void addDescription(Request request, Entry entry, StringBuffer sb) {
-        String desc= entry.getDescription();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     */
+    private void addDescription(Request request, Entry entry,
+                                StringBuffer sb) {
+        String desc = entry.getDescription();
         if (desc.length() > 0) {
             desc = getEntryManager().processText(request, entry, desc);
-            StringBuffer descSB = new StringBuffer("\n<div class=\"description\">\n");
+            StringBuffer descSB =
+                new StringBuffer("\n<div class=\"description\">\n");
             descSB.append(desc);
             descSB.append("</div>\n");
-            sb.append(getRepository().makeShowHideBlock(request, "Description",
-                                                        descSB,true));
+            sb.append(getRepository().makeShowHideBlock(request,
+                    "Description", descSB, true));
         }
     }
 
@@ -822,6 +884,7 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
+
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_GROUPXML)) {
             return getChildrenXml(request, subGroups, entries);
@@ -852,34 +915,48 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-        if(!showApplet) {
-            addDescription(request, group, sb);
+        if ( !showApplet) {
+            //            addDescription(request, group, sb);
             StringBuffer metadataSB = new StringBuffer();
-            getMetadataManager().decorateEntry(request, group, metadataSB, false);
+            getMetadataManager().decorateEntry(request, group, metadataSB,
+                    false);
             String metataDataHtml = metadataSB.toString();
-            if(metataDataHtml.length()>0) {
-                sb.append(getRepository().makeShowHideBlock(request, "Attachments",
-                                                            new StringBuffer("<div class=\"description\">" +metadataSB+"</div>"),true));
+            if (metataDataHtml.length() > 0) {
+                sb.append(getRepository().makeShowHideBlock(request,
+                        "Attachments",
+                        new StringBuffer("<div class=\"description\">"
+                                         + metadataSB + "</div>"), true));
             }
 
         }
 
 
 
-        List          tabTitles  = new ArrayList<String>();
-        List          tabContent = new ArrayList<String>();
-        List<Boolean> treeShown  = new ArrayList<Boolean>();
+        boolean       showInfoBlock = false;
+        List          tabTitles     = new ArrayList<String>();
+        List          tabContent    = new ArrayList<String>();
+        List<Boolean> treeShown     = new ArrayList<Boolean>();
+
+        String        desc          = group.getDescription();
+        if (desc.length() > 0) {
+            showInfoBlock = true;
+            tabTitles.add("Description");
+            desc = getEntryManager().processText(request, group, desc);
+            tabContent.add(desc);
+            treeShown.add(true);
+        }
+
         if ( !group.isDummy()) {
             tabTitles.add("Basic");
             tabContent.add(group.getTypeHandler().getEntryContent(group,
-                    request, false,true));
+                    request, false, true));
             treeShown.add(false);
         }
 
         if ( !showApplet) {
             if ( !group.isDummy()) {
                 for (TwoFacedObject tfo : getMetadataHtml(request, group,
-                        true)) {
+                        true, true)) {
                     tabTitles.add(tfo.toString());
                     tabContent.add(tfo.getId());
                     treeShown.add(false);
@@ -909,23 +986,28 @@ public class HtmlOutputHandler extends OutputHandler {
             treeShown  = new ArrayList<Boolean>();
 
             if ( !group.isDummy()) {
-                tabContent.add(HtmlUtil.div(tmp,HtmlUtil.style("margin-left:15px;")));
+                tabContent.add(
+                    HtmlUtil.div(tmp, HtmlUtil.style("margin-left:15px;")));
                 tabTitles.add(msg("Information"));
-                treeShown.add( !((subGroups.size() > 0)
-                                 || (entries.size() > 0)));
+                treeShown.add(showInfoBlock
+                              || !((subGroups.size() > 0)
+                                   || (entries.size() > 0)));
             }
         }
 
         if (subGroups.size() > 0) {
             StringBuffer groupsSB = new StringBuffer();
-            groupsSB.append("<div " + HtmlUtil.cssClass("folderblock") +">");
+            groupsSB.append("<div " + HtmlUtil.cssClass("folderblock") + ">");
             for (Group subGroup : subGroups) {
-                groupsSB.append(getEntryManager().getAjaxLink(request, subGroup));
+                groupsSB.append(getEntryManager().getAjaxLink(request,
+                        subGroup));
                 groupsSB.append(HtmlUtil.br());
-                groupsSB.append(HtmlUtil.div("",
-                                             HtmlUtil.style("display:none;visibility:hidden") +
-                                             HtmlUtil.cssClass("folderblock") +
-                                             HtmlUtil.id("block_" + subGroup.getId())));
+                groupsSB.append(
+                    HtmlUtil.div(
+                        "",
+                        HtmlUtil.style("display:none;visibility:hidden")
+                        + HtmlUtil.cssClass("folderblock")
+                        + HtmlUtil.id("block_" + subGroup.getId())));
             }
             groupsSB.append("</div>");
             tabTitles.add(msg("Groups"));
@@ -962,6 +1044,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         return makeLinksResult(request, msg("Group"), sb,
                                new State(group, subGroups, entries));
+
 
     }
 

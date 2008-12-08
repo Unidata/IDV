@@ -95,7 +95,8 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
 
-    private Object  MUTEX_ENTRY = new Object();
+    /** _more_          */
+    private Object MUTEX_ENTRY = new Object();
 
 
     /** _more_ */
@@ -113,25 +114,38 @@ public class EntryManager extends RepositoryManager {
 
     /** _more_ */
     public Hashtable<String, Group> groupCache = new Hashtable<String,
-                                                      Group>();
+                                                     Group>();
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public EntryManager(Repository repository) {
         super(repository);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Group getTopGroup() {
         return topGroup;
     }
 
 
 
+    /**
+     * _more_
+     */
     protected void clearCache() {
-        entryCache    = new Hashtable();
-        groupCache    = new Hashtable();
-        topGroups     = null;
+        entryCache = new Hashtable();
+        groupCache = new Hashtable();
+        topGroups  = null;
     }
 
 
@@ -144,69 +158,92 @@ public class EntryManager extends RepositoryManager {
      */
     protected void clearCache(Entry entry) {
         //        System.err.println ("Clear cache " + entry.getId());
-        synchronized(MUTEX_ENTRY) {
+        synchronized (MUTEX_ENTRY) {
             entryCache.remove(entry.getId());
-        if (entry.isGroup()) {
-            Group group = (Group) entry;
-            groupCache.remove(group.getId());
-            groupCache.remove(group.getFullName());
-        }
+            if (entry.isGroup()) {
+                Group group = (Group) entry;
+                groupCache.remove(group.getId());
+                groupCache.remove(group.getFullName());
+            }
         }
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processCatalog(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        String title = msg("Catalog View");
+        StringBuffer sb    = new StringBuffer();
+        String       title = msg("Catalog View");
 
-        String url = request.getString(ARG_CATALOG,(String) null);
-        if(url == null) {
+        String       url   = request.getString(ARG_CATALOG, (String) null);
+        if (url == null) {
             sb.append(HtmlUtil.p());
             sb.append(HtmlUtil.form("/repository/catalog"));
             sb.append(msgLabel("Catalog URL"));
             sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.input(ARG_CATALOG,"http://dataportal.ucar.edu/metadata/browse/human_dimensions.thredds.xml",HtmlUtil.SIZE_60));
+            sb.append(
+                HtmlUtil.input(
+                    ARG_CATALOG,
+                    "http://dataportal.ucar.edu/metadata/browse/human_dimensions.thredds.xml",
+                    HtmlUtil.SIZE_60));
             sb.append(HtmlUtil.submit("View"));
             sb.append(HtmlUtil.formClose());
             //            sb.append("No catalog argument given");
             return new Result(title, sb);
         }
-        return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, CatalogTypeHandler.getCatalogId(url)));
-                          /*
+        return new Result(request.url(getRepository().URL_ENTRY_SHOW,
+                                      ARG_ENTRYID,
+                                      CatalogTypeHandler.getCatalogId(url)));
+        /*
 
-        Element root = XmlUtil.getRoot(url, getClass());
-        if (root == null) {
-            sb.append("Could not load catalog: " + url);
-            return new Result(title, sb);
-        } 
-        Element child = (Element)XmlUtil.findChild(root,
-                                       CatalogOutputHandler.TAG_DATASET);
+Element root = XmlUtil.getRoot(url, getClass());
+if (root == null) {
+sb.append("Could not load catalog: " + url);
+return new Result(title, sb);
+}
+Element child = (Element)XmlUtil.findChild(root,
+                     CatalogOutputHandler.TAG_DATASET);
 
-        if(child!=null) root = child;
-        String name = XmlUtil.getAttribute(root, ATTR_NAME,"");
-        sb.append(name);
-        sb.append("<ul>");
-        recurseCatalog(request, root,sb);
-        sb.append("</ul>");
-        return new Result(title, sb);
-                          */
+if(child!=null) root = child;
+String name = XmlUtil.getAttribute(root, ATTR_NAME,"");
+sb.append(name);
+sb.append("<ul>");
+recurseCatalog(request, root,sb);
+sb.append("</ul>");
+return new Result(title, sb);
+        */
     }
 
-    private void recurseCatalog(Request request, Element node, StringBuffer sb) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param node _more_
+     * @param sb _more_
+     */
+    private void recurseCatalog(Request request, Element node,
+                                StringBuffer sb) {
         NodeList elements = XmlUtil.getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-                String name = XmlUtil.getAttribute(child, ATTR_NAME,"");
+                String name = XmlUtil.getAttribute(child, ATTR_NAME, "");
                 sb.append("<li>");
                 sb.append(name);
                 sb.append("<ul>");
-                recurseCatalog(request,child,sb);
+                recurseCatalog(request, child, sb);
                 sb.append("</ul>");
             }
         }
-        
+
 
     }
 
@@ -226,7 +263,8 @@ public class EntryManager extends RepositoryManager {
             entry = getEntry(request);
             if (entry == null) {
                 Entry tmp = getEntry(request,
-                                     request.getString(ARG_ENTRYID, BLANK), false);
+                                     request.getString(ARG_ENTRYID, BLANK),
+                                     false);
                 if (tmp != null) {
                     throw new IllegalArgumentException(
                         "You do not have access to this entry");
@@ -246,9 +284,9 @@ public class EntryManager extends RepositoryManager {
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
             List<String> ids =
-                getChildIds(
-                    request, findGroup(request, entry.getParentGroupId()),
-                    new ArrayList<Clause>());
+                getChildIds(request,
+                            findGroup(request, entry.getParentGroupId()),
+                            new ArrayList<Clause>());
             String nextId = null;
             for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
                 String id = ids.get(i);
@@ -270,32 +308,36 @@ public class EntryManager extends RepositoryManager {
             }
             //Do a redirect
             if (nextId != null) {
-                return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, nextId,
+                return new Result(
+                    request.url(
+                        getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, nextId,
                         ARG_OUTPUT,
-                        request.getString(ARG_OUTPUT,
-                                          OutputHandler.OUTPUT_HTML.getId().toString())));
+                        request.getString(
+                            ARG_OUTPUT,
+                            OutputHandler.OUTPUT_HTML.getId().toString())));
             }
         }
 
-        String output = request.getString(ARG_OUTPUT,(String)"");
+        String output = request.getString(ARG_OUTPUT, (String) "");
         Result result;
         if (entry.isGroup()) {
-            result =  processGroupShow(request, (Group) entry);
+            result = processGroupShow(request, (Group) entry);
         } else {
-            result =  getRepository().getOutputHandler(request).outputEntry(request, entry);
+            result = getRepository().getOutputHandler(request).outputEntry(
+                request, entry);
         }
 
-        
-        if(result.getShouldDecorate()) {
-            request.put(ARG_OUTPUT,output);
+
+        if (result.getShouldDecorate()) {
+            request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
-            if (!entry.isGroup() || !((Group)entry).isDummy()) {
+            if ( !entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
                 sb.append(crumbs[1]);
                 sb.append(new String(result.getContent()));
                 result.setContent(sb.toString().getBytes());
                 result.setTitle(result.getTitle() + ": " + crumbs[0]);
-            } 
+            }
         }
         return result;
     }
@@ -359,7 +401,8 @@ public class EntryManager extends RepositoryManager {
 
 
         if (type == null) {
-            sb.append(request.form(getRepository().URL_ENTRY_FORM, " name=\"entryform\" "));
+            sb.append(request.form(getRepository().URL_ENTRY_FORM,
+                                   " name=\"entryform\" "));
         } else {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_CHANGE,
                                          " name=\"entryform\" "));
@@ -369,8 +412,11 @@ public class EntryManager extends RepositoryManager {
         String title = BLANK;
 
         if (type == null) {
-            sb.append(HtmlUtil.formEntry("Type:",
-                                         getRepository().makeTypeSelect(request, false,"",true)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    "Type:",
+                    getRepository().makeTypeSelect(
+                        request, false, "", true)));
 
             sb.append(
                 HtmlUtil.formEntry(
@@ -388,8 +434,9 @@ public class EntryManager extends RepositoryManager {
 
             List<Metadata> metadataList = ((entry == null)
                                            ? (List<Metadata>) new ArrayList<Metadata>()
-                                           : getRepository().getMetadataManager().getMetadata(
-                                               entry));
+                                           : getRepository()
+                                               .getMetadataManager()
+                                               .getMetadata(entry));
             String metadataButton = HtmlUtil.submit("Edit Metadata",
                                         ARG_EDIT_METADATA);
 
@@ -400,9 +447,10 @@ public class EntryManager extends RepositoryManager {
 
             String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             String buttons      = ((entry != null)
-                                   ? RepositoryUtil.buttons(submitButton, deleteButton,
-                                             cancelButton)
-                                   : RepositoryUtil.buttons(submitButton, cancelButton));
+                                   ? RepositoryUtil.buttons(submitButton,
+                                       deleteButton, cancelButton)
+                                   : RepositoryUtil.buttons(submitButton,
+                                       cancelButton));
 
 
             String topLevelCheckbox = "";
@@ -486,8 +534,10 @@ public class EntryManager extends RepositoryManager {
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
             if (entry.getIsLocalFile()) {
-                return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                        ARG_MESSAGE, "Cannot edit local files"));
+                return new Result(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, entry, ARG_MESSAGE,
+                        "Cannot edit local files"));
 
             }
             typeHandler = entry.getTypeHandler();
@@ -495,13 +545,16 @@ public class EntryManager extends RepositoryManager {
 
 
             if (request.exists(ARG_CANCEL)) {
-                return new Result(request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
+                return new Result(
+                    request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
             }
 
 
             if (request.exists(ARG_DELETE_CONFIRM)) {
                 if (entry.isTopGroup()) {
-                    return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                    return new Result(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW, entry,
                             ARG_MESSAGE, "Cannot delete top-level group"));
                 }
 
@@ -509,16 +562,21 @@ public class EntryManager extends RepositoryManager {
                 entries.add(entry);
                 deleteEntries(request, entries, null);
                 Group group = findGroup(request, entry.getParentGroupId());
-                return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, group,
-                        ARG_MESSAGE, "Entry is deleted"));
+                return new Result(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, group, ARG_MESSAGE,
+                        "Entry is deleted"));
             }
 
 
             if (request.exists(ARG_DELETE)) {
-                return new Result(request.entryUrl(getRepository().URL_ENTRY_DELETE, entry));
+                return new Result(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_DELETE, entry));
             }
         } else {
-            typeHandler = getRepository().getTypeHandler(request.getString(ARG_TYPE,
+            typeHandler =
+                getRepository().getTypeHandler(request.getString(ARG_TYPE,
                     TypeHandler.TYPE_ANY));
 
         }
@@ -542,8 +600,7 @@ public class EntryManager extends RepositoryManager {
             if (entry == null) {
                 List<String> resources    = new ArrayList();
                 List<String> origNames    = new ArrayList();
-                String       resource = request.getString(ARG_URL,
-                                            BLANK);
+                String       resource     = request.getString(ARG_URL, BLANK);
                 String       filename     = request.getUploadedFile(ARG_FILE);
                 boolean      unzipArchive = false;
                 boolean      isFile       = false;
@@ -598,7 +655,8 @@ public class EntryManager extends RepositoryManager {
                                            length) < 0) {
                             return new Result(
                                 request.entryUrl(
-                                    getRepository().URL_ENTRY_SHOW, parentGroup));
+                                    getRepository().URL_ENTRY_SHOW,
+                                    parentGroup));
                         }
                     } finally {
                         try {
@@ -634,8 +692,9 @@ public class EntryManager extends RepositoryManager {
                 }
 
                 if (request.exists(ARG_CANCEL)) {
-                    return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                            parentGroup));
+                    return new Result(
+                        request.entryUrl(
+                            getRepository().URL_ENTRY_SHOW, parentGroup));
                 }
 
 
@@ -683,7 +742,7 @@ public class EntryManager extends RepositoryManager {
                                 + "'");
                         }
                         Entry existing = findEntryWithName(request,
-                                                           parentGroup, name);
+                                             parentGroup, name);
                         if ((existing != null) && existing.isGroup()) {
                             throw new IllegalArgumentException(
                                 "A group with the given name already exists");
@@ -713,8 +772,8 @@ public class EntryManager extends RepositoryManager {
                             Matcher matcher = datePattern.matcher(origName);
                             if (matcher.find()) {
                                 String dateString = matcher.group(0);
-                                Date dttm =
-                                    RepositoryUtil.makeDateFormat(format).parse(dateString);
+                                Date dttm = RepositoryUtil.makeDateFormat(
+                                                format).parse(dateString);
                                 theDateRange[0] = dttm;
                                 theDateRange[1] = dttm;
                                 //                            System.err.println("got it");
@@ -739,12 +798,14 @@ public class EntryManager extends RepositoryManager {
 
                     }
 
-                    if(!typeHandler.canBeCreatedBy(request)) {
-                        throw new IllegalArgumentException("Cannot create an entry of type " + typeHandler.getDescription());
+                    if ( !typeHandler.canBeCreatedBy(request)) {
+                        throw new IllegalArgumentException(
+                            "Cannot create an entry of type "
+                            + typeHandler.getDescription());
                     }
 
                     entry = typeHandler.createEntry(id);
-                    entry.initEntry(name, description, parentGroup, 
+                    entry.initEntry(name, description, parentGroup,
                                     request.getUser(),
                                     new Resource(theResource, resourceType),
                                     dataType, createDate.getTime(),
@@ -788,8 +849,8 @@ public class EntryManager extends RepositoryManager {
                         entry.getDescription()));
                 entry.setDataType(dataType);
                 if (request.defined(ARG_URL)) {
-                    entry.setResource(
-                        new Resource(request.getString(ARG_URL, BLANK)));
+                    entry.setResource(new Resource(request.getString(ARG_URL,
+                            BLANK)));
                 }
 
                 //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);
@@ -815,11 +876,14 @@ public class EntryManager extends RepositoryManager {
         }
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
+            return new Result(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                    entry.getParentGroup(), ARG_MESSAGE,
+            return new Result(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
+                    ARG_MESSAGE,
                     entries.size() + HtmlUtil.pad(msg("files uploaded"))));
         } else {
             return new Result(BLANK,
@@ -868,7 +932,8 @@ public class EntryManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
+            return new Result(
+                request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
         }
 
 
@@ -880,7 +945,8 @@ public class EntryManager extends RepositoryManager {
                 return asynchDeleteEntries(request, entries);
             } else {
                 deleteEntries(request, entries, null);
-                return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, group));
+                return new Result(
+                    request.entryUrl(getRepository().URL_ENTRY_SHOW, group));
             }
         }
 
@@ -903,8 +969,9 @@ public class EntryManager extends RepositoryManager {
 
         StringBuffer fb = new StringBuffer();
         fb.append(request.form(getRepository().URL_ENTRY_DELETE, BLANK));
-        fb.append(RepositoryUtil.buttons(HtmlUtil.submit(msg("OK"), ARG_DELETE_CONFIRM),
-                          HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
+        fb.append(RepositoryUtil.buttons(HtmlUtil.submit(msg("OK"),
+                ARG_DELETE_CONFIRM), HtmlUtil.submit(msg("Cancel"),
+                    ARG_CANCEL)));
         fb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         fb.append(HtmlUtil.formClose());
         sb.append(getRepository().question(inner.toString(), fb.toString()));
@@ -926,15 +993,18 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryListDelete(Request request) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS, ""),
-                                          ",", true, true)) {
+        for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS,
+                ""), ",", true, true)) {
             Entry entry = getEntry(request, id, false);
             if (entry == null) {
-                throw new RepositoryUtil.MissingEntryException("Could not find entry:"  + id);
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find entry:" + id);
             }
             if (entry.isTopGroup()) {
                 StringBuffer sb = new StringBuffer();
-                sb.append(getRepository().note(msg("Cannot delete top-level group")));
+                sb.append(
+                    getRepository().note(
+                        msg("Cannot delete top-level group")));
                 return new Result(msg("Entry Delete"), sb);
             }
             entries.add(entry);
@@ -959,10 +1029,12 @@ public class EntryManager extends RepositoryManager {
 
         if (request.exists(ARG_CANCEL)) {
             if (entries.size() == 0) {
-                return new Result(request.url(getRepository().URL_ENTRY_SHOW));
+                return new Result(
+                    request.url(getRepository().URL_ENTRY_SHOW));
             }
             String id = entries.get(0).getParentGroupId();
-            return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, id));
+            return new Result(request.url(getRepository().URL_ENTRY_SHOW,
+                                          ARG_ENTRYID, id));
         }
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
@@ -972,7 +1044,9 @@ public class EntryManager extends RepositoryManager {
 
         if (entries.size() == 0) {
             return new Result(
-                "", new StringBuffer(getRepository().warning(msg("No entries selected"))));
+                "",
+                new StringBuffer(
+                    getRepository().warning(msg("No entries selected"))));
         }
 
         StringBuffer msgSB    = new StringBuffer();
@@ -985,12 +1059,13 @@ public class EntryManager extends RepositoryManager {
             msg("Are you sure you want to delete all of the entries?"));
         sb.append(request.form(getRepository().URL_ENTRY_DELETELIST));
         String hidden = HtmlUtil.hidden(ARG_ENTRYIDS, idBuffer.toString());
-        String form = RepositoryUtil.makeOkCancelForm(request, getRepository().URL_ENTRY_DELETELIST,
-                                       ARG_DELETE_CONFIRM, hidden);
+        String form = RepositoryUtil.makeOkCancelForm(request,
+                          getRepository().URL_ENTRY_DELETELIST,
+                          ARG_DELETE_CONFIRM, hidden);
         sb.append(getRepository().question(msgSB.toString(), form));
         sb.append("<ul>");
-        new OutputHandler(getRepository(),"tmp").getEntryHtml(sb, entries, request, false,
-                          false, true);
+        new OutputHandler(getRepository(), "tmp").getEntryHtml(sb, entries,
+                          request, false, false, true);
         sb.append("</ul>");
         return new Result(msg("Delete Confirm"), sb);
     }
@@ -1007,7 +1082,7 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     protected Result asynchDeleteEntries(Request request,
-                                       final List<Entry> entries) {
+                                         final List<Entry> entries) {
         final Request theRequest = request;
         Entry         entry      = entries.get(0);
         /*
@@ -1025,8 +1100,9 @@ public class EntryManager extends RepositoryManager {
                 deleteEntries(theRequest, entries, actionId);
             }
         };
-        String href = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW, group),
-                                    "Continue");
+        String href =
+            HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                           group), "Continue");
         return getActionManager().doAction(request, action, "Deleting entry",
                                            "Continue: " + href);
     }
@@ -1049,9 +1125,11 @@ public class EntryManager extends RepositoryManager {
                                          String title, StringBuffer sb) {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, (entry.isGroup()?getRepository().groupEditUrls:getRepository().entryEditUrls),
-                                          "?" + ARG_ENTRYID + "="
-                                          + entry.getId()));
+                           getRepository().getSubNavLinks(request,
+                               (entry.isGroup()
+                                ? getRepository().groupEditUrls
+                                : getRepository().entryEditUrls), "?"
+                                + ARG_ENTRYID + "=" + entry.getId()));
         return result;
     }
 
@@ -1109,10 +1187,12 @@ public class EntryManager extends RepositoryManager {
             throws Exception {
 
         List<String[]> found = getDescendents(request, entries, connection,
-                                              true);
+                                   true);
         String query;
-        query = SqlUtil.makeDelete(Tables.PERMISSIONS.NAME,
-                                   SqlUtil.eq(Tables.PERMISSIONS.COL_ENTRY_ID, "?"));
+        query =
+            SqlUtil.makeDelete(Tables.PERMISSIONS.NAME,
+                               SqlUtil.eq(Tables.PERMISSIONS.COL_ENTRY_ID,
+                                          "?"));
 
         PreparedStatement permissionsStmt =
             connection.prepareStatement(query);
@@ -1126,21 +1206,24 @@ public class EntryManager extends RepositoryManager {
         PreparedStatement assocStmt = connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(Tables.COMMENTS.NAME,
-                                   SqlUtil.eq(Tables.COMMENTS.COL_ENTRY_ID, "?"));
+                                   SqlUtil.eq(Tables.COMMENTS.COL_ENTRY_ID,
+                                       "?"));
         PreparedStatement commentsStmt = connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(Tables.METADATA.NAME,
-                                   SqlUtil.eq(Tables.METADATA.COL_ENTRY_ID, "?"));
+                                   SqlUtil.eq(Tables.METADATA.COL_ENTRY_ID,
+                                       "?"));
         PreparedStatement metadataStmt = connection.prepareStatement(query);
 
 
-        PreparedStatement entriesStmt =
-            connection.prepareStatement(SqlUtil.makeDelete(Tables.ENTRIES.NAME,
-                Tables.ENTRIES.COL_ID, "?"));
+        PreparedStatement entriesStmt = connection.prepareStatement(
+                                            SqlUtil.makeDelete(
+                                                Tables.ENTRIES.NAME,
+                                                Tables.ENTRIES.COL_ID, "?"));
 
         connection.setAutoCommit(false);
-        Statement statement = connection.createStatement();
-        int       deleteCnt = 0;
+        Statement statement      = connection.createStatement();
+        int       deleteCnt      = 0;
         int       totalDeleteCnt = 0;
         //Go backwards so we go up the tree and hit the children first
         List allIds = new ArrayList();
@@ -1164,7 +1247,8 @@ public class EntryManager extends RepositoryManager {
                 return;
             }
             getActionManager().setActionMessage(actionId,
-                    "Deleted:" + totalDeleteCnt + "/" + found.size() + " entries");
+                    "Deleted:" + totalDeleteCnt + "/" + found.size()
+                    + " entries");
             if (totalDeleteCnt % 100 == 0) {
                 System.err.println("Deleted:" + deleteCnt);
             }
@@ -1188,7 +1272,8 @@ public class EntryManager extends RepositoryManager {
             entriesStmt.addBatch();
 
             //TODO: Batch up the specific type deletes
-            TypeHandler typeHandler = getRepository().getTypeHandler(tuple[1]);
+            TypeHandler typeHandler =
+                getRepository().getTypeHandler(tuple[1]);
             typeHandler.deleteEntry(request, statement, id);
             if (deleteCnt > 1000) {
                 permissionsStmt.executeBatch();
@@ -1209,7 +1294,7 @@ public class EntryManager extends RepositoryManager {
         connection.commit();
         connection.setAutoCommit(true);
 
-        for(int i=0;i<allIds.size();i++) {
+        for (int i = 0; i < allIds.size(); i++) {
             getStorageManager().deleteEntryDir((String) allIds.get(i));
         }
 
@@ -1241,7 +1326,7 @@ public class EntryManager extends RepositoryManager {
         sb.append(request.form(getRepository().URL_ENTRY_FORM));
         sb.append(msgLabel("Create a"));
         sb.append(HtmlUtil.space(1));
-        sb.append(getRepository().makeTypeSelect(request, false,"",true));
+        sb.append(getRepository().makeTypeSelect(request, false, "", true));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Go"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
@@ -1273,9 +1358,10 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryGet(Request request) throws Exception {
         String entryId = (String) request.getId((String) null);
-        
+
         if (entryId == null) {
-            throw new IllegalArgumentException("No " + ARG_ENTRYID + " given");
+            throw new IllegalArgumentException("No " + ARG_ENTRYID
+                    + " given");
         }
         Entry entry = getEntry(request, entryId);
         if (entry == null) {
@@ -1370,8 +1456,7 @@ public class EntryManager extends RepositoryManager {
         entries = getAccessManager().filterEntries(request, entries);
 
         return getRepository().getOutputHandler(request).outputGroup(request,
-                                getDummyGroup(), new ArrayList<Group>(),
-                                entries);
+                getDummyGroup(), new ArrayList<Group>(), entries);
 
     }
 
@@ -1393,13 +1478,14 @@ public class EntryManager extends RepositoryManager {
         }
         Entry fromEntry = getEntry(request, fromId);
         if (fromEntry == null) {
-            throw new RepositoryUtil.MissingEntryException("Could not find entry "
-                    + fromId);
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find entry " + fromId);
         }
 
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
+            return new Result(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
         }
 
 
@@ -1424,16 +1510,20 @@ public class EntryManager extends RepositoryManager {
                     sb.append("<ul>");
                 }
                 sb.append("<li> ");
-                sb.append(HtmlUtil.href(request.url(getRepository().URL_ENTRY_COPY, ARG_FROM,
-                        fromEntry.getId(), ARG_TO, entry.getId(), ARG_ACTION,
-                        ACTION_MOVE), entry.getLabel()));
+                sb.append(
+                    HtmlUtil.href(
+                        request.url(
+                            getRepository().URL_ENTRY_COPY, ARG_FROM,
+                            fromEntry.getId(), ARG_TO, entry.getId(),
+                            ARG_ACTION, ACTION_MOVE), entry.getLabel()));
                 sb.append(HtmlUtil.br());
                 didOne = true;
 
             }
             if ( !didOne) {
                 sb.append(
-                    getRepository().note(msg(
+                    getRepository().note(
+                        msg(
                         "You need to add a destination group to your cart")));
             } else {
                 sb.append("</ul>");
@@ -1450,8 +1540,8 @@ public class EntryManager extends RepositoryManager {
 
         Entry toEntry = getEntry(request, toId);
         if (toEntry == null) {
-            throw new RepositoryUtil.MissingEntryException("Could not find entry "
-                    + toId);
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find entry " + toId);
         }
         if ( !toEntry.isGroup()) {
             throw new IllegalArgumentException(
@@ -1462,20 +1552,24 @@ public class EntryManager extends RepositoryManager {
 
         if ( !getAccessManager().canDoAction(request, fromEntry,
                                              Permission.ACTION_EDIT)) {
-            throw new RepositoryUtil.AccessException("Cannot move:" + fromEntry.getLabel());
+            throw new RepositoryUtil.AccessException("Cannot move:"
+                    + fromEntry.getLabel());
         }
 
 
         if ( !getAccessManager().canDoAction(request, toEntry,
                                              Permission.ACTION_NEW)) {
-            throw new RepositoryUtil.AccessException("Cannot copy to:" + toEntry.getLabel());
+            throw new RepositoryUtil.AccessException("Cannot copy to:"
+                    + toEntry.getLabel());
         }
 
 
         if ( !okToMove(fromEntry, toEntry)) {
             StringBuffer sb = new StringBuffer();
             sb.append(makeEntryHeader(request, fromEntry));
-            sb.append(getRepository().error(msg("Cannot move a group to its descendent")));
+            sb.append(
+                getRepository().error(
+                    msg("Cannot move a group to its descendent")));
             return new Result("", sb);
         }
 
@@ -1501,11 +1595,13 @@ public class EntryManager extends RepositoryManager {
             String hidden = HtmlUtil.hidden(ARG_FROM, fromEntry.getId())
                             + HtmlUtil.hidden(ARG_TO, toEntry.getId())
                             + HtmlUtil.hidden(ARG_ACTION, action);
-            String form = RepositoryUtil.makeOkCancelForm(request, getRepository().URL_ENTRY_COPY,
-                                           ARG_MOVE_CONFIRM, hidden);
-            return new Result(msg("Move confirm"),
-                              new StringBuffer(getRepository().question(sb.toString(),
-                                  form)));
+            String form = RepositoryUtil.makeOkCancelForm(request,
+                              getRepository().URL_ENTRY_COPY,
+                              ARG_MOVE_CONFIRM, hidden);
+            return new Result(
+                msg("Move confirm"),
+                new StringBuffer(
+                    getRepository().question(sb.toString(), form)));
         }
 
 
@@ -1523,13 +1619,17 @@ public class EntryManager extends RepositoryManager {
                     newId = getGroupId(toGroup);
                     fromEntry.setId(newId);
                     String[] info = {
-                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID, 
-                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_PARENT_GROUP_ID, 
-                        Tables.METADATA.NAME, Tables.METADATA.COL_ENTRY_ID, 
-                        Tables.COMMENTS.NAME, Tables.COMMENTS.COL_ENTRY_ID, 
-                        Tables.ASSOCIATIONS.NAME, Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, 
-                        Tables.ASSOCIATIONS.NAME, Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, 
-                        Tables.PERMISSIONS.NAME,  Tables.PERMISSIONS.COL_ENTRY_ID
+                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID,
+                        Tables.ENTRIES.NAME,
+                        Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                        Tables.METADATA.NAME, Tables.METADATA.COL_ENTRY_ID,
+                        Tables.COMMENTS.NAME, Tables.COMMENTS.COL_ENTRY_ID,
+                        Tables.ASSOCIATIONS.NAME,
+                        Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID,
+                        Tables.ASSOCIATIONS.NAME,
+                        Tables.ASSOCIATIONS.COL_TO_ENTRY_ID,
+                        Tables.PERMISSIONS.NAME,
+                        Tables.PERMISSIONS.COL_ENTRY_ID
                     };
 
 
@@ -1553,19 +1653,19 @@ public class EntryManager extends RepositoryManager {
                 }
 
                 //Change the parent
-                String sql = "UPDATE  " + Tables.ENTRIES.NAME + " SET "
-                             + SqlUtil.unDot(Tables.ENTRIES.COL_PARENT_GROUP_ID)
-                             + " = "
-                             + SqlUtil.quote(fromEntry.getParentGroupId())
-                             + " WHERE "
-                             + SqlUtil.eq(Tables.ENTRIES.COL_ID,
-                                          SqlUtil.quote(fromEntry.getId()));
+                String sql =
+                    "UPDATE  " + Tables.ENTRIES.NAME + " SET "
+                    + SqlUtil.unDot(Tables.ENTRIES.COL_PARENT_GROUP_ID)
+                    + " = " + SqlUtil.quote(fromEntry.getParentGroupId())
+                    + " WHERE "
+                    + SqlUtil.eq(Tables.ENTRIES.COL_ID,
+                                 SqlUtil.quote(fromEntry.getId()));
                 statement.execute(sql);
                 connection.commit();
                 connection.setAutoCommit(true);
                 getRepository().clearCache();
-                return new Result(request.url(getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
-                        fromEntry.getId()));
+                return new Result(request.url(getRepository().URL_ENTRY_SHOW,
+                        ARG_ENTRYID, fromEntry.getId()));
             }
         } finally {
             try {
@@ -1655,7 +1755,7 @@ public class EntryManager extends RepositoryManager {
             return processEntryXmlCreateInner(request);
         } catch (Exception exc) {
             exc.printStackTrace();
-            if (request.getString(ARG_OUTPUT,"").equals("xml")) {
+            if (request.getString(ARG_OUTPUT, "").equals("xml")) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
                         XmlUtil.attr(ATTR_CODE, "error"),
                         "" + exc.getMessage()), MIME_XML);
@@ -1729,7 +1829,7 @@ public class EntryManager extends RepositoryManager {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
                 Entry entry = processEntryXml(request, node, entries,
-                                  origFileToStorage,true);
+                                  origFileToStorage, true);
                 XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
                                new String[] { ATTR_ID,
                         entry.getId() });
@@ -1755,7 +1855,7 @@ public class EntryManager extends RepositoryManager {
 
         insertEntries(newEntries, true);
 
-        if (request.getString(ARG_OUTPUT,"").equals("xml")) {
+        if (request.getString(ARG_OUTPUT, "").equals("xml")) {
             //TODO: Return a list of the newly created entries
             String xml = XmlUtil.toString(resultRoot);
             return new Result(xml, MIME_XML);
@@ -1776,24 +1876,28 @@ public class EntryManager extends RepositoryManager {
      * @param node _more_
      * @param entries _more_
      * @param files _more_
+     * @param checkAccess _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected Entry processEntryXml(Request request, Element node,
-                                  Hashtable entries, Hashtable files, boolean checkAccess)
+                                    Hashtable entries, Hashtable files,
+                                    boolean checkAccess)
             throws Exception {
+
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE,
                                            TypeHandler.TYPE_FILE);
-        String dataType    = XmlUtil.getAttribute(node, ATTR_DATATYPE, "");
-        String description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION, (String) null);
-        if(description==null) {
+        String dataType = XmlUtil.getAttribute(node, ATTR_DATATYPE, "");
+        String description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION,
+                                 (String) null);
+        if (description == null) {
             description = XmlUtil.getGrandChildText(node, TAG_DESCRIPTION);
         }
-        if(description==null) {
-            description="";
+        if (description == null) {
+            description = "";
         }
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
@@ -1805,26 +1909,27 @@ public class EntryManager extends RepositoryManager {
         String url   = XmlUtil.getAttribute(node, ATTR_URL, (String) null);
         String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
         String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
-                                               getTopGroup().getId());
+                              getTopGroup().getId());
         Group parentGroup = (Group) entries.get(parentId);
         if (parentGroup == null) {
             parentGroup = (Group) getEntry(request, parentId);
             if (parentGroup == null) {
-                throw new RepositoryUtil.MissingEntryException("Could not find parent:"
-                        + parentId);
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find parent:" + parentId);
             }
         }
-        if(checkAccess) {
+        if (checkAccess) {
             if ( !getAccessManager().canDoAction(request, parentGroup,
-                                                 Permission.ACTION_NEW)) {
-                throw new IllegalArgumentException("Cannot add to parent group:"
-                                                   + parentId);
+                    Permission.ACTION_NEW)) {
+                throw new IllegalArgumentException(
+                    "Cannot add to parent group:" + parentId);
             }
         }
 
         TypeHandler typeHandler = getRepository().getTypeHandler(type);
         if (typeHandler == null) {
-            throw new RepositoryUtil.MissingEntryException("Could not find type:" + type);
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find type:" + type);
         }
         String   id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
                        ? getGroupId(parentGroup)
@@ -1843,35 +1948,42 @@ public class EntryManager extends RepositoryManager {
         Date fromDate   = createDate;
         //        System.err.println("node:" + XmlUtil.toString(node));
         if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
-            fromDate = getRepository().parseDate(XmlUtil.getAttribute(node, ATTR_FROMDATE));
+            fromDate = getRepository().parseDate(XmlUtil.getAttribute(node,
+                    ATTR_FROMDATE));
         }
         Date toDate = fromDate;
         if (XmlUtil.hasAttribute(node, ATTR_TODATE)) {
-            toDate = getRepository().parseDate(XmlUtil.getAttribute(node, ATTR_TODATE));
+            toDate = getRepository().parseDate(XmlUtil.getAttribute(node,
+                    ATTR_TODATE));
         }
 
-        if(!typeHandler.canBeCreatedBy(request)) {
-            throw new IllegalArgumentException("Cannot create an entry of type " + typeHandler.getDescription());
+        if ( !typeHandler.canBeCreatedBy(request)) {
+            throw new IllegalArgumentException(
+                "Cannot create an entry of type "
+                + typeHandler.getDescription());
         }
         Entry entry = typeHandler.createEntry(id);
-        entry.initEntry(name, description, parentGroup, 
-                        request.getUser(), resource, dataType,
-                        createDate.getTime(), fromDate.getTime(),
-                        toDate.getTime(), null);
+        entry.initEntry(name, description, parentGroup, request.getUser(),
+                        resource, dataType, createDate.getTime(),
+                        fromDate.getTime(), toDate.getTime(), null);
 
-        entry.setNorth(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_NORTH,entry.getNorth()+"")));
-        entry.setSouth(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_SOUTH, entry.getSouth()+"")));
-        entry.setEast(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_EAST, entry.getEast()+"")));
-        entry.setWest(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_WEST, entry.getWest()+"")));
+        entry.setNorth(Misc.decodeLatLon(XmlUtil.getAttribute(node,
+                ATTR_NORTH, entry.getNorth() + "")));
+        entry.setSouth(Misc.decodeLatLon(XmlUtil.getAttribute(node,
+                ATTR_SOUTH, entry.getSouth() + "")));
+        entry.setEast(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_EAST,
+                entry.getEast() + "")));
+        entry.setWest(Misc.decodeLatLon(XmlUtil.getAttribute(node, ATTR_WEST,
+                entry.getWest() + "")));
         NodeList entryChildren = XmlUtil.getElements(node);
         for (Element entryChild : (List<Element>) entryChildren) {
-            String tag  = entryChild.getTagName();
+            String tag = entryChild.getTagName();
             if (tag.equals(TAG_METADATA)) {
                 getMetadataManager().processMetadataXml(entry, entryChild);
-            } else if(tag.equals(TAG_DESCRIPTION)) {
-            } else {
+            } else if (tag.equals(TAG_DESCRIPTION)) {}
+            else {
                 throw new IllegalArgumentException("Unknown tag:"
-                                                   + node.getTagName());
+                        + node.getTagName());
             }
         }
         entry.getTypeHandler().initializeEntry(request, entry, node);
@@ -1881,6 +1993,7 @@ public class EntryManager extends RepositoryManager {
             entries.put(tmpid, entry);
         }
         return entry;
+
     }
 
 
@@ -1918,12 +2031,17 @@ public class EntryManager extends RepositoryManager {
         Entry        entry = getEntry(request);
         StringBuffer sb    = new StringBuffer();
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
         sb.append(makeEntryHeader(request, entry));
         sb.append("<p>");
         sb.append(getCommentHtml(request, entry));
-        return  new OutputHandler(getRepository(),"tmp").makeLinksResult(request, msg("Entry Comments"), sb, new OutputHandler.State(entry));
+        return new OutputHandler(getRepository(),
+                                 "tmp").makeLinksResult(request,
+                                     msg("Entry Comments"), sb,
+                                     new OutputHandler.State(entry));
     }
 
 
@@ -1946,22 +2064,24 @@ public class EntryManager extends RepositoryManager {
         if (entry.isDummy()) {
             return new ArrayList<Comment>();
         }
-        Statement stmt = getDatabaseManager().select(Tables.COMMENTS.COLUMNS,
-                             Tables.COMMENTS.NAME,
-                             Clause.eq(Tables.COMMENTS.COL_ENTRY_ID, entry.getId()),
-                             " order by " + Tables.COMMENTS.COL_DATE + " asc ");
+        Statement stmt =
+            getDatabaseManager().select(
+                Tables.COMMENTS.COLUMNS, Tables.COMMENTS.NAME,
+                Clause.eq(Tables.COMMENTS.COL_ENTRY_ID, entry.getId()),
+                " order by " + Tables.COMMENTS.COL_DATE + " asc ");
         SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                comments
-                    .add(new Comment(results
-                        .getString(1), entry, getUserManager()
-                        .findUser(results
-                                  .getString(3), true), 
-                                     getDatabaseManager().getDate(results,4),
-                                     results.getString(5), results.getString(6)));
+                comments.add(
+                    new Comment(
+                        results.getString(1), entry,
+                        getUserManager().findUser(
+                            results.getString(3),
+                            true), getDatabaseManager().getDate(results, 4),
+                                   results.getString(5),
+                                   results.getString(6)));
             }
         }
         entry.setComments(comments);
@@ -1983,14 +2103,15 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processCommentsEdit(Request request) throws Exception {
         Entry entry = getEntry(request);
-        getDatabaseManager().delete(Tables.COMMENTS.NAME,
-                       Clause.eq(Tables.COMMENTS.COL_ID,
-                                 request.getUnsafeString(ARG_COMMENT_ID,
-                                     BLANK)));
+        getDatabaseManager().delete(
+            Tables.COMMENTS.NAME,
+            Clause.eq(
+                Tables.COMMENTS.COL_ID,
+                request.getUnsafeString(ARG_COMMENT_ID, BLANK)));
         entry.setComments(null);
-        return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
-                                      entry.getId(), ARG_MESSAGE,
-                                      "Comment deleted"));
+        return new Result(request.url(getRepository().URL_COMMENTS_SHOW,
+                                      ARG_ENTRYID, entry.getId(),
+                                      ARG_MESSAGE, "Comment deleted"));
     }
 
 
@@ -2005,16 +2126,18 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processCommentsAdd(Request request) throws Exception {
-        Entry        entry = getEntry(request);
+        Entry entry = getEntry(request);
         if (request.exists(ARG_CANCEL)) {
-            return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
-                                          entry.getId()));
+            return new Result(request.url(getRepository().URL_COMMENTS_SHOW,
+                                          ARG_ENTRYID, entry.getId()));
         }
 
-        StringBuffer sb    = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         sb.append(makeEntryHeader(request, entry));
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
 
 
@@ -2026,18 +2149,15 @@ public class EntryManager extends RepositoryManager {
             sb.append(getRepository().warning(msg("Please enter a comment")));
         } else {
             getDatabaseManager().executeInsert(Tables.COMMENTS.INSERT,
-                                               new Object[]{
-                                                   getRepository().getGUID(),
-                                                   entry.getId(),
-                                                   request.getUser().getId(),
-                                                   new Date(),
-                                                   subject,
-                                                   comment});
+                    new Object[] {
+                getRepository().getGUID(), entry.getId(),
+                request.getUser().getId(), new Date(), subject, comment
+            });
             //Now clear out the comments in the cached entry
             entry.setComments(null);
-            return new Result(request.url(getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
-                                          entry.getId(), ARG_MESSAGE,
-                                          "Comment added"));
+            return new Result(request.url(getRepository().URL_COMMENTS_SHOW,
+                                          ARG_ENTRYID, entry.getId(),
+                                          ARG_MESSAGE, "Comment added"));
         }
 
         sb.append(msgLabel("Add comment for") + getEntryLink(request, entry));
@@ -2058,7 +2178,10 @@ public class EntryManager extends RepositoryManager {
                     HtmlUtil.submit(msg("Cancel"), ARG_CANCEL))));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
-        return new OutputHandler(getRepository(),"tmp").makeLinksResult(request, msg("Entry Comments"), sb, new OutputHandler.State(entry));
+        return new OutputHandler(getRepository(),
+                                 "tmp").makeLinksResult(request,
+                                     msg("Entry Comments"), sb,
+                                     new OutputHandler.State(entry));
     }
 
 
@@ -2105,13 +2228,16 @@ public class EntryManager extends RepositoryManager {
                                   ? ""
                                   : HtmlUtil
                                       .href(request
-                                          .url(getRepository().URL_COMMENTS_EDIT, ARG_DELETE,
-                                              "true", ARG_ENTRYID, entry.getId(),
-                                              ARG_COMMENT_ID,
-                                              comment.getId()), HtmlUtil
-                                                  .img(getRepository().fileUrl(ICON_DELETE),
-                                                      msg(
-                                                      "Delete comment"))));
+                                          .url(getRepository()
+                                              .URL_COMMENTS_EDIT, ARG_DELETE,
+                                                  "true", ARG_ENTRYID,
+                                                  entry.getId(),
+                                                  ARG_COMMENT_ID,
+                                                  comment.getId()), HtmlUtil
+                                                      .img(getRepository()
+                                                          .fileUrl(
+                                                              ICON_DELETE), msg(
+                                                              "Delete comment"))));
             if (canEdit) {
                 //                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
             }
@@ -2170,8 +2296,8 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     protected String getEntryLink(Request request, Entry entry, List args) {
-        return HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry, args),
-                             entry.getLabel());
+        return HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                entry, args), entry.getLabel());
     }
 
 
@@ -2184,8 +2310,11 @@ public class EntryManager extends RepositoryManager {
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    protected String getAjaxLink(Request request, Entry entry) throws Exception {
+    protected String getAjaxLink(Request request, Entry entry)
+            throws Exception {
         return getAjaxLink(request, entry, entry.getLabel(), true);
     }
 
@@ -2198,29 +2327,38 @@ public class EntryManager extends RepositoryManager {
      * @param includeIcon _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     protected String getAjaxLink(Request request, Entry entry,
-                                 String linkText, boolean includeIcon) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        String entryId = entry.getId();
+                                 String linkText, boolean includeIcon)
+            throws Exception {
+        StringBuffer sb      = new StringBuffer();
+        String       entryId = entry.getId();
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
             String  icon     = getIconUrl(entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
             String event = (entry.isGroup()
-                            ? HtmlUtil.onMouseClick("folderClick('"
-                                + entryId + "')")
+                            ? HtmlUtil.onMouseClick("folderClick('" + entryId
+                                + "')")
                             : "");
 
             if (okToMove) {
                 event += (entry.isGroup()
-                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event," + HtmlUtil.squote(entryId)+")")
-                          : "") + HtmlUtil.onMouseOut(
-                                                      "mouseOutOnEntry(event," + 
-                                                      HtmlUtil.squote(entryId)+ ")") + 
-                    HtmlUtil.onMouseDown("mouseDownOnEntry(event," + HtmlUtil.squote(entryId)    + "," + 
-                                         HtmlUtil.squote(entry.getLabel().replace("'", ""))  + ");") + (entry.isGroup()
+                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
+                          + HtmlUtil.squote(entryId) + ")")
+                          : "") + HtmlUtil
+                          .onMouseOut("mouseOutOnEntry(event,"
+                              + HtmlUtil.squote(entryId) + ")") + HtmlUtil
+                                  .onMouseDown("mouseDownOnEntry(event,"
+                                      + HtmlUtil.squote(entryId) + ","
+                                          + HtmlUtil
+                                              .squote(entry.getLabel()
+                                                  .replace("'",
+                                                      "")) + ");") + (entry
+                                                          .isGroup()
                         ? dropEvent
                         : "");
             }
@@ -2230,8 +2368,7 @@ public class EntryManager extends RepositoryManager {
                                              ? "Click to open group; "
                                              : "") + (okToMove
                     ? "Drag to move"
-                    : ""), " id=" + HtmlUtil.quote("img_" + entryId)
-                           + event);
+                    : ""), " id=" + HtmlUtil.quote("img_" + entryId) + event);
             if (entry.isGroup()) {
                 //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
                 sb.append(img);
@@ -2239,19 +2376,20 @@ public class EntryManager extends RepositoryManager {
                 sb.append(img);
             }
             sb.append(HtmlUtil.space(1));
-            getMetadataManager().decorateEntry(request, entry, sb,true);
+            getMetadataManager().decorateEntry(request, entry, sb, true);
         }
 
         String elementId = entry.getId();
-        String qid = HtmlUtil.squote(elementId);
-        String tooltipEvents =  HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid+ ");") + 
-            HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid+ ");") +
-            HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid+ ");");
+        String qid       = HtmlUtil.squote(elementId);
+        String tooltipEvents =
+            HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid + ");")
+            + HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid + ");")
+            + HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid + ");");
         sb.append(
             HtmlUtil.href(
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
                 linkText,
-                " id=" + HtmlUtil.quote(elementId) + " " +tooltipEvents));
+                " id=" + HtmlUtil.quote(elementId) + " " + tooltipEvents));
 
         if (includeIcon) {
             //            getMetadataManager().decorateEntry(request, entry, sb,true);
@@ -2286,13 +2424,15 @@ public class EntryManager extends RepositoryManager {
                     forHeader);
             //            if(!forHeader)
             //                links.add(new Link(true));
-            for (OutputHandler outputHandler : getRepository().getOutputHandlers()) {
+            for (OutputHandler outputHandler : getRepository()
+                    .getOutputHandlers()) {
                 outputHandler.getEntryLinks(request, entry, links, forHeader);
             }
             //            if(!forHeader)
             //                links.add(new Link(true));
         }
-        OutputHandler outputHandler = getRepository().getOutputHandler(request);
+        OutputHandler outputHandler =
+            getRepository().getOutputHandler(request);
         if ( !entry.isTopGroup()) {
             links.addAll(outputHandler.getNextPrevLinks(request, entry,
                     request.getOutput()));
@@ -2354,13 +2494,26 @@ public class EntryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected String getEntryLinksToolbar(Request request, Entry entry)
-        throws Exception {
+            throws Exception {
         List<Link>   links = getEntryLinks(request, entry, false);
-        StringBuffer sb  = new StringBuffer();
+        StringBuffer sb    = new StringBuffer();
         for (Link link : links) {
-            String href = HtmlUtil.href(link.getUrl(), HtmlUtil.img(link.getIcon(), link.getLabel(),link.getLabel()));
-            sb.append(HtmlUtil.inset(href,0,3,0,0));
+            String href = HtmlUtil.href(link.getUrl(),
+                                        HtmlUtil.img(link.getIcon(),
+                                            link.getLabel(),
+                                            link.getLabel()));
+            sb.append(HtmlUtil.inset(href, 0, 3, 0, 0));
         }
         return sb.toString();
     }
@@ -2380,17 +2533,29 @@ public class EntryManager extends RepositoryManager {
      */
     public String getBreadCrumbs(Request request, Entry entry)
             throws Exception {
-        return getBreadCrumbs(request, entry,null);
+        return getBreadCrumbs(request, entry, null);
     }
 
-    public String getBreadCrumbs(Request request, Entry entry, RequestUrl requestUrl)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param requestUrl _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getBreadCrumbs(Request request, Entry entry,
+                                 RequestUrl requestUrl)
             throws Exception {
         if (entry == null) {
             return BLANK;
         }
-        List breadcrumbs = new ArrayList();
-        Group parent = findGroup(request, entry.getParentGroupId());
-        int   length = 0;
+        List  breadcrumbs = new ArrayList();
+        Group parent      = findGroup(request, entry.getParentGroupId());
+        int   length      = 0;
         while (parent != null) {
             if (length > 100) {
                 breadcrumbs.add(0, "...");
@@ -2401,24 +2566,27 @@ public class EntryManager extends RepositoryManager {
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            String link =  (requestUrl==null?
-                            getAjaxLink(request, parent, name, false):
-                            HtmlUtil.href(request.entryUrl(requestUrl,parent),name));
+            String link = ((requestUrl == null)
+                           ? getAjaxLink(request, parent, name, false)
+                           : HtmlUtil.href(request.entryUrl(requestUrl,
+                               parent), name));
             breadcrumbs.add(0, link);
             //            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
             //                    parent), name));
             parent = findGroup(request, parent.getParentGroupId());
         }
-        if(requestUrl==null) {
-            breadcrumbs.add(getAjaxLink(request, entry, entry.getLabel(), false));
+        if (requestUrl == null) {
+            breadcrumbs.add(getAjaxLink(request, entry, entry.getLabel(),
+                                        false));
         } else {
-            breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,entry),entry.getLabel()));
+            breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,
+                    entry), entry.getLabel()));
         }
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
-        String separator = getProperty("ramadda.breadcrumbs.separator","");
+        String separator = getProperty("ramadda.breadcrumbs.separator", "");
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -2438,7 +2606,7 @@ public class EntryManager extends RepositoryManager {
     public String[] getBreadCrumbs(Request request, Entry entry,
                                    boolean makeLinkForLastGroup)
             throws Exception {
-        return getBreadCrumbs(request, entry, makeLinkForLastGroup,null);
+        return getBreadCrumbs(request, entry, makeLinkForLastGroup, null);
     }
 
 
@@ -2459,8 +2627,7 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public String[] getBreadCrumbs(Request request, Entry entry,
-                                   boolean makeLinkForLastGroup,
-                                   Group stopAt)
+                                   boolean makeLinkForLastGroup, Group stopAt)
             throws Exception {
         if (request == null) {
             request = new Request(getRepository(), "", new Hashtable());
@@ -2471,9 +2638,9 @@ public class EntryManager extends RepositoryManager {
         if (entry == null) {
             return new String[] { BLANK, BLANK };
         }
-        Group  parent = findGroup(request, entry.getParentGroupId());
-        OutputType output =  OutputHandler.OUTPUT_HTML;
-        int length = 0;
+        Group      parent = findGroup(request, entry.getParentGroupId());
+        OutputType output = OutputHandler.OUTPUT_HTML;
+        int        length = 0;
         while (parent != null) {
             if ((stopAt != null)
                     && parent.getFullName().equals(stopAt.getFullName())) {
@@ -2490,14 +2657,15 @@ public class EntryManager extends RepositoryManager {
             }
             length += name.length();
             titleList.add(0, name);
-            String link =  getAjaxLink(request, parent, name, false);
+            String link = getAjaxLink(request, parent, name, false);
             breadcrumbs.add(0, link);
             parent = findGroup(request, parent.getParentGroupId());
         }
         titleList.add(entry.getLabel());
         String nav;
-        String separator = getProperty("ramadda.breadcrumbs.separator","");
-        String entryLink =  getAjaxLink(request, entry, entry.getLabel(), false);
+        String separator = getProperty("ramadda.breadcrumbs.separator", "");
+        String entryLink = getAjaxLink(request, entry, entry.getLabel(),
+                                       false);
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
@@ -2505,39 +2673,40 @@ public class EntryManager extends RepositoryManager {
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar = getEntryLinksToolbar(request, entry);
-            /***
-            StringBuffer menu = new StringBuffer();
-            menu.append(
-                HtmlUtil.div(
-                    getEntryLinksList(request, entry),
-                    HtmlUtil.id("entrylinksmenu" + entry.getId())
-                    + HtmlUtil.cssClass("menu")));
-            String compId = "menubutton" + entry.getId();
-            String events = HtmlUtil.onMouseOver(
-                                "setImage(" + HtmlUtil.squote(compId) + ",'"
-                                + getRepository().fileUrl(ICON_GRAYRECTARROW)
-                                + "')") + HtmlUtil.onMouseOut(
-                                    "setImage(" + HtmlUtil.squote(compId)
-                                    + ",'" + getRepository().fileUrl(ICON_GRAYRECT)
-                                    + "')") + HtmlUtil.onMouseClick(
-                                        "showMenu(event, "
-                                        + HtmlUtil.squote(compId) + ", "
-                                        + HtmlUtil.squote(
-                                            "entrylinksmenu"
-                                            + entry.getId()) + ")");
-            String menuLink = HtmlUtil.space(1)
-                              + HtmlUtil.jsLink(events,
-                                  HtmlUtil.img(getRepository().fileUrl(ICON_GRAYRECT),
-                                      msg("Show menu"), HtmlUtil.id(compId)));
 
-            ***/
+            /**
+             * StringBuffer menu = new StringBuffer();
+             * menu.append(
+             *   HtmlUtil.div(
+             *       getEntryLinksList(request, entry),
+             *       HtmlUtil.id("entrylinksmenu" + entry.getId())
+             *       + HtmlUtil.cssClass("menu")));
+             * String compId = "menubutton" + entry.getId();
+             * String events = HtmlUtil.onMouseOver(
+             *                   "setImage(" + HtmlUtil.squote(compId) + ",'"
+             *                   + getRepository().fileUrl(ICON_GRAYRECTARROW)
+             *                   + "')") + HtmlUtil.onMouseOut(
+             *                       "setImage(" + HtmlUtil.squote(compId)
+             *                       + ",'" + getRepository().fileUrl(ICON_GRAYRECT)
+             *                       + "')") + HtmlUtil.onMouseClick(
+             *                           "showMenu(event, "
+             *                           + HtmlUtil.squote(compId) + ", "
+             *                           + HtmlUtil.squote(
+             *                               "entrylinksmenu"
+             *                               + entry.getId()) + ")");
+             * String menuLink = HtmlUtil.space(1)
+             *                 + HtmlUtil.jsLink(events,
+             *                     HtmlUtil.img(getRepository().fileUrl(ICON_GRAYRECT),
+             *                         msg("Show menu"), HtmlUtil.id(compId)));
+             *
+             */
             String linkHtml = getEntryLinksHtml(request, entry, true);
             linkHtml = toolbar;
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                 + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink
-                                     + "</td><td align=\"right\">"
-                                     + linkHtml + "</td>") + "</table>";
+                                     + "</td><td align=\"right\">" + linkHtml
+                                     + "</td>") + "</table>";
             nav = HtmlUtil.div(
                 HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")) + header,
                 HtmlUtil.cssClass("entryheader"));
@@ -2600,14 +2769,16 @@ public class EntryManager extends RepositoryManager {
         String entryId = request.getString(ARG_ENTRYID, BLANK);
         Entry  entry   = getEntry(request, entryId);
         if (entry == null) {
-            Entry tmp = getEntry(request, request.getString(ARG_ENTRYID, BLANK),
+            Entry tmp = getEntry(request,
+                                 request.getString(ARG_ENTRYID, BLANK),
                                  false);
             if (tmp != null) {
                 throw new RepositoryUtil.AccessException(
                     "You do not have access to this entry");
             }
-            throw new RepositoryUtil.MissingEntryException("Could not find entry:"
-                    + request.getString(ARG_ENTRYID, BLANK));
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find entry:"
+                + request.getString(ARG_ENTRYID, BLANK));
         }
         return entry;
     }
@@ -2640,56 +2811,65 @@ public class EntryManager extends RepositoryManager {
             return getTopGroup();
         }
 
-        synchronized(MUTEX_ENTRY) {
-        Entry entry = (Entry) entryCache.get(entryId);
-        if (entry != null) {
-            if ( !andFilter) {
-                return entry;
+        synchronized (MUTEX_ENTRY) {
+            Entry entry = (Entry) entryCache.get(entryId);
+            if (entry != null) {
+                if ( !andFilter) {
+                    return entry;
+                }
+                return getAccessManager().filterEntry(request, entry);
             }
-            return getAccessManager().filterEntry(request, entry);
-        }
 
-        //catalog:url:dataset:datasetid
-        if(entryId.startsWith("catalog:")) {
-            CatalogTypeHandler typeHandler = (CatalogTypeHandler) getRepository().getTypeHandler(TypeHandler.TYPE_CATALOG);
-            entry = typeHandler.makeSynthEntry(request, null, entryId);
-        } else  if (isSynthEntry(entryId)) {
-            String[] pair = getSynthId(entryId);
-            String parentEntryId = pair[0];
-            Entry parentEntry = getEntry(request, parentEntryId, andFilter, abbreviated);
-            if(parentEntry == null) return null;
-            TypeHandler typeHandler = parentEntry.getTypeHandler();
-            entry =typeHandler.makeSynthEntry(request, parentEntry, pair[1]);
-            if(entry == null) return null;
-        } else {
-            Statement entryStmt =
-                getDatabaseManager().select(Tables.ENTRIES.COLUMNS, Tables.ENTRIES.NAME,
-                                            Clause.eq(Tables.ENTRIES.COL_ID,
-                                                      entryId));
+            //catalog:url:dataset:datasetid
+            if (entryId.startsWith("catalog:")) {
+                CatalogTypeHandler typeHandler =
+                    (CatalogTypeHandler) getRepository().getTypeHandler(
+                        TypeHandler.TYPE_CATALOG);
+                entry = typeHandler.makeSynthEntry(request, null, entryId);
+            } else if (isSynthEntry(entryId)) {
+                String[] pair          = getSynthId(entryId);
+                String   parentEntryId = pair[0];
+                Entry parentEntry = getEntry(request, parentEntryId,
+                                             andFilter, abbreviated);
+                if (parentEntry == null) {
+                    return null;
+                }
+                TypeHandler typeHandler = parentEntry.getTypeHandler();
+                entry = typeHandler.makeSynthEntry(request, parentEntry,
+                        pair[1]);
+                if (entry == null) {
+                    return null;
+                }
+            } else {
+                Statement entryStmt =
+                    getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                        Tables.ENTRIES.NAME,
+                        Clause.eq(Tables.ENTRIES.COL_ID, entryId));
 
-            ResultSet results = entryStmt.getResultSet();
-            if ( !results.next()) {
+                ResultSet results = entryStmt.getResultSet();
+                if ( !results.next()) {
+                    entryStmt.close();
+                    return null;
+                }
+
+                TypeHandler typeHandler =
+                    getRepository().getTypeHandler(results.getString(2));
+                entry = typeHandler.getEntry(results, abbreviated);
                 entryStmt.close();
-                return null;
+
+            }
+            if ( !abbreviated && (entry != null)) {
+                if (entryCache.size() > ENTRY_CACHE_LIMIT) {
+                    entryCache = new Hashtable();
+                }
+                entryCache.put(entryId, entry);
             }
 
-            TypeHandler typeHandler = getRepository().getTypeHandler(results.getString(2));
-            entry = typeHandler.getEntry(results, abbreviated);
-            entryStmt.close();
-
-        }
-        if ( !abbreviated && (entry != null)) {
-            if (entryCache.size() > ENTRY_CACHE_LIMIT) {
-                entryCache = new Hashtable();
+            if (andFilter) {
+                entry = getAccessManager().filterEntry(request, entry);
             }
-            entryCache.put(entryId, entry);
-        }
 
-        if (andFilter) {
-            entry = getAccessManager().filterEntry(request, entry);
-        }
-
-        return entry;
+            return entry;
         }
 
     }
@@ -2725,9 +2905,10 @@ public class EntryManager extends RepositoryManager {
                                  searchCriteriaSB);
         int skipCnt = request.get(ARG_SKIP, 0);
 
-        Statement statement = typeHandler.select(request, Tables.ENTRIES.COLUMNS,
-                                  where,
-                                  getRepository().getQueryOrderAndLimit(request, false));
+        Statement statement =
+            typeHandler.select(request, Tables.ENTRIES.COLUMNS, where,
+                               getRepository().getQueryOrderAndLimit(request,
+                                   false));
 
 
         SqlUtil.debug = false;
@@ -2781,19 +2962,38 @@ public class EntryManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public boolean isSynthEntry(String id) {
         return id.startsWith(ID_PREFIX_SYNTH);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public String[] getSynthId(String id) {
         id = id.substring(ID_PREFIX_SYNTH.length());
-        String[]pair = StringUtil.split(id, ":", 2);
-        if(pair == null) return new String[]{id,null};
+        String[] pair = StringUtil.split(id, ":", 2);
+        if (pair == null) {
+            return new String[] { id, null };
+        }
         return pair;
     }
 
 
 
+    /**
+     * _more_
+     */
     public void clearSeenResources() {
         seenResources = new Hashtable();
     }
@@ -2812,6 +3012,7 @@ public class EntryManager extends RepositoryManager {
      * @param harvester _more_
      * @param typeHandler _more_
      * @param entries _more_
+     * @param makeThemUnique _more_
      *
      * @return _more_
      *
@@ -2821,7 +3022,7 @@ public class EntryManager extends RepositoryManager {
                                   TypeHandler typeHandler,
                                   List<Entry> entries, boolean makeThemUnique)
             throws Exception {
-        if(makeThemUnique) {
+        if (makeThemUnique) {
             entries = getUniqueEntries(entries);
         }
         insertEntries(entries, true, true);
@@ -2872,18 +3073,23 @@ public class EntryManager extends RepositoryManager {
         if (entry.getResource() == null) {
             entry.setResource(new Resource());
         }
-        statement.setString(col++, getStorageManager().resourceToDB(entry.getResource().getPath()));
+        statement.setString(
+            col++,
+            getStorageManager().resourceToDB(entry.getResource().getPath()));
         statement.setString(col++, entry.getResource().getType());
         statement.setString(col++, entry.getDataType());
-        getDatabaseManager().setDate(statement,col++, getRepository().currentTime());
+        getDatabaseManager().setDate(statement, col++,
+                                     getRepository().currentTime());
         try {
-            getDatabaseManager().setDate(statement, col,entry.getStartDate());
-            getDatabaseManager().setDate(statement, col+1,entry.getEndDate());
+            getDatabaseManager().setDate(statement, col,
+                                         entry.getStartDate());
+            getDatabaseManager().setDate(statement, col + 1,
+                                         entry.getEndDate());
         } catch (Exception exc) {
             System.err.println("Error: Bad date " + entry.getResource() + " "
                                + new Date(entry.getStartDate()));
-            getDatabaseManager().setDate(statement,col, new Date());
-            getDatabaseManager().setDate(statement, col+1, new Date());
+            getDatabaseManager().setDate(statement, col, new Date());
+            getDatabaseManager().setDate(statement, col + 1, new Date());
         }
         col += 2;
         statement.setDouble(col++, entry.getSouth());
@@ -2983,10 +3189,10 @@ public class EntryManager extends RepositoryManager {
         int       batchCnt       = 0;
         connection.setAutoCommit(false);
         for (Entry entry : entries) {
-          
-// if (entry.isCollectionGroup()) {
-//                getTopGroup()s = null;
-//                }
+
+            // if (entry.isCollectionGroup()) {
+            //                getTopGroup()s = null;
+            //                }
             TypeHandler typeHandler = entry.getTypeHandler();
             String      sql         = typeHandler.getInsertSql(isNew);
             //            System.err.println("sql:" + sql);
@@ -3014,8 +3220,8 @@ public class EntryManager extends RepositoryManager {
             if (metadataList != null) {
                 if ( !isNew) {
                     getDatabaseManager().delete(Tables.METADATA.NAME,
-                                   Clause.eq(Tables.METADATA.COL_ENTRY_ID,
-                                             entry.getId()));
+                            Clause.eq(Tables.METADATA.COL_ENTRY_ID,
+                                      entry.getId()));
                 }
                 for (Metadata metadata : metadataList) {
                     //                    System.err.println ("\tmetadata:" + metadata.getEntryId() +" " + metadata.getType() + " " + metadata.getAttr1());
@@ -3132,17 +3338,19 @@ public class EntryManager extends RepositoryManager {
                 seenResources = new Hashtable();
             }
             Connection connection = getDatabaseManager().getConnection();
-            PreparedStatement select = 
+            PreparedStatement select =
                 SqlUtil.getSelectStatement(
-                                           connection, "count(" + Tables.ENTRIES.COL_ID + ")",
+                    connection, "count(" + Tables.ENTRIES.COL_ID + ")",
                     Misc.newList(Tables.ENTRIES.NAME),
                     Clause.and(
                         Clause.eq(Tables.ENTRIES.COL_RESOURCE, ""),
-                        Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, "?")), "");
+                        Clause.eq(
+                            Tables.ENTRIES.COL_PARENT_GROUP_ID, "?")), "");
             long t1 = System.currentTimeMillis();
             for (Entry entry : entries) {
-                String path = getStorageManager().resourceToDB(entry.getResource().getPath());
-                String key  = entry.getParentGroup().getId() + "_" + path;
+                String path = getStorageManager().resourceToDB(
+                                  entry.getResource().getPath());
+                String key = entry.getParentGroup().getId() + "_" + path;
                 if (seenResources.get(key) != null) {
                     //                    System.out.println("seen resource:" + path);
                     continue;
@@ -3197,7 +3405,8 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Group getDummyGroup() throws Exception {
-        Group dummyGroup = new Group(getRepository().getGroupTypeHandler(), true);
+        Group dummyGroup = new Group(getRepository().getGroupTypeHandler(),
+                                     true);
         dummyGroup.setId(getRepository().getGUID());
         dummyGroup.setUser(getUserManager().getAnonymousUser());
         return dummyGroup;
@@ -3219,34 +3428,37 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected List<String> getChildIds(Request request, Group group,
-            List<Clause> where)
+                                       List<Clause> where)
             throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids          = new ArrayList<String>();
 
 
-        boolean isSynthEntry = isSynthEntry(group.getId());
+        boolean      isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
-            String synthId =null;
-            if(isSynthEntry) {
-                String[] pair = getSynthId(group.getId());
-                String entryId = pair[0];
+            String synthId = null;
+            if (isSynthEntry) {
+                String[] pair    = getSynthId(group.getId());
+                String   entryId = pair[0];
                 synthId = pair[1];
-                group = (Group)getEntry(request, entryId, false, false);
-                if(group == null) {
-                    return ids; 
+                group   = (Group) getEntry(request, entryId, false, false);
+                if (group == null) {
+                    return ids;
                 }
-            } 
-            return group.getTypeHandler().getSynthIds(request, group, synthId);
+            }
+            return group.getTypeHandler().getSynthIds(request, group,
+                    synthId);
         }
 
 
         where = new ArrayList<Clause>(where);
-        where.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, group.getId()));
+        where.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                            group.getId()));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         int         skipCnt     = request.get(ARG_SKIP, 0);
-        Statement statement = typeHandler.select(request, Tables.ENTRIES.COL_ID,
-                                  where,
-                                  getRepository().getQueryOrderAndLimit(request, true));
+        Statement statement =
+            typeHandler.select(request, Tables.ENTRIES.COL_ID, where,
+                               getRepository().getQueryOrderAndLimit(request,
+                                   true));
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         ResultSet        results;
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
@@ -3277,15 +3489,15 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processGroupShow(Request request, Group group)
             throws Exception {
-        boolean       doLatest      = request.get(ARG_LATEST, false);
+        boolean doLatest = request.get(ARG_LATEST, false);
 
-        OutputHandler outputHandler = getRepository().getOutputHandler(request);
-        TypeHandler   typeHandler   = getRepository().getTypeHandler(request);
-        List<Clause>  where         =
-            typeHandler.assembleWhereClause(request);
+        OutputHandler outputHandler =
+            getRepository().getOutputHandler(request);
+        TypeHandler  typeHandler = getRepository().getTypeHandler(request);
+        List<Clause> where       = typeHandler.assembleWhereClause(request);
 
-        List<Entry>   entries       = new ArrayList<Entry>();
-        List<Group>   subGroups     = new ArrayList<Group>();
+        List<Entry>  entries     = new ArrayList<Entry>();
+        List<Group>  subGroups   = new ArrayList<Group>();
         try {
             List<String> ids = getChildIds(request, group, where);
             for (String id : ids) {
@@ -3397,17 +3609,38 @@ public class EntryManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param xmlFile _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Entry parseEntryXml(File xmlFile) throws Exception {
-        Element   root       = XmlUtil.getRoot(IOUtil.readContents(xmlFile));
-        return processEntryXml(new Request(getRepository(), getUserManager().getDefaultUser()), root,new Hashtable(), new Hashtable(),false);
+        Element root = XmlUtil.getRoot(IOUtil.readContents(xmlFile));
+        return processEntryXml(
+            new Request(getRepository(), getUserManager().getDefaultUser()),
+            root, new Hashtable(), new Hashtable(), false);
     }
 
-    public  Entry getTemplateEntry(File file) throws Exception {
-        File xmlFile = new File(IOUtil.joinDir(file.getParentFile(),"." + file.getName() +".ramadda"));
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getTemplateEntry(File file) throws Exception {
+        File xmlFile = new File(IOUtil.joinDir(file.getParentFile(),
+                           "." + file.getName() + ".ramadda"));
         Entry fileInfoEntry = null;
-        if(xmlFile.exists()) {
+        if (xmlFile.exists()) {
             fileInfoEntry = parseEntryXml(xmlFile);
-            if(fileInfoEntry.getName().length()==0) {
+            if (fileInfoEntry.getName().length() == 0) {
                 fileInfoEntry.setName(file.getName());
             }
         }
@@ -3431,7 +3664,8 @@ public class EntryManager extends RepositoryManager {
             throws Exception {
         //<attachment name>
         if (s.indexOf("<attachment") >= 0) {
-            List<Association> associations = getEntryManager().getAssociations(request, entry);
+            List<Association> associations =
+                getEntryManager().getAssociations(request, entry);
             for (Association association : associations) {
                 if ( !association.getFromId().equals(entry.getId())) {
                     continue;
@@ -3469,9 +3703,10 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                                                          Tables.ENTRIES.NAME,
-                                                          Clause.eq(Tables.ENTRIES.COL_ID, id));
+        Statement statement =
+            getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                                        Tables.ENTRIES.NAME,
+                                        Clause.eq(Tables.ENTRIES.COL_ID, id));
 
         List<Group> groups = readGroups(statement);
         if (groups.size() > 0) {
@@ -3554,7 +3789,9 @@ public class EntryManager extends RepositoryManager {
                                     boolean createIfNeeded, boolean isTop)
             throws Exception {
         synchronized (MUTEX_GROUP) {
-            String topGroupName = (topGroup!=null?topGroup.getName():GROUP_TOP);
+            String topGroupName = ((topGroup != null)
+                                   ? topGroup.getName()
+                                   : GROUP_TOP);
             if ( !name.equals(topGroupName)
                     && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
                 name = topGroupName + Group.PATHDELIMITER + name;
@@ -3574,7 +3811,8 @@ public class EntryManager extends RepositoryManager {
             } else {
                 lastName = toks.get(toks.size() - 1);
                 toks.remove(toks.size() - 1);
-                parent = findGroupFromName(StringUtil.join(Group.PATHDELIMITER,
+                parent =
+                    findGroupFromName(StringUtil.join(Group.PATHDELIMITER,
                         toks), user, createIfNeeded);
                 if (parent == null) {
                     if ( !isTop) {
@@ -3584,17 +3822,19 @@ public class EntryManager extends RepositoryManager {
                 }
             }
             List<Clause> clauses = new ArrayList<Clause>();
-            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE, TypeHandler.TYPE_GROUP));
+            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
+                                  TypeHandler.TYPE_GROUP));
             if (parent != null) {
                 clauses.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       parent.getId()));
             } else {
-                clauses.add(Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
+                clauses.add(
+                    Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
             }
             clauses.add(Clause.eq(Tables.ENTRIES.COL_NAME, lastName));
             Statement statement =
-                getDatabaseManager().select(Tables.ENTRIES.COLUMNS, Tables.ENTRIES.NAME,
-                                            clauses);
+                getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                                            Tables.ENTRIES.NAME, clauses);
             List<Group> groups = readGroups(statement);
             statement.close();
             if (groups.size() > 0) {
@@ -3625,17 +3865,31 @@ public class EntryManager extends RepositoryManager {
      */
     public Group makeNewGroup(Group parent, String name, User user)
             throws Exception {
-        return makeNewGroup(parent, name, user,null);
+        return makeNewGroup(parent, name, user, null);
     }
 
 
 
-    public Group makeNewGroup(Group parent, String name, User user, Entry template)
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param user _more_
+     * @param template _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Group makeNewGroup(Group parent, String name, User user,
+                              Entry template)
             throws Exception {
         synchronized (MUTEX_GROUP) {
-            TypeHandler typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
-            Group       group = new Group(getGroupId(parent), typeHandler);
-            if(template!=null) {
+            TypeHandler typeHandler =
+                getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
+            Group group = new Group(getGroupId(parent), typeHandler);
+            if (template != null) {
                 group.initWith(template);
                 getRepository().getMetadataManager().newEntry(group);
             } else {
@@ -3663,7 +3917,9 @@ public class EntryManager extends RepositoryManager {
      */
     protected String getGroupId(Group parent) throws Exception {
         //FOr now just use regular ids for groups
-        if(true) return getRepository().getGUID();
+        if (true) {
+            return getRepository().getGUID();
+        }
 
         int    baseId = 0;
         Clause idClause;
@@ -3671,7 +3927,8 @@ public class EntryManager extends RepositoryManager {
         if (parent == null) {
             idClause = Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID);
         } else {
-            idClause = Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, parent.getId());
+            idClause = Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                 parent.getId());
         }
         String newId = null;
         while (true) {
@@ -3681,8 +3938,10 @@ public class EntryManager extends RepositoryManager {
                 newId = parent.getId() + Group.IDDELIMITER + baseId;
             }
 
-            Statement stmt = getDatabaseManager().select(Tables.ENTRIES.COL_ID,
-                                 Tables.ENTRIES.NAME, new Clause[] { idClause,
+            Statement stmt =
+                getDatabaseManager().select(Tables.ENTRIES.COL_ID,
+                                            Tables.ENTRIES.NAME,
+                                            new Clause[] { idClause,
                     Clause.eq(Tables.ENTRIES.COL_ID, newId) });
             ResultSet idResults = stmt.getResultSet();
 
@@ -3715,9 +3974,11 @@ public class EntryManager extends RepositoryManager {
         if (clause != null) {
             clauses.add(clause);
         }
-        clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE, TypeHandler.TYPE_GROUP));
-        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COL_ID,
-                                  Tables.ENTRIES.NAME, clauses);
+        clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
+                              TypeHandler.TYPE_GROUP));
+        Statement statement =
+            getDatabaseManager().select(Tables.ENTRIES.COL_ID,
+                                        Tables.ENTRIES.NAME, clauses);
         return getGroups(request, SqlUtil.readString(statement, 1));
     }
 
@@ -3767,10 +4028,11 @@ public class EntryManager extends RepositoryManager {
         }
         //        System.err.println("ramadda: getTopGroups " + topGroup);
 
-        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COL_ID,
-                                  Tables.ENTRIES.NAME,
-                                  Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
-                                            getTopGroup().getId()));
+        Statement statement = getDatabaseManager().select(
+                                  Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
+                                  Clause.eq(
+                                      Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                      getTopGroup().getId()));
         String[]    ids    = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
@@ -3819,9 +4081,10 @@ public class EntryManager extends RepositoryManager {
      */
     private List<Group> readGroups(Statement statement) throws Exception {
         ResultSet        results;
-        SqlUtil.Iterator iter        = SqlUtil.getIterator(statement);
-        List<Group>      groups      = new ArrayList<Group>();
-        TypeHandler      typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
+        SqlUtil.Iterator iter   = SqlUtil.getIterator(statement);
+        List<Group>      groups = new ArrayList<Group>();
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 Group group = (Group) typeHandler.getEntry(results);
@@ -3860,7 +4123,7 @@ public class EntryManager extends RepositoryManager {
                                    (String) null);
         if (groupNameOrId == null) {
             groupNameOrId = (String) request.getString(ARG_ENTRYID,
-                                                       (String) null);
+                    (String) null);
         }
         if (groupNameOrId == null) {
             throw new IllegalArgumentException("No group specified");
@@ -3873,8 +4136,8 @@ public class EntryManager extends RepositoryManager {
             }
             return (Group) entry;
         }
-        throw new RepositoryUtil.MissingEntryException("Could not find group:"
-                                           + groupNameOrId);
+        throw new RepositoryUtil.MissingEntryException(
+            "Could not find group:" + groupNameOrId);
     }
 
 
@@ -3915,15 +4178,17 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initGroups() throws Exception {
-        Statement statement = getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                                                          Tables.ENTRIES.NAME,
-                                                          Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
+        Statement statement = getDatabaseManager().select(
+                                  Tables.ENTRIES.COLUMNS,
+                                  Tables.ENTRIES.NAME,
+                                  Clause.isNull(
+                                      Tables.ENTRIES.COL_PARENT_GROUP_ID));
 
 
-        
+
 
         List<Group> groups = readGroups(statement);
-        if(groups.size()>0) {
+        if (groups.size() > 0) {
             topGroup = groups.get(0);
         }
 
@@ -3952,9 +4217,9 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected List<String[]> getDescendents(Request request,
-                                          List<Entry> entries,
-                                          Connection connection,
-                                          boolean firstCall)
+                                            List<Entry> entries,
+                                            Connection connection,
+                                            boolean firstCall)
             throws Exception {
         List<String[]> children = new ArrayList();
         for (Entry entry : entries) {
@@ -3979,10 +4244,11 @@ public class EntryManager extends RepositoryManager {
             ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    int    col          = 1;
-                    String childId      = results.getString(col++);
-                    String childType    = results.getString(col++);
-                    String resource     = getStorageManager().resourceFromDB(results.getString(col++));
+                    int    col       = 1;
+                    String childId   = results.getString(col++);
+                    String childType = results.getString(col++);
+                    String resource = getStorageManager().resourceFromDB(
+                                          results.getString(col++));
                     String resourceType = results.getString(col++);
                     children.add(new String[] { childId, childType, resource,
                             resourceType });
@@ -4009,20 +4275,25 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processAssociationAdd(Request request) throws Exception {
         Entry fromEntry = getEntryManager().getEntry(request,
-                                   request.getString(ARG_FROM, BLANK));
-        Entry toEntry = getEntryManager().getEntry(request, request.getString(ARG_TO, BLANK));
+                              request.getString(ARG_FROM, BLANK));
+        Entry toEntry = getEntryManager().getEntry(request,
+                            request.getString(ARG_TO, BLANK));
         if (fromEntry == null) {
-            throw new RepositoryUtil.MissingEntryException("Could not find entry:"
-                    + request.getString(ARG_FROM, BLANK));
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find entry:" + request.getString(ARG_FROM, BLANK));
         }
         if (toEntry == null) {
-            throw new RepositoryUtil.MissingEntryException("Could not find entry:"
-                    + request.getString(ARG_TO, BLANK));
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find entry:" + request.getString(ARG_TO, BLANK));
         }
         String name = request.getString(ARG_NAME, (String) null);
         if (name != null) {
             addAssociation(request, fromEntry, toEntry, name);
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
+            //            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
+            return new Result(
+                request.url(
+                    getRepositoryBase().URL_USER_CART, ARG_MESSAGE,
+                    msg("The association has been added")));
         }
 
         StringBuffer sb = new StringBuffer();
@@ -4060,14 +4331,18 @@ public class EntryManager extends RepositoryManager {
         if (associations.size() == 0) {
             return new Result(
                 msg("Delete Associations"),
-                new StringBuffer(getRepository().error("Could not find assocation")));
+                new StringBuffer(
+                    getRepository().error("Could not find assocation")));
         }
 
-        Entry fromEntry = getEntryManager().getEntry(request, associations.get(0).getFromId());
-        Entry toEntry   = getEntryManager().getEntry(request, associations.get(0).getToId());
+        Entry fromEntry = getEntryManager().getEntry(request,
+                              associations.get(0).getFromId());
+        Entry toEntry = getEntryManager().getEntry(request,
+                            associations.get(0).getToId());
 
         if (request.exists(ARG_CANCEL)) {
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
+            return new Result(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
         }
 
 
@@ -4075,13 +4350,14 @@ public class EntryManager extends RepositoryManager {
             getDatabaseManager().delete(Tables.ASSOCIATIONS.NAME, clause);
             fromEntry.setAssociations(null);
             toEntry.setAssociations(null);
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
+            return new Result(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
         }
         StringBuffer sb = new StringBuffer();
-        String form = RepositoryUtil.makeOkCancelForm(request, getRepository().URL_ASSOCIATION_DELETE,
-                                       ARG_DELETE_CONFIRM,
-                                       HtmlUtil.hidden(ARG_ASSOCIATION,
-                                           associationId));
+        String form = RepositoryUtil.makeOkCancelForm(request,
+                          getRepository().URL_ASSOCIATION_DELETE,
+                          ARG_DELETE_CONFIRM,
+                          HtmlUtil.hidden(ARG_ASSOCIATION, associationId));
         sb.append(
             getRepository().question(
                 msg("Are you sure you want to delete the assocation?"),
@@ -4092,7 +4368,7 @@ public class EntryManager extends RepositoryManager {
         sb.append(fromEntry.getLabel());
         sb.append(HtmlUtil.pad(HtmlUtil.img(fileUrl(ICON_ARROW))));
         sb.append(toEntry.getLabel());
-        return new Result(msg("Delete Associations"),     sb);
+        return new Result(msg("Delete Associations"), sb);
     }
 
 
@@ -4111,7 +4387,7 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected String processAssociationXml(Request request, Element node,
-                                         Hashtable entries, Hashtable files)
+                                           Hashtable entries, Hashtable files)
             throws Exception {
 
         String fromId    = XmlUtil.getAttribute(node, ATTR_FROM);
@@ -4128,8 +4404,8 @@ public class EntryManager extends RepositoryManager {
         if (toEntry == null) {
             toEntry = getEntryManager().getEntry(request, toId);
             if (toEntry == null) {
-                throw new RepositoryUtil.MissingEntryException("Could not find to entry:"
-                        + toId);
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find to entry:" + toId);
             }
         }
         return addAssociation(request, fromEntry, toEntry,
@@ -4165,7 +4441,9 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        PreparedStatement assocInsert = getDatabaseManager().getPreparedStatement(Tables.ASSOCIATIONS.INSERT);
+        PreparedStatement assocInsert =
+            getDatabaseManager().getPreparedStatement(
+                Tables.ASSOCIATIONS.INSERT);
         int    col = 1;
         String id  = getRepository().getGUID();
         assocInsert.setString(col++, id);
@@ -4199,10 +4477,12 @@ public class EntryManager extends RepositoryManager {
         }
         String search = HtmlUtil.href(
                             request.url(
-                                getRepository().URL_SEARCH_FORM, ARG_ASSOCIATION,
-                                getRepository().encode(association)), HtmlUtil.img(
-                                    fileUrl(ICON_SEARCH),
-                                    msg("Search in association")));
+                                getRepository().URL_SEARCH_FORM,
+                                ARG_ASSOCIATION,
+                                getRepository().encode(
+                                    association)), HtmlUtil.img(
+                                        fileUrl(ICON_SEARCH),
+                                        msg("Search in association")));
 
         return search;
     }
@@ -4253,8 +4533,11 @@ public class EntryManager extends RepositoryManager {
             getAssociations(
                 request,
                 Clause.or(
-                    Clause.eq(Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID, entry.getId()),
-                    Clause.eq(Tables.ASSOCIATIONS.COL_TO_ENTRY_ID, entry.getId()))));
+                    Clause.eq(
+                        Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID,
+                        entry.getId()), Clause.eq(
+                            Tables.ASSOCIATIONS.COL_TO_ENTRY_ID,
+                            entry.getId()))));
         return entry.getAssociations();
     }
 
@@ -4272,8 +4555,9 @@ public class EntryManager extends RepositoryManager {
     protected List<Association> getAssociations(Request request,
             Clause clause)
             throws Exception {
-        Statement stmt = getDatabaseManager().select(Tables.ASSOCIATIONS.COLUMNS,
-                             Tables.ASSOCIATIONS.NAME, clause);
+        Statement stmt =
+            getDatabaseManager().select(Tables.ASSOCIATIONS.COLUMNS,
+                                        Tables.ASSOCIATIONS.NAME, clause);
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
         ResultSet         results;
@@ -4311,25 +4595,38 @@ public class EntryManager extends RepositoryManager {
         }
 
         return SqlUtil.readString(typeHandler.select(request,
-                SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME), where, ""), 1);
+                SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME), where,
+                ""), 1);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param text _more_
+     *
+     * @return _more_
+     */
     public String processText(Request request, Entry entry, String text) {
         int idx = text.indexOf("<more>");
-        if(idx>=0) {
-            String first = text.substring(0,idx);
-            String base = ""+(Repository.blockCnt++);
-            String divId = "morediv_" + base;
+        if (idx >= 0) {
+            String first  = text.substring(0, idx);
+            String base   = "" + (Repository.blockCnt++);
+            String divId  = "morediv_" + base;
             String linkId = "morelink_" + base;
-            String second = text.substring(idx+"<more>".length());
-            String moreLink  = "javascript:showMore(" + HtmlUtil.squote(base) +")";
-            String lessLink  = "javascript:hideMore(" + HtmlUtil.squote(base) +")";
-            text = first+"<br><a " + HtmlUtil.id(linkId) +" href=" + HtmlUtil.quote(moreLink) +">More...</a><div style=\"\" class=\"moreblock\" " + HtmlUtil.id(divId)+">" + second +
-                "<br>" +
-                "<a href=" + HtmlUtil.quote(lessLink) +">...Less</a>" +
-                "</div>";
+            String second = text.substring(idx + "<more>".length());
+            String moreLink = "javascript:showMore(" + HtmlUtil.squote(base)
+                              + ")";
+            String lessLink = "javascript:hideMore(" + HtmlUtil.squote(base)
+                              + ")";
+            text = first + "<br><a " + HtmlUtil.id(linkId) + " href="
+                   + HtmlUtil.quote(moreLink)
+                   + ">More...</a><div style=\"\" class=\"moreblock\" "
+                   + HtmlUtil.id(divId) + ">" + second + "<br>" + "<a href="
+                   + HtmlUtil.quote(lessLink) + ">...Less</a>" + "</div>";
         }
         return text;
     }

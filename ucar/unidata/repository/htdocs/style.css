@@ -306,13 +306,13 @@ ul {
    min-height: 100px;
    max-height: 200px; 
    overflow-y: auto;
-   padding:0;
+   padding:5;
 }
 
 
 .tabcontent {
-   xxxmin-height: 100px;
-   padding:2;
+   min-height: 100px;
+   padding:5;
 }
 
 

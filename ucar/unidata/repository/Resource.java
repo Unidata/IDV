@@ -23,11 +23,13 @@
 package ucar.unidata.repository;
 
 
+import ucar.unidata.ui.ImageUtils;
+
+
 
 import java.io.File;
-import java.net.URL;
 
-import ucar.unidata.ui.ImageUtils;
+import java.net.URL;
 
 
 
@@ -155,6 +157,11 @@ public class Resource {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isFileType() {
         if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE)
                 || type.equals(TYPE_LOCAL_FILE)) {

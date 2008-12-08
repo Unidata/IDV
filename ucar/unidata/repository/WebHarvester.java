@@ -86,7 +86,7 @@ public class WebHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_URLS = "urls";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_URLENTRY = "urlentry";
 
 
@@ -318,9 +318,11 @@ public class WebHarvester extends Harvester {
         }
 
         String messages = StringUtil.join("", statusMessages);
-        return status.toString() + (messages.length()==0?"":
-                                   getRepository().makeShowHideBlock(null, "Entries",
-                                                                       new StringBuffer(messages), false));
+        return status.toString() + ((messages.length() == 0)
+                                    ? ""
+                                    : getRepository().makeShowHideBlock(null,
+                                    "Entries", new StringBuffer(messages),
+                                    false));
     }
 
 
@@ -380,7 +382,8 @@ public class WebHarvester extends Harvester {
                 if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
                 }
-                String crumbs = getEntryManager().makeEntryHeader(null, entry);
+                String crumbs = getEntryManager().makeEntryHeader(null,
+                                    entry);
                 crumbs = crumbs.replace("class=", "xclass=");
                 statusMessages.add(crumbs);
                 entryCnt++;
@@ -445,15 +448,15 @@ public class WebHarvester extends Harvester {
         desc = desc.replace("${todate}", getRepository().formatDate(toDate));
         desc = desc.replace("${name}", name);
 
-        Group group = getEntryManager().findGroupFromName(groupName, getUser(),
-                          true);
+        Group group = getEntryManager().findGroupFromName(groupName,
+                          getUser(), true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);
 
-        entry.initEntry(name, desc, group, 
-                        getUser(), resource, "", createDate.getTime(),
-                        fromDate.getTime(), toDate.getTime(), null);
+        entry.initEntry(name, desc, group, getUser(), resource, "",
+                        createDate.getTime(), fromDate.getTime(),
+                        toDate.getTime(), null);
         if (tag.length() > 0) {
             List tags = StringUtil.split(tag, ",", true, true);
             for (int i = 0; i < tags.size(); i++) {

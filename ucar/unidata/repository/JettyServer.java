@@ -25,6 +25,16 @@ package ucar.unidata.repository;
 
 import org.apache.commons.fileupload.MultipartStream;
 
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.HttpConnection;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.handler.AbstractHandler;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
+
 
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -48,16 +58,6 @@ import java.util.Properties;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.HttpConnection;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-
 
 
 
@@ -67,7 +67,8 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class JettyServer  extends RepositoryServlet  {
+public class JettyServer extends RepositoryServlet {
+
     /**
      * _more_
      *
@@ -82,9 +83,10 @@ public class JettyServer  extends RepositoryServlet  {
                 break;
             }
         }
-        Server server = new Server(port);
-        Context context = new Context(server,"/",Context.SESSIONS);
-        context.addServlet(new ServletHolder(new RepositoryServlet(args,port)), "/*");
+        Server  server  = new Server(port);
+        Context context = new Context(server, "/", Context.SESSIONS);
+        context.addServlet(new ServletHolder(new RepositoryServlet(args,
+                port)), "/*");
         server.start();
         server.join();
     }

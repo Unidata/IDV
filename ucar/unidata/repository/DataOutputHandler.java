@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -70,9 +69,9 @@ import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
 import ucar.unidata.data.gis.KmlUtil;
+import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.geoloc.LatLonRect;
-import ucar.unidata.geoloc.LatLonPointImpl;
 
 
 import ucar.unidata.util.Cache;
@@ -140,7 +139,8 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_CDL = new OutputType("CDL",
-                                                    "data.cdl","",ICON_DATA);
+                                                    "data.cdl", "",
+                                                    ICON_DATA);
 
     /** _more_ */
     public static final OutputType OUTPUT_WCS = new OutputType("WCS",
@@ -148,11 +148,11 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_MAP =
-        new OutputType("Point as Map", "data.point.map","",ICON_MAP);
+        new OutputType("Point as Map", "data.point.map", "", ICON_MAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_CSV =
-        new OutputType("Point as CSV", "data.point.csv","",ICON_CSV);
+        new OutputType("Point as CSV", "data.point.csv", "", ICON_CSV);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_KML =
@@ -160,11 +160,13 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TRAJECTORY_MAP =
-        new OutputType("Trajectory as Map", "data.trajectory.map","",ICON_MAP);
+        new OutputType("Trajectory as Map", "data.trajectory.map", "",
+                       ICON_MAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET_FORM =
-        new OutputType("Grid Subset", "data.gridsubset.form","",ICON_SUBSET);
+        new OutputType("Grid Subset", "data.gridsubset.form", "",
+                       ICON_SUBSET);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET =
@@ -183,13 +185,13 @@ public class DataOutputHandler extends OutputHandler {
     private Hashtable<String, Boolean> pointEntries = new Hashtable<String,
                                                           Boolean>();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, Boolean> trajectoryEntries =
         new Hashtable<String, Boolean>();
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Cache ncFileCache = new Cache(10) {
         protected void removeValue(Object key, Object value) {
             try {
@@ -199,7 +201,7 @@ public class DataOutputHandler extends OutputHandler {
     };
 
 
-    /** _more_          */
+    /** _more_ */
     private Cache gridCache = new Cache(10) {
         protected void removeValue(Object key, Object value) {
             try {
@@ -209,7 +211,7 @@ public class DataOutputHandler extends OutputHandler {
     };
 
 
-    /** _more_          */
+    /** _more_ */
     private Cache pointCache = new Cache(10) {
         protected void removeValue(Object key, Object value) {
             try {
@@ -218,7 +220,7 @@ public class DataOutputHandler extends OutputHandler {
         }
     };
 
-    /** _more_          */
+    /** _more_ */
     private Cache trajectoryCache = new Cache(10) {
         protected void removeValue(Object key, Object value) {
             try {
@@ -311,11 +313,11 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (canLoadAsTrajectory(entry)) {
-            addOutputLink(request, entry,links,OUTPUT_TRAJECTORY_MAP);
+            addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         }
 
         if (canLoadAsPoint(entry)) {
-            addOutputLink(request, entry,links,OUTPUT_POINT_MAP);
+            addOutputLink(request, entry, links, OUTPUT_POINT_MAP);
             if (getRepository().isOutputTypeOK(OUTPUT_POINT_CSV)) {
                 links.add(
                     new Link(
@@ -340,7 +342,7 @@ public class DataOutputHandler extends OutputHandler {
                                     ICON_KML), "Point Data as KML"));
             }
         } else if (canLoadAsGrid(entry)) {
-            addOutputLink(request, entry,links,OUTPUT_GRIDSUBSET_FORM);
+            addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
             if (getRepository().isOutputTypeOK(OUTPUT_WCS)) {
                 /*
                   links.add(
@@ -365,7 +367,7 @@ public class DataOutputHandler extends OutputHandler {
             request.put(ARG_OUTPUT, oldOutput);
         }
 
-        addOutputLink(request, entry,links,OUTPUT_CDL);
+        addOutputLink(request, entry, links, OUTPUT_CDL);
     }
 
 
@@ -379,8 +381,8 @@ public class DataOutputHandler extends OutputHandler {
      */
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
-               + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID + ":"
-               + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+               + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
+               + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
     }
 
 
@@ -393,23 +395,39 @@ public class DataOutputHandler extends OutputHandler {
      */
     public String getFullTdsUrl(Entry entry) {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
-               + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
-               + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+               + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/"
+               + ARG_ENTRYID + ":" + Request.encodeEmbedded(entry.getId())
+               + "/entry.das";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     private boolean canLoadEntry(Entry entry) {
-        if(entry.isGroup()) return false;
-        if(entry.getResource().isFileType()) {
+        if (entry.isGroup()) {
+            return false;
+        }
+        if (entry.getResource().isFileType()) {
             return entry.getResource().getFile().exists();
         }
-        if(!entry.getResource().isUrl()) {
+        if ( !entry.getResource().isUrl()) {
             return false;
         }
         String url = entry.getResource().getPath();
-        if(url == null) return false;
-        if(url.indexOf("dods")>=0) return true;
-        if(url.endsWith("das")) return true;
+        if (url == null) {
+            return false;
+        }
+        if (url.indexOf("dods") >= 0) {
+            return true;
+        }
+        if (url.endsWith("das")) {
+            return true;
+        }
         return false;
 
     }
@@ -456,12 +474,13 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = pointEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            if (!canLoadEntry(entry)) {
+            if ( !canLoadEntry(entry)) {
                 ok = false;
             } else {
                 try {
-                    StringBuilder buf  = new StringBuilder();
-                    if (getPointDataset(entry.getResource().getPath()) != null) {
+                    StringBuilder buf = new StringBuilder();
+                    if (getPointDataset(entry.getResource().getPath())
+                            != null) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -485,7 +504,8 @@ public class DataOutputHandler extends OutputHandler {
             boolean ok = false;
             if (canLoadEntry(entry)) {
                 try {
-                    if (getTrajectoryDataset(entry.getResource().getPath()) != null) {
+                    if (getTrajectoryDataset(entry.getResource().getPath())
+                            != null) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -510,7 +530,7 @@ public class DataOutputHandler extends OutputHandler {
         Boolean b = gridEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
-            if (!canLoadEntry(entry)) {
+            if ( !canLoadEntry(entry)) {
                 ok = false;
             } else {
                 try {
@@ -519,7 +539,7 @@ public class DataOutputHandler extends OutputHandler {
                     //Use openFile
                     GridDataset gds = GridDataset.open(file.toString());
                     //Look for the first grid
-                    if(gds.getGrids().iterator().hasNext()) {
+                    if (gds.getGrids().iterator().hasNext()) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -595,12 +615,14 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @param file _more_
      *
+     * @param path _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public PointObsDataset getPointDataset(String path) throws Exception {
-        PointObsDataset pds  = (PointObsDataset) pointCache.get(path);
+        PointObsDataset pds = (PointObsDataset) pointCache.get(path);
         if (pds == null) {
             pds = (PointObsDataset) TypedDatasetFactory.open(
                 FeatureType.POINT, path, null, new StringBuilder());
@@ -615,12 +637,14 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @param file _more_
      *
+     * @param path _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public GridDataset getGridDataset(String path) throws Exception {
-        GridDataset gds  = (GridDataset) gridCache.get(path);
+        GridDataset gds = (GridDataset) gridCache.get(path);
         if (gds == null) {
             gridCache.put(path, gds = GridDataset.open(path));
         }
@@ -653,6 +677,8 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @param file _more_
      *
+     * @param path _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
@@ -663,8 +689,10 @@ public class DataOutputHandler extends OutputHandler {
             (TrajectoryObsDataset) trajectoryCache.get(path);
         if (pds == null) {
             pds = (TrajectoryObsDataset) TypedDatasetFactory.open(
-                                                                  FeatureType.TRAJECTORY, path, null, new StringBuilder());
-            if(pds == null) return null;
+                FeatureType.TRAJECTORY, path, null, new StringBuilder());
+            if (pds == null) {
+                return null;
+            }
             trajectoryCache.put(path, pds);
         }
         return pds;
@@ -691,7 +719,7 @@ public class DataOutputHandler extends OutputHandler {
             && getRepository().getAccessManager().canDoAction(request,
                 entry.getParentGroup(), Permission.ACTION_NEW);
 
-        String path   = entry.getResource().getPath();
+        String       path   = entry.getResource().getPath();
         StringBuffer sb     = new StringBuffer();
         String       prefix = ARG_VARIABLE + ".";
         OutputType   output = request.getOutput();
@@ -772,8 +800,8 @@ public class DataOutputHandler extends OutputHandler {
                             getEntryManager().addInitialMetadata(request,
                                     entries);
                         }
-                        getEntryManager().insertEntries(Misc.newList(newEntry),
-                                true);
+                        getEntryManager().insertEntries(
+                            Misc.newList(newEntry), true);
                         return new Result(
                             request.entryUrl(
                                 getRepository().URL_ENTRY_FORM, newEntry));
@@ -828,7 +856,8 @@ public class DataOutputHandler extends OutputHandler {
         List<Date>   dates     = null;
 
 
-        GridDataset  dataset   = getGridDataset(entry.getResource().getPath());
+        GridDataset  dataset   =
+            getGridDataset(entry.getResource().getPath());
         StringBuffer varSB     = new StringBuffer();
         synchronized (dataset) {
             for (VariableSimpleIF var : dataset.getDataVariables()) {
@@ -934,7 +963,8 @@ public class DataOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid"));
         sb.append(HtmlUtil.formClose());
-        return makeLinksResult(request, msg("Grid Subset"), sb, new State(entry));
+        return makeLinksResult(request, msg("Grid Subset"), sb,
+                               new State(entry));
     }
 
 
@@ -974,8 +1004,8 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointMap(Request request, Entry entry)
             throws Exception {
 
-        PointObsDataset pod  = getPointDataset(entry.getResource().getPath());
-        StringBuffer    sb   = new StringBuffer();
+        PointObsDataset pod = getPointDataset(entry.getResource().getPath());
+        StringBuffer    sb  = new StringBuffer();
         synchronized (pod) {
             List         vars = pod.getDataVariables();
             int          skip = request.get(ARG_SKIP, 0);
@@ -1092,9 +1122,9 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
-                        entry.getId(), ARG_SKIP, "" + (skip - max), ARG_MAX,
-                        "" + max
+                        ARG_OUTPUT, request.getOutput().toString(),
+                        ARG_ENTRYID, entry.getId(), ARG_SKIP,
+                        "" + (skip - max), ARG_MAX, "" + max
                     }), msg("Previous")));
                     didone = true;
                 }
@@ -1104,9 +1134,9 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
-                        entry.getId(), ARG_SKIP, "" + (skip + max), ARG_MAX,
-                        "" + max
+                        ARG_OUTPUT, request.getOutput().toString(),
+                        ARG_ENTRYID, entry.getId(), ARG_SKIP,
+                        "" + (skip + max), ARG_MAX, "" + max
                     }), msg("Next")));
                     didone = true;
                 }
@@ -1117,8 +1147,9 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.href(
                             HtmlUtil.url(
                                 request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
-                        entry.getId(), ARG_SKIP, "" + 0, ARG_MAX, "" + total
+                        ARG_OUTPUT, request.getOutput().toString(),
+                        ARG_ENTRYID, entry.getId(), ARG_SKIP, "" + 0, ARG_MAX,
+                        "" + total
                     }), msg("All")));
 
                 }
@@ -1188,7 +1219,8 @@ public class DataOutputHandler extends OutputHandler {
                     values[i] = (float) fromArray[i];
                 }
             } else {
-                throw new IllegalArgumentException("Unknown array type:" + fromClass.getName());
+                throw new IllegalArgumentException("Unknown array type:"
+                        + fromClass.getName());
             }
             return values;
         }
@@ -1208,8 +1240,9 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputTrajectoryMap(Request request, Entry entry)
             throws Exception {
-        TrajectoryObsDataset tod  = getTrajectoryDataset(entry.getResource().getPath());
-        StringBuffer         sb   = new StringBuffer();
+        TrajectoryObsDataset tod =
+            getTrajectoryDataset(entry.getResource().getPath());
+        StringBuffer sb = new StringBuffer();
         synchronized (tod) {
             StringBuffer js           = new StringBuffer();
             List         trajectories = tod.getTrajectories();
@@ -1217,8 +1250,8 @@ public class DataOutputHandler extends OutputHandler {
                 List allVariables = tod.getDataVariables();
                 TrajectoryObsDatatype todt =
                     (TrajectoryObsDatatype) trajectories.get(i);
-                float[] lats = toFloatArray(todt.getLatitude(null));
-                float[] lons = toFloatArray(todt.getLongitude(null));
+                float[]      lats     = toFloatArray(todt.getLatitude(null));
+                float[]      lons     = toFloatArray(todt.getLongitude(null));
                 StringBuffer markerSB = new StringBuffer();
                 js.append("line = new Polyline([");
                 for (int ptIdx = 0; ptIdx < lats.length; ptIdx++) {
@@ -1307,8 +1340,8 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
 
-        PointObsDataset pod  = getPointDataset(entry.getResource().getPath());
-        StringBuffer    sb   = new StringBuffer();
+        PointObsDataset pod = getPointDataset(entry.getResource().getPath());
+        StringBuffer    sb  = new StringBuffer();
         synchronized (pod) {
             List     vars         = pod.getDataVariables();
             Iterator dataIterator = pod.getDataIterator(16384);
@@ -1384,7 +1417,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        PointObsDataset pod  = getPointDataset(entry.getResource().getPath());
+        PointObsDataset pod = getPointDataset(entry.getResource().getPath());
         synchronized (pod) {
             Element  root         = KmlUtil.kml(entry.getName());
             Element  docNode      = KmlUtil.document(root, entry.getName());
@@ -1499,7 +1532,8 @@ public class DataOutputHandler extends OutputHandler {
             }
         };
 
-        if(request.getHttpServlet()!=null && request.getHttpServlet().getServletConfig()!=null) {
+        if ((request.getHttpServlet() != null)
+                && (request.getHttpServlet().getServletConfig() != null)) {
             servlet.init(request.getHttpServlet().getServletConfig());
         }
 

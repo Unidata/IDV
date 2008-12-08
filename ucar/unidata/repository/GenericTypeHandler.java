@@ -95,9 +95,18 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getIconUrl(Entry entry) {
-        String icon =  getProperty("icon", (String)null);
-        if(icon!=null) return fileUrl(icon);
+        String icon = getProperty("icon", (String) null);
+        if (icon != null) {
+            return fileUrl(icon);
+        }
         return super.getIconUrl(entry);
     }
 
@@ -351,7 +360,7 @@ public class GenericTypeHandler extends TypeHandler {
 
         String[]     values = SqlUtil.readString(statement, 1);
         StringBuffer sb     = new StringBuffer();
-        OutputType       output = request.getOutput();
+        OutputType   output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append(RepositoryUtil.header(title));
             sb.append("<ul>");
@@ -481,7 +490,8 @@ public class GenericTypeHandler extends TypeHandler {
             column.assembleWhereClause(request, where, searchCriteria);
         }
         if ((originalSize != where.size()) && (originalSize > 0)) {
-            where.add(Clause.join(Tables.ENTRIES.COL_ID, getTableName() + ".id"));
+            where.add(Clause.join(Tables.ENTRIES.COL_ID,
+                                  getTableName() + ".id"));
         }
         return where;
     }
@@ -580,6 +590,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @param entry _more_
      * @param request _more_
      * @param output _more_
+     * @param showDescription _more_
      * @param showResource _more_
      * @param showMap _more_
      * @param linkToDownload _more_
@@ -595,14 +606,15 @@ public class GenericTypeHandler extends TypeHandler {
                                              boolean linkToDownload)
             throws Exception {
         StringBuffer sb = super.getInnerEntryContent(entry, request, output,
-                                                     showDescription,
-                                                     showResource, linkToDownload);
+                              showDescription, showResource, linkToDownload);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int      valueIdx = 0;
             Object[] values   = entry.getValues();
             if (values != null) {
                 for (Column column : columns) {
-                    if(!column.getCanShow()) continue;
+                    if ( !column.getCanShow()) {
+                        continue;
+                    }
                     StringBuffer tmpSb = new StringBuffer();
                     valueIdx = column.formatValue(tmpSb, output, values,
                             valueIdx);
@@ -630,8 +642,8 @@ public class GenericTypeHandler extends TypeHandler {
                                             String html)
             throws Exception {
         html = super.processDisplayTemplate(request, entry, html);
-        Object[] values = entry.getValues();
-        OutputType   output = request.getOutput();
+        Object[]   values = entry.getValues();
+        OutputType output = request.getOutput();
         if (values != null) {
             int valueIdx = 0;
             for (Column column : columns) {

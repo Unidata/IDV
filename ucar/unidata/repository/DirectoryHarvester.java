@@ -80,7 +80,7 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class DirectoryHarvester extends Harvester  {
+public class DirectoryHarvester extends Harvester {
 
 
     /**
@@ -100,8 +100,9 @@ public class DirectoryHarvester extends Harvester  {
      *
      * @throws Exception _more_
      */
-    public DirectoryHarvester(Repository repository, String id) throws Exception {
-        super(repository,id);
+    public DirectoryHarvester(Repository repository, String id)
+            throws Exception {
+        super(repository, id);
     }
 
 
@@ -133,17 +134,30 @@ public class DirectoryHarvester extends Harvester  {
                                      HtmlUtil.input(ARG_NAME, getName(),
                                          HtmlUtil.SIZE_40)));
         sb.append(
-            HtmlUtil.formEntry(
-                msgLabel("Run"),
-                HtmlUtil.checkbox(ATTR_ACTIVEONSTART, "true", getActiveOnStart())
-                + HtmlUtil.space(1) + msg("Active on startup")
-                + HtmlUtil.space(3)
-                + HtmlUtil.checkbox(ATTR_MONITOR, "true", getMonitor())
-                + HtmlUtil.space(1) + msg("Monitor") + HtmlUtil.space(3)
-                + msgLabel("Sleep") + HtmlUtil.space(1)
-                + HtmlUtil.input(
-                    ATTR_SLEEP, "" + getSleepMinutes(),
-                    HtmlUtil.SIZE_5) + HtmlUtil.space(1) + msg("(minutes)")));
+            HtmlUtil
+                .formEntry(
+                    msgLabel("Run"),
+                    HtmlUtil
+                        .checkbox(
+                            ATTR_ACTIVEONSTART, "true",
+                            getActiveOnStart()) + HtmlUtil.space(1)
+                                + msg("Active on startup")
+                                + HtmlUtil.space(3)
+                                + HtmlUtil
+                                    .checkbox(
+                                        ATTR_MONITOR, "true",
+                                        getMonitor()) + HtmlUtil.space(1)
+                                            + msg("Monitor")
+                                            + HtmlUtil.space(3)
+                                            + msgLabel("Sleep")
+                                            + HtmlUtil.space(1)
+                                            + HtmlUtil
+                                                .input(ATTR_SLEEP,
+                                                    "" + getSleepMinutes(),
+                                                        HtmlUtil
+                                                            .SIZE_5) + HtmlUtil
+                                                                .space(1) + msg(
+                                                                    "(minutes)")));
 
         String root = (rootDir != null)
                       ? rootDir.toString()
@@ -154,46 +168,64 @@ public class DirectoryHarvester extends Harvester  {
             extraLabel = HtmlUtil.space(2)
                          + HtmlUtil.bold("Directory does not exist");
         }
-        sb.append(RepositoryManager.tableSubHeader("Walk the directory tree"));
+        sb.append(
+            RepositoryManager.tableSubHeader("Walk the directory tree"));
         sb.append(HtmlUtil.formEntry(msgLabel("Under directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
                                          HtmlUtil.SIZE_60) + extraLabel));
 
-        sb.append(RepositoryManager.tableSubHeader("Create new groups under"));
+        sb.append(
+            RepositoryManager.tableSubHeader("Create new groups under"));
         sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
                                      HtmlUtil.input(ATTR_BASEGROUP,
-                                                    baseGroupName,
-                                                    HtmlUtil.SIZE_60)));
+                                         baseGroupName, HtmlUtil.SIZE_60)));
 
 
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     protected void runInner() throws Exception {
         if ( !getActive()) {
             return;
         }
-        if(baseGroupName.length()==0) {
-            baseGroupName  = getEntryManager().getTopGroup().getName();
+        if (baseGroupName.length() == 0) {
+            baseGroupName = getEntryManager().getTopGroup().getName();
         }
-        Group group = getEntryManager().findGroupFromName(baseGroupName, getUser(),
-                                                   true);
+        Group group = getEntryManager().findGroupFromName(baseGroupName,
+                          getUser(), true);
         walkTree(rootDir, group);
     }
 
 
-   protected void walkTree(File dir, Group parentGroup) throws Exception {
-        String name  =dir.getName();
-        File xmlFile = new File(IOUtil.joinDir(dir.getParentFile(),"." + name +".ramadda"));
+    /**
+     * _more_
+     *
+     * @param dir _more_
+     * @param parentGroup _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void walkTree(File dir, Group parentGroup) throws Exception {
+        String name = dir.getName();
+        File xmlFile = new File(IOUtil.joinDir(dir.getParentFile(),
+                           "." + name + ".ramadda"));
         Entry fileInfoEntry = getEntryManager().getTemplateEntry(dir);
-        Group group = getEntryManager().findGroupFromName(parentGroup.getFullName()+"/"+name, getUser(),false);
-        if(group == null) {
-            group = getEntryManager().makeNewGroup(parentGroup,name,getUser(),fileInfoEntry);
+        Group group =
+            getEntryManager().findGroupFromName(parentGroup.getFullName()
+                + "/" + name, getUser(), false);
+        if (group == null) {
+            group = getEntryManager().makeNewGroup(parentGroup, name,
+                    getUser(), fileInfoEntry);
         }
-        File[]files  = dir.listFiles();
-        for(int i=0;i<files.length;i++) {
-            if(files[i].isDirectory()) {
+        File[] files = dir.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
                 walkTree(files[i], group);
             }
         }

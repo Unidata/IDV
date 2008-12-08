@@ -81,22 +81,23 @@ public interface Constants {
 
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
+    /** _more_          */
     public static final String ICON_HEADER = "/header.jpg";
 
     /** _more_ */
     public static final String ICON_RCURVE = "/icons/brc.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_MAP = "/icons/map.gif";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_CSV = "/icons/xls.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_KML = "/icons/kml.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_OPENDAP = "/icons/opendap.gif";
 
     /** _more_ */
@@ -148,6 +149,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ERROR = "/icons/error.png";
 
+    /** _more_          */
     public static final String ICON_PLUS = "/icons/plus.gif";
 
     /** _more_ */
@@ -183,13 +185,14 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_DATA = "/icons/data.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_SUBSET = "/icons/subset.gif";
 
 
     /** _more_ */
     public static final String ICON_MINUS = "/icons/minus.gif";
 
+    /** _more_          */
     public static final String ICON_ADD = "/icons/add.gif";
 
     /** _more_ */
@@ -244,7 +247,10 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
+    /** _more_          */
     public static final String ATTR_TARGET = "target";
+
+    /** _more_          */
     public static final String ATTR_INPUTID = "inputid";
 
     /** _more_ */
@@ -308,6 +314,7 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_DATASET = "dataset";
 
     /** _more_ */
@@ -622,10 +629,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LABEL = "label";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_LATEST = "latest";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_LATESTOPENDAP = "latestopendap";
 
     /** _more_ */
@@ -676,20 +683,26 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    /** _more_          */
     public static final String PROP_ADMIN_PHRASES = "ramadda.admin.phrases";
 
+    /** _more_          */
     public static final String PROP_ADMIN_EMAIL = "ramadda.admin.email";
+
+    /** _more_          */
     public static final String PROP_ADMIN_SMTP = "ramadda.admin.smtp";
 
 
+    /** _more_          */
     public static final String PROP_VERSION = "ramadda.version";
 
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
+    /** _more_          */
     public static final String PROP_HOSTNAME = "ramadda.hostname";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_GOOGLEAPIKEYS = "ramadda.googleapikeys";
 
     /** _more_ */
@@ -815,6 +828,7 @@ public interface Constants {
     public static final String PROP_HTML_GRAPHAPPLET =
         "ramadda.html.graphapplet";
 
+    /** _more_          */
     public static final String PROP_HTML_CHATAPPLET =
         "ramadda.html.chatapplet";
 
@@ -834,6 +848,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_DESCRIPTION = "description";
+
+    /** _more_          */
     public static final String TAG_DESCRIPTION = "description";
 
     /** _more_ */
@@ -884,6 +900,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
+
+    /** _more_          */
     public static final String ARG_URL = "url";
 
     /** _more_ */
@@ -1008,6 +1026,7 @@ public interface Constants {
     public static final String ARG_USER_ROLES = "user.roles";
 
 
+    /** _more_          */
     public static final String ARG_USER_PASSWORDKEY = "user.passwordkey";
 
 
@@ -1035,6 +1054,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ADMIN = "user.admin";
 
+    /** _more_          */
     public static final String ARG_USER_BULK = "user.bulk";
 
 
@@ -1108,15 +1128,23 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_HARVESTER_CLASS = "harvester.class";
 
-    public static final String ARG_HARVESTER_REDIRECTTOEDIT = "harvester.redirecttoedit";
+    /** _more_          */
+    public static final String ARG_HARVESTER_REDIRECTTOEDIT =
+        "harvester.redirecttoedit";
+
+    /** _more_          */
     public static final String ARG_HARVESTER_GETXML = "harvester.getxml";
+
+    /** _more_          */
     public static final String ARG_HARVESTER_XMLFILE = "harvester.xmlfile";
 
 
 
+    /** _more_          */
     public static final String ARG_RESPONSETYPE = "responsetype";
 
 
+    /** _more_          */
     public static final String ID_PREFIX_SYNTH = "synth:";
 
     /** _more_ */

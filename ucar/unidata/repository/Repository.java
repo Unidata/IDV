@@ -31,7 +31,6 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.PluginClassLoader;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -41,6 +40,7 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.PluginClassLoader;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -73,8 +73,6 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
-import java.util.jar.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -86,6 +84,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+
+import java.util.jar.*;
 
 
 
@@ -102,20 +102,38 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository extends RepositoryBase implements 
-        RequestHandler {
+public class Repository extends RepositoryBase implements RequestHandler {
 
 
-    public static final String MACRO_LINKS          =   "links";
-    public static final String MACRO_HEADER_IMAGE   =   "header.image";
-    public static final String MACRO_HEADER_TITLE   =   "header.title";
-    public static final String MACRO_USERLINK       =   "userlink";
-    public static final String MACRO_REPOSITORY_NAME=   "repository_name";
-    public static final String MACRO_FOOTER=            "footer";
-    public static final String MACRO_TITLE=             "title"; 
-    public static final String MACRO_ROOT=              "root"; 
-    public static final String MACRO_BOTTOM=            "bottom"; 
-    public static final String MACRO_CONTENT=           "content";
+    /** _more_          */
+    public static final String MACRO_LINKS = "links";
+
+    /** _more_          */
+    public static final String MACRO_HEADER_IMAGE = "header.image";
+
+    /** _more_          */
+    public static final String MACRO_HEADER_TITLE = "header.title";
+
+    /** _more_          */
+    public static final String MACRO_USERLINK = "userlink";
+
+    /** _more_          */
+    public static final String MACRO_REPOSITORY_NAME = "repository_name";
+
+    /** _more_          */
+    public static final String MACRO_FOOTER = "footer";
+
+    /** _more_          */
+    public static final String MACRO_TITLE = "title";
+
+    /** _more_          */
+    public static final String MACRO_ROOT = "root";
+
+    /** _more_          */
+    public static final String MACRO_BOTTOM = "bottom";
+
+    /** _more_          */
+    public static final String MACRO_CONTENT = "content";
 
     /** _more_ */
     public static int blockCnt = 0;
@@ -136,6 +154,7 @@ public class Repository extends RepositoryBase implements
         //        URL_ENTRY_SHOW
     };
 
+    /** _more_          */
     protected RequestUrl[] groupEditUrls = {
         URL_ENTRY_NEW, URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
         getMetadataManager().URL_METADATA_ADDFORM,
@@ -152,7 +171,8 @@ public class Repository extends RepositoryBase implements
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_DELETER = new OutputType("Delete Entry", "repository.delete");
+    public static final OutputType OUTPUT_DELETER =
+        new OutputType("Delete Entry", "repository.delete");
 
 
     /** _more_ */
@@ -169,6 +189,7 @@ public class Repository extends RepositoryBase implements
     /** _more_ */
     private Properties properties = new Properties();
 
+    /** _more_          */
     private Map<String, String> systemEnv;
 
     /** _more_ */
@@ -193,6 +214,7 @@ public class Repository extends RepositoryBase implements
     private List<TwoFacedObject> languages = new ArrayList<TwoFacedObject>();
 
 
+    /** _more_          */
     private Properties phraseMap;
 
 
@@ -206,6 +228,7 @@ public class Repository extends RepositoryBase implements
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
+    /** _more_          */
     private List<OutputHandler> allOutputHandlers =
         new ArrayList<OutputHandler>();
 
@@ -220,10 +243,17 @@ public class Repository extends RepositoryBase implements
 
 
 
-    private  List<String> typeDefFiles   = new ArrayList<String>();
-    private  List<String> apiDefFiles    = new ArrayList<String>();
-    private  List<String> outputDefFiles       = new ArrayList<String>();
-    private  List<String> metadataDefFiles     = new ArrayList<String>();
+    /** _more_          */
+    private List<String> typeDefFiles = new ArrayList<String>();
+
+    /** _more_          */
+    private List<String> apiDefFiles = new ArrayList<String>();
+
+    /** _more_          */
+    private List<String> outputDefFiles = new ArrayList<String>();
+
+    /** _more_          */
+    private List<String> metadataDefFiles = new ArrayList<String>();
 
 
     /** _more_ */
@@ -251,8 +281,10 @@ public class Repository extends RepositoryBase implements
     /** _more_ */
     private UserManager userManager;
 
+    /** _more_          */
     private EntryManager entryManager;
 
+    /** _more_          */
     private SearchManager searchManager;
 
     /** _more_ */
@@ -309,13 +341,13 @@ public class Repository extends RepositoryBase implements
      * @param inTomcat _more_
      *
      * @throws Exception _more_
-    */
-    public Repository(String[] args, int port,
-                      boolean inTomcat)
+     */
+    public Repository(String[] args, int port, boolean inTomcat)
             throws Exception {
         super(port);
-        java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
-        this.hostname =localMachine.getHostName();
+        java.net.InetAddress localMachine =
+            java.net.InetAddress.getLocalHost();
+        this.hostname = localMachine.getHostName();
         this.inTomcat = inTomcat;
         this.args     = args;
     }
@@ -417,9 +449,9 @@ public class Repository extends RepositoryBase implements
                 "/ucar/unidata/repository/resources/repository.properties",
                 getClass()));
 
-        Properties   argProperties       = new Properties();
+        Properties argProperties = new Properties();
         for (int i = 0; i < args.length; i++) {
-            if(checkFile(args[i])) {
+            if (checkFile(args[i])) {
                 continue;
             }
             if (args[i].endsWith(".properties")) {
@@ -478,7 +510,7 @@ public class Repository extends RepositoryBase implements
 
         initPlugins();
 
-        apiDefFiles.addAll(0,getResourcePaths(PROP_API));
+        apiDefFiles.addAll(0, getResourcePaths(PROP_API));
         typeDefFiles.addAll(0, getResourcePaths(PROP_TYPES));
         outputDefFiles.addAll(0, getResourcePaths(PROP_OUTPUTHANDLERS));
         metadataDefFiles.addAll(0, getResourcePaths(PROP_METADATAHANDLERS));
@@ -516,7 +548,7 @@ public class Repository extends RepositoryBase implements
         }
 
         sdf = RepositoryUtil.makeDateFormat(getProperty(PROP_DATEFORMAT,
-                                         DEFAULT_TIME_FORMAT));
+                DEFAULT_TIME_FORMAT));
         TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
 
 
@@ -526,8 +558,8 @@ public class Repository extends RepositoryBase implements
                 getProperty("ramadda.html.htdocroots", BLANK), ";", true,
                 true));
 
-        String hostname = getProperty(PROP_HOSTNAME,(String)null);
-        if(hostname!=null) {
+        String hostname = getProperty(PROP_HOSTNAME, (String) null);
+        if (hostname != null) {
             this.hostname = hostname;
         }
 
@@ -600,6 +632,11 @@ public class Repository extends RepositoryBase implements
         return new UserManager(this);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected EntryManager doMakeEntryManager() {
         return new EntryManager(this);
     }
@@ -668,6 +705,11 @@ public class Repository extends RepositoryBase implements
         return userManager;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected EntryManager getEntryManager() {
         if (entryManager == null) {
             entryManager = doMakeEntryManager();
@@ -820,15 +862,26 @@ public class Repository extends RepositoryBase implements
     }
 
 
+    /** _more_          */
     public static final double VERSION = 1.0;
 
-    private void  updateToVersion1_0() throws Exception {
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    private void updateToVersion1_0() throws Exception {}
 
-    }
-
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     protected void checkVersion() throws Exception {
-        double version = getDbProperty(PROP_VERSION,0.0);
-        if(version==VERSION) return;
+        double version = getDbProperty(PROP_VERSION, 0.0);
+        if (version == VERSION) {
+            return;
+        }
         updateToVersion1_0();
         //        writeGlobal(PROP_VERSION,""+VERSION);
     }
@@ -855,13 +908,13 @@ public class Repository extends RepositoryBase implements
                 if (content == null) {
                     continue;
                 }
-                
 
 
-                Object[] result  = parsePhrases(content);
-                String     type       = (String)result[0];
-                String     name       = (String)result[1];
-                Properties properties = (Properties)result[2];
+
+                Object[]   result     = parsePhrases(content);
+                String     type       = (String) result[0];
+                String     name       = (String) result[1];
+                Properties properties = (Properties) result[2];
                 if (type != null) {
                     if (name == null) {
                         name = type;
@@ -875,12 +928,18 @@ public class Repository extends RepositoryBase implements
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     private Object[] parsePhrases(String content) {
-        List<String> lines = StringUtil.split(content, "\n", true,
-                                              true);
-        Properties properties = new Properties();
-        String     type       = null;
-        String     name       = null;
+        List<String> lines      = StringUtil.split(content, "\n", true, true);
+        Properties   properties = new Properties();
+        String       type       = null;
+        String       name       = null;
         for (String line : lines) {
             if (line.startsWith("#")) {
                 continue;
@@ -899,7 +958,7 @@ public class Repository extends RepositoryBase implements
                 properties.put(key, value);
             }
         }
-        return new Object[]{type,name,properties};
+        return new Object[] { type, name, properties };
     }
 
 
@@ -924,16 +983,51 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    protected void loadPluginFile(File f) {
-        
-    }
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
+    protected void loadPluginFile(File f) {}
 
+    /**
+     * Class MyClassLoader _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private class MyClassLoader extends PluginClassLoader {
-        public MyClassLoader(String path, ClassLoader parent) throws Exception {
+
+        /**
+         * _more_
+         *
+         * @param path _more_
+         * @param parent _more_
+         *
+         * @throws Exception _more_
+         */
+        public MyClassLoader(String path, ClassLoader parent)
+                throws Exception {
             super(path, parent);
         }
-        protected void checkClass(Class c) throws Exception {
-        }
+
+        /**
+         * _more_
+         *
+         * @param c _more_
+         *
+         * @throws Exception _more_
+         */
+        protected void checkClass(Class c) throws Exception {}
+
+        /**
+         * _more_
+         *
+         * @param jarEntry _more_
+         *
+         * @return _more_
+         */
         protected String defineResource(JarEntry jarEntry) {
             String path = super.defineResource(jarEntry);
             checkFile(path);
@@ -942,21 +1036,32 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    protected void  initPlugins() throws Exception  {
-        File dir = new File(getStorageManager().getPluginsDir());
-        File[]plugins = dir.listFiles();
-        for(int i=0;i<plugins.length;i++) {
-            if(plugins[i].isDirectory()) continue;
-            if(plugins[i].toString().endsWith(".jar")) {
-                PluginClassLoader cl = new MyClassLoader(plugins[i].toString(),
-                                                             getClass().getClassLoader());
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void initPlugins() throws Exception {
+        File   dir     = new File(getStorageManager().getPluginsDir());
+        File[] plugins = dir.listFiles();
+        for (int i = 0; i < plugins.length; i++) {
+            if (plugins[i].isDirectory()) {
+                continue;
+            }
+            if (plugins[i].toString().endsWith(".jar")) {
+                PluginClassLoader cl =
+                    new MyClassLoader(plugins[i].toString(),
+                                      getClass().getClassLoader());
 
                 Misc.addClassLoader(cl);
                 List entries = cl.getEntryNames();
-                for (int entryIdx = 0; entryIdx < entries.size(); entryIdx++) {
+                for (int entryIdx = 0; entryIdx < entries.size();
+                        entryIdx++) {
                     String entry = (String) entries.get(entryIdx);
-                    if(!checkFile(entry)) {
-                        System.err.println ("Don't know how to handle plugin resource:" + entry +" from plugin:" + plugins[i]);
+                    if ( !checkFile(entry)) {
+                        System.err.println(
+                            "Don't know how to handle plugin resource:"
+                            + entry + " from plugin:" + plugins[i]);
                     }
                 }
             } else {
@@ -966,6 +1071,13 @@ public class Repository extends RepositoryBase implements
     }
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     protected boolean checkFile(String file) {
         if (file.indexOf("api.xml") >= 0) {
             apiDefFiles.add(file);
@@ -1009,8 +1121,9 @@ public class Repository extends RepositoryBase implements
      * @throws Exception _more_
      */
     protected void readGlobals() throws Exception {
-        Statement statement = getDatabaseManager().select(Tables.GLOBALS.COLUMNS,
-                                  Tables.GLOBALS.NAME, new Clause[] {});
+        Statement statement =
+            getDatabaseManager().select(Tables.GLOBALS.COLUMNS,
+                                        Tables.GLOBALS.NAME, new Clause[] {});
         dbProperties = new Properties();
         ResultSet results = statement.getResultSet();
         while (results.next()) {
@@ -1032,7 +1145,7 @@ public class Repository extends RepositoryBase implements
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
         getEntryManager().clearCache();
-        dataTypeList  = null;
+        dataTypeList = null;
     }
 
 
@@ -1070,7 +1183,7 @@ public class Repository extends RepositoryBase implements
         if (exc != null) {
             //            exc.printStackTrace();
             thr = LogUtil.getInnerException(exc);
-            if(thr!=null) {
+            if (thr != null) {
                 thr.printStackTrace();
             }
         }
@@ -1370,7 +1483,8 @@ public class Repository extends RepositoryBase implements
         }
 
         getUserManager().initOutputHandlers();
-        OutputHandler outputHandler = new OutputHandler(getRepository(),"Entry Deleter") {
+        OutputHandler outputHandler = new OutputHandler(getRepository(),
+                                          "Entry Deleter") {
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER);
             }
@@ -1401,8 +1515,8 @@ public class Repository extends RepositoryBase implements
                     idBuffer.append(",");
                     idBuffer.append(entry.getId());
                 }
-                return new Result(request.url(URL_ENTRY_DELETELIST, ARG_ENTRYIDS,
-                        idBuffer.toString()));
+                return new Result(request.url(URL_ENTRY_DELETELIST,
+                        ARG_ENTRYIDS, idBuffer.toString()));
             }
         };
         outputHandler.addType(OUTPUT_DELETER);
@@ -1451,9 +1565,10 @@ public class Repository extends RepositoryBase implements
             }
 
             //TODO: For non-html outputs come up with some error format
-            Throwable    inner     = LogUtil.getInnerException(exc);
-            boolean      badAccess = inner instanceof RepositoryUtil.AccessException;
-            StringBuffer sb        = new StringBuffer();
+            Throwable inner = LogUtil.getInnerException(exc);
+            boolean badAccess = inner
+                                instanceof RepositoryUtil.AccessException;
+            StringBuffer sb = new StringBuffer();
             if ( !badAccess) {
                 sb.append(error(msgLabel("An error has occurred")
                                 + HtmlUtil.p() + inner.getMessage()));
@@ -1476,9 +1591,11 @@ public class Repository extends RepositoryBase implements
             } else {
                 result.setResponseCode(Result.RESPONSE_INTERNALERROR);
                 String userAgent = request.getHeaderArg("User-Agent");
-                if(userAgent==null)
+                if (userAgent == null) {
                     userAgent = "Unknown";
-                log("Error handling request:" + request + " user-agent:" + userAgent +" ip:" + request.getIp(), exc);
+                }
+                log("Error handling request:" + request + " user-agent:"
+                    + userAgent + " ip:" + request.getIp(), exc);
             }
         }
 
@@ -1543,7 +1660,8 @@ public class Repository extends RepositoryBase implements
         }
 
 
-        List<Group> topGroups = new ArrayList<Group>(getEntryManager().getTopGroups(request));
+        List<Group> topGroups =
+            new ArrayList<Group>(getEntryManager().getTopGroups(request));
         topGroups.add(getEntryManager().getTopGroup());
         //        System.err.println ("incoming:" + incoming);
         for (Group group : topGroups) {
@@ -1594,8 +1712,9 @@ public class Repository extends RepositoryBase implements
         }
 
         String userAgent = request.getHeaderArg("User-Agent");
-        if(userAgent==null)
+        if (userAgent == null) {
             userAgent = "Unknown";
+        }
         //        System.err.println(request + " user-agent:" + userAgent +" ip:" + request.getIp());
 
         if ( !getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
@@ -1701,10 +1820,13 @@ public class Repository extends RepositoryBase implements
             }
         }
         String userAgent = request.getHeaderArg("User-Agent");
-        if(userAgent==null)
+        if (userAgent == null) {
             userAgent = "Unknown";
+        }
 
-        log(request, "Unknown request:" + request.getUrl() + " user-agent:" + userAgent +" ip:" + request.getIp());
+        log(request,
+            "Unknown request:" + request.getUrl() + " user-agent:"
+            + userAgent + " ip:" + request.getIp());
         Result result =
             new Result(msg("Error"),
                        new StringBuffer(msgLabel("Unknown request") + path));
@@ -1724,14 +1846,14 @@ public class Repository extends RepositoryBase implements
      */
     protected void decorateResult(Request request, Result result)
             throws Exception {
-        String template = null;
-        Metadata metadata =null;
-            /*
+        String   template = null;
+        Metadata metadata = null;
+        /*
 //            getMetadataManager().findMetadata((request.getCollectionEntry()
 //                != null)
 //                ? request.getCollectionEntry()
 //                : topGroup, AdminMetadataHandler.TYPE_TEMPLATE, true);
-            */
+        */
         if (metadata != null) {
             template = metadata.getAttr1();
             if (template.startsWith("file:")) {
@@ -1760,45 +1882,38 @@ public class Repository extends RepositoryBase implements
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml = HtmlUtil.space(1);
         if (links != null) {
-            linksHtml = StringUtil.join(getProperty("ramadda.html.link.separator",""),
-                                        links);
+            linksHtml =
+                StringUtil.join(getProperty("ramadda.html.link.separator",
+                                            ""), links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = "";
         if (sublinks != null) {
-            String sublinksTemplate = getProperty("ramadda.html.sublink.wrapper","");
-            sublinksHtml = StringUtil.join(getProperty("ramadda.html.sublink.separator",""), sublinks);
-            sublinksHtml = sublinksTemplate.replace("${sublinks}", sublinksHtml);
+            String sublinksTemplate =
+                getProperty("ramadda.html.sublink.wrapper", "");
+            sublinksHtml =
+                StringUtil.join(getProperty("ramadda.html.sublink.separator",
+                                            ""), sublinks);
+            sublinksHtml = sublinksTemplate.replace("${sublinks}",
+                    sublinksHtml);
         }
 
 
-        String content = new String(result.getContent());
-        String html = template;
-        String[]macros = new String[]{
-            MACRO_HEADER_IMAGE,
-            fileUrl(ICON_HEADER),
-            MACRO_HEADER_TITLE,
-            getProperty(PROP_REPOSITORY_NAME, "Repository"),
-            MACRO_USERLINK,
-            getUserManager().getUserLinks(request),
-            MACRO_REPOSITORY_NAME,
-            getProperty(PROP_REPOSITORY_NAME, "Repository"),
-            MACRO_FOOTER,
-            getProperty(PROP_HTML_FOOTER, BLANK),
-            MACRO_TITLE, 
-            result.getTitle(),
-            MACRO_BOTTOM, 
-            result.getBottomHtml(),
-            MACRO_LINKS, 
-            linksHtml,
-            MACRO_CONTENT,
-            content + jsContent,
-            MACRO_ROOT, 
-            getUrlBase()
+        String   content = new String(result.getContent());
+        String   html    = template;
+        String[] macros  = new String[] {
+            MACRO_HEADER_IMAGE, fileUrl(ICON_HEADER), MACRO_HEADER_TITLE,
+            getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_USERLINK,
+            getUserManager().getUserLinks(request), MACRO_REPOSITORY_NAME,
+            getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_FOOTER,
+            getProperty(PROP_HTML_FOOTER, BLANK), MACRO_TITLE,
+            result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
+            MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
+            MACRO_ROOT, getUrlBase()
         };
 
-        for(int i=0;i<macros.length;i+=2) {
-            html = html.replace("${" + macros[i] +"}", macros[i+1]);
+        for (int i = 0; i < macros.length; i += 2) {
+            html = html.replace("${" + macros[i] + "}", macros[i + 1]);
         }
 
         if (sublinksHtml.length() > 0) {
@@ -1830,30 +1945,30 @@ public class Repository extends RepositoryBase implements
         User       user     = request.getUser();
         String     language = user.getLanguage();
         Properties tmpMap;
-        Properties map      = (Properties) languageMap.get("default");
-        if(map==null) {
+        Properties map = (Properties) languageMap.get("default");
+        if (map == null) {
             map = new Properties();
         }
         tmpMap = (Properties) languageMap.get(getProperty(PROP_LANGUAGE,
-                    BLANK));
-        if(tmpMap!=null) {
+                BLANK));
+        if (tmpMap != null) {
             map.putAll(tmpMap);
         }
-        tmpMap      = (Properties) languageMap.get(language);
+        tmpMap = (Properties) languageMap.get(language);
 
-        if(tmpMap!=null) {
+        if (tmpMap != null) {
             map.putAll(tmpMap);
         }
 
-        if(phraseMap==null) {
-            String phrases = getProperty(PROP_ADMIN_PHRASES,(String)null);
-            if(phrases!=null) {
-                Object[] result  = parsePhrases(phrases);
-                phraseMap =  (Properties)result[2];
+        if (phraseMap == null) {
+            String phrases = getProperty(PROP_ADMIN_PHRASES, (String) null);
+            if (phrases != null) {
+                Object[] result = parsePhrases(phrases);
+                phraseMap = (Properties) result[2];
             }
         }
 
-        if(phraseMap!=null) {
+        if (phraseMap != null) {
             map.putAll(phraseMap);
         }
 
@@ -1916,10 +2031,17 @@ public class Repository extends RepositoryBase implements
         return getProperty(PROP_DB_CANCACHE, true);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean cacheResources() {
-        String test = (String)properties.get("ramadda.cacheresources");
-        if(test == null) return true;
-        if(test!=null) {
+        String test = (String) properties.get("ramadda.cacheresources");
+        if (test == null) {
+            return true;
+        }
+        if (test != null) {
             return test.equals("true");
         }
         return true;
@@ -1934,32 +2056,33 @@ public class Repository extends RepositoryBase implements
      * @return _more_
      */
     public String getProperty(String name) {
-        if(systemEnv==null) {
-            systemEnv  = System.getenv();
+        if (systemEnv == null) {
+            systemEnv = System.getenv();
         }
         String prop = null;
-        if(!cacheResources()) {
+        if ( !cacheResources()) {
             try {
                 properties.load(
-                                IOUtil.getInputStream(
-                                                      "/ucar/unidata/repository/resources/repository.properties",
-                                                      getClass()));
-            } catch(Exception exc) {
-                
-            }
+                    IOUtil.getInputStream(
+                        "/ucar/unidata/repository/resources/repository.properties",
+                        getClass()));
+            } catch (Exception exc) {}
         }
 
         //Look at the repository.properties first
-        if(prop == null)
-            prop =(String) properties.get(name);
+        if (prop == null) {
+            prop = (String) properties.get(name);
+        }
 
         //Then look at system properties
-        if(prop == null)
+        if (prop == null) {
             prop = System.getProperty(name);
+        }
 
         //Then env vars
-        if(prop == null)
+        if (prop == null) {
             prop = systemEnv.get(name);
+        }
 
         return prop;
     }
@@ -2027,6 +2150,14 @@ public class Repository extends RepositoryBase implements
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public double getDbProperty(String name, double dflt) {
         return Misc.getProperty(dbProperties, name, dflt);
     }
@@ -2134,22 +2265,28 @@ public class Repository extends RepositoryBase implements
     public List<OutputType> getOutputTypes(Request request,
                                            OutputHandler.State state)
             throws Exception {
-        List<OutputType>  allTypes= new ArrayList<OutputType>();
+        List<OutputType> allTypes = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.addOutputTypes(request, state, allTypes);
         }
-        List<OutputType> okTypes= new ArrayList<OutputType>();
-        for(OutputType outputType: allTypes) {
-            if(isOutputTypeOK(outputType)) {
+        List<OutputType> okTypes = new ArrayList<OutputType>();
+        for (OutputType outputType : allTypes) {
+            if (isOutputTypeOK(outputType)) {
                 okTypes.add(outputType);
             }
         }
         return okTypes;
     }
 
-    public List<OutputType> getOutputTypes() 
-            throws Exception {
-        List<OutputType>  allTypes= new ArrayList<OutputType>();
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<OutputType> getOutputTypes() throws Exception {
+        List<OutputType> allTypes = new ArrayList<OutputType>();
         for (OutputHandler outputHandler : outputHandlers) {
             allTypes.addAll(outputHandler.getTypes());
         }
@@ -2157,17 +2294,33 @@ public class Repository extends RepositoryBase implements
     }
 
 
+    /**
+     * _more_
+     *
+     * @param outputType _more_
+     *
+     * @return _more_
+     */
     public boolean isOutputTypeOK(OutputType outputType) {
-        String prop = getProperty(outputType.getId()+".ok");
-        if(prop == null || prop.equals("true")) {
+        String prop = getProperty(outputType.getId() + ".ok");
+        if ((prop == null) || prop.equals("true")) {
             return true;
         }
         return false;
     }
 
-    public void setOutputTypeOK(OutputType outputType, boolean ok) throws Exception {
-        String prop = outputType.getId()+".ok";
-        writeGlobal(prop, ""+ok);
+    /**
+     * _more_
+     *
+     * @param outputType _more_
+     * @param ok _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setOutputTypeOK(OutputType outputType, boolean ok)
+            throws Exception {
+        String prop = outputType.getId() + ".ok";
+        writeGlobal(prop, "" + ok);
     }
 
 
@@ -2182,8 +2335,20 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    public OutputHandler getOutputHandler(OutputType outputType) throws Exception {
-        if(!isOutputTypeOK(outputType)) return null;
+    /**
+     * _more_
+     *
+     * @param outputType _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public OutputHandler getOutputHandler(OutputType outputType)
+            throws Exception {
+        if ( !isOutputTypeOK(outputType)) {
+            return null;
+        }
         return getOutputHandler(outputType.getId());
     }
 
@@ -2198,8 +2363,10 @@ public class Repository extends RepositoryBase implements
      * @throws Exception _more_
      */
     public OutputHandler getOutputHandler(Request request) throws Exception {
-        OutputHandler handler  =  getOutputHandler(request.getOutput());
-        if(handler!=null) return handler;
+        OutputHandler handler = getOutputHandler(request.getOutput());
+        if (handler != null) {
+            return handler;
+        }
         throw new IllegalArgumentException(
             msgLabel("Could not find output handler for")
             + request.getOutput());
@@ -2216,10 +2383,10 @@ public class Repository extends RepositoryBase implements
      * @throws Exception _more_
      */
     public OutputHandler getOutputHandler(String type) throws Exception {
-        if(type == null || type.length()==0) {
+        if ((type == null) || (type.length() == 0)) {
             type = OutputHandler.OUTPUT_HTML.getId();
         }
-        OutputType output = new OutputType("",type);
+        OutputType output = new OutputType("", type);
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
                 return outputHandler;
@@ -2245,6 +2412,11 @@ public class Repository extends RepositoryBase implements
                        new TypeHandler(this, "file", "File"));
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public TypeHandler getGroupTypeHandler() {
         return groupTypeHandler;
     }
@@ -2515,11 +2687,6 @@ public class Repository extends RepositoryBase implements
         return makeTabs(titles, contents, skipEmpty, "tabcontent");
     }
 
-    public String makeTabs(List titles, List contents, boolean skipEmpty,
-                           String tabContentClass) {
-        return makeTabs(titles, contents, skipEmpty, tabContentClass, "tabcontents");
-    }
-
     /**
      * _more_
      *
@@ -2531,8 +2698,24 @@ public class Repository extends RepositoryBase implements
      * @return _more_
      */
     public String makeTabs(List titles, List contents, boolean skipEmpty,
-                           String tabContentClass,
-                           String wrapperClass) {
+                           String tabContentClass) {
+        return makeTabs(titles, contents, skipEmpty, tabContentClass,
+                        "tabcontents");
+    }
+
+    /**
+     * _more_
+     *
+     * @param titles _more_
+     * @param contents _more_
+     * @param skipEmpty _more_
+     * @param tabContentClass _more_
+     * @param wrapperClass _more_
+     *
+     * @return _more_
+     */
+    public String makeTabs(List titles, List contents, boolean skipEmpty,
+                           String tabContentClass, String wrapperClass) {
 
         String id  = "tab_" + (tabCnt++);
         String ids = "tab_" + (tabCnt++) + "_ids";
@@ -2638,10 +2821,10 @@ public class Repository extends RepositoryBase implements
      */
     protected List getSubNavLinks(Request request, RequestUrl[] urls,
                                   String arg) {
-        List   links    = new ArrayList();
-        String type     = request.getRequestPath();
-        String onLinkTemplate = getProperty("ramadda.html.sublink.on","");
-        String offLinkTemplate = getProperty("ramadda.html.sublink.off","");
+        List   links           = new ArrayList();
+        String type            = request.getRequestPath();
+        String onLinkTemplate  = getProperty("ramadda.html.sublink.on", "");
+        String offLinkTemplate = getProperty("ramadda.html.sublink.off", "");
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
             label = msg(label);
@@ -2676,27 +2859,27 @@ public class Repository extends RepositoryBase implements
      * @return _more_
      */
     protected List getNavLinks(Request request) {
-        List    links    = new ArrayList();
-        boolean isAdmin  = false;
+        List    links   = new ArrayList();
+        boolean isAdmin = false;
         if (request != null) {
             User user = request.getUser();
             isAdmin = user.getAdmin();
         }
 
-        String template = getProperty("ramadda.html.link.wrapper","");
+        String template = getProperty("ramadda.html.link.wrapper", "");
 
         for (ApiMethod apiMethod : topLevelMethods) {
             if (apiMethod.getMustBeAdmin() && !isAdmin) {
                 continue;
             }
-            String url; 
+            String url;
             if (apiMethod == homeApi) {
                 url = fileUrl(apiMethod.getRequest());
             } else {
                 url = request.url(apiMethod.getUrl());
             }
-            String html = template.replace("${url}",url);
-            html = html.replace("${label}",apiMethod.getName());
+            String html = template.replace("${url}", url);
+            html = html.replace("${label}", apiMethod.getName());
             links.add(html);
         }
         return links;
@@ -2837,14 +3020,23 @@ public class Repository extends RepositoryBase implements
 
 
 
-    public void createMonthNav(StringBuffer sb, Date date, String url,Hashtable dayLinks) {
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param date _more_
+     * @param url _more_
+     * @param dayLinks _more_
+     */
+    public void createMonthNav(StringBuffer sb, Date date, String url,
+                               Hashtable dayLinks) {
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.setTime(date);
-        int[]  theDate = CalendarOutputHandler.getDayMonthYear(cal);
-        int    theDay = cal.get(cal.DAY_OF_MONTH);
-        int    theMonth = cal.get(cal.MONTH);
-        int    theYear = cal.get(cal.YEAR);
-        while (cal.get(cal.DAY_OF_MONTH)>1) {
+        int[] theDate  = CalendarOutputHandler.getDayMonthYear(cal);
+        int   theDay   = cal.get(cal.DAY_OF_MONTH);
+        int   theMonth = cal.get(cal.MONTH);
+        int   theYear  = cal.get(cal.YEAR);
+        while (cal.get(cal.DAY_OF_MONTH) > 1) {
             cal.add(cal.DAY_OF_MONTH, -1);
         }
         GregorianCalendar prev = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
@@ -2854,26 +3046,31 @@ public class Repository extends RepositoryBase implements
         next.setTime(date);
         next.add(cal.MONTH, 1);
 
-        sb.append(
-                  "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">");
+        sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">");
         String[] dayNames = {
             "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"
         };
-        String prevUrl = HtmlUtil.space(1)+HtmlUtil.href(url +"&" +CalendarOutputHandler.getUrlArgs(prev),"&lt;");
-        String nextUrl = HtmlUtil.href(url +"&" +CalendarOutputHandler.getUrlArgs(next),"&gt;")+HtmlUtil.space(1);
-        sb.append("<tr valign=top><td colspan=\"7\" align=\"center\"  class=\"calnavmonthheader\">");
+        String prevUrl =
+            HtmlUtil.space(1)
+            + HtmlUtil.href(url + "&"
+                            + CalendarOutputHandler.getUrlArgs(prev), "&lt;");
+        String nextUrl =
+            HtmlUtil.href(url + "&" + CalendarOutputHandler.getUrlArgs(next),
+                          "&gt;") + HtmlUtil.space(1);
+        sb.append(
+            "<tr valign=top><td colspan=\"7\" align=\"center\"  class=\"calnavmonthheader\">");
         sb.append("<table cellspacing=0 cellpadding=0 width=100%><tr>");
         sb.append("<td width=1  class=\"calnavmonthheader\">");
         sb.append(prevUrl);
-        sb.append("</td>");        
+        sb.append("</td>");
         sb.append("<td  class=\"calnavmonthheader\">");
         sb.append(DateUtil.MONTH_NAMES[cal.get(cal.MONTH)]);
         sb.append(HtmlUtil.space(1));
-        sb.append(""+theYear);
+        sb.append("" + theYear);
         sb.append("</td>");
         sb.append("<td width=1  class=\"calnavmonthheader\">");
         sb.append(nextUrl);
-        sb.append("</td>");        
+        sb.append("</td>");
         sb.append("</table>");
 
         sb.append("</tr>");
@@ -2894,49 +3091,65 @@ public class Repository extends RepositoryBase implements
                 int    thisDay   = cal.get(cal.DAY_OF_MONTH);
                 int    thisMonth = cal.get(cal.MONTH);
                 int    thisYear  = cal.get(cal.YEAR);
-                String dayClass = "calnavday";
+                String dayClass  = "calnavday";
                 if (thisMonth != theMonth) {
                     dayClass = "calnavoffday";
-                } else if(theMonth == thisMonth && theYear == thisYear && theDay == thisDay) {
-                    dayClass = "calnavtheday";                    
+                } else if ((theMonth == thisMonth) && (theYear == thisYear)
+                           && (theDay == thisDay)) {
+                    dayClass = "calnavtheday";
                 }
                 String content;
-                if(dayLinks!=null) {
-                    String key = thisYear+"/" + thisMonth +"/" + thisDay;
-                    if(dayLinks.get(key)!=null) {
-                        content = HtmlUtil.href(url+"&" + CalendarOutputHandler.getUrlArgs(cal),""+thisDay);
-                        dayClass = "calnavtheday";                    
+                if (dayLinks != null) {
+                    String key = thisYear + "/" + thisMonth + "/" + thisDay;
+                    if (dayLinks.get(key) != null) {
+                        content = HtmlUtil.href(url + "&"
+                                + CalendarOutputHandler.getUrlArgs(cal), ""
+                                    + thisDay);
+                        dayClass = "calnavtheday";
                     } else {
-                        content = ""+thisDay;
+                        content  = "" + thisDay;
                         dayClass = "calnavday";
                     }
                 } else {
-                    content = HtmlUtil.href(url+"&" + CalendarOutputHandler.getUrlArgs(cal),""+thisDay);
+                    content = HtmlUtil.href(
+                        url + "&" + CalendarOutputHandler.getUrlArgs(cal),
+                        "" + thisDay);
                 }
 
-                sb.append("<td " + HtmlUtil.cssClass(dayClass)+ " >" + content
-                          + "</td>");
+                sb.append("<td " + HtmlUtil.cssClass(dayClass) + " >"
+                          + content + "</td>");
                 sb.append("\n");
                 cal.add(cal.DAY_OF_MONTH, 1);
             }
-            if (cal.get(cal.MONTH) > theMonth)
+            if (cal.get(cal.MONTH) > theMonth) {
                 break;
-            if (cal.get(cal.YEAR) > theYear)
+            }
+            if (cal.get(cal.YEAR) > theYear) {
                 break;
+            }
         }
         sb.append("</table>");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processModelProducts(Request request) throws Exception {
-        Date date = request.get(ARG_DATE,new Date());
+        Date date = request.get(ARG_DATE, new Date());
         //        System.err.println(date);
         StringBuffer sb = new StringBuffer();
         request.remove(ARG_DATE);
         Hashtable dayLinks = new Hashtable();
-        dayLinks.put("2008/10/2","");
-        dayLinks.put("2008/10/3","");
-        createMonthNav(sb, date,request.getUrl(),dayLinks);
+        dayLinks.put("2008/10/2", "");
+        dayLinks.put("2008/10/3", "");
+        createMonthNav(sb, date, request.getUrl(), dayLinks);
         return new Result("Model Products", sb);
     }
 
@@ -2979,8 +3192,8 @@ public class Repository extends RepositoryBase implements
                 IOUtil.readContents(getStorageManager().localizePath(id),
                                     getClass());
         }
-        if(cacheResources() && resource != null) {
-            resources.put(id,resource);
+        if (cacheResources() && (resource != null)) {
+            resources.put(id, resource);
         }
         return resource;
     }
@@ -3001,7 +3214,7 @@ public class Repository extends RepositoryBase implements
      */
     public String makeTypeSelect(Request request, boolean includeAny)
             throws Exception {
-        return makeTypeSelect(request, includeAny, "",false);
+        return makeTypeSelect(request, includeAny, "", false);
     }
 
     /**
@@ -3010,6 +3223,7 @@ public class Repository extends RepositoryBase implements
      * @param request _more_
      * @param includeAny _more_
      * @param selected _more_
+     * @param checkAddOk _more_
      *
      * @return _more_
      *
@@ -3024,7 +3238,7 @@ public class Repository extends RepositoryBase implements
             if (typeHandler.isAnyHandler() && !includeAny) {
                 continue;
             }
-            if(checkAddOk && !typeHandler.canBeCreatedBy(request)) {
+            if (checkAddOk && !typeHandler.canBeCreatedBy(request)) {
                 continue;
             }
             tmp.add(new TwoFacedObject(typeHandler.getLabel(),
@@ -3060,7 +3274,8 @@ public class Repository extends RepositoryBase implements
 
         List<Clause> where = typeHandler.assembleWhereClause(request);
         Statement stmt =
-            typeHandler.select(request, SqlUtil.distinct(Tables.ENTRIES.COL_TYPE),
+            typeHandler.select(request,
+                               SqlUtil.distinct(Tables.ENTRIES.COL_TYPE),
                                where, "");
         String[] types = SqlUtil.readString(stmt, 1);
         for (int i = 0; i < types.length; i++) {
@@ -3242,11 +3457,17 @@ public class Repository extends RepositoryBase implements
      * _more_
      */
     public void setLocalFilePaths() {
-        localFilePaths = (List<File>)Misc.toList(IOUtil.toFiles(
-            (List<String>) StringUtil.split(getProperty(PROP_LOCALFILEPATHS,
-                ""), "\n", true, true)));
+        localFilePaths = (List<File>) Misc.toList(
+            IOUtil.toFiles(
+                (List<String>) StringUtil.split(
+                    getProperty(PROP_LOCALFILEPATHS, ""), "\n", true, true)));
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<File> getLocalFilePaths() {
         return localFilePaths;
     }
@@ -3264,10 +3485,10 @@ public class Repository extends RepositoryBase implements
      */
     protected String getQueryOrderAndLimit(Request request,
                                            boolean addOrderBy) {
-        String order = " DESC ";
+        String  order     = " DESC ";
         boolean haveOrder = false;
         if (request.get(ARG_ASCENDING, false)) {
-            order = " ASC ";
+            order     = " ASC ";
             haveOrder = true;
         }
         int    skipCnt     = request.get(ARG_SKIP, 0);
@@ -3287,9 +3508,12 @@ public class Repository extends RepositoryBase implements
             } else if (by.equals("todate")) {
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_TODATE + order;
             } else if (by.equals("createdate")) {
-                orderBy = " ORDER BY " + Tables.ENTRIES.COL_CREATEDATE + order;
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_CREATEDATE
+                          + order;
             } else if (by.equals("name")) {
-                if(!haveOrder) order = " ASC ";
+                if ( !haveOrder) {
+                    order = " ASC ";
+                }
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_NAME + order;
             }
         }
@@ -3536,18 +3760,18 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String MAP_JS_MICROSOFT =
         "http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1";
 
-    /** _more_          */
+    /** _more_ */
     private static final String MAP_ID_MICROSOFT = "microsoft";
 
-    /** _more_          */
+    /** _more_ */
     private static final String MAP_JS_YAHOO =
         "http://api.maps.yahoo.com/ajaxymap?v=3.8&appid=idvunidata";
 
-    /** _more_          */
+    /** _more_ */
     private static final String MAP_ID_YAHOO = "yahoo";
 
 
@@ -3583,9 +3807,11 @@ public class Repository extends RepositoryBase implements
         googleMapsKey = null;
         for (String line : (List<String>) StringUtil.split(googleKeys, "\n",
                 true, true)) {
-            if(line.length()==0) continue;
+            if (line.length() == 0) {
+                continue;
+            }
             String[] toks = StringUtil.split(line, ":", 2);
-            if(toks == null) {
+            if (toks == null) {
                 continue;
             }
             if (toks.length != 2) {
@@ -3621,7 +3847,7 @@ public class Repository extends RepositoryBase implements
     }
 
 
-    
+
 
 
 

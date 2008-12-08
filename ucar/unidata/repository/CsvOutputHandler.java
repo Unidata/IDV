@@ -84,7 +84,8 @@ public class CsvOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_CSV = new OutputType("CSV", "default.csv");
+    public static final OutputType OUTPUT_CSV = new OutputType("CSV",
+                                                    "default.csv");
 
 
 
@@ -195,12 +196,13 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected Result listAssociations(Request request) throws Exception {
 
-        StringBuffer  sb           = new StringBuffer();
-        TypeHandler   typeHandler  = repository.getTypeHandler(request);
-        String[]      associations = getEntryManager().getAssociations(request);
+        StringBuffer  sb          = new StringBuffer();
+        TypeHandler   typeHandler = repository.getTypeHandler(request);
+        String[] associations     =
+            getEntryManager().getAssociations(request);
 
-        List<String>  names        = new ArrayList<String>();
-        List<Integer> counts       = new ArrayList<Integer>();
+        List<String>  names       = new ArrayList<String>();
+        List<Integer> counts      = new ArrayList<Integer>();
         ResultSet     results;
         int           max = -1;
         int           min = -1;

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -101,10 +100,10 @@ public class DatabaseManager extends RepositoryManager {
     /** _more_ */
     private Connection theConnection;
 
-    /** _more_          */
+    /** _more_ */
     private int connectionCnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     private Object CONNECTION_MUTEX = new Object();
 
 
@@ -165,7 +164,7 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private List<ConnectionWrapper> connectionsToClose =
         new ArrayList<ConnectionWrapper>();
 
@@ -178,10 +177,10 @@ public class DatabaseManager extends RepositoryManager {
      */
     private static class ConnectionWrapper {
 
-        /** _more_          */
+        /** _more_ */
         long now = System.currentTimeMillis();
 
-        /** _more_          */
+        /** _more_ */
         Connection connection;
 
         /**
@@ -316,10 +315,15 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     */
     public void closeConnection(Connection connection) {
         try {
             connection.close();
-        } catch(Exception  exc) {
+        } catch (Exception exc) {
             //NOOP
         }
     }
@@ -402,131 +406,136 @@ public class DatabaseManager extends RepositoryManager {
      */
     public void makeDatabaseCopy(OutputStream os, boolean all)
             throws Exception {
-        Connection       connection = getNewConnection();
+
+        Connection connection = getNewConnection();
         try {
-        DatabaseMetaData dbmd       = connection.getMetaData();
-        ResultSet        catalogs = dbmd.getCatalogs();
-        ResultSet tables = dbmd.getTables(null, null, null,
-                                          new String[] { "TABLE" });
+            DatabaseMetaData dbmd     = connection.getMetaData();
+            ResultSet        catalogs = dbmd.getCatalogs();
+            ResultSet tables = dbmd.getTables(null, null, null,
+                                   new String[] { "TABLE" });
 
-        int totalRowCnt = 0;
-        while (tables.next()) {
-            String tableName = tables.getString("Tables.NAME.NAME");
-            String tableType = tables.getString("Tables.TYPE.NAME");
-            if ((tableType == null) || Misc.equals(tableType, "INDEX")
-                    || tableType.startsWith("SYSTEM")) {
-                continue;
-            }
-
-
-            String tn = tableName.toLowerCase();
-            if ( !all) {
-                if (tn.equals(Tables.GLOBALS.NAME) || tn.equals(Tables.USERS.NAME)
-                        || tn.equals(Tables.PERMISSIONS.NAME)
-                        || tn.equals(Tables.HARVESTERS.NAME)
-                        || tn.equals(Tables.USERROLES.NAME)) {
+            int totalRowCnt = 0;
+            while (tables.next()) {
+                String tableName = tables.getString("Tables.NAME.NAME");
+                String tableType = tables.getString("Tables.TYPE.NAME");
+                if ((tableType == null) || Misc.equals(tableType, "INDEX")
+                        || tableType.startsWith("SYSTEM")) {
                     continue;
                 }
-            }
 
 
-            ResultSet cols     = dbmd.getColumns(null, null, tableName, null);
-
-            int       colCnt   = 0;
-
-            String    colNames = null;
-            List      types    = new ArrayList();
-            while (cols.next()) {
-                String colName = cols.getString("COLUMN_NAME");
-                if (colNames == null) {
-                    colNames = " (";
-                } else {
-                    colNames += ",";
+                String tn = tableName.toLowerCase();
+                if ( !all) {
+                    if (tn.equals(Tables.GLOBALS.NAME)
+                            || tn.equals(Tables.USERS.NAME)
+                            || tn.equals(Tables.PERMISSIONS.NAME)
+                            || tn.equals(Tables.HARVESTERS.NAME)
+                            || tn.equals(Tables.USERROLES.NAME)) {
+                        continue;
+                    }
                 }
-                colNames += colName;
-                int type = cols.getInt("DATA_TYPE");
-                types.add(type);
-                colCnt++;
-            }
-            colNames += ") ";
-            System.err.println("table:" + tableName);
 
-            Statement stmt = execute("select * from " + tableName, 10000000,
-                                     0);
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-            ResultSet        results;
-            int              rowCnt    = 0;
-            List             valueList = new ArrayList();
-            boolean          didDelete = false;
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
+
+                ResultSet cols = dbmd.getColumns(null, null, tableName, null);
+
+                int       colCnt   = 0;
+
+                String    colNames = null;
+                List      types    = new ArrayList();
+                while (cols.next()) {
+                    String colName = cols.getString("COLUMN_NAME");
+                    if (colNames == null) {
+                        colNames = " (";
+                    } else {
+                        colNames += ",";
+                    }
+                    colNames += colName;
+                    int type = cols.getInt("DATA_TYPE");
+                    types.add(type);
+                    colCnt++;
+                }
+                colNames += ") ";
+                System.err.println("table:" + tableName);
+
+                Statement stmt = execute("select * from " + tableName,
+                                         10000000, 0);
+                SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+                ResultSet        results;
+                int              rowCnt    = 0;
+                List             valueList = new ArrayList();
+                boolean          didDelete = false;
+                while ((results = iter.next()) != null) {
+                    while (results.next()) {
+                        if ( !didDelete) {
+                            didDelete = true;
+                            IOUtil.write(os,
+                                         "delete from  "
+                                         + tableName.toLowerCase() + ";\n");
+                        }
+                        totalRowCnt++;
+                        rowCnt++;
+                        StringBuffer value = new StringBuffer("(");
+                        for (int i = 1; i <= colCnt; i++) {
+                            int type = ((Integer) types.get(i
+                                           - 1)).intValue();
+                            if (i > 1) {
+                                value.append(",");
+                            }
+                            if (type == java.sql.Types.TIMESTAMP) {
+                                Timestamp ts = results.getTimestamp(i);
+                                //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
+                                value.append(HtmlUtil.squote(ts.toString()));
+                            } else if (type == java.sql.Types.VARCHAR) {
+                                String s = results.getString(i);
+                                if (s != null) {
+                                    //If the target isn't mysql:
+                                    //s = s.replace("'", "''");
+                                    //If the target is mysql:
+                                    s = s.replace("'", "\\'");
+                                    s = s.replace("\r", "\\r");
+                                    s = s.replace("\n", "\\n");
+                                    value.append("'" + s + "'");
+                                } else {
+                                    value.append("null");
+                                }
+                            } else {
+                                String s = results.getString(i);
+                                value.append(s);
+                            }
+                        }
+                        value.append(")");
+                        valueList.add(value.toString());
+                        if (valueList.size() > 50) {
+                            IOUtil.write(os,
+                                         "insert into "
+                                         + tableName.toLowerCase() + colNames
+                                         + " values ");
+                            IOUtil.write(os, StringUtil.join(",", valueList));
+                            IOUtil.write(os, ";\n");
+                            valueList = new ArrayList();
+                        }
+                    }
+                }
+                if (valueList.size() > 0) {
+                    System.err.println("\tdoing last bit");
                     if ( !didDelete) {
                         didDelete = true;
                         IOUtil.write(os,
                                      "delete from  "
                                      + tableName.toLowerCase() + ";\n");
                     }
-                    totalRowCnt++;
-                    rowCnt++;
-                    StringBuffer value = new StringBuffer("(");
-                    for (int i = 1; i <= colCnt; i++) {
-                        int type = ((Integer) types.get(i - 1)).intValue();
-                        if (i > 1) {
-                            value.append(",");
-                        }
-                        if (type == java.sql.Types.TIMESTAMP) {
-                            Timestamp ts = results.getTimestamp(i);
-                            //                            sb.append(SqlUtil.format(new Date(ts.getTime())));
-                            value.append(HtmlUtil.squote(ts.toString()));
-                        } else if (type == java.sql.Types.VARCHAR) {
-                            String s = results.getString(i);
-                            if (s != null) {
-                                //If the target isn't mysql:
-                                //s = s.replace("'", "''");
-                                //If the target is mysql:
-                                s = s.replace("'", "\\'");
-                                s = s.replace("\r", "\\r");
-                                s = s.replace("\n", "\\n");
-                                value.append("'" + s + "'");
-                            } else {
-                                value.append("null");
-                            }
-                        } else {
-                            String s = results.getString(i);
-                            value.append(s);
-                        }
-                    }
-                    value.append(")");
-                    valueList.add(value.toString());
-                    if (valueList.size() > 50) {
-                        IOUtil.write(os,
-                                     "insert into " + tableName.toLowerCase()
-                                     + colNames + " values ");
-                        IOUtil.write(os, StringUtil.join(",", valueList));
-                        IOUtil.write(os, ";\n");
-                        valueList = new ArrayList();
-                    }
-                }
-            }
-            if (valueList.size() > 0) {
-                System.err.println("\tdoing last bit");
-                if ( !didDelete) {
-                    didDelete = true;
                     IOUtil.write(os,
-                                 "delete from  " + tableName.toLowerCase()
-                                 + ";\n");
+                                 "insert into " + tableName.toLowerCase()
+                                 + colNames + " values ");
+                    IOUtil.write(os, StringUtil.join(",", valueList));
+                    IOUtil.write(os, ";\n");
                 }
-                IOUtil.write(os,
-                             "insert into " + tableName.toLowerCase()
-                             + colNames + " values ");
-                IOUtil.write(os, StringUtil.join(",", valueList));
-                IOUtil.write(os, ";\n");
+                System.err.println("\twrote:" + rowCnt + " rows");
             }
-            System.err.println("\twrote:" + rowCnt + " rows");
-        }
         } finally {
             closeConnection(connection);
         }
+
     }
 
 
@@ -647,69 +656,145 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-    public void setTimestamp(PreparedStatement stmt, int col, Date date) throws Exception {
-        if(date == null) {
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param col _more_
+     * @param date _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setTimestamp(PreparedStatement stmt, int col, Date date)
+            throws Exception {
+        if (date == null) {
             stmt.setTimestamp(col, null);
         } else {
-            stmt.setTimestamp(col, new java.sql.Timestamp(date.getTime()),Repository.calendar);
+            stmt.setTimestamp(col, new java.sql.Timestamp(date.getTime()),
+                              Repository.calendar);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param results _more_
+     * @param col _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Date getTimestamp(ResultSet results, int col) throws Exception {
         Date date = results.getTimestamp(col, Repository.calendar);
-        if(date!=null) return date;
+        if (date != null) {
+            return date;
+        }
         return new Date();
     }
 
 
 
-    public void setDate(PreparedStatement stmt, int col, long time) throws Exception {
-        setDate(stmt,col, new Date(time));
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param col _more_
+     * @param time _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setDate(PreparedStatement stmt, int col, long time)
+            throws Exception {
+        setDate(stmt, col, new Date(time));
     }
 
 
-    public void setDate(PreparedStatement stmt, int col, Date date) throws Exception {
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param col _more_
+     * @param date _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setDate(PreparedStatement stmt, int col, Date date)
+            throws Exception {
         //        if (!db.equals(DB_MYSQL)) {
-        if (true ||!db.equals(DB_MYSQL)) {
-            setTimestamp(stmt,col,date);
+        if (true || !db.equals(DB_MYSQL)) {
+            setTimestamp(stmt, col, date);
         } else {
-            if(date == null) {
+            if (date == null) {
                 stmt.setTime(col, null);
             } else {
-                stmt.setTime(col, new java.sql.Time(date.getTime()), Repository.calendar);
+                stmt.setTime(col, new java.sql.Time(date.getTime()),
+                             Repository.calendar);
             }
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param results _more_
+     * @param col _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Date getDate(ResultSet results, int col) throws Exception {
         //        if (!db.equals(DB_MYSQL)) {
-        if (true ||!db.equals(DB_MYSQL)) {
-           return getTimestamp(results,col);
+        if (true || !db.equals(DB_MYSQL)) {
+            return getTimestamp(results, col);
         }
         Date date = results.getTime(col, Repository.calendar);
-        if(date!=null) return date;
+        if (date != null) {
+            return date;
+        }
         return new Date();
     }
 
 
 
-    public void setValues(PreparedStatement stmt,Object[]values) throws Exception {
-        setValues(stmt, values,1);
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setValues(PreparedStatement stmt, Object[] values)
+            throws Exception {
+        setValues(stmt, values, 1);
     }
 
-    public void setValues(PreparedStatement stmt,Object[]values, int startIdx) throws Exception {
-        for(int i=0;i<values.length;i++) {
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param values _more_
+     * @param startIdx _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setValues(PreparedStatement stmt, Object[] values,
+                          int startIdx)
+            throws Exception {
+        for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 stmt.setNull(i + startIdx, java.sql.Types.VARCHAR);
-            } else  if(values[i] instanceof Date) {
-                setDate(stmt, i+startIdx, (Date) values[i]);
+            } else if (values[i] instanceof Date) {
+                setDate(stmt, i + startIdx, (Date) values[i]);
             } else if (values[i] instanceof Boolean) {
                 boolean b = ((Boolean) values[i]).booleanValue();
                 stmt.setInt(i + startIdx, (b
-                                     ? 1
-                                     : 0));
+                                           ? 1
+                                           : 0));
             } else {
                 //                System.err.println ("DB insert value:" + values[i]);
                 stmt.setObject(i + startIdx, values[i]);
@@ -856,8 +941,9 @@ public class DatabaseManager extends RepositoryManager {
             throws Exception {
         Connection connection = getConnection();
         Statement stmt = SqlUtil.select(connection, what,
-                                        Misc.newList(table),
-                                        (clause==null?null:new Clause[] { clause }), extra);
+                                        Misc.newList(table), ((clause == null)
+                ? null
+                : new Clause[] { clause }), extra);
         releaseConnection(connection);
         return stmt;
     }
@@ -900,7 +986,9 @@ public class DatabaseManager extends RepositoryManager {
      */
     public Statement select(String what, String table, Clause clause)
             throws Exception {
-        return select(what, Misc.newList(table), (clause==null?null:new Clause[] { clause }));
+        return select(what, Misc.newList(table), ((clause == null)
+                ? null
+                : new Clause[] { clause }));
     }
 
 

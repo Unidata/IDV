@@ -137,12 +137,17 @@ public class Entry extends Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param template _more_
+     */
     public void initWith(Entry template) {
         setName(template.getName());
         setDescription(template.getDescription());
-        if(template.getMetadata()!=null) {
+        if (template.getMetadata() != null) {
             List<Metadata> thisMetadata = new ArrayList<Metadata>();
-            for(Metadata metadata: template.getMetadata()) {
+            for (Metadata metadata : template.getMetadata()) {
                 metadata.setEntryId(getId());
                 thisMetadata.add(metadata);
             }
@@ -175,9 +180,9 @@ public class Entry extends Entity {
      * @param values _more_
      */
     public void initEntry(String name, String description, Group group,
-                          User user, Resource resource,
-                          String dataType, long createDate, long startDate,
-                          long endDate, Object[] values) {
+                          User user, Resource resource, String dataType,
+                          long createDate, long startDate, long endDate,
+                          Object[] values) {
         super.init(name, description, group, user, createDate);
         //topGroup id is a noop
         this.resource = resource;
@@ -429,16 +434,19 @@ public class Entry extends Entity {
         return false;
     }
 
+    /**
+     * _more_
+     */
     public void trimAreaResolution() {
-        double diff = (south-north);
-        if(Math.abs(diff)>1) {
-            south = ((int)(south*1000))/1000.0;
-            north = ((int)(north*1000))/1000.0;
+        double diff = (south - north);
+        if (Math.abs(diff) > 1) {
+            south = ((int) (south * 1000)) / 1000.0;
+            north = ((int) (north * 1000)) / 1000.0;
         }
-        diff = (east-west);
-        if(Math.abs(diff)>1) {
-            east = ((int)(east*1000))/1000.0;
-            west = ((int)(west*1000))/1000.0;
+        diff = (east - west);
+        if (Math.abs(diff) > 1) {
+            east = ((int) (east * 1000)) / 1000.0;
+            west = ((int) (west * 1000)) / 1000.0;
         }
 
     }

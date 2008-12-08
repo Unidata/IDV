@@ -51,7 +51,7 @@ import java.util.List;
 /**
  */
 
-public class Column implements  Constants {
+public class Column implements Constants {
 
 
     /** _more_ */
@@ -158,6 +158,7 @@ public class Column implements  Constants {
     /** _more_ */
     private static final String ATTR_SEARCHTYPE = "searchtype";
 
+    /** _more_          */
     private static final String ATTR_SHOWINHTML = "showinhtml";
 
 
@@ -219,7 +220,8 @@ public class Column implements  Constants {
     /** _more_ */
     private int offset;
 
-    private boolean canShow  =true;
+    /** _more_          */
+    private boolean canShow = true;
 
 
     /**
@@ -380,7 +382,8 @@ public class Column implements  Constants {
             stmtIdx++;
         } else if (type.equals(TYPE_DATE)) {
             Date dttm = (Date) values[offset];
-            typeHandler.getRepository().getDatabaseManager().setDate(stmt, stmtIdx, dttm);
+            typeHandler.getRepository().getDatabaseManager().setDate(stmt,
+                    stmtIdx, dttm);
             stmtIdx++;
         } else if (type.equals(TYPE_LATLON)) {
             if (values[offset] != null) {
@@ -683,7 +686,7 @@ public class Column implements  Constants {
                         2)));
             state.put(group, group);
         }
-        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",widget));
+        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":", widget));
         //xxxx                                             HtmlUtil.hbox(widget, suffix)));
         formBuffer.append("\n");
     }
@@ -774,7 +777,7 @@ public class Column implements  Constants {
                                         "size=\"" + columns + "\"");
             }
         }
-        return HtmlUtil.hbox(widget, HtmlUtil.inset(suffix,5));
+        return HtmlUtil.hbox(widget, HtmlUtil.inset(suffix, 5));
     }
 
 
@@ -1051,21 +1054,21 @@ public class Column implements  Constants {
 
 
     /**
-       Set the CanShow property.
-
-       @param value The new value for CanShow
-    **/
-    public void setCanShow (boolean value) {
-	canShow = value;
+     *  Set the CanShow property.
+     *
+     *  @param value The new value for CanShow
+     */
+    public void setCanShow(boolean value) {
+        canShow = value;
     }
 
     /**
-       Get the CanShow property.
-
-       @return The CanShow
-    **/
-    public boolean getCanShow () {
-	return canShow;
+     *  Get the CanShow property.
+     *
+     *  @return The CanShow
+     */
+    public boolean getCanShow() {
+        return canShow;
     }
 
 

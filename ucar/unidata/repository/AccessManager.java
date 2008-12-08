@@ -174,8 +174,8 @@ public class AccessManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_ENTRYIDS)) {
-            for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS, ""),
-                    ",", true, true)) {
+            for (String id : StringUtil.split(request.getString(ARG_ENTRYIDS,
+                    ""), ",", true, true)) {
                 Entry entry = getEntryManager().getEntry(request, id, false);
                 if (entry == null) {
                     throw new IllegalArgumentException(
@@ -247,11 +247,11 @@ public class AccessManager extends RepositoryManager {
         }
 
         String requestIp = null;
-        User user = null;
+        User   user      = null;
         if (request == null) {
             user = getUserManager().getAnonymousUser();
         } else {
-            user = request.getUser();
+            user      = request.getUser();
             requestIp = request.getIp();
         }
         //        System.err.println ("cando:" + user + " " + user.getAdmin());
@@ -277,10 +277,12 @@ public class AccessManager extends RepositoryManager {
                         doNot = true;
                         role  = role.substring(1);
                     }
-                    if(role.startsWith("ip:")) {
+                    if (role.startsWith("ip:")) {
                         String ip = role.substring(3);
-                        if(requestIp!=null && requestIp.startsWith(ip)) {
-                            if(doNot) return false;
+                        if ((requestIp != null) && requestIp.startsWith(ip)) {
+                            if (doNot) {
+                                return false;
+                            }
                         } else {
                             return true;
                         }
@@ -291,11 +293,13 @@ public class AccessManager extends RepositoryManager {
                 }
                 break;
             }
-            entry = getEntryManager().getEntry(request, entry.getParentGroupId());
+            entry = getEntryManager().getEntry(request,
+                    entry.getParentGroupId());
         }
         return false;
     }
 
+    /** _more_          */
     Hashtable seen = new Hashtable();
 
     /**
@@ -309,8 +313,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List getRoles(Entry entry, String action)
-            throws Exception {
+    public List getRoles(Entry entry, String action) throws Exception {
         //Make sure we call getPermissions first which forces the instantation of the roles
         getPermissions(entry);
         return entry.getRoles(action);
@@ -426,8 +429,8 @@ public class AccessManager extends RepositoryManager {
             return;
         }
         List<Permission> permissions = getPermissions(entry);
-        String entryUrl = HtmlUtil.href(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
-                              entry.getId()), entry.getName());
+        String entryUrl = HtmlUtil.href(request.url(URL_ACCESS_FORM,
+                              ARG_ENTRYID, entry.getId()), entry.getName());
 
         Hashtable map = new Hashtable();
         for (Permission permission : permissions) {
@@ -449,8 +452,8 @@ public class AccessManager extends RepositoryManager {
         }
         sb.append(HtmlUtil.rowTop(cols.toString()));
         listAccess(request,
-                   getEntryManager().getEntry(request, entry.getParentGroupId()),
-                   sb);
+                   getEntryManager().getEntry(request,
+                       entry.getParentGroupId()), sb);
     }
 
 
@@ -467,17 +470,18 @@ public class AccessManager extends RepositoryManager {
                                      List<Permission> permissions)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            getDatabaseManager().delete(Tables.PERMISSIONS.NAME,
-                           Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID,
-                                     entry.getId()));
+            getDatabaseManager().delete(
+                Tables.PERMISSIONS.NAME,
+                Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId()));
 
             for (Permission permission : permissions) {
                 List roles = permission.getRoles();
                 for (int i = 0; i < roles.size(); i++) {
-                    getDatabaseManager().executeInsert(Tables.PERMISSIONS.INSERT,
-                            new Object[] { entry.getId(),
-                                           permission.getAction(),
-                                           roles.get(i) });
+                    getDatabaseManager().executeInsert(
+                        Tables.PERMISSIONS.INSERT,
+                        new Object[] { entry.getId(),
+                                       permission.getAction(),
+                                       roles.get(i) });
                 }
             }
         }
@@ -495,8 +499,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List<Permission> getPermissions(Entry entry)
-            throws Exception {
+    protected List<Permission> getPermissions(Entry entry) throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
             if (false) {
                 List<Permission> tmp = new ArrayList<Permission>();
@@ -512,13 +515,12 @@ public class AccessManager extends RepositoryManager {
             }
             //            if(!entry.isGroup()) 
             //                System.err.println ("getPermissions for entry:" + entry.getId());
-            SqlUtil.Iterator iter = SqlUtil.getIterator(
-                                        getDatabaseManager().select(
-                                            Tables.PERMISSIONS.COLUMNS,
-                                            Tables.PERMISSIONS.NAME,
-                                            Clause.eq(
-                                                Tables.PERMISSIONS.COL_ENTRY_ID,
-                                                entry.getId())));
+            SqlUtil.Iterator iter =
+                SqlUtil.getIterator(
+                    getDatabaseManager().select(
+                        Tables.PERMISSIONS.COLUMNS, Tables.PERMISSIONS.NAME,
+                        Clause.eq(
+                            Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId())));
 
             List<Permission> permissions = new ArrayList<Permission>();
 
@@ -645,7 +647,8 @@ public class AccessManager extends RepositoryManager {
      */
     public Result processAccessChange(Request request) throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            Entry            entry       = getEntryManager().getEntry(request);
+            Entry            entry       =
+                getEntryManager().getEntry(request);
             String           message     = "Access Changed";
 
             List<Permission> permissions = new ArrayList<Permission>();

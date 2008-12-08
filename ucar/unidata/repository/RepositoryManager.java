@@ -97,7 +97,7 @@ public class RepositoryManager implements RepositorySource, Constants,
     /** _more_ */
     protected Repository repository;
 
-    /** _more_          */
+    /** _more_ */
     private DataOutputHandler dataOutputHandler;
 
     /**
@@ -131,6 +131,13 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public String fileUrl(String url) {
         return getRepository().fileUrl(url);
     }
@@ -183,8 +190,16 @@ public class RepositoryManager implements RepositorySource, Constants,
         return Repository.msg(msg);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public String translateMsg(Request request, String s) {
-        return getRepository().translate(request,msg(s));
+        return getRepository().translate(request, msg(s));
     }
 
 
@@ -234,6 +249,13 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String formHeader(String s) {
         return HtmlUtil.div(s, HtmlUtil.cssClass("formgroupheader"));
     }
@@ -383,6 +405,11 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getAccessManager();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected EntryManager getEntryManager() {
         return repository.getEntryManager();
     }

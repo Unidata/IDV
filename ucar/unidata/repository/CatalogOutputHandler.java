@@ -88,7 +88,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_LATEST = "latest";
 
     /** _more_ */
@@ -96,7 +96,8 @@ public class CatalogOutputHandler extends OutputHandler {
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
 
     /** _more_ */
-    public static final OutputType OUTPUT_CATALOG = new OutputType("Catalog", "thredds.catalog");
+    public static final OutputType OUTPUT_CATALOG = new OutputType("Catalog",
+                                                        "thredds.catalog");
 
 
     /** _more_ */
@@ -206,9 +207,19 @@ public class CatalogOutputHandler extends OutputHandler {
                                        Element node)
             throws Exception {
 
-        collectMetadata(repository, metadataList, node,"");
+        collectMetadata(repository, metadataList, node, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param metadataList _more_
+     * @param node _more_
+     * @param tab _more_
+     *
+     * @throws Exception _more_
+     */
     public static void collectMetadata(Repository repository,
                                        List<Metadata> metadataList,
                                        Element node, String tab)
@@ -233,16 +244,19 @@ public class CatalogOutputHandler extends OutputHandler {
                     String url = XmlUtil.getAttribute(child, "xlink:href");
                     try {
                         Element root = XmlUtil.getRoot(url,
-                                                       CatalogOutputHandler.class);
+                                           CatalogOutputHandler.class);
                         if (root != null) {
-                            collectMetadata(repository, metadataList, root,tab+"  ");
+                            collectMetadata(repository, metadataList, root,
+                                            tab + "  ");
                         }
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         //ignore exceptions here
-                        System.err.println ("Error reading metadata:" + url+"\n" + exc);
+                        System.err.println("Error reading metadata:" + url
+                                           + "\n" + exc);
                     }
                 } else {
-                    collectMetadata(repository, metadataList, child,tab+"  ");
+                    collectMetadata(repository, metadataList, child,
+                                    tab + "  ");
                 }
             } else {
                 for (MetadataHandler metadataHandler : metadataHandlers) {
@@ -520,8 +534,9 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (entry.getTypeHandler().canDownload(request, entry)) {
-            String urlPath = HtmlUtil.url("/" + getStorageManager().getFileTail(entry), ARG_ENTRYID,
-                                          entry.getId());
+            String urlPath =
+                HtmlUtil.url("/" + getStorageManager().getFileTail(entry),
+                             ARG_ENTRYID, entry.getId());
             addService(catalogInfo, SERVICE_HTTP,
                        getRepository().URL_ENTRY_GET.getFullUrl());
             Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS,
@@ -656,13 +671,16 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
-                request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID, group.getId(),
-                            ARG_OUTPUT, OUTPUT_CATALOG);
+                request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
+                            group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
 
-            Element ref = XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_CATALOGREF,
-                                         parent,
-                                         new String[] { CatalogUtil.ATTR_XLINK_TITLE,
-                    group.getName(), CatalogUtil.ATTR_XLINK_HREF, url });
+            Element ref = XmlUtil.create(catalogInfo.doc,
+                                         CatalogUtil.TAG_CATALOGREF, parent,
+                                         new String[] {
+                                             CatalogUtil.ATTR_XLINK_TITLE,
+                                             group.getName(),
+                                             CatalogUtil.ATTR_XLINK_HREF,
+                                             url });
         }
 
         EntryGroup entryGroup = new EntryGroup("");

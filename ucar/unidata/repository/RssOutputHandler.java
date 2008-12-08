@@ -24,13 +24,14 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-
-import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+
+
+import ucar.unidata.util.StringBufferCollection;
 
 
 import ucar.unidata.util.StringUtil;
@@ -82,7 +83,10 @@ public class RssOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_RSS_RSS = "rss";
 
+    /** _more_          */
     public static final String TAG_RSS_GEOLAT = "geo:lat";
+
+    /** _more_          */
     public static final String TAG_RSS_GEOLON = "geo:lon";
 
     /** _more_ */
@@ -108,10 +112,12 @@ public class RssOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_RSS_FULL = new OutputType("Full RSS Feed","rss.full");
+    public static final OutputType OUTPUT_RSS_FULL =
+        new OutputType("Full RSS Feed", "rss.full");
 
     /** _more_ */
-    public static final OutputType OUTPUT_RSS_SUMMARY = new OutputType("RSS Feed","rss.summary");
+    public static final OutputType OUTPUT_RSS_SUMMARY =
+        new OutputType("RSS Feed", "rss.summary");
 
 
 
@@ -146,9 +152,10 @@ public class RssOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, Entry entry,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if(getRepository().isOutputTypeOK(OUTPUT_RSS_SUMMARY)) {
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                          ARG_OUTPUT, OUTPUT_RSS_SUMMARY);
+        if (getRepository().isOutputTypeOK(OUTPUT_RSS_SUMMARY)) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                          entry, ARG_OUTPUT,
+                                          OUTPUT_RSS_SUMMARY);
             links.add(new Link(url, getRepository().fileUrl(ICON_RSS),
                                "RSS Feed"));
         }
@@ -214,7 +221,7 @@ public class RssOutputHandler extends OutputHandler {
         sb.append(XmlUtil.openTag(TAG_RSS_CHANNEL));
         sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", "Repository Query"));
         StringBufferCollection sbc    = new StringBufferCollection();
-        OutputType output = request.getOutput();
+        OutputType             output = request.getOutput();
         request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
         for (Entry entry : entries) {
             sb.append(XmlUtil.openTag(TAG_RSS_ITEM));
@@ -238,13 +245,17 @@ public class RssOutputHandler extends OutputHandler {
             }
 
             sb.append(XmlUtil.closeTag(TAG_RSS_DESCRIPTION));
-            if(entry.hasLocationDefined()) {
-                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT,"",""+entry.getSouth()));
-                sb.append(XmlUtil.tag(TAG_RSS_GEOLON,"",""+entry.getEast()));
-            } else  if(entry.hasAreaDefined()) {
+            if (entry.hasLocationDefined()) {
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT, "",
+                                      "" + entry.getSouth()));
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLON, "",
+                                      "" + entry.getEast()));
+            } else if (entry.hasAreaDefined()) {
                 //For now just include the southeast point
-                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT,"",""+entry.getSouth()));
-                sb.append(XmlUtil.tag(TAG_RSS_GEOLON,"",""+entry.getEast()));
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLAT, "",
+                                      "" + entry.getSouth()));
+                sb.append(XmlUtil.tag(TAG_RSS_GEOLON, "",
+                                      "" + entry.getEast()));
             }
 
 

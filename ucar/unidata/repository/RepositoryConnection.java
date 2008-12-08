@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository;
 
+
 import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
@@ -39,12 +40,24 @@ import java.sql.*;
  * @version $Revision: 1.3 $
  */
 public class RepositoryConnection {
+
+    /** _more_          */
     private Connection connection;
 
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     */
     public RepositoryConnection(Connection connection) {
         this.connection = connection;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Connection getConnection() {
         return connection;
     }

@@ -60,14 +60,16 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
 
-import  javax.mail.internet.MimeMessage;
-import  javax.mail.internet.InternetAddress;
-import  javax.mail.Message;
-import  javax.mail.Transport;
+
+import javax.mail.internet.MimeMessage;
+
 
 /**
- * Class Admin 
+ * Class Admin
  *
  *
  * @author IDV Development Team
@@ -119,8 +121,8 @@ public class Admin extends RepositoryManager {
                                             "Statistics");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_ACCESS = new RequestUrl(this, "/admin/access",
-                                            "Access");
+    public RequestUrl URL_ADMIN_ACCESS = new RequestUrl(this,
+                                             "/admin/access", "Access");
 
 
     /** _more_ */
@@ -339,89 +341,89 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected StringBuffer getDbMetaData()
-            throws Exception {
+    protected StringBuffer getDbMetaData() throws Exception {
 
-        Connection       connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getNewConnection();
         try {
-        StringBuffer     sb       = new StringBuffer();
-        DatabaseMetaData dbmd       = connection.getMetaData();
-        ResultSet        catalogs = dbmd.getCatalogs();
-        ResultSet tables = dbmd.getTables(null, null, null,
-                                          new String[] { "TABLE" });
+            StringBuffer     sb       = new StringBuffer();
+            DatabaseMetaData dbmd     = connection.getMetaData();
+            ResultSet        catalogs = dbmd.getCatalogs();
+            ResultSet tables = dbmd.getTables(null, null, null,
+                                   new String[] { "TABLE" });
 
-        while (tables.next()) {
-            String tableName = tables.getString("TABLE_NAME");
-            //            System.err.println("table name:" + tableName);
-            String tableType = tables.getString("TABLE_TYPE");
-            //            System.err.println("table type" + tableType);
-            if (Misc.equals(tableType, "INDEX")) {
-                continue;
-            }
-            if (tableType == null) {
-                continue;
-            }
+            while (tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                //            System.err.println("table name:" + tableName);
+                String tableType = tables.getString("TABLE_TYPE");
+                //            System.err.println("table type" + tableType);
+                if (Misc.equals(tableType, "INDEX")) {
+                    continue;
+                }
+                if (tableType == null) {
+                    continue;
+                }
 
-            if ((tableType != null) && tableType.startsWith("SYSTEM")) {
-                continue;
-            }
+                if ((tableType != null) && tableType.startsWith("SYSTEM")) {
+                    continue;
+                }
 
 
-            ResultSet columns = dbmd.getColumns(null, null, tableName, null);
-            String encoded = new String(XmlUtil.encodeBase64(("text:?"
-                                 + tableName).getBytes()));
+                ResultSet columns = dbmd.getColumns(null, null, tableName,
+                                        null);
+                String encoded = new String(XmlUtil.encodeBase64(("text:?"
+                                     + tableName).getBytes()));
 
-            int cnt = 0;
-            if (tableName.toLowerCase().indexOf("_index_") < 0) {
-                cnt = getDatabaseManager().getCount(tableName, new Clause());
-            }
-            String tableVar  = null;
-            String TABLENAME = tableName.toUpperCase();
-            sb.append("Table:" + tableName + " (#" + cnt + ")");
-            sb.append("<ul>");
-            List colVars = new ArrayList();
+                int cnt = 0;
+                if (tableName.toLowerCase().indexOf("_index_") < 0) {
+                    cnt = getDatabaseManager().getCount(tableName,
+                            new Clause());
+                }
+                String tableVar  = null;
+                String TABLENAME = tableName.toUpperCase();
+                sb.append("Table:" + tableName + " (#" + cnt + ")");
+                sb.append("<ul>");
+                List colVars = new ArrayList();
 
-            while (columns.next()) {
-                String colName = columns.getString("COLUMN_NAME");
-                String colSize = columns.getString("COLUMN_SIZE");
-                sb.append("<li>");
-                sb.append(colName + " (" + columns.getString("TYPE_NAME")
-                          + " " + colSize+")");
-            }
+                while (columns.next()) {
+                    String colName = columns.getString("COLUMN_NAME");
+                    String colSize = columns.getString("COLUMN_SIZE");
+                    sb.append("<li>");
+                    sb.append(colName + " (" + columns.getString("TYPE_NAME")
+                              + " " + colSize + ")");
+                }
 
-            ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
-                                                  false, true);
-            boolean didone = false;
-            while (indices.next()) {
-                if ( !didone) {
+                ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
+                                        false, true);
+                boolean didone = false;
+                while (indices.next()) {
+                    if ( !didone) {
                         //                            sb.append(
                         //                                "<br><b>Indices</b> (name,order,type,pages)<br>");
                         sb.append("<br><b>Indices</b><br>");
                     }
                     didone = true;
                     String indexName  = indices.getString("INDEX_NAME");
-                        String asc        = indices.getString("ASC_OR_DESC");
-                        int    type       = indices.getInt("TYPE");
-                        String typeString = "" + type;
-                        int    pages      = indices.getInt("PAGES");
-                        if (type == DatabaseMetaData.tableIndexClustered) {
-                            typeString = "clustered";
-                        } else if (type
-                                   == DatabaseMetaData.tableIndexHashed) {
-                            typeString = "hashed";
-                        } else if (type == DatabaseMetaData.tableIndexOther) {
-                            typeString = "other";
-                        }
-                        //                        sb.append("Index:" + indexName + "  " + asc + " "
-                        //                                  + typeString + " " + pages + "<br>");
-                        sb.append("Index:" + indexName + "<br>");
+                    String asc        = indices.getString("ASC_OR_DESC");
+                    int    type       = indices.getInt("TYPE");
+                    String typeString = "" + type;
+                    int    pages      = indices.getInt("PAGES");
+                    if (type == DatabaseMetaData.tableIndexClustered) {
+                        typeString = "clustered";
+                    } else if (type == DatabaseMetaData.tableIndexHashed) {
+                        typeString = "hashed";
+                    } else if (type == DatabaseMetaData.tableIndexOther) {
+                        typeString = "other";
+                    }
+                    //                        sb.append("Index:" + indexName + "  " + asc + " "
+                    //                                  + typeString + " " + pages + "<br>");
+                    sb.append("Index:" + indexName + "<br>");
 
 
                 }
 
                 sb.append("</ul>");
-        }
-        return sb;
+            }
+            return sb;
         } finally {
             getDatabaseManager().closeConnection(connection);
         }
@@ -447,7 +449,7 @@ public class Admin extends RepositoryManager {
         sb.append(header("Database Administration"));
         String what = request.getString(ARG_ADMIN_WHAT, "nothing");
         if (what.equals("shutdown")) {
-            if (!getDatabaseManager().hasConnection()) {
+            if ( !getDatabaseManager().hasConnection()) {
                 sb.append("Not connected to database");
             } else {
                 getRepository().getDatabaseManager().closeConnection();
@@ -463,7 +465,7 @@ public class Admin extends RepositoryManager {
         }
         sb.append("<p>");
         sb.append(request.form(URL_ADMIN_STARTSTOP, " name=\"admin\""));
-        if (!getDatabaseManager().hasConnection()) {
+        if ( !getDatabaseManager().hasConnection()) {
             sb.append(HtmlUtil.hidden(ARG_ADMIN_WHAT, "restart"));
             sb.append(HtmlUtil.submit("Restart Database"));
         } else {
@@ -509,7 +511,7 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminDbTables(Request request) throws Exception {
-        StringBuffer sb           = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         sb.append(header("Database Tables"));
         sb.append(getDbMetaData());
         return makeResult(request, "Administration", sb);
@@ -595,6 +597,7 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSettings(Request request) throws Exception {
+
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Repository Settings"));
         sb.append(HtmlUtil.formTable());
@@ -606,13 +609,16 @@ public class Admin extends RepositoryManager {
         sb.append(tableSubHeader(formHeader(msg("Contact"))));
         sb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
                                      HtmlUtil.input(PROP_ADMIN_EMAIL,
-                                         getProperty(PROP_ADMIN_EMAIL,
-                                             ""), size)));
+                                         getProperty(PROP_ADMIN_EMAIL, ""),
+                                         size)));
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Mail Server"),
-                                     HtmlUtil.input(PROP_ADMIN_SMTP,
-                                         getProperty(PROP_ADMIN_SMTP,
-                                             ""), size)+" " +msg("For sending password reset messages")));
+        sb.append(
+            HtmlUtil.formEntry(
+                msgLabel("Mail Server"),
+                HtmlUtil.input(
+                    PROP_ADMIN_SMTP, getProperty(PROP_ADMIN_SMTP, ""),
+                    size) + " "
+                          + msg("For sending password reset messages")));
 
 
         sb.append(tableSubHeader(formHeader(msg("Display"))));
@@ -626,12 +632,13 @@ public class Admin extends RepositoryManager {
                                                 ""), 5, 40)));
 
 
-        String phrases = getProperty(PROP_ADMIN_PHRASES,(String)null);
-        if(phrases==null) {
+        String phrases = getProperty(PROP_ADMIN_PHRASES, (String) null);
+        if (phrases == null) {
             phrases = "#label=new label to use\n#e.g.: Groups=Projects";
         }
         sb.append(HtmlUtil.formEntryTop(msgLabel("Translations"),
-                                        HtmlUtil.textArea(PROP_ADMIN_PHRASES,phrases, 5, 40)));
+                                        HtmlUtil.textArea(PROP_ADMIN_PHRASES,
+                                            phrases, 5, 40)));
 
 
         sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
@@ -669,29 +676,36 @@ public class Admin extends RepositoryManager {
 
         sb.append(tableSubHeader(formHeader(msg("Available Output Types"))));
 
-        StringBuffer outputSB = new StringBuffer();
-        List<OutputType> types = getRepository().getOutputTypes();
-        String lastGroupName = null;
-        for(OutputType type: types) {
-            if(!type.getForUser()) continue;
+        StringBuffer     outputSB      = new StringBuffer();
+        List<OutputType> types         = getRepository().getOutputTypes();
+        String           lastGroupName = null;
+        for (OutputType type : types) {
+            if ( !type.getForUser()) {
+                continue;
+            }
             boolean ok = getRepository().isOutputTypeOK(type);
-            if(!Misc.equals(lastGroupName, type.getGroupName())) {
-                if(lastGroupName!=null) {
+            if ( !Misc.equals(lastGroupName, type.getGroupName())) {
+                if (lastGroupName != null) {
                     outputSB.append("</div>\n");
                     outputSB.append(HtmlUtil.p());
                 }
-                lastGroupName= type.getGroupName();
-                outputSB.append("<div class=\"pagesubheading\">" + lastGroupName+"</div>\n<div style=\"margin-left:20px\">");
+                lastGroupName = type.getGroupName();
+                outputSB.append("<div class=\"pagesubheading\">"
+                                + lastGroupName
+                                + "</div>\n<div style=\"margin-left:20px\">");
             }
-            outputSB.append(HtmlUtil.checkbox("outputtype." + type.getId(),"true",ok));
+            outputSB.append(HtmlUtil.checkbox("outputtype." + type.getId(),
+                    "true", ok));
             outputSB.append(type.getLabel());
             outputSB.append(HtmlUtil.space(3));
         }
         outputSB.append("</div>\n");
-        String outputDiv =         HtmlUtil.div(outputSB.toString(),HtmlUtil.cssClass("scrollablediv"));
+        String outputDiv = HtmlUtil.div(outputSB.toString(),
+                                        HtmlUtil.cssClass("scrollablediv"));
         sb.append("\n");
-        String doAllOutput = HtmlUtil.checkbox("outputtype.all","true",false) + HtmlUtil.space(1) + msg("Use all");
-        sb.append(HtmlUtil.formEntryTop("",doAllOutput + outputDiv));
+        String doAllOutput = HtmlUtil.checkbox("outputtype.all", "true",
+                                 false) + HtmlUtil.space(1) + msg("Use all");
+        sb.append(HtmlUtil.formEntryTop("", doAllOutput + outputDiv));
         sb.append("\n");
         StringBuffer handlerSB = new StringBuffer();
         List<OutputHandler> outputHandlers =
@@ -714,39 +728,64 @@ public class Admin extends RepositoryManager {
         sb.append("</form>");
         sb.append("</table>");
         return makeResult(request, msg("Settings"), sb);
+
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isEmailCapable() {
-        String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,"").trim();
-        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,"").trim();
-        if(serverAdmin.length()==0 || smtpServer.length() == 0) {
+        String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,
+                                "").trim();
+        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,
+                                 "").trim();
+        if ((serverAdmin.length() == 0) || (smtpServer.length() == 0)) {
             return false;
         }
         return true;
     }
 
-    public void sendEmail(String to, String subject, String contents, boolean asHtml) throws Exception {
-        if(!isEmailCapable()) {
-            throw new IllegalStateException("This RAMADDA server has not been configured to send email");
+    /**
+     * _more_
+     *
+     * @param to _more_
+     * @param subject _more_
+     * @param contents _more_
+     * @param asHtml _more_
+     *
+     * @throws Exception _more_
+     */
+    public void sendEmail(String to, String subject, String contents,
+                          boolean asHtml)
+            throws Exception {
+        if ( !isEmailCapable()) {
+            throw new IllegalStateException(
+                "This RAMADDA server has not been configured to send email");
         }
-        System.err.println ("send email top");
-        String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,"").trim();
-        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,"").trim();
+        System.err.println("send email top");
+        String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,
+                                "").trim();
+        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,
+                                 "").trim();
 
         Properties props = new Properties();
         props.put("mail.smtp.host", smtpServer);
         props.put("mail.from", serverAdmin);
-        javax.mail.Session session = javax.mail.Session.getInstance(props, null);
+        javax.mail.Session session = javax.mail.Session.getInstance(props,
+                                         null);
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(serverAdmin));
-        msg.setRecipients(Message.RecipientType.TO,
-                          to);
+        msg.setRecipients(Message.RecipientType.TO, to);
         msg.setSubject(subject);
         msg.setSentDate(new Date());
-        msg.setContent(contents,(asHtml?"text/html":"text/plain"));
-        System.err.println ("before sending");
+        msg.setContent(contents, (asHtml
+                                  ? "text/html"
+                                  : "text/plain"));
+        System.err.println("before sending");
         Transport.send(msg);
-        System.err.println ("after sending");
+        System.err.println("after sending");
     }
 
 
@@ -761,11 +800,9 @@ public class Admin extends RepositoryManager {
      */
     public Result adminSettingsDo(Request request) throws Exception {
 
-        getRepository().writeGlobal(
-                                    PROP_ADMIN_EMAIL,
+        getRepository().writeGlobal(PROP_ADMIN_EMAIL,
                                     request.getString(PROP_ADMIN_EMAIL, ""));
-        getRepository().writeGlobal(
-                                    PROP_ADMIN_SMTP,
+        getRepository().writeGlobal(PROP_ADMIN_SMTP,
                                     request.getString(PROP_ADMIN_SMTP, ""));
 
         if (request.exists(PROP_REPOSITORY_NAME)) {
@@ -808,10 +845,13 @@ public class Admin extends RepositoryManager {
         }
 
         List<OutputType> types = getRepository().getOutputTypes();
-        boolean doAll = request.get("outputtype.all",false);
-        for(OutputType type: types) {
-            if(!type.getForUser()) continue;
-            boolean ok =    doAll||  request.get("outputtype." + type.getId(),false);
+        boolean          doAll = request.get("outputtype.all", false);
+        for (OutputType type : types) {
+            if ( !type.getForUser()) {
+                continue;
+            }
+            boolean ok = doAll
+                         || request.get("outputtype." + type.getId(), false);
             getRepository().setOutputTypeOK(type, ok);
         }
 
@@ -828,50 +868,71 @@ public class Admin extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminAccess(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Access Overview"));
 
-        Statement stmt = getDatabaseManager().execute("select "
-                                                      + SqlUtil.comma(Tables.PERMISSIONS.COL_ENTRY_ID,
-                                                                      Tables.PERMISSIONS.COL_ACTION,
-                                                                      Tables.PERMISSIONS.COL_ROLE)
-                                                      + " from "
-                                                      + Tables.PERMISSIONS.NAME, 10000000, 0);
+        Statement stmt = getDatabaseManager().execute(
+                             "select "
+                             + SqlUtil.comma(
+                                 Tables.PERMISSIONS.COL_ENTRY_ID,
+                                 Tables.PERMISSIONS.COL_ACTION,
+                                 Tables.PERMISSIONS.COL_ROLE) + " from "
+                                     + Tables.PERMISSIONS.NAME, 10000000, 0);
 
-        Hashtable<String,List> idToPermissions = new Hashtable<String,List>();
+        Hashtable<String, List> idToPermissions = new Hashtable<String,
+                                                      List>();
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
-        List<String> ids = new ArrayList<String>();
+        List<String>     ids = new ArrayList<String>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                String id       = results.getString(1);
-                String action   = results.getString(2);
-                String role     = results.getString(3);
-                List permissions = idToPermissions.get(id);
-                if(permissions == null) {
-                    idToPermissions.put(id,permissions = new ArrayList());
+                String id          = results.getString(1);
+                String action      = results.getString(2);
+                String role        = results.getString(3);
+                List   permissions = idToPermissions.get(id);
+                if (permissions == null) {
+                    idToPermissions.put(id, permissions = new ArrayList());
                     ids.add(id);
                 }
-                permissions.add(new Permission(action,role));
+                permissions.add(new Permission(action, role));
             }
         }
-            
+
         sb.append("<table cellspacing=\"0\" cellpadding=\"0\">");
-        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.space(10),
-                                             HtmlUtil.b("Action")+HtmlUtil.space(3),
-                                             HtmlUtil.b("Role"))));
-        for(String id:ids) {
+        sb.append(
+            HtmlUtil.row(
+                HtmlUtil.cols(
+                    HtmlUtil.space(10),
+                    HtmlUtil.b("Action") + HtmlUtil.space(3),
+                    HtmlUtil.b("Role"))));
+        for (String id : ids) {
             Entry entry = getEntryManager().getEntry(request, id);
-            sb.append(HtmlUtil.row(HtmlUtil.colspan(getEntryManager().getBreadCrumbs(request, entry,getRepository().URL_ACCESS_FORM),3)));
-            List<Permission> permissions = (List<Permission>) idToPermissions.get(id);
-            for(Permission permission:permissions) {
-                sb.append(HtmlUtil.row(HtmlUtil.cols("",permission.getAction(),
-                                                     permission.getRoles().get(0))));
-                                                     
+            sb.append(
+                HtmlUtil.row(
+                    HtmlUtil.colspan(
+                        getEntryManager().getBreadCrumbs(
+                            request, entry,
+                            getRepository().URL_ACCESS_FORM), 3)));
+            List<Permission> permissions =
+                (List<Permission>) idToPermissions.get(id);
+            for (Permission permission : permissions) {
+                sb.append(HtmlUtil.row(HtmlUtil.cols("",
+                        permission.getAction(),
+                        permission.getRoles().get(0))));
+
             }
-            sb.append(HtmlUtil.row(HtmlUtil.colspan("<hr>",3)));
+            sb.append(HtmlUtil.row(HtmlUtil.colspan("<hr>", 3)));
         }
         sb.append("</table>");
 
@@ -901,7 +962,8 @@ public class Admin extends RepositoryManager {
         sb.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
                            msg("Metadata Items") };
-        String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME, Tables.METADATA.NAME };
+        String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME,
+                            Tables.METADATA.NAME };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
                     + getDatabaseManager().getCount(tables[i].toLowerCase(),
@@ -917,7 +979,8 @@ public class Admin extends RepositoryManager {
             HtmlUtil.row(
                 HtmlUtil.cols(
                     "" + getDatabaseManager().getCount(
-                        Tables.ENTRIES.NAME, new Clause()), msg("Total entries"))));
+                        Tables.ENTRIES.NAME, new Clause()), msg(
+                        "Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
@@ -1050,7 +1113,7 @@ public class Admin extends RepositoryManager {
                         if (rsmd.getColumnType(colcnt)
                                 == java.sql.Types.TIMESTAMP) {
                             Date dttm = results.getTimestamp(colcnt,
-                                                             Repository.calendar);
+                                            Repository.calendar);
                             sb.append(HtmlUtil.col(formatDate(request,
                                     dttm)));
                         } else {
@@ -1189,10 +1252,13 @@ public class Admin extends RepositoryManager {
         int myTS = ++cleanupTS;
         try {
             Statement stmt =
-                getDatabaseManager().select(SqlUtil.comma(Tables.ENTRIES.COL_ID,
-                    Tables.ENTRIES.COL_RESOURCE, Tables.ENTRIES.COL_TYPE), Tables.ENTRIES.NAME,
-                        Clause.eq(Tables.ENTRIES.COL_RESOURCE_TYPE,
-                                  Resource.TYPE_FILE));
+                getDatabaseManager().select(
+                    SqlUtil.comma(
+                        Tables.ENTRIES.COL_ID, Tables.ENTRIES.COL_RESOURCE,
+                        Tables.ENTRIES.COL_TYPE), Tables.ENTRIES.NAME,
+                            Clause.eq(
+                                Tables.ENTRIES.COL_RESOURCE_TYPE,
+                                Resource.TYPE_FILE));
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
@@ -1202,14 +1268,14 @@ public class Admin extends RepositoryManager {
             List<Entry>      entries   = new ArrayList<Entry>();
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    if ((cleanupTS != myTS)
-                            || !runningCleanup) {
+                    if ((cleanupTS != myTS) || !runningCleanup) {
                         runningCleanup = false;
                         break;
                     }
-                    int    col      = 1;
-                    String id       = results.getString(col++);
-                    String resource = getStorageManager().resourceFromDB(results.getString(col++));
+                    int    col = 1;
+                    String id  = results.getString(col++);
+                    String resource = getStorageManager().resourceFromDB(
+                                          results.getString(col++));
                     Entry entry = getRepository().getTypeHandler(
                                       results.getString(col++)).createEntry(
                                       id);
@@ -1223,7 +1289,8 @@ public class Admin extends RepositoryManager {
                         System.err.print(".");
                     }
                     if (entries.size() > 1000) {
-                        getEntryManager().deleteEntries(request, entries, null);
+                        getEntryManager().deleteEntries(request, entries,
+                                null);
                         entries   = new ArrayList<Entry>();
                         deleteCnt += 1000;
                         cleanupStatus = new StringBuffer("Removed "

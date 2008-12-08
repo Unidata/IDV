@@ -53,7 +53,7 @@ public class Link {
     /** _more_ */
     String icon;
 
-    /** _more_          */
+    /** _more_ */
     protected boolean hr = false;
 
 

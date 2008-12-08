@@ -94,11 +94,17 @@ import javax.swing.*;
  */
 public class StorageManager extends RepositoryManager {
 
+    /** _more_          */
     public static final String PROP_DIRDEPTH = "ramadda.storage.dirdepth";
+
+    /** _more_          */
     public static final String PROP_DIRRANGE = "ramadda.storage.dirrange";
 
 
+    /** _more_          */
     private int dirDepth = 2;
+
+    /** _more_          */
     private int dirRange = 10;
 
 
@@ -114,6 +120,7 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String uploadDir;
 
+    /** _more_          */
     private String entriesDir;
 
     /** _more_ */
@@ -132,15 +139,33 @@ public class StorageManager extends RepositoryManager {
         super(repository);
     }
 
+    /**
+     * _more_
+     *
+     * @param resource _more_
+     *
+     * @return _more_
+     */
     public String resourceFromDB(String resource) {
-        if(resource!=null)
-            resource = resource.replace("${ramadda.storagedir}",getStorageDir());
+        if (resource != null) {
+            resource = resource.replace("${ramadda.storagedir}",
+                                        getStorageDir());
+        }
         return resource;
     }
 
+    /**
+     * _more_
+     *
+     * @param resource _more_
+     *
+     * @return _more_
+     */
     public String resourceToDB(String resource) {
-        if(resource!=null)
-            resource = resource.replace(getStorageDir(),"${ramadda.storagedir}");
+        if (resource != null) {
+            resource = resource.replace(getStorageDir(),
+                                        "${ramadda.storagedir}");
+        }
         return resource;
     }
 
@@ -267,8 +292,13 @@ public class StorageManager extends RepositoryManager {
         return storageDir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getPluginsDir() {
-        String dir =  IOUtil.joinDir(getRepositoryDir(), "plugins");
+        String dir = IOUtil.joinDir(getRepositoryDir(), "plugins");
         IOUtil.makeDirRecursive(new File(dir));
         return dir;
     }
@@ -318,6 +348,13 @@ public class StorageManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     private String cleanEntryId(String id) {
         return IOUtil.cleanFileName(id);
     }
@@ -325,6 +362,9 @@ public class StorageManager extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param id _more_
+     * @param createIfNeeded _more_
      * @return _more_
      */
     public File getEntryDir(String id, boolean createIfNeeded) {
@@ -333,8 +373,8 @@ public class StorageManager extends RepositoryManager {
             entriesDir = IOUtil.joinDir(getRepositoryDir(), "entries");
             IOUtil.makeDirRecursive(new File(entriesDir));
         }
-        File  entryDir =  new File(IOUtil.joinDir(entriesDir,id));
-        if(createIfNeeded) {
+        File entryDir = new File(IOUtil.joinDir(entriesDir, id));
+        if (createIfNeeded) {
             IOUtil.makeDirRecursive(entryDir);
         }
         return entryDir;
@@ -342,28 +382,53 @@ public class StorageManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public void deleteEntryDir(final String id) {
         Misc.run(new Runnable() {
-                public void run() {
-                    File dir = getEntryDir(id,false);
-                    if(dir.exists()) {
-                        IOUtil.deleteDirectory(dir);
-                    }}});
+            public void run() {
+                File dir = getEntryDir(id, false);
+                if (dir.exists()) {
+                    IOUtil.deleteDirectory(dir);
+                }
+            }
+        });
     }
 
 
-    public File moveToEntryDir(Entry entry, File original)
-            throws Exception {
-        File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),true),
-                                               original.getName()));
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param original _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File moveToEntryDir(Entry entry, File original) throws Exception {
+        File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),
+                           true), original.getName()));
         IOUtil.moveFile(original, newFile);
         return newFile;
     }
 
-    public File copyToEntryDir(Entry entry, File original)
-            throws Exception {
-        File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),true),
-                                               original.getName()));
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param original _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File copyToEntryDir(Entry entry, File original) throws Exception {
+        File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),
+                           true), original.getName()));
         IOUtil.copyFile(original, newFile);
         return newFile;
     }
@@ -381,29 +446,30 @@ public class StorageManager extends RepositoryManager {
      */
     public File moveToStorage(Request request, File original, String prefix)
             throws Exception {
-        String targetName = prefix + original.getName();
-        String storageDir = getStorageDir();
+        String            targetName = prefix + original.getName();
+        String            storageDir = getStorageDir();
 
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.setTime(new Date());
-        
-        storageDir = IOUtil.joinDir(storageDir,"y"+ cal.get(cal.YEAR));
+
+        storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
         IOUtil.makeDir(storageDir);
-        storageDir = IOUtil.joinDir(storageDir,"m"+ (cal.get(cal.MONTH)+1));
+        storageDir = IOUtil.joinDir(storageDir,
+                                    "m" + (cal.get(cal.MONTH) + 1));
         IOUtil.makeDir(storageDir);
-        storageDir = IOUtil.joinDir(storageDir,"d"+ cal.get(cal.DAY_OF_MONTH));
+        storageDir = IOUtil.joinDir(storageDir,
+                                    "d" + cal.get(cal.DAY_OF_MONTH));
         IOUtil.makeDir(storageDir);
 
 
-        for(int depth=0;depth<dirDepth;depth++) {
-            int index=(int)(dirRange*Math.random());
-            storageDir = IOUtil.joinDir(storageDir,"data" + index);
+        for (int depth = 0; depth < dirDepth; depth++) {
+            int index = (int) (dirRange * Math.random());
+            storageDir = IOUtil.joinDir(storageDir, "data" + index);
             IOUtil.makeDir(storageDir);
         }
 
-        File newFile = new File(IOUtil.joinDir(storageDir,
-                                               targetName));
-        System.err.println (newFile);
+        File newFile = new File(IOUtil.joinDir(storageDir, targetName));
+        System.err.println(newFile);
         IOUtil.moveFile(original, newFile);
         return newFile;
     }
@@ -429,14 +495,21 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getFileTail(Entry entry) {
-        if(entry.getIsLocalFile()) {
+        if (entry.getIsLocalFile()) {
             return IOUtil.getFileTail(entry.getResource().getPath());
         }
         return getFileTail(entry.getResource().getPath());
     }
 
+    /**
+     * _more_
+     *
+     * @param fileName _more_
+     *
+     * @return _more_
+     */
     public String getFileTail(String fileName) {
-        int    idx      = fileName.indexOf("_");
+        int idx = fileName.indexOf("_");
         if (idx >= 0) {
             return fileName.substring(idx + 1);
         }

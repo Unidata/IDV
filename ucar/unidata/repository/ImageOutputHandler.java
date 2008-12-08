@@ -81,13 +81,16 @@ public class ImageOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery", "image.gallery");
+    public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
+                                                        "image.gallery");
 
     /** _more_ */
-    public static final OutputType OUTPUT_PLAYER = new OutputType("Image Player", "image.player");
+    public static final OutputType OUTPUT_PLAYER =
+        new OutputType("Image Player", "image.player");
 
     /** _more_ */
-    public static final OutputType OUTPUT_SLIDESHOW = new OutputType("Slideshow", "image.slideshow");
+    public static final OutputType OUTPUT_SLIDESHOW =
+        new OutputType("Slideshow", "image.slideshow");
 
 
 
@@ -123,7 +126,9 @@ public class ImageOutputHandler extends OutputHandler {
                                   List<OutputType> types)
             throws Exception {
         //If its a single entry then punt
-        if(state.entry!=null) return;
+        if (state.entry != null) {
+            return;
+        }
         List<Entry> entries = state.getAllEntries();
         if (entries.size() > 0) {
             boolean ok = false;
@@ -202,7 +207,7 @@ public class ImageOutputHandler extends OutputHandler {
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();
-        OutputType    output     = request.getOutput();
+        OutputType   output     = request.getOutput();
         boolean      showApplet = repository.isAppletEnabled(request);
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
@@ -247,11 +252,12 @@ public class ImageOutputHandler extends OutputHandler {
                 }
                 String url =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + entry.getName(), ARG_ENTRYID, entry.getId());
+                                 + entry.getName(), ARG_ENTRYID,
+                                     entry.getId());
                 String thumburl =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + entry.getName(), ARG_ENTRYID, entry.getId(),
-                                     ARG_IMAGEWIDTH, "" + 50);
+                                 + entry.getName(), ARG_ENTRYID,
+                                     entry.getId(), ARG_IMAGEWIDTH, "" + 50);
                 String entryUrl = getEntryLink(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
                 String title = entry.getTypeHandler().getEntryContent(entry,

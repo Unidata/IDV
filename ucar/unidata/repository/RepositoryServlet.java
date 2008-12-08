@@ -69,7 +69,8 @@ import javax.servlet.http.*;
  */
 public class RepositoryServlet extends HttpServlet {
 
-    private String[]args;
+    /** _more_          */
+    private String[] args;
 
     /** ExceptionLogger to handle any runtime exceptions */
 
@@ -79,10 +80,20 @@ public class RepositoryServlet extends HttpServlet {
     private static Repository repository;
 
 
-    public RepositoryServlet() {
-    }
+    /**
+     * _more_
+     */
+    public RepositoryServlet() {}
 
-    public RepositoryServlet(String[]args, int port) throws Exception {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     * @param port _more_
+     *
+     * @throws Exception _more_
+     */
+    public RepositoryServlet(String[] args, int port) throws Exception {
         this.args = args;
         createRepository(port, new Properties());
     }
@@ -98,21 +109,29 @@ public class RepositoryServlet extends HttpServlet {
      */
     private void createRepository(HttpServletRequest request)
             throws Exception {
-        Properties  webAppProperties = new Properties();
-        ServletContext context =getServletContext();
-        if(context!=null) {
-            String      propertyFile     = "/WEB-INF/repository.properties";
-            InputStream is =context.getResourceAsStream(propertyFile);
+        Properties     webAppProperties = new Properties();
+        ServletContext context          = getServletContext();
+        if (context != null) {
+            String      propertyFile = "/WEB-INF/repository.properties";
+            InputStream is = context.getResourceAsStream(propertyFile);
             if (is != null) {
                 webAppProperties.load(is);
             }
         }
-        createRepository(request.getServerPort(),webAppProperties);
+        createRepository(request.getServerPort(), webAppProperties);
     }
 
-    private void createRepository(int port,Properties webAppProperties)
+    /**
+     * _more_
+     *
+     * @param port _more_
+     * @param webAppProperties _more_
+     *
+     * @throws Exception _more_
+     */
+    private void createRepository(int port, Properties webAppProperties)
             throws Exception {
-        repository = new Repository(getInitParams(),   port, true);
+        repository = new Repository(getInitParams(), port, true);
         repository.init(webAppProperties);
     }
 
@@ -125,7 +144,9 @@ public class RepositoryServlet extends HttpServlet {
      * @return - an String[] containing the initialization parameters required for repository startup
      */
     private String[] getInitParams() {
-        if(args!=null) return args;
+        if (args != null) {
+            return args;
+        }
         List<String> tokens = new ArrayList<String>();
         for (Enumeration params =
                 this.getServletContext().getInitParameterNames();

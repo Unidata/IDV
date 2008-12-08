@@ -134,6 +134,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      *
      * @param request _more_
+     * @param entry _more_
      * @param metadata _more_
      *
      * @return _more_
@@ -222,10 +223,11 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      *
      * @param request _more_
+     * @param entry _more_
      * @param metadata _more_
      * @param forEdit _more_
      *
-     * @return _more_ 
+     * @return _more_
      *
      * @throws Exception _more_
      */

@@ -130,9 +130,15 @@ public class Request implements Constants {
     /** _more_ */
     private String leftMessage;
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param user _more_
+     */
     public Request(Repository repository, User user) {
-        this.repository         = repository;
-        this.user = user;
+        this.repository = repository;
+        this.user       = user;
     }
 
 
@@ -203,11 +209,11 @@ public class Request implements Constants {
         if (entry.getIsLocalFile()) {
             return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
         }
-        
-//        Group collectionGroup = entry.getCollectionGroup();
-//        if (repository.isSynthEntry(entry.getId())) {
-//            return url(theUrl, arg, entry.getId());
-//        }
+
+        //        Group collectionGroup = entry.getCollectionGroup();
+        //        if (repository.isSynthEntry(entry.getId())) {
+        //            return url(theUrl, arg, entry.getId());
+        //        }
 
         //if (collectionGroup != null) {
         //            return url(theUrl, arg, entry.getId());
@@ -313,8 +319,16 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public String formPost(RequestUrl theUrl, String extra) {
-        return HtmlUtil.formPost(url(theUrl),extra);
+        return HtmlUtil.formPost(url(theUrl), extra);
     }
 
 
@@ -573,7 +587,7 @@ public class Request implements Constants {
                 }
                 continue;
             }
-            String svalue =  value.toString();
+            String svalue = value.toString();
             if (svalue.length() == 0) {
                 continue;
             }
@@ -582,7 +596,7 @@ public class Request implements Constants {
             }
             try {
                 svalue = java.net.URLEncoder.encode(svalue, "UTF-8");
-            } catch (Exception exc) { /*noop*/
+            } catch (Exception exc) {  /*noop*/
             }
             sb.append(arg + "=" + svalue);
         }
@@ -640,6 +654,8 @@ public class Request implements Constants {
      * _more_
      *
      * @param s _more_
+     *
+     * @param o _more_
      *
      * @return _more_
      */
@@ -716,7 +732,7 @@ public class Request implements Constants {
     public Hashtable getDefinedProperties() {
         Hashtable props = new Hashtable();
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
-            String arg   =  keys.nextElement().toString();
+            String arg   = keys.nextElement().toString();
             Object value = parameters.get(arg);
             if (value instanceof List) {
                 if (((List) value).size() == 0) {
@@ -899,9 +915,17 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getEncodedString(String key, String dflt) {
-        String s = getString(key,dflt);
-        if(s!=null) {
+        String s = getString(key, dflt);
+        if (s != null) {
             s = HTMLEntityEncode(s);
         }
         return s;
@@ -910,14 +934,22 @@ public class Request implements Constants {
 
 
 
-    public static String HTMLEntityEncode( String input ) {
+    /**
+     * _more_
+     *
+     * @param input _more_
+     *
+     * @return _more_
+     */
+    public static String HTMLEntityEncode(String input) {
         StringBuffer sb = new StringBuffer();
-        for ( int i = 0; i < input.length(); ++i ) {
-            char ch = input.charAt( i );
-            if ( ch>='a' && ch<='z' || ch>='A' && ch<='Z' || ch>='0' && ch<='9' ) {
-                sb.append( ch );
+        for (int i = 0; i < input.length(); ++i) {
+            char ch = input.charAt(i);
+            if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z'))
+                    || ((ch >= '0') && (ch <= '9'))) {
+                sb.append(ch);
             } else {
-                sb.append( "&#" + (int)ch + ";" );
+                sb.append("&#" + (int) ch + ";");
             }
         }
         return sb.toString();
@@ -1413,22 +1445,25 @@ public class Request implements Constants {
      *  Set the CollectionEntry property.
      *
      *  @param value The new value for CollectionEntry
+     *
+     * @return _more_
      */
-/*
-    public void setCollectionEntry(Entry value) {
-        collectionEntry = value;
-    }
-*/
+    /*
+        public void setCollectionEntry(Entry value) {
+            collectionEntry = value;
+        }
+    */
+
     /**
      *  Get the CollectionEntry property.
      *
      *  @return The CollectionEntry
      */
-/*
-    public Entry getCollectionEntry() {
-        return collectionEntry;
-    }
-*/
+    /*
+        public Entry getCollectionEntry() {
+            return collectionEntry;
+        }
+    */
 
 
 

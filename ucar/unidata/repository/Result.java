@@ -94,7 +94,7 @@ public class Result {
     private boolean needToWrite = true;
 
 
-    /** _more_          */
+    /** _more_ */
     public String bottomHtml = "";
 
     /**
@@ -123,8 +123,9 @@ public class Result {
      *
      * @param title _more_
      * @param content _more_
+     * @param foo _more_
      */
-    public Result(String title, byte[] content,boolean foo) {
+    public Result(String title, byte[] content, boolean foo) {
         this(title, content, TYPE_HTML);
     }
 
@@ -355,7 +356,8 @@ public class Result {
      * @return The ShouldDecorate
      */
     public boolean getShouldDecorate() {
-        if(shouldDecorate && mimeType!=null && mimeType.length()>0 && mimeType.indexOf("html")<0) {
+        if (shouldDecorate && (mimeType != null) && (mimeType.length() > 0)
+                && (mimeType.indexOf("html") < 0)) {
             return false;
         }
         return shouldDecorate;

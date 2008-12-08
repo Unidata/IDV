@@ -85,10 +85,12 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRID = new OutputType("Date Grid","calendar.grid");
+    public static final OutputType OUTPUT_GRID = new OutputType("Date Grid",
+                                                     "calendar.grid");
 
     /** _more_ */
-    public static final OutputType OUTPUT_CALENDAR = new OutputType("Calendar","calendar.calendar");
+    public static final OutputType OUTPUT_CALENDAR =
+        new OutputType("Calendar", "calendar.calendar");
 
 
     /**
@@ -147,7 +149,7 @@ public class CalendarOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        OutputType       output = request.getOutput();
+        OutputType   output = request.getOutput();
         StringBuffer sb     = new StringBuffer();
         showNext(request, subGroups, entries, sb);
         entries.addAll(subGroups);
@@ -218,7 +220,8 @@ public class CalendarOutputHandler extends OutputHandler {
                 colSB = new StringBuffer();
                 contents.put(key, colSB);
             }
-            colSB.append(getEntryManager().getAjaxLink(request, entry, time, true));
+            colSB.append(getEntryManager().getAjaxLink(request, entry, time,
+                    true));
             colSB.append(HtmlUtil.br());
         }
 
@@ -254,7 +257,7 @@ public class CalendarOutputHandler extends OutputHandler {
             sb.append("</tr>");
         }
         sb.append("</table>");
-        return  new Result(msg("Date Grid"), sb);
+        return new Result(msg("Date Grid"), sb);
 
     }
 
@@ -265,7 +268,7 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public static  GregorianCalendar getCalendar(int[] day) {
+    public static GregorianCalendar getCalendar(int[] day) {
         return getCalendar(day[IDX_DAY], day[IDX_MONTH], day[IDX_YEAR]);
     }
 
@@ -278,7 +281,8 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public static  GregorianCalendar getCalendar(int day, int month, int year) {
+    public static GregorianCalendar getCalendar(int day, int month,
+            int year) {
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.set(cal.DAY_OF_MONTH, day);
         cal.set(cal.MONTH, month);
@@ -293,7 +297,7 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public static  int[] getDayMonthYear(GregorianCalendar cal) {
+    public static int[] getDayMonthYear(GregorianCalendar cal) {
         return new int[] { cal.get(cal.DAY_OF_MONTH), cal.get(cal.MONTH),
                            cal.get(cal.YEAR) };
     }
@@ -324,15 +328,29 @@ public class CalendarOutputHandler extends OutputHandler {
     private static final int IDX_YEAR = 2;
 
 
+    /**
+     * _more_
+     *
+     * @param cal _more_
+     *
+     * @return _more_
+     */
     public static String getUrlArgs(GregorianCalendar cal) {
         return getUrlArgs(getDayMonthYear(cal));
     }
 
 
-    public static String getUrlArgs(int[]dayMonthYear) {
-        return ARG_YEAR +"=" + dayMonthYear[IDX_YEAR] +"&" +
-            ARG_MONTH +"=" + dayMonthYear[IDX_MONTH] +"&" +
-            ARG_DAY +"=" + dayMonthYear[IDX_DAY];
+    /**
+     * _more_
+     *
+     * @param dayMonthYear _more_
+     *
+     * @return _more_
+     */
+    public static String getUrlArgs(int[] dayMonthYear) {
+        return ARG_YEAR + "=" + dayMonthYear[IDX_YEAR] + "&" + ARG_MONTH
+               + "=" + dayMonthYear[IDX_MONTH] + "&" + ARG_DAY + "="
+               + dayMonthYear[IDX_DAY];
     }
 
     /**
@@ -393,7 +411,7 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
         List                    dayItems = null;
-        Hashtable dates      = new Hashtable();
+        Hashtable               dates    = new Hashtable();
         Hashtable<String, List> map      = new Hashtable<String, List>();
         GregorianCalendar mapCal =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
@@ -406,8 +424,8 @@ public class CalendarOutputHandler extends OutputHandler {
                 int[] entryDay = getDayMonthYear(mapCal);
                 String key = entryDay[IDX_YEAR] + "/" + entryDay[IDX_MONTH]
                              + "/" + entryDay[IDX_DAY];
-                if(tries==0) {
-                    dates.put(key,key);
+                if (tries == 0) {
+                    dates.put(key, key);
                 }
                 if (someDate == null) {
                     someDate = entryDay;
@@ -437,8 +455,10 @@ public class CalendarOutputHandler extends OutputHandler {
                     if (label.length() > 20) {
                         label = label.substring(0, 19) + "...";
                     }
-                    dayList.add(HtmlUtil.nobr(getEntryManager().getAjaxLink(request, entry,
-                            label, true)));
+                    dayList.add(
+                        HtmlUtil.nobr(
+                            getEntryManager().getAjaxLink(
+                                request, entry, label, true)));
                 }
                 didone = true;
             }
@@ -565,12 +585,13 @@ public class CalendarOutputHandler extends OutputHandler {
             request.remove(ARG_DAY);
             sb.append(HtmlUtil.p());
             sb.append("<table cellpadding=10><tr valign=top><td>");
-            getRepository().createMonthNav(sb, cal.getTime(),request.getUrl(),dates);
+            getRepository().createMonthNav(sb, cal.getTime(),
+                                           request.getUrl(), dates);
             sb.append("</td><td>");
             request.put(ARG_MONTH, "" + selected[IDX_MONTH]);
             request.put(ARG_YEAR, "" + selected[IDX_YEAR]);
             String monthUrl = request.getUrl();
-            request.put(ARG_DAY,selected[IDX_DAY]);
+            request.put(ARG_DAY, selected[IDX_DAY]);
             //            sb.append(HtmlUtil.b(StringUtil.join(HtmlUtil.space(1),
             //                    navList)));
             sb.append(
@@ -655,7 +676,7 @@ public class CalendarOutputHandler extends OutputHandler {
         request.remove(ARG_MONTH);
         request.remove(ARG_YEAR);
 
-        return  new Result(msg("Calendar"), sb);
+        return new Result(msg("Calendar"), sb);
     }
 
 

@@ -39,11 +39,12 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.sql.Statement;
-
-
 import java.io.File;
 import java.io.FileInputStream;
+
+
+import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -62,6 +63,7 @@ public class ContentMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_THUMBNAIL =
         new Metadata.Type("content.thumbnail", "Thumbnail Image");
 
+    /** _more_          */
     public static Metadata.Type TYPE_ATTACHMENT =
         new Metadata.Type("content.attachment", "Attachment");
 
@@ -76,7 +78,7 @@ public class ContentMetadataHandler extends MetadataHandler {
     public ContentMetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository, node);
-        addType(TYPE_THUMBNAIL);        
+        addType(TYPE_THUMBNAIL);
         addType(TYPE_ATTACHMENT);
     }
 
@@ -90,56 +92,90 @@ public class ContentMetadataHandler extends MetadataHandler {
     }
 
 
-    public void xxxprocessMetadataXml(Entry entry, Element node) throws Exception {
-        String type =  XmlUtil.getAttribute(node, ATTR_TYPE);
-        if (getType(type).equals(TYPE_THUMBNAIL)||getType(type).equals(TYPE_ATTACHMENT)) {
-            String fileArg  = XmlUtil.getAttribute(node, ATTR_ATTR1,""); 
-            String fileName = getRepository().getStorageManager().copyToEntryDir(entry, new File(fileArg)).getName();
-            Metadata metadata = 
-                new Metadata(
-                             getRepository().getGUID(), entry.getId(),
-                             type,
-                             XmlUtil.getAttribute(node, ATTR_INHERITED,DFLT_INHERITED), 
-                             fileName,
-                             XmlUtil.getAttribute(node, ATTR_ATTR2,""), 
-                             XmlUtil.getAttribute(node, ATTR_ATTR3,""), 
-                             XmlUtil.getAttribute(node, ATTR_ATTR4, ""));
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
+    public void xxxprocessMetadataXml(Entry entry, Element node)
+            throws Exception {
+        String type = XmlUtil.getAttribute(node, ATTR_TYPE);
+        if (getType(type).equals(TYPE_THUMBNAIL)
+                || getType(type).equals(TYPE_ATTACHMENT)) {
+            String fileArg = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
+            String fileName =
+                getRepository().getStorageManager().copyToEntryDir(entry,
+                    new File(fileArg)).getName();
+            Metadata metadata =
+                new Metadata(getRepository().getGUID(), entry.getId(), type,
+                             XmlUtil.getAttribute(node, ATTR_INHERITED,
+                                 DFLT_INHERITED), fileName,
+                                     XmlUtil.getAttribute(node, ATTR_ATTR2,
+                                         ""), XmlUtil.getAttribute(node,
+                                             ATTR_ATTR3,
+                                             ""), XmlUtil.getAttribute(node,
+                                                 ATTR_ATTR4, ""));
             entry.addMetadata(metadata);
         } else {
-            super.processMetadataXml(entry,node);
+            super.processMetadataXml(entry, node);
         }
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void newEntry(Metadata metadata, Entry entry) throws Exception {
-        Metadata.Type type    = getType(metadata.getType());
-        if (type.equals(TYPE_THUMBNAIL)||type.equals(TYPE_ATTACHMENT)) {
-            String fileArg  = metadata.getAttr1();
-            if(!entry.getIsLocalFile()) {
-                fileArg = getRepository().getStorageManager().copyToEntryDir(entry, new File(fileArg)).getName();
+        Metadata.Type type = getType(metadata.getType());
+        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+            String fileArg = metadata.getAttr1();
+            if ( !entry.getIsLocalFile()) {
+                fileArg =
+                    getRepository().getStorageManager().copyToEntryDir(entry,
+                        new File(fileArg)).getName();
             }
             metadata.setAttr1(fileArg);
-        } 
-        super.newEntry(metadata,entry);
+        }
+        super.newEntry(metadata, entry);
     }
 
 
-    public void decorateEntry(Request request, Entry entry, StringBuffer sb, Metadata metadata, boolean forLink) 
-        throws Exception {
-        Metadata.Type type    = getType(metadata.getType());
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param metadata _more_
+     * @param forLink _more_
+     *
+     * @throws Exception _more_
+     */
+    public void decorateEntry(Request request, Entry entry, StringBuffer sb,
+                              Metadata metadata, boolean forLink)
+            throws Exception {
+        Metadata.Type type = getType(metadata.getType());
         if (type.equals(TYPE_THUMBNAIL)) {
-            String html = getHtml(request, entry, metadata,forLink);
-            if(html!=null) {
+            String html = getHtml(request, entry, metadata, forLink);
+            if (html != null) {
                 sb.append(HtmlUtil.space(1));
                 sb.append(html);
                 sb.append(HtmlUtil.space(1));
             }
         }
 
-        if (!forLink && type.equals(TYPE_ATTACHMENT)) {
-            String html = getHtml(request, entry, metadata,false);
-            if(html!=null) {
+        if ( !forLink && type.equals(TYPE_ATTACHMENT)) {
+            String html = getHtml(request, entry, metadata, false);
+            if (html != null) {
                 sb.append(HtmlUtil.space(1));
                 sb.append(html);
                 sb.append(HtmlUtil.space(1));
@@ -149,25 +185,41 @@ public class ContentMetadataHandler extends MetadataHandler {
 
 
 
-    public String getHtml(Request request, Entry entry, Metadata metadata, boolean forLink) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param forLink _more_
+     *
+     * @return _more_
+     */
+    public String getHtml(Request request, Entry entry, Metadata metadata,
+                          boolean forLink) {
         File f = getImageFile(entry, metadata);
-        if(f==null) {
+        if (f == null) {
             return null;
         }
 
-        Metadata.Type type    = getType(metadata.getType());
-        String extra = (forLink?" width=\"75\" ":"");
-        if(ImageUtils.isImage(f.toString())) {
-            return  HtmlUtil.img(request.url(getRepository().getMetadataManager().URL_METADATA_VIEW, ARG_ENTRYID,
-                                             metadata.getEntryId(),
-                                             ARG_METADATA_ID,
-                                             metadata.getId()),"thumbnail",extra);
-        }  else if(f.exists()) {
-            String name  =getRepository().getStorageManager().getFileTail(f.getName());
-            return  HtmlUtil.href(request.url(getRepository().getMetadataManager().URL_METADATA_VIEW, ARG_ENTRYID,
-                                             metadata.getEntryId(),
-                                             ARG_METADATA_ID,
-                                              metadata.getId()), name);
+        Metadata.Type type  = getType(metadata.getType());
+        String        extra = (forLink
+                               ? " width=\"75\" "
+                               : "");
+        if (ImageUtils.isImage(f.toString())) {
+            return HtmlUtil.img(
+                request.url(
+                    getRepository().getMetadataManager().URL_METADATA_VIEW,
+                    ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
+                    metadata.getId()), "thumbnail", extra);
+        } else if (f.exists()) {
+            String name =
+                getRepository().getStorageManager().getFileTail(f.getName());
+            return HtmlUtil.href(
+                request.url(
+                    getRepository().getMetadataManager().URL_METADATA_VIEW,
+                    ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
+                    metadata.getId()), name);
         }
         return "";
     }
@@ -178,17 +230,20 @@ public class ContentMetadataHandler extends MetadataHandler {
      *
      *
      * @param request _more_
+     * @param entry _more_
      * @param metadata _more_
      *
      * @return _more_
      */
-    public String[] getHtml(Request request, Entry entry,Metadata metadata) {
-        if(true) return null;
+    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
+        if (true) {
+            return null;
+        }
         Metadata.Type type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
-            content = getHtml(request, entry, metadata,false);
+            content = getHtml(request, entry, metadata, false);
         }
         if (content == null) {
             return null;
@@ -198,49 +253,99 @@ public class ContentMetadataHandler extends MetadataHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     private File getImageFile(Entry entry, Metadata metadata) {
         File f;
-        if(!entry.getIsLocalFile()) {
-            f = new File(IOUtil.joinDir(getRepository().getStorageManager().getEntryDir(metadata.getEntryId(),false),
-                                             metadata.getAttr1()));
+        if ( !entry.getIsLocalFile()) {
+            f = new File(
+                IOUtil.joinDir(
+                    getRepository().getStorageManager().getEntryDir(
+                        metadata.getEntryId(), false), metadata.getAttr1()));
         } else {
             f = new File(metadata.getAttr1());
         }
-        if(!f.exists()) return null;
+        if ( !f.exists()) {
+            return null;
+        }
         return f;
     }
 
-    public Result processView(Request request, Entry entry, Metadata metadata) throws Exception {
-        Metadata.Type type    = getType(metadata.getType());
-        if(type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processView(Request request, Entry entry, Metadata metadata)
+            throws Exception {
+        Metadata.Type type = getType(metadata.getType());
+        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             File f = getImageFile(entry, metadata);
-            if(f==null) {
-                return new Result("","Thumbnail does not exist");
+            if (f == null) {
+                return new Result("", "Thumbnail does not exist");
             }
-            String mimeType   = getRepository().getMimeTypeFromSuffix(IOUtil.getFileExtension(f.toString()));
-            Result result =  new Result("thumbnail", IOUtil.readBytes(new FileInputStream(f),null,true),mimeType);
+            String mimeType = getRepository().getMimeTypeFromSuffix(
+                                  IOUtil.getFileExtension(f.toString()));
+            Result result =
+                new Result("thumbnail",
+                           IOUtil.readBytes(new FileInputStream(f), null,
+                                            true), mimeType);
             result.setShouldDecorate(false);
             return result;
         }
-        return new Result("","Cannot process view");
+        return new Result("", "Cannot process view");
     }
 
-    public void handleForm(Request request, Entry entry, String id, String suffix,
-                                 List<Metadata> metadataList, boolean newMetadata) throws Exception  {
-        Metadata.Type type    = getType(request.getString(ARG_TYPE + suffix, ""));
-        if(type==null) return;
-        if(type.equals(TYPE_THUMBNAIL)||type.equals(TYPE_ATTACHMENT)) {
-            if(!newMetadata) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param id _more_
+     * @param suffix _more_
+     * @param metadataList _more_
+     * @param newMetadata _more_
+     *
+     * @throws Exception _more_
+     */
+    public void handleForm(Request request, Entry entry, String id,
+                           String suffix, List<Metadata> metadataList,
+                           boolean newMetadata)
+            throws Exception {
+        Metadata.Type type = getType(request.getString(ARG_TYPE + suffix,
+                                 ""));
+        if (type == null) {
+            return;
+        }
+        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+            if ( !newMetadata) {
                 //TODO: delete the old thumbs file
             }
-            String fileArg = request.getUploadedFile(ARG_ATTR1+suffix);
-            if(fileArg==null) return;
-            String fileName = getRepository().getStorageManager().moveToEntryDir(entry, new File(fileArg)).getName();
-            metadataList.add(new Metadata(id, entry.getId(), type,
-                                          false, fileName,"","",""));
+            String fileArg = request.getUploadedFile(ARG_ATTR1 + suffix);
+            if (fileArg == null) {
+                return;
+            }
+            String fileName =
+                getRepository().getStorageManager().moveToEntryDir(entry,
+                    new File(fileArg)).getName();
+            metadataList.add(new Metadata(id, entry.getId(), type, false,
+                                          fileName, "", "", ""));
             return;
-        } 
-        super.handleForm(request, entry, id, suffix, metadataList, newMetadata);
+        }
+        super.handleForm(request, entry, id, suffix, metadataList,
+                         newMetadata);
     }
 
 
@@ -249,6 +354,7 @@ public class ContentMetadataHandler extends MetadataHandler {
      *
      *
      * @param request _more_
+     * @param entry _more_
      * @param metadata _more_
      * @param forEdit _more_
      *
@@ -280,12 +386,18 @@ public class ContentMetadataHandler extends MetadataHandler {
         String arg2 = ARG_ATTR2 + suffix;
         String size = HtmlUtil.SIZE_70;
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
-            String image = getHtml(request,entry, metadata,false);
-            if(image==null) image="";
-            else image = "<br>" + image;
-            content = formEntry(new String[] { submit, msgLabel((type.equals(TYPE_THUMBNAIL)?"Thumbnail":"Attachment")),
-                                               HtmlUtil.fileInput(arg1, size)+ image});
-        }   
+            String image = getHtml(request, entry, metadata, false);
+            if (image == null) {
+                image = "";
+            } else {
+                image = "<br>" + image;
+            }
+            content = formEntry(new String[] { submit,
+                    msgLabel((type.equals(TYPE_THUMBNAIL)
+                              ? "Thumbnail"
+                              : "Attachment")), HtmlUtil.fileInput(arg1,
+                              size) + image });
+        }
 
         if (content == null) {
             return null;

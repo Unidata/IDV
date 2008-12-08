@@ -94,6 +94,11 @@ public class UserManager extends RepositoryManager {
                                         getRepositoryBase().URL_USER_CART };
 
 
+    /** _more_          */
+    protected RequestUrl[] anonUserUrls = { getRepositoryBase()
+                                              .URL_USER_CART };
+
+
 
     /** _more_ */
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
@@ -141,8 +146,15 @@ public class UserManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param sessionId _more_
+     *
+     * @return _more_
+     */
     public Session getSession(String sessionId) {
-        System.err.println ("map:" + sessionMap);
+        System.err.println("map:" + sessionMap);
         return sessionMap.get(sessionId);
     }
 
@@ -165,7 +177,7 @@ public class UserManager extends RepositoryManager {
                 Session session = sessionMap.get(request.getSessionId());
                 if (session != null) {
                     session.lastActivity = new Date();
-                    user = session.user =  getCurrentUser(session.user);
+                    user = session.user = getCurrentUser(session.user);
                     break;
                 }
             }
@@ -177,7 +189,7 @@ public class UserManager extends RepositoryManager {
                 sessionMap.get(request.getString(ARG_SESSIONID));
             if (session != null) {
                 session.lastActivity = new Date();
-                user = session.user =  getCurrentUser(session.user);
+                user = session.user = getCurrentUser(session.user);
             }
         }
 
@@ -264,10 +276,21 @@ public class UserManager extends RepositoryManager {
         request.setUser(user);
     }
 
+    /**
+     * _more_
+     *
+     * @param user _more_
+     *
+     * @return _more_
+     */
     private User getCurrentUser(User user) {
-        if(user==null) return null;
+        if (user == null) {
+            return null;
+        }
         User currentUser = userMap.get(user.getId());
-        if(currentUser!=null) return currentUser;
+        if (currentUser != null) {
+            return currentUser;
+        }
         return user;
     }
 
@@ -444,13 +467,17 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.formClose());
         sb.append(HtmlUtil.formTableClose());
 
-        if(getAdmin().isEmailCapable()) {
+        if (getAdmin().isEmailCapable()) {
             sb.append(HtmlUtil.p());
-            sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_FINDUSERID),
-                                    msg("Forget your user ID?")));
+            sb.append(
+                HtmlUtil.href(
+                    request.url(getRepositoryBase().URL_USER_FINDUSERID),
+                    msg("Forget your user ID?")));
             sb.append(HtmlUtil.br());
-            sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_RESETPASSWORD),
-                                    msg("Forget your password?")));
+            sb.append(
+                HtmlUtil.href(
+                    request.url(getRepositoryBase().URL_USER_RESETPASSWORD),
+                    msg("Forget your password?")));
         }
 
 
@@ -516,7 +543,8 @@ public class UserManager extends RepositoryManager {
             return user;
         }
         Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
-                             Tables.USERS.NAME, Clause.eq(Tables.USERS.COL_ID, id));
+                             Tables.USERS.NAME,
+                             Clause.eq(Tables.USERS.COL_ID, id));
         ResultSet results = stmt.getResultSet();
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
@@ -533,13 +561,23 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param email _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected User findUserFromEmail(String email) throws Exception {
         Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
-                             Tables.USERS.NAME, Clause.eq(Tables.USERS.COL_EMAIL, email));
+                             Tables.USERS.NAME,
+                             Clause.eq(Tables.USERS.COL_EMAIL, email));
         ResultSet results = stmt.getResultSet();
         if ( !results.next()) {
             return null;
-        } 
+        }
         return getUser(results);
     }
 
@@ -555,17 +593,19 @@ public class UserManager extends RepositoryManager {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        if (getDatabaseManager().tableContains(user.getId(), Tables.USERS.NAME,
-                                          Tables.USERS.COL_ID)) {
+        if (getDatabaseManager().tableContains(user.getId(),
+                Tables.USERS.NAME, Tables.USERS.COL_ID)) {
             if ( !updateIfNeeded) {
                 throw new IllegalArgumentException(
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            getDatabaseManager().update(Tables.USERS.NAME, Tables.USERS.COL_ID,
-                           user.getId(), new String[] {
-                Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD, Tables.USERS.COL_EMAIL,
-                Tables.USERS.COL_QUESTION, Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
+            getDatabaseManager().update(Tables.USERS.NAME,
+                                        Tables.USERS.COL_ID, user.getId(),
+                                        new String[] {
+                Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
+                Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
+                Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
                 Tables.USERS.COL_LANGUAGE
             }, new Object[] {
                 user.getName(), user.getPassword(), user.getEmail(),
@@ -614,7 +654,8 @@ public class UserManager extends RepositoryManager {
     protected void deleteUser(User user) throws Exception {
         deleteRoles(user);
         getDatabaseManager().delete(Tables.USERS.NAME,
-                                    Clause.eq(Tables.USERS.COL_ID, user.getId()));
+                                    Clause.eq(Tables.USERS.COL_ID,
+                                        user.getId()));
     }
 
     /**
@@ -626,7 +667,8 @@ public class UserManager extends RepositoryManager {
      */
     protected void deleteRoles(User user) throws Exception {
         getDatabaseManager().delete(Tables.USERROLES.NAME,
-                                    Clause.eq(Tables.USERROLES.COL_USER_ID, user.getId()));
+                                    Clause.eq(Tables.USERROLES.COL_USER_ID,
+                                        user.getId()));
     }
 
 
@@ -736,7 +778,7 @@ public class UserManager extends RepositoryManager {
 
 
         sb.append(RepositoryUtil.header(msgLabel("User") + HtmlUtil.space(1)
-                                         + user.getLabel()));
+                                        + user.getLabel()));
         sb.append(HtmlUtil.p());
         sb.append(request.form(getRepositoryBase().URL_USER_EDIT));
         sb.append(HtmlUtil.hidden(ARG_USER_ID, user.getId()));
@@ -844,6 +886,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminUserNew(Request request) throws Exception {
+
         String       id          = "";
         String       name        = "";
         String       email       = "";
@@ -857,48 +900,64 @@ public class UserManager extends RepositoryManager {
 
         if (request.exists(ARG_USER_BULK)) {
             List<User> users = new ArrayList<User>();
-            boolean ok = true;
-            for(String line: (List<String>)StringUtil.split(request.getString(ARG_USER_BULK,""),"\n",true,true)) {
-                if(line.startsWith("#")) continue;
-                List<String> toks = (List<String>)StringUtil.split(line,",",true,true);
-                if(toks.size()==0) continue;
-                if(toks.size()<2) {
+            boolean    ok    = true;
+            for (String line : (List<String>) StringUtil.split(
+                    request.getString(ARG_USER_BULK, ""), "\n", true, true)) {
+                if (line.startsWith("#")) {
+                    continue;
+                }
+                List<String> toks = (List<String>) StringUtil.split(line,
+                                        ",", true, true);
+                if (toks.size() == 0) {
+                    continue;
+                }
+                if (toks.size() < 2) {
                     ok = false;
                     sb.append(getRepository().error("Bad line:" + line));
                     break;
                 }
-                id = toks.get(0);
+                id        = toks.get(0);
                 password1 = toks.get(1);
-                name = (toks.size()>=3?toks.get(2):id);
-                email = (toks.size()>=4?toks.get(3):"");
-                if(findUser(id)!=null) {
+                name      = ((toks.size() >= 3)
+                             ? toks.get(2)
+                             : id);
+                email     = ((toks.size() >= 4)
+                             ? toks.get(3)
+                             : "");
+                if (findUser(id) != null) {
                     ok = false;
-                    sb.append(getRepository().error(msg("User already exists") +": "+ id));
+                    sb.append(
+                        getRepository().error(
+                            msg("User already exists") + ": " + id));
                     break;
                 }
                 users.add(new User(id, name, email, "", "",
-                                   hashPassword(password1), false,
-                                   ""));
+                                   hashPassword(password1), false, ""));
             }
-            if(ok) {
-                for(User user: users) {
+            if (ok) {
+                for (User user : users) {
                     makeOrUpdateUser(user, false);
                     sb.append(msgLabel("Created user"));
-                    sb.append(HtmlUtil.href(request.url(getRepositoryBase().URL_USER_EDIT,
-                                                        ARG_USER_ID, user.getId()),user.getId()));
+                    sb.append(
+                        HtmlUtil.href(
+                            request.url(
+                                getRepositoryBase().URL_USER_EDIT,
+                                ARG_USER_ID, user.getId()), user.getId()));
                     sb.append(HtmlUtil.br());
                 }
-                if(users.size()==0) {
+                if (users.size() == 0) {
                     sb.append(getRepository().note(msg("No users created")));
-                    makeBulkForm(request, sb, request.getString(ARG_USER_BULK,null));
+                    makeBulkForm(request, sb,
+                                 request.getString(ARG_USER_BULK, null));
                 }
             } else {
-                makeBulkForm(request, sb, request.getString(ARG_USER_BULK,""));
+                makeBulkForm(request, sb,
+                             request.getString(ARG_USER_BULK, ""));
             }
             Result result = new Result(msg("New User"), sb);
             result.putProperty(PROP_NAVSUBLINKS,
                                getRepository().getSubNavLinks(request,
-                                                              getAdmin().adminUrls));
+                                   getAdmin().adminUrls));
 
             return result;
         }
@@ -984,14 +1043,23 @@ public class UserManager extends RepositoryManager {
                            getRepository().getSubNavLinks(request,
                                getAdmin().adminUrls));
         return result;
+
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param init _more_
+     */
     private void makeBulkForm(Request request, StringBuffer sb, String init) {
-        if(init == null)
-            init  = "#one per line\n#user id, password, name, email";
+        if (init == null) {
+            init = "#one per line\n#user id, password, name, email";
+        }
         sb.append(msgHeader("Bulk User Create"));
         sb.append(request.form(getRepositoryBase().URL_USER_NEW));
-        sb.append(HtmlUtil.textArea(ARG_USER_BULK,init,10,60));
+        sb.append(HtmlUtil.textArea(ARG_USER_BULK, init, 10, 60));
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Submit"));
         sb.append("\n</form>\n");
@@ -1130,9 +1198,11 @@ public class UserManager extends RepositoryManager {
                              results.getBoolean(col++),
                              results.getString(col++));
 
-        Statement stmt = getDatabaseManager().select(Tables.USERROLES.COL_ROLE,
+        Statement stmt = getDatabaseManager().select(
+                             Tables.USERROLES.COL_ROLE,
                              Tables.USERROLES.NAME,
-                             Clause.eq(Tables.USERROLES.COL_USER_ID, user.getId()));
+                             Clause.eq(
+                                 Tables.USERROLES.COL_USER_ID, user.getId()));
 
         String[]     array = SqlUtil.readString(stmt, 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
@@ -1229,81 +1299,88 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result showCart(Request request) throws Exception {
-        StringBuffer sb      = new StringBuffer();
-        List<Entry>  entries = getCart(request);
-        sb.append(msgHeader("User Cart"));
+        StringBuffer sb = new StringBuffer();
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
+        }
+        List<Entry> entries = getCart(request);
         if (entries.size() == 0) {
             sb.append(msg("No entries in cart"));
-        } else {
-            sb.append(
-                HtmlUtil.href(
-                    request.url(
-                        getRepositoryBase().URL_USER_CART, ARG_ACTION,
-                        ACTION_CLEAR), msg("Clear Cart")));
-            sb.append(HtmlUtil.p());
-            boolean haveFrom = request.defined(ARG_FROM);
+            return makeResult(request, "User Cart", sb);
+        }
+
+        sb.append(
+            HtmlUtil.href(
+                request.url(
+                    getRepositoryBase().URL_USER_CART, ARG_ACTION,
+                    ACTION_CLEAR), msg("Clear Cart")));
+        sb.append(HtmlUtil.p());
+        boolean haveFrom = request.defined(ARG_FROM);
+        if (haveFrom) {
+            Entry fromEntry = getEntryManager().getEntry(request,
+                                  request.getString(ARG_FROM, ""));
+            sb.append(HtmlUtil.br());
+            sb.append(msgLabel("Pick an entry  to associate with")
+                      + HtmlUtil.space(1) + fromEntry.getName());
+        }
+
+
+        if ( !haveFrom) {
+            sb.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
+                                       "getentries"));
+            sb.append(HtmlUtil.submit(msg("Get selected"), "getselected"));
+            sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(msgLabel("As"));
+            sb.append(HtmlUtil.space(1));
+            List<OutputType> outputList =
+                getRepository().getOutputTypes(request,
+                    new OutputHandler.State(entries));
+            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+            for (OutputType outputType : outputList) {
+                tfos.add(new TwoFacedObject(outputType.getLabel(),
+                                            outputType.getId()));
+            }
+            sb.append(HtmlUtil.select(ARG_OUTPUT, tfos));
+        }
+        //            sb.append("<br>");
+        sb.append("<ul style=\"list-style-image : url("
+                  + getRepository().fileUrl(ICON_FILE) + ")\">");
+        OutputHandler outputHandler =
+            getRepository().getOutputHandler(request);
+        for (Entry entry : entries) {
+            sb.append("<li> ");
             if (haveFrom) {
-                Entry fromEntry = getEntryManager().getEntry(request,
-                                      request.getString(ARG_FROM, ""));
-                sb.append(HtmlUtil.br());
-                sb.append(msgLabel("Pick an entry  to associate with")
-                          + HtmlUtil.space(1) + fromEntry.getName());
-            }
-
-
-            if ( !haveFrom) {
                 sb.append(
-                    request.form(
-                        repository.URL_ENTRY_GETENTRIES,
-                        "name=\"getentries\" method=\"post\""));
-                sb.append(HtmlUtil.submit(msg("Get selected"),
-                                          "getselected"));
-                sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
-                sb.append(HtmlUtil.space(1));
-                sb.append(msgLabel("As"));
-                sb.append(HtmlUtil.space(1));
-                List outputList = repository.getOutputTypes(request,
-                                      new OutputHandler.State(entries));
-                sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
+                    HtmlUtil.href(
+                        request.url(
+                            getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
+                            request.getString(ARG_FROM, ""), ARG_TO,
+                            entry.getId()), HtmlUtil.img(
+                                getRepository().fileUrl(ICON_ASSOCIATION),
+                                msg("Create an association"))));
+            } else {
+                String links = HtmlUtil.checkbox("entry_" + entry.getId(),
+                                   "true");
+                sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                sb.append(links);
+                sb.append(
+                    HtmlUtil.href(
+                        request.url(
+                            getRepositoryBase().URL_USER_CART, ARG_FROM,
+                            entry.getId()), HtmlUtil.img(
+                                getRepository().fileUrl(ICON_ASSOCIATION),
+                                msg("Create an association"))));
             }
-            //            sb.append("<br>");
-            sb.append("<ul style=\"list-style-image : url("
-                      + getRepository().fileUrl(ICON_FILE) + ")\">");
-            OutputHandler outputHandler =
-                getRepository().getOutputHandler(request);
-            for (Entry entry : entries) {
-                sb.append("<li> ");
-                if (haveFrom) {
-                    sb.append(
-                        HtmlUtil.href(
-                            request.url(
-                                getRepository().URL_ASSOCIATION_ADD,
-                                ARG_FROM, request.getString(ARG_FROM, ""),
-                                ARG_TO, entry.getId()), HtmlUtil.img(
-                                    getRepository().fileUrl(
-                                        ICON_ASSOCIATION), msg(
-                                        "Create an association"))));
-                } else {
-                    String links = HtmlUtil.checkbox("entry_"
-                                       + entry.getId(), "true");
-                    sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                    sb.append(links);
-                    sb.append(
-                        HtmlUtil.href(
-                            request.url(
-                                getRepositoryBase().URL_USER_CART, ARG_FROM,
-                                entry.getId()), HtmlUtil.img(
-                                    getRepository().fileUrl(
-                                        ICON_ASSOCIATION), msg(
-                                        "Create an association"))));
-                }
-                sb.append(HtmlUtil.space(1));
-                sb.append(outputHandler.getEntryLink(request, entry));
-            }
-            sb.append("</ul>");
-            if ( !haveFrom) {
-                sb.append("</form>");
-            }
+            sb.append(HtmlUtil.space(1));
+            sb.append(getEntryManager().getAjaxLink(request, entry,
+                    entry.getLabel(), false));
+        }
+        sb.append("</ul>");
+        if ( !haveFrom) {
+            sb.append("</form>");
         }
         return makeResult(request, "User Cart", sb);
     }
@@ -1321,7 +1398,7 @@ public class UserManager extends RepositoryManager {
                               StringBuffer sb) {
         return getRepository().makeResult(request, title, sb,
                                           (request.getUser().getAnonymous()
-                                           ? null
+                                           ? anonUserUrls
                                            : userUrls));
     }
 
@@ -1334,27 +1411,26 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String getUserLinks(Request request) {
-        User   user = request.getUser();
-        String template = getProperty("ramadda.html.link.wrapper","");
-        template = getProperty("ramadda.html.userlink.wrapper",template);
-        String separator = getProperty("ramadda.html.link.separator","");
-        separator = getProperty("ramadda.html.userlink.separator",separator);
+        User   user     = request.getUser();
+        String template = getProperty("ramadda.html.link.wrapper", "");
+        template = getProperty("ramadda.html.userlink.wrapper", template);
+        String separator = getProperty("ramadda.html.link.separator", "");
+        separator = getProperty("ramadda.html.userlink.separator", separator);
 
-        List urls = new ArrayList();
+        List urls   = new ArrayList();
         List labels = new ArrayList();
-        List tips = new ArrayList();
+        List tips   = new ArrayList();
 
         urls.add(request.url(getRepositoryBase().URL_USER_CART));
         labels.add(HtmlUtil.img(getRepository().fileUrl(ICON_CART),
                                 msg("Data Cart")));
         tips.add(msg("View data cart"));
-        
+
         if (user.getAnonymous()) {
             String redirect =
                 XmlUtil.encodeBase64(request.getUrl().getBytes());
             urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
-                                          ARG_REDIRECT,
-                                 redirect));
+                                 ARG_REDIRECT, redirect));
             labels.add(msg("Login"));
             tips.add(msg("Login"));
         } else {
@@ -1366,13 +1442,14 @@ public class UserManager extends RepositoryManager {
             tips.add(msg("Go to user settings"));
         }
         List links = new ArrayList();
-        for(int i=0;i<urls.size();i++) {
-            String link = template.replace("${label}", labels.get(i).toString());
+        for (int i = 0; i < urls.size(); i++) {
+            String link = template.replace("${label}",
+                                           labels.get(i).toString());
             link = link.replace("${url}", urls.get(i).toString());
             link = link.replace("${tooltip}", tips.get(i).toString());
             links.add(link);
         }
-        return StringUtil.join(separator,links);
+        return StringUtil.join(separator, links);
     }
 
 
@@ -1389,7 +1466,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb   = new StringBuffer();
         User         user = request.getUser();
         if (user.getAnonymous()) {
-            if (request.getString(ARG_OUTPUT,"").equals("xml")) {
+            if (request.getString(ARG_OUTPUT, "").equals("xml")) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
                         XmlUtil.attr(ATTR_CODE, "error"),
                         "No user defined"), MIME_XML);
@@ -1406,7 +1483,7 @@ public class UserManager extends RepositoryManager {
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
         }
-        if (request.getString(ARG_OUTPUT,"").equals("xml")) {
+        if (request.getString(ARG_OUTPUT, "").equals("xml")) {
             return new Result(XmlUtil.tag(TAG_RESPONSE,
                                           XmlUtil.attr(ATTR_CODE, "ok"),
                                           user.getId()), MIME_XML);
@@ -1417,137 +1494,220 @@ public class UserManager extends RepositoryManager {
 
 
 
+    /**
+     * Class PasswordReset _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private static class PasswordReset {
+
+        /** _more_          */
         String user;
+
+        /** _more_          */
         Date dttm;
+
+        /**
+         * _more_
+         *
+         * @param user _more_
+         * @param dttm _more_
+         */
         public PasswordReset(String user, Date dttm) {
             this.user = user;
-            this.dttm  = dttm;
+            this.dttm = dttm;
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processFindUserId(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        if(!getAdmin().isEmailCapable()) {
-            return makeResult(request, "User Information",  
-                              new StringBuffer(getRepository().warning(msg("This RAMADDA server has not been configured to send email"))));
+        if ( !getAdmin().isEmailCapable()) {
+            return makeResult(
+                request, "User Information",
+                new StringBuffer(
+                    getRepository().warning(
+                        msg(
+                        "This RAMADDA server has not been configured to send email"))));
         }
 
-        String email = request.getString(ARG_USER_EMAIL,"").trim();
-        if(email.length()>0) {
+        String email = request.getString(ARG_USER_EMAIL, "").trim();
+        if (email.length() > 0) {
             User user = findUserFromEmail(email);
-            if(user !=null) {
-                StringBuffer  contents  = new StringBuffer(translateMsg(request,"Your RAMADDA user ID is")+":" + user.getId());
+            if (user != null) {
+                StringBuffer contents =
+                    new StringBuffer(translateMsg(request,
+                        "Your RAMADDA user ID is") + ":" + user.getId());
                 contents.append("<p>");
-                contents.append(HtmlUtil.href(getRepository().URL_USER_LOGIN.getFullUrl(""),translateMsg(request,"Login")));
-                String subject  = translateMsg(request,"Your RAMADDA user ID");
-                getAdmin().sendEmail(user.getEmail(),subject, contents.toString(),true);
-                sb.append(getRepository().note(msg("You user id has been sent to your registered email")));
+                contents.append(
+                    HtmlUtil.href(
+                        getRepository().URL_USER_LOGIN.getFullUrl(""),
+                        translateMsg(request, "Login")));
+                String subject = translateMsg(request,
+                                     "Your RAMADDA user ID");
+                getAdmin().sendEmail(user.getEmail(), subject,
+                                     contents.toString(), true);
+                sb.append(
+                    getRepository().note(
+                        msg(
+                        "You user id has been sent to your registered email")));
                 sb.append(makeLoginForm(request));
-                return makeResult(request, "User Information",  sb);
-            } 
-            sb.append(getRepository().error(msg("No user is registered with the given email address")));
+                return makeResult(request, "User Information", sb);
+            }
+            sb.append(
+                getRepository().error(
+                    msg(
+                    "No user is registered with the given email address")));
         }
 
         sb.append(request.form(getRepositoryBase().URL_USER_FINDUSERID));
         sb.append(msgLabel("Your Email"));
         sb.append(HtmlUtil.space(1));
-        sb.append(HtmlUtil.input(ARG_USER_EMAIL,email,HtmlUtil.SIZE_30));
+        sb.append(HtmlUtil.input(ARG_USER_EMAIL, email, HtmlUtil.SIZE_30));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Submit"));
         sb.append(HtmlUtil.formClose());
-        return makeResult(request, "User Information",  sb);
+        return makeResult(request, "User Information", sb);
     }
 
 
+    /** _more_          */
     private Hashtable passwordResets = new Hashtable();
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processResetPassword(Request request) throws Exception {
 
-        String key = request.getString(ARG_USER_PASSWORDKEY,(String)null);
-        PasswordReset resetInfo=null;
-        StringBuffer sb = new StringBuffer();
-        if(key !=null) {
+        String key = request.getString(ARG_USER_PASSWORDKEY, (String) null);
+        PasswordReset resetInfo = null;
+        StringBuffer  sb        = new StringBuffer();
+        if (key != null) {
             resetInfo = (PasswordReset) passwordResets.get(key);
-            if(resetInfo!=null) {
-                if(new Date().getTime()>resetInfo.dttm.getTime()) {
-                    sb.append(getRepository().error(msg("Password reset has timed out")+"<br>"+msg("Please try again")));
+            if (resetInfo != null) {
+                if (new Date().getTime() > resetInfo.dttm.getTime()) {
+                    sb.append(
+                        getRepository().error(
+                            msg("Password reset has timed out") + "<br>"
+                            + msg("Please try again")));
                     resetInfo = null;
                     passwordResets.remove(key);
                 }
             } else {
-                sb.append(getRepository().error(msg("Password reset has timed out")+"<br>"+msg("Please try again")));
+                sb.append(
+                    getRepository().error(
+                        msg("Password reset has timed out") + "<br>"
+                        + msg("Please try again")));
             }
         }
-        
-        User  user = (resetInfo!=null?findUser(resetInfo.user,false):null);
-        if(user!=null) {
-            if(request.exists(ARG_USER_PASSWORD1)) {
-                if(checkPasswords(request, user)) {
+
+        User user = ((resetInfo != null)
+                     ? findUser(resetInfo.user, false)
+                     : null);
+        if (user != null) {
+            if (request.exists(ARG_USER_PASSWORD1)) {
+                if (checkPasswords(request, user)) {
                     applyState(request, user, false);
-                    sb.append(getRepository().note(msg("Your password has been reset")));
+                    sb.append(
+                        getRepository().note(
+                            msg("Your password has been reset")));
                     sb.append(makeLoginForm(request));
-                    return makeResult(request, "Password Reset",  sb);
+                    return makeResult(request, "Password Reset", sb);
                 }
                 sb.append(getRepository().warning("Incorrect passwords"));
-            } 
-            sb.append(request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
-            sb.append(HtmlUtil.hidden(ARG_USER_PASSWORDKEY,key));
+            }
+            sb.append(
+                request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
+            sb.append(HtmlUtil.hidden(ARG_USER_PASSWORDKEY, key));
             sb.append(HtmlUtil.formTable());
-            sb.append(HtmlUtil.formEntry(msgLabel("User"),
-                                         user.getId()));
-            sb.append(HtmlUtil.formEntry(msgLabel("Password"),
-                                         HtmlUtil.password(ARG_USER_PASSWORD1)));
-            sb.append(HtmlUtil.formEntry(msgLabel("Password Again"),
-                                         HtmlUtil.password(ARG_USER_PASSWORD2)));
-            sb.append(HtmlUtil.formEntry("",
-                                         HtmlUtil.submit("Submit")));
+            sb.append(HtmlUtil.formEntry(msgLabel("User"), user.getId()));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Password"),
+                    HtmlUtil.password(ARG_USER_PASSWORD1)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Password Again"),
+                    HtmlUtil.password(ARG_USER_PASSWORD2)));
+            sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Submit")));
 
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.formClose());
-            return makeResult(request, "Password Reset",  sb);
+            return makeResult(request, "Password Reset", sb);
         }
 
-        if(!getAdmin().isEmailCapable()) {
-            return makeResult(request, "Password Reset",  
-                              new StringBuffer(getRepository().warning(msg("This RAMADDA server has not been configured to send email"))));
+        if ( !getAdmin().isEmailCapable()) {
+            return makeResult(
+                request, "Password Reset",
+                new StringBuffer(
+                    getRepository().warning(
+                        msg(
+                        "This RAMADDA server has not been configured to send email"))));
         }
 
 
-        if(user == null) {
-            user =  findUser(request.getString(ARG_USER_NAME,""), false);
+        if (user == null) {
+            user = findUser(request.getString(ARG_USER_NAME, ""), false);
         }
-        if(user == null) {
-            if(request.exists(ARG_USER_NAME)) {
+        if (user == null) {
+            if (request.exists(ARG_USER_NAME)) {
                 sb.append(getRepository().error("Not a registered user"));
                 sb.append(HtmlUtil.p());
             }
             sb.append(msgHeader("Please enter your user ID"));
             sb.append(HtmlUtil.p());
-            sb.append(request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
+            sb.append(
+                request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
             sb.append(msgLabel("User ID"));
             sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.input(ARG_USER_NAME,request.getString(ARG_USER_NAME,""),HtmlUtil.SIZE_20));
+            sb.append(HtmlUtil.input(ARG_USER_NAME,
+                                     request.getString(ARG_USER_NAME, ""),
+                                     HtmlUtil.SIZE_20));
             sb.append(HtmlUtil.space(1));
             sb.append(HtmlUtil.submit(msg("Submit")));
             sb.append(HtmlUtil.formClose());
-            return makeResult(request, "Password Reset",  sb);
+            return makeResult(request, "Password Reset", sb);
         }
 
-        key = getRepository().getGUID()+"_"+Math.random();
+        key = getRepository().getGUID() + "_" + Math.random();
         //Time out is 1 hour
-        resetInfo = new PasswordReset(user.getId(), new Date(new Date().getTime()+1000*60*60));
+        resetInfo = new PasswordReset(user.getId(),
+                                      new Date(new Date().getTime()
+                                          + 1000 * 60 * 60));
         passwordResets.put(key, resetInfo);
         String toUser = user.getEmail();
-        String url =
-            getRepository().URL_USER_RESETPASSWORD.getFullUrl("?" + ARG_USER_PASSWORDKEY+"=" + key);
-        StringBuffer contents = new StringBuffer(translateMsg(request,"A request has been made to reset your RAMADDA password"));
+        String url = getRepository().URL_USER_RESETPASSWORD.getFullUrl("?"
+                         + ARG_USER_PASSWORDKEY + "=" + key);
+        StringBuffer contents =
+            new StringBuffer(translateMsg(request,
+                "A request has been made to reset your RAMADDA password"));
         contents.append(HtmlUtil.p());
-        contents.append(HtmlUtil.href(url,translateMsg(request,"Click to reset")));
-        String subject = translateMsg(request,"RAMADDA password reset");
-        getAdmin().sendEmail(toUser,subject, contents.toString(),true);
-        sb.append(getRepository().note(msg("Instructions on how to reset your password have been sent to your registered email address")));
-        return makeResult(request, "Password Reset",  sb);
+        contents.append(HtmlUtil.href(url,
+                                      translateMsg(request,
+                                          "Click to reset")));
+        String subject = translateMsg(request, "RAMADDA password reset");
+        getAdmin().sendEmail(toUser, subject, contents.toString(), true);
+        sb.append(
+            getRepository().note(
+                msg(
+                "Instructions on how to reset your password have been sent to your registered email address")));
+        return makeResult(request, "Password Reset", sb);
     }
 
 
@@ -1564,17 +1724,19 @@ public class UserManager extends RepositoryManager {
     public Result processLogin(Request request) throws Exception {
         StringBuffer sb     = new StringBuffer();
         User         user   = null;
-        String       output = request.getString(ARG_OUTPUT,"");
+        String       output = request.getString(ARG_OUTPUT, "");
         if (request.exists(ARG_USER_ID)) {
             String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD, "");
             password = hashPassword(password);
 
-            Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
-                                 Tables.USERS.NAME,
-                                 Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
-                                            Clause.eq(Tables.USERS.COL_PASSWORD,
-                                                password)));
+            Statement stmt = getDatabaseManager().select(
+                                 Tables.USERS.COLUMNS, Tables.USERS.NAME,
+                                 Clause.and(
+                                     Clause.eq(Tables.USERS.COL_ID, name),
+                                     Clause.eq(
+                                         Tables.USERS.COL_PASSWORD,
+                                         password)));
 
             ResultSet results = stmt.getResultSet();
             if (results.next()) {
@@ -1641,7 +1803,8 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_CART = new OutputType("User Cart", "user.cart");
+    public static final OutputType OUTPUT_CART = new OutputType("User Cart",
+                                                     "user.cart");
 
     /**
      * _more_
@@ -1649,7 +1812,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initOutputHandlers() throws Exception {
-        OutputHandler outputHandler = new OutputHandler(getRepository(),"Cart") {
+        OutputHandler outputHandler = new OutputHandler(getRepository(),
+                                          "Cart") {
             protected void getEntryLinks(Request request, Entry entry,
                                          List<Link> links, boolean forHeader)
                     throws Exception {
@@ -1693,10 +1857,11 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<String> getRoles() throws Exception {
-        String[] roleArray = SqlUtil.readString(
-                                 getDatabaseManager().select(
-                                     SqlUtil.distinct(Tables.USERROLES.COL_ROLE),
-                                     Tables.USERROLES.NAME, new Clause()), 1);
+        String[] roleArray =
+            SqlUtil.readString(
+                getDatabaseManager().select(
+                    SqlUtil.distinct(Tables.USERROLES.COL_ROLE),
+                    Tables.USERROLES.NAME, new Clause()), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
         roles.add(0, ROLE_ANY);
         return roles;
@@ -1796,6 +1961,11 @@ public class UserManager extends RepositoryManager {
             lastActivity    = new Date();
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public User getUser() {
             return user;
         }
