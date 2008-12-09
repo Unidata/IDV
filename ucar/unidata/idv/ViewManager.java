@@ -4864,7 +4864,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public synchronized void startImageCapture() {
         if (isg != null) {
-            LogUtil.userMessage("Images are already being captured");
+            LogUtil.userMessage("The Movie Capture dialog window is open");
             isg.show();
             return;
         }
