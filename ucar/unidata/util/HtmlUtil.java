@@ -1485,6 +1485,9 @@ public class HtmlUtil {
     }
 
 
+    public static String call(String function,String args) {
+        return function+"(" + args+");\n";
+    }
 
     /**
      * _more_
