@@ -82,8 +82,13 @@ they essentially get it from their container type tag.
   </server>
 -->
   <server name="unidata2.ssec.wisc.edu">
+<!--
     <group
        names="GOESEAST,EAST,WEST"
+       type="image"/>
+-->
+    <group
+       names="GOESEAST"
        type="image"/>
   </server>
   <server name="goessouth.unidata.ucar.edu">
