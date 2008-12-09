@@ -33,9 +33,30 @@ All top level tags under components can be referred to by other xml (either in t
 or by other components) using the idref="..." attribute.
 -->
   <components>
-    <!-- The very top panel. It contains a single child panel that is placed to the West -->
       <panel id="verytop" layout="border" >
+        <menubar   place="West">
+          <menu id="filemenu" label="File">
+           <menuitem label="Save session" action="chat.savesession" />
+           <separator/>
+           <menuitem label="Show/hide top" action="ui.toggle(toppanel)" />
+           <menuitem label="Show/hide bottom" action="ui.toggle(bottompanel)" />
+           <menuitem label="Float/embed" action="ui.float" />
+           <menuitem label="Change room" action="chat.changeroom" />
+        </menu>
+        <menu  label="View"  border="true" id="viewmenu">
+           <menuitem label="Clear text"  action="chat.cleartext" />
+           <menuitem label="Toggle text view" action="ui.flip(textpanel);" />      
+        </menu>
+        </menubar>
+      </panel>
+
+
+
+
+    <!-- The very top panel. It contains a single child panel that is placed to the West -->
+      <panel id="verytopx" layout="border" >
         <panel   place="West" layout="gridbag" cols="2">
+    <!-- Create the commands menu. Wrap it so it doesn't expand vertically in its parent panel-->
           <panel layout="gridbag" colwidths="0,1" cols="2" hspace="2" vspace="2">
             <panel layout="gridbag" cols="2" colheights="0">
               <button action="popup(filemenu)" label="File"  border="true"/>
@@ -51,13 +72,7 @@ or by other components) using the idref="..." attribute.
       </panel>
 
       <panel id="toppanel" layout="border">
-        <component idref="usersfiles"  place="West"/>      
           <panel  layout="border" place="Center">
-            <panel id="topbuttons" layout="grid" rows="1" cols="0" place="North" >
-              <button label="Clear text"  id="clearbtn" action="chat.cleartext" />
-              <button label="Toggle text view" action="ui.flip(textpanel);" />
-            </panel>
-      
             <panel layout="border" place="Center">
               <panel layout="inset" hspace="2" vspace="2" place="Center">
                  <panel id="textpanel" layout="card" default="chattext_wrapper">
@@ -74,6 +89,7 @@ or by other components) using the idref="..." attribute.
 
 <!-- The vertical stack of "Users" label, userlist, "Files/Urls" popup menu btn, filelist -->
 
+<!--
       <panel id="usersfiles" layout="grid"   vspace="2" cols="1">
         <panel layout="border">
           <label place="North" label="Users:" align="LEFT" />
@@ -84,7 +100,7 @@ or by other components) using the idref="..." attribute.
           <component id="filelist"  place="Center" />
         </panel>
       </panel>
-
+-->
 
       <panel id="textinput" layout="card" place="South">
         <panel layout="border">
@@ -93,7 +109,7 @@ or by other components) using the idref="..." attribute.
               <button place="North" label="Send:" action="chat.input(inputfld1)" />
             </panel>
             <textinput id="inputfld1" action="chat.input"/>
-            <image  place="North"  border="true"  image="resource:/com/infocetera/images/smile1.gif" action="popup(textmenu)"/>
+<!--            <image  place="North"  border="true"  image="resource:/com/infocetera/images/smile1.gif" action="popup(textmenu)"/> -->
           </panel>
           <label label=" " place="Center"/>
         </panel>	  
