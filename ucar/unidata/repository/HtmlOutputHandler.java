@@ -997,6 +997,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (subGroups.size() > 0) {
             StringBuffer groupsSB = new StringBuffer();
+            
             groupsSB.append("<div " + HtmlUtil.cssClass("folderblock") + ">");
             for (Group subGroup : subGroups) {
                 groupsSB.append(getEntryManager().getAjaxLink(request,

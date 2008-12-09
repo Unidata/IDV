@@ -598,6 +598,48 @@ public class OutputHandler extends RepositoryManager {
     public void applySettings(Request request) throws Exception {}
 
 
+    public static int entryCnt = 0;
+
+    public String[] getEntryFormStart(Request request,List entries) throws Exception {
+        String base = "toggleentry" + (entryCnt++);
+        StringBuffer formSB = new StringBuffer();
+        formSB.append(
+                      request.formPost(
+                                       getRepository().URL_ENTRY_GETENTRIES, "getentries"));
+        List<OutputType> outputList =
+            getRepository().getOutputTypes(request, new State(entries));
+        List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+        for (OutputType outputType : outputList) {
+            tfos.add(new TwoFacedObject(outputType.getLabel(),
+                                        outputType.getId()));
+        }
+        StringBuffer selectSB = new StringBuffer();
+        selectSB.append(HtmlUtil.space(4));
+        selectSB.append(msgLabel("View As"));
+        selectSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
+        selectSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
+        selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
+        
+        String arrowImg =
+            HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),
+                         msg("Show/Hide Form"), HtmlUtil.id(base+"img"));
+        String link = HtmlUtil.space(2)
+            + HtmlUtil.jsLink(
+                              HtmlUtil.onMouseClick(base+".groupToggleVisibility()"), arrowImg);
+        formSB.append(HtmlUtil.span(selectSB.toString(),
+                                    HtmlUtil.id(base+"select")));
+        formSB.append(HtmlUtil.script(base+" = new VisibilityGroup("+ HtmlUtil.squote(base+"img")+");\n"+
+                                      HtmlUtil.call(base+".groupAddEntry", HtmlUtil.squote(base+"select"))));
+        return new String[]{link,base,formSB.toString()};
+    }
+
+    public String getEntryFormEnd(Request request, String base) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.formClose());
+        sb.append(HtmlUtil.script(base+".groupToggleVisibility();"));
+        return sb.toString();
+    }
+
 
 
     /**
@@ -620,49 +662,28 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
 
         String link = "";
+        String base = "";
         if (doForm) {
-            StringBuffer formSB = new StringBuffer();
-            formSB.append(
-                request.formPost(
-                    getRepository().URL_ENTRY_GETENTRIES, "getentries"));
-            //            formSB.append(HtmlUtil.space(1));
-            List<OutputType> outputList =
-                getRepository().getOutputTypes(request, new State(entries));
-            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-            for (OutputType outputType : outputList) {
-                tfos.add(new TwoFacedObject(outputType.getLabel(),
-                                            outputType.getId()));
-            }
-            sb.append("\n");
-            formSB.append(HtmlUtil.space(4));
-            formSB.append(msgLabel("View As"));
-            formSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
-            formSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
-            formSB.append(HtmlUtil.submit(msg("All"), "getall"));
-
-            String arrowImg =
-                HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),
-                             "Show/Hide Form", " id=\"entryformimg\" ");
-            link = HtmlUtil.space(2)
-                   + HtmlUtil.jsLink(
-                       HtmlUtil.onMouseClick("toggleEntryForm()"), arrowImg);
-            sb.append(HtmlUtil.span(formSB.toString(),
-                                    " id = \"entryform\" "));
+            String[]tuple   = getEntryFormStart(request,entries);
+            link = tuple[0];
+            base = tuple[1];
+            sb.append(tuple[2]);
             sb.append(
                 "<ul class=\"folderblock\" style=\"list-style-image : url("
                 + getRepository().fileUrl(ICON_BLANK) + ")\">");
         }
         //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int cnt = 0;
+        StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
             sb.append("<li>");
             if (doForm) {
+                String id = base+(cnt++);
+                jsSB.append(base+".groupAddEntry(" + HtmlUtil.squote(id)+");\n");
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                sb.append(
-                    HtmlUtil.span(
-                        HtmlUtil.checkbox(
-                            "entry_" + entry.getId(), "true",
-                            dfltSelected), " id=\"entryform" + (cnt++) + "\" "));
+                String cbx = HtmlUtil.checkbox("entry_" + entry.getId(), "true",dfltSelected);
+                cbx = HtmlUtil.span(cbx,HtmlUtil.id(id));
+                sb.append(cbx);
             }
 
             if (showCrumbs) {
@@ -678,9 +699,8 @@ public class OutputHandler extends RepositoryManager {
         }
         if (doForm) {
             sb.append("</ul>");
-            sb.append(HtmlUtil.formClose());
-            sb.append(
-                "\n<SCRIPT LANGUAGE=\"JavaScript\">toggleEntryForm();</script>\n");
+            sb.append(HtmlUtil.script(jsSB.toString()));
+            sb.append(getEntryFormEnd(request,base));
         }
         return link;
     }

@@ -424,21 +424,45 @@ tooltip = new Tooltip();
 document.onkeypress = tooltip.keyPressed;
 
 
-function toggleEntryForm () {
-    var obj = util.getDomObject('entryform');
-    var img = util.getDomObject('entryformimg');
-    if(obj) {
-        if(toggleVisibilityOnObject(obj,'')) {
-            if(img) img.obj.src =  "${urlroot}/icons/downarrow.gif";
-        } else {
-            if(img) img.obj.src =  "${urlroot}/icons/rightarrow.gif";
-        }
+
+
+function VisibilityGroup(img) {
+	this.numEntries = 0;
+	this.entries = new Array();
+	this.toggleImg  = img;
+	this.on = 1;
+        this.groupAddEntry = groupAddEntry;
+        this.groupToggleVisibility = groupToggleVisibility;
+}
+
+
+function groupAddEntry(entryId) {
+	this.entries[this.numEntries] = entryId;
+	this.numEntries++;
+}
+
+
+
+function groupToggleVisibility () {
+    this.on = !this.on;
+    if(this.toggleImg) {
+	    var img = util.getDomObject(this.toggleImg);
+            if(img) {
+		if(this.on) {
+   		    img.obj.src =  "${urlroot}/icons/downarrow.gif";
+		} else {
+	            img.obj.src =  "${urlroot}/icons/rightarrow.gif";
+		}
+            }
     }
-    var cnt = 0;
-    while(1) {
-        obj = util.getDomObject('entryform' + (cnt++));
-        if(!obj) break;
-        toggleVisibilityOnObject(obj,'');
+    for(i=0;i<this.numEntries;i++) {
+        obj = util.getDomObject(this.entries[i]);
+        if(!obj) continue;
+        if(this.on) {
+            showObject(obj,"inline");
+        } else {
+            hideObject(obj);
+        }
     }
 }
 
