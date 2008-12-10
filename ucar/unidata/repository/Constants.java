@@ -81,6 +81,8 @@ public interface Constants {
 
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
+    public static final String ICON_CHAT = "/icons/chat.gif";
+
     /** _more_          */
     public static final String ICON_HEADER = "/header.jpg";
 

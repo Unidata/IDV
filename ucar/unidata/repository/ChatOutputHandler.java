@@ -108,6 +108,9 @@ public class ChatOutputHandler extends OutputHandler {
     List<ChatConnection> connections = new ArrayList<ChatConnection>();
 
 
+
+
+
     /**
      * Class ChatConnection _more_
      *
@@ -131,6 +134,8 @@ public class ChatOutputHandler extends OutputHandler {
 
         /** _more_          */
         private String entryId;
+
+        private  Entry entry;
 
         /** _more_          */
         private String session;
@@ -168,9 +173,11 @@ public class ChatOutputHandler extends OutputHandler {
          *
          * @throws Exception _more_
          */
-        private void write(String type, String attrs, String body)
+        private void writeMessage(String type, String attrs, String body)
                 throws Exception {
-            write(message(type, attrs, body));
+            String message  = message(type, attrs, body);
+            //            System.err.println (message);
+            write(message);
         }
 
         /**
@@ -202,7 +209,7 @@ public class ChatOutputHandler extends OutputHandler {
          * @throws Exception _more_
          */
         private void writeError(String msg) throws Exception {
-            write("ERROR", "", msg);
+            writeMessage("ERROR", "", msg);
         }
 
 
@@ -236,8 +243,8 @@ public class ChatOutputHandler extends OutputHandler {
                     }
                     String tmpEntryId = XmlUtil.getAttribute(node,
                                             ATTR_CHANNEL);
-                    Entry entry = getEntryManager().getEntry(null,
-                                      tmpEntryId);
+                    entry = getEntryManager().getEntry(null,
+                                                       tmpEntryId);
                     if (entry == null) {
                         writeError("Could not find entry:" + tmpEntryId);
                         return;
@@ -245,7 +252,7 @@ public class ChatOutputHandler extends OutputHandler {
                     //TODO: Check view access here on the entry
                     this.session = tmpSession;
                     this.entryId = tmpEntryId;
-                    write("STATE",
+                    writeMessage("STATE",
                           XmlUtil.attr("username", user.getName())
                           + XmlUtil.attr("userid", connectionId), "");
                     StringBuffer sb = new StringBuffer();
@@ -259,6 +266,7 @@ public class ChatOutputHandler extends OutputHandler {
             } catch (Exception exc) {
                 try {
                     writeError("An error has occurred:" + exc);
+                    exc.printStackTrace();
                 } catch (Exception ignore) {}
             }
         }
@@ -283,7 +291,33 @@ public class ChatOutputHandler extends OutputHandler {
                 node.setAttribute("FROM", connectionId);
                 writeExcept(XmlUtil.toString(node), this, this);
             } else if (type.equals("SESSION")) {
-                write("SESSION", XmlUtil.attr("id", connectionId), "");
+                writeMessage("SESSION", XmlUtil.attr("id", connectionId), "");
+            } else if (type.equals("FILE")) {
+                Request request = new Request(getRepository(),this.user);
+                StringBuffer sb = new StringBuffer();
+                Group parent = entry.getParentGroup();
+                List<String> ids = getEntryManager().getChildIds(request, parent, null);
+                for (String id : ids) {
+                    Entry entry = getEntryManager().getEntry(request, id);
+                    if (entry == null) {
+                        continue;
+                    }
+                    if(entry.isGroup()) continue;
+                    String url=null;
+                    String entryType;
+                    if (entry.getResource().isImage()) {
+                        entryType = "image";
+                        url =getEntryManager().getEntryResourceUrl(request,entry);
+                    } else {
+                        entryType = "url";
+                        url =request.entryUrl(getRepository().URL_ENTRY_SHOW, entry);
+                    }
+                    if(url==null) continue;
+                            
+                    writeMessage("FILE", XmlUtil.attr("name",entry.getName())+
+                          XmlUtil.attr("filetype",entryType)+
+                          XmlUtil.attr("url",url),"");
+                }
             } else if (type.equals("USERLIST")) {
                 StringBuffer sb = new StringBuffer();
                 for (ChatConnection connection : findConnectionsInRoom(
@@ -292,7 +326,7 @@ public class ChatOutputHandler extends OutputHandler {
                               + "\" name=\"" + connection.user.getName()
                               + "\"/>\n");
                 }
-                write("USERLIST", "", sb.toString());
+                writeMessage("USERLIST", "", sb.toString());
             }
         }
 
@@ -439,6 +473,25 @@ public class ChatOutputHandler extends OutputHandler {
         }
     }
 
+
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links, boolean forHeader)
+            throws Exception {
+        if (getRepository().isOutputTypeOK(OUTPUT_CHATROOM)) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                          entry, ARG_OUTPUT,
+                                          OUTPUT_CHATROOM);
+            links.add(new Link(url, getRepository().fileUrl(ICON_CHAT),
+                               "Chat Room"));
+        }
+    }
+
+
+    public Result outputGroup(Request request, Group group,
+                              List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+        return outputEntry(request, group);
+    }
 
     /**
      * _more_

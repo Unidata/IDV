@@ -139,6 +139,9 @@ public class Request implements Constants {
     public Request(Repository repository, User user) {
         this.repository = repository;
         this.user       = user;
+        this.type               = "";
+        this.parameters         = new Hashtable();
+        this.originalParameters = new Hashtable();
     }
 
 

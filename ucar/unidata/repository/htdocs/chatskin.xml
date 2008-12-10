@@ -12,7 +12,7 @@ which is the url pointing to the skin file to use.
   <ui>
     <panel  hspace="4" vspace="4" layout="border" fontsize="12" fontface="Dialog">
       <component idref="verytop" place="North"/>
-      <panel layout="grid" cols="1" place="Center">
+      <splitpane orientation="v" place="Center">
         <component idref="toppanel" />    
         <panel layout="border" id="bottompanel">
           <component idref="whiteboardpanel" place="Center"/>
@@ -24,7 +24,7 @@ which is the url pointing to the skin file to use.
 	    <button label="Update others"  action="wb.sendstate" />	    	    
           </panel>
 	</panel>
-      </panel>
+      </splitpane>
     </panel>
   </ui>
 
@@ -71,8 +71,29 @@ or by other components) using the idref="..." attribute.
         <component id="whiteboard" place="Center"/>
       </panel>
 
+      <panel id="usersfiles" layout="grid"   vspace="2" cols="1">
+        <panel layout="border">
+          <label place="North" label="Users:" align="LEFT" />
+          <component id="userlist"  place="Center"/>
+        </panel>
+        <panel layout="border">
+	<menubar place="North">
+	      <menu   id="filesmenu" label="Files" place="North">
+	            <menuitem action="files.select" label ="Add new url" />
+		    <menuitem action="files.upload" label ="Select file from server" />
+                    <menuitem action="files.remove" label ="Remove selected" />
+                    <menuitem action="files.share" label ="Share selected" />
+                    <menuitem action="files.view" label ="View selected" />
+             </menu>
+        </menubar>
+          <component id="filelist"  place="Center" />
+        </panel>
+      </panel>
+
+
       <panel id="toppanel" layout="border">
           <panel  layout="border" place="Center">
+            <component idref="usersfiles" place="West"/>
             <panel layout="border" place="Center">
               <panel layout="inset" hspace="2" vspace="2" place="Center">
                  <panel id="textpanel" layout="card" default="chattext_wrapper">
@@ -89,18 +110,7 @@ or by other components) using the idref="..." attribute.
 
 <!-- The vertical stack of "Users" label, userlist, "Files/Urls" popup menu btn, filelist -->
 
-<!--
-      <panel id="usersfiles" layout="grid"   vspace="2" cols="1">
-        <panel layout="border">
-          <label place="North" label="Users:" align="LEFT" />
-          <component id="userlist"  place="Center"/>
-        </panel>
-        <panel layout="border">
-          <button label="Files/Urls"  place="North" action="popup(filesmenu)" />
-          <component id="filelist"  place="Center" />
-        </panel>
-      </panel>
--->
+
 
       <panel id="textinput" layout="card" place="South">
         <panel layout="border">
@@ -139,6 +149,7 @@ or by other components) using the idref="..." attribute.
       <menuitem action="files.upload" label ="Select file from server" />
       <menuitem action="files.remove" label ="Remove selected" />
       <menuitem action="files.share" label ="Share selected" />
+      <menuitem action="files.view" label ="View selected" />
     </menu>
 
     <menu id="textmenu" actiontemplate="ui.write(inputfld1,%value%)">

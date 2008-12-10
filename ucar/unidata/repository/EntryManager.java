@@ -3450,7 +3450,12 @@ return new Result(title, sb);
         }
 
 
-        where = new ArrayList<Clause>(where);
+
+        if(where!=null) {
+            where = new ArrayList<Clause>(where);
+        } else {
+            where = new ArrayList<Clause>();
+        }
         where.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                             group.getId()));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);

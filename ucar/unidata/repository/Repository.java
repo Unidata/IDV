@@ -2458,9 +2458,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected TypeHandler getTypeHandler(Request request) throws Exception {
-        String type = request.getString(ARG_TYPE,
-                                        TypeHandler.TYPE_ANY).trim();
-        return getTypeHandler(type, false, true);
+        if(request!=null) {
+            String type = request.getString(ARG_TYPE,
+                                            TypeHandler.TYPE_ANY).trim();
+            return getTypeHandler(type, false, true);
+        } else {
+            return getTypeHandler(TypeHandler.TYPE_FILE, false, true);
+        }
     }
 
     /**
