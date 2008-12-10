@@ -295,7 +295,7 @@ public class ChatOutputHandler extends OutputHandler {
             } else if (type.equals("FILE")) {
                 Request request = new Request(getRepository(),this.user);
                 StringBuffer sb = new StringBuffer();
-                Group parent = entry.getParentGroup();
+                Group parent = (entry.isGroup()?(Group)entry:entry.getParentGroup());
                 List<String> ids = getEntryManager().getChildIds(request, parent, null);
                 for (String id : ids) {
                     Entry entry = getEntryManager().getEntry(request, id);

@@ -83,7 +83,7 @@ or by other components) using the idref="..." attribute.
 		    <menuitem action="files.upload" label ="Select file from server" />
                     <menuitem action="files.remove" label ="Remove selected" />
                     <menuitem action="files.share" label ="Share selected" />
-                    <menuitem action="files.view" label ="View selected" />
+                    <menuitem action="files.view" label ="Use as background" />
              </menu>
         </menubar>
           <component id="filelist"  place="Center" />
