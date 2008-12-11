@@ -17,9 +17,9 @@ Bugs:
 - offscreen image capter hangs from isl (Jeff)   DONE!
 - Dashboard covers view window in isl (Jeff)   DONE!
 - user/password not used with bundles (opendapguest/opendapguest) (Jeff) DONE (Mattias is looking into it on his end)
-- probe autoscaling did not work (Don)
+- probe autoscaling did not work (Don)  DONE!
 - Animation wierdness (Jeff) DONE
-- .5 degree data choice for Level II radar gave wierd display (Yuan)
+- .5 degree data choice for Level II radar gave wierd display (Yuan)  (can't replicate)
 - incorrect unit specification in station data filtering (using () or {})   gives a nasty message (Jeff) DONE!
 - Transect lines don't match up (Jeff) DONE! (Well, I cannot replicate this)
 - When you change data binning and check reload displays, it doesn't work  very well (Jeff) ??? Not sure what this refers to
@@ -42,7 +42,7 @@ Enhancements:
 - Subset levels when saving data locally
 - Save NEXRAD/TDS radar data in a bundle  (Yuan)
 - HTML control needs some sort of name for the tab in
-the Displays section of the Dashboard (Don)
+the Displays section of the Dashboard (Don) (can't reproduce)
 - Allow user to set the layout model in the Data Subset panel (Yuan/Don)
 - Export point data as a shapefile
 - add location and time attributes into variable lists for Layout model editing. (Jeff) DONE!
@@ -54,7 +54,7 @@ the Displays section of the Dashboard (Don)
 - Add MetaData details for Trajectory data (Don)
 - Add a generic NetCDF reader for doing an ncdump (Yuan)
 - Decluttering of stations needs a lower setting.  The default
-is to cluttered (Don)
+is too cluttered (Don)
 - Add hectares for drawing control (Jeff) DONE!
 - Make pallets for different kinds of shapes in the drawing control - ala NMAP  (Jeff) 
 - allow user to pick multiple levels for profiler plots (John)
