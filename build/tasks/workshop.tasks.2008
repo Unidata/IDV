@@ -30,6 +30,7 @@ Bugs:
 - Category box in Color Table editor doesn't  apply without a return first (Jeff) DONE! (That is just the way it works, a swing thing)
 - Add .jar to plugin name in creator (Don) DONE!
 - List resources in Resource Manager isn't updated with new resources 
+- Station id label in Level III TDS sweep is wrong (missing first char) (Yuan)
 
 
 Enhancements:
@@ -78,7 +79,6 @@ is to cluttered (Don)
 - VisAD point data adapter needs a flag to add unit into the
   realtype name. (Don)
 - Add "include metadata header" option when exporting CSV (Jeff) DONE!
-- Station id label in Level III TDS sweep is wrong (missing first char) (Yuan)
 - Offer to save settings for CSV metadata dialog 
 - Change "Layout Model" to "Plot Model" for 2.7 (Don)
 - Time animate SkewT for multiple stations
