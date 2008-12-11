@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -155,10 +156,10 @@ public class ProbeRowInfo {
     /** For probing on point data */
     private String pointParameter;
 
-    /** _more_          */
+    /** station name */
     private String stationName = "";
 
-    /** _more_          */
+    /** point index */
     private int pointIndex = -1;
 
     /** For playing sounds */
@@ -225,9 +226,9 @@ public class ProbeRowInfo {
     }
 
     /**
-     * _more_
+     * Is this for point data
      *
-     * @return _more_
+     * @return true if point data
      */
     public boolean isPoint() {
         return !isGrid();
@@ -287,9 +288,9 @@ public class ProbeRowInfo {
 
 
     /**
-     * _more_
+     * Get the time sample
      *
-     * @return _more_
+     * @return the time sample
      */
     protected Data getTimeSample() {
         return timeSample;
@@ -316,7 +317,9 @@ public class ProbeRowInfo {
         // TODO - how much of lineState should we copy?
         // copy along the lineState name  
         lineState.setChartName(that.lineState.getChartName());
-        lineState.setRange(new Range(that.lineState.getRange()));
+        if (that.lineState.getRange() != null) {
+            lineState.setRange(new Range(that.lineState.getRange()));
+        }
     }
 
 
@@ -454,16 +457,16 @@ public class ProbeRowInfo {
 
 
 
-    /** _more_          */
+    /** the tuple type */
     private TupleType tupleType;
 
     /**
-     * _more_
+     * Get the TupleType for the data
      *
-     * @return _more_
+     * @return the type
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
     public TupleType getTupleType() throws VisADException, RemoteException {
         if (tupleType != null) {
@@ -501,7 +504,18 @@ public class ProbeRowInfo {
     }
 
 
-    protected Real getRealValue(Data timeSample) throws VisADException, RemoteException {
+    /**
+     * Get the value at the time sample
+     *
+     * @param timeSample  the time sample
+     *
+     * @return  the value
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected Real getRealValue(Data timeSample)
+            throws VisADException, RemoteException {
         if (timeSample == null) {
             return null;
         }
@@ -531,12 +545,12 @@ public class ProbeRowInfo {
 
 
     /**
-     * _more_
+     * Get the point parameter name
      *
-     * @return _more_
+     * @return  the name
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public String getPointParameterName()
             throws VisADException, RemoteException {
@@ -557,12 +571,12 @@ public class ProbeRowInfo {
     }
 
     /**
-     * _more_
+     * Get the point index
      *
-     * @return _more_
+     * @return  the index
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public int getPointIndex() throws VisADException, RemoteException {
         if (pointIndex >= 0) {
@@ -620,8 +634,8 @@ public class ProbeRowInfo {
      * @param sample sample
      * @param elt The point we sampled on
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected void setPointSample(FieldImpl sample, EarthLocation elt)
             throws VisADException, RemoteException {
@@ -631,12 +645,12 @@ public class ProbeRowInfo {
 
 
     /**
-     * _more_
+     * Set the station name
      *
-     * @param ob _more_
+     * @param ob  the point observation
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public void setStationName(PointOb ob)
             throws VisADException, RemoteException {
@@ -664,8 +678,8 @@ public class ProbeRowInfo {
      *
      * @return time set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected Set getTimeSet() throws VisADException, RemoteException {
         if (pointSample != null) {
@@ -807,9 +821,9 @@ public class ProbeRowInfo {
     }
 
     /**
-     * _more_
+     * Get the station name
      *
-     * @return _more_
+     * @return  the name or null
      */
     public String getStationName() {
         return stationName;
