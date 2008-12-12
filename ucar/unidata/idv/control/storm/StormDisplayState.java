@@ -159,6 +159,7 @@ public class StormDisplayState {
         Color.GREEN, Color.BLUE, Color.CYAN, Color.GRAY, Color.LIGHT_GRAY
     };
 
+    /** _more_          */
     private boolean hasBeenEdited = false;
 
     /** _more_ */
@@ -344,25 +345,32 @@ public class StormDisplayState {
     }
 
 
+    /** _more_          */
     private int wayCnt = -1;
 
     /**
      * Check if its ok to show the given way.
      * if we have less than 2 ways total then always showit
+     *
+     * @param way _more_
+     *
+     * @return _more_
      */
     protected boolean okToShowWay(Way way) {
-        if(wayCnt==-1) {
+        if (wayCnt == -1) {
             List<StormTrack> tracks = trackCollection.getTracks();
-            Hashtable ways = new Hashtable();
+            Hashtable        ways   = new Hashtable();
             wayCnt = 0;
             for (StormTrack track : tracks) {
-                if(ways.get(track.getWay())==null) {
+                if (ways.get(track.getWay()) == null) {
                     wayCnt++;
                     ways.put(track.getWay(), "");
                 }
             }
         }
-        if(wayCnt<=1) return true;
+        if (wayCnt <= 1) {
+            return true;
+        }
         return stormTrackControl.okToShowWay(way);
     }
 
@@ -375,15 +383,15 @@ public class StormDisplayState {
         if (trackCollection == null) {
             return null;
         }
-        double  minLon = Double.POSITIVE_INFINITY;
-        double  maxLon = Double.NEGATIVE_INFINITY;
-        double  minLat = Double.POSITIVE_INFINITY;
-        double  maxLat = Double.NEGATIVE_INFINITY;
+        double           minLon = Double.POSITIVE_INFINITY;
+        double           maxLon = Double.NEGATIVE_INFINITY;
+        double           minLat = Double.POSITIVE_INFINITY;
+        double           maxLat = Double.NEGATIVE_INFINITY;
 
-        boolean didone = false;
+        boolean          didone = false;
         List<StormTrack> tracks = trackCollection.getTracks();
         for (StormTrack track : tracks) {
-            if (!okToShowWay(track.getWay())) {
+            if ( !okToShowWay(track.getWay())) {
                 continue;
             }
             LatLonRect bbox = track.getBoundingBox();
@@ -908,8 +916,7 @@ public class StormDisplayState {
 
         List topComps = new ArrayList();
 
-        timeModeBox = new JComboBox(new Vector(Misc.newList("On",
-                "Off")));
+        timeModeBox = new JComboBox(new Vector(Misc.newList("On", "Off")));
         timeModeBox.setSelectedIndex(forecastAnimationMode);
         timeModeBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -918,7 +925,8 @@ public class StormDisplayState {
                     //                    reload();
                     updateDisplays();
                 } catch (Exception exc) {
-                    stormTrackControl.logException("change forecast animation mode", exc);
+                    stormTrackControl.logException(
+                        "change forecast animation mode", exc);
                 }
             }
         });
@@ -940,7 +948,7 @@ public class StormDisplayState {
 
         topComps.add(GuiUtils.rLabel("Animation:"));
         topComps.add(obsLayoutComp);
-        topComps.add(forecastModeComp); //GuiUtils.filler());
+        topComps.add(forecastModeComp);  //GuiUtils.filler());
 
 
         forecastColorTableLabel = new JLabel(" ");
@@ -973,7 +981,7 @@ public class StormDisplayState {
 
         for (Way way : ways) {
             WayDisplayState wds = getWayDisplayState(way);
-            if (!okToShowWay(wds.getWay())) {
+            if ( !okToShowWay(wds.getWay())) {
                 continue;
             }
             JComponent labelComp =
@@ -1398,7 +1406,7 @@ public class StormDisplayState {
         try {
             List<WayDisplayState> wayDisplayStates = getWayDisplayStates();
             for (WayDisplayState wds : wayDisplayStates) {
-                if (!okToShowWay(wds.getWay())) {
+                if ( !okToShowWay(wds.getWay())) {
                     continue;
                 }
                 wds.updateDisplay();
@@ -1658,18 +1666,24 @@ public class StormDisplayState {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<StormParam> getStormChartParams() {
-        Hashtable<String, Boolean> s1 =  stormTrackControl.getOkParams();
-        List<StormParam> allParams = stormTrackControl.getTrackParams();
-        List<StormParam> params = new ArrayList();
-        for(StormParam sp : allParams){
+        Hashtable<String, Boolean> s1     = stormTrackControl.getOkParams();
+        List<StormParam> allParams        =
+            stormTrackControl.getTrackParams();
+        List<StormParam>           params = new ArrayList();
+        for (StormParam sp : allParams) {
             Boolean v = s1.get(sp.getName());
-            if(v != null && v.booleanValue()) {
+            if ((v != null) && v.booleanValue()) {
                 params.add(sp);
             }
         }
         return params;
-       // return stormTrackControl.getChartParamFromSelector();
+        // return stormTrackControl.getChartParamFromSelector();
     }
 
     /**
@@ -2140,14 +2154,27 @@ public class StormDisplayState {
         return forecastLayoutModelName;
     }
 
-    public int getForecastAnimationMode(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getForecastAnimationMode() {
         return forecastAnimationMode;
     }
 
-    public void setForecastAnimationMode(int value){
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setForecastAnimationMode(int value) {
         forecastAnimationMode = value;
     }
 
+    /**
+     * _more_
+     */
     public void markHasBeenEdited() {
         hasBeenEdited = true;
     }

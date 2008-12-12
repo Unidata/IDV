@@ -209,7 +209,7 @@ public class StormTrackControl extends DisplayControlImpl {
     private TwoListPanel waysToUseSelector;
 
     /** _more_ */
-       private TwoListPanel chartParamsSelector;
+    private TwoListPanel chartParamsSelector;
 
     /** _more_ */
     private JCheckBox waysToUsePreferenceCbx;
@@ -224,7 +224,7 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private List<Way> useWays;
 
-        /** _more_ */
+    /** _more_ */
     private List<StormParam> allParams;
 
     /** _more_ */
@@ -256,6 +256,11 @@ public class StormTrackControl extends DisplayControlImpl {
         return basePref + "." + stormDataSource.getId();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean isEditable() {
         return stormDataSource.isEditable();
     }
@@ -285,9 +290,12 @@ public class StormTrackControl extends DisplayControlImpl {
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
 
-        DataChoice.addCurrentName(new TwoFacedObject("Storm Track>Forecast Hour","fhour"));
-        DataChoice.addCurrentName(new TwoFacedObject("Storm Track>Forecast Time","rhour"));
-        DataChoice.addCurrentName(new TwoFacedObject("Storm Track>Forecast STI Time","shour"));
+        DataChoice.addCurrentName(
+            new TwoFacedObject("Storm Track>Forecast Hour", "fhour"));
+        DataChoice.addCurrentName(
+            new TwoFacedObject("Storm Track>Forecast Time", "rhour"));
+        DataChoice.addCurrentName(
+            new TwoFacedObject("Storm Track>Forecast STI Time", "shour"));
 
         placeHolder = new CompositeDisplayable("Place holder");
         addDisplayable(placeHolder);
@@ -338,6 +346,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private JComponent getWaysToUseComp() {
 
         useWays = new ArrayList<Way>();
@@ -368,6 +381,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private boolean applyWaysToUse() {
         boolean changed = false;
         List    only    = Misc.sort(waysToUseSelector.getCurrentEntries());
@@ -387,13 +405,18 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
-    public void  showWaysToUseDialog(){
+    /**
+     * _more_
+     */
+    public void showWaysToUseDialog() {
         JComponent waysToUseComp = getWaysToUseComp();
-        JLabel label = GuiUtils.cLabel(getWaysName() + " to use");
-        JComponent contents= GuiUtils.topCenter(label,waysToUseComp);
-        if(!GuiUtils.showOkCancelDialog(null,getWaysName() + " to use",
-                                        waysToUseComp,null)) return;
-        if(applyWaysToUse()) {
+        JLabel     label         = GuiUtils.cLabel(getWaysName() + " to use");
+        JComponent contents      = GuiUtils.topCenter(label, waysToUseComp);
+        if ( !GuiUtils.showOkCancelDialog(null, getWaysName() + " to use",
+                                          waysToUseComp, null)) {
+            return;
+        }
+        if (applyWaysToUse()) {
             //??
         }
     }
@@ -427,9 +450,10 @@ public class StormTrackControl extends DisplayControlImpl {
             chartParamsPreferenceCbx = new JCheckBox("Save as preference",
                     false);
         }
-        chartParamsSelector = new TwoListPanel(allParams, "All Parameters", useParams,
-                                             "Selected Parameters", null, false);
-        JComponent paramsContents = GuiUtils.centerBottom(chartParamsSelector,
+        chartParamsSelector = new TwoListPanel(allParams, "All Parameters",
+                useParams, "Selected Parameters", null, false);
+        JComponent paramsContents =
+            GuiUtils.centerBottom(chartParamsSelector,
                                   GuiUtils.left(chartParamsPreferenceCbx));
         jtp.add("Chart Parameters", paramsContents);
 
@@ -464,31 +488,37 @@ public class StormTrackControl extends DisplayControlImpl {
                         width, height);
             }
             jtp.add(
-                "Observation " + getWayName(),GuiUtils.centerBottom(
-                                                         obsWayContents, GuiUtils.left(obsWayPreferenceCbx)));
+                "Observation " + getWayName(),
+                GuiUtils.centerBottom(
+                    obsWayContents, GuiUtils.left(obsWayPreferenceCbx)));
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<StormParam> getTrackParams() {
-        List<StormParam> params = new ArrayList<StormParam>();
-        
+        List<StormParam>     params = new ArrayList<StormParam>();
 
-        StormDisplayState sds = getCurrentStormDisplayState();
-        StormTrackCollection stc = sds.getTrackCollection();
-        if(stc == null) {
+
+        StormDisplayState    sds    = getCurrentStormDisplayState();
+        StormTrackCollection stc    = sds.getTrackCollection();
+        if (stc == null) {
             for (int i = stormInfos.size() - 1; i >= 0; i--) {
                 StormInfo stormInfo = stormInfos.get(i);
                 StormDisplayState stormDisplayState =
                     getStormDisplayState(stormInfo);
                 stc = sds.getTrackCollection();
-                if(stc!=null) {
+                if (stc != null) {
                     break;
                 }
             }
         }
 
-        if(stc==null) {
+        if (stc == null) {
             System.err.println("Unable to find any active storm displays");
             return params;
         }
@@ -504,8 +534,7 @@ public class StormTrackControl extends DisplayControlImpl {
 
         //If we didn't get any from the forecast track use the obs track
         if (params.size() == 0) {
-            StormTrack obsTrack =
-                stc.getObsTrack();
+            StormTrack obsTrack = stc.getObsTrack();
             if (obsTrack != null) {
                 params = obsTrack.getParams();
             }
@@ -527,19 +556,19 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
         boolean changed = false;
-        if(applyWaysToUse()) {
+        if (applyWaysToUse()) {
             changed = true;
         }
 
-        List    onlyCP    = chartParamsSelector.getCurrentEntries();
+        List onlyCP = chartParamsSelector.getCurrentEntries();
         if ( !useParams.equals(onlyCP)) {
             changed = true;
             if (onlyCP.size() == allParams.size()) {
                 onlyShowTheseParams(new ArrayList<StormParam>(),
-                                  chartParamsPreferenceCbx.isSelected());
+                                    chartParamsPreferenceCbx.isSelected());
             } else {
                 onlyShowTheseParams((List<StormParam>) onlyCP,
-                                  chartParamsPreferenceCbx.isSelected());
+                                    chartParamsPreferenceCbx.isSelected());
             }
         }
 
@@ -572,14 +601,14 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-  /*  public List<StormParam>  getChartParamFromSelector(){
-        if(chartParamsSelector!= null) {
-            List pa = chartParamsSelector.getCurrentEntries();
-            return pa;
-        }
-        return null;
-    }
- */
+    /*  public List<StormParam>  getChartParamFromSelector(){
+          if(chartParamsSelector!= null) {
+              List pa = chartParamsSelector.getCurrentEntries();
+              return pa;
+          }
+          return null;
+      }
+   */
 
     /**
      * Signal base class to add this as a control listener
@@ -795,13 +824,16 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @param
      *
+     * @param param _more_
+     *
      * @return _more_
      */
     protected boolean okToShowParam(StormParam param) {
         if (okParams == null) {
             return true;
         }
-        if ((okParams.size() > 0) && (okParams.get(param.getName()) == null)) {
+        if ((okParams.size() > 0)
+                && (okParams.get(param.getName()) == null)) {
             return false;
         }
         return true;
@@ -842,6 +874,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private List<StormDisplayState> getStormDisplays() {
         List<StormDisplayState> states = new ArrayList<StormDisplayState>();
         for (int i = stormInfos.size() - 1; i >= 0; i--) {
@@ -855,7 +892,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * _more_
      */
     private void reloadStormTracks() {
-        for (StormDisplayState stormDisplayState: getActiveStorms()) {
+        for (StormDisplayState stormDisplayState : getActiveStorms()) {
             stormDisplayState.reload();
         }
     }
@@ -877,6 +914,7 @@ public class StormTrackControl extends DisplayControlImpl {
         }
 
     }
+
     /**
      * _more_
      *
@@ -884,7 +922,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param writeAsPreference _more_
      */
     private void onlyShowTheseParams(List<StormParam> params,
-                                   boolean writeAsPreference) {
+                                     boolean writeAsPreference) {
         okParams = new Hashtable();
         for (StormParam param : params) {
             okParams.put(param.getName(), new Boolean(true));
@@ -920,7 +958,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * _more_
      */
     public void unloadAllTracks() {
-        for (StormDisplayState stormDisplayState:getActiveStorms()) {
+        for (StormDisplayState stormDisplayState : getActiveStorms()) {
             stormDisplayState.deactivate();
         }
     }
@@ -1456,6 +1494,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @throws Exception _more_
      */
     public void loadYearInner(YearDisplayState yds) throws Exception {
+
         TextType         textType    = TextType.getTextType("ID");
         List             fields      = new ArrayList();
         List             times       = new ArrayList();
@@ -1520,11 +1559,12 @@ public class StormTrackControl extends DisplayControlImpl {
                         errorWindow.pack();
                         try {
                             Point loc = yds.getButton().getLocationOnScreen();
-                            errorWindow.setLocation((int) loc.getX(),
-                                                    (int) (loc.getY()
-                                                           + yds.getButton().bounds().height));
-                            
-                        } catch(Exception exc) {
+                            errorWindow.setLocation(
+                                (int) loc.getX(),
+                                (int) (loc.getY()
+                                       + yds.getButton().bounds().height));
+
+                        } catch (Exception exc) {
                             //Ignore this incase the component isn't being shown
                         }
                         errorWindow.show();
@@ -1540,7 +1580,7 @@ public class StormTrackControl extends DisplayControlImpl {
                 FieldImpl       field = makeTrackField(obsTrack, null);
                 StormTrackPoint stp   = obsTrack.getTrackPoints().get(0);
                 DateTime dttm = new DateTime(sdf.parse("" + yds.getYear()));
-                if (!doYearTime) {
+                if ( !doYearTime) {
                     dttm = stormInfo.getStartTime();
                 }
                 obsTracks.add(obsTrack);
@@ -1557,7 +1597,7 @@ public class StormTrackControl extends DisplayControlImpl {
             errorWindow.setVisible(false);
         }
         //If we can't find an obs track then set the yds to be inactive
-        if(times.size()==0) {
+        if (times.size() == 0) {
             yds.setStatus("No observation track found");
             yds.setState(YearDisplayState.STATE_INACTIVE);
         } else {
@@ -1565,6 +1605,7 @@ public class StormTrackControl extends DisplayControlImpl {
             yds.setState(YearDisplayState.STATE_ACTIVE);
             yds.setStatus("");
         }
+
     }
 
 
@@ -2324,7 +2365,7 @@ public class StormTrackControl extends DisplayControlImpl {
     public void setOkWays(Hashtable<String, Boolean> value) {
         okWays = value;
     }
- 
+
     /**
      * _more_
      *

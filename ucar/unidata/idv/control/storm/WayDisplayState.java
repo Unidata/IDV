@@ -315,15 +315,16 @@ public class WayDisplayState {
         }
 
         getHolder().setVisible(true);
-        int forecastAnimationMode = stormDisplayState.getForecastAnimationMode();
+        int forecastAnimationMode =
+            stormDisplayState.getForecastAnimationMode();
         if (shouldShowTrack()) {
             StormParam tmpParam     = stormDisplayState.getColorParam(this);
             boolean    hadTrack     = hasTrackDisplay();
             boolean    paramChanged = !Misc.equals(colorParam, tmpParam);
-            boolean    modeChanged = !(modeParam == forecastAnimationMode);
+            boolean    modeChanged  = !(modeParam == forecastAnimationMode);
             if ( !hadTrack || paramChanged || modeChanged) {
                 colorParam = tmpParam;
-               // modeParam = forecastAnimationMode;
+                // modeParam = forecastAnimationMode;
                 FieldImpl trackField = makeTrackField(forecastAnimationMode);
                 if (trackField != null) {
                     getTrackDisplay().setUseTimesInAnimation(false);
@@ -364,13 +365,14 @@ public class WayDisplayState {
 
         if (shouldShowCone()) {
             List<StormParam> tmp = stormDisplayState.getConeParams(this);
-            if ( !hasConeDisplay() || !Misc.equals(tmp, coneParams) ||
-                    !(modeParam == forecastAnimationMode)) {
+            if ( !hasConeDisplay() || !Misc.equals(tmp, coneParams)
+                    || !(modeParam == forecastAnimationMode)) {
                 this.coneParams = tmp;
                 getConesHolder().clearDisplayables();
                 setConeColor();
                 for (StormParam param : coneParams) {
-                    TrackDisplayable coneDisplay = makeConeDisplay(param, forecastAnimationMode);
+                    TrackDisplayable coneDisplay = makeConeDisplay(param,
+                                                       forecastAnimationMode);
                     if (coneDisplay != null) {
                         getConesHolder().addDisplayable(coneDisplay);
                     }
@@ -386,14 +388,15 @@ public class WayDisplayState {
 
 
         if (shouldShowRings()) {
-            StormParam tmp = stormDisplayState.getRingsParam(this);
+            StormParam       tmp = stormDisplayState.getRingsParam(this);
             TrackDisplayable ringDisplay = getRingsDisplay();
-            if ( !hasRingsDisplay() || !Misc.equals(tmp, ringsParam) ||
-                    !(modeParam == forecastAnimationMode)) {
+            if ( !hasRingsDisplay() || !Misc.equals(tmp, ringsParam)
+                    || !(modeParam == forecastAnimationMode)) {
                 this.ringsParam = tmp;
                 setRingsColor();
-                FieldImpl field = makeRingsField(ringsParam, forecastAnimationMode);
-                if (field == null || field.getLength() == 0) {
+                FieldImpl field = makeRingsField(ringsParam,
+                                      forecastAnimationMode);
+                if ((field == null) || (field.getLength() == 0)) {
                     ringDisplay.setData(new Real(0));
                 } else {
                     ringDisplay.setTrack(field);
@@ -515,13 +518,13 @@ public class WayDisplayState {
             if (sm == null) {
                 removeLabelDisplay();
             } else {
-                if ( pointObs.size() > 0) {  //(!hasLabelDisplay()) {
-                        FieldImpl pointField =
-                            PointObFactory.makeTimeSequenceOfPointObs(pointObs,
-                                -1, -1);
+                if (pointObs.size() > 0) {  //(!hasLabelDisplay()) {
+                    FieldImpl pointField =
+                        PointObFactory.makeTimeSequenceOfPointObs(pointObs,
+                            -1, -1);
 
-                        getLabelDisplay().setStationData(pointField);
-                        getLabelDisplay().setStationModel(sm);
+                    getLabelDisplay().setStationData(pointField);
+                    getLabelDisplay().setStationModel(sm);
                 }
             }
         }
@@ -848,6 +851,7 @@ public class WayDisplayState {
      * _more_
      *
      * @param param _more_
+     * @param mode _more_
      *
      * @return _more_
      *
@@ -869,6 +873,16 @@ public class WayDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param param _more_
+     * @param mode _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public TrackDisplayable makeRingDisplay(StormParam param, int mode)
             throws Exception {
         FieldImpl field = makeRingsField(param, mode);
@@ -1048,6 +1062,8 @@ public class WayDisplayState {
      * _more_
      *
      *
+     *
+     * @param mode _more_
      * @return _more_
      * @throws Exception _more_
      */
@@ -1071,7 +1087,7 @@ public class WayDisplayState {
             datas[i++] = field;
             fields.add(field);
             times.add(track.getStartTime());
-          //  if(!way.isObservation() && mode == 0)
+            //  if(!way.isObservation() && mode == 0)
             pointObs.addAll(makePointObs(track, !way.isObservation()));
             if (way.isObservation()) {
                 allPointObs.addAll(makeObsPointObs(track));
@@ -1083,10 +1099,11 @@ public class WayDisplayState {
         }
         //        if(fields.size()==1) return fields.get(0);
 
-        if(!way.isObservation() && mode == 1)
+        if ( !way.isObservation() && (mode == 1)) {
             return Util.indexedField(datas, false);
-        else
+        } else {
             return Util.makeTimeField(fields, times);
+        }
     }
 
 
@@ -1098,6 +1115,7 @@ public class WayDisplayState {
      *
      *
      * @param stormParam _more_
+     * @param mode _more_
      *
      * @return _more_
      * @throws Exception _more_
@@ -1106,12 +1124,15 @@ public class WayDisplayState {
             throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
-        Data[] datas = new Data[tracks.size()];
-        int i = 0;
+        Data[]          datas  = new Data[tracks.size()];
+        int             i      = 0;
         for (StormTrack track : tracks) {
             StormTrack coneTrack = makeConeTrack(track, stormParam);
-            if(coneTrack == null) continue;
-            FieldImpl field = stormDisplayState.getStormTrackControl().makeTrackField(
+            if (coneTrack == null) {
+                continue;
+            }
+            FieldImpl field =
+                stormDisplayState.getStormTrackControl().makeTrackField(
                     coneTrack, null);
             fields.add(field);
 
@@ -1123,10 +1144,11 @@ public class WayDisplayState {
             return null;
         }
 
-        if(!way.isObservation() && mode == 1)
+        if ( !way.isObservation() && (mode == 1)) {
             return Util.indexedField(datas, false);
-        else
+        } else {
             return Util.makeTimeField(fields, times);
+        }
     }
 
 
@@ -1140,7 +1162,7 @@ public class WayDisplayState {
      * @return _more_
      * @throws Exception _more_
      */
-    private List<PointOb>   makePointObs(StormTrack track, boolean useStartTime)
+    private List<PointOb> makePointObs(StormTrack track, boolean useStartTime)
             throws Exception {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getStartTime();
@@ -1162,10 +1184,10 @@ public class WayDisplayState {
         Date             startDate = Util.makeDate(startTime);
         List<StormParam> params    = track.getParams();
         for (int i = 0; i < stps.size(); i++) {
-            StormTrackPoint stp   = stps.get(i);
-            DateTime        time  = (useStartTime
-                                     ? startTime
-                                     : stp.getTime());
+            StormTrackPoint stp    = stps.get(i);
+            DateTime        time   = (useStartTime
+                                      ? startTime
+                                      : stp.getTime());
             String          flabel = "";
             String          rlabel = "";
             String          slabel = "";
@@ -1209,7 +1231,14 @@ public class WayDisplayState {
         return pointObs;
     }
 
-    private String getMonDayHour(Date dt){
+    /**
+     * _more_
+     *
+     * @param dt _more_
+     *
+     * @return _more_
+     */
+    private String getMonDayHour(Date dt) {
         Calendar cal = Calendar.getInstance();
 
         cal.setTime(dt);
@@ -1217,7 +1246,7 @@ public class WayDisplayState {
         int d = cal.get(Calendar.DAY_OF_MONTH);
         int h = cal.get(Calendar.HOUR_OF_DAY);
 
-        return  ""+ m + "/" + d + "/" + h + "H";
+        return "" + m + "/" + d + "/" + h + "H";
     }
 
 
@@ -1250,7 +1279,7 @@ public class WayDisplayState {
             DateTime        baseTime = baseStp.getTime();
             Date            baseDate = Util.makeDate(baseTime);
             for (int j = i; j < stps.size(); j++) {
-                StormTrackPoint stp   = stps.get(j);
+                StormTrackPoint stp    = stps.get(j);
                 String          flabel = "";
                 String          rlabel = "";
                 String          slabel = "";
@@ -1519,6 +1548,7 @@ public class WayDisplayState {
      * _more_
      *
      * @param stormParam _more_
+     * @param mode _more_
      *
      * @return _more_
      *
@@ -1528,22 +1558,24 @@ public class WayDisplayState {
             throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
-        Data[] datas = new Data[tracks.size()*10];
-        int i = 0;
+        Data[]          datas  = new Data[tracks.size() * 10];
+        int             i      = 0;
 
-        if(!way.isObservation() && mode == 1) {
-           for (StormTrack track : tracks) {
-               List<StormTrack>  stList = makeRingTrackList(track, stormParam);
-               for(StormTrack stk: stList){
-                   FieldImpl field = stormDisplayState.getStormTrackControl().makeTrackField(
-                    stk, null);
-                   fields.add(field);
-                   datas[i++] = field;
-               }
+        if ( !way.isObservation() && (mode == 1)) {
+            for (StormTrack track : tracks) {
+                List<StormTrack> stList = makeRingTrackList(track,
+                                              stormParam);
+                for (StormTrack stk : stList) {
+                    FieldImpl field =
+                        stormDisplayState.getStormTrackControl()
+                            .makeTrackField(stk, null);
+                    fields.add(field);
+                    datas[i++] = field;
+                }
 
-           }
-            
-           return Util.indexedField(datas, false);
+            }
+
+            return Util.indexedField(datas, false);
         }
 
         for (StormTrack track : tracks) {
@@ -1559,6 +1591,16 @@ public class WayDisplayState {
         return Util.makeTimeField(fields, times);
     }
 
+    /**
+     * _more_
+     *
+     * @param track _more_
+     * @param param _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public List makeRingTrackList(StormTrack track, StormParam param)
             throws Exception {
         List<StormTrackPoint> stps = getRealTrackPoints(track, param);
@@ -1632,7 +1674,7 @@ public class WayDisplayState {
                 stormDisplayState.getStormTrackControl().makeTrackField(
                     ringTrack, null);
         }
-            return  Util.indexedField(datas, false);
+        return Util.indexedField(datas, false);
     }
 
     /**
@@ -1692,7 +1734,7 @@ public class WayDisplayState {
         StormTrackPoint stp;
 
         // circle  1 to n
-        
+
         for (int i = 1; i < size; i++) {
             stp2 = stps.get(i);
             //right point
@@ -1708,22 +1750,22 @@ public class WayDisplayState {
         StormTrackPoint last   = stps.get(size - 1);
         EarthLocation   lastEl = last.getLocation();
         StormTrackPoint endSTP = conePoints[size - 1];
-        int ii = 0;
-        while( endSTP == null && ii < (size -2)) {
+        int             ii     = 0;
+        while ((endSTP == null) && (ii < (size - 2))) {
             ii++;
             last   = stps.get(size - 1 - ii);
             lastEl = last.getLocation();
             endSTP = conePoints[size - 1 - ii];
         }
 
-        if(endSTP == null || ii == (size -2)) {
+        if ((endSTP == null) || (ii == (size - 2))) {
             return null;
         }
-        EarthLocation   endEl  = endSTP.getLocation();
+        EarthLocation endEl = endSTP.getLocation();
 
-        double          ang    = getCircleAngleRange(lastEl, endEl);
+        double        ang   = getCircleAngleRange(lastEl, endEl);
 
-        Real            r      = last.getAttribute(param);
+        Real          r     = last.getAttribute(param);
         StormTrackPoint[] halfCircle = getHalfCircleTrackPoint(lastEl, ang,
                                            ((r != null)
                                             ? r.getValue()
@@ -1735,8 +1777,9 @@ public class WayDisplayState {
 
         List coneList = new ArrayList<StormTrackPoint>();
         for (int i = 0; i < numberOfPoint; i++) {
-            if(conePoints[i] != null)
+            if (conePoints[i] != null) {
                 coneList.add(conePoints[i]);
+            }
         }
 
         return new StormTrack(track.getStormInfo(),
@@ -1760,16 +1803,16 @@ public class WayDisplayState {
             StormTrackPoint sp2, StormParam param, boolean right)
             throws VisADException {
 
-        int              sign = 1;
-        EarthLocation    el1  = sp1.getLocation();
-        EarthLocation    el2  = sp2.getLocation();
+        int           sign = 1;
+        EarthLocation el1  = sp1.getLocation();
+        EarthLocation el2  = sp2.getLocation();
 
-        Real             rl   = sp2.getAttribute(param);
-        double           r    = rl.getValue();
+        Real          rl   = sp2.getAttribute(param);
+        double        r    = rl.getValue();
 
-        if(Float.isNaN((float)r) || r == 0.0){
+        if (Float.isNaN((float) r) || (r == 0.0)) {
             return null;
-         }
+        }
 
 
         double           lat1 = el1.getLatitude().getValue();
