@@ -79,7 +79,7 @@ public class FlatFieldTable extends JTable {
      * The ctor
      *
      * @param ff The flat field to use
-     * @param showNativeCoordinates _more_
+     * @param showNativeCoordinates Should show native coordinates
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -198,4 +198,5 @@ public class FlatFieldTable extends JTable {
     }
 
 }
+
 
