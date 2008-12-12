@@ -46,7 +46,7 @@ import javax.swing.table.AbstractTableModel;
 
 
 /**
- * Class FlatFieldTable _more_
+ * Class FlatFieldTable Displays the data in a flat field in a jtable
  *
  *
  * @author IDV Development Team
@@ -54,34 +54,34 @@ import javax.swing.table.AbstractTableModel;
  */
 public class FlatFieldTable extends JTable {
 
-    /** _more_          */
+    /** The table model to use          */
     private TableModel model = null;
 
-    /** _more_          */
+    /** The flat field we are displaying          */
     private FlatField displayedFlatField;
 
-    /** _more_          */
+    /** The range data from the flat field          */
     private double[][] rangeData;
 
-    /** _more_          */
+    /** The lat/lon domain          */
     private float[][] domainData;
 
-    /** _more_          */
+    /** How many columns for the domain          */
     private int numDomainCols;
 
-    /** _more_          */
+    /** How many columns in the rannge          */
     private int numRangeCols;
 
-    /** _more_          */
+    /** The table column names          */
     private String[] columnNames;
 
     /**
-     * _more_
+     * The ctor
      *
-     * @param ff _more_
+     * @param ff The flat field to use
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public FlatFieldTable(FlatField ff, boolean showNativeCoordinates)
             throws VisADException, RemoteException {
@@ -134,7 +134,7 @@ public class FlatFieldTable extends JTable {
 
 
     /**
-     * Class MyFlatField _more_
+     * Class MyFlatField The table model class
      *
      *
      * @author IDV Development Team
@@ -143,46 +143,46 @@ public class FlatFieldTable extends JTable {
     public class MyFlatField extends AbstractTableModel {
 
         /**
-         * _more_
+         * The ctor
          */
         MyFlatField() {}
 
         /**
-         * _more_
+         * number of columns
          *
-         * @return _more_
+         * @return number of columns
          */
         public int getColumnCount() {
             return columnNames.length;
         }
 
         /**
-         * _more_
+         * Get number of rows
          *
-         * @return _more_
+         * @return Number of rows
          */
         public int getRowCount() {
             return domainData[0].length;
         }
 
         /**
-         * _more_
+         * Get name of column
          *
-         * @param col _more_
+         * @param col column number
          *
-         * @return _more_
+         * @return name of column
          */
         public String getColumnName(int col) {
             return columnNames[col];
         }
 
         /**
-         * _more_
+         * Get value at column/row
          *
-         * @param row _more_
-         * @param col _more_
+         * @param row the row
+         * @param col the column
          *
-         * @return _more_
+         * @return the value
          */
         public Object getValueAt(int row, int col) {
             if (col < numDomainCols) {
@@ -196,4 +196,6 @@ public class FlatFieldTable extends JTable {
     }
 
 }
+
+
 
