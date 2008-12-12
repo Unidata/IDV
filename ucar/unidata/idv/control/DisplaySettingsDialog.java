@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -178,7 +174,10 @@ public class DisplaySettingsDialog {
     }
 
 
+    /** The font to use */
     private static Font FONT_NORMAL;
+
+    /** The selected font */
     private static Font FONT_SELECTED;
 
     /**
@@ -196,8 +195,8 @@ public class DisplaySettingsDialog {
         updatePropertiesComponent();
         for (int i = 0; i < displays.size(); i++) {
             DisplayWrapper dw = (DisplayWrapper) displayWrappers.get(i);
-            if(FONT_NORMAL ==null) {
-                FONT_NORMAL = dw.cbx.getFont();
+            if (FONT_NORMAL == null) {
+                FONT_NORMAL   = dw.cbx.getFont();
                 FONT_SELECTED = FONT_NORMAL.deriveFont(Font.ITALIC);
             }
             if (dw.dci == display) {
@@ -214,7 +213,7 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * Add a property value 
+     * Add a property value
      *
      * @param object value of the property
      * @param propName its name
@@ -1027,5 +1026,4 @@ public class DisplaySettingsDialog {
 
 
 }
-
 

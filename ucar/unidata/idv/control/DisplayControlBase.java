@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -351,7 +348,7 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** group flags */
     public static final String SETTINGS_GROUP_FLAGS = "Flags";
 
-    /** Temp properties          */
+    /** Temp properties */
     private Hashtable tmpProperties;
 
 
@@ -989,5 +986,4 @@ public abstract class DisplayControlBase extends SharableImpl {
 
 
 }
-
 

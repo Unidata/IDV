@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -42,7 +39,6 @@ import ucar.unidata.ui.MapPanel;
 
 
 import ucar.unidata.util.FileManager;
-import ucar.unidata.util.Trace;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -52,6 +48,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Resource;
+import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.*;
 
@@ -331,8 +328,8 @@ public class MapDisplayControl extends DisplayControlImpl {
             applyMapPosition();
             activateDisplays();
             updateLegendLabel();
-            if(newMap.getComponentHolder()!=null) {
-                if(this.getComponentHolder() !=null) {
+            if (newMap.getComponentHolder() != null) {
+                if (this.getComponentHolder() != null) {
                     this.getComponentHolder().setObject(null);
                     this.getComponentHolder().doRemove();
                 }

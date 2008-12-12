@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -50,7 +47,7 @@ import javax.swing.*;
  */
 public class DisplaySetting {
 
-    /** The name  */
+    /** The name */
     private String name;
 
     /** List of values */
@@ -449,6 +446,4 @@ public class DisplaySetting {
 
 
 }
-
-
 

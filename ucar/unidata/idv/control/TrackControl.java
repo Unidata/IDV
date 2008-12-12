@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -137,6 +136,7 @@ public class TrackControl extends GridDisplayControl {
     /** Shows the width */
     private JLabel widthLabel;
 
+    /** the widget for the layout model */
     protected LayoutModelWidget layoutModelWidget;
 
     /** Entire track type */
@@ -160,6 +160,7 @@ public class TrackControl extends GridDisplayControl {
     /** selector point */
     private StationModelDisplayable indicator = null;
 
+    /** the displayable that holdss the times */
     private DisplayableData timesHolder = null;
 
 
@@ -466,15 +467,16 @@ public class TrackControl extends GridDisplayControl {
         if ( !getTimeDeclutterEnabled()) {
             if ( !getAskedUserToDeclutterTime() && (numTimes > 1000)) {
                 int success =
-                    GuiUtils.showYesNoCancelDialog(getWindow(),
-                        "<html>There are " + numTimes
-                        + " time steps in the data.<br>Do you want to show them all?</html>", "Time Declutter", GuiUtils.CMD_NO);
+                    GuiUtils
+                        .showYesNoCancelDialog(getWindow(), "<html>There are "
+                            + numTimes
+                            + " time steps in the data.<br>Do you want to show them all?</html>", "Time Declutter", GuiUtils
+                                .CMD_NO);
                 if (success == JOptionPane.CANCEL_OPTION) {
                     return;
                 } else {
                     setAskedUserToDeclutterTime(true);
-                    setTimeDeclutterEnabled(success
-                                            == JOptionPane.NO_OPTION);
+                    setTimeDeclutterEnabled(success == JOptionPane.NO_OPTION);
                 }
             }
         }
@@ -516,11 +518,11 @@ public class TrackControl extends GridDisplayControl {
         if (seconds == 0) {
             seconds = 1;
         }
-        double[] tmpTimes  = new double[times.length];
-        int numFound = 0;
-        Hashtable seenTime   = new Hashtable();
+        double[]  tmpTimes = new double[times.length];
+        int       numFound = 0;
+        Hashtable seenTime = new Hashtable();
         for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
-            Integer timeKey = new Integer((int)(times[timeIdx] / seconds));
+            Integer timeKey = new Integer((int) (times[timeIdx] / seconds));
             if ((timeIdx < numTimes - 1) && (seenTime.get(timeKey) != null)) {
                 continue;
             }
@@ -590,8 +592,8 @@ public class TrackControl extends GridDisplayControl {
         JComponent contents = (JComponent) super.doMakeContents();
         if (trackType.equals(CMD_RANGE)) {
             JTabbedPane jtp = new JTabbedPane();
-            jtp.add("Layout",GuiUtils.topLeft(contents));
-            
+            jtp.add("Layout", GuiUtils.topLeft(contents));
+
             List timeWidgets = new ArrayList();
             timeWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Times to Use:"),
@@ -600,8 +602,8 @@ public class TrackControl extends GridDisplayControl {
             List widgetComponents = ControlWidget.fillList(timeWidgets);
             GuiUtils.tmpInsets = new Insets(4, 8, 4, 8);
             GuiUtils.tmpFill   = GridBagConstraints.HORIZONTAL;
-            JPanel timesComp = GuiUtils.doLayout(widgetComponents, 2, GuiUtils.WT_NY,
-                                         GuiUtils.WT_N);
+            JPanel timesComp = GuiUtils.doLayout(widgetComponents, 2,
+                                   GuiUtils.WT_NY, GuiUtils.WT_N);
             jtp.add("Times", GuiUtils.topLeft(timesComp));
             return jtp;
         }
@@ -678,13 +680,13 @@ public class TrackControl extends GridDisplayControl {
 
         super.getControlWidgets(controlWidgets);
 
-/*
-        if (trackType.equals(CMD_RANGE)) {
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel("Times to Use:"),
-                    doMakeTimeOptionWidget(), null));
-        }
-        */
+        /*
+                if (trackType.equals(CMD_RANGE)) {
+                    controlWidgets.add(new WrapperWidget(this,
+                            GuiUtils.rLabel("Times to Use:"),
+                            doMakeTimeOptionWidget(), null));
+                }
+                */
 
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Marker:"),
@@ -702,6 +704,11 @@ public class TrackControl extends GridDisplayControl {
 
     }
 
+    /**
+     * the control widgets to add to
+     *
+     * @param controlWidgets the control widgets to add to
+     */
     protected void addTimeModeWidget(List controlWidgets) {
         //noop
     }
@@ -1070,14 +1077,14 @@ public class TrackControl extends GridDisplayControl {
                 LogUtil.userErrorMessage("Unable to find layout model: "
                                          + name + ". Using default");
             }
-            
+
         }
 
         if (layout == null) {
             layout =
                 getControlContext().getStationModelManager()
                     .getDefaultStationModel();
-         }
+        }
         if (layoutModelWidget != null) {
             layoutModelWidget.setLayoutModel(layout);
         }
@@ -1380,18 +1387,23 @@ public class TrackControl extends GridDisplayControl {
         return markerVisible;
     }
 
+    /**
+     * set the station model
+     *
+     * @param sm the station model
+     */
     public void setStationModelFromWidget(final StationModel sm) {
         Misc.run(new Runnable() {
-                public void run() {
-                    showWaitCursor();
-                    try {
-                        setMarkerLayout(sm);
-                    } catch (Exception exc) {
-                        logException("Changing station model",
-                                     exc);
-                    }
-                    showNormalCursor();
-                }});
+            public void run() {
+                showWaitCursor();
+                try {
+                    setMarkerLayout(sm);
+                } catch (Exception exc) {
+                    logException("Changing station model", exc);
+                }
+                showNormalCursor();
+            }
+        });
     }
 
     /**
@@ -1401,10 +1413,8 @@ public class TrackControl extends GridDisplayControl {
      */
     protected JPanel makeLayoutModelWidget() {
         StationModel marker = getMarkerLayout();
-        layoutModelWidget =
-            new LayoutModelWidget(
-                                  this, this, "setStationModelFromWidget",
-                                  layoutModel);
+        layoutModelWidget = new LayoutModelWidget(this, this,
+                "setStationModelFromWidget", layoutModel);
 
 
         final ValueSliderWidget vsw = new ValueSliderWidget(this, 0, 50,
@@ -1414,10 +1424,10 @@ public class TrackControl extends GridDisplayControl {
         final JLabel vswLabel = GuiUtils.rLabel("   Scale: ");
         vswLabel.setEnabled(markerVisible);
 
-        final JPanel markerComp = GuiUtils.doLayout(new Component[]{
-            layoutModelWidget,vswLabel,  vsw.getContents(false)},3,
-                                              GuiUtils.WT_N,
-                                              GuiUtils.WT_N);
+        final JPanel markerComp = GuiUtils.doLayout(new Component[] {
+                                      layoutModelWidget,
+                                      vswLabel, vsw.getContents(false) }, 3,
+                                          GuiUtils.WT_N, GuiUtils.WT_N);
 
         JCheckBox showMarker = new JCheckBox("", markerVisible);
         showMarker.setToolTipText("Show the marker");
@@ -1430,9 +1440,9 @@ public class TrackControl extends GridDisplayControl {
         });
         GuiUtils.enableTree(markerComp, markerVisible);
 
-        return GuiUtils.left(GuiUtils.doLayout(new Component[] {showMarker,GuiUtils.inset(markerComp,new Insets(0,8,0,0)),},3,
-                                 GuiUtils.WT_N,
-                                 GuiUtils.WT_N));
+        return GuiUtils.left(GuiUtils.doLayout(new Component[] { showMarker,
+                GuiUtils.inset(markerComp, new Insets(0, 8, 0, 0)), }, 3,
+                GuiUtils.WT_N, GuiUtils.WT_N));
 
 
     }
@@ -1440,5 +1450,4 @@ public class TrackControl extends GridDisplayControl {
 
 
 }
-
 

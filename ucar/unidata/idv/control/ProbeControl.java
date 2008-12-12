@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -170,6 +166,7 @@ public class ProbeControl extends DisplayControlImpl {
     /** list of infos */
     private List<ProbeRowInfo> infos = new ArrayList();
 
+    /** mutex */
     private Object INFO_MUTEX = new Object();
 
     /** list of levels */
@@ -248,7 +245,7 @@ public class ProbeControl extends DisplayControlImpl {
     /** Show the table in the legend */
     private boolean showTableInLegend = true;
 
-    /** Show sunrise/sunset display in time series          */
+    /** Show sunrise/sunset display in time series */
     private boolean showSunriseSunset = false;
 
 
@@ -296,7 +293,7 @@ public class ProbeControl extends DisplayControlImpl {
 
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
-            if (!checkIfDataOk(info.getDataInstance())) {
+            if ( !checkIfDataOk(info.getDataInstance())) {
                 return false;
             }
         }
@@ -540,8 +537,7 @@ public class ProbeControl extends DisplayControlImpl {
             getDisplayConventions().formatLatLon(
                 llp.getLatitude().getValue()));
         double lon = Misc.normalizeLongitude(llp.getLongitude().getValue());
-        latLonWidget.setLon(
-            getDisplayConventions().formatLatLon(lon));
+        latLonWidget.setLon(getDisplayConventions().formatLatLon(lon));
         latLonWidget.setAlt(
             getDisplayConventions().formatAltitude(elt.getAltitude()));
     }
@@ -759,11 +755,11 @@ public class ProbeControl extends DisplayControlImpl {
      */
     protected void resetData() throws VisADException, RemoteException {
         //        synchronized(INFO_MUTEX) {
-            clearCachedSamples();
-            updateLegendLabel();
-            setTimesForAnimation();
-            doMoveProbe();
-            //        }
+        clearCachedSamples();
+        updateLegendLabel();
+        setTimesForAnimation();
+        doMoveProbe();
+        //        }
         fireStructureChanged();
     }
 
@@ -965,15 +961,16 @@ public class ProbeControl extends DisplayControlImpl {
      * @param time new time
      */
     protected void timeChanged(Real time) {
-        GuiUtils.invokeInSwingThread(new Runnable(){
-                public void run() {
-                    try {
-                        updateTime();
-                        getChart().timeChanged();
-                    } catch (Exception exc) {
-                        logException("changePosition", exc);
-                    }
-                }});
+        GuiUtils.invokeInSwingThread(new Runnable() {
+            public void run() {
+                try {
+                    updateTime();
+                    getChart().timeChanged();
+                } catch (Exception exc) {
+                    logException("changePosition", exc);
+                }
+            }
+        });
         super.timeChanged(time);
     }
 
@@ -1658,7 +1655,7 @@ public class ProbeControl extends DisplayControlImpl {
             return rowInfo.getPointParameter() + "@"
                    + rowInfo.getStationName();
         }
-        if(rowInfo.getLineState().getName()!=null) {
+        if (rowInfo.getLineState().getName() != null) {
             return rowInfo.getLineState().getName();
         }
         return rowInfo.getDataInstance().getDataChoice().getName();
@@ -1744,17 +1741,26 @@ public class ProbeControl extends DisplayControlImpl {
         if ( !getHaveInitialized()) {
             return;
         }
-        GuiUtils.invokeInSwingThread(new Runnable(){
-                public void run() {
-                    try {
-                        updatePositionInSwingThread(position);
-                    } catch (Exception exc) {
-                        logException("Updating chart", exc);
-                    }
-                }});
+        GuiUtils.invokeInSwingThread(new Runnable() {
+            public void run() {
+                try {
+                    updatePositionInSwingThread(position);
+                } catch (Exception exc) {
+                    logException("Updating chart", exc);
+                }
+            }
+        });
     }
 
 
+    /**
+     * update the position
+     *
+     * @param position the position
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
     private void updatePositionInSwingThread(RealTuple position)
             throws VisADException, RemoteException {
         updatePending = false;
@@ -1774,7 +1780,7 @@ public class ProbeControl extends DisplayControlImpl {
         }
         updateTime();
         final List<ProbeRowInfo> rowInfos = new ArrayList();
-        List               choices  = getDataChoices();
+        List                     choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
             rowInfos.add(getRowInfo(i));
         }
@@ -1795,11 +1801,17 @@ public class ProbeControl extends DisplayControlImpl {
      */
     private void updateTime() throws VisADException, RemoteException {
         //        synchronized(INFO_MUTEX) {
-            updateTimeInner();
-            //        }
+        updateTimeInner();
+        //        }
     }
 
 
+    /**
+     * update the time
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
     private void updateTimeInner() throws VisADException, RemoteException {
 
         if ( !getHaveInitialized() || !getActive()) {
@@ -2073,6 +2085,9 @@ public class ProbeControl extends DisplayControlImpl {
 
     /**
      * This clears out the cached data
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private void clearCachedSamples() throws VisADException, RemoteException {
         for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
@@ -2198,8 +2213,9 @@ public class ProbeControl extends DisplayControlImpl {
      *
      * @throws Exception On badness
      */
-    protected List getCursorReadoutInner(EarthLocation elt, Real animationValue,
-                                 int animationStep)
+    protected List getCursorReadoutInner(EarthLocation elt,
+                                         Real animationValue,
+                                         int animationStep)
             throws Exception {
         List l = new ArrayList();
         for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
@@ -2210,19 +2226,25 @@ public class ProbeControl extends DisplayControlImpl {
                 continue;
             }
             Data rt = d[1];
-            Real r = info.getRealValue(rt);
-            if (r == null|| r.isMissing()) {
+            Real r  = info.getRealValue(rt);
+            if ((r == null) || r.isMissing()) {
                 continue;
             }
             if (l.size() == 0) {
-                l.add("<tr><td>"+getMenuLabel() + ":" +"</td><td></td></tr>");
+                l.add("<tr><td>" + getMenuLabel() + ":"
+                      + "</td><td></td></tr>");
             }
 
-            Unit unit = info.getUnit();
-            double value = (unit!=null?r.getValue(unit):r.getValue());
-            if(unit == null) unit = r.getUnit();
-            l.add("<tr><td>&nbsp;&nbsp;&nbsp;" + info.toString() + ":</td><td align=\"right\">"
-                  + Misc.format(value) + "[" + unit + "]</td></tr>");
+            Unit   unit  = info.getUnit();
+            double value = ((unit != null)
+                            ? r.getValue(unit)
+                            : r.getValue());
+            if (unit == null) {
+                unit = r.getUnit();
+            }
+            l.add("<tr><td>&nbsp;&nbsp;&nbsp;" + info.toString()
+                  + ":</td><td align=\"right\">" + Misc.format(value) + "["
+                  + unit + "]</td></tr>");
         }
         return l;
     }
@@ -2873,5 +2895,4 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 }
-
 

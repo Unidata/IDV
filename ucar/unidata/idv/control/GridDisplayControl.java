@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -169,7 +167,11 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
             return null;
         }
         List result = new ArrayList();
-        Real r      = GridUtil.sampleToReal(field, el, animationValue,getSamplingModeValue(getObjectStore().get(PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+        Real r = GridUtil.sampleToReal(
+                     field, el, animationValue,
+                     getSamplingModeValue(
+                         getObjectStore().get(
+                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
         if ((r != null) && !r.isMissing()) {
             result.add("<tr><td>" + getMenuLabel()
                        + ":</td><td align=\"right\">"

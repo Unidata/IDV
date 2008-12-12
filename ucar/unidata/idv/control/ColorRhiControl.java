@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -331,8 +330,9 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         // DisplayConventions method that will take an EarthLocation and
         // return a nicely formatted string. 
         stationLabel.setText(
-            staname.substring(0,4).trim() + "  ("
-            + getDisplayConventions().formatEarthLocation(centerPoint, true) + ")");
+            staname.substring(0, 4).trim() + "  ("
+            + getDisplayConventions().formatEarthLocation(centerPoint, true)
+            + ")");
         setCSLineLength(defaultLen);
     }
 

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -250,6 +249,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
         return true;
     }
 
+    /** Do we have a load pending */
     private boolean waitingToLoad = false;
 
 
@@ -265,6 +265,11 @@ public class WMSControl extends ImageControl implements ImageObserver {
         super.initDone();
     }
 
+    /**
+     * have we fully initialized
+     *
+     * @return have we fully initialized
+     */
     public boolean isInitDone() {
         if ( !super.isInitDone()) {
             return false;
@@ -765,8 +770,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
                 //                    || (navDisplay.getDisplay().getComponent() == null)) {
                 return;
             }
-            Rectangle screenBounds =
-                navDisplay.getScreenBounds();
+            Rectangle screenBounds = navDisplay.getScreenBounds();
             imageWidth = (int) (screenBounds.width * scale);
             Rectangle2D.Double rect = getNavigatedDisplay().getLatLonBox();
             if ((scale > 1.0) && !inGlobe) {
@@ -799,8 +803,8 @@ public class WMSControl extends ImageControl implements ImageObserver {
             public void run() {
                 try {
                     loadImage(loadId =
-                              JobManager.getManager().stopAndRestart(loadId,
-                                                                     "WMSControl"));
+                        JobManager.getManager().stopAndRestart(loadId,
+                            "WMSControl"));
                 } finally {
                     waitingToLoad = false;
                 }

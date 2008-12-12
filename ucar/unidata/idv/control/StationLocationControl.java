@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -120,7 +119,7 @@ public class StationLocationControl extends StationModelControl {
     /** The displayable */
     private StationLocationDisplayable locationDisplayable;
 
-    /** the displayable          */
+    /** the displayable */
     private StationLocationDisplayable selectedDisplayable;
 
     /** Shows any lines */
@@ -968,13 +967,18 @@ public class StationLocationControl extends StationModelControl {
         return v;
     }
 
+    /**
+     * update the table
+     */
     private void updateTable() {
-        final List sortedStations = Misc.sort(displayedStations);
+        final List sortedStations    = Misc.sort(displayedStations);
         final List allSortedStations = Misc.sort(getStationList());
-        GuiUtils.invokeInSwingThread(new Runnable() {public void run() {
-            locationsTableModel.setLocations(sortedStations);
-            allLocationsTableModel.setLocations(allSortedStations);
-        }});
+        GuiUtils.invokeInSwingThread(new Runnable() {
+            public void run() {
+                locationsTableModel.setLocations(sortedStations);
+                allLocationsTableModel.setLocations(allSortedStations);
+            }
+        });
 
     }
 
@@ -2249,6 +2253,4 @@ public class StationLocationControl extends StationModelControl {
 
 
 }
-
-
 

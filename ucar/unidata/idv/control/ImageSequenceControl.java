@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -781,6 +780,11 @@ public class ImageSequenceControl extends BaseImageControl {
         return showProgressBar;
     }
 
+    /**
+     * is this display a raster display. Used for writing svg
+     *
+     * @return is raster
+     */
     public boolean getIsRaster() {
         return true;
     }

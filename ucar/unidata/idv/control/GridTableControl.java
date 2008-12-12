@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -56,9 +54,9 @@ import java.awt.event.*;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -76,14 +74,17 @@ import javax.swing.table.*;
 
 public class GridTableControl extends GridDisplayControl {
 
-    /** The flat field          */
+    /** The flat field */
     private FieldImpl field;
 
-    /** gui component          */
-    private     GuiUtils.CardLayoutPanel cardLayoutPanel = new GuiUtils.CardLayoutPanel();
+    /** gui component */
+    private GuiUtils.CardLayoutPanel cardLayoutPanel =
+        new GuiUtils.CardLayoutPanel();
 
+    /** gui component */
     private JCheckBox nativeCoordsCbx;
 
+    /** show native coordinates */
     private boolean showNativeCoordinates = false;
 
     /**
@@ -155,7 +156,8 @@ public class GridTableControl extends GridDisplayControl {
                     continue;
                 }
                 dates.add(dt);
-                FlatFieldTable table = new FlatFieldTable(ff,showNativeCoordinates);
+                FlatFieldTable table = new FlatFieldTable(ff,
+                                           showNativeCoordinates);
                 cardLayoutPanel.addCard(new JScrollPane(table));
             }
         }
@@ -163,13 +165,19 @@ public class GridTableControl extends GridDisplayControl {
     }
 
 
+    /**
+     * handle the animation time change
+     *
+     * @param time the new time
+     */
     public void timeChanged(Real time) {
         try {
             super.timeChanged(time);
             int current = getAnimation(true).getCurrent();
-            if(current>=0) 
+            if (current >= 0) {
                 cardLayoutPanel.show(current);
-        } catch(Exception exc) {
+            }
+        } catch (Exception exc) {
             logException("Time changed", exc);
         }
     }
@@ -185,40 +193,43 @@ public class GridTableControl extends GridDisplayControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         createTables();
-        nativeCoordsCbx = new JCheckBox("Show native coordinates", getShowNativeCoordinates());
+        nativeCoordsCbx = new JCheckBox("Show native coordinates",
+                                        getShowNativeCoordinates());
         nativeCoordsCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    showNativeCoordinates = nativeCoordsCbx.isSelected();
-                    try {
+            public void actionPerformed(ActionEvent ae) {
+                showNativeCoordinates = nativeCoordsCbx.isSelected();
+                try {
                     createTables();
-                    } catch(Exception exc) {
-                        logException("Creating tables", exc);
-                    }
+                } catch (Exception exc) {
+                    logException("Creating tables", exc);
                 }
-            });
-        return GuiUtils.topCenter(GuiUtils.leftRight(getAnimationWidget().getContents(),nativeCoordsCbx),cardLayoutPanel);
+            }
+        });
+        return GuiUtils.topCenter(
+            GuiUtils.leftRight(
+                getAnimationWidget().getContents(),
+                nativeCoordsCbx), cardLayoutPanel);
     }
 
 
     /**
-       Set the ShowNativeCoordinates property.
-
-       @param value The new value for ShowNativeCoordinates
-    **/
-    public void setShowNativeCoordinates (boolean value) {
-	showNativeCoordinates = value;
+     *  Set the ShowNativeCoordinates property.
+     *
+     *  @param value The new value for ShowNativeCoordinates
+     */
+    public void setShowNativeCoordinates(boolean value) {
+        showNativeCoordinates = value;
     }
 
     /**
-       Get the ShowNativeCoordinates property.
-
-       @return The ShowNativeCoordinates
-    **/
-    public boolean getShowNativeCoordinates () {
-	return showNativeCoordinates;
+     *  Get the ShowNativeCoordinates property.
+     *
+     *  @return The ShowNativeCoordinates
+     */
+    public boolean getShowNativeCoordinates() {
+        return showNativeCoordinates;
     }
 
 
 }
-
 

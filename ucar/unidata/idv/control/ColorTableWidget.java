@@ -353,7 +353,9 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
                 return;
             }
             //For now let's not bring up the editor on a click
-            if(true) return;
+            if (true) {
+                return;
+            }
             try {
                 if (parentWidget == null) {
                     ctw.doEdit();

@@ -18,7 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -157,6 +156,13 @@ public class VolumeRenderControl extends GridDisplayControl {
      *                                   getUseTexture3D()));
      *   comps.add(cbx);
      * }
+     *
+     * @param choice the data choice
+     *
+     * @return ???
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
 
     /**

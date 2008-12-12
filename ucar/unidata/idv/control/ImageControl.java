@@ -259,4 +259,3 @@ public class ImageControl extends BaseImageControl {
     }
 }
 
-

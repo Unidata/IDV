@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -64,28 +63,28 @@ import javax.swing.text.html.*;
  */
 public class AnimationTextControl extends DisplayControlImpl implements HyperlinkListener {
 
-    /** Current animation time          */
+    /** Current animation time */
     private DateTime currentTime;
 
-    /** List of text items          */
+    /** List of text items */
     private List textList = new ArrayList();
 
-    /** The editor pane to show text in          */
+    /** The editor pane to show text in */
     private JEditorPane editor;
 
-    /** The subject field          */
+    /** The subject field */
     private JTextField subjectFld;
 
-    /** The time          */
+    /** The time */
     private JComboBox timeBox;
 
-    /** Should we ignore combobox events          */
+    /** Should we ignore combobox events */
     private boolean ignoreBoxEvents = false;
 
-    /** m          */
+    /** m */
     private JCheckBox listenCbx;
 
-    /** m          */
+    /** m */
     private boolean listenOnAnimation = true;
 
     /**
@@ -223,7 +222,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
     /**
      * Respond to a timeChange event
-    *
+     *
      * @param time new time
      */
     protected void timeChanged(Real time) {
@@ -241,17 +240,23 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
      */
     public void hyperlinkUpdate(HyperlinkEvent e) {}
 
+    /**
+     * Step to next time
+     */
     public void goToNextTime() {
         int index = timeBox.getSelectedIndex();
-        if(index < textList.size()-1) {
-            timeBox.setSelectedIndex(index+1);
+        if (index < textList.size() - 1) {
+            timeBox.setSelectedIndex(index + 1);
         }
     }
 
+    /**
+     * go to previous tome
+     */
     public void goToPrevTime() {
         int index = timeBox.getSelectedIndex();
-        if(index >=1) {
-            timeBox.setSelectedIndex(index-1);
+        if (index >= 1) {
+            timeBox.setSelectedIndex(index - 1);
         }
     }
 
@@ -265,15 +270,16 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
         subjectFld = new JTextField();
         editor     = new JEditorPane();
         editor.addKeyListener(new KeyAdapter() {
-                public void keyPressed(KeyEvent e) {
-                    if(e.isControlDown() && e.getKeyCode() == e.VK_N) {
-                        goToNextTime();
-                    } else if(e.isControlDown() && e.getKeyCode() == e.VK_P) {
-                        goToPrevTime();
-                    }
+            public void keyPressed(KeyEvent e) {
+                if (e.isControlDown() && (e.getKeyCode() == e.VK_N)) {
+                    goToNextTime();
+                } else if (e.isControlDown() && (e.getKeyCode() == e.VK_P)) {
+                    goToPrevTime();
                 }
-            });
-        editor.setToolTipText("Control-n: go to next time; Control-p: Go to previous time");
+            }
+        });
+        editor.setToolTipText(
+            "Control-n: go to next time; Control-p: Go to previous time");
         editor.setEditable(true);
         editor.addHyperlinkListener(this);
         editor.setContentType("text/html");
@@ -381,7 +387,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
      */
     public static class DatedText extends DatedObject {
 
-        /** The text          */
+        /** The text */
         private String subject = "";
 
         /**
@@ -484,5 +490,4 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
 
 }
-
 

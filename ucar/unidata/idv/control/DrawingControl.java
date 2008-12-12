@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -107,7 +104,7 @@ public class DrawingControl extends DisplayControlImpl {
     public static final String ATTR_USETIMESINANIMATION =
         "usetimesinanimation";
 
-    /** xgrf attribute       */
+    /** xgrf attribute */
     public static final String ATTR_FRONTDISPLAY = "frontdisplay";
 
     /** Xml tag for the editor settings in the import/export format */
@@ -168,7 +165,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Is this control enabled */
     private boolean enabled = true;
 
-    /** Are we a front display         */
+    /** Are we a front display */
     private boolean frontDisplay = false;
 
     /** Controls the disabled state */
@@ -382,7 +379,7 @@ public class DrawingControl extends DisplayControlImpl {
         if (dataChoice != null) {
             Data data = dataChoice.getData(null);
             if (data != null) {
-                editable = false;
+                editable    = false;
                 displayOnly = true;
                 processData(data);
             }
@@ -486,6 +483,9 @@ public class DrawingControl extends DisplayControlImpl {
 
     /**
      * respond to the reload data call
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected void resetData() throws VisADException, RemoteException {
         DataChoice dataChoice = getDataChoice();
@@ -513,11 +513,11 @@ public class DrawingControl extends DisplayControlImpl {
         setDisplayInactive();
         NodeList elements = XmlUtil.getElements(root);
         //Only set the usetimesinanimation when we are newly created
-        if(!getWasUnPersisted()) {
+        if ( !getWasUnPersisted()) {
             setUseTimesInAnimation(XmlUtil.getAttribute(root,
-                                                        ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
+                    ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
         }
-        
+
         frontDisplay = XmlUtil.getAttribute(root, ATTR_FRONTDISPLAY,
                                             frontDisplay);
         if (displayHolder != null) {
@@ -941,7 +941,8 @@ public class DrawingControl extends DisplayControlImpl {
                     }
 
                     if (keyEvent.getKeyCode() == KeyEvent.VK_DELETE) {
-                        if (currentGlyph!=null && currentCmd.equals(CMD_STRETCH)) {
+                        if ((currentGlyph != null)
+                                && currentCmd.equals(CMD_STRETCH)) {
                             setSelection(currentGlyph);
                             currentGlyph.doDeletePoint(event);
                         }
@@ -1052,14 +1053,18 @@ public class DrawingControl extends DisplayControlImpl {
                     setSelection(currentGlyph);
                     currentGlyph.doMove(event);
                     //Update the table listing
-                    if(glyphTable!=null) glyphTable.repaint();
+                    if (glyphTable != null) {
+                        glyphTable.repaint();
+                    }
                     return;
                 }
                 if (currentCmd.equals(CMD_STRETCH)) {
                     setSelection(currentGlyph);
                     currentGlyph.doStretch(event);
                     //Update the table listing
-                    if(glyphTable!=null) glyphTable.repaint();
+                    if (glyphTable != null) {
+                        glyphTable.repaint();
+                    }
                     return;
                 }
                 setCurrentGlyph(currentGlyph,
@@ -1513,6 +1518,11 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
 
+    /**
+     * Make the shapes panel
+     *
+     * @return the shapes panel
+     */
     protected JComponent doMakeShapesPanel() {
         JComponent contents = GuiUtils.inset(doMakeTablePanel(), 4);
         if (displayOnly) {
@@ -1540,13 +1550,14 @@ public class DrawingControl extends DisplayControlImpl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         JTabbedPane tabbedPane = new JTabbedPane();
-        if(frontDisplay) {
+        if (frontDisplay) {
             tabbedPane.add("Fronts", doMakeShapesPanel());
-        } else if(!editable) {
-            return GuiUtils.topCenter(doMakeControlsPanel(), doMakeShapesPanel());
+        } else if ( !editable) {
+            return GuiUtils.topCenter(doMakeControlsPanel(),
+                                      doMakeShapesPanel());
         } else {
             tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
-            if(editable) {
+            if (editable) {
                 tabbedPane.add("Style", GuiUtils.top(doMakeStylePanel()));
             }
             tabbedPane.add("Shapes", doMakeShapesPanel());
@@ -2743,7 +2754,7 @@ public class DrawingControl extends DisplayControlImpl {
          * @return num cols
          */
         public int getColumnCount() {
-            if(!editable) {
+            if ( !editable) {
                 return 3;
             } else {
                 return 4;
@@ -2773,7 +2784,7 @@ public class DrawingControl extends DisplayControlImpl {
             if (column == 1) {
                 return glyph.getDescription();
             }
-            if(!editable) {
+            if ( !editable) {
                 return glyph.getExtraDescription();
             }
             if (column == 2) {
@@ -2803,7 +2814,9 @@ public class DrawingControl extends DisplayControlImpl {
             if (column == 1) {
                 return "Type";
             }
-            if(!editable) return "";
+            if ( !editable) {
+                return "";
+            }
             if (column == 2) {
                 return "Coordinates";
             }

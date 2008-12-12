@@ -116,7 +116,9 @@ public class ControlWidget implements ActionListener {
      */
 
     public DisplayConventions getDisplayConventions() {
-        if(displayControl==null) return null;
+        if (displayControl == null) {
+            return null;
+        }
         return displayControl.getDisplayConventions();
     }
 
@@ -127,7 +129,9 @@ public class ControlWidget implements ActionListener {
      * @param exc The exception
      */
     public void logException(String message, Exception exc) {
-        if(displayControl==null) return;
+        if (displayControl == null) {
+            return;
+        }
         displayControl.logException(message, exc);
     }
 
@@ -137,7 +141,9 @@ public class ControlWidget implements ActionListener {
      * @param message The message
      */
     public void userMessage(String message) {
-        if(displayControl==null) return;
+        if (displayControl == null) {
+            return;
+        }
         displayControl.userMessage(message);
     }
 

@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -1703,10 +1701,10 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     protected void updateLocationLabel() {
         StringBuffer buf = new StringBuffer();
         buf.append(getDisplayConventions().formatEarthLocation(startLocation,
-                                                               false,false));
+                false, false));
         buf.append("  to  ");
         buf.append(getDisplayConventions().formatEarthLocation(endLocation,
-                                                               false,false));
+                false, false));
 
         positionText = buf.toString();
         if (locationLabel == null) {

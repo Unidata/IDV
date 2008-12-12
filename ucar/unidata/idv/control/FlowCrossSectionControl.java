@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -81,6 +80,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     /** Range for flow scale */
     private Range flowRange;
 
+    /** Widget to set barb size */
     ValueSliderWidget barbSizeWidget;
 
     /**
@@ -119,10 +119,15 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     }
 
 
+    /**
+     * Add this displaycontrol's display settings to the dialog
+     *
+     * @param dsd the dialog
+     */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale", "Scale",
-                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale",
+                             "Scale", SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(flowRange, "flowRange", "Flow Field Range",
                              SETTINGS_GROUP_DISPLAY);
     }
@@ -229,8 +234,8 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
-        barbSizeWidget = new ValueSliderWidget(this, 1, 21,
-                                               "flowScale", "Scale: ");
+        barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
+                "Scale: ");
         JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
                                      barbSizeWidget.getContents(false));
         if ( !getWindbarbs()) {
@@ -304,7 +309,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
             }
             doShare(SHARE_FLOWRANGE, flowRange);
         }
-        if(barbSizeWidget!=null) {
+        if (barbSizeWidget != null) {
             barbSizeWidget.setValue(f);
         }
     }
@@ -524,7 +529,7 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
      * Show the color control widget in the widgets if FLAG_COLOR is set.
      * @return  false  subclasses should override
      */
-    public boolean  showColorControlWidget() {
+    public boolean showColorControlWidget() {
         return true;
     }
 

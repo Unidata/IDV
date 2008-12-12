@@ -110,7 +110,7 @@ import javax.swing.*;
  * @author Jeff McWhirter
  * @version $Revision: 1.71 $
  */
-public class ImageMovieControl extends DisplayControlImpl  {
+public class ImageMovieControl extends DisplayControlImpl {
 
     /** Xml tag name */
     public static final String TAG_IMAGESET = "imageset";
@@ -337,7 +337,7 @@ public class ImageMovieControl extends DisplayControlImpl  {
             throws VisADException, RemoteException {
         super.init(dataChoice);
 
-        
+
         imageDisplay = new ImageRGBDisplayable("ImageDisplayable");
         ColorTable colorTable = getRGBColorTable();
         imageDisplay.setRangeForColor(0.0, 255.0);
@@ -720,8 +720,8 @@ public class ImageMovieControl extends DisplayControlImpl  {
         });
         previewPanel = new ImagePanel();
         JPanel topPanel = GuiUtils.left(getAnimationWidget().getContents());
-        JPanel moviePanel = GuiUtils.topCenterBottom(topPanel, getImagePanel(),
-                                GuiUtils.left(descLabel));
+        JPanel moviePanel = GuiUtils.topCenterBottom(topPanel,
+                                getImagePanel(), GuiUtils.left(descLabel));
         fileList = new JList();
         /*
         fileList.addKeyListener(new KeyAdapter() {
@@ -911,8 +911,9 @@ public class ImageMovieControl extends DisplayControlImpl  {
             stationToElement.put(station, child);
             elementToStation.put(child, station);
         }
-        if(locs.size()>0) {
-            latLons = (LatLonTuple[]) locs.toArray(new LatLonTuple[locs.size()]);
+        if (locs.size() > 0) {
+            latLons =
+                (LatLonTuple[]) locs.toArray(new LatLonTuple[locs.size()]);
             locations.setData(Util.indexedField(latLons, false));
             stationMap.setStations(stations);
         }
@@ -925,8 +926,9 @@ public class ImageMovieControl extends DisplayControlImpl  {
      */
     private void doMakeImageSetTree(JTabbedPane tabbedPane) {
         try {
-            if(tocFiles!=null) {
-                extraCollections.addAll(StringUtil.split(tocFiles,";",true,true));
+            if (tocFiles != null) {
+                extraCollections.addAll(StringUtil.split(tocFiles, ";", true,
+                        true));
             } else if (doImageSetResources) {
                 XmlResourceCollection xrc =
                     getControlContext().getResourceManager().getXmlResources(
@@ -1037,7 +1039,14 @@ public class ImageMovieControl extends DisplayControlImpl  {
     }
 
 
+    /** the toc files */
     private String tocFiles;
+
+    /**
+     * Set the toc files
+     *
+     * @param files toc files
+     */
     public void setTocFiles(String files) {
         tocFiles = files;
     }
@@ -1101,8 +1110,13 @@ public class ImageMovieControl extends DisplayControlImpl  {
 
 
 
+    /**
+     * get the image location
+     *
+     * @return image location
+     */
     private LatLonPoint getImageLocation() {
-        if(imageLocation == null) {
+        if (imageLocation == null) {
             setSelectedPoint();
         }
         return imageLocation;
@@ -1221,7 +1235,9 @@ public class ImageMovieControl extends DisplayControlImpl  {
                         : XmlUtil.getAttribute(root, ATTR_BASE,
                             (String) null));
         String url = XmlUtil.getAttribute(node, ATTR_INDEX, (String) null);
-        if(url == null) return null;
+        if (url == null) {
+            return null;
+        }
         if (base != null) {
             if ( !base.endsWith("/") && !url.startsWith("/")) {
                 url = base + "/" + url;
@@ -1398,7 +1414,7 @@ public class ImageMovieControl extends DisplayControlImpl  {
                     dir,
                     (java.io.FileFilter) new PatternFileFilter(
                         filePattern, false), false);
-            List files = new ArrayList();
+            List    files    = new ArrayList();
             String  errorMsg = null;
             Pattern pattern  = Pattern.compile(getDatePattern());
             for (int i = 0; i < imageFiles.length; i++) {
@@ -1472,24 +1488,29 @@ public class ImageMovieControl extends DisplayControlImpl  {
      */
     private void addMoviesToList() {
         Vector items = new Vector();
-        List files = getImagePanel().getFiles();
+        List   files = getImagePanel().getFiles();
         for (int i = 0; i < files.size(); i++) {
             items.add(times.get(i).toString());
         }
         if (fileList != null) {
-           fileList.setListData(items);
+            fileList.setListData(items);
         }
     }
 
 
+    /**
+     * get the image panel
+     *
+     * @return image panel
+     */
     private ImagePanel getImagePanel() {
-        if(imagePanel == null) {
+        if (imagePanel == null) {
             imagePanel = new ImagePanel() {
-                    public void setImage(Image image) {
-                        super.setImage(image);
-                        loadImage(imagePanel.getImage());
-                    }
-                };
+                public void setImage(Image image) {
+                    super.setImage(image);
+                    loadImage(imagePanel.getImage());
+                }
+            };
             imagePanel.setPreferredSize(new Dimension(300, 300));
         }
         return imagePanel;
@@ -1499,10 +1520,11 @@ public class ImageMovieControl extends DisplayControlImpl  {
      * initdone
      */
     public void initDone() {
-        if (getImagePanel().getFiles().size() == 0 && tabbedPane.getTabCount() > 1) {
+        if ((getImagePanel().getFiles().size() == 0)
+                && (tabbedPane.getTabCount() > 1)) {
             tabbedPane.setSelectedIndex(1);
         }
-        
+
         setImageForTime();
         super.initDone();
     }

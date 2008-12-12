@@ -199,4 +199,3 @@ public class FlatFieldTable extends JTable {
 
 }
 
-

@@ -135,13 +135,13 @@ public class ShapefileControl extends DisplayControlImpl {
     /** The db file. May be null if there was no dbf file */
     private DbaseFile dbFile;
 
-    /** The field names          */
+    /** The field names */
     private String[] fieldNames;
 
-    /** The map sets          */
+    /** The map sets */
     private List mapSets;
 
-    /** ???          */
+    /** ??? */
     private boolean hasProperties = false;
 
     /** Does each row pass through the filters. */
@@ -151,6 +151,7 @@ public class ShapefileControl extends DisplayControlImpl {
     /** Holds lists which hold the cell values */
     private List tableCols = new ArrayList();
 
+    /** the visible rows */
     private List visibleRows = new ArrayList();
 
     /** The column names in the table */
@@ -377,12 +378,12 @@ public class ShapefileControl extends DisplayControlImpl {
      * Fill the table
      */
     private void populateTable() {
-        if (mapSets == null || !hasProperties || dbModel == null) {
+        if ((mapSets == null) || !hasProperties || (dbModel == null)) {
             return;
         }
         visibleRows = new ArrayList();
-        tableCols = new ArrayList();
-        colNames  = new ArrayList();
+        tableCols   = new ArrayList();
+        colNames    = new ArrayList();
         int       numRecords = mapSets.size();
         List      comps      = new ArrayList();
         boolean[] unique     = null;
@@ -459,7 +460,7 @@ public class ShapefileControl extends DisplayControlImpl {
             }
 
             public int getRowCount() {
-                if (tableCols.size()>0) {
+                if (tableCols.size() > 0) {
                     List colData = (List) tableCols.get(0);
                     return colData.size();
                 }
@@ -778,8 +779,8 @@ public class ShapefileControl extends DisplayControlImpl {
         if (mainData instanceof UnionSet) {
             SampledSet[] sets = ((UnionSet) mainData).getSets();
             if ((sets.length > 0) && (sets[0] instanceof MapSet)) {
-                mapSets =  Misc.toList(sets);
-                List names = ((MapSet)mapSets.get(0)).getPropertyNames();
+                mapSets = Misc.toList(sets);
+                List names = ((MapSet) mapSets.get(0)).getPropertyNames();
                 if ((names != null) && (names.size() > 0)) {
                     hasProperties = true;
                     fieldNames =
@@ -1062,5 +1063,4 @@ public class ShapefileControl extends DisplayControlImpl {
 
 
 }
-
 
