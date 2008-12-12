@@ -54,7 +54,7 @@
 
 
     <target name="idvplugin" depends="init,clean">
-        <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
+        <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
         <javac
             classpath="${pluginclasspath}"
             debug="true"

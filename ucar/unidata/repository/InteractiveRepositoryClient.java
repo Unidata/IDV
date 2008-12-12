@@ -334,6 +334,9 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                 });
                 String xml = IOUtil.readContents(url, getClass());
                 removeAllChildren();
+                //                System.err.println ("URL:" + id);
+                //                System.err.println ("XML:" + xml);
+
                 Element root = XmlUtil.getRoot(xml);
                 for (Element child : (List<Element>) XmlUtil.findChildren(
                         root, TAG_GROUP)) {

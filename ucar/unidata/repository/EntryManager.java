@@ -261,6 +261,7 @@ return new Result(title, sb);
         Entry entry;
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
+            
             if (entry == null) {
                 Entry tmp = getEntry(request,
                                      request.getString(ARG_ENTRYID, BLANK),
