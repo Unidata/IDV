@@ -1,19 +1,19 @@
 /*
- * 
+ *
  * Copyright 1997-2008 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -54,31 +54,32 @@ import javax.swing.table.AbstractTableModel;
  */
 public class FlatFieldTable extends JTable {
 
-    /** The table model to use          */
+    /** The table model to use */
     private TableModel model = null;
 
-    /** The flat field we are displaying          */
+    /** The flat field we are displaying */
     private FlatField displayedFlatField;
 
-    /** The range data from the flat field          */
+    /** The range data from the flat field */
     private double[][] rangeData;
 
-    /** The lat/lon domain          */
+    /** The lat/lon domain */
     private float[][] domainData;
 
-    /** How many columns for the domain          */
+    /** How many columns for the domain */
     private int numDomainCols;
 
-    /** How many columns in the rannge          */
+    /** How many columns in the rannge */
     private int numRangeCols;
 
-    /** The table column names          */
+    /** The table column names */
     private String[] columnNames;
 
     /**
      * The ctor
      *
      * @param ff The flat field to use
+     * @param showNativeCoordinates _more_
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -86,26 +87,26 @@ public class FlatFieldTable extends JTable {
     public FlatFieldTable(FlatField ff, boolean showNativeCoordinates)
             throws VisADException, RemoteException {
 
-        rangeData      = ff.getValues(false);
+        rangeData = ff.getValues(false);
 
-        SampledSet ss        = GridUtil.getSpatialDomain(ff);
-        
-        domainData = ss.getSamples(true);
-        numDomainCols  = domainData.length;
-        numRangeCols   = rangeData.length;
-        columnNames    = new String[numDomainCols + numRangeCols];
+        SampledSet ss = GridUtil.getSpatialDomain(ff);
 
-        if (ss.getCoordinateSystem() != null && !showNativeCoordinates) {
-            domainData = ss.getCoordinateSystem().toReference(domainData);
+        domainData    = ss.getSamples(true);
+        numDomainCols = domainData.length;
+        numRangeCols  = rangeData.length;
+        columnNames   = new String[numDomainCols + numRangeCols];
+
+        if ((ss.getCoordinateSystem() != null) && !showNativeCoordinates) {
+            domainData     = ss.getCoordinateSystem().toReference(domainData);
             columnNames[0] = "Latitude";
             columnNames[1] = "Longitude";
             if (domainData.length > 2) {
                 columnNames[2] = "Altitude";
             }
-        }  else {
-            SetType t = (SetType)ss.getType();
-            RealTupleType rtt = t.getDomain();
-            MathType[] comps = rtt.getComponents();
+        } else {
+            SetType       t     = (SetType) ss.getType();
+            RealTupleType rtt   = t.getDomain();
+            MathType[]    comps = rtt.getComponents();
             columnNames[0] = ucar.visad.Util.cleanTypeName(comps[0]);
             columnNames[1] = ucar.visad.Util.cleanTypeName(comps[1]);
             if (domainData.length > 2) {
@@ -118,7 +119,8 @@ public class FlatFieldTable extends JTable {
         RealType[] comps = ((FunctionType) ff.getType()).getRealComponents();
         for (int i = 0; i < comps.length; i++) {
             columnNames[numDomainCols + i] =
-                ucar.visad.Util.cleanTypeName(comps[i]) +" [" + comps[i].getDefaultUnit()+"]";
+                ucar.visad.Util.cleanTypeName(comps[i]) + " ["
+                + comps[i].getDefaultUnit() + "]";
         }
 
         TableSorter sorter = new TableSorter(model = new MyFlatField());
@@ -196,6 +198,4 @@ public class FlatFieldTable extends JTable {
     }
 
 }
-
-
 
