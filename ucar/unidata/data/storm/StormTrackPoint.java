@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -43,7 +44,10 @@ import java.util.List;
  */
 public class StormTrackPoint implements Comparable {
 
-    private int id=-1;
+    /** _more_          */
+    private int id = -1;
+
+    /** _more_          */
     private boolean edited = false;
 
     /** _more_ */
@@ -204,6 +208,8 @@ public class StormTrackPoint implements Comparable {
      *
      * @param o _more_
      *
+     * @param value _more_
+     *
      * @return _more_
      */
     /*
@@ -219,43 +225,43 @@ public class StormTrackPoint implements Comparable {
         }*/
 
     /**
-       Set the Id property.
-
-       @param value The new value for Id
-    **/
-    public void setId (int value) {
-	id = value;
+     *  Set the Id property.
+     *
+     *  @param value The new value for Id
+     */
+    public void setId(int value) {
+        id = value;
     }
 
     /**
-       Get the Id property.
-
-       @return The Id
-    **/
-    public int getId () {
-	return id;
+     *  Get the Id property.
+     *
+     *  @return The Id
+     */
+    public int getId() {
+        return id;
     }
 
     /**
-       Set the Edited property.
-
-       @param value The new value for Edited
-    **/
-    public void setEdited (boolean value) {
-	edited = value;
+     *  Set the Edited property.
+     *
+     *  @param value The new value for Edited
+     */
+    public void setEdited(boolean value) {
+        edited = value;
     }
 
     /**
-       Get the Edited property.
-
-       @return The Edited
-    **/
-    public boolean getEdited () {
-	return edited;
+     *  Get the Edited property.
+     *
+     *  @return The Edited
+     */
+    public boolean getEdited() {
+        return edited;
     }
 
 
-    
+
 
 
 }

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
@@ -344,6 +345,11 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isEditable() {
         return true;
     }
@@ -440,7 +446,7 @@ public class STIStormDataSource extends StormDataSource {
             forecastParams = new StormParam[] {
                 PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
                 PARAM_RADIUSMODERATEGALE, PARAM_RADIUSWHOLEGALE,
-                PARAM_MOVEDIRECTION, PARAM_MOVESPEED, //PARAM_DISTANCEERROR,
+                PARAM_MOVEDIRECTION, PARAM_MOVESPEED,  //PARAM_DISTANCEERROR,
                 PARAM_PROBABILITY10RADIUS, PARAM_PROBABILITY20RADIUS,
                 PARAM_PROBABILITY30RADIUS, PARAM_PROBABILITY40RADIUS,
                 PARAM_PROBABILITY50RADIUS, PARAM_PROBABILITY60RADIUS,
@@ -498,7 +504,8 @@ public class STIStormDataSource extends StormDataSource {
             Class.forName("com.mysql.jdbc.Driver");
             if ( !initConnection()) {
                 setInError(true, true,
-                           "Unable to initialize database connection:" + dbUrl);
+                           "Unable to initialize database connection:"
+                           + dbUrl);
             } else {
                 stormInfos = getAllStormInfos();
             }
@@ -559,9 +566,9 @@ public class STIStormDataSource extends StormDataSource {
         //                                         (Way) forecastWays.get(0));
         if (obsTrack != null) {
             List<StormTrack> tracks = trackCollection.getTracks();
-          //  for (StormTrack stk : tracks) {
-          //      addDistanceError(obsTrack, stk);
-          //  }
+            //  for (StormTrack stk : tracks) {
+            //      addDistanceError(obsTrack, stk);
+            //  }
             long t2 = System.currentTimeMillis();
             //        System.err.println("time:" + (t2 - t1));
             trackCollection.addTrack(obsTrack);
@@ -769,7 +776,7 @@ public class STIStormDataSource extends StormDataSource {
                     new EarthLocationLite(new Real(RealType.Latitude,
                         latitude), new Real(RealType.Longitude, longitude),
                                    altReal);
-                if (true) { //radiuses != null) {
+                if (true) {  //radiuses != null) {
                     //radius = fhour * 50.0f / 24.0f;
                     addProbabilityRadiusAttrs(attrs, radiuses);
                 }
@@ -835,7 +842,7 @@ public class STIStormDataSource extends StormDataSource {
      */
     private void addProbabilityRadiusAttrs(List<Real> attrs, float[] radiuses)
             throws Exception {
-        if(radiuses != null) {
+        if (radiuses != null) {
             attrs.add(PARAM_PROBABILITY10RADIUS.getReal(radiuses[0]));
             attrs.add(PARAM_PROBABILITY20RADIUS.getReal(radiuses[1]));
             attrs.add(PARAM_PROBABILITY30RADIUS.getReal(radiuses[2]));
@@ -846,7 +853,8 @@ public class STIStormDataSource extends StormDataSource {
             attrs.add(PARAM_PROBABILITY80RADIUS.getReal(radiuses[7]));
             attrs.add(PARAM_PROBABILITY90RADIUS.getReal(radiuses[8]));
             attrs.add(PARAM_PROBABILITY100RADIUS.getReal(radiuses[9]));
-            attrs.add(PARAM_DISTANCE_ERROR.getReal(getLatLonValue(radiuses[10])));
+            attrs.add(
+                PARAM_DISTANCE_ERROR.getReal(getLatLonValue(radiuses[10])));
         } else {
             attrs.add(PARAM_PROBABILITY10RADIUS.getReal(Float.NaN));
             attrs.add(PARAM_PROBABILITY20RADIUS.getReal(Float.NaN));
@@ -994,16 +1002,16 @@ public class STIStormDataSource extends StormDataSource {
                 int     col     = 1;
                 String  wayName = results.getString(col++);
                 int     fhour   = results.getInt(col++);
-                wp[0] = results.getFloat(col++);
-                wp[1] = results.getFloat(col++);
-                wp[2] = results.getFloat(col++);
-                wp[3] = results.getFloat(col++);
-                wp[4] = results.getFloat(col++);
-                wp[5] = results.getFloat(col++);
-                wp[6] = results.getFloat(col++);
-                wp[7] = results.getFloat(col++);
-                wp[8] = results.getFloat(col++);
-                wp[9] = results.getFloat(col++);
+                wp[0]  = results.getFloat(col++);
+                wp[1]  = results.getFloat(col++);
+                wp[2]  = results.getFloat(col++);
+                wp[3]  = results.getFloat(col++);
+                wp[4]  = results.getFloat(col++);
+                wp[5]  = results.getFloat(col++);
+                wp[6]  = results.getFloat(col++);
+                wp[7]  = results.getFloat(col++);
+                wp[8]  = results.getFloat(col++);
+                wp[9]  = results.getFloat(col++);
                 wp[10] = results.getFloat(col++);
                 putProbabilityRadius(new Way(wayName), fhour, wp);
             }
@@ -1505,22 +1513,26 @@ public class STIStormDataSource extends StormDataSource {
             try {
                 //System.err.println(url);
                 if (useDerby()) {
-                        connection = DriverManager.getConnection(url);
+                    connection = DriverManager.getConnection(url);
                 } else {
-                    if(url.indexOf("user")>0 && url.indexOf("password")>0)
+                    if ((url.indexOf("user") > 0)
+                            && (url.indexOf("password") > 0)) {
                         connection = DriverManager.getConnection(url);
-                    else
-                        connection = DriverManager.getConnection(url, userName,
-                                                                 password);
+                    } else {
+                        connection = DriverManager.getConnection(url,
+                                userName, password);
+                    }
                 }
 
                 return connection;
             } catch (Exception sqe) {
-              //  System.out.println(sqe);
+                //  System.out.println(sqe);
                 String msg = sqe.toString();
-                if (msg.indexOf("Access denied")>=0 ||
-                            (msg.indexOf("role \"" + userName
-                                 + "\" does not exist") >= 0) || (msg.indexOf("user name specified") >= 0)) {
+                if ((msg.indexOf(
+                        "Access denied") >= 0) || (msg.indexOf(
+                            "role \"" + userName
+                            + "\" does not exist") >= 0) || (msg.indexOf(
+                                "user name specified") >= 0)) {
                     String label;
                     if (cnt == 0) {
                         label =

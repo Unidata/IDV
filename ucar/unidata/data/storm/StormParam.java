@@ -20,12 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 
@@ -75,7 +76,8 @@ public class StormParam {
     public StormParam(RealType type) {
         this.type = type;
         if (type != null) {
-            DataChoice.addCurrentName(new TwoFacedObject("Storm Track>"+type, Util.cleanTypeName(type)));
+            DataChoice.addCurrentName(new TwoFacedObject("Storm Track>"
+                    + type, Util.cleanTypeName(type)));
         }
     }
 

@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -69,45 +70,119 @@ import java.util.zip.GZIPInputStream;
  */
 public class AtcfStormDataSource extends StormDataSource {
 
-private int  BASEIDX = 0;
-private int  IDX_BASIN=BASEIDX++;
-private int  IDX_CY=BASEIDX++;
-private int  IDX_YYYYMMDDHH=BASEIDX++;
-private int  IDX_TECHNUM=BASEIDX++;
-private int  IDX_TECH=BASEIDX++;
-private int  IDX_TAU=BASEIDX++;
-private int  IDX_LAT=BASEIDX++;
-private int  IDX_LON=BASEIDX++;
-private int  IDX_VMAX=BASEIDX++;
-private int  IDX_MSLP=BASEIDX++;
-private int  IDX_TY=BASEIDX++;
-private int  IDX_RAD=BASEIDX++;
-private int  IDX_WINDCODE=BASEIDX++;
-private int  IDX_RAD1=BASEIDX++;
-private int  IDX_RAD2=BASEIDX++;
-private int  IDX_RAD3=BASEIDX++;
-private int  IDX_RAD4=BASEIDX++;
-private int  IDX_RADP=BASEIDX++;
-private int  IDX_RRP=BASEIDX++;
-private int  IDX_MRD=BASEIDX++;
-private int  IDX_GUSTS=BASEIDX++;
-private int  IDX_EYE=BASEIDX++;
-private int  IDX_SUBREGION=BASEIDX++;
-private int  IDX_MAXSEAS=BASEIDX++;
-private int  IDX_INITIALS=BASEIDX++;
-private int  IDX_DIR=BASEIDX++;
-private int  IDX_SPEED=BASEIDX++;
-private int  IDX_STORMNAME=BASEIDX++;
-private int  IDX_DEPTH=BASEIDX++;
-private int  IDX_SEAS=BASEIDX++;
-private int  IDX_SEASCODE=BASEIDX++;
-private int  IDX_SEAS1=BASEIDX++;
-private int  IDX_SEAS2=BASEIDX++;
-private int  IDX_SEAS3=BASEIDX++;
-private int  IDX_SEAS4=BASEIDX++;
+    /** _more_          */
+    private int BASEIDX = 0;
+
+    /** _more_          */
+    private int IDX_BASIN = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_CY = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_YYYYMMDDHH = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_TECHNUM = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_TECH = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_TAU = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_LAT = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_LON = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_VMAX = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_MSLP = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_TY = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RAD = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_WINDCODE = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RAD1 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RAD2 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RAD3 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RAD4 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RADP = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_RRP = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_MRD = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_GUSTS = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_EYE = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SUBREGION = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_MAXSEAS = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_INITIALS = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_DIR = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SPEED = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_STORMNAME = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_DEPTH = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SEAS = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SEASCODE = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SEAS1 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SEAS2 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SEAS3 = BASEIDX++;
+
+    /** _more_          */
+    private int IDX_SEAS4 = BASEIDX++;
 
 
+    /** _more_          */
     private static final String PREFIX_ANALYSIS = "a";
+
+    /** _more_          */
     private static final String PREFIX_BEST = "b";
 
     /** _more_ */
@@ -143,6 +218,11 @@ private int  IDX_SEAS4=BASEIDX++;
     public AtcfStormDataSource() throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getFullDescription() {
         return "ATCF Data Source<br>Path:" + path;
     }
@@ -196,18 +276,18 @@ private int  IDX_SEAS4=BASEIDX++;
         try {
             incrOutstandingGetDataCalls();
             stormInfos = new ArrayList<StormInfo>();
-            if (path.toLowerCase().endsWith(".atcf") ||
-                path.toLowerCase().endsWith(".gz")   || 
-                path.toLowerCase().endsWith(".dat")) {
+            if (path.toLowerCase().endsWith(".atcf")
+                    || path.toLowerCase().endsWith(".gz")
+                    || path.toLowerCase().endsWith(".dat")) {
                 String name  =
                     IOUtil.stripExtension(IOUtil.getFileTail(path));
                 StormInfo si = new StormInfo(name, new DateTime(new Date()));
                 stormInfos.add(si);
                 localTracks = new StormTrackCollection();
-                readTracks(si, localTracks, path, null,true);
+                readTracks(si, localTracks, path, null, true);
                 List<StormTrack> trackList = localTracks.getTracks();
 
-                if(trackList.size()>0) {
+                if (trackList.size() > 0) {
                     si.setStartTime(trackList.get(0).getStartTime());
                 }
                 return;
@@ -316,13 +396,16 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
      * @param tracks _more_
      * @param trackFile _more_
      * @param waysToUse _more_
+     * @param throwError _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
-    private boolean readTracks(StormInfo stormInfo, StormTrackCollection tracks,
-                            String trackFile,
-                            Hashtable<String, Boolean> waysToUse,
-                            boolean throwError)
+    private boolean readTracks(StormInfo stormInfo,
+                               StormTrackCollection tracks, String trackFile,
+                               Hashtable<String, Boolean> waysToUse,
+                               boolean throwError)
             throws Exception {
 
 
@@ -331,17 +414,18 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         long   t2    = System.currentTimeMillis();
         //        System.err.println("read time:" + (t2 - t1));
         boolean isZip = trackFile.endsWith(".gz");
-        if (bytes == null && isZip) {
-            String withoutGZ = trackFile.substring(0, trackFile.length()-3);
+        if ((bytes == null) && isZip) {
+            String withoutGZ = trackFile.substring(0, trackFile.length() - 3);
             bytes = readFile(withoutGZ, true);
             isZip = false;
         }
 
 
         if (bytes == null) {
-            if(throwError)
-                throw new BadDataException("Unable to read track file:" +
-                                           trackFile);
+            if (throwError) {
+                throw new BadDataException("Unable to read track file:"
+                                           + trackFile);
+            }
             return false;
         }
 
@@ -395,16 +479,16 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             //            if (okWays.get(wayString) == null) {
             //                continue;
             //            }
-            boolean isBest    = wayString.equals(WAY_BEST);
-            boolean isWarning = wayString.equals(WAY_WRNG);
-            boolean isCarq    = wayString.equals(WAY_CARQ);
+            boolean isBest       = wayString.equals(WAY_BEST);
+            boolean isWarning    = wayString.equals(WAY_WRNG);
+            boolean isCarq       = wayString.equals(WAY_CARQ);
 
-            String fhour = (String) toks.get(IDX_TAU);
-            int forecastHour  = new Integer(fhour).intValue();
+            String  fhour        = (String) toks.get(IDX_TAU);
+            int     forecastHour = new Integer(fhour).intValue();
             //A hack - we've seen some atfc files that have a 5 character forecast hour
             //right padded with "00", eg., 01200
-            if(fhour.length()==5 && forecastHour>100) {
-                forecastHour = forecastHour/100;
+            if ((fhour.length() == 5) && (forecastHour > 100)) {
+                forecastHour = forecastHour / 100;
             }
 
             if (isWarning || isCarq) {
@@ -521,34 +605,35 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         boolean justObs = (waysToUse != null) && (waysToUse.size() == 1)
                           && (waysToUse.get(Way.OBSERVATION.toString())
                               != null);
-        int nowYear =            new GregorianCalendar(DateUtil.TIMEZONE_GMT).get(Calendar.YEAR);
+        int nowYear =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT).get(Calendar.YEAR);
         int stormYear = getYear(stormInfo.getStartTime());
         //If its the current year then its in the aid_public dir
-        String aSubDir = (stormYear  == nowYear?"aid_public":("archive/" + stormYear)); 
-        String bSubDir = (stormYear  == nowYear?"btk":("archive/" + stormYear)); 
-        if (!justObs) {
-            trackFile = getFullPath(aSubDir+"/"+
-                                    PREFIX_ANALYSIS 
+        String aSubDir = ((stormYear == nowYear)
+                          ? "aid_public"
+                          : ("archive/" + stormYear));
+        String bSubDir = ((stormYear == nowYear)
+                          ? "btk"
+                          : ("archive/" + stormYear));
+        if ( !justObs) {
+            trackFile = getFullPath(aSubDir + "/" + PREFIX_ANALYSIS
                                     + stormInfo.getBasin().toLowerCase()
-                                    + stormInfo.getNumber()
-                                    + stormYear
+                                    + stormInfo.getNumber() + stormYear
                                     + ".dat.gz");
             try {
-                readTracks(stormInfo, tracks, trackFile, waysToUse,true);
-            } catch(BadDataException bde) {
+                readTracks(stormInfo, tracks, trackFile, waysToUse, true);
+            } catch (BadDataException bde) {
                 //                System.err.println("Failed reading 'A' file for storm:" + stormInfo+" file:" + trackFile);
             }
         }
         //Now  read the b"est file
-        trackFile = getFullPath(bSubDir+"/" + 
-                                PREFIX_BEST + 
-                                stormInfo.getBasin().toLowerCase()
-                                + stormInfo.getNumber()
-                                + stormYear
+        trackFile = getFullPath(bSubDir + "/" + PREFIX_BEST
+                                + stormInfo.getBasin().toLowerCase()
+                                + stormInfo.getNumber() + stormYear
                                 + ".dat.gz");
         try {
-            readTracks(stormInfo, tracks, trackFile, null,true);
-        } catch(BadDataException bde) {
+            readTracks(stormInfo, tracks, trackFile, null, true);
+        } catch (BadDataException bde) {
             //            System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
         }
         long t2 = System.currentTimeMillis();
@@ -594,11 +679,13 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             return IOUtil.readBytes(IOUtil.getInputStream(file, getClass()));
         }
         if ( !file.startsWith("ftp:")) {
-            if(ignoreErrors) return null;
+            if (ignoreErrors) {
+                return null;
+            }
             throw new FileNotFoundException("Could not read file: " + file);
         }
 
-        URL url = new URL(file);
+        URL       url = new URL(file);
         FTPClient ftp = new FTPClient();
         try {
             ftp.connect(url.getHost());
@@ -609,9 +696,10 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
             if (ftp.retrieveFile(url.getPath(), bos)) {
                 return bos.toByteArray();
             } else {
-                throw new IOException ("Unable to retrieve file:" + url);
+                throw new IOException("Unable to retrieve file:" + url);
             }
-        } catch (org.apache.commons.net.ftp.FTPConnectionClosedException fcce) {
+        } catch (org.apache.commons.net.ftp
+                .FTPConnectionClosedException fcce) {
             System.err.println("ftp error:" + fcce);
             System.err.println(ftp.getReplyString());
             if ( !ignoreErrors) {
