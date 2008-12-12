@@ -92,8 +92,10 @@ public class DataSourceDescriptor {
     /** pattern file filter */
     private FileFilter patternFilter;
 
+    /** The ncml template from the datasource.xml entry */
     private String ncmlTemplate;
 
+    /** can this data source be instantiated stand-alone */
     private boolean standalone = false;
 
 
@@ -357,39 +359,39 @@ public class DataSourceDescriptor {
     }
 
     /**
-       Set the NcmlTemplate property.
-
-       @param value The new value for NcmlTemplate
-    **/
-    public void setNcmlTemplate (String value) {
-	ncmlTemplate = value;
+     *  Set the NcmlTemplate property.
+     *
+     *  @param value The new value for NcmlTemplate
+     */
+    public void setNcmlTemplate(String value) {
+        ncmlTemplate = value;
     }
 
     /**
-       Get the NcmlTemplate property.
-
-       @return The NcmlTemplate
-    **/
-    public String getNcmlTemplate () {
-	return ncmlTemplate;
+     *  Get the NcmlTemplate property.
+     *
+     *  @return The NcmlTemplate
+     */
+    public String getNcmlTemplate() {
+        return ncmlTemplate;
     }
 
     /**
-       Set the Standalone property.
-
-       @param value The new value for Standalone
-    **/
-    public void setStandalone (boolean value) {
-	standalone = value;
+     *  Set the Standalone property.
+     *
+     *  @param value The new value for Standalone
+     */
+    public void setStandalone(boolean value) {
+        standalone = value;
     }
 
     /**
-       Get the Standalone property.
-
-       @return The Standalone
-    **/
-    public boolean getStandalone () {
-	return standalone;
+     *  Get the Standalone property.
+     *
+     *  @return The Standalone
+     */
+    public boolean getStandalone() {
+        return standalone;
     }
 
 

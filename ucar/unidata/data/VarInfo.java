@@ -82,7 +82,7 @@ public class VarInfo {
     /** The real type to use */
     private RealType realType;
 
-    /** the missing value     */
+    /** the missing value */
     private double missingValue;
 
 

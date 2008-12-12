@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data;
 
 
@@ -76,7 +74,7 @@ public class DataSelection {
     /** The subset */
     private GeoSelection geoSelection;
 
-    /** _more_ */
+    /** properties for the data selection */
     private Hashtable properties = new Hashtable();
 
     /**
@@ -88,10 +86,10 @@ public class DataSelection {
 
 
     /**
-     * _more_
+     * ctor
      *
-     * @param fromLevel _more_
-     * @param toLevel _more_
+     * @param fromLevel from level
+     * @param toLevel -0
      */
     public DataSelection(Object fromLevel, Object toLevel) {
         this.fromLevel = fromLevel;
@@ -472,30 +470,30 @@ public class DataSelection {
 
 
     /**
-     * _more_
+     * get the property
      *
-     * @param key _more_
+     * @param key property key
      *
-     * @return _more_
+     * @return property value
      */
     public Object getProperty(Object key) {
         return properties.get(key);
     }
 
     /**
-     * _more_
+     * remove the property identified by the given key
      *
-     * @param key _more_
+     * @param key property key
      */
     public void removeProperty(Object key) {
         properties.remove(key);
     }
 
     /**
-     * _more_
+     * put the property
      *
-     * @param key _more_
-     * @param value _more_
+     * @param key key
+     * @param value value
      */
     public void putProperty(Object key, Object value) {
         properties.put(key, value);

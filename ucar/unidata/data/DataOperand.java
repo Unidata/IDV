@@ -57,6 +57,7 @@ public class DataOperand {
     /** description property in operand attributes */
     private static final String PROP_DESCRIPTION = "description";
 
+    /** The level property */
     public static final String PROP_LEVEL = "level";
 
 

@@ -73,13 +73,13 @@ public class GeoSelectionPanel extends JPanel {
 
     /** For the properties */
     private static final int[] STRIDE_VALUES = {
-        GeoSelection.STRIDE_NONE, GeoSelection.STRIDE_BASE, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 50, 100
+        GeoSelection.STRIDE_NONE, GeoSelection.STRIDE_BASE, 2, 3, 4, 5, 6, 7,
+        8, 9, 10, 15, 20, 50, 100
     };
 
     /** For the properties */
     private static final String[] PT_STRIDE_LABELS = {
-        "Undefined",
-        "All points", "Every other point", "Every third point",
+        "Undefined", "All points", "Every other point", "Every third point",
         "Every fourth point", "Every fifth point", "Every sixth point",
         "Every seventh point", "Every eighth point", "Every ninth point",
         "Every tenth point", "Every fifteenth point", "Every twentieth point",
@@ -88,9 +88,8 @@ public class GeoSelectionPanel extends JPanel {
 
     /** For the properties */
     private static final String[] PT_STRIDE_LABELS_SHORT = {
-        "Undefined",
-        "All", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
-        "15th", "20th", "50th", "100th"
+        "Undefined", "All", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th",
+        "9th", "10th", "15th", "20th", "50th", "100th"
     };
 
 
@@ -98,8 +97,7 @@ public class GeoSelectionPanel extends JPanel {
 
     /** For the properties */
     private static final String[] LEVEL_STRIDE_LABELS = {
-        "Undefined",
-        "All levels", "Every other level", "Every third level",
+        "Undefined", "All levels", "Every other level", "Every third level",
         "Every fourth level", "Every fifth level", "Every sixth level",
         "Every seventh level", "Every eighth level", "Every ninth level",
         "Every tenth level", "Every fifteenth level", "Every twentieth level",
@@ -191,7 +189,7 @@ public class GeoSelectionPanel extends JPanel {
      */
     private JComboBox makeBox(int stride, String[] labels) {
         final JComboBox box = GuiUtils.makeComboBox(STRIDE_VALUES, labels,
-                                                    stride);
+                                  stride);
 
         //FOr now do include the STRIDE_NONE in the combo box
         //        final JComboBox box = GuiUtils.makeComboBox(STRIDE_VALUES, labels,
@@ -241,9 +239,10 @@ public class GeoSelectionPanel extends JPanel {
             if (mapPanel.getProjectionImpl().equals(
                     p.mapPanel.getProjectionImpl())) {
                 NavigatedPanel np = mapPanel.getNavigatedPanel();
-                if(p.mapPanel.getNavigatedPanel().getSelectedRegion()!=null) {
+                if (p.mapPanel.getNavigatedPanel().getSelectedRegion()
+                        != null) {
                     np.setSelectedRegion(
-                                         p.mapPanel.getNavigatedPanel().getSelectedRegion());
+                        p.mapPanel.getNavigatedPanel().getSelectedRegion());
                 }
                 mapPanel.repaint();
             }

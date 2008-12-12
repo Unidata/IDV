@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data;
 
 
@@ -317,12 +315,23 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /**
+     * If this datasource has an ncml template this method will wrap the actual data file in ncml and return the ncml
+     *
+     * @param source the original file or url
+     *
+     * @return The wrapped file or url if we have an ncml template. Else the source
+     *
+     * @throws Exception On badness
+     */
     public String convertSourceFile(String source) throws Exception {
-        if(descriptor.getNcmlTemplate()!=null) {
-            String ncml  = IOUtil.readContents(descriptor.getNcmlTemplate(), getClass());
+        if (descriptor.getNcmlTemplate() != null) {
+            String ncml = IOUtil.readContents(descriptor.getNcmlTemplate(),
+                              getClass());
             String file = getDataContext().getObjectStore().getUniqueTmpFile(
-                                                                             "ncmltemplate", ".ncml");
-            ncml = ncml.replace("%location%", ""+IOUtil.getURL(source, getClass()));
+                              "ncmltemplate", ".ncml");
+            ncml = ncml.replace("%location%",
+                                "" + IOUtil.getURL(source, getClass()));
             //            System.err.println ("ncml" + ncml);
             IOUtil.writeFile(file, ncml);
             return file;
@@ -390,7 +399,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
-    public boolean canAddCurrentName(DataChoice dataChoice){
+    /**
+     * Can we add the data choice name to the global list of parameter names (used in the station model editor)
+     *
+     * @param dataChoice the data choice
+     *
+     * @return can add to global name list
+     */
+    public boolean canAddCurrentName(DataChoice dataChoice) {
         return true;
     }
 
@@ -1589,8 +1605,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                     result.add(choice.cloneMe());
                     continue;
                 }
-                if (StringUtil.stringMatch(choice.getName(), sid,
-                                           true, false)) {
+                if (StringUtil.stringMatch(choice.getName(), sid, true,
+                                           false)) {
                     result.add(choice.cloneMe());
                     continue;
                 }
@@ -2063,12 +2079,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                                       getDataSelection());
         Object baseCacheKey = createCacheKey(dataChoice, selection,
                                              requestProperties);
-        List cacheKey = (baseCacheKey!=null?Misc.newList(baseCacheKey):null);
+        List cacheKey = ((baseCacheKey != null)
+                         ? Misc.newList(baseCacheKey)
+                         : null);
 
         if (requestProperties != null) {
             Hashtable newProperties = (Hashtable) requestProperties.clone();
             newProperties.remove(DataChoice.PROP_REQUESTER);
-            if (cacheKey!=null && newProperties.size() > 0) {
+            if ((cacheKey != null) && (newProperties.size() > 0)) {
                 cacheKey.add(newProperties.toString());
             }
         }
@@ -2082,7 +2100,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
          */
 
 
-        Data cachedData = (cacheKey!=null?(Data) getCache(cacheKey):null);
+        Data cachedData = ((cacheKey != null)
+                           ? (Data) getCache(cacheKey)
+                           : null);
         if (cachedData == null) {
             outstandingGetDataCalls++;
             try {
@@ -2096,7 +2116,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             } finally {
                 outstandingGetDataCalls--;
             }
-            if (cacheKey!=null && cachedData != null && shouldCache(cachedData)) {
+            if ((cacheKey != null) && (cachedData != null)
+                    && shouldCache(cachedData)) {
                 putCache(cacheKey, cachedData);
             }
         } else {}
@@ -2228,8 +2249,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  the full description of this data source (description + name)
      */
     public String getFullDescription() {
-        return  "<b>Name:</b>" + getName()+"<br>" +
-            "<b>Description:</b>" +getDescription();
+        return "<b>Name:</b>" + getName() + "<br>" + "<b>Description:</b>"
+               + getDescription();
     }
 
 
@@ -2500,7 +2521,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return The JobManager load id
      */
     protected Object beginWritingDataToLocalDisk(String msg) {
-        final Object loadId = JobManager.getManager().startLoad(msg, true, true);
+        final Object loadId = JobManager.getManager().startLoad(msg, true,
+                                  true);
         return loadId;
     }
 
@@ -3610,7 +3632,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return true if successful
      */
     public boolean showPasswordDialog(String title, String label) {
-        if(!LogUtil.getInteractiveMode()) throw new IllegalStateException ("Cannot show dialog in non-interactive mode");
+        if ( !LogUtil.getInteractiveMode()) {
+            throw new IllegalStateException(
+                "Cannot show dialog in non-interactive mode");
+        }
 
         JTextField nameFld     = new JTextField(((this.getUserName() != null)
                 ? this.getUserName()

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -59,13 +58,13 @@ import javax.swing.event.*;
  */
 public abstract class DataSelectionComponent {
 
-    /** the name*/
+    /** the name */
     private String name;
 
-    /** gui content*/
+    /** gui content */
     JComponent contents;
 
-    /** We can be used by a display control and this is the control's data selection      */
+    /** We can be used by a display control and this is the control's data selection */
     protected DataSelection dataSelection;
 
     /**

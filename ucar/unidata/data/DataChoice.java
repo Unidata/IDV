@@ -344,12 +344,17 @@ public abstract class DataChoice {
     }
 
 
+    /**
+     * Set the level
+     *
+     * @param level The level
+     */
     public void setLevelSelection(Real level) {
         if (myDataSelection == null) {
             myDataSelection = new DataSelection();
         }
         myDataSelection.setLevel(level);
-        
+
     }
 
     /**

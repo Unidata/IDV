@@ -582,16 +582,16 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
     /**
-     * _more_
+     * get the data from the dataChoice and set it on the operand
      *
-     * @param dataChoice _more_
-     * @param dataOperand _more_
-     * @param dataChoiceToData _more_
-     * @param dataSelection _more_
-     * @param requestProperties _more_
+     * @param dataChoice the data choice
+     * @param dataOperand the operand
+     * @param dataChoiceToData map of previously created data
+     * @param dataSelection properties
+     * @param requestProperties properties
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private void setData(DataChoice dataChoice, DataOperand dataOperand,
                          Hashtable dataChoiceToData,
@@ -619,13 +619,13 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
     /**
-     * _more_
+     * if the operand has a level property then set the level on the data choices DataSelection
      *
-     * @param dataChoice _more_
-     * @param op _more_
+     * @param dataChoice the data choice
+     * @param op the operand
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private void checkLevel(DataChoice dataChoice, DataOperand op)
             throws VisADException, RemoteException {
@@ -975,13 +975,13 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
     /**
-     * _more_
+     * parse the operands in the given jython code
      *
-     * @param jythonCode _more_
-     * @param operands _more_
-     * @param seen _more_
+     * @param jythonCode jython code to parse
+     * @param operands ???
+     * @param seen operands we have seen so far
      *
-     * @return _more_
+     * @return the operands
      */
     public static List parseOperands(String jythonCode, List operands,
                                      Hashtable seen) {

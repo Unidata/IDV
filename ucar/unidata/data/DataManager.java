@@ -21,7 +21,7 @@
  */
 
 package ucar.unidata.data;
-import ucar.grib.grib2.Grib2Indexer;
+
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -29,6 +29,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import ucar.grib.grib2.Grib2Indexer;
 
 import ucar.unidata.idv.IdvConstants;
 
@@ -157,8 +159,11 @@ public class DataManager {
 
     /** The XML attribute for allowing multiple data choices */
     public static final String ATTR_DOESMULTIPLES = "doesmultiples";
+
+    /** xml attribute identifier for the datasource.xml file */
     public static final String ATTR_STANDALONE = "standalone";
 
+    /** xml attribute identifier for the datasource.xml file */
     public static final String ATTR_NCMLTEMPLATE = "ncmltemplate";
 
     /** The XML "id" attribute */
@@ -212,7 +217,9 @@ public class DataManager {
      */
     protected ArrayList descriptors = new ArrayList();
 
-    private List<DataSourceDescriptor> standaloneDescriptors = new ArrayList<DataSourceDescriptor>();
+    /** List of the data source descriptors that can be stand alone */
+    private List<DataSourceDescriptor> standaloneDescriptors =
+        new ArrayList<DataSourceDescriptor>();
 
     /**
      * A mapping from datasource_id (String) to {@link DataSourceDescriptor}
@@ -319,7 +326,8 @@ public class DataManager {
         org.apache.commons.httpclient.auth.CredentialsProvider provider =
             new IdvAuthenticator(dataContext.getIdv());
         //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
-        org.apache.commons.httpclient.HttpClient client = ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
+        org.apache.commons.httpclient.HttpClient client =
+            ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
         opendap.dap.DConnect2.setHttpClient(client);
         ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(client);
 
@@ -566,7 +574,7 @@ public class DataManager {
         }
     }
 
-    /** 
+    /**
      * get an html listing of all of the data source descriptions
      *
      * @return html listing of data sources
@@ -580,32 +588,49 @@ public class DataManager {
                 try {
                     html.append("\n<hr>");
                     html.append(dataSource.getFullDescription());
-                } catch(Exception exc) {
-                    html.append("Error getting datasource html:" + dataSource.getName());
+                } catch (Exception exc) {
+                    html.append("Error getting datasource html:"
+                                + dataSource.getName());
                 }
             }
             html.append("\n<hr>");
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             html.append("Error getting datasource html");
         }
         return html;
     }
 
-    public static String getDatasourceXml(String type, String label,Class datasourceClass,Hashtable properties) throws Exception {
-        Document doc = XmlUtil.makeDocument();
-        Element root = doc.createElement(TAG_DATASOURCES);
-        Element node = XmlUtil.create(TAG_DATASOURCE, root);
+    /**
+     * Create a snippet of the datasource xml for the given data source
+     *
+     * @param type The data source type
+     * @param label the label
+     * @param datasourceClass the class
+     * @param properties properties
+     *
+     * @return The xml
+     *
+     * @throws Exception On badness
+     */
+    public static String getDatasourceXml(String type, String label,
+                                          Class datasourceClass,
+                                          Hashtable properties)
+            throws Exception {
+        Document doc  = XmlUtil.makeDocument();
+        Element  root = doc.createElement(TAG_DATASOURCES);
+        Element  node = XmlUtil.create(TAG_DATASOURCE, root);
         node.setAttribute(ATTR_ID, type);
-        node.setAttribute(ATTR_LABEL,label);
+        node.setAttribute(ATTR_LABEL, label);
         node.setAttribute(ATTR_FACTORY, datasourceClass.getName());
-        node.setAttribute(ATTR_FILESELECTION,"true");
-        if(properties!=null) {
-            for (java.util.Enumeration keys=properties.keys();keys.hasMoreElements();) {
-                String key = (String)keys.nextElement();
+        node.setAttribute(ATTR_FILESELECTION, "true");
+        if (properties != null) {
+            for (java.util.Enumeration keys = properties.keys();
+                    keys.hasMoreElements(); ) {
+                String key   = (String) keys.nextElement();
                 String value = (String) properties.get(key);
-                Element propNode = XmlUtil.create(doc,TAG_PROPERTY,node,value,new String[]{
-                    ATTR_NAME, key
-                });
+                Element propNode = XmlUtil.create(doc, TAG_PROPERTY, node,
+                                       value, new String[] { ATTR_NAME,
+                        key });
             }
         }
         /*
@@ -619,7 +644,7 @@ public class DataManager {
 </datasources>
         */
 
-        return XmlUtil.getHeader() +XmlUtil.toString(root);
+        return XmlUtil.getHeader() + XmlUtil.toString(root);
     }
 
 
@@ -632,6 +657,7 @@ public class DataManager {
      * @param datasourceNode    the element for a data source
      */
     private void processDataSourceXml(Element datasourceNode) {
+
         try {
             String ids    = XmlUtil.getAttribute(datasourceNode, ATTR_ID);
             List   idList = StringUtil.split(ids);
@@ -701,14 +727,14 @@ public class DataManager {
                 for (int propIdx = 0; propIdx < props.getLength();
                         propIdx++) {
                     Element propNode = (Element) props.item(propIdx);
-                    if(XmlUtil.hasAttribute(propNode, ATTR_VALUE)) {
-                        properties.put(XmlUtil.getAttribute(propNode, ATTR_NAME),
-                                       XmlUtil.getAttribute(propNode,
-                                                            ATTR_VALUE));
+                    if (XmlUtil.hasAttribute(propNode, ATTR_VALUE)) {
+                        properties.put(XmlUtil.getAttribute(propNode,
+                                ATTR_NAME), XmlUtil.getAttribute(propNode,
+                                    ATTR_VALUE));
                     } else {
                         String value = XmlUtil.getChildText(propNode);
-                        properties.put(XmlUtil.getAttribute(propNode, ATTR_NAME),
-                                       value);
+                        properties.put(XmlUtil.getAttribute(propNode,
+                                ATTR_NAME), value);
                     }
                 }
                 DataSourceDescriptor descriptor =
@@ -716,11 +742,15 @@ public class DataManager {
                                              Misc.findClass(factory),
                                              patterns, fileSelection,
                                              doesMultiples, properties);
-                descriptor.setStandalone(XmlUtil.getAttribute(datasourceNode,ATTR_STANDALONE, false));
-                if(descriptor.getStandalone())
+                descriptor.setStandalone(XmlUtil.getAttribute(datasourceNode,
+                        ATTR_STANDALONE, false));
+                if (descriptor.getStandalone()) {
                     standaloneDescriptors.add(descriptor);
-                if(XmlUtil.hasAttribute(datasourceNode,ATTR_NCMLTEMPLATE)) {
-                    descriptor.setNcmlTemplate(XmlUtil.getAttribute(datasourceNode,ATTR_NCMLTEMPLATE));
+                }
+                if (XmlUtil.hasAttribute(datasourceNode, ATTR_NCMLTEMPLATE)) {
+                    descriptor.setNcmlTemplate(
+                        XmlUtil.getAttribute(
+                            datasourceNode, ATTR_NCMLTEMPLATE));
                 }
                 descriptors.add(descriptor);
                 idToDescriptor.put(id, descriptor);
@@ -728,14 +758,25 @@ public class DataManager {
         } catch (Exception exc) {
             LogUtil.printException(log_, "Processing data source", exc);
         }
+
     }
 
 
+    /**
+     * get the data source descriptors
+     *
+     * @return the descriptors
+     */
     public List<DataSourceDescriptor> getDescriptors() {
         return descriptors;
     }
 
-    public  List<DataSourceDescriptor> getStandaloneDescriptors() {
+    /**
+     * get the data source descriptors for those data sources that can be stand-alone
+     *
+     * @return stand alone descriptors
+     */
+    public List<DataSourceDescriptor> getStandaloneDescriptors() {
         return standaloneDescriptors;
     }
 
@@ -1156,11 +1197,11 @@ public class DataManager {
 
 
     /**
-     * _more_
+     * Find the data source with the given name
      *
-     * @param name _more_
+     * @param name The name. This is passed to DataSource.identifiedBy() method. It can be 'class:some_class' or a regexp pattern that matches on the data source name
      *
-     * @return _more_
+     * @return the data source or null if none found
      */
     public DataSource findDataSource(String name) {
         if (name == null) {
@@ -1267,11 +1308,11 @@ public class DataManager {
     public DataSourceResults createDataSource(Object definingObject,
             String dataType, Hashtable properties) {
 
-        
-        if(dataType!=null && dataType.length()==0) {
+
+        if ((dataType != null) && (dataType.length() == 0)) {
             dataType = null;
         }
-        if(dataType==null && properties!=null) {
+        if ((dataType == null) && (properties != null)) {
             dataType = (String) properties.get("idv.datatype");
         }
         if ((dataType == null) && (definingObject instanceof String)) {

@@ -112,7 +112,8 @@ public class DataUtil {
                     values[i] = (float) fromArray[i];
                 }
             } else {
-                throw new IllegalArgumentException("Unknown array type:" + fromClass.getName());
+                throw new IllegalArgumentException("Unknown array type:"
+                        + fromClass.getName());
             }
             return values;
         }
@@ -307,7 +308,14 @@ public class DataUtil {
         return values;
     }
 
-    public static float[][] cloneArray(float[][]a) {
+    /**
+     * clone the array
+     *
+     * @param a incoming array
+     *
+     * @return cloned array
+     */
+    public static float[][] cloneArray(float[][] a) {
         float[][] values = new float[a.length][a[0].length];
         for (int i = 0; i < a.length; i++) {
             for (int j = 0; j < a[0].length; j++) {
@@ -317,55 +325,95 @@ public class DataUtil {
         return values;
     }
 
-    public static void absoluteValue(float[][]originalValues,
-                                     float[][]newValues,
-                                     int[]indexArray) {
-        for(int j=0;j<indexArray.length;j++) {
-            if(originalValues[0][indexArray[j]]<0)
-                newValues[0][indexArray[j]] = -originalValues[0][indexArray[j]];
+    /**
+     * copy the originalValues to the new values. Set all values to be positive
+     *
+     * @param originalValues original values
+     * @param newValues new values
+     * @param indexArray The indices to change
+     */
+    public static void absoluteValue(float[][] originalValues,
+                                     float[][] newValues, int[] indexArray) {
+        for (int j = 0; j < indexArray.length; j++) {
+            if (originalValues[0][indexArray[j]] < 0) {
+                newValues[0][indexArray[j]] =
+                    -originalValues[0][indexArray[j]];
+            }
         }
     }
 
 
-    public static void max(float[][]originalValues,
-                           float[][]newValues,
-                           int[]indexArray, float value) {
-        for(int j=0;j<indexArray.length;j++) {
-            if(originalValues[0][indexArray[j]]>value)
+    /**
+     * Copy the values in originalValues[indexArray] that are greater than the given value to newValues
+     *
+     * @param originalValues original values
+     * @param newValues new Values
+     * @param indexArray indices
+     * @param value the threshold value
+     */
+    public static void max(float[][] originalValues, float[][] newValues,
+                           int[] indexArray, float value) {
+        for (int j = 0; j < indexArray.length; j++) {
+            if (originalValues[0][indexArray[j]] > value) {
                 newValues[0][indexArray[j]] = value;
+            }
         }
     }
 
 
-    public static void setValue(float[][]originalValues,
-                           float[][]newValues,
-                           int[]indexArray, float value) {
-        for(int j=0;j<indexArray.length;j++) {
+    /**
+     * set the values in the indices in newValues = the given value
+     *
+     * @param originalValues originalValues
+     * @param newValues newValues
+     * @param indexArray indices
+     * @param value value
+     */
+    public static void setValue(float[][] originalValues,
+                                float[][] newValues, int[] indexArray,
+                                float value) {
+        for (int j = 0; j < indexArray.length; j++) {
             newValues[0][indexArray[j]] = value;
         }
     }
 
-    public static void min(float[][]originalValues,
-                           float[][]newValues,
-                           int[]indexArray, float value) {
-        for(int j=0;j<indexArray.length;j++) {
-            if(originalValues[0][indexArray[j]]<value)
+    /**
+     * If the originalValues < given value then set the newValues = value
+     *
+     * @param originalValues  originalValues 
+     * @param newValues  newValues 
+     * @param indexArray indices
+     * @param value value
+     */
+    public static void min(float[][] originalValues, float[][] newValues,
+                           int[] indexArray, float value) {
+        for (int j = 0; j < indexArray.length; j++) {
+            if (originalValues[0][indexArray[j]] < value) {
                 newValues[0][indexArray[j]] = value;
+            }
         }
     }
 
 
-    public static void average(float[][]originalValues,
-                               float[][]newValues,
-                               int[]indexArray) {
-        if (indexArray.length==0) return;
-        float total=0;
-
-        for(int j=0;j<indexArray.length;j++) {
-            total +=originalValues[0][indexArray[j]];
+    /**
+     * set newValues to be the average of the original values in the index array
+     *
+     * @param originalValues original values
+     * @param newValues new value
+     * @param indexArray indices
+     */
+    public static void average(float[][] originalValues, float[][] newValues,
+                               int[] indexArray) {
+        if (indexArray.length == 0) {
+            return;
         }
-        for(int j=0;j<indexArray.length;j++) {
-            newValues[0][indexArray[j]] = total/indexArray.length;
+        float total = 0;
+
+        for (int j = 0; j < indexArray.length; j++) {
+            total += originalValues[0][indexArray[j]];
+        }
+        for (int j = 0; j < indexArray.length; j++) {
+            newValues[0][indexArray[j]] = total / indexArray.length;
         }
     }
 
@@ -407,10 +455,10 @@ public class DataUtil {
 
 
     /**
-     * _more_
+     * Write a csv file. The rows list contains lists. We take the toString value of each list element
      *
-     * @param filename _more_
-     * @param rows _more_
+     * @param filename file to write to
+     * @param rows data
      */
     public static void writeCsv(String filename, List rows) {
         try {
@@ -431,24 +479,39 @@ public class DataUtil {
 
 
     /**
-     * _more_
+     * Write to an excel spreadsheet
      *
-     * @param filename _more_
-     * @param rows _more_
+     * @param filename file
+     * @param rows data
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public static void writeXls(String filename, List rows) throws Exception {
         writeXls(filename, Misc.newList(rows), null);
     }
 
-    public static void writeXls(String filename,  List<List> rowsList,List<String> names) throws Exception {
+    /**
+     * Write to an excel spreadsheet
+     *
+     * @param filename file
+     * @param rows data
+     * @param names sheet names
+     *
+     * @throws Exception On badness
+     */
+    public static void writeXls(String filename, List<List> rowsList,
+                                List<String> names)
+            throws Exception {
         HSSFWorkbook     wb      = new HSSFWorkbook();
         FileOutputStream fileOut = new FileOutputStream(filename);
-        for(int sheetIdx=0;sheetIdx<rowsList.size();sheetIdx++) {
-            String sheetName = (names!=null?names.get(sheetIdx):null);
-            HSSFSheet        sheet   = (sheetName!=null?wb.createSheet(sheetName):wb.createSheet());
-            List rows = rowsList.get(sheetIdx);
+        for (int sheetIdx = 0; sheetIdx < rowsList.size(); sheetIdx++) {
+            String    sheetName = ((names != null)
+                                   ? names.get(sheetIdx)
+                                   : null);
+            HSSFSheet sheet     = ((sheetName != null)
+                                   ? wb.createSheet(sheetName)
+                                   : wb.createSheet());
+            List      rows      = rowsList.get(sheetIdx);
             for (int i = 0; i < rows.size(); i++) {
                 HSSFRow row  = sheet.createRow((short) i);
                 List    cols = (List) rows.get(i);
@@ -474,13 +537,13 @@ public class DataUtil {
 
 
     /**
-     * _more_
+     * Convert excel to csv
      *
-     * @param filename _more_
+     * @param filename excel file
      *
-     * @return _more_
+     * @return csv
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public static String xlsToCsv(String filename) throws Exception {
         StringBuffer sb    = new StringBuffer();

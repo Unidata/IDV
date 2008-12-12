@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.data;
+
+
 import visad.*;
 
 
@@ -33,70 +35,80 @@ import visad.*;
 
 public class NamedArray {
 
+    /** the name */
     private String name;
-    private Unit unit;
-    private float[]values;
 
-    public NamedArray(String name,
-                      Unit unit,
-                      float[]values) {
-        this.name = name;
-        this.unit = unit;
+    /** the unit */
+    private Unit unit;
+
+    /** the values */
+    private float[] values;
+
+    /**
+     * ctor
+     *
+     * @param name name
+     * @param unit unit
+     * @param values values
+     */
+    public NamedArray(String name, Unit unit, float[] values) {
+        this.name   = name;
+        this.unit   = unit;
         this.values = values;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	name = value;
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-	return name;
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
-       Set the Unit property.
-
-       @param value The new value for Unit
-    **/
-    public void setUnit (Unit value) {
-	unit = value;
+     *  Set the Unit property.
+     *
+     *  @param value The new value for Unit
+     */
+    public void setUnit(Unit value) {
+        unit = value;
     }
 
     /**
-       Get the Unit property.
-
-       @return The Unit
-    **/
-    public Unit getUnit () {
-	return unit;
+     *  Get the Unit property.
+     *
+     *  @return The Unit
+     */
+    public Unit getUnit() {
+        return unit;
     }
 
     /**
-       Set the Values property.
-
-       @param value The new value for Values
-    **/
-    public void setValues (float[] value) {
-	values = value;
+     *  Set the Values property.
+     *
+     *  @param value The new value for Values
+     */
+    public void setValues(float[] value) {
+        values = value;
     }
 
     /**
-       Get the Values property.
-
-       @return The Values
-    **/
-    public float[] getValues () {
-	return values;
+     *  Get the Values property.
+     *
+     *  @return The Values
+     */
+    public float[] getValues() {
+        return values;
     }
 
 

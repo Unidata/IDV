@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -113,8 +112,12 @@ public interface DataSource {
     public static final String MOST_RECENT = "datasource.mostrecent";
 
 
+    /** ??? */
     public static final String DATAPATH_DATE_FORMAT = "yyyy_MM_dd_HH_mm_ss_z";
-    public static final String DATAPATH_DATE_PATTERN = "\\d\\d\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_[^._]+";
+
+    /** ??? */
+    public static final String DATAPATH_DATE_PATTERN =
+        "\\d\\d\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_[^._]+";
 
     /**
      * Return the List of {@link DataChoice} objects
@@ -218,7 +221,7 @@ public interface DataSource {
      * A utility method to find all data choices that match the pattern
      *
      *
-     * @param id _more_
+     * @param id The id
      *
      * @return  List of data choices
      */
@@ -466,11 +469,11 @@ public interface DataSource {
 
 
     /**
-     * _more_
+     * Returns a list of DataSelectionComponents that are shown in the field selector
      *
-     * @param dataChoice _more_
+     * @param dataChoice The data choice in the field selector
      *
-     * @return _more_
+     * @return The list of components
      */
     public List<DataSelectionComponent> getDataSelectionComponents(
             DataChoice dataChoice);
@@ -509,10 +512,10 @@ public interface DataSource {
     public List getTmpPaths();
 
     /**
-     * _more_
+     * Update the state
      *
-     * @param newObject _more_
-     * @param newProperties _more_
+     * @param newObject new object
+     * @param newProperties the properties
      */
     public void updateState(Object newObject, Hashtable newProperties);
 
@@ -576,6 +579,13 @@ public interface DataSource {
     public void createAutoDisplay(String displayType,
                                   DataContext dataContext);
 
+    /**
+     * can we add the data choice to the global list of parameter names
+     *
+     * @param dataChoice the data choice
+     *
+     * @return can add
+     */
     public boolean canAddCurrentName(DataChoice dataChoice);
 
 }

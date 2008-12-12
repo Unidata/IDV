@@ -182,7 +182,7 @@ public class DerivedDataDescriptor {
     private String operandsCategories;
 
     /** categories for operands */
-    private     List operandsCategoryList;
+    private List operandsCategoryList;
 
     /**
      *  This is the  identifier used for the created {@link DerivedDataChoice}
@@ -395,6 +395,7 @@ public class DerivedDataDescriptor {
         this.properties  = properties;
     }
 
+    /** some buffer */
     StringBuffer sb = new StringBuffer();
 
     /**
@@ -504,7 +505,7 @@ public class DerivedDataDescriptor {
      * @return derived needs
      */
     public List getNeeds() {
-        if(myNeeds!=null) {
+        if (myNeeds != null) {
             return new ArrayList(myNeeds);
         }
         return null;
@@ -517,7 +518,7 @@ public class DerivedDataDescriptor {
      * @param needs The needs
      */
     public void setNeeds(List<DerivedNeed> needs) {
-        if(needs!=null) {
+        if (needs != null) {
             myNeeds = new ArrayList<DerivedNeed>(needs);
         } else {
             myNeeds = null;
@@ -529,14 +530,14 @@ public class DerivedDataDescriptor {
 
 
     /**
-     * _more_
+     * check the myNeeds list
      */
     private void checkNeeds() {
         if (myNeeds != null) {
             List tmp = new ArrayList();
             for (int i = 0; i < myNeeds.size(); i++) {
                 Object obj = myNeeds.get(i);
-                if ( obj instanceof DerivedNeed) {
+                if (obj instanceof DerivedNeed) {
                     tmp.add(obj);
                 }
             }
@@ -573,7 +574,9 @@ public class DerivedDataDescriptor {
      *  on the set of {@link DerivedNeed}-s
      */
     public void initForSearch() {
-        if(myNeeds==null) return;
+        if (myNeeds == null) {
+            return;
+        }
         for (int i = 0; i < myNeeds.size(); i++) {
             DerivedNeed need = (DerivedNeed) myNeeds.get(i);
             need.initForSearch();
@@ -622,7 +625,7 @@ public class DerivedDataDescriptor {
         //Find the first DerivedNeed that is satisfied with the
         //DataChoice-s held in choicesSoFar
         for (int i = 0; i < myNeeds.size(); i++) {
-            DerivedNeed need = (DerivedNeed) myNeeds.get(i);
+            DerivedNeed need        = (DerivedNeed) myNeeds.get(i);
             List        dataChoices = need.getDataChoices(choicesSoFar);
             if (dataChoices != null) {
                 return new NamedList(getDescription(), dataChoices);
@@ -686,7 +689,7 @@ public class DerivedDataDescriptor {
         }
         node.appendChild(opNode);
         for (int needIdx = 0; needIdx < myNeeds.size(); needIdx++) {
-            DerivedNeed need = (DerivedNeed) myNeeds.get(needIdx);
+            DerivedNeed need      = (DerivedNeed) myNeeds.get(needIdx);
             String      groupName = need.getGroupName();
             Element     needNode;
             if (groupName != null) {
