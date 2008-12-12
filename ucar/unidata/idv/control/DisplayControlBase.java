@@ -351,7 +351,7 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** group flags */
     public static final String SETTINGS_GROUP_FLAGS = "Flags";
 
-    /** _more_          */
+    /** Temp properties          */
     private Hashtable tmpProperties;
 
 
@@ -989,4 +989,5 @@ public abstract class DisplayControlBase extends SharableImpl {
 
 
 }
+
 

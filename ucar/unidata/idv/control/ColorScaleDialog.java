@@ -271,9 +271,9 @@ public class ColorScaleDialog implements ActionListener {
     }
 
     /**
-     * _more_
+     * Was ok pressed
      *
-     * @return _more_
+     * @return was ok pressed
      */
     public boolean getOk() {
         return ok;
@@ -281,4 +281,5 @@ public class ColorScaleDialog implements ActionListener {
 
 
 }
+
 

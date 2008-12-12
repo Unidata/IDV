@@ -120,7 +120,7 @@ public class StationLocationControl extends StationModelControl {
     /** The displayable */
     private StationLocationDisplayable locationDisplayable;
 
-    /** _more_          */
+    /** the displayable          */
     private StationLocationDisplayable selectedDisplayable;
 
     /** Shows any lines */
@@ -602,12 +602,12 @@ public class StationLocationControl extends StationModelControl {
     }
 
     /**
-     * _more_
+     * The list of stations that changed
      *
-     * @param selectionList _more_
+     * @param selectionList the list
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected void selectedStationsChanged(List selectionList)
             throws VisADException, RemoteException {
@@ -616,12 +616,12 @@ public class StationLocationControl extends StationModelControl {
 
 
     /**
-     * _more_
+     * set the selected stations
      *
-     * @param stations _more_
+     * @param stations the selected stations
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected void setSelectedStations(List<NamedStationImpl> stations)
             throws VisADException, RemoteException {
@@ -632,8 +632,8 @@ public class StationLocationControl extends StationModelControl {
     /**
      * updates the displayable when anything changes.
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private void updateSelectedDisplayable()
             throws VisADException, RemoteException {
@@ -650,12 +650,12 @@ public class StationLocationControl extends StationModelControl {
     }
 
     /**
-     * _more_
+     * set the scale factor on the displayable
      *
-     * @param f _more_
+     * @param f the scale
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected void setScaleOnDisplayable(float f)
             throws RemoteException, VisADException {
@@ -1122,9 +1122,9 @@ public class StationLocationControl extends StationModelControl {
     }
 
     /**
-     * _more_
+     * add the selected stations to the given list
      *
-     * @param listOfStations _more_
+     * @param listOfStations list to add to
      */
     protected void addSelectedToList(List listOfStations) {
         for (int i = 0; i < selectionList.size(); i++) {
@@ -1309,15 +1309,15 @@ public class StationLocationControl extends StationModelControl {
     }
 
     /**
-     * _more_
+     * Make the main tabbed pane gui
      *
-     * @param showDataSets _more_
-     * @param showFilters _more_
+     * @param showDataSets show the datasets component
+     * @param showFilters show the filters component
      *
-     * @return _more_
+     * @return the tabbed pane
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected JTabbedPane doMakeTabs(boolean showDataSets,
                                      boolean showFilters)
@@ -1533,8 +1533,8 @@ public class StationLocationControl extends StationModelControl {
          *
          * @param station station
          *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
+         * @throws RemoteException On badness
+         * @throws VisADException On badness
          */
         protected void stationSelected(NamedStationImpl station)
                 throws VisADException, RemoteException {
@@ -1547,10 +1547,10 @@ public class StationLocationControl extends StationModelControl {
         }
 
         /**
-         * _more_
+         * Clear out the selected stations
          *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
+         * @throws RemoteException On badness
+         * @throws VisADException On badness
          */
         protected void clearSelectedStations()
                 throws VisADException, RemoteException {
@@ -2249,4 +2249,6 @@ public class StationLocationControl extends StationModelControl {
 
 
 }
+
+
 

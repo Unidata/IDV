@@ -135,13 +135,13 @@ public class ShapefileControl extends DisplayControlImpl {
     /** The db file. May be null if there was no dbf file */
     private DbaseFile dbFile;
 
-    /** _more_          */
+    /** The field names          */
     private String[] fieldNames;
 
-    /** _more_          */
+    /** The map sets          */
     private List mapSets;
 
-    /** _more_          */
+    /** ???          */
     private boolean hasProperties = false;
 
     /** Does each row pass through the filters. */
@@ -1062,4 +1062,5 @@ public class ShapefileControl extends DisplayControlImpl {
 
 
 }
+
 

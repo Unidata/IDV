@@ -50,28 +50,28 @@ import javax.swing.*;
  */
 public class DisplaySetting {
 
-    /** _more_ */
+    /** The name  */
     private String name;
 
-    /** _more_ */
+    /** List of values */
     private List propertyValues;
 
-    /** _more_ */
+    /** Is this one of the user's local display settings */
     private boolean isLocal;
 
-    /** _more_ */
+    /** Which controls if any is this applicable to */
     private Hashtable applicableToControls;
 
     /**
-     * _more_
+     * ctor
      */
     public DisplaySetting() {}
 
     /**
-     * _more_
+     * ctor
      *
-     * @param name _more_
-     * @param propertyValues _more_
+     * @param name The name
+     * @param propertyValues The values
      */
     public DisplaySetting(String name, List propertyValues) {
         this.name           = name;
@@ -79,11 +79,11 @@ public class DisplaySetting {
     }
 
     /**
-     * _more_
+     * Is this displaysetting applicable to the given cd
      *
-     * @param cd _more_
+     * @param cd The control descriptor
      *
-     * @return _more_
+     * @return is applicable
      */
     public boolean applicableTo(ControlDescriptor cd) {
         if ((applicableToControls == null)
@@ -94,20 +94,20 @@ public class DisplaySetting {
     }
 
 
-    /** _more_ */
+    /** The last category */
     private static String lastCat;
 
-    /** _more_ */
+    /** The last name */
     private static String lastName = "";
 
 
     /**
-     * _more_
+     * Change the name of this display setting
      *
-     * @param idv _more_
-     * @param dialog _more_
+     * @param idv the idv
+     * @param dialog the dialog
      *
-     * @return _more_
+     * @return ok
      */
     public boolean changeName(IntegratedDataViewer idv, JDialog dialog) {
         String name = this.getNameWithoutCategory();
@@ -138,12 +138,12 @@ public class DisplaySetting {
 
 
     /**
-     * _more_
+     * Save the display settings
      *
-     * @param idv _more_
-     * @param dialog _more_
-     * @param propList _more_
-     * @param display _more_
+     * @param idv the idv
+     * @param dialog the dialog
+     * @param propList List of properties
+     * @param display The display
      */
     public static void doSave(IntegratedDataViewer idv, JDialog dialog,
                               List propList, DisplayControlImpl display) {
@@ -185,15 +185,15 @@ public class DisplaySetting {
     }
 
     /**
-     * _more_
+     * Get a new name
      *
-     * @param idv _more_
-     * @param dialog _more_
-     * @param dfltCategory _more_
-     * @param dfltName _more_
-     * @param cbxLabel _more_
+     * @param idv the idv
+     * @param dialog The dialog
+     * @param dfltCategory The dflt category
+     * @param dfltName The name
+     * @param cbxLabel label for checkbox
      *
-     * @return _more_
+     * @return new name to use
      */
     private static Object[] getNewName(IntegratedDataViewer idv,
                                        JDialog dialog, String dfltCategory,
@@ -292,9 +292,9 @@ public class DisplaySetting {
     }
 
     /**
-     * _more_
+     * get the category
      *
-     * @return _more_
+     * @return the category
      */
     public String getCategory() {
         int idx = getName().lastIndexOf(">");
@@ -305,9 +305,9 @@ public class DisplaySetting {
     }
 
     /**
-     * _more_
+     * Get just the name without the category prefix
      *
-     * @return _more_
+     * @return name
      */
     public String getNameWithoutCategory() {
         int idx = name.lastIndexOf(">");
@@ -320,11 +320,11 @@ public class DisplaySetting {
 
 
     /**
-     * _more_
+     * Clean up the name
      *
-     * @param name _more_
+     * @param name the name
      *
-     * @return _more_
+     * @return cleaned name
      */
     public static String cleanName(String name) {
         List toks = StringUtil.split(name, ">", true, true);
@@ -361,11 +361,11 @@ public class DisplaySetting {
 
 
     /**
-     * _more_
+     * is equals
      *
-     * @param o _more_
+     * @param o to
      *
-     * @return _more_
+     * @return is equals
      */
     public boolean equals(Object o) {
         if ( !(o instanceof DisplaySetting)) {
@@ -399,9 +399,9 @@ public class DisplaySetting {
 
 
     /**
-     * _more_
+     * to string
      *
-     * @return _more_
+     * @return to string
      */
     public String toString() {
         //        return GuiUtils.getLocalName(name, isLocal, false);
@@ -412,16 +412,16 @@ public class DisplaySetting {
     }
 
     /**
-     * _more_
+     * clear out the applicable to controls map
      */
     public void clearOnlyApplicableTo() {
         applicableToControls = null;
     }
 
     /**
-     * _more_
+     * set that this setting is only applicable to the given control
      *
-     * @param cd _more_
+     * @param cd the control
      */
     public void setOnlyApplicableTo(ControlDescriptor cd) {
         applicableToControls = new Hashtable();
@@ -449,4 +449,6 @@ public class DisplaySetting {
 
 
 }
+
+
 

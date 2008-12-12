@@ -73,7 +73,7 @@ import javax.swing.*;
  */
 public class DisplaySettingsDialog {
 
-    /** _more_ */
+    /** the idv */
     IntegratedDataViewer idv;
 
     /** The dialog */
@@ -82,33 +82,33 @@ public class DisplaySettingsDialog {
     /** The display */
     private DisplayControlImpl display;
 
-    /** _more_ */
+    /** The property values */
     private List propertyValues = new ArrayList();
 
-    /** _more_ */
+    /** apply button */
     private JButton applyBtn;
 
-    /** _more_ */
+    /** ??? */
     List displayWrappers;
 
-    /** _more_ */
+    /** The displays */
     List displays;
 
-    /** _more_ */
+    /** gui component */
     private JPanel propertiesHolder;
 
-    /** _more_ */
+    /** gui component */
     private JScrollPane leftSP;
 
-    /** _more_ */
+    /** gui component */
     private JComponent contents;
 
 
     /**
-     * _more_
+     * ctor
      *
-     * @param idv _more_
-     * @param display _more_
+     * @param idv the idv
+     * @param display The initial display to use
      */
     public DisplaySettingsDialog(IntegratedDataViewer idv,
                                  DisplayControlImpl display) {
@@ -116,11 +116,11 @@ public class DisplaySettingsDialog {
     }
 
     /**
-     * _more_
+     * The ctor
      *
-     * @param idv _more_
-     * @param display _more_
-     * @param showDialog _more_
+     * @param idv the idv
+     * @param display Initial display to use
+     * @param showDialog Should we show the dialog
      */
     public DisplaySettingsDialog(IntegratedDataViewer idv,
                                  DisplayControlImpl display,
@@ -142,9 +142,9 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * ctor
      *
-     * @param idv _more_
+     * @param idv the idv
      */
     public DisplaySettingsDialog(IntegratedDataViewer idv) {
         this(idv, null);
@@ -154,18 +154,18 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * ctor
      *
-     * @param display _more_
+     * @param display The initial display
      */
     public DisplaySettingsDialog(DisplayControlImpl display) {
         this(display.getIdv(), display);
     }
 
     /**
-     * _more_
+     * Get the property values
      *
-     * @return _more_
+     * @return property values
      */
     public List getPropertyValues() {
         List props = new ArrayList();
@@ -182,9 +182,9 @@ public class DisplaySettingsDialog {
     private static Font FONT_SELECTED;
 
     /**
-     * _more_
+     * Set the display to use
      *
-     * @param display _more_
+     * @param display The display
      */
     public void setDisplay(DisplayControlImpl display) {
         this.display   = display;
@@ -214,12 +214,12 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * Add a property value 
      *
-     * @param object _more_
-     * @param propName _more_
-     * @param label _more_
-     * @param category _more_
+     * @param object value of the property
+     * @param propName its name
+     * @param label label to use
+     * @param category The category of the property
      */
     protected void addPropertyValue(Object object, String propName,
                                     String label, String category) {
@@ -254,7 +254,7 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * Class DisplayWrapper _more_
+     * Class DisplayWrapper Holds a display and the gui state shown in the dialog
      *
      *
      * @author IDV Development Team
@@ -262,18 +262,18 @@ public class DisplaySettingsDialog {
      */
     private class DisplayWrapper {
 
-        /** _more_ */
+        /** The checkbox */
         JCheckBox cbx;
 
-        /** _more_ */
+        /** The display */
         DisplayControlImpl dci;
 
         /**
-         * _more_
+         * ctor
          *
-         * @param dci _more_
+         * @param dci The display
          *
-         * @param display _more_
+         * @param display the display
          */
         public DisplayWrapper(DisplayControlImpl display) {
             this.dci = display;
@@ -298,9 +298,9 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * Make the gui
      *
-     * @return _more_
+     * @return the gui
      */
     private JComponent doMakeContents() {
         displayWrappers = new ArrayList();
@@ -395,9 +395,9 @@ public class DisplaySettingsDialog {
     }
 
     /**
-     * _more_
+     * Show the display selection group menu
      *
-     * @param comp _more_
+     * @param comp The component to show near
      */
     private void popupDisplayGroupMenu(JComponent comp) {
         final List items = new ArrayList();
@@ -462,7 +462,7 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * Update gui
      */
     private void updatePropertiesComponent() {
         List      cats   = new ArrayList();
@@ -502,9 +502,9 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * popup menu
      *
-     * @param holder _more_
+     * @param holder ???
      */
     public void popupDisplaySettingsMenu(JButton[] holder) {
         List displaySettings = idv.getResourceManager().getDisplaySettings();
@@ -519,7 +519,7 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * Save the settings
      */
     public void doSave() {
         List propList = new ArrayList();
@@ -538,9 +538,9 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * Apply the display settings
      *
-     * @param displaySetting _more_
+     * @param displaySetting The display setting
      */
     public void applyDisplaySetting(DisplaySetting displaySetting) {
         List newProps = new ArrayList(displaySetting.getPropertyValues());
@@ -580,15 +580,15 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * make menu items
      *
      *
-     * @param displaySettings _more_
-     * @param object _more_
-     * @param method _more_
-     * @param labelPrefix _more_
+     * @param displaySettings List of display settings
+     * @param object ???
+     * @param method Method to call
+     * @param labelPrefix Prefix
      *
-     * @return _more_
+     * @return Items
      */
     public static List makeDisplaySettingsMenuItems(List displaySettings,
             Object object, String method, String labelPrefix) {
@@ -634,14 +634,14 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * cancel dialog
      */
     public void doCancel() {
         dialog.dispose();
     }
 
     /**
-     * _more_
+     * do ok of dialog
      */
     public void doOk() {
         doApply();
@@ -649,7 +649,7 @@ public class DisplaySettingsDialog {
     }
 
     /**
-     * _more_
+     * apply dialog
      */
     public void doApply() {
         final List selectedDisplays = new ArrayList();
@@ -681,10 +681,10 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * apply property values to the displays
      *
-     * @param selectedDisplays _more_
-     * @param props _more_
+     * @param selectedDisplays displays
+     * @param props properties
      */
     private static void applyPropertyValues(List selectedDisplays,
                                             List props) {
@@ -705,7 +705,7 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * Class PropertyValueWrapper _more_
+     * Class PropertyValueWrapper utility class
      *
      *
      * @author IDV Development Team
@@ -713,29 +713,29 @@ public class DisplaySettingsDialog {
      */
     public class PropertyValueWrapper {
 
-        /** _more_ */
+        /** The value */
         PropertyValue propertyValue;
 
-        /** _more_ */
+        /** gui component */
         private JCheckBox cbx;
 
-        /** _more_ */
+        /** gui component */
         private JComponent changeBtn;
 
         /**
-         * _more_
+         * ctor
          *
-         * @param propertyValue _more_
+         * @param propertyValue the value
          */
         public PropertyValueWrapper(PropertyValue propertyValue) {
             this(propertyValue, false);
         }
 
         /**
-         * _more_
+         * ctor
          *
-         * @param propertyValue _more_
-         * @param cbxValue _more_
+         * @param propertyValue the value
+         * @param cbxValue is cbx on
          */
         public PropertyValueWrapper(PropertyValue propertyValue,
                                     boolean cbxValue) {
@@ -744,11 +744,11 @@ public class DisplaySettingsDialog {
         }
 
         /**
-         * _more_
+         * can the property value be changed in the gui
          *
-         * @param v _more_
+         * @param v property value
          *
-         * @return _more_
+         * @return can we change this
          */
         private boolean canChange(Object v) {
             return (v instanceof String) || (v instanceof Double)
@@ -762,7 +762,7 @@ public class DisplaySettingsDialog {
 
 
         /**
-         * _more_
+         * Change the property value
          */
         public void changeProperty() {
             Object v = propertyValue.getValue();
@@ -801,9 +801,9 @@ public class DisplaySettingsDialog {
 
 
         /**
-         * _more_
+         * Get the cbx
          *
-         * @return _more_
+         * @return the cbx
          */
         public JCheckBox getCheckbox() {
             if (cbx == null) {
@@ -829,7 +829,7 @@ public class DisplaySettingsDialog {
 
 
         /**
-         * _more_
+         * Change the value
          */
         public void changeValue() {
 
@@ -944,9 +944,9 @@ public class DisplaySettingsDialog {
 
 
         /**
-         * _more_
+         * Change the value
          *
-         * @param o _more_
+         * @param o new value
          */
         public void changeValueTo(Object o) {
             propertyValue.setValue(o);
@@ -955,7 +955,7 @@ public class DisplaySettingsDialog {
 
 
         /**
-         * _more_
+         * set label
          */
         public void setCheckboxLabel() {
             Object value  = propertyValue.getValue();
@@ -972,18 +972,18 @@ public class DisplaySettingsDialog {
         }
 
         /**
-         * _more_
+         * get the category of this property value
          *
-         * @return _more_
+         * @return get the category of this property value
          */
         public String getCategory() {
             return propertyValue.getCategory();
         }
 
         /**
-         * _more_
+         * Get the name
          *
-         * @return _more_
+         * @return the name
          */
         public String getName() {
             return propertyValue.getName();
@@ -993,11 +993,11 @@ public class DisplaySettingsDialog {
 
 
     /**
-     * _more_
+     * Get label to show for the given value
      *
-     * @param v _more_
+     * @param v value
      *
-     * @return _more_
+     * @return label
      */
     public static String getValueLabel(Object v) {
         if (v == null) {
@@ -1027,4 +1027,5 @@ public class DisplaySettingsDialog {
 
 
 }
+
 

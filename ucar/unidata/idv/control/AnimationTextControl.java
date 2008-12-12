@@ -64,28 +64,28 @@ import javax.swing.text.html.*;
  */
 public class AnimationTextControl extends DisplayControlImpl implements HyperlinkListener {
 
-    /** _more_          */
+    /** Current animation time          */
     private DateTime currentTime;
 
-    /** _more_          */
+    /** List of text items          */
     private List textList = new ArrayList();
 
-    /** _more_          */
+    /** The editor pane to show text in          */
     private JEditorPane editor;
 
-    /** _more_          */
+    /** The subject field          */
     private JTextField subjectFld;
 
-    /** _more_          */
+    /** The time          */
     private JComboBox timeBox;
 
-    /** _more_          */
+    /** Should we ignore combobox events          */
     private boolean ignoreBoxEvents = false;
 
-    /** _more_          */
+    /** m          */
     private JCheckBox listenCbx;
 
-    /** _more_          */
+    /** m          */
     private boolean listenOnAnimation = true;
 
     /**
@@ -116,7 +116,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     }
 
     /**
-     * _more_
+     * finish initialization
      */
     public void initDone() {
         super.initDone();
@@ -132,13 +132,13 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     }
 
     /**
-     * _more_
+     * Find the dated text with the given time
      *
-     * @param dttm _more_
+     * @param dttm the time
      *
-     * @return _more_
+     * @return the dated text
      *
-     * @throws VisADException _more_
+     * @throws VisADException On badness
      */
     private DatedText findDatedText(DateTime dttm) throws VisADException {
         if (dttm == null) {
@@ -156,9 +156,9 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
 
     /**
-     * _more_
+     * Set the current text being shown
      *
-     * @param dt _more_
+     * @param dt The text to show
      */
     private void setDatedText(DatedText dt) {
         try {
@@ -192,9 +192,9 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
 
     /**
-     * _more_
+     * Set the time
      *
-     * @param time _more_
+     * @param time the time
      */
     private void setTime(Real time) {
         try {
@@ -235,9 +235,9 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
 
     /**
-     * _more_
+     * Handle html href click
      *
-     * @param e _more_
+     * @param e the event
      */
     public void hyperlinkUpdate(HyperlinkEvent e) {}
 
@@ -316,7 +316,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     }
 
     /**
-     * _more_
+     * remove the current displayed dated text
      */
     public void deleteCurrent() {
         try {
@@ -339,9 +339,9 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     }
 
     /**
-     * _more_
+     * should we listen for time animation events
      *
-     * @return _more_
+     * @return true
      */
     protected boolean shouldAddAnimationListener() {
         return true;
@@ -373,7 +373,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     }
 
     /**
-     * Class DatedText _more_
+     * Class DatedText Holds text and a date
      *
      *
      * @author IDV Development Team
@@ -381,36 +381,36 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
      */
     public static class DatedText extends DatedObject {
 
-        /** _more_          */
+        /** The text          */
         private String subject = "";
 
         /**
-         * _more_
+         * ctor
          */
         public DatedText() {}
 
         /**
-         * _more_
+         * ctor
          *
-         * @param date _more_
+         * @param date The date
          */
         public DatedText(Date date) {
             super(date, "");
         }
 
         /**
-         * _more_
+         * get the text
          *
-         * @return _more_
+         * @return the text
          */
         public String getText() {
             return (String) getObject();
         }
 
         /**
-         * _more_
+         * set the text
          *
-         * @param text _more_
+         * @param text the text
          */
         protected void setText(String text) {
             super.setObject(text);
@@ -418,11 +418,11 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
         }
 
         /**
-         * _more_
+         * get the date
          *
-         * @return _more_
+         * @return the date
          *
-         * @throws VisADException _more_
+         * @throws VisADException On badness
          */
         public DateTime getDateTime() throws VisADException {
             return new DateTime(getDate());
@@ -447,9 +447,9 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
         }
 
         /**
-         * _more_
+         * to string
          *
-         * @return _more_
+         * @return to string
          */
         public String toString() {
             return getDate() + "";
@@ -484,4 +484,5 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
 
 }
+
 

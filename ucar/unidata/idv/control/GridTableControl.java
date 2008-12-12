@@ -76,10 +76,10 @@ import javax.swing.table.*;
 
 public class GridTableControl extends GridDisplayControl {
 
-    /** _more_          */
+    /** The flat field          */
     private FieldImpl field;
 
-    /** _more_          */
+    /** gui component          */
     private     GuiUtils.CardLayoutPanel cardLayoutPanel = new GuiUtils.CardLayoutPanel();
 
     private JCheckBox nativeCoordsCbx;
@@ -135,10 +135,10 @@ public class GridTableControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Create the tables
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private void createTables() throws VisADException, RemoteException {
         List dates = new ArrayList();
@@ -175,12 +175,12 @@ public class GridTableControl extends GridDisplayControl {
     }
 
     /**
-     * _more_
+     * Make the gui
      *
-     * @return _more_
+     * @return the gui
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
@@ -220,4 +220,5 @@ public class GridTableControl extends GridDisplayControl {
 
 
 }
+
 

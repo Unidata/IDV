@@ -244,12 +244,12 @@ public class TrackControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Do we have good data
      *
-     * @return _more_
+     * @return Do we have good data
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private boolean trackDataOk() throws VisADException, RemoteException {
         DataInstance dataInstance = getDataInstance();
@@ -1440,4 +1440,5 @@ public class TrackControl extends GridDisplayControl {
 
 
 }
+
 

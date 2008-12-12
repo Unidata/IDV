@@ -2817,7 +2817,7 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
     /**
-     * _more_
+     * export the point data as a  netcdf file
      */
     public void exportAsNetcdf() {
         try {
@@ -3867,4 +3867,5 @@ public class StationModelControl extends ObsDisplayControl {
 
 
 }
+
 

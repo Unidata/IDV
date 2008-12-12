@@ -796,9 +796,9 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Add any display settings
      *
-     * @param dsd _more_
+     * @param dsd the dialog to add to
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
@@ -863,4 +863,5 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
     }
 
 }
+
 

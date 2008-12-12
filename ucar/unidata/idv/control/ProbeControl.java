@@ -248,7 +248,7 @@ public class ProbeControl extends DisplayControlImpl {
     /** Show the table in the legend */
     private boolean showTableInLegend = true;
 
-    /** _more_          */
+    /** Show sunrise/sunset display in time series          */
     private boolean showSunriseSunset = false;
 
 
@@ -1068,9 +1068,9 @@ public class ProbeControl extends DisplayControlImpl {
 
 
     /**
-     * _more_
+     * Change the parameter to use
      *
-     * @param param _more_
+     * @param param The parameter
      */
     public void changePointParameter(Object[] param) {
         try {
@@ -2089,12 +2089,12 @@ public class ProbeControl extends DisplayControlImpl {
      * @param info the info
      * @param elt point
      * @param llp point again
-     * @param useRowInfoCache _more_
+     * @param useRowInfoCache Do we use the cached value in the rowinfo
      *
      * @return sample
      *
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
@@ -2188,15 +2188,15 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
     /**
-     * _more_
+     * Return the list of html for doing the cursor readout
      *
-     * @param elt _more_
-     * @param animationValue _more_
-     * @param animationStep _more_
+     * @param elt The location
+     * @param animationValue The time animation
+     * @param animationStep Which step in the animation
      *
-     * @return _more_
+     * @return List of html to display
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     protected List getCursorReadoutInner(EarthLocation elt, Real animationValue,
                                  int animationStep)
@@ -2230,17 +2230,17 @@ public class ProbeControl extends DisplayControlImpl {
 
 
     /**
-     * _more_
+     * Sample at the location and time
      *
-     * @param info _more_
-     * @param elt _more_
-     * @param aniValue _more_
-     * @param step _more_
-     * @param useRowInfoCache _more_
+     * @param info The value to sample on
+     * @param elt The location
+     * @param aniValue The animation time
+     * @param step The animation step
+     * @param useRowInfoCache Use cached value
      *
-     * @return _more_
+     * @return The sample
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private Data[] getSampleAt(ProbeRowInfo info, EarthLocation elt,
                                Real aniValue, int step,
@@ -2272,7 +2272,7 @@ public class ProbeControl extends DisplayControlImpl {
      * @param step The time step
      *
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
@@ -2391,7 +2391,7 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
 
-    /** _more_ */
+    /** gui component */
     private JCheckBox columnsCbx;
 
     /**
@@ -2417,7 +2417,7 @@ public class ProbeControl extends DisplayControlImpl {
 
 
     /**
-     * _more_
+     * Export all times as csv
      */
     public void exportCsvAllTimes() {
         try {
@@ -2434,7 +2434,7 @@ public class ProbeControl extends DisplayControlImpl {
     /**
      * Export all times as csv
      *
-     * @param times _more_
+     * @param times export given times as csv
      */
     public void exportToCsv(Real[] times) {
         try {
@@ -2873,4 +2873,5 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 }
+
 

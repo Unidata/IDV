@@ -207,7 +207,7 @@ public class ImageControl extends BaseImageControl {
      *   }
      * }
      *
-     * @param v _more_
+     * @param v ???
      */
 
 
@@ -258,4 +258,5 @@ public class ImageControl extends BaseImageControl {
         return FLAG_COLORTABLE | FLAG_ZPOSITION;
     }
 }
+
 
