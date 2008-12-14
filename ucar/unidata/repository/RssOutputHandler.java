@@ -113,11 +113,11 @@ public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_FULL =
-        new OutputType("Full RSS Feed", "rss.full");
+        new OutputType("Full RSS Feed", "rss.full",false);
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_SUMMARY =
-        new OutputType("RSS Feed", "rss.summary");
+        new OutputType("RSS Feed", "rss.summary",false);
 
 
 

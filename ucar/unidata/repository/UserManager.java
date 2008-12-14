@@ -74,6 +74,10 @@ import java.util.Properties;
 public class UserManager extends RepositoryManager {
 
     /** _more_ */
+    public static final OutputType OUTPUT_CART = new OutputType("User Cart",
+                                                                "user.cart",true);
+
+    /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";
 
     /** _more_ */
@@ -1802,9 +1806,7 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    /** _more_ */
-    public static final OutputType OUTPUT_CART = new OutputType("User Cart",
-                                                     "user.cart");
+
 
     /**
      * _more_

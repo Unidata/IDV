@@ -226,11 +226,8 @@ public class RepositoryBase implements Constants, RepositorySource {
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
 
-
-
     /** _more_ */
-    private String urlBase = "/repository";
-
+    private static String urlBase = "/repository";
 
 
     /** _more_ */
@@ -532,7 +529,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    public String fileUrl(String f) {
+    public static String fileUrl(String f) {
         return urlBase + f;
     }
 
@@ -551,7 +548,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return The UrlBase
      */
-    public String getUrlBase() {
+    public static String getUrlBase() {
         return urlBase;
     }
 

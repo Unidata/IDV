@@ -81,7 +81,7 @@ public class ZipOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_ZIP = new OutputType("Zip File",
-                                                    "zip.zip");
+                                                               "zip.zip",false);
 
 
     /**

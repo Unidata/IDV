@@ -83,7 +83,7 @@ public class TextOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TEXT = new OutputType("Text",
-                                                     "text");
+                                                                "text",true);
 
 
     /**

@@ -82,7 +82,7 @@ public class OutputHandler extends RepositoryManager {
 
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
-                                                     "default.html");
+                                                                "default.html",true);
 
 
     /** _more_          */
@@ -104,6 +104,13 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
         super(repository);
         this.name = name;
+    }
+
+
+    public OutputType findOutputType(String id) {
+        int idx = types.indexOf(new OutputType(id,true));
+        if(idx>=0) return types.get(idx);
+        return null;
     }
 
 
@@ -498,11 +505,18 @@ public class OutputHandler extends RepositoryManager {
      */
     protected static String getGroupSelect(Request request, String elementId)
             throws Exception {
+        return getSelect(request, elementId, "Select",false,false);
+    }
+
+
+    protected static String getSelect(Request request, String elementId,String label, boolean allEntries,  boolean append)
+            throws Exception {
         String event = "selectInitialClick(event,"
-                       + HtmlUtil.squote(elementId) + ")";
-        return HtmlUtil.mouseClickHref(event, "Select",
+            + HtmlUtil.squote(elementId)+","+HtmlUtil.squote(""+allEntries)+"," +
+            HtmlUtil.squote(""+append) + ")";
+        return HtmlUtil.mouseClickHref(event, msg(label),
                                        HtmlUtil.id(elementId
-                                           + ".selectlink"));
+                                                   + ".selectlink"));
     }
 
     /**
@@ -516,33 +530,34 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected String getSelectLink(Request request, Group group,
-                                   String target)
-            throws Exception {
-        String       linkText = group.getLabel();
+    protected String getSelectLink(Request request, Entry entry,
+                                   String target, boolean allEntries)
+        throws Exception {
+        String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
-        String       entryId  = group.getId();
-        String       icon     = getEntryManager().getIconUrl(group);
-        String       event    = (group.isGroup()
+        String       entryId  = entry.getId();
+        String       icon     = getEntryManager().getIconUrl(entry);
+        String       event    = (entry.isGroup()
                                  ? HtmlUtil.onMouseClick("folderClick("
                                      + HtmlUtil.squote(entryId)
                                      + ",'selectxml',"
                                      + HtmlUtil.squote(ATTR_TARGET + "="
-                                         + target) + ")")
+                                         + target+"&allentries="+allEntries) + ")")
                                  : "");
-        String img = HtmlUtil.img(icon, (group.isGroup()
+        String img = HtmlUtil.img(icon, (entry.isGroup()
                                          ? "Click to open group; "
-                                         : ""), " id="
-                                             + HtmlUtil.quote("img_"
-                                                 + entryId) + event);
+                                         : ""), HtmlUtil.id("img_"+ entryId) + event);
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 
-        String elementId = group.getId();
-        String value     = group.getFullName();
+        boolean append = request.get("append",false);
+        String elementId = entry.getId();
+        String value     = (entry.isGroup()?((Group)entry).getFullName():entry.getName());
         sb.append(HtmlUtil.mouseClickHref("selectClick("
                                           + HtmlUtil.squote(target) + ","
-                                          + HtmlUtil.squote(value)
+                                          + HtmlUtil.squote(entry.getId()) +","
+                                          + HtmlUtil.squote(value)+","
+                                          + (append?"1":"0") 
                                           + ")", linkText));
         return sb.toString();
     }

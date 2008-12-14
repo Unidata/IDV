@@ -511,54 +511,73 @@ function folderClick(id, output,args) {
 }
 
 
-function selectClick(id,value) {
-	var comp = util.getDomObject(id);
-  	if(!comp)return;
-	comp.obj.value =value;
-	selectCancel();
+
+
+var selectors = new Array();
+
+function Selector(event, id, allEntries, append) {
+    this.id = id;
+    this.allEntries = allEntries;
+    this.append = append;
+    this.textComp = util.getDomObject(id);
+    if(!this.textComp)return false;
+
+    event = util.getEvent(event);
+    x = util.getEventX(event);
+    y = util.getEventY(event);
+
+
+    var link = util.getDomObject(id+'.selectlink');
+    if(!link)return false;
+    this.div = util.getDomObject('selectdiv');
+    if(!this.div)return false;
+
+    if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
+        x= util.getLeft(link.obj);
+        y = link.obj.offsetHeight+util.getTop(link.obj) + 2;
+    } else {
+        x+=20;
+    }
+
+    util.setPosition(this.div, x+10,y);
+    showObject(this.div);
+    url = "${urlroot}/entry/show?output=selectxml&append=" + this.append+"&allentries=" + this.allEntries+"&target=" + id;
+    util.loadXML( url, handleSelect,id);
+    return false;
+}
+
+
+function selectClick(id,entryId,value) {
+    selector = selectors[id];
+    if (selector.append=="true") {
+        selector.textComp.obj.value =selector.textComp.obj.value+"[[" +entryId+"|"+value+"]]";
+    } else {
+        selector.textComp.obj.value =value;
+    }
+    selectCancel();
 }
 
 function selectCancel() {
-	var div = util.getDomObject('selectdiv');
-  	if(!div)return false;
-	hideObject(div);
+    var div = util.getDomObject('selectdiv');
+    if(!div)return false;
+    hideObject(div);
 }
 
-function selectInitialClick(event, id) {
-        event = util.getEvent(event);
-	x = util.getEventX(event);
-	y = util.getEventY(event);
-	var comp = util.getDomObject(id);
-  	if(!comp)return false;
-
-        var link = util.getDomObject(id+'.selectlink');
-  	if(!link)return false;
-	var div = util.getDomObject('selectdiv');
-  	if(!div)return false;
-
-        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
-            x= util.getLeft(link.obj);
-            y = link.obj.offsetHeight+util.getTop(link.obj) + 2;
-        } else {
-            x+=20;
-        }
-
-        util.setPosition(div, x+10,y);
-	showObject(div);
-        url = "${urlroot}/entry/show?output=selectxml&target=" +id;;
-	util.loadXML( url, handleSelect,div);
-	return false;
-    }
 
 
-    function handleSelect(request, obj) {
-        var xmlDoc=request.responseXML.documentElement;
-        text = getChildText(xmlDoc);
-        var close = "<a href=\"javascript:selectCancel();\"><img border=0 src=${urlroot}/icons/close.gif></a>";
-        obj.obj.innerHTML = "<table width=100%><tr><td align=right>" + close +"</table>" +text;
-    }
+function selectInitialClick(event, id,allEntries,append) {
+    selectors[id] = new Selector(event,id,allEntries,append);
+    return false;
+}
 
 
+function handleSelect(request, id) {
+    selector = selectors[id];
+    var xmlDoc=request.responseXML.documentElement;
+    text = getChildText(xmlDoc);
+    var close = "<a href=\"javascript:selectCancel();\"><img border=0 src=${urlroot}/icons/close.gif></a>";
+    selector.div.obj.innerHTML = "<table width=100%><tr><td align=right>" + close +"</table>" +text;
+}
 
 
 

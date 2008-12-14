@@ -83,28 +83,28 @@ public class HtmlOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TIMELINE =
-        new OutputType("Timeline", "default.timeline");
+        new OutputType("Timeline", "default.timeline",true);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
-                                                      "default.graph");
+                                                                 "default.graph",true);
 
     /** _more_ */
     public static final OutputType OUTPUT_CLOUD = new OutputType("Cloud",
-                                                      "default.cloud");
+                                                                 "default.cloud",true);
 
     /** _more_ */
     public static final OutputType OUTPUT_GROUPXML =
-        new OutputType("groupxml");
+        new OutputType("groupxml",false);
 
     /** _more_ */
     public static final OutputType OUTPUT_SELECTXML =
-        new OutputType("selectxml");
+        new OutputType("selectxml",false);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATAXML =
-        new OutputType("metadataxml");
+        new OutputType("metadataxml",false);
 
 
 
@@ -820,8 +820,11 @@ public class HtmlOutputHandler extends OutputHandler {
         String       target = request.getString(ATTR_TARGET, "");
         StringBuffer sb     = new StringBuffer();
         String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
+        boolean allEntries = request.get("allentries",false);
+        boolean append = request.get("append",false);
+
         for (Group subGroup : subGroups) {
-            String groupLink = getSelectLink(request, subGroup, target);
+            String groupLink = getSelectLink(request, subGroup, target,allEntries);
             sb.append(groupLink);
             sb.append("<br>");
             sb.append(
@@ -829,9 +832,12 @@ public class HtmlOutputHandler extends OutputHandler {
                 + HtmlUtil.quote("block_" + subGroup.getId()) + "></div>");
         }
 
-        for (Entry entry : entries) {
-            //            sb.append("<li>");
-            //            sb.append(getSelectLink(request, entry));
+        if(allEntries) {
+            for (Entry entry : entries) {
+                String link = getSelectLink(request, entry, target,allEntries);
+                sb.append(link);
+                sb.append("<br>");
+            }
         }
 
 

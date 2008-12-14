@@ -1086,7 +1086,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public OutputType getOutput(String dflt) {
-        return new OutputType(getString(ARG_OUTPUT, dflt));
+        return new OutputType(getString(ARG_OUTPUT, dflt),false);
     }
 
 

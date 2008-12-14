@@ -319,6 +319,9 @@ public interface Constants {
     /** _more_          */
     public static final String ARG_DATASET = "dataset";
 
+    public static final String ARG_WIKI_CREATE = "wiki.create";
+    public static final String ARG_WIKI_TEXT = "wiki.text";
+
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
@@ -551,6 +554,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_OUTPUT = "output";
+
+    public static final String ARG_EMBEDDED = "embedded";
 
     /** _more_ */
     public static final String ARG_NAME = "name";

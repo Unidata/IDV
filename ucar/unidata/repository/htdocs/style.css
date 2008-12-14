@@ -476,6 +476,7 @@ a.menulink {
 }
 
 
+
 .folderblock {
    margin:0px;
    padding:0px;
@@ -559,6 +560,73 @@ form {
 
 
 
+
+.wiki-toc {
+   margin-top:5px;
+   border : 1px #aaaaaa solid;
+   background-color:#f9f9f9;
+   padding-left:5;
+   padding-bottom:5;
+}
+
+.wiki-tocheader {
+   font-weight: bold;
+}
+
+.wiki-h1 {
+   font-weight: bold;
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 22px; 
+}
+
+.wiki-h2 {
+   font-weight: bold;
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 20px; 
+}
+
+.wiki-h3 {
+   font-weight: bold;
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 18px; 
+}
+
+
+.wiki-h4 {
+   font-weight: bold;
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 16px; 
+}
+
+
+.wiki-h5 {
+   font-weight: bold;
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 14px; 
+}
+
+.wiki-hr {
+   margin-top: 0;
+   margin-bottom: 0;
+}
+
+.wiki-link {
+}
+
+
+.wiki-link-noexist {
+	color:red;
+}
+
+
+a.wiki-link-noexist {
+	color:red;
+}
 
 .cpYearNavigation,
 	.cpMonthNavigation

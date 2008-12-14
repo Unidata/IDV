@@ -36,12 +36,7 @@ or by other components) using the idref="..." attribute.
       <panel id="verytop" layout="border" >
         <menubar   place="West">
           <menu id="filemenu" label="File">
-           <menuitem label="Save session" action="chat.savesession" />
-           <separator/>
-           <menuitem label="Show/hide top" action="ui.toggle(toppanel)" />
-           <menuitem label="Show/hide bottom" action="ui.toggle(bottompanel)" />
            <menuitem label="Float/embed" action="ui.float" />
-           <menuitem label="Change room" action="chat.changeroom" />
         </menu>
         <menu  label="View"  border="true" id="viewmenu">
            <menuitem label="Clear text"  action="chat.cleartext" />
@@ -73,19 +68,11 @@ or by other components) using the idref="..." attribute.
 
       <panel id="usersfiles" layout="grid"   vspace="2" cols="1">
         <panel layout="border">
-          <label place="North" label="Users:" align="LEFT" />
+          <panel place="North" layout="inset" hspace="5" ><label place="North" label="Users:" align="LEFT" /></panel>
           <component id="userlist"  place="Center"/>
         </panel>
         <panel layout="border">
-	<menubar place="North">
-	      <menu   id="filesmenu" label="Files" place="North">
-	            <menuitem action="files.select" label ="Add new url" />
-		    <menuitem action="files.upload" label ="Select file from server" />
-                    <menuitem action="files.remove" label ="Remove selected" />
-                    <menuitem action="files.share" label ="Share selected" />
-                    <menuitem action="files.view" label ="Use as background" />
-             </menu>
-        </menubar>
+          <panel place="North" layout="inset" hspace="5" ><label place="North" label="Files:" align="LEFT" /></panel>
           <component id="filelist"  place="Center" />
         </panel>
       </panel>
@@ -201,12 +188,14 @@ or by other components) using the idref="..." attribute.
 
 
         <menu id="filemenu">
+<!--
            <menuitem label="Save session" action="chat.savesession" />
            <separator/>
            <menuitem label="Show/hide top" action="ui.toggle(toppanel)" />
            <menuitem label="Show/hide bottom" action="ui.toggle(bottompanel)" />
+-->
            <menuitem label="Float/embed" action="ui.float" />
-           <menuitem label="Change room" action="chat.changeroom" />
+<!--           <menuitem label="Change room" action="chat.changeroom" /> -->
         </menu>
 
         <menu event="onpress" label="View"  border="true" id="viewmenu">

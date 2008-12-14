@@ -172,7 +172,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_DELETER =
-        new OutputType("Delete Entry", "repository.delete");
+        new OutputType("Delete Entry", "repository.delete",true);
 
 
     /** _more_ */
@@ -2386,7 +2386,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if ((type == null) || (type.length() == 0)) {
             type = OutputHandler.OUTPUT_HTML.getId();
         }
-        OutputType output = new OutputType("", type);
+        OutputType output = new OutputType("", type,true);
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
                 return outputHandler;
@@ -2643,10 +2643,30 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String makeShowHideBlock(Request request, String label,
                                     StringBuffer content, boolean visible,
                                     String headerExtra) {
-        String       id      = "block_" + (blockCnt++);
-        StringBuffer sb      = new StringBuffer();
         String       hideImg = fileUrl(ICON_MINUS);
         String       showImg = fileUrl(ICON_PLUS);
+        return makeShowHideBlock(label,content,visible, headerExtra, " class=\".block\" ", hideImg,showImg);
+    }
+
+
+
+    public static String makeShowHideBlock(String label,
+                                           StringBuffer content, boolean visible,
+                                           String headerExtra,
+                                           String blockExtra) {
+        String       hideImg = fileUrl(ICON_MINUS);
+        String       showImg = fileUrl(ICON_PLUS);
+        return makeShowHideBlock(label,content,visible, headerExtra, blockExtra,hideImg,showImg);
+    }
+
+    public static String makeShowHideBlock(String label,
+                                    StringBuffer content, boolean visible,
+                                    String headerExtra,
+                                           String blockExtra,
+                                    String hideImg,
+                                    String showImg) {
+        String       id      = "block_" + (blockCnt++);
+        StringBuffer sb      = new StringBuffer();
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
@@ -2659,7 +2679,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                                   "pagesubheadinglink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
-        sb.append("<div class=\"block\">");
+        sb.append("<div  " + blockExtra+">");
         sb.append(HtmlUtil.div(link, headerExtra));
         sb.append("<div class=\"hideshowblock\" id=\"" + id
                   + "\" style=\"display:block;visibility:visible\">");
@@ -2673,6 +2693,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         sb.append("</div>");
         return sb.toString();
     }
+
+
 
 
     /** _more_ */

@@ -97,7 +97,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_CATALOG = new OutputType("Catalog",
-                                                        "thredds.catalog");
+                                                        "thredds.catalog",false);
 
 
     /** _more_ */

@@ -30,6 +30,13 @@
      <property name="form.show.resource" value="false"/>
 </type>
 
+  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.WikiPageTypeHandler">
+     <property name="form.rows.desc" value="100"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+</type>
+
 
   <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" group="Level 3 Things" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 

@@ -135,42 +135,43 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_OPENDAP = new OutputType("OpenDAP",
-                                                        "data.opendap");
+                                                                   "data.opendap",false,OutputType.SUFFIX_NONE,
+                                                                   ICON_OPENDAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_CDL = new OutputType("CDL",
-                                                    "data.cdl", "",
-                                                    ICON_DATA);
+                                                               "data.cdl", true, OutputType.SUFFIX_NONE,
+                                                               ICON_DATA);
 
     /** _more_ */
     public static final OutputType OUTPUT_WCS = new OutputType("WCS",
-                                                    "data.wcs");
+                                                               "data.wcs",false);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_MAP =
-        new OutputType("Point as Map", "data.point.map", "", ICON_MAP);
+        new OutputType("Point as Map", "data.point.map", true, OutputType.SUFFIX_NONE, ICON_MAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_CSV =
-        new OutputType("Point as CSV", "data.point.csv", "", ICON_CSV);
+        new OutputType("Point as CSV", "data.point.csv", false, OutputType.SUFFIX_NONE, ICON_CSV);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_KML =
-        new OutputType("Point as KML", "data.point.kml");
+        new OutputType("Point as KML", "data.point.kml",false);
 
     /** _more_ */
     public static final OutputType OUTPUT_TRAJECTORY_MAP =
-        new OutputType("Trajectory as Map", "data.trajectory.map", "",
+        new OutputType("Trajectory as Map", "data.trajectory.map", true,OutputType.SUFFIX_NONE,
                        ICON_MAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET_FORM =
-        new OutputType("Grid Subset", "data.gridsubset.form", "",
+        new OutputType("Grid Subset", "data.gridsubset.form", true, OutputType.SUFFIX_NONE,
                        ICON_SUBSET);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET =
-        new OutputType("data.gridsubset");
+        new OutputType("data.gridsubset",false);
 
 
     /** _more_ */

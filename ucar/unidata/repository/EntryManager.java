@@ -320,15 +320,7 @@ return new Result(title, sb);
         }
 
         String output = request.getString(ARG_OUTPUT, (String) "");
-        Result result;
-        if (entry.isGroup()) {
-            result = processGroupShow(request, (Group) entry);
-        } else {
-            result = getRepository().getOutputHandler(request).outputEntry(
-                request, entry);
-        }
-
-
+        Result result =  processEntryShow(request, entry);
         if (result.getShouldDecorate()) {
             request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
@@ -340,10 +332,21 @@ return new Result(title, sb);
                 result.setTitle(result.getTitle() + ": " + crumbs[0]);
             }
         }
+
         return result;
     }
 
 
+    public Result processEntryShow(Request request,Entry entry) throws Exception {
+        Result result=null;
+        if (entry.isGroup()) {
+            result = processGroupShow(request, (Group) entry);
+        } else {
+            result = getRepository().getOutputHandler(request).outputEntry(
+                                                                           request, entry);
+        }
+        return result;
+    }
 
 
 
@@ -358,8 +361,6 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryForm(Request request) throws Exception {
-
-
         Group        group = null;
         String       type  = null;
         Entry        entry = null;
@@ -388,25 +389,23 @@ return new Result(title, sb);
         if (type == null) {
             type = request.getString(ARG_TYPE, (String) null);
         }
-
         if (entry == null) {
             sb.append(makeEntryHeader(request, group));
         } else {
             sb.append(makeEntryHeader(request, entry));
         }
 
-        if (((entry != null) && entry.getIsLocalFile())) {
+        if (entry != null && entry.getIsLocalFile()) {
             sb.append("This is a local file and cannot be edited");
             return makeEntryEditResult(request, entry, "Entry Edit", sb);
         }
 
-
         if (type == null) {
             sb.append(request.form(getRepository().URL_ENTRY_FORM,
-                                   " name=\"entryform\" "));
+                                   HtmlUtil.attr("name","entryform")));
         } else {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_CHANGE,
-                                         " name=\"entryform\" "));
+                                         HtmlUtil.attr("name","entryform")));
         }
 
         sb.append(HtmlUtil.formTable());
@@ -415,31 +414,22 @@ return new Result(title, sb);
         if (type == null) {
             sb.append(
                 HtmlUtil.formEntry(
-                    "Type:",
-                    getRepository().makeTypeSelect(
-                        request, false, "", true)));
+                                   msgLabel("Type"),
+                                   getRepository().makeTypeSelect(
+                                                                  request, false, "", true)));
 
             sb.append(
                 HtmlUtil.formEntry(
-                    BLANK, HtmlUtil.submit("Select Type to Add")));
+                    BLANK, HtmlUtil.submit(msg("Select Type to Add"))));
             sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
         } else {
             TypeHandler typeHandler = ((entry == null)
                                        ? getRepository().getTypeHandler(type)
                                        : entry.getTypeHandler());
 
-
             String submitButton = HtmlUtil.submit(title = ((entry == null)
                     ? "Add " + typeHandler.getLabel()
                     : "Edit " + typeHandler.getLabel()));
-
-            List<Metadata> metadataList = ((entry == null)
-                                           ? (List<Metadata>) new ArrayList<Metadata>()
-                                           : getRepository()
-                                               .getMetadataManager()
-                                               .getMetadata(entry));
-            String metadataButton = HtmlUtil.submit("Edit Metadata",
-                                        ARG_EDIT_METADATA);
 
             String deleteButton = (((entry != null) && entry.isTopGroup())
                                    ? ""
@@ -454,24 +444,13 @@ return new Result(title, sb);
                                        cancelButton));
 
 
-            String topLevelCheckbox = "";
-            if ((entry == null) && request.getUser().getAdmin()) {
-                topLevelCheckbox = HtmlUtil.space(1)
-                                   + HtmlUtil.checkbox(ARG_TOPLEVEL, "true",
-                                       false) + HtmlUtil.space(1)
-                                           + msg("Make top level");
-
-            }
-            topLevelCheckbox = "";
-            sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons
-                    + topLevelCheckbox, 2)));
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
             } else {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
             }
-            //            sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
             typeHandler.addToEntryForm(request, sb, entry);
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
         }
@@ -2334,6 +2313,17 @@ return new Result(title, sb);
     protected String getAjaxLink(Request request, Entry entry,
                                  String linkText, boolean includeIcon)
             throws Exception {
+        return getAjaxLink(request, entry, linkText,
+                           request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
+                           includeIcon);
+    }
+
+    protected String getAjaxLink(Request request, Entry entry,
+                                 String linkText, String url,
+                                 boolean includeIcon)
+            throws Exception {
+
+
         StringBuffer sb      = new StringBuffer();
         String       entryId = entry.getId();
         if (includeIcon) {
@@ -2388,9 +2378,9 @@ return new Result(title, sb);
             + HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid + ");");
         sb.append(
             HtmlUtil.href(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
-                linkText,
-                " id=" + HtmlUtil.quote(elementId) + " " + tooltipEvents));
+                          url,
+                          linkText,
+                          HtmlUtil.id(elementId) + " " + tooltipEvents));
 
         if (includeIcon) {
             //            getMetadataManager().decorateEntry(request, entry, sb,true);
@@ -3415,6 +3405,20 @@ return new Result(title, sb);
 
 
 
+
+
+    protected List<Entry> getChildren(Request request, Group group) throws Exception {
+        List<Entry> children =  new ArrayList<Entry>();
+        List<String> ids = getChildIds(request, group, null);
+        for (String id : ids) {
+            Entry entry = getEntry(request, id);
+            if (entry == null) {
+                continue;
+            }
+            children.add(entry);
+        }
+        return children;
+    }
 
 
     /**

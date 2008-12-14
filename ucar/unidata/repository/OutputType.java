@@ -79,8 +79,11 @@ import java.util.zip.*;
  */
 public class OutputType {
 
+    public static String ICON_NULL = null;
+    public static String SUFFIX_NONE = "";
+
     /** _more_ */
-    private String suffix = "";
+    private String suffix = SUFFIX_NONE;
 
     /** _more_          */
     private String id;
@@ -97,28 +100,26 @@ public class OutputType {
     /** _more_          */
     private String icon;
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     */
-    public OutputType(String id) {
-        this.id      = id;
-        this.label   = id;
-        this.forUser = false;
+    private boolean isHtml = true;
+
+
+    public OutputType(String id, boolean isHtml) {
+        this(id,id,isHtml);
     }
+
+
 
     /**
      * _more_
      *
+     * @param name _more_
      * @param output _more_
      *
      * @param label _more_
      * @param id _more_
-     * @param suffix _more_
      */
-    public OutputType(String label, String id, String suffix) {
-        this(label, id, suffix, null);
+    public OutputType(String label, String id,boolean isHtml) {
+        this(label, id, isHtml, SUFFIX_NONE,ICON_NULL);
     }
 
 
@@ -130,25 +131,16 @@ public class OutputType {
      * @param suffix _more_
      * @param icon _more_
      */
-    public OutputType(String label, String id, String suffix, String icon) {
+    public OutputType(String label, String id, boolean isHtml, String suffix, String icon) {
         this.label  = label;
         this.id     = id;
+        this.isHtml = isHtml;
         this.suffix = suffix;
         this.icon   = icon;
     }
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param output _more_
-     *
-     * @param label _more_
-     * @param id _more_
-     */
-    public OutputType(String label, String id) {
-        this(label, id, "");
-    }
+
+
 
     /**
      * _more_
@@ -160,6 +152,7 @@ public class OutputType {
         this.label  = that.label;
         this.id     = that.id;
         this.suffix = that.suffix;
+        this.isHtml = that.isHtml;
     }
 
     /**
@@ -291,6 +284,24 @@ public class OutputType {
      */
     public String getGroupName() {
         return groupName;
+    }
+
+    /**
+       Set the IsHtml property.
+
+       @param value The new value for IsHtml
+    **/
+    public void setIsHtml (boolean value) {
+	isHtml = value;
+    }
+
+    /**
+       Get the IsHtml property.
+
+       @return The IsHtml
+    **/
+    public boolean getIsHtml () {
+	return isHtml;
     }
 
 

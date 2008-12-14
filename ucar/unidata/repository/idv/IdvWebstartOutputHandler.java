@@ -83,7 +83,8 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_WEBSTART = new OutputType("View in IDV","idv.webstart");
+    public static final OutputType OUTPUT_WEBSTART = new OutputType("View in IDV","idv.webstart",false);
+
 
 
     /**
