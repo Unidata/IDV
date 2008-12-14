@@ -877,8 +877,14 @@ public class HtmlUtil {
      */
     public static String textArea(String name, String value, int rows,
                                   int columns) {
-        return "<textarea name=\"" + name + "\" rows=\"" + rows
-               + "\"  cols=\"" + columns + "\">" + value + "</textarea>";
+
+        return textArea(name,value,rows,columns,"");
+    }
+
+    public static String textArea(String name, String value, int rows,
+                                  int columns, String extra) {
+        return "<textarea " + attr("name", name) + attr("rows",""+ rows) +
+            attr("cols",""+ columns) +extra + "\">" + value + "</textarea>";
     }
 
     /**
@@ -1499,6 +1505,8 @@ public class HtmlUtil {
     public static String importJS(String jsUrl) {
         return "<script src=\"" + jsUrl + "\"></script>\n";
     }
+
+
 
 
 
