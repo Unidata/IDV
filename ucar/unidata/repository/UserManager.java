@@ -41,7 +41,6 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.File;
 
 
-
 import java.io.UnsupportedEncodingException;
 
 import java.security.MessageDigest;
@@ -1561,12 +1560,13 @@ public class UserManager extends RepositoryManager {
                                      "Your RAMADDA user ID");
                 getAdmin().sendEmail(user.getEmail(), subject,
                                      contents.toString(), true);
-                sb.append(
+                String message = "You user id has been sent to your registered email";
+                /*                sb.append(
                     getRepository().note(
                         msg(
-                        "You user id has been sent to your registered email")));
-                sb.append(makeLoginForm(request));
-                return makeResult(request, "User Information", sb);
+                        )));*/
+                //                sb.append(makeLoginForm(request));
+                return new Result(request.url(getRepositoryBase().URL_USER_LOGIN, ARG_MESSAGE,message));
             }
             sb.append(
                 getRepository().error(
@@ -1581,8 +1581,9 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Submit"));
         sb.append(HtmlUtil.formClose());
-        return makeResult(request, "User Information", sb);
+        return new Result(msg("Password Reset"),  sb);
     }
+
 
 
     /** _more_          */
@@ -1632,7 +1633,7 @@ public class UserManager extends RepositoryManager {
                         getRepository().note(
                             msg("Your password has been reset")));
                     sb.append(makeLoginForm(request));
-                    return makeResult(request, "Password Reset", sb);
+                    return new Result(msg("Password Reset"), sb);
                 }
                 sb.append(getRepository().warning("Incorrect passwords"));
             }
@@ -1653,12 +1654,11 @@ public class UserManager extends RepositoryManager {
 
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.formClose());
-            return makeResult(request, "Password Reset", sb);
+            return new Result(msg("Password Reset"), sb);
         }
 
         if ( !getAdmin().isEmailCapable()) {
-            return makeResult(
-                request, "Password Reset",
+            return new Result(msg("Password Reset"),
                 new StringBuffer(
                     getRepository().warning(
                         msg(
@@ -1686,7 +1686,7 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.space(1));
             sb.append(HtmlUtil.submit(msg("Submit")));
             sb.append(HtmlUtil.formClose());
-            return makeResult(request, "Password Reset", sb);
+            return new Result(msg("Password Reset"), sb);
         }
 
         key = getRepository().getGUID() + "_" + Math.random();
@@ -1707,11 +1707,15 @@ public class UserManager extends RepositoryManager {
                                           "Click to reset")));
         String subject = translateMsg(request, "RAMADDA password reset");
         getAdmin().sendEmail(toUser, subject, contents.toString(), true);
+        String message = "Instructions on how to reset your password have been sent to your registered email address";
+        return new Result(request.url(getRepositoryBase().URL_USER_LOGIN, ARG_MESSAGE,message));
+        /*
         sb.append(
             getRepository().note(
                 msg(
                 "Instructions on how to reset your password have been sent to your registered email address")));
-        return makeResult(request, "Password Reset", sb);
+        return new Result(msg("Password Reset"), sb);
+        */
     }
 
 
