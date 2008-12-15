@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -147,7 +148,7 @@ public class ValueSliderComponent {
         setMethod = Misc.findMethod(callingObject.getClass(), setMethodName,
                                     null);
 
-        if ((getMethod == null) || ((setMethod == null) && useSetMethod)) {
+        if (((getMethod == null) || (setMethod == null)) && useSetMethod) {
             logException(
                 "ValueSliderComponent.init",
                 new IllegalArgumentException(
