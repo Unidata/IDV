@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -408,6 +409,16 @@ public class StationModelControl extends ObsDisplayControl {
             tmpStationModelName =
                 dataChoice.getProperty(PointDataSource.PROP_STATIONMODELNAME,
                                        (String) null);
+
+            if (getDataSelection() != null) {
+                StationModel sm =
+                    (StationModel) getDataSelection().getProperty(
+                        PointDataSource.PROP_STATIONMODELNAME);
+                if (sm != null) {
+                    tmpStationModelName = sm.getName();
+                }
+            }
+
             //Try the defaults
             if (tmpStationModelName == null) {
                 if (getControlContext().getStationModelManager()
