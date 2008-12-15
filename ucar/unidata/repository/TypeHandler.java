@@ -1201,7 +1201,7 @@ public class TypeHandler extends RepositoryManager {
                 }
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                            getRepository().makeTabs(tabTitles, tabContent,
+                            HtmlUtil.makeTabs(tabTitles, tabContent,
                                 true, "tabcontent", "tabcontents_noborder")));
                 }
 
@@ -1667,10 +1667,9 @@ public class TypeHandler extends RepositoryManager {
         advancedSB.append(HtmlUtil.formTableClose());
 
 
-        formBuffer.append(getRepository().makeShowHideBlock(request,
-                msg("Basic"), basicSB, true));
-        formBuffer.append(getRepository().makeShowHideBlock(request,
-                msg("Advanced"), advancedSB, false));
+        formBuffer.append(HtmlUtil.makeShowHideBlock(
+                                                     msg("Basic"), basicSB.toString(), true));
+        formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Advanced"), advancedSB.toString(), false));
     }
 
 

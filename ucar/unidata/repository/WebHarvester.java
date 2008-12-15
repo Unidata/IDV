@@ -320,9 +320,9 @@ public class WebHarvester extends Harvester {
         String messages = StringUtil.join("", statusMessages);
         return status.toString() + ((messages.length() == 0)
                                     ? ""
-                                    : getRepository().makeShowHideBlock(null,
-                                    "Entries", new StringBuffer(messages),
-                                    false));
+                                    : HtmlUtil.makeShowHideBlock(
+                                                                 "Entries", messages,
+                                                                 false));
     }
 
 

@@ -537,13 +537,23 @@ public class OutputHandler extends RepositoryManager {
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
         String       icon     = getEntryManager().getIconUrl(entry);
-        String       event    = (entry.isGroup()
-                                 ? HtmlUtil.onMouseClick("folderClick("
-                                     + HtmlUtil.squote(entryId)
-                                     + ",'selectxml',"
-                                     + HtmlUtil.squote(ATTR_TARGET + "="
-                                         + target+"&allentries="+allEntries) + ")")
-                                 : "");
+        String       event;
+        if (entry.isGroup()) {
+            event = HtmlUtil.onMouseClick("folderClick("
+                                          + HtmlUtil.squote(entryId)+","
+                                          + HtmlUtil.squote(entryId)
+                                          + ",'selectxml',"
+                                          + HtmlUtil.squote(ATTR_TARGET + "="
+                                                            + target+"&allentries="+allEntries) + ")");
+        } else {
+            event = HtmlUtil.onMouseClick("folderClick("
+                                          + HtmlUtil.squote(entryId)+","
+                                          + HtmlUtil.squote(entryId)
+                                          + ",'selectxml',"
+                                          + HtmlUtil.squote(ATTR_TARGET + "="
+                                                            + target+"&allentries="+allEntries) + ")");
+
+        }
         String img = HtmlUtil.img(icon, (entry.isGroup()
                                          ? "Click to open group; "
                                          : ""), HtmlUtil.id("img_"+ entryId) + event);
@@ -671,7 +681,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      * @throws Exception _more_
      */
-    public String getEntryHtml(StringBuffer sb, List entries,
+    public String getEntriesList(StringBuffer sb, List entries,
                                Request request, boolean doForm,
                                boolean dfltSelected, boolean showCrumbs)
             throws Exception {
@@ -683,10 +693,11 @@ public class OutputHandler extends RepositoryManager {
             link = tuple[0];
             base = tuple[1];
             sb.append(tuple[2]);
-            sb.append(
-                "<ul class=\"folderblock\" style=\"list-style-image : url("
-                + getRepository().fileUrl(ICON_BLANK) + ")\">");
-        }
+       }
+        sb.append(
+                  "<ul class=\"folderblock\" style=\"list-style-image : url("
+                  + getRepository().fileUrl(ICON_BLANK) + ")\">");
+
         //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int cnt = 0;
         StringBuffer jsSB = new StringBuffer();
@@ -709,7 +720,7 @@ public class OutputHandler extends RepositoryManager {
                 sb.append(getEntryManager().getBreadCrumbs(request, entry));
             } else {
                 sb.append(getEntryManager().getAjaxLink(request, entry,
-                        entry.getLabel(), true));
+                                                        entry.getLabel(), true));
             }
         }
         if (doForm) {

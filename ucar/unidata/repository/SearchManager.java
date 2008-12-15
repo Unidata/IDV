@@ -213,8 +213,8 @@ public class SearchManager extends RepositoryManager {
         metadataSB.append(HtmlUtil.formTable());
         getMetadataManager().addToSearchForm(request, metadataSB);
         metadataSB.append(HtmlUtil.formTableClose());
-        sb.append(getRepository().makeShowHideBlock(request, msg("Metadata"),
-                metadataSB, false));
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Metadata"),
+                metadataSB.toString(), false));
 
 
 
@@ -245,8 +245,7 @@ public class SearchManager extends RepositoryManager {
 
 
 
-        sb.append(getRepository().makeShowHideBlock(request, msg("Output"),
-                outputForm, false));
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Output"),  outputForm.toString(), false));
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);

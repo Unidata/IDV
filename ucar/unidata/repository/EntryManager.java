@@ -1044,7 +1044,7 @@ return new Result(title, sb);
                           ARG_DELETE_CONFIRM, hidden);
         sb.append(getRepository().question(msgSB.toString(), form));
         sb.append("<ul>");
-        new OutputHandler(getRepository(), "tmp").getEntryHtml(sb, entries,
+        new OutputHandler(getRepository(), "tmp").getEntriesList(sb, entries,
                           request, false, false, true);
         sb.append("</ul>");
         return new Result(msg("Delete Confirm"), sb);
@@ -2239,10 +2239,9 @@ return new Result(title, sb);
             //            System.err.println("Comment: " + comment.getComment());
             content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
-            sb.append(HtmlUtil.div(getRepository().makeShowHideBlock(request,
-                    "<b>Subject</b>:" + comment.getSubject()
-                    + HtmlUtil.space(2) + byLine, content, true,
-                        ""), theClass));
+            sb.append(HtmlUtil.div(HtmlUtil.makeShowHideBlock("<b>Subject</b>:" + comment.getSubject()
+                    + HtmlUtil.space(2) + byLine, content.toString(), true,
+                                                              ""), theClass));
         }
         //        sb.append("</table>");
         return sb.toString();
@@ -2326,15 +2325,15 @@ return new Result(title, sb);
 
         StringBuffer sb      = new StringBuffer();
         String       entryId = entry.getId();
+
+        String uid = "link_" +HtmlUtil.blockCnt++;
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
             String  icon     = getIconUrl(entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
-            String event = (entry.isGroup()
-                            ? HtmlUtil.onMouseClick("folderClick('" + entryId
-                                + "')")
-                            : "");
+            String event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick", HtmlUtil.squote(entryId)+","+HtmlUtil.squote(uid)));
+
 
             if (okToMove) {
                 event += (entry.isGroup()
@@ -2357,15 +2356,10 @@ return new Result(title, sb);
 
             String img = HtmlUtil.img(icon, (entry.isGroup()
                                              ? "Click to open group; "
-                                             : "") + (okToMove
+                                             : "Click to view actions; ") + (okToMove
                     ? "Drag to move"
-                    : ""), " id=" + HtmlUtil.quote("img_" + entryId) + event);
-            if (entry.isGroup()) {
-                //                sb.append("<a href=\"JavaScript: noop()\" " + event +"/>" +      img +"</a>");
-                sb.append(img);
-            } else {
-                sb.append(img);
-            }
+                    : ""), HtmlUtil.id("img_" + uid) + event);
+            sb.append(img);
             sb.append(HtmlUtil.space(1));
             getMetadataManager().decorateEntry(request, entry, sb, true);
         }
@@ -2382,14 +2376,18 @@ return new Result(title, sb);
                           linkText,
                           HtmlUtil.id(elementId) + " " + tooltipEvents));
 
-        if (includeIcon) {
-            //            getMetadataManager().decorateEntry(request, entry, sb,true);
+        String link = HtmlUtil.span(sb.toString(),
+                                    HtmlUtil.id("span_" + entry.getId()));
+
+        if(includeIcon) {
+            link = link +
+                HtmlUtil.br()+
+                "<div style=\"display:none;visibility:hidden\" " + 
+                HtmlUtil.cssClass("folderblock") +
+                HtmlUtil.id(uid) + "></div>";
         }
+        return link;
 
-
-        return HtmlUtil.span(sb.toString(),
-                             " id="
-                             + HtmlUtil.quote("span_" + entry.getId()));
     }
 
 
@@ -2443,12 +2441,13 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinksHtml(Request request, Entry entry,
+    protected String getEntryActionsToolbar(Request request, Entry entry,
                                        boolean forHeader)
             throws Exception {
         return StringUtil.join(HtmlUtil.space(1),
                                getEntryLinks(request, entry, forHeader));
     }
+
 
 
     /**
@@ -2461,7 +2460,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinksList(Request request, Entry entry)
+    protected String getEntryActionsList(Request request, Entry entry)
             throws Exception {
         List<Link>   links = getEntryLinks(request, entry, false);
         StringBuffer menu  = new StringBuffer();
@@ -2691,7 +2690,7 @@ return new Result(title, sb);
              *                         msg("Show menu"), HtmlUtil.id(compId)));
              *
              */
-            String linkHtml = getEntryLinksHtml(request, entry, true);
+            String linkHtml = getEntryActionsToolbar(request, entry, true);
             linkHtml = toolbar;
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
@@ -3406,10 +3405,33 @@ return new Result(title, sb);
 
 
 
+    protected List<Entry> getChildrenGroups(Request request, Entry group) throws Exception {
+        List<Entry> result = new ArrayList<Entry>();
+        if(!group.isGroup()) 
+            return result;
+        for(Entry entry: getChildren(request,  (Group)group)) {
+            if(entry.isGroup()) result.add(entry);
+        }
+        return result;
+    }
 
-    protected List<Entry> getChildren(Request request, Group group) throws Exception {
+    protected List<Entry> getChildrenEntries(Request request, Entry group) throws Exception {
+        List<Entry> result = new ArrayList<Entry>();
+        if(!group.isGroup()) 
+            return result;
+        for(Entry entry: getChildren(request,  (Group)group)) {
+            if(!entry.isGroup()) result.add(entry);
+        }
+        return result;
+    }
+
+
+
+    protected List<Entry> getChildren(Request request,  Entry group) throws Exception {
         List<Entry> children =  new ArrayList<Entry>();
-        List<String> ids = getChildIds(request, group, null);
+        if(!group.isGroup()) 
+            return children;
+        List<String> ids = getChildIds(request, (Group)group, null);
         for (String id : ids) {
             Entry entry = getEntry(request, id);
             if (entry == null) {
@@ -4624,7 +4646,7 @@ return new Result(title, sb);
         int idx = text.indexOf("<more>");
         if (idx >= 0) {
             String first  = text.substring(0, idx);
-            String base   = "" + (Repository.blockCnt++);
+            String base   = "" + (HtmlUtil.blockCnt++);
             String divId  = "morediv_" + base;
             String linkId = "morelink_" + base;
             String second = text.substring(idx + "<more>".length());

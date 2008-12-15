@@ -607,6 +607,11 @@ public class Request implements Constants {
     }
 
 
+    public boolean isEmbedded() {
+        return get(ARG_EMBEDDED,false);
+    }
+
+
     /**
      * _more_
      *

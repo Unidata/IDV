@@ -412,7 +412,7 @@ public class CatalogHarvester extends Harvester {
             groupSB.append(groupLine);
         }
         groupSB.append("</ul></div>");
-        sb.append(getRepository().makeShowHideBlock(null, "Entries", groupSB,
+        sb.append(HtmlUtil.makeShowHideBlock("Entries", groupSB.toString(),
                 false));
         return sb.toString();
     }

@@ -777,8 +777,7 @@ public class MetadataManager extends RepositoryManager {
                 tmp.append("<ul>");
                 tmp.append(groupMap.get(name));
                 tmp.append("</ul>");
-                sb.append(getRepository().makeShowHideBlock(request, name,
-                        tmp, false));
+                sb.append(HtmlUtil.makeShowHideBlock(name,  tmp.toString(), false));
 
             }
         } else {

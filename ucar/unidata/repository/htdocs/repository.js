@@ -481,35 +481,61 @@ function toggleBlockVisibility(id, imgid, showimg, hideimg) {
 
 
 
-function  handleFolderList(request, id) {
-    var block = util.getDomObject("block_" + id);
-    var img = util.getDomObject("img_" +id);
-    var xmlDoc=request.responseXML.documentElement;
-    block.obj.innerHTML = getChildText(xmlDoc);
-    if(img) img.obj.src = "${urlroot}/icons/folderopen.gif";
 
-}
 
-function folderClick(id, output,args) {
+
+var originalImages = new Array();
+var changeImages = new Array();
+var entryIds = new Array();
+
+function folderClick(entryId, uid, output,args,changeImg) {
+    changeImages[uid] = changeImg;
+    entryIds[uid] = entryId;
     if (!output) output = "groupxml";
     if(!args) args ="";
     else args = "&" + args;
-    var block = util.getDomObject("block_" + id);
-    if(!block) return;
-    var img = util.getDomObject("img_" +id);
+    var block = util.getDomObject(uid);
+    if(!block) {
+        alert("no block " + uid);
+	return;
+    }
+    var img = util.getDomObject("img_" +uid);
     if(!block.obj.isOpen) {
+	originalImages[uid] = img.obj.src;
         block.obj.isOpen = 1;
         showObject(block);
         if(img) img.obj.src = "${urlroot}/icons/progress.gif";
-        url = "${urlroot}/entry/show?entryid=" + id +"&output=" + output+args;
-	util.loadXML( url, handleFolderList,id);
+        url = "${urlroot}/entry/show?entryid=" + entryId +"&output=" + output+args;
+	util.loadXML( url, handleFolderList,uid);
     } else {
-        if(img) img.obj.src = "${urlroot}/icons/folderclosed.gif";
+	if(changeImg && img) {
+            if(originalImages[uid]) {
+                img.obj.src = originalImages[uid];
+            } else 
+                img.obj.src = "${urlroot}/icons/folderclosed.gif";
+        }
         block.obj.isOpen = 0;
         hideObject(block);
     }
 }
 
+
+
+function  handleFolderList(request, uid) {
+    var block = util.getDomObject(uid);
+    var img = util.getDomObject("img_" +uid);
+    var xmlDoc=request.responseXML.documentElement;
+    block.obj.innerHTML = getChildText(xmlDoc);
+    
+    if(img) {
+        if(changeImages[uid]) {
+            img.obj.src = "${urlroot}/icons/folderopen.gif";
+        } else {
+            img.obj.src = originalImages[uid];
+        }
+    }
+
+}
 
 
 

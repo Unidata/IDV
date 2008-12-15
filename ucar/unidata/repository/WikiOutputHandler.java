@@ -94,6 +94,17 @@ public class WikiOutputHandler extends OutputHandler implements WikiUtil.WikiPag
 
     public static final String WIKIPROP_IMPORT = "import";
 
+    public static final String WIKIPROP_TOOLBAR = "toolbar";
+    public static final String WIKIPROP_METADATA = "metadata";
+    public static final String WIKIPROP_NAME = "name";
+    public static final String WIKIPROP_DESCRIPTION = "description";
+    public static final String WIKIPROP_ACTIONS = "actions";
+    public static final String WIKIPROP_ = "";
+    public static final String WIKIPROP_CHILDREN_GROUPS = "subgroups";
+    public static final String WIKIPROP_CHILDREN_ENTRIES = "subentries";
+    public static final String WIKIPROP_CHILDREN = "children";
+
+
     /**
      * _more_
      *
@@ -147,7 +158,6 @@ public class WikiOutputHandler extends OutputHandler implements WikiUtil.WikiPag
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
 
-
         String desc = entry.getDescription();
         StringBuffer sb  = new StringBuffer();
 
@@ -171,18 +181,78 @@ public class WikiOutputHandler extends OutputHandler implements WikiUtil.WikiPag
     }
 
     
-    public String makeShowHideBlock(WikiUtil wikiUtil, String title, String contents) {
-        return Repository.makeShowHideBlock(title, new StringBuffer(contents),
-                                            true," class=\"wiki=tocheader\"",
-                                            " class=\"wiki-toc\" ");
-    }
 
     public String getPropertyValue(WikiUtil wikiUtil, String property) {
-        property  =property.trim();
-        if(property.startsWith(WIKIPROP_IMPORT+":")) {
-            return handleImport(wikiUtil,property.substring(WIKIPROP_IMPORT.length()+1));
+        try {
+            Entry entry = (Entry) wikiUtil.getProperty(PROP_ENTRY);
+            Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
+            property  =property.trim();
+            if(property.startsWith(WIKIPROP_IMPORT+":")) {
+                return handleImport(wikiUtil,property.substring(WIKIPROP_IMPORT.length()+1));
+            }
+            String include = handleImport(wikiUtil, request, entry, property);
+            if(include!=null) {
+                return include;
+            }
+            return wikiUtil.getPropertyValue(property);
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
         }
-        return wikiUtil.getPropertyValue(property);
+    }
+
+
+    public String getInclude(WikiUtil wikiUtil, Request request, Entry  entry, String include) throws Exception {
+        if(include.equals(WIKIPROP_METADATA)) {
+            String informationBlock = getRepository().getHtmlOutputHandler().getInformationTabs(request, entry,true);
+            String result= HtmlUtil.makeShowHideBlock(msg("Information"),
+                                              informationBlock, true);
+            return result;
+        }
+        if(include.equals(WIKIPROP_ACTIONS)) {
+            return  HtmlUtil.makeShowHideBlock(msg("Actions"),getEntryManager().getEntryActionsList(request, entry),true);
+        }
+        if(include.equals(WIKIPROP_TOOLBAR)) {
+            return getEntryManager().getEntryActionsToolbar(request, entry,
+                                                     false);
+        }
+        if(include.equals(WIKIPROP_DESCRIPTION)) {
+            return entry.getDescription();
+        }
+        if(include.equals(WIKIPROP_NAME)) {
+            return entry.getName();
+        }
+        if(include.equals(WIKIPROP_CHILDREN_GROUPS)) {
+            StringBuffer sb = new StringBuffer();
+            List<Entry> children = getEntryManager().getChildrenGroups(request, entry);
+            if(children.size()==0) return "";
+            String link = getEntriesList(sb, children, request, true,
+                                         false, false);
+            return HtmlUtil.makeShowHideBlock(msg("Groups") + link,
+                                              sb.toString(), true);
+        }
+
+        if(include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
+            StringBuffer sb = new StringBuffer();
+            List<Entry> children = getEntryManager().getChildrenEntries(request, entry);
+            if(children.size()==0) return "";
+            String link = getEntriesList(sb, children, request, true,
+                                         false, false);
+            return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
+                                              sb.toString(), true);
+        }
+
+        if(include.equals(WIKIPROP_CHILDREN)) {
+            StringBuffer sb = new StringBuffer();
+            List<Entry> children = getEntryManager().getChildren(request, entry);
+            if(children.size()==0) return "";
+            String link = getEntriesList(sb, children, request, true,
+                                         false, false);
+            return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
+                                              sb.toString(), true);
+        }
+
+
+        return null;
     }
 
     public String handleImport(WikiUtil wikiUtil, String property) {
@@ -198,26 +268,31 @@ public class WikiOutputHandler extends OutputHandler implements WikiUtil.WikiPag
                 entryName = pair[0].trim();
                 outputType = new OutputType(pair[1].trim(),false);
             }
-
-            //Check for metadata, header, etc.
-            if(outputType.equals("metadata")) {
-                
-            }
-
-            OutputHandler handler = getRepository().getOutputHandler(outputType);
-            if(handler == null) {
-                return "Error:Could not find output handler for type: " + outputType;
-            }
-            outputType = handler.findOutputType(outputType.getId());
-
             Entry importEntry = findEntry(request, entryName,parent);
             if(importEntry==null) {
                 return "Error:Could not find entry: " + entryName;
             }
 
-            if(importEntry.equals(entry)) {
-                return "Error:Circular wiki reference: " + entryName;
+            return handleImport(wikiUtil, request, importEntry, outputType.getId());
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+
+    public String handleImport(WikiUtil wikiUtil, Request request, Entry importEntry,String property) {
+        try {
+            String include = getInclude(wikiUtil,request, importEntry, property);
+            if(include!=null) {
+                return include;
             }
+
+            OutputHandler handler = getRepository().getOutputHandler(property);
+            if(handler == null) {
+                return null;
+            }
+            OutputType outputType = handler.findOutputType(property);
 
 
             String originalOutput = request.getString(ARG_OUTPUT, (String) "");

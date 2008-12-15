@@ -489,6 +489,20 @@ a.menulink {
 }
 
 
+.actionblock {
+   xxmax-height: 50px; 
+   xxoverflow-y: auto;
+   margin:0px;
+   padding:0px;
+   padding-left:18px;
+}
+
+.actionblock li {
+   margin:0px;
+   padding:0px;   
+}
+
+
 .pagesubheading {
    margin:0px;
    padding:0px;
