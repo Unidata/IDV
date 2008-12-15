@@ -59,7 +59,6 @@ public class WikiUtil {
 
     public static interface WikiPageHandler {
         public String makeLink(WikiUtil wikiUtil, String name, String label);
-        public String makeShowHideBlock(WikiUtil wikiUtil,String title, String contents);
         public String getPropertyValue(WikiUtil wikiUtil, String property);
     }
 
@@ -117,9 +116,9 @@ public class WikiUtil {
 
 
 
+        List headings = new ArrayList();
         pattern  =Pattern.compile("(?m)^\\s*(==+)([^=]+)(==+)\\s*$");
         matcher  =pattern.matcher(s);
-        List headings = new ArrayList();
         while(matcher.find()) {
             String prefix = matcher.group(1).trim();
             String label = matcher.group(2).trim();
@@ -209,33 +208,56 @@ public class WikiUtil {
         s = buff.toString();
 
 
-        pattern  =Pattern.compile("\\{\\{([^\\}]+)\\}\\}");
-        matcher  =pattern.matcher(s);
-        while(matcher.find()) {
-            String property = matcher.group(1).trim();
-            int start = matcher.start(0);
-            int end =matcher.end(0);
+        StringBuffer sb = new StringBuffer();
+        int baseIdx = 0;
+        while(true) {
+            int idx1 = s.indexOf("{{",baseIdx);
+            if(idx1<0) {
+                //                System.err.println("no idx1");
+                sb.append(s.substring(baseIdx));
+                break;
+            }
+            int idx2 = s.indexOf("}}",idx1);
+            if(idx2<=idx1) {
+                //                System.err.println("no idx2");
+                sb.append(s.substring(baseIdx));
+                break;
+            }
+            sb.append(s.substring(baseIdx,idx1));
+            String property = s.substring(idx1+2,idx2);
+            //            System.err.println("property:" + property);
+            baseIdx = idx2+2;
             String value=null;
             if(handler!=null) {
                 value = handler.getPropertyValue(this,property);
             } 
-            if(value==null) value = "unknown property: " + property;
-            s = s.substring(0,start) +value+ s.substring(end);
-            matcher =pattern.matcher(s);
+            if(value==null) value = "Unknown property:" + property;
+            sb.append(value);
         }
-        if(true) return s;
+
+        s = sb.toString();
+        //        if(true) return s;
+
+        /*
+          <block title="foo">xxxxx</block>
+         */
+        while(true) {
+            int idx1 = s.indexOf("<block");
+            if(idx1<0) break;
+            String first  = s.substring(0, idx1);
+        }
 
         s = s.replace("_BRACKETOPEN_","[");
         s = s.replace("_BRACKETCLOSE_","]");
-        s = s.replaceAll("(\n\r)+","<br>\n");
-        s = s.replaceAll("\n+","<br>\n");
+        //        s = s.replaceAll("(\n\r)+","<br>\n");
+        //        s = s.replaceAll("\n+","<br>\n");
 
         if(headings.size()>=4) {
             StringBuffer toc  = new StringBuffer();
             makeHeadings(headings,toc,-1,"");
             String block;
             if(handler!=null) {
-                block  = handler.makeShowHideBlock(this,"Contents", toc.toString());
+                block  = HtmlUtil.makeShowHideBlock("Contents", toc.toString(),true);
             } else {
                 block = HtmlUtil.div(HtmlUtil.div("Contents"," class=\"wiki=tocheader\""),
                                      " class=\"wiki-toc\" ");

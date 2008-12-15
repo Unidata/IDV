@@ -1509,6 +1509,202 @@ public class HtmlUtil {
 
 
 
+    /** _more_ */
+    static int tabCnt = 0;
+
+    /**
+     * _more_
+     *
+     * @param titles _more_
+     * @param contents _more_
+     * @param skipEmpty _more_
+     *
+     * @return _more_
+     */
+    public static String makeTabs(List titles, List contents, boolean skipEmpty) {
+        return makeTabs(titles, contents, skipEmpty, "tabcontent");
+    }
+
+    /**
+     * _more_
+     *
+     * @param titles _more_
+     * @param contents _more_
+     * @param skipEmpty _more_
+     * @param tabContentClass _more_
+     *
+     * @return _more_
+     */
+    public static String makeTabs(List titles, List contents, boolean skipEmpty,
+                           String tabContentClass) {
+        return makeTabs(titles, contents, skipEmpty, tabContentClass,
+                        "tabcontents");
+    }
+
+    /**
+     * _more_
+     *
+     * @param titles _more_
+     * @param contents _more_
+     * @param skipEmpty _more_
+     * @param tabContentClass _more_
+     * @param wrapperClass _more_
+     *
+     * @return _more_
+     */
+    public static String makeTabs(List titles, List contents, boolean skipEmpty,
+                           String tabContentClass, String wrapperClass) {
+
+        String id  = "tab_" + (tabCnt++);
+        String ids = "tab_" + (tabCnt++) + "_ids";
+        StringBuffer titleSB =
+            new StringBuffer(
+                "<table cellspacing=\"0\" cellpadding=\"0\"><tr>");
+
+        titleSB = new StringBuffer("");
+        StringBuffer contentSB = new StringBuffer();
+        StringBuffer jsSB      = new StringBuffer("var " + ids + "=[");
+        boolean      didone    = false;
+        for (int i = 0; i < titles.size(); i++) {
+            String title   = titles.get(i).toString();
+            String content = contents.get(i).toString();
+            if (skipEmpty && (content.length() == 0)) {
+                continue;
+            }
+            String tabId = id + "_" + i;
+            contentSB.append("\n");
+            contentSB.append(
+                HtmlUtil.div(
+                    content,
+                    HtmlUtil.cssClass(tabContentClass)
+                    + HtmlUtil.id("content_" + tabId)
+                    + HtmlUtil.style("display:block;visibility:" + ( !didone
+                    ? "visible"
+                    : "hidden"))));
+            String link = HtmlUtil.href("javascript:" + id + ".toggleTab("
+                                        + HtmlUtil.squote(tabId)
+                                        + ")", title);
+            //            titleSB.append("<td>\n");
+            titleSB.append(HtmlUtil.span(link,
+                                         HtmlUtil.cssClass("tabtitle")
+                                         + HtmlUtil.id("title_" + tabId)));
+            //            titleSB.append("\n</td>\n");
+            if (didone) {
+                jsSB.append(",");
+            }
+            jsSB.append(HtmlUtil.squote(tabId));
+            didone = true;
+        }
+        jsSB.append("];\n");
+
+        //        titleSB.append("</tr></table>");
+        return HtmlUtil.script(jsSB.toString())
+               + HtmlUtil.div(
+                   titleSB.toString(),
+                   HtmlUtil.cssClass("tabtitles")) + HtmlUtil.div(
+                       contentSB.toString(),
+                       HtmlUtil.cssClass(wrapperClass)) + HtmlUtil.script(
+                           "var " + id + "=new Tab(" + ids + ");\n");
+    }
+
+
+    private static String blockHideImageUrl;
+    private static String blockShowImageUrl;
+
+    public static void setHideShowImage(String hideImg, String showImg) {
+        blockHideImageUrl = hideImg;
+        blockShowImageUrl = showImg;
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
+    public static String makeShowHideBlock(String label,
+                                           String content, boolean visible) {
+        return makeShowHideBlock(label, content, visible,
+                                 "class=\"pagesubheading\"");
+    }
+
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     * @param headerExtra _more_
+     *
+     * @return _more_
+     */
+    public static String makeShowHideBlock(String label,
+                                    String content, boolean visible,
+                                    String headerExtra) {
+        return HtmlUtil.makeShowHideBlock(label,content,visible, headerExtra, HtmlUtil.cssClass("block"), blockHideImageUrl,blockShowImageUrl);
+    }
+
+
+
+
+
+    public static String makeShowHideBlock(String label,
+                                           String content, 
+                                           boolean visible,
+                                           String headerExtra,
+                                           String blockExtra) {
+        return HtmlUtil.makeShowHideBlock(label,content,visible, headerExtra, blockExtra,blockHideImageUrl,blockShowImageUrl);
+    }
+
+
+
+
+
+    /** _more_ */
+    public static int blockCnt = 0;
+
+
+    public static String makeShowHideBlock(String label,
+                                    String content, boolean visible,
+                                    String headerExtra,
+                                           String blockExtra,
+                                    String hideImg,
+                                    String showImg) {
+        String       id      = "block_" + (blockCnt++);
+        StringBuffer sb      = new StringBuffer();
+        String link =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
+                + id + "','" + id + "img','" + hideImg + "','" + showImg
+                + "')"), HtmlUtil.img(visible
+                                      ? hideImg
+                                      : showImg, "",
+                                          " id='" + id
+                                          + "img' ") + HtmlUtil.space(1)
+                                              + label, HtmlUtil.cssClass(
+                                                  "pagesubheadinglink"));
+
+        //        sb.append(RepositoryManager.tableSubHeader(link));
+        sb.append("<div  " + blockExtra+">");
+        sb.append(HtmlUtil.div(link, headerExtra));
+        sb.append("<div " + HtmlUtil.cssClass("hideshowblock") + HtmlUtil.id(id)
+                  + HtmlUtil.style("display:block;visibility:visible") +">");
+        if ( !visible) {
+            sb.append(HtmlUtil.script(HtmlUtil.call("hide",HtmlUtil.squote("id"))));
+        }
+
+        sb.append(content.toString());
+        sb.append("</div>");
+        sb.append("</div>");
+        return sb.toString();
+    }
+
 
 
 }
