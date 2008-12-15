@@ -58,8 +58,8 @@ public class WikiUtil {
     }
 
     public static interface WikiPageHandler {
-        public String makeLink(WikiUtil wikiUtil, String name, String label);
-        public String getPropertyValue(WikiUtil wikiUtil, String property);
+        public String makeWikiLink(WikiUtil wikiUtil, String name, String label);
+        public String getWikiPropertyValue(WikiUtil wikiUtil, String property);
     }
 
     public String getPropertyValue(String property) {
@@ -87,7 +87,7 @@ public class WikiUtil {
                 if(label.trim().length()==0) label = name;
                 link = "<a href=\"" + name +"\">" + label +"</a>";
             } else {
-                link  = handler.makeLink(this, name, label);
+                link  = handler.makeWikiLink(this, name, label);
             }
             s = s.substring(0,start) +link + s.substring(end);
             matcher =pattern.matcher(s);
@@ -133,6 +133,7 @@ public class WikiUtil {
             s = s.substring(0,start)  + value+ s.substring(end);
             matcher =pattern.matcher(s);
         }
+
 
 
 
@@ -208,6 +209,7 @@ public class WikiUtil {
         s = buff.toString();
 
 
+        //        System.err.println("S:" + s.trim()+"\n***********************");
         StringBuffer sb = new StringBuffer();
         int baseIdx = 0;
         while(true) {
@@ -229,23 +231,22 @@ public class WikiUtil {
             baseIdx = idx2+2;
             String value=null;
             if(handler!=null) {
-                value = handler.getPropertyValue(this,property);
+                value = handler.getWikiPropertyValue(this,property);
             } 
             if(value==null) value = "Unknown property:" + property;
             sb.append(value);
         }
 
         s = sb.toString();
-        //        if(true) return s;
 
         /*
           <block title="foo">xxxxx</block>
          */
-        while(true) {
-            int idx1 = s.indexOf("<block");
-            if(idx1<0) break;
-            String first  = s.substring(0, idx1);
-        }
+        //        while(true) {
+            //            int idx1 = s.indexOf("<block");
+            //            if(idx1<0) break;
+            //            String first  = s.substring(0, idx1);
+        //        }
 
         s = s.replace("_BRACKETOPEN_","[");
         s = s.replace("_BRACKETCLOSE_","]");
@@ -257,7 +258,7 @@ public class WikiUtil {
             makeHeadings(headings,toc,-1,"");
             String block;
             if(handler!=null) {
-                block  = HtmlUtil.makeShowHideBlock("Contents", toc.toString(),true);
+                block  = HtmlUtil.makeShowHideBlock("Contents", toc.toString(),true,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
             } else {
                 block = HtmlUtil.div(HtmlUtil.div("Contents"," class=\"wiki=tocheader\""),
                                      " class=\"wiki-toc\" ");

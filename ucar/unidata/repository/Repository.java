@@ -2338,6 +2338,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public HtmlOutputHandler getHtmlOutputHandler() throws Exception {
         return  (HtmlOutputHandler)getOutputHandler(OutputHandler.OUTPUT_HTML);
     }
+
+
     /**
      * _more_
      *

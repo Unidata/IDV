@@ -589,21 +589,21 @@ form {
 
 .wiki-h1 {
    font-weight: bold;
-   margin-top: 0;
+   margin-top: 5;
    margin-bottom: 0;
    font-size: 22px; 
 }
 
 .wiki-h2 {
    font-weight: bold;
-   margin-top: 0;
+   margin-top: 5;
    margin-bottom: 0;
    font-size: 20px; 
 }
 
 .wiki-h3 {
    font-weight: bold;
-   margin-top: 0;
+   margin-top: 5;
    margin-bottom: 0;
    font-size: 18px; 
 }
@@ -611,7 +611,7 @@ form {
 
 .wiki-h4 {
    font-weight: bold;
-   margin-top: 0;
+   margin-top: 5;
    margin-bottom: 0;
    font-size: 16px; 
 }
@@ -619,7 +619,7 @@ form {
 
 .wiki-h5 {
    font-weight: bold;
-   margin-top: 0;
+   margin-top: 5;
    margin-bottom: 0;
    font-size: 14px; 
 }
