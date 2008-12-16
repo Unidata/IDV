@@ -28,7 +28,6 @@ import org.w3c.dom.*;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.WikiUtil;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
@@ -36,6 +35,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.WikiUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -79,17 +79,18 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPageHandler {
+public class OutputHandler extends RepositoryManager implements WikiUtil
+    .WikiPageHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
-                                                                "default.html",true);
+                                                     "default.html", true);
 
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private List<OutputType> types = new ArrayList<OutputType>();
 
 
@@ -108,9 +109,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public OutputType findOutputType(String id) {
-        int idx = types.indexOf(new OutputType(id,true));
-        if(idx>=0) return types.get(idx);
+        int idx = types.indexOf(new OutputType(id, true));
+        if (idx >= 0) {
+            return types.get(idx);
+        }
         return null;
     }
 
@@ -506,18 +516,34 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      */
     protected static String getGroupSelect(Request request, String elementId)
             throws Exception {
-        return getSelect(request, elementId, "Select",false,false);
+        return getSelect(request, elementId, "Select", false, false);
     }
 
 
-    protected static String getSelect(Request request, String elementId,String label, boolean allEntries,  boolean append)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param elementId _more_
+     * @param label _more_
+     * @param allEntries _more_
+     * @param append _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected static String getSelect(Request request, String elementId,
+                                      String label, boolean allEntries,
+                                      boolean append)
             throws Exception {
         String event = "selectInitialClick(event,"
-            + HtmlUtil.squote(elementId)+","+HtmlUtil.squote(""+allEntries)+"," +
-            HtmlUtil.squote(""+append) + ")";
+                       + HtmlUtil.squote(elementId) + ","
+                       + HtmlUtil.squote("" + allEntries) + ","
+                       + HtmlUtil.squote("" + append) + ")";
         return HtmlUtil.mouseClickHref(event, msg(label),
                                        HtmlUtil.id(elementId
-                                                   + ".selectlink"));
+                                           + ".selectlink"));
     }
 
     /**
@@ -525,7 +551,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      *
      * @param request _more_
      * @param group _more_
+     * @param entry _more_
      * @param target _more_
+     * @param allEntries _more_
      *
      * @return _more_
      *
@@ -533,7 +561,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      */
     protected String getSelectLink(Request request, Entry entry,
                                    String target, boolean allEntries)
-        throws Exception {
+            throws Exception {
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
@@ -541,35 +569,41 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         String       event;
         if (entry.isGroup()) {
             event = HtmlUtil.onMouseClick("folderClick("
-                                          + HtmlUtil.squote(entryId)+","
+                                          + HtmlUtil.squote(entryId) + ","
                                           + HtmlUtil.squote(entryId)
                                           + ",'selectxml',"
                                           + HtmlUtil.squote(ATTR_TARGET + "="
-                                                            + target+"&allentries="+allEntries) + ")");
+                                              + target + "&allentries="
+                                                  + allEntries) + ")");
         } else {
             event = HtmlUtil.onMouseClick("folderClick("
-                                          + HtmlUtil.squote(entryId)+","
+                                          + HtmlUtil.squote(entryId) + ","
                                           + HtmlUtil.squote(entryId)
                                           + ",'selectxml',"
                                           + HtmlUtil.squote(ATTR_TARGET + "="
-                                                            + target+"&allentries="+allEntries) + ")");
+                                              + target + "&allentries="
+                                                  + allEntries) + ")");
 
         }
         String img = HtmlUtil.img(icon, (entry.isGroup()
                                          ? "Click to open group; "
-                                         : ""), HtmlUtil.id("img_"+ entryId) + event);
+                                         : ""), HtmlUtil.id("img_" + entryId)
+                                             + event);
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 
-        boolean append = request.get("append",false);
-        String elementId = entry.getId();
-        String value     = (entry.isGroup()?((Group)entry).getFullName():entry.getName());
+        boolean append    = request.get("append", false);
+        String  elementId = entry.getId();
+        String  value     = (entry.isGroup()
+                             ? ((Group) entry).getFullName()
+                             : entry.getName());
         sb.append(HtmlUtil.mouseClickHref("selectClick("
                                           + HtmlUtil.squote(target) + ","
-                                          + HtmlUtil.squote(entry.getId()) +","
-                                          + HtmlUtil.squote(value)+","
-                                          + (append?"1":"0") 
-                                          + ")", linkText));
+                                          + HtmlUtil.squote(entry.getId())
+                                          + "," + HtmlUtil.squote(value)
+                                          + "," + (append
+                ? "1"
+                : "0") + ")", linkText));
         return sb.toString();
     }
 
@@ -624,16 +658,27 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
     public void applySettings(Request request) throws Exception {}
 
 
+    /** _more_          */
     public static int entryCnt = 0;
 
-    public String[] getEntryFormStart(Request request,List entries) throws Exception {
-        String base = "toggleentry" + (entryCnt++);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] getEntryFormStart(Request request, List entries)
+            throws Exception {
+        String       base   = "toggleentry" + (entryCnt++);
         StringBuffer formSB = new StringBuffer();
-        formSB.append(
-                      request.formPost(
-                                       getRepository().URL_ENTRY_GETENTRIES, "getentries"));
-        List<OutputType> outputList =
-            getRepository().getOutputTypes(request, new State(entries));
+        formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
+                                       "getentries"));
+        List<OutputType> outputList = getRepository().getOutputTypes(request,
+                                          new State(entries));
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         for (OutputType outputType : outputList) {
             tfos.add(new TwoFacedObject(outputType.getLabel(),
@@ -645,24 +690,37 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         selectSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
         selectSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
-        
+
         String arrowImg =
             HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),
-                         msg("Show/Hide Form"), HtmlUtil.id(base+"img"));
+                         msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
         String link = HtmlUtil.space(2)
-            + HtmlUtil.jsLink(
-                              HtmlUtil.onMouseClick(base+".groupToggleVisibility()"), arrowImg);
+                      + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base
+                          + ".groupToggleVisibility()"), arrowImg);
         formSB.append(HtmlUtil.span(selectSB.toString(),
-                                    HtmlUtil.id(base+"select")));
-        formSB.append(HtmlUtil.script(base+" = new VisibilityGroup("+ HtmlUtil.squote(base+"img")+");\n"+
-                                      HtmlUtil.call(base+".groupAddEntry", HtmlUtil.squote(base+"select"))));
-        return new String[]{link,base,formSB.toString()};
+                                    HtmlUtil.id(base + "select")));
+        formSB.append(
+            HtmlUtil.script(
+                base + " = new VisibilityGroup("
+                + HtmlUtil.squote(base + "img") + ");\n"
+                + HtmlUtil.call(
+                    base + ".groupAddEntry",
+                    HtmlUtil.squote(base + "select"))));
+        return new String[] { link, base, formSB.toString() };
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param base _more_
+     *
+     * @return _more_
+     */
     public String getEntryFormEnd(Request request, String base) {
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.formClose());
-        sb.append(HtmlUtil.script(base+".groupToggleVisibility();"));
+        sb.append(HtmlUtil.script(base + ".groupToggleVisibility();"));
         return sb.toString();
     }
 
@@ -683,33 +741,34 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
      * @throws Exception _more_
      */
     public String getEntriesList(StringBuffer sb, List entries,
-                               Request request, boolean doForm,
-                               boolean dfltSelected, boolean showCrumbs)
+                                 Request request, boolean doForm,
+                                 boolean dfltSelected, boolean showCrumbs)
             throws Exception {
 
         String link = "";
         String base = "";
         if (doForm) {
-            String[]tuple   = getEntryFormStart(request,entries);
+            String[] tuple = getEntryFormStart(request, entries);
             link = tuple[0];
             base = tuple[1];
             sb.append(tuple[2]);
-       }
-        sb.append(
-                  "<ul class=\"folderblock\" style=\"list-style-image : url("
+        }
+        sb.append("<ul class=\"folderblock\" style=\"list-style-image : url("
                   + getRepository().fileUrl(ICON_BLANK) + ")\">");
 
         //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
-        int cnt = 0;
+        int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
             sb.append("<li>");
             if (doForm) {
-                String id = base+(cnt++);
-                jsSB.append(base+".groupAddEntry(" + HtmlUtil.squote(id)+");\n");
+                String id = base + (cnt++);
+                jsSB.append(base + ".groupAddEntry(" + HtmlUtil.squote(id)
+                            + ");\n");
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                String cbx = HtmlUtil.checkbox("entry_" + entry.getId(), "true",dfltSelected);
-                cbx = HtmlUtil.span(cbx,HtmlUtil.id(id));
+                String cbx = HtmlUtil.checkbox("entry_" + entry.getId(),
+                                 "true", dfltSelected);
+                cbx = HtmlUtil.span(cbx, HtmlUtil.id(id));
                 sb.append(cbx);
             }
 
@@ -721,13 +780,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
                 sb.append(getEntryManager().getBreadCrumbs(request, entry));
             } else {
                 sb.append(getEntryManager().getAjaxLink(request, entry,
-                                                        entry.getLabel(), true));
+                        entry.getLabel(), true));
             }
         }
         if (doForm) {
             sb.append("</ul>");
             sb.append(HtmlUtil.script(jsSB.toString()));
-            sb.append(getEntryFormEnd(request,base));
+            sb.append(getEntryFormEnd(request, base));
         }
         return link;
     }
@@ -854,169 +913,269 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
 
 
 
+    /** _more_          */
     public static final String PROP_ENTRY = "entry";
+
+    /** _more_          */
     public static final String PROP_REQUEST = "request";
+
+    /** _more_          */
     public static final String WIKIPROP_IMPORT = "import";
+
+    /** _more_          */
     public static final String WIKIPROP_TOOLBAR = "toolbar";
+
+    /** _more_          */
     public static final String WIKIPROP_METADATA = "metadata";
+
+    /** _more_          */
     public static final String WIKIPROP_NAME = "name";
+
+    /** _more_          */
     public static final String WIKIPROP_DESCRIPTION = "description";
+
+    /** _more_          */
     public static final String WIKIPROP_ACTIONS = "actions";
+
+    /** _more_          */
     public static final String WIKIPROP_ = "";
+
+    /** _more_          */
     public static final String WIKIPROP_CHILDREN_GROUPS = "subgroups";
+
+    /** _more_          */
     public static final String WIKIPROP_CHILDREN_ENTRIES = "subentries";
+
+    /** _more_          */
     public static final String WIKIPROP_CHILDREN = "children";
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param property _more_
+     *
+     * @return _more_
+     */
     public String getWikiPropertyValue(WikiUtil wikiUtil, String property) {
         try {
-            Entry entry = (Entry) wikiUtil.getProperty(PROP_ENTRY);
+            Entry   entry   = (Entry) wikiUtil.getProperty(PROP_ENTRY);
             Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
-            property  =property.trim();
-            if(property.startsWith(WIKIPROP_IMPORT+":")) {
-                return handleWikiImport(wikiUtil,property.substring(WIKIPROP_IMPORT.length()+1));
+            property = property.trim();
+            if (property.startsWith(WIKIPROP_IMPORT + ":")) {
+                return handleWikiImport(
+                    wikiUtil,
+                    property.substring(WIKIPROP_IMPORT.length() + 1));
             }
-            String include = handleWikiImport(wikiUtil, request, entry, property);
-            if(include!=null) {
+            String include = handleWikiImport(wikiUtil, request, entry,
+                                 property);
+            if (include != null) {
                 return include;
             }
             return wikiUtil.getPropertyValue(property);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
 
-    public String getWikiInclude(WikiUtil wikiUtil, Request request, Entry  entry, String include) throws Exception {
-        if(include.equals(WIKIPROP_METADATA)) {
-            String informationBlock = getRepository().getHtmlOutputHandler().getInformationTabs(request, entry,true);
-            String result= HtmlUtil.makeShowHideBlock(msg("Information"),
-                                              informationBlock, true);
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param request _more_
+     * @param entry _more_
+     * @param include _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getWikiInclude(WikiUtil wikiUtil, Request request,
+                                 Entry entry, String include)
+            throws Exception {
+        if (include.equals(WIKIPROP_METADATA)) {
+            String informationBlock =
+                getRepository().getHtmlOutputHandler().getInformationTabs(
+                    request, entry, true);
+            String result = HtmlUtil.makeShowHideBlock(msg("Information"),
+                                informationBlock, true);
             return result;
         }
-        if(include.equals(WIKIPROP_ACTIONS)) {
-            return  HtmlUtil.makeShowHideBlock(msg("Actions"),getEntryManager().getEntryActionsList(request, entry),true);
+        if (include.equals(WIKIPROP_ACTIONS)) {
+            return HtmlUtil.makeShowHideBlock(msg("Actions"),
+                    getEntryManager().getEntryActionsList(request, entry),
+                    true);
         }
-        if(include.equals(WIKIPROP_TOOLBAR)) {
+        if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryActionsToolbar(request, entry,
-                                                     false);
+                    false);
         }
-        if(include.equals(WIKIPROP_DESCRIPTION)) {
+        if (include.equals(WIKIPROP_DESCRIPTION)) {
             return entry.getDescription();
         }
-        if(include.equals(WIKIPROP_NAME)) {
+        if (include.equals(WIKIPROP_NAME)) {
             return entry.getName();
         }
-        if(include.equals(WIKIPROP_CHILDREN_GROUPS)) {
+        if (include.equals(WIKIPROP_CHILDREN_GROUPS)) {
             StringBuffer sb = new StringBuffer();
-            List<Entry> children = getEntryManager().getChildrenGroups(request, entry);
-            if(children.size()==0) return "";
-            String link = getEntriesList(sb, children, request, true,
-                                         false, false);
+            List<Entry> children =
+                getEntryManager().getChildrenGroups(request, entry);
+            if (children.size() == 0) {
+                return "";
+            }
+            String link = getEntriesList(sb, children, request, true, false,
+                                         false);
             return HtmlUtil.makeShowHideBlock(msg("Groups") + link,
-                                              sb.toString(), true);
+                    sb.toString(), true);
         }
 
-        if(include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
+        if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
             StringBuffer sb = new StringBuffer();
-            List<Entry> children = getEntryManager().getChildrenEntries(request, entry);
-            if(children.size()==0) return "";
-            String link = getEntriesList(sb, children, request, true,
-                                         false, false);
+            List<Entry> children =
+                getEntryManager().getChildrenEntries(request, entry);
+            if (children.size() == 0) {
+                return "";
+            }
+            String link = getEntriesList(sb, children, request, true, false,
+                                         false);
             return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                                              sb.toString(), true);
+                    sb.toString(), true);
         }
 
-        if(include.equals(WIKIPROP_CHILDREN)) {
+        if (include.equals(WIKIPROP_CHILDREN)) {
             StringBuffer sb = new StringBuffer();
-            List<Entry> children = getEntryManager().getChildren(request, entry);
-            if(children.size()==0) return "";
-            String link = getEntriesList(sb, children, request, true,
-                                         false, false);
+            List<Entry> children = getEntryManager().getChildren(request,
+                                       entry);
+            if (children.size() == 0) {
+                return "";
+            }
+            String link = getEntriesList(sb, children, request, true, false,
+                                         false);
             return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                                              sb.toString(), true);
+                    sb.toString(), true);
         }
 
 
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param property _more_
+     *
+     * @return _more_
+     */
     public String handleWikiImport(WikiUtil wikiUtil, String property) {
         try {
             //{{import:the id|output type}}
-            Entry entry = (Entry) wikiUtil.getProperty(PROP_ENTRY);
-            Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
-            Group parent = entry.getParentGroup();
+            Entry      entry      = (Entry) wikiUtil.getProperty(PROP_ENTRY);
+            Request    request = (Request) wikiUtil.getProperty(PROP_REQUEST);
+            Group      parent     = entry.getParentGroup();
             OutputType outputType = OutputHandler.OUTPUT_HTML;
-            String entryName = property;
-            String []pair  = StringUtil.split(property,"|",2);
-            if(pair !=null) {
-                entryName = pair[0].trim();
-                outputType = new OutputType(pair[1].trim(),false);
+            String     entryName  = property;
+            String[]   pair       = StringUtil.split(property, "|", 2);
+            if (pair != null) {
+                entryName  = pair[0].trim();
+                outputType = new OutputType(pair[1].trim(), false);
             }
-            Entry importEntry = findEntry(request, entryName,parent);
-            if(importEntry==null) {
+            Entry importEntry = findEntry(request, entryName, parent);
+            if (importEntry == null) {
                 return "Error:Could not find entry: " + entryName;
             }
 
-            return handleWikiImport(wikiUtil, request, importEntry, outputType.getId());
-        } catch(Exception exc) {
+            return handleWikiImport(wikiUtil, request, importEntry,
+                                    outputType.getId());
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
 
 
-    public String handleWikiImport(WikiUtil wikiUtil, Request request, Entry importEntry,String property) {
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param request _more_
+     * @param importEntry _more_
+     * @param property _more_
+     *
+     * @return _more_
+     */
+    public String handleWikiImport(WikiUtil wikiUtil, Request request,
+                                   Entry importEntry, String property) {
         try {
-            String include = getWikiInclude(wikiUtil,request, importEntry, property);
-            if(include!=null) {
+            String include = getWikiInclude(wikiUtil, request, importEntry,
+                                            property);
+            if (include != null) {
                 return include;
             }
 
-            OutputHandler handler = getRepository().getOutputHandler(property);
-            if(handler == null) {
+            OutputHandler handler =
+                getRepository().getOutputHandler(property);
+            if (handler == null) {
                 return null;
             }
             OutputType outputType = handler.findOutputType(property);
 
 
-            String originalOutput = request.getString(ARG_OUTPUT, (String) "");
+            String originalOutput = request.getString(ARG_OUTPUT,
+                                        (String) "");
             String originalId = request.getString(ARG_ENTRYID, (String) "");
             request.put(ARG_ENTRYID, importEntry.getId());
             request.put(ARG_OUTPUT, outputType.getId());
-            request.put(ARG_EMBEDDED,"true");
+            request.put(ARG_EMBEDDED, "true");
 
             String propertyValue;
-            if(!outputType.getIsHtml()) {
-                String url =  request.entryUrl(getRepository().URL_ENTRY_SHOW,importEntry, ARG_OUTPUT, outputType.getId());
-                String label  = importEntry.getName() +" - " + outputType.getLabel();
-                propertyValue =  getEntryManager().getAjaxLink(request, importEntry,
-                                                     label,url, false);
+            if ( !outputType.getIsHtml()) {
+                String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                 importEntry, ARG_OUTPUT, outputType.getId());
+                String label = importEntry.getName() + " - "
+                               + outputType.getLabel();
+                propertyValue = getEntryManager().getAjaxLink(request,
+                        importEntry, label, url, false);
             } else {
-                Result result = getEntryManager().processEntryShow(request, importEntry);
-                propertyValue =new String(result.getContent());
+                Result result = getEntryManager().processEntryShow(request,
+                                    importEntry);
+                propertyValue = new String(result.getContent());
             }
 
             request.put(ARG_OUTPUT, originalOutput);
             request.put(ARG_ENTRYID, originalId);
             request.remove(ARG_EMBEDDED);
             return propertyValue;
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
 
-    public Entry findEntry(Request request, String name,Group parent) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param name _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry findEntry(Request request, String name, Group parent)
+            throws Exception {
         name = name.trim();
-        Entry theEntry=null;
+        Entry theEntry = null;
         theEntry = getEntryManager().getEntry(request, name);
-        if(theEntry == null) {
-            for(Entry child:  getEntryManager().getChildren(request, parent)) {
-                if(child.getName().equals(name)) {
+        if (theEntry == null) {
+            for (Entry child : getEntryManager().getChildren(request,
+                    parent)) {
+                if (child.getName().equals(name)) {
                     theEntry = child;
                     break;
                 }
@@ -1025,38 +1184,72 @@ public class OutputHandler extends RepositoryManager implements WikiUtil.WikiPag
         return theEntry;
     }
 
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param name _more_
+     * @param label _more_
+     *
+     * @return _more_
+     */
     public String makeWikiLink(WikiUtil wikiUtil, String name, String label) {
         try {
-        Entry entry = (Entry) wikiUtil.getProperty(PROP_ENTRY);
-        Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
-        Group parent = entry.getParentGroup();
-        Entry theEntry=findEntry(request, name,parent);
+            Entry   entry    = (Entry) wikiUtil.getProperty(PROP_ENTRY);
+            Request request  = (Request) wikiUtil.getProperty(PROP_REQUEST);
+            Group   parent   = entry.getParentGroup();
+            Entry   theEntry = findEntry(request, name, parent);
 
-        if(theEntry != null) {
-            if(label.trim().length()==0) label = theEntry.getName();
-            if(theEntry.getType().equals(WikiPageTypeHandler.TYPE_WIKIPAGE)) {
-                String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, theEntry, ARG_OUTPUT,WikiOutputHandler.OUTPUT_WIKI);
-                return getEntryManager().getAjaxLink(request, theEntry,
-                                                     label,url, false);
+            if (theEntry != null) {
+                if (label.trim().length() == 0) {
+                    label = theEntry.getName();
+                }
+                if (theEntry.getType().equals(
+                        WikiPageTypeHandler.TYPE_WIKIPAGE)) {
+                    String url =
+                        request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                         theEntry, ARG_OUTPUT,
+                                         WikiOutputHandler.OUTPUT_WIKI);
+                    return getEntryManager().getAjaxLink(request, theEntry,
+                            label, url, false);
 
-            } else {
-                return getEntryManager().getAjaxLink(request, theEntry,
-                                                     label,false);
+                } else {
+                    return getEntryManager().getAjaxLink(request, theEntry,
+                            label, false);
+                }
             }
-        }
 
-        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,WikiOutputHandler.OUTPUT_WIKI,ARG_WIKI_CREATE, name);
-        return HtmlUtil.href(url,name,HtmlUtil.cssClass("wiki-link-noexist"));
-        } catch(Exception exc) {
+            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                          entry, ARG_OUTPUT,
+                                          WikiOutputHandler.OUTPUT_WIKI,
+                                          ARG_WIKI_CREATE, name);
+            return HtmlUtil.href(url, name,
+                                 HtmlUtil.cssClass("wiki-link-noexist"));
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
 
 
-    public String wikifyEntry(Request request, Entry entry, String wikiContent) throws Exception {
-        WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[]{PROP_REQUEST,request,PROP_ENTRY,entry}));
-        return wikiUtil.wikify(wikiContent,this);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param wikiContent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String wikifyEntry(Request request, Entry entry,
+                              String wikiContent)
+            throws Exception {
+        WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
+                                PROP_REQUEST,
+                                request, PROP_ENTRY, entry }));
+        return wikiUtil.wikify(wikiContent, this);
     }
 
 

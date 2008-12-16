@@ -105,34 +105,34 @@ import javax.swing.*;
 public class Repository extends RepositoryBase implements RequestHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_LINKS = "links";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_HEADER_IMAGE = "header.image";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_HEADER_TITLE = "header.title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_USERLINK = "userlink";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_REPOSITORY_NAME = "repository_name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_FOOTER = "footer";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_ROOT = "root";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_BOTTOM = "bottom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_CONTENT = "content";
 
 
@@ -152,7 +152,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         //        URL_ENTRY_SHOW
     };
 
-    /** _more_          */
+    /** _more_ */
     protected RequestUrl[] groupEditUrls = {
         URL_ENTRY_NEW, URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
         getMetadataManager().URL_METADATA_ADDFORM,
@@ -170,7 +170,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_DELETER =
-        new OutputType("Delete Entry", "repository.delete",true);
+        new OutputType("Delete Entry", "repository.delete", true);
 
 
     /** _more_ */
@@ -187,7 +187,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private Properties properties = new Properties();
 
-    /** _more_          */
+    /** _more_ */
     private Map<String, String> systemEnv;
 
     /** _more_ */
@@ -212,7 +212,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<TwoFacedObject> languages = new ArrayList<TwoFacedObject>();
 
 
-    /** _more_          */
+    /** _more_ */
     private Properties phraseMap;
 
 
@@ -226,7 +226,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
-    /** _more_          */
+    /** _more_ */
     private List<OutputHandler> allOutputHandlers =
         new ArrayList<OutputHandler>();
 
@@ -241,16 +241,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private List<String> typeDefFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> apiDefFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> outputDefFiles = new ArrayList<String>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> metadataDefFiles = new ArrayList<String>();
 
 
@@ -279,10 +279,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private UserManager userManager;
 
-    /** _more_          */
+    /** _more_ */
     private EntryManager entryManager;
 
-    /** _more_          */
+    /** _more_ */
     private SearchManager searchManager;
 
     /** _more_ */
@@ -863,7 +863,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     public static final double VERSION = 1.0;
 
     /**
@@ -2335,8 +2335,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return outputHandlers;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public HtmlOutputHandler getHtmlOutputHandler() throws Exception {
-        return  (HtmlOutputHandler)getOutputHandler(OutputHandler.OUTPUT_HTML);
+        return (HtmlOutputHandler) getOutputHandler(
+            OutputHandler.OUTPUT_HTML);
     }
 
 
@@ -2391,7 +2399,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if ((type == null) || (type.length() == 0)) {
             type = OutputHandler.OUTPUT_HTML.getId();
         }
-        OutputType output = new OutputType("", type,true);
+        OutputType output = new OutputType("", type, true);
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
                 return outputHandler;
@@ -2463,7 +2471,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected TypeHandler getTypeHandler(Request request) throws Exception {
-        if(request!=null) {
+        if (request != null) {
             String type = request.getString(ARG_TYPE,
                                             TypeHandler.TYPE_ANY).trim();
             return getTypeHandler(type, false, true);
@@ -3634,9 +3642,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String initMap(Request request, StringBuffer sb, int width,
                           int height, boolean normalControls) {
-        if(request.isEmbedded()) {
-            width = (int)(0.75*width);
-            height = (int)(0.75*height);
+        if (request.isEmbedded()) {
+            width  = (int) (0.75 * width);
+            height = (int) (0.75 * height);
         }
         String userAgent = request.getHeaderArg("User-Agent");
         String host      = request.getHeaderArg("Host");

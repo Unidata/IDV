@@ -58,6 +58,7 @@ import java.util.Properties;
  */
 public class WikiPageTypeHandler extends GenericTypeHandler {
 
+    /** _more_          */
     public static String TYPE_WIKIPAGE = "wikipage";
 
     /**
@@ -75,26 +76,34 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToEntryForm(Request request, StringBuffer sb, Entry entry)
             throws Exception {
         String size = HtmlUtil.SIZE_70;
         sb.append(HtmlUtil.formEntry(msgLabel("Wiki Page Title"),
-                                     HtmlUtil.input(ARG_NAME,
-                                                    ((entry != null)
-                                                     ? entry.getName()
-                                                     : getFormDefault(ARG_NAME, "")), size)));
+                                     HtmlUtil.input(ARG_NAME, ((entry != null)
+                ? entry.getName()
+                : getFormDefault(ARG_NAME, "")), size)));
 
-        String select    = OutputHandler.getSelect(request, ARG_DESCRIPTION,"Add link", true,true);
+        String select = OutputHandler.getSelect(request, ARG_DESCRIPTION,
+                            "Add link", true, true);
 
-        String textWidget = HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
-                                                                ? entry.getDescription()
-                                                                : BLANK), 200, 80,
-                                              HtmlUtil.id(ARG_DESCRIPTION));
-        textWidget = "<table><tr valign=\"top\"><td>"+ textWidget+"</td><td>" + select +"</td></tr></table>";
-        sb.append(
-                  HtmlUtil.formEntryTop(
-                                        msgLabel("Wiki Text"),
-                                        textWidget));
+        String textWidget = HtmlUtil.textArea(ARG_DESCRIPTION,
+                                ((entry != null)
+                                 ? entry.getDescription()
+                                 : BLANK), 200, 80,
+                                           HtmlUtil.id(ARG_DESCRIPTION));
+        textWidget = "<table><tr valign=\"top\"><td>" + textWidget
+                     + "</td><td>" + select + "</td></tr></table>";
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Wiki Text"), textWidget));
     }
 
 

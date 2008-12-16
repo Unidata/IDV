@@ -82,15 +82,16 @@ public class ImageOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
-                                                                   "image.gallery",true);
+                                                        "image.gallery",
+                                                        true);
 
     /** _more_ */
     public static final OutputType OUTPUT_PLAYER =
-        new OutputType("Image Player", "image.player",true);
+        new OutputType("Image Player", "image.player", true);
 
     /** _more_ */
     public static final OutputType OUTPUT_SLIDESHOW =
-        new OutputType("Slideshow", "image.slideshow",true);
+        new OutputType("Slideshow", "image.slideshow", true);
 
 
 

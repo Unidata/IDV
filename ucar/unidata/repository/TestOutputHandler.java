@@ -89,7 +89,7 @@ public class TestOutputHandler extends OutputHandler {
     public TestOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        addType(new OutputType("", "testit",true));
+        addType(new OutputType("", "testit", true));
     }
 
 

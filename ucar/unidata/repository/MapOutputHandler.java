@@ -82,7 +82,7 @@ public class MapOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_MAP = new OutputType("Map",
-                                                    "map.map",true);
+                                                    "map.map", true);
 
 
     /**

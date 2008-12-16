@@ -69,7 +69,7 @@ import javax.servlet.http.*;
  */
 public class RepositoryServlet extends HttpServlet {
 
-    /** _more_          */
+    /** _more_ */
     private String[] args;
 
     /** ExceptionLogger to handle any runtime exceptions */

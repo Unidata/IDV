@@ -137,8 +137,8 @@ public class Request implements Constants {
      * @param user _more_
      */
     public Request(Repository repository, User user) {
-        this.repository = repository;
-        this.user       = user;
+        this.repository         = repository;
+        this.user               = user;
         this.type               = "";
         this.parameters         = new Hashtable();
         this.originalParameters = new Hashtable();
@@ -607,8 +607,13 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isEmbedded() {
-        return get(ARG_EMBEDDED,false);
+        return get(ARG_EMBEDDED, false);
     }
 
 
@@ -1091,7 +1096,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public OutputType getOutput(String dflt) {
-        return new OutputType(getString(ARG_OUTPUT, dflt),false);
+        return new OutputType(getString(ARG_OUTPUT, dflt), false);
     }
 
 

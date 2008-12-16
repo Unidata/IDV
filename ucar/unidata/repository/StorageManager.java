@@ -94,17 +94,17 @@ import javax.swing.*;
  */
 public class StorageManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DIRDEPTH = "ramadda.storage.dirdepth";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DIRRANGE = "ramadda.storage.dirrange";
 
 
-    /** _more_          */
+    /** _more_ */
     private int dirDepth = 2;
 
-    /** _more_          */
+    /** _more_ */
     private int dirRange = 10;
 
 
@@ -120,7 +120,7 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String uploadDir;
 
-    /** _more_          */
+    /** _more_ */
     private String entriesDir;
 
     /** _more_ */

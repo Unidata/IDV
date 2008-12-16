@@ -299,7 +299,7 @@ public class AccessManager extends RepositoryManager {
         return false;
     }
 
-    /** _more_          */
+    /** _more_ */
     Hashtable seen = new Hashtable();
 
     /**

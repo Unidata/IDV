@@ -79,32 +79,42 @@ import java.util.zip.*;
  */
 public class OutputType {
 
+    /** _more_          */
     public static String ICON_NULL = null;
+
+    /** _more_          */
     public static String SUFFIX_NONE = "";
 
     /** _more_ */
     private String suffix = SUFFIX_NONE;
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private String label;
 
-    /** _more_          */
+    /** _more_ */
     private boolean forUser = true;
 
-    /** _more_          */
+    /** _more_ */
     private String groupName = "";
 
-    /** _more_          */
+    /** _more_ */
     private String icon;
 
+    /** _more_          */
     private boolean isHtml = true;
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param isHtml _more_
+     */
     public OutputType(String id, boolean isHtml) {
-        this(id,id,isHtml);
+        this(id, id, isHtml);
     }
 
 
@@ -114,12 +124,13 @@ public class OutputType {
      *
      * @param name _more_
      * @param output _more_
+     * @param isHtml _more_
      *
      * @param label _more_
      * @param id _more_
      */
-    public OutputType(String label, String id,boolean isHtml) {
-        this(label, id, isHtml, SUFFIX_NONE,ICON_NULL);
+    public OutputType(String label, String id, boolean isHtml) {
+        this(label, id, isHtml, SUFFIX_NONE, ICON_NULL);
     }
 
 
@@ -128,10 +139,12 @@ public class OutputType {
      *
      * @param label _more_
      * @param id _more_
+     * @param isHtml _more_
      * @param suffix _more_
      * @param icon _more_
      */
-    public OutputType(String label, String id, boolean isHtml, String suffix, String icon) {
+    public OutputType(String label, String id, boolean isHtml, String suffix,
+                      String icon) {
         this.label  = label;
         this.id     = id;
         this.isHtml = isHtml;
@@ -287,21 +300,21 @@ public class OutputType {
     }
 
     /**
-       Set the IsHtml property.
-
-       @param value The new value for IsHtml
-    **/
-    public void setIsHtml (boolean value) {
-	isHtml = value;
+     *  Set the IsHtml property.
+     *
+     *  @param value The new value for IsHtml
+     */
+    public void setIsHtml(boolean value) {
+        isHtml = value;
     }
 
     /**
-       Get the IsHtml property.
-
-       @return The IsHtml
-    **/
-    public boolean getIsHtml () {
-	return isHtml;
+     *  Get the IsHtml property.
+     *
+     *  @return The IsHtml
+     */
+    public boolean getIsHtml() {
+        return isHtml;
     }
 
 

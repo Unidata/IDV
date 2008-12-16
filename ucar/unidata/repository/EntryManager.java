@@ -95,7 +95,7 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private Object MUTEX_ENTRY = new Object();
 
 
@@ -261,7 +261,7 @@ return new Result(title, sb);
         Entry entry;
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
-            
+
             if (entry == null) {
                 Entry tmp = getEntry(request,
                                      request.getString(ARG_ENTRYID, BLANK),
@@ -320,7 +320,7 @@ return new Result(title, sb);
         }
 
         String output = request.getString(ARG_OUTPUT, (String) "");
-        Result result =  processEntryShow(request, entry);
+        Result result = processEntryShow(request, entry);
         if (result.getShouldDecorate()) {
             request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
@@ -337,13 +337,24 @@ return new Result(title, sb);
     }
 
 
-    public Result processEntryShow(Request request,Entry entry) throws Exception {
-        Result result=null;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processEntryShow(Request request, Entry entry)
+            throws Exception {
+        Result result = null;
         if (entry.isGroup()) {
             result = processGroupShow(request, (Group) entry);
         } else {
             result = getRepository().getOutputHandler(request).outputEntry(
-                                                                           request, entry);
+                request, entry);
         }
         return result;
     }
@@ -395,17 +406,17 @@ return new Result(title, sb);
             sb.append(makeEntryHeader(request, entry));
         }
 
-        if (entry != null && entry.getIsLocalFile()) {
+        if ((entry != null) && entry.getIsLocalFile()) {
             sb.append("This is a local file and cannot be edited");
             return makeEntryEditResult(request, entry, "Entry Edit", sb);
         }
 
         if (type == null) {
             sb.append(request.form(getRepository().URL_ENTRY_FORM,
-                                   HtmlUtil.attr("name","entryform")));
+                                   HtmlUtil.attr("name", "entryform")));
         } else {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_CHANGE,
-                                         HtmlUtil.attr("name","entryform")));
+                                         HtmlUtil.attr("name", "entryform")));
         }
 
         sb.append(HtmlUtil.formTable());
@@ -414,9 +425,9 @@ return new Result(title, sb);
         if (type == null) {
             sb.append(
                 HtmlUtil.formEntry(
-                                   msgLabel("Type"),
-                                   getRepository().makeTypeSelect(
-                                                                  request, false, "", true)));
+                    msgLabel("Type"),
+                    getRepository().makeTypeSelect(
+                        request, false, "", true)));
 
             sb.append(
                 HtmlUtil.formEntry(
@@ -2239,9 +2250,12 @@ return new Result(title, sb);
             //            System.err.println("Comment: " + comment.getComment());
             content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
-            sb.append(HtmlUtil.div(HtmlUtil.makeShowHideBlock("<b>Subject</b>:" + comment.getSubject()
-                    + HtmlUtil.space(2) + byLine, content.toString(), true,
-                                                              ""), theClass));
+            sb.append(
+                HtmlUtil.div(
+                    HtmlUtil.makeShowHideBlock(
+                        "<b>Subject</b>:" + comment.getSubject()
+                        + HtmlUtil.space(2) + byLine, content.toString(),
+                            true, ""), theClass));
         }
         //        sb.append("</table>");
         return sb.toString();
@@ -2313,10 +2327,23 @@ return new Result(title, sb);
                                  String linkText, boolean includeIcon)
             throws Exception {
         return getAjaxLink(request, entry, linkText,
-                           request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
-                           includeIcon);
+                           request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                            entry), includeIcon);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param linkText _more_
+     * @param url _more_
+     * @param includeIcon _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected String getAjaxLink(Request request, Entry entry,
                                  String linkText, String url,
                                  boolean includeIcon)
@@ -2326,13 +2353,15 @@ return new Result(title, sb);
         StringBuffer sb      = new StringBuffer();
         String       entryId = entry.getId();
 
-        String uid = "link_" +HtmlUtil.blockCnt++;
+        String       uid     = "link_" + HtmlUtil.blockCnt++;
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
             String  icon     = getIconUrl(entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
-            String event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick", HtmlUtil.squote(entryId)+","+HtmlUtil.squote(uid)));
+            String event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                               HtmlUtil.squote(entryId) + ","
+                               + HtmlUtil.squote(uid)));
 
 
             if (okToMove) {
@@ -2370,21 +2399,18 @@ return new Result(title, sb);
             HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid + ");")
             + HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid + ");")
             + HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid + ");");
-        sb.append(
-            HtmlUtil.href(
-                          url,
-                          linkText,
-                          HtmlUtil.id(elementId) + " " + tooltipEvents));
+        sb.append(HtmlUtil.href(url, linkText,
+                                HtmlUtil.id(elementId) + " "
+                                + tooltipEvents));
 
         String link = HtmlUtil.span(sb.toString(),
                                     HtmlUtil.id("span_" + entry.getId()));
 
-        if(includeIcon) {
-            link = link +
-                HtmlUtil.br()+
-                "<div style=\"display:none;visibility:hidden\" " + 
-                HtmlUtil.cssClass("folderblock") +
-                HtmlUtil.id(uid) + "></div>";
+        if (includeIcon) {
+            link = link + HtmlUtil.br()
+                   + "<div style=\"display:none;visibility:hidden\" "
+                   + HtmlUtil.cssClass("folderblock") + HtmlUtil.id(uid)
+                   + "></div>";
         }
         return link;
 
@@ -2442,7 +2468,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     protected String getEntryActionsToolbar(Request request, Entry entry,
-                                       boolean forHeader)
+                                            boolean forHeader)
             throws Exception {
         return StringUtil.join(HtmlUtil.space(1),
                                getEntryLinks(request, entry, forHeader));
@@ -3405,33 +3431,73 @@ return new Result(title, sb);
 
 
 
-    protected List<Entry> getChildrenGroups(Request request, Entry group) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Entry> getChildrenGroups(Request request, Entry group)
+            throws Exception {
         List<Entry> result = new ArrayList<Entry>();
-        if(!group.isGroup()) 
+        if ( !group.isGroup()) {
             return result;
-        for(Entry entry: getChildren(request,  (Group)group)) {
-            if(entry.isGroup()) result.add(entry);
+        }
+        for (Entry entry : getChildren(request, (Group) group)) {
+            if (entry.isGroup()) {
+                result.add(entry);
+            }
         }
         return result;
     }
 
-    protected List<Entry> getChildrenEntries(Request request, Entry group) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Entry> getChildrenEntries(Request request, Entry group)
+            throws Exception {
         List<Entry> result = new ArrayList<Entry>();
-        if(!group.isGroup()) 
+        if ( !group.isGroup()) {
             return result;
-        for(Entry entry: getChildren(request,  (Group)group)) {
-            if(!entry.isGroup()) result.add(entry);
+        }
+        for (Entry entry : getChildren(request, (Group) group)) {
+            if ( !entry.isGroup()) {
+                result.add(entry);
+            }
         }
         return result;
     }
 
 
 
-    protected List<Entry> getChildren(Request request,  Entry group) throws Exception {
-        List<Entry> children =  new ArrayList<Entry>();
-        if(!group.isGroup()) 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Entry> getChildren(Request request, Entry group)
+            throws Exception {
+        List<Entry> children = new ArrayList<Entry>();
+        if ( !group.isGroup()) {
             return children;
-        List<String> ids = getChildIds(request, (Group)group, null);
+        }
+        List<String> ids = getChildIds(request, (Group) group, null);
         for (String id : ids) {
             Entry entry = getEntry(request, id);
             if (entry == null) {
@@ -3478,7 +3544,7 @@ return new Result(title, sb);
 
 
 
-        if(where!=null) {
+        if (where != null) {
             where = new ArrayList<Clause>(where);
         } else {
             where = new ArrayList<Clause>();

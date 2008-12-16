@@ -134,7 +134,7 @@ public class PatternHarvester extends Harvester {
     private int newEntryCnt = 0;
 
 
-    /** _more_          */
+    /** _more_ */
     private long lastRunTime = 0;
 
     /**

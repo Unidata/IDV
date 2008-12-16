@@ -599,20 +599,22 @@ public class Admin extends RepositoryManager {
     public Result adminSettings(Request request) throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        sb.append(msgHeader("Repository Settings"));
-        sb.append(HtmlUtil.formTable());
         sb.append(request.form(URL_ADMIN_SETTINGS_DO));
         String size = " size=\"40\" ";
+
+
         sb.append(
             HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
 
-        sb.append(tableSubHeader(formHeader(msg("Contact"))));
-        sb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
-                                     HtmlUtil.input(PROP_ADMIN_EMAIL,
-                                         getProperty(PROP_ADMIN_EMAIL, ""),
-                                         size)));
 
-        sb.append(
+        StringBuffer csb = new StringBuffer();
+        csb.append(HtmlUtil.formTable());
+        csb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
+                                      HtmlUtil.input(PROP_ADMIN_EMAIL,
+                                          getProperty(PROP_ADMIN_EMAIL, ""),
+                                          size)));
+
+        csb.append(
             HtmlUtil.formEntry(
                 msgLabel("Mail Server"),
                 HtmlUtil.input(
@@ -621,39 +623,66 @@ public class Admin extends RepositoryManager {
                           + msg("For sending password reset messages")));
 
 
-        sb.append(tableSubHeader(formHeader(msg("Display"))));
-        sb.append(HtmlUtil.formEntry(msgLabel("Title"),
-                                     HtmlUtil.input(PROP_REPOSITORY_NAME,
-                                         getProperty(PROP_REPOSITORY_NAME,
-                                             "Repository"), size)));
-        sb.append(HtmlUtil.formEntryTop(msgLabel("Footer"),
-                                        HtmlUtil.textArea(PROP_HTML_FOOTER,
-                                            getProperty(PROP_HTML_FOOTER,
-                                                ""), 5, 40)));
+
+
+        /*    public static final String PROP_USER_RESET_PASSWORD_TEMPLATE = "ramadda.user.reset.password.template";
+              public static final String PROP_USER_RESET_PASSWORD_SUBJECT = "ramadda.user.reset.password.subject";
+
+              public static final String PROP_USER_RESET_ID_TEMPLATE = "ramadda.user.reset.id.template";
+              public static final String PROP_USER_RESET_ID_SUBJECT = "ramadda.user.reset.id.subject";
+        */
+
+
+
+        csb.append(HtmlUtil.formTableClose());
+        sb.append(makeConfigBlock("Contact", csb.toString()));
+
+
+        StringBuffer dsb = new StringBuffer();
+
+        dsb.append(HtmlUtil.formTable());
+        dsb.append(HtmlUtil.formEntry(msgLabel("Title"),
+                                      HtmlUtil.input(PROP_REPOSITORY_NAME,
+                                          getProperty(PROP_REPOSITORY_NAME,
+                                              "Repository"), size)));
+        dsb.append(HtmlUtil.formEntryTop(msgLabel("Footer"),
+                                         HtmlUtil.textArea(PROP_HTML_FOOTER,
+                                             getProperty(PROP_HTML_FOOTER,
+                                                 ""), 5, 40)));
+
 
 
         String phrases = getProperty(PROP_ADMIN_PHRASES, (String) null);
         if (phrases == null) {
             phrases = "#label=new label to use\n#e.g.: Groups=Projects";
         }
-        sb.append(HtmlUtil.formEntryTop(msgLabel("Translations"),
-                                        HtmlUtil.textArea(PROP_ADMIN_PHRASES,
-                                            phrases, 5, 40)));
+        dsb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Translations"),
+                HtmlUtil.textArea(PROP_ADMIN_PHRASES, phrases, 5, 40)));
 
 
-        sb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
+        dsb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
                 + HtmlUtil.textArea(PROP_GOOGLEAPIKEYS, getProperty(PROP_GOOGLEAPIKEYS, ""), 5, 80)
                 + "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
 
 
-        sb.append(tableSubHeader(formHeader(msg("Access"))));
-        sb.append(HtmlUtil.formEntry("",
-                                     HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
-                                         "true",
-                                         getProperty(PROP_ACCESS_ADMINONLY,
-                                             false)) + HtmlUtil.space(2)
-                                                 + msg("Admin only")));
-        sb.append(
+        dsb.append(HtmlUtil.formTableClose());
+        sb.append(makeConfigBlock("Display", dsb.toString()));
+
+
+        StringBuffer asb = new StringBuffer();
+        asb.append(HtmlUtil.formTable());
+
+        asb.append(
+            HtmlUtil.formEntry(
+                "",
+                HtmlUtil.checkbox(
+                    PROP_ACCESS_ADMINONLY, "true",
+                    getProperty(
+                        PROP_ACCESS_ADMINONLY, false)) + HtmlUtil.space(2)
+                            + msg("Admin only")));
+        asb.append(
             HtmlUtil.formEntry(
                 "",
                 HtmlUtil.checkbox(
@@ -667,14 +696,22 @@ public class Admin extends RepositoryManager {
                                 getProperty(PROP_LOCALFILEPATHS, ""), 5, 40);
         String fileLabel =
             "Enter one server file system directory per line.<br><b>Note:RAMADDA will provide complete access to the file directory trees defined here</b>";
-        sb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
-                                        "<table><tr valign=top><td>"
-                                        + fileWidget + "</td><td>"
-                                        + fileLabel + "</td></tr></table>"));
+        asb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
+                                         "<table><tr valign=top><td>"
+                                         + fileWidget + "</td><td>"
+                                         + fileLabel + "</td></tr></table>"));
 
 
 
-        sb.append(tableSubHeader(formHeader(msg("Available Output Types"))));
+        asb.append(HtmlUtil.formTableClose());
+        sb.append(makeConfigBlock("Access", asb.toString()));
+
+
+
+
+        StringBuffer osb = new StringBuffer();
+        osb.append(HtmlUtil.formTable());
+
 
         StringBuffer     outputSB      = new StringBuffer();
         List<OutputType> types         = getRepository().getOutputTypes();
@@ -702,11 +739,11 @@ public class Admin extends RepositoryManager {
         outputSB.append("</div>\n");
         String outputDiv = HtmlUtil.div(outputSB.toString(),
                                         HtmlUtil.cssClass("scrollablediv"));
-        sb.append("\n");
+        osb.append("\n");
         String doAllOutput = HtmlUtil.checkbox("outputtype.all", "true",
                                  false) + HtmlUtil.space(1) + msg("Use all");
-        sb.append(HtmlUtil.formEntryTop("", doAllOutput + outputDiv));
-        sb.append("\n");
+        osb.append(HtmlUtil.formEntryTop("", doAllOutput + outputDiv));
+        osb.append("\n");
         StringBuffer handlerSB = new StringBuffer();
         List<OutputHandler> outputHandlers =
             getRepository().getOutputHandlers();
@@ -716,11 +753,15 @@ public class Admin extends RepositoryManager {
 
         String extra = handlerSB.toString();
         if (extra.length() > 0) {
-            sb.append(tableSubHeader(msg("Output")));
-            sb.append(extra);
+            osb.append(tableSubHeader(msg("Output")));
+            osb.append(extra);
         }
 
-        sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
+        osb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
+
+
+        osb.append(HtmlUtil.formTableClose());
+        sb.append(makeConfigBlock("Available Output Types", osb.toString()));
 
 
         sb.append(
@@ -729,6 +770,21 @@ public class Admin extends RepositoryManager {
         sb.append("</table>");
         return makeResult(request, msg("Settings"), sb);
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param contents _more_
+     *
+     * @return _more_
+     */
+    private String makeConfigBlock(String title, String contents) {
+        return HtmlUtil.makeShowHideBlock(
+            msg(title),
+            HtmlUtil.div(contents, HtmlUtil.cssClass("admin-block-inner")),
+            false, "class=\"pagesubheading\"", "class=\"admin-block\"");
     }
 
     /**
@@ -764,7 +820,9 @@ public class Admin extends RepositoryManager {
             throw new IllegalStateException(
                 "This RAMADDA server has not been configured to send email");
         }
-        System.err.println("send email top");
+
+        //        System.err.println("subject:" + subject);
+        //        System.err.println("contents:" + contents);
         String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,
                                 "").trim();
         String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,
@@ -783,9 +841,7 @@ public class Admin extends RepositoryManager {
         msg.setContent(contents, (asHtml
                                   ? "text/html"
                                   : "text/plain"));
-        System.err.println("before sending");
         Transport.send(msg);
-        System.err.println("after sending");
     }
 
 

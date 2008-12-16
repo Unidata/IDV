@@ -76,7 +76,7 @@ public class Entity implements Cloneable {
     /** _more_ */
     private String parentGroupId;
 
-    /** _more_          */
+    /** _more_ */
     private String treeId;
 
 

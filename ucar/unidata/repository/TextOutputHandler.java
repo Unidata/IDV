@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -83,7 +82,7 @@ public class TextOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TEXT = new OutputType("Text",
-                                                                "text",true);
+                                                     "text", true);
 
 
     /**

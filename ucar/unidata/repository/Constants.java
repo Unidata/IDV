@@ -81,9 +81,10 @@ public interface Constants {
 
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
+    /** _more_          */
     public static final String ICON_CHAT = "/icons/chat.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_HEADER = "/header.jpg";
 
     /** _more_ */
@@ -151,7 +152,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ERROR = "/icons/error.png";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_PLUS = "/icons/plus.gif";
 
     /** _more_ */
@@ -194,7 +195,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_MINUS = "/icons/minus.gif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_ADD = "/icons/add.gif";
 
     /** _more_ */
@@ -249,10 +250,10 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TARGET = "target";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_INPUTID = "inputid";
 
     /** _more_ */
@@ -316,10 +317,13 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DATASET = "dataset";
 
+    /** _more_          */
     public static final String ARG_WIKI_CREATE = "wiki.create";
+
+    /** _more_          */
     public static final String ARG_WIKI_TEXT = "wiki.text";
 
     /** _more_ */
@@ -555,6 +559,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_OUTPUT = "output";
 
+    /** _more_          */
     public static final String ARG_EMBEDDED = "embedded";
 
     /** _more_ */
@@ -690,23 +695,23 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ADMIN_PHRASES = "ramadda.admin.phrases";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ADMIN_EMAIL = "ramadda.admin.email";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ADMIN_SMTP = "ramadda.admin.smtp";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_VERSION = "ramadda.version";
 
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HOSTNAME = "ramadda.hostname";
 
     /** _more_ */
@@ -835,7 +840,7 @@ public interface Constants {
     public static final String PROP_HTML_GRAPHAPPLET =
         "ramadda.html.graphapplet";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HTML_CHATAPPLET =
         "ramadda.html.chatapplet";
 
@@ -856,7 +861,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_DESCRIPTION = "description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
     /** _more_ */
@@ -908,7 +913,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_URL = "url";
 
     /** _more_ */
@@ -1033,7 +1038,7 @@ public interface Constants {
     public static final String ARG_USER_ROLES = "user.roles";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_USER_PASSWORDKEY = "user.passwordkey";
 
 
@@ -1061,7 +1066,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ADMIN = "user.admin";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_USER_BULK = "user.bulk";
 
 
@@ -1135,23 +1140,23 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_HARVESTER_CLASS = "harvester.class";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_HARVESTER_REDIRECTTOEDIT =
         "harvester.redirecttoedit";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_HARVESTER_GETXML = "harvester.getxml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_HARVESTER_XMLFILE = "harvester.xmlfile";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_RESPONSETYPE = "responsetype";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ID_PREFIX_SYNTH = "synth:";
 
     /** _more_ */
@@ -1171,6 +1176,27 @@ public interface Constants {
 
     /** _more_ */
     public static final String TYPE_CATALOG = "catalog";
+
+
+
+
+
+    /** _more_          */
+    public static final String PROP_USER_RESET_PASSWORD_TEMPLATE =
+        "ramadda.user.reset.password.template";
+
+    /** _more_          */
+    public static final String PROP_USER_RESET_PASSWORD_SUBJECT =
+        "ramadda.user.reset.password.subject";
+
+    /** _more_          */
+    public static final String PROP_USER_RESET_ID_TEMPLATE =
+        "ramadda.user.reset.id.template";
+
+    /** _more_          */
+    public static final String PROP_USER_RESET_ID_SUBJECT =
+        "ramadda.user.reset.id.subject";
+
 
 
 

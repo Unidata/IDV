@@ -86,11 +86,11 @@ public class CalendarOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_GRID = new OutputType("Date Grid",
-                                                     "calendar.grid",true);
+                                                     "calendar.grid", true);
 
     /** _more_ */
     public static final OutputType OUTPUT_CALENDAR =
-        new OutputType("Calendar", "calendar.calendar",true);
+        new OutputType("Calendar", "calendar.calendar", true);
 
 
     /**

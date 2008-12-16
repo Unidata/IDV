@@ -42,11 +42,14 @@ import java.util.List;
 
 public class HtmlUtil {
 
+    /** _more_          */
     public static final String SIZE_3 = "  size=\"3\" ";
 
 
+    /** _more_          */
     public static final String SIZE_5 = "  size=\"5\" ";
 
+    /** _more_          */
     public static final String SIZE_8 = "  size=\"8\" ";
 
     /** _more_ */
@@ -76,7 +79,10 @@ public class HtmlUtil {
     /** _more_ */
     public static final String SIZE_70 = "  size=\"70\" ";
 
+    /** _more_          */
     public static final String SIZE_80 = "  size=\"80\" ";
+
+    /** _more_          */
     public static final String SIZE_90 = "  size=\"90\" ";
 
 
@@ -116,9 +122,17 @@ public class HtmlUtil {
         return "<br>";
     }
 
+    /**
+     * _more_
+     *
+     * @param line _more_
+     *
+     * @return _more_
+     */
     public static String br(String line) {
-        return line +"<br>";
+        return line + "<br>";
     }
+
     /**
      * _more_
      *
@@ -137,33 +151,79 @@ public class HtmlUtil {
         return "<p>";
     }
 
+    /**
+     * _more_
+     *
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static String nobr(String inner) {
-        return wrap("nobr",inner);
+        return wrap("nobr", inner);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static String b(String inner) {
-        return wrap("b",inner);
+        return wrap("b", inner);
     }
 
+    /**
+     * _more_
+     *
+     * @param inner _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String li(String inner, String extra) {
-        return wrap("li",extra, inner);
+        return wrap("li", extra, inner);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static String center(String inner) {
-        return wrap("center",inner);
+        return wrap("center", inner);
     }
 
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static String wrap(String tag, String inner) {
-        return "<" + tag +">" + inner +"</" + tag +">";
+        return "<" + tag + ">" + inner + "</" + tag + ">";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     * @param extra _more_
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static String wrap(String tag, String extra, String inner) {
         //        System.err.println ("<" + tag +" " + extra +">" + inner +"</" + tag +">");
 
-        return "<" + tag +" " + extra +">" + inner +"</" + tag +">";
+        return "<" + tag + " " + extra + ">" + inner + "</" + tag + ">";
     }
 
 
@@ -227,6 +287,13 @@ public class HtmlUtil {
         return "\"" + s + "\"";
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String squote(String s) {
         return "'" + s + "'";
     }
@@ -284,16 +351,37 @@ public class HtmlUtil {
         return " class=\"" + c + "\" ";
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     */
     public static String title(String c) {
-        return " title=" + quote(c) +" " ;
+        return " title=" + quote(c) + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     */
     public static String id(String c) {
-        return " id=\"" + c +"\" ";
+        return " id=\"" + c + "\" ";
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     */
     public static String style(String c) {
-        return " style=\"" + c +"\" ";
+        return " style=\"" + c + "\" ";
     }
 
     /**
@@ -371,7 +459,8 @@ public class HtmlUtil {
      */
     public static String url(String path, String n1, Object v1, String n2,
                              Object v2) {
-        return url(path, new String[] { n1, v1.toString(), n2, v2.toString() });
+        return url(path,
+                   new String[] { n1, v1.toString(), n2, v2.toString() });
     }
 
     /**
@@ -413,12 +502,21 @@ public class HtmlUtil {
                              Object v2, String n3, Object v3, String n4,
                              Object v4) {
         return url(path, new String[] {
-            n1, v1.toString(), n2, v2.toString(), n3, v3.toString(), n4, v4.toString()
+            n1, v1.toString(), n2, v2.toString(), n3, v3.toString(), n4,
+            v4.toString()
         });
     }
 
-    public static String url(String path, List  args) {
-        return url(path,Misc.listToStringArray(args));
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
+    public static String url(String path, List args) {
+        return url(path, Misc.listToStringArray(args));
     }
 
 
@@ -449,9 +547,11 @@ public class HtmlUtil {
                 url = url + "&";
             }
             try {
-                url          = url + args[i] + "=" + java.net.URLEncoder.encode(args[i + 1], "UTF-8");
-            } catch(Exception exc) {
-                System.err.println("error encoding arg:" + args[i+1] + " " + exc);
+                url = url + args[i] + "="
+                      + java.net.URLEncoder.encode(args[i + 1], "UTF-8");
+            } catch (Exception exc) {
+                System.err.println("error encoding arg:" + args[i + 1] + " "
+                                   + exc);
             }
             addAmpersand = true;
         }
@@ -594,9 +694,16 @@ public class HtmlUtil {
                + cols(s6);
     }
 
-    public static String cols(Object[]columns) {
-        StringBuffer sb  = new StringBuffer();
-        for(int i=0;i<columns.length;i++) {
+    /**
+     * _more_
+     *
+     * @param columns _more_
+     *
+     * @return _more_
+     */
+    public static String cols(Object[] columns) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < columns.length; i++) {
             sb.append(cols(columns[i].toString()));
         }
         return sb.toString();
@@ -618,13 +725,18 @@ public class HtmlUtil {
                                        String north, String east,
                                        String west) {
         return "<table>" + "<tr><td colspan=\"2\" align=\"center\">"
-               + input(baseName + "_north", north, " size=\"5\" id=\"" + baseName + "_north\"" )
-               + "</td></tr>" + "<tr><td>"
-               + input(baseName + "_west", west, " size=\"5\" id=\"" + baseName + "_west\"") + "</td><td>"
-               + input(baseName + "_east", east, " size=\"5\"  id=\"" + baseName + "_east\"") + "</tr>"
-               + "<tr><td colspan=\"2\" align=\"center\">"
-               + input(baseName + "_south", south, " size=\"5\"  id=\"" + baseName + "_south\"")
-               + "</table>";
+               + input(baseName + "_north", north, " size=\"5\" id=\""
+                   + baseName + "_north\"") + "</td></tr>" + "<tr><td>"
+                       + input(baseName + "_west", west, " size=\"5\" id=\""
+                           + baseName + "_west\"") + "</td><td>"
+                               + input(baseName
+                                   + "_east", east, " size=\"5\"  id=\""
+                                       + baseName + "_east\"") + "</tr>"
+                                           + "<tr><td colspan=\"2\" align=\"center\">"
+                                               + input(baseName
+                                                   + "_south", south, " size=\"5\"  id=\""
+                                                       + baseName
+                                                           + "_south\"") + "</table>";
     }
 
     /**
@@ -765,8 +877,17 @@ public class HtmlUtil {
         return "<form method=\"post\" action=\"" + url + "\">";
     }
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String formPost(String url, String extra) {
-        return "<form method=\"post\" action=\"" + url + "\"" + " " + extra+">";
+        return "<form method=\"post\" action=\"" + url + "\"" + " " + extra
+               + ">";
     }
 
 
@@ -878,13 +999,25 @@ public class HtmlUtil {
     public static String textArea(String name, String value, int rows,
                                   int columns) {
 
-        return textArea(name,value,rows,columns,"");
+        return textArea(name, value, rows, columns, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param rows _more_
+     * @param columns _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String textArea(String name, String value, int rows,
                                   int columns, String extra) {
-        return "<textarea " + attr("name", name) + attr("rows",""+ rows) +
-            attr("cols",""+ columns) +extra + "\">" + value + "</textarea>";
+        return "<textarea " + attr("name", name) + attr("rows", "" + rows)
+               + attr("cols", "" + columns) + extra + "\">" + value
+               + "</textarea>";
     }
 
     /**
@@ -991,8 +1124,18 @@ public class HtmlUtil {
     }
 
 
-    public static String select(String name, List values, List<String> selected,
-                                String extra) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param values _more_
+     * @param selected _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String select(String name, List values,
+                                List<String> selected, String extra) {
         return select(name, values, selected, extra, Integer.MAX_VALUE);
     }
 
@@ -1043,15 +1186,27 @@ public class HtmlUtil {
     public static String select(String name, List values, String selected,
                                 String extra, int maxLength) {
         List<String> selectedList = null;
-        if(selected!=null && selected.length()>0) {
-            selectedList = (List<String>)Misc.newList(selected);
+        if ((selected != null) && (selected.length() > 0)) {
+            selectedList = (List<String>) Misc.newList(selected);
         }
         return select(name, values, selectedList, extra, maxLength);
     }
 
 
-    public static String select(String name, List values, List<String> selected,
-                                String extra, int maxLength) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param values _more_
+     * @param selected _more_
+     * @param extra _more_
+     * @param maxLength _more_
+     *
+     * @return _more_
+     */
+    public static String select(String name, List values,
+                                List<String> selected, String extra,
+                                int maxLength) {
         StringBuffer sb = new StringBuffer();
         sb.append("<select name=" + quote(name) + " " + extra + ">\n");
         for (int i = 0; i < values.size(); i++) {
@@ -1073,24 +1228,49 @@ public class HtmlUtil {
                 label = "..." + label.substring(label.length() - maxLength);
             }
 
-            sb.append("<option " + selectedAttr + " title=\"" + value +"\"" + " value=\"" + value + "\">"
-                      + label + "</option>\n");
+            sb.append("<option " + selectedAttr + " title=\"" + value + "\""
+                      + " value=\"" + value + "\">" + label + "</option>\n");
         }
         sb.append("</select>\n");
         return sb.toString();
     }
 
 
-    public static String inset(String html, int top,int left,int bottom, int right) {
-        return span(html,style((top==0?"":"margin-top:" + top +"px;")+
-                               (left==0?"":"margin-left:" + left +"px;")+
-                               (bottom==0?"":"margin-bottom:" + bottom +"px;") +
-                               (right==0?"":"margin-right:" + top +"px;")));
+    /**
+     * _more_
+     *
+     * @param html _more_
+     * @param top _more_
+     * @param left _more_
+     * @param bottom _more_
+     * @param right _more_
+     *
+     * @return _more_
+     */
+    public static String inset(String html, int top, int left, int bottom,
+                               int right) {
+        return span(html, style(((top == 0)
+                                 ? ""
+                                 : "margin-top:" + top + "px;") + ((left == 0)
+                ? ""
+                : "margin-left:" + left + "px;") + ((bottom == 0)
+                ? ""
+                : "margin-bottom:" + bottom + "px;") + ((right == 0)
+                ? ""
+                : "margin-right:" + top + "px;")));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param html _more_
+     * @param space _more_
+     *
+     * @return _more_
+     */
     public static String inset(String html, int space) {
-        return div(html,style("margin:" + space +"px;"));
+        return div(html, style("margin:" + space + "px;"));
     }
 
     /**
@@ -1152,9 +1332,16 @@ public class HtmlUtil {
                + "</table>";
     }
 
-    public static String table(Object[]columns) {
-        return "<table cellpadding=\"5\" cellspacing=\"0\">\n" + row(cols(columns)," valign=\"top\" ")
-               + "</table>";
+    /**
+     * _more_
+     *
+     * @param columns _more_
+     *
+     * @return _more_
+     */
+    public static String table(Object[] columns) {
+        return "<table cellpadding=\"5\" cellspacing=\"0\">\n"
+               + row(cols(columns), " valign=\"top\" ") + "</table>";
     }
 
 
@@ -1224,13 +1411,25 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String formEntryTop(String left, String right) {
-        return formEntryTop(left,right,"",true);
+        return formEntryTop(left, right, "", true);
     }
 
 
-    public static String formEntryTop(String left, String right, String trExtra,boolean dummy) {
+    /**
+     * _more_
+     *
+     * @param left _more_
+     * @param right _more_
+     * @param trExtra _more_
+     * @param dummy _more_
+     *
+     * @return _more_
+     */
+    public static String formEntryTop(String left, String right,
+                                      String trExtra, boolean dummy) {
         //        if(left.length()>0) 
-        return " <tr  " + trExtra+" valign=\"top\"><td align=\"right\" valign=\"top\" class=\"formlabel\">"
+        return " <tr  " + trExtra
+               + " valign=\"top\"><td align=\"right\" valign=\"top\" class=\"formlabel\">"
                + left + "</td><td>" + right + "</td></tr>";
 
     }
@@ -1389,6 +1588,13 @@ public class HtmlUtil {
         return " onmouseover=" + quote(call) + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     *
+     * @return _more_
+     */
     public static String onMouseMove(String call) {
         return " onmousemove=" + quote(call) + " ";
     }
@@ -1440,13 +1646,32 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param call _more_
+     * @param label _more_
+     *
+     * @return _more_
+     */
     public static String mouseClickHref(String call, String label) {
-        return mouseClickHref(call,label,"");
+        return mouseClickHref(call, label, "");
     }
 
-    public static String mouseClickHref(String call, String label, String extra) {
+    /**
+     * _more_
+     *
+     * @param call _more_
+     * @param label _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String mouseClickHref(String call, String label,
+                                        String extra) {
         //        return "<a href=\"javascript:void(0)\" " +onMouseClick(call) +">" +label +"</a>";
-        return "<a href=\"javascript:void(0);\" " +onMouseClick(call) +extra+">" +label +"</a>";
+        return "<a href=\"javascript:void(0);\" " + onMouseClick(call)
+               + extra + ">" + label + "</a>";
     }
 
 
@@ -1491,8 +1716,16 @@ public class HtmlUtil {
     }
 
 
-    public static String call(String function,String args) {
-        return function+"(" + args+");\n";
+    /**
+     * _more_
+     *
+     * @param function _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
+    public static String call(String function, String args) {
+        return function + "(" + args + ");\n";
     }
 
     /**
@@ -1521,7 +1754,8 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String makeTabs(List titles, List contents, boolean skipEmpty) {
+    public static String makeTabs(List titles, List contents,
+                                  boolean skipEmpty) {
         return makeTabs(titles, contents, skipEmpty, "tabcontent");
     }
 
@@ -1535,8 +1769,8 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String makeTabs(List titles, List contents, boolean skipEmpty,
-                           String tabContentClass) {
+    public static String makeTabs(List titles, List contents,
+                                  boolean skipEmpty, String tabContentClass) {
         return makeTabs(titles, contents, skipEmpty, tabContentClass,
                         "tabcontents");
     }
@@ -1552,8 +1786,9 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String makeTabs(List titles, List contents, boolean skipEmpty,
-                           String tabContentClass, String wrapperClass) {
+    public static String makeTabs(List titles, List contents,
+                                  boolean skipEmpty, String tabContentClass,
+                                  String wrapperClass) {
 
         String id  = "tab_" + (tabCnt++);
         String ids = "tab_" + (tabCnt++) + "_ids";
@@ -1608,9 +1843,18 @@ public class HtmlUtil {
     }
 
 
+    /** _more_          */
     private static String blockHideImageUrl;
+
+    /** _more_          */
     private static String blockShowImageUrl;
 
+    /**
+     * _more_
+     *
+     * @param hideImg _more_
+     * @param showImg _more_
+     */
     public static void setHideShowImage(String hideImg, String showImg) {
         blockHideImageUrl = hideImg;
         blockShowImageUrl = showImg;
@@ -1629,8 +1873,8 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String makeShowHideBlock(String label,
-                                           String content, boolean visible) {
+    public static String makeShowHideBlock(String label, String content,
+                                           boolean visible) {
         return makeShowHideBlock(label, content, visible,
                                  "class=\"pagesubheading\"");
     }
@@ -1645,22 +1889,39 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String makeShowHideBlock(String label,
-                                    String content, boolean visible,
-                                    String headerExtra) {
-        return HtmlUtil.makeShowHideBlock(label,content,visible, headerExtra, HtmlUtil.cssClass("block"), blockHideImageUrl,blockShowImageUrl);
+    public static String makeShowHideBlock(String label, String content,
+                                           boolean visible,
+                                           String headerExtra) {
+        return HtmlUtil.makeShowHideBlock(label, content, visible,
+                                          headerExtra,
+                                          HtmlUtil.cssClass("block"),
+                                          blockHideImageUrl,
+                                          blockShowImageUrl);
     }
 
 
 
 
 
-    public static String makeShowHideBlock(String label,
-                                           String content, 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     * @param headerExtra _more_
+     * @param blockExtra _more_
+     *
+     * @return _more_
+     */
+    public static String makeShowHideBlock(String label, String content,
                                            boolean visible,
                                            String headerExtra,
                                            String blockExtra) {
-        return HtmlUtil.makeShowHideBlock(label,content,visible, headerExtra, blockExtra,blockHideImageUrl,blockShowImageUrl);
+        return HtmlUtil.makeShowHideBlock(label, content, visible,
+                                          headerExtra, blockExtra,
+                                          blockHideImageUrl,
+                                          blockShowImageUrl);
     }
 
 
@@ -1671,14 +1932,26 @@ public class HtmlUtil {
     public static int blockCnt = 0;
 
 
-    public static String makeShowHideBlock(String label,
-                                    String content, boolean visible,
-                                    String headerExtra,
-                                           String blockExtra,
-                                    String hideImg,
-                                    String showImg) {
-        String       id      = "block_" + (blockCnt++);
-        StringBuffer sb      = new StringBuffer();
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     * @param headerExtra _more_
+     * @param blockExtra _more_
+     * @param hideImg _more_
+     * @param showImg _more_
+     *
+     * @return _more_
+     */
+    public static String makeShowHideBlock(String label, String content,
+                                           boolean visible,
+                                           String headerExtra,
+                                           String blockExtra, String hideImg,
+                                           String showImg) {
+        String       id = "block_" + (blockCnt++);
+        StringBuffer sb = new StringBuffer();
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
@@ -1691,12 +1964,14 @@ public class HtmlUtil {
                                                   "pagesubheadinglink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
-        sb.append("<div  " + blockExtra+">");
+        sb.append("<div  " + blockExtra + ">");
         sb.append(HtmlUtil.div(link, headerExtra));
-        sb.append("<div " + HtmlUtil.cssClass("hideshowblock") + HtmlUtil.id(id)
-                  + HtmlUtil.style("display:block;visibility:visible") +">");
+        sb.append("<div " + HtmlUtil.cssClass("hideshowblock")
+                  + HtmlUtil.id(id)
+                  + HtmlUtil.style("display:block;visibility:visible") + ">");
         if ( !visible) {
-            sb.append(HtmlUtil.script(HtmlUtil.call("hide",HtmlUtil.squote("id"))));
+            sb.append(HtmlUtil.script(HtmlUtil.call("hide",
+                    HtmlUtil.squote(id))));
         }
 
         sb.append(content.toString());

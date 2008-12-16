@@ -72,9 +72,12 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
+
+
+
     /** _more_ */
     public static final OutputType OUTPUT_CART = new OutputType("User Cart",
-                                                                "user.cart",true);
+                                                     "user.cart", true);
 
     /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";
@@ -97,7 +100,7 @@ public class UserManager extends RepositoryManager {
                                         getRepositoryBase().URL_USER_CART };
 
 
-    /** _more_          */
+    /** _more_ */
     protected RequestUrl[] anonUserUrls = { getRepositoryBase()
                                               .URL_USER_CART };
 
@@ -444,6 +447,13 @@ public class UserManager extends RepositoryManager {
      */
     public String makeLoginForm(Request request, String extra) {
         StringBuffer sb = new StringBuffer();
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
+        }
+
+
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         if (getRepository().isSSLEnabled()) {
@@ -1506,10 +1516,10 @@ public class UserManager extends RepositoryManager {
      */
     private static class PasswordReset {
 
-        /** _more_          */
+        /** _more_ */
         String user;
 
-        /** _more_          */
+        /** _more_ */
         Date dttm;
 
         /**
@@ -1548,25 +1558,22 @@ public class UserManager extends RepositoryManager {
         if (email.length() > 0) {
             User user = findUserFromEmail(email);
             if (user != null) {
-                StringBuffer contents =
-                    new StringBuffer(translateMsg(request,
-                        "Your RAMADDA user ID is") + ":" + user.getId());
-                contents.append("<p>");
-                contents.append(
-                    HtmlUtil.href(
-                        getRepository().URL_USER_LOGIN.getFullUrl(""),
-                        translateMsg(request, "Login")));
-                String subject = translateMsg(request,
-                                     "Your RAMADDA user ID");
+                String userIdMailTemplate =
+                    getProperty(PROP_USER_RESET_ID_TEMPLATE, "${userid}");
+                String contents = userIdMailTemplate.replace("${userid}",
+                                      user.getId());
+                contents = contents.replace(
+                    "${url}", getRepository().URL_USER_LOGIN.getFullUrl(""));
+                String subject = getProperty(PROP_USER_RESET_ID_SUBJECT,
+                                             "Your RAMADDA ID");
                 getAdmin().sendEmail(user.getEmail(), subject,
                                      contents.toString(), true);
-                String message = "You user id has been sent to your registered email";
-                /*                sb.append(
-                    getRepository().note(
-                        msg(
-                        )));*/
-                //                sb.append(makeLoginForm(request));
-                return new Result(request.url(getRepositoryBase().URL_USER_LOGIN, ARG_MESSAGE,message));
+                String message =
+                    "You user id has been sent to your registered email address";
+                return new Result(
+                    request.url(
+                        getRepositoryBase().URL_USER_LOGIN, ARG_MESSAGE,
+                        message));
             }
             sb.append(
                 getRepository().error(
@@ -1574,19 +1581,22 @@ public class UserManager extends RepositoryManager {
                     "No user is registered with the given email address")));
         }
 
+        sb.append(msgHeader("Please enter your registered email address"));
+        sb.append(HtmlUtil.p());
+
         sb.append(request.form(getRepositoryBase().URL_USER_FINDUSERID));
-        sb.append(msgLabel("Your Email"));
+        sb.append(msgLabel("Email"));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.input(ARG_USER_EMAIL, email, HtmlUtil.SIZE_30));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Submit"));
         sb.append(HtmlUtil.formClose());
-        return new Result(msg("Password Reset"),  sb);
+        return new Result(msg("Password Reset"), sb);
     }
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable passwordResets = new Hashtable();
 
     /**
@@ -1637,6 +1647,9 @@ public class UserManager extends RepositoryManager {
                 }
                 sb.append(getRepository().warning("Incorrect passwords"));
             }
+            sb.append(msgHeader("Please reset your password"));
+            sb.append(HtmlUtil.p());
+
             sb.append(
                 request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
             sb.append(HtmlUtil.hidden(ARG_USER_PASSWORDKEY, key));
@@ -1658,7 +1671,8 @@ public class UserManager extends RepositoryManager {
         }
 
         if ( !getAdmin().isEmailCapable()) {
-            return new Result(msg("Password Reset"),
+            return new Result(
+                msg("Password Reset"),
                 new StringBuffer(
                     getRepository().warning(
                         msg(
@@ -1698,17 +1712,16 @@ public class UserManager extends RepositoryManager {
         String toUser = user.getEmail();
         String url = getRepository().URL_USER_RESETPASSWORD.getFullUrl("?"
                          + ARG_USER_PASSWORDKEY + "=" + key);
-        StringBuffer contents =
-            new StringBuffer(translateMsg(request,
-                "A request has been made to reset your RAMADDA password"));
-        contents.append(HtmlUtil.p());
-        contents.append(HtmlUtil.href(url,
-                                      translateMsg(request,
-                                          "Click to reset")));
-        String subject = translateMsg(request, "RAMADDA password reset");
-        getAdmin().sendEmail(toUser, subject, contents.toString(), true);
-        String message = "Instructions on how to reset your password have been sent to your registered email address";
-        return new Result(request.url(getRepositoryBase().URL_USER_LOGIN, ARG_MESSAGE,message));
+        String template = getProperty(PROP_USER_RESET_PASSWORD_TEMPLATE, "");
+        template = template.replace("${url}", url);
+        template = template.replace("${userid}", user.getId());
+        String subject = getProperty(PROP_USER_RESET_PASSWORD_SUBJECT,
+                                     "Your RAMADDA Password");
+        getAdmin().sendEmail(toUser, subject, template, true);
+        String message =
+            "Instructions on how to reset your password have been sent to your registered email address";
+        return new Result(request.url(getRepositoryBase().URL_USER_LOGIN,
+                                      ARG_MESSAGE, message));
         /*
         sb.append(
             getRepository().note(

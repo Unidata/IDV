@@ -575,6 +575,19 @@ form {
 
 
 
+.admin-block {
+   margin-top:5px;
+   padding-left:5;
+   padding-bottom:5;
+}
+
+.admin-block-inner {
+   margin-left:20px;
+   background-color:#f9f9f9;
+   border : 1px #aaaaaa solid;
+}
+
+
 .wiki-toc {
    margin-top:5px;
    border : 1px #aaaaaa solid;

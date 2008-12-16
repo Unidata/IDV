@@ -63,7 +63,7 @@ public class ContentMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_THUMBNAIL =
         new Metadata.Type("content.thumbnail", "Thumbnail Image");
 
-    /** _more_          */
+    /** _more_ */
     public static Metadata.Type TYPE_ATTACHMENT =
         new Metadata.Type("content.attachment", "Attachment");
 

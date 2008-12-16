@@ -84,7 +84,7 @@ public class GraphOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
-                                                      "graph.graph",true);
+                                                      "graph.graph", true);
 
 
 

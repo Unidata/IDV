@@ -158,7 +158,7 @@ public class Column implements Constants {
     /** _more_ */
     private static final String ATTR_SEARCHTYPE = "searchtype";
 
-    /** _more_          */
+    /** _more_ */
     private static final String ATTR_SHOWINHTML = "showinhtml";
 
 
@@ -220,7 +220,7 @@ public class Column implements Constants {
     /** _more_ */
     private int offset;
 
-    /** _more_          */
+    /** _more_ */
     private boolean canShow = true;
 
 

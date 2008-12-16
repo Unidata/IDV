@@ -184,7 +184,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_USER_RESETPASSWORD =
         new RequestUrl(this, "/user/resetpassword");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_USER_FINDUSERID = new RequestUrl(this,
                                                       "/user/finduserid");
 
@@ -255,7 +255,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     protected SimpleDateFormat timeSdf =
         RepositoryUtil.makeDateFormat("HH:mm:ss z");
 
-    /** _more_          */
+    /** _more_ */
     protected List<SimpleDateFormat> formats;
 
     /**

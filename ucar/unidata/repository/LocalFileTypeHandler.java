@@ -156,19 +156,19 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         return file;
     }
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_PATH = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_AGE = 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_INCLUDES = 2;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_EXCLUDES = 3;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_NAMES = 4;
 
     /**

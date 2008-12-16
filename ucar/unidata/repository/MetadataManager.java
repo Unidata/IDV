@@ -398,6 +398,12 @@ public class MetadataManager extends RepositoryManager {
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
                             Element.class });
+                    if (ctor == null) {
+                        throw new IllegalStateException(
+                            "Could not find constructor for MetadataHandler:"
+                            + c.getName());
+                    }
+
                     metadataHandlers.add(
                         (MetadataHandler) ctor.newInstance(
                             new Object[] { getRepository(),
@@ -777,7 +783,8 @@ public class MetadataManager extends RepositoryManager {
                 tmp.append("<ul>");
                 tmp.append(groupMap.get(name));
                 tmp.append("</ul>");
-                sb.append(HtmlUtil.makeShowHideBlock(name,  tmp.toString(), false));
+                sb.append(HtmlUtil.makeShowHideBlock(name, tmp.toString(),
+                        false));
 
             }
         } else {

@@ -83,10 +83,10 @@ public class RssOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_RSS_RSS = "rss";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_GEOLAT = "geo:lat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_GEOLON = "geo:lon";
 
     /** _more_ */
@@ -113,11 +113,11 @@ public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_FULL =
-        new OutputType("Full RSS Feed", "rss.full",false);
+        new OutputType("Full RSS Feed", "rss.full", false);
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_SUMMARY =
-        new OutputType("RSS Feed", "rss.summary",false);
+        new OutputType("RSS Feed", "rss.summary", false);
 
 
 

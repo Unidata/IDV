@@ -1201,8 +1201,8 @@ public class TypeHandler extends RepositoryManager {
                 }
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                            HtmlUtil.makeTabs(tabTitles, tabContent,
-                                true, "tabcontent", "tabcontents_noborder")));
+                            HtmlUtil.makeTabs(tabTitles, tabContent, true,
+                                "tabcontent", "tabcontents_noborder")));
                 }
 
             } else {
@@ -1667,9 +1667,10 @@ public class TypeHandler extends RepositoryManager {
         advancedSB.append(HtmlUtil.formTableClose());
 
 
-        formBuffer.append(HtmlUtil.makeShowHideBlock(
-                                                     msg("Basic"), basicSB.toString(), true));
-        formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Advanced"), advancedSB.toString(), false));
+        formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Basic"),
+                basicSB.toString(), true));
+        formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Advanced"),
+                advancedSB.toString(), false));
     }
 
 
@@ -1765,7 +1766,7 @@ public class TypeHandler extends RepositoryManager {
          *   }
          *   addOrClause(Tables.ENTRIES.COL_TOP_GROUP_ID,
          *               request.getString(ARG_COLLECTION, ""), where);
-         *               }*
+         *               }
          */
 
         if (request.defined(ARG_FILESUFFIX)) {

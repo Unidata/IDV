@@ -41,7 +41,7 @@ import java.sql.*;
  */
 public class RepositoryConnection {
 
-    /** _more_          */
+    /** _more_ */
     private Connection connection;
 
     /**

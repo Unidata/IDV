@@ -347,10 +347,10 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      */
     public static class DomHolder {
 
-        /** _more_          */
+        /** _more_ */
         Element root;
 
-        /** _more_          */
+        /** _more_ */
         Date dttm;
 
         /**

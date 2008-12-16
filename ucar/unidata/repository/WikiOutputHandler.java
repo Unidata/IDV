@@ -19,15 +19,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
+
+
+import org.w3c.dom.*;
 
 
 
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.WikiUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.WikiUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -40,7 +42,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
-import org.w3c.dom.*;
 
 /**
  *
@@ -54,7 +55,7 @@ public class WikiOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
-                                                                "wiki",true);
+                                                     "wiki", true);
 
 
     /**
@@ -91,7 +92,7 @@ public class WikiOutputHandler extends OutputHandler {
         if (state.entry == null) {
             return;
         }
-        if(state.entry.getType().equals(WikiPageTypeHandler.TYPE_WIKIPAGE)) {
+        if (state.entry.getType().equals(WikiPageTypeHandler.TYPE_WIKIPAGE)) {
             types.add(OUTPUT_WIKI);
         }
     }
@@ -110,27 +111,52 @@ public class WikiOutputHandler extends OutputHandler {
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
 
-        if(request.exists(ARG_WIKI_CREATE)) {
+        if (request.exists(ARG_WIKI_CREATE)) {
             return wikiPageCreate(request, entry);
         }
-        StringBuffer sb  = new StringBuffer(wikifyEntry(request, entry, entry.getDescription()));
+        StringBuffer sb = new StringBuffer(wikifyEntry(request, entry,
+                              entry.getDescription()));
         return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
     }
 
 
 
 
-    public Result wikiPageCreate(Request request, Entry entry) throws Exception {
-        return makeLinksResult(request, msg("Wiki Create"), new StringBuffer("TBD"), new State(entry));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result wikiPageCreate(Request request, Entry entry)
+            throws Exception {
+        return makeLinksResult(request, msg("Wiki Create"),
+                               new StringBuffer("TBD"), new State(entry));
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         return outputEntry(request, group);
     }
 
-    
+
 
 
 }

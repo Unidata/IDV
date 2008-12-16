@@ -740,7 +740,8 @@ public class GenericTypeHandler extends TypeHandler {
             typeSB = new StringBuffer(HtmlUtil.formTable() + typeSB
                                       + HtmlUtil.formTableClose());
             formBuffer.append(HtmlUtil.p());
-            formBuffer.append(HtmlUtil.makeShowHideBlock(msg(getLabel()), typeSB.toString(), true));
+            formBuffer.append(HtmlUtil.makeShowHideBlock(msg(getLabel()),
+                    typeSB.toString(), true));
         }
 
 
