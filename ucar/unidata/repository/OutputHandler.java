@@ -79,8 +79,8 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler extends RepositoryManager implements WikiUtil
-    .WikiPageHandler {
+public class OutputHandler extends RepositoryManager implements 
+                                                         WikiUtil.WikiPageHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
@@ -537,10 +537,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                       String label, boolean allEntries,
                                       boolean append)
             throws Exception {
-        String event = "selectInitialClick(event,"
-                       + HtmlUtil.squote(elementId) + ","
-                       + HtmlUtil.squote("" + allEntries) + ","
-                       + HtmlUtil.squote("" + append) + ")";
+        String event = HtmlUtil.call("selectInitialClick","event,"
+                                     + HtmlUtil.squote(elementId) + ","
+                                     + HtmlUtil.squote("" + allEntries) + ","
+                                     + HtmlUtil.squote("" + append));
         return HtmlUtil.mouseClickHref(event, msg(label),
                                        HtmlUtil.id(elementId
                                            + ".selectlink"));
@@ -753,8 +753,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             base = tuple[1];
             sb.append(tuple[2]);
         }
-        sb.append("<ul class=\"folderblock\" style=\"list-style-image : url("
-                  + getRepository().fileUrl(ICON_BLANK) + ")\">");
+        sb.append("<ul" + HtmlUtil.cssClass("folderblock") + HtmlUtil.style("list-style-image : url("
+                                                                            + getRepository().fileUrl(ICON_BLANK) + ")")+
+                  ">");
 
         //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int          cnt  = 0;
@@ -913,6 +914,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
+    public static final String RESOURCE_ENTRYTEMPLATE = "entrytemplate.txt";
+    public static final String RESOURCE_GROUPTEMPLATE = "grouptemplate.txt";
+
+
     /** _more_          */
     public static final String PROP_ENTRY = "entry";
 
@@ -1021,12 +1026,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             return entry.getName();
         }
         if (include.equals(WIKIPROP_CHILDREN_GROUPS)) {
-            StringBuffer sb = new StringBuffer();
-            List<Entry> children =
-                getEntryManager().getChildrenGroups(request, entry);
+            List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_subgroups");
+            if(children==null) {
+                children = getEntryManager().getChildrenGroups(request, entry);
+            }
             if (children.size() == 0) {
                 return "";
             }
+            StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
             return HtmlUtil.makeShowHideBlock(msg("Groups") + link,
@@ -1034,12 +1041,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         }
 
         if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
-            StringBuffer sb = new StringBuffer();
-            List<Entry> children =
-                getEntryManager().getChildrenEntries(request, entry);
+            List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_subentries");
+            if(children==null) {
+                children = getEntryManager().getChildrenEntries(request, entry);
+            }
             if (children.size() == 0) {
                 return "";
             }
+
+            StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
             return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
@@ -1048,8 +1058,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
         if (include.equals(WIKIPROP_CHILDREN)) {
             StringBuffer sb = new StringBuffer();
-            List<Entry> children = getEntryManager().getChildren(request,
-                                       entry);
+            List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_children");
+            if(children==null) {
+                children = getEntryManager().getChildren(request, entry);
+            }
+
             if (children.size() == 0) {
                 return "";
             }
@@ -1193,7 +1206,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @return _more_
      */
-    public String makeWikiLink(WikiUtil wikiUtil, String name, String label) {
+    public String getWikiLink(WikiUtil wikiUtil, String name, String label) {
         try {
             Entry   entry    = (Entry) wikiUtil.getProperty(PROP_ENTRY);
             Request request  = (Request) wikiUtil.getProperty(PROP_REQUEST);
@@ -1219,10 +1232,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 }
             }
 
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry, ARG_OUTPUT,
-                                          WikiOutputHandler.OUTPUT_WIKI,
-                                          ARG_WIKI_CREATE, name);
+            String url = request.url(getRepository().URL_ENTRY_FORM,
+                                     ARG_NAME,name,
+                                     ARG_GROUP,
+                                     parent.getId(),
+                                     ARG_TYPE,
+                                     WikiPageTypeHandler.TYPE_WIKIPAGE);
+
             return HtmlUtil.href(url, name,
                                  HtmlUtil.cssClass("wiki-link-noexist"));
         } catch (Exception exc) {
@@ -1245,10 +1261,35 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public String wikifyEntry(Request request, Entry entry,
                               String wikiContent)
+        throws Exception {
+        return wikifyEntry(request, entry, wikiContent, null,null);
+    }
+
+
+    public String wikifyEntry(Request request, Entry entry,
+                              String wikiContent,
+                              List<Group> subGroups,
+                              List<Entry> subEntries)
             throws Exception {
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
                                 PROP_REQUEST,
                                 request, PROP_ENTRY, entry }));
+        List children = new ArrayList();
+        if(subGroups!=null) {
+            wikiUtil.putProperty(entry.getId()+"_subgroups",subGroups);
+            children.addAll(subGroups);
+        }
+
+        if(subEntries!=null) {
+            wikiUtil.putProperty(entry.getId()+"_subentries",subEntries);
+            children.addAll(subEntries);
+        }
+
+        wikiUtil.putProperty(entry.getId()+"_children",children);
+
+
+        //TODO: We need to keep track of what is getting called so we prevent
+        //infinite loops
         return wikiUtil.wikify(wikiContent, this);
     }
 

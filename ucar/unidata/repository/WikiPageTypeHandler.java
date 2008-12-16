@@ -61,6 +61,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     /** _more_          */
     public static String TYPE_WIKIPAGE = "wikipage";
 
+    public static final String ARG_WIKI_TEXT = "wikipage.wikitext";
+
     /**
      * _more_
      *
@@ -72,8 +74,28 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     public WikiPageTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
+        initWikiTable(entryNode);
+
     }
 
+    private void initWikiTable(Element node) throws Exception {
+        Statement statement = getDatabaseManager().createStatement();
+
+        StringBuffer tableDef = new StringBuffer("CREATE TABLE "
+                                    + getTableName()+"_history" + " (\n");
+
+        tableDef.append(COL_ID + " varchar(200),");
+        tableDef.append(COL_ID + " varchar(200),");
+        tableDef.append(")");
+        try {
+            statement.execute(tableDef.toString());
+        } catch (Throwable exc) {
+        }
+
+        
+
+        statement.close();
+    }
 
 
     /**
@@ -91,15 +113,21 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
         sb.append(HtmlUtil.formEntry(msgLabel("Wiki Page Title"),
                                      HtmlUtil.input(ARG_NAME, ((entry != null)
                 ? entry.getName()
-                : getFormDefault(ARG_NAME, "")), size)));
+                : request.getString(ARG_NAME, "")), size)));
 
-        String select = OutputHandler.getSelect(request, ARG_DESCRIPTION,
+        String wikiText = "";
+        if(entry!=null) {
+            Object[]values = entry.getValues();
+            if(values!=null && values.length>0 && values[0]!=null)
+                wikiText = (String)values[0];
+        }
+
+        String select = OutputHandler.getSelect(request, ARG_WIKI_TEXT,
                             "Add link", true, true);
 
-        String textWidget = HtmlUtil.textArea(ARG_DESCRIPTION,
-                                ((entry != null)
-                                 ? entry.getDescription()
-                                 : BLANK), 200, 80,
+        String textWidget = HtmlUtil.textArea(ARG_WIKI_TEXT,
+                                              wikiText,
+                                              200, 80,
                                            HtmlUtil.id(ARG_DESCRIPTION));
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget
                      + "</td><td>" + select + "</td></tr></table>";

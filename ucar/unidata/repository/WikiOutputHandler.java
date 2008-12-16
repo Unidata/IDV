@@ -114,8 +114,12 @@ public class WikiOutputHandler extends OutputHandler {
         if (request.exists(ARG_WIKI_CREATE)) {
             return wikiPageCreate(request, entry);
         }
+        String wikiText = "";
+        Object[]values = entry.getValues();
+        if(values!=null && values.length>0 && values[0]!=null)
+            wikiText = (String)values[0];
         StringBuffer sb = new StringBuffer(wikifyEntry(request, entry,
-                              entry.getDescription()));
+                              wikiText));
         return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
     }
 

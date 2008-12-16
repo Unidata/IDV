@@ -161,12 +161,25 @@ CREATE TABLE  globals (name varchar(500),
 
 
 
+
+-----------------------------------------------------------------------
+--- Holds changes to wiki pages
+-----------------------------------------------------------------------
+CREATE TABLE wikihistory (id varchar(200),
+		        user_id varchar(200),
+			date ramadda.datetime, 
+			description varchar(2000));
+
+
+
+CREATE INDEX WIKIHISTORY_INDEX_ID ON wikihistory (ID);
+
+
+
+
 -----------------------------------------------------------------------
 --- just here so ramadda knows if the db has been created
 -----------------------------------------------------------------------
 CREATE TABLE  dummy (name varchar(500));
-
-
----CREATE TABLE stats ();
 
 

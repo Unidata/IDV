@@ -210,22 +210,26 @@ public class HtmlOutputHandler extends OutputHandler {
             return getActionXml(request, entry);
         }
 
+        StringBuffer sb         = new StringBuffer();
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
-        StringBuffer sb         = new StringBuffer();
-        String informationBlock = getInformationTabs(request, entry, false);
-        sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                                             informationBlock, true));
+        String wikiTemplate = getWikiText(request, entry);
+        if(wikiTemplate!=null) {
+            sb.append(wikifyEntry(request, entry, wikiTemplate));
+        } else {
+            String informationBlock = getInformationTabs(request, entry, false);
+            sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
+                                                 informationBlock, true));
 
-        StringBuffer metadataSB = new StringBuffer();
-        getMetadataManager().decorateEntry(request, entry, metadataSB, false);
-        String metataDataHtml = metadataSB.toString();
-        if (metataDataHtml.length() > 0) {
-            sb.append(HtmlUtil.makeShowHideBlock(msg("Attachments"),
-                    "<div class=\"description\">" + metadataSB + "</div>",
-                    true));
+            StringBuffer metadataSB = new StringBuffer();
+            getMetadataManager().decorateEntry(request, entry, metadataSB, false);
+            String metataDataHtml = metadataSB.toString();
+            if (metataDataHtml.length() > 0) {
+                sb.append(HtmlUtil.makeShowHideBlock(msg("Attachments"),
+                                                     "<div class=\"description\">" + metadataSB + "</div>",
+                                                     true));
+            }
         }
-
 
         return makeLinksResult(request, msg("Entry"), sb, new State(entry));
     }
@@ -841,7 +845,7 @@ public class HtmlOutputHandler extends OutputHandler {
     private void addDescription(Request request, Entry entry,
                                 StringBuffer sb) {
         String desc = entry.getDescription();
-        if (desc.length() > 0) {
+        if (desc.length() > 0 && !desc.startsWith("<wiki>")) {
             desc = getEntryManager().processText(request, entry, desc);
             StringBuffer descSB =
                 new StringBuffer("\n<div class=\"description\">\n");
@@ -947,17 +951,13 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-
-
-
-
+        String wikiTemplate = getWikiText(request, group);
+        
         if (showApplet) {
             List allEntries = new ArrayList(entries);
             allEntries.addAll(subGroups);
             sb.append(getTimelineApplet(request, allEntries));
-        }
-
-        if ( !showApplet && !group.isDummy()) {
+        } else if (wikiTemplate==null && !group.isDummy()) {
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
@@ -974,20 +974,24 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-        if (subGroups.size() > 0) {
-            StringBuffer groupsSB = new StringBuffer();
-            String link = getEntriesList(groupsSB, subGroups, request, true,
-                                         false, group.isDummy());
-            sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
-                    groupsSB.toString(), true));
-        }
+        if(wikiTemplate!=null) {
+            sb.append(wikifyEntry(request, group,  wikiTemplate,subGroups,entries));
+        } else {
+            if (subGroups.size() > 0) {
+                StringBuffer groupsSB = new StringBuffer();
+                String link = getEntriesList(groupsSB, subGroups, request, true,
+                                             false, group.isDummy());
+                sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
+                                                     groupsSB.toString(), true));
+            }
 
-        if (entries.size() > 0) {
-            StringBuffer entriesSB = new StringBuffer();
-            String link = getEntriesList(entriesSB, entries, request, true,
-                                         false, group.isDummy());
-            sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                    entriesSB.toString(), true));
+            if (entries.size() > 0) {
+                StringBuffer entriesSB = new StringBuffer();
+                String link = getEntriesList(entriesSB, entries, request, true,
+                                             false, group.isDummy());
+                sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
+                                                     entriesSB.toString(), true));
+            }
         }
 
 
@@ -1004,6 +1008,28 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
     }
+
+
+
+    private static boolean checkedTemplates = false;
+    private static String entryTemplate;
+    private static String groupTemplate;
+
+    private String getWikiText(Request request, Entry entry) throws Exception {
+        if(!checkedTemplates) {
+            entryTemplate = getRepository().getResource(RESOURCE_ENTRYTEMPLATE,true);
+            groupTemplate = getRepository().getResource(RESOURCE_GROUPTEMPLATE,true);
+            checkedTemplates = true;
+        }
+        if(entry.getDescription().trim().startsWith("<wiki>")) {
+            return entry.getDescription();
+        }
+        if(entry.isGroup()) {
+            return groupTemplate;
+        }
+        return entryTemplate;
+    } 
+
 
 
 

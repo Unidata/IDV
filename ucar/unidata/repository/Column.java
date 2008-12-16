@@ -82,6 +82,8 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
+    public static final String TYPE_CLOB = "clob";
+
     /** _more_ */
     public static final String TYPE_INT = "int";
 
@@ -475,6 +477,8 @@ public class Column implements Constants {
     public void createTable(Statement statement) throws Exception {
         if (type.equals(TYPE_STRING)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
+        } else if (type.equals(TYPE_CLOB)) {
+            defineColumn(statement, name, "clob(" + size + ") ");
         } else if (type.equals(TYPE_ENUMERATION)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_INT)) {

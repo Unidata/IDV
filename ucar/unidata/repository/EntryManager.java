@@ -3497,14 +3497,19 @@ return new Result(title, sb);
         if ( !group.isGroup()) {
             return children;
         }
+        List<Entry> entries = new ArrayList<Entry>();
         List<String> ids = getChildIds(request, (Group) group, null);
         for (String id : ids) {
             Entry entry = getEntry(request, id);
             if (entry == null) {
                 continue;
             }
-            children.add(entry);
+            if(entry.isGroup())
+                children.add(entry);
+            else
+                entries.add(entry);
         }
+        children.addAll(entries);
         return children;
     }
 

@@ -3024,6 +3024,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public String getResource(String id) throws Exception {
+        return getResource(id,false);
+    }
+
+
+    public String getResource(String id, boolean ignoreErrors) throws Exception {
         String resource = (String) resources.get(id);
         if (resource != null) {
             return resource;
@@ -3042,9 +3047,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 }
             }
         } else {
+            try {
             resource =
                 IOUtil.readContents(getStorageManager().localizePath(id),
                                     getClass());
+            } catch(Exception exc) {
+                if(!ignoreErrors) throw exc;
+            }
         }
         if (cacheResources() && (resource != null)) {
             resources.put(id, resource);

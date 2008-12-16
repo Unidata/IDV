@@ -17,6 +17,12 @@
         <property name="repositorydir" value="${srcdir}/ucar/unidata/repository" />
         <property name="releasedir" value="${libsdir}/repository" />
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
+
+	<property name="docs_dest" value="${basedir}/repositorydocs"/>
+        <mkdir dir="${docs_dest}"/>
+        <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
+        <mkdir dir="${docs_javadoc_dest}"/>
+
         <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar"/>
     </target>
 
@@ -240,6 +246,24 @@
             <exclude name="ucar/unidata/geoloc/**"/>
             <exclude name="ucar/unidata/view/sounding/test/**"/>
         </jar>
+    </target>
+
+
+    <target name="javadoc" depends="init">
+        <javadoc
+            Author="true"
+            Doctitle="Unidata RAMADDA"
+            Use="true"
+            Version="true"
+            Windowtitle="Unidata RAMADDA"
+            classpath="${classpath}:/upc/share/junit/junit.jar"
+            destdir="${docs_javadoc_dest}"
+            maxmemory="256m"
+            sourcepath="${srcdir}">
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+            <package name="ucar.unidata.repository.*"/>
+            <package name="ucar.unidata.sql"/>
+        </javadoc>
     </target>
 
 

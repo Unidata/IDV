@@ -1440,6 +1440,7 @@ public class UserManager extends RepositoryManager {
         tips.add(msg("View data cart"));
 
         if (user.getAnonymous()) {
+            request.remove(ARG_MESSAGE);
             String redirect =
                 XmlUtil.encodeBase64(request.getUrl().getBytes());
             urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
