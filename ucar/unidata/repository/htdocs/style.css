@@ -1,20 +1,19 @@
 
 body {
-   font-weight: normal;
    font-size: 12pt;
-   font-family: Arial, Helvetica, sans-serif;
+   font-family: sans-serif;
    color: black;
    margin: 0px;
 }
 
 
 
-A {
+a {
    color: #0000FF;
    text-decoration: none;
 }
 
-A:link {
+a:link {
    color: #0000FF;
 }
 
@@ -23,6 +22,7 @@ a:hover {
    color: #FF0000;
    text-decoration: underline;
 }
+
 
 
 
@@ -50,14 +50,17 @@ a.header  {
 }
 
 
-.headercontent {
-  font-size: 20pt;
+.header-content {
+  color: white;
+}
+
+.header-title {
+  font-size: 200%;
   color: white;
 }
 
 
 .nav {
-   font-size: 12pt;
    font-weight: bold;
    color: black;
 }
@@ -68,7 +71,6 @@ a.header  {
 }
 
 .subnav {
-   font-size: 12pt;
    padding-top:4;   
    padding-left:4;   
    background-color : #c3d9ff;
@@ -116,13 +118,10 @@ a.subnavoffcomp  {
 
 
 .subnav2 {
-   font-size: 12pt;
-   xpadding-left:5;   
    padding-top:5;   
    background-color : #c3d9ff;
    font-weight: bold;
    color: black;
-   xborder-bottom : 1px #666666 solid;
 }
 
 
@@ -164,6 +163,7 @@ a.subnavoffcomp2  {
 
 
 .content {
+    line-height: 1.5em;
     margin:5;
 }
 
@@ -272,13 +272,11 @@ a.subnavoffcomp2  {
 
 td {
    font-weight: normal;
-   font-size: 12pt;
-   font-family: Arial, Helvetica, sans-serif;
 }
 
 .separator {
+   font-size: 8pt;
    font-weight: bold;
-   font-size: 12pt;
 }
 
 
@@ -419,7 +417,6 @@ a.menulink {
 
 
 .pageheading {
-  font-size: 12pt;
   font-weight: bold;
   color: #9C9C9C;
 }
@@ -428,7 +425,6 @@ a.menulink {
 .breadcrumbs {
    text-decoration: none;
    font-weight: bold;
-   font-size: 12pt;
    margin-bottom:0px;
 }
 
@@ -445,11 +441,20 @@ a.menulink {
 
 .entryheader {
    font-weight: bold;
-   font-size: 12pt;
+   font-size: 110%;
    color: #9C9C9C;
    border-bottom : 1px #666666 solid;
 }
 
+
+
+
+.entryname {
+   font-size: 110%;
+   padding-left:15px;
+   font-weight: bold;
+   vertical-align: bottom;
+}
 
 .entryname a:hover {
    text-decoration: underline;
@@ -458,13 +463,6 @@ a.menulink {
 
 .entryname a {
    color: #000000;
-}
-
-.entryname {
-   padding-left:15px;
-   font-weight: bold;
-   font-size: 12pt;
-   vertical-align: bottom;
 }
 
 .hideshowblock {
@@ -588,10 +586,14 @@ form {
 }
 
 
+.wiki-toc-wrapper {
+    margin:10px;
+}
+
 .wiki-toc {
    margin-top:5px;
    border : 1px #aaaaaa solid;
-   background-color:#f9f9f9;
+   background-color:#f8f8f8;
    padding-left:5;
    padding-bottom:5;
 }
@@ -600,47 +602,35 @@ form {
    font-weight: bold;
 }
 
-.wiki-h1 {
-   font-weight: bold;
-   margin-top: 5;
-   margin-bottom: 0;
-   font-size: 22px; 
+.wiki-h1, .wiki-h2, .wiki-h3, .wiki-h4, .wiki-h5, .wiki-h6 {
+	color: black;
+	background: none;
+	font-weight: normal;
+	margin: 0;
+	padding-top: .5em;
+	padding-bottom: .17em;
+	border-bottom: 1px solid #aaa;
 }
-
-.wiki-h2 {
-   font-weight: bold;
-   margin-top: 5;
-   margin-bottom: 0;
-   font-size: 20px; 
+.wiki-h1 { font-size: 188%; }
+.wiki-h2 { font-size: 150%; }
+.wiki-h3, .wiki-h4, .wiki-h5, .wiki-h6 {
+	border-bottom: none;
+	font-weight: bold;
 }
-
-.wiki-h3 {
-   font-weight: bold;
-   margin-top: 5;
-   margin-bottom: 0;
-   font-size: 18px; 
-}
-
-
-.wiki-h4 {
-   font-weight: bold;
-   margin-top: 5;
-   margin-bottom: 0;
-   font-size: 16px; 
-}
-
-
-.wiki-h5 {
-   font-weight: bold;
-   margin-top: 5;
-   margin-bottom: 0;
-   font-size: 14px; 
-}
+.wiki-h3 { font-size: 132%; }
+.wiki-h4 { font-size: 116%; }
+.wiki-h5 { font-size: 100%; }
+.wiki-h6 { font-size: 80%;  }
 
 .wiki-hr {
-   margin-top: 0;
-   margin-bottom: 0;
+	height: 1px;
+	color: #aaa;
+	background-color: #aaa;
+	border: 0;
+	margin: .2em 0 .2em 0;
 }
+
+
 
 .wiki-link {
 }
@@ -652,7 +642,7 @@ form {
 
 
 a.wiki-link-noexist {
-	color:red;
+	color:#aa0000;
 }
 
 .cpYearNavigation,

@@ -24,6 +24,7 @@
 
 
   <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.WikiPageTypeHandler">
+     <property name="icon" value="/icons/wiki.gif"/>
      <property name="form.rows.desc" value="50"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>

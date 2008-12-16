@@ -836,10 +836,12 @@ public class DatabaseManager extends RepositoryManager {
         if (db.equals(DB_MYSQL)) {
             sql = sql.replace("ramadda.double", "double");
             sql = sql.replace("ramadda.datetime", "datetime");
+            sql = sql.replace("ramadda.clob", "mediumtext");
             //sql = sql.replace("ramadda.datetime", "timestamp");
         } else if (db.equals(DB_DERBY)) {
             sql = sql.replace("ramadda.double", "double");
             sql = sql.replace("ramadda.datetime", "timestamp");
+            sql = sql.replace("ramadda.clob", "clob(64000)");
         } else if (db.equals(DB_POSTGRES)) {
             sql = sql.replace("ramadda.double", "float8");
             sql = sql.replace("ramadda.datetime", "timestamp");
@@ -874,6 +876,23 @@ public class DatabaseManager extends RepositoryManager {
      * @return _more_
      */
     protected String convertType(String type) {
+        return convertType(type,-1);
+    }
+
+    protected String convertType(String type, int size) {
+        if(type.equals("clob")) {
+            if ( db.equals(DB_DERBY)) {
+                return "clob(" + size + ") ";
+            } 
+            if ( db.equals(DB_MYSQL)) {
+                return "mediumtext";
+            }
+            if (db.equals(DB_POSTGRES)) {
+                //TODO:
+                return "clob";
+            }
+
+        }
         if (type.equals("double")) {
             if (db.equals(DB_POSTGRES)) {
                 return "float8";

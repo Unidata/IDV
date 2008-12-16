@@ -4140,6 +4140,7 @@ return new Result(title, sb);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
             //Get the entry but don't check for access control
+            try {
             Entry e = getEntry(request, ids[i], false);
             if (e == null) {
                 continue;
@@ -4149,6 +4150,10 @@ return new Result(title, sb);
             }
             Group g = (Group) e;
             groups.add(g);
+            } catch(Throwable exc) {
+                System.err.println ("Error getting top groups:");
+                exc.printStackTrace();
+            }
         }
         //For now don't check for access control
         //        return topGroups = new ArrayList<Group>(

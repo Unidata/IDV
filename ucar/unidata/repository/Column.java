@@ -478,7 +478,9 @@ public class Column implements Constants {
         if (type.equals(TYPE_STRING)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_CLOB)) {
-            defineColumn(statement, name, "clob(" + size + ") ");
+            String clobType = typeHandler.getRepository().getDatabaseManager().convertType(
+                                                                                           "clob",size);
+            defineColumn(statement, name, clobType);
         } else if (type.equals(TYPE_ENUMERATION)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_INT)) {

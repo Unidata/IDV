@@ -1145,6 +1145,7 @@ public class OutputHandler extends RepositoryManager implements
             request.put(ARG_OUTPUT, outputType.getId());
             request.put(ARG_EMBEDDED, "true");
 
+            String title = null;
             String propertyValue;
             if ( !outputType.getIsHtml()) {
                 String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
@@ -1157,11 +1158,16 @@ public class OutputHandler extends RepositoryManager implements
                 Result result = getEntryManager().processEntryShow(request,
                                     importEntry);
                 propertyValue = new String(result.getContent());
+                title = result.getTitle();
             }
 
             request.put(ARG_OUTPUT, originalOutput);
             request.put(ARG_ENTRYID, originalId);
             request.remove(ARG_EMBEDDED);
+            if(title!=null) {
+                return HtmlUtil.makeShowHideBlock(title,propertyValue, 
+                                                  true,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
+            }
             return propertyValue;
         } catch (Exception exc) {
             throw new RuntimeException(exc);

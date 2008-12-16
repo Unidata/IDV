@@ -74,6 +74,10 @@ public class WikiUtil {
     public   String wikify(String s, WikiPageHandler handler) {
         s = s.replace("\\\\[","_BRACKETOPEN_");
 
+        s = s.replaceAll("\r\n\r\n","\n<p>\n");
+        //        s = s.replaceAll("\r\r","<p>");
+
+        //        System.err.println (s);
         s = s.replaceAll("'''''([^']+)'''''","<b><i>$1</i></b>");
         s = s.replaceAll("'''([^']+)'''","<b>$1</b>");
         s = s.replaceAll("''([^']+)''","<i>$1</i>");
@@ -130,10 +134,10 @@ public class WikiUtil {
             //            System.err.println("MATCH " + prefix + ":" + label);
             int start = matcher.start(0);
             int end =matcher.end(0);
-            int level = prefix.length()-1;
+            int level = prefix.length();
             String value ="<a name=\"" + label +"\"></a><div class=\"wiki-h" + level +"\">" + label +"</div>";
-            if(level==1)
-                value = value+"<hr class=\"wiki-hr\">";
+            //            if(level==1)
+            //                value = value+"<hr class=\"wiki-hr\">";
             headings.add(new Object[]{new Integer(level),label});
             s = s.substring(0,start)  + value+ s.substring(end);
             matcher =pattern.matcher(s);
@@ -156,19 +160,24 @@ public class WikiUtil {
             if(starCnt>0) {
                 if(starCnt>ulCnt) {
                     while(starCnt>ulCnt) {
-                        buff.append("<ul>");
-                        ulCnt++;
-                    }
+                        buff.append("<ul>\n");
+                        ulCnt++; 
+                   }
                 } else {
                     while(starCnt<ulCnt && ulCnt>0) {
-                        buff.append("</ul>");
+                        buff.append("</ul>\n");
                         ulCnt--;
                     }
                 }
                 buff.append("<li> ");
                 buff.append(tline);
+                buff.append("\n");
                 continue;
             } 
+            while(ulCnt>0) {
+                buff.append("</ul>\n");
+                ulCnt--;
+            }
 
 
             int hashCnt =0;
@@ -179,22 +188,23 @@ public class WikiUtil {
             if(hashCnt>0) {
                 if(hashCnt>olCnt) {
                     while(hashCnt>olCnt) {
-                        buff.append("<ol>");
+                        buff.append("<ol>\n");
                         olCnt++;
                     }
                 } else {
                     while(hashCnt<olCnt && olCnt>0) {
-                        buff.append("</ol>");
+                        buff.append("</ol>\n");
                         olCnt--;
                     }
                 }
                 buff.append("<li> ");
                 buff.append(tline);
+                buff.append("\n");
                 continue;
             } 
 
             while(olCnt>0) {
-                buff.append("</ol>");
+                buff.append("</ol>\n");
                 olCnt--;
             }
 
@@ -202,12 +212,12 @@ public class WikiUtil {
             buff.append("\n");
         }
         while(ulCnt>0) {
-            buff.append("</ul>");
+            buff.append("</ul>\n");
             ulCnt--;
         }
 
         while(olCnt>0) {
-            buff.append("</ol>");
+            buff.append("</ol>\n");
             olCnt--;
         }
 
@@ -268,7 +278,7 @@ public class WikiUtil {
                 block = HtmlUtil.div(HtmlUtil.div("Contents"," class=\"wiki=tocheader\""),
                                      " class=\"wiki-toc\" ");
             }
-            block = "<table width=\"30%\"><tr><td>" + block +"</td></tr></table>";
+            block = "<table class=\"wiki-toc-wrapper\" align=\"right\" width=\"30%\"><tr><td>" + block +"</td></tr></table>";
             s = block +s;
         }
 
