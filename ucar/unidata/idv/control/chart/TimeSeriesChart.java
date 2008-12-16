@@ -523,12 +523,34 @@ public class TimeSeriesChart extends XYChartManager {
                                            currentProbeData));
         try {
             initCharts();
+            System.err.println("setProbeSamplesInner");
             if ((rowInfos != null) && (rowInfos.size() > 0)) {
+                TimeSeries speedSeries    = null;
+                TimeSeries dirSeries      = null;
+                LineState  speedLineState = null;
+                LineState  dirLineState   = null;
+                Unit       speedUnit      = null;
+                double
+                    speedMin         = 0,
+                    speedMax         = 0;
+                double
+                    dirMin         = 0,
+                    dirMax         = 0;
+                boolean polarWind = true;
+
+                int speedIdx=0;
+                int dirIdx=0;
+
+
                 for (int paramIdx = 0; paramIdx < rowInfos.size();
                         paramIdx++) {
                     ProbeRowInfo info      = rowInfos.get(paramIdx);
                     LineState    lineState = info.getLineState();
                     addLineState(lineState);
+                    String canonical =
+                        DataAlias.aliasToCanonical(lineState.getName());
+
+                    System.err.println("\tCanonical" + canonical);
                     FieldImpl field = info.getPointSample();
                     if (field == null) {
                         continue;
@@ -546,6 +568,7 @@ public class TimeSeriesChart extends XYChartManager {
                             + info.getLevel().getUnit();
                     }
 
+                    
                     TimeSeries series = new TimeSeries(name,
                                             Millisecond.class);
 
@@ -582,10 +605,65 @@ public class TimeSeriesChart extends XYChartManager {
                         series.addOrUpdate(new Millisecond(date),
                                            valueArray[i]);
                     }
+
+
+                    synchronized (MUTEX) {
+                        if (Misc.equals(canonical, "U")) {
+                            System.err.println("\tgot U");
+                            speedIdx = paramIdx;
+                            speedMin = min;
+                            speedMax = max;
+                            speedUnit      = lineState.unit;
+                            speedSeries    = series;
+                            polarWind      = false;
+                            speedLineState = lineState;
+                            continue;
+                        }
+                        if (Misc.equals(canonical, "V")) {
+                            System.err.println("\tgot V");
+                            dirIdx = paramIdx;
+                            dirSeries    = series;
+                            dirLineState = lineState;
+                            dirMin = min;
+                            dirMax = max;
+                            polarWind      = false;
+                            continue;
+                        }
+                    }
+
                     addSeries(series, lineState, paramIdx, null, true);
                     addRange(min, max,
                              "Data range from: " + lineState.getName());
                 }
+
+                if ((speedSeries != null) && (dirSeries != null)) {
+                    XYItemRenderer renderer =
+                        new WindbarbRenderer(speedLineState, speedSeries,
+                                             dirSeries, speedUnit, polarWind);
+                    Axis axis = addSeries(speedSeries, speedLineState,
+                                          speedIdx, renderer, true);
+                    if (speedLineState.getVerticalPosition()
+                        != LineState.VPOS_NONE) {
+                        axis.setVisible(false);
+                    }
+                    speedSeries = null;
+                    dirSeries   = null;
+                }
+                if (speedSeries != null) {
+                    addSeries(speedSeries, speedLineState, speedIdx, null, true);
+                    addRange(speedMin, speedMax,
+                             "Data range from: " + speedLineState.getName());
+                }
+                if (dirSeries != null) {
+                    addSeries(dirSeries, dirLineState, dirIdx, null, true);
+                    addRange(dirMin, dirMax,
+                             "Data range from: " + dirLineState.getName());
+                }
+
+
+
+
+
             }
             updateContents();
         } finally {
