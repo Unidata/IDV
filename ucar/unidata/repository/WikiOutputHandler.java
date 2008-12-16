@@ -55,7 +55,7 @@ public class WikiOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
-                                                     "wiki", true);
+                                                                "wiki", true);
 
 
     /**

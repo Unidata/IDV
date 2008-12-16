@@ -321,30 +321,7 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    private String getImageUrl(Request request, Entry entry) {
-        if ( !entry.getResource().isImage()) {
-            if (entry.hasAreaDefined()) {
-                return request.url(repository.URL_GETMAP, ARG_SOUTH,
-                                   "" + entry.getSouth(), ARG_WEST,
-                                   "" + entry.getWest(), ARG_NORTH,
-                                   "" + entry.getNorth(), ARG_EAST,
-                                   "" + entry.getEast());
-            }
-            return null;
-        }
 
-        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                            + entry.getName(), ARG_ENTRYID, entry.getId());
-    }
 
 }
 

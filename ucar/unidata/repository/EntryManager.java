@@ -2680,8 +2680,9 @@ return new Result(title, sb);
         titleList.add(entry.getLabel());
         String nav;
         String separator = getProperty("ramadda.breadcrumbs.separator", "");
-        String entryLink = getAjaxLink(request, entry, entry.getLabel(),
-                                       false);
+        String entryLink = (!entry.isGroup()?HtmlUtil.img(getIconUrl(entry))+HtmlUtil.space(1):"") + getAjaxLink(request, entry, entry.getLabel(),
+                                                                                           false);
+        
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);

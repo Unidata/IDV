@@ -1670,8 +1670,11 @@ public class HtmlUtil {
     public static String mouseClickHref(String call, String label,
                                         String extra) {
         //        return "<a href=\"javascript:void(0)\" " +onMouseClick(call) +">" +label +"</a>";
-        return tag(TAG_A,attrs(ATTR_HREF,"javascript:void(0);") +  onMouseClick(call)
+        String result =tag(TAG_A,attrs(ATTR_HREF,"javascript:void(0);") +  onMouseClick(call)
                    + extra,label);
+        //        System.err.println(result);
+
+        return result;
     }
 
 

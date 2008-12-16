@@ -933,6 +933,8 @@ public class OutputHandler extends RepositoryManager implements
     /** _more_          */
     public static final String WIKIPROP_METADATA = "metadata";
 
+    public static final String WIKIPROP_IMAGE = "image";
+
     /** _more_          */
     public static final String WIKIPROP_NAME = "name";
 
@@ -990,6 +992,32 @@ public class OutputHandler extends RepositoryManager implements
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public  String getImageUrl(Request request, Entry entry) {
+        if ( !entry.getResource().isImage()) {
+            if (entry.hasAreaDefined()) {
+                return request.url(repository.URL_GETMAP, ARG_SOUTH,
+                                   "" + entry.getSouth(), ARG_WEST,
+                                   "" + entry.getWest(), ARG_NORTH,
+                                   "" + entry.getNorth(), ARG_EAST,
+                                   "" + entry.getEast());
+            }
+            return null;
+        }
+
+        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
+                            + entry.getName(), ARG_ENTRYID, entry.getId());
+    }
+
+
+    /**
+     * _more_
+     *
      * @param wikiUtil _more_
      * @param request _more_
      * @param entry _more_
@@ -1009,6 +1037,13 @@ public class OutputHandler extends RepositoryManager implements
             String result = HtmlUtil.makeShowHideBlock(msg("Information"),
                                 informationBlock, true);
             return result;
+        }
+
+        if (include.equals(WIKIPROP_IMAGE)) {
+            if(!entry.getResource().isImage()) {
+                return "Not an image";
+            }
+            return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         }
         if (include.equals(WIKIPROP_ACTIONS)) {
             return HtmlUtil.makeShowHideBlock(msg("Actions"),

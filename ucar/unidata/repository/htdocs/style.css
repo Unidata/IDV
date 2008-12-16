@@ -163,7 +163,7 @@ a.subnavoffcomp2  {
 
 
 .content {
-    line-height: 1.5em;
+    line-height: 1.4em;
     margin:5;
 }
 
@@ -285,6 +285,7 @@ ul {
 }
 
 .tabtitles {
+   line-height: 1.15em;
    border-bottom : 2px #000000 solid;
 }
 
@@ -295,9 +296,6 @@ ul {
 }
 
 .tabcontents_noborder {
-   xborder-left : 1px #000000 solid;
-   xborder-right : 1px #000000 solid;
-   xborder-bottom : 1px #000000 solid;
 }
 
 .tabcontent_fixedheight {

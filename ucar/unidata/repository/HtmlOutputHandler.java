@@ -881,7 +881,8 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         tabTitles.add("Basic");
-        tabContent.add(entry.getTypeHandler().getEntryContent(entry, request,
+        Object basic;
+        tabContent.add(basic = entry.getTypeHandler().getEntryContent(entry, request,
                 false, true));
 
 

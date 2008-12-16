@@ -545,7 +545,7 @@ public class TypeHandler extends RepositoryManager {
 
         StringBuffer sb     = new StringBuffer();
         OutputType   output = request.getOutput();
-        if (output.equals(OutputHandler.OUTPUT_HTML)) {
+        if (true) {
             if (displayTemplatePath != null) {
                 String html =
                     getRepository().getResource(displayTemplatePath);
@@ -760,7 +760,7 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        if (output.equals(OutputHandler.OUTPUT_HTML)) {
+        if (true || output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
             String nextPrev = StringUtil.join(HtmlUtil.space(1),

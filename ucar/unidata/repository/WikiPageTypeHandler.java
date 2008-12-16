@@ -128,7 +128,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
         String textWidget = HtmlUtil.textArea(ARG_WIKI_TEXT,
                                               wikiText,
                                               200, 80,
-                                           HtmlUtil.id(ARG_DESCRIPTION));
+                                              HtmlUtil.id(ARG_WIKI_TEXT));
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget
                      + "</td><td>" + select + "</td></tr></table>";
         sb.append(HtmlUtil.formEntryTop(msgLabel("Wiki Text"), textWidget));
