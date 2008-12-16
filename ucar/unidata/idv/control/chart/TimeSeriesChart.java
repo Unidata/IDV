@@ -523,7 +523,6 @@ public class TimeSeriesChart extends XYChartManager {
                                            currentProbeData));
         try {
             initCharts();
-            System.err.println("setProbeSamplesInner");
             if ((rowInfos != null) && (rowInfos.size() > 0)) {
                 TimeSeries speedSeries    = null;
                 TimeSeries dirSeries      = null;
@@ -547,10 +546,7 @@ public class TimeSeriesChart extends XYChartManager {
                     ProbeRowInfo info      = rowInfos.get(paramIdx);
                     LineState    lineState = info.getLineState();
                     addLineState(lineState);
-                    String canonical =
-                        DataAlias.aliasToCanonical(lineState.getName());
 
-                    System.err.println("\tCanonical" + canonical);
                     FieldImpl field = info.getPointSample();
                     if (field == null) {
                         continue;
@@ -562,6 +558,8 @@ public class TimeSeriesChart extends XYChartManager {
                     lineState.unit = info.getUnit();
                     lineState.setNameIfNeeded(info.getDataInstance().getParamName());
                     String  name  =lineState.getName();
+                    String canonical =
+                        DataAlias.aliasToCanonical(name);
                     if (info.getLevel() != null) {
                         name = name+ "@"
                             + Util.formatReal(info.getLevel())
@@ -609,7 +607,6 @@ public class TimeSeriesChart extends XYChartManager {
 
                     synchronized (MUTEX) {
                         if (Misc.equals(canonical, "U")) {
-                            System.err.println("\tgot U");
                             speedIdx = paramIdx;
                             speedMin = min;
                             speedMax = max;
@@ -620,7 +617,6 @@ public class TimeSeriesChart extends XYChartManager {
                             continue;
                         }
                         if (Misc.equals(canonical, "V")) {
-                            System.err.println("\tgot V");
                             dirIdx = paramIdx;
                             dirSeries    = series;
                             dirLineState = lineState;
