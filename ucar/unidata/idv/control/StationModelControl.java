@@ -411,11 +411,11 @@ public class StationModelControl extends ObsDisplayControl {
                                        (String) null);
 
             if (getDataSelection() != null) {
-                StationModel sm =
-                    (StationModel) getDataSelection().getProperty(
+                String sm =
+                    (String) getDataSelection().getProperty(
                         PointDataSource.PROP_STATIONMODELNAME);
                 if (sm != null) {
-                    tmpStationModelName = sm.getName();
+                    tmpStationModelName = sm;
                 }
             }
 

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -5304,8 +5305,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                             getDataChoice());
                     if (dataSelectionComponents != null) {
                         for (DataSelectionComponent dsc : dataSelectionComponents) {
-                            jtp.add(dsc.getName(),
-                                    dsc.getContents(getDataSelection()));
+                            if (dsc.getShowInControlProperties()) {
+                                jtp.add(dsc.getName(),
+                                        dsc.getContents(getDataSelection()));
+                            }
                         }
                     }
                 }
@@ -5558,8 +5561,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             if (dataSelectionComponents != null) {
                 for (DataSelectionComponent dsc : dataSelectionComponents) {
-                    dsc.applyToDataSelection(getDataSelection());
-                    needToReloadData = true;
+                    if (dsc.getShowInControlProperties()) {
+                        dsc.applyToDataSelection(getDataSelection());
+                        needToReloadData = true;
+                    }
                 }
             }
             if (dataSelectionWidget != null) {
