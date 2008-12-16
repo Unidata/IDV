@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -702,9 +703,11 @@ public abstract class XYChartManager extends ChartManager {
          * @param speedSeries speed data
          * @param dirSeries dir data
          * @param unit speed unit
+         * @param polarWind true if polar coords
          */
         public WindbarbRenderer(LineState lineState, TimeSeries speedSeries,
-                                TimeSeries dirSeries, Unit unit, boolean polarWind) {
+                                TimeSeries dirSeries, Unit unit,
+                                boolean polarWind) {
             this.lineState   = lineState;
             this.speedUnit   = unit;
             this.speedSeries = speedSeries;
@@ -777,17 +780,17 @@ public abstract class XYChartManager extends ChartManager {
 
             double speed = speedSeries.getValue(item).doubleValue();
             double dir   = dirSeries.getValue(item).doubleValue();
-            if (!polarWind) {
+            if ( !polarWind) {
                 double u = speed;
                 double v = dir;
-                speed     = Math.sqrt(u * u + v * v);
-                dir = Math.atan2(-u, -v);
+                speed = Math.sqrt(u * u + v * v);
+                dir   = Math.toDegrees(Math.atan2(-u, -v));
                 if (dir < 0) {
-                    dir += 2 * Math.PI;
+                    dir += 360;
                 }
             }
-                
-            double x     = dataset.getXValue(series, item);
+
+            double x = dataset.getXValue(series, item);
 
             if (Double.isNaN(x) || Double.isNaN(speed) || Double.isNaN(dir)) {
                 return;
