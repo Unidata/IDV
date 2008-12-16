@@ -52,13 +52,18 @@ public class WikiUtil {
         this.properties = properties;
     }
 
+    public void putProperty(Object key, Object value) {
+        if(properties == null) properties = new Hashtable();
+        properties.put(key,value);
+    }
+
     public Object getProperty(Object key) {
         if(properties==null) return null;
         return properties.get(key);
     }
 
     public static interface WikiPageHandler {
-        public String makeWikiLink(WikiUtil wikiUtil, String name, String label);
+        public String getWikiLink(WikiUtil wikiUtil, String name, String label);
         public String getWikiPropertyValue(WikiUtil wikiUtil, String property);
     }
 
@@ -87,7 +92,7 @@ public class WikiUtil {
                 if(label.trim().length()==0) label = name;
                 link = "<a href=\"" + name +"\">" + label +"</a>";
             } else {
-                link  = handler.makeWikiLink(this, name, label);
+                link  = handler.getWikiLink(this, name, label);
             }
             s = s.substring(0,start) +link + s.substring(end);
             matcher =pattern.matcher(s);
