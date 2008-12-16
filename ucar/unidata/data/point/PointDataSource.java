@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -32,10 +31,12 @@ import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataSource;
 
 import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.idv.ui.PlotModelComponent;
 import ucar.unidata.idv.ui.ValueSliderComponent;
 
 
 import ucar.unidata.ui.TimeLengthField;
+import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -249,10 +250,101 @@ public abstract class PointDataSource extends FilesDataSource {
     protected void init() throws VisADException {}
 
 
+    /**
+     * Class PlotModelSelectionComponent holds plot (layout) model. Used for
+     * field selector and the properties
+     *
+     * @author IDV Development Team
+     */
+    public static class PlotModelSelectionComponent extends DataSelectionComponent {
+
+        /** the data source */
+        PointDataSource pointDataSource;
+
+        /** The main component */
+        private JComponent comp;
+
+        /** plot model component */
+        private PlotModelComponent pmc;
+
+        /**
+         * ctor
+         *
+         * @param pointDataSource the associated source
+         */
+        public PlotModelSelectionComponent(PointDataSource pointDataSource) {
+            super("Layout Model");
+            this.pointDataSource = pointDataSource;
+            pmc = new PlotModelComponent(
+                pointDataSource.getDataContext().getIdv(), this,
+                "setPlotModel", null);
+        }
+
+        /**
+         * Make the gui for the data subset panel
+         *
+         * @return gui for data subset panel
+         */
+        protected JComponent doMakeContents() {
+            GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+            String prop =
+                (String) pointDataSource.getProperty(PROP_STATIONMODELNAME);
+            if (dataSelection != null) {
+                prop = (String) dataSelection.getProperty(
+                    PROP_STATIONMODELNAME);
+            }
+            if (prop != null) {
+                pmc.setPlotModelByName((String) prop);
+            }
+
+            return GuiUtils.top(
+                GuiUtils.hflow(
+                    Misc.newList(new JLabel("Layout Model: "), pmc), 5, 5));
+        }
+
+        /**
+         * set properties on dataselection
+         *
+         * @param dataSelection the dataselection
+         */
+        public void applyToDataSelection(DataSelection dataSelection) {
+            if (dataSelection != null) {
+                dataSelection.putProperty(PROP_STATIONMODELNAME,
+                                          getPlotModel().getName());
+            }
+        }
+
+        /**
+         * Get the selected plot model
+         *
+         * @param model  plot model
+         */
+        public void setPlotModel(StationModel model) {
+            pmc.setPlotModel(model);
+        }
+
+        /**
+         * Get the selected plot model
+         *
+         * @return plot model
+         */
+        public StationModel getPlotModel() {
+            return pmc.getPlotModel();
+        }
+
+        /**
+         * Should we show in the control properties tabs.
+         * @return false;
+         */
+        public boolean getShowInControlProperties() {
+            return false;
+        }
+
+    }
 
     /**
-     * Class GridParameters holds the grid spacing/passes gui. Used for hte field selector
-     * and the properties
+     * Class GridParameters holds the grid spacing/passes gui. Used for the
+     * field selector and the properties
      *
      *
      * @author IDV Development Team
@@ -260,7 +352,7 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     private static class GridParameters extends DataSelectionComponent {
 
-        /** _more_          */
+        /** the data source */
         PointDataSource pointDataSource;
 
         /** gui component */
@@ -302,7 +394,7 @@ public abstract class PointDataSource extends FilesDataSource {
         /**
          * ctor
          *
-         * @param pointDataSource _more_
+         * @param pointDataSource the associated data source
          */
         public GridParameters(PointDataSource pointDataSource) {
             super("Grid Parameters");
@@ -425,23 +517,27 @@ public abstract class PointDataSource extends FilesDataSource {
          * @param dataSelection the dataselection
          */
         public void applyToDataSelection(DataSelection dataSelection) {
-            if ( !useDefaultCbx.isSelected()) {
-                dataSelection.putProperty(PROP_GRID_X, new Float(getGridX()));
-                dataSelection.putProperty(PROP_GRID_Y, new Float(getGridY()));
-                dataSelection.putProperty(PROP_GRID_UNIT, getGridUnit());
-                dataSelection.putProperty(PROP_GRID_NUMPASSES,
-                                          new Integer(getNumGridPasses()));
-                dataSelection.putProperty(PROP_GRID_GAIN,
-                                          new Float(getGridGain()));
-                dataSelection.putProperty(PROP_GRID_SEARCH_RADIUS,
-                                          new Float(getGridGain()));
-            } else {
-                dataSelection.removeProperty(PROP_GRID_X);
-                dataSelection.removeProperty(PROP_GRID_Y);
-                dataSelection.removeProperty(PROP_GRID_UNIT);
-                dataSelection.removeProperty(PROP_GRID_NUMPASSES);
-                dataSelection.removeProperty(PROP_GRID_GAIN);
-                dataSelection.removeProperty(PROP_GRID_SEARCH_RADIUS);
+            if (dataSelection != null) {
+                if ( !useDefaultCbx.isSelected()) {
+                    dataSelection.putProperty(PROP_GRID_X,
+                            new Float(getGridX()));
+                    dataSelection.putProperty(PROP_GRID_Y,
+                            new Float(getGridY()));
+                    dataSelection.putProperty(PROP_GRID_UNIT, getGridUnit());
+                    dataSelection.putProperty(PROP_GRID_NUMPASSES,
+                            new Integer(getNumGridPasses()));
+                    dataSelection.putProperty(PROP_GRID_GAIN,
+                            new Float(getGridGain()));
+                    dataSelection.putProperty(PROP_GRID_SEARCH_RADIUS,
+                            new Float(getGridGain()));
+                } else {
+                    dataSelection.removeProperty(PROP_GRID_X);
+                    dataSelection.removeProperty(PROP_GRID_Y);
+                    dataSelection.removeProperty(PROP_GRID_UNIT);
+                    dataSelection.removeProperty(PROP_GRID_NUMPASSES);
+                    dataSelection.removeProperty(PROP_GRID_GAIN);
+                    dataSelection.removeProperty(PROP_GRID_SEARCH_RADIUS);
+                }
             }
         }
 
@@ -526,9 +622,10 @@ public abstract class PointDataSource extends FilesDataSource {
             final DataChoice dataChoice) {
 
         if ( !(dataChoice.getId() instanceof List)) {
-            return;
+            components.add(new PlotModelSelectionComponent(this));
+        } else {
+            components.add(new GridParameters(this));
         }
-        components.add(new GridParameters(this));
     }
 
 
