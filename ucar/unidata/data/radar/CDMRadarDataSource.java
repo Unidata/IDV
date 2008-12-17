@@ -263,7 +263,8 @@ public class CDMRadarDataSource extends RadarDataSource {
         setName(makeName(da));
         if (namedStation == null) {
             try {
-                namedStation = new NamedStationImpl(stationID.substring(1),
+                String ids = stationID.length() > 3 ? stationID.substring(1) : stationID.toString();
+                namedStation = new NamedStationImpl(ids,
                         stationName, rdLocation.getLatitude().getValue(),
                         rdLocation.getLongitude().getValue(),
                         rdLocation.getAltitude().getValue(),
