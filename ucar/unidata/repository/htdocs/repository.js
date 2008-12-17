@@ -1,7 +1,6 @@
 
 
 
-
 function Util () {
 
     this.loadXML = function (url, callback,arg) {
@@ -549,10 +548,10 @@ function  handleFolderList(request, uid) {
 
 var selectors = new Array();
 
-function Selector(event, id, allEntries, append) {
+function Selector(event, id, allEntries, selecttype) {
     this.id = id;
     this.allEntries = allEntries;
-    this.append = append;
+    this.selecttype = selecttype;
     this.textComp = util.getDomObject(id);
     if(!this.textComp)return false;
 
@@ -575,7 +574,7 @@ function Selector(event, id, allEntries, append) {
 
     util.setPosition(this.div, x+10,y);
     showObject(this.div);
-    url = "${urlroot}/entry/show?output=selectxml&append=" + this.append+"&allentries=" + this.allEntries+"&target=" + id;
+    url = "${urlroot}/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + id;
     util.loadXML( url, handleSelect,id);
     return false;
 }
@@ -591,8 +590,10 @@ function insertText(id,value) {
 
 function selectClick(id,entryId,value) {
     selector = selectors[id];
-    if (selector.append=="true") {
+    if (selector.selecttype=="wikilink") {
         insertAtCursor(selector.textComp.obj,"[[" +entryId+"|"+value+"]]");
+    } else if (selector.selecttype=="entryid") {
+        insertAtCursor(selector.textComp.obj,entryId);
     } else { 
        selector.textComp.obj.value =value;
     }
@@ -607,8 +608,8 @@ function selectCancel() {
 
 
 
-function selectInitialClick(event, id,allEntries,append) {
-    selectors[id] = new Selector(event,id,allEntries,append);
+function selectInitialClick(event, id,allEntries,selecttype) {
+    selectors[id] = new Selector(event,id,allEntries,selecttype);
     return false;
 }
 
@@ -648,13 +649,15 @@ function hide(id) {
 }
 
 
-function showMenu(event,srcId,id) {
-    var obj = util.getDomObject(id);
+function showMenu(event,srcId,menuId) {
+    hideMenuObject();
+    var menu = util.getDomObject(menuId);
     var srcObj = util.getDomObject(srcId);
-    if(!obj || !srcObj) return;
+    if(!menu || !srcObj) return;
     event = util.getEvent(event);
     x = util.getEventX(event);
     y = util.getEventY(event);
+
     if(srcObj.obj.offsetLeft && srcObj.obj.offsetWidth) {
         x= util.getLeft(srcObj.obj);
         y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
@@ -663,10 +666,10 @@ function showMenu(event,srcId,id) {
     x+=2;
     x+=3;
 
-    menuObject = obj;
-    showObject(obj);
+    menuObject = menu;
+    showObject(menu);
     
-    util.setPosition(obj, x,y);
+    util.setPosition(menu, x,y);
 }
 
 
@@ -803,4 +806,85 @@ function insertAtCursor(myField, myValue) {
     } else {
         myField.value += myValue;
     }
+}
+
+
+
+function insertTags(id, tagOpen, tagClose, sampleText) {
+    var textComp = util.getDomObject(id);
+    if(textComp) {
+	insertTagsInner(textComp.obj, tagOpen,tagClose,sampleText);
+    }
+}
+
+
+// apply tagOpen/tagClose to selection in textarea,
+// use sampleText instead of selection if there is none
+function insertTagsInner(txtarea, tagOpen, tagClose, sampleText) {
+	var selText, isSample = false;
+
+	if (document.selection  && document.selection.createRange) { // IE/Opera
+
+		//save window scroll position
+		if (document.documentElement && document.documentElement.scrollTop)
+			var winScroll = document.documentElement.scrollTop
+		else if (document.body)
+			var winScroll = document.body.scrollTop;
+		//get current selection  
+		txtarea.focus();
+		var range = document.selection.createRange();
+		selText = range.text;
+		//insert tags
+		checkSelectedText();
+		range.text = tagOpen + selText + tagClose;
+		//mark sample text as selected
+		if (isSample && range.moveStart) {
+			if (window.opera)
+				tagClose = tagClose.replace(/\n/g,'');
+			range.moveStart('character', - tagClose.length - selText.length); 
+			range.moveEnd('character', - tagClose.length); 
+		}
+		range.select();   
+		//restore window scroll position
+		if (document.documentElement && document.documentElement.scrollTop)
+			document.documentElement.scrollTop = winScroll
+		else if (document.body)
+			document.body.scrollTop = winScroll;
+
+	} else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
+
+		//save textarea scroll position
+		var textScroll = txtarea.scrollTop;
+		//get current selection
+		txtarea.focus();
+		var startPos = txtarea.selectionStart;
+		var endPos = txtarea.selectionEnd;
+		selText = txtarea.value.substring(startPos, endPos);
+		//insert tags
+		checkSelectedText();
+		txtarea.value = txtarea.value.substring(0, startPos)
+			+ tagOpen + selText + tagClose
+			+ txtarea.value.substring(endPos, txtarea.value.length);
+		//set new selection
+		if (isSample) {
+			txtarea.selectionStart = startPos + tagOpen.length;
+			txtarea.selectionEnd = startPos + tagOpen.length + selText.length;
+		} else {
+			txtarea.selectionStart = startPos + tagOpen.length + selText.length + tagClose.length;
+			txtarea.selectionEnd = txtarea.selectionStart;
+		}
+		//restore textarea scroll position
+		txtarea.scrollTop = textScroll;
+	} 
+
+	function checkSelectedText(){
+		if (!selText) {
+			selText = sampleText;
+			isSample = true;
+		} else if (selText.charAt(selText.length - 1) == ' ') { //exclude ending space char
+			selText = selText.substring(0, selText.length - 1);
+			tagClose += ' '
+		} 
+	}
+
 }

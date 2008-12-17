@@ -2710,7 +2710,7 @@ return new Result(title, sb);
              *                           + HtmlUtil.squote(
              *                               "entrylinksmenu"
              *                               + entry.getId()) + ")");
-             * String menuLink = HtmlUtil.space(1)
+e             * String menuLink = HtmlUtil.space(1)
              *                 + HtmlUtil.jsLink(events,
              *                     HtmlUtil.img(getRepository().fileUrl(ICON_GRAYRECT),
              *                         msg("Show menu"), HtmlUtil.id(compId)));

@@ -247,6 +247,9 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_FROMDATE = "fromdate";
 
+    public static final String ATTR_SELECTTYPE = "selecttype";
+
+
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 

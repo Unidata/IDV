@@ -516,7 +516,7 @@ public class OutputHandler extends RepositoryManager implements
      */
     protected static String getGroupSelect(Request request, String elementId)
             throws Exception {
-        return getSelect(request, elementId, "Select", false, false);
+        return getSelect(request, elementId, "Select", false, "");
     }
 
 
@@ -535,12 +535,12 @@ public class OutputHandler extends RepositoryManager implements
      */
     protected static String getSelect(Request request, String elementId,
                                       String label, boolean allEntries,
-                                      boolean append)
+                                      String type)
             throws Exception {
         String event = HtmlUtil.call("selectInitialClick","event,"
                                      + HtmlUtil.squote(elementId) + ","
                                      + HtmlUtil.squote("" + allEntries) + ","
-                                     + HtmlUtil.squote("" + append));
+                                     + HtmlUtil.squote(type));
         return HtmlUtil.mouseClickHref(event, msg(label),
                                        HtmlUtil.id(elementId
                                            + ".selectlink"));
@@ -560,7 +560,7 @@ public class OutputHandler extends RepositoryManager implements
      * @throws Exception _more_
      */
     protected String getSelectLink(Request request, Entry entry,
-                                   String target, boolean allEntries)
+                                   String target, boolean allEntries, String selectType)
             throws Exception {
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
@@ -575,7 +575,7 @@ public class OutputHandler extends RepositoryManager implements
                                                         + ",'selectxml',"
                                                         + HtmlUtil.squote(ATTR_TARGET + "="
                                                                           + target + "&allentries="
-                                                                          + allEntries)));
+                                                                          + allEntries+"&"+ATTR_SELECTTYPE +"=" + selectType)));
         } else {
             event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                                                         HtmlUtil.squote(entryId) + ","
@@ -583,7 +583,7 @@ public class OutputHandler extends RepositoryManager implements
                                           + ",'selectxml',"
                                           + HtmlUtil.squote(ATTR_TARGET + "="
                                               + target + "&allentries="
-                                                  + allEntries)));
+                                                  + allEntries+"&"+ATTR_SELECTTYPE +"=" + selectType)));
 
         }
         String img = HtmlUtil.img(icon, (entry.isGroup()
@@ -593,7 +593,7 @@ public class OutputHandler extends RepositoryManager implements
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 
-        boolean append    = request.get("append", false);
+        String type    = request.getString(ATTR_SELECTTYPE, "");
         String  elementId = entry.getId();
         String  value     = (entry.isGroup()
                              ? ((Group) entry).getFullName()
@@ -602,8 +602,7 @@ public class OutputHandler extends RepositoryManager implements
                                                         HtmlUtil.squote(target) + ","
                                                         + HtmlUtil.squote(entry.getId())
                                                         + "," + HtmlUtil.squote(value)
-                                                        + "," + (append? "1"
-                                                                 : "0")), linkText));
+                                                        + "," + HtmlUtil.squote(type)), linkText));
 
 
         sb.append(HtmlUtil.br());
@@ -935,6 +934,8 @@ public class OutputHandler extends RepositoryManager implements
     /** _more_          */
     public static final String WIKIPROP_TOOLBAR = "toolbar";
 
+    public static final String WIKIPROP_BREADCRUMBS = "breadcrumbs";
+
     /** _more_          */
     public static final String WIKIPROP_INFORMATION = "information";
 
@@ -963,11 +964,12 @@ public class OutputHandler extends RepositoryManager implements
 
     //        WIKIPROP_IMPORT = "import";
     public static final String []WIKIPROPS ={
-        WIKIPROP_TOOLBAR,
         WIKIPROP_INFORMATION,
-        WIKIPROP_IMAGE,
         WIKIPROP_NAME,
         WIKIPROP_DESCRIPTION,
+        WIKIPROP_BREADCRUMBS,
+        WIKIPROP_TOOLBAR,
+        WIKIPROP_IMAGE,
         WIKIPROP_ACTIONS/*,
         WIKIPROP_CHILDREN_GROUPS,
         WIKIPROP_CHILDREN_ENTRIES,
@@ -1104,6 +1106,10 @@ public class OutputHandler extends RepositoryManager implements
             return getEntryManager().getEntryActionsToolbar(request, entry,
                     false);
         }
+        if (include.equals(WIKIPROP_BREADCRUMBS)) {
+            return getEntryManager().getBreadCrumbs(request, entry);
+        }
+
         if (include.equals(WIKIPROP_DESCRIPTION)) {
             return entry.getDescription();
         }
@@ -1238,7 +1244,7 @@ public class OutputHandler extends RepositoryManager implements
      *
      * @throws Exception _more_
      */
-    public Entry findEntry(Request request, String name, Group parent)
+    public Entry findWikiEntry(Request request, String name, Group parent)
             throws Exception {
         name = name.trim();
         Entry theEntry = null;
@@ -1246,7 +1252,7 @@ public class OutputHandler extends RepositoryManager implements
         if (theEntry == null) {
             for (Entry child : getEntryManager().getChildren(request,
                     parent)) {
-                if (child.getName().equals(name)) {
+                if (child.getName().equalsIgnoreCase(name)) {
                     theEntry = child;
                     break;
                 }
@@ -1269,7 +1275,7 @@ public class OutputHandler extends RepositoryManager implements
             Entry   entry    = (Entry) wikiUtil.getProperty(PROP_ENTRY);
             Request request  = (Request) wikiUtil.getProperty(PROP_REQUEST);
             Group   parent   = entry.getParentGroup();
-            Entry   theEntry = findEntry(request, name, parent);
+            Entry   theEntry = findWikiEntry(request, name, parent);
 
             if (theEntry != null) {
                 if (label.trim().length() == 0) {
@@ -1348,7 +1354,9 @@ public class OutputHandler extends RepositoryManager implements
 
         //TODO: We need to keep track of what is getting called so we prevent
         //infinite loops
-        return wikiUtil.wikify(wikiContent, this);
+        String content =wikiUtil.wikify(wikiContent, this);
+        return HtmlUtil.div(content, HtmlUtil.cssClass("wikicontent"));
+
     }
 
 

@@ -1800,6 +1800,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         path = path.substring(length);
 
 
+        
         //Go through all of the htdoc roots
         for (String root : htdocRoots) {
             root = getStorageManager().localizePath(root);
@@ -3717,6 +3718,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    
+    public String makeMenuPopupLink(String link, String menuContents) {
+        String compId = "menu_" + HtmlUtil.blockCnt++;
+        String linkId = "menulink_" + HtmlUtil.blockCnt++;
+        StringBuffer menu = new StringBuffer();
+        menu.append(
+                    HtmlUtil.div(menuContents,
+                                 HtmlUtil.id(compId)+ HtmlUtil.cssClass("menu")));
+
+        String onClick = HtmlUtil.onMouseClick("showMenu(event," + HtmlUtil.squote(linkId)+"," +HtmlUtil.squote(compId)+");");
+        String href = HtmlUtil.href("javascript:noop();",link,onClick+HtmlUtil.id(linkId));
+        return href+menu;
+    }
 
 
 

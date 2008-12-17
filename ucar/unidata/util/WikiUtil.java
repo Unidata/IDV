@@ -113,10 +113,12 @@ public class WikiUtil {
             if(idx>0) {
                 String label = name.substring(idx);
                 name = name.substring(0,idx);
-                s = s.substring(0,start) +"<a href=\"" + name +"\">" + label +"</a>" + s.substring(end);
+                String ahref = "<a title=\""  +name +"\" class=\"wiki-link-external\" target=\"externalpage\" href=\"" + name +"\">";
+                s = s.substring(0,start) +ahref + label +"</a>" + s.substring(end);
             } else {
                 cnt++;
-                s = s.substring(0,start) +"<a href=\"" + name +"\">_BRACKETOPEN_" + cnt +"_BRACKETCLOSE_</a>" + s.substring(end);
+                String ahref = "<a title=\""  +name +"\" class=\"wiki-link-external\" target=\"externalpage\" href=\"" + name +"\">";
+                s = s.substring(0,start) +ahref  + "_BRACKETOPEN_" + cnt +"_BRACKETCLOSE_</a>" + s.substring(end);
             }
             matcher =pattern.matcher(s);
         }
@@ -152,6 +154,11 @@ public class WikiUtil {
         int olCnt=0;
         for(String line:(List<String>) StringUtil.split(s,"\n",false,false)) {
             String tline = line.trim();
+            if(tline.equals("----")) {
+                buff.append("<hr>");
+                buff.append("\n");
+                continue;
+            }
             int starCnt =0;
             while(tline.startsWith("*")) {
                 tline = tline.substring(1);

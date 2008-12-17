@@ -167,8 +167,15 @@ a.subnavoffcomp2  {
 
 
 .content {
-    line-height: 1.4em;
+    xline-height: 1.4em;
     margin:5;
+}
+
+
+
+
+.wikicontent {
+    line-height: 1.5em;
 }
 
 
@@ -289,7 +296,7 @@ ul {
 }
 
 .tabtitles {
-   line-height: 1.15em;
+   xline-height: 1.15em;
    border-bottom : 2px #000000 solid;
 }
 
@@ -588,6 +595,12 @@ form {
 }
 
 
+
+
+
+
+
+
 .wiki-toc-wrapper {
     margin:10px;
 }
@@ -634,7 +647,14 @@ form {
 
 
 
+
 .wiki-link {
+}
+
+
+.wiki-link-external {
+    background: url(${urlroot}/icons/wiki/external.png) center right no-repeat;
+   padding-right: 13px;
 }
 
 

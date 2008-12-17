@@ -798,18 +798,21 @@ public class HtmlOutputHandler extends OutputHandler {
         String       target     = request.getString(ATTR_TARGET, "");
         StringBuffer sb         = new StringBuffer();
         String       folder     = getRepository().fileUrl(ICON_FOLDER_CLOSED);
+
+
         boolean      allEntries = request.get("allentries", false);
-        boolean      append     = request.get("append", false);
+        String       type     = request.getString(ATTR_SELECTTYPE, "");
+
 
         for (Group subGroup : subGroups) {
             sb.append(getSelectLink(request, subGroup, target,
-                                    allEntries));
+                                    allEntries,type));
         }
 
         if (allEntries) {
             for (Entry entry : entries) {
                 sb.append(getSelectLink(request, entry, target,
-                                            allEntries));
+                                        allEntries,type));
             }
         }
 
