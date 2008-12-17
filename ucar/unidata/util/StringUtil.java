@@ -1557,6 +1557,22 @@ public class StringUtil {
         return a;
     }
 
+    public static List<String> splitUpTo(String s, String delimiter, int cnt) {
+        List<String> toks = new ArrayList<String>();
+        for (int i = 0; i < cnt - 1; i++) {
+            int idx = s.indexOf(delimiter);
+            if (idx < 0) {
+                break;
+            }
+            toks.add(s.substring(0, idx));
+            s  = s.substring(idx + 1).trim();
+        }
+        if(s.length()>0) {
+            toks.add(s);
+        }
+        return toks;
+    }
+
 
     /**
      * Replace the macro within s with the formatted date.
@@ -2248,6 +2264,63 @@ public class StringUtil {
     }
 
 
+    public static Hashtable parseHtmlProperties(String s) {
+        boolean debug = false;
+        Hashtable properties = new Hashtable();
+        while(true) {
+            if(debug)   System.err.println("S:"+s);
+            int idx = s.indexOf("=");
+            if(idx<0) {
+                s =s.trim();
+                if(s.length()>0) {
+                    if(debug)       System.err.println("\tsingle name:"+s+":");
+                    properties.put(s,"");
+                }
+                break;
+            }
+            String name = s.substring(0,idx).trim();
+            s = s.substring(idx+1).trim();
+            if(s.length()==0) {
+                if(debug)   System.err.println("\tsingle name="+name);
+                properties.put(name,"");
+                break;
+            }
+            if(s.charAt(0)=='\"') {
+                s = s.substring(1);
+                idx = s.indexOf("\"");
+                if(idx<0) {
+                    //no closing "="
+                    properties.put(name,s);
+                    break;
+                }
+                String value  = s.substring(0,idx);
+                if(debug) System.err.println("\tname="+name);
+                if(debug) System.err.println("\tvalue="+value);
+                s = s.substring(idx+1);
+            } else {
+                idx = s.indexOf(" ");
+                if(idx<0) {
+                    if(debug) System.err.println("\tname="+name);
+                    if(debug) System.err.println("\tvalue="+s);
+                    properties.put(name,s);
+                    break;
+                }
+                String value  = s.substring(0,idx);
+                if(debug) System.err.println("\tname="+name);
+                if(debug)  System.err.println("\tvalue="+value);
+                s = s.substring(idx+1);
+
+            }
+
+        }
+
+
+
+        return properties;
+    }
+
+
+
     /**
      * usage for test code
      */
@@ -2264,6 +2337,11 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
+        parseHtmlProperties(args[0]);
+        if(true) return;
+
+
+
         String pattern =
             ".*([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{2})([0-9]{2}).*";
         String with  = "NCEP GFS 191km Alaska $1-$2-$3 $4:$5:00 GMT";
