@@ -54,6 +54,10 @@ a.header  {
   color: white;
 }
 
+.smallhelp {
+   font-size: 9pt;
+}
+
 .header-title {
   font-size: 200%;
   color: white;
@@ -275,7 +279,7 @@ td {
 }
 
 .separator {
-   font-size: 8pt;
+   font-size: 12pt;
    font-weight: bold;
 }
 

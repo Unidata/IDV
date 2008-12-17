@@ -802,24 +802,14 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean      append     = request.get("append", false);
 
         for (Group subGroup : subGroups) {
-            String groupLink = getSelectLink(request, subGroup, target,
-                                             allEntries);
-            sb.append(groupLink);
-            sb.append("<br>");
-            sb.append(
-                "<div style=\"display:none;visibility:hidden\" class=\"folderblock\" id="
-                + HtmlUtil.quote("block_" + subGroup.getId()) + "></div>");
+            sb.append(getSelectLink(request, subGroup, target,
+                                    allEntries));
         }
 
         if (allEntries) {
             for (Entry entry : entries) {
-                String link = getSelectLink(request, entry, target,
-                                            allEntries);
-                sb.append(link);
-                sb.append("<br>");
-                sb.append(
-                    "<div style=\"display:none;visibility:hidden\" class=\"actionblock\" id="
-                    + HtmlUtil.quote("block_" + entry.getId()) + "></div>");
+                sb.append(getSelectLink(request, entry, target,
+                                            allEntries));
             }
         }
 

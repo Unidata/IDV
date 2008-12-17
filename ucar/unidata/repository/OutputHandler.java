@@ -567,27 +567,28 @@ public class OutputHandler extends RepositoryManager implements
         String       entryId  = entry.getId();
         String       icon     = getEntryManager().getIconUrl(entry);
         String       event;
+        String uid = "link_" + HtmlUtil.blockCnt++;
         if (entry.isGroup()) {
-            event = HtmlUtil.onMouseClick("folderClick("
-                                          + HtmlUtil.squote(entryId) + ","
-                                          + HtmlUtil.squote(entryId)
-                                          + ",'selectxml',"
-                                          + HtmlUtil.squote(ATTR_TARGET + "="
-                                              + target + "&allentries="
-                                                  + allEntries) + ")");
+            event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                        HtmlUtil.squote(entryId) + ","
+                                                        + HtmlUtil.squote(uid)
+                                                        + ",'selectxml',"
+                                                        + HtmlUtil.squote(ATTR_TARGET + "="
+                                                                          + target + "&allentries="
+                                                                          + allEntries)));
         } else {
-            event = HtmlUtil.onMouseClick("folderClick("
-                                          + HtmlUtil.squote(entryId) + ","
-                                          + HtmlUtil.squote(entryId)
+            event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                        HtmlUtil.squote(entryId) + ","
+                                          + HtmlUtil.squote(uid)
                                           + ",'selectxml',"
                                           + HtmlUtil.squote(ATTR_TARGET + "="
                                               + target + "&allentries="
-                                                  + allEntries) + ")");
+                                                  + allEntries)));
 
         }
         String img = HtmlUtil.img(icon, (entry.isGroup()
                                          ? "Click to open group; "
-                                         : ""), HtmlUtil.id("img_" + entryId)
+                                         : ""), HtmlUtil.id("img_" + uid)
                                              + event);
         sb.append(img);
         sb.append(HtmlUtil.space(1));
@@ -597,13 +598,17 @@ public class OutputHandler extends RepositoryManager implements
         String  value     = (entry.isGroup()
                              ? ((Group) entry).getFullName()
                              : entry.getName());
-        sb.append(HtmlUtil.mouseClickHref("selectClick("
-                                          + HtmlUtil.squote(target) + ","
-                                          + HtmlUtil.squote(entry.getId())
-                                          + "," + HtmlUtil.squote(value)
-                                          + "," + (append
-                ? "1"
-                : "0") + ")", linkText));
+        sb.append(HtmlUtil.mouseClickHref(HtmlUtil.call("selectClick",
+                                                        HtmlUtil.squote(target) + ","
+                                                        + HtmlUtil.squote(entry.getId())
+                                                        + "," + HtmlUtil.squote(value)
+                                                        + "," + (append? "1"
+                                                                 : "0")), linkText));
+
+
+        sb.append(HtmlUtil.br());
+        sb.append(HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,"display:none;visibility:hidden",
+                                                 HtmlUtil.ATTR_CLASS,"folderblock",HtmlUtil.ATTR_ID,uid)));
         return sb.toString();
     }
 
@@ -931,7 +936,7 @@ public class OutputHandler extends RepositoryManager implements
     public static final String WIKIPROP_TOOLBAR = "toolbar";
 
     /** _more_          */
-    public static final String WIKIPROP_METADATA = "metadata";
+    public static final String WIKIPROP_INFORMATION = "information";
 
     public static final String WIKIPROP_IMAGE = "image";
 
@@ -956,6 +961,19 @@ public class OutputHandler extends RepositoryManager implements
     /** _more_          */
     public static final String WIKIPROP_CHILDREN = "children";
 
+    //        WIKIPROP_IMPORT = "import";
+    public static final String []WIKIPROPS ={
+        WIKIPROP_TOOLBAR,
+        WIKIPROP_INFORMATION,
+        WIKIPROP_IMAGE,
+        WIKIPROP_NAME,
+        WIKIPROP_DESCRIPTION,
+        WIKIPROP_ACTIONS/*,
+        WIKIPROP_CHILDREN_GROUPS,
+        WIKIPROP_CHILDREN_ENTRIES,
+        WIKIPROP_CHILDREN*/
+    };
+
 
 
 
@@ -969,16 +987,48 @@ public class OutputHandler extends RepositoryManager implements
      */
     public String getWikiPropertyValue(WikiUtil wikiUtil, String property) {
         try {
+            /*
+              {{type name="value" ...}}
+              {{import "entry identifier" type name="value"}}
+             */
             Entry   entry   = (Entry) wikiUtil.getProperty(PROP_ENTRY);
             Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
+            //Check for infinite loop
             property = property.trim();
-            if (property.startsWith(WIKIPROP_IMPORT + ":")) {
-                return handleWikiImport(
-                    wikiUtil,
-                    property.substring(WIKIPROP_IMPORT.length() + 1));
+            if(property.length()==0) {
+                return "";
             }
-            String include = handleWikiImport(wikiUtil, request, entry,
-                                 property);
+            if(request.getExtraProperty(property)!=null) {
+                return "<b>Detected circular wiki import:" + property+"</b>";
+            }
+            request.putExtraProperty(property,property);
+
+            List<String>toks = StringUtil.splitUpTo(property," ",3);
+            String tag = toks.get(0);
+            toks.remove(0);
+            Entry theEntry = entry;
+            if (tag.equals(WIKIPROP_IMPORT)) {
+                if(toks.size()==0) {
+                    return "<b>Incorrect import specification:" + property+"</b>";
+                }
+                String id = toks.get(0).trim();
+                theEntry = getEntryManager().getEntry(request, id);
+                if(theEntry==null) {
+                    return "<b>Could not find entry&lt;" + id +"&gt;</b>";
+                }
+                toks.remove(0);
+                if(toks.size()==0) {
+                    return "<b>Incorrect import specification:" + property+"</b>";
+                }
+                tag = toks.get(0);
+                toks.remove(0);
+            }
+            Hashtable props = new Hashtable();
+            if(toks.size()>0) {
+                props = StringUtil.parseHtmlProperties(toks.get(0));
+            }
+            String include = handleWikiImport(wikiUtil, request, theEntry,tag,
+                                              props);
             if (include != null) {
                 return include;
             }
@@ -1030,7 +1080,7 @@ public class OutputHandler extends RepositoryManager implements
     public String getWikiInclude(WikiUtil wikiUtil, Request request,
                                  Entry entry, String include)
             throws Exception {
-        if (include.equals(WIKIPROP_METADATA)) {
+        if (include.equals(WIKIPROP_INFORMATION)) {
             String informationBlock =
                 getRepository().getHtmlOutputHandler().getInformationTabs(
                     request, entry, true);
@@ -1111,39 +1161,6 @@ public class OutputHandler extends RepositoryManager implements
         return null;
     }
 
-    /**
-     * _more_
-     *
-     * @param wikiUtil _more_
-     * @param property _more_
-     *
-     * @return _more_
-     */
-    public String handleWikiImport(WikiUtil wikiUtil, String property) {
-        try {
-            //{{import:the id|output type}}
-            Entry      entry      = (Entry) wikiUtil.getProperty(PROP_ENTRY);
-            Request    request = (Request) wikiUtil.getProperty(PROP_REQUEST);
-            Group      parent     = entry.getParentGroup();
-            OutputType outputType = OutputHandler.OUTPUT_HTML;
-            String     entryName  = property;
-            String[]   pair       = StringUtil.split(property, "|", 2);
-            if (pair != null) {
-                entryName  = pair[0].trim();
-                outputType = new OutputType(pair[1].trim(), false);
-            }
-            Entry importEntry = findEntry(request, entryName, parent);
-            if (importEntry == null) {
-                return "Error:Could not find entry: " + entryName;
-            }
-
-            return handleWikiImport(wikiUtil, request, importEntry,
-                                    outputType.getId());
-        } catch (Exception exc) {
-            throw new RuntimeException(exc);
-        }
-    }
-
 
 
     /**
@@ -1157,20 +1174,20 @@ public class OutputHandler extends RepositoryManager implements
      * @return _more_
      */
     public String handleWikiImport(WikiUtil wikiUtil, Request request,
-                                   Entry importEntry, String property) {
+                                   Entry importEntry, String tag, Hashtable props) {
         try {
             String include = getWikiInclude(wikiUtil, request, importEntry,
-                                            property);
+                                            tag);
             if (include != null) {
                 return include;
             }
 
             OutputHandler handler =
-                getRepository().getOutputHandler(property);
+                getRepository().getOutputHandler(tag);
             if (handler == null) {
                 return null;
             }
-            OutputType outputType = handler.findOutputType(property);
+            OutputType outputType = handler.findOutputType(tag);
 
 
             String originalOutput = request.getString(ARG_OUTPUT,

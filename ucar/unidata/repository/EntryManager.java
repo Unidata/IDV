@@ -2363,7 +2363,6 @@ return new Result(title, sb);
                                HtmlUtil.squote(entryId) + ","
                                + HtmlUtil.squote(uid)));
 
-
             if (okToMove) {
                 event += (entry.isGroup()
                           ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
@@ -2407,10 +2406,10 @@ return new Result(title, sb);
                                     HtmlUtil.id("span_" + entry.getId()));
 
         if (includeIcon) {
-            link = link + HtmlUtil.br()
-                   + "<div style=\"display:none;visibility:hidden\" "
-                   + HtmlUtil.cssClass("folderblock") + HtmlUtil.id(uid)
-                   + "></div>";
+            link = link + 
+                HtmlUtil.br()
+                + HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,"display:none;visibility:hidden",
+                                                 HtmlUtil.ATTR_CLASS,"folderblock",HtmlUtil.ATTR_ID,uid));
         }
         return link;
 

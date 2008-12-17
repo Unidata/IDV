@@ -494,7 +494,12 @@ function folderClick(entryId, uid, output,args,changeImg) {
     if (!output) output = "groupxml";
     if(!args) args ="";
     else args = "&" + args;
-    var block = util.getDomObject(uid);
+
+    var block = util.getDomObject('block_'+uid);
+    if(!block) {
+	block = util.getDomObject(uid);    
+    }
+
     if(!block) {
         alert("no block " + uid);
 	return;
@@ -522,7 +527,10 @@ function folderClick(entryId, uid, output,args,changeImg) {
 
 
 function  handleFolderList(request, uid) {
-    var block = util.getDomObject(uid);
+    var block = util.getDomObject('block_'+uid);
+    if(!block) {
+	block = util.getDomObject(uid);    
+    }
     var img = util.getDomObject("img_" +uid);
     var xmlDoc=request.responseXML.documentElement;
     block.obj.innerHTML = getChildText(xmlDoc);
@@ -572,6 +580,14 @@ function Selector(event, id, allEntries, append) {
     return false;
 }
 
+
+
+function insertText(id,value) {
+    var textComp = util.getDomObject(id);
+    if(textComp) {
+	insertAtCursor(textComp.obj, value);
+    }
+}
 
 function selectClick(id,entryId,value) {
     selector = selectors[id];

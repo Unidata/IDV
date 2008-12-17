@@ -122,6 +122,22 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                 wikiText = (String)values[0];
         }
 
+
+        StringBuffer help = new StringBuffer();
+        help.append("<b>Import:</b><br>");
+        help.append("e.g., <i>{{property &lt;optional arguments&gt;}}</i><br>");
+        help.append("Or: <i>{{import entryid property &lt;arguments&gt;}}</i><br>");
+        help.append("Properties:<br>");
+        for(int i=0;i<OutputHandler.WIKIPROPS.length;i++) {
+            String prop  ="{{" + OutputHandler.WIKIPROPS[i] +"}}";
+            String js = "javascript:insertText(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
+                HtmlUtil.squote(prop)+");";
+            help.append(HtmlUtil.href(js,prop));
+            help.append(HtmlUtil.br());
+        }
+        help.append("<i>{{&lt;output identifier&gt;}}</i><br>");
+
+
         String select = OutputHandler.getSelect(request, ARG_WIKI_TEXT,
                             "Add link", true, true);
 
@@ -129,8 +145,9 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                                               wikiText,
                                               200, 80,
                                               HtmlUtil.id(ARG_WIKI_TEXT));
+        String right = select + HtmlUtil.div(help.toString(),HtmlUtil.cssClass("smallhelp"));
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget
-                     + "</td><td>" + select + "</td></tr></table>";
+                     + "</td><td>" + right + "</td></tr></table>";
         sb.append(HtmlUtil.formEntryTop(msgLabel("Wiki Text"), textWidget));
     }
 

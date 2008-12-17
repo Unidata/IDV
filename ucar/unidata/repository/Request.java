@@ -95,6 +95,8 @@ public class Request implements Constants {
     /** _more_ */
     private Hashtable originalParameters;
 
+    private Hashtable extraProperties = new Hashtable();
+
     /** _more_ */
     private Repository repository;
 
@@ -1527,7 +1529,13 @@ public class Request implements Constants {
         return leftMessage;
     }
 
+    public void putExtraProperty(Object key, Object value) {
+        extraProperties.put(key,value);
+    }
 
+    public Object getExtraProperty(Object key) {
+        return extraProperties.get(key);
+    }
 
 }
 
