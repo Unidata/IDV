@@ -104,6 +104,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
         Object[]values = entry.getValues();
         if(values!=null && values.length>1 && values[0]!=null) {
             String wikiText = (String)values[0];
+            
+            
             //            System.err.println(" got text:" + wikiText);
         //            String wikiText = (String)values[0];
         }

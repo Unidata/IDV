@@ -1022,10 +1022,12 @@ public class OutputHandler extends RepositoryManager implements
                 if(toks.size()==0) {
                     return "<b>Incorrect import specification:" + property+"</b>";
                 }
+                toks = StringUtil.splitUpTo(toks.get(0)," ",2);
                 tag = toks.get(0);
                 toks.remove(0);
             }
             Hashtable props = new Hashtable();
+
             if(toks.size()>0) {
                 props = StringUtil.parseHtmlProperties(toks.get(0));
             }
@@ -1080,14 +1082,16 @@ public class OutputHandler extends RepositoryManager implements
      * @throws Exception _more_
      */
     public String getWikiInclude(WikiUtil wikiUtil, Request request,
-                                 Entry entry, String include)
+                                 Entry entry, String include,Hashtable props)
             throws Exception {
+        boolean open =  Misc.getProperty(props,"open",true);
+        String title = Misc.getProperty(props,"title",msg("Information"));
         if (include.equals(WIKIPROP_INFORMATION)) {
             String informationBlock =
                 getRepository().getHtmlOutputHandler().getInformationTabs(
                     request, entry, true);
-            String result = HtmlUtil.makeShowHideBlock(msg("Information"),
-                                informationBlock, true);
+            String result = HtmlUtil.makeShowHideBlock(title,
+                                informationBlock, open);
             return result;
         }
 
@@ -1098,9 +1102,9 @@ public class OutputHandler extends RepositoryManager implements
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         }
         if (include.equals(WIKIPROP_ACTIONS)) {
-            return HtmlUtil.makeShowHideBlock(msg("Actions"),
+            return HtmlUtil.makeShowHideBlock(title,
                     getEntryManager().getEntryActionsList(request, entry),
-                    true);
+                    open);
         }
         if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryActionsToolbar(request, entry,
@@ -1127,8 +1131,8 @@ public class OutputHandler extends RepositoryManager implements
             StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
-            return HtmlUtil.makeShowHideBlock(msg("Groups") + link,
-                    sb.toString(), true);
+            return HtmlUtil.makeShowHideBlock(title + link,
+                    sb.toString(), open);
         }
 
         if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
@@ -1143,8 +1147,8 @@ public class OutputHandler extends RepositoryManager implements
             StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
-            return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                    sb.toString(), true);
+            return HtmlUtil.makeShowHideBlock(title + link,
+                    sb.toString(), open);
         }
 
         if (include.equals(WIKIPROP_CHILDREN)) {
@@ -1159,8 +1163,8 @@ public class OutputHandler extends RepositoryManager implements
             }
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
-            return HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                    sb.toString(), true);
+            return HtmlUtil.makeShowHideBlock(title + link,
+                    sb.toString(), open);
         }
 
 
@@ -1183,7 +1187,7 @@ public class OutputHandler extends RepositoryManager implements
                                    Entry importEntry, String tag, Hashtable props) {
         try {
             String include = getWikiInclude(wikiUtil, request, importEntry,
-                                            tag);
+                                            tag,props);
             if (include != null) {
                 return include;
             }
@@ -1217,14 +1221,17 @@ public class OutputHandler extends RepositoryManager implements
                                     importEntry);
                 propertyValue = new String(result.getContent());
                 title = result.getTitle();
+
+                title = Misc.getProperty(props,"title",title);
             }
 
+            boolean open =  Misc.getProperty(props,"open",true);
             request.put(ARG_OUTPUT, originalOutput);
             request.put(ARG_ENTRYID, originalId);
             request.remove(ARG_EMBEDDED);
             if(title!=null) {
                 return HtmlUtil.makeShowHideBlock(title,propertyValue, 
-                                                  true,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
+                                                  open,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
             }
             return propertyValue;
         } catch (Exception exc) {

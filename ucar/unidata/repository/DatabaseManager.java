@@ -564,7 +564,7 @@ public class DatabaseManager extends RepositoryManager {
         //        getRepository().log("making connection:" + connectionURL);
         Connection connection;
         if (userName != null) {
-            //            System.err.println("name:" + userName + " password:" + password);
+            //            System.err.println("name:" + userName + ": password:" + password+":");
 
             connection = DriverManager.getConnection(connectionURL, userName,
                     password);

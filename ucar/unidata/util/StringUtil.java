@@ -1557,7 +1557,17 @@ public class StringUtil {
         return a;
     }
 
-    public static List<String> splitUpTo(String s, String delimiter, int cnt) {
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param delimiter _more_
+     * @param cnt _more_
+     *
+     * @return _more_
+     */
+    public static List<String> splitUpTo(String s, String delimiter,
+                                         int cnt) {
         List<String> toks = new ArrayList<String>();
         for (int i = 0; i < cnt - 1; i++) {
             int idx = s.indexOf(delimiter);
@@ -1565,9 +1575,9 @@ public class StringUtil {
                 break;
             }
             toks.add(s.substring(0, idx));
-            s  = s.substring(idx + 1).trim();
+            s = s.substring(idx + 1).trim();
         }
-        if(s.length()>0) {
+        if (s.length() > 0) {
             toks.add(s);
         }
         return toks;
@@ -1616,7 +1626,7 @@ public class StringUtil {
         String   fullMacro = s.substring(idx1 + macroPrefix.length(), idx2);
         String[] toks      = StringUtil.split(fullMacro, ":", 2);
 
-        if (toks == null || toks.length != 2) {
+        if ((toks == null) || (toks.length != 2)) {
             throw new IllegalArgumentException("Could not find date format:"
                     + s);
         }
@@ -2089,9 +2099,15 @@ public class StringUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String camelCase(String s) {
-        return s.substring(0, 1).toUpperCase()
-            + s.substring(1).toLowerCase();
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 
 
@@ -2264,51 +2280,80 @@ public class StringUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static Hashtable parseHtmlProperties(String s) {
-        boolean debug = false;
+        //        boolean debug = true;
+        boolean   debug      = false;
         Hashtable properties = new Hashtable();
-        while(true) {
-            if(debug)   System.err.println("S:"+s);
+
+        while (true) {
+            if (debug) {
+                System.err.println("S:" + s);
+            }
             int idx = s.indexOf("=");
-            if(idx<0) {
-                s =s.trim();
-                if(s.length()>0) {
-                    if(debug)       System.err.println("\tsingle name:"+s+":");
-                    properties.put(s,"");
+            if (idx < 0) {
+                s = s.trim();
+                if (s.length() > 0) {
+                    if (debug) {
+                        System.err.println("\tsingle name:" + s + ":");
+                    }
+                    properties.put(s, "");
                 }
                 break;
             }
-            String name = s.substring(0,idx).trim();
-            s = s.substring(idx+1).trim();
-            if(s.length()==0) {
-                if(debug)   System.err.println("\tsingle name="+name);
-                properties.put(name,"");
+            String name = s.substring(0, idx).trim();
+            s = s.substring(idx + 1).trim();
+            if (s.length() == 0) {
+                if (debug) {
+                    System.err.println("\tsingle name=" + name);
+                }
+                properties.put(name, "");
                 break;
             }
-            if(s.charAt(0)=='\"') {
-                s = s.substring(1);
+            if (s.charAt(0) == '\"') {
+                s   = s.substring(1);
                 idx = s.indexOf("\"");
-                if(idx<0) {
+                if (idx < 0) {
                     //no closing "="
-                    properties.put(name,s);
+                    properties.put(name, s);
                     break;
                 }
-                String value  = s.substring(0,idx);
-                if(debug) System.err.println("\tname="+name);
-                if(debug) System.err.println("\tvalue="+value);
-                s = s.substring(idx+1);
+                String value = s.substring(0, idx);
+                if (debug) {
+                    System.err.println("\tname=" + name);
+                }
+                if (debug) {
+                    System.err.println("\tvalue=" + value);
+                }
+                properties.put(name, value);
+                s = s.substring(idx + 1);
             } else {
                 idx = s.indexOf(" ");
-                if(idx<0) {
-                    if(debug) System.err.println("\tname="+name);
-                    if(debug) System.err.println("\tvalue="+s);
-                    properties.put(name,s);
+                if (idx < 0) {
+                    if (debug) {
+                        System.err.println("\tname=" + name);
+                    }
+                    if (debug) {
+                        System.err.println("\tvalue=" + s);
+                    }
+                    properties.put(name, s);
                     break;
                 }
-                String value  = s.substring(0,idx);
-                if(debug) System.err.println("\tname="+name);
-                if(debug)  System.err.println("\tvalue="+value);
-                s = s.substring(idx+1);
+                String value = s.substring(0, idx);
+                properties.put(name, value);
+                if (debug) {
+                    System.err.println("\tname=" + name);
+                }
+                if (debug) {
+                    System.err.println("\tvalue=" + value);
+                }
+                s = s.substring(idx + 1);
 
             }
 
@@ -2338,7 +2383,9 @@ public class StringUtil {
      */
     public static void main(String[] args) throws Exception {
         parseHtmlProperties(args[0]);
-        if(true) return;
+        if (true) {
+            return;
+        }
 
 
 
