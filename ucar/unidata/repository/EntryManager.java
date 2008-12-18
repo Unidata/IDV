@@ -861,7 +861,7 @@ return new Result(title, sb);
             }
 
             
-            if(request.getUser().getAdmin() && request.exists(ARG_USER_ID)) {
+            if(request.getUser().getAdmin() && request.defined(ARG_USER_ID)) {
 
                 User newUser = getUserManager().findUser(request.getString(ARG_USER_ID,"").trim());
                 if(newUser==null) {
