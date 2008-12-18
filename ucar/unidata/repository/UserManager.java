@@ -1092,7 +1092,6 @@ public class UserManager extends RepositoryManager {
     public StringBuffer getSessionList(Request request) throws Exception {
         List<Session> sessions    = getSessions();
         StringBuffer  sessionHtml = new StringBuffer(HtmlUtil.formTable());
-        sessionHtml.append(msgHeader("Current Sessions"));
         sessionHtml.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
@@ -1123,10 +1122,11 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserList(Request request) throws Exception {
 
+        Hashtable<String,StringBuffer> rolesMap = new Hashtable<String,StringBuffer>();
+        List<String> rolesList = new ArrayList<String>();
         StringBuffer usersHtml = new StringBuffer();
+        StringBuffer rolesHtml = new StringBuffer();
 
-
-        usersHtml.append(msgHeader("Users"));
         usersHtml.append(request.form(getRepositoryBase().URL_USER_NEW));
         usersHtml.append(HtmlUtil.submit(msg("New User")));
         usersHtml.append("</form>");
@@ -1144,6 +1144,7 @@ public class UserManager extends RepositoryManager {
                 users.add(getUser(results));
             }
         }
+
 
         usersHtml.append("<table>");
         usersHtml.append(
@@ -1169,19 +1170,50 @@ public class UserManager extends RepositoryManager {
                               "" + user.getAdmin()) + "</tr>";
             usersHtml.append(row);
 
+            List<String> roles = user.getRoles();
+            if (roles != null) {
+                for(String role: roles) {
+                    StringBuffer rolesSB = rolesMap.get(role);
+                    if(rolesSB==null) {
+                        rolesSB= new StringBuffer("");
+                        rolesList.add(role);
+                        rolesMap.put(role, rolesSB);
+                    }
+                    rolesSB.append("<li> ");
+                    rolesSB.append(userEditLink + HtmlUtil.space(2) + user.getName());
+                }
+            }
         }
         usersHtml.append("</table>");
+
+        for(String role: rolesList) {
+            StringBuffer rolesSB = rolesMap.get(role);
+            rolesHtml.append(HtmlUtil.makeShowHideBlock(role,"<ul>"+rolesSB.toString()+"</ul>",false));
+        }
+        if(rolesList.size()==0) {
+            rolesHtml.append(msg("No roles"));
+        }
+
 
 
 
         StringBuffer sb = new StringBuffer();
-        sb.append("<table>");
-        sb.append(
-            HtmlUtil.rowTop(
-                HtmlUtil.cols(
-                    getSessionList(request).toString(), HtmlUtil.space(5),
-                    usersHtml.toString())));
-        sb.append("</table>");
+        List tabTitles = new ArrayList();
+        List tabContent = new ArrayList();
+
+        tabTitles.add(msg("User List"));
+        tabContent.add(usersHtml.toString());
+
+        tabTitles.add(msg("Roles"));
+        tabContent.add(rolesHtml.toString());
+
+
+        tabTitles.add(msg("Current Sessions"));
+        tabContent.add(getSessionList(request).toString());
+
+
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.makeTabs(tabTitles, tabContent, true)); 
 
         Result result = new Result(msg("Users"), sb);
         result.putProperty(PROP_NAVSUBLINKS,

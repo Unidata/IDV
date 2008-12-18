@@ -1151,6 +1151,14 @@ public class TypeHandler extends RepositoryManager {
                     : BLANK), rows, 60)));
         }
 
+        if(request.getUser().getAdmin()) {
+            sb.append(HtmlUtil.formEntry(msgLabel("User"),
+                                         HtmlUtil.input(ARG_USER_ID,
+                                             ((entry != null)
+                                              ? entry.getUser().getId()
+                                              : ""), size)));
+        }
+
         if (okToShowInForm(ARG_RESOURCE)) {
             List tabTitles  = new ArrayList();
             List tabContent = new ArrayList();

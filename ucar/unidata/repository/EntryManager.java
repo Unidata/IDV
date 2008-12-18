@@ -860,6 +860,18 @@ return new Result(title, sb);
                 entries.add(entry);
             }
 
+            
+            if(request.getUser().getAdmin() && request.exists(ARG_USER_ID)) {
+
+                User newUser = getUserManager().findUser(request.getString(ARG_USER_ID,"").trim());
+                if(newUser==null) {
+                    throw new IllegalArgumentException("Could not find user: " +request.getString(ARG_USER_ID,""));
+                }
+                for(Entry theEntry: entries) {
+                    theEntry.setUser(newUser);
+                }
+            }
+
             if (newEntry && request.get(ARG_ADDMETADATA, false)) {
                 addInitialMetadata(request, entries);
             }
