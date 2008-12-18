@@ -1005,32 +1005,31 @@ public class OutputHandler extends RepositoryManager implements
             }
             request.putExtraProperty(property,property);
 
-            List<String>toks = StringUtil.splitUpTo(property," ",3);
+            List<String>toks = StringUtil.splitUpTo(property," ",2);
+            System.err.println("toks:" + toks);
             String tag = toks.get(0);
-            toks.remove(0);
+            String remainder = "";
+            if(toks.size()>1)
+                remainder  = toks.get(1);
             Entry theEntry = entry;
             if (tag.equals(WIKIPROP_IMPORT)) {
-                if(toks.size()==0) {
+                toks = StringUtil.splitUpTo(remainder," ",3);
+                if(toks.size()!=2) {
                     return "<b>Incorrect import specification:" + property+"</b>";
                 }
                 String id = toks.get(0).trim();
+                tag = toks.get(1).trim();
+                if(toks.size()==3)
+                    remainder  = toks.get(2);
+                else 
+                    remainder  = "";
                 theEntry = getEntryManager().getEntry(request, id);
                 if(theEntry==null) {
                     return "<b>Could not find entry&lt;" + id +"&gt;</b>";
                 }
-                toks.remove(0);
-                if(toks.size()==0) {
-                    return "<b>Incorrect import specification:" + property+"</b>";
-                }
-                toks = StringUtil.splitUpTo(toks.get(0)," ",2);
-                tag = toks.get(0);
-                toks.remove(0);
             }
             Hashtable props = new Hashtable();
-
-            if(toks.size()>0) {
-                props = StringUtil.parseHtmlProperties(toks.get(0));
-            }
+            props = StringUtil.parseHtmlProperties(remainder);
             String include = handleWikiImport(wikiUtil, request, theEntry,tag,
                                               props);
             if (include != null) {
