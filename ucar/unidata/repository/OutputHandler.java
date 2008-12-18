@@ -1085,12 +1085,12 @@ public class OutputHandler extends RepositoryManager implements
                                  Entry entry, String include,Hashtable props)
             throws Exception {
         boolean open =  Misc.getProperty(props,"open",true);
-        String title = Misc.getProperty(props,"title",msg("Information"));
+
         if (include.equals(WIKIPROP_INFORMATION)) {
             String informationBlock =
                 getRepository().getHtmlOutputHandler().getInformationTabs(
                     request, entry, true);
-            String result = HtmlUtil.makeShowHideBlock(title,
+            String result = HtmlUtil.makeShowHideBlock(Misc.getProperty(props,"title",msg("Information")),
                                 informationBlock, open);
             return result;
         }
@@ -1102,7 +1102,7 @@ public class OutputHandler extends RepositoryManager implements
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         }
         if (include.equals(WIKIPROP_ACTIONS)) {
-            return HtmlUtil.makeShowHideBlock(title,
+            return HtmlUtil.makeShowHideBlock(Misc.getProperty(props,"title",msg("Actions")),
                     getEntryManager().getEntryActionsList(request, entry),
                     open);
         }
@@ -1131,6 +1131,9 @@ public class OutputHandler extends RepositoryManager implements
             StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
+            String title = Misc.getProperty(props,"title",msg("Groups"));
+            boolean inBlock = Misc.getProperty(props,"showhide",true);
+            if(!inBlock) return sb.toString();
             return HtmlUtil.makeShowHideBlock(title + link,
                     sb.toString(), open);
         }
@@ -1147,6 +1150,9 @@ public class OutputHandler extends RepositoryManager implements
             StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
+            String title = Misc.getProperty(props,"title",msg("Groups"));
+            boolean inBlock = Misc.getProperty(props,"showhide",true);
+            if(!inBlock) return sb.toString();
             return HtmlUtil.makeShowHideBlock(title + link,
                     sb.toString(), open);
         }
@@ -1163,6 +1169,9 @@ public class OutputHandler extends RepositoryManager implements
             }
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
+            String title = Misc.getProperty(props,"title",msg("Groups"));
+            boolean inBlock = Misc.getProperty(props,"showhide",true);
+            if(!inBlock) return sb.toString();
             return HtmlUtil.makeShowHideBlock(title + link,
                     sb.toString(), open);
         }
