@@ -2291,6 +2291,8 @@ public class StringUtil {
         //        boolean debug = true;
         boolean   debug      = false;
         Hashtable properties = new Hashtable();
+        debug = true;
+        if(debug) System.err.println("Source:" + s);
 
         while (true) {
             if (debug) {
@@ -2358,6 +2360,8 @@ public class StringUtil {
             }
 
         }
+        if(debug)
+            System.err.println("props:" + properties);
 
 
 
