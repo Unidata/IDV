@@ -781,7 +781,7 @@ function toggleTab(mainId) {
 	} else {
 		content.style.visibility="hidden";
                 content.style.display = "none";
-		title.style.backgroundColor="#c3d9ff";
+		title.style.backgroundColor="#dddddd";
 		title.style.borderBottom = "2px #000000  solid";
 	}
     }

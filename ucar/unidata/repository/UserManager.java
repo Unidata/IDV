@@ -665,6 +665,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteUser(User user) throws Exception {
+        userMap.remove(user.getId());
         deleteRoles(user);
         getDatabaseManager().delete(Tables.USERS.NAME,
                                     Clause.eq(Tables.USERS.COL_ID,
@@ -741,17 +742,23 @@ public class UserManager extends RepositoryManager {
             List<String> roles =
                 StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
                                  true, true);
-            deleteRoles(user);
-            for (String role : roles) {
-                getDatabaseManager().executeInsert(Tables.USERROLES.INSERT,
-                        new Object[] { user.getId(),
-                                       role });
-            }
+            
             user.setRoles(roles);
+            setRoles(request, user);
         }
         makeOrUpdateUser(user, true);
     }
 
+
+    private void setRoles(Request request, User user) throws Exception {
+        deleteRoles(user);
+        if(user.getRoles()==null) return;
+        for (String role : user.getRoles()) {
+            getDatabaseManager().executeInsert(Tables.USERROLES.INSERT,
+                        new Object[] { user.getId(),
+                                       role });
+        }
+   }
 
     /**
      * _more_
@@ -905,6 +912,8 @@ public class UserManager extends RepositoryManager {
         String       email       = "";
         String       password1   = "";
         String       password2   = "";
+        List<String> roles;
+
         boolean      admin       = false;
 
         StringBuffer sb          = new StringBuffer();
@@ -937,6 +946,10 @@ public class UserManager extends RepositoryManager {
                 email     = ((toks.size() >= 4)
                              ? toks.get(3)
                              : "");
+                roles =  new ArrayList<String>();
+                for(int i=4;i<toks.size();i++) {
+                    roles.add(toks.get(i));
+                }
                 if (findUser(id) != null) {
                     ok = false;
                     sb.append(
@@ -944,12 +957,15 @@ public class UserManager extends RepositoryManager {
                             msg("User already exists") + ": " + id));
                     break;
                 }
-                users.add(new User(id, name, email, "", "",
-                                   hashPassword(password1), false, ""));
+                User user = new User(id, name, email, "", "",
+                                     hashPassword(password1), false, "");
+                user.setRoles(roles);
+                users.add(user);
             }
             if (ok) {
                 for (User user : users) {
                     makeOrUpdateUser(user, false);
+                    setRoles(request, user);
                     sb.append(msgLabel("Created user"));
                     sb.append(
                         HtmlUtil.href(
@@ -1072,7 +1088,7 @@ public class UserManager extends RepositoryManager {
         }
         sb.append(msgHeader("Bulk User Create"));
         sb.append(request.form(getRepositoryBase().URL_USER_NEW));
-        sb.append(HtmlUtil.textArea(ARG_USER_BULK, init, 10, 60));
+        sb.append(HtmlUtil.textArea(ARG_USER_BULK, init, 10, 80));
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Submit"));
         sb.append("\n</form>\n");
