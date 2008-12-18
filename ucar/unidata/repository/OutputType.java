@@ -80,9 +80,23 @@ import java.util.zip.*;
 public class OutputType {
 
     /** _more_          */
-    public static String ICON_NULL = null;
+    public static final int TYPE_HTML = 1 << 0;
 
     /** _more_          */
+    public static final int TYPE_NONHTML = 1 << 1;
+
+    /** _more_          */
+    public static final int TYPE_ACTION = 1 << 2;
+
+    /** _more_          */
+    public static final int TYPE_INTERNAL = 1 << 3;
+
+
+
+    /** _more_ */
+    public static String ICON_NULL = null;
+
+    /** _more_ */
     public static String SUFFIX_NONE = "";
 
     /** _more_ */
@@ -104,17 +118,16 @@ public class OutputType {
     private String icon;
 
     /** _more_          */
-    private boolean isHtml = true;
-
+    private int type = TYPE_HTML;
 
     /**
      * _more_
      *
      * @param id _more_
-     * @param isHtml _more_
+     * @param type _more_
      */
-    public OutputType(String id, boolean isHtml) {
-        this(id, id, isHtml);
+    public OutputType(String id, int type) {
+        this(id, id, type);
     }
 
 
@@ -124,13 +137,13 @@ public class OutputType {
      *
      * @param name _more_
      * @param output _more_
-     * @param isHtml _more_
+     * @param type _more_
      *
      * @param label _more_
      * @param id _more_
      */
-    public OutputType(String label, String id, boolean isHtml) {
-        this(label, id, isHtml, SUFFIX_NONE, ICON_NULL);
+    public OutputType(String label, String id, int type) {
+        this(label, id, type, SUFFIX_NONE, ICON_NULL);
     }
 
 
@@ -139,15 +152,15 @@ public class OutputType {
      *
      * @param label _more_
      * @param id _more_
-     * @param isHtml _more_
+     * @param type _more_
      * @param suffix _more_
      * @param icon _more_
      */
-    public OutputType(String label, String id, boolean isHtml, String suffix,
+    public OutputType(String label, String id, int type, String suffix,
                       String icon) {
         this.label  = label;
         this.id     = id;
-        this.isHtml = isHtml;
+        this.type   = type;
         this.suffix = suffix;
         this.icon   = icon;
     }
@@ -165,7 +178,7 @@ public class OutputType {
         this.label  = that.label;
         this.id     = that.id;
         this.suffix = that.suffix;
-        this.isHtml = that.isHtml;
+        this.type   = that.type;
     }
 
     /**
@@ -299,14 +312,6 @@ public class OutputType {
         return groupName;
     }
 
-    /**
-     *  Set the IsHtml property.
-     *
-     *  @param value The new value for IsHtml
-     */
-    public void setIsHtml(boolean value) {
-        isHtml = value;
-    }
 
     /**
      *  Get the IsHtml property.
@@ -314,7 +319,35 @@ public class OutputType {
      *  @return The IsHtml
      */
     public boolean getIsHtml() {
-        return isHtml;
+        return type == TYPE_HTML;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsAction() {
+        return type == TYPE_ACTION;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsNonHtml() {
+        return type == TYPE_NONHTML;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsInternal() {
+        return type == TYPE_INTERNAL;
     }
 
 

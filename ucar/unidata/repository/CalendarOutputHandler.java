@@ -86,11 +86,12 @@ public class CalendarOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_GRID = new OutputType("Date Grid",
-                                                     "calendar.grid", true);
+                                                     "calendar.grid",
+                                                     OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_CALENDAR =
-        new OutputType("Calendar", "calendar.calendar", true);
+        new OutputType("Calendar", "calendar.calendar", OutputType.TYPE_HTML);
 
 
     /**
@@ -119,18 +120,22 @@ public class CalendarOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
         if (state.entry != null) {
             return;
         }
-        types.add(OUTPUT_CALENDAR);
-        types.add(OUTPUT_GRID);
+        if (state.getEntry() != null) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_CALENDAR));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_GRID));
+        }
     }
 
 

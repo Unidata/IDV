@@ -44,6 +44,12 @@ import java.util.List;
  */
 public class Link {
 
+    /** _more_          */
+    public static final int TYPE_HEADER  = 0;
+    public static final int TYPE_ACTIONS = 1;
+    public static final int TYPE_TOOLBAR = 2;
+
+
     /** _more_ */
     String url;
 
@@ -56,15 +62,10 @@ public class Link {
     /** _more_ */
     protected boolean hr = false;
 
+    int type = TYPE_HEADER;
 
-    /**
-     * _more_
-     *
-     * @param hr _more_
-     */
-    public Link(boolean hr) {
-        this.hr = true;
-    }
+    /** _more_          */
+    OutputType outputType;
 
 
     /**
@@ -75,9 +76,58 @@ public class Link {
      * @param label _more_
      */
     public Link(String url, String icon, String label) {
-        this.url   = url;
-        this.label = label;
-        this.icon  = icon;
+        this(url, icon, label, null);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param icon _more_
+     * @param label _more_
+     * @param outputType _more_
+     */
+    public Link(String url, String icon, String label,
+                OutputType outputType) {
+        this(url, icon,label,outputType, getLinkType(outputType));
+    }
+
+
+
+    public Link(String url, String icon, String label,
+                OutputType outputType, int linkType) {
+        this.url        = url;
+        this.label      = label;
+        this.icon       = icon;
+        this.outputType = outputType;
+        this.type = linkType;
+    }
+
+
+    public boolean isForHeader() {
+        return type == TYPE_HEADER;
+    }
+
+    public boolean isForToolbar() {
+        return type == TYPE_TOOLBAR;
+    }
+
+
+
+    public static int getLinkType(OutputType outputType) {
+        if(outputType == null) return TYPE_TOOLBAR;
+        if(outputType.getIsHtml()) return TYPE_HEADER;
+        return TYPE_TOOLBAR;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public OutputType getOutputType() {
+        return outputType;
     }
 
 
@@ -89,6 +139,9 @@ public class Link {
     public String toString() {
         if (hr) {
             return "<hr>";
+        }
+        if (icon == null) {
+            return HtmlUtil.href(url, label);
         }
         return HtmlUtil.href(url, HtmlUtil.img(icon, label));
     }

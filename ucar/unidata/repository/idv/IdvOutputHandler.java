@@ -103,7 +103,7 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_IDV_GRID = new OutputType("Grid Preview","idv.grid",true);
+    public static final OutputType OUTPUT_IDV_GRID = new OutputType("Grid Preview","idv.grid",OutputType.TYPE_HTML);
 
 
     /** _more_          */
@@ -141,15 +141,16 @@ public class IdvOutputHandler extends OutputHandler {
     }
 
 
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
+        throws Exception {
+
         List<Entry> theEntries = null;
         if(state.entry!=null) {
             if ( !getDataOutputHandler().canLoadAsGrid(state.entry)) {
                 return;
             }
-            types.add(OUTPUT_IDV_GRID);
+            links.add(makeLink(request, state.getEntry(),OUTPUT_IDV_GRID));
         } else {
             //            theEntries = getRadarEntries(state.getAllEntries());
         }

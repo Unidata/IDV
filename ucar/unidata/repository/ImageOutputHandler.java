@@ -83,15 +83,15 @@ public class ImageOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
                                                         "image.gallery",
-                                                        true);
+                                                        OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_PLAYER =
-        new OutputType("Image Player", "image.player", true);
+        new OutputType("Image Player", "image.player", OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_SLIDESHOW =
-        new OutputType("Slideshow", "image.slideshow", true);
+        new OutputType("Slideshow", "image.slideshow", OutputType.TYPE_HTML);
 
 
 
@@ -119,12 +119,15 @@ public class ImageOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
         //If its a single entry then punt
         if (state.entry != null) {
@@ -144,9 +147,11 @@ public class ImageOutputHandler extends OutputHandler {
             }
         }
 
-        types.add(OUTPUT_SLIDESHOW);
-        types.add(OUTPUT_GALLERY);
-        types.add(OUTPUT_PLAYER);
+        if (state.getEntry() != null) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_SLIDESHOW));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_GALLERY));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_PLAYER));
+        }
     }
 
 

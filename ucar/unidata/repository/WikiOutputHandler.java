@@ -55,7 +55,9 @@ public class WikiOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
-                                                                "wiki", true);
+                                                     "wiki",
+                                                     OutputType.TYPE_HTML,
+                                                     "", ICON_WIKI);
 
 
     /**
@@ -81,19 +83,21 @@ public class WikiOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
 
         if (state.entry == null) {
             return;
         }
         if (state.entry.getType().equals(WikiPageTypeHandler.TYPE_WIKIPAGE)) {
-            types.add(OUTPUT_WIKI);
+            links.add(makeLink(request, state.entry, OUTPUT_WIKI));
         }
     }
 
@@ -114,10 +118,11 @@ public class WikiOutputHandler extends OutputHandler {
         if (request.exists(ARG_WIKI_CREATE)) {
             return wikiPageCreate(request, entry);
         }
-        String wikiText = "";
-        Object[]values = entry.getValues();
-        if(values!=null && values.length>0 && values[0]!=null)
-            wikiText = (String)values[0];
+        String   wikiText = "";
+        Object[] values   = entry.getValues();
+        if ((values != null) && (values.length > 0) && (values[0] != null)) {
+            wikiText = (String) values[0];
+        }
         StringBuffer sb = new StringBuffer(wikifyEntry(request, entry,
                               wikiText));
         return makeLinksResult(request, msg("Wiki"), sb, new State(entry));

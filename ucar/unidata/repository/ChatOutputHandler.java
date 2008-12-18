@@ -86,11 +86,14 @@ public class ChatOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_CHATROOM =
-        new OutputType("Chat Room", "chat.room", true);
+        new OutputType("Chat Room", "chat.room", OutputType.TYPE_HTML, "",
+                       ICON_CHAT);
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_CHAT = new OutputType("Chat",
-                                                     "chat.room", true);
+                                                     "chat.room",
+                                                     OutputType.TYPE_HTML,
+                                                     "", ICON_CHAT);
 
 
     /**
@@ -141,7 +144,7 @@ public class ChatOutputHandler extends OutputHandler {
         /** _more_ */
         private String entryId;
 
-        /** _more_          */
+        /** _more_ */
         private Entry entry;
 
         /** _more_ */
@@ -498,28 +501,8 @@ public class ChatOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     * @param state _more_
-     * @param types _more_
-     *
-     *
-     * @throws Exception _more_
-     */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
-            throws Exception {
-        //If its a single entry then punt
-        if (state.entry == null) {
-            return;
-        }
-        if (state.entry.getType().equals("chatroom")) {
-            types.add(OUTPUT_CHATROOM);
-        }
-    }
+
+
 
 
     /**
@@ -527,32 +510,28 @@ public class ChatOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param state _more_
      * @param links _more_
      * @param forHeader _more_
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
+    protected void getEntryLinks(Request request, State state,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if ( !entry.getType().equals("chatroom")) {
-            if (getRepository().isOutputTypeOK(OUTPUT_CHAT)) {
-                String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                 entry, ARG_OUTPUT, OUTPUT_CHAT);
-                links.add(new Link(url, getRepository().fileUrl(ICON_CHAT),
-                                   "Chat"));
+
+        Entry entry = state.getEntry();
+        if (entry != null) {
+            if ( !entry.getType().equals("chatroom")) {
+                links.add(makeLink(request, state.getEntry(), OUTPUT_CHAT));
+            } else {
+                links.add(makeLink(request, state.getEntry(),
+                                   OUTPUT_CHATROOM));
             }
-        } else {
-            /*
-            if (getRepository().isOutputTypeOK(OUTPUT_CHATROOM)) {
-                String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                              entry, ARG_OUTPUT,
-                                              OUTPUT_CHATROOM);
-                links.add(new Link(url, getRepository().fileUrl(ICON_CHAT),
-                                   "Chat Room"));
-                                   }*/
         }
     }
+
+
 
 
     /**

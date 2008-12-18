@@ -860,14 +860,19 @@ return new Result(title, sb);
                 entries.add(entry);
             }
 
-            
-            if(request.getUser().getAdmin() && request.defined(ARG_USER_ID)) {
 
-                User newUser = getUserManager().findUser(request.getString(ARG_USER_ID,"").trim());
-                if(newUser==null) {
-                    throw new IllegalArgumentException("Could not find user: " +request.getString(ARG_USER_ID,""));
+            if (request.getUser().getAdmin()
+                    && request.defined(ARG_USER_ID)) {
+
+                User newUser =
+                    getUserManager().findUser(request.getString(ARG_USER_ID,
+                        "").trim());
+                if (newUser == null) {
+                    throw new IllegalArgumentException(
+                        "Could not find user: "
+                        + request.getString(ARG_USER_ID, ""));
                 }
-                for(Entry theEntry: entries) {
+                for (Entry theEntry : entries) {
                     theEntry.setUser(newUser);
                 }
             }
@@ -2418,10 +2423,12 @@ return new Result(title, sb);
                                     HtmlUtil.id("span_" + entry.getId()));
 
         if (includeIcon) {
-            link = link + 
-                HtmlUtil.br()
-                + HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,"display:none;visibility:hidden",
-                                                 HtmlUtil.ATTR_CLASS,"folderblock",HtmlUtil.ATTR_ID,uid));
+            link = link + HtmlUtil.br()
+                   + HtmlUtil.div("",
+                                  HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
+                                      "display:none;visibility:hidden",
+                                      HtmlUtil.ATTR_CLASS, "folderblock",
+                                      HtmlUtil.ATTR_ID, uid));
         }
         return link;
 
@@ -2444,19 +2451,19 @@ return new Result(title, sb);
     protected List<Link> getEntryLinks(Request request, Entry entry,
                                        boolean forHeader)
             throws Exception {
-        List<Link> links = new ArrayList<Link>();
+        List<Link>          links;
+        OutputHandler.State state = new OutputHandler.State(entry);
+        if (forHeader) {
+            links = getRepository().getLinksForHeader(request, state);
+        } else {
+            links = getRepository().getLinksForToolbar(request, state);
+        }
+
         if ( !forHeader) {
             entry.getTypeHandler().getEntryLinks(request, entry, links,
                     forHeader);
-            //            if(!forHeader)
-            //                links.add(new Link(true));
-            for (OutputHandler outputHandler : getRepository()
-                    .getOutputHandlers()) {
-                outputHandler.getEntryLinks(request, entry, links, forHeader);
-            }
-            //            if(!forHeader)
-            //                links.add(new Link(true));
         }
+
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
         if ( !entry.isTopGroup()) {
@@ -2691,9 +2698,12 @@ return new Result(title, sb);
         titleList.add(entry.getLabel());
         String nav;
         String separator = getProperty("ramadda.breadcrumbs.separator", "");
-        String entryLink = (!entry.isGroup()?HtmlUtil.img(getIconUrl(entry))+HtmlUtil.space(1):"") + getAjaxLink(request, entry, entry.getLabel(),
-                                                                                           false);
-        
+        String entryLink = ( !entry.isGroup()
+                             ? HtmlUtil.img(getIconUrl(entry))
+                               + HtmlUtil.space(1)
+                             : "") + getAjaxLink(request, entry,
+                                 entry.getLabel(), false);
+
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
@@ -2722,7 +2732,7 @@ return new Result(title, sb);
              *                           + HtmlUtil.squote(
              *                               "entrylinksmenu"
              *                               + entry.getId()) + ")");
-e             * String menuLink = HtmlUtil.space(1)
+             * e             * String menuLink = HtmlUtil.space(1)
              *                 + HtmlUtil.jsLink(events,
              *                     HtmlUtil.img(getRepository().fileUrl(ICON_GRAYRECT),
              *                         msg("Show menu"), HtmlUtil.id(compId)));
@@ -3509,17 +3519,18 @@ e             * String menuLink = HtmlUtil.space(1)
         if ( !group.isGroup()) {
             return children;
         }
-        List<Entry> entries = new ArrayList<Entry>();
-        List<String> ids = getChildIds(request, (Group) group, null);
+        List<Entry>  entries = new ArrayList<Entry>();
+        List<String> ids     = getChildIds(request, (Group) group, null);
         for (String id : ids) {
             Entry entry = getEntry(request, id);
             if (entry == null) {
                 continue;
             }
-            if(entry.isGroup())
+            if (entry.isGroup()) {
                 children.add(entry);
-            else
+            } else {
                 entries.add(entry);
+            }
         }
         children.addAll(entries);
         return children;
@@ -4153,17 +4164,17 @@ e             * String menuLink = HtmlUtil.space(1)
         for (int i = 0; i < ids.length; i++) {
             //Get the entry but don't check for access control
             try {
-            Entry e = getEntry(request, ids[i], false);
-            if (e == null) {
-                continue;
-            }
-            if ( !e.isGroup()) {
-                continue;
-            }
-            Group g = (Group) e;
-            groups.add(g);
-            } catch(Throwable exc) {
-                System.err.println ("Error getting top groups:");
+                Entry e = getEntry(request, ids[i], false);
+                if (e == null) {
+                    continue;
+                }
+                if ( !e.isGroup()) {
+                    continue;
+                }
+                Group g = (Group) e;
+                groups.add(g);
+            } catch (Throwable exc) {
+                System.err.println("Error getting top groups:");
                 exc.printStackTrace();
             }
         }

@@ -96,9 +96,9 @@ public class CatalogOutputHandler extends OutputHandler {
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
 
     /** _more_ */
-    public static final OutputType OUTPUT_CATALOG = new OutputType("Catalog",
-                                                        "thredds.catalog",
-                                                        false);
+    public static final OutputType OUTPUT_CATALOG =
+        new OutputType("Catalog", "thredds.catalog", OutputType.TYPE_NONHTML,
+                       "", ICON_CATALOG);
 
 
     /** _more_ */
@@ -289,14 +289,18 @@ public class CatalogOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
-        types.add(OUTPUT_CATALOG);
+        if (state.getEntry() != null) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_CATALOG));
+        }
     }
 
 

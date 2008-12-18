@@ -170,7 +170,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_DELETER =
-        new OutputType("Delete Entry", "repository.delete", true);
+        new OutputType("Delete Entry", "repository.delete",
+                       OutputType.TYPE_ACTION);
 
 
     /** _more_ */
@@ -1489,10 +1490,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER);
             }
-            protected void addOutputTypes(Request request, State state,
-                                          List<OutputType> types)
+            protected void getEntryLinks(Request request, State state,
+                                         List<Link> links, boolean forHeader)
                     throws Exception {
-                if ((state.group != null) || (state.entry != null)) {
+                if (state.getEntry() != null) {
                     return;
                 }
                 for (Entry entry : state.getAllEntries()) {
@@ -1501,7 +1502,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         return;
                     }
                 }
-                types.add(OUTPUT_DELETER);
+                links.add(makeLink(request, state.getEntry(),
+                                   OUTPUT_DELETER));
             }
 
 
@@ -1800,7 +1802,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         path = path.substring(length);
 
 
-        
+
         //Go through all of the htdoc roots
         for (String root : htdocRoots) {
             root = getStorageManager().localizePath(root);
@@ -2264,21 +2266,73 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      *  @throws Exception _more_
      */
-    public List<OutputType> getOutputTypes(Request request,
-                                           OutputHandler.State state)
+    public List<Link> getOutputLinks(Request request,
+                                     OutputHandler.State state)
             throws Exception {
-        List<OutputType> allTypes = new ArrayList<OutputType>();
+        List<Link> links = new ArrayList<Link>();
         for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.addOutputTypes(request, state, allTypes);
+            outputHandler.getEntryLinks(request, state, links, false);
         }
-        List<OutputType> okTypes = new ArrayList<OutputType>();
-        for (OutputType outputType : allTypes) {
+        List<Link> okLinks = new ArrayList<Link>();
+        for (Link link : links) {
+            OutputType outputType = link.getOutputType();
             if (isOutputTypeOK(outputType)) {
-                okTypes.add(outputType);
+                okLinks.add(link);
             }
         }
-        return okTypes;
+        return okLinks;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param state _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<Link> getLinksForHeader(Request request,
+                                        OutputHandler.State state)
+            throws Exception {
+        List<Link> links   = getOutputLinks(request, state);
+
+        List<Link> okLinks = new ArrayList<Link>();
+
+        for (Link link : links) {
+            if (link.isForHeader()) {
+                okLinks.add(link);
+            }
+        }
+        return okLinks;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param state _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<Link> getLinksForToolbar(Request request,
+                                         OutputHandler.State state)
+            throws Exception {
+        List<Link> links   = getOutputLinks(request, state);
+        List<Link> okLinks = new ArrayList<Link>();
+        for (Link link : links) {
+            if (link.isForToolbar()) {
+                okLinks.add(link);
+            }
+        }
+        return okLinks;
+    }
+
 
     /**
      * _more_
@@ -2400,7 +2454,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if ((type == null) || (type.length() == 0)) {
             type = OutputHandler.OUTPUT_HTML.getId();
         }
-        OutputType output = new OutputType("", type, true);
+        OutputType output = new OutputType("", type, OutputType.TYPE_HTML);
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
                 return outputHandler;
@@ -3025,11 +3079,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public String getResource(String id) throws Exception {
-        return getResource(id,false);
+        return getResource(id, false);
     }
 
 
-    public String getResource(String id, boolean ignoreErrors) throws Exception {
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param ignoreErrors _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getResource(String id, boolean ignoreErrors)
+            throws Exception {
         String resource = (String) resources.get(id);
         if (resource != null) {
             return resource;
@@ -3049,11 +3114,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         } else {
             try {
-            resource =
-                IOUtil.readContents(getStorageManager().localizePath(id),
-                                    getClass());
-            } catch(Exception exc) {
-                if(!ignoreErrors) throw exc;
+                resource =
+                    IOUtil.readContents(getStorageManager().localizePath(id),
+                                        getClass());
+            } catch (Exception exc) {
+                if ( !ignoreErrors) {
+                    throw exc;
+                }
             }
         }
         if (cacheResources() && (resource != null)) {
@@ -3718,18 +3785,29 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    
-    public String makeMenuPopupLink(String link, String menuContents) {
-        String compId = "menu_" + HtmlUtil.blockCnt++;
-        String linkId = "menulink_" + HtmlUtil.blockCnt++;
-        StringBuffer menu = new StringBuffer();
-        menu.append(
-                    HtmlUtil.div(menuContents,
-                                 HtmlUtil.id(compId)+ HtmlUtil.cssClass("menu")));
 
-        String onClick = HtmlUtil.onMouseClick("showMenu(event," + HtmlUtil.squote(linkId)+"," +HtmlUtil.squote(compId)+");");
-        String href = HtmlUtil.href("javascript:noop();",link,onClick+HtmlUtil.id(linkId));
-        return href+menu;
+    /**
+     * _more_
+     *
+     * @param link _more_
+     * @param menuContents _more_
+     *
+     * @return _more_
+     */
+    public String makeMenuPopupLink(String link, String menuContents) {
+        String       compId = "menu_" + HtmlUtil.blockCnt++;
+        String       linkId = "menulink_" + HtmlUtil.blockCnt++;
+        StringBuffer menu   = new StringBuffer();
+        menu.append(HtmlUtil.div(menuContents,
+                                 HtmlUtil.id(compId)
+                                 + HtmlUtil.cssClass("menu")));
+
+        String onClick = HtmlUtil.onMouseClick("showMenu(event,"
+                             + HtmlUtil.squote(linkId) + ","
+                             + HtmlUtil.squote(compId) + ");");
+        String href = HtmlUtil.href("javascript:noop();", link,
+                                    onClick + HtmlUtil.id(linkId));
+        return href + menu;
     }
 
 

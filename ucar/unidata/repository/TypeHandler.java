@@ -195,6 +195,22 @@ public class TypeHandler extends RepositoryManager {
      * _more_
      *
      * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result getHtmlDisplay(Request request, Entry entry)
+            throws Exception {
+        return null;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
      *
      * @return _more_
      */
@@ -1151,12 +1167,12 @@ public class TypeHandler extends RepositoryManager {
                     : BLANK), rows, 60)));
         }
 
-        if(request.getUser().getAdmin()) {
+        if (request.getUser().getAdmin()) {
             sb.append(HtmlUtil.formEntry(msgLabel("User"),
                                          HtmlUtil.input(ARG_USER_ID,
                                              ((entry != null)
-                                              ? entry.getUser().getId()
-                                              : ""), size)));
+                    ? entry.getUser().getId()
+                    : ""), size)));
         }
 
         if (okToShowInForm(ARG_RESOURCE)) {

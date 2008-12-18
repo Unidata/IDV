@@ -135,46 +135,53 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_OPENDAP =
-        new OutputType("OpenDAP", "data.opendap", false,
+        new OutputType("OpenDAP", "data.opendap", OutputType.TYPE_NONHTML,
                        OutputType.SUFFIX_NONE, ICON_OPENDAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_CDL = new OutputType("CDL",
-                                                    "data.cdl", true,
+                                                    "data.cdl",
+                                                    OutputType.TYPE_HTML,
                                                     OutputType.SUFFIX_NONE,
                                                     ICON_DATA);
 
     /** _more_ */
     public static final OutputType OUTPUT_WCS = new OutputType("WCS",
-                                                    "data.wcs", false);
+                                                    "data.wcs",
+                                                    OutputType.TYPE_NONHTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_MAP =
-        new OutputType("Point as Map", "data.point.map", true,
-                       OutputType.SUFFIX_NONE, ICON_MAP);
+        new OutputType("Point as Map", "data.point.map",
+                       OutputType.TYPE_HTML, OutputType.SUFFIX_NONE,
+                       ICON_MAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_CSV =
-        new OutputType("Point as CSV", "data.point.csv", false,
-                       OutputType.SUFFIX_NONE, ICON_CSV);
+        new OutputType("Point as CSV", "data.point.csv",
+                       OutputType.TYPE_NONHTML, OutputType.SUFFIX_NONE,
+                       ICON_CSV);
 
     /** _more_ */
     public static final OutputType OUTPUT_POINT_KML =
-        new OutputType("Point as KML", "data.point.kml", false);
+        new OutputType("Point as KML", "data.point.kml",
+                       OutputType.TYPE_NONHTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_TRAJECTORY_MAP =
-        new OutputType("Trajectory as Map", "data.trajectory.map", true,
-                       OutputType.SUFFIX_NONE, ICON_MAP);
+        new OutputType("Trajectory as Map", "data.trajectory.map",
+                       OutputType.TYPE_HTML, OutputType.SUFFIX_NONE,
+                       ICON_MAP);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET_FORM =
-        new OutputType("Grid Subset", "data.gridsubset.form", true,
-                       OutputType.SUFFIX_NONE, ICON_SUBSET);
+        new OutputType("Grid Subset", "data.gridsubset.form",
+                       OutputType.TYPE_HTML, OutputType.SUFFIX_NONE,
+                       ICON_SUBSET);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRIDSUBSET =
-        new OutputType("data.gridsubset", false);
+        new OutputType("data.gridsubset", OutputType.TYPE_NONHTML);
 
 
     /** _more_ */
@@ -271,105 +278,52 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+
+
+
+
     /**
      * _more_
      *
      * @param request _more_
      * @param entry _more_
      * @param state _more_
-     * @param types _more_
-     *
-     * @throws Exception On badness
-     */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
-            throws Exception {
-        if (state.entry == null) {
-            return;
-        }
-        if (canLoadAsCdm(state.entry)
-                && (request.getHttpServletRequest() == null)) {
-            types.add(new OutputType(OUTPUT_OPENDAP) {
-                public String assembleUrl(Request request) {
-                    return request.getRequestPath() + getSuffix() + "/"
-                           + request.getPathEmbeddedArgs() + "/" + ARG_OUTPUT
-                           + ":" + OUTPUT_OPENDAP + "/entry.das";
-                }
-            });
-        }
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
      * @param links _more_
      * @param forHeader _more_
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
+    protected void getEntryLinks(Request request, State state,
                                  List<Link> links, boolean forHeader)
             throws Exception {
+        Entry entry = state.entry;
+        if (entry == null) {
+            return;
+        }
         if ( !canLoadAsCdm(entry)) {
             return;
         }
 
         if (canLoadAsTrajectory(entry)) {
             addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
-        }
-
-        if (canLoadAsPoint(entry)) {
+        } else if (canLoadAsPoint(entry)) {
             addOutputLink(request, entry, links, OUTPUT_POINT_MAP);
-            if (getRepository().isOutputTypeOK(OUTPUT_POINT_CSV)) {
-                links.add(
-                    new Link(
-                        HtmlUtil.url(
-                            request.getRequestPath() + "/"
-                            + IOUtil.stripExtension(entry.getName())
-                            + ".csv", Misc.newList(
-                                ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
-                                OUTPUT_POINT_CSV)), getRepository().fileUrl(
-                                    ICON_CSV), "Point Data as CSV"));
-            }
+            links.add(makeLink(request,entry,OUTPUT_POINT_CSV, 
+                               "/"+ IOUtil.stripExtension(entry.getName())+ ".csv"));
 
-            if (getRepository().isOutputTypeOK(OUTPUT_POINT_KML)) {
-                links.add(
-                    new Link(
-                        HtmlUtil.url(
-                            request.getRequestPath() + "/"
-                            + IOUtil.stripExtension(entry.getName())
-                            + ".kml", Misc.newList(
-                                ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
-                                OUTPUT_POINT_KML)), getRepository().fileUrl(
-                                    ICON_KML), "Point Data as KML"));
-            }
+            links.add(makeLink(request,entry,OUTPUT_POINT_KML, 
+                               "/"+ IOUtil.stripExtension(entry.getName())+ ".kml"));
         } else if (canLoadAsGrid(entry)) {
             addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
-            if (getRepository().isOutputTypeOK(OUTPUT_WCS)) {
-                /*
-                  links.add(
-                  new Link(
-                  request.entryUrl(
-                  getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                  OUTPUT_WCS), getRepository().fileUrl(ICON_DATA),
-                  "WCS"));
-                */
-            }
         }
 
-        if (getRepository().isOutputTypeOK(OUTPUT_OPENDAP)) {
-            Object oldOutput = request.getOutput();
-            request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
-            String opendapUrl = request.getRequestPath() + "/"
-                                + request.getPathEmbeddedArgs()
-                                + "/entry.das";
-            links.add(new Link(opendapUrl,
-                               getRepository().fileUrl(ICON_OPENDAP),
-                               "OpenDAP"));
-            request.put(ARG_OUTPUT, oldOutput);
-        }
+        Object oldOutput = request.getOutput();
+        request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
+        String opendapUrl = request.getRequestPath() + "/"
+                            + request.getPathEmbeddedArgs() + "/entry.das";
+        links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
+                           "OpenDAP", OUTPUT_OPENDAP));
+        request.put(ARG_OUTPUT, oldOutput);
 
         addOutputLink(request, entry, links, OUTPUT_CDL);
     }
@@ -446,6 +400,9 @@ public class DataOutputHandler extends OutputHandler {
      * @return Can the given entry be served by the tds
      */
     public boolean canLoadAsCdm(Entry entry) {
+        if ( !entry.isFile()) {
+            return false;
+        }
         Boolean b = checkedEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;

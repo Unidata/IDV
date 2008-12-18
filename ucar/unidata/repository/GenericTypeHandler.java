@@ -176,11 +176,11 @@ public class GenericTypeHandler extends TypeHandler {
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
             String className = XmlUtil.getAttribute(columnNode, ATTR_CLASS,
-                                                    Column.class.getName());
+                                   Column.class.getName());
             Class c = Misc.findClass(className);
             Constructor ctor = Misc.findConstructor(c,
                                    new Class[] { getClass(),
-                                                 Element.class, Integer.TYPE });
+                    Element.class, Integer.TYPE });
             Column column = (Column) ctor.newInstance(new Object[] { this,
                     columnNode, new Integer(colNames.size() - 1) });
             columns.add(column);

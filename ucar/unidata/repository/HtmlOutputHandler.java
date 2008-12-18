@@ -83,28 +83,30 @@ public class HtmlOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TIMELINE =
-        new OutputType("Timeline", "default.timeline", true);
+        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
-                                                      "default.graph", true);
+                                                      "default.graph",
+                                                      OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_CLOUD = new OutputType("Cloud",
-                                                      "default.cloud", true);
+                                                      "default.cloud",
+                                                      OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final OutputType OUTPUT_GROUPXML =
-        new OutputType("groupxml", false);
+        new OutputType("groupxml", OutputType.TYPE_INTERNAL);
 
     /** _more_ */
     public static final OutputType OUTPUT_SELECTXML =
-        new OutputType("selectxml", false);
+        new OutputType("selectxml", OutputType.TYPE_INTERNAL);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATAXML =
-        new OutputType("metadataxml", false);
+        new OutputType("metadataxml", OutputType.TYPE_INTERNAL);
 
 
 
@@ -134,17 +136,22 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
         List<Entry> entries = state.getAllEntries();
-        types.add(OUTPUT_HTML);
-        if (entries.size() > 1) {
-            types.add(OUTPUT_TIMELINE);
+        if (state.getEntry() != null) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_HTML));
+            if (entries.size() > 1) {
+                links.add(makeLink(request, state.getEntry(),
+                                   OUTPUT_TIMELINE));
+            }
         }
     }
 
@@ -210,24 +217,32 @@ public class HtmlOutputHandler extends OutputHandler {
             return getActionXml(request, entry);
         }
 
-        StringBuffer sb         = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
+        Result typeResult = typeHandler.getHtmlDisplay(request, entry);
+        if (typeResult != null) {
+            return typeResult;
+        }
+
+
         String wikiTemplate = getWikiText(request, entry);
-        if(wikiTemplate!=null) {
+        if (wikiTemplate != null) {
             sb.append(wikifyEntry(request, entry, wikiTemplate));
         } else {
-            String informationBlock = getInformationTabs(request, entry, false);
+            String informationBlock = getInformationTabs(request, entry,
+                                          false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                                                 informationBlock, true));
+                    informationBlock, true));
 
             StringBuffer metadataSB = new StringBuffer();
-            getMetadataManager().decorateEntry(request, entry, metadataSB, false);
+            getMetadataManager().decorateEntry(request, entry, metadataSB,
+                    false);
             String metataDataHtml = metadataSB.toString();
             if (metataDataHtml.length() > 0) {
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Attachments"),
-                                                     "<div class=\"description\">" + metadataSB + "</div>",
-                                                     true));
+                        "<div class=\"description\">" + metadataSB
+                        + "</div>", true));
             }
         }
 
@@ -801,18 +816,18 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         boolean      allEntries = request.get("allentries", false);
-        String       type     = request.getString(ATTR_SELECTTYPE, "");
+        String       type       = request.getString(ATTR_SELECTTYPE, "");
 
 
         for (Group subGroup : subGroups) {
-            sb.append(getSelectLink(request, subGroup, target,
-                                    allEntries,type));
+            sb.append(getSelectLink(request, subGroup, target, allEntries,
+                                    type));
         }
 
         if (allEntries) {
             for (Entry entry : entries) {
-                sb.append(getSelectLink(request, entry, target,
-                                        allEntries,type));
+                sb.append(getSelectLink(request, entry, target, allEntries,
+                                        type));
             }
         }
 
@@ -838,7 +853,7 @@ public class HtmlOutputHandler extends OutputHandler {
     private void addDescription(Request request, Entry entry,
                                 StringBuffer sb) {
         String desc = entry.getDescription();
-        if (desc.length() > 0 && !desc.startsWith("<wiki>")) {
+        if ((desc.length() > 0) && !desc.startsWith("<wiki>")) {
             desc = getEntryManager().processText(request, entry, desc);
             StringBuffer descSB =
                 new StringBuffer("\n<div class=\"description\">\n");
@@ -875,8 +890,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
         tabTitles.add("Basic");
         Object basic;
-        tabContent.add(basic = entry.getTypeHandler().getEntryContent(entry, request,
-                false, true));
+        tabContent.add(basic = entry.getTypeHandler().getEntryContent(entry,
+                request, false, true));
 
 
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, true,
@@ -946,12 +961,12 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         String wikiTemplate = getWikiText(request, group);
-        
+
         if (showApplet) {
             List allEntries = new ArrayList(entries);
             allEntries.addAll(subGroups);
             sb.append(getTimelineApplet(request, allEntries));
-        } else if (wikiTemplate==null && !group.isDummy()) {
+        } else if ((wikiTemplate == null) && !group.isDummy()) {
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
@@ -968,23 +983,24 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-        if(wikiTemplate!=null) {
-            sb.append(wikifyEntry(request, group,  wikiTemplate,subGroups,entries));
+        if (wikiTemplate != null) {
+            sb.append(wikifyEntry(request, group, wikiTemplate, subGroups,
+                                  entries));
         } else {
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
-                String link = getEntriesList(groupsSB, subGroups, request, true,
-                                             false, group.isDummy());
+                String link = getEntriesList(groupsSB, subGroups, request,
+                                             true, false, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
-                                                     groupsSB.toString(), true));
+                        groupsSB.toString(), true));
             }
 
             if (entries.size() > 0) {
                 StringBuffer entriesSB = new StringBuffer();
-                String link = getEntriesList(entriesSB, entries, request, true,
-                                             false, group.isDummy());
+                String link = getEntriesList(entriesSB, entries, request,
+                                             true, false, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
-                                                     entriesSB.toString(), true));
+                        entriesSB.toString(), true));
             }
         }
 
@@ -1005,24 +1021,42 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
+    /** _more_          */
     private static boolean checkedTemplates = false;
+
+    /** _more_          */
     private static String entryTemplate;
+
+    /** _more_          */
     private static String groupTemplate;
 
-    private String getWikiText(Request request, Entry entry) throws Exception {
-        if(!checkedTemplates) {
-            entryTemplate = getRepository().getResource(RESOURCE_ENTRYTEMPLATE,true);
-            groupTemplate = getRepository().getResource(RESOURCE_GROUPTEMPLATE,true);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getWikiText(Request request, Entry entry)
+            throws Exception {
+        if ( !checkedTemplates) {
+            entryTemplate =
+                getRepository().getResource(RESOURCE_ENTRYTEMPLATE, true);
+            groupTemplate =
+                getRepository().getResource(RESOURCE_GROUPTEMPLATE, true);
             checkedTemplates = true;
         }
-        if(entry.getDescription().trim().startsWith("<wiki>")) {
+        if (entry.getDescription().trim().startsWith("<wiki>")) {
             return entry.getDescription();
         }
-        if(entry.isGroup()) {
+        if (entry.isGroup()) {
             return groupTemplate;
         }
         return entryTemplate;
-    } 
+    }
 
 
 

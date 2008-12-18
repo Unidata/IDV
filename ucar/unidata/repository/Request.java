@@ -95,6 +95,7 @@ public class Request implements Constants {
     /** _more_ */
     private Hashtable originalParameters;
 
+    /** _more_          */
     private Hashtable extraProperties = new Hashtable();
 
     /** _more_ */
@@ -1098,7 +1099,8 @@ public class Request implements Constants {
      * @return _more_
      */
     public OutputType getOutput(String dflt) {
-        return new OutputType(getString(ARG_OUTPUT, dflt), false);
+        return new OutputType(getString(ARG_OUTPUT, dflt),
+                              OutputType.TYPE_NONHTML);
     }
 
 
@@ -1529,10 +1531,23 @@ public class Request implements Constants {
         return leftMessage;
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
     public void putExtraProperty(Object key, Object value) {
-        extraProperties.put(key,value);
+        extraProperties.put(key, value);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public Object getExtraProperty(Object key) {
         return extraProperties.get(key);
     }

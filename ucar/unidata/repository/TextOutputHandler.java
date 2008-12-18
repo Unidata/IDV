@@ -82,7 +82,8 @@ public class TextOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TEXT = new OutputType("Text",
-                                                     "text", true);
+                                                     "text",
+                                                     OutputType.TYPE_HTML);
 
 
     /**
@@ -108,12 +109,14 @@ public class TextOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
 
         if (state.entry == null) {
@@ -127,7 +130,7 @@ public class TextOutputHandler extends OutputHandler {
 
         for (int i = 0; i < suffixes.length; i++) {
             if (path.endsWith(suffixes[i])) {
-                types.add(OUTPUT_TEXT);
+                links.add(makeLink(request, state.entry, OUTPUT_TEXT));
                 return;
             }
         }

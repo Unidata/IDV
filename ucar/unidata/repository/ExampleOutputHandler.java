@@ -53,15 +53,15 @@ public class ExampleOutputHandler extends OutputHandler {
 
     /** example1 */
     public static final OutputType OUTPUT_EXAMPLE1 =
-        new OutputType("Example 1", "example.example1", true);
+        new OutputType("Example 1", "example.example1", OutputType.TYPE_HTML);
 
     /** example2 */
     public static final OutputType OUTPUT_EXAMPLE2 =
-        new OutputType("Example 2", "example.example2", true);
+        new OutputType("Example 2", "example.example2", OutputType.TYPE_HTML);
 
     /** example3 */
     public static final OutputType OUTPUT_EXAMPLE3 =
-        new OutputType("Example 3", "example.example3", true);
+        new OutputType("Example 3", "example.example3", OutputType.TYPE_HTML);
 
 
     /**
@@ -83,10 +83,11 @@ public class ExampleOutputHandler extends OutputHandler {
 
 
     /*
-      addOutputTypes and getEntryLinks is the boiler plate code that is called
+      getEntryLinks is the boiler plate code that is called
       by the repository and is used to determine what if any outputtypes are applicable
       to the given content.
     */
+
 
 
     /**
@@ -99,16 +100,18 @@ public class ExampleOutputHandler extends OutputHandler {
      * @param request The request
      * @param state The state
      * @param types The list to add to
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception On badness
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
         //We'll add example1 when we are viewing a group and example2 when viewing a single entry
         if (state.group != null) {
-            types.add(OUTPUT_EXAMPLE1);
+            links.add(makeLink(request, state.group, OUTPUT_EXAMPLE1));
         }
         if (state.entry != null) {
             /*
@@ -120,43 +123,14 @@ public class ExampleOutputHandler extends OutputHandler {
               }
             */
 
-            types.add(OUTPUT_EXAMPLE2);
-        }
-    }
 
-    /**
-     * This adds in the links that show up in the drop down list and in the Actions tab
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param links _more_
-     * @param forHeader _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links, boolean forHeader)
-            throws Exception {
-
-        //Only do example3 links for non-groups
-        if (entry.isGroup()) {
-            return;
+            links.add(makeLink(request, state.entry, OUTPUT_EXAMPLE2));
+            links.add(makeLink(request, state.entry, OUTPUT_EXAMPLE3));
         }
 
-        //Links have an icon and a label
-        String label = "Show example 3";
 
-        //fileUrl makes a file access url to the given content
-        String icon = getRepository().fileUrl(ICON_LIST);
 
-        //The request.entryUrl creates a url for the given entry.
-        //URL_ENTRY_SHOW is the main entry viewing url
-        //We also pass in the OUTPUT_EXAMPLE3 as the output argument
-        String url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
-                                      ARG_OUTPUT, OUTPUT_EXAMPLE3);
 
-        //Now add in the Link
-        links.add(new Link(url, icon, label));
     }
 
 

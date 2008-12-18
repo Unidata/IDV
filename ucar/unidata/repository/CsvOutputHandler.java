@@ -85,7 +85,8 @@ public class CsvOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_CSV = new OutputType("CSV",
-                                                    "default.csv", false);
+                                                    "default.csv",
+                                                    OutputType.TYPE_NONHTML);
 
 
 
@@ -110,13 +111,17 @@ public class CsvOutputHandler extends OutputHandler {
      * @param request _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
-        types.add(OUTPUT_CSV);
+        if (state.entry != null) {
+            links.add(makeLink(request, state.entry, OUTPUT_CSV));
+        }
     }
 
 

@@ -82,7 +82,8 @@ public class MapOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_MAP = new OutputType("Map",
-                                                    "map.map", true);
+                                                    "map.map",
+                                                    OutputType.TYPE_HTML);
 
 
     /**
@@ -108,14 +109,15 @@ public class MapOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param state _more_
      * @param types _more_
+     * @param links _more_
+     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {
-
         boolean ok = false;
         for (Entry entry : state.getAllEntries()) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
@@ -123,10 +125,10 @@ public class MapOutputHandler extends OutputHandler {
                 break;
             }
         }
-        if ( !ok) {
-            return;
+        if (ok) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_MAP));
+
         }
-        types.add(OUTPUT_MAP);
     }
 
 

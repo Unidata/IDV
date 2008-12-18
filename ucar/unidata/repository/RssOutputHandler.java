@@ -113,11 +113,11 @@ public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_FULL =
-        new OutputType("Full RSS Feed", "rss.full", false);
+        new OutputType("Full RSS Feed", "rss.full", OutputType.TYPE_NONHTML,"",ICON_RSS);
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_SUMMARY =
-        new OutputType("RSS Feed", "rss.summary", false);
+        new OutputType("RSS Feed", "rss.summary", OutputType.TYPE_NONHTML,"",ICON_RSS);
 
 
 
@@ -144,22 +144,21 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param state _more_
      * @param links _more_
      * @param forHeader _more_
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
+    protected void getEntryLinks(Request request, State state,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if (getRepository().isOutputTypeOK(OUTPUT_RSS_SUMMARY)) {
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry, ARG_OUTPUT,
-                                          OUTPUT_RSS_SUMMARY);
-            links.add(new Link(url, getRepository().fileUrl(ICON_RSS),
-                               "RSS Feed"));
+
+        if (state.getEntry() != null) {
+            links.add(makeLink(request, state.entry, OUTPUT_RSS_SUMMARY,"/" +IOUtil.stripExtension(state.getEntry().getName())+ ".rss"));
         }
     }
+
 
 
 

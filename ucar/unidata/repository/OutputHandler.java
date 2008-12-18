@@ -79,12 +79,13 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler extends RepositoryManager implements 
-                                                         WikiUtil.WikiPageHandler {
+public class OutputHandler extends RepositoryManager implements WikiUtil
+    .WikiPageHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
-                                                     "default.html", true);
+                                                     "default.html",
+                                                     OutputType.TYPE_HTML);
 
 
     /** _more_ */
@@ -117,7 +118,7 @@ public class OutputHandler extends RepositoryManager implements
      * @return _more_
      */
     public OutputType findOutputType(String id) {
-        int idx = types.indexOf(new OutputType(id, true));
+        int idx = types.indexOf(new OutputType(id, OutputType.TYPE_HTML));
         if (idx >= 0) {
             return types.get(idx);
         }
@@ -285,7 +286,14 @@ public class OutputHandler extends RepositoryManager implements
          * @param entry _more_
          */
         public State(Entry entry) {
-            this.entry = entry;
+            if (entry != null) {
+                if (entry.isGroup()) {
+                    group = (Group) entry;
+                } else {
+                    this.entry = entry;
+                }
+            }
+
         }
 
         /**
@@ -342,6 +350,18 @@ public class OutputHandler extends RepositoryManager implements
             return (List<Entry>) allEntries;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public Entry getEntry() {
+            if (entry != null) {
+                return entry;
+            }
+            return group;
+        }
+
     }
 
 
@@ -377,10 +397,11 @@ public class OutputHandler extends RepositoryManager implements
     protected void addLinks(Request request, Result result, State state)
             throws Exception {
         state.forWhat = State.FOR_HEADER;
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getHeader(request, request.getOutput(),
-                                     getRepository().getOutputTypes(request,
-                                         state)));
+        result.putProperty(
+            PROP_NAVSUBLINKS,
+            getHeader(
+                request, request.getOutput(),
+                getRepository().getLinksForHeader(request, state)));
     }
 
 
@@ -388,30 +409,69 @@ public class OutputHandler extends RepositoryManager implements
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
+     * @param entry _more_
      * @param state _more_
-     * @param types _more_
-     *
+     * @param links _more_
+     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request, State state,
-                                  List<OutputType> types)
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
             throws Exception {}
+
+
 
     /**
      * _more_
      *
      * @param request _more_
      * @param entry _more_
-     * @param links _more_
-     * @param forHeader _more_
+     * @param outputType _more_
+     *
+     * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links, boolean forHeader)
-            throws Exception {}
+    protected Link makeLink(Request request, Entry entry,
+                            OutputType outputType)
+            throws Exception {
+        return makeLink(request, entry, outputType, "");
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param outputType _more_
+     * @param suffix _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Link makeLink(Request request, Entry entry,
+                            OutputType outputType, String suffix)
+            throws Exception {
+        String url;
+        if (entry == null) {
+            url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW + suffix,
+                               ARG_OUTPUT, outputType.toString());
+        } else {
+            url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW + suffix,
+                               ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
+                               outputType.toString());
+        }
+        int linkType = Link.TYPE_TOOLBAR;
+        return new Link(url, (outputType.getIcon() == null)
+                             ? null
+                             : getRepository()
+                                 .fileUrl(outputType.getIcon()), outputType
+                                     .getLabel(), outputType);
+
+    }
+
 
     /**
      * _more_
@@ -426,15 +486,13 @@ public class OutputHandler extends RepositoryManager implements
     protected void addOutputLink(Request request, Entry entry,
                                  List<Link> links, OutputType type)
             throws Exception {
-        if (getRepository().isOutputTypeOK(type)) {
-            links.add(
-                new Link(
-                    request.entryUrl(
-                        getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                        type), getRepository().fileUrl(type.getIcon()),
-                               type.getLabel()));
+        links.add(
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    type), getRepository().fileUrl(type.getIcon()),
+                           type.getLabel(), type));
 
-        }
     }
 
     /**
@@ -528,6 +586,7 @@ public class OutputHandler extends RepositoryManager implements
      * @param label _more_
      * @param allEntries _more_
      * @param append _more_
+     * @param type _more_
      *
      * @return _more_
      *
@@ -537,10 +596,10 @@ public class OutputHandler extends RepositoryManager implements
                                       String label, boolean allEntries,
                                       String type)
             throws Exception {
-        String event = HtmlUtil.call("selectInitialClick","event,"
-                                     + HtmlUtil.squote(elementId) + ","
-                                     + HtmlUtil.squote("" + allEntries) + ","
-                                     + HtmlUtil.squote(type));
+        String event = HtmlUtil.call("selectInitialClick",
+                                     "event," + HtmlUtil.squote(elementId)
+                                     + "," + HtmlUtil.squote("" + allEntries)
+                                     + "," + HtmlUtil.squote(type));
         return HtmlUtil.mouseClickHref(event, msg(label),
                                        HtmlUtil.id(elementId
                                            + ".selectlink"));
@@ -554,36 +613,36 @@ public class OutputHandler extends RepositoryManager implements
      * @param entry _more_
      * @param target _more_
      * @param allEntries _more_
+     * @param selectType _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected String getSelectLink(Request request, Entry entry,
-                                   String target, boolean allEntries, String selectType)
+                                   String target, boolean allEntries,
+                                   String selectType)
             throws Exception {
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
         String       icon     = getEntryManager().getIconUrl(entry);
         String       event;
-        String uid = "link_" + HtmlUtil.blockCnt++;
+        String       uid = "link_" + HtmlUtil.blockCnt++;
         if (entry.isGroup()) {
             event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                        HtmlUtil.squote(entryId) + ","
-                                                        + HtmlUtil.squote(uid)
-                                                        + ",'selectxml',"
-                                                        + HtmlUtil.squote(ATTR_TARGET + "="
-                                                                          + target + "&allentries="
-                                                                          + allEntries+"&"+ATTR_SELECTTYPE +"=" + selectType)));
+                    HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
+                    + ",'selectxml',"
+                    + HtmlUtil.squote(ATTR_TARGET + "=" + target
+                                      + "&allentries=" + allEntries + "&"
+                                      + ATTR_SELECTTYPE + "=" + selectType)));
         } else {
             event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                        HtmlUtil.squote(entryId) + ","
-                                          + HtmlUtil.squote(uid)
-                                          + ",'selectxml',"
-                                          + HtmlUtil.squote(ATTR_TARGET + "="
-                                              + target + "&allentries="
-                                                  + allEntries+"&"+ATTR_SELECTTYPE +"=" + selectType)));
+                    HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
+                    + ",'selectxml',"
+                    + HtmlUtil.squote(ATTR_TARGET + "=" + target
+                                      + "&allentries=" + allEntries + "&"
+                                      + ATTR_SELECTTYPE + "=" + selectType)));
 
         }
         String img = HtmlUtil.img(icon, (entry.isGroup()
@@ -593,21 +652,24 @@ public class OutputHandler extends RepositoryManager implements
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 
-        String type    = request.getString(ATTR_SELECTTYPE, "");
-        String  elementId = entry.getId();
-        String  value     = (entry.isGroup()
-                             ? ((Group) entry).getFullName()
-                             : entry.getName());
+        String type      = request.getString(ATTR_SELECTTYPE, "");
+        String elementId = entry.getId();
+        String value     = (entry.isGroup()
+                            ? ((Group) entry).getFullName()
+                            : entry.getName());
         sb.append(HtmlUtil.mouseClickHref(HtmlUtil.call("selectClick",
-                                                        HtmlUtil.squote(target) + ","
-                                                        + HtmlUtil.squote(entry.getId())
-                                                        + "," + HtmlUtil.squote(value)
-                                                        + "," + HtmlUtil.squote(type)), linkText));
+                HtmlUtil.squote(target) + ","
+                + HtmlUtil.squote(entry.getId()) + ","
+                + HtmlUtil.squote(value) + ","
+                + HtmlUtil.squote(type)), linkText));
 
 
         sb.append(HtmlUtil.br());
-        sb.append(HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,"display:none;visibility:hidden",
-                                                 HtmlUtil.ATTR_CLASS,"folderblock",HtmlUtil.ATTR_ID,uid)));
+        sb.append(HtmlUtil.div("",
+                               HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
+                                   "display:none;visibility:hidden",
+                                   HtmlUtil.ATTR_CLASS, "folderblock",
+                                   HtmlUtil.ATTR_ID, uid)));
         return sb.toString();
     }
 
@@ -662,7 +724,7 @@ public class OutputHandler extends RepositoryManager implements
     public void applySettings(Request request) throws Exception {}
 
 
-    /** _more_          */
+    /** _more_ */
     public static int entryCnt = 0;
 
     /**
@@ -681,10 +743,14 @@ public class OutputHandler extends RepositoryManager implements
         StringBuffer formSB = new StringBuffer();
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        "getentries"));
-        List<OutputType> outputList = getRepository().getOutputTypes(request,
-                                          new State(entries));
+        List<Link> links = getRepository().getOutputLinks(request,
+                               new State(entries));
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-        for (OutputType outputType : outputList) {
+        for (Link link : links) {
+            OutputType outputType = link.getOutputType();
+            if (outputType == null) {
+                continue;
+            }
             tfos.add(new TwoFacedObject(outputType.getLabel(),
                                         outputType.getId()));
         }
@@ -757,9 +823,10 @@ public class OutputHandler extends RepositoryManager implements
             base = tuple[1];
             sb.append(tuple[2]);
         }
-        sb.append("<ul" + HtmlUtil.cssClass("folderblock") + HtmlUtil.style("list-style-image : url("
-                                                                            + getRepository().fileUrl(ICON_BLANK) + ")")+
-                  ">");
+        sb.append("<ul" + HtmlUtil.cssClass("folderblock")
+                  + HtmlUtil.style("list-style-image : url("
+                                   + getRepository().fileUrl(ICON_BLANK)
+                                   + ")") + ">");
 
         //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         int          cnt  = 0;
@@ -824,38 +891,36 @@ public class OutputHandler extends RepositoryManager implements
      * @param request _more_
      * @param output _more_
      * @param outputTypes _more_
+     * @param links _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected List getHeader(Request request, OutputType output,
-                             List<OutputType> outputTypes)
+                             List<Link> links)
             throws Exception {
 
         List   items          = new ArrayList();
-        String initialOutput  = request.getString(ARG_OUTPUT, "");
         Object initialMessage = request.remove(ARG_MESSAGE);
         String onLinkTemplate =
             getRepository().getProperty("ramadda.html.sublink.on", "");
         String offLinkTemplate =
             getRepository().getProperty("ramadda.html.sublink.off", "");
-        for (OutputType outputType : outputTypes) {
-            request.put(ARG_OUTPUT, outputType);
-            String url   = outputType.assembleUrl(request);
-            String label = msg(outputType.getLabel());
-            String template;
-            if (outputType.equals(output)) {
+        for (Link link : links) {
+            OutputType outputType = link.getOutputType();
+            String     url        = link.getUrl();
+            String     template;
+            if (Misc.equals(outputType, output)) {
                 template = onLinkTemplate;
             } else {
                 template = offLinkTemplate;
             }
-            String html = template.replace("${label}", label);
+            String html = template.replace("${label}", link.getLabel());
             html = html.replace("${url}", url);
             html = html.replace("${root}", getRepository().getUrlBase());
             items.add(html);
         }
-        request.put(ARG_OUTPUT, initialOutput);
         if (initialMessage != null) {
             request.put(ARG_MESSAGE, initialMessage);
         }
@@ -918,62 +983,65 @@ public class OutputHandler extends RepositoryManager implements
 
 
 
+    /** _more_          */
     public static final String RESOURCE_ENTRYTEMPLATE = "entrytemplate.txt";
+
+    /** _more_          */
     public static final String RESOURCE_GROUPTEMPLATE = "grouptemplate.txt";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ENTRY = "entry";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_REQUEST = "request";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_IMPORT = "import";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_TOOLBAR = "toolbar";
 
+    /** _more_          */
     public static final String WIKIPROP_BREADCRUMBS = "breadcrumbs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_INFORMATION = "information";
 
+    /** _more_          */
     public static final String WIKIPROP_IMAGE = "image";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_DESCRIPTION = "description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_ACTIONS = "actions";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_ = "";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_CHILDREN_GROUPS = "subgroups";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_CHILDREN_ENTRIES = "subentries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_CHILDREN = "children";
 
     //        WIKIPROP_IMPORT = "import";
-    public static final String []WIKIPROPS ={
-        WIKIPROP_INFORMATION,
-        WIKIPROP_NAME,
-        WIKIPROP_DESCRIPTION,
-        WIKIPROP_BREADCRUMBS,
-        WIKIPROP_TOOLBAR,
-        WIKIPROP_IMAGE,
-        WIKIPROP_ACTIONS/*,
-        WIKIPROP_CHILDREN_GROUPS,
-        WIKIPROP_CHILDREN_ENTRIES,
-        WIKIPROP_CHILDREN*/
+
+    /** _more_          */
+    public static final String[] WIKIPROPS = {
+        WIKIPROP_INFORMATION, WIKIPROP_NAME, WIKIPROP_DESCRIPTION,
+        WIKIPROP_BREADCRUMBS, WIKIPROP_TOOLBAR, WIKIPROP_IMAGE,
+        WIKIPROP_ACTIONS  /*,
+          WIKIPROP_CHILDREN_GROUPS,
+          WIKIPROP_CHILDREN_ENTRIES,
+          WIKIPROP_CHILDREN*/
     };
 
 
@@ -997,41 +1065,44 @@ public class OutputHandler extends RepositoryManager implements
             Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
             //Check for infinite loop
             property = property.trim();
-            if(property.length()==0) {
+            if (property.length() == 0) {
                 return "";
             }
-            if(request.getExtraProperty(property)!=null) {
-                return "<b>Detected circular wiki import:" + property+"</b>";
+            if (request.getExtraProperty(property) != null) {
+                return "<b>Detected circular wiki import:" + property
+                       + "</b>";
             }
-            request.putExtraProperty(property,property);
+            request.putExtraProperty(property, property);
 
-            List<String>toks = StringUtil.splitUpTo(property," ",2);
-            System.err.println("toks:" + toks);
-            String tag = toks.get(0);
-            String remainder = "";
-            if(toks.size()>1)
-                remainder  = toks.get(1);
+            List<String> toks      = StringUtil.splitUpTo(property, " ", 2);
+            String       tag       = toks.get(0);
+            String       remainder = "";
+            if (toks.size() > 1) {
+                remainder = toks.get(1);
+            }
             Entry theEntry = entry;
             if (tag.equals(WIKIPROP_IMPORT)) {
-                toks = StringUtil.splitUpTo(remainder," ",3);
-                if(toks.size()!=2) {
-                    return "<b>Incorrect import specification:" + property+"</b>";
+                toks = StringUtil.splitUpTo(remainder, " ", 3);
+                if (toks.size() < 2) {
+                    return "<b>Incorrect import specification:" + property
+                           + "</b>";
                 }
                 String id = toks.get(0).trim();
                 tag = toks.get(1).trim();
-                if(toks.size()==3)
-                    remainder  = toks.get(2);
-                else 
-                    remainder  = "";
+                if (toks.size() == 3) {
+                    remainder = toks.get(2);
+                } else {
+                    remainder = "";
+                }
                 theEntry = getEntryManager().getEntry(request, id);
-                if(theEntry==null) {
-                    return "<b>Could not find entry&lt;" + id +"&gt;</b>";
+                if (theEntry == null) {
+                    return "<b>Could not find entry&lt;" + id + "&gt;</b>";
                 }
             }
             Hashtable props = new Hashtable();
             props = StringUtil.parseHtmlProperties(remainder);
-            String include = handleWikiImport(wikiUtil, request, theEntry,tag,
-                                              props);
+            String include = handleWikiImport(wikiUtil, request, theEntry,
+                                 tag, props);
             if (include != null) {
                 return include;
             }
@@ -1051,7 +1122,7 @@ public class OutputHandler extends RepositoryManager implements
      *
      * @return _more_
      */
-    public  String getImageUrl(Request request, Entry entry) {
+    public String getImageUrl(Request request, Entry entry) {
         if ( !entry.getResource().isImage()) {
             if (entry.hasAreaDefined()) {
                 return request.url(repository.URL_GETMAP, ARG_SOUTH,
@@ -1075,46 +1146,53 @@ public class OutputHandler extends RepositoryManager implements
      * @param request _more_
      * @param entry _more_
      * @param include _more_
+     * @param props _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public String getWikiInclude(WikiUtil wikiUtil, Request request,
-                                 Entry entry, String include,Hashtable props)
+                                 Entry entry, String include, Hashtable props)
             throws Exception {
-        boolean open =  Misc.getProperty(props,"open",true);
-        boolean inBlock = Misc.getProperty(props,"showhide",true);
-        String blockContent = null;
-        String blockTitle = "";
-        boolean doBG= true;
+
+        boolean open         = Misc.getProperty(props, "open", true);
+        boolean inBlock      = Misc.getProperty(props, "showhide", true);
+        String  blockContent = null;
+        String  blockTitle   = "";
+        boolean doBG         = true;
 
         if (include.equals(WIKIPROP_INFORMATION)) {
-            blockContent  = getRepository().getHtmlOutputHandler().getInformationTabs(
-                                                                                      request, entry, true);
-            blockTitle = Misc.getProperty(props,"title",msg("Information"));
-        } else  if (include.equals(WIKIPROP_IMAGE)) {
-            if(!entry.getResource().isImage()) {
+            blockContent =
+                getRepository().getHtmlOutputHandler().getInformationTabs(
+                    request, entry, true);
+            blockTitle = Misc.getProperty(props, "title", msg("Information"));
+        } else if (include.equals(WIKIPROP_IMAGE)) {
+            if ( !entry.getResource().isImage()) {
                 return "Not an image";
             }
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         } else if (include.equals(WIKIPROP_ACTIONS)) {
-            blockTitle = Misc.getProperty(props,"title",msg("Actions"));
-            blockContent =  getEntryManager().getEntryActionsList(request, entry);
-        } else  if (include.equals(WIKIPROP_TOOLBAR)) {
+            blockTitle = Misc.getProperty(props, "title", msg("Actions"));
+            blockContent = getEntryManager().getEntryActionsList(request,
+                    entry);
+        } else if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryActionsToolbar(request, entry,
                     false);
         } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
             return getEntryManager().getBreadCrumbs(request, entry);
-        } else  if (include.equals(WIKIPROP_DESCRIPTION)) {
+        } else if (include.equals(WIKIPROP_DESCRIPTION)) {
             return entry.getDescription();
-        }else  if (include.equals(WIKIPROP_NAME)) {
+        } else if (include.equals(WIKIPROP_NAME)) {
             return entry.getName();
-        } else  if (include.equals(WIKIPROP_CHILDREN_GROUPS)) {
+        } else if (include.equals(WIKIPROP_CHILDREN_GROUPS)) {
             doBG = false;
-            List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_subgroups");
-            if(children==null) {
-                children = getEntryManager().getChildrenGroups(request, entry);
+            List<Entry> children =
+                (List<Entry>) wikiUtil.getProperty(entry.getId()
+                    + "_subgroups");
+            if (children == null) {
+                children = getEntryManager().getChildrenGroups(request,
+                        entry);
             }
             if (children.size() == 0) {
                 return "";
@@ -1123,12 +1201,16 @@ public class OutputHandler extends RepositoryManager implements
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
             blockContent = sb.toString();
-            blockTitle= Misc.getProperty(props,"title",msg("Groups"))+link;
-        } else    if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
+            blockTitle = Misc.getProperty(props, "title", msg("Groups"))
+                         + link;
+        } else if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
             doBG = false;
-            List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_subentries");
-            if(children==null) {
-                children = getEntryManager().getChildrenEntries(request, entry);
+            List<Entry> children =
+                (List<Entry>) wikiUtil.getProperty(entry.getId()
+                    + "_subentries");
+            if (children == null) {
+                children = getEntryManager().getChildrenEntries(request,
+                        entry);
             }
             if (children.size() == 0) {
                 return "";
@@ -1138,14 +1220,18 @@ public class OutputHandler extends RepositoryManager implements
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
             blockContent = sb.toString();
-            blockTitle= Misc.getProperty(props,"title",msg("Entries"))+link;
+            blockTitle = Misc.getProperty(props, "title", msg("Entries"))
+                         + link;
             blockContent = sb.toString();
-            blockTitle= Misc.getProperty(props,"title",msg("Groups"))+link;
-        } else  if (include.equals(WIKIPROP_CHILDREN)) {
+            blockTitle = Misc.getProperty(props, "title", msg("Groups"))
+                         + link;
+        } else if (include.equals(WIKIPROP_CHILDREN)) {
             doBG = false;
             StringBuffer sb = new StringBuffer();
-            List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_children");
-            if(children==null) {
+            List<Entry> children =
+                (List<Entry>) wikiUtil.getProperty(entry.getId()
+                    + "_children");
+            if (children == null) {
                 children = getEntryManager().getChildren(request, entry);
             }
 
@@ -1155,16 +1241,23 @@ public class OutputHandler extends RepositoryManager implements
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
             blockContent = sb.toString();
-            blockTitle= Misc.getProperty(props,"title",msg("Children"))+link;
+            blockTitle = Misc.getProperty(props, "title", msg("Children"))
+                         + link;
         } else {
             return null;
         }
-        if(!inBlock) return blockContent;
-        if(doBG) 
-            return HtmlUtil.makeShowHideBlock(blockTitle,blockContent,
-                                              open,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
-        else
-            return HtmlUtil.makeShowHideBlock(blockTitle,blockContent, open);
+
+        if ( !inBlock) {
+            return blockContent;
+        }
+        if (doBG) {
+            return HtmlUtil.makeShowHideBlock(blockTitle, blockContent, open,
+                    HtmlUtil.cssClass("wiki-tocheader"),
+                    HtmlUtil.cssClass("wiki-toc"));
+        } else {
+            return HtmlUtil.makeShowHideBlock(blockTitle, blockContent, open);
+        }
+
 
     }
 
@@ -1177,20 +1270,22 @@ public class OutputHandler extends RepositoryManager implements
      * @param request _more_
      * @param importEntry _more_
      * @param property _more_
+     * @param tag _more_
+     * @param props _more_
      *
      * @return _more_
      */
     public String handleWikiImport(WikiUtil wikiUtil, Request request,
-                                   Entry importEntry, String tag, Hashtable props) {
+                                   Entry importEntry, String tag,
+                                   Hashtable props) {
         try {
             String include = getWikiInclude(wikiUtil, request, importEntry,
-                                            tag,props);
+                                            tag, props);
             if (include != null) {
                 return include;
             }
 
-            OutputHandler handler =
-                getRepository().getOutputHandler(tag);
+            OutputHandler handler = getRepository().getOutputHandler(tag);
             if (handler == null) {
                 return null;
             }
@@ -1217,18 +1312,19 @@ public class OutputHandler extends RepositoryManager implements
                 Result result = getEntryManager().processEntryShow(request,
                                     importEntry);
                 propertyValue = new String(result.getContent());
-                title = result.getTitle();
+                title         = result.getTitle();
 
-                title = Misc.getProperty(props,"title",title);
+                title         = Misc.getProperty(props, "title", title);
             }
 
-            boolean open =  Misc.getProperty(props,"open",true);
+            boolean open = Misc.getProperty(props, "open", true);
             request.put(ARG_OUTPUT, originalOutput);
             request.put(ARG_ENTRYID, originalId);
             request.remove(ARG_EMBEDDED);
-            if(title!=null) {
-                return HtmlUtil.makeShowHideBlock(title,propertyValue, 
-                                                  open,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
+            if (title != null) {
+                return HtmlUtil.makeShowHideBlock(title, propertyValue, open,
+                        HtmlUtil.cssClass("wiki-tocheader"),
+                        HtmlUtil.cssClass("wiki-toc"));
             }
             return propertyValue;
         } catch (Exception exc) {
@@ -1301,10 +1397,8 @@ public class OutputHandler extends RepositoryManager implements
             }
 
             String url = request.url(getRepository().URL_ENTRY_FORM,
-                                     ARG_NAME,name,
-                                     ARG_GROUP,
-                                     parent.getId(),
-                                     ARG_TYPE,
+                                     ARG_NAME, name, ARG_GROUP,
+                                     parent.getId(), ARG_TYPE,
                                      WikiPageTypeHandler.TYPE_WIKIPAGE);
 
             return HtmlUtil.href(url, name,
@@ -1329,36 +1423,48 @@ public class OutputHandler extends RepositoryManager implements
      */
     public String wikifyEntry(Request request, Entry entry,
                               String wikiContent)
-        throws Exception {
-        return wikifyEntry(request, entry, wikiContent, null,null);
+            throws Exception {
+        return wikifyEntry(request, entry, wikiContent, null, null);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param wikiContent _more_
+     * @param subGroups _more_
+     * @param subEntries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String wikifyEntry(Request request, Entry entry,
-                              String wikiContent,
-                              List<Group> subGroups,
+                              String wikiContent, List<Group> subGroups,
                               List<Entry> subEntries)
             throws Exception {
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
                                 PROP_REQUEST,
                                 request, PROP_ENTRY, entry }));
         List children = new ArrayList();
-        if(subGroups!=null) {
-            wikiUtil.putProperty(entry.getId()+"_subgroups",subGroups);
+        if (subGroups != null) {
+            wikiUtil.putProperty(entry.getId() + "_subgroups", subGroups);
             children.addAll(subGroups);
         }
 
-        if(subEntries!=null) {
-            wikiUtil.putProperty(entry.getId()+"_subentries",subEntries);
+        if (subEntries != null) {
+            wikiUtil.putProperty(entry.getId() + "_subentries", subEntries);
             children.addAll(subEntries);
         }
 
-        wikiUtil.putProperty(entry.getId()+"_children",children);
+        wikiUtil.putProperty(entry.getId() + "_children", children);
 
 
         //TODO: We need to keep track of what is getting called so we prevent
         //infinite loops
-        String content =wikiUtil.wikify(wikiContent, this);
+        String content = wikiUtil.wikify(wikiContent, this);
         return HtmlUtil.div(content, HtmlUtil.cssClass("wikicontent"));
 
     }

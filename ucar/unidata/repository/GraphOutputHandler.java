@@ -84,7 +84,9 @@ public class GraphOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
-                                                      "graph.graph", true);
+                                                      "graph.graph",
+                                                      OutputType.TYPE_HTML,
+                                                      "", ICON_GRAPH);
 
 
 
@@ -111,23 +113,17 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param state _more_
      * @param links _more_
      * @param forHeader _more_
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
+    protected void getEntryLinks(Request request, State state,
                                  List<Link> links, boolean forHeader)
             throws Exception {
-        if ( !getRepository().isAppletEnabled(request)) {
-            return;
-        }
-
-        if (getRepository().isOutputTypeOK(OUTPUT_GRAPH)) {
-            String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry, ARG_OUTPUT, OUTPUT_GRAPH);
-            links.add(new Link(url, getRepository().fileUrl(ICON_GRAPH),
-                               "Show in graph"));
+        if (state.getEntry() != null) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_GRAPH));
         }
     }
 

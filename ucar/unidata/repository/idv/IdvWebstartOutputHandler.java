@@ -83,7 +83,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_WEBSTART = new OutputType("View in IDV","idv.webstart",false);
+    public static final OutputType OUTPUT_WEBSTART = new OutputType("View in IDV","idv.webstart",OutputType.TYPE_NONHTML,"","/icons/idv.gif");
 
 
 
@@ -110,21 +110,21 @@ public class IdvWebstartOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void addOutputTypes(Request request,
-                                  State state, 
-                                  List<OutputType> types) throws Exception {
-        if(state.entry==null) return;
-        Entry entry = state.entry;
-        if(entry.getResource().getPath().endsWith(".xidv") ||
-           entry.getResource().getPath().endsWith(".zidv")) {
-            String suffix = "/"+entry.getId()+".jnlp";
-            types.add(new OutputType(OUTPUT_WEBSTART, suffix));
-        } else {
-            DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
-            if(data !=null) {
+    protected void getEntryLinks(Request request, State state,
+                                 List<Link> links, boolean forHeader)
+            throws Exception {
+            if(state.entry==null) return;
+            Entry entry = state.entry;
+            if(entry.getResource().getPath().endsWith(".xidv") ||
+               entry.getResource().getPath().endsWith(".zidv")) {
+                String suffix = "/"+entry.getId()+".jnlp";
+                links.add(makeLink(request, state.getEntry(),OUTPUT_WEBSTART,suffix));
+            } else {
+                DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
+                if(data !=null) {
                 if(data.canLoadAsCdm(entry)) {
                     String suffix = "/"+entry.getId()+".jnlp";
-                    types.add(new OutputType(OUTPUT_WEBSTART, suffix));
+                    links.add(makeLink(request, state.getEntry(),OUTPUT_WEBSTART,suffix));
                 }
             }
 

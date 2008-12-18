@@ -28,13 +28,13 @@ import org.w3c.dom.*;
 
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.sql.PreparedStatement;
@@ -59,9 +59,10 @@ import java.util.Properties;
  */
 public class WikiPageTypeHandler extends GenericTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static String TYPE_WIKIPAGE = "wikipage";
 
+    /** _more_          */
     public static final String ARG_WIKI_TEXT = "wikipage.wikitext";
 
     /**
@@ -79,35 +80,66 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result getHtmlDisplay(Request request, Entry entry)
+            throws Exception {
+        return getRepository().getOutputHandler(
+            WikiOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
+    }
+
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
     private void initWikiTable(Element node) throws Exception {
         Statement statement = getDatabaseManager().createStatement();
 
         StringBuffer tableDef = new StringBuffer("CREATE TABLE "
-                                    + getTableName()+"_history" + " (\n");
+                                    + getTableName() + "_history" + " (\n");
 
         tableDef.append(COL_ID + " varchar(200),");
         tableDef.append(COL_ID + " varchar(200),");
         tableDef.append(")");
         try {
             statement.execute(tableDef.toString());
-        } catch (Throwable exc) {
-        }
+        } catch (Throwable exc) {}
         statement.close();
     }
 
 
 
-    public void initializeEntry(Request request, Entry entry) throws Exception {
-        super.initializeEntry(request,entry);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initializeEntry(Request request, Entry entry)
+            throws Exception {
+        super.initializeEntry(request, entry);
         //        System.err.println(" entry:" + entry);
 
-        Object[]values = entry.getValues();
-        if(values!=null && values.length>1 && values[0]!=null) {
-            String wikiText = (String)values[0];
-            
-            
+        Object[] values = entry.getValues();
+        if ((values != null) && (values.length > 1) && (values[0] != null)) {
+            String wikiText = (String) values[0];
+
+
             //            System.err.println(" got text:" + wikiText);
-        //            String wikiText = (String)values[0];
+            //            String wikiText = (String)values[0];
         }
 
     }
@@ -125,143 +157,207 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public void addToEntryForm(Request request, StringBuffer sb, Entry entry)
             throws Exception {
+
         String size = HtmlUtil.SIZE_70;
         String name;
-        if(entry!=null) {
-            name =entry.getName();
+        if (entry != null) {
+            name = entry.getName();
         } else {
-            name =request.getString(ARG_NAME,"");
+            name = request.getString(ARG_NAME, "");
             List tmp = new ArrayList();
-            for(String tok: (List<String>)StringUtil.split(name," ", true,true)) {
+            for (String tok : (List<String>) StringUtil.split(name, " ",
+                    true, true)) {
                 tmp.add(StringUtil.camelCase(tok));
             }
-            name = StringUtil.join(" ",tmp);
+            name = StringUtil.join(" ", tmp);
         }
         sb.append(HtmlUtil.formEntry(msgLabel("Wiki Page Title"),
                                      HtmlUtil.input(ARG_NAME, name, size)));
         String wikiText = "";
-        if(entry!=null) {
-            Object[]values = entry.getValues();
-            if(values!=null && values.length>0 && values[0]!=null)
-                wikiText = (String)values[0];
+        if (entry != null) {
+            Object[] values = entry.getValues();
+            if ((values != null) && (values.length > 0)
+                    && (values[0] != null)) {
+                wikiText = (String) values[0];
+            }
         }
 
 
         StringBuffer help = new StringBuffer();
         help.append("<b>Import:</b><br>");
-        help.append("e.g., <i>{{property &lt;optional arguments&gt;}}</i><br>");
-        help.append("Or: <i>{{import entryid property &lt;arguments&gt;}}</i><br>");
+        help.append(
+            "e.g., <i>{{property &lt;optional arguments&gt;}}</i><br>");
+        help.append(
+            "Or: <i>{{import entryid property &lt;arguments&gt;}}</i><br>");
         help.append("<i>{{&lt;output identifier&gt;}}</i><br>");
 
 
         String select = OutputHandler.getSelect(request, ARG_WIKI_TEXT,
-                                                "Add link", true, "wikilink")+HtmlUtil.space(1) +
-            OutputHandler.getSelect(request, ARG_WIKI_TEXT,
-                                    "Add import entry", true, "entryid");
+                            "Add link", true, "wikilink") + HtmlUtil.space(1)
+                                + OutputHandler.getSelect(request,
+                                    ARG_WIKI_TEXT, "Add import entry", true,
+                                    "entryid");
 
         StringBuffer buttons = new StringBuffer();
-        buttons.append(addButton("button_bold.png","Bold text","\\'\\'\\'","\\'\\'\\'","Bold text","mw-editbutton-bold"));
-        buttons.append(addButton("button_italic.png","Italic text","\\'\\'","\\'\\'","Italic text","mw-editbutton-italic"));
-        buttons.append(addButton("button_link.png","Internal link","[[","]]","Link title","mw-editbutton-link"));
-        buttons.append(addButton("button_extlink.png","External link (remember http:// prefix)","[","]","http://www.example.com link title","mw-editbutton-extlink"));
-        buttons.append(addButton("button_headline.png","Level 2 headline","\\n== "," ==\\n","Headline text","mw-editbutton-headline"));
-        buttons.append(addButton("button_linebreak.png","Line break","<br>","","","mw-editbutton-headline"));
-        buttons.append(addButton("button_strike.png","Strike Through","<s>","</s>","Strike-through text","mw-editbutton-headline"));
-        buttons.append(addButton("button_upper_letter.png","Super Script","<sup>","</sup>","Super script text","mw-editbutton-headline"));
-        buttons.append(addButton("button_lower_letter.png","Sub Script","<sub>","</sub>","Subscript script text","mw-editbutton-headline"));
-        buttons.append(addButton("button_small.png","Small text","<small>","</small>","Small text","mw-editbutton-headline"));
-        buttons.append(addButton("button_blockquote.png","Insert block quote","<blockquote>","</blockquote>","Quoted text","mw-editbutton-headline"));
+        buttons.append(addButton("button_bold.png", "Bold text", "\\'\\'\\'",
+                                 "\\'\\'\\'", "Bold text",
+                                 "mw-editbutton-bold"));
+        buttons.append(addButton("button_italic.png", "Italic text",
+                                 "\\'\\'", "\\'\\'", "Italic text",
+                                 "mw-editbutton-italic"));
+        buttons.append(addButton("button_link.png", "Internal link", "[[",
+                                 "]]", "Link title", "mw-editbutton-link"));
+        buttons.append(addButton("button_extlink.png",
+                                 "External link (remember http:// prefix)",
+                                 "[", "]",
+                                 "http://www.example.com link title",
+                                 "mw-editbutton-extlink"));
+        buttons.append(addButton("button_headline.png", "Level 2 headline",
+                                 "\\n== ", " ==\\n", "Headline text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addButton("button_linebreak.png", "Line break",
+                                 "<br>", "", "", "mw-editbutton-headline"));
+        buttons.append(addButton("button_strike.png", "Strike Through",
+                                 "<s>", "</s>", "Strike-through text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addButton("button_upper_letter.png", "Super Script",
+                                 "<sup>", "</sup>", "Super script text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addButton("button_lower_letter.png", "Sub Script",
+                                 "<sub>", "</sub>", "Subscript script text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addButton("button_small.png", "Small text", "<small>",
+                                 "</small>", "Small text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addButton("button_blockquote.png",
+                                 "Insert block quote", "<blockquote>",
+                                 "</blockquote>", "Quoted text",
+                                 "mw-editbutton-headline"));
         //        buttons.append(addButton("button_image.png","Embedded file","[[File:","]]","Example.jpg","mw-editbutton-image"));
         //        buttons.append(addButton("button_media.png","File link","[[Media:","]]","Example.ogg","mw-editbutton-media"));
         //        buttons.append(addButton("button_nowiki.png","Ignore wiki formatting","\\x3cnowiki\\x3e","\\x3c/nowiki\\x3e","Insert non-formatted text here","mw-editbutton-nowiki"));
         //        buttons.append(addButton("button_sig.png","Your signature with timestamp","--~~~~","","","mw-editbutton-signature"));
-        buttons.append(addButton("button_hr.png","Horizontal line (use sparingly)","\\n----\\n","","","mw-editbutton-hr"));
+        buttons.append(addButton("button_hr.png",
+                                 "Horizontal line (use sparingly)",
+                                 "\\n----\\n", "", "", "mw-editbutton-hr"));
 
         StringBuffer propertyMenu = new StringBuffer();
-        StringBuffer importMenu = new StringBuffer();
-        for(int i=0;i<OutputHandler.WIKIPROPS.length;i++) {
+        StringBuffer importMenu   = new StringBuffer();
+        for (int i = 0; i < OutputHandler.WIKIPROPS.length; i++) {
             String prop = OutputHandler.WIKIPROPS[i];
-            String js = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
-                HtmlUtil.squote("{{") +","+
-                HtmlUtil.squote("}}") +","+
-                HtmlUtil.squote(prop)+");";
-            propertyMenu.append(HtmlUtil.href(js,prop));
+            String js = "javascript:insertTags("
+                        + HtmlUtil.squote(ARG_WIKI_TEXT) + ","
+                        + HtmlUtil.squote("{{") + "," + HtmlUtil.squote("}}")
+                        + "," + HtmlUtil.squote(prop) + ");";
+            propertyMenu.append(HtmlUtil.href(js, prop));
             propertyMenu.append(HtmlUtil.br());
 
-            String js2 = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
-                HtmlUtil.squote("{{import ") +","+
-                HtmlUtil.squote(" " + prop+"}}") +","+
-                HtmlUtil.squote(" entryid ")+");";
-            importMenu.append(HtmlUtil.href(js2,prop));
+            String js2 = "javascript:insertTags("
+                         + HtmlUtil.squote(ARG_WIKI_TEXT) + ","
+                         + HtmlUtil.squote("{{import ") + ","
+                         + HtmlUtil.squote(" " + prop + "}}") + ","
+                         + HtmlUtil.squote(" entryid ") + ");";
+            importMenu.append(HtmlUtil.href(js2, prop));
             importMenu.append(HtmlUtil.br());
         }
 
-        List<OutputType> types = getRepository().getOutputTypes(request,
-                                                                new OutputHandler.State(entry));
+        List<Link> links = getRepository().getOutputLinks(request,
+                               new OutputHandler.State(entry));
 
 
         propertyMenu.append("<hr>");
-        for(OutputType type: types) {
-            String prop = type.getId();
-            String js = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
-                HtmlUtil.squote("{{") +","+
-                HtmlUtil.squote("}}") +","+
-                HtmlUtil.squote(prop)+");";
-            propertyMenu.append(HtmlUtil.href(js,type.getLabel()));
+        for (Link link : links) {
+            if (link.getOutputType() == null) {
+                continue;
+            }
+
+            String prop = link.getOutputType().getId();
+            String js = "javascript:insertTags("
+                        + HtmlUtil.squote(ARG_WIKI_TEXT) + ","
+                        + HtmlUtil.squote("{{") + "," + HtmlUtil.squote("}}")
+                        + "," + HtmlUtil.squote(prop) + ");";
+            propertyMenu.append(HtmlUtil.href(js, link.getLabel()));
             propertyMenu.append(HtmlUtil.br());
         }
 
 
-        List<OutputType> allTypes = getRepository().getOutputTypes();
+
         StringBuffer importOutputMenu = new StringBuffer();
-        //        importMenu.append("<hr>");
-        for(OutputType type: allTypes) {
-            String prop = type.getId();
-            String js = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
-                HtmlUtil.squote("{{import ") +","+
-                HtmlUtil.squote(" " + type.getId()+" }}") +","+
-                HtmlUtil.squote("entryid")+");";
-            importOutputMenu.append(HtmlUtil.href(js,type.getLabel()));
-            importOutputMenu.append(HtmlUtil.br());
-        }
+        /*
+                List<OutputType> allTypes = getRepository().getOutputTypes();
+                //        importMenu.append("<hr>");
+                for(OutputType type: allTypes) {
+                    String prop = type.getId();
+                    String js = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
+                        HtmlUtil.squote("{{import ") +","+
+                        HtmlUtil.squote(" " + type.getId()+" }}") +","+
+                        HtmlUtil.squote("entryid")+");";
+                    importOutputMenu.append(HtmlUtil.href(js,type.getLabel()));
+                    importOutputMenu.append(HtmlUtil.br());
+                }
+        */
 
 
-
-        String propertyMenuLabel = HtmlUtil.img(fileUrl("/icons/wiki/button_property.png"),"Add Entry Property");
-        String propertyButton = getRepository().makeMenuPopupLink(propertyMenuLabel, propertyMenu.toString());
+        String propertyMenuLabel =
+            HtmlUtil.img(fileUrl("/icons/wiki/button_property.png"),
+                         "Add Entry Property");
+        String propertyButton =
+            getRepository().makeMenuPopupLink(propertyMenuLabel,
+                propertyMenu.toString());
         buttons.append(propertyButton);
-        String importMenuLabel = HtmlUtil.img(fileUrl("/icons/wiki/button_import.png"),"Import Entry Property");
-        String importButton = getRepository().makeMenuPopupLink(importMenuLabel,         HtmlUtil.hbox(importMenu.toString(),importOutputMenu.toString()));
+        String importMenuLabel =
+            HtmlUtil.img(fileUrl("/icons/wiki/button_import.png"),
+                         "Import Entry Property");
+        String importButton =
+            getRepository().makeMenuPopupLink(importMenuLabel,
+                HtmlUtil.hbox(importMenu.toString(),
+                              importOutputMenu.toString()));
         buttons.append(importButton);
         buttons.append(HtmlUtil.space(2));
         buttons.append(select);
 
 
-        String textWidget = buttons+HtmlUtil.br()+HtmlUtil.textArea(ARG_WIKI_TEXT,
-                                              wikiText,
-                                              200, 80,
-                                              HtmlUtil.id(ARG_WIKI_TEXT));
-        String right =  HtmlUtil.div(help.toString(),HtmlUtil.cssClass("smallhelp"));
+        String textWidget = buttons + HtmlUtil.br()
+                            + HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 200,
+                                80, HtmlUtil.id(ARG_WIKI_TEXT));
+        String right = HtmlUtil.div(help.toString(),
+                                    HtmlUtil.cssClass("smallhelp"));
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget
                      + "</td><td>" + right + "</td></tr></table>";
         sb.append(HtmlUtil.formEntryTop(msgLabel("Wiki Text"), textWidget));
+
     }
 
 
 
-    private String addButton(String icon,String label,String prefix, String suffix,String example,String huh) {
-        String prop = prefix + example +suffix;
+    /**
+     * _more_
+     *
+     * @param icon _more_
+     * @param label _more_
+     * @param prefix _more_
+     * @param suffix _more_
+     * @param example _more_
+     * @param huh _more_
+     *
+     * @return _more_
+     */
+    private String addButton(String icon, String label, String prefix,
+                             String suffix, String example, String huh) {
+        String prop = prefix + example + suffix;
         String js;
-        if(suffix.length()==0) {
-            js = "javascript:insertText(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
-                HtmlUtil.squote(prop)+");";
+        if (suffix.length() == 0) {
+            js = "javascript:insertText(" + HtmlUtil.squote(ARG_WIKI_TEXT)
+                 + "," + HtmlUtil.squote(prop) + ");";
         } else {
-            js = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)+"," +
-                HtmlUtil.squote(prefix) +","+
-                HtmlUtil.squote(suffix) +","+
-                HtmlUtil.squote(example)+");";
+            js = "javascript:insertTags(" + HtmlUtil.squote(ARG_WIKI_TEXT)
+                 + "," + HtmlUtil.squote(prefix) + ","
+                 + HtmlUtil.squote(suffix) + "," + HtmlUtil.squote(example)
+                 + ");";
         }
-        return HtmlUtil.href(js,HtmlUtil.img(fileUrl("/icons/wiki/" + icon), label));
+        return HtmlUtil.href(js,
+                             HtmlUtil.img(fileUrl("/icons/wiki/" + icon),
+                                          label));
 
     }
 

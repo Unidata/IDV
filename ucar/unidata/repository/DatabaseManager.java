@@ -878,15 +878,23 @@ public class DatabaseManager extends RepositoryManager {
      * @return _more_
      */
     protected String convertType(String type) {
-        return convertType(type,-1);
+        return convertType(type, -1);
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param size _more_
+     *
+     * @return _more_
+     */
     protected String convertType(String type, int size) {
-        if(type.equals("clob")) {
-            if ( db.equals(DB_DERBY)) {
+        if (type.equals("clob")) {
+            if (db.equals(DB_DERBY)) {
                 return "clob(" + size + ") ";
-            } 
-            if ( db.equals(DB_MYSQL)) {
+            }
+            if (db.equals(DB_MYSQL)) {
                 return "mediumtext";
             }
             if (db.equals(DB_POSTGRES)) {

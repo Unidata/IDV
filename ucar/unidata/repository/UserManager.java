@@ -77,7 +77,8 @@ public class UserManager extends RepositoryManager {
 
     /** _more_ */
     public static final OutputType OUTPUT_CART = new OutputType("User Cart",
-                                                     "user.cart", true);
+                                                     "user.cart",
+                                                     OutputType.TYPE_HTML);
 
     /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";
@@ -742,7 +743,7 @@ public class UserManager extends RepositoryManager {
             List<String> roles =
                 StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
                                  true, true);
-            
+
             user.setRoles(roles);
             setRoles(request, user);
         }
@@ -750,15 +751,25 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param user _more_
+     *
+     * @throws Exception _more_
+     */
     private void setRoles(Request request, User user) throws Exception {
         deleteRoles(user);
-        if(user.getRoles()==null) return;
+        if (user.getRoles() == null) {
+            return;
+        }
         for (String role : user.getRoles()) {
             getDatabaseManager().executeInsert(Tables.USERROLES.INSERT,
-                        new Object[] { user.getId(),
-                                       role });
+                    new Object[] { user.getId(),
+                                   role });
         }
-   }
+    }
 
     /**
      * _more_
@@ -907,11 +918,11 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserNew(Request request) throws Exception {
 
-        String       id          = "";
-        String       name        = "";
-        String       email       = "";
-        String       password1   = "";
-        String       password2   = "";
+        String       id        = "";
+        String       name      = "";
+        String       email     = "";
+        String       password1 = "";
+        String       password2 = "";
         List<String> roles;
 
         boolean      admin       = false;
@@ -946,8 +957,8 @@ public class UserManager extends RepositoryManager {
                 email     = ((toks.size() >= 4)
                              ? toks.get(3)
                              : "");
-                roles =  new ArrayList<String>();
-                for(int i=4;i<toks.size();i++) {
+                roles     = new ArrayList<String>();
+                for (int i = 4; i < toks.size(); i++) {
                     roles.add(toks.get(i));
                 }
                 if (findUser(id) != null) {
@@ -1138,7 +1149,8 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserList(Request request) throws Exception {
 
-        Hashtable<String,StringBuffer> rolesMap = new Hashtable<String,StringBuffer>();
+        Hashtable<String, StringBuffer> rolesMap = new Hashtable<String,
+                                                       StringBuffer>();
         List<String> rolesList = new ArrayList<String>();
         StringBuffer usersHtml = new StringBuffer();
         StringBuffer rolesHtml = new StringBuffer();
@@ -1188,34 +1200,36 @@ public class UserManager extends RepositoryManager {
 
             List<String> roles = user.getRoles();
             if (roles != null) {
-                for(String role: roles) {
+                for (String role : roles) {
                     StringBuffer rolesSB = rolesMap.get(role);
-                    if(rolesSB==null) {
-                        rolesSB= new StringBuffer("");
+                    if (rolesSB == null) {
+                        rolesSB = new StringBuffer("");
                         rolesList.add(role);
                         rolesMap.put(role, rolesSB);
                     }
                     rolesSB.append("<li> ");
-                    rolesSB.append(userEditLink + HtmlUtil.space(2) + user.getName());
+                    rolesSB.append(userEditLink + HtmlUtil.space(2)
+                                   + user.getName());
                 }
             }
         }
         usersHtml.append("</table>");
 
-        for(String role: rolesList) {
+        for (String role : rolesList) {
             StringBuffer rolesSB = rolesMap.get(role);
-            rolesHtml.append(HtmlUtil.makeShowHideBlock(role,"<ul>"+rolesSB.toString()+"</ul>",false));
+            rolesHtml.append(HtmlUtil.makeShowHideBlock(role,
+                    "<ul>" + rolesSB.toString() + "</ul>", false));
         }
-        if(rolesList.size()==0) {
+        if (rolesList.size() == 0) {
             rolesHtml.append(msg("No roles"));
         }
 
 
 
 
-        StringBuffer sb = new StringBuffer();
-        List tabTitles = new ArrayList();
-        List tabContent = new ArrayList();
+        StringBuffer sb         = new StringBuffer();
+        List         tabTitles  = new ArrayList();
+        List         tabContent = new ArrayList();
 
         tabTitles.add(msg("User List"));
         tabContent.add(usersHtml.toString());
@@ -1229,7 +1243,7 @@ public class UserManager extends RepositoryManager {
 
 
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.makeTabs(tabTitles, tabContent, true)); 
+        sb.append(HtmlUtil.makeTabs(tabTitles, tabContent, true));
 
         Result result = new Result(msg("Users"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
@@ -1396,11 +1410,14 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.space(1));
             sb.append(msgLabel("As"));
             sb.append(HtmlUtil.space(1));
-            List<OutputType> outputList =
-                getRepository().getOutputTypes(request,
-                    new OutputHandler.State(entries));
+            List<Link> links = getRepository().getOutputLinks(request,
+                                   new OutputHandler.State(entries));
             List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-            for (OutputType outputType : outputList) {
+            for (Link link : links) {
+                OutputType outputType = link.getOutputType();
+                if (outputType == null) {
+                    continue;
+                }
                 tfos.add(new TwoFacedObject(outputType.getLabel(),
                                             outputType.getId()));
             }

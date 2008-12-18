@@ -82,6 +82,7 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
+    /** _more_          */
     public static final String TYPE_CLOB = "clob";
 
     /** _more_ */
@@ -478,8 +479,9 @@ public class Column implements Constants {
         if (type.equals(TYPE_STRING)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_CLOB)) {
-            String clobType = typeHandler.getRepository().getDatabaseManager().convertType(
-                                                                                           "clob",size);
+            String clobType =
+                typeHandler.getRepository().getDatabaseManager().convertType(
+                    "clob", size);
             defineColumn(statement, name, clobType);
         } else if (type.equals(TYPE_ENUMERATION)) {
             defineColumn(statement, name, "varchar(" + size + ") ");

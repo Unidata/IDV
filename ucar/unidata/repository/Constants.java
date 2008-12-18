@@ -82,6 +82,9 @@ public interface Constants {
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
     /** _more_          */
+    public static final String ICON_CATALOG = "/icons/catalog.jpg";
+
+    /** _more_ */
     public static final String ICON_CHAT = "/icons/chat.gif";
 
     /** _more_ */
@@ -157,6 +160,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ICON_QUESTION = "/icons/question.png";
+
+    /** _more_          */
+    public static final String ICON_WIKI = "/icons/wiki.gif";
 
     /** _more_ */
     public static final String ICON_WARNING = "/icons/warning.png";
@@ -247,6 +253,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_FROMDATE = "fromdate";
 
+    /** _more_          */
     public static final String ATTR_SELECTTYPE = "selecttype";
 
 
@@ -323,10 +330,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DATASET = "dataset";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_WIKI_CREATE = "wiki.create";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_WIKI_TEXT = "wiki.text";
 
     /** _more_ */
@@ -562,7 +569,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_OUTPUT = "output";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EMBEDDED = "embedded";
 
     /** _more_ */
@@ -1184,19 +1191,19 @@ public interface Constants {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_USER_RESET_PASSWORD_TEMPLATE =
         "ramadda.user.reset.password.template";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_USER_RESET_PASSWORD_SUBJECT =
         "ramadda.user.reset.password.subject";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_USER_RESET_ID_TEMPLATE =
         "ramadda.user.reset.id.template";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_USER_RESET_ID_SUBJECT =
         "ramadda.user.reset.id.subject";
 
