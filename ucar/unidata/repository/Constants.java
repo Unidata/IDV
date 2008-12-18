@@ -330,6 +330,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DATASET = "dataset";
 
+    public static final String ARG_HEIGHT = "height";
+
     /** _more_ */
     public static final String ARG_WIKI_CREATE = "wiki.create";
 

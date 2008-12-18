@@ -1279,6 +1279,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                    Entry importEntry, String tag,
                                    Hashtable props) {
         try {
+            Request myRequest = new Request(getRepository(), request.getUser());
+
+
+            for (Enumeration keys =props.keys(); keys.hasMoreElements();) {
+                Object key = keys.nextElement();
+                myRequest.put(key, props.get(key));
+            }
+
+
+
             String include = getWikiInclude(wikiUtil, request, importEntry,
                                             tag, props);
             if (include != null) {
@@ -1295,32 +1305,40 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             String originalOutput = request.getString(ARG_OUTPUT,
                                         (String) "");
             String originalId = request.getString(ARG_ENTRYID, (String) "");
-            request.put(ARG_ENTRYID, importEntry.getId());
-            request.put(ARG_OUTPUT, outputType.getId());
-            request.put(ARG_EMBEDDED, "true");
+            myRequest.put(ARG_ENTRYID, importEntry.getId());
+            myRequest.put(ARG_OUTPUT, outputType.getId());
+            myRequest.put(ARG_EMBEDDED, "true");
 
             String title = null;
             String propertyValue;
             if ( !outputType.getIsHtml()) {
-                String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                 importEntry, ARG_OUTPUT, outputType.getId());
+                List<Link> links = new ArrayList<Link>();
+                handler.getEntryLinks(myRequest,new State(importEntry),links,true);
+                Link theLink = null;
+                for(Link link: links) {
+                    if(Misc.equals(outputType, link.getOutputType())) {
+                        theLink = link;
+                        break;
+                    }
+                    
+                }
+                String url = (theLink!=null?
+                              theLink.getUrl():
+                              myRequest.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                               importEntry, ARG_OUTPUT, outputType.getId()));
                 String label = importEntry.getName() + " - "
-                               + outputType.getLabel();
-                propertyValue = getEntryManager().getAjaxLink(request,
+                    + (theLink!=null?theLink.getLabel():outputType.getLabel());
+                propertyValue = getEntryManager().getAjaxLink(myRequest,
                         importEntry, label, url, false);
             } else {
-                Result result = getEntryManager().processEntryShow(request,
+                Result result = getEntryManager().processEntryShow(myRequest,
                                     importEntry);
                 propertyValue = new String(result.getContent());
                 title         = result.getTitle();
-
                 title         = Misc.getProperty(props, "title", title);
             }
 
             boolean open = Misc.getProperty(props, "open", true);
-            request.put(ARG_OUTPUT, originalOutput);
-            request.put(ARG_ENTRYID, originalId);
-            request.remove(ARG_EMBEDDED);
             if (title != null) {
                 return HtmlUtil.makeShowHideBlock(title, propertyValue, open,
                         HtmlUtil.cssClass("wiki-tocheader"),

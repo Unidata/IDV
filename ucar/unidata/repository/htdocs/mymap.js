@@ -6,13 +6,12 @@ var lines = new Object();
 var addedToMap = new Object();
 var markers = new Object();
 
-var mapstraction;
 function MapInitialize(addControls,mapProvider)
 {
 	// Create a map object
 //	mapstraction = new Mapstraction('mapstraction', 'google');
 //	mapstraction = new Mapstraction('mapstraction', 'yahoo');
-	mapstraction = new Mapstraction('mapstraction', mapProvider);
+	var mapstraction = new Mapstraction('mapstraction', mapProvider);
 	if(!addControls) {
 //		vemap = mapstraction.maps[mapstraction.api];
 //		vemap.SetDashboardSize(VEDashboardSize.Tiny);
@@ -34,25 +33,25 @@ function MapInitialize(addControls,mapProvider)
                 zoom: 'small',
                 map_type: true 
             });
-
+        return mapstraction;
 }
 
 
-function initMarker(marker,id) {
+function initMarker(marker,id,theMap) {
 	marker.iconSize = [16,16];
 	marker.iconShadowUrl = "${urlroot}/icons/blank.gif";
 	markers[id]=marker;
-	mapstraction.addMarker(marker);
+	theMap.addMarker(marker);
 }
 
-function initLine(line,id,addItToMap) {
+function initLine(line,id,addItToMap,theMap) {
  	line.setColor(lineColor);
 	line.setWidth(3);
 	lines[id]=line;
 	addedToMap[id]=addItToMap;
         
         if (addItToMap) {
-            mapstraction.addPolyline(line);
+            theMap.addPolyline(line);
         }
 }
 

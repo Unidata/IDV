@@ -114,6 +114,9 @@ public class Link {
     }
 
 
+    public void setLinkType(int type) {
+        this.type = type;
+    }
 
     public static int getLinkType(OutputType outputType) {
         if(outputType == null) return TYPE_TOOLBAR;

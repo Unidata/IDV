@@ -3717,11 +3717,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public String initMap(Request request, StringBuffer sb, int width,
+    public String initMap(Request request, String mapVarName, StringBuffer sb, int width,
                           int height, boolean normalControls) {
         if (request.isEmbedded()) {
-            width  = (int) (0.75 * width);
-            height = (int) (0.75 * height);
+            //            width  = (int) (0.75 * width);
+            //            height = (int) (0.75 * height);
         }
         String userAgent = request.getHeaderArg("User-Agent");
         String host      = request.getHeaderArg("Host");
@@ -3776,7 +3776,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         sb.append(HtmlUtil.importJS(fileUrl("/mymap.js")));
         sb.append("<div style=\"width:" + width + "px; height:" + height
                   + "px\" id=\"mapstraction\"></div>\n");
-        sb.append(HtmlUtil.script("MapInitialize(" + normalControls + ","
+        sb.append(HtmlUtil.script(mapVarName +"=MapInitialize(" + normalControls + ","
                                   + HtmlUtil.squote(mapProvider) + ");"));
         return "";
     }

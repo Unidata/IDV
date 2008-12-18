@@ -165,7 +165,7 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_POINT_KML =
         new OutputType("Point as KML", "data.point.kml",
-                       OutputType.TYPE_NONHTML);
+                       OutputType.TYPE_NONHTML,"",ICON_KML);
 
     /** _more_ */
     public static final OutputType OUTPUT_TRAJECTORY_MAP =
@@ -325,7 +325,10 @@ public class DataOutputHandler extends OutputHandler {
                            "OpenDAP", OUTPUT_OPENDAP));
         request.put(ARG_OUTPUT, oldOutput);
 
-        addOutputLink(request, entry, links, OUTPUT_CDL);
+
+        Link cdlLink  = makeLink(request, state.entry, OUTPUT_CDL);
+        cdlLink.setLinkType(Link.TYPE_TOOLBAR);
+        links.add(cdlLink);
     }
 
 
@@ -965,6 +968,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointMap(Request request, Entry entry)
             throws Exception {
 
+        String mapVarName = "mapstraction"+ HtmlUtil.blockCnt++;
         PointObsDataset pod = getPointDataset(entry.getResource().getPath());
         StringBuffer    sb  = new StringBuffer();
         synchronized (pod) {
@@ -1037,12 +1041,12 @@ public class DataOutputHandler extends OutputHandler {
                                    + "}\n");
                 js.append("marker.setInfoBubble(\"" + info.toString()
                           + "\");\n");
-                js.append("initMarker(marker," + HtmlUtil.quote("" + cnt)
+                js.append("initMarker(marker," + HtmlUtil.quote("" + cnt) +"," +mapVarName
                           + ");\n");
             }
 
-            js.append("mapstraction.autoCenterAndZoom();\n");
-            //        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
+            js.append(mapVarName+".autoCenterAndZoom();\n");
+            //        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
 
             StringBuffer yui         = new StringBuffer();
 
@@ -1116,7 +1120,7 @@ public class DataOutputHandler extends OutputHandler {
                 }
             }
             //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
-            getRepository().initMap(request, sb, 800, 500, true);
+            getRepository().initMap(request, mapVarName, sb, request.get(ARG_WIDTH,800), request.get(ARG_HEIGHT,500), true);
             /*        sb.append("</td><td>");
                       sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
                       sb.append("</td></tr></table>");
@@ -1204,6 +1208,7 @@ public class DataOutputHandler extends OutputHandler {
         TrajectoryObsDataset tod =
             getTrajectoryDataset(entry.getResource().getPath());
         StringBuffer sb = new StringBuffer();
+        String mapVarName = "mapstraction"+ HtmlUtil.blockCnt++;
         synchronized (tod) {
             StringBuffer js           = new StringBuffer();
             List         trajectories = tod.getTrajectories();
@@ -1244,7 +1249,7 @@ public class DataOutputHandler extends OutputHandler {
                 js.append("]);\n");
                 js.append("line.setWidth(2);\n");
                 js.append("line.setColor(\"#FF0000\");\n");
-                js.append("mapstraction.addPolyline(line);\n");
+                js.append(mapVarName +".addPolyline(line);\n");
                 js.append(markerSB);
                 StructureData    structure = todt.getData(0);
                 VariableSimpleIF theVar    = null;
@@ -1264,8 +1269,8 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-            js.append("mapstraction.autoCenterAndZoom();\n");
-            getRepository().initMap(request, sb, 800, 500, true);
+            js.append(mapVarName+".autoCenterAndZoom();\n");
+            getRepository().initMap(request, mapVarName,sb, 800, 500, true);
             sb.append(HtmlUtil.script(js.toString()));
             return new Result(msg("Trajectory Map"), sb);
         }

@@ -179,13 +179,13 @@ public class MapOutputHandler extends OutputHandler {
 
         sb.append(
             "<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
-        getMap(request, entriesToUse, sb, 700, 500, true);
+        String mapVarName =   getMap(request, entriesToUse, sb, 700, 500, true);
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
                 sb.append(HtmlUtil.img(getEntryManager().getIconUrl(entry)));
                 sb.append(HtmlUtil.space(1));
-                sb.append("<a href=\"javascript:hiliteEntry(mapstraction,"
+                sb.append("<a href=\"javascript:hiliteEntry(" + mapVarName+","
                           + sqt(entry.getId()) + ");\">" + entry.getName()
                           + "</a><br>");
             }
@@ -214,13 +214,14 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getMap(Request request, List<Entry> entriesToUse,
+    public String getMap(Request request, List<Entry> entriesToUse,
                        StringBuffer sb, int width, int height,
                        boolean normalControls)
             throws Exception {
         StringBuffer js = new StringBuffer();
-        getRepository().initMap(request, sb, width, height, normalControls);
-        js.append("mapstraction.resizeTo(" + width + "," + height + ");\n");
+        String mapVarName = "mapstraction"+ HtmlUtil.blockCnt++;
+        getRepository().initMap(request, mapVarName, sb, width, height, normalControls);
+        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
         js.append("var line;\n");
 
@@ -284,8 +285,9 @@ public class MapOutputHandler extends OutputHandler {
                 js.append("initMarker(marker," + qt(entry.getId()) + ");\n");
             }
         }
-        js.append("mapstraction.autoCenterAndZoom();\n");
+        js.append(mapVarName+".autoCenterAndZoom();\n");
         sb.append(HtmlUtil.script(js.toString()));
+        return mapVarName;
     }
 
     /**
