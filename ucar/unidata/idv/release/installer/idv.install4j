@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.1.5" transformSequenceNumber="2">
-  <directoryPresets config="/usr/local/jdk1.6.0_11/jre" />
+  <directoryPresets config="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico" />
   <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.6" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -53,6 +53,7 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV" overwrite="5" shared="false" mode="755" uninstallMode="0" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/simpleIDV.bat" overwrite="5" shared="false" mode="755" uninstallMode="0" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="233" file="${compiler:SRCDIR}/java3D/java3d-1.3.1-linux.zip" overwrite="2" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="293" file="${compiler:SRCDIR}/libsrc/macos-java3d_jogl.zip" overwrite="2" shared="false" mode="644" uninstallMode="0" />
     </entries>
@@ -71,6 +72,7 @@
           <entry location="simpleidv.jar" fileType="regular" />
           <entry location="NOTICE" fileType="regular" />
           <entry location="idv.gif" fileType="regular" />
+          <entry location="idv.ico" fileType="regular" />
         </include>
         <dependencies />
       </component>
@@ -105,10 +107,10 @@
   </files>
   <launchers>
     <launcher name="runIDV" id="2" external="true" excludeFromMenu="false" menuName="" externalFile="runIDV" />
-    <launcher name="runIDV.bat" id="7" external="true" excludeFromMenu="false" menuName="IDV" externalFile="runIDV.bat" />
+    <launcher name="runIDV.bat" id="7" external="true" excludeFromMenu="true" menuName="" externalFile="runIDV.bat" />
     <launcher name="simpleIDV" id="4" external="true" excludeFromMenu="false" menuName="" externalFile="simpleIDV" />
-    <launcher name="simpleIDV.bat" id="9" external="true" excludeFromMenu="false" menuName="Simple IDV" externalFile="simpleIDV.bat" />
-    <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.gif" pngIcon32File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.gif" macServiceDependencies="" swtApp="false" fileset="">
+    <launcher name="simpleIDV.bat" id="9" external="true" excludeFromMenu="true" menuName="" externalFile="simpleIDV.bat" />
+    <launcher name="IDV" id="49" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_16x16.png" pngIcon32File="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_32x32.png" macServiceDependencies="" swtApp="false" fileset="">
       <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" />
       </executable>
@@ -144,8 +146,21 @@
               <void property="allowUnattended">
                 <boolean>false</boolean>
               </void>
+              <void property="customPngIcon16File">
+                <object class="com.install4j.api.beans.ExternalFile">
+                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_16x16.png</string>
+                </object>
+              </void>
+              <void property="customPngIcon32File">
+                <object class="com.install4j.api.beans.ExternalFile">
+                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_32x32.png</string>
+                </object>
+              </void>
               <void property="resizable">
                 <boolean>false</boolean>
+              </void>
+              <void property="useCustomIcon">
+                <boolean>true</boolean>
               </void>
               <void property="watermark">
                 <boolean>false</boolean>
@@ -233,6 +248,38 @@
             <actions />
             <formComponents />
           </screen>
+          <screen name="" id="358" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
+              </java>
+            </serializedBean>
+            <condition>Util.isWindows()</condition>
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents>
+              <formComponent name="Add a desktop link" id="359" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                      <void property="checkboxText">
+                        <string>${i18n:CreateDesktopIcon}</string>
+                      </void>
+                      <void property="initiallySelected">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="variableName">
+                        <string>createDesktopLinkAction</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+              </formComponent>
+            </formComponents>
+          </screen>
           <screen name="Linux Options" id="227" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
@@ -305,9 +352,6 @@
                       <void property="initiallySelected">
                         <boolean>true</boolean>
                       </void>
-                      <void property="labelText">
-                        <string>Mac OS-X Options</string>
-                      </void>
                       <void property="variableName">
                         <string>installJOGLAction</string>
                       </void>
@@ -341,18 +385,87 @@
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                      <void property="addDefaultLauncherLinks">
+                        <boolean>false</boolean>
+                      </void>
+                      <void property="programGroupEntryConfigs">
+                        <void method="add">
+                          <object class="com.install4j.runtime.beans.screens.components.ProgramGroupEntryConfig">
+                            <void property="iconFile">
+                              <object class="com.install4j.api.beans.ExternalFile">
+                                <string>idv.ico</string>
+                              </object>
+                            </void>
+                            <void property="name">
+                              <string>${compiler:sys.fullName}</string>
+                            </void>
+                            <void property="target">
+                              <object class="java.io.File">
+                                <string>runIDV.bat</string>
+                              </object>
+                            </void>
+                          </object>
+                        </void>
+                        <void method="add">
+                          <object class="com.install4j.runtime.beans.screens.components.ProgramGroupEntryConfig">
+                            <void property="iconFile">
+                              <object class="com.install4j.api.beans.ExternalFile">
+                                <string>idv.ico</string>
+                              </object>
+                            </void>
+                            <void property="name">
+                              <string>Simple IDV</string>
+                            </void>
+                            <void property="target">
+                              <object class="java.io.File">
+                                <string>simpleIDV.bat</string>
+                              </object>
+                            </void>
+                          </object>
+                        </void>
+                      </void>
                       <void property="programGroupName">
-                        <string>${compiler:sys.fullName}</string>
+                        <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
                       </void>
                     </object>
                   </java>
                 </serializedBean>
                 <condition />
               </action>
+              <action name="" id="403" beanClass="com.install4j.runtime.beans.actions.desktop.CreateDesktopLinkAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateDesktopLinkAction">
+                      <void property="description">
+                        <string>Run ${compiler:sys.fullName} ${compiler:sys.version}</string>
+                      </void>
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>runIDV.bat</string>
+                        </object>
+                      </void>
+                      <void property="name">
+                        <string>IDV ${compiler:sys.version}</string>
+                      </void>
+                      <void property="winIconFile">
+                        <object class="com.install4j.api.beans.ExternalFile">
+                          <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>context.getBooleanVariable("createDesktopLinkAction")</condition>
+              </action>
               <action name="" id="83" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
+                      <void property="icon">
+                        <object class="com.install4j.api.beans.ExternalFile">
+                          <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico</string>
+                        </object>
+                      </void>
                       <void property="itemName">
                         <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
                       </void>
@@ -424,8 +537,86 @@
             <validation />
             <preActivation />
             <postActivation />
-            <actions />
-            <formComponents />
+            <actions>
+              <group name="" id="439" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>Util.isWindows()</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="" id="440" beanClass="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to launch the IDV">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction">
+                          <void property="launcherId">
+                            <string>7</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>context.getBooleanVariable("executeLauncherAction") &amp;&amp; (!context.isUnattended())</condition>
+                  </action>
+                </beans>
+              </group>
+              <group name="" id="442" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>Util.isUnixInstaller()</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="" id="443" beanClass="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.finish.ExecuteLauncherAction">
+                          <void property="launcherId">
+                            <string>2</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>context.getBooleanVariable("executeLauncherAction") &amp;&amp; (!context.isUnattended())</condition>
+                  </action>
+                </beans>
+              </group>
+            </actions>
+            <formComponents>
+              <formComponent name="Execute launcher" id="441" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                      <void property="checkboxText">
+                        <string>${i18n:RunEntryExec("${compiler:sys.fullName}")}</string>
+                      </void>
+                      <void property="initiallySelected">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="variableName">
+                        <string>executeLauncherAction</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+              </formComponent>
+            </formComponents>
           </screen>
         </screens>
       </application>
@@ -677,8 +868,7 @@
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true">
-    <mediaSet refId="3" />
-    <mediaSet refId="12" />
+    <mediaSet refId="8" />
   </buildIds>
 </install4j>
 
