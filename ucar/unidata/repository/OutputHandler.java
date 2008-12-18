@@ -1085,42 +1085,34 @@ public class OutputHandler extends RepositoryManager implements
                                  Entry entry, String include,Hashtable props)
             throws Exception {
         boolean open =  Misc.getProperty(props,"open",true);
+        boolean inBlock = Misc.getProperty(props,"showhide",true);
+        String blockContent = null;
+        String blockTitle = "";
+        boolean doBG= true;
 
         if (include.equals(WIKIPROP_INFORMATION)) {
-            String informationBlock =
-                getRepository().getHtmlOutputHandler().getInformationTabs(
-                    request, entry, true);
-            String result = HtmlUtil.makeShowHideBlock(Misc.getProperty(props,"title",msg("Information")),
-                                informationBlock, open);
-            return result;
-        }
-
-        if (include.equals(WIKIPROP_IMAGE)) {
+            blockContent  = getRepository().getHtmlOutputHandler().getInformationTabs(
+                                                                                      request, entry, true);
+            blockTitle = Misc.getProperty(props,"title",msg("Information"));
+        } else  if (include.equals(WIKIPROP_IMAGE)) {
             if(!entry.getResource().isImage()) {
                 return "Not an image";
             }
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
-        }
-        if (include.equals(WIKIPROP_ACTIONS)) {
-            return HtmlUtil.makeShowHideBlock(Misc.getProperty(props,"title",msg("Actions")),
-                    getEntryManager().getEntryActionsList(request, entry),
-                    open);
-        }
-        if (include.equals(WIKIPROP_TOOLBAR)) {
+        } else if (include.equals(WIKIPROP_ACTIONS)) {
+            blockTitle = Misc.getProperty(props,"title",msg("Actions"));
+            blockContent =  getEntryManager().getEntryActionsList(request, entry);
+        } else  if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryActionsToolbar(request, entry,
                     false);
-        }
-        if (include.equals(WIKIPROP_BREADCRUMBS)) {
+        } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
             return getEntryManager().getBreadCrumbs(request, entry);
-        }
-
-        if (include.equals(WIKIPROP_DESCRIPTION)) {
+        } else  if (include.equals(WIKIPROP_DESCRIPTION)) {
             return entry.getDescription();
-        }
-        if (include.equals(WIKIPROP_NAME)) {
+        }else  if (include.equals(WIKIPROP_NAME)) {
             return entry.getName();
-        }
-        if (include.equals(WIKIPROP_CHILDREN_GROUPS)) {
+        } else  if (include.equals(WIKIPROP_CHILDREN_GROUPS)) {
+            doBG = false;
             List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_subgroups");
             if(children==null) {
                 children = getEntryManager().getChildrenGroups(request, entry);
@@ -1131,14 +1123,10 @@ public class OutputHandler extends RepositoryManager implements
             StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
-            String title = Misc.getProperty(props,"title",msg("Groups"));
-            boolean inBlock = Misc.getProperty(props,"showhide",true);
-            if(!inBlock) return sb.toString();
-            return HtmlUtil.makeShowHideBlock(title + link,
-                    sb.toString(), open);
-        }
-
-        if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
+            blockContent = sb.toString();
+            blockTitle= Misc.getProperty(props,"title",msg("Groups"))+link;
+        } else    if (include.equals(WIKIPROP_CHILDREN_ENTRIES)) {
+            doBG = false;
             List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_subentries");
             if(children==null) {
                 children = getEntryManager().getChildrenEntries(request, entry);
@@ -1150,14 +1138,12 @@ public class OutputHandler extends RepositoryManager implements
             StringBuffer sb = new StringBuffer();
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
-            String title = Misc.getProperty(props,"title",msg("Groups"));
-            boolean inBlock = Misc.getProperty(props,"showhide",true);
-            if(!inBlock) return sb.toString();
-            return HtmlUtil.makeShowHideBlock(title + link,
-                    sb.toString(), open);
-        }
-
-        if (include.equals(WIKIPROP_CHILDREN)) {
+            blockContent = sb.toString();
+            blockTitle= Misc.getProperty(props,"title",msg("Entries"))+link;
+            blockContent = sb.toString();
+            blockTitle= Misc.getProperty(props,"title",msg("Groups"))+link;
+        } else  if (include.equals(WIKIPROP_CHILDREN)) {
+            doBG = false;
             StringBuffer sb = new StringBuffer();
             List<Entry> children =(List<Entry>) wikiUtil.getProperty(entry.getId()+"_children");
             if(children==null) {
@@ -1169,15 +1155,18 @@ public class OutputHandler extends RepositoryManager implements
             }
             String link = getEntriesList(sb, children, request, true, false,
                                          false);
-            String title = Misc.getProperty(props,"title",msg("Groups"));
-            boolean inBlock = Misc.getProperty(props,"showhide",true);
-            if(!inBlock) return sb.toString();
-            return HtmlUtil.makeShowHideBlock(title + link,
-                    sb.toString(), open);
+            blockContent = sb.toString();
+            blockTitle= Misc.getProperty(props,"title",msg("Children"))+link;
+        } else {
+            return null;
         }
+        if(!inBlock) return blockContent;
+        if(doBG) 
+            return HtmlUtil.makeShowHideBlock(blockTitle,blockContent,
+                                              open,HtmlUtil.cssClass("wiki-tocheader"),HtmlUtil.cssClass("wiki-toc"));
+        else
+            return HtmlUtil.makeShowHideBlock(blockTitle,blockContent, open);
 
-
-        return null;
     }
 
 
