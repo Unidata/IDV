@@ -2291,7 +2291,7 @@ public class StringUtil {
         //        boolean debug = true;
         boolean   debug      = false;
         Hashtable properties = new Hashtable();
-        debug = true;
+        //        debug = true;
         if(debug) System.err.println("Source:" + s);
 
         while (true) {
