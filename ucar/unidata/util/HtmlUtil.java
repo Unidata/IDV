@@ -135,7 +135,7 @@ public class HtmlUtil {
     public static final String ATTR_ONCLICK="onClick";
 
     public static final String ATTR_ROWS="rows";
-    public static final String ATTR_SELECT="select";
+    public static final String ATTR_SELECTED="selected";
     public static final String ATTR_SRC="src";
     public static final String ATTR_STYLE="style";
     public static final String ATTR_TYPE="type";
@@ -1275,7 +1275,7 @@ public class HtmlUtil {
             }
             String selectedAttr = "";
             if ((selected != null) && selected.contains(value)) {
-                selectedAttr = attrs(ATTR_SELECT,"selected");
+                selectedAttr = attrs(ATTR_SELECTED,"selected");
             }
             if (label.length() > maxLength) {
                 label = "..." + label.substring(label.length() - maxLength);
