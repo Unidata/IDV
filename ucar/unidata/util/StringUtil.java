@@ -2386,12 +2386,29 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
+
+        String t = IOUtil.readContents(new java.io.File(args[0]));
+        t = "<properties>xxx\n</properties>";
+            //            "ramadda.template.sublink.wrapper=<div class=\"subnav2\">${sublinks}</div>"+
+            //            "ramadda.template.sublink.on=<div class=\"subnavoncomp2\">${label}</div>" +
+            //            "ramadda.template.sublink.off=<div class=\"subnavoffcomp2\"><a href=\"${url}\">${label}</a></div>"
+        //            +  "</properties>";
+        //        Pattern pattern = Pattern.compile("(?m)<properties>(.*)");
+        Pattern pattern = Pattern.compile("(?s)<properties>.*?</properties>");
+        Matcher matcher = pattern.matcher(t);
+        System.err.println ("find:" +matcher.find());
+        if (true) {
+            return;
+        }
+
+
         parseHtmlProperties(args[0]);
         if (true) {
             return;
         }
 
 
+        /*
 
         String pattern =
             ".*([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{2})([0-9]{2}).*";
@@ -2401,7 +2418,7 @@ public class StringUtil {
         System.err.println(pattern);
         System.err.println(with);
         System.err.println(value.replaceAll(pattern, with));
-
+        */
 
     }
 
