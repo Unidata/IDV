@@ -393,7 +393,7 @@
                           <object class="com.install4j.runtime.beans.screens.components.ProgramGroupEntryConfig">
                             <void property="iconFile">
                               <object class="com.install4j.api.beans.ExternalFile">
-                                <string>idv.ico</string>
+                                <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico</string>
                               </object>
                             </void>
                             <void property="name">
@@ -410,7 +410,7 @@
                           <object class="com.install4j.runtime.beans.screens.components.ProgramGroupEntryConfig">
                             <void property="iconFile">
                               <object class="com.install4j.api.beans.ExternalFile">
-                                <string>idv.ico</string>
+                                <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico</string>
                               </object>
                             </void>
                             <void property="name">
@@ -868,7 +868,7 @@
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true">
-    <mediaSet refId="8" />
+    <mediaSet refId="3" />
   </buildIds>
 </install4j>
 
