@@ -885,6 +885,7 @@ public class Admin extends RepositoryManager {
             }
             boolean ok = doAll
                          || request.get("outputtype." + type.getId(), false);
+            //            if(!ok)System.err.println("TYPE:" + type + " " + ok);
             getRepository().setOutputTypeOK(type, ok);
         }
 

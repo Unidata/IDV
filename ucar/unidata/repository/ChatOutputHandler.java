@@ -91,7 +91,7 @@ public class ChatOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_CHAT = new OutputType("Chat",
-                                                     "chat.room",
+                                                     "chat.chat",
                                                      OutputType.TYPE_HTML,
                                                      "", ICON_CHAT);
 
