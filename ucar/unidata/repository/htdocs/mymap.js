@@ -6,12 +6,12 @@ var lines = new Object();
 var addedToMap = new Object();
 var markers = new Object();
 
-function MapInitialize(addControls,mapProvider)
+function MapInitialize(addControls,mapProvider,divname)
 {
 	// Create a map object
 //	mapstraction = new Mapstraction('mapstraction', 'google');
 //	mapstraction = new Mapstraction('mapstraction', 'yahoo');
-	var mapstraction = new Mapstraction('mapstraction', mapProvider);
+	var mapstraction = new Mapstraction(divname, mapProvider);
 	if(!addControls) {
 //		vemap = mapstraction.maps[mapstraction.api];
 //		vemap.SetDashboardSize(VEDashboardSize.Tiny);

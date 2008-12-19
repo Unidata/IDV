@@ -1278,11 +1278,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @return _more_
      */
-    public String handleWikiImport(WikiUtil wikiUtil, Request request,
+    public String handleWikiImport(WikiUtil wikiUtil, final Request request,
                                    Entry importEntry, String tag,
                                    Hashtable props) {
         try {
-            Request myRequest = new Request(getRepository(), request.getUser());
+            Request myRequest = new Request(getRepository(), request.getUser()) {
+                    public void putExtraProperty(Object key, Object value) {
+                        request.putExtraProperty(key, value);
+                    }
+                    public Object getExtraProperty(Object key) {
+                        return request.getExtraProperty(key);
+                    }
+
+                };
+            
 
 
             for (Enumeration keys =props.keys(); keys.hasMoreElements();) {

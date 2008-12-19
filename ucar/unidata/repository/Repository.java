@@ -3844,10 +3844,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String initMap(Request request, String mapVarName, StringBuffer sb, int width,
                           int height, boolean normalControls) {
-        if (request.isEmbedded()) {
-            //            width  = (int) (0.75 * width);
-            //            height = (int) (0.75 * height);
-        }
         String userAgent = request.getHeaderArg("User-Agent");
         String host      = request.getHeaderArg("Host");
         if (host == null) {
@@ -3896,13 +3892,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-        sb.append(HtmlUtil.importJS(mapJS));
-        sb.append(HtmlUtil.importJS(fileUrl("/mapstraction.js")));
-        sb.append(HtmlUtil.importJS(fileUrl("/mymap.js")));
-        sb.append("<div style=\"width:" + width + "px; height:" + height
-                  + "px\" id=\"mapstraction\"></div>\n");
-        sb.append(HtmlUtil.script(mapVarName +"=MapInitialize(" + normalControls + ","
-                                  + HtmlUtil.squote(mapProvider) + ");"));
+        if(request.getExtraProperty("initmap")==null) {
+            sb.append(HtmlUtil.importJS(mapJS));
+            sb.append(HtmlUtil.importJS(fileUrl("/mapstraction.js")));
+            sb.append(HtmlUtil.importJS(fileUrl("/mymap.js")));
+            request.putExtraProperty("initmap","");
+        }
+
+
+        sb.append(HtmlUtil.div("", HtmlUtil.style("width:" + width + "px; height:" + height + "px") +
+                               " " +HtmlUtil.id(mapVarName)));
+        sb.append(HtmlUtil.script(mapVarName +"=" + HtmlUtil.call("MapInitialize" ,normalControls + ","
+                                                                  + HtmlUtil.squote(mapProvider) + ","+ HtmlUtil.squote(mapVarName))+";"));
         return "";
     }
 
