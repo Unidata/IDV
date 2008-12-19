@@ -122,7 +122,7 @@ public class User {
      */
     public User(String id, String name, String email, String question,
                 String answer, String password, boolean admin,
-                String language) {
+                String language,String template) {
 
         this.id       = id;
         this.name     = name;
@@ -135,7 +135,7 @@ public class User {
             language = "";
         }
         this.language = language;
-
+        this.template = template;
     }
 
     /**
@@ -439,6 +439,7 @@ public class User {
        @return The Template
     **/
     public String getTemplate () {
+        if(template == null) return "";
 	return template;
     }
 

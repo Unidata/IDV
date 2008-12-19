@@ -117,9 +117,11 @@ CREATE TABLE  users (id varchar(200),
                      answer  varchar(200),  
                      password  varchar(200),
 		     admin int,
-		     language varchar(50));
+		     language varchar(50),
+		     template varchar(200));
 
 
+alter table users add column template varchar(200);
 
 
 -----------------------------------------------------------------------

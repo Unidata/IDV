@@ -357,9 +357,12 @@ public class Tables {
         public static final String COL_LANGUAGE = NAME + ".language";
 
         /** _more_ */
+        public static final String COL_TEMPLATE = NAME + ".template";
+
+        /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_NAME, COL_EMAIL, COL_QUESTION, COL_ANSWER,
-            COL_PASSWORD, COL_ADMIN, COL_LANGUAGE
+            COL_PASSWORD, COL_ADMIN, COL_LANGUAGE,COL_TEMPLATE
         };
 
 

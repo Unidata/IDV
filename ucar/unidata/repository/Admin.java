@@ -276,7 +276,7 @@ public class Admin extends RepositoryManager {
                 if (okToAdd) {
                     getUserManager().makeOrUpdateUser(new User(id, name, "",
                             "", "", getUserManager().hashPassword(password1),
-                            true, ""), false);
+                            true, "",""), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
                     sb.append(msg("Site administrator created"));

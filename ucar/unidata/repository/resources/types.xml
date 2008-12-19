@@ -1,5 +1,17 @@
 <types>
 
+  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.WikiPageTypeHandler">
+     <property name="icon" value="/icons/wiki.gif"/>
+     <property name="form.rows.desc" value="50"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+     <column name="wikitext" type="clob" size="256000" label="Wiki Text" cansearch="true" showinhtml="false"/>
+     <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="true"/>
+</type>
+
+
+
   <type name="localfiles"  description="Local File View" handler="ucar.unidata.repository.LocalFileTypeHandler">
      <property name="form.show.resource" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -10,6 +22,7 @@
      <column name="excludepattern" type="string"     label="Exclude files with patterns" rows="5" suffix="wildcard or &quot;regexp:pattern&quot;. One per line. e.g.&lt;br&gt;&lt;i&gt;*.nc&lt;br&gt;regexp:model[0-9]\.grb$&lt;br&gt;dir:*data&lt;/i&gt; (To match directories)"  showinhtml="false"/>
      <column name="naming"  group="Attributes"       type="string"     label="Naming" rows="5" suffix="pattern:replacement e.g.&lt;br&gt;&lt;i&gt;NAM:North American Model&lt;br&gt;path:GFS:Global Forecast Model&lt;br&gt;&lt;i&gt;"  showinhtml="false"/>
  </type>
+
 
 
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.CatalogTypeHandler">
@@ -23,15 +36,7 @@
   </type>
 
 
-  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.WikiPageTypeHandler">
-     <property name="icon" value="/icons/wiki.gif"/>
-     <property name="form.rows.desc" value="50"/>
-     <property name="form.show.date" value="false"/>
-     <property name="form.show.area" value="false"/>
-     <property name="form.show.resource" value="false"/>
-     <column name="wikitext" type="clob" size="256000" label="Wiki Text" cansearch="true" showinhtml="false"/>
-     <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="true"/>
-</type>
+
 
   <type name="blogpost"  description="Blog Post">
      <property name="form.rows.desc" value="10"/>
@@ -41,6 +46,14 @@
 </type>
 
 
+
+  <type name="chatroom"  description="Chat Room">
+     <property name="icon" value="/icons/chat.gif"/>
+     <property name="form.rows.desc" value="10"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+  </type>
 
 
   <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
@@ -52,13 +65,7 @@
 
 
 
-  <type name="chatroom"  description="Chat Room">
-     <property name="icon" value="/icons/chat.gif"/>
-     <property name="form.rows.desc" value="10"/>
-     <property name="form.show.date" value="false"/>
-     <property name="form.show.area" value="false"/>
-     <property name="form.show.resource" value="false"/>
-  </type>
+
 
 
   <type name="model"  description="Model" datatype="model" >
@@ -89,7 +96,6 @@
 
 
   <type name="image"  description="Image File" datatype="image"/>
-
 
 
 <!--

@@ -619,12 +619,13 @@ public class UserManager extends RepositoryManager {
                 Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
                 Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
                 Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
-                Tables.USERS.COL_LANGUAGE
+                Tables.USERS.COL_LANGUAGE,
+                Tables.USERS.COL_TEMPLATE
             }, new Object[] {
                 user.getName(), user.getPassword(), user.getEmail(),
                 user.getQuestion(), user.getAnswer(), user.getAdmin()
                         ? new Integer(1)
-                        : new Integer(0), user.getLanguage()
+                : new Integer(0), user.getLanguage(),user.getTemplate()
             });
             userMap.put(user.getId(), user);
             return;
@@ -633,7 +634,7 @@ public class UserManager extends RepositoryManager {
         getDatabaseManager().executeInsert(Tables.USERS.INSERT, new Object[] {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
             user.getAnswer(), user.getPassword(),
-            new Boolean(user.getAdmin()), user.getLanguage()
+            new Boolean(user.getAdmin()), user.getLanguage(), user.getTemplate()
         });
 
         userMap.put(user.getId(), user);
@@ -728,6 +729,10 @@ public class UserManager extends RepositoryManager {
             throws Exception {
         user.setName(request.getString(ARG_USER_NAME, user.getName()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
+        user.setTemplate(request.getString(ARG_TEMPLATE,
+                                           user.getTemplate()));
+
+
         user.setLanguage(request.getString(ARG_USER_LANGUAGE,
                                            user.getLanguage()));
         user.setQuestion(request.getString(ARG_USER_QUESTION,
@@ -888,6 +893,11 @@ public class UserManager extends RepositoryManager {
                                      HtmlUtil.input(ARG_USER_EMAIL,
                                          user.getEmail(), HtmlUtil.SIZE_40)));
 
+        List<TwoFacedObject> templates = getRepository().getTemplateSelectList();
+        sb.append(HtmlUtil.formEntry(msgLabel("Page Template"),
+                                     HtmlUtil.select(ARG_TEMPLATE,
+                                                     templates, user.getTemplate())));
+
         List languages = new ArrayList(getRepository().getLanguages());
         languages.add(0, new TwoFacedObject("None", ""));
         sb.append(HtmlUtil.formEntry(msgLabel("Language"),
@@ -968,7 +978,7 @@ public class UserManager extends RepositoryManager {
                     break;
                 }
                 User user = new User(id, name, email, "", "",
-                                     hashPassword(password1), false, "");
+                                     hashPassword(password1), false, "","");
                 user.setRoles(roles);
                 users.add(user);
             }
@@ -1031,7 +1041,7 @@ public class UserManager extends RepositoryManager {
             if (okToAdd) {
                 makeOrUpdateUser(new User(id, name, email, "", "",
                                           hashPassword(password1), admin,
-                                          ""), false);
+                                          "",""), false);
                 String userEditLink =
                     request.url(getRepositoryBase().URL_USER_EDIT,
                                 ARG_USER_ID, id);
@@ -1270,6 +1280,7 @@ public class UserManager extends RepositoryManager {
                              results.getString(col++),
                              results.getString(col++),
                              results.getBoolean(col++),
+                             results.getString(col++),
                              results.getString(col++));
 
         Statement stmt = getDatabaseManager().select(
@@ -1488,8 +1499,8 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String getUserLinks(Request request) {
-        User   user     = request.getUser();
-        String template = getRepository().getTemplateProperty(request,"ramadda.template.link.wrapper", "");
+        User   user     = request.getUser(); 
+       String template = getRepository().getTemplateProperty(request,"ramadda.template.link.wrapper", "");
         template = getRepository().getTemplateProperty(request,"ramadda.template.userlink.wrapper", template);
         String separator = getRepository().getTemplateProperty(request,"ramadda.template.link.separator", "");
         separator = getRepository().getTemplateProperty(request,"ramadda.template.userlink.separator", separator);

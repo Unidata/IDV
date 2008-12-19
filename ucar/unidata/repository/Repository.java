@@ -1889,10 +1889,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         public boolean isTemplateFor(Request request) {
             String  templateId = request.getUser().getTemplate();
             if(templateId == null) {
-                templateId = request.getString(ARG_TEMPLATE,"");
+                return false;
             }
             if(Misc.equals(id,templateId)) {
-                request.getUser().setTemplate(templateId);
                 return true;
             }
             return false;
@@ -2122,9 +2121,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    private List<HtmlTemplate> templates;
 
-    public HtmlTemplate getTemplate(Request request) {
+
+
+    private List<HtmlTemplate> getTemplates() {
         List<HtmlTemplate> theTemplates = templates;
         if(theTemplates==null) {
             theTemplates = new ArrayList<HtmlTemplate>();
@@ -2142,8 +2142,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 templates = theTemplates;
             }
         }
-        
+        return theTemplates;
+    }
 
+    private List<HtmlTemplate> templates;
+
+    public List<TwoFacedObject> getTemplateSelectList() {
+        List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+        for(HtmlTemplate template: getTemplates()) {
+            tfos.add(new TwoFacedObject(template.name, template.id));
+        }
+        return tfos;
+
+    }
+
+    public HtmlTemplate getTemplate(Request request) {
+        List<HtmlTemplate> theTemplates = getTemplates();
         for(HtmlTemplate template: theTemplates) {
             if(template.isTemplateFor(request)) {
                 return template;

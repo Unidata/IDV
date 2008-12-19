@@ -1396,7 +1396,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             Entry   entry    = (Entry) wikiUtil.getProperty(PROP_ENTRY);
             Request request  = (Request) wikiUtil.getProperty(PROP_REQUEST);
             Group   parent   = entry.getParentGroup();
-            Entry   theEntry = findWikiEntry(request, name, parent);
+            Entry   theEntry=null;
+            //If the entry is a group first check its children.
+            if(entry.isGroup()) {
+                theEntry= findWikiEntry(request, name, (Group)entry);
+            }
+            if(theEntry==null) {
+                theEntry= findWikiEntry(request, name, parent);
+            }
 
             if (theEntry != null) {
                 if (label.trim().length() == 0) {
@@ -1417,9 +1424,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 }
             }
 
+            
             String url = request.url(getRepository().URL_ENTRY_FORM,
                                      ARG_NAME, name, ARG_GROUP,
-                                     parent.getId(), ARG_TYPE,
+                                     (entry.isGroup()?entry.getId():parent.getId()), ARG_TYPE,
                                      WikiPageTypeHandler.TYPE_WIKIPAGE);
 
             return HtmlUtil.href(url, name,
