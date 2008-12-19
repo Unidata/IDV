@@ -239,7 +239,7 @@ public class ChatOutputHandler extends OutputHandler {
             try {
                 Element node = XmlUtil.getRoot(s);
                 String  type = XmlUtil.getAttribute(node, ATTR_TYPE);
-                System.err.println("handleMessage:" + s);
+                //                System.err.println("handleMessage:" + s);
                 if (session == null) {
                     String tmpSession = XmlUtil.getAttribute(node,
                                             ATTR_SESSIONID);
@@ -295,8 +295,8 @@ public class ChatOutputHandler extends OutputHandler {
          */
         public void handleMessage(String type, Element node, String msg)
                 throws Exception {
-            System.err.println("handleMessage:" + type + " "
-                               + XmlUtil.toString(node));
+            //            System.err.println("handleMessage:" + type + " "
+            //                               + XmlUtil.toString(node));
             if (type.equals("TEXT")) {
                 node.setAttribute("FROM", connectionId);
                 writeExcept(XmlUtil.toString(node), this, this);

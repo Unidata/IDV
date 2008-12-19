@@ -163,22 +163,6 @@ public class ZipOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public String getMimeType(OutputType output) {
-        if (output.equals(OUTPUT_ZIP)) {
-            return repository.getMimeTypeFromSuffix(".zip");
-        } else {
-            return super.getMimeType(output);
-        }
-    }
-
-
-    /**
-     * _more_
-     *
      * @param request _more_
      * @param group _more_
      * @param subGroups _more_
@@ -193,6 +177,25 @@ public class ZipOutputHandler extends OutputHandler {
             throws Exception {
         return toZip(request, entries);
     }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param output _more_
+     *
+     * @return _more_
+     */
+    public String getMimeType(OutputType output) {
+        if (output.equals(OUTPUT_ZIP)) {
+            return repository.getMimeTypeFromSuffix(".zip");
+        } else {
+            return super.getMimeType(output);
+        }
+    }
+
 
 
 

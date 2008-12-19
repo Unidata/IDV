@@ -161,7 +161,6 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public Session getSession(String sessionId) {
-        System.err.println("map:" + sessionMap);
         return sessionMap.get(sessionId);
     }
 
@@ -1490,10 +1489,10 @@ public class UserManager extends RepositoryManager {
      */
     public String getUserLinks(Request request) {
         User   user     = request.getUser();
-        String template = getProperty("ramadda.html.link.wrapper", "");
-        template = getProperty("ramadda.html.userlink.wrapper", template);
-        String separator = getProperty("ramadda.html.link.separator", "");
-        separator = getProperty("ramadda.html.userlink.separator", separator);
+        String template = getRepository().getTemplateProperty(request,"ramadda.template.link.wrapper", "");
+        template = getRepository().getTemplateProperty(request,"ramadda.template.userlink.wrapper", template);
+        String separator = getRepository().getTemplateProperty(request,"ramadda.template.link.separator", "");
+        separator = getRepository().getTemplateProperty(request,"ramadda.template.userlink.separator", separator);
 
         List urls   = new ArrayList();
         List labels = new ArrayList();

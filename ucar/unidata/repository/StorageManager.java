@@ -227,6 +227,7 @@ public class StorageManager extends RepositoryManager {
      */
     public String localizePath(String path) {
         path = path.replace("%repositorydir%", getRepositoryDir());
+        path = path.replace("%resourcedir%", "/ucar/unidata/repository/resources");
         return path;
     }
 

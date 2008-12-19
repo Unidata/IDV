@@ -289,6 +289,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             if (entry != null) {
                 if (entry.isGroup()) {
                     group = (Group) entry;
+                    this.subGroups   = group.getSubGroups();
+                    this.entries = group.getSubEntries();
                 } else {
                     this.entry = entry;
                 }
@@ -904,9 +906,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         List   items          = new ArrayList();
         Object initialMessage = request.remove(ARG_MESSAGE);
         String onLinkTemplate =
-            getRepository().getProperty("ramadda.html.sublink.on", "");
+            getRepository().getTemplateProperty(request,"ramadda.template.sublink.on", "");
         String offLinkTemplate =
-            getRepository().getProperty("ramadda.html.sublink.off", "");
+            getRepository().getTemplateProperty(request,"ramadda.template.sublink.off", "");
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
             String     url        = link.getUrl();
@@ -1124,6 +1126,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public String getImageUrl(Request request, Entry entry) {
         if ( !entry.getResource().isImage()) {
+            if(true)return null;
             if (entry.hasAreaDefined()) {
                 return request.url(repository.URL_GETMAP, ARG_SOUTH,
                                    "" + entry.getSouth(), ARG_WEST,

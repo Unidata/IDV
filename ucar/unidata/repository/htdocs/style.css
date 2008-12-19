@@ -7,7 +7,6 @@ body {
 }
 
 
-
 a {
    color: #0000FF;
    text-decoration: none;
@@ -24,8 +23,6 @@ a:hover {
 }
 
 
-
-
 .header {
   border-bottom : 1px black solid;
   background-repeat: no-repeat;
@@ -36,6 +33,7 @@ a:hover {
   padding-right:5px;
 }
 
+
 a.header  {
 	color:white;
 }
@@ -45,9 +43,11 @@ a.header  {
 }
 
 
+
 .header a {
 	color:white;
 }
+
 
 
 .header-content {
@@ -70,6 +70,13 @@ a.header  {
 }
 
 
+################################################################################
+## Styles for the default template
+################################################################################
+
+
+
+
 .subnav a:hover  {
 	color:red;
 }
@@ -82,6 +89,9 @@ a.header  {
    color: black;
    border-bottom : 1px #666666 solid;
 }
+
+
+
 
 
 .curve {
@@ -99,6 +109,10 @@ a.header  {
    padding-left:7;   
    padding-right:7;   
 }
+
+
+
+
 
 
 
@@ -121,47 +135,89 @@ a.subnavoffcomp  {
 
 
 
-.subnav2 {
-   padding-top:5;   
-   background-color : #c3d9ff;
+.header-left {
+  border-bottom : 2px #888888 solid;
+  background-color:#006699;
+  color: white;
+  padding-top:10px;
+  padding-left:5px;
+  padding-right:5px;
+}
+
+a.header-left  {
+    color:white;
+}
+
+.header-left a:hover  {
+    color:red;
+}
+
+.header-left-title {
+  font-size: 200%;
+  color: white;
+}
+
+.header-left a {
+	color:white;
+}
+
+.nav-left {
    font-weight: bold;
    color: black;
 }
 
 
 
-.subnavoncomp2  {
-   padding-left:5;   
-   xborder-bottom : 1px #ffffff solid;
+.subnav-left {
+   margin:0;
+   padding:0;
+   background-color : #c3d9ff;
+   font-weight: bold;
+   color: black;
+   min-height: 500px;
+}
+
+
+.subnavoncomp-left  {
+   font-weight: bold;
+   border-bottom : 1px #666666 solid;
+   color:#000000;
+   margin:0;
    background-color : #ffffff;
    color:#000000;
-}
-
-.subnavoffcomp2  {
    padding-left:5;   
-   color:#000000;
-   xpadding-left:7;   
-   xpadding-right:7;   
+   padding-top:2px;   
+   padding-bottom:1px;   
 }
 
-
-
-.subnavoffcomp2  a {
-   color:#000000;
-}
-
-a.subnavoffcomp2  {
-   color:#000000;
-}
-
-.subnavoffcomp2 a:visited {
+.subnavoffcomp-left  {
+   font-weight: bold;
+   xcolor:#000000;
+   color:red;
+   border-bottom : 1px #666666 solid;
+   margin:0;
+   padding-left:5;   
+   padding-top:2px;   
+   padding-bottom:1px;   
    color:#000000;
 }
 
 
-.subnavoffcomp2 a:hover {
+.subnavoffcomp-left  a {
+   color:#000000;
+}
+
+
+.subnavoffcomp-left a:visited {
+   color:#000000;
+}
+
+
+.subnavoffcomp-left a:hover {
    color:red;
 }
+
+
 
 
 
@@ -453,6 +509,7 @@ a.menulink {
    font-size: 110%;
    color: #9C9C9C;
    border-bottom : 1px #666666 solid;
+   margin-bottom:5px;
 }
 
 

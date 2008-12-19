@@ -129,11 +129,17 @@ public class ImageOutputHandler extends OutputHandler {
     protected void getEntryLinks(Request request, State state,
                                  List<Link> links, boolean forHeader)
             throws Exception {
+
         //If its a single entry then punt
         if (state.entry != null) {
             return;
         }
+
         List<Entry> entries = state.getAllEntries();
+        if (entries.size() == 0) {
+            return;
+        }
+
         if (entries.size() > 0) {
             boolean ok = false;
             for (Entry entry : entries) {

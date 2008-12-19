@@ -833,6 +833,8 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_HTML_TEMPLATE = "ramadda.html.template";
 
+    public static final String PROP_HTML_TEMPLATES = "ramadda.html.templates";
+
     /** _more_ */
     public static final String PROP_HTML_IMAGEPLAYER =
         "ramadda.html.imageplayer";
@@ -905,6 +907,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_NODETYPE = "nodetype";
+
+    public static final String ARG_TEMPLATE = "template";
 
     /** _more_ */
     public static final String ARG_IMAGEWIDTH = "imagewidth";

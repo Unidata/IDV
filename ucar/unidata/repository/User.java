@@ -72,6 +72,8 @@ public class User {
     private String language = "";
 
 
+    private String template;
+
     /**
      * _more_
      */
@@ -421,6 +423,24 @@ public class User {
         return language;
     }
 
+
+    /**
+       Set the Template property.
+
+       @param value The new value for Template
+    **/
+    public void setTemplate (String value) {
+	template = value;
+    }
+
+    /**
+       Get the Template property.
+
+       @return The Template
+    **/
+    public String getTemplate () {
+	return template;
+    }
 
 
 

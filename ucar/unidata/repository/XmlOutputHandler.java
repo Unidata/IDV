@@ -281,10 +281,8 @@ public class XmlOutputHandler extends OutputHandler {
         }
         StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, getMimeType(output));
-
-
-
     }
+
 
 
 

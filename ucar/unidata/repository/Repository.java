@@ -1838,6 +1838,75 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return result;
     }
 
+    public HtmlTemplate getHtmlTemplate(Request request) {
+        return null;
+    }
+
+
+    public  class HtmlTemplate {
+
+        private String name;
+        private String id;
+        private String template;
+        private String path;
+        private Hashtable properties = new Hashtable();
+
+
+        public HtmlTemplate(String path, String t) {
+            try {
+                this.path = path;
+                Pattern pattern = Pattern.compile("(?s)(.*)<properties>(.*)</properties>(.*)");
+                Matcher matcher = pattern.matcher(t);
+                if(matcher.find()) {
+                    template =  matcher.group(1) +matcher.group(3);
+                    Properties p = new Properties();
+                    p.load(new ByteArrayInputStream(matcher.group(2).getBytes()));
+                    properties.putAll(p);
+                    //                System.err.println ("got props " + properties);
+                } else {
+                    template = t;
+                }
+                name = (String) properties.get("name");
+                id = (String) properties.get("id");
+                if(name == null) {
+                    name = IOUtil.stripExtension(IOUtil.getFileTail(path));
+                }
+                if(id == null) {
+                    id = IOUtil.stripExtension(IOUtil.getFileTail(path));
+                }
+            } catch(Exception exc) {
+                System.err.println ("Error processing template: " + path);
+                exc.printStackTrace();
+                this.template = t;
+            }
+
+        }
+
+        public String toString() {
+            return name;
+        }
+
+        public boolean isTemplateFor(Request request) {
+            String  templateId = request.getUser().getTemplate();
+            if(templateId == null) {
+                templateId = request.getString(ARG_TEMPLATE,"");
+            }
+            if(Misc.equals(id,templateId)) {
+                request.getUser().setTemplate(templateId);
+                return true;
+            }
+            return false;
+        }
+
+        public String getTemplateProperty(String name, String dflt) {
+            String value = (String) properties.get(name);
+            if(value !=null) return value;
+            return getProperty(name, dflt);
+
+        }
+        
+    }
+
 
     /**
      * _more_
@@ -1873,7 +1942,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         if (template == null) {
-            template = getResource(PROP_HTML_TEMPLATE);
+            template =getTemplate(request).template;
+            //            template = getResource(PROP_HTML_TEMPLATE);
         }
 
 
@@ -1887,16 +1957,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String linksHtml = HtmlUtil.space(1);
         if (links != null) {
             linksHtml =
-                StringUtil.join(getProperty("ramadda.html.link.separator",
+                StringUtil.join(getTemplateProperty(request,"ramadda.template.link.separator",
                                             ""), links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = "";
         if (sublinks != null) {
             String sublinksTemplate =
-                getProperty("ramadda.html.sublink.wrapper", "");
+                getTemplateProperty(request,"ramadda.template.sublink.wrapper", "");
             sublinksHtml =
-                StringUtil.join(getProperty("ramadda.html.sublink.separator",
+                StringUtil.join(getTemplateProperty(request,"ramadda.template.sublink.separator",
                                             ""), sublinks);
             sublinksHtml = sublinksTemplate.replace("${sublinks}",
                     sublinksHtml);
@@ -2052,6 +2122,42 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    private List<HtmlTemplate> templates;
+
+    public HtmlTemplate getTemplate(Request request) {
+        List<HtmlTemplate> theTemplates = templates;
+        if(theTemplates==null) {
+            theTemplates = new ArrayList<HtmlTemplate>();
+            for(String path: (List<String>)StringUtil.split(getProperty(PROP_HTML_TEMPLATES,"%resourcedir%/template.html"),";",true,true)) {
+                path = getStorageManager().localizePath(path);
+                try {
+                    String resource = IOUtil.readContents(path, getClass());
+                    HtmlTemplate template = new HtmlTemplate(path,resource);
+                    theTemplates.add(template);
+                } catch (Exception exc) {
+                    //noop
+                }
+            }
+            if(cacheResources()) {
+                templates = theTemplates;
+            }
+        }
+        
+
+        for(HtmlTemplate template: theTemplates) {
+            if(template.isTemplateFor(request)) {
+                return template;
+            }
+        }
+        return theTemplates.get(0);
+    }
+
+
+    public String getTemplateProperty(Request request,String name,String dflt)  {
+        return getTemplate(request).getTemplateProperty(name,dflt);
+    }
+
+
     /**
      * _more_
      *
@@ -2107,6 +2213,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         return Misc.getProperty(properties, name, dflt);
     }
+
+
+
 
     /**
      * _more_
@@ -2732,8 +2841,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                   String arg) {
         List   links           = new ArrayList();
         String type            = request.getRequestPath();
-        String onLinkTemplate  = getProperty("ramadda.html.sublink.on", "");
-        String offLinkTemplate = getProperty("ramadda.html.sublink.off", "");
+        String onLinkTemplate  = getTemplateProperty(request,"ramadda.template.sublink.on", "");
+        String offLinkTemplate = getTemplateProperty(request,"ramadda.template.sublink.off", "");
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
             label = msg(label);
@@ -2760,6 +2869,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+
+
     /**
      * _more_
      *
@@ -2775,7 +2886,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             isAdmin = user.getAdmin();
         }
 
-        String template = getProperty("ramadda.html.link.wrapper", "");
+        String template = getTemplateProperty(request,"ramadda.template.link.wrapper", "");
 
         for (ApiMethod apiMethod : topLevelMethods) {
             if (apiMethod.getMustBeAdmin() && !isAdmin) {

@@ -600,13 +600,9 @@ public class Admin extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         sb.append(request.form(URL_ADMIN_SETTINGS_DO));
-        String size = " size=\"40\" ";
-
-
-        sb.append(
-            HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
-
-
+        String size = HtmlUtil.SIZE_40;
+        sb.append(HtmlUtil.submit(msg("Change Settings")));
+        sb.append(HtmlUtil.br());
         StringBuffer csb = new StringBuffer();
         csb.append(HtmlUtil.formTable());
         csb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
@@ -621,17 +617,6 @@ public class Admin extends RepositoryManager {
                     PROP_ADMIN_SMTP, getProperty(PROP_ADMIN_SMTP, ""),
                     size) + " "
                           + msg("For sending password reset messages")));
-
-
-
-
-        /*    public static final String PROP_USER_RESET_PASSWORD_TEMPLATE = "ramadda.user.reset.password.template";
-              public static final String PROP_USER_RESET_PASSWORD_SUBJECT = "ramadda.user.reset.password.subject";
-
-              public static final String PROP_USER_RESET_ID_TEMPLATE = "ramadda.user.reset.id.template";
-              public static final String PROP_USER_RESET_ID_SUBJECT = "ramadda.user.reset.id.subject";
-        */
-
 
 
         csb.append(HtmlUtil.formTableClose());
@@ -673,7 +658,6 @@ public class Admin extends RepositoryManager {
 
         StringBuffer asb = new StringBuffer();
         asb.append(HtmlUtil.formTable());
-
         asb.append(
             HtmlUtil.formEntry(
                 "",
@@ -705,9 +689,6 @@ public class Admin extends RepositoryManager {
 
         asb.append(HtmlUtil.formTableClose());
         sb.append(makeConfigBlock("Access", asb.toString()));
-
-
-
 
         StringBuffer osb = new StringBuffer();
         osb.append(HtmlUtil.formTable());
@@ -758,16 +739,12 @@ public class Admin extends RepositoryManager {
         }
 
         osb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
-
-
         osb.append(HtmlUtil.formTableClose());
         sb.append(makeConfigBlock("Available Output Types", osb.toString()));
 
 
-        sb.append(
-            HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
-        sb.append("</form>");
-        sb.append("</table>");
+        sb.append(HtmlUtil.submit(msg("Change Settings")));
+        sb.append(HtmlUtil.formClose());
         return makeResult(request, msg("Settings"), sb);
 
     }

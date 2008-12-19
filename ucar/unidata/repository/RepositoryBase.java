@@ -63,12 +63,12 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     public final RequestUrl URL_SEARCH_FORM = new RequestUrl(this,
                                                   "/search/form",
-                                                  "Advanced Search");
+                                                  "Advanced");
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_TEXTFORM = new RequestUrl(this,
                                                       "/search/textform",
-                                                      "Text Search");
+                                                      "Text");
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_BROWSE = new RequestUrl(this,

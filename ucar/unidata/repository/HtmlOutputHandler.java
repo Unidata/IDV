@@ -1015,8 +1015,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
         return makeLinksResult(request, msg("Group"), sb,
                                new State(group, subGroups, entries));
-
-
     }
 
 

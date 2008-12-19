@@ -247,10 +247,10 @@ public class MapOutputHandler extends OutputHandler {
                 js.append(",");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append("]);\n");
-                js.append("initLine(line," + qt(entry.getId()) + ","
+                 js.append("initLine(line," + qt(entry.getId()) + ","
                           + (makeRectangles
                              ? "1"
-                             : "0") + ");\n");
+                             : "0") + ","+mapVarName+");\n");
 
 
 
@@ -282,7 +282,7 @@ public class MapOutputHandler extends OutputHandler {
 
                 js.append("marker.setIcon(" + qt(icon) + ");\n");
                 js.append("marker.setInfoBubble(\"" + info + "\");\n");
-                js.append("initMarker(marker," + qt(entry.getId()) + ");\n");
+                js.append("initMarker(marker," + qt(entry.getId()) + "," + mapVarName +  ");\n");
             }
         }
         js.append(mapVarName+".autoCenterAndZoom();\n");

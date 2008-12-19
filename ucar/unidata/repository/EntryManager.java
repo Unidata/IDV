@@ -2620,7 +2620,7 @@ return new Result(title, sb);
         //                entry), entry.getLabel()));
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
-        String separator = getProperty("ramadda.breadcrumbs.separator", "");
+        String separator = getRepository().getTemplateProperty(request,"ramadda.template.breadcrumbs.separator", "");
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -2697,7 +2697,7 @@ return new Result(title, sb);
         }
         titleList.add(entry.getLabel());
         String nav;
-        String separator = getProperty("ramadda.breadcrumbs.separator", "");
+        String separator = getRepository().getTemplateProperty(request,"ramadda.template.breadcrumbs.separator", "");
         String entryLink = ( !entry.isGroup()
                              ? HtmlUtil.img(getIconUrl(entry))
                                + HtmlUtil.space(1)
@@ -3652,7 +3652,11 @@ return new Result(title, sb);
         }
 
 
-        return outputHandler.outputGroup(request, group, subGroups, entries);
+        group.setSubEntries(entries);
+        group.setSubGroups(subGroups);
+        Result result =  outputHandler.outputGroup(request, group, subGroups, entries);
+
+        return result;
     }
 
 
