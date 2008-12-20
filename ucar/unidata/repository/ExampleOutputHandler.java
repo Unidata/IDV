@@ -107,7 +107,7 @@ public class ExampleOutputHandler extends OutputHandler {
      * @throws Exception On badness
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
         //We'll add example1 when we are viewing a group and example2 when viewing a single entry
         if (state.group != null) {

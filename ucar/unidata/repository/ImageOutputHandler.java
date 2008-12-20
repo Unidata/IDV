@@ -127,7 +127,7 @@ public class ImageOutputHandler extends OutputHandler {
      */
 
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
 
         //If its a single entry then punt

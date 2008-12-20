@@ -116,7 +116,7 @@ public class MapOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
         boolean ok = false;
         for (Entry entry : state.getAllEntries()) {

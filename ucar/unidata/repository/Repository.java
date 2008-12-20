@@ -275,7 +275,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private OutputStream logFOS;
 
     /** _more_ */
-    protected boolean debug = true;
+    public static boolean debug = true;
 
     /** _more_ */
     private UserManager userManager;
@@ -1156,9 +1156,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @param message _more_
      */
-    protected void debug(String message) {
+    public static void debug(String message) {
         if (debug) {
-            log(message, null);
+            System.err.println(message);
+            //            log(message, null);
         }
     }
 
@@ -1491,7 +1492,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 return output.equals(OUTPUT_DELETER);
             }
             protected void getEntryLinks(Request request, State state,
-                                         List<Link> links, boolean forHeader)
+                                         List<Link> links)
                     throws Exception {
                 if (state.getEntry() != null) {
                     return;
@@ -2394,14 +2395,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             throws Exception {
         List<Link> links = new ArrayList<Link>();
         for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getEntryLinks(request, state, links, false);
+            outputHandler.getEntryLinks(request, state, links);
         }
         List<Link> okLinks = new ArrayList<Link>();
+
+
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
             if (isOutputTypeOK(outputType)) {
                 okLinks.add(link);
-            }
+            } 
         }
         return okLinks;
     }

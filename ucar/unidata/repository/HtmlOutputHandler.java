@@ -143,7 +143,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
         List<Entry> entries = state.getAllEntries();
         if (state.getEntry() != null) {

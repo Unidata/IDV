@@ -151,7 +151,7 @@ public class RssOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
 
         if (state.getEntry() != null) {

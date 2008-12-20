@@ -294,7 +294,7 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
         Entry entry = state.entry;
         if (entry == null) {
@@ -1476,12 +1476,16 @@ public class DataOutputHandler extends OutputHandler {
             return outputPointKml(request, entry);
         }
 
+        if (output.equals(OUTPUT_OPENDAP)) {
+            return outputOpendap(request, entry);
+        }
 
-        //        System.err.println ("entry:" + entry);
+        throw new IllegalArgumentException("Unknown output type:" + output);
+    }
 
-        //TODO: we create a new servlet every time we service a request.
-        //any problems with that?
 
+
+    public Result outputOpendap(final Request request, final Entry entry) throws Exception {
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry) {
             public ServletConfig getServletConfig() {
@@ -1510,8 +1514,8 @@ public class DataOutputHandler extends OutputHandler {
         Result result = new Result("");
         result.setNeedToWrite(false);
         return result;
-    }
 
+    }
 
 
     /**
@@ -1559,10 +1563,27 @@ public class DataOutputHandler extends OutputHandler {
             HttpServletRequest request = preq.getRequest();
             String             reqPath = entry.getName();
             String location = entry.getResource().getFile().toString();
+            try {
+            List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+            for(Metadata metadata: metadataList) {
+                if(metadata.getType().equals(ContentMetadataHandler.TYPE_ATTACHMENT)) {
+                    if(metadata.getAttr1().endsWith(".ncml")) {
+                        String ncml = IOUtil.readContents(new File(metadata.getAttr1()));
+                        ncml = ncml.replace("${location}",location);
+                        File ncmlFile = getStorageManager().getTmpFile(repositoryRequest, "tmp.ncml");
+                        IOUtil.writeBytes(ncmlFile, ncml.getBytes());
+                        System.err.println ("Doing ncml file");
+                        location = ncmlFile.toString();
+                        break;
+                    }
+                }
+            }
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
 
             try {
-                NetcdfFile ncFile =
-                    getNetcdfDataset(entry.getResource().getFile());
+                NetcdfFile ncFile =  getNetcdfDataset(new File(location));
                 GuardedDatasetImpl guardedDataset =
                     new GuardedDatasetImpl(reqPath, ncFile, true);
                 return guardedDataset;

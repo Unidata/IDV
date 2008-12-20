@@ -320,6 +320,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      */
     public Entry makeSynthEntry(Request request, Entry parentEntry, String id)
             throws Exception {
+        List<Metadata> metadataList = getMetadataManager().getMetadata(parentEntry);
         Object[] values = parentEntry.getValues();
         if (values == null) {
             return null;
@@ -398,7 +399,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         if (templateEntry != null) {
             entry.initWith(templateEntry);
         }
-
+        //Tack on the metadata
+        entry.setMetadata(metadataList);
         return entry;
     }
 

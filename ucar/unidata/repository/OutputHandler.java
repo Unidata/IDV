@@ -254,7 +254,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    public static class State {
+    public static  class State {
 
         /** _more_ */
         public static final int FOR_UNKNOWN = 0;
@@ -318,7 +318,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
          *
          * @param entries _more_
          */
-        public State(List<Entry> entries) {
+        public State(Group group, List<Entry> entries) {
+            this.group = group;
             this.entries = entries;
         }
 
@@ -419,7 +420,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {}
 
 
@@ -745,8 +746,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         StringBuffer formSB = new StringBuffer();
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        "getentries"));
+
         List<Link> links = getRepository().getOutputLinks(request,
-                               new State(entries));
+                                                          new State(getEntryManager().getDummyGroup(),entries));
+
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
@@ -1325,7 +1328,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             String propertyValue;
             if ( !outputType.getIsHtml()) {
                 List<Link> links = new ArrayList<Link>();
-                handler.getEntryLinks(myRequest,new State(importEntry),links,true);
+                handler.getEntryLinks(myRequest,new State(importEntry),links);
                 Link theLink = null;
                 for(Link link: links) {
                     if(Misc.equals(outputType, link.getOutputType())) {

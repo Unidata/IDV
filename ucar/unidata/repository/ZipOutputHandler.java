@@ -111,19 +111,18 @@ public class ZipOutputHandler extends OutputHandler {
      * @param entry _more_
      * @param state _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
         if (state.entry != null) {
             if (getAccessManager().canDownload(request, state.entry)) {
                 links.add(makeLink(request,state.entry,OUTPUT_ZIP, 
                                    "/"+ IOUtil.stripExtension(state.entry.getName())+ ".zip"));
             }
-        } else  if (state.group != null) {
+        } else {
             boolean ok = false;
             for (Entry child : state.getAllEntries()) {
                 if (getAccessManager().canDownload(request, child)) {
@@ -132,8 +131,12 @@ public class ZipOutputHandler extends OutputHandler {
                 }
             }
             if (ok) {
-                links.add(makeLink(request,state.group,OUTPUT_ZIP, 
-                                   "/"+ IOUtil.stripExtension(state.group.getName())+ ".zip"));
+                if(state.group!=null) {
+                    links.add(makeLink(request,state.group,OUTPUT_ZIP, 
+                                       "/"+ IOUtil.stripExtension(state.group.getName())+ ".zip"));
+                } else {
+                    links.add(makeLink(request,state.group,OUTPUT_ZIP));
+                }
             }
         }
     }

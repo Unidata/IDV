@@ -78,7 +78,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final OutputType OUTPUT_CART = new OutputType("User Cart",
                                                      "user.cart",
-                                                     OutputType.TYPE_HTML);
+                                                     OutputType.TYPE_NONHTML,"",ICON_CART);
 
     /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";
@@ -1421,7 +1421,7 @@ public class UserManager extends RepositoryManager {
             sb.append(msgLabel("As"));
             sb.append(HtmlUtil.space(1));
             List<Link> links = getRepository().getOutputLinks(request,
-                                   new OutputHandler.State(entries));
+                                   new OutputHandler.State(getEntryManager().getDummyGroup(),entries));
             List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
             for (Link link : links) {
                 OutputType outputType = link.getOutputType();
@@ -1909,33 +1909,28 @@ public class UserManager extends RepositoryManager {
     protected void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Cart") {
-            protected void getEntryLinks(Request request, Entry entry,
-                                         List<Link> links, boolean forHeader)
+            protected void getEntryLinks(Request request, State state,
+                                         List<Link> links)
                     throws Exception {
-                links.add(new Link(request.url(getRepository().URL_USER_CART,
-                        ARG_ACTION, ACTION_ADD, ARG_ENTRYID,
-                        entry.getId()), getRepository().fileUrl(ICON_CART),
-                                        msg("Add to cart")));
+                if(state.getEntry()!=null) {
+                    links.add(makeLink(request, state.getEntry(), OUTPUT_CART));
+                }            
             }
 
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_CART);
             }
 
-
-            protected void addOutputTypes(Request request, State state,
-                                          List<OutputType> types)
-                    throws Exception {
-                if ( !state.forHeader()) {
-                    types.add(OUTPUT_CART);
-                }
-            }
-
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
-                addToCart(request, entries);
+                if(group.isDummy()) {
+                    addToCart(request, entries);
+                    addToCart(request, (List<Entry>)new ArrayList(subGroups));
+                } else {
+                    addToCart(request, (List<Entry>)Misc.newList(group));
+                }
                 return showCart(request);
             }
         };

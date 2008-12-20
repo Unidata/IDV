@@ -142,7 +142,7 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     protected void getEntryLinks(Request request, State state,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
         throws Exception {
 
         List<Entry> theEntries = null;
