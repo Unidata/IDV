@@ -17,7 +17,6 @@ CREATE TABLE entries (id varchar(200),
 	           name varchar(200),
                    description varchar(10000),
                    parent_group_id varchar(200),
-		   tree_id varchar(1000),
    		   user_id varchar(200),
 	           resource varchar(500),	           
                    resource_type varchar(200),
@@ -171,12 +170,13 @@ CREATE TABLE  globals (name varchar(500),
 --DROP INDEX WIKIHISTORY_INDEX_ID;
 
 
+
+
 CREATE TABLE wikihistory (entry_id varchar(200),
-                          version  int,
  		          user_id varchar(200),
 			  date ramadda.datetime, 
-			  description varchar(2000));
-
+			  description varchar(2000),
+			  wikitext ramadda.clob);
 
 CREATE INDEX WIKIHISTORY_INDEX_ENTRY_ID ON wikihistory (ENTRY_ID);
 

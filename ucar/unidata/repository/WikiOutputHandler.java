@@ -32,6 +32,8 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WikiUtil;
 
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.sql.Clause;
+import ucar.unidata.sql.SqlUtil;
 
 
 
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.Properties;
 
 
+import java.sql.*;
 /**
  *
  *
@@ -55,9 +58,14 @@ public class WikiOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
-                                                     "wiki",
+                                                     "wiki.view",
                                                      OutputType.TYPE_HTML,
                                                      "", ICON_WIKI);
+
+    public static final OutputType OUTPUT_WIKI_HISTORY = new OutputType("Wiki History",
+                                                                        "wiki.history",
+                                                                        OutputType.TYPE_HTML,
+                                                                        "", ICON_WIKI);
 
 
     /**
@@ -72,6 +80,7 @@ public class WikiOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
         addType(OUTPUT_WIKI);
+        addType(OUTPUT_WIKI_HISTORY);
     }
 
 
@@ -98,6 +107,7 @@ public class WikiOutputHandler extends OutputHandler {
         }
         if (state.entry.getType().equals(WikiPageTypeHandler.TYPE_WIKIPAGE)) {
             links.add(makeLink(request, state.entry, OUTPUT_WIKI));
+            links.add(makeLink(request, state.entry, OUTPUT_WIKI_HISTORY));
         }
     }
 
@@ -115,9 +125,11 @@ public class WikiOutputHandler extends OutputHandler {
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
 
-        if (request.exists(ARG_WIKI_CREATE)) {
-            return wikiPageCreate(request, entry);
+        OutputType   output = request.getOutput();
+        if(output.equals(OUTPUT_WIKI_HISTORY)) {
+            return outputWikiHistory(request, entry);
         }
+
         String   wikiText = "";
         Object[] values   = entry.getValues();
         if ((values != null) && (values.length > 0) && (values[0] != null)) {
@@ -141,10 +153,56 @@ public class WikiOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result wikiPageCreate(Request request, Entry entry)
+    public Result outputWikiHistory(Request request, Entry entry)
             throws Exception {
-        return makeLinksResult(request, msg("Wiki Create"),
-                               new StringBuffer("TBD"), new State(entry));
+        StringBuffer sb = new StringBuffer();
+
+        Statement stmt = getDatabaseManager().select(Tables.WIKIHISTORY.COLUMNS,
+                                                     Tables.WIKIHISTORY.NAME,
+                                                     Clause.eq(Tables.WIKIHISTORY.COL_ENTRY_ID, entry.getId()),
+                                                     " order by " + Tables.WIKIHISTORY.COL_DATE +" asc ");
+
+        SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
+        ResultSet         results;
+
+
+        /*CREATE TABLE wikihistory (entry_id varchar(200),
+                          version  int,
+ 		          user_id varchar(200),
+			  date ramadda.datetime, 
+			  description varchar(2000),
+			  wikitext ramadda.clob);*/
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b(msg("Version")),
+                                             HtmlUtil.b(msg("User")),
+                                             HtmlUtil.b(msg("Date")),
+                                             HtmlUtil.b(msg("Description")))));
+        int version = 1;
+        List<WikiPageHistory> history = new ArrayList<WikiPageHistory>();
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int col = 2;
+                WikiPageHistory wph = new WikiPageHistory(version++,
+                                                          getUserManager().findUser(results.getString(col++),true),
+                                                          getDatabaseManager().getDate(results, col++),
+                                                          results.getString(col++));
+                history.add(wph);
+            }
+        }
+
+        for(int i = history.size()-1;i>=0;i--) {
+            WikiPageHistory wph = history.get(i);
+            sb.append(HtmlUtil.row(HtmlUtil.cols(""+wph.getVersion(),
+                                                 wph.getUser().getLabel(),
+                                                 getRepository().formatDate(wph.getDate()),
+                                                 wph.getDescription())));
+        }
+
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+
+        stmt.close();
+        return makeLinksResult(request, msg("Wiki History"),
+                               sb, new State(entry));
     }
 
     /**

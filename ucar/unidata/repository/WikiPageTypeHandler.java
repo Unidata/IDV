@@ -76,8 +76,6 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     public WikiPageTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
-        initWikiTable(entryNode);
-
     }
 
     /**
@@ -96,16 +94,15 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             WikiOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
     }
 
-    /**
-     * _more_
-     *
-     * @param node _more_
-     *
-     * @throws Exception _more_
-     */
-    private void initWikiTable(Element node) throws Exception {
-    }
 
+    public void deleteEntry(Request request, Statement statement, Entry entry)
+            throws Exception {
+        super.deleteEntry(request, statement, entry);
+        String query = SqlUtil.makeDelete(Tables.WIKIHISTORY.NAME, COL_ID,
+                                          SqlUtil.quote(entry.getId()));
+        System.err.println("delete:" + query);
+        statement.execute(query);
+    }
 
 
     /**
@@ -118,34 +115,42 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public void initializeEntry(Request request, Entry entry)
             throws Exception {
+        String originalText = "";
         Object[] values = entry.getValues();
         if(values!=null) {
-            System.err.println("values:" + values.length);
-            for(int i=0;i<values.length;i++) 
-                System.err.println("\tvalue[" + i +"]=" + values[i]); 
+            originalText = (String) values[0];
         }
-        if(values.length>=3) {
-            if(values[2] ==null) {
-                System.err.println("version was null");
-                values[2] = new Integer(0);
-            }   else {
-                Integer version = (Integer)values[2];
-                values[2] = new Integer(version.intValue()+1);
-            }
-        }
-        if ((values != null) && (values.length > 1) && (values[0] != null)) {
-            String wikiText = (String) values[0];
-
-
-            //            System.err.println(" got text:" + wikiText);
-            //            String wikiText = (String)values[0];
-        }
-
         super.initializeEntry(request, entry);
-        //        System.err.println(" entry:" + entry);
+        String newText = (String)  entry.getValues()[0];
+
+        if(!Misc.equals(originalText, newText)) {
+            if(originalText==null) originalText = "";
+            System.err.println(" changed version");
+            getDatabaseManager().executeInsert(Tables.WIKIHISTORY.INSERT,
+                    new Object[] {
+                        entry.getId(), 
+                        request.getUser().getId(), new Date(), request.getString(ARG_WIKI_CHANGEDESCRIPTION,""),
+                        originalText
+                    });
+        }
     }
 
 
+    public static class WikiHistory {
+        int version;
+        User user;
+        Date date;
+        String description;
+        String text;
+        public WikiHistory(User user, Date date, String description) {
+            this.user = user;
+            this.date = date;
+            this.description = description;
+        }
+
+
+
+    }
 
     /**
      * _more_
@@ -172,8 +177,15 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             }
             name = StringUtil.join(" ", tmp);
         }
-        sb.append(HtmlUtil.formEntry(msgLabel("Wiki Page Title"),
+        sb.append(HtmlUtil.formEntry(msgLabel("Title"),
                                      HtmlUtil.input(ARG_NAME, name, size)));
+
+        if(entry!=null) {
+            sb.append(HtmlUtil.formEntry(msgLabel("Edit&nbsp;Summary"),
+                                         HtmlUtil.input(ARG_WIKI_CHANGEDESCRIPTION,"",size)));
+        }
+
+
         String wikiText = "";
         if (entry != null) {
             Object[] values = entry.getValues();
@@ -320,10 +332,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
         String textWidget = buttons + HtmlUtil.br()
                             + HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 200,
-                                                80, HtmlUtil.id(ARG_WIKI_TEXT)) +HtmlUtil.br() +
-            msg("Briefly describe the changes you have made") +HtmlUtil.br() +
-            msgLabel("Edit Summary") +HtmlUtil.space(1) +
-            HtmlUtil.input(ARG_WIKI_CHANGEDESCRIPTION,"",HtmlUtil.SIZE_50);
+                                                80, HtmlUtil.id(ARG_WIKI_TEXT));
+
         String right = HtmlUtil.div(help.toString(),
                                     HtmlUtil.cssClass("smallhelp"));
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget
