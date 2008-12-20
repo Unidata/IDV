@@ -13,8 +13,8 @@ ramadda.template.userlink.separator=<span class="separator"> | </span>
 
 
 ramadda.template.sublink.wrapper=${sublinks}
-ramadda.template.sublink.on=<span class="subnavoncomp-leftcolumn">${label}</span>
-ramadda.template.sublink.off=<span class="subnavoffcomp-leftcolumn"><a href="${url}">${label}</a></span>
+ramadda.template.sublink.on=<span class="subnavoncomp">${label}</span>
+ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${label}</a></span>
 </properties>
 
 
@@ -32,7 +32,7 @@ ramadda.template.sublink.off=<span class="subnavoffcomp-leftcolumn"><a href="${u
 
 .breadcrumbs a {
    text-decoration: none;
-   color: black;
+   xcolor: black;
 }
 
 .breadcrumbs {
@@ -66,7 +66,14 @@ ramadda.template.sublink.off=<span class="subnavoffcomp-leftcolumn"><a href="${u
   border : 1px #888888 solid;
   min-height:500px;
   background-color:#ffffff;
+  padding:5px;
 }
+
+.leftcolumn {
+ margin-left:3px;
+ margin-right:4px;
+}
+
 
 .header-leftcolumn {
   border-bottom : 2px #888888 solid;
@@ -101,7 +108,7 @@ a.header-leftcolumn  {
 
 
 
-.subnav-leftcolumn {
+.subnav {
    margin:10;
    margin-left:0;
    padding:0;
@@ -111,7 +118,11 @@ a.header-leftcolumn  {
 
 
 
-.subnavoncomp-leftcolumn  {
+
+
+
+.subnavoncomp  {
+   xfont-weight: bold;
    background-color:#ffffff;
    border: 1px #999999 solid; 
    border-bottom: 2px white solid; 
@@ -121,10 +132,12 @@ a.header-leftcolumn  {
    padding-right:5;   
    padding-top:2px;   
    padding-bottom:0px;   
+   font-weight: bold;
 }
 
-.subnavoffcomp-leftcolumn  {
-   background-color:#cccccc;
+.subnavoffcomp  {
+   font-weight: bold;
+   background-color:#dddddd;
    border: 1px #999999 solid; 
    border-bottom: 1px 000000 solid; 
    margin-left:5px;
@@ -171,8 +184,8 @@ a.header-leftcolumn  {
 <tr valign="top">
 <td width="100">
 <a href="http://www.unidata.ucar.edu" target="external"><img border="0" width=\"120\" src="${root}/images/logo.png" align="center"></a>
-<div class="subnav-leftcolumn">
-Links:
+<div class="leftcolumn">
+<b>Links:</b>
 <div class="leftbox">${links}</div>
 <p>
 
@@ -180,7 +193,7 @@ Links:
 </td>
 
 <td>
-<table width="100%">
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr>
 <td width=50% >
 <span  class="header-leftcolumn-title">${header.title}</span>
