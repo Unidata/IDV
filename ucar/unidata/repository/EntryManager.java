@@ -1987,7 +1987,7 @@ return new Result(title, sb);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag = entryChild.getTagName();
             if (tag.equals(TAG_METADATA)) {
-                getMetadataManager().processMetadataXml(entry, entryChild);
+                getMetadataManager().processMetadataXml(entry, entryChild,files);
             } else if (tag.equals(TAG_DESCRIPTION)) {}
             else {
                 throw new IllegalArgumentException("Unknown tag:"

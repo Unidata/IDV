@@ -105,7 +105,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void processMetadataXml(Entry entry, Element node)
+    public void processMetadataXml(Entry entry, Element node, Hashtable fileMap)
             throws Exception {
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         Metadata metadata =

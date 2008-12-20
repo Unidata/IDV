@@ -100,27 +100,30 @@ public class ContentMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    public void xxxprocessMetadataXml(Entry entry, Element node)
+    public void processMetadataXml(Entry entry, Element node, Hashtable fileMap)
             throws Exception {
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         if (getType(type).equals(TYPE_THUMBNAIL)
                 || getType(type).equals(TYPE_ATTACHMENT)) {
             String fileArg = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
+            String tmpFile = (String)fileMap.get(fileArg);
+            if(tmpFile==null) {
+                System.err.println ("No uploaded file:" + fileArg);
+                System.err.println ("files: " + fileMap);
+                return;
+            }
             String fileName =
                 getRepository().getStorageManager().copyToEntryDir(entry,
-                    new File(fileArg)).getName();
+                                                                   new File(tmpFile)).getName();
+            System.err.println ("adding attachment " + fileName );
             Metadata metadata =
                 new Metadata(getRepository().getGUID(), entry.getId(), type,
                              XmlUtil.getAttribute(node, ATTR_INHERITED,
                                  DFLT_INHERITED), fileName,
-                                     XmlUtil.getAttribute(node, ATTR_ATTR2,
-                                         ""), XmlUtil.getAttribute(node,
-                                             ATTR_ATTR3,
-                                             ""), XmlUtil.getAttribute(node,
-                                                 ATTR_ATTR4, ""));
+                             "","","");
             entry.addMetadata(metadata);
         } else {
-            super.processMetadataXml(entry, node);
+            super.processMetadataXml(entry, node,fileMap);
         }
 
     }

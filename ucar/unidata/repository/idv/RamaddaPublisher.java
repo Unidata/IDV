@@ -40,6 +40,7 @@ import ucar.unidata.repository.InteractiveRepositoryClient;
 
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.HttpFormEntry;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 
@@ -120,6 +121,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
     /** _more_          */
     private JCheckBox doBundleCbx = new JCheckBox("Publish bundle and attach product", true);
+
+    private JCheckBox doThumbnailCbx = new JCheckBox("Show as  a thumbnail", true);
 
     private JCheckBox uploadZidvDataCbx = new JCheckBox("Upload ZIDV Data", false);
 
@@ -340,13 +343,21 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             }
 
 
+            boolean isImage = false;
             if ((contentFile != null) && !isBundle) {
                 topComps.add(GuiUtils.rLabel("File:"));
+                JComponent extra;
+                if(ImageUtils.isImage(contentFile)) {
+                    isImage = true;
+                    extra = doThumbnailCbx;
+                } else {
+                    extra = GuiUtils.filler(1,1);
+                }
                 topComps.add(
                     GuiUtils.left(
                         GuiUtils.hbox(
                             new JLabel(IOUtil.getFileTail(contentFile)),
-                            GuiUtils.filler(10, 5), doBundleCbx)));
+                            GuiUtils.filler(10, 5), doBundleCbx,extra)));
                 if (lastBundleId != null) {
                     addAssociationCbx = myAddAssociationCbx;
                     addAssociationCbx.setText(
@@ -442,12 +453,14 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
                 GuiUtils.ProgressDialog dialog = new GuiUtils.ProgressDialog("Publishing to RAMADDA");
                 List<String> files = new ArrayList<String>();
+                List<String> zipEntryNames = new ArrayList<String>();
 
                 String bundleFile = null;
                 if (isBundle) {
                     bundleFile  = contentFile;
                     contentFile = null;
                     files.add(bundleFile);
+                    zipEntryNames.add(IOUtil.getFileTail(bundleFile));
                 } else if (doBundleCbx.isSelected()) {
                     String tmpFile = contentFile;
                     if (tmpFile == null) {
@@ -458,25 +471,16 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                         + ".xidv");
                     getIdv().getPersistenceManager().doSave(bundleFile);
                     files.add(bundleFile);
+                    zipEntryNames.add(IOUtil.getFileTail(bundleFile));
                     if(contentFile!=null) {
                         files.add(contentFile);
+                        zipEntryNames.add(IOUtil.getFileTail(contentFile));
                     }
-                } else {
+                } else if(contentFile!=null) {
                     files.add(contentFile);
+                    zipEntryNames.add(IOUtil.getFileTail(contentFile));
                 }
 
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ZipOutputStream       zos = new ZipOutputStream(bos);
-
-                for(String file: files) {
-                    if(file==null) continue;
-                    zos.putNextEntry(
-                        new ZipEntry(IOUtil.getFileTail(file)));
-                    byte[] bytes =
-                        IOUtil.readBytes(new FileInputStream(file));
-                    zos.write(bytes, 0, bytes.length);
-                    zos.closeEntry();
-                }
 
 
 
@@ -541,8 +545,37 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 }
 
                 if (contentFile != null && node !=null) {
-                    repositoryClient.addAttachment(node, IOUtil.getFileTail(contentFile));
+                    if(isImage && doThumbnailCbx.isSelected()) {
+                        repositoryClient.addThumbnail(node, IOUtil.getFileTail(contentFile));
+                    } else {
+                        repositoryClient.addAttachment(node, IOUtil.getFileTail(contentFile));
+                    }
+                    if(false && isImage && doThumbnailCbx.isSelected()) {
+                        Image  image   = ImageUtils.readImage(contentFile);
+                        image = ImageUtils.resize(image,75,-1);
+                        String filename = "thumb_" + IOUtil.getFileTail(contentFile);
+                        String tmpFile = getIdv().getObjectStore().getTmpFile(filename);
+                        ImageUtils.writeImageToFile(image,tmpFile);
+                        repositoryClient.addThumbnail(node, filename);
+                        zipEntryNames.add(filename);
+                        files.add(tmpFile);
+                    }
                 }
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ZipOutputStream       zos = new ZipOutputStream(bos);
+
+                for(int i=0;i<files.size();i++) {
+                    String file = files.get(i);
+                    String name = zipEntryNames.get(i);
+                    if(file==null) continue;
+                    zos.putNextEntry(new ZipEntry(name));
+                    byte[] bytes =
+                        IOUtil.readBytes(new FileInputStream(file));
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                }
+
+
 
                 if(zidvFile!=null && isZidv && uploadZidvDataCbx.isSelected()) {
                     ZipInputStream zin  = new ZipInputStream(new FileInputStream(new File(zidvFile)));
@@ -558,7 +591,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                         if(getIdv().getArgsManager().isBundleFile(entryName)) {
                             continue;
                         }
-                       dialog.setText("Adding " + entryName);
+                        dialog.setText("Adding " + entryName);
                         zos.putNextEntry(new ZipEntry(entryName));
                         byte[] bytes =
                             IOUtil.readBytes(zin,null, false);
@@ -587,7 +620,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
 
                 String xml = XmlUtil.toString(root);
-                System.out.println(xml);
+                //                System.out.println(xml);
 
                 zos.putNextEntry(new ZipEntry("entries.xml"));
                 byte[] bytes = xml.getBytes();

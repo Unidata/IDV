@@ -179,6 +179,12 @@ public class RepositoryClient extends RepositoryBase {
                                       "content.attachment", ATTR_ATTR1, filename });
     }
 
+    public void addThumbnail(Element node, String filename) throws Exception {
+        XmlUtil.create(node.getOwnerDocument(), TAG_METADATA, node,
+                       new String[] { ATTR_TYPE,
+                                      "content.thumbnail", ATTR_ATTR1, filename });
+    }
+
     /**
      * _more_
      *

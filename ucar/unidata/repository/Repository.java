@@ -3024,6 +3024,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public static String msg(String msg) {
+        if(msg==null) return null;
         if (msg.indexOf(MSG_PREFIX) >= 0) {
             throw new IllegalArgumentException("bad msg:" + msg);
         }
@@ -3038,6 +3039,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public static String msgLabel(String msg) {
+        if(msg==null) return null;
         return msg(msg) + ":" + HtmlUtil.space(1);
     }
 
