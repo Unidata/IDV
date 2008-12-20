@@ -708,9 +708,8 @@ public class Admin extends RepositoryManager {
                     outputSB.append(HtmlUtil.p());
                 }
                 lastGroupName = type.getGroupName();
-                outputSB.append("<div class=\"pagesubheading\">"
-                                + lastGroupName
-                                + "</div>\n<div style=\"margin-left:20px\">");
+                outputSB.append(HtmlUtil.div(lastGroupName,HtmlUtil.cssClass("pagesubheading"))
+                                              +"\n<div style=\"margin-left:20px\">");
             }
             outputSB.append(HtmlUtil.checkbox("outputtype." + type.getId(),
                     "true", ok));
@@ -761,7 +760,7 @@ public class Admin extends RepositoryManager {
         return HtmlUtil.makeShowHideBlock(
             msg(title),
             HtmlUtil.div(contents, HtmlUtil.cssClass("admin-block-inner")),
-            false, "class=\"pagesubheading\"", "class=\"admin-block\"");
+            false, HtmlUtil.cssClass("pagesubheading"), HtmlUtil.cssClass("admin-block"));
     }
 
     /**

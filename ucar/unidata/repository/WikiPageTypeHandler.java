@@ -104,18 +104,6 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     private void initWikiTable(Element node) throws Exception {
-        Statement statement = getDatabaseManager().createStatement();
-
-        StringBuffer tableDef = new StringBuffer("CREATE TABLE "
-                                    + getTableName() + "_history" + " (\n");
-
-        tableDef.append(COL_ID + " varchar(200),");
-        tableDef.append(COL_ID + " varchar(200),");
-        tableDef.append(")");
-        try {
-            statement.execute(tableDef.toString());
-        } catch (Throwable exc) {}
-        statement.close();
     }
 
 
@@ -130,10 +118,21 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public void initializeEntry(Request request, Entry entry)
             throws Exception {
-        super.initializeEntry(request, entry);
-        //        System.err.println(" entry:" + entry);
-
         Object[] values = entry.getValues();
+        if(values!=null) {
+            System.err.println("values:" + values.length);
+            for(int i=0;i<values.length;i++) 
+                System.err.println("\tvalue[" + i +"]=" + values[i]); 
+        }
+        if(values.length>=3) {
+            if(values[2] ==null) {
+                System.err.println("version was null");
+                values[2] = new Integer(0);
+            }   else {
+                Integer version = (Integer)values[2];
+                values[2] = new Integer(version.intValue()+1);
+            }
+        }
         if ((values != null) && (values.length > 1) && (values[0] != null)) {
             String wikiText = (String) values[0];
 
@@ -142,6 +141,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             //            String wikiText = (String)values[0];
         }
 
+        super.initializeEntry(request, entry);
+        //        System.err.println(" entry:" + entry);
     }
 
 
@@ -319,7 +320,10 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
         String textWidget = buttons + HtmlUtil.br()
                             + HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 200,
-                                80, HtmlUtil.id(ARG_WIKI_TEXT));
+                                                80, HtmlUtil.id(ARG_WIKI_TEXT)) +HtmlUtil.br() +
+            msg("Briefly describe the changes you have made") +HtmlUtil.br() +
+            msgLabel("Edit Summary") +HtmlUtil.space(1) +
+            HtmlUtil.input(ARG_WIKI_CHANGEDESCRIPTION,"",HtmlUtil.SIZE_50);
         String right = HtmlUtil.div(help.toString(),
                                     HtmlUtil.cssClass("smallhelp"));
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget

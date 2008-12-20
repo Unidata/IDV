@@ -3051,7 +3051,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     protected static String msgHeader(String h) {
-        return HtmlUtil.div(msg(h), "class=\"pageheading\"");
+        return HtmlUtil.div(msg(h), HtmlUtil.cssClass("pageheading"));
     }
 
 
