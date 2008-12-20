@@ -1,0 +1,183 @@
+<html><head><title>${repository_name} - ${title}</title>
+
+<properties>
+name=Wikipedia Style
+id=wikipedia
+
+ramadda.template.link.wrapper =<div class="navlink"><a href="${url}">${label}</a></div>
+ramadda.template.link.separator=
+
+ramadda.template.userlink.wrapper =<span class="navlink"><a href="${url}" title="${tooltip}">${label}</a></span>
+ramadda.template.userlink.separator=<span class="separator"> | </span>
+
+
+
+ramadda.template.sublink.wrapper=${sublinks}
+ramadda.template.sublink.on=<span class="subnavoncomp-leftcolumn">${label}</span>
+ramadda.template.sublink.off=<span class="subnavoffcomp-leftcolumn"><a href="${url}">${label}</a></span>
+</properties>
+
+
+<link rel="stylesheet" href="${root}/style.css" type="text/css">
+<script language="JavaScript1.2" src="${root}/repository.js"></script>
+<script language="JavaScript1.2" src="${root}/CalendarPopup.js"></script>
+
+<style type="text/css">
+
+.navlink {
+   margin-left: 5px;
+   margin-top: 2px;
+   font-size: 12pt;
+   font-weight: normal;
+}
+
+.navlink a:link {
+   color:black;
+}
+
+.leftbox {
+   border: 1px #999999 solid; 
+   margin-top: 0px;
+   background-color:#ffffff;
+}
+
+
+.topbox {
+   padding:0px;
+   margin-top: 5px;
+   background-color:#ffffff;
+}
+
+.content {
+  border : 1px #888888 solid;
+  min-height:500px;
+  background-color:#ffffff;
+}
+
+.header-leftcolumn {
+  border-bottom : 2px #888888 solid;
+  xbackground-color:#006699;
+  color: #000000;
+  padding-top:10px;
+  padding-right:5px;
+}
+
+
+a.header-leftcolumn  {
+    color:black;
+}
+
+.header-leftcolumn a:hover  {
+    color:red;
+}
+
+.header-leftcolumn-title {
+  font-size: 150%;
+  color: black;
+}
+
+.header-leftcolumn a {
+	color:black;
+}
+
+.nav-leftcolumn {
+   font-weight: bold;
+   color: black;
+}
+
+
+
+.subnav-leftcolumn {
+   margin:10;
+   margin-left:0;
+   padding:0;
+   color: black;
+   min-height: 500px;
+}
+
+
+
+.subnavoncomp-leftcolumn  {
+   border: 1px #999999 solid; 
+   border-bottom: 2px white solid; 
+   margin-left:5px;
+   margin-right:5px;
+   padding-left:5;   
+   padding-right:5;   
+   padding-top:2px;   
+   padding-bottom:0px;   
+}
+
+.subnavoffcomp-leftcolumn  {
+   background-color:#cccccc;
+   border: 1px #999999 solid; 
+   border-bottom: 1px 000000 solid; 
+   margin-left:5px;
+   margin-right:5px;
+   padding-left:5;   
+   padding-right:5;   
+   padding-top:2px;   
+   padding-bottom:0px;   
+}
+
+
+
+.leftbox  a:link {
+   color:#000000;
+}
+
+
+.leftbox a:visited {
+   color:#000000;
+}
+
+
+.leftbox a:hover {
+   color:red;
+}
+
+
+
+.content {
+    min-height:800px;
+    margin:0;
+    margin-right:4px;
+}
+
+
+
+</style>
+
+
+</head>
+
+<body>
+<table style="background-repeat: no-repeat; background-image:url(${root}/images/headbg.jpg);" border="0"  width="100%" cellspacing="0" cellpadding="0" border="0" >
+<tr valign="top">
+<td width="100">
+<a href="http://www.unidata.ucar.edu" target="external"><img border="0" width=\"120\" src="${root}/images/logo.png" align="center"></a>
+<div class="subnav-leftcolumn">
+Links:
+<div class="leftbox">${links}</div>
+<p>
+
+</div>
+</td>
+
+<td>
+<table width="100%">
+<tr>
+<td width=50% >
+<span  class="header-leftcolumn-title">${header.title}</span>
+</td>
+<td width=25% align="right" >
+<span class="nav-leftcolumn">${userlink}&nbsp;</span>
+</td>
+</table>
+
+<div class="topbox">${sublinks}</div>
+<div class="content">${content}</div>
+</td></tr></table>
+<div class="footer">${footer}</div>
+${bottom}
+</body></html>
