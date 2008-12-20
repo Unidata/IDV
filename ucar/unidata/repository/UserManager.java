@@ -97,8 +97,9 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_SETTINGS,
-                                        getRepositoryBase().URL_USER_CART };
+    protected RequestUrl[] userUrls = {  getRepositoryBase().URL_USER_HOME,
+                                         getRepositoryBase().URL_USER_SETTINGS,
+                                         getRepositoryBase().URL_USER_CART };
 
 
     /** _more_ */

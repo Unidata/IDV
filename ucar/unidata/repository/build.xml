@@ -62,6 +62,7 @@
     <target name="idvplugin" depends="init,clean">
         <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
         <javac
+            verbose="false"
             classpath="${pluginclasspath}"
             debug="true"
             source="${srcversion}"
@@ -70,6 +71,8 @@
             failonerror="${failonerror}" 
             nowarn="true"
             srcdir="${srcdir}"
+            fork="true"
+            memoryMaximumSize="256m"
            target="1.5"
         >
         <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
@@ -85,7 +88,7 @@
             <include name="ucar/unidata/repository/htdocs/folderclosed.gif"/>
 	    </jar>
 
-        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
              <fileset file="${jars_dest}/ramaddaplugin.jar"/>
         </copy>
 

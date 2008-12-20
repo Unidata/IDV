@@ -1067,7 +1067,7 @@ return new Result(title, sb);
             msg("Are you sure you want to delete all of the entries?"));
         sb.append(request.form(getRepository().URL_ENTRY_DELETELIST));
         String hidden = HtmlUtil.hidden(ARG_ENTRYIDS, idBuffer.toString());
-        String form = RepositoryUtil.makeOkCancelForm(request,
+        String form = Repository.makeOkCancelForm(request,
                           getRepository().URL_ENTRY_DELETELIST,
                           ARG_DELETE_CONFIRM, hidden);
         sb.append(getRepository().question(msgSB.toString(), form));
@@ -1603,7 +1603,7 @@ return new Result(title, sb);
             String hidden = HtmlUtil.hidden(ARG_FROM, fromEntry.getId())
                             + HtmlUtil.hidden(ARG_TO, toEntry.getId())
                             + HtmlUtil.hidden(ARG_ACTION, action);
-            String form = RepositoryUtil.makeOkCancelForm(request,
+            String form = Repository.makeOkCancelForm(request,
                               getRepository().URL_ENTRY_COPY,
                               ARG_MOVE_CONFIRM, hidden);
             return new Result(
@@ -4489,7 +4489,7 @@ return new Result(title, sb);
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
         }
         StringBuffer sb = new StringBuffer();
-        String form = RepositoryUtil.makeOkCancelForm(request,
+        String form = Repository.makeOkCancelForm(request,
                           getRepository().URL_ASSOCIATION_DELETE,
                           ARG_DELETE_CONFIRM,
                           HtmlUtil.hidden(ARG_ASSOCIATION, associationId));

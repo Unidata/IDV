@@ -117,29 +117,6 @@ public class RepositoryUtil {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param url _more_
-     * @param okArg _more_
-     * @param extra _more_
-     *
-     * @return _more_
-     */
-    public static String makeOkCancelForm(Request request, RequestUrl url,
-                                          String okArg, String extra) {
-        StringBuffer fb = new StringBuffer();
-        fb.append(request.form(url));
-        fb.append(extra);
-        String okButton     = HtmlUtil.submit("OK", okArg);
-        String cancelButton = HtmlUtil.submit("Cancel", Constants.ARG_CANCEL);
-        String buttons      = RepositoryUtil.buttons(okButton, cancelButton);
-        fb.append(buttons);
-        fb.append(HtmlUtil.formClose());
-        return fb.toString();
-    }
-
 
 
     /**

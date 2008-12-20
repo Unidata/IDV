@@ -173,6 +173,12 @@ public class RepositoryClient extends RepositoryBase {
         }
     }
 
+    public void addAttachment(Element node, String filename) throws Exception {
+        XmlUtil.create(node.getOwnerDocument(), TAG_METADATA, node,
+                       new String[] { ATTR_TYPE,
+                                      "content.attachment", ATTR_ATTR1, filename });
+    }
+
     /**
      * _more_
      *
@@ -239,7 +245,7 @@ public class RepositoryClient extends RepositoryBase {
                                           new String[] {});
             Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
                                     new String[] {
-                ATTR_ID, "1234", ATTR_TYPE, TypeHandler.TYPE_GROUP,
+                ATTR_ID, "1234", ATTR_TYPE, TYPE_GROUP,
                 ATTR_PARENT, parentId, ATTR_NAME, name
             });
 
