@@ -23,6 +23,12 @@ a:hover {
 }
 
 
+.footer {
+   margin:10px;
+   align:center;
+   text-align:center;
+}
+
 .header {
   border-bottom : 1px black solid;
   background-repeat: no-repeat;

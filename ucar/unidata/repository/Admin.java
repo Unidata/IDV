@@ -600,7 +600,7 @@ public class Admin extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         sb.append(request.form(URL_ADMIN_SETTINGS_DO));
-        String size = HtmlUtil.SIZE_40;
+        String size = HtmlUtil.SIZE_60;
         sb.append(HtmlUtil.submit(msg("Change Settings")));
         sb.append(HtmlUtil.br());
         StringBuffer csb = new StringBuffer();
@@ -608,14 +608,14 @@ public class Admin extends RepositoryManager {
         csb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
                                       HtmlUtil.input(PROP_ADMIN_EMAIL,
                                           getProperty(PROP_ADMIN_EMAIL, ""),
-                                          size)));
+                                          HtmlUtil.SIZE_40)));
 
         csb.append(
             HtmlUtil.formEntry(
                 msgLabel("Mail Server"),
                 HtmlUtil.input(
                     PROP_ADMIN_SMTP, getProperty(PROP_ADMIN_SMTP, ""),
-                    size) + " "
+                    HtmlUtil.SIZE_40) + " "
                           + msg("For sending password reset messages")));
 
 
@@ -633,7 +633,7 @@ public class Admin extends RepositoryManager {
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Footer"),
                                          HtmlUtil.textArea(PROP_HTML_FOOTER,
                                              getProperty(PROP_HTML_FOOTER,
-                                                 ""), 5, 40)));
+                                                 ""), 5, 60)));
 
 
 
@@ -644,7 +644,7 @@ public class Admin extends RepositoryManager {
         dsb.append(
             HtmlUtil.formEntryTop(
                 msgLabel("Translations"),
-                HtmlUtil.textArea(PROP_ADMIN_PHRASES, phrases, 5, 40)));
+                HtmlUtil.textArea(PROP_ADMIN_PHRASES, phrases, 5, 60)));
 
 
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"

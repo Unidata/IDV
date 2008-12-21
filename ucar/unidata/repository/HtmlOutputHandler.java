@@ -587,28 +587,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param sb _more_
-     *
-     *
-     * @return _more_
-     * @throws Exception _more_
-     */
-    public StringBuffer getCommentBlock(Request request, Entry entry)
-            throws Exception {
-        StringBuffer  sb       = new StringBuffer();
-        List<Comment> comments = getEntryManager().getComments(request,
-                                     entry);
-        if (comments.size() > 0) {
-            sb.append(getEntryManager().getCommentHtml(request, entry));
-        }
-        return sb;
-
-    }
 
 
     /**

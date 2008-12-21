@@ -1012,6 +1012,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKIPROP_IMPORT = "import";
 
+    public static final String WIKIPROP_COMMENTS = "comments";
+
     /** _more_ */
     public static final String WIKIPROP_TOOLBAR = "toolbar";
 
@@ -1050,6 +1052,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_          */
     public static final String[] WIKIPROPS = {
         WIKIPROP_INFORMATION, WIKIPROP_NAME, WIKIPROP_DESCRIPTION,
+        WIKIPROP_COMMENTS,
         WIKIPROP_BREADCRUMBS, WIKIPROP_TOOLBAR, WIKIPROP_IMAGE,
         WIKIPROP_ACTIONS  /*,
           WIKIPROP_CHILDREN_GROUPS,
@@ -1190,6 +1193,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             blockTitle = Misc.getProperty(props, "title", msg("Actions"));
             blockContent = getEntryManager().getEntryActionsList(request,
                     entry);
+        } else if (include.equals(WIKIPROP_COMMENTS)) {
+            return getCommentBlock(request, entry).toString();
         } else if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryActionsToolbar(request, entry,
                     false);
@@ -1274,6 +1279,30 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     *
+     * @return _more_
+     * @throws Exception _more_
+     */
+    public StringBuffer getCommentBlock(Request request, Entry entry)
+            throws Exception {
+        StringBuffer  sb       = new StringBuffer();
+        List<Comment> comments = getEntryManager().getComments(request,
+                                     entry);
+        if (comments.size() > 0) {
+            sb.append(getEntryManager().getCommentHtml(request, entry));
+        }
+        return sb;
+
+    }
+
 
 
 
