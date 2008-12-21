@@ -17,7 +17,7 @@
   <outputhandler class="ucar.unidata.repository.ZipOutputHandler" name="ZIP Files"/>
   <outputhandler class="ucar.unidata.repository.GraphOutputHandler" name="Graph"/>
   <outputhandler class="ucar.unidata.repository.TextOutputHandler" name="Text"/>
-  <outputhandler class="ucar.unidata.repository.WikiOutputHandler" name="Wiki"/>
+  <outputhandler class="ucar.unidata.repository.WikiPageOutputHandler" name="Wiki"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false" name="IDV Preview"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 

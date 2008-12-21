@@ -94,7 +94,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
         return getRepository().getOutputHandler(
-            WikiOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
+            WikiPageOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
     }
 
 
@@ -141,7 +141,6 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                     });
         }
     }
-
 
 
     /**

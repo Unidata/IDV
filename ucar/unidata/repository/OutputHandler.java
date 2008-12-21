@@ -1433,7 +1433,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                     String url =
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                          theEntry, ARG_OUTPUT,
-                                         WikiOutputHandler.OUTPUT_WIKI);
+                                         WikiPageOutputHandler.OUTPUT_WIKI);
                     return getEntryManager().getAjaxLink(request, theEntry,
                             label, url, false);
 

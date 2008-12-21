@@ -51,7 +51,7 @@ import java.sql.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class WikiOutputHandler extends OutputHandler {
+public class WikiPageOutputHandler extends OutputHandler {
 
 
 
@@ -75,7 +75,7 @@ public class WikiOutputHandler extends OutputHandler {
      * @param element _more_
      * @throws Exception _more_
      */
-    public WikiOutputHandler(Repository repository, Element element)
+    public WikiPageOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
         addType(OUTPUT_WIKI);
