@@ -339,6 +339,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_WIKI_TEXT = "wiki.text";
 
+    public static final String ARG_WIKI_EDITWITH = "wiki.editwith";
+
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
@@ -824,6 +826,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_NAVSUBLINKS = "ramadda.navsublinks";
+
+    public static final String PROP_ENTRY_HEADER = "ramadda.entryheader";
 
     /** _more_ */
     public static final String PROP_SHOW_APPLET = "ramadda.html.showapplet";

@@ -3,8 +3,8 @@
 <script language="JavaScript1.2" src="${root}/repository.js"></script>
 <script language="JavaScript1.2" src="${root}/CalendarPopup.js"></script>
 <properties>
-name=Default Template
-id=default
+name=Tabs
+id=tabs
 ramadda.template.sublink.wrapper=<div class="subnav">${sublinks}</div>
 ramadda.template.sublink.on=<span  class="subnavoncomp"><img class="curve" src="${root}/icons/blc.gif">${label}<img class="curve" src="${root}/icons/brc.gif"></span>
 ramadda.template.sublink.off=<span  class="subnavoffcomp"><a href="${url}">${label}</a></span>
@@ -32,7 +32,10 @@ ramadda.template.sublink.off=<span  class="subnavoffcomp"><a href="${url}">${lab
 
 
 ${sublinks}
-<div class="content">${content}</div>
+
+<div class="content">
+${entry.header}
+${content}</div>
 <div class="footer">${footer}</div>
 ${bottom}
 </body></html>

@@ -559,7 +559,7 @@ public class AccessManager extends RepositoryManager {
     public Result processAccessForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
-        sb.append(getEntryManager().makeEntryHeader(request, entry));
+        //        sb.append(getEntryManager().makeEntryHeader(request, entry));
         if (request.exists(ARG_MESSAGE)) {
             sb.append(
                 getRepository().note(

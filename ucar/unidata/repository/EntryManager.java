@@ -318,21 +318,22 @@ return new Result(title, sb);
                             OutputHandler.OUTPUT_HTML.getId().toString())));
             }
         }
+        return addEntryHeader(request, entry, processEntryShow(request, entry));
+    }
 
-        String output = request.getString(ARG_OUTPUT, (String) "");
-        Result result = processEntryShow(request, entry);
+
+    public Result addEntryHeader(Request request, Entry entry, Result result) throws Exception {
         if (result.getShouldDecorate()) {
+            String output = request.getString(ARG_OUTPUT, (String) "");
             request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
             if ( !entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
                 sb.append(crumbs[1]);
-                sb.append(new String(result.getContent()));
-                result.setContent(sb.toString().getBytes());
                 result.setTitle(result.getTitle() + ": " + crumbs[0]);
+                result.putProperty(PROP_ENTRY_HEADER, sb.toString());
             }
         }
-
         return result;
     }
 
@@ -380,12 +381,6 @@ return new Result(title, sb);
         //                           Misc.newList("contents1","contents2","contents3")));
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
-            /*
-            if (entry.isTopGroup()) {
-                sb.append(makeEntryHeader(request, entry));
-                sb.append(getRepository().note("Cannot edit top-level group"));
-                return makeEntryEditResult(request, entry, "Edit Entry", sb);
-                }*/
             type = entry.getTypeHandler().getType();
             if ( !entry.isTopGroup()) {
                 group = findGroup(request, entry.getParentGroupId());
@@ -400,14 +395,10 @@ return new Result(title, sb);
         if (type == null) {
             type = request.getString(ARG_TYPE, (String) null);
         }
-        if (entry == null) {
-            sb.append(makeEntryHeader(request, group));
-        } else {
-            sb.append(makeEntryHeader(request, entry));
-        }
+
 
         if ((entry != null) && entry.getIsLocalFile()) {
-            sb.append("This is a local file and cannot be edited");
+            sb.append(msg("This is a local file and cannot be edited"));
             return makeEntryEditResult(request, entry, "Entry Edit", sb);
         }
 
@@ -467,7 +458,7 @@ return new Result(title, sb);
         }
         sb.append(HtmlUtil.formTableClose());
         if (entry == null) {
-            return new Result(title, sb);
+            return addEntryHeader(request, group,new Result(title, sb));
         }
         return makeEntryEditResult(request, entry, title, sb);
     }
@@ -933,7 +924,7 @@ return new Result(title, sb);
     public Result processEntryDelete(Request request) throws Exception {
         Entry        entry = getEntry(request);
         StringBuffer sb    = new StringBuffer();
-        sb.append(makeEntryHeader(request, entry));
+        //        sb.append(makeEntryHeader(request, entry));
         if (entry.isTopGroup()) {
             sb.append(getRepository().note("Cannot delete top-level group"));
             return makeEntryEditResult(request, entry, "Delete Entry", sb);
@@ -1130,7 +1121,7 @@ return new Result(title, sb);
      * @return _more_
      */
     protected Result makeEntryEditResult(Request request, Entry entry,
-                                         String title, StringBuffer sb) {
+                                         String title, StringBuffer sb) throws Exception {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
@@ -1138,7 +1129,7 @@ return new Result(title, sb);
                                 ? getRepository().groupEditUrls
                                 : getRepository().entryEditUrls), "?"
                                 + ARG_ENTRYID + "=" + entry.getId()));
-        return result;
+        return addEntryHeader(request, entry,result);
     }
 
 
@@ -1329,7 +1320,7 @@ return new Result(title, sb);
     public Result processEntryNew(Request request) throws Exception {
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
-        sb.append(makeEntryHeader(request, group));
+        //        sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
         sb.append(request.form(getRepository().URL_ENTRY_FORM));
         sb.append(msgLabel("Create a"));
@@ -1496,12 +1487,11 @@ return new Result(title, sb);
                 request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
         }
 
-
         if ( !request.exists(ARG_TO)) {
             StringBuffer sb     = new StringBuffer();
             List<Entry>  cart   = getUserManager().getCart(request);
             boolean      didOne = false;
-            sb.append(makeEntryHeader(request, fromEntry));
+            //            sb.append(makeEntryHeader(request, fromEntry));
             for (Entry entry : cart) {
                 if ( !getAccessManager().canDoAction(request, entry,
                         Permission.ACTION_NEW)) {
@@ -1537,7 +1527,7 @@ return new Result(title, sb);
                 sb.append("</ul>");
             }
 
-            return new Result(msg("Entry Move/Copy"), sb);
+            return addEntryHeader(request, fromEntry,new Result(msg("Entry Move/Copy"), sb));
         }
 
 
@@ -1574,11 +1564,11 @@ return new Result(title, sb);
 
         if ( !okToMove(fromEntry, toEntry)) {
             StringBuffer sb = new StringBuffer();
-            sb.append(makeEntryHeader(request, fromEntry));
+            //            sb.append(makeEntryHeader(request, fromEntry));
             sb.append(
                 getRepository().error(
                     msg("Cannot move a group to its descendent")));
-            return new Result("", sb);
+            return addEntryHeader(request, fromEntry,new Result("", sb));
         }
 
 
@@ -2043,13 +2033,13 @@ return new Result(title, sb);
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
-        sb.append(makeEntryHeader(request, entry));
+        //        sb.append(makeEntryHeader(request, entry));
         sb.append("<p>");
         sb.append(getCommentHtml(request, entry));
-        return new OutputHandler(getRepository(),
-                                 "tmp").makeLinksResult(request,
-                                     msg("Entry Comments"), sb,
-                                     new OutputHandler.State(entry));
+        return addEntryHeader(request, entry,new OutputHandler(getRepository(),
+                                                               "tmp").makeLinksResult(request,
+                                                                                      msg("Entry Comments"), sb,
+                                                                                      new OutputHandler.State(entry)));
     }
 
 
@@ -2141,7 +2131,7 @@ return new Result(title, sb);
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append(makeEntryHeader(request, entry));
+        //        sb.append(makeEntryHeader(request, entry));
         if (request.exists(ARG_MESSAGE)) {
             sb.append(
                 getRepository().note(
@@ -2163,9 +2153,10 @@ return new Result(title, sb);
             });
             //Now clear out the comments in the cached entry
             entry.setComments(null);
-            return new Result(request.url(getRepository().URL_COMMENTS_SHOW,
-                                          ARG_ENTRYID, entry.getId(),
-                                          ARG_MESSAGE, "Comment added"));
+            return addEntryHeader(request, entry,  
+                                  new Result(request.url(getRepository().URL_COMMENTS_SHOW,
+                                                         ARG_ENTRYID, entry.getId(),
+                                                         ARG_MESSAGE, "Comment added")));
         }
 
         sb.append(msgLabel("Add comment for") + getEntryLink(request, entry));
@@ -2186,10 +2177,10 @@ return new Result(title, sb);
                     HtmlUtil.submit(msg("Cancel"), ARG_CANCEL))));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
-        return new OutputHandler(getRepository(),
+        return addEntryHeader(request, entry,new OutputHandler(getRepository(),
                                  "tmp").makeLinksResult(request,
                                      msg("Entry Comments"), sb,
-                                     new OutputHandler.State(entry));
+                                     new OutputHandler.State(entry)));
     }
 
 

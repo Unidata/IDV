@@ -523,7 +523,7 @@ public class HarvesterManager extends RepositoryManager {
         Group        group   = getEntryManager().findGroup(request);
         boolean      recurse = request.get(ARG_RECURSE, false);
         StringBuffer sb      = new StringBuffer();
-        sb.append(getEntryManager().makeEntryHeader(request, group));
+        //        sb.append(getEntryManager().makeEntryHeader(request, group));
         sb.append("<p>");
         String catalog = request.getString(ARG_CATALOG, "").trim();
         sb.append(request.form(URL_HARVESTERS_IMPORTCATALOG));
@@ -543,7 +543,7 @@ public class HarvesterManager extends RepositoryManager {
             Misc.run(harvester, "run");
         }
 
-        Result result = new Result(request.url(URL_HARVESTERS_LIST));
+        Result result =    getEntryManager().addEntryHeader(request, group,new Result(request.url(URL_HARVESTERS_LIST)));
         return result;
     }
 

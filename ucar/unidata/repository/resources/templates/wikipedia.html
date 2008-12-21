@@ -1,14 +1,17 @@
 <html><head><title>${repository_name} - ${title}</title>
 
 <properties>
-name=Wikipedia Style
+name=Default Style
 id=wikipedia
 
 ramadda.template.link.wrapper =<div class="navlink"><a href="${url}">${label}</a></div>
 ramadda.template.link.separator=
 
-ramadda.template.userlink.wrapper =<span class="navlink"><a href="${url}" title="${tooltip}">${label}</a></span>
-ramadda.template.userlink.separator=<span class="separator"> | </span>
+ramadda.template.userlink.wrapper =<div class="navlink"><a href="${url}">${label}</a></div>
+ramadda.template.userlink.separator=
+
+xramadda.template.userlink.wrapper =<span class="navlink"><a href="${url}" title="${tooltip}">${label}</a></span>
+xramadda.template.userlink.separator=<span class="separator"> | </span>
 
 
 
@@ -28,6 +31,7 @@ ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${labe
    font-weight: bold;
    font-size: 110%;
    color: black;
+   border: 0px #999999 solid; 
 }
 
 .breadcrumbs a {
@@ -186,7 +190,10 @@ a.header-leftcolumn  {
 <a href="http://www.unidata.ucar.edu" target="external"><img border="0" width=\"120\" src="${root}/images/logo.png" align="center"></a>
 <div class="leftcolumn">
 <b>Links:</b>
-<div class="leftbox">${links}</div>
+<div class="leftbox">${links}
+<hr width=75%>
+${userlink}
+</div>
 <p>
 
 </div>
@@ -199,11 +206,14 @@ a.header-leftcolumn  {
 <span  class="header-leftcolumn-title">${header.title}</span>
 </td>
 <td width=25% align="right" >
-<span class="nav-leftcolumn">${userlink}&nbsp;</span>
+<!--<span class="nav-leftcolumn">${userlink}&nbsp;</span>-->
 </td>
 </table>
 
-<div class="topbox">${sublinks}</div>
+${entry.header}
+<div class="topbox">
+${sublinks}
+</div>
 <div class="content">${content}</div>
 </td></tr></table>
 <div class="footer">${footer}</div>

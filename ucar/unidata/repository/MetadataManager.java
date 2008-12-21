@@ -689,7 +689,7 @@ public class MetadataManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
 
-        sb.append(getEntryManager().makeEntryHeader(request, entry));
+        //        sb.append(getEntryManager().makeEntryHeader(request, entry));
 
         List<Metadata> metadataList = getMetadata(entry);
         sb.append(HtmlUtil.p());
@@ -748,7 +748,7 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
-        sb.append(getEntryManager().makeEntryHeader(request, entry));
+        //        sb.append(getEntryManager().makeEntryHeader(request, entry));
         sb.append(HtmlUtil.p());
         if ( !request.exists(ARG_TYPE)) {
             List<String> groups   = new ArrayList<String>();

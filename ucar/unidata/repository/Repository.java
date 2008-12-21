@@ -108,6 +108,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final String MACRO_LINKS = "links";
 
+    public static final String MACRO_ENTRY_HEADER = "entry.header";
+
     /** _more_ */
     public static final String MACRO_HEADER_IMAGE = "header.image";
 
@@ -1960,6 +1962,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 StringUtil.join(getTemplateProperty(request,"ramadda.template.link.separator",
                                             ""), links);
         }
+        String entryHeader = (String)result.getProperty(PROP_ENTRY_HEADER);
+        if(entryHeader==null) entryHeader  = "";
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = "";
         if (sublinks != null) {
@@ -1983,6 +1987,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             getProperty(PROP_HTML_FOOTER, BLANK), MACRO_TITLE,
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
             MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
+            MACRO_ENTRY_HEADER,entryHeader,
             MACRO_ROOT, getUrlBase()
         };
 
@@ -2917,6 +2922,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
             String html = template.replace("${url}", url);
             html = html.replace("${label}", apiMethod.getName());
+            html = html.replace("${topgroup}", getEntryManager().getTopGroup().getName());
             links.add(html);
         }
         return links;

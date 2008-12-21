@@ -5,7 +5,7 @@
 
 
   <group handler="entrymanager">
-      <api request="/entry/show"             method="processEntryShow"    name="Home" toplevel="true" ishome="true"/>
+      <api request="/entry/show"             method="processEntryShow"    name="${topgroup}" toplevel="true" ishome="true"/>
       <api request="/entry/show/*"           method="processEntryShow"/>
       <api request="/entry/form"             method="processEntryForm"       actions="edit"/>
       <api request="/entry/change"           method="processEntryChange"     actions="edit"/>
