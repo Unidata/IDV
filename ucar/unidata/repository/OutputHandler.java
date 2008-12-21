@@ -323,6 +323,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             this.entries = entries;
         }
 
+        public boolean isDummyGroup() {
+            Entry entry  = getEntry();
+            if(entry==null) return false;
+            if(!entry.isGroup()) return false;
+            return entry.isDummy();
+        }
+
         /**
          * _more_
          *

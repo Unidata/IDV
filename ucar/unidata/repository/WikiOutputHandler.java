@@ -130,11 +130,22 @@ public class WikiOutputHandler extends OutputHandler {
         }
 
         String   wikiText = "";
-        Object[] values   = entry.getValues();
-        if ((values != null) && (values.length > 0) && (values[0] != null)) {
-            wikiText = (String) values[0];
+        String header = "";
+        if(request.defined(ARG_WIKI_VERSION)) {
+            Date dttm= new Date((long)request.get(ARG_WIKI_VERSION,0.0));
+            WikiPageHistory wph = ((WikiPageTypeHandler)entry.getTypeHandler()).getHistory(entry, dttm);
+            if(wph==null) {
+                throw new IllegalArgumentException("Could not find wiki history");
+            }
+            wikiText = wph.getText();
+            header = getRepository().note(msgLabel("Text from version") +getRepository().formatDate(wph.getDate())); 
+        } else {
+            Object[] values   = entry.getValues();
+            if ((values != null) && (values.length > 0) && (values[0] != null)) {
+                wikiText = (String) values[0];
+            }
         }
-        StringBuffer sb = new StringBuffer(wikifyEntry(request, entry,
+        StringBuffer sb = new StringBuffer(header+wikifyEntry(request, entry,
                               wikiText));
         return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
     }
@@ -159,8 +170,9 @@ public class WikiOutputHandler extends OutputHandler {
 
         List<WikiPageHistory> history = ((WikiPageTypeHandler)entry.getTypeHandler()).getHistoryList(entry,null,false);
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
-        sb.append(HtmlUtil.row(HtmlUtil.cols("",
+        sb.append(HtmlUtil.row(HtmlUtil.cols(
                                              HtmlUtil.b(msg("Version")),
+                                             "","",
                                              HtmlUtil.b(msg("User")),
                                              HtmlUtil.b(msg("Date")),
                                              HtmlUtil.b(msg("Description")))));
@@ -172,7 +184,9 @@ public class WikiOutputHandler extends OutputHandler {
                 edit = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_FORM, entry,ARG_WIKI_EDITWITH,wph.getDate().getTime()+""),
                                      HtmlUtil.img(getRepository().fileUrl(ICON_EDIT), msg("Edit with this version")));
             }
-            sb.append(HtmlUtil.row(HtmlUtil.cols(edit,""+wph.getVersion(),
+            String view = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,ARG_WIKI_VERSION,wph.getDate().getTime()+""),
+                                        HtmlUtil.img(getRepository().fileUrl(ICON_WIKI), msg("View this page")));
+            sb.append(HtmlUtil.row(HtmlUtil.cols(""+wph.getVersion(),edit,view,
                                                  wph.getUser().getLabel(),
                                                  getRepository().formatDate(wph.getDate()),
                                                  wph.getDescription())));

@@ -101,9 +101,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     public void deleteEntry(Request request, Statement statement, Entry entry)
             throws Exception {
         super.deleteEntry(request, statement, entry);
-        String query = SqlUtil.makeDelete(Tables.WIKIHISTORY.NAME, COL_ID,
+        String query = SqlUtil.makeDelete(Tables.WIKIHISTORY.NAME, Tables.WIKIHISTORY.COL_ENTRY_ID,
                                           SqlUtil.quote(entry.getId()));
-        System.err.println("delete:" + query);
         statement.execute(query);
     }
 
@@ -118,19 +117,18 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public void initializeEntry(Request request, Entry entry)
             throws Exception {
-        String originalText = null;
         Object[] values = entry.getValues();
+        String originalText=null;
         if(values!=null) {
-            originalText = (String) values[0];
+            originalText  = (String)values[0];
         }
+        boolean wasNew =(values==null);
         super.initializeEntry(request, entry);
         String newText = (String)  entry.getValues()[0];
-
         if(originalText==null || !Misc.equals(originalText, newText)) {
             String desc="";
-            if(originalText==null) {
+            if(wasNew) {
                 desc = "Created";
-                originalText = "";
             } else {
                 desc = request.getString(ARG_WIKI_CHANGEDESCRIPTION,"");
             }
@@ -139,27 +137,12 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                     new Object[] {
                         entry.getId(), 
                         request.getUser().getId(), new Date(), desc,
-                        originalText
+                        newText
                     });
         }
     }
 
 
-    public static class WikiHistory {
-        int version;
-        User user;
-        Date date;
-        String description;
-        String text;
-        public WikiHistory(User user, Date date, String description) {
-            this.user = user;
-            this.date = date;
-            this.description = description;
-        }
-
-
-
-    }
 
     /**
      * _more_

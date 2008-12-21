@@ -173,7 +173,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final OutputType OUTPUT_DELETER =
         new OutputType("Delete Entry", "repository.delete",
-                       OutputType.TYPE_ACTION);
+                       OutputType.TYPE_ACTION,"",ICON_DELETE);
 
 
     /** _more_ */
@@ -1496,7 +1496,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             protected void getEntryLinks(Request request, State state,
                                          List<Link> links)
                     throws Exception {
-                if (state.getEntry() != null) {
+                if (!state.isDummyGroup()) {
                     return;
                 }
                 for (Entry entry : state.getAllEntries()) {
