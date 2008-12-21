@@ -2762,7 +2762,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(Request request, String entryId)
+    public Entry getEntry(Request request, String entryId)
             throws Exception {
         return getEntry(request, entryId, true);
     }
@@ -2778,7 +2778,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(Request request, String entryId,
+    public Entry getEntry(Request request, String entryId,
                              boolean andFilter)
             throws Exception {
         return getEntry(request, entryId, andFilter, false);
@@ -2794,7 +2794,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(Request request) throws Exception {
+    public Entry getEntry(Request request) throws Exception {
         String entryId = request.getString(ARG_ENTRYID, BLANK);
         Entry  entry   = getEntry(request, entryId);
         if (entry == null) {
@@ -2828,7 +2828,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(Request request, String entryId,
+    public Entry getEntry(Request request, String entryId,
                              boolean andFilter, boolean abbreviated)
             throws Exception {
 
@@ -2912,7 +2912,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List[] getEntries(Request request) throws Exception {
+    public List[] getEntries(Request request) throws Exception {
         return getEntries(request, new StringBuffer());
     }
 
@@ -2926,7 +2926,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List[] getEntries(Request request,
+    public List[] getEntries(Request request,
                                 StringBuffer searchCriteriaSB)
             throws Exception {
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
@@ -3454,7 +3454,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Entry> getChildrenGroups(Request request, Entry group)
+    public List<Entry> getChildrenGroups(Request request, Entry group)
             throws Exception {
         List<Entry> result = new ArrayList<Entry>();
         if ( !group.isGroup()) {
@@ -3478,7 +3478,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Entry> getChildrenEntries(Request request, Entry group)
+    public List<Entry> getChildrenEntries(Request request, Entry group)
             throws Exception {
         List<Entry> result = new ArrayList<Entry>();
         if ( !group.isGroup()) {
@@ -3504,7 +3504,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Entry> getChildren(Request request, Entry group)
+    public List<Entry> getChildren(Request request, Entry group)
             throws Exception {
         List<Entry> children = new ArrayList<Entry>();
         if ( !group.isGroup()) {
@@ -3539,7 +3539,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<String> getChildIds(Request request, Group group,
+    public List<String> getChildIds(Request request, Group group,
                                        List<Clause> where)
             throws Exception {
         List<String> ids          = new ArrayList<String>();
@@ -3662,7 +3662,7 @@ return new Result(title, sb);
      *
      * @return _more_
      */
-    protected List<Entry> sortEntriesOnDate(List<Entry> entries,
+    public List<Entry> sortEntriesOnDate(List<Entry> entries,
                                             final boolean descending) {
         Comparator comp = new Comparator() {
             public int compare(Object o1, Object o2) {
@@ -3810,7 +3810,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Group findGroup(Request request, String id) throws Exception {
+    public Group findGroup(Request request, String id) throws Exception {
         if ((id == null) || (id.length() == 0)) {
             return null;
         }
@@ -3849,7 +3849,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Group findGroupFromName(String name, User user,
+    public Group findGroupFromName(String name, User user,
                                       boolean createIfNeeded)
             throws Exception {
         return findGroupFromName(name, user, createIfNeeded, false);
@@ -4036,7 +4036,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getGroupId(Group parent) throws Exception {
+    public String getGroupId(Group parent) throws Exception {
         //FOr now just use regular ids for groups
         if (true) {
             return getRepository().getGUID();
@@ -4287,7 +4287,7 @@ return new Result(title, sb);
      *
      * @return _more_
      */
-    protected String getPathFromEntry(Entry entry) {
+    public String getPathFromEntry(Entry entry) {
         String name = entry.getName();
         name = name.toLowerCase();
         name = name.replace(" ", "_");

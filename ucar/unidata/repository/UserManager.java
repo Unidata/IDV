@@ -506,7 +506,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected User getDefaultUser() throws Exception {
+    public User getDefaultUser() throws Exception {
         makeUserIfNeeded(new User("default", "Default User", false));
         return findUser("default");
     }
@@ -518,7 +518,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected User getAnonymousUser() throws Exception {
+    public User getAnonymousUser() throws Exception {
         return new User();
     }
 
@@ -532,7 +532,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected User findUser(String id) throws Exception {
+    public User findUser(String id) throws Exception {
         return findUser(id, false);
     }
 
@@ -546,7 +546,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected User findUser(String id, boolean userDefaultIfNotFound)
+    public User findUser(String id, boolean userDefaultIfNotFound)
             throws Exception {
         if (id == null) {
             return null;

@@ -22,6 +22,7 @@
 package ucar.unidata.repository;
 
 
+import ucar.unidata.repository.collab.*;
 import org.w3c.dom.*;
 
 
@@ -582,7 +583,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected static String getGroupSelect(Request request, String elementId)
+    public static String getGroupSelect(Request request, String elementId)
             throws Exception {
         return getSelect(request, elementId, "Select", false, "");
     }
@@ -602,7 +603,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected static String getSelect(Request request, String elementId,
+    public static String getSelect(Request request, String elementId,
                                       String label, boolean allEntries,
                                       String type)
             throws Exception {

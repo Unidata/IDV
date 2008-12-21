@@ -283,7 +283,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    protected String getGUID() {
+    public String getGUID() {
         return UUID.randomUUID().toString();
     }
 

@@ -813,7 +813,7 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void executeInsert(String insert, Object[] values)
+    public void executeInsert(String insert, Object[] values)
             throws Exception {
         PreparedStatement pstmt = getPreparedStatement(insert);
         setValues(pstmt, values);
