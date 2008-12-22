@@ -370,6 +370,7 @@ public class RepositoryBase implements Constants, RepositorySource {
         return "http://" + hostname + ":" + port + url;
     }
 
+
     /**
      * _more_
      *
@@ -378,9 +379,17 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String httpsUrl(String url) {
-        return "https://" + hostname + ":" + port + url;
+        String  port = getProperty(PROP_SSL_PORT,"").trim();
+        if(port.length()==0) throw new IllegalStateException ("Do not have ssl port defined");
+        if(port.equals("default")) 
+            return "https://" + hostname + url;
+        else
+            return "https://" + hostname +":" + port + url;
     }
 
+    public String getProperty(String name,String dflt) {
+        return dflt;
+    }
 
 
 

@@ -362,9 +362,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public boolean isSSLEnabled() {
-        return inTomcat;
+    public boolean isSSLEnabled(Request request) {
+        if(!request.get(ARG_SSLOK,true)) return false;
+        if(getProperty(PROP_SSL_IGNORE,false)) return false;
+        String  port = getProperty(PROP_SSL_PORT,"");
+        if(port.trim().length()==0) return false;
+        return true;
     }
+
+
 
 
 
@@ -475,12 +481,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
             } else if (args[i].startsWith("-D")) {
                 String       s    = args[i].substring(2);
                 List<String> toks = StringUtil.split(s, "=", true, true);
-                if (toks.size() != 2) {
+                if (toks.size() ==0) {
                     throw new IllegalArgumentException("Bad argument:"
                             + args[i]);
+                } else if(toks.size()==1) {
+                    argProperties.put(toks.get(0), "");
+                } else {
+                    argProperties.put(toks.get(0), toks.get(1));
                 }
-
-                argProperties.put(toks.get(0), toks.get(1));
             } else {
                 usage("Unknown argument: " + args[i]);
             }

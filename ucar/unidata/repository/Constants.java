@@ -715,6 +715,12 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    public static final String PROP_SSL_PORT = "ramadda.ssl.port";
+    public static final String PROP_SSL_IGNORE = "ramadda.ssl.ignore";
+
+    public static final String ARG_SSLOK = "sslok";
+
+
     /** _more_ */
     public static final String PROP_ADMIN_PHRASES = "ramadda.admin.phrases";
 

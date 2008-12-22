@@ -454,13 +454,12 @@ public class UserManager extends RepositoryManager {
                     request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
 
-
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
-        if (getRepository().isSSLEnabled()) {
-            //sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
-            sb.append(
-                HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
+        if (getRepository().isSSLEnabled(request)) {
+            sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
+            //            sb.append(
+            //                HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
         } else {
             sb.append(
                 HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
@@ -1853,10 +1852,16 @@ public class UserManager extends RepositoryManager {
                     return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
                             "true", ARG_MESSAGE, msg("You are logged in")));
                 } else {
-                    return new Result(
-                        request.url(
-                            getRepositoryBase().URL_USER_HOME, ARG_FROMLOGIN,
-                            "true", ARG_MESSAGE, msg("You are logged in")));
+                    String redirect;
+                    //If we are under ssl then redirect to non-ssl
+                    if (getRepository().isSSLEnabled(request)) {
+                        redirect = getRepositoryBase().URL_USER_HOME.getFullUrl("");
+                    } else {
+                        redirect = getRepositoryBase().URL_USER_HOME.toString();
+                    }
+                    return new Result(HtmlUtil.url(redirect,
+                                                   ARG_FROMLOGIN,
+                                                   "true", ARG_MESSAGE, msg("You are logged in")));
                 }
             } else {
                 if (output.equals("xml")) {
@@ -1864,6 +1869,7 @@ public class UserManager extends RepositoryManager {
                             XmlUtil.attr(ATTR_CODE, "error"),
                             "Incorrect user name or password"), MIME_XML);
                 }
+                //TODO: what to do when we have ssl here?
                 sb.append(
                     getRepository().warning(
                         msg("Incorrect user name or password")));
@@ -1986,10 +1992,16 @@ public class UserManager extends RepositoryManager {
                     getRepository().warning(msg("Incorrect passwords")));
             } else {
                 applyState(request, user, false);
-                return new Result(
-                    request.url(
-                        getRepositoryBase().URL_USER_SETTINGS, ARG_MESSAGE,
-                        msg("User settings changed")));
+                String redirect;
+                //If we are under ssl then redirect to non-ssl
+                if (getRepository().isSSLEnabled(request)) {
+                    redirect = getRepositoryBase().URL_USER_SETTINGS.getFullUrl("");
+                } else {
+                    redirect = getRepositoryBase().URL_USER_SETTINGS.toString();
+                }
+                return new Result(HtmlUtil.url(redirect,
+                                               ARG_MESSAGE,
+                                               msg("User settings changed")));
             }
         }
 
@@ -1999,7 +2011,11 @@ public class UserManager extends RepositoryManager {
                     request.getUnsafeString(ARG_MESSAGE, "")));
         }
 
-        sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
+        if (getRepository().isSSLEnabled(request)) {
+            sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_SETTINGS.getHttpsUrl("")));
+        } else {
+            sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
+        }
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
         makeUserForm(request, user, sb, false);
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));

@@ -676,10 +676,23 @@ public class Admin extends RepositoryManager {
                             + msg("Require login")));
 
 
+
+
+
+        asb.append(HtmlUtil.formEntry(
+                msgLabel("SSL Port"),
+                HtmlUtil.input(
+                               PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
+                               HtmlUtil.SIZE_5) + HtmlUtil.space(1) +
+                msg("Port number for SSL access.") +HtmlUtil.space(1) +msg("Enter 'default' for default SSL port.")));
+
+
+
+
         String fileWidget = HtmlUtil.textArea(PROP_LOCALFILEPATHS,
                                 getProperty(PROP_LOCALFILEPATHS, ""), 5, 40);
         String fileLabel =
-            "Enter one server file system directory per line.<br><b>Note:RAMADDA will provide complete access to the file directory trees defined here</b>";
+            msg("Enter one server file system directory per line.");
         asb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
                                          "<table><tr valign=top><td>"
                                          + fileWidget + "</td><td>"
@@ -860,6 +873,10 @@ public class Admin extends RepositoryManager {
                                         request.getString(PROP_GOOGLEAPIKEYS,
                                             ""));
         }
+
+        getRepository().writeGlobal(
+                                    PROP_SSL_PORT,
+                                    request.getString(PROP_SSL_PORT, getProperty(PROP_SSL_PORT,"")));
 
 
         if (request.exists(PROP_LOCALFILEPATHS)) {
