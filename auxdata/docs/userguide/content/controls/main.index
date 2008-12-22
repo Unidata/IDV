@@ -40,6 +40,7 @@ title:Display Controls
 >title: Observation and Location Controls
 >>StationModelControl.html
 >>ObsListControl.html
+>>ObjectiveAnalysis.html
 >>AerologicalSoundingControl.html
 >>StationLocationControl.html
 >>WorldWindControl.html
