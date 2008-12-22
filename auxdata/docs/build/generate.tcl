@@ -112,8 +112,8 @@ proc ht::doImage {img class {caption ""} {extra ""}} {
         set href2 ""
     }
 
+    set cnt [gen::getNextImageId $img $caption]
     if {$caption != ""} {
-        set cnt [gen::getNextImageId $img $caption]
         set html  "<a name=\"image$cnt\"></a><div class=\"$class\">$href1<img  src=\"$img\" $extra alt=\"$caption\" >$href2"
         append html "<br><span class=\"caption\">Image $cnt: $caption</span></div>"
         return $html
