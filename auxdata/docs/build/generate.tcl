@@ -171,7 +171,11 @@ proc gen::thumbName {img} {
 
 proc gen::thumb {img {dim 110x110}} {
     set to [gen::thumbName $img]
-    exec convert -interlace NONE -geometry $dim $img $to
+    if {[gen::getDoImageoverview]} {
+        file copy -force $img $to
+    } else {
+            exec convert -interlace NONE -geometry $dim $img $to
+    }
 }
 
 
@@ -2402,7 +2406,7 @@ proc gen::parseArgs {} {
 
 
     set argc [llength $argv]
-    set flags [list Glossary Frames Icons DoAll DoTranslateLinks LinkCheck NumberTop Numbering Icons Verbose Format JustExtraFormat Clean JSNav JSBorder JSBG SkipIndex ChildOverview TclEvaluation FinalVersion Thumbnails]
+    set flags [list Glossary Frames Icons DoAll DoTranslateLinks LinkCheck NumberTop Numbering Icons Verbose Format JustExtraFormat Clean JSNav JSBorder JSBG SkipIndex ChildOverview TclEvaluation FinalVersion Thumbnails Imageoverview]
 
 
     for {set i 0} {$i < $argc} {incr i} {
@@ -2629,6 +2633,9 @@ proc gen::writeFiles  {} {
                 set thumb ""
                 append imageHtml "<li> "
             }
+            if {[gen::getDoImageoverview]} {
+                    append imageHtml "<hr><i>$img</i><br>"
+            }
             append imageHtml "<a href=\"$file\#image$id\"> $thumb Image $id:</a> $caption\n"
             if {[gen::getDoThumbnails]} {
                 append imageHtml "<p>\n"
@@ -2686,7 +2693,7 @@ proc gen::copyFiles {dir} {
             file mkdir $imgDir
         }
         file copy -force $f $imgDir
-        if {[gen::getDoThumbnails]} {
+        if {[gen::getDoThumbnails] && [regexp {(.gif|.png|.jpg|.jpeg)} $f]} {
             gen::thumb [file join $imgDir [file tail $f]]
         }
     }
@@ -2723,7 +2730,7 @@ set state(topDir) ""
 
 
 
-foreach {var dflt} [list  UrlRoot {} DoClean 0 Verbose 0 DoChildOverview 1 DoFinalVersion 1 AllFileName all.html TargetDir [file join $state(topDir) ../processed]  DoGlossary 1 DoImages 1 DoFrames 1 DoIcons 1 DoIndex 1  NumberTop 0 Numbering 1 DoTclEvaluation 0 DoTranslateLinks 0 DoAll 0 DoLinkCheck 0 CssFiles [list] AllNavFiles [list] AllNonNavFiles [list]    DoJSNav 0 DoJSBorder 1 DoJSBG 1 DoStrictIndex 1 IconWidth "" Format 0 JustExtraFormat 0 SkipIndex 0 IndexFile main.index TopFile {} UniqueId 1 DoThumbnails 0 DoImageLinks 1]   {
+foreach {var dflt} [list  UrlRoot {} DoClean 0 Verbose 0 DoChildOverview 1 DoFinalVersion 1 AllFileName all.html TargetDir [file join $state(topDir) ../processed]  DoGlossary 1 DoImages 1 DoFrames 1 DoIcons 1 DoIndex 1  NumberTop 0 Numbering 1 DoTclEvaluation 0 DoTranslateLinks 0 DoAll 0 DoLinkCheck 0 CssFiles [list] AllNavFiles [list] AllNonNavFiles [list]    DoJSNav 0 DoJSBorder 1 DoJSBG 1 DoStrictIndex 1 IconWidth "" Format 0 JustExtraFormat 0 SkipIndex 0 IndexFile main.index TopFile {} UniqueId 1 DoThumbnails 0 DoImageoverview 0 DoImageLinks 1]   {
     set state($var) $dflt
     proc gen::get$var {} "set ::state($var)"
     proc gen::set$var {v} "set ::state($var) \$v"
