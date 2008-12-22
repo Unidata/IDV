@@ -17,6 +17,11 @@
      category="Weather"
      href="/ucar/unidata/idv/resources/stations/weatherstations.xml"/>
 
+  <stationtable
+     name="TDWR Radar Sites"
+     category="Weather"
+     href="/ucar/unidata/idv/resources/stations/tdwr.tbl"/>
+
   <stationtable name="Profiler Sites" elevunit="meters" category="Weather" 
                 href="/ucar/unidata/idv/resources/stations/profilerstns.xml"/>
 
