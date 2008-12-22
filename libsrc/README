@@ -1,3 +1,5 @@
+
+---------------------------------------------------------------
 mailapi.jar and smtp.jar:
 from: http://java.sun.com/products/javamail/ 
 These are from the Java Mail package and are used by RAMADDA
@@ -6,9 +8,38 @@ jar of jars they need to be unjarred and the META_INF directory
 removed.
 
 
+---------------------------------------------------------------
 jetty.jar jetty-util.jar:
 These are from the Jetty project: http://www.mortbay.org/jetty/
 and provide a embeddable web server used by RAMADDA
+
+---------------------------------------------------------------
+render.jar:
+This holds the pdf/svg/ps rendering code from the FOP project.
+render.jar a big jar of the classes in the FOP release.
+We get the FOP-0_95 release from:
+http://xmlgraphics.apache.org/fop/download.html
+
+From the fop directory we want to unjar all of the jars in lib
+and the build/fop.jar
+
+From the FOP  directory copy build/fop.jar to the lib directory
+cd to lib and mkdir tmp
+ls *.jar> jars
+Edit the jars file to do:
+jar -xvf ../<the jar file>
+for each line (we do this because jar -xvf *.jar does not work)
+cd tmp
+source ../jars (this unjars all of the jars
+now create render.jar
+jar -cvf ../../../render.jar *
+
+Now go and build 
+ant externaljar
+from the ucar main package.
+
+
+
 
 
 
