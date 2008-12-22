@@ -353,7 +353,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     //         CATEGORY_SWEEP_3D);
                 }
                 for (int j = 0; j < angles.length; j++) {
-                    String name = "Elevation Angle " + angles[j];
+                    String name = "Elevation Angle " + Misc.format(angles[j]);
                     Hashtable dataChoiceProperties =
                         Misc.newHashtable(new Object[] {
                         PROP_ANGLES, new double[] { angles[j] }, PROP_ANGLE,
