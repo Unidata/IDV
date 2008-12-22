@@ -1,34 +1,14 @@
 Bugs:
 
-- Time series wierdness (Jeff) DONE!
 - Removing regional subset did not change grid dimensions (Yuan)
 - NDFD starts at day 4 - why?  (Don/Tom Y)
-- Station is wrong in properties in Level II radar. (Yuan) DONE!
 - Set time window in fronts? 
-- Front display does not remember the Use Time in Animation property in a bundle. (Jeff) DONE!
 - Just displays bundle - selecting a different level doesn't get passed through (Jeff)
 - Satellite does not show in NEXRCOMP projection (Don)
-- Copying data dialog doesn't go away (Jeff) DONE!
-- Saving a local file dialog says saving remote data. (Jeff)    DONE!
 - Check point data spatial subset (Yuan)
-- Math.atan2 hang in Bearing (Jeff) DONE!
-- Upper Air data - chooser selected level doesn't get set in the levels data subset panel (Don) DONE!
-- \n in isl doesn't work (Jeff)   DONE!
-- offscreen image capter hangs from isl (Jeff)   DONE!
-- Dashboard covers view window in isl (Jeff)   DONE!
-- user/password not used with bundles (opendapguest/opendapguest) (Jeff) DONE (Mattias is looking into it on his end)
-- probe autoscaling did not work (Don)  DONE!
-- Animation wierdness (Jeff) DONE
 - .5 degree data choice for Level II radar gave wierd display (Yuan)  (can't replicate)
-- incorrect unit specification in station data filtering (using () or {})   gives a nasty message (Jeff) DONE!
-- Transect lines don't match up (Jeff) DONE! (Well, I cannot replicate this)
 - When you change data binning and check reload displays, it doesn't work  very well (Jeff) ??? Not sure what this refers to
-- Reloading front data doesn't update the displays (Jeff)  DONE!
 - Blue Marble vertical position? (Jeff) ????
-- Right click in Jython Editor not on a procedure gives a NullPointerEx (Jeff) DONE!
-- In derived quantities exercise, Fields dialog not picking up the Label (still showing D1, D2) (Jeff) DONE!
-- Category box in Color Table editor doesn't  apply without a return first (Jeff) DONE! (That is just the way it works, a swing thing)
-- Add .jar to plugin name in creator (Don) DONE!
 - List resources in Resource Manager isn't updated with new resources 
 - Station id label in Level III TDS sweep is wrong (missing first char) (Yuan)
 
@@ -37,38 +17,27 @@ Enhancements:
 
 - Pressure (or native coords) label on cross section axis (Don)
 - Slider for animation 
-- Default display list label for fronts should include time. (Jeff) DONE!
-- Just Displays bundle needs to show what the bundle is in the title bar. (Jeff) DONE!
 - Subset levels when saving data locally
 - Save NEXRAD/TDS radar data in a bundle  (Yuan)
 - HTML control needs some sort of name for the tab in
 the Displays section of the Dashboard (Don) (can't reproduce)
 - Allow user to set the layout model in the Data Subset panel (Yuan/Don)
 - Export point data as a shapefile
-- add location and time attributes into variable lists for Layout model editing. (Jeff) DONE!
 - Handle depth for trajectory (John)
 - plot upper air data at the right height
 - Techs in storm display list all, not the ones for that storm 
 (e.g. ECMWF)
-- Add more Details for the WMS data source (Jeff) DONE!
 - Add MetaData details for Trajectory data (Don)
 - Add a generic NetCDF reader for doing an ncdump (Yuan)
 - Decluttering of stations needs a lower setting.  The default
 is too cluttered (Don)
-- Add hectares for drawing control (Jeff) DONE!
 - Make pallets for different kinds of shapes in the drawing control - ala NMAP  (Jeff) 
 - allow user to pick multiple levels for profiler plots (John)
-- Better error messages from ISL (Jeff) DONE! (I'm just going to leave the stack trace for now) 
-- allow overlay of transparent images (logos) in isl (Jeff) DONE!
-- add animation speed control to movie preview window (Don)  DONE!
-- scale images with window size in preview window (Don)  DONE!
-- undock quicktime movie control by default (Yuan/Don) DONE!
 - when publishing to ramadda, need better handling of lat/lon bounds when display is globe display (Jeff) ????  Not sure what to do here for the globe display 
 - Simple plugin needs to be updated (Yuan)
    - resource viewer
    - TDS radar chooser
 - Dave F mentioned having nicer color bars showing in the PDF.
-- Move license files to a subdirectory (Don) DONE!
 - Support UTM coordinates in shapefiles (and elsewhere) (Don)
 - Labels for lat/lon lines (Don)
 - Allow for copy in Drag and Drop (Don)
@@ -78,52 +47,28 @@ is too cluttered (Don)
 - unit spec in filtering needs info on default value
 - VisAD point data adapter needs a flag to add unit into the
   realtype name. (Don)
-- Add "include metadata header" option when exporting CSV (Jeff) DONE!
 - Offer to save settings for CSV metadata dialog 
 - Change "Layout Model" to "Plot Model" for 2.7 (Don)
 - Time animate SkewT for multiple stations
 - Ignore times for objective analysis (Don)
-- Add Times tab in track control like we have for point data. (Jeff) DONE!
 - Make flow plan and flow cross section UI's consistent (Don)
-- Delete a single point from a polygon (Jeff)   DONE!
 - Color Table editor - At Data Point should be At Range Point (Don)
-- Add Invert the color table command (Jeff) DONE!
 - Implement Boba's drift code (on Don's laptop (ascent = 4 m/sec)) (Don)
 - Rework plugin creator UI (Yuan)
-- Fix label/description/attributes in controls.xml (Jeff) DONE!
 
 
 Docs:
 
-- Bad "Documentation" link (Jeff) DONE!
 - Bundles: Add a section on relative path selection (Jeff)
 - Point Data - show how to use the preference that they
 created.(Yuan)
-- Enhance Barnes analysis docs (Don)
-- 3.8.0  Transect  - Misc Data to Sample Data (Don)  DONE!
 - Performance tuning (Jeff)
-- 5.0.2 - update the list of jars that go into external.jar (Don)  DONE!
-- Example idv.properties needs to be updated (Don) DONE!
-- Bad link to download  zip in building from source (Don) DONE!
-- update overview of data sources page to include new data sources (Don) DONE!
-- miscellaneous is misspelled int data type page (Don)  DONE!
 - Add a section for adding your own maps, go over the settings tab (Yuan)
 - Add "Cache to Disk" docs to User Guide (Jeff)
-- put Performance Tuning link in large grids to new tab (Don) DONE!
-- Better docs for "What data should I use"  (Jeff W)
-- Update docs for all controls to tell how to create the display (Don)
-- Add docs to user guide for Storm stuff (Jeff/Yuan)
 - Show how to use animation timeline in satellite workshop section (Yuan)
 - update the seconds in the times for Level III data (Yuan)
 - Add info on IOSP use in DataSources section of developer docs (Don)
-- Update list of controls in Developer docs section (Don)
-- Update Data Formats page in User Guide (add images, traj csv)) (Don)
 - Don't use MADIS data for layout model exercise (Yuan)
 - Section 4.6.8 - Save vs. Apply (Yuan)
 - Xvfb docs (Don)
-- remove ucar.unidata.ui.imagery from developer package docs (Don) DONE!
 - Change idv.rbi to example.rbi in developer docs (Jeff) ??? Not sure where this is
-- choosers.xml needs to be update in developer docs (Don) DONE!
-- add Display Settings section to the User Guide (Jeff)
-
-
