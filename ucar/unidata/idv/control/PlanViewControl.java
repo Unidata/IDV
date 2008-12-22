@@ -1000,7 +1000,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return;
         }
         if (levelBox != null) {
-            levelBox.setSelectedItem(level);
+            levelBox.setSelectedItem(getLabeledReal(level));
         }
 
         Real altitude = null;
