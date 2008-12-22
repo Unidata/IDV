@@ -21,12 +21,7 @@
  */
 
 
-
-
-
 package ucar.unidata.metdata;
-
-
 
 
 import org.w3c.dom.Attr;
@@ -41,7 +36,6 @@ import ucar.unidata.gis.WorldWindReader;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.StringUtil;
@@ -82,7 +76,7 @@ import javax.swing.event.*;
  */
 public class NamedStationTable extends StationTableImpl {
 
-    /** _more_ */
+    /** valid flag */
     private boolean valid = true;
 
 
@@ -388,16 +382,28 @@ public class NamedStationTable extends StationTableImpl {
 
 
     /**
-     * _more_
+     * Is this a KML list of locations
      *
-     * @param filename _more_
+     * @param filename  name of the file
      *
-     * @return _more_
+     * @return  true if identified as KML
      */
     private static boolean isKml(String filename) {
         return (filename.toLowerCase().endsWith(".kml")
                 || filename.toLowerCase().endsWith(".kmz"));
     }
+
+    /**
+     * Is this a GEMPAK list of locations
+     *
+     * @param filename  name of the file
+     *
+     * @return  true if identified as GEMPAK station file
+     */
+    private static boolean isGempak(String filename) {
+        return filename.toLowerCase().endsWith(".tbl");
+    }
+
 
     /**
      * Create a list of NamedStationTables from a set of resources
@@ -455,7 +461,7 @@ public class NamedStationTable extends StationTableImpl {
                 continue;
             }
 
-            if (name.toLowerCase().endsWith(".tbl")) {
+            if (isGempak(name)) {
                 try {
                     String tbl = xrc.read(i);
                     if (tbl != null) {
@@ -844,11 +850,11 @@ public class NamedStationTable extends StationTableImpl {
      */
 
     /**
-     * _more_
+     * Create a station table from KML
      *
-     * @param filename _more_
+     * @param filename
      *
-     * @throws Exception _more_
+     * @throws Exception problem reading th estation
      */
     public void createStationTableFromKmlFile(String filename)
             throws Exception {
@@ -1063,6 +1069,7 @@ public class NamedStationTable extends StationTableImpl {
         int     numToks    = indices.length;
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
+            //System.out.println(">" + line + "<");
             if (line.startsWith("!")) {
                 continue;  // comment
             }
@@ -1070,9 +1077,9 @@ public class NamedStationTable extends StationTableImpl {
                 String station = line.substring(0, 8);
                 if (station.substring(4, 8).equals("    ")
                         || !station.substring(4, 5).equals(" ")) {
-                    // System.out.println("new format");
+                    //System.out.println("new format");
                 } else {
-                    // System.out.println("old format");
+                    //System.out.println("old format");
                     indices = new int[] {
                         0, 5, 12, 45, 48, 51, 57, 64
                     };
@@ -1277,7 +1284,7 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
             return table;
         }
 
-        if (filename.toLowerCase().endsWith(".tbl")) {
+        if (isGempak(filename)) {
             NamedStationTable table = new NamedStationTable(
                                           IOUtil.stripExtension(
                                               IOUtil.getFileTail(filename)));
@@ -1383,6 +1390,17 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
                     if (isKml(href)) {
                         try {
                             this.createStationTableFromKmlFile(href);
+                            return super.getMap();
+                        } catch (Exception exc) {
+                            return null;
+                        }
+                    }
+
+                    if (isGempak(href)) {
+                        try {
+                            this.createStationTableFromGempak(
+                                IOUtil.readContents(
+                                    href, NamedStationTable.class));
                             return super.getMap();
                         } catch (Exception exc) {
                             return null;
@@ -1691,9 +1709,9 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
     /**
      * Test a particular file
      *
-     * @param args _more_
+     * @param args  test the file
      *
-     * @throws Exception _more_
+     * @throws Exception  problem reading the file
      */
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
