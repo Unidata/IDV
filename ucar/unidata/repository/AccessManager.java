@@ -131,6 +131,8 @@ public class AccessManager extends RepositoryManager {
     protected void initTopGroup(Group topGroup) throws Exception {
         topGroup.addPermission(new Permission(Permission.ACTION_VIEW,
                 getUserManager().ROLE_ANY));
+        topGroup.addPermission(new Permission(Permission.ACTION_VIEWCHILDREN,
+                getUserManager().ROLE_ANY));
         topGroup.addPermission(new Permission(Permission.ACTION_EDIT,
                 getUserManager().ROLE_NONE));
         topGroup.addPermission(new Permission(Permission.ACTION_NEW,
@@ -367,6 +369,10 @@ public class AccessManager extends RepositoryManager {
         if ( !canDoAction(request, entry, Permission.ACTION_VIEW)) {
             return null;
         }
+        Group parent = entry.getParentGroup();
+        if(parent!=null && !canDoAction(request, parent, Permission.ACTION_VIEWCHILDREN)) {
+            return null;
+        }
         return entry;
     }
 
@@ -489,6 +495,14 @@ public class AccessManager extends RepositoryManager {
     }
 
 
+    public boolean hasPermissionSet(Entry entry, String permission) throws Exception {
+        for(Permission p:getPermissions(entry)) {
+            if(Misc.equals(p.getAction(),permission)) return true;
+        }
+        return false;
+    }
+
+
     /**
      * _more_
      *
@@ -501,12 +515,6 @@ public class AccessManager extends RepositoryManager {
      */
     protected List<Permission> getPermissions(Entry entry) throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
-            if (false) {
-                List<Permission> tmp = new ArrayList<Permission>();
-                tmp.add(new Permission(Permission.ACTION_VIEW,
-                                       getUserManager().ROLE_ANY));
-                return tmp;
-            }
             if (entry.isGroup() && ((Group) entry).isDummy()) {
                 return new ArrayList<Permission>();
             }
@@ -567,7 +575,7 @@ public class AccessManager extends RepositoryManager {
         }
 
         StringBuffer currentAccess = new StringBuffer();
-        currentAccess.append(HtmlUtil.formTable("border=1"));
+        currentAccess.append(HtmlUtil.open(HtmlUtil.TAG_TABLE," cellspacing=0 ccellpadding=0 border=1 "));
         StringBuffer header =
             new StringBuffer(HtmlUtil.cols(HtmlUtil.bold("Entry")));
         for (int i = 0; i < Permission.ACTIONS.length; i++) {
@@ -577,7 +585,7 @@ public class AccessManager extends RepositoryManager {
         currentAccess.append(HtmlUtil.rowTop(header.toString()));
 
         listAccess(request, entry, currentAccess);
-        currentAccess.append(HtmlUtil.formTableClose());
+        currentAccess.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 
 
 

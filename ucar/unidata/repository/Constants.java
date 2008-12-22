@@ -185,6 +185,9 @@ public interface Constants {
     public static final String ICON_FOLDER_CLOSED = "/icons/folderclosed.gif";
 
     /** _more_ */
+    public static final String ICON_FOLDER_CLOSED_LOCKED = "/icons/folderclosedlocked.gif";
+
+    /** _more_ */
     public static final String ICON_FILE = "/icons/file.gif";
 
     /** _more_ */

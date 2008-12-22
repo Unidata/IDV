@@ -637,7 +637,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
-        String       icon     = getEntryManager().getIconUrl(entry);
+        String       icon     = getEntryManager().getIconUrl(request,entry);
         String       event;
         String       uid = "link_" + HtmlUtil.blockCnt++;
         if (entry.isGroup()) {
@@ -859,7 +859,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
             if (showCrumbs) {
                 String img =
-                    HtmlUtil.img(getEntryManager().getIconUrl(entry));
+                    HtmlUtil.img(getEntryManager().getIconUrl(request,entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
                 sb.append(getEntryManager().getBreadCrumbs(request, entry));

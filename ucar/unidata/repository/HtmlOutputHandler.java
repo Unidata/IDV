@@ -747,7 +747,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result getChildrenXml(Request request, List<Group> subGroups,
+    public Result getChildrenXml(Request request, Group parent, List<Group> subGroups,
                                  List<Entry> entries)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
@@ -761,7 +761,13 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if ((subGroups.size() == 0) && (entries.size() == 0)) {
-            sb.append("No sub-groups");
+            sb.append("No sub-groups.");
+            if(getAccessManager().hasPermissionSet(parent,Permission.ACTION_VIEWCHILDREN)) {
+                if(!getAccessManager().canDoAction(request, parent, Permission.ACTION_VIEWCHILDREN)) {
+                    sb.append(HtmlUtil.space(1));
+                    sb.append("You do not have permission to view the sub-groups of this entry");
+                }
+            }
         }
 
 
@@ -909,7 +915,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_GROUPXML)) {
-            return getChildrenXml(request, subGroups, entries);
+            return getChildrenXml(request, group, subGroups, entries);
         }
 
         if (output.equals(OUTPUT_SELECTXML)) {
@@ -937,6 +943,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(getRepository().note(msg("No entries found")));
             }
         }
+
 
         String wikiTemplate = getWikiText(request, group);
 
@@ -980,6 +987,15 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
                         entriesSB.toString(), true));
             }
+
+            if (!group.isDummy() && subGroups.size() == 0 && entries.size() == 0) {
+                if(getAccessManager().hasPermissionSet(group,Permission.ACTION_VIEWCHILDREN)) {
+                    if(!getAccessManager().canDoAction(request, group, Permission.ACTION_VIEWCHILDREN)) {
+                        sb.append(getRepository().warning("You do not have permission to view the sub-groups of this entry"));
+                    }
+                }
+            }
+
         }
 
 

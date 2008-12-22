@@ -79,6 +79,8 @@ public class Permission {
     /** _more_ */
     public static final String ACTION_VIEW = "view";
 
+    public static final String ACTION_VIEWCHILDREN = "viewchildren";
+
     /** _more_ */
     public static final String ACTION_EDIT = "edit";
 
@@ -93,12 +95,13 @@ public class Permission {
 
 
     /** _more_ */
-    public static final String[] ACTIONS = { ACTION_VIEW, ACTION_EDIT,
+    public static final String[] ACTIONS = { ACTION_VIEW, ACTION_VIEWCHILDREN,
+                                             ACTION_EDIT,
                                              ACTION_NEW, ACTION_DELETE,
                                              ACTION_COMMENT };
 
     /** _more_ */
-    public static final String[] ACTION_NAMES = { "View", "Edit", "New",
+    public static final String[] ACTION_NAMES = { "View", "View Children", "Edit", "New",
             "Delete", "Comment" };
 
 

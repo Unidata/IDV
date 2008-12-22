@@ -102,12 +102,12 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @return _more_
      */
-    public String getIconUrl(Entry entry) {
+    public String getIconUrl(Request request,Entry entry) throws Exception {
         String icon = getProperty("icon", (String) null);
         if (icon != null) {
             return fileUrl(icon);
         }
-        return super.getIconUrl(entry);
+        return super.getIconUrl(request, entry);
     }
 
 

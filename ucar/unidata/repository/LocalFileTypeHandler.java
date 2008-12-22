@@ -99,11 +99,11 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      *
      * @return _more_
      */
-    public String getIconUrl(Entry entry) {
+    public String getIconUrl(Request request,Entry entry) throws Exception {
         if (entry.isGroup()) {
             return fileUrl(ICON_FOLDER_CLOSED);
         }
-        return super.getIconUrl(entry);
+        return super.getIconUrl(request,entry);
     }
 
 

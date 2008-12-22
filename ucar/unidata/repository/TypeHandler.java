@@ -1355,10 +1355,15 @@ public class TypeHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getIconUrl(Entry entry) {
+    public String getIconUrl(Request request,Entry entry) throws Exception {
         Resource resource = entry.getResource();
         String   path     = resource.getPath();
         if (entry.isGroup()) {
+            if(getAccessManager().hasPermissionSet(entry,Permission.ACTION_VIEWCHILDREN)) {
+                if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_VIEWCHILDREN)) {
+                    return fileUrl(ICON_FOLDER_CLOSED_LOCKED);
+                }
+            }
             return fileUrl(ICON_FOLDER_CLOSED);
         }
         String img = ICON_FILE;

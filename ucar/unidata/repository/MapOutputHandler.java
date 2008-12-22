@@ -183,7 +183,7 @@ public class MapOutputHandler extends OutputHandler {
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
-                sb.append(HtmlUtil.img(getEntryManager().getIconUrl(entry)));
+                sb.append(HtmlUtil.img(getEntryManager().getIconUrl(request, entry)));
                 sb.append(HtmlUtil.space(1));
                 sb.append("<a href=\"javascript:hiliteEntry(" + mapVarName+","
                           + sqt(entry.getId()) + ");\">" + entry.getName()
@@ -265,7 +265,7 @@ public class MapOutputHandler extends OutputHandler {
                 info = info.replace("\r", " ");
                 info = info.replace("\n", " ");
                 info = info.replace("\"", "\\\"");
-                String icon = getEntryManager().getIconUrl(entry);
+                String icon = getEntryManager().getIconUrl(request, entry);
                 if (makeRectangles || !entry.hasAreaDefined()) {
                     js.append("marker = new Marker("
                               + llp(entry.getSouth(), entry.getEast())

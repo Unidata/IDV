@@ -2364,7 +2364,7 @@ return new Result(title, sb);
         String       uid     = "link_" + HtmlUtil.blockCnt++;
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
-            String  icon     = getIconUrl(entry);
+            String  icon     = getIconUrl(request, entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
             String event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
@@ -2690,7 +2690,7 @@ return new Result(title, sb);
         String nav;
         String separator = getRepository().getTemplateProperty(request,"ramadda.template.breadcrumbs.separator", "");
         String entryLink = ( !entry.isGroup()
-                             ? HtmlUtil.img(getIconUrl(entry))
+                             ? HtmlUtil.img(getIconUrl(request, entry))
                                + HtmlUtil.space(1)
                              : "") + getAjaxLink(request, entry,
                                  entry.getLabel(), false);
@@ -4276,8 +4276,8 @@ return new Result(title, sb);
      *
      * @return _more_
      */
-    public String getIconUrl(Entry entry) {
-        return entry.getTypeHandler().getIconUrl(entry);
+    public String getIconUrl(Request request,Entry entry) throws Exception {
+        return entry.getTypeHandler().getIconUrl(request,entry);
     }
 
     /**
