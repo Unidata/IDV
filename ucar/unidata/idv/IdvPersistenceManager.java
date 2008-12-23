@@ -141,8 +141,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** The separator to use when displaying categories */
     public static final String CATEGORY_SEPARATOR = ">";
 
-    /** This is the JPanel that holds the checkboxes and is added into the Save file chooser */
-    private JPanel fileAccessory;
 
 
     /** List of OjbectPairs that define a name->list of files mapping */
@@ -462,42 +460,27 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return The  file accessory panel
      */
     public JPanel getFileAccessory() {
-        if (fileAccessory == null) {
-
-            /**
-             *  fileAccessory = GuiUtils.top(
-             *   GuiUtils.vbox(
-             *       new JLabel("  What should be saved? "), saveViewStateCbx,
-             *       saveDisplaysCbx, saveDataSourcesCbx, saveDataCbx));
-             */
-
-
-            List accessories = Misc.newList(saveViewStateCbx,
+        List fileAccessories = Misc.newList(saveViewStateCbx,
                                             saveDisplaysCbx,
                                             saveDataSourcesCbx);
-            accessories.add(GuiUtils.left(GuiUtils.inset(saveJythonBox,
-                    new Insets(0, 3, 0, 0))));
-            accessories.add(GuiUtils.filler(1, 10));
-            accessories.add(makeDataRelativeCbx);
-            //            accessories.add(makeDataEditableCbx);
+        fileAccessories.add(GuiUtils.left(GuiUtils.inset(saveJythonBox,
+                                                         new Insets(0, 3, 0, 0))));
+        fileAccessories.add(GuiUtils.filler(1, 10));
+        fileAccessories.add(makeDataRelativeCbx);
+        //fileAccessories.add(makeDataEditableCbx);
 
-
-            if (publishCbx == null) {
-                publishCbx = getIdv().getPublishManager().makeSelector();
-            }
-            if (publishCbx != null) {
-                accessories.add(GuiUtils.filler(1, 10));
-                accessories.add(publishCbx);
-            }
-
-            fileAccessory = GuiUtils.top(
-                GuiUtils.vbox(
-                    Misc.newList(
-                        new JLabel("What should be saved?"),
-                        GuiUtils.vbox(accessories))));
-
+        if (publishCbx == null) {
+            publishCbx = getIdv().getPublishManager().makeSelector();
         }
-        return fileAccessory;
+        if (publishCbx != null) {
+            fileAccessories.add(GuiUtils.filler(1, 10));
+            fileAccessories.add(publishCbx);
+        }
+        return GuiUtils.top(
+                            GuiUtils.vbox(
+                                          Misc.newList(
+                                                       new JLabel("What should be saved?"),
+                                                       GuiUtils.vbox(fileAccessories))));
     }
 
 
