@@ -1,0 +1,79 @@
+[ht::head {IDV Publisher}]
+<%nochildlist%>
+
+
+The <a href="http://www.unidata.ucar.edu/software/idv">Integrated Data Viewer (IDV)</a>
+has the ability to publish IDV bundles and generated products directly
+to a RAMADDA server that you have an account on. This facility is 
+defined in an IDV <i>plugin</i>. To load it you need to bring up the
+Plugin Manager from the [ht::menu Tools {Plugin Manager}] menu.
+Under <i>Miscellaneous</i> install the &quot;RAMADDA Publisher&quot;
+plugin and restart the IDV.
+
+
+<subhead intoc="false" id="configuring">Configuring the Publisher</subhead>
+If you have successfully installed the RAMADDA Publisher plugin there should be
+a &quot;Publisher&quot; menu in the [ht::menu File] menu. Choose
+[ht::menu File Publisher New] to bring up the RAMADDA Publisher configuration dialog:
+[ht::cimg images/idvpublishernew.gif]
+
+You can optionally change the name. You need to provide the server name (e.g., motherlode.ucar.edu), the port the server is running on,
+the base path of the repository (&quot;/repository&quot; is the default),
+and your user id and password.  Note: the password is saved on your local 
+disk (in your IDV directory) similarly to how browsers and other clients
+save  and manage your passwords.
+<p>
+Pressing OK will create a new Publisher configuration and attempt to
+connect to the server. You can change this configuration through the
+[ht::menu File Publish Configure] menu. You can remove a publisher
+through the [ht::menu File Publish Delete] menu.
+
+<subhead intoc="false" id="publishing">Publishing Bundles</subhead>
+Once you have created one or more publisher accounts whenever you 
+save a bundle, a captured image or a movie there will be a 
+&quot;Select Publisher&quot; menu shown in the File Dialog:
+[ht::cimg images/idvpublisherfile.gif]
+
+Enter the file name you want save and also select the Publisher account
+you want to use from the &quot;Select Publisher&quot; menu.
+The IDV will save the bundle or product file as usual but then
+it will also popup the publish dialog:
+[ht::cimg images/idvpublisher.gif]
+
+This allows you to enter a name and description for the entry that will be created on the RAMADDA server. You can optionally enter any  number of &quot;tags&quot; (comma separated) in the Tags field.
+<p>
+You need to select the RAMADDA group to where your new entry will be placed.
+This tree view will indicate what groups you have write access to. Select the group.  Note: by right clicking on a group you can bring up a context menu
+that allows you to create a new group or to refresh the group tree view.
+<p>
+The date range and lat/lon bounding box are taken from the date range and lat/lon extent of the the displays you have loaded. You can change these values
+and/or clear out the lat/lon values.
+<p>
+Pressing OK will publish the bundle or product to RAMADDA and a confirmation
+dialog will be shown.
+
+<p>
+If you have data loaded in the IDV (e.g., OpenDAP grids)
+whose source is the  RAMADDA server that you are publishing to
+you can optionally choose to create a RAMADDA &quot;association&quot;
+between the content your are publishing and the data entry in RAMADDA.
+<p>
+
+When you save a &quot;.zidv&quot; bundle (i.e., one that contains data)
+the publisher dialog will show a checkbox that allows you to upload the
+data files that the zidv bundle contains as separate entries to RAMADDA.
+You can also choose to upload the .zidv bundle as well.
+
+<subhead intoc="false" id="products">Publishing Products</subhead>
+
+When you capture an image or a movie product the File Save dialog will
+also have a &quot;Select Publisher&quot; menu. When publishing a product
+you can choose to publish the product directly or you can choose to
+publish a bundle and attach the product to the bundle. For example,
+if you do a screen capture in the IDV and publish it you can
+publish the bundle file and attach the screen capture as an attachment
+and have it shown as a thumbnail image in RAMADDA.
+
+
+
+[ht::foot]
