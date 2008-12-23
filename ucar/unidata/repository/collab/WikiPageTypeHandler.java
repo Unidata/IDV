@@ -335,7 +335,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
         String textWidget = buttons + HtmlUtil.br()
                             + HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 250,
-                                                40, HtmlUtil.id(ARG_WIKI_TEXT));
+                                                60, HtmlUtil.id(ARG_WIKI_TEXT));
 
         String right = HtmlUtil.div(help.toString(),
                                     HtmlUtil.cssClass("smallhelp"));

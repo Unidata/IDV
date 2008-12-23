@@ -171,12 +171,12 @@ CREATE TABLE  globals (name varchar(500),
 
 
 
-
 CREATE TABLE wikihistory (entry_id varchar(200),
  		          user_id varchar(200),
 			  date ramadda.datetime, 
 			  description varchar(2000),
 			  wikitext ramadda.clob);
+
 
 CREATE INDEX WIKIHISTORY_INDEX_ENTRY_ID ON wikihistory (ENTRY_ID);
 
