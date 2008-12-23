@@ -5076,7 +5076,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 hiBtn      = new JRadioButton("High", true);
                 medBtn     = new JRadioButton("Medium", false);
                 lowBtn     = new JRadioButton("Low", false);
-                publishCbx = getIdv().getPublishManager().makeSelector();
                 GuiUtils.buttonGroup(hiBtn, medBtn).add(lowBtn);
                 backgroundTransparentBtn = new JCheckBox("BG Transparent");
                 backgroundTransparentBtn.setToolTipText(
@@ -5088,6 +5087,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                      fullWindowBtn).add(contentsBtn);
             }
 
+            if(publishCbx==null) {
+                publishCbx = getIdv().getPublishManager().makeSelector();
+            }
             hiBtn.setBorder(null);
             medBtn.setBorder(null);
             lowBtn.setBorder(null);
