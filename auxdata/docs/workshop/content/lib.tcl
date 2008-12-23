@@ -73,7 +73,7 @@ catch {
 	}
     }
     if {$ok} {
-#       gen::defineMacro {<%idv.version%>} "$major.${minor}$revision"
+       gen::defineMacro {<%idv.version%>} "$major.${minor}$revision"
        gen::defineMacro {<%dev.version%>} "$major.${minor}$revision"
     }
 } err
