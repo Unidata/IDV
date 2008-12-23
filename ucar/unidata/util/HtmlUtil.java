@@ -868,6 +868,14 @@ public class HtmlUtil {
         return checkbox(name, value, false);
     }
 
+    public static String radio(String name, String value, boolean checked) {
+        return tag(TAG_INPUT, attrs("type", "radio", "name", name, "value", value)
+                   + (checked
+                      ? " checked "
+                      : ""));
+    }
+
+
     /**
      * _more_
      *
