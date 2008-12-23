@@ -1,41 +1,127 @@
 {Storm Track Control}
 
 {
-The Storm Track Control is used to control the display of
-single or multiple storm tracks. First, to load in the ATCF data,
-selecting Data->Special->ATCF Data will load in a data source with a predefined
-path to the National Hurricane Center ftp site. Then, create the Storm Track display.
-The control window includes a left panel which display a list of storm dataset collection.
-On the top of the list is yearly option which allows user to display single
-or multiple years storm tracks.
+<%nochildlist%>
+
+The Storm Track Control displays tropical storm observation and model output tracks.
+Currently the IDV supports both 
+the <a href="http://www.nrlmry.navy.mil/atcf_web/index1.html">Automated Tropical Cyclone Forecasting System (ATCF)</a>
+data as well as data from the <a href="http://www.sti.org.cn/">Shanghai Typhoon Institute</a>.
 <p>
+To  load in  ATCF data select the  [ht::menu Data Special {ATCF Tropical Storm Data}] menu.
+This creates a data source with a predefined
+path to the National Hurricane Center ftp site. Then, create the Storm Track display.
+<p>
+The display control shows the set of available storms on the  left panel organized by year and basin,
+e.g., Atlantic (AL), Eastern Pacific (EP) and Central Pacific (CP).
+
+
+<subhead id="yearly" intoc="false">Year Display</subhead>
+At the top of the list is an option  (Yearly Tracks) which allows the user to display the observed tracks
+for all the storms in a given year. You can load and/or unload any number of years worth
+of observed tracks. The color  swatch changes the color of the tracks for a given year.
+The Time Mode menu allows one to change the animation mode, e.g., use the year or use the storm start time.
+
 
 [ht::cimg images/StormTrackYearlyControl.gif]
 
-Selecting a single storm in the list, the control panel consists of three tabs,
-the first tab is the storm track control, the second tab is the table of storm parameters,
-the third tab is the storm chart control which displays all graphics of selected parameters.
-In the storm track control tab, by default, only the checkbox of observation track is checked.
-Turn on the Forecasts checkbox to show the forecast tracks.
-<p>
 
+
+
+<subhead id="storm" intoc="false">Storm Display</subhead>
+
+To show the observation and all of the model results for a single storm 
+select the storm in the list and press the [ug::button Load Tracks] button.
+You can load any number of storms but they are shown in different panels.
+You can use the [ht::menu View {Storm Tracks}] menu to list out all of the loaded storms,
+remove them all, etc. Once a storm is loaded it can be removed with the small &quot;scissors&quot;
+icon shown in the upper right.
+
+<p>
+Once a storm is loaded 
+the first thing you should do is to specify which &quot;Techs&quot; (or models) to use by 
+bringing up the control's Properties dialog [ht::menu Edit Properties] menu.
+In the &quot;Techs to use&quot; tab,  select all of the Techs in the &quot;Use&quot; list (click and press control-a)
+and press [ug::button Remove]. This places them in the &quot;Don't Use&quot; list.
+Select the desired Techs in the &quot;Don't use&quot; list and press Add.  
+You can also choose what parameters are to be used and displayed in the 
+&quot;Chart Parameters&quot; tab, repeat the same step to select the desired parameters. 
+If you want these selections
+to be saved as a preference, please check the &quot;Save as Preference&quot; box.
+
+[ht::cimg images/StormTrackPropertiesControl.gif]
+
+
+
+
+The Storm display panel  consists of three tabs: <a href="#tracks">Tracks</a>, 
+<a href="#table"> Table</a>
+and <a href="#chart">Storm Chart</a>.
+
+
+<subhead id="tracks" intoc="false">Tracks</subhead>
 [ht::cimg images/StormTrackControl.gif]
 
-In the storm track table tab, the data values of parameters of all the storm track points
-associated with the specific storm track is showing. The control window includes a panel
-which has a list of storm tracks grouped under each Tech. When a track is selected
-according to its starting time, all the parameters are showing in the table.
+
+The  [ug::button Tracks] tab  controls the display and animation of the tracks.
+<p>
+The [ug::button Points] menus specify which Layout Model
+to use for both the Observation as well as the Forecast tracks.
 <p>
 
+The [ug::button Animation] is the layout model to use for the Observation track
+that moves along with the time animation.
+<p>
+The [ug::button Animation Mode] determines whether to animate the tracks or show
+all of the tracks.
+<p>
+Using the  [ug::button Color By] menus one can specify whether the track is shown with a fixed color
+or using a color table. The color table used is a single one for the entire display control
+and is set through the main [ht::menu Edit] menu.
+<p>
+Under the [ug::button Show] table one can specify what is to be shown.
+One can toggle on/off the visiblity of the Observation track, all of the forecast tracks
+or individual forecast tracks.
+
+
+
+<subhead id="table" intoc="false">Table</subhead>
+
+The Table tab shows a tabular listing of all of the observational track data
+and individual forecast model  runs.
+On the left is a tree view organized by the Tech and model run time.
+Selecting one of the model runs will display the  data in the table.
+The main [ht::menu File Save {Export to Spreadsheet}] menu allows you to export
+the track data to an Excel spreadsheet. In the File Dialog are options to
+select what is to be saved.
 
 [ht::cimg images/StormTrackTableControl.gif]
 
+
+
+<subhead id="chart" intoc="false">Storm Chart</subhead>
+
+The Storm Chart tab shows time series charts of selected tracks.
+Under the main [ht::menu Edit ] menu you can any number of new forecast time or
+forecast hour charts. The forecast time chart is based around the model run time
+of the selected forecasts. The forecast hour charts selects data across the different
+model run times, e.g., you can show the 12 hour forecast from each model run.
+
+<p>
+
+To do the charting of the storm track, one or more Techs need to be selected.
+Once selected the Forecast Hour/Forecast Time list is populated. One or more
+times can be selected (control-click).
+Each Parameter that is selected will result in a new chart shown on the right.
+<p>
+The [ug::button Use Difference] button, when selected, results in the display of the difference between
+the forecast value and the observed value.
+
+[ht::cimg images/StormTrackChartControl1.gif]
+
+
+
 }
-{{Points} {Select the layout model for both Observation and Forecast track.}}
 
 
-{{Animation} {Select the animation layout model for the Observation track and
-    the animation mode for the Forecast track.}}
- 
 
-{{Color By} {Select the fixed mode or color by parameter for both Observation and Forecast track.}}

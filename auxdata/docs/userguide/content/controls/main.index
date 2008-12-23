@@ -46,13 +46,12 @@ title:Display Controls
 >>WorldWindControl.html
 >>TrackControl.html
 
->title:StormTrack Controls
->>stormtrack/StormTrackControl.html
->>stormtrack/StormTrackPropertiesControl.html
->>stormtrack/StormTrackChartControl.html
->>stormtrack/StormTrackTableControl.html
+
+
+
 
 >title:Miscellaneous Controls
+>>stormtrack/StormTrackControl.html
 >>misc/MultiDisplayHolder.html
 >>misc/RangeAndBearingControl.html
 >>misc/NoteControl.html
