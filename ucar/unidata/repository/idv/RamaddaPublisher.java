@@ -120,7 +120,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     private JTextField westFld;
 
     /** _more_          */
-    private JCheckBox doBundleCbx = new JCheckBox("Publish bundle and attach product", true);
+    private JCheckBox doBundleCbx = new JCheckBox("Publish bundle and attach image", true);
 
     private JCheckBox doThumbnailCbx = new JCheckBox("Show as  a thumbnail", true);
 
@@ -353,6 +353,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 } else {
                     extra = GuiUtils.filler(1,1);
                 }
+                if(isImage)
+                    doBundleCbx.setText("Publish bundle and attach image");
+                else
+                    doBundleCbx.setText("Publish bundle and attach product");
                 topComps.add(
                     GuiUtils.left(
                         GuiUtils.hbox(
