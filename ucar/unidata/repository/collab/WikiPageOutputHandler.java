@@ -232,7 +232,13 @@ public class WikiPageOutputHandler extends OutputHandler {
                                         HtmlUtil.img(getRepository().fileUrl(ICON_WIKI), msg("View this page")));
             String btns = HtmlUtil.radio(ARG_WIKI_COMPARE1,""+wph.getDate().getTime(),false) +
                  HtmlUtil.radio(ARG_WIKI_COMPARE2,""+wph.getDate().getTime(),false);
-            sb.append(HtmlUtil.row(HtmlUtil.cols(new Object[]{""+wph.getVersion(),btns,edit,view,
+            String versionLabel;
+            if(i==history.size()-1) {
+                versionLabel = msg("Current");
+            } else {
+                versionLabel = ""+wph.getVersion();
+            }
+            sb.append(HtmlUtil.row(HtmlUtil.cols(new Object[]{versionLabel,btns,edit,view,
                                                  wph.getUser().getLabel(),
                                                  getRepository().formatDate(wph.getDate()),
                                                  wph.getDescription()})));
@@ -283,7 +289,6 @@ public class WikiPageOutputHandler extends OutputHandler {
             String     type     = delEnd != Difference.NONE && addEnd != Difference.NONE ? "c" : (delEnd == Difference.NONE ? "a" : "d");
 
 
-
             if (delEnd != Difference.NONE) {
                 sb.append("<tr valign=top><td class=wikicompare-changed><pre>");
                 appendLines(delStart, delEnd, "", aLines,sb);
@@ -309,7 +314,6 @@ public class WikiPageOutputHandler extends OutputHandler {
     protected void appendLines(int start, int end, String ind, String[] lines,StringBuffer sb)
     {
         for (int lnum = start; lnum <= end; ++lnum) {
-            System.err.println(ind + " " + lines[lnum]+"\n");
             sb.append(ind + " " + lines[lnum]+"\n");
         }
     }
