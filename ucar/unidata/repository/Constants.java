@@ -338,6 +338,9 @@ public interface Constants {
     public static final String ARG_WIKI_CREATE = "wiki.create";
 
     public static final String ARG_WIKI_VERSION = "wiki.version";
+    public static final String ARG_WIKI_COMPARE1 = "wiki.compare1";
+    public static final String ARG_WIKI_COMPARE2 = "wiki.compare2";
+
 
     public static final String ARG_WIKI_CHANGEDESCRIPTION = "wiki.changedescription";
 

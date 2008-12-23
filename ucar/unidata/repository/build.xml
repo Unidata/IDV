@@ -194,6 +194,7 @@
         <unjar src="${libsrc}/jetty.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jetty-util.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mailapi.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/javadiff.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/smtp.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>

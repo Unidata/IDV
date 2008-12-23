@@ -237,6 +237,22 @@ a.header-left  {
 
 
 
+.wikicompare-deleted {
+	background-color:red;
+}
+
+.wikicompare-changed {
+	background-color:#ffffcc;
+}
+
+.wikicompare-context {
+	background-color:white;
+}
+
+.wikicompare {
+	background-color:white;
+}
+
 .wikicontent {
     xline-height: 1.5em;
 }
