@@ -309,8 +309,11 @@ public abstract class PointDataSource extends FilesDataSource {
          */
         public void applyToDataSelection(DataSelection dataSelection) {
             if (dataSelection != null) {
-                dataSelection.putProperty(PROP_STATIONMODELNAME,
-                                          getPlotModel().getName());
+                StationModel plotModel =  getPlotModel();
+                if(plotModel!=null) {
+                    dataSelection.putProperty(PROP_STATIONMODELNAME,
+                                              plotModel.getName());
+                }
             }
         }
 
