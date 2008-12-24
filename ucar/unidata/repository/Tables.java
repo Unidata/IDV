@@ -183,6 +183,30 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
 
+public static class LOGINS {
+public static final String NAME = "logins";
+public static final String COL_USER_ID = NAME + ".user_id";
+public static final String COL_DATE = NAME + ".date";
+public static final String COL_IPADDRESS = NAME + ".ipaddress";
+public static final String []ARRAY= new String[] {
+COL_USER_ID,COL_DATE,COL_IPADDRESS
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
+
+
+
+
 public static class USERROLES {
 public static final String NAME = "userroles";
 public static final String COL_USER_ID = NAME + ".user_id";

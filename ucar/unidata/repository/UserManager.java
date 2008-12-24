@@ -457,12 +457,12 @@ public class UserManager extends RepositoryManager {
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         if (getRepository().isSSLEnabled(request)) {
-            sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
+            sb.append(HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
             //            sb.append(
-            //                HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
+            //                HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.toString()));
         } else {
             sb.append(
-                HtmlUtil.form(getRepositoryBase().URL_USER_LOGIN.toString()));
+                HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.toString()));
         }
         if (request.defined(ARG_REDIRECT)) {
             sb.append(HtmlUtil.hidden(ARG_REDIRECT,
@@ -1187,6 +1187,7 @@ public class UserManager extends RepositoryManager {
         usersHtml.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
+                              "",
                     HtmlUtil.bold(msg("ID")) + HtmlUtil.space(2),
                     HtmlUtil.bold(msg("Name")) + HtmlUtil.space(2),
                     HtmlUtil.bold(msg("Roles")) + HtmlUtil.space(2),
@@ -1199,10 +1200,16 @@ public class UserManager extends RepositoryManager {
                                           ARG_USER_ID,
                                           user.getId()), user.getId());
 
+            String userLogLink =
+                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_LOG,
+                                          ARG_USER_ID,
+                                          user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log") ));
+
+
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtil.cols(
-                              userEditLink, user.getName(),
+                                                                    userLogLink,   userEditLink, user.getName(),
                               user.getRolesAsString("<br>"), user.getEmail(),
                               "" + user.getAdmin()) + "</tr>";
             usersHtml.append(row);
@@ -1826,7 +1833,6 @@ public class UserManager extends RepositoryManager {
             String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD, "");
             password = hashPassword(password);
-
             Statement stmt = getDatabaseManager().select(
                                  Tables.USERS.COLUMNS, Tables.USERS.NAME,
                                  Clause.and(
@@ -1838,6 +1844,12 @@ public class UserManager extends RepositoryManager {
             ResultSet results = stmt.getResultSet();
             if (results.next()) {
                 user = getUser(results);
+                getDatabaseManager().executeInsert(Tables.LOGINS.INSERT,
+                                                   new Object[] {
+                                                       user.getId(), 
+                                                       new Date(), request.getIp()
+                                                   });
+
                 setUserSession(request, user);
                 if (output.equals("xml")) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
@@ -1962,6 +1974,57 @@ public class UserManager extends RepositoryManager {
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
         roles.add(0, ROLE_ANY);
         return roles;
+    }
+
+
+
+    public Result processLog(Request request) throws Exception {
+        StringBuffer sb   = new StringBuffer();
+
+        User user = findUser(request.getString(ARG_USER_ID,""));
+
+        if(user == null) {
+            sb.append(getRepository().error("Could not find user"));
+        } else {
+            Statement stmt = getDatabaseManager().select(Tables.LOGINS.COLUMNS,
+                                                         Tables.LOGINS.NAME,
+                                                         Clause.eq(Tables.LOGINS.COL_USER_ID,
+                                                                   user.getId()),
+                                                         " order by " + Tables.LOGINS.COL_DATE +" desc ");
+
+            SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
+            ResultSet         results;
+            sb.append(msgLabel("Logins for User"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(user.getLabel());
+            sb.append(HtmlUtil.p());
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b(msg("Date")),
+                                                 HtmlUtil.b(msg("IP Address")))));
+
+            int cnt=0;
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    int col=2;
+                    Date dttm = getDatabaseManager().getDate(results, col++);
+                    String ip  =  results.getString(col++);
+                    sb.append(HtmlUtil.row(HtmlUtil.cols(
+                                                         getRepository().formatDate(dttm),ip)));
+
+                    cnt++;
+                }
+            }
+            sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+            if(cnt==0) {
+                sb.append(msg("No logins"));
+            }
+        }
+        Result result =  new Result(msg("User Log"), sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getRepository().getSubNavLinks(request,
+                                                          getAdmin().adminUrls));
+        return result;
+
     }
 
     /**

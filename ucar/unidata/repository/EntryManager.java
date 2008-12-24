@@ -1397,9 +1397,12 @@ return new Result(title, sb);
                 BLANK, bytes,
                 IOUtil.getFileExtension(entry.getResource().getPath()));
         } else {
+            InputStream inputStream =  IOUtil.getInputStream(entry.getResource()
+                                                    .getPath(), getClass());
+            //            System.err.println ("args:" + request.getHttpHeaderArgs());
+            //inputStream
             return new Result(BLANK,
-                              IOUtil.getInputStream(entry.getResource()
-                                  .getPath(), getClass()), IOUtil
+                              inputStream, IOUtil
                                       .getFileExtension(entry.getResource()
                                           .getPath()));
         }
@@ -1904,7 +1907,7 @@ return new Result(title, sb);
         if (file != null) {
             String tmp = (String) files.get(file);
             String newFile = getStorageManager().moveToStorage(request,
-                                 new File(tmp)).toString();
+                                                               new File(tmp)).toString();
             file = newFile;
         }
         String url   = XmlUtil.getAttribute(node, ATTR_URL, (String) null);

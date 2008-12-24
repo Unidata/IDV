@@ -132,6 +132,16 @@ CREATE TABLE  userroles (
 
 
 -----------------------------------------------------------------------
+--- tracks logins
+-----------------------------------------------------------------------
+CREATE TABLE  logins (user_id  varchar(200),
+                      date ramadda.datetime, 
+               	      ipaddress  varchar(400));
+
+CREATE INDEX LOGINS_INDEX_USER_ID ON comments (USER_ID);
+
+
+-----------------------------------------------------------------------
 ---  permissions on entries
 -----------------------------------------------------------------------
 CREATE TABLE  permissions (

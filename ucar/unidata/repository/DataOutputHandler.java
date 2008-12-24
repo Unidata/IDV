@@ -320,7 +320,7 @@ public class DataOutputHandler extends OutputHandler {
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
         String opendapUrl = request.getRequestPath() + "/"
-                            + request.getPathEmbeddedArgs() + "/entry.das";
+                            + request.getPathEmbeddedArgs() + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
                            "OpenDAP", OUTPUT_OPENDAP));
         request.put(ARG_OUTPUT, oldOutput);
