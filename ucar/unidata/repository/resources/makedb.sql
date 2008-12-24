@@ -179,19 +179,14 @@ CREATE TABLE  globals (name varchar(500),
 -----------------------------------------------------------------------
 --- Holds changes to wiki pages
 -----------------------------------------------------------------------
---DROP TABLE wikihistory;
---DROP INDEX WIKIHISTORY_INDEX_ID;
-
-
-
-CREATE TABLE wikihistory (entry_id varchar(200),
+CREATE TABLE wikipagehistory (entry_id varchar(200),
  		          user_id varchar(200),
 			  date ramadda.datetime, 
 			  description varchar(2000),
 			  wikitext ramadda.clob);
 
 
-CREATE INDEX WIKIHISTORY_INDEX_ENTRY_ID ON wikihistory (ENTRY_ID);
+CREATE INDEX WIKIPAGEHISTORY_INDEX_ENTRY_ID ON wikipagehistory (ENTRY_ID);
 
 
 

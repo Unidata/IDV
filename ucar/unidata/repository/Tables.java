@@ -290,8 +290,8 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
 
-public static class WIKIHISTORY {
-public static final String NAME = "wikihistory";
+public static class WIKIPAGEHISTORY {
+public static final String NAME = "wikipagehistory";
 public static final String COL_ENTRY_ID = NAME + ".entry_id";
 public static final String COL_USER_ID = NAME + ".user_id";
 public static final String COL_DATE = NAME + ".date";

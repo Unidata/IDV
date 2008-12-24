@@ -156,7 +156,7 @@ public class TextOutputHandler extends OutputHandler {
         for (String line : (List<String>) StringUtil.split(contents, "\n",
                 false, false)) {
             cnt++;
-            line = Request.HTMLEntityEncode(line);
+            line = HtmlUtil.entityEncode(line);
             sb.append("<a " + HtmlUtil.attr("name", "line" + cnt)
                       + "></a><a href=#line" + cnt + ">" + cnt + "</a>"
                       + HtmlUtil.space(1) + line + "<br>");

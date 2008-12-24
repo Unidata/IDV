@@ -20,12 +20,19 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.collab;
-import ucar.unidata.repository.*;
+
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.*;
 
+
+import ucar.unidata.sql.Clause;
+
+
+import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 
@@ -37,9 +44,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
-
-import ucar.unidata.sql.Clause;
-import ucar.unidata.sql.SqlUtil;
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
@@ -65,7 +69,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     /** _more_ */
     public static String TYPE_WIKIPAGE = "wikipage";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_WIKI_TEXT = "wikipage.wikitext";
 
     /**
@@ -98,11 +102,22 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param statement _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void deleteEntry(Request request, Statement statement, Entry entry)
             throws Exception {
         super.deleteEntry(request, statement, entry);
-        String query = SqlUtil.makeDelete(Tables.WIKIHISTORY.NAME, Tables.WIKIHISTORY.COL_ENTRY_ID,
-                                          SqlUtil.quote(entry.getId()));
+        String query =
+            SqlUtil.makeDelete(Tables.WIKIPAGEHISTORY.NAME,
+                               Tables.WIKIPAGEHISTORY.COL_ENTRY_ID,
+                               SqlUtil.quote(entry.getId()));
         statement.execute(query);
     }
 
@@ -117,28 +132,26 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public void initializeEntry(Request request, Entry entry)
             throws Exception {
-        Object[] values = entry.getValues();
-        String originalText=null;
-        if(values!=null) {
-            originalText  = (String)values[0];
+        Object[] values       = entry.getValues();
+        String   originalText = null;
+        if (values != null) {
+            originalText = (String) values[0];
         }
-        boolean wasNew =(values==null);
+        boolean wasNew = (values == null);
         super.initializeEntry(request, entry);
-        String newText = (String)  entry.getValues()[0];
-        if(originalText==null || !Misc.equals(originalText, newText)) {
-            String desc="";
-            if(wasNew) {
+        String newText = (String) entry.getValues()[0];
+        if ((originalText == null) || !Misc.equals(originalText, newText)) {
+            String desc = "";
+            if (wasNew) {
                 desc = "Created";
             } else {
-                desc = request.getString(ARG_WIKI_CHANGEDESCRIPTION,"");
+                desc = request.getString(ARG_WIKI_CHANGEDESCRIPTION, "");
             }
 
-            getDatabaseManager().executeInsert(Tables.WIKIHISTORY.INSERT,
-                    new Object[] {
-                        entry.getId(), 
-                        request.getUser().getId(), new Date(), desc,
-                        newText
-                    });
+            getDatabaseManager().executeInsert(Tables.WIKIPAGEHISTORY.INSERT,
+                    new Object[] { entry.getId(),
+                                   request.getUser().getId(), new Date(),
+                                   desc, newText });
         }
     }
 
@@ -177,22 +190,29 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                 wikiText = (String) values[0];
             }
         }
-        if(request.defined(ARG_WIKI_EDITWITH)) {
-            Date dttm= new Date((long)request.get(ARG_WIKI_EDITWITH,0.0));
+        if (request.defined(ARG_WIKI_EDITWITH)) {
+            Date dttm = new Date((long) request.get(ARG_WIKI_EDITWITH, 0.0));
             WikiPageHistory wph = getHistory(entry, dttm);
-            if(wph==null) {
-                throw new IllegalArgumentException("Could not find wiki history");
+            if (wph == null) {
+                throw new IllegalArgumentException(
+                    "Could not find wiki history");
             }
             wikiText = wph.getText();
-            sb.append(HtmlUtil.formEntry("",msgLabel("Editing with text from version") + getRepository().formatDate(wph.getDate())));
+            sb.append(
+                HtmlUtil.formEntry(
+                    "",
+                    msgLabel("Editing with text from version")
+                    + getRepository().formatDate(wph.getDate())));
         }
 
         sb.append(HtmlUtil.formEntry(msgLabel("Title"),
                                      HtmlUtil.input(ARG_NAME, name, size)));
 
-        if(entry!=null) {
-            sb.append(HtmlUtil.formEntry(msgLabel("Edit&nbsp;Summary"),
-                                         HtmlUtil.input(ARG_WIKI_CHANGEDESCRIPTION,"",size)));
+        if (entry != null) {
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Edit&nbsp;Summary"),
+                    HtmlUtil.input(ARG_WIKI_CHANGEDESCRIPTION, "", size)));
         }
 
 
@@ -335,7 +355,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
         String textWidget = buttons + HtmlUtil.br()
                             + HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 250,
-                                                60, HtmlUtil.id(ARG_WIKI_TEXT));
+                                60, HtmlUtil.id(ARG_WIKI_TEXT));
 
         String right = HtmlUtil.div(help.toString(),
                                     HtmlUtil.cssClass("smallhelp"));
@@ -380,43 +400,78 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     }
 
 
-    public WikiPageHistory getHistory(Entry entry, Date date) throws Exception {
-        List<WikiPageHistory>         list = getHistoryList(entry,date,true);
-        if(list.size()>0) return list.get(0);
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param date _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public WikiPageHistory getHistory(Entry entry, Date date)
+            throws Exception {
+        List<WikiPageHistory> list = getHistoryList(entry, date, true);
+        if (list.size() > 0) {
+            return list.get(0);
+        }
         return null;
     }
 
-    public List<WikiPageHistory> getHistoryList(Entry entry, Date date, boolean includeText) throws Exception {
-        Statement stmt = getDatabaseManager().select(SqlUtil.comma(includeText?
-                                                      new String[]{
-                                                          Tables.WIKIHISTORY.COL_USER_ID,
-                                                          Tables.WIKIHISTORY.COL_DATE,
-                                                          Tables.WIKIHISTORY.COL_DESCRIPTION,
-                                                          Tables.WIKIHISTORY.COL_WIKITEXT}:
-                                                      new String[]{
-                                                          Tables.WIKIHISTORY.COL_USER_ID,
-                                                          Tables.WIKIHISTORY.COL_DATE,
-                                                          Tables.WIKIHISTORY.COL_DESCRIPTION}),
-                                                     Tables.WIKIHISTORY.NAME,
-                                                      (date!=null?
-                                                       Clause.and(
-                                                                  Clause.eq(Tables.WIKIHISTORY.COL_ENTRY_ID, entry.getId()),
-                                                                  Clause.eq(Tables.WIKIHISTORY.COL_DATE, date)):
-                                                       Clause.eq(Tables.WIKIHISTORY.COL_ENTRY_ID, entry.getId())),
-                                                     " order by " + Tables.WIKIHISTORY.COL_DATE +" asc ");
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param date _more_
+     * @param includeText _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<WikiPageHistory> getHistoryList(Entry entry, Date date,
+            boolean includeText)
+            throws Exception {
+        Statement stmt = getDatabaseManager().select(SqlUtil.comma(includeText
+                ? new String[] { Tables.WIKIPAGEHISTORY.COL_USER_ID,
+                                 Tables.WIKIPAGEHISTORY.COL_DATE,
+                                 Tables.WIKIPAGEHISTORY.COL_DESCRIPTION,
+                                 Tables.WIKIPAGEHISTORY.COL_WIKITEXT }
+                : new String[] { Tables.WIKIPAGEHISTORY.COL_USER_ID,
+                                 Tables.WIKIPAGEHISTORY.COL_DATE,
+                                 Tables.WIKIPAGEHISTORY
+                                     .COL_DESCRIPTION }), Tables
+                                         .WIKIPAGEHISTORY
+                                         .NAME, ((date != null)
+                ? Clause
+                    .and(Clause
+                        .eq(Tables.WIKIPAGEHISTORY.COL_ENTRY_ID,
+                            entry.getId()), Clause
+                                .eq(Tables.WIKIPAGEHISTORY.COL_DATE, date))
+                : Clause.eq(
+                    Tables.WIKIPAGEHISTORY.COL_ENTRY_ID,
+                    entry.getId())), " order by "
+                                     + Tables.WIKIPAGEHISTORY.COL_DATE
+                                     + " asc ");
 
-        SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
-        ResultSet         results;
+        SqlUtil.Iterator      iter = SqlUtil.getIterator(stmt);
+        ResultSet             results;
         List<WikiPageHistory> history = new ArrayList<WikiPageHistory>();
-        int version=1;
+        int                   version = 1;
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int col = 1;
-                WikiPageHistory wph = new WikiPageHistory(version++,
-                                                          getUserManager().findUser(results.getString(col++),true),
-                                                          getDatabaseManager().getDate(results, col++),
-                                                          results.getString(col++),
-                                                          (includeText?results.getString(col++):""));
+                WikiPageHistory wph =
+                    new WikiPageHistory(
+                        version++,
+                        getUserManager().findUser(
+                            results.getString(col++),
+                            true), getDatabaseManager().getDate(
+                                results, col++), results.getString(col++),
+                                    (includeText
+                                     ? results.getString(col++)
+                                     : ""));
                 history.add(wph);
             }
         }

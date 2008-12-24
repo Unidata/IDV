@@ -238,19 +238,32 @@ a.header-left  {
 
 
 .wikicompare-deleted {
-	background-color:red;
+	background: #ffa;
+	font-size: smaller;
 }
 
-.wikicompare-changed {
-	background-color:#ffffcc;
-}
+
 
 .wikicompare-context {
-	background-color:white;
+	background: #eee;
+	font-size: smaller;
+}
+
+.wikicompare-added {
+	background: #cfc;
+	font-size: smaller;
+}
+
+
+.wikicompare-lineheader {
+    padding-top:10px;
+    font-weight: bold;
 }
 
 .wikicompare {
-	background-color:white;
+    max-width: 50%; 
+    overflow-x: automatic;
+    background-color:white;
 }
 
 .wikicontent {

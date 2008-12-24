@@ -941,34 +941,13 @@ public class Request implements Constants {
     public String getEncodedString(String key, String dflt) {
         String s = getString(key, dflt);
         if (s != null) {
-            s = HTMLEntityEncode(s);
+            s = HtmlUtil.entityEncode(s);
         }
         return s;
     }
 
 
 
-
-    /**
-     * _more_
-     *
-     * @param input _more_
-     *
-     * @return _more_
-     */
-    public static String HTMLEntityEncode(String input) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < input.length(); ++i) {
-            char ch = input.charAt(i);
-            if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z'))
-                    || ((ch >= '0') && (ch <= '9'))) {
-                sb.append(ch);
-            } else {
-                sb.append("&#" + (int) ch + ";");
-            }
-        }
-        return sb.toString();
-    }
 
 
     /**
@@ -1000,7 +979,7 @@ public class Request implements Constants {
                                         + " value:" + v + ":");
         }
 
-        //        v = HTMLEntityEncode(v);
+        //        v = HtmlUtil.entityEncode(v);
         //TODO:Check the value
         return v;
         //        return repository.getDatabaseManager().escapeString(v);
