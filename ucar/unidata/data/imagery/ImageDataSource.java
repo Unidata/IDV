@@ -1206,7 +1206,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             AddeImageInfo biggestPosition = null;
             int           pos             = 0;
             boolean       anyRelative     = false;
-            //Find the descriptor with the largets position
+            //Find the descriptor with the largest position
             String biggestSource = null;
             for (Iterator iter =
                     descriptorsToUse.iterator(); iter.hasNext(); ) {
@@ -1240,14 +1240,18 @@ public abstract class ImageDataSource extends DataSourceImpl {
             //            System.err.println(getCacheDataToDisk() + " " + biggestPosition);
 
             //If any of them are relative then read in the list of AreaDirectorys so we can get the correct absolute times
+            // TODO:  revisit this
 
             if (getCacheDataToDisk() && anyRelative
                     && (biggestPosition != null)) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
-                System.err.println(biggestPosition.makeAddeUrl()
-                                   + "\nfrom aid:" + biggestSource);
+                //System.err.println(biggestPosition.makeAddeUrl()
+                //                   + "\nfrom aid:" + biggestSource);
+                //System.err.println(biggestPosition.makeAddeUrl()
+                //                   + "\nfrom aii:" + biggestPosition.makeAddeUrl());
                 //                AreaDirectoryList adl =
                 //                    new AreaDirectoryList(biggestPosition.makeAddeUrl());
+                biggestSource = biggestSource.replace("imagedata", "imagedir");
                 AreaDirectoryList adl = new AreaDirectoryList(biggestSource);
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDATA);
                 currentDirs = adl.getSortedDirs();
