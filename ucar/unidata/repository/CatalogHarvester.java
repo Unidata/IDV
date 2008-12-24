@@ -76,6 +76,8 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     boolean recurse = false;
 
+    boolean download = false;
+
     /** _more_ */
     Hashtable seen = new Hashtable();
 
@@ -110,10 +112,11 @@ public class CatalogHarvester extends Harvester {
      * @param recurse _more_
      */
     public CatalogHarvester(Repository repository, Group group, String url,
-                            User user, boolean recurse) {
+                            User user, boolean recurse, boolean download) {
         super(repository);
         setName("Catalog harvester");
         this.recurse  = recurse;
+        this.download =download;
         this.topGroup = group;
         this.topUrl   = url;
         this.user     = user;
@@ -294,8 +297,40 @@ public class CatalogHarvester extends Harvester {
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
                         DFLT_INHERITED, ext, "", "", ""));
             }
+            Resource resource = null;
+            if(download && (urlPath.startsWith("http:")
+                            ||urlPath.startsWith("https:")
+
+                           ||urlPath.startsWith("ftp:"))) {
+                String tail = IOUtil.getFileTail(urlPath);
+                File newFile = getStorageManager().getTmpFile(null,
+                                                              tail);
+                try {
+                    RepositoryUtil.checkFilePath(newFile.toString());
+                    URL           fromUrl    = new URL(urlPath);
+                    URLConnection connection = fromUrl.openConnection();
+                    InputStream   fromStream = connection.getInputStream();
+                    FileOutputStream toStream = new FileOutputStream(newFile);
+                    //                    System.err.println("writing to " + newFile);
+                    int bytes = IOUtil.writeTo(fromStream, toStream);
+                    toStream.close();
+                    fromStream.close();
+                    if(bytes>0) {
+                        String theFile = getStorageManager().moveToStorage((Request)null,
+                                                                           newFile).toString();
+                        resource = new Resource(new File(theFile), Resource.TYPE_STOREDFILE);
+                    }
+                } catch(Exception ignore) {
+                    System.err.println("error " + ignore);
+                    ignore.printStackTrace();
+                }
+            } 
+            if(resource == null) {
+                resource = new Resource(urlPath, Resource.TYPE_URL);
+            }
+
             entry.initEntry(name, "", parent, user,
-                            new Resource(urlPath, Resource.TYPE_URL), "",
+                            resource, "",
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);
             entries.add(entry);

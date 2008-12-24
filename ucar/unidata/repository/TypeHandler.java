@@ -815,7 +815,8 @@ public class TypeHandler extends RepositoryManager {
                                          + formatDate(request,
                                              entry.getCreateDate())));
 
-            String resourceLink = entry.getResource().getPath();
+            Resource resource  = entry.getResource();
+            String resourceLink = resource.getPath();
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
                     resourceLink = "<a href=\"" + resourceLink + "\">"

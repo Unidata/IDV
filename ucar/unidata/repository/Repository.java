@@ -1898,6 +1898,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         public boolean isTemplateFor(Request request) {
+            if(request.getUser()==null) return false;
             String  templateId = request.getUser().getTemplate();
             if(templateId == null) {
                 return false;
@@ -2173,6 +2174,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public HtmlTemplate getTemplate(Request request) {
         List<HtmlTemplate> theTemplates = getTemplates();
         for(HtmlTemplate template: theTemplates) {
+            if(request==null) return template;
             if(template.isTemplateFor(request)) {
                 return template;
             }

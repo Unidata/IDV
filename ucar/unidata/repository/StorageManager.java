@@ -470,7 +470,6 @@ public class StorageManager extends RepositoryManager {
         }
 
         File newFile = new File(IOUtil.joinDir(storageDir, targetName));
-        System.err.println(newFile);
         IOUtil.moveFile(original, newFile);
         return newFile;
     }

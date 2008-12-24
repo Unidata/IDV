@@ -1699,14 +1699,17 @@ return new Result(title, sb);
                     getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getId()));
             sb.append(msgLabel("Import a catalog"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
-                      + HtmlUtil.space(1)
-                      + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
-                      + " Recurse");
-            sb.append(HtmlUtil.submit(msg("Go")));
-
-
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.formEntry(msgLabel("URL"),
+                                         HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)));
+            sb.append(HtmlUtil.formEntry("", HtmlUtil.checkbox(ARG_RECURSE, "true", false)+
+                                         HtmlUtil.space(1) +msg("Recurse")+
+                                         HtmlUtil.space(1)+
+                                         HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false) +
+                                         HtmlUtil.space(1)+
+                                         msg("Download URLS")));
+            sb.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Go"))));
+            sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.formClose());
         }
         return sb.toString();
