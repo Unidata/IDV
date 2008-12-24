@@ -88,7 +88,7 @@ public class ContentMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     protected String getHandlerGroupName() {
-        return "Content";
+        return "Attachments";
     }
 
 
@@ -219,11 +219,23 @@ public class ContentMetadataHandler extends MetadataHandler {
                                ? " width=\"100\" "
                                : "");
         if (ImageUtils.isImage(f.toString())) {
-            return HtmlUtil.img(
-                request.url(
-                    getRepository().getMetadataManager().URL_METADATA_VIEW,
-                    ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                    metadata.getId()), "thumbnail", extra);
+            String img= HtmlUtil.img(
+                                      request.url(
+                                                  getRepository().getMetadataManager().URL_METADATA_VIEW,
+                                                  ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
+                                                  metadata.getId()), "thumbnail", extra);
+
+            if(forLink) {
+                String bigimg= HtmlUtil.img(
+                                      request.url(
+                                                  getRepository().getMetadataManager().URL_METADATA_VIEW,
+                                                  ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
+                                                  metadata.getId()), "thumbnail", "");
+
+
+                img = getRepository().makeMenuPopupLink(img,bigimg,true);
+            }
+            return img;
         } else if (f.exists()) {
             String name =
                 getRepository().getStorageManager().getFileTail(f.getName());

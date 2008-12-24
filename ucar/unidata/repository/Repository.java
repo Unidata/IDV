@@ -3942,9 +3942,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String makeMenuPopupLink(String link, String menuContents) {
+        return makeMenuPopupLink(link,menuContents,false);
+    }
+
+    public String makeMenuPopupLink(String link, String menuContents, boolean makeClose) {
         String       compId = "menu_" + HtmlUtil.blockCnt++;
         String       linkId = "menulink_" + HtmlUtil.blockCnt++;
         StringBuffer menu   = new StringBuffer();
+        if(makeClose) {
+            String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hideMenuObject();"), 
+                                                                      HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
+            menuContents = closeLink+HtmlUtil.br()+menuContents;
+        }
+
         menu.append(HtmlUtil.div(menuContents,
                                  HtmlUtil.id(compId)
                                  + HtmlUtil.cssClass("menu")));
