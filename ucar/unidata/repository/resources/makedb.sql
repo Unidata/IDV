@@ -134,11 +134,14 @@ CREATE TABLE  userroles (
 -----------------------------------------------------------------------
 --- tracks logins
 -----------------------------------------------------------------------
-CREATE TABLE  logins (user_id  varchar(200),
-                      date ramadda.datetime, 
-               	      ipaddress  varchar(400));
+CREATE TABLE  user_activity (
+	user_id  varchar(200),
+	date ramadda.datetime, 
+        what  varchar(100),  
+        extra  varchar(1000),  
+        ipaddress  varchar(400));
 
-CREATE INDEX LOGINS_INDEX_USER_ID ON comments (USER_ID);
+CREATE INDEX USER_ACTIVITY_INDEX_USER_ID ON user_activity (USER_ID);
 
 
 -----------------------------------------------------------------------

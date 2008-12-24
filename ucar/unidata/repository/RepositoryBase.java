@@ -182,8 +182,8 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
     /** _more_ */
-    public final RequestUrl URL_USER_LOG = new RequestUrl(this,
-                                                 "/user/log");
+    public final RequestUrl URL_USER_ACTIVITY = new RequestUrl(this,
+                                                 "/user/activity");
 
     /** _more_ */
     public final RequestUrl URL_USER_RESETPASSWORD =

@@ -183,14 +183,19 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
 
-public static class LOGINS {
-public static final String NAME = "logins";
+
+public static class USER_ACTIVITY {
+public static final String NAME = "user_activity";
 public static final String COL_USER_ID = NAME + ".user_id";
 public static final String COL_DATE = NAME + ".date";
+public static final String COL_WHAT = NAME + ".what";
+public static final String COL_EXTRA = NAME + ".extra";
 public static final String COL_IPADDRESS = NAME + ".ipaddress";
 public static final String []ARRAY= new String[] {
-COL_USER_ID,COL_DATE,COL_IPADDRESS
+COL_USER_ID,COL_DATE,COL_WHAT,COL_EXTRA,COL_IPADDRESS
 };
+
+
 
 
 public static final String COLUMNS = SqlUtil.comma(ARRAY);

@@ -1201,7 +1201,7 @@ public class UserManager extends RepositoryManager {
                                           user.getId()), user.getId());
 
             String userLogLink =
-                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_LOG,
+                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
                                           ARG_USER_ID,
                                           user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log") ));
 
@@ -1815,6 +1815,16 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    private void addActivity(Request request, User user, String what, String extra) 
+        throws Exception {
+        getDatabaseManager().executeInsert(Tables.USER_ACTIVITY.INSERT,
+                                           new Object[] {
+                                               user.getId(), 
+                                               new Date(), what,extra,
+                                               request.getIp()
+                                           });
+    } 
+
 
     /**
      * _more_
@@ -1844,12 +1854,7 @@ public class UserManager extends RepositoryManager {
             ResultSet results = stmt.getResultSet();
             if (results.next()) {
                 user = getUser(results);
-                getDatabaseManager().executeInsert(Tables.LOGINS.INSERT,
-                                                   new Object[] {
-                                                       user.getId(), 
-                                                       new Date(), request.getIp()
-                                                   });
-
+                addActivity(request, user,"login","");
                 setUserSession(request, user);
                 if (output.equals("xml")) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
@@ -1978,7 +1983,7 @@ public class UserManager extends RepositoryManager {
 
 
 
-    public Result processLog(Request request) throws Exception {
+    public Result processActivityLog(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
 
         User user = findUser(request.getString(ARG_USER_ID,""));
@@ -1986,20 +1991,22 @@ public class UserManager extends RepositoryManager {
         if(user == null) {
             sb.append(getRepository().error("Could not find user"));
         } else {
-            Statement stmt = getDatabaseManager().select(Tables.LOGINS.COLUMNS,
-                                                         Tables.LOGINS.NAME,
-                                                         Clause.eq(Tables.LOGINS.COL_USER_ID,
+            Statement stmt = getDatabaseManager().select(Tables.USER_ACTIVITY.COLUMNS,
+                                                         Tables.USER_ACTIVITY.NAME,
+                                                         Clause.eq(Tables.USER_ACTIVITY.COL_USER_ID,
                                                                    user.getId()),
-                                                         " order by " + Tables.LOGINS.COL_DATE +" desc ");
+                                                         " order by " + Tables.USER_ACTIVITY.COL_DATE +" desc ");
 
             SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
             ResultSet         results;
-            sb.append(msgLabel("Logins for User"));
+            sb.append(msgLabel("Activity for User"));
             sb.append(HtmlUtil.space(1));
             sb.append(user.getLabel());
             sb.append(HtmlUtil.p());
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
-            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b(msg("Date")),
+            sb.append(HtmlUtil.row(HtmlUtil.cols(
+                                                 HtmlUtil.b(msg("Activity")),
+                                                 HtmlUtil.b(msg("Date")),
                                                  HtmlUtil.b(msg("IP Address")))));
 
             int cnt=0;
@@ -2007,8 +2014,10 @@ public class UserManager extends RepositoryManager {
                 while (results.next()) {
                     int col=2;
                     Date dttm = getDatabaseManager().getDate(results, col++);
+                    String what = results.getString(col++);
+                    String extra = results.getString(col++);
                     String ip  =  results.getString(col++);
-                    sb.append(HtmlUtil.row(HtmlUtil.cols(
+                    sb.append(HtmlUtil.row(HtmlUtil.cols(what,
                                                          getRepository().formatDate(dttm),ip)));
 
                     cnt++;
