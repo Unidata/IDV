@@ -136,6 +136,19 @@ public class Entry extends Entity {
         return that;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getFullName() {
+        if (getParentGroup() != null) {
+            return getParentGroup().getFullName() + "/" + getName();
+        }
+        return getName();
+    }
+
+
 
     /**
      * _more_

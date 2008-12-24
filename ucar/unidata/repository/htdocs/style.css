@@ -539,6 +539,9 @@ a.menulink {
 }
 
 
+.entrymenulink {
+    background-color:#999999;
+}
 .entryheader {
    font-weight: bold;
    font-size: 110%;

@@ -31,7 +31,7 @@ ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${labe
    font-weight: bold;
    font-size: 110%;
    color: black;
-   border: 0px #999999 solid; 
+   border-bottom: 1px #000000 solid; 
 }
 
 .breadcrumbs a {
@@ -210,11 +210,10 @@ ${userlink}
 </td>
 </table>
 
-${entry.header}
 <div class="topbox">
 ${sublinks}
 </div>
-<div class="content">${content}</div>
+<div class="content">${entry.header}${content}</div>
 </td></tr></table>
 <div class="footer">${footer}</div>
 ${bottom}

@@ -2670,7 +2670,7 @@ return new Result(title, sb);
         if (entry == null) {
             return new String[] { BLANK, BLANK };
         }
-        Group      parent = findGroup(request, entry.getParentGroupId());
+        Entry      parent = findGroup(request, entry.getParentGroupId());
         OutputType output = OutputHandler.OUTPUT_HTML;
         int        length = 0;
         while (parent != null) {
@@ -2710,37 +2710,19 @@ return new Result(title, sb);
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar = getEntryLinksToolbar(request, entry);
 
-            /**
-             * StringBuffer menu = new StringBuffer();
-             * menu.append(
-             *   HtmlUtil.div(
-             *       getEntryLinksList(request, entry),
-             *       HtmlUtil.id("entrylinksmenu" + entry.getId())
-             *       + HtmlUtil.cssClass("menu")));
-             * String compId = "menubutton" + entry.getId();
-             * String events = HtmlUtil.onMouseOver(
-             *                   "setImage(" + HtmlUtil.squote(compId) + ",'"
-             *                   + getRepository().fileUrl(ICON_GRAYRECTARROW)
-             *                   + "')") + HtmlUtil.onMouseOut(
-             *                       "setImage(" + HtmlUtil.squote(compId)
-             *                       + ",'" + getRepository().fileUrl(ICON_GRAYRECT)
-             *                       + "')") + HtmlUtil.onMouseClick(
-             *                           "showMenu(event, "
-             *                           + HtmlUtil.squote(compId) + ", "
-             *                           + HtmlUtil.squote(
-             *                               "entrylinksmenu"
-             *                               + entry.getId()) + ")");
-             * e             * String menuLink = HtmlUtil.space(1)
-             *                 + HtmlUtil.jsLink(events,
-             *                     HtmlUtil.img(getRepository().fileUrl(ICON_GRAYRECT),
-             *                         msg("Show menu"), HtmlUtil.id(compId)));
-             *
-             */
+            StringBuffer menu = new StringBuffer();
+            //xxxx
+            menu.append(
+                        HtmlUtil.div(
+                                     getEntryActionsList(request, entry),
+                                     HtmlUtil.id("entrylinksmenu" + entry.getId())
+                                     + HtmlUtil.cssClass("menu")));
+            String fileMenu = getRepository().makeMenuPopupLink("<span class=entrymenulink>File</span>",menu.toString(),true);
             String linkHtml = getEntryActionsToolbar(request, entry, true);
             linkHtml = toolbar;
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + entryLink
+                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + fileMenu +entryLink
                                      + "</td><td align=\"right\">" + linkHtml
                                      + "</td>") + "</table>";
             nav = HtmlUtil.div(

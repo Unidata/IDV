@@ -144,17 +144,6 @@ public List<Entry> getSubEntries () {
     protected void addChildrenIds(List<String> ids) {}
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getFullName() {
-        if (getParentGroup() != null) {
-            return getParentGroup().getFullName() + "/" + getName();
-        }
-        return getName();
-    }
 
 
 }
