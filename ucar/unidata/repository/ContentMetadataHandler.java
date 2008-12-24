@@ -114,8 +114,8 @@ public class ContentMetadataHandler extends MetadataHandler {
             } else {
                 String tmpFile = (String)fileMap.get(fileArg);
                 if(tmpFile==null) {
-                    System.err.println ("No uploaded file:" + fileArg);
-                    System.err.println ("files: " + fileMap);
+                    System.err.println ("No attachment uploaded file:" + fileArg);
+                    System.err.println ("available files: " + fileMap);
                     return;
                 }
                 File file = new File(tmpFile);
