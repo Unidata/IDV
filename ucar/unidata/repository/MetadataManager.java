@@ -468,11 +468,11 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void processMetadataXml(Entry entry, Element entryChild, Hashtable fileMap)
+    public void processMetadataXml(Entry entry, Element entryChild, Hashtable fileMap,boolean internal)
             throws Exception {
         String          type    = XmlUtil.getAttribute(entryChild, ATTR_TYPE);
         MetadataHandler handler = findMetadataHandler(type);
-        handler.processMetadataXml(entry, entryChild,fileMap);
+        handler.processMetadataXml(entry, entryChild,fileMap, internal);
     }
 
     /**

@@ -1833,7 +1833,7 @@ return new Result(title, sb);
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
                 Entry entry = processEntryXml(request, node, entries,
-                                  origFileToStorage, true);
+                                  origFileToStorage, true,false);
                 XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
                                new String[] { ATTR_ID,
                         entry.getId() });
@@ -1888,7 +1888,8 @@ return new Result(title, sb);
      */
     protected Entry processEntryXml(Request request, Element node,
                                     Hashtable entries, Hashtable files,
-                                    boolean checkAccess)
+                                    boolean checkAccess,
+                                    boolean internal)
             throws Exception {
 
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
@@ -1983,7 +1984,7 @@ return new Result(title, sb);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag = entryChild.getTagName();
             if (tag.equals(TAG_METADATA)) {
-                getMetadataManager().processMetadataXml(entry, entryChild,files);
+                getMetadataManager().processMetadataXml(entry, entryChild,files,internal);
             } else if (tag.equals(TAG_DESCRIPTION)) {}
             else {
                 throw new IllegalArgumentException("Unknown tag:"
@@ -3745,11 +3746,11 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public Entry parseEntryXml(File xmlFile) throws Exception {
+    public Entry parseEntryXml(File xmlFile, boolean internal) throws Exception {
         Element root = XmlUtil.getRoot(IOUtil.readContents(xmlFile));
         return processEntryXml(
             new Request(getRepository(), getUserManager().getDefaultUser()),
-            root, new Hashtable(), new Hashtable(), false);
+            root, new Hashtable(), new Hashtable(), false, internal);
     }
 
     /**
@@ -3766,7 +3767,7 @@ return new Result(title, sb);
                            "." + file.getName() + ".ramadda"));
         Entry fileInfoEntry = null;
         if (xmlFile.exists()) {
-            fileInfoEntry = parseEntryXml(xmlFile);
+            fileInfoEntry = parseEntryXml(xmlFile,true);
             if (fileInfoEntry.getName().length() == 0) {
                 fileInfoEntry.setName(file.getName());
             }

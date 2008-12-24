@@ -1190,7 +1190,7 @@ public class UserManager extends RepositoryManager {
                               "",
                     HtmlUtil.bold(msg("ID")) + HtmlUtil.space(2),
                     HtmlUtil.bold(msg("Name")) + HtmlUtil.space(2),
-                    HtmlUtil.bold(msg("Roles")) + HtmlUtil.space(2),
+                              //                    HtmlUtil.bold(msg("Roles")) + HtmlUtil.space(2),
                     HtmlUtil.bold(msg("Email")) + HtmlUtil.space(2),
                     HtmlUtil.bold(msg("Admin?")) + HtmlUtil.space(2))));
 
@@ -1210,7 +1210,8 @@ public class UserManager extends RepositoryManager {
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtil.cols(
                                                                     userLogLink,   userEditLink, user.getName(),
-                              user.getRolesAsString("<br>"), user.getEmail(),
+                                                                    /*user.getRolesAsString("<br>"),*/
+                                                                    user.getEmail(),
                               "" + user.getAdmin()) + "</tr>";
             usersHtml.append(row);
 
@@ -2025,7 +2026,7 @@ public class UserManager extends RepositoryManager {
             }
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
             if(cnt==0) {
-                sb.append(msg("No logins"));
+                sb.append(msg("No activity"));
             }
         }
         Result result =  new Result(msg("User Log"), sb);

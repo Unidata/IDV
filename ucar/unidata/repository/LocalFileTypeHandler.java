@@ -395,12 +395,13 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                 ? Resource.TYPE_LOCAL_DIRECTORY
                 : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
                 targetFile.lastModified(), targetFile.lastModified(), null);
-
-        if (templateEntry != null) {
+ 
+       if (templateEntry != null) {
             entry.initWith(templateEntry);
+        } else {
+            //Tack on the metadata
+            entry.setMetadata(metadataList);
         }
-        //Tack on the metadata
-        entry.setMetadata(metadataList);
         return entry;
     }
 

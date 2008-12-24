@@ -100,21 +100,30 @@ public class ContentMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    public void processMetadataXml(Entry entry, Element node, Hashtable fileMap)
+    public void processMetadataXml(Entry entry, Element node, Hashtable fileMap,boolean internal)
             throws Exception {
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         if (getType(type).equals(TYPE_THUMBNAIL)
                 || getType(type).equals(TYPE_ATTACHMENT)) {
             String fileArg = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
-            String tmpFile = (String)fileMap.get(fileArg);
-            if(tmpFile==null) {
-                System.err.println ("No uploaded file:" + fileArg);
-                System.err.println ("files: " + fileMap);
-                return;
+
+            String fileName =null;
+
+            if(internal) {
+                fileName = fileArg;
+            } else {
+                String tmpFile = (String)fileMap.get(fileArg);
+                if(tmpFile==null) {
+                    System.err.println ("No uploaded file:" + fileArg);
+                    System.err.println ("files: " + fileMap);
+                    return;
+                }
+                File file = new File(tmpFile);
+                fileName =
+                    getRepository().getStorageManager().copyToEntryDir(entry,
+                                                                       file).getName();
             }
-            String fileName =
-                getRepository().getStorageManager().copyToEntryDir(entry,
-                                                                   new File(tmpFile)).getName();
+
             System.err.println ("adding attachment " + fileName );
             Metadata metadata =
                 new Metadata(getRepository().getGUID(), entry.getId(), type,
@@ -123,7 +132,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                              "","","");
             entry.addMetadata(metadata);
         } else {
-            super.processMetadataXml(entry, node,fileMap);
+            super.processMetadataXml(entry, node,fileMap,internal);
         }
 
     }
