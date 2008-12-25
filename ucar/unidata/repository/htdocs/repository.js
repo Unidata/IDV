@@ -765,6 +765,7 @@ function Tab(ids) {
 }
 
 function toggleTab(mainId) {
+//return;
     var mainContentId = 'content_' + mainId;
     for(i=0;i<this.ids.length;i++) {
 	var contentId  = 'content_'+this.ids[i];
@@ -778,12 +779,12 @@ function toggleTab(mainId) {
 		content.style.visibility="visible";
                 content.style.display = "block";
 		title.style.backgroundColor="#ffffff";
-		title.style.borderBottom = "2px #ffffff  solid";
+		title.style.borderBottom = "1px #ffffff  solid";
 	} else {
 		content.style.visibility="hidden";
                 content.style.display = "none";
 		title.style.backgroundColor="#f1f0f3";
-		title.style.borderBottom = "0px #000000  solid";
+		title.style.borderBottom = "1px #000000  solid";
 	}
     }
 

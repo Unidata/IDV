@@ -387,6 +387,8 @@ ul {
 
 .tabtitles {
    border-bottom : 1px #000000 solid;
+   margin:0px;
+   padding:0px;
 }
 
 .tabcontents {
@@ -423,9 +425,9 @@ ul {
         background-color:#ffffff;
 	border: 1px #000000 solid;
         font-weight: bold;
-	border-bottom: 0px #ffffff solid;
-	margin:2;
-	margin-bottom:0;
+	border-bottom: 1px #ffffff solid;
+	margin-left:3px;
+	margin-right:3px;
 	padding-bottom:0;
 	padding-top:2;
 	padding-left:6;
