@@ -86,9 +86,9 @@ public class GroupTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
-        super.getEntryLinks(request, entry, links, forHeader);
+        super.getEntryLinks(request, entry, links);
 
 
         if ( !entry.getIsLocalFile()) {

@@ -76,7 +76,7 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_CART = new OutputType("User Cart",
+    public static final OutputType OUTPUT_CART = new OutputType("Add to Cart",
                                                      "user.cart",
                                                      OutputType.TYPE_NONHTML,"",ICON_CART);
 
@@ -1938,7 +1938,9 @@ public class UserManager extends RepositoryManager {
                                          List<Link> links)
                     throws Exception {
                 if(state.getEntry()!=null) {
-                    links.add(makeLink(request, state.getEntry(), OUTPUT_CART));
+                    Link link = makeLink(request, state.getEntry(), OUTPUT_CART);
+                    link.setLinkType(OutputType.TYPE_ACTION);
+                    links.add(link);
                 }            
             }
 

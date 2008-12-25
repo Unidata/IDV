@@ -2446,22 +2446,12 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Link> getEntryLinks(Request request, Entry entry,
-                                       boolean forHeader)
+    protected List<Link> getEntryLinks(Request request, Entry entry)
             throws Exception {
-        List<Link>          links;
+        List<Link>          links = new ArrayList<Link>();
         OutputHandler.State state = new OutputHandler.State(entry);
-        if (forHeader) {
-            links = getRepository().getLinksForHeader(request, state);
-        } else {
-            links = getRepository().getLinksForToolbar(request, state);
-        }
-
-        if ( !forHeader) {
-            entry.getTypeHandler().getEntryLinks(request, entry, links,
-                    forHeader);
-        }
-
+        entry.getTypeHandler().getEntryLinks(request, entry, links);
+        links.addAll(getRepository().getOutputLinks(request, state));
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
         if ( !entry.isTopGroup()) {
@@ -2472,54 +2462,45 @@ return new Result(title, sb);
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param forHeader _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String getEntryActionsToolbar(Request request, Entry entry,
-                                            boolean forHeader)
+
+
+    protected String getEntryActionsTable(Request request, Entry entry,int typeMask)
             throws Exception {
-        return StringUtil.join(HtmlUtil.space(1),
-                               getEntryLinks(request, entry, forHeader));
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String getEntryActionsList(Request request, Entry entry)
-            throws Exception {
-        List<Link>   links = getEntryLinks(request, entry, false);
-        StringBuffer menu  = new StringBuffer();
-        menu.append("<table cellspacing=\"0\" cellpadding=\"0\">");
+        List<Link> links   = getEntryLinks(request, entry);
+        StringBuffer htmlSB = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+        StringBuffer nonHtmlSB = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+        StringBuffer actionSB = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
         for (Link link : links) {
-            if (link.hr) {
-                menu.append("<tr><td colspan=2><hr class=menuseparator>");
+            StringBuffer sb;
+            if(!link.isType(typeMask)) continue;
+            int type = link.getType();
+            if(type == OutputType.TYPE_ACTION) {
+                sb = actionSB;
+            } else if(type == OutputType.TYPE_HTML) {
+                sb = htmlSB;
+            } else if(type == OutputType.TYPE_NONHTML) {
+                sb = nonHtmlSB;
             } else {
-                menu.append("<tr><td>");
-                menu.append(HtmlUtil.img(link.getIcon()));
-                menu.append(HtmlUtil.space(1));
-                menu.append("</td><td>");
-                menu.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
-                                          HtmlUtil.cssClass("menulink")));
+                continue;
             }
-            menu.append("</td></tr>");
+            sb.append("<tr><td>");
+            if(link.getIcon()==null) {
+                sb.append(HtmlUtil.space(1));
+            } else {
+                sb.append(HtmlUtil.img(link.getIcon()));
+            }
+            sb.append(HtmlUtil.space(1));
+            sb.append("</td><td>");
+            sb.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
+                                    HtmlUtil.cssClass("menulink")));
+            sb.append("</td></tr>");
         }
+        actionSB.append("</table>");
+        htmlSB.append("</table>");
+        nonHtmlSB.append("</table>");
+        StringBuffer menu  = new StringBuffer();
+        menu.append("<table cellspacing=\"0\" cellpadding=\"4\">");
+        menu.append(HtmlUtil.rowTop(HtmlUtil.cols(htmlSB.toString(),nonHtmlSB.toString(),actionSB.toString())));
         menu.append("</table>");
         return menu.toString();
 
@@ -2536,18 +2517,32 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinksToolbar(Request request, Entry entry)
-            throws Exception {
-        List<Link>   links = getEntryLinks(request, entry, false);
+    public String getEntryToolbar(Request request, Entry entry)
+        throws Exception {
+        List<Link>   links = getEntryLinks(request, entry);
         StringBuffer sb    = new StringBuffer();
         for (Link link : links) {
-            String href = HtmlUtil.href(link.getUrl(),
-                                        HtmlUtil.img(link.getIcon(),
-                                            link.getLabel(),
-                                            link.getLabel()));
-            sb.append(HtmlUtil.inset(href, 0, 3, 0, 0));
+            if(link.getType()== OutputType.TYPE_ACTION ||
+               link.getType()== OutputType.TYPE_NONHTML) {
+                String href = HtmlUtil.href(link.getUrl(),
+                                            HtmlUtil.img(link.getIcon(),
+                                                         link.getLabel(),
+                                                         link.getLabel()));
+                sb.append(HtmlUtil.inset(href, 0, 3, 0, 0));
+            }
         }
         return sb.toString();
+    }
+
+    public String getEntryMenubar(Request request, Entry entry)
+        throws Exception {
+            StringBuffer editMenuInner = 
+                new StringBuffer(getEntryActionsTable(request, entry,OutputType.TYPE_ACTION));
+            StringBuffer viewMenuInner = 
+                new StringBuffer(getEntryActionsTable(request, entry,OutputType.TYPE_HTML|OutputType.TYPE_NONHTML));
+            String editMenu = getRepository().makeMenuPopupLink("<span class=entrymenulink>Edit</span>",editMenuInner.toString(),true);
+            String viewMenu = getRepository().makeMenuPopupLink("<span class=entrymenulink>View</span>",viewMenuInner.toString(),true);
+            return HtmlUtil.span(editMenu.toString() + viewMenu.toString(),HtmlUtil.cssClass("entrymenubar"));
     }
 
 
@@ -2708,22 +2703,13 @@ return new Result(title, sb);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-            String toolbar = getEntryLinksToolbar(request, entry);
+            String toolbar =getEntryToolbar(request, entry); 
+            String menubar =getEntryMenubar(request, entry); 
 
-            StringBuffer menu = new StringBuffer();
-            //xxxx
-            menu.append(
-                        HtmlUtil.div(
-                                     getEntryActionsList(request, entry),
-                                     HtmlUtil.id("entrylinksmenu" + entry.getId())
-                                     + HtmlUtil.cssClass("menu")));
-            String fileMenu = getRepository().makeMenuPopupLink("<span class=entrymenulink>File</span>",menu.toString(),true);
-            String linkHtml = getEntryActionsToolbar(request, entry, true);
-            linkHtml = toolbar;
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + fileMenu +entryLink
-                                     + "</td><td align=\"right\">" + linkHtml
+                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + menubar + entryLink
+                                     + "</td><td align=\"right\">" + toolbar
                                      + "</td>") + "</table>";
             nav = HtmlUtil.div(
                 HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")) + header,

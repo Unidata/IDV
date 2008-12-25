@@ -327,7 +327,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
         Link cdlLink  = makeLink(request, state.entry, OUTPUT_CDL);
-        cdlLink.setLinkType(Link.TYPE_TOOLBAR);
+        //        cdlLink.setLinkType(OutputType.TYPE_ACTION);
         links.add(cdlLink);
     }
 

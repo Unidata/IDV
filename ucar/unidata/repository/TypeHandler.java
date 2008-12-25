@@ -605,6 +605,7 @@ public class TypeHandler extends RepositoryManager {
 
     }
 
+
     /**
      * _more_
      *
@@ -617,7 +618,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links, boolean forHeader)
+                                 List<Link> links)
             throws Exception {
 
         if (entry.isGroup()
@@ -642,19 +643,17 @@ public class TypeHandler extends RepositoryManager {
                         .fileUrl(ICON_ADD), msg("Add Metadata")));
 
             /*
-            if (!forHeader) {
-                links.add(
+              links.add(
                     new Link(
                         request.entryUrl(
                             getMetadataManager().URL_METADATA_FORM,
                             entry), getRepository().fileUrl(ICON_METADATA),
                                     msg("Edit Metadata")));
 
-                                    }*/
+                                    */
         }
 
-        if ( !forHeader
-                && getAccessManager().canDoAction(request, entry,
+        if (getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_DELETE)) {
             links.add(
                 new Link(

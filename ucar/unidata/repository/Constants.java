@@ -83,7 +83,7 @@ public interface Constants {
     public static final String ICON_LOG = "/icons/log.gif";
 
     /** _more_          */
-    public static final String ICON_CATALOG = "/icons/catalog.jpg";
+    public static final String ICON_CATALOG = "/icons/catalog.gif";
 
     /** _more_ */
     public static final String ICON_CHAT = "/icons/chat.gif";
@@ -113,6 +113,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CLOUD = "/icons/cloud.gif";
 
+    public static final String ICON_CLOCK = "/icons/clock.gif";
+
     /** _more_ */
     public static final String ICON_LIST = "/icons/list.gif";
 
@@ -121,6 +123,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ICON_CALENDAR = "/icons/calendar.gif";
+
+    public static final String ICON_DATEGRID = "/icons/dategrid.gif";
 
     /** _more_ */
     public static final String ICON_RSS = "/icons/rss.gif";

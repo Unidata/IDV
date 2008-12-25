@@ -1495,7 +1495,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         }
 
-        getUserManager().initOutputHandlers();
+
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Entry Deleter") {
             public boolean canHandleOutput(OutputType output) {
@@ -1535,6 +1535,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         };
         outputHandler.addType(OUTPUT_DELETER);
         addOutputHandler(outputHandler);
+
+        getUserManager().initOutputHandlers();
+
     }
 
 
@@ -2443,7 +2446,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<Link> okLinks = new ArrayList<Link>();
 
         for (Link link : links) {
-            if (link.isForHeader()) {
+            if(link.getType()==OutputType.TYPE_HTML) {
                 okLinks.add(link);
             }
         }
@@ -2467,7 +2470,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<Link> links   = getOutputLinks(request, state);
         List<Link> okLinks = new ArrayList<Link>();
         for (Link link : links) {
-            if (link.isForToolbar()) {
+            if(link.getType()==OutputType.TYPE_ACTION ||
+               link.getType()==OutputType.TYPE_NONHTML) {
                 okLinks.add(link);
             }
         }
@@ -2731,6 +2735,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+
+    public Result processHelp(Request request) throws Exception {
+        return new Result(
+            BLANK,
+            new StringBuffer(
+                note(request.getUnsafeString(ARG_MESSAGE, BLANK))));
+        
+    }
 
 
     /**

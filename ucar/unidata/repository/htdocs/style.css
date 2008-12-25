@@ -230,7 +230,6 @@ a.header-left  {
 
 
 .content {
-    xline-height: 1.4em;
     margin:5;
 }
 
@@ -267,7 +266,6 @@ a.header-left  {
 }
 
 .wikicontent {
-    xline-height: 1.5em;
 }
 
 
@@ -388,8 +386,7 @@ ul {
 }
 
 .tabtitles {
-   xline-height: 1.15em;
-   border-bottom : 2px #000000 solid;
+   border-bottom : 1px #000000 solid;
 }
 
 .tabcontents {
@@ -429,6 +426,7 @@ ul {
 	border-bottom: 0px #ffffff solid;
 	margin:2;
 	margin-bottom:0;
+	padding-bottom:0;
 	padding-top:2;
 	padding-left:6;
 	padding-right:6;
@@ -449,7 +447,8 @@ ul {
 
 .tooltip-inner {
    border : 1px black solid;
-   background-color : #FFFFCC;
+   xbackground-color : #FFFFCC;
+   background-color : #eeeeee;
    margin:0px;
 }
 
@@ -457,7 +456,8 @@ ul {
    border : 1px black solid;
    margin:0px;
    padding:1px;
-   background-color : #FFFFCC;
+   xbackground-color : #FFFFCC;
+   background-color : #eeeeee;
 }
 
 .tooltip-outer {
@@ -491,11 +491,11 @@ a.menulink {
    padding:1px;
    text-decoration: none;
    border : 1px black solid;
-   background-color : #FFFFCC;
+   xbackground-color : #FFFFCC;
+   background-color : #eeeeee;
    position: absolute; 
    visibility: hidden; 
    z-index: 1;
-
 }
 
 
@@ -539,9 +539,23 @@ a.menulink {
 }
 
 
-.entrymenulink {
-    background-color:#999999;
+.entrymenubar {
+   background-color:#f1f0f3;
+   border : 1px #666666 solid;
+   margin-left:2px;
+   margin-right:2px;
 }
+
+.entrymenulink {
+
+    xmargin:2px;
+    padding-top:3px;
+    padding-right:3px;
+    padding-left:3px;
+    font-size: 80%;
+    font-weight: bold;
+}
+
 .entryheader {
    font-weight: bold;
    font-size: 110%;
@@ -656,6 +670,7 @@ form {
 .innernote {
    padding-top:10px;
 }
+
 
 .note {
   z-index: 1;

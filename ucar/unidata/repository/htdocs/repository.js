@@ -657,11 +657,12 @@ function showMenu(event,srcId,menuId) {
     event = util.getEvent(event);
     x = util.getEventX(event);
     y = util.getEventY(event);
-
     if(srcObj.obj.offsetLeft && srcObj.obj.offsetWidth) {
-        x= util.getLeft(srcObj.obj);
+        x = util.getLeft(srcObj.obj);
         y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
     } 
+
+//   alert(util.getRight(menu.obj));
 
     x+=2;
     x+=3;
@@ -781,8 +782,8 @@ function toggleTab(mainId) {
 	} else {
 		content.style.visibility="hidden";
                 content.style.display = "none";
-		title.style.backgroundColor="#dddddd";
-		title.style.borderBottom = "2px #000000  solid";
+		title.style.backgroundColor="#f1f0f3";
+		title.style.borderBottom = "0px #000000  solid";
 	}
     }
 

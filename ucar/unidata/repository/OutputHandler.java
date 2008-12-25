@@ -474,7 +474,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
                                outputType.toString());
         }
-        int linkType = Link.TYPE_TOOLBAR;
+        int linkType = OutputType.TYPE_ACTION;
         return new Link(url, (outputType.getIcon() == null)
                              ? null
                              : getRepository()
@@ -699,20 +699,24 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public List<Link> getNextPrevLinks(Request request, Entry entry,
                                        OutputType output) {
+        Link link;
         List<Link> links = new ArrayList<Link>();
-        links.add(
-            new Link(
+
+        link = new Link(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                     output, ARG_PREVIOUS, "true"), getRepository().fileUrl(
-                        ICON_LEFT), msg("View Previous Entry")));
+                        ICON_LEFT), msg("View Previous Entry"));
 
-        links.add(
-            new Link(
+        link.setLinkType(OutputType.TYPE_NONHTML);
+        links.add(link);
+        link = new Link(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                     output, ARG_NEXT, "true"), getRepository().fileUrl(
-                        ICON_RIGHT), msg("View Next Entry")));
+                        ICON_RIGHT), msg("View Next Entry"));
+        link.setLinkType(OutputType.TYPE_NONHTML);
+        links.add(link);
         return links;
     }
 
@@ -1191,13 +1195,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         } else if (include.equals(WIKIPROP_ACTIONS)) {
             blockTitle = Misc.getProperty(props, "title", msg("Actions"));
-            blockContent = getEntryManager().getEntryActionsList(request,
-                    entry);
+            blockContent = getEntryManager().getEntryActionsTable(request,
+                    entry,OutputType.TYPE_ALL);
         } else if (include.equals(WIKIPROP_COMMENTS)) {
             return getCommentBlock(request, entry).toString();
         } else if (include.equals(WIKIPROP_TOOLBAR)) {
-            return getEntryManager().getEntryActionsToolbar(request, entry,
-                    false);
+            return getEntryManager().getEntryToolbar(request, entry);
         } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
             return getEntryManager().getBreadCrumbs(request, entry);
         } else if (include.equals(WIKIPROP_DESCRIPTION)) {

@@ -3,6 +3,9 @@
   <property name="admin" value="false"/>
   <property name="cancache" value="true"/>
 
+  <group handler="repository">
+     <api request="/help/*"           method="processHelp"/>
+  </group>
 
   <group handler="entrymanager">
       <api request="/entry/show"             method="processEntryShow"    name="${topgroup}" toplevel="true" ishome="true"/>

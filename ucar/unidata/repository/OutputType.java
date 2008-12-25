@@ -91,6 +91,7 @@ public class OutputType {
     /** _more_          */
     public static final int TYPE_INTERNAL = 1 << 3;
 
+    public static final int TYPE_ALL = TYPE_HTML|TYPE_ACTION|TYPE_NONHTML;
 
 
     /** _more_ */
@@ -312,6 +313,10 @@ public class OutputType {
         return groupName;
     }
 
+
+    public int getType() {
+        return type;
+    }
 
     /**
      *  Get the IsHtml property.

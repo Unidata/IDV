@@ -124,7 +124,6 @@ public class ContentMetadataHandler extends MetadataHandler {
                                                                        file).getName();
             }
 
-            System.err.println ("adding attachment " + fileName );
             Metadata metadata =
                 new Metadata(getRepository().getGUID(), entry.getId(), type,
                              XmlUtil.getAttribute(node, ATTR_INHERITED,

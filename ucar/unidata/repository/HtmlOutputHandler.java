@@ -83,7 +83,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TIMELINE =
-        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML);
+        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML,"",ICON_CLOCK);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
@@ -171,8 +171,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         request.put(ARG_OUTPUT, OUTPUT_HTML);
-        String toolbar = getEntryManager().getEntryActionsToolbar(request,
-                             entry, false);
+        String toolbar = getEntryManager().getEntryToolbar(request, entry);
         boolean didOne = false;
         sb.append("<table>");
         sb.append(HtmlUtil.formEntry(msgLabel("Actions"), toolbar));
@@ -724,7 +723,7 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result getActionXml(Request request, Entry entry)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(getEntryManager().getEntryActionsList(request, entry));
+        sb.append(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
 
         StringBuffer xml = new StringBuffer("<content>\n");
         XmlUtil.appendCdata(xml,
@@ -888,7 +887,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
         tabTitles.add(msg("Actions"));
-        tabContent.add(getEntryManager().getEntryActionsList(request, entry));
+        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
         return HtmlUtil.makeTabs(tabTitles, tabContent, true, (fixedHeight
                 ? "tabcontent_fixedheight"
                 : "tabcontent"));

@@ -44,12 +44,6 @@ import java.util.List;
  */
 public class Link {
 
-    /** _more_          */
-    public static final int TYPE_HEADER  = 0;
-    public static final int TYPE_ACTIONS = 1;
-    public static final int TYPE_TOOLBAR = 2;
-
-
     /** _more_ */
     String url;
 
@@ -62,7 +56,7 @@ public class Link {
     /** _more_ */
     protected boolean hr = false;
 
-    int type = TYPE_HEADER;
+    int type = OutputType.TYPE_ACTION;
 
     /** _more_          */
     OutputType outputType;
@@ -104,24 +98,21 @@ public class Link {
         this.type = linkType;
     }
 
-
-    public boolean isForHeader() {
-        return type == TYPE_HEADER;
+    public boolean isType(int typeMask) {
+        return (getType()&typeMask)!=0;
     }
-
-    public boolean isForToolbar() {
-        return type == TYPE_TOOLBAR;
-    }
-
 
     public void setLinkType(int type) {
         this.type = type;
     }
 
     public static int getLinkType(OutputType outputType) {
-        if(outputType == null) return TYPE_TOOLBAR;
-        if(outputType.getIsHtml()) return TYPE_HEADER;
-        return TYPE_TOOLBAR;
+        if(outputType == null) return OutputType.TYPE_ACTION;
+        return outputType.getType();
+    }
+
+    public int getType() {
+        return type;
     }
 
     /**
