@@ -124,17 +124,26 @@ public class Association {
         return name;
     }
 
+    public String getLabel() {
+        if(name==null||name.length()==0) return type;
+        return name;
+    }
 
 
     public boolean equals(Object o) {
         if(!(o instanceof Association) ) return false;
         Association that = (Association) o;
         return Misc.equals(this.name, that.name) &&
+            Misc.equals(this.type, that.type) &&
             Misc.equals(this.fromId, that.fromId) &&
             Misc.equals(this.toId, that.toId);
                                              
     }
 
+    public String toString() {
+        return "name:" + name +" type:" + type + " fromId:" + fromId;
+        //        return "name:" + name +" type:" + type + " fromId:" + fromId +" toId:" + toId;
+    }
 
     /**
      * Set the FromId property.

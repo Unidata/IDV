@@ -174,7 +174,7 @@ public class HtmlOutputHandler extends OutputHandler {
         String toolbar = getEntryManager().getEntryToolbar(request, entry);
         boolean didOne = false;
         sb.append("<table>");
-        sb.append(HtmlUtil.formEntry(msgLabel("Actions"), toolbar));
+        sb.append(HtmlUtil.formEntry(msgLabel("Links"), toolbar));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, true, false, true));
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, false,
@@ -310,7 +310,7 @@ public class HtmlOutputHandler extends OutputHandler {
                        args)));
             sb.append("&nbsp;&nbsp;");
             sb.append("</td><td>");
-            sb.append(HtmlUtil.bold(association.getName()));
+            sb.append(HtmlUtil.bold(association.getLabel()));
             sb.append("</td><td>");
             sb.append(HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)));
             sb.append("&nbsp;&nbsp;");
@@ -886,7 +886,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getCommentBlock(request, entry));
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
-        tabTitles.add(msg("Actions"));
+        tabTitles.add(msg("Links"));
         tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
         return HtmlUtil.makeTabs(tabTitles, tabContent, true, (fixedHeight
                 ? "tabcontent_fixedheight"

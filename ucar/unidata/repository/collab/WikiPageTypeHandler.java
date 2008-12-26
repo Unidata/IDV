@@ -67,6 +67,10 @@ import java.util.Properties;
  */
 public class WikiPageTypeHandler extends GenericTypeHandler {
 
+    public static String ASSOC_WIKILINK = "wikilink";
+
+
+
     /** _more_ */
     public static String TYPE_WIKIPAGE = "wikipage";
 
@@ -98,8 +102,10 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
-        return getRepository().getOutputHandler(
-            WikiPageOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
+        if(request.get(ARG_WIKI_DETAILS,false)) return null;
+        Result result = getRepository().getOutputHandler(
+                                                         WikiPageOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
+        return result;
     }
 
 
@@ -163,25 +169,34 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             Hashtable<Entry,Entry> links = (Hashtable<Entry,Entry>) wikiUtil.getProperty("wikilinks");
             if(links !=null) {
                 Hashtable ids = new Hashtable();
-                List<Association> okAssociations = new ArrayList<Association>();
+                List<Association> newAssociations = new ArrayList<Association>();
                 for(Enumeration keys= links.keys();keys.hasMoreElements();) {
                     Entry linkedEntry = (Entry) keys.nextElement();
-                    Association tmp= new Association(getRepository().getGUID(),"","wikilink",
+                    Association tmp= new Association(getRepository().getGUID(),"",ASSOC_WIKILINK,
                                                     entry.getId(),
                                                     linkedEntry.getId());
-                    okAssociations.add(tmp);
+                    newAssociations.add(tmp);
                 }
                 
+
                 List<Association> associations =
                     getEntryManager().getAssociations(request, entry);
-                for(Association assocation: associations) {
-                    
-                    
+                for(Association oldAssociation: (List<Association>)new ArrayList(associations)) {
+                    if(oldAssociation.getType().equals(ASSOC_WIKILINK) && 
+                       oldAssociation.getFromId().equals(entry.getId())) {
+                        if(!newAssociations.contains(oldAssociation)) {
+                            System.err.println("delete:" + oldAssociation);
+                            getEntryManager().deleteAssociation(request, oldAssociation);
+                        }
+                    }
                 }
-
-                
+                for(Association newAssociation: (List<Association>)new ArrayList(newAssociations)) {
+                    if(!associations.contains(newAssociation)) {
+                        System.err.println("add:" + newAssociation);
+                        getEntryManager().addAssociation(request, newAssociation);
+                    }
+                }
             }
-
 
         }
 

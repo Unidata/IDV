@@ -162,15 +162,19 @@ public class WikiPageOutputHandler extends OutputHandler {
                 wikiText = (String) values[0];
             }
         }
+        String detailsView = HtmlUtil.href(request.entryUrl(
+                                                            getRepository().URL_ENTRY_SHOW, entry,
+                                                            ARG_WIKI_DETAILS,""+true),msg("Details"));
+
+        header = HtmlUtil.leftRight(header,detailsView);
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
             OutputHandler.PROP_REQUEST,
                                 request, OutputHandler.PROP_ENTRY, entry }));
-        StringBuffer sb = new StringBuffer(header
-                                           + wikifyEntry(request, entry,
-                                                         wikiUtil,
-                                                         wikiText,null,null));
-        
-
+        StringBuffer sb = new StringBuffer();
+        sb.append(header);
+        sb.append(wikifyEntry(request, entry,
+                              wikiUtil,
+                              wikiText,null,null));
         Hashtable links = (Hashtable) wikiUtil.getProperty("wikilinks");
         if(links !=null) {
             List<Association> associations =

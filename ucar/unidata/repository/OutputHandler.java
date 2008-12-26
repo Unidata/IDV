@@ -1037,7 +1037,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public static final String WIKIPROP_DESCRIPTION = "description";
 
     /** _more_ */
-    public static final String WIKIPROP_ACTIONS = "actions";
+    public static final String WIKIPROP_LINKS = "links";
 
     /** _more_ */
     public static final String WIKIPROP_ = "";
@@ -1058,7 +1058,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         WIKIPROP_INFORMATION, WIKIPROP_NAME, WIKIPROP_DESCRIPTION,
         WIKIPROP_COMMENTS,
         WIKIPROP_BREADCRUMBS, WIKIPROP_TOOLBAR, WIKIPROP_IMAGE,
-        WIKIPROP_ACTIONS  /*,
+        WIKIPROP_LINKS  /*,
           WIKIPROP_CHILDREN_GROUPS,
           WIKIPROP_CHILDREN_ENTRIES,
           WIKIPROP_CHILDREN*/
@@ -1194,8 +1194,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 return "Not an image";
             }
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
-        } else if (include.equals(WIKIPROP_ACTIONS)) {
-            blockTitle = Misc.getProperty(props, "title", msg("Actions"));
+        } else if (include.equals(WIKIPROP_LINKS)) {
+            blockTitle = Misc.getProperty(props, "title", msg("Links"));
             blockContent = getEntryManager().getEntryActionsTable(request,
                     entry,OutputType.TYPE_ALL);
         } else if (include.equals(WIKIPROP_COMMENTS)) {

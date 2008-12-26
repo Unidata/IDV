@@ -2708,7 +2708,7 @@ return new Result(title, sb);
 
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + menubar + entryLink
+                + HtmlUtil.rowBottom("<td class=\"entryname\" >"  + entryLink
                                      + "</td><td align=\"right\">" + toolbar
                                      + "</td>") + "</table>";
             nav = HtmlUtil.div(
@@ -4389,7 +4389,8 @@ return new Result(title, sb);
         }
         String name = request.getString(ARG_NAME, (String) null);
         if (name != null) {
-            addAssociation(request, fromEntry, toEntry, name);
+            String type = request.getString(ARG_TYPE, "");
+            addAssociation(request, fromEntry, toEntry, name,type);
             //            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
             return new Result(
                 request.url(
@@ -4510,7 +4511,8 @@ return new Result(title, sb);
             }
         }
         return addAssociation(request, fromEntry, toEntry,
-                              XmlUtil.getAttribute(node, ATTR_NAME));
+                              XmlUtil.getAttribute(node, ATTR_NAME),
+                              XmlUtil.getAttribute(node, ATTR_TYPE,""));
     }
 
 
@@ -4527,8 +4529,8 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private String addAssociation(Request request, Entry fromEntry,
-                                  Entry toEntry, String name)
+    public String addAssociation(Request request, Entry fromEntry,
+                                  Entry toEntry, String name, String type)
             throws Exception {
         if ( !getAccessManager().canDoAction(request, fromEntry,
                                              Permission.ACTION_NEW)) {
@@ -4540,26 +4542,54 @@ return new Result(title, sb);
             throw new IllegalArgumentException("Cannot add association to "
                     + toEntry);
         }
+        //Clear the cached associations
+        return addAssociation(request, new Association(getRepository().getGUID(),name,type,
+                                                    fromEntry.getId(),
+                                                    toEntry.getId()));
 
+    }
+
+
+    public String addAssociation(Request request, Association association) 
+        throws Exception {
 
         PreparedStatement assocInsert =
             getDatabaseManager().getPreparedStatement(
                 Tables.ASSOCIATIONS.INSERT);
         int    col = 1;
         String id  = getRepository().getGUID();
-        assocInsert.setString(col++, id);
-        assocInsert.setString(col++, name);
-        assocInsert.setString(col++, "");
-        assocInsert.setString(col++, fromEntry.getId());
-        assocInsert.setString(col++, toEntry.getId());
+        assocInsert.setString(col++, association.getId());
+        assocInsert.setString(col++, association.getName());
+        assocInsert.setString(col++, association.getType());
+        assocInsert.setString(col++, association.getFromId());
+        assocInsert.setString(col++, association.getToId());
         assocInsert.execute();
         assocInsert.close();
-        fromEntry.setAssociations(null);
-        toEntry.setAssociations(null);
+        associationChanged(request, association);
         return id;
     }
 
 
+    public void associationChanged(Request request, Association association) 
+        throws Exception {
+        Entry fromEntry  = getEntry(request, association.getFromId());
+        if(fromEntry!=null)
+            fromEntry.setAssociations(null);
+        Entry toEntry  = getEntry(request, association.getToId());
+        if(toEntry!=null)
+            toEntry.setAssociations(null);
+
+    }
+
+
+    public void deleteAssociation(Request request, Association association) 
+        throws Exception {
+        getDatabaseManager().delete(
+            Tables.ASSOCIATIONS.NAME,
+            Clause.eq(
+                Tables.ASSOCIATIONS.COL_ID,
+                association.getId()));
+    }
 
     /**
      * _more_
@@ -4630,7 +4660,7 @@ return new Result(title, sb);
             return new ArrayList<Association>();
         }
 
-        entry.setAssociations(
+        List<Association> associations = 
             getAssociations(
                 request,
                 Clause.or(
@@ -4638,8 +4668,9 @@ return new Result(title, sb);
                         Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID,
                         entry.getId()), Clause.eq(
                             Tables.ASSOCIATIONS.COL_TO_ENTRY_ID,
-                            entry.getId()))));
-        return entry.getAssociations();
+                            entry.getId())));
+        entry.setAssociations(associations);
+        return associations;
     }
 
 

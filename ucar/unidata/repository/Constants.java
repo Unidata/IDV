@@ -338,11 +338,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DATASET = "dataset";
 
+
     public static final String ARG_HEIGHT = "height";
 
     /** _more_ */
     public static final String ARG_WIKI_CREATE = "wiki.create";
 
+    public static final String ARG_WIKI_DETAILS = "wiki.details";
     public static final String ARG_WIKI_VERSION = "wiki.version";
     public static final String ARG_WIKI_COMPARE1 = "wiki.compare1";
     public static final String ARG_WIKI_COMPARE2 = "wiki.compare2";
