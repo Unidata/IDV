@@ -4600,8 +4600,8 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Association> getAssociations(Request request,
-            String entryId)
+    public List<Association> getAssociations(Request request,
+                                             String entryId)
             throws Exception {
         Entry entry = getEntryManager().getEntry(request, entryId);
         if (entry == null) {
@@ -4621,7 +4621,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Association> getAssociations(Request request, Entry entry)
+    public List<Association> getAssociations(Request request, Entry entry)
             throws Exception {
         if (entry.getAssociations() != null) {
             return entry.getAssociations();

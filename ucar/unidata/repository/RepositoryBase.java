@@ -68,7 +68,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     public final RequestUrl URL_SEARCH_TEXTFORM = new RequestUrl(this,
                                                       "/search/textform",
-                                                      "Text");
+                                                      "Search");
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_BROWSE = new RequestUrl(this,

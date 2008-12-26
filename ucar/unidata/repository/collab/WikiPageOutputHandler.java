@@ -32,6 +32,7 @@ import ucar.unidata.util.HtmlUtil;
 
 
 
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -161,9 +162,21 @@ public class WikiPageOutputHandler extends OutputHandler {
                 wikiText = (String) values[0];
             }
         }
+        WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
+            OutputHandler.PROP_REQUEST,
+                                request, OutputHandler.PROP_ENTRY, entry }));
         StringBuffer sb = new StringBuffer(header
                                            + wikifyEntry(request, entry,
-                                               wikiText));
+                                                         wikiUtil,
+                                                         wikiText,null,null));
+        
+
+        Hashtable links = (Hashtable) wikiUtil.getProperty("wikilinks");
+        if(links !=null) {
+            List<Association> associations =
+                getEntryManager().getAssociations(request, entry);
+        }
+
         return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
     }
 

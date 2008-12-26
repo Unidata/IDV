@@ -35,6 +35,7 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.WikiUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -152,7 +153,40 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                     new Object[] { entry.getId(),
                                    request.getUser().getId(), new Date(),
                                    desc, newText });
+            WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
+                OutputHandler.PROP_REQUEST,
+                request, OutputHandler.PROP_ENTRY, entry }));
+            getRepository().getHtmlOutputHandler().wikifyEntry(request, entry,
+                                                               wikiUtil,
+                                                               newText,null,null);
+        
+            Hashtable<Entry,Entry> links = (Hashtable<Entry,Entry>) wikiUtil.getProperty("wikilinks");
+            if(links !=null) {
+                Hashtable ids = new Hashtable();
+                List<Association> okAssociations = new ArrayList<Association>();
+                for(Enumeration keys= links.keys();keys.hasMoreElements();) {
+                    Entry linkedEntry = (Entry) keys.nextElement();
+                    Association tmp= new Association(getRepository().getGUID(),"","wikilink",
+                                                    entry.getId(),
+                                                    linkedEntry.getId());
+                    okAssociations.add(tmp);
+                }
+                
+                List<Association> associations =
+                    getEntryManager().getAssociations(request, entry);
+                for(Association assocation: associations) {
+                    
+                    
+                }
+
+                
+            }
+
+
         }
+
+
+
     }
 
 

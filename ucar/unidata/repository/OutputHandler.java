@@ -1121,6 +1121,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
             Hashtable props = new Hashtable();
             props = StringUtil.parseHtmlProperties(remainder);
+            addWikiLink(wikiUtil,  theEntry);
             String include = handleWikiImport(wikiUtil, request, theEntry,
                                  tag, props);
             if (include != null) {
@@ -1417,7 +1418,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Entry findWikiEntry(Request request, String name, Group parent)
+    public Entry findWikiEntry(Request request, WikiUtil wikiUtil, String name, Group parent)
             throws Exception {
         name = name.trim();
         Entry theEntry = null;
@@ -1451,13 +1452,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             Entry   theEntry=null;
             //If the entry is a group first check its children.
             if(entry.isGroup()) {
-                theEntry= findWikiEntry(request, name, (Group)entry);
+                theEntry= findWikiEntry(request, wikiUtil,name, (Group)entry);
             }
             if(theEntry==null) {
-                theEntry= findWikiEntry(request, name, parent);
+                theEntry= findWikiEntry(request, wikiUtil,name, parent);
             }
 
             if (theEntry != null) {
+                addWikiLink(wikiUtil,  theEntry);
                 if (label.trim().length() == 0) {
                     label = theEntry.getName();
                 }
@@ -1529,6 +1531,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
                                 PROP_REQUEST,
                                 request, PROP_ENTRY, entry }));
+        return wikifyEntry(request, entry, wikiUtil, wikiContent, subGroups, subEntries);
+    }
+
+
+    public String wikifyEntry(Request request, Entry entry,
+                              WikiUtil wikiUtil,
+                              String wikiContent, 
+                              List<Group> subGroups,
+                              List<Entry> subEntries)
+            throws Exception {
         List children = new ArrayList();
         if (subGroups != null) {
             wikiUtil.putProperty(entry.getId() + "_subgroups", subGroups);
@@ -1550,6 +1562,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     }
 
+    protected void addWikiLink(WikiUtil wikiUtil, Entry toEntry) {
+        Hashtable links  = (Hashtable)wikiUtil.getProperty("wikilinks");
+        if(links == null) {
+            wikiUtil.putProperty("wikilinks",links = new Hashtable());
+        }
+        links.put(toEntry,toEntry);
+    }
 
 
 }

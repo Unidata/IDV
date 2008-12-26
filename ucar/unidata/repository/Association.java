@@ -126,6 +126,16 @@ public class Association {
 
 
 
+    public boolean equals(Object o) {
+        if(!(o instanceof Association) ) return false;
+        Association that = (Association) o;
+        return Misc.equals(this.name, that.name) &&
+            Misc.equals(this.fromId, that.fromId) &&
+            Misc.equals(this.toId, that.toId);
+                                             
+    }
+
+
     /**
      * Set the FromId property.
      *
