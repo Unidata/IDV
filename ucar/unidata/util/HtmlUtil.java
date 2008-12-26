@@ -236,6 +236,7 @@ public class HtmlUtil {
 
     /** _more_          */
     public static final String ATTR_VALIGN = "valign";
+    public static final String ATTR_WIDTH="width";
 
     //    public static final String ATTR_="";
     //    public static final String ATTR_="";
@@ -597,7 +598,10 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String col(String v1) {
-        return tag(TAG_TD, "", v1);
+        return col(v1,"");
+    }
+    public static String col(String v1,String attr) {
+        return tag(TAG_TD, " " +attr+" ", v1);
     }
 
 
@@ -1541,6 +1545,11 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+
+    public static String leftRight(String left, String right) {
+        return tag(TAG_TABLE,attrs(ATTR_WIDTH,"100%",ATTR_CELLPADDING,"0", ATTR_CELLSPACING,"0"),
+                   row(col(left)+col(right,attr(ATTR_ALIGN,"right")),attr(ATTR_VALIGN,"top")));
+    }
 
     /**
      * _more_
