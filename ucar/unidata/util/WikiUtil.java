@@ -49,6 +49,10 @@ public class WikiUtil {
     /** _more_          */
     private Hashtable properties;
 
+    private List categoryLinks=new ArrayList();
+
+    private List floatBoxes = new ArrayList();
+
     /**
      * _more_
      */
@@ -74,6 +78,10 @@ public class WikiUtil {
             properties = new Hashtable();
         }
         properties.put(key, value);
+    }
+
+    public void addCategoryLink(String link) {
+        categoryLinks.add(link);
     }
 
     /**
@@ -131,7 +139,52 @@ public class WikiUtil {
      * @return _more_
      */
     public String getInfoBox(String property) {
-        return null;
+        StringBuffer sb = new StringBuffer();
+        List<String> toks =( List<String>)StringUtil.split(property,"\n",true,true);
+        String firstLine = toks.get(0);
+        toks.remove(0);
+        /*
+          {{Infobox file format
+          | name = Network Common Data Form
+          | icon = 
+          | extension = .nc<br/>.cdf
+          | mime = application/netcdf<br/>application/x-netcdf
+          | owner = [[University Corporation for Atmospheric Research|UCAR]]
+          | typecode = 
+          | magic = CDF\001
+          | genre = scientific binary data
+          | containerfor = 
+          | containedby = 
+          | extendedfrom = [[Common Data Format|CDF]]
+          | extendedto = 
+          | standard =
+          }}
+        */
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        String title = "";
+        for(String line: toks) {
+            String[] toks2 = StringUtil.split(line,"=",2);
+            if(toks2==null) continue;
+            String name = toks2[0].trim();
+            if(name.startsWith("|")) name = name.substring(1).trim();
+            if(name.equals("name")) {
+                title = toks2[1].trim();
+            }  else if(toks2[1].trim().length()>0){
+                sb.append(HtmlUtil.rowTop(HtmlUtil.col(name,HtmlUtil.cssClass("wiki-infobox-entry-title"))
+                                       +HtmlUtil.col(toks2[1],HtmlUtil.cssClass("wiki-infobox-entry"))));
+
+            }
+        }
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        String div =   HtmlUtil.makeShowHideBlock(title,
+                                                      sb.toString(), true,
+                                                      HtmlUtil.cssClass("wiki-infobox-title"),
+                                                      HtmlUtil.cssClass("wiki-infobox"));
+        div =    wikify(div,null);
+        floatBoxes.add(div);
+        return "";
+        //        return "<table class=\"wiki-toc-wrapper\" align=\"right\" width=\"30%\"><tr><td>"
+        //                + div + "</td></tr></table><br clear=right>";
     }
 
     /**
@@ -387,20 +440,19 @@ public class WikiUtil {
         if (headings.size() >= 4) {
             StringBuffer toc = new StringBuffer();
             makeHeadings(headings, toc, -1, "");
-            String block;
-            if (handler != null) {
-                block = HtmlUtil.makeShowHideBlock("Contents",
-                        toc.toString(), true,
-                        HtmlUtil.cssClass("wiki-tocheader"),
-                        HtmlUtil.cssClass("wiki-toc"));
-            } else {
-                block = HtmlUtil.div(HtmlUtil.div("Contents",
-                        " class=\"wiki=tocheader\""), " class=\"wiki-toc\" ");
-            }
-            block =
-                "<table class=\"wiki-toc-wrapper\" align=\"right\" width=\"30%\"><tr><td>"
-                + block + "</td></tr></table>";
-            s = block + s;
+            String block = HtmlUtil.makeShowHideBlock("Contents",
+                                                      toc.toString(), true,
+                                                      HtmlUtil.cssClass("wiki-tocheader"),
+                                                      HtmlUtil.cssClass("wiki-toc"));
+            floatBoxes.add(block);
+
+            String blocks =                 "<table class=\"wiki-toc-wrapper\" align=\"right\" width=\"30%\"><tr><td>" +
+                StringUtil.join("<br>", floatBoxes) + "</td></tr></table>";
+            s = blocks + s;
+        }
+
+        if(categoryLinks.size()>0) {
+            s = s + HtmlUtil.div("<b>Categories:</b> " + StringUtil.join("&nbsp;|&nbsp; ", categoryLinks),HtmlUtil.cssClass("wiki-categories"));
         }
 
         return s;
