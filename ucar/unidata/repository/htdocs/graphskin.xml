@@ -1,0 +1,213 @@
+
+<skin>
+<ui>
+
+  <panel fontsize="12" layout="border" >
+    <panel place="North"  layout="border">
+      <panel layout="border" bgcolor="white" place="North">
+      <panel layout="gridbag" cols="9" bgcolor="$headercolor$" place="West">
+        <shapepanel bgcolor="white" width="10" height="20">
+	  <shape type="FCIRCLE" color="$headercolor$" start="90" length="90" x="0" y="0" width="20" height="20"/>
+	  <shape type="FRECTANGLE" color="$headercolor$" x="0" y="10" width="40" height="40"/>
+        </shapepanel>
+        <component idref="menubar"/>
+<!--
+        <label label="   "/>
+        <component idref="navbuttons"/>
+        <label label="   "/>
+        <component idref="zoombuttons"/>
+        <label label="   "/>
+        <component idref="scrollbuttons"/>
+-->
+        <shapepanel bgcolor="white" width="12" height="20">
+	  <shape type="FCIRCLE" color="$headercolor$" start="0" length="90" x="-10" y="0" width="20" height="20"/>
+	  <shape type="FRECTANGLE" color="$headercolor$" x="0" y="10" width="40" height="40"/>
+        </shapepanel>
+      </panel>
+      </panel>
+    </panel>
+
+    <border type="matte" margin="0" margin-top="2" margin-bottom="2" color="black">
+      <component place="Center" id="canvas" bgcolor="$canvascolor$"/>
+    </border>
+
+    <panel place="South" layout="gridbag" cols="1" colwidths="1" rowheights="0" bgcolor="$footercolor$">
+      <border  margin="0" margin-left="1" margin-right="1" margin-bottom="1"  type="matte" color="black">
+        <label id="message2" label="" fontstyle="plain" align="left"/>
+      </border>
+    </panel>
+
+  </panel>
+
+
+</ui>
+
+<components>
+
+  <menu id="filemenu">
+    <menuitem label="New window"      id="floatbutton" action="new()" />
+    <menuitem label="Show node list"  action="showNodeList()" />    
+    <menuitem label="Float window"    id="floatbutton" action="float()" key="Ctrl+f" />
+    <separator/>
+    <menuitem   label="Reload"            action="reload()" />     
+  </menu>
+
+  <menu  id="viewmenu">
+    <menu label="Change visibility" id="menu.shape">
+    </menu>
+    <menu label="Zoom">
+      <menuitem label="Zoom in" action="zoomIn"/>
+      <menuitem label="Zoom out" action="zoomOut"/>
+      <menuitem label="Zoom reset" action="zoomReset"/>
+    </menu>
+    <cbmenuitem  label="Show mouse over"   action="setFlag(showMouseOver,%value%)" value="true"/>
+    <cbmenuitem  label="Pause on mouse over"   action="setFlag(pauseMouseOver,%value%)" value="true"/>     
+    <cbmenuitem  label="Animate"           action="setFlag(animateMoves,%value%)" value="true"/> 
+    <cbmenuitem  label="Show all edges"    action="setFlag(showAllEdges,%value%)" value="true" /> 
+    <cbmenuitem label="Show all labels"    value="false" action="setFlag(showAllLabels,%value%)" /> 
+  </menu>
+
+
+  <menu label="Layout"  id="layoutmenu">
+    <menu label="Type      (Ctrl+l)" >
+      <cbmenuitem key="group:Ctrl+l" value="true"  group="layout.type" label="Radial"       action="setLayout(radial)" /> 
+      <cbmenuitem value="false" group="layout.type" label="Relax-1"      action="setLayout(relax1)" /> 
+      <cbmenuitem value="false" group="layout.type" label="Relax-2"      action="setLayout(relax2)" /> 
+      <cbmenuitem value="false" group="layout.type" label="Tree"         action="setLayout(vtree)" />
+      <cbmenuitem value="false" group="layout.type" label="Hierarchy"   action="setLayout(vhier)" />
+      <cbmenuitem value="false" group="layout.type" label="Hor. Hierarchy"   action="setLayout(hhier)" />      
+      <cbmenuitem value="false" group="layout.type" label="Circular-1"   action="setLayout(circular1)" /> 
+      <cbmenuitem value="false" group="layout.type" label="Circular-2"   action="setLayout(circular2)" /> 
+      <cbmenuitem value="false" group="layout.type" label="Rectilinear"  action="setLayout(rectilinear)" />
+      <cbmenuitem value="false" group="layout.type" label="Visited"      action="setLayout(history)" />       
+      <cbmenuitem value="false" group="layout.type" label="None"         action="setLayout(none)" /> 
+    </menu>
+    <menu  label="Direction    (Ctrl+d)">
+      <cbmenuitem  key="group:Ctrl+d" label="Both"      value="true"  action="setDirection(both)" group="layout.direction"/>
+      <cbmenuitem  label="Outgoing"  value="false" action="setDirection(out)"  group="layout.direction"/> 
+      <cbmenuitem  label="Incoming"  value="false" action="setDirection(in)"   group="layout.direction"/>       
+    </menu>
+    <menu  label="Level">
+      <cbmenuitem label="Scale levels" value="false" action="setFlag(scaleWithLevel,%value%)"/> 
+      <separator/>
+      <cbmenuitem key="Ctrl+1" label="Level 1" value="false" action="setLevel(1)" group="layout.level"/> 
+      <cbmenuitem key="Ctrl+2" label="Level 2" value="true"  action="setLevel(2)" group="layout.level"/> 
+      <cbmenuitem key="Ctrl+3" label="Level 3" value="false" action="setLevel(3)" group="layout.level"/> 
+      <cbmenuitem key="Ctrl+4" label="Level 4" value="false" action="setLevel(4)" group="layout.level"/> 
+      <cbmenuitem key="Ctrl+5" label="Level 5" value="false" action="setLevel(5)" group="layout.level"/> 
+      <cbmenuitem key="Ctrl+6" label="Level 6" value="false" action="setLevel(6)" group="layout.level"/> 
+      <cbmenuitem label="All"     value="false" action="setLevel(10000)" group="layout.level"/> 
+    </menu>
+    <menu label="Tightness  (Ctrl-t)">
+      <cbmenuitem key="group:Ctrl+t" label="Loosest" value="false" action="setTightness(1.2)"  group="layout.tightness" /> 
+      <cbmenuitem label="....." value="false" action="setTightness(1.0)"  group="layout.tightness" /> 
+      <cbmenuitem label="...." value="true" action="setTightness(0.8)"  group="layout.tightness" /> 
+      <cbmenuitem label="..." value="false" action="setTightness(0.6)"  group="layout.tightness" /> 
+      <cbmenuitem label=".." value="false" action="setTightness(0.4)"  group="layout.tightness" />
+      <cbmenuitem label="Tightest" value="false" action="setTightness(0.2)"  group="layout.tightness" />       
+    </menu>
+    <menu label="Max connections   (Ctrl+c)">
+        <cbmenuitem  label="Relative to level"  value="false" action="setFlag(relativeToLevel,%value%)" /> 
+      <separator/>
+      <cbmenuitem key="group:Ctrl+c" label="All"   value="true" action="setMaxConnections(1000)"  group="layout.maxconnections" /> 
+      <cbmenuitem label="2"     value="false" action="setMaxConnections(2)"  group="layout.maxconnections" /> 
+      <cbmenuitem label="3"     value="false" action="setMaxConnections(3)"  group="layout.maxconnections" />
+      <cbmenuitem label="4"     value="false" action="setMaxConnections(4)"  group="layout.maxconnections" />
+      <cbmenuitem label="5"     value="false" action="setMaxConnections(5)"  group="layout.maxconnections" />      
+
+      <cbmenuitem label="10"     value="false" action="setMaxConnections(10)"  group="layout.maxconnections" />
+      <cbmenuitem label="15"     value="false" action="setMaxConnections(15)"  group="layout.maxconnections" />       
+      <cbmenuitem label="20"     value="false" action="setMaxConnections(20)"  group="layout.maxconnections" />       
+
+    </menu>
+  </menu>
+
+
+<panel id="menubar" layout="flow" rows="1">
+   <border type="matte" margin="0" margin-right="1" color="gray">
+   <shapepanel  height="20" mouseexit="ui.message()" mouseenter="ui.message(Click to show file menu)" mouseclick="popup(filemenu)" >
+      <shape filter="mousein" type="FRECTANGLE" color="lightgray" x="2" y="2" width="inherit" dheight="-4" dwidth="-6"  height="inherit"/>
+      <shape filter="mouseout" type="HTMLTEXT" text="File" color="$headercolor$" x="4" y="2"/>
+      <shape filter="mousein" type="HTMLTEXT" text="&lt;b&gt;File&lt;/b&gt;" color="$headercolor$" x="4" y="2"/>      
+   </shapepanel>
+   </border>
+   <shapepanel  height="20" mouseexit="ui.message()" mouseenter="ui.message(Click to show view menu)"  mouseclick="popup(viewmenu)" >
+      <shape filter="mousein" type="FRECTANGLE" color="lightgray" x="2" y="2" width="inherit" dheight="-4" dwidth="-6"  height="inherit"/>
+      <shape filter="mouseout" type="HTMLTEXT" text="View" color="$headercolor$" x="4" y="2"/>
+      <shape filter="mousein" type="HTMLTEXT" text="&lt;b&gt;View&lt;/b&gt;" color="$headercolor$" x="4" y="2"/>
+   </shapepanel>
+   <border type="matte" margin="0" margin-left="1" color="gray">
+   <shapepanel height="20" mouseexit="ui.message()" mouseenter="ui.message(Click to show layout menu)"  mouseclick="popup(layoutmenu)" >
+      <shape filter="mousein" type="FRECTANGLE" color="lightgray" x="2" y="2" width="inherit" dheight="-4" dwidth="-6"  height="inherit"/>
+      <shape filter="mouseout" type="HTMLTEXT" text="Layout" color="$headercolor$" x="4" y="2"/>
+      <shape filter="mousein" type="HTMLTEXT" text="&lt;b&gt;Layout&lt;/b&gt;" color="$headercolor$" x="4" y="2"/>      
+   </shapepanel>
+   </border>
+</panel>
+
+
+<panel  id="navbuttons" layout="gridbag" cols="6" colwidths="0" rowheights="0">
+  <image id="nav.backback" image="resource:/com/infocetera/graph/images/Rewind16.gif" action="navBackBack"
+    mouseenter="ui.message(Click to view first node in history)"
+    mouseexit="ui.message()"  />
+  <image id="nav.back"  key="Ctrl+p"   image="resource:/com/infocetera/graph/images/StepBack16.gif" action="navBack"
+    mouseenter="ui.message(Click to view previous node in history)"
+    mouseexit="ui.message()"/>
+  <image id="nav.fwd"      key="Ctrl+n" image="resource:/com/infocetera/graph/images/StepForward16.gif" action="navFwd"
+    mouseenter="ui.message(Click to view next node in history)"
+    mouseexit="ui.message()"/>
+  <image id="nav.fwdfwd"   image="resource:/com/infocetera/graph/images/FastForward16.gif" action="navFwdFwd"
+    mouseenter="ui.message(Click to view last node in history)"
+    mouseexit="ui.message()"/>   
+</panel>
+
+
+<panel id="zoombuttons" layout="gridbag" cols="4"  colwidths="0" rowheights="0">
+  <image image="resource:/com/infocetera/graph/images/ZoomOut16.gif"  action="zoomOut"
+  mouseenter="ui.message(Click to zoom out)"
+  mouseexit="ui.message()"  
+  />
+  <image image="resource:/com/infocetera/graph/images/Zoom16.gif"     action="zoomReset"
+  mouseenter="ui.message(Click to reset zoom)"
+  mouseexit="ui.message()"  
+/>
+  <image image="resource:/com/infocetera/graph/images/ZoomIn16.gif"   action="zoomIn"
+  mouseenter="ui.message(Click to zoom in)"
+  mouseexit="ui.message()"  
+  />
+</panel>
+
+
+<panel id="scrollbuttons" layout="gridbag" cols="5" colwidths="0" rowheights="0">
+  <image image="resource:/com/infocetera/graph/images/Back16.gif" action="scrollLeft"
+    mouseenter="ui.message(Click to scroll left)"
+    mouseexit="ui.message()"      
+/>
+  <image image="resource:/com/infocetera/graph/images/Forward16.gif" action="scrollRight"
+    mouseenter="ui.message(Click to scroll right)"
+    mouseexit="ui.message()"      
+  />
+  <image image="resource:/com/infocetera/graph/images/Home16.gif" action="scrollReset"
+    mouseenter="ui.message(Click to reset scroll)"
+    mouseexit="ui.message()"        
+/>
+  <image image="resource:/com/infocetera/graph/images/Up16.gif" action="scrollUp"
+    mouseenter="ui.message(Click to scroll up)"
+    mouseexit="ui.message()"        
+/>
+  <image image="resource:/com/infocetera/graph/images/Down16.gif" action="scrollDown"
+    mouseenter="ui.message(Click to scroll down)"
+    mouseexit="ui.message()"        
+/>
+</panel>
+
+
+</components>
+
+<properties>
+  <property name="headercolor" value="#ffcc66" />
+  <property name="canvascolor" value="#77BBFF" />
+  <property name="footercolor" value="white" />
+</properties>
+
+</skin>
