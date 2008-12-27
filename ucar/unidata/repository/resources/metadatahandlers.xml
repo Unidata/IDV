@@ -5,6 +5,9 @@
                    name="Tag"
                    type="enum_tag"
                    />
+  <metadatahandler foruser="false" class="ucar.unidata.repository.EnumeratedMetadataHandler" 
+                   name="Wiki Category"
+                   type="wikicategory"/>
   <metadatahandler class="ucar.unidata.repository.EnumeratedMetadataHandler" file="/ucar/unidata/repository/resources/gcmdkeywords.txt" 
                    name="GCMD Science Keyword"
                    type="enum_gcmdkeyword"

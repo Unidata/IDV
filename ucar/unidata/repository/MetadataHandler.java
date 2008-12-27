@@ -56,6 +56,10 @@ import java.util.List;
  */
 public class MetadataHandler extends RepositoryManager {
 
+    /** _more_ */
+    public static String ATTR_FORUSER=  "foruser";
+
+
 
     /** _more_ */
     public static String ARG_TYPE = "type";
@@ -85,6 +89,10 @@ public class MetadataHandler extends RepositoryManager {
     /** _more_ */
     private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
 
+
+    boolean forUser = true;
+
+
     /**
      * _more_
      *
@@ -107,6 +115,7 @@ public class MetadataHandler extends RepositoryManager {
      */
     public void processMetadataXml(Entry entry, Element node, Hashtable fileMap,boolean internal)
             throws Exception {
+        forUser = XmlUtil.getAttribute(node, ATTR_FORUSER,true);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         Metadata metadata =
             new Metadata(getRepository().getGUID(), entry.getId(), type,
@@ -776,6 +785,27 @@ public class MetadataHandler extends RepositoryManager {
         return "";
     }
 
+
+
+
+
+    /**
+       Set the ForUser property.
+
+       @param value The new value for ForUser
+    **/
+    public void setForUser (boolean value) {
+	forUser = value;
+    }
+
+    /**
+       Get the ForUser property.
+
+       @return The ForUser
+    **/
+    public boolean getForUser () {
+	return forUser;
+    }
 
 
 

@@ -236,6 +236,29 @@ a.header-left  {
 
 
 
+.wiki-infobox {
+   margin-top:5px;
+   border : 1px #aaaaaa solid;
+   background-color:#f8f8f8;
+   padding-left:5;
+   padding-bottom:5;
+}
+
+.wiki-infobox-title {
+   font-weight: bold;
+}
+
+.wiki-infobox-entry-title {
+   font-weight: bold;
+}
+
+
+
+.wiki-categories {
+   border: 1px #999999 solid; 
+   padding:4px;
+}
+
 .wikicompare-deleted {
 	background: #ffa;
 	font-size: smaller;
@@ -705,13 +728,6 @@ form {
    background-color:#f9f9f9;
    border : 1px #aaaaaa solid;
 }
-
-
-
-
-
-
-
 
 .wiki-toc-wrapper {
     margin:10px;

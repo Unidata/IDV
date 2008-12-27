@@ -1191,7 +1191,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             blockTitle = Misc.getProperty(props, "title", msg("Information"));
         } else if (include.equals(WIKIPROP_IMAGE)) {
             if ( !entry.getResource().isImage()) {
-                return "Not an image";
+                return msg("Not an image");
             }
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         } else if (include.equals(WIKIPROP_LINKS)) {
@@ -1449,6 +1449,25 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             Entry   entry    = (Entry) wikiUtil.getProperty(PROP_ENTRY);
             Request request  = (Request) wikiUtil.getProperty(PROP_REQUEST);
             Group   parent   = entry.getParentGroup();
+
+
+            name = name.trim();
+            if(name.startsWith("Category:")) {
+                String category = name.substring("Category:".length());
+                String url = request.url(getRepository().URL_ENTRY_SEARCH,
+                                         ARG_METADATA_TYPE+".wikicategory",
+                                         "wikicategory",
+                                         ARG_METADATA_ATTR1+".wikicategory",
+                                         category);
+                wikiUtil.addCategoryLink(HtmlUtil.href(url, category));
+                List categories = (List) wikiUtil.getProperty("wikicategories");
+                if(categories == null) {
+                    wikiUtil.putProperty("wikicategories",categories = new ArrayList());
+                }
+                categories.add(category);
+                return "";
+            }
+
             Entry   theEntry=null;
             //If the entry is a group first check its children.
             if(entry.isGroup()) {

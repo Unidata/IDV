@@ -315,6 +315,9 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    
+
+
     /**
      * _more_
      *
@@ -433,6 +436,7 @@ public class MetadataManager extends RepositoryManager {
     public StringBuffer addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
+            if(!handler.getForUser()) continue;
             handler.addToSearchForm(request, sb);
         }
         return sb;
@@ -885,14 +889,26 @@ public class MetadataManager extends RepositoryManager {
      */
     public void insertMetadata(Metadata metadata) throws Exception {
         distinctMap = null;
+
         getDatabaseManager().executeInsert(Tables.METADATA.INSERT,
                                            new Object[] {
-            metadata.getId(), metadata.getEntryId(), metadata.getType(),
-            new Integer(metadata.getInherited()
-                        ? 1
-                        : 0), metadata.getAttr1(), metadata.getAttr2(),
-            metadata.getAttr3(), metadata.getAttr4()
-        });
+                                               metadata.getId(), 
+                                               metadata.getEntryId(), 
+                                               metadata.getType(),
+                                               new Integer(metadata.getInherited()
+                                                           ? 1
+                                                           : 0), 
+                                               metadata.getAttr1(), 
+                                               metadata.getAttr2(),
+                                               metadata.getAttr3(), 
+                                               metadata.getAttr4()
+                                           });
+    }
+
+    public void deleteMetadata(Metadata metadata) throws Exception {
+        getDatabaseManager().delete(Tables.METADATA.NAME,
+                                    Clause.eq(Tables.METADATA.COL_ID,
+                                              metadata.getId()));
     }
 
 

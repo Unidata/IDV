@@ -814,11 +814,11 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void executeInsert(String insert, Object[] values)
-            throws Exception {
+        throws Exception {
         PreparedStatement pstmt = getPreparedStatement(insert);
         setValues(pstmt, values);
         try {
-            pstmt.execute();
+            pstmt.executeUpdate();
             pstmt.close();
         } catch (Exception exc) {
             System.err.println("Error:" + insert);

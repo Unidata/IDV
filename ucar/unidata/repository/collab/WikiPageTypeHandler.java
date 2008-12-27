@@ -166,35 +166,60 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                                                                wikiUtil,
                                                                newText,null,null);
         
-            Hashtable<Entry,Entry> links = (Hashtable<Entry,Entry>) wikiUtil.getProperty("wikilinks");
-            if(links !=null) {
-                Hashtable ids = new Hashtable();
-                List<Association> newAssociations = new ArrayList<Association>();
-                for(Enumeration keys= links.keys();keys.hasMoreElements();) {
-                    Entry linkedEntry = (Entry) keys.nextElement();
-                    Association tmp= new Association(getRepository().getGUID(),"",ASSOC_WIKILINK,
-                                                    entry.getId(),
-                                                    linkedEntry.getId());
-                    newAssociations.add(tmp);
+            List categories = (List) wikiUtil.getProperty("wikicategories");
+            if(categories == null) {
+                categories = new ArrayList();
+            }
+            //TODO: 
+            List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+            for(Metadata metadata: (List<Metadata>)new ArrayList(metadataList)) {
+                if(metadata.getType().equals("wikicategory")) {
+                    if(!categories.contains(metadata.getAttr1())) {
+                        metadataList.remove(metadata);
+                        //getMetadataManager().deleteMetadata(metadata);
+                    } else {
+                        categories.remove(metadata.getAttr1());
+                    }
                 }
+            }
+            for(String cat:(List<String>) categories) {
+                Metadata metadata= new Metadata(getRepository().getGUID(),entry.getId(), "wikicategory",
+                                                false,
+                                                cat,"","","");
+                //                getMetadataManager().insertMetadata(metadata);
+                metadataList.add(metadata);
+            }                
+            entry.setMetadata(metadataList);
+            Hashtable<Entry,Entry> links = (Hashtable<Entry,Entry>) wikiUtil.getProperty("wikilinks");
+            if(links ==null) {
+                links = new Hashtable<Entry,Entry>();
+            }
+            Hashtable ids = new Hashtable();
+            List<Association> newAssociations = new ArrayList<Association>();
+            for(Enumeration keys= links.keys();keys.hasMoreElements();) {
+                Entry linkedEntry = (Entry) keys.nextElement();
+                Association tmp= new Association(getRepository().getGUID(),"",ASSOC_WIKILINK,
+                                                 entry.getId(),
+                                                 linkedEntry.getId());
+                newAssociations.add(tmp);
+            }
                 
 
-                List<Association> associations =
-                    getEntryManager().getAssociations(request, entry);
-                for(Association oldAssociation: (List<Association>)new ArrayList(associations)) {
-                    if(oldAssociation.getType().equals(ASSOC_WIKILINK) && 
-                       oldAssociation.getFromId().equals(entry.getId())) {
-                        if(!newAssociations.contains(oldAssociation)) {
-                            System.err.println("delete:" + oldAssociation);
-                            getEntryManager().deleteAssociation(request, oldAssociation);
-                        }
+            List<Association> associations =
+                getEntryManager().getAssociations(request, entry);
+            for(Association oldAssociation: (List<Association>)new ArrayList(associations)) {
+                if(oldAssociation.getType().equals(ASSOC_WIKILINK) && 
+                   oldAssociation.getFromId().equals(entry.getId())) {
+                    if(!newAssociations.contains(oldAssociation)) {
+                        System.err.println("delete:" + oldAssociation);
+                        getEntryManager().deleteAssociation(request, oldAssociation);
                     }
                 }
-                for(Association newAssociation: (List<Association>)new ArrayList(newAssociations)) {
-                    if(!associations.contains(newAssociation)) {
-                        System.err.println("add:" + newAssociation);
-                        getEntryManager().addAssociation(request, newAssociation);
-                    }
+            }
+            for(Association newAssociation: (List<Association>)new ArrayList(newAssociations)) {
+                if(!associations.contains(newAssociation)) {
+                    System.err.println("add:" + newAssociation);
+                    getEntryManager().addAssociation(request, newAssociation);
                 }
             }
 

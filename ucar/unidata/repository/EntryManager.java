@@ -907,7 +907,6 @@ return new Result(title, sb);
         entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
         entry.setEast(request.get(ARG_AREA + "_east", entry.getEast()));
 
-
         entry.getTypeHandler().initializeEntry(request, entry);
     }
 
