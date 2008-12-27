@@ -1,7 +1,11 @@
-   <APPLET CODE=com.infocetera.graph.GraphApplet.class WIDTH="100%" HEIGHT="500"  CODEBASE="." ARCHIVE="${root}/graph.jar">
+   <APPLET 
+CODE=com.infocetera.graph.GraphApplet.class 
+WIDTH="100%" HEIGHT="500"  
+CODEBASE="${root}" ARCHIVE="${root}/applets/graph.jar">
 	    <PARAM NAME=istree  VALUE=true>
             <PARAM NAME=dataurl VALUE="${root}/graph/get?entryid=${id}&amp;nodetype=${type}&amp;URL=DATAURL">
             <PARAM NAME=nodeurl VALUE="${root}/graph/get?entryid=%nodeids%&amp;&nodetype=%nodetypes%&amp;URL=NODEURL">
+            <PARAM NAME=skinurl VALUE="${root}/applets/graphskin.xml">
             <PARAM NAME=debug VALUE=true>
             <PARAM NAME=shownodelist VALUE=false>
    </APPLET>

@@ -1074,14 +1074,14 @@ public class HtmlOutputHandler extends OutputHandler {
             labels.add(entry.getLabel());
             ids.add(entry.getId());
         }
-        String tmp = StringUtil.replace(timelineAppletTemplate, "%times%",
+        String tmp = StringUtil.replace(timelineAppletTemplate, "${times}",
                                         StringUtil.join(",", times));
-        tmp = StringUtil.replace(tmp, "%root%", getRepository().getUrlBase());
-        tmp = StringUtil.replace(tmp, "%labels%",
+        tmp = StringUtil.replace(tmp, "${root}", getRepository().getUrlBase());
+        tmp = StringUtil.replace(tmp, "${labels}",
                                  StringUtil.join(",", labels));
-        tmp = StringUtil.replace(tmp, "%ids%", StringUtil.join(",", ids));
+        tmp = StringUtil.replace(tmp, "${ids}", StringUtil.join(",", ids));
         tmp = StringUtil.replace(
-            tmp, "%loadurl%",
+            tmp, "${loadurl}",
             request.url(
                 getRepository().URL_ENTRY_GETENTRIES, ARG_ENTRYIDS, "%ids%",
                 ARG_OUTPUT, OUTPUT_HTML));

@@ -11,14 +11,13 @@
 	  <shape type="FRECTANGLE" color="$headercolor$" x="0" y="10" width="40" height="40"/>
         </shapepanel>
         <component idref="menubar"/>
-<!--
         <label label="   "/>
         <component idref="navbuttons"/>
         <label label="   "/>
         <component idref="zoombuttons"/>
         <label label="   "/>
         <component idref="scrollbuttons"/>
--->
+
         <shapepanel bgcolor="white" width="12" height="20">
 	  <shape type="FCIRCLE" color="$headercolor$" start="0" length="90" x="-10" y="0" width="20" height="20"/>
 	  <shape type="FRECTANGLE" color="$headercolor$" x="0" y="10" width="40" height="40"/>
@@ -125,19 +124,19 @@
 
 <panel id="menubar" layout="flow" rows="1">
    <border type="matte" margin="0" margin-right="1" color="gray">
-   <shapepanel  height="20" mouseexit="ui.message()" mouseenter="ui.message(Click to show file menu)" mouseclick="popup(filemenu)" >
+   <shapepanel  height="20" xwidth="100" mouseexit="ui.message()" mouseenter="ui.message(Click to show file menu)" mouseclick="popup(filemenu)" >
       <shape filter="mousein" type="FRECTANGLE" color="lightgray" x="2" y="2" width="inherit" dheight="-4" dwidth="-6"  height="inherit"/>
       <shape filter="mouseout" type="HTMLTEXT" text="File" color="$headercolor$" x="4" y="2"/>
       <shape filter="mousein" type="HTMLTEXT" text="&lt;b&gt;File&lt;/b&gt;" color="$headercolor$" x="4" y="2"/>      
    </shapepanel>
    </border>
-   <shapepanel  height="20" mouseexit="ui.message()" mouseenter="ui.message(Click to show view menu)"  mouseclick="popup(viewmenu)" >
+   <shapepanel  height="20"  mouseexit="ui.message()" mouseenter="ui.message(Click to show view menu)"  mouseclick="popup(viewmenu)" >
       <shape filter="mousein" type="FRECTANGLE" color="lightgray" x="2" y="2" width="inherit" dheight="-4" dwidth="-6"  height="inherit"/>
       <shape filter="mouseout" type="HTMLTEXT" text="View" color="$headercolor$" x="4" y="2"/>
       <shape filter="mousein" type="HTMLTEXT" text="&lt;b&gt;View&lt;/b&gt;" color="$headercolor$" x="4" y="2"/>
    </shapepanel>
    <border type="matte" margin="0" margin-left="1" color="gray">
-   <shapepanel height="20" mouseexit="ui.message()" mouseenter="ui.message(Click to show layout menu)"  mouseclick="popup(layoutmenu)" >
+   <shapepanel height="20" xwidth="100" mouseexit="ui.message()" mouseenter="ui.message(Click to show layout menu)"  mouseclick="popup(layoutmenu)" >
       <shape filter="mousein" type="FRECTANGLE" color="lightgray" x="2" y="2" width="inherit" dheight="-4" dwidth="-6"  height="inherit"/>
       <shape filter="mouseout" type="HTMLTEXT" text="Layout" color="$headercolor$" x="4" y="2"/>
       <shape filter="mousein" type="HTMLTEXT" text="&lt;b&gt;Layout&lt;/b&gt;" color="$headercolor$" x="4" y="2"/>      
@@ -146,7 +145,7 @@
 </panel>
 
 
-<panel  id="navbuttons" layout="gridbag" cols="6" colwidths="0" rowheights="0">
+<panel  id="navbuttons" layout="gridbag" cols="6" colwidths="0" rowheights="0" color="gray">
   <image id="nav.backback" image="resource:/com/infocetera/graph/images/Rewind16.gif" action="navBackBack"
     mouseenter="ui.message(Click to view first node in history)"
     mouseexit="ui.message()"  />
@@ -205,7 +204,7 @@
 </components>
 
 <properties>
-  <property name="headercolor" value="#ffcc66" />
+  <property name="headercolor" value="#eeeeee" />
   <property name="canvascolor" value="#77BBFF" />
   <property name="footercolor" value="white" />
 </properties>

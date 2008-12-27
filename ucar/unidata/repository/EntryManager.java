@@ -4634,7 +4634,7 @@ return new Result(title, sb);
             throws Exception {
         Entry entry = getEntryManager().getEntry(request, entryId);
         if (entry == null) {
-            System.err.println("Entry is null:" + entryId);
+            throw new IllegalArgumentException("getAssociations Entry is null:" + entryId);
         }
         return getAssociations(request, entry);
     }

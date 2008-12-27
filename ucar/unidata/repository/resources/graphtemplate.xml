@@ -1,4 +1,4 @@
-<canvas bgimage="${root}/logo.gif">
+<canvas bgimage="${root}/images/logo.gif">
 <graph>
 
     <edgetype name="groupedby" arrow="-6" />       
@@ -16,7 +16,7 @@
     <rrect src="label" id="rect" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
   </shape>
   <shape  layout="h" src="rect" from="n" to="s" >
-    <image url="${root}/Tag.png" alt="Tag"/>
+    <image url="${root}/icons/tag.gif" alt="Tag"/>
    </shape>
   </shape>
 </nodetype>
@@ -40,7 +40,7 @@
 </nodetype>
 
 
-<nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="${root}/file.gif">
+<nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="${root}/icons/file.gif">
   <command label="View entry" command="url(,${root}/entry/show?entryid=%id%)"/>
   <shape>
   <shape>
@@ -49,7 +49,7 @@
   </shape>
 
   <shape  layout="h" src="rect" from="n" to="s" >
-    <image url="${root}/%imagepath%"
+    <image url="%imagepath%"
            alt="Tag"/>
    </shape>
   </shape>
@@ -66,7 +66,7 @@
 </nodetype>
 
 
-<nodetype    name="level3radar" parent="entry" alt="Level 3 Radar" imagepath="${root}/radar.gif"/>
+<nodetype    name="level3radar" parent="entry" alt="Level 3 Radar" imagepath="${root}/icons/radar.gif"/>
 
 ${content}
 
