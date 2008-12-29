@@ -1,0 +1,54 @@
+[ht::head {FAQ}]
+
+<%nochildlist%>
+
+
+
+
+<faq>
+<faqitem cat="Logins"></faqitem>
+
+<faqitem q="I forgot my user id. How do I retrieve it?" >
+If your RAMADDA site has been configured to send email (see <a href="#email">here</a> to configure email)
+then on the Login page you should see &quot;Forget you User ID?&quot; and
+&quot;Forget you Password?&quot; links. 
+
+<faqitem q="I forgot the administrator password and cannot access RAMADDA. How do I login?" >
+You can specify an administrator user id and password from the command line when starting RAMADDA.
+If you are running RAMADDA stand alone then just provide the arguments:<pre>
+-admin &lt;user id&gt; &lt;password&gt;
+</pre>
+This creates a new user id if needed and sets the password.
+<p>
+If you are running RAMADDA under Tomcat then change the web.xml to pass in command line arguments
+using the &quot;args&quot; entry. This is a comma separated value list of the command line arguments
+that are processed by RAMADDA.
+<pre>
+    &lt;param-name&gt;args&lt;/param-name&gt;
+    &lt;param-value&gt;-admin,userid,password&lt;/param-value&gt;
+</pre>
+
+</faqitem>
+
+
+<faqitem cat="Administration"></faqitem>
+
+<faqitem q="How do I configure SSL access to RAMADDA?" >
+On the main Site Administration  page under the &quot;Contact&quot; area you can specify
+the SSL port number on your server. When RAMADDA is configured to use SSL the login form
+will use SSL.
+...more here...
+</faqitem>
+
+
+
+<faqitem q="How do I configure RAMADDA to send email?" >
+On the main Site Administration  page under the &quot;Contact&quot; area you can specify
+a SMTP server that RAMADDA will use to send email.
+</faqitem>
+
+
+</faq>
+
+
+[ht::foot]
