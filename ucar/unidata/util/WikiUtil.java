@@ -212,6 +212,7 @@ public class WikiUtil {
      */
     public String wikify(String s, WikiPageHandler handler) {
 
+
         s = s.replace("\\\\[", "_BRACKETOPEN_");
 
         s = s.replaceAll("\r\n\r\n", "\n<p>\n");
@@ -224,37 +225,6 @@ public class WikiUtil {
         Pattern pattern;
         Matcher matcher;
 
-
-        //        System.err.println("S:" + s.trim()+"\n***********************");
-        StringBuffer sb      = new StringBuffer();
-        int          baseIdx = 0;
-        while (true) {
-            int idx1 = s.indexOf("{{", baseIdx);
-            if (idx1 < 0) {
-                //                System.err.println("no idx1");
-                sb.append(s.substring(baseIdx));
-                break;
-            }
-            int idx2 = s.indexOf("}}", idx1);
-            if (idx2 <= idx1) {
-                //                System.err.println("no idx2");
-                sb.append(s.substring(baseIdx));
-                break;
-            }
-            sb.append(s.substring(baseIdx, idx1));
-            String property = s.substring(idx1 + 2, idx2);
-            //            System.err.println("property:" + property);
-            baseIdx = idx2 + 2;
-            String value = null;
-            if (handler != null) {
-                value = handler.getWikiPropertyValue(this, property);
-            }
-            if (value == null) {
-                value = "Unknown property:" + property;
-            }
-            sb.append(value);
-        }
-        s       = sb.toString();
 
 
 
@@ -421,6 +391,37 @@ public class WikiUtil {
 
         s = buff.toString();
 
+
+        //        System.err.println("S:" + s.trim()+"\n***********************");
+        StringBuffer sb      = new StringBuffer();
+        int          baseIdx = 0;
+        while (true) {
+            int idx1 = s.indexOf("{{", baseIdx);
+            if (idx1 < 0) {
+                //                System.err.println("no idx1");
+                sb.append(s.substring(baseIdx));
+                break;
+            }
+            int idx2 = s.indexOf("}}", idx1);
+            if (idx2 <= idx1) {
+                //                System.err.println("no idx2");
+                sb.append(s.substring(baseIdx));
+                break;
+            }
+            sb.append(s.substring(baseIdx, idx1));
+            String property = s.substring(idx1 + 2, idx2);
+            //            System.err.println("property:" + property);
+            baseIdx = idx2 + 2;
+            String value = null;
+            if (handler != null) {
+                value = handler.getWikiPropertyValue(this, property);
+            }
+            if (value == null) {
+                value = "Unknown property:" + property;
+            }
+            sb.append(value);
+        }
+        s       = sb.toString();
 
 
         /*

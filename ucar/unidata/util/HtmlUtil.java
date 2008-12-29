@@ -2025,7 +2025,8 @@ public class HtmlUtil {
         jsSB.append("];\n");
 
         //        titleSB.append("</tr></table>");
-        return HtmlUtil.script(jsSB.toString())
+        return "\n" + 
+            HtmlUtil.script(jsSB.toString())+"\n" 
                + HtmlUtil.div(
                    titleSB.toString(),
                    HtmlUtil.cssClass("tabtitles")) + HtmlUtil.div(
