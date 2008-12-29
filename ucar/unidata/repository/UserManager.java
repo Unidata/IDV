@@ -813,7 +813,7 @@ public class UserManager extends RepositoryManager {
 
 
         sb.append(RepositoryUtil.header(msgLabel("User") + HtmlUtil.space(1)
-                                        + user.getLabel()));
+                                        + user.getId()));
         sb.append(HtmlUtil.p());
         sb.append(request.form(getRepositoryBase().URL_USER_EDIT));
         sb.append(HtmlUtil.hidden(ARG_USER_ID, user.getId()));

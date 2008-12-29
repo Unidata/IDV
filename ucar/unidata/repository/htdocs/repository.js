@@ -329,7 +329,6 @@ function Tooltip () {
     this.onMouseOut = function (event,id) {
         lastMove++;
         if(state !=STATE_LINK) return;
-        this.debug('on mouse out ' + id);
         setTimeout("tooltip.checkHide(" + lastMove+ ")", hideDelay);
     }
 
