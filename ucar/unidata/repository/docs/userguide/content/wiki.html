@@ -2,7 +2,87 @@
 
 <%nochildlist%>
 
+One of the entry types that RAMADDA provides is a Wiki Page entry.
+You create a new Wiki Page just like you create any entry - in a group
+that you have create privileges for click the create icon <img src="images/new.gif">
+and select &quot;Wiki Page&quot; to go to the Wiki Page create form:
 
-RAMADDA uses wiki text 
+[ht::cimg images/wikicreate.gif {Wiki Page Create Form} {border=0 width=600}]
+
+You can enter  an entry name and the wiki text. We generally follow the format
+that Wikipedia follows. See the 
+<a href="http://en.wikipedia.org/wiki/Wikipedia:Formatting#Wiki_markup">Wikipedia page on Wiki Markup</a> 
+for basic information.
+<p>
+The default HTML view of a Wiki Page entry  looks like:
+[ht::cimg images/wikiexample.gif {Wiki Page} {border=0 width=600}]
+
+The &quot;Details&quot; link in the upper right will show the default html view of this page.
+<p>
+The &quot;Wiki History&quot; link in the top tabs will take you to the history page for the entry.
+[ht::cimg images/wikihistory.gif {Wiki History Page} {border=0 width=600}]
+This shows the history of past edits and allows you to view and compare versions and to revert 
+back to past versions.
+
+
+<subhead intoc="false" id="links">Linking to other entries</subhead>
+Normally in a wiki a link to another page is of the form:<blockquote>
+\[\[Page name\]\]</blockquote>
+In RAMADDA you can use the name of another entry to create the link.
+The Entry needs to be a sibling entry to the Wiki Page
+(i.e., it shares the same parent of the Wiki Page entry) or it needs to be the
+identifier of some other entry, e.g.,<blockquote>
+\[\[7ca13e52-8efb-4d17-863f-e17027dbcc22|Earthquake data\]\]</blockquote>
+If the entry with the given name does not exist then the link will take one to the
+create entry form.
+<p>
+
+You can add links to other entries with the &quot;Add Link&quot; menu.
+
+<subhead intoc="false" id="import">Importing Content</subhead>
+You can also import content from the current Wiki Page entry or any other entry with the import  
+syntax:<blockquote>{{<i>importtag</i> <i>property name=value pairs</i>}}
+</blockquote>
+e.g., in the above example we are importing the Information tab block for the Wiki Page entry with:
+<blockquote>{{information}}</blockquote>
+
+If we wanted to import some content from another entry we use:<blockquote>{{import <i>theentryid</i> <i>importtag</i>  <i>property name=value pairs</i>}}</blockquote>
+
+For example, if we want to import the information block for the above data file with the
+block being closed we would do:<blockquote>
+{{import 7ca13e52-8efb-4d17-863f-e17027dbcc22 information open="false"}}</blockquote>
+
+
+
+The set of import tags include:
+<ul>
+<li> <i>name</i> The name of the entry.
+<li> <i>description</i> The description of the entry.
+<li> <i>comments</i> The comments for the entry.
+<li> <i>toolbar</i> The icon toolbar.
+<li> <i>breadcrumbs</i> The breadcrumb path.
+<li> <i>information</i> The metadata information block.
+<li> <i>image</i> If the entry is an image then the image.
+<li> <i>links</i> The table  of views and actions.
+<li> <i>children</i> The list of children entries.
+<li> <i>subgroups</i> Just the children groups.
+<li> <i>subentries</i> Just the children non groups.
+</ul>
+
+You can also import any of the views of an entry, e.g., the map view, the opendap view, the 
+calendar view, etc.
+In the above example we are importing the map view of the earthquake data:
+<blockquote>{{import 7ca13e52-8efb-4d17-863f-e17027dbcc22 data.point.map width="400"}}</blockquote>
+Right now you need to manually enter the output view identifier in the import statement.
+Look at the URL of a page and you will see &quot;output=<i>identifier</i>&quot;.
+
+<subhead intoc="false" id="wikidesc">Wiki Text in Other Entries</subhead>
+You can use the wiki text display capabilities to customize the default
+HTML view of any other entry or group types. If the description of the entry
+begins with &quot;&lt;wiki&gt;&quot; then we treat the description as wiki text
+and process it to create the default HTML view.
+
+
+
 
 [ht::foot]
