@@ -1508,15 +1508,17 @@ public class UserManager extends RepositoryManager {
      */
     public String getUserLinks(Request request) {
         User   user     = request.getUser(); 
-       String template = getRepository().getTemplateProperty(request,"ramadda.template.link.wrapper", "");
+        String template = getRepository().getTemplateProperty(request,"ramadda.template.link.wrapper", "");
         template = getRepository().getTemplateProperty(request,"ramadda.template.userlink.wrapper", template);
         String separator = getRepository().getTemplateProperty(request,"ramadda.template.link.separator", "");
         separator = getRepository().getTemplateProperty(request,"ramadda.template.userlink.separator", separator);
 
+        List extras = new ArrayList();
         List urls   = new ArrayList();
         List labels = new ArrayList();
         List tips   = new ArrayList();
 
+        extras.add("");
         urls.add(request.url(getRepositoryBase().URL_USER_CART));
         labels.add(HtmlUtil.img(getRepository().fileUrl(ICON_CART),
                                 msg("Data Cart")));
@@ -1526,24 +1528,34 @@ public class UserManager extends RepositoryManager {
             request.remove(ARG_MESSAGE);
             String redirect =
                 XmlUtil.encodeBase64(request.getUrl().getBytes());
+            extras.add("");
             urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
                                  ARG_REDIRECT, redirect));
             labels.add(msg("Login"));
             tips.add(msg("Login"));
         } else {
+            extras.add("");
             urls.add(request.url(getRepositoryBase().URL_USER_LOGOUT));
             labels.add(msg("Logout"));
             tips.add(msg("Logout"));
+            extras.add("");
             urls.add(request.url(getRepositoryBase().URL_USER_SETTINGS));
             labels.add(user.getLabel());
             tips.add(msg("Go to user settings"));
         }
+
+        urls.add("http://www.unidata.ucar.edu/software/ramadda/docs/userguide");
+        extras.add(" target=\"_help\" ");
+        labels.add(msg("Help"));
+        tips.add(msg("View Help"));
+
         List links = new ArrayList();
         for (int i = 0; i < urls.size(); i++) {
             String link = template.replace("${label}",
                                            labels.get(i).toString());
             link = link.replace("${url}", urls.get(i).toString());
             link = link.replace("${tooltip}", tips.get(i).toString());
+            link = link.replace("${extra}", extras.get(i).toString());
             links.add(link);
         }
         return StringUtil.join(separator, links);

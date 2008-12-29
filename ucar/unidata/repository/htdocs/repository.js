@@ -68,7 +68,10 @@ function Util () {
 
     this.print = function (s, clear) {
         var obj = util.getDomObject("output");
-        if(!obj) return;
+        if(!obj) {
+		alert('could not find print output\n'+  s);
+        	return;
+         }
         if(clear) {
             obj.obj.innerHTML  ="";
         }
@@ -306,7 +309,7 @@ function Tooltip () {
     var showDelay = 500;
 
     this.debug = function(msg) {
-        //        util.print(msg);
+       	 util.print(msg);
     }
     this.keyPressed = function (event) {
         if(state==STATE_INIT) return;
@@ -767,26 +770,32 @@ function Tab(ids) {
 function toggleTab(mainId) {
 //return;
     var mainContentId = 'content_' + mainId;
+    var tabs = '';
     for(i=0;i<this.ids.length;i++) {
 	var contentId  = 'content_'+this.ids[i];
         var content = util.getDomObject(contentId);
 	var titleId  = 'title_'+this.ids[i];
 	var title = util.getDomObject(titleId);
         if(!content) {
+		tabs = tabs+'cannot find content:' + i +'\n';
 		continue;
         }
 	if(contentId==mainContentId) {
+		tabs = tabs+'turning it on:' + i +'\n';
 		content.style.visibility="visible";
                 content.style.display = "block";
+		content.style.backgroundColor="#ffffff";
 		title.style.backgroundColor="#ffffff";
 		title.style.borderBottom = "1px #ffffff  solid";
 	} else {
+		tabs = tabs+'turning it off:' + i +'\n';
 		content.style.visibility="hidden";
                 content.style.display = "none";
 		title.style.backgroundColor="#f1f0f3";
 		title.style.borderBottom = "1px #000000  solid";
 	}
     }
+//   util.print(tabs);
 
 }
 
