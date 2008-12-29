@@ -176,7 +176,7 @@ public interface Constants {
     public static final String ICON_PROGRESS = "/icons/progress.gif";
 
     /** _more_ */
-    public static final String ICON_INFORMATION = "/icons/information.png";
+    public static final String ICON_INFORMATION = "/icons/information.gif";
 
     /** _more_ */
     public static final String ICON_RIGHTARROW = "/icons/rightarrow.gif";
@@ -680,6 +680,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_LAYOUT = "layout";
+
+    public static final String ARG_LIMIT = "limit";
 
     /** _more_ */
     public static final String ARG_MINLAT = "minlat";

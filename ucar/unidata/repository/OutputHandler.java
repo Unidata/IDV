@@ -86,7 +86,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
                                                      "default.html",
-                                                     OutputType.TYPE_HTML);
+                                                                OutputType.TYPE_HTML,"",ICON_INFORMATION);
 
 
     /** _more_ */
@@ -1201,7 +1201,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         } else if (include.equals(WIKIPROP_COMMENTS)) {
             return getCommentBlock(request, entry).toString();
         } else if (include.equals(WIKIPROP_TOOLBAR)) {
-            return getEntryManager().getEntryToolbar(request, entry);
+            return getEntryManager().getEntryToolbar(request, entry,false);
         } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
             return getEntryManager().getBreadCrumbs(request, entry);
         } else if (include.equals(WIKIPROP_DESCRIPTION)) {

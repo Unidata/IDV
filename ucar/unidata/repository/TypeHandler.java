@@ -637,10 +637,11 @@ public class TypeHandler extends RepositoryManager {
                 new Link(
                     request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
                     getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
+            /*
             links.add(new Link(request
                 .entryUrl(getRepository().getMetadataManager()
                     .URL_METADATA_ADDFORM, entry), getRepository()
-                        .fileUrl(ICON_ADD), msg("Add Metadata")));
+                    .fileUrl(ICON_ADD), msg("Add Metadata")));*/
 
             /*
               links.add(

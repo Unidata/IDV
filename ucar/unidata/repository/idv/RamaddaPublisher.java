@@ -124,6 +124,8 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
     private JCheckBox doThumbnailCbx = new JCheckBox("Show as  a thumbnail", true);
 
+    private JCheckBox doZidvCbx = new JCheckBox("Save as zidv file", false);
+
     private JCheckBox uploadZidvDataCbx = new JCheckBox("Upload ZIDV Data", false);
 
     private JCheckBox uploadZidvBundleCbx = new JCheckBox("Upload ZIDV Bundle", true);
@@ -349,19 +351,21 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 JComponent extra;
                 if(ImageUtils.isImage(contentFile)) {
                     isImage = true;
-                    extra = doThumbnailCbx;
+                    //                    extra = doThumbnailCbx;
                 } else {
                     extra = GuiUtils.filler(1,1);
                 }
+                
                 if(isImage)
                     doBundleCbx.setText("Publish bundle and attach image");
                 else
                     doBundleCbx.setText("Publish bundle and attach product");
+                doBundleCbx.setToolTipText("<html>Instead of publishing the product actually make and <br>publish a bundle and add the product as an attachment</html>");
                 topComps.add(
                     GuiUtils.left(
                         GuiUtils.hbox(
                             new JLabel(IOUtil.getFileTail(contentFile)),
-                            GuiUtils.filler(10, 5), doBundleCbx,extra)));
+                            GuiUtils.filler(10, 5), doBundleCbx,doZidvCbx)));
                 if (lastBundleId != null) {
                     addAssociationCbx = myAddAssociationCbx;
                     addAssociationCbx.setText(
@@ -472,7 +476,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     }
                     bundleFile = getIdv().getObjectStore().getTmpFile(
                         IOUtil.stripExtension(IOUtil.getFileTail(tmpFile))
-                        + ".xidv");
+                        + (doZidvCbx.isSelected()?".zidv":".xidv"));
                     getIdv().getPersistenceManager().doSave(bundleFile);
                     files.add(bundleFile);
                     zipEntryNames.add(IOUtil.getFileTail(bundleFile));

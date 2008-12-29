@@ -1242,8 +1242,6 @@ public class UserManager extends RepositoryManager {
         }
 
 
-
-
         StringBuffer sb         = new StringBuffer();
         List         tabTitles  = new ArrayList();
         List         tabContent = new ArrayList();
@@ -1258,6 +1256,9 @@ public class UserManager extends RepositoryManager {
         tabTitles.add(msg("Current Sessions"));
         tabContent.add(getSessionList(request).toString());
 
+
+        tabTitles.add(msg("Recent Activity"));
+        tabContent.add(getUserActivities(request, null));
 
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.makeTabs(tabTitles, tabContent, true));
@@ -1879,6 +1880,9 @@ public class UserManager extends RepositoryManager {
                                           XmlUtil.decodeBase64(
                                               request.getUnsafeString(
                                                   ARG_REDIRECT, "")));
+                    if(!redirect.startsWith("http")) {
+                        redirect  = getRepository().absoluteUrl(redirect);
+                    }
                     return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
                             "true", ARG_MESSAGE, msg("You are logged in")));
                 } else {
@@ -2006,50 +2010,82 @@ public class UserManager extends RepositoryManager {
         if(user == null) {
             sb.append(getRepository().error("Could not find user"));
         } else {
-            Statement stmt = getDatabaseManager().select(Tables.USER_ACTIVITY.COLUMNS,
-                                                         Tables.USER_ACTIVITY.NAME,
-                                                         Clause.eq(Tables.USER_ACTIVITY.COL_USER_ID,
-                                                                   user.getId()),
-                                                         " order by " + Tables.USER_ACTIVITY.COL_DATE +" desc ");
-
-            SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
-            ResultSet         results;
-            sb.append(msgLabel("Activity for User"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(user.getLabel());
-            sb.append(HtmlUtil.p());
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
-            sb.append(HtmlUtil.row(HtmlUtil.cols(
-                                                 HtmlUtil.b(msg("Activity")),
-                                                 HtmlUtil.b(msg("Date")),
-                                                 HtmlUtil.b(msg("IP Address")))));
-
-            int cnt=0;
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    int col=2;
-                    Date dttm = getDatabaseManager().getDate(results, col++);
-                    String what = results.getString(col++);
-                    String extra = results.getString(col++);
-                    String ip  =  results.getString(col++);
-                    sb.append(HtmlUtil.row(HtmlUtil.cols(what,
-                                                         getRepository().formatDate(dttm),ip)));
-
-                    cnt++;
-                }
-            }
-            sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
-            if(cnt==0) {
-                sb.append(msg("No activity"));
-            }
+            sb.append(getUserActivities(request, user));
         }
         Result result =  new Result(msg("User Log"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
                                                           getAdmin().adminUrls));
         return result;
-
     }
+
+
+
+    private  String getUserActivities(Request request,User theUser) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        Clause clause = null;
+        String limitString = "";
+        if(theUser!=null) {
+            clause = Clause.eq(Tables.USER_ACTIVITY.COL_USER_ID,
+                               theUser.getId());
+        } else {
+            limitString = getDatabaseManager().getLimitString(0, request.get(ARG_LIMIT,100));
+        }
+
+
+        Statement stmt = getDatabaseManager().select(Tables.USER_ACTIVITY.COLUMNS,
+                                                     Tables.USER_ACTIVITY.NAME,
+                                                     clause,
+                                                     " order by " + Tables.USER_ACTIVITY.COL_DATE +" desc "+
+                                                     limitString);
+
+        SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
+        ResultSet         results;
+        if(theUser!=null) {
+            sb.append(msgLabel("Activity for User"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(theUser.getLabel());
+        }
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.row(HtmlUtil.cols(
+                                             (theUser==null? HtmlUtil.b(msg("User")):""),
+                                             HtmlUtil.b(msg("Activity")),
+                                             HtmlUtil.b(msg("Date")),
+                                             HtmlUtil.b(msg("IP Address")))));
+
+        int cnt=0;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int col=1;
+                String userId= results.getString(col++);
+                String firstCol = "";
+                if(theUser==null) {
+                    User user = findUser(userId);
+                    firstCol = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
+                                                         ARG_USER_ID,
+                                                         user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log")) +" " + user.getLabel());
+
+                }
+                Date dttm = getDatabaseManager().getDate(results, col++);
+                String what = results.getString(col++);
+                String extra = results.getString(col++);
+                String ip  =  results.getString(col++);
+                sb.append(HtmlUtil.row(HtmlUtil.cols(firstCol,
+                                                     what,
+                                                     getRepository().formatDate(dttm),ip)));
+
+                cnt++;
+            }
+        }
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        if(cnt==0) {
+            sb.append(msg("No activity"));
+        }
+        return sb.toString();
+    }
+
+
 
     /**
      * _more_

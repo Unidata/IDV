@@ -343,7 +343,7 @@ public class DataOutputHandler extends OutputHandler {
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
-               + ":" + Request.encodeEmbedded(entry.getId()) + "/entry.das";
+               + ":" + Request.encodeEmbedded(entry.getId()) + "/dodsC/entry.das";
     }
 
 
@@ -358,7 +358,7 @@ public class DataOutputHandler extends OutputHandler {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
                + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/"
                + ARG_ENTRYID + ":" + Request.encodeEmbedded(entry.getId())
-               + "/entry.das";
+               + "/dodsC/entry.das";
     }
 
 

@@ -171,7 +171,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         request.put(ARG_OUTPUT, OUTPUT_HTML);
-        String toolbar = getEntryManager().getEntryToolbar(request, entry);
+        String toolbar = getEntryManager().getEntryToolbar(request, entry,false);
         boolean didOne = false;
         sb.append("<table>");
         sb.append(HtmlUtil.formEntry(msgLabel("Links"), toolbar));

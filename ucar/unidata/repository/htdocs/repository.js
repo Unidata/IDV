@@ -533,8 +533,10 @@ function  handleFolderList(request, uid) {
 	block = util.getDomObject(uid);    
     }
     var img = util.getDomObject("img_" +uid);
-    var xmlDoc=request.responseXML.documentElement;
-    block.obj.innerHTML = getChildText(xmlDoc);
+    if(request.responseXML!=null) {
+        var xmlDoc=request.responseXML.documentElement;
+        block.obj.innerHTML = getChildText(xmlDoc);
+    }
     
     if(img) {
         if(changeImages[uid]) {

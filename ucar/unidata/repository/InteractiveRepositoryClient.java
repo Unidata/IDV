@@ -181,7 +181,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      * _more_
      */
     private void doMakeGroupTree() {
-        treeRoot  = new GroupNode("Top", "0", true);
+        treeRoot  = new GroupNode("Top", "", true);
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
         groupTree.setToolTipText("Right-click to show menu");
@@ -327,11 +327,15 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         public void checkExpansionInner() {
             try {
                 GuiUtils.setCursor(groupTree, GuiUtils.waitCursor);
-                String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),
-                                          new String[] {
-                    ARG_ENTRYID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID,
-                    getSessionId()
-                });
+                boolean haveId = id.length()>0;
+                String[]args;
+                if(haveId) {
+                    args =  new String[] {
+                        ARG_ENTRYID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID, getSessionId()};
+                } else {
+                    args =  new String[] {ARG_OUTPUT, "xml.xml", ARG_SESSIONID, getSessionId()};
+                }
+               String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),args);
                 String xml = IOUtil.readContents(url, getClass());
                 removeAllChildren();
                 //                System.err.println ("URL:" + id);

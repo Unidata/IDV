@@ -7,7 +7,7 @@
      <property name="form.show.area" value="false"/>
      <property name="form.show.resource" value="false"/>
      <column name="wikitext" type="clob" size="256000" label="Wiki Text" cansearch="true" showinhtml="false"/>
-     <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="true"/>
+     <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="false"/>
 </type>
 
 

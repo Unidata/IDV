@@ -2486,7 +2486,8 @@ return new Result(title, sb);
             if(link.getIcon()==null) {
                 sb.append(HtmlUtil.space(1));
             } else {
-                sb.append(HtmlUtil.img(link.getIcon()));
+                sb.append(HtmlUtil.href(link.getUrl(), HtmlUtil.img(link.getIcon())));
+
             }
             sb.append(HtmlUtil.space(1));
             sb.append("</td><td>");
@@ -2516,13 +2517,13 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public String getEntryToolbar(Request request, Entry entry)
+    public String getEntryToolbar(Request request, Entry entry,boolean justActions)
         throws Exception {
         List<Link>   links = getEntryLinks(request, entry);
         StringBuffer sb    = new StringBuffer();
         for (Link link : links) {
             if(link.getType()== OutputType.TYPE_ACTION ||
-               link.getType()== OutputType.TYPE_NONHTML) {
+               (!justActions && link.getType()== OutputType.TYPE_NONHTML)) {
                 String href = HtmlUtil.href(link.getUrl(),
                                             HtmlUtil.img(link.getIcon(),
                                                          link.getLabel(),
@@ -2702,7 +2703,7 @@ return new Result(title, sb);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
             nav = StringUtil.join(separator, breadcrumbs);
-            String toolbar =getEntryToolbar(request, entry); 
+            String toolbar =getEntryToolbar(request, entry,true); 
             String menubar =getEntryMenubar(request, entry); 
 
             String header =
