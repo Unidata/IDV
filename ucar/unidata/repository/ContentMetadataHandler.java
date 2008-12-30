@@ -216,7 +216,7 @@ public class ContentMetadataHandler extends MetadataHandler {
 
         Metadata.Type type  = getType(metadata.getType());
         String        extra = (forLink
-                               ? " width=\"100\" "
+                               ? " "
                                : "");
         if (ImageUtils.isImage(f.toString())) {
             String img= HtmlUtil.img(
