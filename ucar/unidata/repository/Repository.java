@@ -3973,30 +3973,38 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public String makeMenuPopupLink(String link, String menuContents) {
-        return makeMenuPopupLink(link,menuContents,false);
+    public String makePopupLink(String link, String menuContents) {
+        return makePopupLink(link,menuContents,false);
     }
 
-    public String makeMenuPopupLink(String link, String menuContents, boolean makeClose) {
+
+    public String makePopupLink(String link, String menuContents, boolean makeClose) {
         String       compId = "menu_" + HtmlUtil.blockCnt++;
         String       linkId = "menulink_" + HtmlUtil.blockCnt++;
-        StringBuffer menu   = new StringBuffer();
-        if(makeClose) {
-            String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hideMenuObject();"), 
-                                                                      HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
-            menuContents = closeLink+HtmlUtil.br()+menuContents;
-        }
-
-        menu.append(HtmlUtil.div(menuContents,
-                                 HtmlUtil.id(compId)
-                                 + HtmlUtil.cssClass("menu")));
-
+        String contents = makePopupDiv(menuContents, compId, makeClose);
         String onClick = HtmlUtil.onMouseClick("showMenu(event,"
                              + HtmlUtil.squote(linkId) + ","
                              + HtmlUtil.squote(compId) + ");");
         String href = HtmlUtil.href("javascript:noop();", link,
                                     onClick + HtmlUtil.id(linkId));
-        return href + menu;
+        return href + contents;
+    }
+
+
+
+
+    public String makePopupDiv(String contents, String compId, boolean makeClose) {
+        StringBuffer menu   = new StringBuffer();
+        if(makeClose) {
+            String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hideMenuObject();"), 
+                                                                      HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
+            contents = closeLink+HtmlUtil.br()+contents;
+        }
+
+        menu.append(HtmlUtil.div(contents,
+                                 HtmlUtil.id(compId)
+                                 + HtmlUtil.cssClass("menu")));
+        return menu.toString();
     }
 
 

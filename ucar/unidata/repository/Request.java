@@ -199,6 +199,23 @@ public class Request implements Constants {
         return entryUrl(theUrl, entry, ARG_ENTRYID);
     }
 
+    public String getEntryUrl(String  theUrl, Entry entry) {
+        String url = theUrl.toString();
+        if(theUrl.equals(repository.URL_ENTRY_SHOW.toString())) {
+            try {
+                String name = entry.getFullName();
+                name = name.replace("/","_FORWARDSLASH_");
+                name  =  java.net.URLEncoder.encode(name, "UTF-8");
+                name = name.replace("_FORWARDSLASH_","/");
+                url = url + "/" + name;
+                //                url = url + "/" + entry.getFullName();
+            } catch(Exception ignore){}
+        }
+
+        return url;
+    }
+
+
     /**
      * _more_
      *
@@ -209,11 +226,12 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg) {
+        String url = getEntryUrl(theUrl.toString(), entry);
         if (entry.isTopGroup()) {
-            return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
+            return HtmlUtil.url(url, arg, entry.getId());
         }
         if (entry.getIsLocalFile()) {
-            return HtmlUtil.url(theUrl.toString(), arg, entry.getId());
+            return HtmlUtil.url(url, arg, entry.getId());
         }
 
         //        Group collectionGroup = entry.getCollectionGroup();
@@ -230,7 +248,9 @@ public class Request implements Constants {
         //        }
 
 
-        return url(theUrl, arg, entry.getId());
+        //        return url(theUrl, arg, entry.getId());
+        return HtmlUtil.url(url,arg,entry.getId());
+        //        return url(theUrl, arg, entry.getId());
     }
 
     /**

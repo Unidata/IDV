@@ -2373,9 +2373,20 @@ return new Result(title, sb);
             String  icon     = getIconUrl(request, entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
-            String event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                               HtmlUtil.squote(entryId) + ","
-                               + HtmlUtil.squote(uid)));
+            String event="";
+
+            String       compId = "popup_" + HtmlUtil.blockCnt++;
+            String linkId = "img_" + uid;
+
+            if(entry.isGroup()) {
+                event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                            HtmlUtil.squote(entryId) + ","
+                                                            + HtmlUtil.squote(uid)));
+            } else {
+                event = HtmlUtil.onMouseClick("showMenu(event,"
+                                              + HtmlUtil.squote(linkId) + ","
+                                              + HtmlUtil.squote(compId) + ");");
+            }
 
             if (okToMove) {
                 event += (entry.isGroup()
@@ -2394,14 +2405,20 @@ return new Result(title, sb);
                         ? dropEvent
                         : "");
             }
-
-
             String img = HtmlUtil.img(icon, (entry.isGroup()
                                              ? "Click to open group; "
                                              : "Click to view actions; ") + (okToMove
                     ? "Drag to move"
                     : ""), HtmlUtil.id("img_" + uid) + event);
+
+
+
+
             sb.append(img);
+            if(!entry.isGroup()) {
+                String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
+                sb.append(getRepository().makePopupDiv(links, compId, true));
+            }
             sb.append(HtmlUtil.space(1));
             getMetadataManager().decorateEntry(request, entry, sb, true);
         }
@@ -2540,8 +2557,8 @@ return new Result(title, sb);
                 new StringBuffer(getEntryActionsTable(request, entry,OutputType.TYPE_ACTION));
             StringBuffer viewMenuInner = 
                 new StringBuffer(getEntryActionsTable(request, entry,OutputType.TYPE_HTML|OutputType.TYPE_NONHTML));
-            String editMenu = getRepository().makeMenuPopupLink("<span class=entrymenulink>Edit</span>",editMenuInner.toString(),true);
-            String viewMenu = getRepository().makeMenuPopupLink("<span class=entrymenulink>View</span>",viewMenuInner.toString(),true);
+            String editMenu = getRepository().makePopupLink("<span class=entrymenulink>Edit</span>",editMenuInner.toString(),true);
+            String viewMenu = getRepository().makePopupLink("<span class=entrymenulink>View</span>",viewMenuInner.toString(),true);
             return HtmlUtil.span(editMenu.toString() + viewMenu.toString(),HtmlUtil.cssClass("entrymenubar"));
     }
 
@@ -2691,24 +2708,25 @@ return new Result(title, sb);
         titleList.add(entry.getLabel());
         String nav;
         String separator = getRepository().getTemplateProperty(request,"ramadda.template.breadcrumbs.separator", "");
-        String entryLink = ( !entry.isGroup()
-                             ? HtmlUtil.img(getIconUrl(request, entry))
-                               + HtmlUtil.space(1)
-                             : "") + getAjaxLink(request, entry,
-                                 entry.getLabel(), false);
+        
+        String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
+        String entryLink =   HtmlUtil.space(1) + getAjaxLink(request, entry,
+                                                             entry.getLabel(), false);
 
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
+
+            String img  = getRepository().makePopupLink(HtmlUtil.img(getIconUrl(request, entry)),links, true);
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar =getEntryToolbar(request, entry,true); 
             String menubar =getEntryMenubar(request, entry); 
 
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + HtmlUtil.rowBottom("<td class=\"entryname\" >"  + entryLink
+                + HtmlUtil.rowBottom("<td class=\"entryname\" >"  + img+entryLink
                                      + "</td><td align=\"right\">" + toolbar
                                      + "</td>") + "</table>";
             nav = HtmlUtil.div(

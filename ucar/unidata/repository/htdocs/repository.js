@@ -597,7 +597,7 @@ function selectClick(id,entryId,value) {
     if (selector.selecttype=="wikilink") {
         insertAtCursor(selector.textComp.obj,"[[" +entryId+"|"+value+"]]");
     } else if (selector.selecttype=="entryid") {
-        insertAtCursor(selector.textComp.obj,entryId);
+        insertTagsInner(selector.textComp.obj, "{{import " +entryId+" "," }}","importtype");
     } else { 
        selector.textComp.obj.value =value;
     }

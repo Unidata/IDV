@@ -2141,19 +2141,23 @@ public class HtmlUtil {
     public static String makeShowHideBlock(String label, String content,
                                            boolean visible,
                                            String headerExtra,
-                                           String blockExtra, String hideImg,
+                                           String blockExtra, 
+                                           String hideImg,
                                            String showImg) {
         String       id = "block_" + (blockCnt++);
         StringBuffer sb = new StringBuffer();
+        String img = "";
+        if(showImg!=null && showImg.length()>0) {
+            img = HtmlUtil.img(visible
+                               ? hideImg
+                               : showImg, "",
+                               " id='" + id
+                               + "img' ") + HtmlUtil.space(1);
+        }
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
-                + "')"), HtmlUtil.img(visible
-                                      ? hideImg
-                                      : showImg, "",
-                                          " id='" + id
-                                          + "img' ") + HtmlUtil.space(1)
-                                              + label, HtmlUtil.cssClass(
+                + "')"), img + label, HtmlUtil.cssClass(
                                                   "pagesubheadinglink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
@@ -2172,6 +2176,34 @@ public class HtmlUtil {
         sb.append("</div>");
         return sb.toString();
     }
+
+
+    public static String makeShowHideBlock(String clickHtml, String label, String content,
+                                           boolean visible) {
+        String       id = "block_" + (blockCnt++);
+        StringBuffer sb = new StringBuffer();
+        String link =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
+                + id + "','" + id + "img','" + "" + "','" + ""
+                + "')"), clickHtml, HtmlUtil.cssClass(
+                                                  "pagesubheadinglink")) + label;
+
+        //        sb.append(RepositoryManager.tableSubHeader(link));
+        sb.append(link);
+        sb.append("<span " + HtmlUtil.cssClass("hideshowblock")
+                  + HtmlUtil.id(id)
+                  + HtmlUtil.style("display:block;visibility:visible") + ">");
+        if ( !visible) {
+            sb.append(HtmlUtil.script(HtmlUtil.call("hide",
+                    HtmlUtil.squote(id))));
+        }
+
+        sb.append(content.toString());
+        sb.append("</span>");
+        return sb.toString();
+    }
+
+
 
 
 

@@ -360,6 +360,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_THUMBNAIL = "thumbnail";
     /** _more_ */
     public static final String ARG_VARIABLE = "variable";
 

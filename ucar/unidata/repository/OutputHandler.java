@@ -470,7 +470,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW + suffix,
                                ARG_OUTPUT, outputType.toString());
         } else {
-            url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW + suffix,
+            url = request.getEntryUrl(getRepository().URL_ENTRY_SHOW + suffix, entry);
+            url = HtmlUtil.url(url,
                                ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
                                outputType.toString());
         }
@@ -1114,7 +1115,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 } else {
                     remainder = "";
                 }
-                theEntry = getEntryManager().getEntry(request, id);
+                theEntry =  findWikiEntry(request, wikiUtil, id, entry);
                 if (theEntry == null) {
                     return "<b>Could not find entry&lt;" + id + "&gt;</b>";
                 }
@@ -1418,15 +1419,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Entry findWikiEntry(Request request, WikiUtil wikiUtil, String name, Group parent)
+    public Entry findWikiEntry(Request request, WikiUtil wikiUtil, String name, Entry parent)
             throws Exception {
         name = name.trim();
         Entry theEntry = null;
         theEntry = getEntryManager().getEntry(request, name);
-        if (theEntry == null) {
+        if (theEntry == null && parent.isGroup()) {
             for (Entry child : getEntryManager().getChildren(request,
-                    parent)) {
-                if (child.getName().equalsIgnoreCase(name)) {
+                                                             (Group)parent)) {
+                if (child.getName().trim().equalsIgnoreCase(name)) {
                     theEntry = child;
                     break;
                 }
@@ -1434,6 +1435,171 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         }
         return theEntry;
     }
+
+
+    public String makeWikiEditBar(Request request,Entry entry, String textAreaId) throws Exception {
+
+        String select = OutputHandler.getSelect(request, textAreaId,
+                            "Add link", true, "wikilink") + HtmlUtil.space(1)
+                                + OutputHandler.getSelect(request,
+                                                          textAreaId, "Add import entry", true,
+                                    "entryid");
+
+        StringBuffer buttons = new StringBuffer();
+        buttons.append(addWikiEditButton(textAreaId,"button_bold.png", "Bold text", "\\'\\'\\'",
+                                 "\\'\\'\\'", "Bold text",
+                                 "mw-editbutton-bold"));
+        buttons.append(addWikiEditButton(textAreaId,"button_italic.png", "Italic text",
+                                 "\\'\\'", "\\'\\'", "Italic text",
+                                 "mw-editbutton-italic"));
+        buttons.append(addWikiEditButton(textAreaId,"button_link.png", "Internal link", "[[",
+                                 "]]", "Link title", "mw-editbutton-link"));
+        buttons.append(addWikiEditButton(textAreaId,"button_extlink.png",
+                                 "External link (remember http:// prefix)",
+                                 "[", "]",
+                                 "http://www.example.com link title",
+                                 "mw-editbutton-extlink"));
+        buttons.append(addWikiEditButton(textAreaId,"button_headline.png", "Level 2 headline",
+                                 "\\n== ", " ==\\n", "Headline text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,"button_linebreak.png", "Line break",
+                                 "<br>", "", "", "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,"button_strike.png", "Strike Through",
+                                 "<s>", "</s>", "Strike-through text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,"button_upper_letter.png", "Super Script",
+                                 "<sup>", "</sup>", "Super script text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,"button_lower_letter.png", "Sub Script",
+                                 "<sub>", "</sub>", "Subscript script text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,"button_small.png", "Small text", "<small>",
+                                 "</small>", "Small text",
+                                 "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,"button_blockquote.png",
+                                 "Insert block quote", "<blockquote>",
+                                 "</blockquote>", "Quoted text",
+                                 "mw-editbutton-headline"));
+        //        buttons.append(addWikiEditButton(textAreaId,"button_image.png","Embedded file","[[File:","]]","Example.jpg","mw-editbutton-image"));
+        //        buttons.append(addWikiEditButton(textAreaId,"button_media.png","File link","[[Media:","]]","Example.ogg","mw-editbutton-media"));
+        //        buttons.append(addWikiEditButton(textAreaId,"button_nowiki.png","Ignore wiki formatting","\\x3cnowiki\\x3e","\\x3c/nowiki\\x3e","Insert non-formatted text here","mw-editbutton-nowiki"));
+        //        buttons.append(addWikiEditButton(textAreaId,"button_sig.png","Your signature with timestamp","--~~~~","","","mw-editbutton-signature"));
+        buttons.append(addWikiEditButton(textAreaId,"button_hr.png",
+                                 "Horizontal line (use sparingly)",
+                                 "\\n----\\n", "", "", "mw-editbutton-hr"));
+
+        StringBuffer propertyMenu = new StringBuffer();
+        StringBuffer importMenu   = new StringBuffer();
+        for (int i = 0; i < OutputHandler.WIKIPROPS.length; i++) {
+            String prop = OutputHandler.WIKIPROPS[i];
+            String js = "javascript:insertTags("
+                        + HtmlUtil.squote(textAreaId) + ","
+                        + HtmlUtil.squote("{{") + "," + HtmlUtil.squote("}}")
+                        + "," + HtmlUtil.squote(prop) + ");";
+            propertyMenu.append(HtmlUtil.href(js, prop));
+            propertyMenu.append(HtmlUtil.br());
+
+            String js2 = "javascript:insertTags("
+                         + HtmlUtil.squote(textAreaId) + ","
+                         + HtmlUtil.squote("{{import ") + ","
+                         + HtmlUtil.squote(" " + prop + "}}") + ","
+                         + HtmlUtil.squote(" entryid ") + ");";
+            importMenu.append(HtmlUtil.href(js2, prop));
+            importMenu.append(HtmlUtil.br());
+        }
+
+        List<Link> links = getRepository().getOutputLinks(request,
+                               new OutputHandler.State(entry));
+
+
+        propertyMenu.append("<hr>");
+        for (Link link : links) {
+            if (link.getOutputType() == null) {
+                continue;
+            }
+
+            String prop = link.getOutputType().getId();
+            String js = "javascript:insertTags("
+                        + HtmlUtil.squote(textAreaId) + ","
+                        + HtmlUtil.squote("{{") + "," + HtmlUtil.squote("}}")
+                        + "," + HtmlUtil.squote(prop) + ");";
+            propertyMenu.append(HtmlUtil.href(js, link.getLabel()));
+            propertyMenu.append(HtmlUtil.br());
+        }
+
+
+
+        StringBuffer importOutputMenu = new StringBuffer();
+        /*
+                List<OutputType> allTypes = getRepository().getOutputTypes();
+                //        importMenu.append("<hr>");
+                for(OutputType type: allTypes) {
+                    String prop = type.getId();
+                    String js = "javascript:insertTags(" + HtmlUtil.squote(textAreaId)+"," +
+                        HtmlUtil.squote("{{import ") +","+
+                        HtmlUtil.squote(" " + type.getId()+" }}") +","+
+                        HtmlUtil.squote("entryid")+");";
+                    importOutputMenu.append(HtmlUtil.href(js,type.getLabel()));
+                    importOutputMenu.append(HtmlUtil.br());
+                }
+        */
+
+
+        String propertyMenuLabel =
+            HtmlUtil.img(fileUrl("/icons/wiki/button_property.png"),
+                         "Add Entry Property");
+        String propertyButton =
+            getRepository().makePopupLink(propertyMenuLabel,
+                propertyMenu.toString());
+        buttons.append(propertyButton);
+        String importMenuLabel =
+            HtmlUtil.img(fileUrl("/icons/wiki/button_import.png"),
+                         "Import Entry Property");
+        String importButton =
+            getRepository().makePopupLink(importMenuLabel,
+                HtmlUtil.hbox(importMenu.toString(),
+                              importOutputMenu.toString()));
+        buttons.append(importButton);
+        buttons.append(HtmlUtil.space(2));
+        buttons.append(select);
+
+        return buttons.toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param icon _more_
+     * @param label _more_
+     * @param prefix _more_
+     * @param suffix _more_
+     * @param example _more_
+     * @param huh _more_
+     *
+     * @return _more_
+     */
+    private String addWikiEditButton(String textAreaId, String icon, String label, String prefix,
+                             String suffix, String example, String huh) {
+        String prop = prefix + example + suffix;
+        String js;
+        if (suffix.length() == 0) {
+            js = "javascript:insertText(" + HtmlUtil.squote(textAreaId)
+                 + "," + HtmlUtil.squote(prop) + ");";
+        } else {
+            js = "javascript:insertTags(" + HtmlUtil.squote(textAreaId)
+                 + "," + HtmlUtil.squote(prefix) + ","
+                 + HtmlUtil.squote(suffix) + "," + HtmlUtil.squote(example)
+                 + ");";
+        }
+        return HtmlUtil.href(js,
+                             HtmlUtil.img(fileUrl("/icons/wiki/" + icon),
+                                          label));
+
+    }
+
+
+
 
     /**
      * _more_

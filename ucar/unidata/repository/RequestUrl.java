@@ -144,5 +144,12 @@ public class RequestUrl {
         return path;
     }
 
+    public boolean equals(Object o) {
+        if(!(o instanceof RequestUrl)) return false;
+        RequestUrl that = (RequestUrl) o;
+        return this.path.equals(that.path);
+    }
+
+
 }
 

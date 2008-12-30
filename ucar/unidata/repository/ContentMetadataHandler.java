@@ -26,6 +26,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
+import java.awt.Image;
 import ucar.unidata.ui.ImageUtils;
 
 
@@ -222,7 +223,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                       request.url(
                                                   getRepository().getMetadataManager().URL_METADATA_VIEW,
                                                   ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                                                  metadata.getId()), "thumbnail", extra);
+                                                  metadata.getId(),ARG_THUMBNAIL,""+forLink), "thumbnail", extra);
 
             if(forLink) {
                 String bigimg= HtmlUtil.img(
@@ -232,7 +233,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                                   metadata.getId()), "thumbnail", "");
 
 
-                img = getRepository().makeMenuPopupLink(img,bigimg,true);
+                img = getRepository().makePopupLink(img,bigimg,true);
             }
             return img;
         } else if (f.exists()) {
@@ -321,6 +322,17 @@ public class ContentMetadataHandler extends MetadataHandler {
             }
             String mimeType = getRepository().getMimeTypeFromSuffix(
                                   IOUtil.getFileExtension(f.toString()));
+            if(request.get(ARG_THUMBNAIL,false)) {
+                File thumb = getStorageManager().getTmpFile(request, IOUtil.getFileTail(f.toString()));
+                if(!thumb.exists()) {
+                    Image image = ImageUtils.readImage(f.toString());
+                    image = ImageUtils.resize(image, 100,-1);
+                    ImageUtils.waitOnImage(image);
+                    ImageUtils.writeImageToFile(image, thumb.toString());
+                }
+                f = thumb;
+            }
+
             Result result =
                 new Result("thumbnail",
                            IOUtil.readBytes(new FileInputStream(f), null,

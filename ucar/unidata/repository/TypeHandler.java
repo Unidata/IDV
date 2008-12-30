@@ -1160,12 +1160,20 @@ public class TypeHandler extends RepositoryManager {
         }
         int rows = getProperty("form.rows.desc", 3);
         if (okToShowInForm(ARG_DESCRIPTION)) {
+            String desc = "";
+            String buttons = "";
+            if(entry!=null) {
+                desc =  entry.getDescription();
+                if(desc.startsWith("<wiki>")) {
+                    rows = 20;
+                    buttons = getRepository().getHtmlOutputHandler().makeWikiEditBar(request,entry, ARG_DESCRIPTION)+HtmlUtil.br();
+                }
+            }
             sb.append(
                 HtmlUtil.formEntryTop(
                     msgLabel("Description"),
-                    HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
-                    ? entry.getDescription()
-                    : BLANK), rows, 60)));
+                    buttons+
+                    HtmlUtil.textArea(ARG_DESCRIPTION, desc, rows, 60,HtmlUtil.id(ARG_DESCRIPTION))));
         }
 
         if (request.getUser().getAdmin()) {
@@ -1173,7 +1181,7 @@ public class TypeHandler extends RepositoryManager {
                                          HtmlUtil.input(ARG_USER_ID,
                                              ((entry != null)
                     ? entry.getUser().getId()
-                    : ""), size)));
+                    : ""), HtmlUtil.SIZE_20)));
         }
 
         if (okToShowInForm(ARG_RESOURCE)) {
@@ -1231,8 +1239,19 @@ public class TypeHandler extends RepositoryManager {
                 }
 
             } else {
-                sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                                             entry.getResource().getPath()));
+                if(entry.getResource().isFile()) {
+                    if(request.getUser().getAdmin()) {
+                        sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                                     entry.getResource().getPath()));
+                    } else {
+                        String fileTail = getStorageManager().getFileTail(entry);
+                        sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                                     fileTail));
+                    }
+                } else {
+                    sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                                 entry.getResource().getPath()));
+                }
             }
 
 
