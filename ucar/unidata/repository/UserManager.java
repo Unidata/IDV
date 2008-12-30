@@ -1545,8 +1545,8 @@ public class UserManager extends RepositoryManager {
             tips.add(msg("Go to user settings"));
         }
 
-        urls.add("http://www.unidata.ucar.edu/software/ramadda/docs/userguide");
-        extras.add(" target=\"_help\" ");
+        urls.add(request.url(getRepositoryBase().URL_HELP));
+        extras.add("");
         labels.add(msg("Help"));
         tips.add(msg("View Help"));
 

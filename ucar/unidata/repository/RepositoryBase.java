@@ -53,6 +53,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
 
 
+    public final RequestUrl URL_HELP = new RequestUrl(this, "/help/index.html");
     /** _more_ */
     public final RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 

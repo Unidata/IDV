@@ -254,6 +254,62 @@ a.header-left  {
 
 
 
+
+.cimg {
+    text-align:center;
+    margin-top: 20;
+    margin-bottom: 40;
+}
+
+.caption {
+    text-align:center;
+    font-style:italic;
+}
+
+.pagetitle {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #8080C0;
+    margin-top: 15;
+    margin-bottom: 5;
+}
+
+.pagesubtitle {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #8080C0;
+    margin-top: 10;
+    margin-bottom: 5;
+}
+
+.childlist-level {
+    font-weigt:bold;
+    font-size: 14pt;
+    color: #8080C0;
+    margin-top: 10;
+    margin-bottom: 5;
+}
+
+.childlist {
+    margin: 10;
+    margin-left: 30;
+}
+
+
+
+.pagesubsubtitle {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #8080C0;
+    margin-top: 5;
+    margin-bottom: 5;
+}
+
+
+
+
+
+
 .wiki-categories {
    border: 1px #999999 solid; 
    padding:4px;

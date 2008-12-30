@@ -2737,11 +2737,31 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     public Result processHelp(Request request) throws Exception {
-        return new Result(
-            BLANK,
-            new StringBuffer(
-                note(request.getUnsafeString(ARG_MESSAGE, BLANK))));
-        
+        String path = request.getRequestPath();
+        path = path.substring((getUrlBase()+"/help").length());
+        if(path.length()==0) path = "/index.html";
+        if(path.equals("/")) path = "/index.html";
+        path = "/ucar/unidata/repository/docs/userguide/processed" + path;
+        RepositoryUtil.checkFilePath(path);
+        if(path.endsWith(".html")) {
+            String helpText = 
+                IOUtil.readContents(path);
+            //            Pattern pattern  = Pattern.compile(".*<body>(.*)</body>.*");
+
+            //Pull out the body if we can
+            Pattern pattern  = Pattern.compile("(?s).*<body>(.*)</body>");
+            Matcher matcher = pattern.matcher(helpText);
+            if(matcher.find()) {
+                helpText = matcher.group(1);
+            }
+            return new Result(
+                              BLANK,
+                              new StringBuffer(helpText));
+        } else {
+            InputStream inputStream =  IOUtil.getInputStream(path,getClass());
+            return new Result(BLANK,inputStream,IOUtil
+                              .getFileExtension(path));
+        }
     }
 
 
