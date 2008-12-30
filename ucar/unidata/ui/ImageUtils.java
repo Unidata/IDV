@@ -929,6 +929,8 @@ public class ImageUtils {
     public static Image resize(Image image, int width, int height) {
         return image.getScaledInstance(width, height,
                                        Image.SCALE_AREA_AVERAGING);
+        //                                       Image.SCALE_SMOOTH);
+
     }
 
 
