@@ -68,6 +68,9 @@ public class User {
     /** _more_ */
     private List<String> roles;
 
+    private List<FavoriteEntry> favorites;
+
+
     /** _more_ */
     private String language = "";
 
@@ -444,6 +447,24 @@ public class User {
     }
 
 
+
+    /**
+       Set the Favorites property.
+
+       @param value The new value for Favorites
+    **/
+    public void setFavorites (List<FavoriteEntry> value) {
+	favorites = value;
+    }
+
+    /**
+       Get the Favorites property.
+
+       @return The Favorites
+    **/
+    public List<FavoriteEntry> getFavorites () {
+	return favorites;
+    }
 
 
 }

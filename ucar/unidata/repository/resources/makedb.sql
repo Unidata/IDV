@@ -132,6 +132,18 @@ CREATE TABLE  userroles (
 
 
 -----------------------------------------------------------------------
+--- user's favorites
+-----------------------------------------------------------------------
+CREATE TABLE  favorites (
+        id varchar(200),
+        user_id varchar(200),
+        entry_id varchar(200),
+        name varchar(1000),
+	category varchar(1000));
+
+CREATE INDEX FAVORITES_INDEX_USER_ID ON favorites (USER_ID);
+
+-----------------------------------------------------------------------
 --- tracks logins
 -----------------------------------------------------------------------
 CREATE TABLE  user_activity (

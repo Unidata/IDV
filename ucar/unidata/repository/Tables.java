@@ -210,6 +210,30 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 
 
 
+public static class FAVORITES {
+public static final String NAME = "favorites";
+public static final String COL_ID = NAME + ".id";
+public static final String COL_USER_ID = NAME + ".user_id";
+public static final String COL_ENTRY_ID = NAME + ".entry_id";
+public static final String COL_NAME = NAME + ".name";
+public static final String COL_CATEGORY = NAME + ".category";
+public static final String []ARRAY= new String[] {
+    COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
+
+
 
 
 public static class USERROLES {

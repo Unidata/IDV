@@ -283,6 +283,38 @@ public class UserManager extends RepositoryManager {
         request.setUser(user);
     }
 
+    public List<FavoriteEntry> getFavorites(Request request, User user) throws Exception {
+        List<FavoriteEntry> favorites  = user.getFavorites();
+        if(favorites == null) {
+            favorites = new ArrayList<FavoriteEntry>();
+            Statement stmt = getDatabaseManager().select(Tables.FAVORITES.COLUMNS,
+                                                         Tables.FAVORITES.NAME, 
+                                                         Clause.eq(Tables.FAVORITES.COL_USER_ID, user.getId()));
+            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            ResultSet        results;
+            //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    int col=1;
+                    String id = results.getString(col++);
+                    String userId =     results.getString(col++);
+                    Entry entry = getEntryManager().getEntry(request, results.getString(col++));
+                    String name = results.getString(col++);
+                    String category = results.getString(col++);
+                    if(entry == null) {
+                        //TODO: delete it from the list of favorites
+                        continue;
+                    } 
+                    favorites.add(new FavoriteEntry(id,entry,name,category));
+                }
+            }
+            user.setFavorites(favorites);
+        }
+        return favorites;
+    }
+
+
+
     /**
      * _more_
      *
@@ -1470,6 +1502,18 @@ public class UserManager extends RepositoryManager {
                             entry.getId()), HtmlUtil.img(
                                 getRepository().fileUrl(ICON_ASSOCIATION),
                                 msg("Create an association"))));
+
+                if(!request.getUser().getAnonymous()) {
+                    sb.append(
+                              HtmlUtil.href(
+                                            request.url(
+                                                        getRepositoryBase().URL_USER_FAVORITE, 
+                                                        ARG_FAVORITE_ADD,"true",
+                                                        ARG_ENTRYID,
+                                                        entry.getId()), HtmlUtil.img(
+                                                                                     getRepository().fileUrl(ICON_ADD),
+                                                                                     msg("Add as a favorite"))));
+                }
             }
             sb.append(HtmlUtil.space(1));
             sb.append(getEntryManager().getAjaxLink(request, entry,
@@ -1540,7 +1584,7 @@ public class UserManager extends RepositoryManager {
             labels.add(msg("Logout"));
             tips.add(msg("Logout"));
             extras.add("");
-            urls.add(request.url(getRepositoryBase().URL_USER_SETTINGS));
+            urls.add(request.url(getRepositoryBase().URL_USER_HOME));
             labels.add(user.getLabel());
             tips.add(msg("Go to user settings"));
         }
@@ -1560,6 +1604,50 @@ public class UserManager extends RepositoryManager {
             links.add(link);
         }
         return StringUtil.join(separator, links);
+    }
+
+    public Result processFavorite(Request request) throws Exception {
+        String message = "";
+        User user  = request.getUser();
+        if(user.getAnonymous()) {
+            return new Result(msg("Favorites"), new StringBuffer(getRepository().error("Anonymous users cannCot have favorites")));
+        }
+        String entryId = request.getString(ARG_ENTRYID, BLANK);
+
+        if(request.get(ARG_FAVORITE_ADD,false)) {
+            Entry entry = getEntryManager().getEntry(request,entryId);
+            if(entry == null) {
+                return new Result(msg("Favorites"), new StringBuffer(getRepository().error("Cannot find or access entry")));
+            }
+
+            //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME
+            String name = "";
+            String category = "";
+            getDatabaseManager().executeInsert(Tables.FAVORITES.INSERT,
+                                           new Object[] {
+                                               getRepository().getGUID(),
+                                               user.getId(), 
+                                               entry.getId(),
+                                               name,category});
+            user.setFavorites(null);
+            message = msg("Favorite added");
+        } else if(request.get(ARG_FAVORITE_DELETE,false)) {
+            getDatabaseManager().delete(Tables.FAVORITES.NAME,
+                                        Clause.and(
+                                                   Clause.eq(Tables.FAVORITES.COL_ID,
+                                                             request.getString(ARG_FAVORITE_ID,"")),
+                                                   Clause.eq(Tables.FAVORITES.COL_USER_ID,
+                                                             user.getId())));
+            message = msg("Favorite deleted");
+            user.setFavorites(null);
+        } else {
+            message = msg("Unknown favorite command");
+        }
+
+        String redirect = getRepositoryBase().URL_USER_HOME.toString();
+        return new Result(HtmlUtil.url(redirect,
+                                       ARG_MESSAGE, message));
+
     }
 
 
@@ -1598,6 +1686,28 @@ public class UserManager extends RepositoryManager {
                                           XmlUtil.attr(ATTR_CODE, "ok"),
                                           user.getId()), MIME_XML);
         }
+
+
+        int cnt = 0;
+        for(FavoriteEntry favorite:  getFavorites(request, user)) {
+            if(cnt==0) {
+                sb.append(msgHeader("Favorites"));
+            }
+            cnt++;
+            //TODO: Use the categories
+            String removeLink =
+                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_FAVORITE,
+                                          ARG_FAVORITE_ID,
+                                          favorite.getId(),
+                                          ARG_FAVORITE_DELETE,"true"), 
+                              HtmlUtil.img(getRepository().fileUrl(ICON_DELETE),msg("Delete this favorite") ));
+            sb.append(removeLink);
+            sb.append(HtmlUtil.space(1));
+            sb.append(getEntryManager().getBreadCrumbs(request, favorite.getEntry()));
+            sb.append(HtmlUtil.br());
+        }
+
+
         return makeResult(request, "User Home", sb);
     }
 

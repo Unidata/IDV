@@ -77,7 +77,7 @@
       <api request="/user/list"     method="adminUserList"   admin="true"/>
       <api request="/user/edit"     method="adminUserEdit"   admin="true"/>
       <api request="/user/new"      method="adminUserNew"    admin="true"/>
-
+      <api request="/user/favorite"      method="processFavorite" />
   </group>
 
   <group handler="admin">

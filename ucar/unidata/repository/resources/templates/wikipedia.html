@@ -13,7 +13,7 @@ ramadda.template.userlink.separator=
 xramadda.template.userlink.wrapper =<span class="navlink"><a ${extra} href="${url}" title="${tooltip}">${label}</a></span>
 xramadda.template.userlink.separator=<span class="separator"> | </span>
 
-
+ramadda.template.favorites = <b>Favorites:</b><div class="favorites">${favorites}</div>
 
 ramadda.template.sublink.wrapper=${sublinks}
 ramadda.template.sublink.on=<span class="subnavoncomp">${label}</span>
@@ -59,6 +59,13 @@ ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${labe
    border: 1px #999999 solid; 
    margin-top: 0px;
    background-color:#ffffff;
+}
+
+.favorites {
+   border: 1px #999999 solid; 
+   margin-top: 0px;
+   background-color:#ffffff;
+   font-size:80%;
 }
 
 
@@ -195,7 +202,11 @@ a.header-leftcolumn  {
 <hr width=75%>
 ${userlink}
 </div>
-<p>
+<br>
+
+${favorites}
+
+
 
 </div>
 </td>

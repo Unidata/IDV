@@ -182,6 +182,9 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                  "/user/login");
 
 
+    public final RequestUrl URL_USER_FAVORITE = new RequestUrl(this,
+                                                 "/user/favorite");
+
     /** _more_ */
     public final RequestUrl URL_USER_ACTIVITY = new RequestUrl(this,
                                                  "/user/activity");

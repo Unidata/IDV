@@ -2365,6 +2365,14 @@ return new Result(title, sb);
                                  String linkText, String url,
                                  boolean includeIcon)
             throws Exception {
+        return getAjaxLink(request, entry, linkText, url, includeIcon, true);
+    }        
+
+
+    protected String getAjaxLink(Request request, Entry entry,
+                                 String linkText, String url,
+                                 boolean includeIcon, boolean normalGroupIcon)
+            throws Exception {
 
 
         StringBuffer sb      = new StringBuffer();
@@ -2381,7 +2389,7 @@ return new Result(title, sb);
             String       compId = "popup_" + HtmlUtil.blockCnt++;
             String linkId = "img_" + uid;
 
-            if(entry.isGroup()) {
+            if(entry.isGroup() && normalGroupIcon) {
                 event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                                                             HtmlUtil.squote(entryId) + ","
                                                             + HtmlUtil.squote(uid)));
@@ -2392,7 +2400,7 @@ return new Result(title, sb);
             }
 
             if (okToMove) {
-                event += (entry.isGroup()
+                event += (entry.isGroup()&&normalGroupIcon
                           ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
                           + HtmlUtil.squote(entryId) + ")")
                           : "") + HtmlUtil
@@ -2408,7 +2416,7 @@ return new Result(title, sb);
                         ? dropEvent
                         : "");
             }
-            String img = HtmlUtil.img(icon, (entry.isGroup()
+            String img = HtmlUtil.img(icon, (entry.isGroup()&&normalGroupIcon
                                              ? "Click to open group; "
                                              : "Click to view actions; ") + (okToMove
                     ? "Drag to move"
@@ -2418,7 +2426,7 @@ return new Result(title, sb);
 
 
             sb.append(img);
-            if(!entry.isGroup()) {
+            if(!entry.isGroup()||!normalGroupIcon) {
                 String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
                 sb.append(getRepository().makePopupDiv(links, compId, true));
             }
@@ -2440,7 +2448,7 @@ return new Result(title, sb);
                                     HtmlUtil.id("span_" + entry.getId()));
 
         if (includeIcon) {
-            link = link + HtmlUtil.br()
+            link = link  +"<br>" 
                    + HtmlUtil.div("",
                                   HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
                                       "display:none;visibility:hidden",

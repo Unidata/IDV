@@ -535,6 +535,11 @@ public interface Constants {
     public static final String ARG_SHOW_ASSOCIATIONS = "showassociations";
 
 
+    public static final String ARG_FAVORITE_ADD = "user.favorite.add";
+    public static final String ARG_FAVORITE_DELETE = "user.favorite.delete";
+    public static final String ARG_FAVORITE_ID = "user.favorite.id";
+
+
     /** _more_ */
     public static final String ARG_USER_ID = "user.id";
 

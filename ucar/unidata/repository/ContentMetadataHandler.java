@@ -223,7 +223,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                       request.url(
                                                   getRepository().getMetadataManager().URL_METADATA_VIEW,
                                                   ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                                                  metadata.getId(),ARG_THUMBNAIL,""+forLink), "thumbnail", extra);
+                                                  metadata.getId(),ARG_THUMBNAIL,""+forLink), msg("Click to enlarge"), extra);
 
             if(forLink) {
                 String bigimg= HtmlUtil.img(

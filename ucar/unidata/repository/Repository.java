@@ -119,6 +119,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final String MACRO_USERLINK = "userlink";
 
+    public static final String MACRO_FAVORITES = "favorites";
+
+
+
     /** _more_ */
     public static final String MACRO_REPOSITORY_NAME = "repository_name";
 
@@ -1989,6 +1993,34 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
+        List<FavoriteEntry> favoritesList =   getUserManager().getFavorites(request, request.getUser());
+        String favorites = "";
+        if(favoritesList.size()>0) {
+            String favoritesWrapper =
+                getTemplateProperty(request,"ramadda.template.favorites.wrapper", "${link}");
+            String favoritesTemplate =
+                getTemplateProperty(request,"ramadda.template.favorites", "<b>Favorites:<b><br>${favorites}");
+            String favoritesSeparator =
+                getTemplateProperty(request,"ramadda.template.favrorites.separator", "");
+            List favoriteLinks = new ArrayList();
+            for(FavoriteEntry favorite: favoritesList) {
+                Entry entry  =favorite.getEntry();
+                String baseUrl =  request.entryUrl(URL_ENTRY_SHOW,   entry);
+                String label = entry.getLabel();
+                if(label.length()>12) {
+                    label = label.substring(0,11)+"...";
+                }
+                label = "<nobr>" + label+"</nobr>";
+                String url =  getEntryManager().getAjaxLink(request, entry,label,baseUrl,true,false);
+                String  link = favoritesWrapper.replace("${link}",url);
+                favoriteLinks.add(link);
+            }
+            favorites = favoritesTemplate.replace("${favorites}",StringUtil.join(favoritesSeparator, favoriteLinks));
+        }
+
+
+
+
         String   content = new String(result.getContent());
         String   html    = template;
         String[] macros  = new String[] {
@@ -1999,6 +2031,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             getProperty(PROP_HTML_FOOTER, BLANK), MACRO_TITLE,
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
             MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
+            MACRO_FAVORITES, favorites,
             MACRO_ENTRY_HEADER,entryHeader,
             MACRO_ROOT, getUrlBase()
         };
