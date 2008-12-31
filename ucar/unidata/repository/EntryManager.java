@@ -578,6 +578,7 @@ return new Result(title, sb);
         } else {
             dataType = request.getString(ARG_DATATYPE_SELECT, "");
         }
+        System.err.println ("download " + download);
         synchronized (mutex) {
             if (entry == null) {
                 List<String> resources    = new ArrayList();
@@ -585,6 +586,7 @@ return new Result(title, sb);
                 String       resource     = request.getString(ARG_URL, BLANK);
                 String       filename     = request.getUploadedFile(ARG_FILE);
                 boolean      unzipArchive = false;
+
                 boolean      isFile       = false;
                 String       resourceName = request.getString(ARG_FILE,
                                                 BLANK);
@@ -633,8 +635,9 @@ return new Result(title, sb);
                     }
                     FileOutputStream toStream = new FileOutputStream(newFile);
                     try {
-                        if (IOUtil.writeTo(fromStream, toStream, actionId,
-                                           length) < 0) {
+                        int bytes = IOUtil.writeTo(fromStream, toStream, actionId, length);
+                        //System.err.println ("getting url " + resource +"\nread " + bytes);
+                        if (bytes < 0) {
                             return new Result(
                                 request.entryUrl(
                                     getRepository().URL_ENTRY_SHOW,

@@ -1058,9 +1058,9 @@ public class UserManager extends RepositoryManager {
         sb.append(request.form(getRepositoryBase().URL_USER_NEW));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("ID"),
-                                     HtmlUtil.input(ARG_USER_ID, id)));
+                                     HtmlUtil.input(ARG_USER_ID, id, HtmlUtil.SIZE_40)));
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                     HtmlUtil.input(ARG_USER_NAME, name)));
+                                     HtmlUtil.input(ARG_USER_NAME, name, HtmlUtil.SIZE_40)));
 
 
         sb.append(HtmlUtil.formEntry(msgLabel("Admin"),
@@ -1068,7 +1068,7 @@ public class UserManager extends RepositoryManager {
                                          "true", admin)));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Email"),
-                                     HtmlUtil.input(ARG_USER_EMAIL, email)));
+                                     HtmlUtil.input(ARG_USER_EMAIL, email, HtmlUtil.SIZE_40)));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Password"),
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));

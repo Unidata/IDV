@@ -408,6 +408,7 @@ public class RepositoryServlet extends HttpServlet {
                 throws IOException {
             String fieldName = item.getFieldName();
             String fileName  = item.getName();
+            if(fileName == null || fileName.trim().length()==0) return;
             try {
                 RepositoryUtil.checkFilePath(fileName);
             } catch (Exception e) {
