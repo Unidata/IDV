@@ -1663,6 +1663,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                     Object s      = dataChoice.getProperty(PROP_ANGLE);
                     int    sIndex = 0;
                     if (s == null) {
+                        if( anglesMap.get(vn) == null) return null;
                         sIndex = getAngleIdx((double[]) anglesMap.get(vn),
                                              value);
                     } else {
