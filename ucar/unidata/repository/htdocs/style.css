@@ -555,7 +555,7 @@ ul {
 }
 
 
-.menu a:hover {
+.popup a:hover {
    text-decoration: underline;
 }
 
@@ -568,7 +568,7 @@ a.menulink {
    color:black;
 }
 
-.menu {
+.popup {
    padding:1px;
    text-decoration: none;
    border : 1px black solid;
@@ -579,6 +579,12 @@ a.menulink {
    z-index: 1;
 }
 
+
+code.menu {
+         font-size: 12pt;
+         font-family: SansSerif, Arial, Helvetica, sans-serif;       
+         font-weight: bold;
+}
 
 .floatdiv {
    position: absolute; 

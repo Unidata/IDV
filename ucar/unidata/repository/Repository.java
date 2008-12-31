@@ -4003,7 +4003,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         menu.append(HtmlUtil.div(contents,
                                  HtmlUtil.id(compId)
-                                 + HtmlUtil.cssClass("menu")));
+                                 + HtmlUtil.cssClass("popup")));
         return menu.toString();
     }
 
