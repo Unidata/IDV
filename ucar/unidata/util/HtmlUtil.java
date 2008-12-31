@@ -106,6 +106,12 @@ public class HtmlUtil {
     /** _more_          */
     public static final String TAG_HR = "hr";
 
+    public static final String TAG_H1 = "h1";
+
+    public static final String TAG_H2 = "h2";
+
+    public static final String TAG_H3 = "h3";
+
     /** _more_          */
     public static final String TAG_IMG = "img";
 
