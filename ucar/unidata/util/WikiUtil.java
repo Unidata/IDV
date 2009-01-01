@@ -427,11 +427,29 @@ public class WikiUtil {
         /*
           <block title="foo">xxxxx</block>
          */
-        //        while(true) {
-        //            int idx1 = s.indexOf("<block");
-        //            if(idx1<0) break;
-        //            String first  = s.substring(0, idx1);
-        //        }
+        sb = new StringBuffer();
+        while(true) {
+            int idx1 = s.indexOf("<block");
+            if(idx1<0) break;
+            int idx2 = s.indexOf(">",idx1);
+            if(idx2<0) break;
+            int idx3 = s.indexOf("</block>",idx2);
+            if(idx3<0) break;
+            String first  = s.substring(0, idx1);
+            String attrs  = s.substring(idx1+6,idx2);
+            String inner  = s.substring(idx2+1,idx3);
+            Hashtable props= StringUtil.parseHtmlProperties(attrs);
+            
+            boolean open = Misc.getProperty(props,"open",true);
+            String title = Misc.getProperty(props,"title","");
+            sb.append(first);
+            sb.append(HtmlUtil.makeShowHideBlock(title,inner,open,HtmlUtil.cssClass("wiki-blockheader"),
+                                                 HtmlUtil.cssClass("wiki-block")));
+            s  = s.substring(idx3+"</block>".length());
+        }
+        sb.append(s);
+        s = sb.toString();
+
 
         s = s.replace("_BRACKETOPEN_", "[");
         s = s.replace("_BRACKETCLOSE_", "]");
@@ -515,7 +533,7 @@ public class WikiUtil {
         try {
             String contents = IOUtil.readContents(new java.io.File(args[0]));
             contents = new WikiUtil().wikify(contents, null);
-            System.out.println(contents);
+            System.out.println("\ncontents:" +contents);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
