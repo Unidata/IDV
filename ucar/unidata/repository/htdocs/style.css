@@ -60,6 +60,9 @@ a.header  {
   color: white;
 }
 
+.smalllink {
+  font-size:80%;
+}
 .smallhelp {
    font-size: 9pt;
 }
@@ -804,6 +807,18 @@ form {
 }
 
 .wiki-tocheader {
+   font-weight: bold;
+}
+
+.wiki-block {
+   margin-top:5px;
+   border : 1px #aaaaaa solid;
+   background-color:#f8f8f8;
+   padding-left:5;
+   padding-bottom:5;
+}
+
+.wiki-blockheader {
    font-weight: bold;
 }
 

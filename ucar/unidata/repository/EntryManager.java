@@ -431,7 +431,7 @@ return new Result(title, sb);
 
             String submitButton = HtmlUtil.submit(title = ((entry == null)
                     ? "Add " + typeHandler.getLabel()
-                    : "Edit " + typeHandler.getLabel()));
+                    : msg("Save")));
 
             String deleteButton = (((entry != null) && entry.isTopGroup())
                                    ? ""
@@ -528,7 +528,7 @@ return new Result(title, sb);
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(
-                    request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
+                    request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
             }
 
 

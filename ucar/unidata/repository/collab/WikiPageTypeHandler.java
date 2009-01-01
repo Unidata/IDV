@@ -218,7 +218,6 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             }
             for(Association newAssociation: (List<Association>)new ArrayList(newAssociations)) {
                 if(!associations.contains(newAssociation)) {
-                    System.err.println("add:" + newAssociation);
                     getEntryManager().addAssociation(request, newAssociation);
                 }
             }

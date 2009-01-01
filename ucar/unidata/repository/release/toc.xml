@@ -1,0 +1,37 @@
+<!DOCTYPE toc SYSTEM "/content/downloads/toc.dtd">
+<toc title="RAMADDA Downloads">
+  <property name="%version%" value="0.1a" />
+
+  <description>
+<![CDATA[
+RAMADDA Version %version%<P>
+RAMADDA (<b>R</b>epository for <b>A</b>rchiving, <b>M</b>anaging and <b>A</b>ccessing <b>D</b>iverse <b>DA</b>ta)  is a content management system and publishing platform for Earth Science Data.
+<br>
+<b>Note: These releases are very much alpha and are intended to be used for evaluation purposes. The APIs and the underlying data model may change in the future.
+]]>
+</description>
+
+    <category title="RAMADDA Downloads">
+    <file url="ftp/repository.war" name="RAMADDA WAR file">
+        <description>
+	The WAR file for running under Tomcat or other servlet container
+        </description>
+    </file>
+
+    <file url="ftp/repository.tar" name="RAMADDA TAR file">
+        <description>
+	This file allows you to run RAMADDA as a stand-alone server
+	and to run the command line publishing clients.
+        </description>
+    </file>
+
+
+    <file url="ftp/repository_src.jar" name="Repository Source Release">
+        <description>
+	Contains the source code for RAMADDA. See README in ucar/unidata/repository.
+        </description>
+    </file>
+    </category>
+
+
+</toc>

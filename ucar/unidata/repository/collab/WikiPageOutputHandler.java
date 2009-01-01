@@ -140,6 +140,10 @@ public class WikiPageOutputHandler extends OutputHandler {
             return outputWikiHistory(request, entry);
         }
 
+
+
+
+
         String wikiText = "";
         String header   = "";
         if (request.defined(ARG_WIKI_VERSION)) {
@@ -162,11 +166,27 @@ public class WikiPageOutputHandler extends OutputHandler {
                 wikiText = (String) values[0];
             }
         }
+
+        if(request.get(ARG_WIKI_RAW,false)) {
+            StringBuffer sb =new StringBuffer();
+            sb.append(HtmlUtil.form(""));
+            sb.append(HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 250,
+                                        60, HtmlUtil.id(ARG_WIKI_TEXT)));
+            sb.append(HtmlUtil.formClose());
+            return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
+        }
+
+
+
         String detailsView = HtmlUtil.href(request.entryUrl(
                                                             getRepository().URL_ENTRY_SHOW, entry,
                                                             ARG_WIKI_DETAILS,""+true),msg("Details"));
 
-        header = HtmlUtil.leftRight(header,detailsView);
+        String rawLink = HtmlUtil.href(request.entryUrl(
+                                                        getRepository().URL_ENTRY_SHOW, entry,
+                                                        ARG_WIKI_RAW,""+true),msg("Text"));
+
+        header = HtmlUtil.leftRight(header,HtmlUtil.div(detailsView+" " + rawLink,HtmlUtil.cssClass("smalllink")));
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
             OutputHandler.PROP_REQUEST,
                                 request, OutputHandler.PROP_ENTRY, entry }));

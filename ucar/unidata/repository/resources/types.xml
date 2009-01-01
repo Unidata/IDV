@@ -38,12 +38,14 @@
 
 
 
+<!--
   <type name="blogpost"  description="Blog Post">
      <property name="form.rows.desc" value="10"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.resource" value="false"/>
 </type>
+-->
 
 
 
@@ -56,16 +58,13 @@
   </type>
 
 
+<!--
   <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" group="Level 3 Things" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 
                 properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>
 	<column name="product" type="string" group="Level 3 Things"  isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
                 properties="/ucar/unidata/repository/resources/level3radar.product.properties"/>
   </type>
-
-
-
-
 
 
   <type name="model"  description="Model" datatype="model" >
@@ -98,7 +97,7 @@
   <type name="image"  description="Image File" datatype="image"/>
 
 
-<!--
+
 
   <type name="testit" description="Test it">
 	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" isindex="true" cansearch="true" canlist="true" />
