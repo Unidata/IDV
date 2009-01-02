@@ -257,8 +257,11 @@ public class XmlTree extends JTree {
             if (value instanceof XmlTreeNode) {
                 XmlTreeNode treeNode = (XmlTreeNode) value;
                 if (treeNode.getXmlNode() != null) {
-                    ImageIcon icon = xmlTree.getIcon(treeNode.getXmlNode(),
+                    ImageIcon icon = getIconForNode(treeNode.getXmlNode());
+                    if(icon == null) {
+                        icon = xmlTree.getIcon(treeNode.getXmlNode(),
                                          leaf);
+                    }
                     if (icon != null) {
                         setIcon(icon);
                     }
@@ -267,6 +270,11 @@ public class XmlTree extends JTree {
             return this;
         }
     }
+
+    public ImageIcon getIconForNode(Element node) {
+        return null;
+    }
+
 
     /**
      * Get the tooltip at the mouse
