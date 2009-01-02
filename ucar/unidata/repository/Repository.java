@@ -1942,6 +1942,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+
+
+
     /**
      * _more_
      *
@@ -1955,6 +1958,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             throws Exception {
         String   template = null;
         Metadata metadata = null;
+        String sessionMessage = getUserManager().getSessionMessage(request);
+
+
         /*
 //            getMetadataManager().findMetadata((request.getCollectionEntry()
 //                != null)
@@ -2038,6 +2044,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         String   content = new String(result.getContent());
+        if(sessionMessage!=null) {
+            content = note(sessionMessage) + content;
+        }
+
+
         String   html    = template;
         String[] macros  = new String[] {
             MACRO_HEADER_IMAGE, fileUrl(ICON_HEADER), MACRO_HEADER_TITLE,

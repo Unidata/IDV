@@ -347,6 +347,37 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    private Hashtable sessionMessages;
+    //    String sessionMessage;
+
+
+    public String getSessionMessage(Request request) {
+        String sessionMessage = null;
+        Object id  = request.getSessionId();
+        if(id !=null && sessionMessages!=null) {
+            synchronized(sessionMessages) {
+                sessionMessage = (String) sessionMessages.get(id);
+                if(sessionMessage!=null) {
+                    sessionMessages.remove(id);
+                }
+            }
+        }
+        return sessionMessage;
+    }
+
+    public void setSessionMessage(String message) {
+        sessionMessages = new Hashtable();
+        if(message!=null && message.trim().length()>0) {
+        synchronized(sessionMessages) {
+            for(Session session: getSessions()) {
+                sessionMessages.put(session.id, message);
+            }
+        }
+        }
+    }
+
+
+
     /**
      * _more_
      *
@@ -1179,6 +1210,12 @@ public class UserManager extends RepositoryManager {
 
 
 
+
+
+
+
+
+
     /**
      * _more_
      *
@@ -1292,24 +1329,6 @@ public class UserManager extends RepositoryManager {
         tabTitles.add(msg("Recent User Activity"));
         tabContent.add(getUserActivities(request, null));
 
-        StringBuffer logSB = new StringBuffer();
-        logSB.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
-        logSB.append(HtmlUtil.row(HtmlUtil.cols(
-                                                HtmlUtil.b(msg("User")),
-                                                HtmlUtil.b(msg("Date")),
-                                                HtmlUtil.b(msg("Path")))));
-        List<Repository.LogEntry> log = getRepository().getLog();
-        for(int i=log.size()-1;i>=0;i--) {
-            Repository.LogEntry logEntry = log.get(i);
-            logSB.append(HtmlUtil.row(HtmlUtil.cols(
-                                                    logEntry.getUser().getLabel(),
-                                                    getRepository().formatDate(logEntry.getDate()),
-                                                    logEntry.getPath())));
-            
-        }
-        logSB.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
-        tabTitles.add(msg("Log"));
-        tabContent.add(logSB.toString());
 
 
         sb.append(HtmlUtil.p());

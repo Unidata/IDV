@@ -81,7 +81,9 @@
   </group>
 
   <group handler="admin">
+      <api request="/admin/usermessage"     method="adminUserMessage"      admin="true"/>
       <api request="/admin/sql"          method="adminSql"           admin="true"/>
+      <api request="/admin/log"          method="adminLog"           admin="true"/>
       <api request="/admin/startstop"    method="adminDbStartStop"   admin="true"/>
       <api request="/admin/settings"     method="adminSettings"      admin="true" name="Admin" toplevel="true"/>
       <api request="/admin/settings/do"  method="adminSettingsDo"    admin="true"/>

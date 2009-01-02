@@ -81,6 +81,9 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_SQL = new RequestUrl(this, "/admin/sql",
                                           "SQL");
 
+    public RequestUrl URL_ADMIN_USERMESSAGE = new RequestUrl(this, "/admin/usermessage",
+                                                            "User Message");
+
     /** _more_ */
     public RequestUrl URL_ADMIN_IMPORT_CATALOG = new RequestUrl(this,
                                                      "/admin/import/catalog",
@@ -126,13 +129,20 @@ public class Admin extends RepositoryManager {
 
 
     /** _more_ */
+    public RequestUrl URL_ADMIN_LOG = new RequestUrl(this,
+                                             "/admin/log", "Log");
+
+
+    /** _more_ */
     protected RequestUrl[] adminUrls = {
         URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
         URL_ADMIN_STATS, URL_ADMIN_ACCESS,
         getHarvesterManager().URL_HARVESTERS_LIST,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
-        URL_ADMIN_SQL, URL_ADMIN_CLEANUP
+        URL_ADMIN_LOG,
+        URL_ADMIN_SQL, URL_ADMIN_CLEANUP,
+        URL_ADMIN_USERMESSAGE
     };
 
 
@@ -182,6 +192,58 @@ public class Admin extends RepositoryManager {
     private void didIt(String what) throws Exception {
         getRepository().writeGlobal(what, "true");
     }
+
+
+    public Result adminUserMessage(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if(request.exists(ARG_MESSAGE)) {
+            getUserManager().setSessionMessage(request.getString(ARG_MESSAGE,""));
+            sb.append(msg("Message set"));
+        } else {
+            sb.append(msgHeader("Enter a message to show one time to all users"));
+            sb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.formEntry(msgLabel("Message"),
+                                         HtmlUtil.textArea(ARG_MESSAGE,"",5,60)));
+            sb.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.submit(msg("Set user message")));
+            sb.append("</form>");
+
+        }
+        Result result = new Result(msg("Alert Message"), sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getRepository().getSubNavLinks(request,
+                                                          getAdmin().adminUrls));
+        return result;
+    }
+
+    public Result adminLog(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.row(HtmlUtil.cols(
+                                                HtmlUtil.b(msg("User")),
+                                                HtmlUtil.b(msg("Date")),
+                                                HtmlUtil.b(msg("Path")))));
+        List<Repository.LogEntry> log = getRepository().getLog();
+        for(int i=log.size()-1;i>=0;i--) {
+            Repository.LogEntry logEntry = log.get(i);
+            //Encode the path just in case the user does a XSS attack
+            sb.append(HtmlUtil.row(HtmlUtil.cols(
+                                                    logEntry.getUser().getLabel(),
+                                                    getRepository().formatDate(logEntry.getDate()),
+                                                    HtmlUtil.entityEncode(logEntry.getPath()))));
+            
+        }
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+
+        Result result = new Result(msg("Log"), sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getRepository().getSubNavLinks(request,
+                                                          getAdmin().adminUrls));
+        return result;
+    }
+
+
 
 
     /**
