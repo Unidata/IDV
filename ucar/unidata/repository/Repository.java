@@ -180,6 +180,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        OutputType.TYPE_ACTION,"",ICON_DELETE);
 
 
+
     /** _more_ */
     private List<EntryListener> entryListeners =
         new ArrayList<EntryListener>();
@@ -335,6 +336,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<File> localFilePaths = new ArrayList<File>();
 
+
+    private List<LogEntry> log=new ArrayList<LogEntry>();
 
 
     /**
@@ -1777,6 +1780,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return null;
         }
 
+        //Keep the size of the log at 200
+        synchronized(log) {
+            while(log.size()>200) {
+                log.remove(0);
+            }
+            log.add(new LogEntry(request.getUser(),request.getRequestPath()));
+        }
+
         if ((result.getInputStream() == null) && cachingOk
                 && apiMethod.getCanCache()) {
             pageCache.put(request, result);
@@ -1790,6 +1801,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return result;
     }
 
+    public List<LogEntry> getLog() {
+        synchronized(log) {
+            return new ArrayList<LogEntry>(log);
+        }
+    }
 
 
     /**
@@ -4065,6 +4081,76 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return fb.toString();
     }
 
+
+    public static class LogEntry {
+        User user;
+        Date date;
+        String path;
+        public LogEntry(User user, String path) {
+            this.date = new Date();
+            this.path = path;
+            this.user = user;
+        }
+
+        /**
+Set the User property.
+
+@param value The new value for User
+**/
+public void setUser (User value) {
+	user = value;
+}
+
+/**
+Get the User property.
+
+@return The User
+**/
+public User getUser () {
+	return user;
+}
+
+/**
+Set the Date property.
+
+@param value The new value for Date
+**/
+public void setDate (Date value) {
+	date = value;
+}
+
+/**
+Get the Date property.
+
+@return The Date
+**/
+public Date getDate () {
+	return date;
+}
+
+/**
+Set the Path property.
+
+@param value The new value for Path
+**/
+public void setPath (String value) {
+	path = value;
+}
+
+/**
+Get the Path property.
+
+@return The Path
+**/
+public String getPath () {
+	return path;
+}
+
+
+
+
+
+    }
 
 
 

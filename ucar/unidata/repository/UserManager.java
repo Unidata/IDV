@@ -1289,8 +1289,28 @@ public class UserManager extends RepositoryManager {
         tabContent.add(getSessionList(request).toString());
 
 
-        tabTitles.add(msg("Recent Activity"));
+        tabTitles.add(msg("Recent User Activity"));
         tabContent.add(getUserActivities(request, null));
+
+        StringBuffer logSB = new StringBuffer();
+        logSB.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        logSB.append(HtmlUtil.row(HtmlUtil.cols(
+                                                HtmlUtil.b(msg("User")),
+                                                HtmlUtil.b(msg("Date")),
+                                                HtmlUtil.b(msg("Path")))));
+        List<Repository.LogEntry> log = getRepository().getLog();
+        for(int i=log.size()-1;i>=0;i--) {
+            Repository.LogEntry logEntry = log.get(i);
+            logSB.append(HtmlUtil.row(HtmlUtil.cols(
+                                                    logEntry.getUser().getLabel(),
+                                                    getRepository().formatDate(logEntry.getDate()),
+                                                    logEntry.getPath())));
+            
+        }
+        logSB.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        tabTitles.add(msg("Log"));
+        tabContent.add(logSB.toString());
+
 
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.makeTabs(tabTitles, tabContent, true));
