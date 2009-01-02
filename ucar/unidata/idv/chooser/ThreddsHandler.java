@@ -211,17 +211,20 @@ public class ThreddsHandler extends XmlHandler {
             }
             Element child = (Element) tmp;
             if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
-                if (docNodes == null) {
-                    docNodes = new ArrayList();
-                }
-                docNodes.add(child);
                 node.removeChild(child);
+                if(XmlUtil.getAttribute(child,"xlink:title","").indexOf("Imported from")<0) {
+                    if (docNodes == null) {
+                        docNodes = new ArrayList();
+                    }
+                    docNodes.add(child);
+                }
+
             } else {
                 shuffleDocNodes(child, doc);
             }
         }
 
-        if (docNodes != null) {
+        if (docNodes != null&& docNodes.size()>0) {
             if (docNodes.size() == 1) {
                 node.appendChild((Element) docNodes.get(0));
             } else {
@@ -265,7 +268,21 @@ public class ThreddsHandler extends XmlHandler {
 
         tree = new XmlTree(root, true, path) {
 
-            protected Document readXlinkXml(String href) throws Exception {
+                public ImageIcon getIconForNode(Element node) {
+                    List propertyNodes = XmlUtil.findChildren(node,
+                                                              CatalogUtil.TAG_PROPERTY);
+                    for (Element propertyNode : (List<Element>) propertyNodes) {
+                        String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
+                        if(name.equals("thumbnail")) {
+                            String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
+                            return GuiUtils.getImageIcon(value);
+                        }
+                    }            
+                    return super.getIconForNode(node);
+                }
+
+
+                protected Document readXlinkXml(String href) throws Exception {
                 //If it is a thredds catalog then keep it in place.
                 Document doc = XmlUtil.getDocument(href, getClass());
                 if (doc == null) {
@@ -315,6 +332,21 @@ public class ThreddsHandler extends XmlHandler {
                         if (paths.size() > 0) {
                             XmlChooser.PropertiedAction pa =
                                 (XmlChooser.PropertiedAction) paths.get(0);
+
+                            String thumbnail = null;
+                            List propertyNodes = XmlUtil.findChildren(n,
+                                                                      CatalogUtil.TAG_PROPERTY);
+                            for (Element propertyNode : (List<Element>) propertyNodes) {
+                                String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
+                                if(name.equals("thumbnail")) {
+                                    String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
+                                    thumbnail = "<img src=\"" + value +"\">";
+                                    break;
+                                }
+                            }
+                            if(thumbnail!=null) {
+                                return "<html>"  + "Url: " + pa.action +"<br>" + thumbnail +"</html>";
+                            }
                             return "Url: " + pa.action;
                         }
                     }
@@ -385,14 +417,14 @@ public class ThreddsHandler extends XmlHandler {
             TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         tree.addXlinkTag(CatalogUtil.TAG_CATALOGREF);
         if (version == CatalogUtil.THREDDS_VERSION_0_4) {
-            tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOG,
+            tree.addTagsToProcess(Misc.newList(new Object[]{CatalogUtil.TAG_CATALOG,
                     CatalogUtil.TAG_CATALOGREF, CatalogUtil.TAG_COLLECTION,
-                    CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION));
+                                                            CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION}));
         } else {
-            tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOGREF,
+            tree.addTagsToProcess(Misc.newList(new Object[]{CatalogUtil.TAG_CATALOGREF,
                     CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET,
                     CatalogUtil.TAG_DOCUMENTATION,
-                    CatalogUtil.TAG_DOCPARENT));
+                    CatalogUtil.TAG_DOCPARENT}));
             tree.addTagsToNotProcessButRecurse(
                 Misc.newList(CatalogUtil.TAG_CATALOG));
         }
@@ -412,6 +444,7 @@ public class ThreddsHandler extends XmlHandler {
                 tree.getScroller()), 5);
         return ui;
     }
+
 
 
 
