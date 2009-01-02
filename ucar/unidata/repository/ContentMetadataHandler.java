@@ -93,6 +93,25 @@ public class ContentMetadataHandler extends MetadataHandler {
     }
 
 
+    public void addMetadataToCatalog(Request request, Entry entry,
+                                     Metadata metadata, Document doc,
+                                     Element datasetNode)
+            throws Exception {
+        Metadata.Type type = getType(metadata.getType());
+        if (type.equals(TYPE_THUMBNAIL)) {
+            XmlUtil.create(doc, ThreddsMetadataHandler.getTag(ThreddsMetadataHandler.TYPE_PROPERTY), datasetNode,
+                           new String[] { ThreddsMetadataHandler.ATTR_NAME,
+                                          "thumbnail", ThreddsMetadataHandler.ATTR_VALUE,
+                                          getRepository().absoluteUrl(request.url(
+                                                      getRepository().getMetadataManager().URL_METADATA_VIEW,
+                                                      ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
+                                                      metadata.getId(),ARG_THUMBNAIL,"true"))
+                                           });
+        }
+    }
+
+
+
     /**
      * _more_
      *

@@ -510,7 +510,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    private String getTag(Metadata.Type type) {
+    public static  String getTag(Metadata.Type type) {
         int idx = type.getType().indexOf(".");
         if (idx < 0) {
             return type.getType();
