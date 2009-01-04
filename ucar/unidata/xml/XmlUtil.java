@@ -1529,7 +1529,14 @@ public abstract class XmlUtil {
      * @return _more_
      */
     public static CDATASection makeCDataNode(Document doc, String text) {
-        return doc.createCDATASection(XmlUtil.encodeBase64(text.getBytes()));
+        return makeCDataNode(doc,text,true);
+    }
+
+    public static CDATASection makeCDataNode(Document doc, String text, boolean andEncode) {
+        if(andEncode) 
+            return doc.createCDATASection(XmlUtil.encodeBase64(text.getBytes()));
+        else
+            return doc.createCDATASection(text);
     }
 
 
