@@ -917,6 +917,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_FILE = "file";
+    public static final String ATTR_LOCALFILE = "localfile";
+    public static final String ATTR_LOCALFILETOMOVE = "localfiletomove";
 
     /** _more_ */
     public static final String ATTR_CANDONEW = "candonew";

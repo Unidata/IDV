@@ -1836,6 +1836,8 @@ return new Result(title, sb);
             if (node.getTagName().equals(TAG_ENTRY)) {
                 Entry entry = processEntryXml(request, node, entries,
                                   origFileToStorage, true,false);
+                //                System.err.println("entry:" + entry.getFullName() + " " + entry.getId());
+
                 XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
                                new String[] { ATTR_ID,
                         entry.getId() });
@@ -1906,6 +1908,7 @@ return new Result(title, sb);
         if (description == null) {
             description = "";
         }
+
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
             String tmp = (String) files.get(file);
@@ -1914,6 +1917,8 @@ return new Result(title, sb);
             file = newFile;
         }
         String url   = XmlUtil.getAttribute(node, ATTR_URL, (String) null);
+        String localFile   = XmlUtil.getAttribute(node, ATTR_LOCALFILE, (String) null);
+        String localFileToMove   = XmlUtil.getAttribute(node, ATTR_LOCALFILETOMOVE, (String) null);
         String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
         String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
                               getTopGroup().getId());
@@ -1943,9 +1948,17 @@ return new Result(title, sb);
                        : getRepository().getGUID());
 
         Resource resource;
-
         if (file != null) {
             resource = new Resource(file, Resource.TYPE_STOREDFILE);
+        } else if (localFile != null) {
+            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("Only administrators can upload a local file");
+            resource = new Resource(localFile, Resource.TYPE_LOCAL_FILE);
+        } else if (localFileToMove != null) {
+            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("Only administrators can upload a local file");
+            localFileToMove = 
+                getStorageManager().moveToStorage(request,
+                                                  new File(localFileToMove)).toString();
+            resource = new Resource(localFileToMove, Resource.TYPE_STOREDFILE);
         } else if (url != null) {
             resource = new Resource(url, Resource.TYPE_URL);
         } else {

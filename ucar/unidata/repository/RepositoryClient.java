@@ -40,7 +40,15 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+
+import java.net.URL;
+
 import java.util.ArrayList;
+import java.util.zip.*;
 
 import java.util.List;
 
@@ -75,6 +83,16 @@ public class RepositoryClient extends RepositoryBase {
      * _more_
      */
     public RepositoryClient() {}
+
+    public RepositoryClient(URL serverUrl, String user, String password)
+            throws Exception {
+        setPort(serverUrl.getPort());
+        setHostname(serverUrl.getHost());
+        setUrlBase(serverUrl.getPath());
+        this.user     = user;
+        this.password = password;
+    }
+
 
     /**
      * _more_
@@ -127,6 +145,145 @@ public class RepositoryClient extends RepositoryBase {
         return HttpFormEntry.doPost(entries, url.getFullUrl());
     }
 
+    public static void usage(String msg) {
+        System.err.println (msg);
+        System.err.println(
+                           "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
+    }
+
+
+    private void processCommandLine(String[]args) throws Exception {
+        String xmlFile = null;
+        List<File> files = new ArrayList<File>();
+        Element root = null;            
+        Element entryNode = null;
+        Document doc = null;
+        boolean haveParent = false;
+        for( int i = 3; i<args.length;i++) {
+            String arg = args[i];
+            if(arg.equals("-name")) {
+                if(i ==args.length) usage("Bad -name argument");
+                i++;
+                if(root == null) {
+                    doc = XmlUtil.makeDocument();
+                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                          new String[] {});
+                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                               new String[] {});
+                        
+                }
+                entryNode.setAttribute(ATTR_NAME,args[i]);
+            } else if(arg.equals("-description")) {
+                if(i ==args.length) usage("Bad -description argument");
+                if(root == null) usage("Must specify -name first");
+                i++;
+                Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION, entryNode);
+                descNode.appendChild(XmlUtil.makeCDataNode(doc,args[i],false));
+            } else if(arg.equals("-parent")) {
+                if(i ==args.length) usage("Bad -parent argument");
+                if(root == null) usage("Must specify -name first");
+                i++;
+                entryNode.setAttribute(ATTR_PARENT,args[i]);
+                haveParent = true;
+            } else if(arg.equals("-localfile")) {
+                if(i ==args.length) usage("Bad -localfile argument");
+                i++;
+                File f = new File(args[i]);
+                //                if(!f.exists()) usage("Bad file:" + args[i]);
+                if(root == null) {
+                    doc = XmlUtil.makeDocument();
+                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                          new String[] {});
+                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                               new String[] {});
+                    entryNode.setAttribute(ATTR_NAME, IOUtil.getFileTail(args[i]));
+                }
+                entryNode.setAttribute(ATTR_LOCALFILE,f.getPath());
+            } else if(arg.equals("-localfiletomove")) {
+                if(i ==args.length) usage("Bad -localfiletomove argument");
+                i++;
+                File f = new File(args[i]);
+                //                if(!f.exists()) usage("Bad file:" + args[i]);
+                if(root == null) {
+                    doc = XmlUtil.makeDocument();
+                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                          new String[] {});
+                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                               new String[] {});
+                    entryNode.setAttribute(ATTR_NAME, IOUtil.getFileTail(args[i]));
+                }
+                entryNode.setAttribute(ATTR_LOCALFILETOMOVE,f.getPath());
+            } else if(arg.equals("-file")) {
+                if(i ==args.length) usage("Bad -file argument");
+                i++; 
+                File f = new File(args[i]);
+                if(!f.exists()) {
+                    usage("File does not exist:" + args[i]);
+                }
+                if(root == null) {
+                    doc = XmlUtil.makeDocument();
+                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                          new String[] {});
+                    entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                               new String[] {});
+                    entryNode.setAttribute(ATTR_NAME, IOUtil.getFileTail(args[i]));
+                }
+                entryNode.setAttribute(ATTR_FILE, IOUtil.getFileTail(args[i]));
+                files.add(f);
+            } else {
+                if(!new File(args[i]).exists()) usage("Unknown argument:" + args[i]);
+                files.add(new File(args[i]));
+            }
+        }
+
+        if(files.size()==0 && root == null) {
+            usage("");
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream       zos = new ZipOutputStream(bos);
+
+        //Write the xml if we have it
+        if(root!=null) {
+            if(!haveParent)usage("Must specify a parent group destination with -parent");
+            String xml = XmlUtil.toString(root);
+            zos.putNextEntry(new ZipEntry("entries.xml"));
+            byte[] bytes = xml.getBytes();
+            zos.write(bytes, 0, bytes.length);
+            zos.closeEntry();
+    
+        }
+        //Now write the files
+        for(File f: files) {
+            zos.putNextEntry(new ZipEntry(IOUtil.getFileTail(f.toString())));
+            byte[] bytes =
+                IOUtil.readBytes(new FileInputStream(f));
+            zos.write(bytes, 0, bytes.length);
+            zos.closeEntry();
+        }
+        zos.close();
+        bos.close();
+
+        List<HttpFormEntry> postEntries = new ArrayList<HttpFormEntry>();
+        addUrlArgs(postEntries);
+        postEntries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
+                                          bos.toByteArray()));
+        String[] result =doPost(URL_ENTRY_XMLCREATE,  postEntries);
+        if (result[0] != null) {
+            System.err.println ("Error:" + result[0]);
+            return;
+        }
+
+        System.err.println ("result:" + result[1]);
+        Element response = XmlUtil.getRoot(result[1]);
+
+        String body = XmlUtil.getChildText(response).trim();
+        if (responseOk(response)) {
+            System.err.println ("OK:" + body);
+        } else {
+            System.err.println ("Error:" + body);
+        }
+    }
 
     /**
      * _more_
@@ -135,20 +292,18 @@ public class RepositoryClient extends RepositoryBase {
      */
     public static void main(String[] args) {
 
-        if (args.length != 3) {
-            System.err.println(
-                "Usage: RepositoryClient <server> <user id> <password>");
-            return;
+        if (args.length < 3) {
+            usage("Incorrect number of arguments");
         }
         try {
-            RepositoryClient client = new RepositoryClient(args[0], 80,
-                                          "/repository", args[1], args[2]);
+            RepositoryClient client = new RepositoryClient(new URL(args[0]),  args[1], args[2]);
             String[] msg = { "" };
-            if (client.isValidSession(true, msg)) {
-                System.err.println("Valid session");
-            } else {
-                System.err.println("Invalid session:" + msg[0]);
+            if (!client.isValidSession(true, msg)) {
+                System.err.println("Error: invalid session:" + msg[0]);
+                return;
             }
+        
+            client.processCommandLine(args);
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
             exc.printStackTrace();
@@ -352,7 +507,7 @@ public class RepositoryClient extends RepositoryBase {
                 return false;
             }
         } catch (Exception exc) {
-            msg[0] = "Could not connect to server:" + getHostname();
+            msg[0] = "Could not connect to server:" + getHostname()+"\n" + exc;
             return false;
         }
     }
@@ -380,12 +535,17 @@ public class RepositoryClient extends RepositoryBase {
      */
     public boolean doLogin(String[] msg) {
         try {
-            String url = HtmlUtil.url(URL_USER_LOGIN.getFullUrl(),
-                                      new String[] {
-                ARG_OUTPUT, "xml", ARG_USER_PASSWORD, getPassword(),
-                ARG_USER_ID, getUser()
-            });
-            String  contents = IOUtil.readContents(url, getClass());
+            List   entries = Misc.toList(new Object[]{
+                HttpFormEntry.hidden(ARG_OUTPUT, "xml"),
+                HttpFormEntry.hidden(ARG_USER_PASSWORD, getPassword()),
+                HttpFormEntry.hidden(ARG_USER_ID, getUser())});
+            String[] result = doPost(URL_USER_LOGIN,entries);
+            if (result[0] != null) {
+                msg[0] = "Error logging in:" + result[0];
+                return false;
+            }
+            String  contents = result[1];
+            //            System.err.println(contents);
             Element root     = XmlUtil.getRoot(contents);
             String  body     = XmlUtil.getChildText(root).trim();
             if (responseOk(root)) {
@@ -396,7 +556,7 @@ public class RepositoryClient extends RepositoryBase {
                 return false;
             }
         } catch (Exception exc) {
-            msg[0] = "Could not connect to server:" + getHostname();
+            msg[0] = "Could not connect to server:" + getHostname()+"\n" + exc;
         }
         return false;
     }

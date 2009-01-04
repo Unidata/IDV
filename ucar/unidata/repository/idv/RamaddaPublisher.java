@@ -658,7 +658,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 if (repositoryClient.responseOk(response)) {
                     if (bundleFile != null) {
                         //TODO: get the id of the bundle created
-                        Element firstResult = XmlUtil.findChild(response,
+                       Element firstResult = XmlUtil.findChild(response,
                                                   TAG_ENTRY);
                         if (firstResult != null) {
                             lastBundleId = XmlUtil.getAttribute(firstResult,

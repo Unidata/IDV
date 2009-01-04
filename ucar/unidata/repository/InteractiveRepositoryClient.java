@@ -434,7 +434,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         comps.add(GuiUtils.inset(portFld, 4));
         comps.add(GuiUtils.rLabel("Base Path:"));
         comps.add(GuiUtils.inset(pathFld, 4));
-        comps.add(GuiUtils.rLabel("User name:"));
+        comps.add(GuiUtils.rLabel("User Name:"));
         comps.add(GuiUtils.inset(userFld, 4));
         comps.add(GuiUtils.rLabel("Password:"));
         comps.add(GuiUtils.inset(passwordFld, 4));

@@ -122,17 +122,18 @@ public class RepositoryServlet extends HttpServlet {
     }
 
     /**
-     * _more_
+     * Create the repository. 
      *
      * @param port _more_
      * @param webAppProperties _more_
      *
      * @throws Exception _more_
      */
-    private void createRepository(int port, Properties webAppProperties)
+    private synchronized void createRepository(int port, Properties webAppProperties)
             throws Exception {
-        repository = new Repository(getInitParams(), port, true);
-        repository.init(webAppProperties);
+        Repository tmp = new Repository(getInitParams(), port, true);
+        tmp.init(webAppProperties);
+        repository = tmp;
     }
 
 
@@ -207,8 +208,9 @@ public class RepositoryServlet extends HttpServlet {
             }
         }
 
-        RequestHandler handler          = new RequestHandler(request);
 
+
+        RequestHandler handler          = new RequestHandler(request);
         Result         repositoryResult = null;
         try {
             // need to support HTTP HEAD request since we are overriding HttpServlet doGet   
@@ -369,11 +371,11 @@ public class RepositoryServlet extends HttpServlet {
                 Map      p  = request.getParameterMap();
                 Iterator it = p.entrySet().iterator();
                 // Convert Map values into type String. 
+
                 while (it.hasNext()) {
                     Map.Entry    pairs = (Map.Entry) it.next();
                     String       key   = (String) pairs.getKey();
                     String[]     vals  = (String[]) pairs.getValue();
-                    StringBuffer sb    = new StringBuffer();
                     if (vals.length > 0) {
                         formArgs.put(key, vals[0]);
                     }
