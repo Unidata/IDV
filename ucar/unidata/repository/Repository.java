@@ -1785,7 +1785,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             while(log.size()>200) {
                 log.remove(0);
             }
-            log.add(new LogEntry(request.getUser(),request.getRequestPath()));
+            log.add(new LogEntry(request));
         }
 
         if ((result.getInputStream() == null) && cachingOk
@@ -4097,66 +4097,109 @@ public class Repository extends RepositoryBase implements RequestHandler {
         User user;
         Date date;
         String path;
-        public LogEntry(User user, String path) {
+        String ip;
+        String userAgent;
+        public LogEntry(Request request) {
+            this.user = request.getUser();
+            this.path = request.getRequestPath();
             this.date = new Date();
-            this.path = path;
-            this.user = user;
+            this.ip = request.getIp();
+            this.userAgent = request.getHeaderArg("User-Agent");
+        }
+
+
+        /**
+           Set the Ip property.
+
+           @param value The new value for Ip
+        **/
+        public void setIp (String value) {
+            ip = value;
         }
 
         /**
-Set the User property.
+           Get the Ip property.
 
-@param value The new value for User
-**/
-public void setUser (User value) {
-	user = value;
-}
+           @return The Ip
+        **/
+        public String getIp () {
+            return ip;
+        }
 
-/**
-Get the User property.
+        /**
+           Set the UserAgent property.
 
-@return The User
-**/
-public User getUser () {
-	return user;
-}
+           @param value The new value for UserAgent
+        **/
+        public void setUserAgent (String value) {
+            userAgent = value;
+        }
 
-/**
-Set the Date property.
+        /**
+           Get the UserAgent property.
 
-@param value The new value for Date
-**/
-public void setDate (Date value) {
-	date = value;
-}
+           @return The UserAgent
+        **/
+        public String getUserAgent () {
+            return userAgent;
+        }
 
-/**
-Get the Date property.
 
-@return The Date
-**/
-public Date getDate () {
-	return date;
-}
 
-/**
-Set the Path property.
 
-@param value The new value for Path
-**/
-public void setPath (String value) {
-	path = value;
-}
+        /**
+           Set the User property.
 
-/**
-Get the Path property.
+           @param value The new value for User
+        **/
+        public void setUser (User value) {
+            user = value;
+        }
 
-@return The Path
-**/
-public String getPath () {
-	return path;
-}
+        /**
+           Get the User property.
 
+           @return The User
+        **/
+        public User getUser () {
+            return user;
+        }
+
+        /**
+           Set the Date property.
+
+           @param value The new value for Date
+        **/
+        public void setDate (Date value) {
+            date = value;
+        }
+
+        /**
+           Get the Date property.
+
+           @return The Date
+        **/
+        public Date getDate () {
+            return date;
+        }
+
+        /**
+           Set the Path property.
+
+           @param value The new value for Path
+        **/
+        public void setPath (String value) {
+            path = value;
+        }
+
+        /**
+           Get the Path property.
+
+           @return The Path
+        **/
+        public String getPath () {
+            return path;
+        }
 
 
 

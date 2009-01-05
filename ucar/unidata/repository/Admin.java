@@ -223,7 +223,10 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.row(HtmlUtil.cols(
                                                 HtmlUtil.b(msg("User")),
                                                 HtmlUtil.b(msg("Date")),
-                                                HtmlUtil.b(msg("Path")))));
+                                                HtmlUtil.b(msg("Path")),
+                                                HtmlUtil.b(msg("IP")),
+                                                HtmlUtil.b(msg("User agent"))
+                                                )));
         List<Repository.LogEntry> log = getRepository().getLog();
         for(int i=log.size()-1;i>=0;i--) {
             Repository.LogEntry logEntry = log.get(i);
@@ -231,7 +234,9 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.row(HtmlUtil.cols(
                                                     logEntry.getUser().getLabel(),
                                                     getRepository().formatDate(logEntry.getDate()),
-                                                    HtmlUtil.entityEncode(logEntry.getPath()))));
+                                                    HtmlUtil.entityEncode(logEntry.getPath()),
+                                                    logEntry.getIp(),
+                                                    logEntry.getUserAgent())));
             
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
