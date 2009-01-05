@@ -105,7 +105,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                           getRepository().absoluteUrl(request.url(
                                                       getRepository().getMetadataManager().URL_METADATA_VIEW,
                                                       ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                                                      metadata.getId(),ARG_THUMBNAIL,"true"))
+                                                      metadata.getId()/*,ARG_THUMBNAIL,"true"*/))
                                            });
         }
     }
