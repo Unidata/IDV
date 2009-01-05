@@ -39,6 +39,7 @@ import ucar.unidata.data.DataSource;
 
 import ucar.unidata.idv.*;
 
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.XmlTree;
 import ucar.unidata.util.CatalogUtil;
 
@@ -240,6 +241,7 @@ public class ThreddsHandler extends XmlHandler {
 
     }
 
+    private Hashtable<String,ImageIcon> thumbnails = new Hashtable();
 
     /**
      * Create the  UI
@@ -275,7 +277,15 @@ public class ThreddsHandler extends XmlHandler {
                         String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
                         if(name.equals("thumbnail")) {
                             String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
-                            return GuiUtils.getImageIcon(value);
+                            ImageIcon icon = thumbnails.get(value);
+                            if(icon == null) {
+                                Image image = ImageUtils.readImage(value);
+                                image = ImageUtils.resize(image, 100,-1);
+                                ImageUtils.waitOnImage(image);
+                                icon = new ImageIcon(image);
+                                thumbnails.put(value,icon);
+                            }
+                            return icon;
                         }
                     }            
                     return super.getIconForNode(node);
