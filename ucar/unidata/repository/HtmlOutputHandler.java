@@ -241,7 +241,7 @@ public class HtmlOutputHandler extends OutputHandler {
             if (metataDataHtml.length() > 0) {
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Attachments"),
                         "<div class=\"description\">" + metadataSB
-                        + "</div>", true));
+                        + "</div>", false));
             }
         }
 
@@ -963,7 +963,7 @@ public class HtmlOutputHandler extends OutputHandler {
             if (metataDataHtml.length() > 0) {
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Attachments"),
                         "<div class=\"description\">" + metadataSB
-                        + "</div>", true));
+                        + "</div>", false));
             }
         }
 

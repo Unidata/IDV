@@ -1184,14 +1184,14 @@ public class TypeHandler extends RepositoryManager {
                     : ""), HtmlUtil.SIZE_20)));
         }
 
+        boolean showFile  = okToShowInForm(ARG_FILE);
+        boolean showUrl   = okToShowInForm(ARG_URL);
         if (okToShowInForm(ARG_RESOURCE)) {
             List tabTitles  = new ArrayList();
             List tabContent = new ArrayList();
             if (entry == null) {
                 String  urlLabel  = getFormLabel(ARG_URL, "URL");
                 String  fileLabel = getFormLabel(ARG_FILE, "File");
-                boolean showFile  = okToShowInForm(ARG_FILE);
-                boolean showUrl   = okToShowInForm(ARG_URL);
                 if (showFile) {
                     String addMetadata = HtmlUtil.space(2)
                                          + HtmlUtil.checkbox(ARG_ADDMETADATA,
@@ -1248,6 +1248,14 @@ public class TypeHandler extends RepositoryManager {
                         sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                                                      fileTail));
                     }
+
+                    if(entry.getResource().isStoredFile() && showFile) {
+                        String formContent = HtmlUtil.fileInput(ARG_FILE, size);
+                        sb.append(HtmlUtil.formEntry(msgLabel("Upload new file"),
+                                                     formContent));
+
+                    }
+
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                                                  entry.getResource().getPath()));

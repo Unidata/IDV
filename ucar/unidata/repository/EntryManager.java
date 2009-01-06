@@ -578,7 +578,7 @@ return new Result(title, sb);
         } else {
             dataType = request.getString(ARG_DATATYPE_SELECT, "");
         }
-        System.err.println ("download " + download);
+
         synchronized (mutex) {
             if (entry == null) {
                 List<String> resources    = new ArrayList();
@@ -800,6 +800,16 @@ return new Result(title, sb);
                     entries.add(entry);
                 }
             } else {
+                String       filename     = request.getUploadedFile(ARG_FILE);
+                //Did they upload a new file???
+                if(filename !=null && entry.getResource().isStoredFile()) {
+                    filename =
+                        getStorageManager().moveToStorage(request,
+                                                          new File(filename)).toString();
+                    getStorageManager().removeFile(entry.getResource());
+                    entry.setResource(new Resource(filename, Resource.TYPE_STOREDFILE));
+                }
+
                 if (entry.isTopGroup()) {
                     //                    throw new IllegalArgumentException(
                     //                        "Cannot edit top-level group");

@@ -532,7 +532,6 @@ public class ChatOutputHandler extends OutputHandler {
 
         Entry entry = state.getEntry();
         if (entry != null) {
-            System.err.println("image? " + entry.getResource().isImage());
             if (entry.getResource().isImage()) {
                 links.add(makeLink(request, state.getEntry(),
                                    OUTPUT_WHITEBOARD));
