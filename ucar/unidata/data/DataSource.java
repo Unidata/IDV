@@ -354,6 +354,8 @@ public interface DataSource {
      */
     public boolean getInError();
 
+    public void setInError(boolean b);
+
     /**
      * Do we need to show the error  to the user or was it already handled
      *
