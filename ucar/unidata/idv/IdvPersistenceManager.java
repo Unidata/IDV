@@ -3361,7 +3361,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         List dataSources   = (List) ht.get(ID_DATASOURCES);
         if (dataSources != null) {
-
             if ( !updateDataPaths(dataSources, letUserChangeData)) {
                 return;
             }
@@ -3373,6 +3372,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             for (int i = 0; i < dataSources.size(); i++) {
                 DataSource dataSource = (DataSource) dataSources.get(i);
+                //Clear the error flag
+                dataSource.setInError(false);
                 loadDialog.setMessage1("Loading data source " + (i + 1)
                                        + " of " + dataSources.size());
                 loadDialog.setMessage2(
