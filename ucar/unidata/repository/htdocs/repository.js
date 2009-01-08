@@ -319,21 +319,21 @@ function Tooltip () {
         }
     }
 
-    this.onMouseMove = function (event,id) {
+    this.onMouseMove = function (event,id,linkId) {
         lastMove++;
         if(state!=STATE_INIT) return;
         event = util.getEvent(event);
-        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", showDelay);
+        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+  ",'" + linkId +"')", showDelay);
     }
 
-    this.onMouseOut = function (event,id) {
+    this.onMouseOut = function (event,id,linkId) {
         lastMove++;
         if(state !=STATE_LINK) return;
         setTimeout("tooltip.checkHide(" + lastMove+ ")", hideDelay);
     }
 
 
-    this.onMouseOver = function(event,id) {
+    this.onMouseOver = function(event,id,linkId) {
         event = util.getEvent(event);
 
         if(state ==STATE_LINK && currentID && id!=currentID) {
@@ -343,7 +343,7 @@ function Tooltip () {
         }
         lastMove++;
         if(state!=STATE_INIT) return;
-        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+")", showDelay);
+        setTimeout("tooltip.showLink(" + lastMove+"," +util.getEventX(event)+","+ util.getEventY(event) +"," + "'" + id +"'"+",'" + linkId +"')", showDelay);
     }
 
 
@@ -392,14 +392,14 @@ function Tooltip () {
     }
 
 
-    this.showLink = function(moveId,x,y,id) {
+    this.showLink = function(moveId,x,y,id,linkId) {
         if(lastMove!=moveId) return;
 	if(state!=STATE_INIT) return;
         currentID = id;
         var obj = util.getDomObject("tooltipdiv");
         if(!obj) return;
         state = STATE_LINK;
-        var link = util.getDomObject(id);
+        var link = util.getDomObject(linkId);
         x = this.getX(link,x);
         y = this.getY(link,y);
         util.setPosition(obj, x,y);

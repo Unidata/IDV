@@ -26,6 +26,8 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
+import java.net.URL;
+import java.net.URLConnection;
 import java.awt.Image;
 import ucar.unidata.ui.ImageUtils;
 
@@ -40,6 +42,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.io.*;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -169,7 +172,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         Metadata.Type type = getType(metadata.getType());
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             String fileArg = metadata.getAttr1();
-            if ( !entry.getIsLocalFile()) {
+            if (!entry.getIsLocalFile()) {
                 fileArg =
                     getRepository().getStorageManager().copyToEntryDir(entry,
                         new File(fileArg)).getName();
@@ -387,15 +390,44 @@ public class ContentMetadataHandler extends MetadataHandler {
             if ( !newMetadata) {
                 //TODO: delete the old thumbs file
             }
-            String fileArg = request.getUploadedFile(ARG_ATTR1 + suffix);
-            if (fileArg == null) {
-                return;
+            String url = request.getString(ARG_ATTR2 + suffix,"");
+            String theFile = null;
+            if(url.length()>0) {
+                String tail = IOUtil.getFileTail(url);
+                File tmpFile = getStorageManager().getTmpFile(request,
+                                                              tail);
+                RepositoryUtil.checkFilePath(tmpFile.toString());
+                URL           fromUrl    = new URL(url);
+                URLConnection connection = fromUrl.openConnection();
+                InputStream   fromStream = connection.getInputStream();
+                FileOutputStream toStream = new FileOutputStream(tmpFile);
+                try {
+                        int bytes = IOUtil.writeTo(fromStream, toStream);
+                        if (bytes < 0) {
+                            throw new IllegalArgumentException("Could not download url:" + url);
+                        }
+                } catch(Exception ioe) {
+                    throw new IllegalArgumentException("Could not download url:" + url);
+                } finally {
+                    try {
+                        toStream.close();
+                        fromStream.close();
+                    } catch (Exception exc) {}
+                }
+                theFile =  tmpFile.toString();
+            } else {
+                String fileArg = request.getUploadedFile(ARG_ATTR1 + suffix);
+                if (fileArg == null) {
+                    return;
+                }
+
+                theFile = fileArg;
             }
-            String fileName =
-                getRepository().getStorageManager().moveToEntryDir(entry,
-                    new File(fileArg)).getName();
+            
+            theFile = getRepository().getStorageManager().moveToEntryDir(entry,
+                                                               new File(theFile)).getName();
             metadataList.add(new Metadata(id, entry.getId(), type, false,
-                                          fileName, "", "", ""));
+                                          theFile, "", "", ""));
             return;
         }
         super.handleForm(request, entry, id, suffix, metadataList,
@@ -450,7 +482,9 @@ public class ContentMetadataHandler extends MetadataHandler {
                     msgLabel((type.equals(TYPE_THUMBNAIL)
                               ? "Thumbnail"
                               : "Attachment")), HtmlUtil.fileInput(arg1,
-                              size) + image });
+                                                                   size) + image,
+                                               msgLabel("Or download URL"),
+                                               HtmlUtil.input(arg2,"",size)});
         }
 
         if (content == null) {

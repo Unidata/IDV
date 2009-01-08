@@ -2459,16 +2459,19 @@ return new Result(title, sb);
 
         String elementId = entry.getId();
         String qid       = HtmlUtil.squote(elementId);
+        String linkId =  "link_"+(HtmlUtil.blockCnt++);
+        String qlinkId =  HtmlUtil.squote(linkId);
         String tooltipEvents =
-            HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid + ");")
-            + HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid + ");")
-            + HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid + ");");
+            HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid + "," + qlinkId+");")
+            + HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid + "," + qlinkId+ ");")
+            + HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid + "," + qlinkId+ ");");
         sb.append(HtmlUtil.href(url, linkText,
-                                HtmlUtil.id(elementId) + " "
+                                HtmlUtil.id(linkId) + " "
                                 + tooltipEvents));
 
         String link = HtmlUtil.span(sb.toString(),
                                     HtmlUtil.id("span_" + entry.getId()));
+
 
         if (includeIcon) {
             link = link  +"<br>" 
