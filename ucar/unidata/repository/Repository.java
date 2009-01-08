@@ -180,6 +180,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        OutputType.TYPE_ACTION,"",ICON_DELETE);
 
 
+    public static final OutputType OUTPUT_COPY =
+        new OutputType("Copy Entry", "repository.copy",
+                       OutputType.TYPE_ACTION,"",ICON_MOVE);
+
 
     /** _more_ */
     private List<EntryListener> entryListeners =
@@ -1542,6 +1546,49 @@ public class Repository extends RepositoryBase implements RequestHandler {
         };
         outputHandler.addType(OUTPUT_DELETER);
         addOutputHandler(outputHandler);
+
+
+
+        OutputHandler copyHandler = new OutputHandler(getRepository(),
+                                          "Entry Copier") {
+            public boolean canHandleOutput(OutputType output) {
+                return output.equals(OUTPUT_COPY);
+            }
+            protected void getEntryLinks(Request request, State state,
+                                         List<Link> links)
+                    throws Exception {
+                if(request.getUser().getAnonymous()) return;
+                if (!state.isDummyGroup()) {
+                    return;
+                }
+                links.add(makeLink(request, state.getEntry(),
+                                   OUTPUT_COPY));
+            }
+
+            public Result outputEntry(Request request, Entry entry) throws Exception {
+                if(request.getUser().getAnonymous()) return new Result("","");
+                return new Result(request.url(URL_ENTRY_COPY,
+                                              ARG_ENTRYIDS, entry.getId()));
+            }
+
+            public Result outputGroup(Request request, Group group,
+                                      List<Group> subGroups,
+                                      List<Entry> entries)
+                    throws Exception {
+                if(request.getUser().getAnonymous()) return new Result("","");
+                if(!group.isDummy()) return outputEntry(request,group);
+                StringBuffer idBuffer = new StringBuffer();
+                entries.addAll(subGroups);
+                for (Entry entry : entries) {
+                    idBuffer.append(",");
+                    idBuffer.append(entry.getId());
+                }
+                return new Result(request.url(URL_ENTRY_COPY,
+                        ARG_ENTRYIDS, idBuffer.toString()));
+            }
+        };
+        copyHandler.addType(OUTPUT_COPY);
+        addOutputHandler(copyHandler);
 
         getUserManager().initOutputHandlers();
 
