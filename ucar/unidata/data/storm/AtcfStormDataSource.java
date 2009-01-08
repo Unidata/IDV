@@ -620,9 +620,22 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
                                     + stormInfo.getBasin().toLowerCase()
                                     + stormInfo.getNumber() + stormYear
                                     + ".dat.gz");
+            //What we think might be in the archive might actually be the last year
+            //and they haven't moved it into the archive
             try {
                 readTracks(stormInfo, tracks, trackFile, waysToUse, true);
             } catch (BadDataException bde) {
+                if(!aSubDir.equals("aid_public")) {
+                    try {
+                        trackFile = getFullPath("aid_public/" + PREFIX_ANALYSIS
+                                                + stormInfo.getBasin().toLowerCase()
+                                                + stormInfo.getNumber() + stormYear
+                                                + ".dat.gz");
+                        readTracks(stormInfo, tracks, trackFile, waysToUse, true);
+                    } catch (BadDataException bde2) {
+                        System.err.println("Failed reading 'A' file for storm:" + stormInfo+" file:" + trackFile);
+                    }
+                }
                 //                System.err.println("Failed reading 'A' file for storm:" + stormInfo+" file:" + trackFile);
             }
         }
@@ -634,7 +647,19 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         try {
             readTracks(stormInfo, tracks, trackFile, null, true);
         } catch (BadDataException bde) {
-            //            System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
+                if(!bSubDir.equals("btk")) {
+                    try {
+                        trackFile = getFullPath("btk/" + PREFIX_BEST
+                                                + stormInfo.getBasin().toLowerCase()
+                                                + stormInfo.getNumber() + stormYear
+                                                + ".dat.gz");
+                        readTracks(stormInfo, tracks, trackFile, null, true);
+                    } catch (BadDataException bde2) {
+                        System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
+                    }
+
+                }
+                //            System.err.println("Failed reading 'B' file for storm:" + stormInfo+" file:" + trackFile);
         }
         long t2 = System.currentTimeMillis();
         //        System.err.println("time: " + (t2 - t1));
