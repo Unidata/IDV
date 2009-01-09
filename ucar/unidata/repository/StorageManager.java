@@ -474,6 +474,36 @@ public class StorageManager extends RepositoryManager {
         return newFile;
     }
 
+
+    public File copyToStorage(Request request, File original, String newName)
+            throws Exception {
+        String            targetName = newName;
+        String            storageDir = getStorageDir();
+
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        cal.setTime(new Date());
+
+        storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
+        IOUtil.makeDir(storageDir);
+        storageDir = IOUtil.joinDir(storageDir,
+                                    "m" + (cal.get(cal.MONTH) + 1));
+        IOUtil.makeDir(storageDir);
+        storageDir = IOUtil.joinDir(storageDir,
+                                    "d" + cal.get(cal.DAY_OF_MONTH));
+        IOUtil.makeDir(storageDir);
+
+
+        for (int depth = 0; depth < dirDepth; depth++) {
+            int index = (int) (dirRange * Math.random());
+            storageDir = IOUtil.joinDir(storageDir, "data" + index);
+            IOUtil.makeDir(storageDir);
+        }
+
+        File newFile = new File(IOUtil.joinDir(storageDir, targetName));
+        IOUtil.copyFile(original, newFile);
+        return newFile;
+    }
+
     /**
      * _more_
      *

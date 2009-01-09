@@ -1648,23 +1648,66 @@ return new Result(title, sb);
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
+        List<Entry> newEntries = new ArrayList<Entry>();
         try {
             List<String[]> found = getDescendents(request, entries, connection,
                                                   true);
-            Hashtable newIds = new Hashtable();
+            Hashtable<String,Entry>  oldIdToNewEntry= new Hashtable<String,Entry>();
             for (int i = found.size() - 1; i >= 0; i--) {
                 String[] tuple = found.get(i);
                 String   id    = tuple[0];
-                Entry entry = getEntry(request,id);
-                
-            }
+                Entry oldEntry = getEntry(request,id);
+                String newId = getRepository().getGUID();
+                Entry newEntry = oldEntry.getTypeHandler().createEntry(newId);
+                oldIdToNewEntry.put(oldEntry.getId(), newEntry);
+                //(String name, String description, Group group,User user, Resource resource, String dataType,
+                //                          long createDate, long startDate, long endDate, Object[] values) {
+                //See if this new entry is somewhere down in the tree
+                Entry newParent = oldIdToNewEntry.get(oldEntry.getParentGroupId());
+                if(newParent==null) {
+                    newParent = toGroup;
+                }
+                Resource newResource = new Resource(oldEntry.getResource());
+                if(newResource.isFile()) {
+                    String newFile = getStorageManager().copyToStorage(request,
+                                                                       oldEntry.getResource().getFile(),
+                                                                       getRepository().getGUID() + "_" +
+                                                                       getStorageManager().getFileTail(oldEntry.getResource().getPath())).toString();
+                    newResource.setPath(newFile);
+                    System.err.println("old file: " + oldEntry.getResource());
+                    System.err.println("new file: " + newResource);
+                }
 
+
+                newEntry.initEntry(oldEntry.getName(),
+                                   oldEntry.getDescription(),
+                                   (Group)newParent,
+                                   request.getUser(),
+                                   newResource,
+                                   oldEntry.getDataType(),
+                                   oldEntry.getCreateDate(),
+                                   oldEntry.getStartDate(),
+                                   oldEntry.getEndDate(),
+                                   oldEntry.getValues());
+
+                List<Metadata> newMetadata = new ArrayList<Metadata>();
+                for (Metadata oldMetadata : getMetadataManager().getMetadata(oldEntry)) {
+                    newMetadata.add(new Metadata(getRepository().getGUID(), newEntry.getId(),
+                                                 oldMetadata));
+                }
+                newEntry.setMetadata(newMetadata);
+                newEntries.add(newEntry);
+            }
+            insertEntries(newEntries, true);
+            return new Result(request.url(getRepository().URL_ENTRY_SHOW,
+                                          ARG_ENTRYID, toGroup.getId(),
+                                          ARG_MESSAGE,
+                                          "Entries copied"));
         } finally {
             try {
                 connection.close();
             } catch (Exception exc) {}
         }
-        return new Result(msg("Entry Copy"), sb);
     }
 
     /******************

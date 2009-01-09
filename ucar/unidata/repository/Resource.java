@@ -123,6 +123,11 @@ public class Resource {
         this.type = type;
     }
 
+    public Resource(Resource that) {
+        this.path = that.path;
+        this.type = that.type;
+    }
+
     /**
      * _more_
      *
@@ -205,6 +210,7 @@ public class Resource {
      */
     public void setPath(String value) {
         path = value;
+        file = null;
     }
 
     /**

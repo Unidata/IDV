@@ -1550,7 +1550,7 @@ public class UserManager extends RepositoryManager {
                                                         ARG_FAVORITE_ADD,"true",
                                                         ARG_ENTRYID,
                                                         entry.getId()), HtmlUtil.img(
-                                                                                     getRepository().fileUrl(ICON_ADD),
+                                                                                     getRepository().fileUrl(ICON_FAVORITE),
                                                                                      msg("Add as a favorite"))));
                 }
             }
