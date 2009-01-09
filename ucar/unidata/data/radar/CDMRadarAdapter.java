@@ -62,6 +62,7 @@ import visad.bom.Radar3DCoordinateSystem;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.NamedLocation;
+import visad.georef.EarthLocationLite;
 
 import java.io.IOException;
 
@@ -229,6 +230,30 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * Get the radar location from the dataset.
+     * @return EarthLocation.
+     */
+    public EarthLocation getRadarStationInFile() {
+        Attribute latAttr = rds.findGlobalAttributeIgnoreCase("RadarLatitude");
+        Attribute lonAttr = rds.findGlobalAttributeIgnoreCase("RadarLongitude");
+        Attribute altAttr = rds.findGlobalAttributeIgnoreCase("RadarAltitude");
+
+        if(latAttr != null && lonAttr != null && altAttr != null) {
+            double   latitude = latAttr.getNumericValue().doubleValue();
+            double   longitude = lonAttr.getNumericValue().doubleValue();
+            double   altitude = altAttr.getNumericValue().doubleValue();
+            EarthLocation elt =
+                        new EarthLocationLite(new Real(RealType.Latitude,
+                            latitude), new Real(RealType.Longitude, longitude),
+                                       new Real(RealType.Altitude, altitude));
+            return elt;
+
+        } else {
+            return null;
+        }
+
+    }
+    /**
      *  init from the named data file
      *
      * @throws VisADException problem creating data
@@ -255,6 +280,10 @@ public class CDMRadarAdapter implements RadarAdapter {
                 rds.findGlobalAttributeIgnoreCase("SweepMode");
             Attribute vcpAttr = rds.findGlobalAttributeIgnoreCase(
                                     "VolumeCoveragePatternName");
+            EarthLocation elf = getRadarStationInFile();
+            if(elf != null)
+                radarLocation = elf;
+
             if (vcpAttr != null) {
                 vcp = vcpAttr.getStringValue();
             } else {
