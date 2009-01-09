@@ -235,8 +235,14 @@ public class CDMRadarAdapter implements RadarAdapter {
      */
     public EarthLocation getRadarStationInFile() {
         Attribute latAttr = rds.findGlobalAttributeIgnoreCase("RadarLatitude");
+        if(latAttr == null)
+           latAttr = rds.findGlobalAttributeIgnoreCase("StationLatitude");
         Attribute lonAttr = rds.findGlobalAttributeIgnoreCase("RadarLongitude");
+        if(lonAttr == null)
+           lonAttr = rds.findGlobalAttributeIgnoreCase("StationLongitude");
         Attribute altAttr = rds.findGlobalAttributeIgnoreCase("RadarAltitude");
+        if(altAttr == null)
+            altAttr = rds.findGlobalAttributeIgnoreCase("StationElevationInMeters");
 
         if(latAttr != null && lonAttr != null && altAttr != null) {
             double   latitude = latAttr.getNumericValue().doubleValue();
