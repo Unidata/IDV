@@ -966,16 +966,14 @@ return new Result(title, sb);
         StringBuffer inner = new StringBuffer();
         if (entry.isGroup()) {
             inner.append(
-                msgLabel("Are you sure you want to delete the group"));
-            inner.append(entry.getLabel());
+                msg("Are you sure you want to delete the following group?"));
             inner.append(HtmlUtil.p());
             inner.append(
                 msg(
                 "Note: This will also delete all of the descendents of the group"));
         } else {
             inner.append(
-                msgLabel("Are you sure you want to delete the entry"));
-            inner.append(entry.getLabel());
+                msg("Are you sure you want to delete the following entry?"));
         }
 
         StringBuffer fb = new StringBuffer();
@@ -986,6 +984,9 @@ return new Result(title, sb);
         fb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         fb.append(HtmlUtil.formClose());
         sb.append(getRepository().question(inner.toString(), fb.toString()));
+        sb.append(getBreadCrumbs(request, entry));
+
+
         return makeEntryEditResult(request, entry,
                                    msg("Entry delete confirm"), sb);
     }
@@ -1621,9 +1622,9 @@ return new Result(title, sb);
             fb.append(request.form(getRepository().URL_ENTRY_COPY));
             fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
             fb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
-            fb.append(HtmlUtil.submit("Yes, move them", ARG_ACTION_MOVE));
-            fb.append(HtmlUtil.space(1));
             fb.append(HtmlUtil.submit("Yes, copy them", ARG_ACTION_COPY));
+            fb.append(HtmlUtil.space(1));
+            fb.append(HtmlUtil.submit("Yes, move them", ARG_ACTION_MOVE));
             fb.append(HtmlUtil.space(1));
             fb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
             fb.append(HtmlUtil.formClose());
@@ -1650,11 +1651,11 @@ return new Result(title, sb);
         Statement statement = connection.createStatement();
         List<Entry> newEntries = new ArrayList<Entry>();
         try {
-            List<String[]> found = getDescendents(request, entries, connection,
+            List<String[]> ids = getDescendents(request, entries, connection,
                                                   true);
             Hashtable<String,Entry>  oldIdToNewEntry= new Hashtable<String,Entry>();
-            for (int i = found.size() - 1; i >= 0; i--) {
-                String[] tuple = found.get(i);
+            for (int i = 0;i<ids.size(); i++) {
+                String[] tuple = ids.get(i);
                 String   id    = tuple[0];
                 Entry oldEntry = getEntry(request,id);
                 String newId = getRepository().getGUID();
@@ -1669,13 +1670,13 @@ return new Result(title, sb);
                 }
                 Resource newResource = new Resource(oldEntry.getResource());
                 if(newResource.isFile()) {
+                    String newFileName = getStorageManager().getFileTail(oldEntry.getResource().getFile().getName());
                     String newFile = getStorageManager().copyToStorage(request,
                                                                        oldEntry.getResource().getFile(),
-                                                                       getRepository().getGUID() + "_" +
-                                                                       getStorageManager().getFileTail(oldEntry.getResource().getPath())).toString();
+                                                                       getRepository().getGUID() + "_" + newFileName).toString();
                     newResource.setPath(newFile);
-                    System.err.println("old file: " + oldEntry.getResource());
-                    System.err.println("new file: " + newResource);
+                    //                    System.err.println("old file: " + oldEntry.getResource());
+                    //                    System.err.println("new file: " + newResource);
                 }
 
 
@@ -4474,6 +4475,23 @@ return new Result(title, sb);
             if ( !entry.isGroup()) {
                 continue;
             }
+
+            if(isSynthEntry(entry.getId())) {
+                for(String childId: getChildIds(request, (Group) entry, null)) {
+                    Entry childEntry  =getEntry(request,childId);
+                    if(childEntry==null) continue;
+                    children.add(new String[] { childId, childEntry.getType(), childEntry.getResource().getPath(),
+                                                childEntry.getResource().getType()});
+                    if(childEntry.isGroup()) {
+                        children.addAll(getDescendents(request,
+                                                       (List<Entry>) Misc.newList(childEntry),
+                                                       connection, false));
+                    }
+                }
+                return children;
+            }
+
+
             Statement stmt = SqlUtil.select(connection,
                                             SqlUtil.comma(new String[] {
                                                 Tables.ENTRIES.COL_ID,
