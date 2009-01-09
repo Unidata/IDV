@@ -559,6 +559,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_ACTION = "action";
+    public static final String ARG_ACTION_COPY = "action.copy";
+    public static final String ARG_ACTION_MOVE = "action.move";
 
     /** _more_ */
     public static final String ARG_ROLES = "roles";

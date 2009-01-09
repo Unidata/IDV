@@ -1486,20 +1486,32 @@ return new Result(title, sb);
      */
     public Result processEntryCopy(Request request) throws Exception {
 
-        String fromId = request.getString(ARG_FROM, "");
-        if (fromId == null) {
-            throw new IllegalArgumentException("No " + ARG_FROM + " given");
-        }
-        Entry fromEntry = getEntry(request, fromId);
-        if (fromEntry == null) {
-            throw new RepositoryUtil.MissingEntryException(
-                "Could not find entry " + fromId);
+        String fromIds = request.getString(ARG_FROM, "");
+        List<Entry> entries = new ArrayList<Entry>();
+        for (String id : StringUtil.split(fromIds, ",", true, true)) {
+            Entry entry = getEntry(request, id, false);
+            if (entry == null) {
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find entry:" + id);
+            }
+            if (entry.isTopGroup()) {
+                StringBuffer sb = new StringBuffer();
+                sb.append(
+                    getRepository().note(
+                        msg("Cannot delete top-level group")));
+                return new Result(msg("Entry Delete"), sb);
+            }
+            entries.add(entry);
         }
 
+
+        if (entries.size()==0) {
+            throw new IllegalArgumentException("No entries specified");
+        }
 
         if (request.exists(ARG_CANCEL)) {
             return new Result(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, entries.get(0)));
         }
 
         if ( !request.exists(ARG_TO)) {
@@ -1515,11 +1527,16 @@ return new Result(title, sb);
                 if ( !entry.isGroup()) {
                     continue;
                 }
-                if ( !okToMove(fromEntry, entry)) {
-                    continue;
+                boolean ok = true;
+                for(Entry fromEntry: entries) {
+                    if ( !okToMove(fromEntry, entry)) {
+                        ok = false;
+                    }
                 }
+                if(!ok) continue;
+
                 if ( !didOne) {
-                    sb.append(header("Move to:"));
+                    sb.append(header("Please select a group to copy/move the given entries to:"));
                     sb.append("<ul>");
                 }
                 sb.append("<li> ");
@@ -1527,11 +1544,9 @@ return new Result(title, sb);
                     HtmlUtil.href(
                         request.url(
                             getRepository().URL_ENTRY_COPY, ARG_FROM,
-                            fromEntry.getId(), ARG_TO, entry.getId(),
-                            ARG_ACTION, ACTION_MOVE), entry.getLabel()));
+                            fromIds, ARG_TO, entry.getId()), entry.getLabel()));
                 sb.append(HtmlUtil.br());
                 didOne = true;
-
             }
             if ( !didOne) {
                 sb.append(
@@ -1541,14 +1556,13 @@ return new Result(title, sb);
             } else {
                 sb.append("</ul>");
             }
-
-            return addEntryHeader(request, fromEntry,new Result(msg("Entry Move/Copy"), sb));
+            return addEntryHeader(request, entries.get(0),new Result(msg("Entry Move/Copy"), sb));
         }
 
 
         String toId = request.getString(ARG_TO, "");
         if (toId == null) {
-            throw new IllegalArgumentException("No " + ARG_TO + " given");
+            throw new IllegalArgumentException("No destination group specified");
         }
 
         Entry toEntry = getEntry(request, toId);
@@ -1563,71 +1577,97 @@ return new Result(title, sb);
         Group toGroup = (Group) toEntry;
 
 
-        if ( !getAccessManager().canDoAction(request, fromEntry,
-                                             Permission.ACTION_EDIT)) {
-            throw new RepositoryUtil.AccessException("Cannot move:"
-                    + fromEntry.getLabel());
-        }
 
+        if (request.exists(ARG_ACTION_MOVE)) {
+            for(Entry fromEntry: entries) {
+                if ( !getAccessManager().canDoAction(request, fromEntry,
+                                                     Permission.ACTION_EDIT)) {
+                    throw new RepositoryUtil.AccessException("Cannot move:"
+                                                             + fromEntry.getLabel());
+                }
+            }
+        }
 
         if ( !getAccessManager().canDoAction(request, toEntry,
                                              Permission.ACTION_NEW)) {
-            throw new RepositoryUtil.AccessException("Cannot copy to:"
+            throw new RepositoryUtil.AccessException("Cannot copy/move to:"
                     + toEntry.getLabel());
         }
 
 
-        if ( !okToMove(fromEntry, toEntry)) {
-            StringBuffer sb = new StringBuffer();
-            //            sb.append(makeEntryHeader(request, fromEntry));
-            sb.append(
-                getRepository().error(
-                    msg("Cannot move a group to its descendent")));
-            return addEntryHeader(request, fromEntry,new Result("", sb));
+        StringBuffer fromList = new StringBuffer();
+        for(Entry fromEntry: entries) {
+            if ( !okToMove(fromEntry, toEntry)) {
+                StringBuffer sb = new StringBuffer();
+                sb.append(
+                          getRepository().error(
+                                                msg("Cannot move a group to its descendent")));
+                return addEntryHeader(request, fromEntry,new Result("", sb));
+            }
+            fromList.append(HtmlUtil.space(3));
+            fromList.append(getEntryManager().getBreadCrumbs(request, fromEntry));
+            fromList.append(HtmlUtil.br());
         }
 
 
-
-        String action = request.getString(ARG_ACTION, ACTION_COPY);
-
-
-
-        if ( !request.exists(ARG_MOVE_CONFIRM)) {
+        if (!(request.exists(ARG_ACTION_MOVE) ||  request.exists(ARG_ACTION_COPY))) {
             StringBuffer sb = new StringBuffer();
-            sb.append(msgLabel("Are you sure you want to move"));
-            sb.append(HtmlUtil.br());
-            sb.append(HtmlUtil.space(3));
-            sb.append(fromEntry.getLabel());
-            sb.append(HtmlUtil.br());
-            sb.append(msgLabel("To"));
+            sb.append(msgLabel("Are you sure you want to copy/move the following entries to the group"));
             sb.append(HtmlUtil.br());
             sb.append(HtmlUtil.space(3));
             sb.append(toEntry.getLabel());
-            sb.append(HtmlUtil.br());
 
-            String hidden = HtmlUtil.hidden(ARG_FROM, fromEntry.getId())
-                            + HtmlUtil.hidden(ARG_TO, toEntry.getId())
-                            + HtmlUtil.hidden(ARG_ACTION, action);
-            String form = Repository.makeOkCancelForm(request,
-                              getRepository().URL_ENTRY_COPY,
-                              ARG_MOVE_CONFIRM, hidden);
-            return new Result(
-                msg("Move confirm"),
-                new StringBuffer(
-                    getRepository().question(sb.toString(), form)));
+            StringBuffer fb = new StringBuffer();
+            fb.append(request.form(getRepository().URL_ENTRY_COPY));
+            fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
+            fb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
+            fb.append(HtmlUtil.submit("Yes, move them", ARG_ACTION_MOVE));
+            fb.append(HtmlUtil.space(1));
+            fb.append(HtmlUtil.submit("Yes, copy them", ARG_ACTION_COPY));
+            fb.append(HtmlUtil.space(1));
+            fb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
+            fb.append(HtmlUtil.formClose());
+            StringBuffer contents = new StringBuffer(getRepository().question(sb.toString(), fb.toString()));
+            contents.append(fromList);
+            return new Result(msg("Move confirm"),contents);
         }
 
 
+        if(request.exists(ARG_ACTION_MOVE)) {
+            return processEntryMove(request, toGroup,entries);
+        } else if(request.exists(ARG_ACTION_COPY)) {
+            return processEntryCopy(request, toGroup, entries);
+        }
+
+        return new Result(msg("Move"),new StringBuffer());
+    }
+
+
+    private  Result processEntryCopy(Request request, Group toGroup, List<Entry> entries) throws Exception {
+        StringBuffer sb = new StringBuffer();
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
         try {
-            if (action.equals(ACTION_MOVE)) {
-                fromEntry.setParentGroup(toGroup);
-                String oldId = fromEntry.getId();
-                String newId = oldId;
-                //TODO: critical section around new group id
-                //Don't do this for now
+            List<String[]> found = getDescendents(request, entries, connection,
+                                                  true);
+            Hashtable newIds = new Hashtable();
+            for (int i = found.size() - 1; i >= 0; i--) {
+                String[] tuple = found.get(i);
+                String   id    = tuple[0];
+                Entry entry = getEntry(request,id);
+                
+            }
+
+        } finally {
+            try {
+                connection.close();
+            } catch (Exception exc) {}
+        }
+        return new Result(msg("Entry Copy"), sb);
+    }
+
+    /******************
                 if (false && fromEntry.isGroup()) {
                     newId = getGroupId(toGroup);
                     fromEntry.setId(newId);
@@ -1657,15 +1697,25 @@ return new Result(title, sb);
                     }
 
                     //TODO: we also cache the group full names
-                    /*                    synchronized(MUTEX_ENTRY) {
+                                        synchronized(MUTEX_ENTRY) {
                         entryCache.remove(oldId);
                         entryCache.put(fromEntry.getId(), fromEntry);
                         groupCache.remove(fromEntry.getId());
                         groupCache.put(fromEntry.getId(), (Group) fromEntry);
-                        }*/
+                        }
                 }
+    **********/
 
-                //Change the parent
+
+    private  Result processEntryMove(Request request, Group toGroup, List<Entry> entries) throws Exception {
+        Connection connection = getDatabaseManager().getNewConnection();
+        connection.setAutoCommit(false);
+        Statement statement = connection.createStatement();
+        try {
+            for(Entry fromEntry: entries) {
+                fromEntry.setParentGroup(toGroup);
+                String oldId = fromEntry.getId();
+                String newId = oldId;
                 String sql =
                     "UPDATE  " + Tables.ENTRIES.NAME + " SET "
                     + SqlUtil.unDot(Tables.ENTRIES.COL_PARENT_GROUP_ID)
@@ -1675,23 +1725,16 @@ return new Result(title, sb);
                                  SqlUtil.quote(fromEntry.getId()));
                 statement.execute(sql);
                 connection.commit();
-                connection.setAutoCommit(true);
-                getRepository().clearCache();
-                return new Result(request.url(getRepository().URL_ENTRY_SHOW,
-                        ARG_ENTRYID, fromEntry.getId()));
             }
+            connection.setAutoCommit(true);
+            getRepository().clearCache();
+            return new Result(request.url(getRepository().URL_ENTRY_SHOW,
+                                          ARG_ENTRYID, entries.get(0).getId()));
         } finally {
             try {
                 connection.close();
             } catch (Exception exc) {}
         }
-
-
-        String       title = (action.equals(ACTION_COPY)
-                              ? "Entry Copy"
-                              : "Entry Move");
-        StringBuffer sb    = new StringBuffer();
-        return new Result(msg(title), sb);
     }
 
 

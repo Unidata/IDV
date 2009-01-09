@@ -181,7 +181,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     public static final OutputType OUTPUT_COPY =
-        new OutputType("Copy Entry", "repository.copy",
+        new OutputType("Copy/Move Entry", "repository.copy",
                        OutputType.TYPE_ACTION,"",ICON_MOVE);
 
 
@@ -1568,7 +1568,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             public Result outputEntry(Request request, Entry entry) throws Exception {
                 if(request.getUser().getAnonymous()) return new Result("","");
                 return new Result(request.url(URL_ENTRY_COPY,
-                                              ARG_ENTRYIDS, entry.getId()));
+                                              ARG_FROM, entry.getId()));
             }
 
             public Result outputGroup(Request request, Group group,
@@ -1584,7 +1584,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     idBuffer.append(entry.getId());
                 }
                 return new Result(request.url(URL_ENTRY_COPY,
-                        ARG_ENTRYIDS, idBuffer.toString()));
+                        ARG_FROM, idBuffer.toString()));
             }
         };
         copyHandler.addType(OUTPUT_COPY);
