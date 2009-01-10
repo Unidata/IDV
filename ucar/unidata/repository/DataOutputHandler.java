@@ -185,22 +185,20 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    private Hashtable<String, Boolean> checkedEntries = new Hashtable<String,
-                                                            Boolean>();
+    private Cache cdmEntries = new Cache(10000);
 
     /** _more_ */
-    private Hashtable<String, Boolean> gridEntries = new Hashtable<String,
-                                                         Boolean>();
+    private Cache gridEntries = new Cache(10000);
+
 
     /** _more_ */
-    private Hashtable<String, Boolean> pointEntries = new Hashtable<String,
-                                                          Boolean>();
+    private Cache pointEntries = new Cache(10000);
 
     /** _more_ */
-    private Hashtable<String, Boolean> trajectoryEntries =
-        new Hashtable<String, Boolean>();
+    private Cache trajectoryEntries = new Cache(10000);
 
-
+    //TODO: When we close a ncfile some thread might be using it
+    //Do we have to actually close it??
 
     /** _more_ */
     private Cache ncFileCache = new Cache(10) {
@@ -302,6 +300,9 @@ public class DataOutputHandler extends OutputHandler {
         }
         long t1 = System.currentTimeMillis();
         if ( !canLoadAsCdm(entry)) {
+            long t2 = System.currentTimeMillis();
+            if(t2>t1)
+                System.err.println ("DataOutputHandler (cdm) getEntryLinks  " + entry.getName() +" time:" + (t2-t1));
             return;
         }
 
@@ -331,7 +332,8 @@ public class DataOutputHandler extends OutputHandler {
         //        cdlLink.setLinkType(OutputType.TYPE_ACTION);
         links.add(cdlLink);
         long t2 = System.currentTimeMillis();
-        System.err.println ("can load:" + (t2-t1));
+        if(t2>t1)
+            System.err.println ("DataOutputHandler  getEntryLinks  " + entry.getName() +" time:" + (t2-t1));
     }
 
 
@@ -373,6 +375,16 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     private boolean canLoadEntry(Entry entry) {
+        String url = entry.getResource().getPath();
+        if (url == null) {
+            return false;
+        }
+        if(url.endsWith("~")) {
+            return false;
+        }
+        if(url.endsWith("#")) {
+            return false;
+        }
         if (entry.isGroup()) {
             return false;
         }
@@ -382,14 +394,7 @@ public class DataOutputHandler extends OutputHandler {
         if ( !entry.getResource().isUrl()) {
             return false;
         }
-        String url = entry.getResource().getPath();
-        if (url == null) {
-            return false;
-        }
         if (url.indexOf("dods") >= 0) {
-            return true;
-        }
-        if (url.endsWith(".das")) {
             return true;
         }
         return false;
@@ -409,7 +414,9 @@ public class DataOutputHandler extends OutputHandler {
         if ( !entry.isFile()) {
             return false;
         }
-        Boolean b = checkedEntries.get(entry.getId());
+        if(cannotLoad(entry,TYPE_CDM)) return false;
+        if(canLoad(entry,TYPE_CDM)) return true;
+        Boolean b = (Boolean)cdmEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if (canLoadEntry(entry)) {
@@ -424,7 +431,7 @@ public class DataOutputHandler extends OutputHandler {
                 }
             }
             b = new Boolean(ok);
-            checkedEntries.put(entry.getId(), b);
+            cdmEntries.put(entry.getId(), b);
         }
         return b.booleanValue();
     }
@@ -438,7 +445,10 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsPoint(Entry entry) {
-        Boolean b = pointEntries.get(entry.getId());
+        if(cannotLoad(entry,TYPE_POINT)) return false;
+        if(canLoad(entry,TYPE_POINT)) return true;
+
+        Boolean b = (Boolean)pointEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if ( !canLoadEntry(entry)) {
@@ -466,7 +476,15 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsTrajectory(Entry entry) {
-        Boolean b = trajectoryEntries.get(entry.getId());
+        if(cannotLoad(entry,TYPE_TRAJECTORY)) return false;
+        if(canLoad(entry,TYPE_TRAJECTORY)) return true;
+
+        if ( !canLoadAsCdm(entry)) {
+            return false;
+        }
+
+
+        Boolean b = (Boolean)trajectoryEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if (canLoadEntry(entry)) {
@@ -483,6 +501,48 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    public static final String TYPE_CDM = "cdm";
+    public static final String TYPE_GRID = "grid";
+    public static final String TYPE_TRAJECTORY = "trajectory";
+    public static final String TYPE_POINT = "point";
+
+    private Hashtable prefixMap;
+
+    private boolean cannotLoad(Entry entry, String type) {
+        return hasPrefixForType(entry, type, true);
+    }
+
+    private boolean canLoad(Entry entry, String type) {
+        return hasPrefixForType(entry, type, false);
+    }
+
+    private boolean hasPrefixForType(Entry entry, String type,boolean forNot) {
+        if(prefixMap == null) {
+            Hashtable tmp = new Hashtable();
+            String[]types ={TYPE_CDM,TYPE_GRID,TYPE_TRAJECTORY,TYPE_POINT};
+            for(int i=0;i<types.length;i++) {
+                List toks = StringUtil.split(getRepository().getProperty("ramadda.data."+types[i]+".prefixes",""),",",true,true);
+                for(String tok: (List<String>) toks) {
+                    tmp.put(types[i]+"." + tok,"");
+                }
+            }
+            prefixMap = tmp;
+        }
+        String url = entry.getResource().getPath();
+        if (url == null) {
+            return false;
+        }
+        String ext = IOUtil.getFileExtension(url).toLowerCase();
+        String key = type +"." + ext;
+        String notKey = type +".!" + ext;
+        if(forNot)
+            return prefixMap.get(notKey)!=null;
+        else
+            return prefixMap.get(key)!=null;
+        
+
+    }
+
     /**
      * _more_
      *
@@ -491,10 +551,14 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsGrid(Entry entry) {
+        if(cannotLoad(entry,TYPE_GRID)) return false;
+        if(canLoad(entry,TYPE_GRID)) return true;
         if ( !canLoadAsCdm(entry)) {
             return false;
         }
-        Boolean b = gridEntries.get(entry.getId());
+
+
+        Boolean b = (Boolean)gridEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if ( !canLoadEntry(entry)) {
