@@ -301,7 +301,7 @@ public class DataOutputHandler extends OutputHandler {
         long t1 = System.currentTimeMillis();
         if ( !canLoadAsCdm(entry)) {
             long t2 = System.currentTimeMillis();
-            if(t2>t1)
+            if((t2-t1)>1)
                 System.err.println ("DataOutputHandler (cdm) getEntryLinks  " + entry.getName() +" time:" + (t2-t1));
             return;
         }
@@ -332,7 +332,7 @@ public class DataOutputHandler extends OutputHandler {
         //        cdlLink.setLinkType(OutputType.TYPE_ACTION);
         links.add(cdlLink);
         long t2 = System.currentTimeMillis();
-        if(t2>t1)
+        if((t2-t1)>1)
             System.err.println ("DataOutputHandler  getEntryLinks  " + entry.getName() +" time:" + (t2-t1));
     }
 
