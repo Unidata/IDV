@@ -306,8 +306,9 @@ public class DataOutputHandler extends OutputHandler {
             return;
         }
 
-        if (canLoadAsTrajectory(entry)) {
-            addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
+
+        if (canLoadAsGrid(entry)) {
+            addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
         } else if (canLoadAsPoint(entry)) {
             addOutputLink(request, entry, links, OUTPUT_POINT_MAP);
             links.add(makeLink(request,entry,OUTPUT_POINT_CSV, 
@@ -315,8 +316,8 @@ public class DataOutputHandler extends OutputHandler {
 
             links.add(makeLink(request,entry,OUTPUT_POINT_KML, 
                                "/"+ IOUtil.stripExtension(entry.getName())+ ".kml"));
-        } else if (canLoadAsGrid(entry)) {
-            addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
+        } else if (  canLoadAsTrajectory(entry) ) {
+            addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         }
 
         Object oldOutput = request.getOutput();
@@ -415,7 +416,11 @@ public class DataOutputHandler extends OutputHandler {
             return false;
         }
         if(cannotLoad(entry,TYPE_CDM)) return false;
-        if(canLoad(entry,TYPE_CDM)) return true;
+
+        String[]types ={TYPE_CDM,TYPE_GRID,TYPE_TRAJECTORY,TYPE_POINT};
+        for(int i=0;i<types.length;i++)  {
+            if(canLoad(entry,types[i])) return true;
+        }
         Boolean b = (Boolean)cdmEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
@@ -509,6 +514,19 @@ public class DataOutputHandler extends OutputHandler {
     private Hashtable prefixMap;
 
     private boolean cannotLoad(Entry entry, String type) {
+        String[]types ={TYPE_CDM,TYPE_GRID,TYPE_TRAJECTORY,TYPE_POINT};
+        //If this entry can be loaded by another type then we cannot
+        //load it for this type
+        /*        if(!type.equals(TYPE_CDM)) {
+            for(int i=0;i<types.length;i++) {
+                if(!types[i].equals(TYPE_CDM)) {
+                    continue;
+                }
+                if(type.equals(types[i])) continue;
+                if(canLoad(entry,types[i])) return true;
+            }
+            }*/
+
         return hasPrefixForType(entry, type, true);
     }
 
@@ -551,8 +569,12 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsGrid(Entry entry) {
-        if(cannotLoad(entry,TYPE_GRID)) return false;
-        if(canLoad(entry,TYPE_GRID)) return true;
+        if(cannotLoad(entry,TYPE_GRID)) {
+            return false;
+        }
+        if(canLoad(entry,TYPE_GRID)){
+            return true;
+        }
         if ( !canLoadAsCdm(entry)) {
             return false;
         }
