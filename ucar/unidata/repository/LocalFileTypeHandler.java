@@ -206,6 +206,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         if (values == null) {
             return ids;
         }
+        long t1 = System.currentTimeMillis();
+        System.err.println ("getSynthIds " + parentEntry);
         File   rootDir     = new File((String) values[0]);
         String rootDirPath = rootDir.toString();
         File   childPath   = getFileFromId(synthId, rootDir);
@@ -232,6 +234,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             }
             ids.add(getSynthId(parentEntry, rootDirPath, childFile));
         }
+        long t2 = System.currentTimeMillis();
+        System.err.println ("Time:" + (t2-t1));
         return ids;
     }
 
@@ -330,6 +334,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         if ( !rootDir.exists() || !targetFile.exists()) {
             return null;
         }
+        long t1 = System.currentTimeMillis();
         //TODO: Check the time since last change here
         List<String> includes = get(values, COL_INCLUDES);
         List<String> excludes = get(values, COL_EXCLUDES);
@@ -402,6 +407,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             //Tack on the metadata
             entry.setMetadata(metadataList);
         }
+        long t2 = System.currentTimeMillis();
+        //        System.err.println ("makeSynthEntry: " + entry + " " +(t2-t1));
         return entry;
     }
 
