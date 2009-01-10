@@ -235,7 +235,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             ids.add(getSynthId(parentEntry, rootDirPath, childFile));
         }
         long t2 = System.currentTimeMillis();
-        System.err.println ("Time:" + (t2-t1) + " ids:" + ids.size());
+        //        System.err.println ("Time:" + (t2-t1) + " ids:" + ids.size());
         return ids;
     }
 

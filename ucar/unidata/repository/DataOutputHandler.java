@@ -300,6 +300,7 @@ public class DataOutputHandler extends OutputHandler {
         if (entry == null) {
             return;
         }
+        long t1 = System.currentTimeMillis();
         if ( !canLoadAsCdm(entry)) {
             return;
         }
@@ -329,6 +330,8 @@ public class DataOutputHandler extends OutputHandler {
         Link cdlLink  = makeLink(request, state.entry, OUTPUT_CDL);
         //        cdlLink.setLinkType(OutputType.TYPE_ACTION);
         links.add(cdlLink);
+        long t2 = System.currentTimeMillis();
+        System.err.println ("can load:" + (t2-t1));
     }
 
 
@@ -386,7 +389,7 @@ public class DataOutputHandler extends OutputHandler {
         if (url.indexOf("dods") >= 0) {
             return true;
         }
-        if (url.endsWith("das")) {
+        if (url.endsWith(".das")) {
             return true;
         }
         return false;
