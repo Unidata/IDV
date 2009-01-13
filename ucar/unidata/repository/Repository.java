@@ -2035,7 +2035,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         String jsContent =
-            HtmlUtil.div("", " id=\"tooltipdiv\" class=\"tooltip-outer\" ")
+            HtmlUtil.div("", " id=\"tooltipdiv\" class=\"tooltip-outer\" ") 
+            + HtmlUtil.div("", " id=\"popupdiv\" class=\"tooltip-outer\" ")
             + HtmlUtil.div("", " id=\"output\"")
             + HtmlUtil.div("", " id=\"selectdiv\" class=\"selectdiv\" ")
             + HtmlUtil.div("", " id=\"floatdiv\" class=\"floatdiv\" ");
@@ -2062,15 +2063,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
+        String favoritesWrapper =
+            getTemplateProperty(request,"ramadda.template.favorites.wrapper", "${link}");
+        String favoritesTemplate =
+            getTemplateProperty(request,"ramadda.template.favorites", "<b>Favorites:<b><br>${entries}");
+        String favoritesSeparator =
+            getTemplateProperty(request,"ramadda.template.favrorites.separator", "");
+
         List<FavoriteEntry> favoritesList =   getUserManager().getFavorites(request, request.getUser());
-        String favorites = "";
+        StringBuffer favorites = new StringBuffer();
         if(favoritesList.size()>0) {
-            String favoritesWrapper =
-                getTemplateProperty(request,"ramadda.template.favorites.wrapper", "${link}");
-            String favoritesTemplate =
-                getTemplateProperty(request,"ramadda.template.favorites", "<b>Favorites:<b><br>${favorites}");
-            String favoritesSeparator =
-                getTemplateProperty(request,"ramadda.template.favrorites.separator", "");
             List favoriteLinks = new ArrayList();
             for(FavoriteEntry favorite: favoritesList) {
                 Entry entry  =favorite.getEntry();
@@ -2084,10 +2086,28 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 String  link = favoritesWrapper.replace("${link}",url);
                 favoriteLinks.add(link);
             }
-            favorites = favoritesTemplate.replace("${favorites}",StringUtil.join(favoritesSeparator, favoriteLinks));
+            favorites.append(favoritesTemplate.replace("${entries}",StringUtil.join(favoritesSeparator, favoriteLinks)));
         }
 
-
+        List<Entry> cartEntries = getUserManager().getCart(request);
+        if(cartEntries.size()>0) {
+            String cartTemplate =
+                getTemplateProperty(request,"ramadda.template.cart", "<b>Cart:<b><br>${entries}");
+            List cartLinks = new ArrayList();
+            for(Entry entry: cartEntries) {
+                String baseUrl =  request.entryUrl(URL_ENTRY_SHOW,   entry);
+                String label = entry.getLabel();
+                if(label.length()>12) {
+                    label = label.substring(0,11)+"...";
+                }
+                label = "<nobr>" + label+"</nobr>";
+                String url =  getEntryManager().getAjaxLink(request, entry,label,baseUrl,true,false);
+                String  link = favoritesWrapper.replace("${link}",url);
+                cartLinks.add(link);
+            }
+            favorites.append(HtmlUtil.p());
+            favorites.append(cartTemplate.replace("${entries}",StringUtil.join(favoritesSeparator, cartLinks)));
+        }
 
 
         String   content = new String(result.getContent());
@@ -2105,7 +2125,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             getProperty(PROP_HTML_FOOTER, BLANK), MACRO_TITLE,
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
             MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
-            MACRO_FAVORITES, favorites,
+            MACRO_FAVORITES, favorites.toString(),
             MACRO_ENTRY_HEADER,entryHeader,
             MACRO_ROOT, getUrlBase()
         };
@@ -4089,7 +4109,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String       compId = "menu_" + HtmlUtil.blockCnt++;
         String       linkId = "menulink_" + HtmlUtil.blockCnt++;
         String contents = makePopupDiv(menuContents, compId, makeClose);
-        String onClick = HtmlUtil.onMouseClick("showMenu(event,"
+        String onClick = HtmlUtil.onMouseClick("showPopup(event,"
                              + HtmlUtil.squote(linkId) + ","
                              + HtmlUtil.squote(compId) + ");");
         String href = HtmlUtil.href("javascript:noop();", link,
@@ -4103,7 +4123,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String makePopupDiv(String contents, String compId, boolean makeClose) {
         StringBuffer menu   = new StringBuffer();
         if(makeClose) {
-            String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hideMenuObject();"), 
+            String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"), 
                                                                       HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
             contents = closeLink+HtmlUtil.br()+contents;
         }

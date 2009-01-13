@@ -140,9 +140,14 @@ public class Request implements Constants {
      * @param user _more_
      */
     public Request(Repository repository, User user) {
+        this(repository, user,"");
+    }
+
+
+    public Request(Repository repository, User user,String path) {
         this.repository         = repository;
         this.user               = user;
-        this.type               = "";
+        this.type               = path;
         this.parameters         = new Hashtable();
         this.originalParameters = new Hashtable();
     }

@@ -161,7 +161,7 @@ function noop() {
 
 
 
-var menuObject;
+var popupObject;
 document.onmousemove = mouseMove;
 document.onmousedown = mouseDown;
 document.onmouseup   = mouseUp;
@@ -171,17 +171,17 @@ var draggedEntry;
 var draggedEntryName;
 var mouseMoveCnt =0;
 
-function hideMenuObject() {
-    if(menuObject) {
-        hideObject(menuObject);
-        menuObject = null;
+function hidePopupObject() {
+    if(popupObject) {
+        hideObject(popupObject);
+        popupObject = null;
     }
 }
 
 
 function mouseDown(event) {
-    if(menuObject) {
-        setTimeout("hideMenuObject()",1000);
+    if(popupObject) {
+        setTimeout("hidePopupObject()",1000);
     }
     event = util.getEvent(event);
     mouseIsDown = 1;
@@ -653,11 +653,26 @@ function hide(id) {
 }
 
 
-function showMenu(event,srcId,menuId) {
-    hideMenuObject();
-    var menu = util.getDomObject(menuId);
+function showAjaxPopup(event,srcId,url) {
+    util.loadXML( url, handleAjaxPopup,srcId);
+}
+
+function handleAjaxPopup(request, srcId) {
+        var xmlDoc=request.responseXML.documentElement;
+        text = getChildText(xmlDoc);
+	var srcObj = util.getDomObject(srcId);
+        var obj = util.getDomObject("tooltipdiv");
+	obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=${urlroot}/icons/close.gif></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+        showObject(obj);
+}
+
+
+
+function showPopup(event,srcId,popupId) {
+    hidePopupObject();
+    var popup = util.getDomObject(popupId);
     var srcObj = util.getDomObject(srcId);
-    if(!menu || !srcObj) return;
+    if(!popup || !srcObj) return;
     event = util.getEvent(event);
     x = util.getEventX(event);
     y = util.getEventY(event);
@@ -666,15 +681,14 @@ function showMenu(event,srcId,menuId) {
         y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
     } 
 
-//   alert(util.getRight(menu.obj));
+//   alert(util.getRight(popup.obj));
 
     x+=2;
     x+=3;
 
-    menuObject = menu;
-    showObject(menu);
-    
-    util.setPosition(menu, x,y);
+    popupObject = popup;
+    showObject(popup);
+    util.setPosition(popup, x,y);
 }
 
 

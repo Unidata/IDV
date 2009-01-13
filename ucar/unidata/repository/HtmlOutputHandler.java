@@ -108,6 +108,9 @@ public class HtmlOutputHandler extends OutputHandler {
     public static final OutputType OUTPUT_METADATAXML =
         new OutputType("metadataxml", OutputType.TYPE_INTERNAL);
 
+    public static final OutputType OUTPUT_LINKSXML =
+        new OutputType("linksxml", OutputType.TYPE_INTERNAL);
+
 
 
     /**
@@ -126,6 +129,7 @@ public class HtmlOutputHandler extends OutputHandler {
         addType(OUTPUT_GROUPXML);
         addType(OUTPUT_SELECTXML);
         addType(OUTPUT_METADATAXML);
+        addType(OUTPUT_LINKSXML);
     }
 
 
@@ -182,8 +186,6 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(tfo.getId().toString());
         }
 
-
-
         sb.append("</table>");
         String       contents = sb.toString();
 
@@ -195,6 +197,21 @@ public class HtmlOutputHandler extends OutputHandler {
         return new Result("", xml, "text/xml");
 
     }
+
+
+    public Result getLinksXml(Request request, Entry entry)
+            throws Exception {
+        StringBuffer sb = new StringBuffer("<content>\n");
+        String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
+        String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"), 
+                                            HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
+        sb.append(closeLink+HtmlUtil.br());
+        sb.append(links);
+        sb.append("\n</content>");
+        return new Result("", sb, "text/xml");
+    }
+
+
 
 
     /**
@@ -211,6 +228,9 @@ public class HtmlOutputHandler extends OutputHandler {
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, entry);
+        }
+        if (output.equals(OUTPUT_LINKSXML)) {
+            return getLinksXml(request, entry);
         }
         if (output.equals(OUTPUT_GROUPXML)) {
             return getActionXml(request, entry);
@@ -923,6 +943,10 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (output.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, group);
+        }
+
+        if (output.equals(OUTPUT_LINKSXML)) {
+            return getLinksXml(request, group);
         }
 
         boolean      showApplet = output.equals(OUTPUT_TIMELINE);

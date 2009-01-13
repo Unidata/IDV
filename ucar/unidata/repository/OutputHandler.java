@@ -1327,7 +1327,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                    Entry importEntry, String tag,
                                    Hashtable props) {
         try {
-            Request myRequest = new Request(getRepository(), request.getUser()) {
+            Request myRequest = new Request(getRepository(), request.getUser(),getRepository().URL_ENTRY_SHOW.toString()) {
                     public void putExtraProperty(Object key, Object value) {
                         request.putExtraProperty(key, value);
                     }
@@ -1358,7 +1358,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
             OutputType outputType = handler.findOutputType(tag);
 
-
             String originalOutput = request.getString(ARG_OUTPUT,
                                         (String) "");
             String originalId = request.getString(ARG_ENTRYID, (String) "");
@@ -1377,8 +1376,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                         theLink = link;
                         break;
                     }
-                    
                 }
+
                 String url = (theLink!=null?
                               theLink.getUrl():
                               myRequest.entryUrl(getRepository().URL_ENTRY_SHOW,
