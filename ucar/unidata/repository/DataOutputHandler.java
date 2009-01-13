@@ -1323,7 +1323,7 @@ public class DataOutputHandler extends OutputHandler {
                                 "endMarker.setInfoBubble(\"End time:"
                                 + todt.getEndDate() + "\");\n");
                             markerSB.append(
-                                "initMarker(endMarker,\"endMarker\");\n");
+                                "initMarker(endMarker,\"endMarker\"," + mapVarName+");\n");
                         }
                     } else {
                         markerSB.append("var startMarker = new Marker("
@@ -1333,7 +1333,7 @@ public class DataOutputHandler extends OutputHandler {
                             "startMarker.setInfoBubble(\"Start time:"
                             + todt.getStartDate() + "\");\n");
                         markerSB.append(
-                            "initMarker(startMarker,\"startMarker\");\n");
+                            "initMarker(startMarker,\"startMarker\"," + mapVarName+");\n");
                     }
                     js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
                 }
