@@ -10,15 +10,14 @@ ramadda.template.link.separator=
 ramadda.template.userlink.wrapper =<div class="navlink"><a href="${url}">${label}</a></div>
 ramadda.template.userlink.separator=
 
-xramadda.template.userlink.wrapper =<span class="navlink"><a ${extra} href="${url}" title="${tooltip}">${label}</a></span>
-xramadda.template.userlink.separator=<span class="separator"> | </span>
-
-ramadda.template.favorites = <b>Favorites:</b><div class="favorites">${entries}</div>
-ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
 
 ramadda.template.sublink.wrapper=${sublinks}
 ramadda.template.sublink.on=<span class="subnavoncomp">${label}</span>
 ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${label}</a></span>
+
+ramadda.template.favorites = <b>Favorites:</b><div class="favorites">${entries}</div>
+ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
+
 </properties>
 
 
@@ -65,8 +64,8 @@ ramadda.template.sublink.off=<span class="subnavoffcomp"><a href="${url}">${labe
 .favorites {
    border: 1px #999999 solid; 
    margin-top: 0px;
-   background-color:#ffffff;
-   font-size:80%;
+   xbackground-color:#ffffff;
+   font-size:70%;
 }
 
 

@@ -2066,7 +2066,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String favoritesWrapper =
             getTemplateProperty(request,"ramadda.template.favorites.wrapper", "${link}");
         String favoritesTemplate =
-            getTemplateProperty(request,"ramadda.template.favorites", "<b>Favorites:<b><br>${entries}");
+            getTemplateProperty(request,"ramadda.template.favorites", "<b>Favorites:<b>${entries}");
         String favoritesSeparator =
             getTemplateProperty(request,"ramadda.template.favrorites.separator", "");
 
@@ -2105,7 +2105,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 String  link = favoritesWrapper.replace("${link}",url);
                 cartLinks.add(link);
             }
-            favorites.append(HtmlUtil.p());
+            favorites.append(HtmlUtil.br());
             favorites.append(cartTemplate.replace("${entries}",StringUtil.join(favoritesSeparator, cartLinks)));
         }
 
