@@ -911,8 +911,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
         tabTitles.add(msg("Links"));
-        //        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
-        tabContent.add("LINKS");
+        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
 
 
         
