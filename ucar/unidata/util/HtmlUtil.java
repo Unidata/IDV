@@ -1954,7 +1954,7 @@ public class HtmlUtil {
      */
     public static String makeTabs(List titles, List contents,
                                   boolean skipEmpty) {
-        return makeTabs(titles, contents, skipEmpty, "tabcontent");
+        return makeTabs(titles, contents, skipEmpty, "tab_content");
     }
 
     /**
@@ -1970,7 +1970,7 @@ public class HtmlUtil {
     public static String makeTabs(List titles, List contents,
                                   boolean skipEmpty, String tabContentClass) {
         return makeTabs(titles, contents, skipEmpty, tabContentClass,
-                        "tabcontents");
+                        "tab_contents");
     }
 
     /**
@@ -1996,49 +1996,57 @@ public class HtmlUtil {
 
         titleSB = new StringBuffer("");
         StringBuffer contentSB = new StringBuffer();
-        StringBuffer jsSB      = new StringBuffer("var " + ids + "=[");
+        StringBuffer idArray      = new StringBuffer("new Array(" );
         boolean      didone    = false;
         for (int i = 0; i < titles.size(); i++) {
-            String title   = titles.get(i).toString();
             String content = contents.get(i).toString();
             if (skipEmpty && (content.length() == 0)) {
                 continue;
             }
+
+            String tabId = id + "_" + i;
+            if (didone) {
+                idArray.append(",");
+            }
+            didone = true;
+            idArray.append(HtmlUtil.squote(tabId));
+        }
+        idArray.append(")");
+
+        didone = false;
+        for (int i = 0; i < titles.size(); i++) {
+            String content = contents.get(i).toString();
+            if (skipEmpty && (content.length() == 0)) {
+                continue;
+            }
+            String title   = titles.get(i).toString();
             String tabId = id + "_" + i;
             contentSB.append("\n");
             contentSB.append(
                 HtmlUtil.div(
                     content,
-                    HtmlUtil.cssClass(tabContentClass)
+                    HtmlUtil.cssClass(tabContentClass+(!didone?"_on":"_off"))
                     + HtmlUtil.id("content_" + tabId)
-                    + HtmlUtil.style("display:block;visibility:" + ( !didone
+                    + HtmlUtil.style("display:" +(!didone?"block":"none")+";visibility:" + ( !didone
                     ? "visible"
                     : "hidden"))));
-            String link = HtmlUtil.href("javascript:" + id + ".toggleTab("
-                                        + HtmlUtil.squote(tabId)
+            String link = HtmlUtil.href("javascript:" + "tabPress("
+                                        + HtmlUtil.squote(tabId)+"," +
+                                        idArray+"," +
+                                        HtmlUtil.squote(tabId)
                                         + ")", title);
-            //            titleSB.append("<td>\n");
             titleSB.append(HtmlUtil.span(link,
-                                         HtmlUtil.cssClass("tabtitle")
+                                         (didone?HtmlUtil.cssClass("tab_title_off"):
+                                          HtmlUtil.cssClass("tab_title_on"))
                                          + HtmlUtil.id("title_" + tabId)));
-            //            titleSB.append("\n</td>\n");
-            if (didone) {
-                jsSB.append(",");
-            }
-            jsSB.append(HtmlUtil.squote(tabId));
             didone = true;
         }
-        jsSB.append("];\n");
 
-        //        titleSB.append("</tr></table>");
-        return "\n" + 
-            HtmlUtil.script(jsSB.toString())+"\n" 
-               + HtmlUtil.div(
-                   titleSB.toString(),
-                   HtmlUtil.cssClass("tabtitles")) + HtmlUtil.div(
-                       contentSB.toString(),
-                       HtmlUtil.cssClass(wrapperClass)) + HtmlUtil.script(
-                           "var " + id + "=new Tab(" + ids + ");\n");
+        return  HtmlUtil.div(
+                             titleSB.toString(),
+                             HtmlUtil.cssClass("tab_titles")) + HtmlUtil.div(
+                                                                            contentSB.toString(),
+                                                                            HtmlUtil.cssClass(wrapperClass));
     }
 
 

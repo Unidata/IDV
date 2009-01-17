@@ -83,7 +83,7 @@ public class Cache {
      */
     public synchronized void put(Object key, Object value) {
         //TESTING:
-        if(true) return;
+        //        if(true) return;
         keys.remove(key);
         keys.add(key);
         while (keys.size() > cacheSize) {
