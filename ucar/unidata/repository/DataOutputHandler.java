@@ -490,7 +490,6 @@ public class DataOutputHandler extends OutputHandler {
             return false;
         }
 
-
         Boolean b = (Boolean)trajectoryEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;

@@ -1160,6 +1160,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    protected void clearAllCaches() {
+        clearCache();
+    }
+
     /**
      * _more_
      */
