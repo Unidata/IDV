@@ -750,6 +750,13 @@ public class Admin extends RepositoryManager {
 
 
         asb.append(HtmlUtil.formEntry(
+                msgLabel("Hostname"),
+                HtmlUtil.input(
+                               PROP_HOSTNAME, getProperty(PROP_HOSTNAME, ""),
+                               HtmlUtil.SIZE_40)));
+
+
+        asb.append(HtmlUtil.formEntry(
                 msgLabel("SSL Port"),
                 HtmlUtil.input(
                                PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
@@ -945,8 +952,15 @@ public class Admin extends RepositoryManager {
         }
 
         getRepository().writeGlobal(
+                                    PROP_HOSTNAME,
+                                    request.getString(PROP_HOSTNAME, getProperty(PROP_HOSTNAME,"")));
+
+
+        getRepository().writeGlobal(
                                     PROP_SSL_PORT,
                                     request.getString(PROP_SSL_PORT, getProperty(PROP_SSL_PORT,"")));
+
+
 
 
         if (request.exists(PROP_LOCALFILEPATHS)) {

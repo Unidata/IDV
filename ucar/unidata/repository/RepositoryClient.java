@@ -123,7 +123,7 @@ public class RepositoryClient extends RepositoryBase {
                             String user, String password)
             throws Exception {
         super(port);
-        this.hostname = hostname;
+        setHostname(hostname);
         this.user     = user;
         this.password = password;
         setUrlBase(base);

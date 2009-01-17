@@ -359,12 +359,20 @@ public class Repository extends RepositoryBase implements RequestHandler {
         super(port);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
-        this.hostname = localMachine.getHostName();
+        setHostname(localMachine.getHostName());
         this.inTomcat = inTomcat;
         this.args     = args;
     }
 
 
+    public String getHostname() {
+        String hostname  = getProperty(PROP_HOSTNAME,(String)null);
+        if(hostname!=null && hostname.trim().length()>0) {
+            return hostname;
+        }
+        return super.getHostname();
+                               
+    }
 
 
 
@@ -577,11 +585,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             StringUtil.split(
                 getProperty("ramadda.html.htdocroots", BLANK), ";", true,
                 true));
-
-        String hostname = getProperty(PROP_HOSTNAME, (String) null);
-        if (hostname != null) {
-            this.hostname = hostname;
-        }
 
     }
 
