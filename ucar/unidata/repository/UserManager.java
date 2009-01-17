@@ -625,11 +625,14 @@ public class UserManager extends RepositoryManager {
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
             if (userDefaultIfNotFound) {
+                getDatabaseManager().close(stmt);
                 return getDefaultUser();
             }
+            getDatabaseManager().close(stmt);
             return null;
         } else {
             user = getUser(results);
+            getDatabaseManager().close(stmt);
         }
 
         userMap.put(user.getId(), user);
@@ -2243,9 +2246,13 @@ public class UserManager extends RepositoryManager {
                 String firstCol = "";
                 if(theUser==null) {
                     User user = findUser(userId);
-                    firstCol = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
-                                                         ARG_USER_ID,
-                                                         user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log")) +" " + user.getLabel());
+                    if(user==null) {
+                        firstCol = "No user:" + userId;
+                    } else {
+                        firstCol = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
+                                                             ARG_USER_ID,
+                                                             user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log")) +" " + user.getLabel());
+                    }
 
                 }
                 Date dttm = getDatabaseManager().getDate(results, col++);
