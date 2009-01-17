@@ -69,6 +69,7 @@
       <api request="/user/login"    method="processLogin"    admin="false"/>
       <api request="/user/logout"   method="processLogout"   admin="false"/>
       <api request="/user/home"     method="processHome"     admin="false"/>
+      <api request="/user/profile"     method="processProfile"     admin="false"/>
       <api request="/user/settings" method="processSettings" admin="false"/>
       <api request="/user/activity"      method="processActivityLog"      admin="true"/>
       <api request="/user/cart"     method="processCart"     admin="false"/>

@@ -155,6 +155,7 @@ public class GenericTypeHandler extends TypeHandler {
         tableDef.append(COL_ID + " varchar(200))");
         try {
             statement.execute(tableDef.toString());
+            
         } catch (Throwable exc) {
             if (exc.toString().indexOf("already exists") < 0) {
                 //TODO:

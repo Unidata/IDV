@@ -289,6 +289,7 @@ public class DatabaseManager extends RepositoryManager {
                 //check if the connection is OK
                 Statement statement = theConnection.createStatement();
                 statement.execute("select * from dummy");
+                statement.close();
             } catch (Exception exc) {
                 try {
                     closeConnection();
@@ -358,6 +359,12 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    public void close(Statement stmt) {
+        try {
+            stmt.close();
+        } catch(Exception ignore) {}
+    }
+
 
     /**
      * _more_
@@ -373,10 +380,14 @@ public class DatabaseManager extends RepositoryManager {
         Statement statement = select("count(*)", table, clause);
 
         ResultSet results   = statement.getResultSet();
+        int result;
         if ( !results.next()) {
-            return 0;
+            result =  0;
+        } else {
+            result =  results.getInt(1);
         }
-        return results.getInt(1);
+        close(statement);
+        return result;
     }
 
 
@@ -587,6 +598,7 @@ public class DatabaseManager extends RepositoryManager {
         if (db.equals(DB_MYSQL)) {
             Statement statement = connection.createStatement();
             statement.execute("set time_zone = '+0:00'");
+            close(statement);
         }
     }
 
@@ -819,7 +831,7 @@ public class DatabaseManager extends RepositoryManager {
         setValues(pstmt, values);
         try {
             pstmt.executeUpdate();
-            pstmt.close();
+            close(pstmt);
         } catch (Exception exc) {
             System.err.println("Error:" + insert);
             throw exc;
@@ -1094,7 +1106,9 @@ public class DatabaseManager extends RepositoryManager {
                                      Clause.eq(column, id));
 
         ResultSet results = statement.getResultSet();
-        return results.next();
+        boolean result =  results.next();
+        close(statement);
+        return result;
     }
 
 

@@ -1752,6 +1752,38 @@ public class UserManager extends RepositoryManager {
 
 
 
+    public Result processProfile(Request request) throws Exception {
+        StringBuffer sb   = new StringBuffer();
+        User         user = findUser(request.getString(ARG_USER_ID,""));
+        if(user == null) {
+            sb.append(msgLabel("Unknown user"));
+            sb.append(request.getString(ARG_USER_ID,""));
+            return new Result(msg("User Profile"), sb);
+        }
+
+        sb.append(msgHeader("User Profile"));
+        String searchLink = 
+            HtmlUtil.href(
+                          HtmlUtil.url(
+                                       request.url(getRepository().URL_ENTRY_SEARCH),
+                                       ARG_USER_ID,
+                                       user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_SEARCH),
+                                                                   msg("Search for entries created by this user")));
+
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry(msgLabel("ID"),user.getId()+HtmlUtil.space(2)+ searchLink));        
+        sb.append(HtmlUtil.formEntry(msgLabel("Name"),user.getLabel()));        
+        String email = user.getEmail();
+        if(email.length()>0) {
+            email = email.replace("@"," _AT_ ");
+            sb.append(HtmlUtil.formEntry(msgLabel("Email"),email));
+        }
+        sb.append(HtmlUtil.formTableClose());
+        return new Result(msg("User Profile"), sb);
+    }
+
+
+
 
     /**
      * Class PasswordReset _more_

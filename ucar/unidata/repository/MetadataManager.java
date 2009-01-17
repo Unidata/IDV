@@ -872,6 +872,7 @@ public class MetadataManager extends RepositoryManager {
                                      Tables.METADATA.COL_TYPE,
                                      type.getType()));
             values = SqlUtil.readString(stmt, 1);
+            getDatabaseManager().close(stmt);
             if (myDistinctMap != null) {
                 myDistinctMap.put(type.getType(), values);
             }

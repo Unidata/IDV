@@ -185,17 +185,17 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    private Cache cdmEntries = new Cache(10000);
+    private Cache cdmEntries = new Cache(5000);
 
     /** _more_ */
-    private Cache gridEntries = new Cache(10000);
+    private Cache gridEntries = new Cache(5000);
 
 
     /** _more_ */
-    private Cache pointEntries = new Cache(10000);
+    private Cache pointEntries = new Cache(5000);
 
     /** _more_ */
-    private Cache trajectoryEntries = new Cache(10000);
+    private Cache trajectoryEntries = new Cache(5000);
 
     //TODO: When we close a ncfile some thread might be using it
     //Do we have to actually close it??

@@ -1778,6 +1778,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getResult(Request request) throws Exception {
         ApiMethod apiMethod = findMethod(request);
+        System.err.println("Request:" + request);
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }

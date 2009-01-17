@@ -207,6 +207,9 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_USER_HOME = new RequestUrl(this,
                                                 "/user/home","User Home");
 
+    public final RequestUrl URL_USER_PROFILE = new RequestUrl(this,
+                                                "/user/profile","User Profile");
+
     /** _more_ */
     public final RequestUrl URL_USER_SETTINGS = new RequestUrl(this,
                                                     "/user/settings",

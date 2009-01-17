@@ -804,11 +804,10 @@ public class TypeHandler extends RepositoryManager {
             String userSearchLink =
                 HtmlUtil.href(
                     HtmlUtil.url(
-                        request.url(getRepository().URL_ENTRY_SEARCH),
+                        request.url(getRepository().URL_USER_PROFILE),
                         ARG_USER_ID,
                         entry.getUser().getId()), entry.getUser().getLabel(),
-                            "title=\"Search for entries created by "
-                            + entry.getUser().getLabel() + "\"");
+                            "title=\"View user profile\"");
 
             sb.append(HtmlUtil.formEntry(msgLabel("Created by"),
                                          userSearchLink + " @ "

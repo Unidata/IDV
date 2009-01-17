@@ -42,6 +42,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
 
+import java.text.DecimalFormat;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -66,6 +67,8 @@ import javax.mail.internet.InternetAddress;
 
 
 import javax.mail.internet.MimeMessage;
+import java.lang.management.*;
+
 
 
 /**
@@ -1066,33 +1069,65 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminStats(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
 
-        sb.append(msgHeader("Repository State"));
-        sb.append(HtmlUtil.formTable());
-        getStorageManager().addInfo(sb);
-        getDatabaseManager().addInfo(sb);
-        sb.append(HtmlUtil.formTableClose());
-        sb.append("<p>");
+        DecimalFormat fmt = new DecimalFormat("#0");
 
-        sb.append(msgHeader("Repository Database Statistics"));
-        sb.append("<table>\n");
+
+        StringBuffer stateSB = new StringBuffer();
+        stateSB.append(HtmlUtil.formTable());
+        getStorageManager().addInfo(stateSB);
+        getDatabaseManager().addInfo(stateSB);
+        stateSB.append(HtmlUtil.formTableClose());
+
+
+
+        StringBuffer statusSB = new StringBuffer();
+        double totalMemory   = (double) Runtime.getRuntime().maxMemory();
+        double freeMemory = (double) Runtime.getRuntime().freeMemory();
+        double highWaterMark =
+            (double) Runtime.getRuntime().totalMemory();
+        double usedMemory = (highWaterMark - freeMemory);
+        statusSB.append(HtmlUtil.formTable());
+        totalMemory   = totalMemory / 1000000.0;
+        usedMemory    = usedMemory / 1000000.0;
+        statusSB.append(HtmlUtil.formEntry(msgLabel("Total Memory Available"),
+                                     fmt.format(totalMemory)+" (MB)"));
+        statusSB.append(HtmlUtil.formEntry(msgLabel("Used Memory"),
+                                     fmt.format(usedMemory)+" (MB)"));
+
+        long uptime =  ManagementFactory.getRuntimeMXBean().getUptime();
+        statusSB.append(HtmlUtil.formEntry(msgLabel("Up Time"),
+                                     fmt.format((double)(uptime/1000/60)) +" " + msg("minutes")));
+
+        getEntryManager().addStatusInfo(statusSB);
+
+
+        statusSB.append(HtmlUtil.formTableClose());
+
+
+
+
+        StringBuffer dbSB = new StringBuffer();
+
+
+
+        dbSB.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
                            msg("Metadata Items") };
         String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME,
                             Tables.METADATA.NAME };
         for (int i = 0; i < tables.length; i++) {
-            sb.append(HtmlUtil.row(HtmlUtil.cols(""
+            dbSB.append(HtmlUtil.row(HtmlUtil.cols(""
                     + getDatabaseManager().getCount(tables[i].toLowerCase(),
                         new Clause()), names[i])));
         }
 
 
-        sb.append(
+        dbSB.append(
             HtmlUtil.row(
                 HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")), 2)));
         int total = 0;
-        sb.append(
+        dbSB.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
                     "" + getDatabaseManager().getCount(
@@ -1110,13 +1145,20 @@ public class Admin extends RepositoryManager {
                     request.url(
                         getRepository().URL_SEARCH_FORM, ARG_TYPE,
                         typeHandler.getType()), typeHandler.getLabel());
-            sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
+            dbSB.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
         }
 
 
 
-        sb.append("</table>\n");
+        dbSB.append("</table>\n");
 
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.makeShowHideBlock(msg("System Status"),
+                                             statusSB.toString(), true));
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Repository State"),
+                                             stateSB.toString(), false));
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Database Statistics"),
+                                             dbSB.toString(), false));
         return makeResult(request, msg("Statistics"), sb);
     }
 
