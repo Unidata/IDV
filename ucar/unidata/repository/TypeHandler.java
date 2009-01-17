@@ -1234,7 +1234,7 @@ public class TypeHandler extends RepositoryManager {
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             HtmlUtil.makeTabs(tabTitles, tabContent, true,
-                                "tabcontent", "tabcontents_noborder")));
+                                "tab_content", "tab_contents_noborder")));
                 }
 
             } else {

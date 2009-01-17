@@ -467,22 +467,24 @@ ul {
    margin-top:5px;
 }
 
-.tabtitles {
+.tab_titles {
    border-bottom : 1px #000000 solid;
    margin:0px;
    padding:0px;
 }
 
-.tabcontents {
+.tab_contents {
    border-left : 1px #000000 solid;
    border-right : 1px #000000 solid;
    border-bottom : 1px #000000 solid;
+   margin:0px;
+   padding:0px;
 }
 
-.tabcontents_noborder {
+.tab_contents_noborder {
 }
 
-.tabcontent_fixedheight {
+.tab_content_fixedheight_off {
    min-height: 100px;
    max-height: 200px; 
    overflow-y: auto;
@@ -490,21 +492,30 @@ ul {
 }
 
 
-.tabcontent {
+
+.tab_content_fixedheight_on {
+   background-color:#ffffff;
    min-height: 100px;
+   max-height: 200px; 
+   overflow-y: auto;
    padding:5;
 }
 
 
-.tabtitleon {
+.tab_content_off {
+   xmin-height: 50px;
+   padding:5;
 }
 
-.tabtitleoff {
+.tab_content_on {
    background-color:white;
+   xmin-height: 50px;
+   padding:5;
 }
 
-.tabtitle {
-        background-color:#ffffff;
+
+.tab_title_on {
+   background-color:white;
 	border: 1px #000000 solid;
         font-weight: bold;
 	border-bottom: 1px #ffffff solid;
@@ -514,9 +525,32 @@ ul {
 	padding-top:2;
 	padding-left:6;
 	padding-right:6;
+	border-bottom:1px #ffffff  solid;
 }
 
-.tabtitle a {
+.tab_title_off {
+   background-color:#f1f0f3;
+	border: 1px #000000 solid;
+        font-weight: bold;
+	border-bottom: 1px #ffffff solid;
+	margin-left:3px;
+	margin-right:3px;
+	padding-bottom:0;
+	padding-top:2;
+	padding-left:6;
+	padding-right:6;
+	border-bottom:1px #000000  solid;
+}
+
+
+
+.tab_title_on a {
+	color:#000000;
+	text-decoration: none;
+}
+
+
+.tab_title_off a {
 	color:#000000;
 	text-decoration: none;
 }
@@ -532,7 +566,8 @@ ul {
 .tooltip-inner {
    border : 1px black solid;
    xbackground-color : #FFFFCC;
-   background-color : #eeeeee;
+   background-color : #ffffff;
+   xbackground-color : #eeeeee;
    margin:0px;
 }
 
@@ -541,7 +576,7 @@ ul {
    margin:0px;
    padding:1px;
    xbackground-color : #FFFFCC;
-   background-color : #eeeeee;
+   background-color : #ffffff;
 }
 
 .tooltip-outer {

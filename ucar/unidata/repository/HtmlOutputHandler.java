@@ -175,10 +175,8 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         request.put(ARG_OUTPUT, OUTPUT_HTML);
-        String toolbar = getEntryManager().getEntryToolbar(request, entry,false);
         boolean didOne = false;
         sb.append("<table>");
-        sb.append(HtmlUtil.formEntry(msgLabel("Links"), toolbar));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, true, false, true));
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, false,
@@ -187,7 +185,13 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         sb.append("</table>");
-        String       contents = sb.toString();
+
+        String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
+        String contents =  HtmlUtil.makeTabs(Misc.newList(msg("Information"),msg("Links")), 
+                                             Misc.newList(sb.toString(),links),
+                                             true,  "tabcontent");
+
+        //        String       contents = sb.toString();
 
         StringBuffer xml      = new StringBuffer("<content>\n");
         XmlUtil.appendCdata(xml,
@@ -252,7 +256,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String informationBlock = getInformationTabs(request, entry,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                    informationBlock, true));
+                                                 informationBlock, true));
 
             StringBuffer metadataSB = new StringBuffer();
             getMetadataManager().decorateEntry(request, entry, metadataSB,
@@ -894,7 +898,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tabTitles.add("Basic");
         Object basic;
         tabContent.add(basic = entry.getTypeHandler().getEntryContent(entry,
-                request, false, true));
+                                                                      request, false, true));
 
 
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, true,
@@ -907,10 +911,14 @@ public class HtmlOutputHandler extends OutputHandler {
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
         tabTitles.add(msg("Links"));
-        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
+        //        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
+        tabContent.add("LINKS");
+
+
+        
         return HtmlUtil.makeTabs(tabTitles, tabContent, true, (fixedHeight
-                ? "tabcontent_fixedheight"
-                : "tabcontent"));
+                ? "tab_content_fixedheight"
+                : "tab_content"));
 
 
     }
@@ -978,7 +986,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                    informationBlock, false));
+                                                 informationBlock, false));
 
             StringBuffer metadataSB = new StringBuffer();
             getMetadataManager().decorateEntry(request, group, metadataSB,

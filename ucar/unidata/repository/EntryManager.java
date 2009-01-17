@@ -2491,7 +2491,7 @@ return new Result(title, sb);
 
     protected String getAjaxLink(Request request, Entry entry,
                                  String linkText, String url,
-                                 boolean includeIcon, boolean normalGroupIcon)
+                                 boolean includeIcon, boolean forTreeNavigation)
             throws Exception {
 
 
@@ -2509,18 +2509,18 @@ return new Result(title, sb);
             String       compId = "popup_" + HtmlUtil.blockCnt++;
             String linkId = "img_" + uid;
 
-            if(entry.isGroup() && normalGroupIcon) {
+            if(entry.isGroup() && forTreeNavigation) {
                 event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                                                             HtmlUtil.squote(entryId) + ","
                                                             + HtmlUtil.squote(uid)));
-            } else {
+            } else if(!forTreeNavigation) {
                 event = HtmlUtil.onMouseClick("showMenu(event,"
                                               + HtmlUtil.squote(linkId) + ","
                                               + HtmlUtil.squote(compId) + ");");
             }
 
             if (okToMove) {
-                event += (entry.isGroup()&&normalGroupIcon
+                event += (entry.isGroup()&&forTreeNavigation
                           ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
                           + HtmlUtil.squote(entryId) + ")")
                           : "") + HtmlUtil
@@ -2536,7 +2536,7 @@ return new Result(title, sb);
                         ? dropEvent
                         : "");
             }
-            String img = HtmlUtil.img(icon, (entry.isGroup()&&normalGroupIcon
+            String img = HtmlUtil.img(icon, (entry.isGroup()&&forTreeNavigation
                                              ? "Click to open group; "
                                              : "Click to view actions; ") + (okToMove
                     ? "Drag to move"
@@ -2546,13 +2546,16 @@ return new Result(title, sb);
 
 
             sb.append(img);
-            if(!entry.isGroup()||!normalGroupIcon) {
-                String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
-                sb.append(getRepository().makePopupDiv(links, compId, true));
+            if(!entry.isGroup()||!forTreeNavigation) {
+                //                String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
+                //                sb.append(getRepository().makePopupDiv(links, compId, true));
             }
             sb.append(HtmlUtil.space(1));
             getMetadataManager().decorateEntry(request, entry, sb, true);
         }
+
+
+
 
         String elementId = entry.getId();
         String qid       = HtmlUtil.squote(elementId);

@@ -756,6 +756,17 @@ function selectDate(div,field,id,fmt) {
 }
 
 
+var tabs = new Array();
+
+function tabPress(tabId,ids,what) {
+	if(!tabs[tabId]) {
+		tabs[tabId] = new Tab(ids);
+	}
+	tabs[tabId].toggleTab(what);
+}
+
+
+
 function Tab(ids) {
 	this.ids = ids;
 	this.toggleTab = toggleTab;
@@ -770,7 +781,6 @@ function Tab(ids) {
 		break;
 	}*/
 
-
         for(i=0;i<ids.length;i++) {
 		var contentId  = 'content_'+ids[i];
 	        var content = util.getDomObject(contentId);
@@ -779,7 +789,7 @@ function Tab(ids) {
 		if(i==0) this.onStyle = title.style;
 		else  this.offStyle = title.style;
 	}
-	this.toggleTab(this.ids[0]);
+//	this.toggleTab(this.ids[0]);
 }
 
 function toggleTab(mainId) {
@@ -795,6 +805,7 @@ function toggleTab(mainId) {
 		tabs = tabs+'cannot find content:' + i +'\n';
 		continue;
         }
+
 	if(contentId==mainContentId) {
 		tabs = tabs+'turning it on:' + i +'\n';
 		content.style.visibility="visible";

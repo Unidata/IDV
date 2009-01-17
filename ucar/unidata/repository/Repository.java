@@ -1708,6 +1708,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
             result.addCookie(UserManager.COOKIE_NAME,
                              sessionId + "; path=" + getUrlBase()+ "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
         }
+
+        if(request.get("gc",false)) {
+            System.err.println("Running gc");
+            Misc.gc();
+        }
+
         return result;
     }
 
@@ -1782,7 +1788,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getResult(Request request) throws Exception {
         ApiMethod apiMethod = findMethod(request);
-        System.err.println("Request:" + request);
+        //        System.err.println("Request:" + request);
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }
