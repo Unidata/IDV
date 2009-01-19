@@ -937,8 +937,6 @@ public class ArgsManager extends IdvManager {
         } else if (arg.equals(ARG_ISLINTERACTIVE)) {
             islInteractive = true;
             setIsOffScreen(false);
-            
-            scriptingFiles.add(arg);
         } else if (isIslFile(arg)) {
             scriptingFiles.add(arg);
             if ( !islInteractive) {
