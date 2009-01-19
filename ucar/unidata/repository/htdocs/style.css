@@ -503,19 +503,18 @@ ul {
 
 
 .tab_content_off {
-   xmin-height: 50px;
    padding:5;
 }
 
 .tab_content_on {
-   background-color:white;
-   xmin-height: 50px;
+   background-color:#ffffff;
+   padding:50px;
    padding:5;
 }
 
 
 .tab_title_on {
-   background-color:white;
+   background-color:#ffffff;
 	border: 1px #000000 solid;
         font-weight: bold;
 	border-bottom: 1px #ffffff solid;
@@ -529,7 +528,7 @@ ul {
 }
 
 .tab_title_off {
-   background-color:#f1f0f3;
+   background-color:#dddddd;
 	border: 1px #000000 solid;
         font-weight: bold;
 	border-bottom: 1px #ffffff solid;
@@ -564,9 +563,10 @@ ul {
 
 
 .tooltip-inner {
-   border : 1px black solid;
-   xbackground-color : #FFFFCC;
-   background-color : #ffffff;
+   padding:3px;
+   border : 1px solid #bbbbbb;
+   background-color : #FFFFCC;
+   xbackground-color : #ffffff;
    xbackground-color : #eeeeee;
    margin:0px;
 }

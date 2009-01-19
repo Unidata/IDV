@@ -122,7 +122,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public static final String MACRO_FAVORITES = "favorites";
 
 
-
     /** _more_ */
     public static final String MACRO_REPOSITORY_NAME = "repository_name";
 
@@ -192,9 +191,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private Properties mimeTypes;
 
-    /** _more_ */
-    private Properties namesMap;
-
 
     /** _more_ */
     private Properties properties = new Properties();
@@ -250,7 +246,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private Hashtable namesHolder = new Hashtable();
-
 
 
     /** _more_ */
@@ -327,7 +322,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private List pageCacheList = new ArrayList();
-
 
 
     /** _more_ */
@@ -1164,6 +1158,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     protected void clearAllCaches() {
+        for (OutputHandler outputHandler : outputHandlers) {
+            outputHandler.clearCache();
+        }
         clearCache();
     }
 
@@ -1712,8 +1709,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                              sessionId + "; path=" + getUrlBase()+ "; expires=Fri, 31-Dec-2010 23:59:59 GMT;");
         }
 
-        if(request.get("gc",false)) {
-            System.err.println("Running gc");
+        if(request.get("gc",false) && request.getUser()!=null && request.getUser().getAdmin()) {
+            clearAllCaches();
             Misc.gc();
         }
 

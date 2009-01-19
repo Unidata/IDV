@@ -189,7 +189,7 @@ public class HtmlOutputHandler extends OutputHandler {
         String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
         String contents =  HtmlUtil.makeTabs(Misc.newList(msg("Information"),msg("Links")), 
                                              Misc.newList(sb.toString(),links),
-                                             true,  "tabcontent");
+                                             true,  "tab_content");
 
         //        String       contents = sb.toString();
 

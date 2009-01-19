@@ -760,7 +760,7 @@ var tabs = new Array();
 
 function tabPress(tabId,ids,what) {
 	if(!tabs[tabId]) {
-		tabs[tabId] = new Tab(ids);
+              tabs[tabId] = new Tab(ids);
 	}
 	tabs[tabId].toggleTab(what);
 }
@@ -770,59 +770,54 @@ function tabPress(tabId,ids,what) {
 function Tab(ids) {
 	this.ids = ids;
 	this.toggleTab = toggleTab;
-	/*
-	if (document.styleSheets[0].cssRules) {
-		theRules = document.styleSheets[0].cssRules;
-	} else if (document.styleSheets[0].rules) {
-		theRules = document.styleSheets[0].rules;
-	}
-        for(i=0;i<theRules.length;i++) {
-		rule = theRules[i];
-		break;
-	}*/
+	this.onColor = "#ffffff";
+	this.offColor = "#dddddd";
 
         for(i=0;i<ids.length;i++) {
 		var contentId  = 'content_'+ids[i];
 	        var content = util.getDomObject(contentId);
 		var titleId  = 'title_'+ids[i];
 	        var title = util.getDomObject(titleId);
-		if(i==0) this.onStyle = title.style;
-		else  this.offStyle = title.style;
+		if(i==0) {
+			this.onStyle = title.style;
+			if(title.style.backgroundColor) {
+				//this.onColor = title.style.backgroundColor;
+			}
+		} else {
+			this.offStyle = title.style;
+			if(title.style.backgroundColor) {
+				//this.offColor = title.style.backgroundColor;
+			}
+		}
 	}
 //	this.toggleTab(this.ids[0]);
 }
 
 function toggleTab(mainId) {
-//return;
     var mainContentId = 'content_' + mainId;
-    var tabs = '';
     for(i=0;i<this.ids.length;i++) {
 	var contentId  = 'content_'+this.ids[i];
         var content = util.getDomObject(contentId);
 	var titleId  = 'title_'+this.ids[i];
 	var title = util.getDomObject(titleId);
         if(!content) {
-		tabs = tabs+'cannot find content:' + i +'\n';
 		continue;
         }
 
 	if(contentId==mainContentId) {
-		tabs = tabs+'turning it on:' + i +'\n';
 		content.style.visibility="visible";
                 content.style.display = "block";
-		content.style.backgroundColor="#ffffff";
-		title.style.backgroundColor="#ffffff";
+		//content.style.backgroundColor="#ffffff";
+		content.style.backgroundColor=this.onColor;
+		title.style.backgroundColor=this.onColor;
 		title.style.borderBottom = "1px #ffffff  solid";
 	} else {
-		tabs = tabs+'turning it off:' + i +'\n';
 		content.style.visibility="hidden";
                 content.style.display = "none";
-		title.style.backgroundColor="#f1f0f3";
+		title.style.backgroundColor=this.offColor;
 		title.style.borderBottom = "1px #000000  solid";
 	}
     }
-//   util.print(tabs);
-
 }
 
 

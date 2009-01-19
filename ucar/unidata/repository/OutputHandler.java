@@ -146,6 +146,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public void init() {}
 
 
+    public void clearCache() {
+    }
+
     /**
      * _more_
      *

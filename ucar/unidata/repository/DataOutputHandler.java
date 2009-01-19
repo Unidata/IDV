@@ -275,8 +275,17 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-
-
+    public void clearCache() {
+        super.clearCache();
+        ncFileCache.clear();
+        gridCache.clear();
+        pointCache.clear();
+        trajectoryCache.clear();
+        cdmEntries.clear();
+        gridEntries.clear();
+        pointEntries.clear();
+        trajectoryEntries.clear();
+    }
 
 
 
