@@ -2031,7 +2031,7 @@ public class HtmlUtil {
                     ? "visible"
                     : "hidden"))));
             String link = HtmlUtil.href("javascript:" + "tabPress("
-                                        + HtmlUtil.squote(tabId)+"," +
+                                        + HtmlUtil.squote(id)+"," +
                                         idArray+"," +
                                         HtmlUtil.squote(tabId)
                                         + ")", title);
