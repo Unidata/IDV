@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.idv;
 
 
@@ -321,6 +317,13 @@ public interface DisplayControl extends Sharable {
      * @return  text for menu
      */
     public String getMenuLabel();
+
+    /**
+     * Get the menus for this control.
+     * @param comp  component for placement of window (can be null)
+     * @return  list of menus
+     */
+    public List getControlMenus(JComponent comp);
 
     /**
      * Get a label describing control

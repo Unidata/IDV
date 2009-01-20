@@ -8082,6 +8082,28 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param event The mouse event
      */
     protected void showLegendMenu(final JComponent comp, MouseEvent event) {
+        List items = getControlMenus(comp);
+
+        /*
+        //If we have our own window then add the Control Window menu item
+        items.add(0, GuiUtils.makeMenuItem("Control Window", this, "popup",
+                                           comp));
+        items.add(1, GuiUtils.MENU_SEPARATOR);
+        */
+        JPopupMenu menu = GuiUtils.makePopupMenu(items);
+        menu.show(comp, event.getX(), event.getY());
+    }
+
+
+
+    /**
+     * Get the list of menus associated with this control.
+     *
+     *
+     * @param comp _more_
+     * @return  The menus
+     */
+    public List getControlMenus(final JComponent comp) {
 
         List fileItems  = new ArrayList();
         List viewItems  = new ArrayList();
@@ -8120,13 +8142,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         items.add(GuiUtils.makeMenu("Help", helpItems));
 
+        if (comp != null) {
+            //If we have our own window then add the Control Window menu item
+            items.add(0, GuiUtils.makeMenuItem("Control Window", this,
+                    "popup", comp));
+            items.add(1, GuiUtils.MENU_SEPARATOR);
+        }
 
-        //If we have our own window then add the Control Window menu item
-        items.add(0, GuiUtils.makeMenuItem("Control Window", this, "popup",
-                                           comp));
-        items.add(1, GuiUtils.MENU_SEPARATOR);
-        JPopupMenu menu = GuiUtils.makePopupMenu(items);
-        menu.show(comp, event.getX(), event.getY());
+        return items;
     }
 
 

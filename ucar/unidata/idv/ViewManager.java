@@ -27,9 +27,6 @@ package ucar.unidata.idv;
 
 import org.w3c.dom.*;
 
-
-import ucar.unidata.java3d.LightInfo;
-
 import ucar.unidata.collab.*;
 import ucar.unidata.data.GeoLocationInfo;
 
@@ -38,6 +35,9 @@ import ucar.unidata.idv.publish.PublishManager;
 
 
 import ucar.unidata.idv.ui.*;
+
+
+import ucar.unidata.java3d.LightInfo;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
 import ucar.unidata.ui.DropPanel;
@@ -120,12 +120,13 @@ import java.util.List;
 import java.util.Vector;
 import java.util.zip.*;
 
+
+import javax.media.j3d.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
-
-import javax.media.j3d.*;
 import javax.vecmath.*;
 
 
@@ -319,7 +320,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** For full screen properties */
     private JTextField fullScreenHeightFld;
 
+    /** flag for light changes */
     private boolean ignoreLightChanges = false;
+
+    /** lock lights button */
     private JToggleButton lockLightsBtn;
 
 
@@ -1131,14 +1135,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
             GuiUtils.inset(GuiUtils.centerBottom(getPropertiesComponent(),
                 buttons), 5);
         boolean newOne = false;
-        if(propertiesDialog==null) {
+        if (propertiesDialog == null) {
             propertiesDialog = GuiUtils.createDialog("Properties", false);
-            newOne = true;
+            newOne           = true;
         }
         propertiesDialog.getContentPane().removeAll();
         propertiesDialog.getContentPane().add(comp);
         propertiesDialog.pack();
-        if(newOne) {
+        if (newOne) {
             GuiUtils.showDialogNearSrc(viewMenu, propertiesDialog);
         } else {
             propertiesDialog.show();
@@ -1259,67 +1263,84 @@ public class ViewManager extends SharableImpl implements ActionListener,
         tabbedPane.add(
             "Aspect Ratio",
             GuiUtils.inset(GuiUtils.top(getAspectPropertiesComponent()), 5));
-        if(lights!=null) {
+        if (lights != null) {
             try {
 
 
-                if(lockLightsBtn==null) {
-                    lockLightsBtn =
-                        GuiUtils.getToggleButton("/auxdata/ui/icons/Unlinked.gif", 0,
-                                                 0);
+                if (lockLightsBtn == null) {
+                    lockLightsBtn = GuiUtils.getToggleButton(
+                        "/auxdata/ui/icons/Unlinked.gif", 0, 0);
                     lockLightsBtn.setContentAreaFilled(false);
                     lockLightsBtn.setSelectedIcon(
-                                                 GuiUtils.getImageIcon(
-                                                                       "/auxdata/ui/icons/Linked.gif", getClass()));
+                        GuiUtils.getImageIcon(
+                            "/auxdata/ui/icons/Linked.gif", getClass()));
                     lockLightsBtn.setSelected(false);
-                    lockLightsBtn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-                    lockLightsBtn.setToolTipText("Link stride changes between x & y");
+                    lockLightsBtn.setBorder(
+                        BorderFactory.createEmptyBorder(0, 0, 0, 0));
+                    lockLightsBtn.setToolTipText(
+                        "Link stride changes between x & y");
                 }
 
                 List comps = new ArrayList();
-                for(LightInfo lightInfo: lights) {
+                for (LightInfo lightInfo : lights) {
                     ObjectListener listener = new ObjectListener(lightInfo) {
-                            public void actionPerformed(ActionEvent ae) {
-                                
-                                LightInfo theLight = (LightInfo) theObject;
-                                if(ignoreLightChanges) return;
-                                ignoreLightChanges  =true;
-                                theLight.applyProperties();
-                                if(lockLightsBtn.isSelected()) {
-                                    for(LightInfo light: lights) {
-                                        if(light==theLight) continue;
-                                        light.setVisible(theLight.getVisible(),true);
-                                        light.updateLight();
-                                    }
-                                } 
+                        public void actionPerformed(ActionEvent ae) {
 
-                                ignoreLightChanges= false;
+                            LightInfo theLight = (LightInfo) theObject;
+                            if (ignoreLightChanges) {
+                                return;
                             }
-                            public void stateChanged(ChangeEvent e) {
-                                JSlider slider = (JSlider) e.getSource();
-                                if(ignoreLightChanges || slider.getValueIsAdjusting()) return;
-                                LightInfo theLight = (LightInfo) theObject;
-                                ignoreLightChanges  =true;
-                                theLight.applyProperties();
-                                if(lockLightsBtn.isSelected()) {
-                                    for(LightInfo light: lights) {
-                                        if(light==theLight) continue;
-                                        light.setColor(theLight.getColor(),true);
-                                        light.updateLight();
+                            ignoreLightChanges = true;
+                            theLight.applyProperties();
+                            if (lockLightsBtn.isSelected()) {
+                                for (LightInfo light : lights) {
+                                    if (light == theLight) {
+                                        continue;
                                     }
-
-                                } 
-                                ignoreLightChanges  =false;
+                                    light.setVisible(theLight.getVisible(),
+                                            true);
+                                    light.updateLight();
+                                }
                             }
-                            
-                        };
-                    lightInfo.getPropertyComponents(comps,listener);
+
+                            ignoreLightChanges = false;
+                        }
+                        public void stateChanged(ChangeEvent e) {
+                            JSlider slider = (JSlider) e.getSource();
+                            if (ignoreLightChanges
+                                    || slider.getValueIsAdjusting()) {
+                                return;
+                            }
+                            LightInfo theLight = (LightInfo) theObject;
+                            ignoreLightChanges = true;
+                            theLight.applyProperties();
+                            if (lockLightsBtn.isSelected()) {
+                                for (LightInfo light : lights) {
+                                    if (light == theLight) {
+                                        continue;
+                                    }
+                                    light.setColor(theLight.getColor(), true);
+                                    light.updateLight();
+                                }
+
+                            }
+                            ignoreLightChanges = false;
+                        }
+
+                    };
+                    lightInfo.getPropertyComponents(comps, listener);
                 }
 
                 JComponent lightsComp = GuiUtils.formLayout(comps);
-                tabbedPane.add("Lighting",GuiUtils.inset(GuiUtils.top(GuiUtils.vbox(lightsComp, GuiUtils.left(lockLightsBtn))),5));
-            } catch(Exception exc) {
-                logException("",exc);
+                tabbedPane.add(
+                    "Lighting",
+                    GuiUtils.inset(
+                        GuiUtils.top(
+                            GuiUtils.vbox(
+                                lightsComp,
+                                GuiUtils.left(lockLightsBtn))), 5));
+            } catch (Exception exc) {
+                logException("", exc);
             }
         }
     }
@@ -1352,10 +1373,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    private List<LightInfo> lights; 
+    /** list of lights */
+    private List<LightInfo> lights;
 
-    private void   initLights(DisplayRendererJ3D renderer) {
-        if(lights == null) {
+    /**
+     * Initialize the lights
+     *
+     * @param renderer  the renderer
+     */
+    private void initLights(DisplayRendererJ3D renderer) {
+        if (lights == null) {
             lights = new ArrayList<LightInfo>();
             createInitialLights();
         }
@@ -1366,7 +1393,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         lightsNode.setCapability(Group.ALLOW_CHILDREN_EXTEND);
 
 
-        for(LightInfo lightInfo: lights) {
+        for (LightInfo lightInfo : lights) {
             lightsNode.addChild(lightInfo.getLight());
         }
 
@@ -1376,33 +1403,41 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    /**
+     * Make the lights brighter
+     */
     public void brighter() {
-        if(lights==null) return;
-        for(LightInfo lightInfo: lights) {
+        if (lights == null) {
+            return;
+        }
+        for (LightInfo lightInfo : lights) {
             lightInfo.brighter();
         }
     }
 
 
-    private void   createInitialLights() {
-        Point3d[] locations = new Point3d[]{new Point3d(0.0, 0.0, 0.0),
-                                            new Point3d(0.0, 0.0, 0.0),
-                                            new Point3d(0.0, 0.0, 0.0),
-                                            new Point3d(0.0, 0.0, 0.0),
-                                            new Point3d(0.0, 0.0, 0.0),
-                                            new Point3d(0.0, 0.0, 0.0)};
+    /**
+     * Create the initial lights
+     */
+    private void createInitialLights() {
+        Point3d[] locations = new Point3d[] {
+            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0),
+            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0),
+            new Point3d(0.0, 0.0, 0.0), new Point3d(0.0, 0.0, 0.0)
+        };
 
-        Vector3f[] directions = new Vector3f[]{new Vector3f(0.0f, 0.0f, 1.0f),
-                                               new Vector3f(0.0f, 0.0f, -1.0f),
-                                               new Vector3f(0.0f, -1.0f, 0.0f),
-                                               new Vector3f(0.0f, 1.0f, 0.0f),
-                                               new Vector3f(1.0f, 0.0f, 0.0f),
-                                               new Vector3f(-1.0f, 0.0f, 0.0f)};
+        Vector3f[] directions = new Vector3f[] {
+            new Vector3f(0.0f, 0.0f, 1.0f), new Vector3f(0.0f, 0.0f, -1.0f),
+            new Vector3f(0.0f, -1.0f, 0.0f), new Vector3f(0.0f, 1.0f, 0.0f),
+            new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(-1.0f, 0.0f, 0.0f)
+        };
 
 
-        String [] names = {"Over","Under","Top","Bottom","Right","Left"};
-        for(int i=0;i<directions.length;i++) {
-            lights.add(new LightInfo(names[i],locations[i],directions[i]));
+        String[] names = {
+            "Over", "Under", "Top", "Bottom", "Right", "Left"
+        };
+        for (int i = 0; i < directions.length; i++) {
+            lights.add(new LightInfo(names[i], locations[i], directions[i]));
         }
     }
 
@@ -1457,8 +1492,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return true if successful
      */
     public boolean applyProperties() {
-        if(lights!=null) {
-            for(LightInfo lightInfo: lights) {
+        if (lights != null) {
+            for (LightInfo lightInfo : lights) {
                 lightInfo.applyProperties();
             }
         }
@@ -1611,9 +1646,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             this.properties.putAll(that.properties);
 
 
-            if(that.lights!=null) {
+            if (that.lights != null) {
                 this.lights = new ArrayList<LightInfo>();
-                for(LightInfo lightInfo: that.lights) {
+                for (LightInfo lightInfo : that.lights) {
                     this.lights.add(new LightInfo(lightInfo));
                 }
             }
@@ -3524,7 +3559,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected void reallyFillLegends() {
         //If we are not loading a bundle then fill the legends right now
-        if ( !getStateManager().isLoadingXml() || !getIdv().getInteractiveMode()) {
+        if ( !getStateManager().isLoadingXml()
+                || !getIdv().getInteractiveMode()) {
             fillLegendsInner();
         } else {
             //else fill them in about 1 second
@@ -3638,14 +3674,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 displayMenu.addSeparator();
             }
             String legendOrder = " #" + (++cnt) + "  ";
-            item = new JMenuItem(legendOrder + " " + control.getMenuLabel());
-            item.addActionListener(new ObjectListener(control) {
-                public void actionPerformed(ActionEvent event) {
-                    ((DisplayControl) theObject).show();
-                    ((DisplayControl) theObject).toFront();
-                }
-            });
-            displayMenu.add(item);
+            String label       = legendOrder + " " + control.getMenuLabel();
+            displayMenu.add(GuiUtils.makeMenu(label,
+                    control.getControlMenus(displayMenu)));
         }
 
         if ( !didone) {
@@ -3755,7 +3786,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (getIdv().getInteractiveMode()) {
             fillLegends();
             updateTimelines(true);
-            if (!getStateManager().isLoadingXml()) {
+            if ( !getStateManager().isLoadingXml()) {
                 toFront();
             }
         } else {
@@ -4169,10 +4200,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         if (timelineDialog != null) {
             timelineDialog.dispose();
-            timelineDialog=null;
+            timelineDialog = null;
         }
 
-        if(propertiesDialog!=null) {
+        if (propertiesDialog != null) {
             propertiesDialog.dispose();
             propertiesDialog = null;
         }
@@ -4190,8 +4221,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 master.destroy();
             } catch (Throwable exp) {
                 logException("Destroying the View Manager", exp);
-            } finally {
-            }
+            } finally {}
             master = null;
         }
 
@@ -4465,8 +4495,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     parseProperties(tmp);
                 }
                 master = doMakeDisplayMaster();
-                DisplayRenderer renderer = master.getDisplay().getDisplayRenderer();
-                if(renderer instanceof DisplayRendererJ3D) {
+                DisplayRenderer renderer =
+                    master.getDisplay().getDisplayRenderer();
+                if (renderer instanceof DisplayRendererJ3D) {
                     initLights((DisplayRendererJ3D) renderer);
                 }
 
@@ -4698,7 +4729,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             final int myComponentResizeCnt = ++componentResizeCnt;
             Misc.runInABit(200, new Runnable() {
                 public void run() {
-                    if(isDestroyed) return;
+                    if (isDestroyed) {
+                        return;
+                    }
                     if (myComponentResizeCnt == componentResizeCnt) {
                         updateDisplayList();
                     }
@@ -5073,9 +5106,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         System.setSecurityManager(null);
         try {
             if (hiBtn == null) {
-                hiBtn      = new JRadioButton("High", true);
-                medBtn     = new JRadioButton("Medium", false);
-                lowBtn     = new JRadioButton("Low", false);
+                hiBtn  = new JRadioButton("High", true);
+                medBtn = new JRadioButton("Medium", false);
+                lowBtn = new JRadioButton("Low", false);
                 GuiUtils.buttonGroup(hiBtn, medBtn).add(lowBtn);
                 backgroundTransparentBtn = new JCheckBox("BG Transparent");
                 backgroundTransparentBtn.setToolTipText(
@@ -5087,7 +5120,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                      fullWindowBtn).add(contentsBtn);
             }
 
-            if(publishCbx==null) {
+            if (publishCbx == null) {
                 publishCbx = getIdv().getPublishManager().makeSelector();
             }
             hiBtn.setBorder(null);
@@ -5268,27 +5301,48 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
-    public int paintDisplayList(Graphics2D graphics, List<DisplayControl> displayControls,int width, int height, boolean bottom, Color color, Font font)             
-        throws VisADException, RemoteException {
-        if(displayControls==null) {
-             displayControls = getControls();
+    /**
+     * Paint the display list in a 2D graphics
+     *
+     * @param graphics  the graphics to paint on
+     * @param displayControls  the list of controls
+     * @param width  width
+     * @param height height
+     * @param bottom bottom position
+     * @param color  label color
+     * @param font   label font
+     *
+     * @return the height of the top label
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   problem with VisAD data
+     */
+    public int paintDisplayList(Graphics2D graphics,
+                                List<DisplayControl> displayControls,
+                                int width, int height, boolean bottom,
+                                Color color, Font font)
+            throws VisADException, RemoteException {
+        if (displayControls == null) {
+            displayControls = getControls();
         }
 
         int  cnt = 0;
-        Font f   = (font!=null?font:getDisplayListFont());
+        Font f   = ((font != null)
+                    ? font
+                    : getDisplayListFont());
         graphics.setFont(f);
         FontMetrics fm         = graphics.getFontMetrics();
         int         lineHeight = fm.getAscent() + fm.getDescent();
-        int startY;
-        int offsetY;
-        int totalHeight = 0;
-        if(bottom) {
-            startY = height - 4;
-            offsetY = - (lineHeight + 1);
-            totalHeight=4;
+        int         startY;
+        int         offsetY;
+        int         totalHeight = 0;
+        if (bottom) {
+            startY      = height - 4;
+            offsetY     = -(lineHeight + 1);
+            totalHeight = 4;
         } else {
-            startY = 2+lineHeight;
-            offsetY =  (lineHeight + 1);
+            startY      = 2 + lineHeight;
+            offsetY     = (lineHeight + 1);
             totalHeight = lineHeight;
         }
 
@@ -5310,13 +5364,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     if (now != null) {
                         FieldImpl fi = (FieldImpl) data;
                         Data rangeValue = fi.evaluate(now,
-                                                      Data.NEAREST_NEIGHBOR,
-                                                      Data.NO_ERRORS);
+                                              Data.NEAREST_NEIGHBOR,
+                                              Data.NO_ERRORS);
                         if ((rangeValue != null)
-                            && (rangeValue
-                                instanceof visad.Text)) {
-                            text = ((visad.Text) rangeValue)
-                                .getValue();
+                                && (rangeValue instanceof visad.Text)) {
+                            text = ((visad.Text) rangeValue).getValue();
                         }
                     }
                 }
@@ -5324,17 +5376,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if ((text == null) || (text.length() == 0)) {
                 continue;
             }
-            Color c = (color!=null?color:getDisplayListColor());
+            Color c = ((color != null)
+                       ? color
+                       : getDisplayListColor());
             if (c == null) {
-                c = ((ucar.unidata.idv.control
-                      .DisplayControlImpl) control)
+                c = ((ucar.unidata.idv.control.DisplayControlImpl) control)
                     .getDisplayListColor();
             }
             graphics.setColor(c);
             int lineWidth = fm.stringWidth(text);
             graphics.drawString(text, width / 2 - lineWidth / 2,
-                                startY+ offsetY* cnt);
-            totalHeight+= Math.abs(offsetY);
+                                startY + offsetY * cnt);
+            totalHeight += Math.abs(offsetY);
             cnt++;
         }
         return totalHeight;
@@ -6391,21 +6444,21 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-       Set the Lights property.
-
-       @param value The new value for Lights
-    **/
-    public void setLights (List<LightInfo> value) {
+     *  Set the Lights property.
+     *
+     *  @param value The new value for Lights
+     */
+    public void setLights(List<LightInfo> value) {
         lights = value;
     }
 
     /**
-       Get the Lights property.
-
-       @return The Lights
-    **/
-    public List<LightInfo> getLights () {
-	return lights;
+     *  Get the Lights property.
+     *
+     *  @return The Lights
+     */
+    public List<LightInfo> getLights() {
+        return lights;
     }
 
 
