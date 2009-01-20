@@ -150,7 +150,12 @@ public class ImageUtils {
      * @return  the Image
      */
     public static Image readImage(String imagePath) {
-        return waitOnImage(GuiUtils.getImage(imagePath));
+        System.err.println ("getImage");
+        Image image = GuiUtils.getImage(imagePath);
+        System.err.println ("waiting");
+        image = waitOnImage(image);
+        System.err.println ("done waiting");
+        return image;
     }
 
 
@@ -192,7 +197,9 @@ public class ImageUtils {
          * @param i  the image
          */
         public void setImage(Image i) {
+            //Humm, is this good enough?
             if ((i.getWidth(null) > 0) && (i.getHeight(null) > 0)) {
+                //                i.getWidth(this);
                 allBits = true;
             } else {
                 i.getWidth(this);
@@ -237,6 +244,13 @@ public class ImageUtils {
             if (flags == 0) {
                 allBits = true;
             }
+            if ((flags & ImageObserver.FRAMEBITS) != 0) {
+                if (debug) {
+                    System.err.println("got FRAMEBITS");
+                }
+                allBits = true;
+            }
+
             if ((flags & ImageObserver.ALLBITS) != 0) {
                 if (debug) {
                     System.err.println("got ALLBITS");
@@ -263,6 +277,10 @@ public class ImageUtils {
                 //                System.err.println (id + "\timageUpdate-ABORT");
                 badImage = true;
             }
+                if (debug) {
+                    //                    System.err.println("all bits:" + allBits + " badImage:" + badImage);
+                }
+
             return !(allBits || badImage);
         }
     }
@@ -1093,66 +1111,24 @@ public class ImageUtils {
      * @throws Exception  problem with this
      */
     public static void main(String[] args) throws Exception {
-        setAlpha(null,0.0);
-        setAlpha(null,0.5);
-        setAlpha(null,0.75);
-        setAlpha(null,1);
-        if(true) return;
-        /*
-        com.drew.metadata.Metadata metadata = com.drew.imaging.jpeg.JpegMetadataReader.readMetadata(new File(args[0]));
-        Iterator directories = metadata.getDirectoryIterator(); 
-        while (directories.hasNext()) { 
-            com.drew.metadata.Directory directory = (com.drew.metadata.Directory)directories.next(); 
-            // iterate through tags and print to System.out  
-            Iterator tags = directory.getTagIterator(); 
-            while (tags.hasNext()) { 
-                com.drew.metadata.Tag tag = (com.drew.metadata.Tag)tags.next(); 
-                // use Tag.toString()  
-                System.out.println(tag); 
-            } 
-        }
-        if(true) return;
-        */
-
-        /*
-
-        JButton b = new JButton("hello");
-        JFrame  f = new JFrame();
-        f.getContentPane().add(b);
-        f.pack();
-        f.show();
-
-        FileOutputStream fos= new FileOutputStream("test.pdf");
-        writePDF(fos,b);
-        fos.close();
-        if(true) return;
-
-
-        Image i =
-            renderHtml(
-                "<html>a b c d e f g h i j k l m n o p q r s t u v w x y z",
-                100, null, null);
-        JLabel lbl = new JLabel(new ImageIcon(i));
-        GuiUtils.showOkCancelDialog(null, "", lbl, null);
-        if (true) {
-            return;
-        }
-        */
-
-        int width = new Integer(args[0]).intValue();
-        BufferedImage image = toBufferedImage(readImage(args[1]),
+        int width = 200;
+        System.err.println ("reading");
+        Image image = readImage(args[0]);
+        System.err.println ("cvrting");
+        BufferedImage bimage = toBufferedImage(image,
                                   BufferedImage.TYPE_INT_ARGB);
+        System.err.println ("resizing");
         BufferedImage resizedImage =
-            ImageUtils.toBufferedImage(image.getScaledInstance(width, -1,
+            ImageUtils.toBufferedImage(bimage.getScaledInstance(width, -1,
                 Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
 
+        waitOnImage(resizedImage);
 
-        String ext  = IOUtil.getFileExtension(args[1]);
-        String tail = IOUtil.stripExtension(args[1]);
-        writeImageToFile(resizedImage, tail + "_thumb" + width + ".gif");
+        String ext  = IOUtil.getFileExtension(args[0]);
+        String tail = IOUtil.stripExtension(args[0]);
+        System.err.println ("writing");
+        writeImageToFile(resizedImage, tail + "_thumb" + width + ".png");
         System.exit(0);
-
-
     }
 
 
