@@ -1877,6 +1877,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getHtdocsFile(Request request) throws Exception {
         String path = request.getRequestPath();
+        //        System.err.println("path:" + path);
         if ( !path.startsWith(getUrlBase())) {
             log(request, "Unknown request" + " \"" + path + "\"");
             Result result =
@@ -1909,6 +1910,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     is = new ByteArrayInputStream(js.getBytes());
                 }
                 Result result = new Result(BLANK, is, type);
+
+                
+
+
                 result.setCacheOk(true);
                 return result;
             } catch (IOException fnfe) {

@@ -215,6 +215,7 @@ public class RepositoryServlet extends HttpServlet {
         try {
             // need to support HTTP HEAD request since we are overriding HttpServlet doGet   
             if (request.getMethod().equals("HEAD")) {
+                //                System.err.println("head:" +  request.getRequestURI());
                 return;
             }
 
@@ -253,6 +254,11 @@ public class RepositoryServlet extends HttpServlet {
                 }
             }
 
+            if(repositoryResult.getCacheOk()) {
+                response.setHeader("Cache-Control","public,max-age=259200");
+                response.setHeader("Expires","Tue, 08 Jan 2019 07:41:19 GMT");
+                response.setHeader("Last-Modified","Tue, 20 Jan 2009 01:45:54 GMT");
+            }
 
             if (repositoryResult.getRedirectUrl() != null) {
                 try {
