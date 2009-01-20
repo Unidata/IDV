@@ -1324,8 +1324,7 @@ public class GeoGridDataSource extends GridDataSource {
              && ((requestProperties != null)
                  && (requestProperties.get(
                      DerivedDataChoice.PROP_FROMDERIVED) != null)));
-        // System.out.println("need volume = " + needVolume);
-
+        //        System.out.println("need volume = " + needVolume + " " + geoGrid.getCoordinateSystem().getVerticalTransform());
 
         StringBuffer filename = new StringBuffer("grid_" + paramName);
 
@@ -1356,6 +1355,7 @@ public class GeoGridDataSource extends GridDataSource {
                     levelRange = new ucar.ma2.Range(fromLevelIndex,
                             toLevelIndex, geoSelection.getZStrideToUse());
                 }
+                //                System.out.println("level range(1):  " + levelRange);
                 geoGrid = geoGrid.subset(null, levelRange,
                                          geoSelection.getLatLonRect(),
                                          geoSelection.getZStrideToUse(),
@@ -1363,6 +1363,7 @@ public class GeoGridDataSource extends GridDataSource {
                                          geoSelection.getXStrideToUse());
             } else if (levelRange != null) {
                 extraCacheKey = levelRange;
+                //                System.out.println("level range(2):  " + levelRange);
                 geoGrid       = geoGrid.subset(null, levelRange, null, null);
             }
         } catch (InvalidRangeException ire) {
@@ -1466,9 +1467,7 @@ public class GeoGridDataSource extends GridDataSource {
             toLevelIndex   = indexOf(toLevel, allLevels);
         }
 
-        //        System.err.println ("fromLevel:" + fromLevel + " index:" + fromLevelIndex);
-        //        Misc.printStack ("index:" + fromLevelIndex + " " +toLevelIndex, 15,null);
-
+        System.err.println ("fromLevel:" + fromLevel +  " index:" + fromLevelIndex + " toLevel:" + toLevel +" index:" + toLevelIndex);
 
 
         String      paramName = dataChoice.getStringId();
