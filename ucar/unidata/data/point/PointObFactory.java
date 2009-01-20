@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -317,14 +318,14 @@ public class PointObFactory {
 
 
     /**
-     * _more_
+     * Get the list of PointOb objects from the given field
      *
-     * @param field _more_
+     * @param field the field that contains the PointObs
      *
-     * @return _more_
+     * @return List of PointObs
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     public static List<PointOb> getPointObs(FieldImpl field)
             throws VisADException, RemoteException {
@@ -353,17 +354,18 @@ public class PointObFactory {
 
 
     /**
-     * _more_
+     * Write the PointObs contained in the given field as a netcdf file
      *
-     * @param file _more_
-     * @param field _more_
+     * @param file file to write to
+     * @param field The field
      *
-     * @throws IOException _more_
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws IOException on badness
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     public static void writeToNetcdf(File file, FieldImpl field)
             throws VisADException, RemoteException, IOException {
+
         List<PointOb> obs = getPointObs(field);
         if (obs.size() == 0) {
             throw new IllegalArgumentException(
@@ -377,32 +379,66 @@ public class PointObFactory {
         int             numFloat  = 0;
         int             numString = 0;
         for (PointOb ob : obs) {
-            EarthLocation el    = ob.getEarthLocation();
-            Real          alt   = el.getAltitude();
-            LatLonPoint   llp   = el.getLatLonPoint();
-            Tuple         tuple = (Tuple) ob.getData();
-            TupleType     type  = (TupleType) tuple.getType();
-            MathType[]    types = type.getComponents();
+            EarthLocation el        = ob.getEarthLocation();
+            Real          alt       = el.getAltitude();
+            LatLonPoint   llp       = el.getLatLonPoint();
+            Tuple         tuple     = (Tuple) ob.getData();
+            TupleType     type      = (TupleType) tuple.getType();
+            MathType[]    types     = type.getComponents();
+            int           numFields = types.length;
+            int[]         lengths   = new int[numFields];
+            boolean[]     isText    = new boolean[numFields];
             if (writer == null) {
-                for (int i = 0; i < types.length; i++) {
-                    if (types[i] instanceof TextType) {
+                boolean haveText = false;
+                for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+                    lengths[fieldIdx] = 0;
+                    if (types[fieldIdx] instanceof TextType) {
+                        haveText         = true;
+                        isText[fieldIdx] = true;
                         continue;
                     }
+                    isText[fieldIdx] = false;
                     PointObVar pointObVar = new PointObVar();
-                    pointObVar.setName(Util.cleanTypeName(types[i]));
+                    pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
                     pointObVar.setUnits(
-                        ((RealType) types[i]).getDefaultUnit() + "");
+                        ((RealType) types[fieldIdx]).getDefaultUnit() + "");
                     pointObVar.setDataType(DataType.DOUBLE);
                     dataVars.add(pointObVar);
                     numFloat++;
                 }
-                for (int i = 0; i < types.length; i++) {
-                    if ( !(types[i] instanceof TextType)) {
+
+                if (haveText) {
+                    for (PointOb ob2 : obs) {
+                        Tuple  tuple2 = (Tuple) ob2.getData();
+                        Data[] data   = tuple2.getComponents();
+                        for (int fieldIdx = 0; fieldIdx < lengths.length;
+                                fieldIdx++) {
+                            if ( !isText[fieldIdx]) {
+                                continue;
+                            }
+                            String s   = ((Text) data[fieldIdx]).getValue();
+                            int    len = s.length();
+                            if (len > lengths[fieldIdx]) {
+                                lengths[fieldIdx] = len;
+                            }
+                        }
+                    }
+                }
+
+
+
+                for (int fieldIdx = 0; fieldIdx < lengths.length;
+                        fieldIdx++) {
+                    if ( !isText[fieldIdx]) {
                         continue;
                     }
                     PointObVar pointObVar = new PointObVar();
-                    pointObVar.setName(Util.cleanTypeName(types[i]));
-                    pointObVar.setDataType(DataType.STRING);
+                    System.err.println("idx:" + fieldIdx + "   name:"
+                                       + Util.cleanTypeName(types[fieldIdx])
+                                       + " length:" + lengths[fieldIdx]);
+                    pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
+                    pointObVar.setDataType(DataType.CHAR);
+                    pointObVar.setLen(lengths[fieldIdx]);
                     dataVars.add(pointObVar);
                     numString++;
                 }
@@ -416,11 +452,12 @@ public class PointObFactory {
             int      dcnt  = 0;
             int      scnt  = 0;
             Data[]   data  = tuple.getComponents();
-            for (int i = 0; i < types.length; i++) {
-                if (types[i] instanceof TextType) {
-                    svals[scnt++] = ((Text) data[i]).getValue();
+            for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+                if (isText[fieldIdx]) {
+                    svals[scnt++] = ((Text) data[fieldIdx]).getValue();
+                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
                 } else {
-                    dvals[dcnt++] = ((Real) data[i]).getValue();
+                    dvals[dcnt++] = ((Real) data[fieldIdx]).getValue();
                 }
             }
 
@@ -429,11 +466,15 @@ public class PointObFactory {
                     ? alt.getValue()
                     : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
                             dvals, svals);
+            if (true) {
+                break;
+            }
         }
 
 
         writer.finish();
         dos.close();
+
     }
 
 
@@ -1796,4 +1837,5 @@ public class PointObFactory {
 
 
 }
+
 
