@@ -1467,7 +1467,7 @@ public class GeoGridDataSource extends GridDataSource {
             toLevelIndex   = indexOf(toLevel, allLevels);
         }
 
-        System.err.println ("fromLevel:" + fromLevel +  " index:" + fromLevelIndex + " toLevel:" + toLevel +" index:" + toLevelIndex);
+        //        System.err.println ("fromLevel:" + fromLevel +  " index:" + fromLevelIndex + " toLevel:" + toLevel +" index:" + toLevelIndex);
 
 
         String      paramName = dataChoice.getStringId();
