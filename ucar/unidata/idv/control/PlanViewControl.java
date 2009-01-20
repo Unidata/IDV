@@ -861,7 +861,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if ((getDataSelection().getFromLevel() != null)
                 && Misc.equals(getDataSelection().getFromLevel(),
                                getDataSelection().getToLevel())) {
-            getDataSelection().setLevel(pl);
+            Real realLevel    = getLevelReal(pl);
+            getDataSelection().setLevel(realLevel);
             getDataInstance().setDataSelection(getDataSelection());
         }
         if ((workingGrid == null)
