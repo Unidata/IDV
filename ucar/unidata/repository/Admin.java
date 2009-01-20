@@ -234,12 +234,28 @@ public class Admin extends RepositoryManager {
         for(int i=log.size()-1;i>=0;i--) {
             Repository.LogEntry logEntry = log.get(i);
             //Encode the path just in case the user does a XSS attack
-            sb.append(HtmlUtil.row(HtmlUtil.cols(
-                                                    logEntry.getUser().getLabel(),
-                                                    getRepository().formatDate(logEntry.getDate()),
-                                                    HtmlUtil.entityEncode(logEntry.getPath()),
+            String path = logEntry.getPath();
+            if(path.length()>50) {
+                path = path.substring(0,49)+"...";
+            }
+            String userAgent = logEntry.getUserAgent();
+            if(userAgent.indexOf("Googlebot")>=0) {
+                userAgent = "Googlebot";
+            }
+            int idx = userAgent.indexOf("(");
+            if(idx>0) {
+                userAgent = userAgent.substring(0,idx);
+            }
+            String dttm  = getRepository().formatDate(logEntry.getDate());
+            dttm = dttm.replace(" ","&nbsp;");
+            String user =  logEntry.getUser().getLabel();
+            user = user.replace(" ","&nbsp;");
+            sb.append(HtmlUtil.rowTop(HtmlUtil.cols(
+                                                    user,
+                                                    dttm,
+                                                    HtmlUtil.entityEncode(path),
                                                     logEntry.getIp(),
-                                                    logEntry.getUserAgent())));
+                                                    userAgent)));
             
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
