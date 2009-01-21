@@ -115,7 +115,7 @@ public class DerivedGridFactory {
      */
     public static FieldImpl createThickness(FieldImpl grid)
             throws VisADException, RemoteException {
-        return createLayerDifference(grid, 500, 1000);
+        return createLayerDifference(grid, 500, 1000, CommonUnits.HECTOPASCAL);
     }
 
     /**
@@ -134,10 +134,32 @@ public class DerivedGridFactory {
     public static FieldImpl createLayerDifference(FieldImpl grid,
             String value1, String value2)
             throws VisADException, RemoteException {
-        return createLayerDifference(grid, Misc.parseNumber(value1),
-                                     Misc.parseNumber(value2));
+        return createLayerDifference(grid, value1, value2, (String) null);
     }
 
+    /**
+     * Make the difference of one grid's values at the given levels;
+     * first level subtract second level values.
+     *
+     * @param grid grid of data
+     * @param value1 level the first as a String
+     * @param value2 level the second as a String
+     * @param levelUnit  unit spec for level
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createLayerDifference(FieldImpl grid,
+            String value1, String value2, String levelUnit)
+            throws VisADException, RemoteException {
+        return createLayerDifference(grid, Misc.parseNumber(value1),
+                                     Misc.parseNumber(value2), 
+                                     (levelUnit != null) 
+                                         ? Util.parseUnit(levelUnit)
+                                         : (Unit) null);
+    }
 
     /**
      * Make the difference of one grid's values at the given levels;
@@ -156,11 +178,54 @@ public class DerivedGridFactory {
             double value1, double value2)
             throws VisADException, RemoteException {
 
+        return createLayerDifference(grid, value1, value2, null);
+
+    }
+
+
+    /**
+     * Make the difference of one grid's values at the given levels;
+     * first level subtract second level values.
+     *
+     * @param grid     grid of data
+     * @param value1   level of first
+     * @param value1   level of first
+     * @param levelUnit  unit for level
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createLayerDifference(FieldImpl grid,
+            double value1, double value2, Unit levelUnit)
+            throws VisADException, RemoteException {
+        RealType levelType = RealType.Generic;
+        if (levelUnit != null) {
+            if (Unit.canConvert(levelUnit, CommonUnits.HECTOPASCAL)) {
+                levelType = AirPressure.getRealType();
+            } else if (Unit.canConvert(levelUnit, CommonUnit.meter)) {
+                levelType = RealType.Altitude;
+            } else { // TODO:  figure out something better
+                levelUnit = null;
+            }
+        }
+        Real level1 = 
+            (levelUnit != null) 
+                ? new Real(levelType, value1, levelUnit)
+                : new Real(levelType, value1);
+        Real level2 = 
+            (levelUnit != null) 
+                ? new Real(levelType, value2, levelUnit)
+                : new Real(levelType, value2);
+
         FieldImpl first =
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
                                          false);
         FieldImpl second =
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
                                          false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result    = (FieldImpl) first.subtract(second);
@@ -193,9 +258,32 @@ public class DerivedGridFactory {
     public static FieldImpl createLayerAverage(FieldImpl grid, String value1,
             String value2)
             throws VisADException, RemoteException {
-        return createLayerAverage(grid, Misc.parseNumber(value1),
-                                  Misc.parseNumber(value2));
+        return createLayerAverage(grid, value1, value2, (String) null);
     }
+
+    /**
+     * Make the average of 2 levels of a grid
+     *
+     * @param grid grid of data
+     * @param value1 level the first as a String
+     * @param value2 level the second as a String
+     * @param levelUnit  unit for level
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createLayerAverage(FieldImpl grid, String value1,
+            String value2, String levelUnit)
+            throws VisADException, RemoteException {
+        return createLayerAverage(grid, Misc.parseNumber(value1),
+                                  Misc.parseNumber(value2), 
+                                  (levelUnit != null) 
+                                      ? Util.parseUnit(levelUnit)
+                                      : (Unit) null);
+    }
+
 
 
     /**
@@ -214,11 +302,52 @@ public class DerivedGridFactory {
             double value2)
             throws VisADException, RemoteException {
 
+        return createLayerAverage(grid, value1, value2, null);
+    }
+
+
+    /**
+     * Make the average of 2 levels of a grid
+     *
+     * @param grid     grid of data
+     * @param value1   level of first
+     * @param value2   level of second
+     * @param levelUnit  unit for level
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createLayerAverage(FieldImpl grid, double value1,
+            double value2, Unit levelUnit)
+            throws VisADException, RemoteException {
+        RealType levelType = RealType.Generic;
+        if (levelUnit != null) {
+            if (Unit.canConvert(levelUnit, CommonUnits.HECTOPASCAL)) {
+                levelType = AirPressure.getRealType();
+            } else if (Unit.canConvert(levelUnit, CommonUnit.meter)) {
+                levelType = RealType.Altitude;
+            } else { // TODO:  figure out something better
+                levelUnit = null;
+            }
+        }
+        Real level1 = 
+            (levelUnit != null) 
+                ? new Real(levelType, value1, levelUnit)
+                : new Real(levelType, value1);
+        Real level2 = 
+            (levelUnit != null) 
+                ? new Real(levelType, value2, levelUnit)
+                : new Real(levelType, value2);
+
         FieldImpl first =
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
                                          false);
         FieldImpl second =
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
                                          false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result =
