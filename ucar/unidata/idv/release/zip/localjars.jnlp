@@ -7,7 +7,7 @@
        <information> 
          <title>Integrated Data Viewer </title> 
          <vendor>Unidata</vendor> 
-         <homepage href="http://www.unidata.ucar.edu/content/software/IDV/index.html"/> 
+         <homepage href="http://www.unidata.ucar.edu/software/idv/index.html"/> 
          <description>Integrated Data Viewer (IDV)</description> 
          <description kind="short">View geolocated scientific datasets. 
         </description> 
