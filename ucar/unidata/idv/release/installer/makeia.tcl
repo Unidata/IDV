@@ -105,7 +105,7 @@ proc processTemplate {template  list } {
 proc createWebstart {} {
     set webstartDir [string tolower webstart]
     puts "Creating the webstart release in: [file join $::destDir $webstartDir]"
-    exec   ant -buildfile $::rootDir/build/build.xml jnlp  -verbose -Dwebstart_target_root $::destDir -Dwebstart_target_subdir=$webstartDir -Dwebstart_url_root=http://www.unidata.ucar.edu/content/software/IDV/release/[string tolower $::version]
+    exec   ant -buildfile $::rootDir/build/build.xml jnlp  -verbose -Dwebstart_target_root $::destDir -Dwebstart_target_subdir=$webstartDir -Dwebstart_url_root=http://www.unidata.ucar.edu/software/IDV/release/[string tolower $::version]
     puts "Done creating the webstart release"
 
 }
