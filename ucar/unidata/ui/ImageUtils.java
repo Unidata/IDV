@@ -150,11 +150,11 @@ public class ImageUtils {
      * @return  the Image
      */
     public static Image readImage(String imagePath) {
-        System.err.println ("getImage");
+        //System.err.println ("getImage");
         Image image = GuiUtils.getImage(imagePath);
-        System.err.println ("waiting");
+        //System.err.println ("waiting");
         image = waitOnImage(image);
-        System.err.println ("done waiting");
+        //System.err.println ("done waiting");
         return image;
     }
 
