@@ -457,6 +457,8 @@ public class JythonShell extends InteractiveShell {
         String html = StringUtil.replace(code.trim(), "\n", "<br>");
         html = StringUtil.replace(html, " ", "&nbsp;");
         html = StringUtil.replace(html, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+        html = html.replace("<","&lt;");
+        html = html.replace(">","&gt;");
         return html;
     }
 
