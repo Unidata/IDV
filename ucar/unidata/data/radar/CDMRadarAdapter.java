@@ -287,8 +287,14 @@ public class CDMRadarAdapter implements RadarAdapter {
             Attribute vcpAttr = rds.findGlobalAttributeIgnoreCase(
                                     "VolumeCoveragePatternName");
             EarthLocation elf = getRadarStationInFile();
-            if(elf != null)
-                radarLocation = elf;
+            if(elf != null) {
+                if(radarLocation instanceof NamedLocation) {
+                    String sID = ((NamedLocation) radarLocation).getIdentifier().getValue();
+                    if(stationID.equalsIgnoreCase(sID))
+                       radarLocation = elf;
+                }
+
+            }
 
             if (vcpAttr != null) {
                 vcp = vcpAttr.getStringValue();
