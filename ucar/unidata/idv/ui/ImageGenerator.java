@@ -264,6 +264,8 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_TRANSPARENT = "transparent";
 
+    public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
+
     public static final String ATTR_TRANSPARENCY = "transparency";
 
     public static final String ATTR_TOP= "top";
@@ -2199,7 +2201,7 @@ public class ImageGenerator extends IdvManager {
         Image image = ImageUtils.renderHtml(html, width, null, null);
         image = processImage(ImageUtils.toBufferedImage(image),
                              XmlUtil.getAttribute(node, ATTR_FILE), node,
-                             getAllProperties(), null);
+                             getAllProperties(), null,new Hashtable());
 
         //        writeImageToFile(image, XmlUtil.getAttribute(node, ATTR_FILE));
         return true;
@@ -3308,7 +3310,7 @@ public class ImageGenerator extends IdvManager {
                           BufferedImage.TYPE_INT_RGB);
             String loopFilename = applyMacros(filename);
             lastImage = processImage((BufferedImage) tmpImage, loopFilename,
-                                     scriptingNode, getAllProperties(), null);
+                                     scriptingNode, getAllProperties(), null,new Hashtable());
             return;
         }
 
@@ -3324,7 +3326,7 @@ public class ImageGenerator extends IdvManager {
             lastImage = display.getImage(applyMacros(scriptingNode,
                     ATTR_WHAT, (String) null));
             lastImage = processImage((BufferedImage) lastImage, loopFilename,
-                                     scriptingNode, getAllProperties(), null);
+                                     scriptingNode, getAllProperties(), null,new Hashtable());
             return;
         }
 
@@ -3365,7 +3367,7 @@ public class ImageGenerator extends IdvManager {
                 lastImage = viewManager.getMaster().getImage(false);
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
-                                         getAllProperties(), viewManager);
+                                         getAllProperties(), viewManager,new Hashtable());
             }
         }
         popProperties();
@@ -3471,9 +3473,11 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable On badness
      */
     protected BufferedImage processImage(BufferedImage image,
-                                         String filename, Element node,
+                                         String filename, 
+                                         Element node,
                                          Hashtable props,
-                                         ViewManager viewManager)
+                                         ViewManager viewManager,
+                                         Hashtable returnProps)
             throws Throwable {
 
         if (node == null) {
@@ -3750,8 +3754,14 @@ public class ImageGenerator extends IdvManager {
                         baseY += height + 30;
                     }
                 }
-            } else if (tagName.equals(TAG_TRANSPARENT)) {
-                Color c = applyMacros(child, ATTR_COLOR, (Color) null);
+
+            } else if (tagName.equals(TAG_TRANSPARENT) || tagName.equals(TAG_BGTRANSPARENT)) {
+                Color c=null;
+                if (tagName.equals(TAG_BGTRANSPARENT)) {
+                    c = viewManager.getBackground();
+                } else {
+                    c = applyMacros(child, ATTR_COLOR, (Color) null);
+                }
                 //                System.err.println ("c:" + c);
                 int[] redRange   = { 0, 0 };
                 int[] greenRange = { 0, 0 };
@@ -3845,6 +3855,10 @@ public class ImageGenerator extends IdvManager {
                         display.getSpatialCoordinates(el1, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(el2, null));
+                    returnProps.put(ATTR_NORTH, new Double(el1.getLatitude().getValue()));
+                    returnProps.put(ATTR_WEST, new Double(el1.getLongitude().getValue()));
+                    returnProps.put(ATTR_SOUTH, new Double(el2.getLatitude().getValue()));
+                    returnProps.put(ATTR_EAST, new Double(el2.getLongitude().getValue()));
                 } else if (XmlUtil.hasAttribute(child, ATTR_LEFT)) {
                     ul = new int[] {
                         (int) toDouble(child, ATTR_LEFT, imageWidth),
@@ -3897,7 +3911,7 @@ public class ImageGenerator extends IdvManager {
                         Image splitImage = image.getSubimage(hSpace * col,
                                                vSpace * row, hSpace, vSpace);
                         processImage(ImageUtils.toBufferedImage(splitImage),
-                                     realFile, child, myprops, viewManager);
+                                     realFile, child, myprops, viewManager, new Hashtable());
                         popProperties();
                     }
                 }
@@ -3911,7 +3925,7 @@ public class ImageGenerator extends IdvManager {
                     thumbFile = IOUtil.stripExtension(filename) + "_thumb"
                                 + IOUtil.getFileExtension(filename);
                 }
-                processImage(thumbImage, thumbFile, child, null, viewManager);
+                processImage(thumbImage, thumbFile, child, null, viewManager, new Hashtable());
             } else if (tagName.equals(TAG_KML)) {
                 //NOOP
             } else if (tagName.equals(TAG_KMZFILE)) {
@@ -3985,7 +3999,7 @@ public class ImageGenerator extends IdvManager {
                                          (String) null);
                 if (shouldIterateChildren) {
                     newImage = processImage(newImage, newFileName, child,
-                                            null, viewManager);
+                                            null, viewManager, new Hashtable());
                 }
                 if (newFileName != null) {
                     ImageUtils.writeImageToFile(newImage,
@@ -4001,10 +4015,13 @@ public class ImageGenerator extends IdvManager {
 
         if (filename != null) {
             float quality = (float) applyMacros(node, ATTR_QUALITY, 1.0);
-            //            Misc.printStack("writing image", 5,null);
-            debug("Writing image:" + getImageFileName(filename));
-            ImageUtils.writeImageToFile(image, getImageFileName(filename),
-                                        quality);
+            List<String> fileToks = (List<String>)StringUtil.split(filename, ",", true,
+                                             true);
+            for(String file: fileToks) {
+                file = getImageFileName(file);
+                debug("Writing image:" + file);
+                ImageUtils.writeImageToFile(image, file, quality);
+            }
         }
         return image;
     }

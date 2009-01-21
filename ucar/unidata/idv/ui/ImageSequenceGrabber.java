@@ -1579,6 +1579,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         ? new DateTime(anime.getAniValue())
                         : null);
 
+                GeoLocationInfo bounds = null;
+                if (viewManager != null) {
+                    bounds  = viewManager.getVisibleGeoBounds();
+                }
+
                 if (alternateComponent != null) {
                     GuiUtils.toFront(GuiUtils.getFrame(alternateComponent));
                     Misc.sleep(50);
@@ -1597,8 +1602,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         imageGenerator.putIndex(props,
                                 ImageGenerator.PROP_IMAGEINDEX,
                                 images.size());
+                        Hashtable returnProps =  new Hashtable();
                         imageGenerator.processImage(image, path,
-                                scriptingNode, props, viewManager);
+                                scriptingNode, props, viewManager,returnProps);
+                        if(bounds!=null) {
+                            Double d;
+                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_NORTH))!=null) {
+                                bounds.setMaxLat(d.doubleValue());
+                            }
+                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_SOUTH))!=null) {
+                                bounds.setMinLat(d.doubleValue());
+                            }
+                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_WEST))!=null) {
+                                bounds.setMinLon(d.doubleValue());
+                            }
+                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_EAST))!=null) {
+                                bounds.setMaxLon(d.doubleValue());
+                            }
+                        }
                     } else {
                         Component comp;
                         if (fullWindowBtn.isSelected()) {
@@ -1631,7 +1652,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 //TODO
                 if (viewManager != null) {
                     positions.add(viewManager.getDisplayMatrix());
-                    locs.add(viewManager.getVisibleGeoBounds());
+                    locs.add(bounds);
                 } else {
                     positions.add(null);
                     locs.add(null);
@@ -1799,9 +1820,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                    displayRate, scriptingNode);
                 } else if (movieFile.toLowerCase().endsWith(".kmz")
                            || movieFile.toLowerCase().endsWith(".kml")) {
-                    createKmz(movieFile, images, times, locs, size,
+                    createKmz(movieFile, images, times, locs, 
                               displayRate, scriptingNode);
-
                 } else if (movieFile.toLowerCase().endsWith(".avi")) {
                     ImageUtils.writeAvi(images, displayRate,
                                         new File(movieFile));
@@ -1840,9 +1860,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param displayRate rate
      * @param scriptingNode isl node
      */
-    private void createKmz(String movieFile, List images, List times,
-                           List locs, Dimension size, double displayRate,
-                           Element scriptingNode) {
+    public void createKmz(String movieFile, List images, List times,
+                          List locs, double displayRate,
+                          Element scriptingNode) {
 
         try {
             ZipOutputStream zos = null;
