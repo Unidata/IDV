@@ -19,13 +19,21 @@ The items below reflect changes since the 2.5 release.
 
 <faqitem q="Use of netCDF 4.0 library" id="whatsnext">
 The IDV now uses the Java-netCDF 4.0 library. This provides
-limited support for HDF-4 and HDF-5 files.</li>
+limited support for HDF-4 and HDF-5 files.
 </faqitem>
 
 <faqitem q="Use of Java 1.6" id="jdk6">
 The IDV installers now use Java 6.  Web Start still uses Java 5
 (JDK 1.5) since there is no version of Java 6 on Mac OS-X for
-older systems.</li>
+older systems.
+</faqitem>
+
+<faqitem q="User data now in .unidata/idv" id="no_mo_metapps">
+The default location for the storage of user data (preferences,
+favorite bundles, plug-ins, etc) has been changed from
+.metapps to .unidata/idv under the user's home directory.
+This is consistent with other Unidata software (e.g. netCDF-Java)
+which use the .unidata directory.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
@@ -85,7 +93,14 @@ forecasts in the database.
 
 <faqitem q="Known Problems" id="knownproblems">
 For a list of outstanding known problems, see the 
-<a href="Bugs.html">Known Problems</a> page.
+<a href="Bugs.html">Known Problems</a> page.<p>
+Bugs fixed in this update:
+
+<ul>
+<li>Changing levels in a plan view after the first load caused
+the entire volume to be downloaded.
+<li>-islinteractive flag caused error.  Worked in 2.5
+</ul>
 </faqitem>
 
 </faq>
