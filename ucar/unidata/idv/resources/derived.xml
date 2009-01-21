@@ -271,7 +271,7 @@ or
      isdefault="true" 
      isenduser="false"
      properties="levels=false"
-     formula="DerivedGridFactory.createLayerDifference (D1, 500, 1000)">
+     formula="DerivedGridFactory.createThickness (D1)">
     <categories>
       <category
          value="2D grid-Derived"
