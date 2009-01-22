@@ -1704,6 +1704,7 @@ public class StringUtil {
      */
     public static String replace(String string, String pattern,
                                  String value) {
+        if(pattern.length()==0) return string;
         StringBuffer returnValue   = new StringBuffer();
         int          patternLength = pattern.length();
         while (true) {
