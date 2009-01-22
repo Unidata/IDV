@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -32,8 +33,10 @@ import visad.DateTime;
 
 import java.io.File;
 
-import java.util.List;
 import java.util.ArrayList;
+
+import java.util.List;
+
 
 /**
  * Class ImageWrapper Holds information about captured images
@@ -65,7 +68,13 @@ public class ImageWrapper {
         this(path, null, null, null);
     }
 
-    public ImageWrapper(String path,DateTime dttm) {
+    /**
+     * ctor
+     *
+     * @param path image file path
+     * @param dttm date
+     */
+    public ImageWrapper(String path, DateTime dttm) {
         this(path, dttm, null, null);
     }
 
@@ -97,12 +106,35 @@ public class ImageWrapper {
         this.position = position;
     }
 
-    public static List<ImageWrapper> makeList(List source) {
-        List<ImageWrapper>result = new ArrayList<ImageWrapper>();
-        for(int i=0;i<source.size();i++) {
+    /**
+     * utility to return a list of the image paths in the given list of ImageWrappers
+     *
+     * @param wrappers image wrappers
+     *
+     * @return image file paths
+     */
+    public static List<String> makeFileList(List<ImageWrapper> wrappers) {
+        List<String> files = new ArrayList<String>();
+        for (ImageWrapper imageWrapper : wrappers) {
+            files.add(imageWrapper.path);
+        }
+        return files;
+    }
+
+
+    /**
+     * utility to create a list of ImageWrapper from a list of file names
+     *
+     * @param source list of file names
+     *
+     * @return list of image wrappers
+     */
+    public static List<ImageWrapper> makeImageWrappers(List source) {
+        List<ImageWrapper> result = new ArrayList<ImageWrapper>();
+        for (int i = 0; i < source.size(); i++) {
             Object o = source.get(i);
-            if(o instanceof ImageWrapper) {
-                result.add((ImageWrapper)o);
+            if (o instanceof ImageWrapper) {
+                result.add((ImageWrapper) o);
             } else {
                 result.add(new ImageWrapper(o.toString()));
             }
@@ -111,10 +143,18 @@ public class ImageWrapper {
     }
 
 
+    /**
+     * to string
+     *
+     * @return to string
+     */
     public String toString() {
         return path;
     }
 
+    /**
+     * delete the image file
+     */
     public void deleteFile() {
         new File(path).delete();
     }
@@ -196,4 +236,5 @@ public class ImageWrapper {
 
 
 }
+
 
