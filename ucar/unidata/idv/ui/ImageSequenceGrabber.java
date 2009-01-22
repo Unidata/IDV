@@ -281,16 +281,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** image quality */
     private float quality = 1.0f;
 
-    /** Holds the filenames of the images we have captured */
-    Vector images = new Vector();
-
-    /** List of times corresponding to each image */
-    Vector times = new Vector();
-
-    List  positions = new ArrayList();
 
     /** List of earth locations corresponding to each image */
-    Vector locs = new Vector();
+    List<ImageWrapper> images = new ArrayList<ImageWrapper>();
 
     /** The directory we write to */
     String directory;
@@ -522,15 +515,15 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     public ImageSequenceGrabber(String filename, IntegratedDataViewer idv,
                                 ImageGenerator imageGenerator,
-                                Element scriptingNode, List imageFiles,
+                                Element scriptingNode, List<ImageWrapper> imageFiles,
                                 Dimension size, double displayRate) {
         this.idv            = idv;
         this.imageGenerator = imageGenerator;
         this.scriptingNode  = scriptingNode;
-        this.images         = new Vector(imageFiles);
+        this.images         = ImageWrapper.makeImageWrappers(imageFiles);
         this.idv            = idv;
         movieFileName       = filename;
-        createMovie(movieFileName, images, null, null, size, displayRate,
+        createMovie(movieFileName, images,  size, displayRate,
                     scriptingNode);
     }
 
@@ -606,6 +599,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         directory =
             IOUtil.joinDir(viewManager.getStore().getUserTmpDirectory(),
                            "images_" + System.currentTimeMillis());
+
+
 
         //Make sure the dir exists
         IOUtil.makeDir(directory);
@@ -816,7 +811,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             playButton.setEnabled(haveImages);
             deleteFrameButton.setEnabled(haveImages);
             if (haveImages) {
-                String current = images.get(previewIndex).toString();
+                String current = images.get(previewIndex).getPath();
                 if ( !Misc.equals(current, lastPreview)) {
                     previewPanel.loadFile(current);
                     /*                    Image image =
@@ -1089,7 +1084,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void stopAnimationCapture(boolean andWrite) {
         if (viewManager != null) {
-            viewManager.useImages(images, justCaptureAnimation);
+            viewManager.useImages(ImageWrapper.makeFileList(images), justCaptureAnimation);
             if (justCaptureAnimation) {
                 return;
             }
@@ -1223,11 +1218,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } else if (cmd.equals(CMD_PREVIEW_DELETE)) {
             if ((images.size() > 0) && (previewIndex >= 0)
                     && (previewIndex < images.size())) {
-                String filename = images.get(previewIndex).toString();
+                String filename = images.get(previewIndex).getPath();
                 images.remove(previewIndex);
-                times.remove(previewIndex);
-                positions.remove(previewIndex);
-                locs.remove(previewIndex);
                 previewIndex--;
                 imagesChanged();
                 new File(filename).delete();
@@ -1282,8 +1274,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints", writePositions);
             writePositionsCbx.setToolTipText("Also save the viewpoint matrices as an 'xidv' file");
 
-
-
             List accessoryComps = new ArrayList();
             accessoryComps.add(GuiUtils.hflow(
                         Misc.newList(
@@ -1329,7 +1319,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void publishMovie() {
         stopCapturingAuto();
         String uid  = Misc.getUniqueId();
-        String tail = uid + ".mov";
+        String tail = uid + FileManager.SUFFIX_MOV;
         String file = idv.getStore().getTmpFile(tail);
         createMovie(file);
         idv.getPublishManager().doPublish("Publish Quicktime file", file);
@@ -1364,14 +1354,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void deleteFiles() {
         for (int i = 0; i < images.size(); i++) {
-            (new File((String) images.get(i))).delete();
-        }
-        images = new Vector();
-        times  = new Vector();
-        locs   = new Vector();
-        positions = new Vector();
+            images.get(i).deleteFile();
+       }
+        images = new ArrayList<ImageWrapper>();
         if (viewManager != null) {
-            viewManager.useImages(images, justCaptureAnimation);
+            //TODO:
+            viewManager.useImages(ImageWrapper.makeFileList(images), justCaptureAnimation);
         }
     }
 
@@ -1605,21 +1593,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         Hashtable returnProps =  new Hashtable();
                         imageGenerator.processImage(image, path,
                                 scriptingNode, props, viewManager,returnProps);
-                        if(bounds!=null) {
-                            Double d;
-                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_NORTH))!=null) {
-                                bounds.setMaxLat(d.doubleValue());
-                            }
-                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_SOUTH))!=null) {
-                                bounds.setMinLat(d.doubleValue());
-                            }
-                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_WEST))!=null) {
-                                bounds.setMinLon(d.doubleValue());
-                            }
-                            if((d = (Double)returnProps.get(ImageGenerator.ATTR_EAST))!=null) {
-                                bounds.setMaxLon(d.doubleValue());
-                            }
-                        }
+                        subsetBounds(bounds, returnProps);
                     } else {
                         Component comp;
                         if (fullWindowBtn.isSelected()) {
@@ -1646,16 +1620,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
                     }
                 }
-                images.add(path);
-                times.add(time);
-
                 //TODO
                 if (viewManager != null) {
-                    positions.add(viewManager.getDisplayMatrix());
-                    locs.add(bounds);
+                    images.add(new ImageWrapper(path, time,bounds,viewManager.getDisplayMatrix()));
                 } else {
-                    positions.add(null);
-                    locs.add(null);
+                    images.add(new ImageWrapper(path, time));
                 }
                 imagesChanged();
             }
@@ -1667,8 +1636,25 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
 
-
     }
+
+    public static void subsetBounds(GeoLocationInfo bounds, Hashtable returnProps) { 
+        if(bounds == null) return;
+        Double d;
+        if((d = (Double)returnProps.get(ImageGenerator.ATTR_NORTH))!=null) {
+            bounds.setMaxLat(d.doubleValue());
+        }
+        if((d = (Double)returnProps.get(ImageGenerator.ATTR_SOUTH))!=null) {
+            bounds.setMinLat(d.doubleValue());
+        }
+        if((d = (Double)returnProps.get(ImageGenerator.ATTR_WEST))!=null) {
+            bounds.setMinLon(d.doubleValue());
+        }
+        if((d = (Double)returnProps.get(ImageGenerator.ATTR_EAST))!=null) {
+            bounds.setMaxLon(d.doubleValue());
+        }
+    }
+
 
 
 
@@ -1706,7 +1692,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         double displayRate =
             (new Double(displayRateFld.getText())).doubleValue();
 
-        createMovie(movieFile, images, times, locs, size, displayRate,
+        createMovie(movieFile, images,  size, displayRate,
                     scriptingNode);
     }
 
@@ -1732,7 +1718,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param images list of images
      * @param scriptingNode scripting node
      */
-    private void createPanel(String file, List images,
+    private void createPanel(String file, List<ImageWrapper> images,
                              Element scriptingNode) {
         try {
             imageGenerator.debug("Making image panel:" + file);
@@ -1746,8 +1732,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                    imageGenerator.ATTR_BACKGROUND,
                                    (Color) null);
             List sizedImages = new ArrayList();
-            for (int i = 0; i < images.size(); i++) {
-                String imageFile = images.get(i).toString();
+            for (ImageWrapper imageWrapper: images) {
+                String imageFile = imageWrapper.getPath();
                 Image  image     = ImageUtils.readImage(imageFile);
                 BufferedImage bufferedImage =
                     ImageUtils.toBufferedImage(image);
@@ -1768,15 +1754,15 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      *
      * @param commaSeparatedFiles This can be a list of comma separated files. eg: .mov, .kmz, etc
      * @param images List of images to make a movie from
-     * @param times List of times
-     * @param locs List of bounds
      * @param size size
      * @param displayRate display rate
      * @param scriptingNode isl node. May be null
      */
-    private void createMovie(String commaSeparatedFiles, List images,
-                             List times, List locs, Dimension size,
-                             double displayRate, Element scriptingNode) {
+    private void createMovie(String commaSeparatedFiles, 
+                             List<ImageWrapper> images,
+                             Dimension size,
+                             double displayRate, 
+                             Element scriptingNode) {
 
 
         List fileToks = StringUtil.split(commaSeparatedFiles, ",", true,
@@ -1791,6 +1777,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         if(writePositions && fileToks.size()>0) {
             try {
                 String positionFilename = IOUtil.stripExtension((String)fileToks.get(0))+".xidv";
+                List<double[]> positions = new ArrayList<double[]>();
+                for(ImageWrapper imageWrapper: images) {
+                    positions.add(imageWrapper.getPosition());
+                }
                 IOUtil.writeFile(positionFilename, idv.encodeObject(positions,true));
             } catch (IOException ioe) {
                 LogUtil.userErrorMessage("Error writing positions:" + ioe);
@@ -1808,22 +1798,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     continue;
                 }
                 //                System.err.println("createMovie:" + movieFile);
-                if (movieFile.toLowerCase().endsWith(".gif")) {
+                if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_GIF)) {
                     double rate = 1.0 / displayRate;
-                    //                    System.err.println("images:" + images);
-                    AnimatedGifEncoder.createGif(movieFile, images,
-                            AnimatedGifEncoder.REPEAT_FOREVER,
-                            (int) (rate * 1000));
+                    AnimatedGifEncoder.createGif(movieFile, ImageWrapper.makeFileList(images),
+                                                 AnimatedGifEncoder.REPEAT_FOREVER,
+                                                 (int) (rate * 1000));
                 } else if (movieFile.toLowerCase().endsWith(".htm")
                            || movieFile.toLowerCase().endsWith(".html")) {
-                    createAnisHtml(movieFile, images, times, size,
+                    createAnisHtml(movieFile, images, size,
                                    displayRate, scriptingNode);
-                } else if (movieFile.toLowerCase().endsWith(".kmz")
-                           || movieFile.toLowerCase().endsWith(".kml")) {
-                    createKmz(movieFile, images, times, locs, 
-                              displayRate, scriptingNode);
-                } else if (movieFile.toLowerCase().endsWith(".avi")) {
-                    ImageUtils.writeAvi(images, displayRate,
+                } else if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_KMZ)
+                           || movieFile.toLowerCase().endsWith(FileManager.SUFFIX_KMZ)) {
+                    createKmz(movieFile, images, scriptingNode);
+                } else if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_AVI)) {
+                    ImageUtils.writeAvi(ImageWrapper.makeFileList(images), displayRate,
                                         new File(movieFile));
                 } else {
                     //                    System.err.println("mov:" + movieFile);
@@ -1831,7 +1819,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     System.setSecurityManager(null);
                     JpegImagesToMovie.createMovie(movieFile, size.width,
                             size.height, (int) displayRate,
-                            new Vector(images));
+                                                  new Vector(ImageWrapper.makeFileList(images)));
                     System.setSecurityManager(backup);
                 }
             } catch (NumberFormatException nfe) {
@@ -1854,19 +1842,15 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      *
      * @param movieFile file name
      * @param images list of images
-     * @param times List of times
-     * @param locs List of bounds
      * @param size image size
-     * @param displayRate rate
      * @param scriptingNode isl node
      */
-    public void createKmz(String movieFile, List images, List times,
-                          List locs, double displayRate,
+    public void createKmz(String movieFile, List<ImageWrapper> images, 
                           Element scriptingNode) {
 
         try {
             ZipOutputStream zos = null;
-            if (movieFile.toLowerCase().endsWith(".kmz")) {
+            if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_KMZ)) {
                 zos = new ZipOutputStream(new FileOutputStream(movieFile));
             }
 
@@ -1938,8 +1922,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             TimeZone tz = TimeZone.getTimeZone("GMT");
 
 
-            for (int i = 0; i < images.size(); i++) {
-                String image = (String) images.get(i);
+            for (ImageWrapper imageWrapper: images) {
+                String image = imageWrapper.getPath();
                 String tail  = IOUtil.getFileTail(image);
                 //      System.err.println("tail:" + tail);
                 if (zos != null) {
@@ -1948,13 +1932,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         IOUtil.readBytes(new FileInputStream(image));
                     zos.write(imageBytes, 0, imageBytes.length);
                 }
-                DateTime        dttm   = (DateTime) ((times == null)
-                        ? null
-                        : times.get(i));
-                GeoLocationInfo bounds = (GeoLocationInfo) ((locs == null)
-                        ? null
-                        : locs.get(i));
-
+                DateTime        dttm   = imageWrapper.getDttm();
+                GeoLocationInfo bounds = imageWrapper.getBounds();
                 sb.append("<GroundOverlay>\n");
                 sb.append("<name>" + ((dttm == null)
                                       ? image
@@ -1980,7 +1959,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 zos.putNextEntry(
                     new ZipEntry(
                         IOUtil.stripExtension(IOUtil.getFileTail(movieFile))
-                        + ".kml"));
+                        + FileManager.SUFFIX_KML));
 
                 byte[] kmlBytes = sb.toString().getBytes();
                 //                System.out.println("sb:" + sb);
@@ -2001,12 +1980,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      *
      * @param movieFile file name
      * @param images list of images
-     * @param times List of times
-     * @param size image size
      * @param displayRate rate
      * @param scriptingNode isl node
      */
-    private void createAnisHtml(String movieFile, List images, List times,
+    private void createAnisHtml(String movieFile, List<ImageWrapper> images,
                                 Dimension size, double displayRate,
                                 Element scriptingNode) {
 
@@ -2067,7 +2044,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             String       files = "";
 
             for (int i = 0; i < images.size(); i++) {
-                String file = images.get(i).toString();
+                ImageWrapper imageWrapper = images.get(i);
+                String file = imageWrapper.getPath();
                 if (copyFiles) {
                     IOUtil.copyFile(new File(file), new File(dir));
                 }

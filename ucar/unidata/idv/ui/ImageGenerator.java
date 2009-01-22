@@ -53,6 +53,7 @@ import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.drawing.Glyph;
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.FileManager;
 
 
 import ucar.unidata.util.GuiUtils;
@@ -1831,6 +1832,7 @@ public class ImageGenerator extends IdvManager {
             viewManager.updateDisplayList();
         }
         //One more pause for the display lists
+        updateViewManagers();
         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                                             getIdv().getIdvUIManager());
         return true;
@@ -3032,7 +3034,6 @@ public class ImageGenerator extends IdvManager {
      * @return List of view managers
      */
     private List getViewManagers(Element node) {
-        updateViewManagers();
         List viewManagers = getVMManager().getViewManagers();
         if ((node == null) || !XmlUtil.hasAttribute(node, ATTR_VIEW)) {
             return viewManagers;
@@ -3273,7 +3274,7 @@ public class ImageGenerator extends IdvManager {
      * @throws Exception On badness
      */
     public Image getImage() throws Exception {
-        updateViewManagers();
+        //        updateViewManagers();
         List viewManagers = getVMManager().getViewManagers();
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
@@ -3364,7 +3365,13 @@ public class ImageGenerator extends IdvManager {
                     new VectorGraphicsRenderer(viewManager);
                 vectorRenderer.renderTo(loopFilename);
             } else {
+                getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
+                                                                    getIdv().getIdvUIManager(),0);
+                //                int taskCnt = ActionImpl.getTaskCount();
+                //                StringBuffer stack = LogUtil.getStackDump(false,true);
                 lastImage = viewManager.getMaster().getImage(false);
+                //                System.err.println(stack);
+                //                System.err.println("TASK CNT:" + taskCnt);
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
                                          getAllProperties(), viewManager,new Hashtable());
@@ -4020,7 +4027,21 @@ public class ImageGenerator extends IdvManager {
             for(String file: fileToks) {
                 file = getImageFileName(file);
                 debug("Writing image:" + file);
-                ImageUtils.writeImageToFile(image, file, quality);
+                if(file.endsWith(FileManager.SUFFIX_KMZ)) {
+                    GeoLocationInfo bounds = null;
+                    if (viewManager != null) {
+                        bounds  = viewManager.getVisibleGeoBounds();
+                        ImageSequenceGrabber.subsetBounds(bounds, returnProps);
+                        String tail = IOUtil.getFileTail(file);
+                        String tmpImageFile = getIdv().getStore().getTmpFile(tail+".png");
+                        ImageUtils.writeImageToFile(image, tmpImageFile, quality);
+                        ImageWrapper imageWrapper = new ImageWrapper(tmpImageFile,null,bounds,null);
+                        new ImageSequenceGrabber(file,getIdv(), this, node,(List<ImageWrapper>)Misc.newList(imageWrapper),
+                                                 null,1);
+                    }
+                } else {
+                    ImageUtils.writeImageToFile(image, file, quality);
+                }
             }
         }
         return image;
