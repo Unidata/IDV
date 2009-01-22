@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -44,6 +45,8 @@ import ucar.unidata.util.Trace;
 import visad.ActionImpl;
 
 import java.awt.*;
+
+import java.lang.management.*;
 
 import javax.swing.*;
 
@@ -367,27 +370,41 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
      * cursor count
      */
     public static void waitUntilDisplaysAreDone(IdvUIManager uiManager) {
+        long timeToWait = 100;
+        waitUntilDisplaysAreDone(uiManager, timeToWait);
+    }
+
+    /**
+     * A utility method that will wait until all displays are finished
+     * being created. This looks at the DisplayControls, data sources, global wait cursor count,
+     * the visad thread pool and looks at any active java3d threads
+     *
+     * @param uiManager The ui manager. We use this to access the wait
+     * cursor count
+     * @param timeToWait (milliseconds) elapsed time to wait for nothing to be active
+     */
+    public static void waitUntilDisplaysAreDone(IdvUIManager uiManager,
+            long timeToWait) {
         Trace.call1("Waiting on displays");
-        int successiveTimesWithNoActive = 0;
-        int sleepTime                   = 10;
-        //        long timeToWait                  = 500;
-        long timeToWait = 50;
-        long firstTime  = System.currentTimeMillis();
-        int  cnt        = 0;
+        int  successiveTimesWithNoActive = 0;
+        int  sleepTime                   = 10;
+        long firstTime                   = System.currentTimeMillis();
+        int  cnt                         = 0;
         while (true) {
             boolean cursorCount = (uiManager.getWaitCursorCount() > 0);
             boolean actionCount = ActionImpl.getTaskCount() > 0;
             boolean dataActive = DataSourceImpl.getOutstandingGetDataCalls()
                                  > 0;
+            boolean anyJ3dActive = anyJava3dThreadsActive();
             boolean allDisplaysInitialized =
                 uiManager.getIdv().getAllDisplaysIntialized();
 
             //            System.err.println ("\tAll displays init:" + allDisplaysInitialized +" cursor cnt:" + uiManager.getWaitCursorCount() + " action cnt:" +actionCount + " data active: " + dataActive);
-            if ((cnt++) % 30 == 0) {
-                //                System.err.println ("\tcnt:" + uiManager.getWaitCursorCount() + " " +actionCount + " " + dataActive);
-            }
+            //            if ((cnt++) % 30 == 0) {
+            //                System.err.println ("\tcnt:" + uiManager.getWaitCursorCount() + " " +actionCount + " " + dataActive);
+            //            }
             boolean anyActive = actionCount || cursorCount || dataActive
-                                || !allDisplaysInitialized;
+                                || !allDisplaysInitialized || anyJ3dActive;
             if (dataActive) {
                 firstTime = System.currentTimeMillis();
             }
@@ -397,18 +414,49 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
             } else {
                 successiveTimesWithNoActive++;
             }
+            if ((timeToWait == 0) && !anyActive) {
+                break;
+            }
             if (successiveTimesWithNoActive * sleepTime > timeToWait) {
                 break;
             }
             Misc.sleep(sleepTime);
             //At most wait 120 seconds
             if (System.currentTimeMillis() - firstTime > 120000) {
+                System.err.println("Error waiting for to be done:"
+                                   + LogUtil.getStackDump(false));
                 return;
             }
         }
         Trace.call2("Waiting on displays");
 
     }
+
+
+    /**
+     * A total hack to see if there are any active Java3D threads running
+     *
+     * @return any java3d threads running
+     */
+    private static boolean anyJava3dThreadsActive() {
+        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+        long[]       ids        = threadBean.getAllThreadIds();
+        for (int i = 0; i < ids.length; i++) {
+            ThreadInfo info = threadBean.getThreadInfo(ids[i],
+                                  Integer.MAX_VALUE);
+            if (info == null) {
+                continue;
+            }
+            if (info.getThreadState() != Thread.State.RUNNABLE) {
+                continue;
+            }
+            if (info.getThreadName().indexOf("J3D") >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 
