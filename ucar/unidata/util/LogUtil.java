@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -30,6 +31,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.io.*;
+
+import java.lang.management.*;
 
 
 
@@ -50,8 +53,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.swing.*;
-
-import java.lang.management.*;
 
 
 /**
@@ -228,6 +229,11 @@ public class LogUtil {
         return testMode;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static boolean getInteractiveMode() {
         return !testMode;
     }
@@ -1259,48 +1265,92 @@ public class LogUtil {
         });
     }
 
-    public static StringBuffer  getStackDump(boolean asHtml) {
+    /**
+     * return the stack trace of all threads
+     *
+     * @param asHtml If true generate html instead of text
+     *
+     * @return stack dump
+     */
+    public static StringBuffer getStackDump(boolean asHtml) {
+        return getStackDump(asHtml, false);
+    }
+
+    /**
+     * return the stack trace of all threads
+     *
+     * @param asHtml If true generate html instead of text
+     * @param onlyRunning Only show the running threads
+     *
+     * @return stack dump
+     */
+    public static StringBuffer getStackDump(boolean asHtml,
+                                            boolean onlyRunning) {
         StringBuffer longSB = new StringBuffer();
-        if(asHtml)
+        if (asHtml) {
             longSB.append("<pre>\n");
-        ThreadMXBean threadBean =ManagementFactory.getThreadMXBean();
-        long[] ids = threadBean.getAllThreadIds();
-        StringBuffer blockedSB = new StringBuffer();
-        StringBuffer otherSB = new StringBuffer();
-        for(int i=0;i<ids.length;i++) {
-            ThreadInfo info =   threadBean.getThreadInfo(ids[i],Integer.MAX_VALUE);
-            if(info==null) continue;
-            StackTraceElement[]stack =	info.getStackTrace();
-            String extra = "";
-            String style="";
-            StringBuffer sb= otherSB;
-            if(info.getThreadState()==Thread.State.WAITING) {
+        }
+        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+        long[]       ids        = threadBean.getAllThreadIds();
+        StringBuffer blockedSB  = new StringBuffer();
+        StringBuffer otherSB    = new StringBuffer();
+        for (int i = 0; i < ids.length; i++) {
+            ThreadInfo info = threadBean.getThreadInfo(ids[i],
+                                  Integer.MAX_VALUE);
+            if (info == null) {
+                continue;
+            }
+            if (onlyRunning) {
+                if (info.getThreadState() != Thread.State.RUNNABLE) {
+                    continue;
+                }
+            }
+            StackTraceElement[] stack = info.getStackTrace();
+            String              extra = "";
+            String              style = "";
+            StringBuffer        sb    = otherSB;
+            if (info.getThreadState() == Thread.State.WAITING) {
                 extra = " on " + info.getLockName();
-            } else   if(info.getThreadState()==Thread.State.BLOCKED) {
-                style="  background-color:#cccccc; ";
-                if(asHtml)
-                    extra = " on " + info.getLockName() + " held by <a href=\"#id" + info.getLockOwnerId()+"\">" + info.getLockOwnerName() + " id:" + info.getLockOwnerId()+"</a>";
-                else
-                    extra = " on " + info.getLockName() + " held by " + info.getLockOwnerId() + info.getLockOwnerName() + " id:" + info.getLockOwnerId();
+            } else if (info.getThreadState() == Thread.State.BLOCKED) {
+                style = "  background-color:#cccccc; ";
+                if (asHtml) {
+                    extra = " on " + info.getLockName()
+                            + " held by <a href=\"#id"
+                            + info.getLockOwnerId() + "\">"
+                            + info.getLockOwnerName() + " id:"
+                            + info.getLockOwnerId() + "</a>";
+                } else {
+                    extra = " on " + info.getLockName() + " held by "
+                            + info.getLockOwnerId() + info.getLockOwnerName()
+                            + " id:" + info.getLockOwnerId();
+                }
                 sb = blockedSB;
             }
-            if(asHtml) {
-                sb.append("<a name=\"id" +ids[i]+"\"></a>");
-                sb.append("<span style=\"" + style +"\">&quot;" +info.getThreadName() +"&quot;" +  " ID:" + ids[i] +"  "+ info.getThreadState()+extra+"</span>\n");
+            if (asHtml) {
+                sb.append("<a name=\"id" + ids[i] + "\"></a>");
+                sb.append("<span style=\"" + style + "\">&quot;"
+                          + info.getThreadName() + "&quot;" + " ID:" + ids[i]
+                          + "  " + info.getThreadState() + extra
+                          + "</span>\n");
             } else {
-                sb.append("\"" +info.getThreadName() +"\"" +  " ID:" + ids[i] +"  "+ info.getThreadState()+extra+"\n");
+                sb.append("\"" + info.getThreadName() + "\"" + " ID:"
+                          + ids[i] + "  " + info.getThreadState() + extra
+                          + "\n");
             }
-            String space = (asHtml?"&nbsp;&nbsp;&nbsp;&nbsp;":"    ");
-            for(int stackIdx=0;stackIdx<stack.length;stackIdx++) {
+            String space = (asHtml
+                            ? "&nbsp;&nbsp;&nbsp;&nbsp;"
+                            : "    ");
+            for (int stackIdx = 0; stackIdx < stack.length; stackIdx++) {
                 sb.append(space);
-                sb.append(stack[stackIdx]+"\n");
+                sb.append(stack[stackIdx] + "\n");
             }
             sb.append("\n\n");
         }
         longSB.append(blockedSB);
         longSB.append(otherSB);
-        if(asHtml)
+        if (asHtml) {
             longSB.append("</pre>");
+        }
         return longSB;
     }
 
