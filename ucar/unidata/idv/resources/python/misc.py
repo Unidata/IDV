@@ -14,13 +14,13 @@ def cloneArray(array):
     return DataUtil.cloneArray(array);
 
 def idveval(formula):
-  """  evaluate a formula """
+  """  evaluate a formula  and return a DerivedDataChoice """
   from ucar.unidata.data import DerivedDataChoice
   from ucar.unidata.data import DataCancelException
   derivedDataChoice.setName(formula)
   try:
     ddc = DerivedDataChoice(idv,formula)
-    return ddc.getData(None)  
+    return ddc;
   except DataCancelException, dce:
     return None;    
 
