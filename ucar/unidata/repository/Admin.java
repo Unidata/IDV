@@ -244,7 +244,7 @@ public class Admin extends RepositoryManager {
             }
             int idx = userAgent.indexOf("(");
             if(idx>0) {
-                userAgent = userAgent.substring(0,idx);
+                //                userAgent = userAgent.substring(0,idx);
             }
             String dttm  = getRepository().formatDate(logEntry.getDate());
             dttm = dttm.replace(" ","&nbsp;");

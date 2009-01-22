@@ -1838,6 +1838,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return null;
         }
 
+        
         //Keep the size of the log at 200
         synchronized(log) {
             while(log.size()>200) {
@@ -1910,8 +1911,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     is = new ByteArrayInputStream(js.getBytes());
                 }
                 Result result = new Result(BLANK, is, type);
-
-                
+              
 
 
                 result.setCacheOk(true);
@@ -2095,12 +2095,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 String baseUrl =  request.entryUrl(URL_ENTRY_SHOW,   entry);
                 String label = entry.getLabel();
                 if(label.length()>12) {
-                    label = label.substring(0,11)+"...";
+                    //                    label = label.substring(0,11)+"...";
                 }
-                label = "<nobr>" + label+"</nobr>";
+                //                label = "<nobr>" + label+"</nobr>";
                 String url =  getEntryManager().getAjaxLink(request, entry,label,baseUrl,true,false);
                 String  link = favoritesWrapper.replace("${link}",url);
-                favoriteLinks.add(link);
+                favoriteLinks.add("<nobr>" +link+"<nobr>");
             }
             favorites.append(favoritesTemplate.replace("${entries}",StringUtil.join(favoritesSeparator, favoriteLinks)));
         }
@@ -2114,12 +2114,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 String baseUrl =  request.entryUrl(URL_ENTRY_SHOW,   entry);
                 String label = entry.getLabel();
                 if(label.length()>12) {
-                    label = label.substring(0,11)+"...";
+                    //                    label = label.substring(0,11)+"...";
                 }
-                label = "<nobr>" + label+"</nobr>";
+                //                label = "<nobr>" + label+"</nobr>";
                 String url =  getEntryManager().getAjaxLink(request, entry,label,baseUrl,true,false);
                 String  link = favoritesWrapper.replace("${link}",url);
-                cartLinks.add(link);
+                cartLinks.add("<nobr>" +link+"<nobr>");
+                //                cartLinks.add(link);
             }
             favorites.append(HtmlUtil.br());
             favorites.append(cartTemplate.replace("${entries}",StringUtil.join(favoritesSeparator, cartLinks)));
@@ -2886,6 +2887,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if(path.equals("/")) path = "/index.html";
         path = "/ucar/unidata/repository/docs/userguide/processed" + path;
         RepositoryUtil.checkFilePath(path);
+        Result result =null;
         if(path.endsWith(".html")) {
             String helpText = 
                 IOUtil.readContents(path);
@@ -2897,14 +2899,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if(matcher.find()) {
                 helpText = matcher.group(1);
             }
-            return new Result(
-                              BLANK,
-                              new StringBuffer(helpText));
+            result = new Result(BLANK,
+                                new StringBuffer(helpText));
         } else {
             InputStream inputStream =  IOUtil.getInputStream(path,getClass());
-            return new Result(BLANK,inputStream,IOUtil
-                              .getFileExtension(path));
+            result = new Result(BLANK,inputStream,IOUtil
+                                .getFileExtension(path));
+            
         }
+        result.setCacheOk(true);
+        return result;
     }
 
 

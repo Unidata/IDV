@@ -538,6 +538,7 @@ function  handleFolderList(request, uid) {
         block.obj.innerHTML = getChildText(xmlDoc);
     }
     
+    //    alert(img + ' ' + uid + ' ' + changeImages[uid]);
     if(img) {
         if(changeImages[uid]) {
             img.obj.src = "${urlroot}/icons/folderopen.gif";

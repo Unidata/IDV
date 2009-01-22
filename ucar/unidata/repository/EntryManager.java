@@ -2512,7 +2512,8 @@ return new Result(title, sb);
             if(entry.isGroup() && forTreeNavigation) {
                 event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                                                             HtmlUtil.squote(entryId) + ","
-                                                            + HtmlUtil.squote(uid)));
+                                                            + HtmlUtil.squote(uid) +",null,null,"+
+                                                            HtmlUtil.squote(fileUrl(ICON_FOLDER_OPEN))));
             } else if(!forTreeNavigation) {
                 event = HtmlUtil.onMouseClick("showMenu(event,"
                                               + HtmlUtil.squote(linkId) + ","
