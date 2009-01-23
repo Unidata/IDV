@@ -411,6 +411,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     protected void addLinks(Request request, Result result, State state)
             throws Exception {
         state.forWhat = State.FOR_HEADER;
+        if(state.getEntry().getDescription().indexOf("<nolinks>")>=0) return;
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(
