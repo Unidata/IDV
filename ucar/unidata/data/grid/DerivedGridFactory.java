@@ -115,7 +115,8 @@ public class DerivedGridFactory {
      */
     public static FieldImpl createThickness(FieldImpl grid)
             throws VisADException, RemoteException {
-        return createLayerDifference(grid, 500, 1000, CommonUnits.HECTOPASCAL);
+        return createLayerDifference(grid, 500, 1000,
+                                     CommonUnits.HECTOPASCAL);
     }
 
     /**
@@ -155,10 +156,10 @@ public class DerivedGridFactory {
             String value1, String value2, String levelUnit)
             throws VisADException, RemoteException {
         return createLayerDifference(grid, Misc.parseNumber(value1),
-                                     Misc.parseNumber(value2), 
-                                     (levelUnit != null) 
-                                         ? Util.parseUnit(levelUnit)
-                                         : (Unit) null);
+                                     Misc.parseNumber(value2),
+                                     (levelUnit != null)
+                                     ? Util.parseUnit(levelUnit)
+                                     : (Unit) null);
     }
 
     /**
@@ -190,6 +191,7 @@ public class DerivedGridFactory {
      * @param grid     grid of data
      * @param value1   level of first
      * @param value1   level of first
+     * @param value2 _more_
      * @param levelUnit  unit for level
      *
      * @return computed layer difference
@@ -206,27 +208,25 @@ public class DerivedGridFactory {
                 levelType = AirPressure.getRealType();
             } else if (Unit.canConvert(levelUnit, CommonUnit.meter)) {
                 levelType = RealType.Altitude;
-            } else { // TODO:  figure out something better
+            } else {  // TODO:  figure out something better
                 levelUnit = null;
             }
         }
-        Real level1 = 
-            (levelUnit != null) 
-                ? new Real(levelType, value1, levelUnit)
-                : new Real(levelType, value1);
-        Real level2 = 
-            (levelUnit != null) 
-                ? new Real(levelType, value2, levelUnit)
-                : new Real(levelType, value2);
+        Real      level1 = (levelUnit != null)
+                           ? new Real(levelType, value1, levelUnit)
+                           : new Real(levelType, value1);
+        Real      level2 = (levelUnit != null)
+                           ? new Real(levelType, value2, levelUnit)
+                           : new Real(levelType, value2);
 
-        FieldImpl first =
-            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
-                                         false);
+        FieldImpl first  =
+        //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
+                                     false);
         FieldImpl second =
-            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
-                                         false);
+        //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
+                                     false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result    = (FieldImpl) first.subtract(second);
         if (paramType.getDimension() == 1) {
@@ -278,10 +278,10 @@ public class DerivedGridFactory {
             String value2, String levelUnit)
             throws VisADException, RemoteException {
         return createLayerAverage(grid, Misc.parseNumber(value1),
-                                  Misc.parseNumber(value2), 
-                                  (levelUnit != null) 
-                                      ? Util.parseUnit(levelUnit)
-                                      : (Unit) null);
+                                  Misc.parseNumber(value2),
+                                  (levelUnit != null)
+                                  ? Util.parseUnit(levelUnit)
+                                  : (Unit) null);
     }
 
 
@@ -328,27 +328,25 @@ public class DerivedGridFactory {
                 levelType = AirPressure.getRealType();
             } else if (Unit.canConvert(levelUnit, CommonUnit.meter)) {
                 levelType = RealType.Altitude;
-            } else { // TODO:  figure out something better
+            } else {  // TODO:  figure out something better
                 levelUnit = null;
             }
         }
-        Real level1 = 
-            (levelUnit != null) 
-                ? new Real(levelType, value1, levelUnit)
-                : new Real(levelType, value1);
-        Real level2 = 
-            (levelUnit != null) 
-                ? new Real(levelType, value2, levelUnit)
-                : new Real(levelType, value2);
+        Real      level1 = (levelUnit != null)
+                           ? new Real(levelType, value1, levelUnit)
+                           : new Real(levelType, value1);
+        Real      level2 = (levelUnit != null)
+                           ? new Real(levelType, value2, levelUnit)
+                           : new Real(levelType, value2);
 
-        FieldImpl first =
-            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
-                                         false);
+        FieldImpl first  =
+        //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
+                                     false);
         FieldImpl second =
-            //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
-            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
-                                         false);
+        //GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
+                                     false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result =
             (FieldImpl) (first.add(second)).divide(new Real(2));
@@ -683,9 +681,9 @@ public class DerivedGridFactory {
             FieldImpl topoGrid)
             throws VisADException, RemoteException {
 
-        FieldImpl grid = paramGrid;
-        RealType rt = GridUtil.getParamType(topoGrid).getRealComponents()[0];
-        Unit     topoUnit = rt.getDefaultUnit();
+        FieldImpl grid     = paramGrid;
+        RealType  rt = GridUtil.getParamType(topoGrid).getRealComponents()[0];
+        Unit      topoUnit = rt.getDefaultUnit();
         if ( !(Unit.canConvert(topoUnit,
                                GeopotentialAltitude
                                    .getGeopotentialMeter()) || Unit
@@ -698,34 +696,38 @@ public class DerivedGridFactory {
         if (MathType.findScalarType(GridUtil.getParamType(paramGrid), rt)) {
             return paramGrid;
         } else {
-            
+
             // check to make sure domains are compatible
+            Set topoDomain  = GridUtil.getSpatialDomain(topoGrid);
+            Set paramDomain = GridUtil.getSpatialDomain(paramGrid);
+            //System.err.println("topo domain " +topoDomain);
+            //System.err.println("param domain " +paramDomain);
+
+            // 3D grid on a 2D manifold over a 2D topography
+            if ((topoDomain.getDimension() == 2)
+                    && (paramDomain.getDimension() == 3)
+                    && (paramDomain.getManifoldDimension() == 2)) {
+                grid        = GridUtil.make2DGridFromSlice(paramGrid, true);
+                paramDomain = GridUtil.getSpatialDomain(grid);
+                // System.err.println("new param domain " +paramDomain);
+            }
+            RealTupleType paramRef = null;
+            RealTupleType topoRef  = null;
+            if (paramDomain.getCoordinateSystem() != null) {
+                paramRef = paramDomain.getCoordinateSystem().getReference();
+            } else {
+                paramRef = ((SetType) paramDomain.getType()).getDomain();
+            }
+            if (topoDomain.getCoordinateSystem() != null) {
+                topoRef = topoDomain.getCoordinateSystem().getReference();
+            } else {
+                topoRef = ((SetType) topoDomain.getType()).getDomain();
+            }
+            // System.err.println("paramRef = " + paramRef);
+            // System.err.println("topoRef = " + topoRef);
+            // lat/lon over lon/lat (or vice versa)
+            // TODO:  handle a time sequence topography
             if ( !GridUtil.isTimeSequence(topoGrid)) {
-                Set paramDomain = GridUtil.getSpatialDomain(paramGrid);
-                // System.err.println("param domain " +paramDomain);
-                if (paramDomain.getDimension() == 3 &&
-                    paramDomain.getManifoldDimension() == 2) {
-                    grid = GridUtil.make2DGridFromSlice(paramGrid, true);
-                    paramDomain = GridUtil.getSpatialDomain(grid);
-                    //System.err.println("new param domain " +paramDomain);
-                }
-                Set topoDomain = topoGrid.getDomainSet();
-                // System.err.println("topo domain " +topoDomain);
-                RealTupleType paramRef = null;
-                RealTupleType topoRef  = null;
-                if (paramDomain.getCoordinateSystem() != null) {
-                    paramRef =
-                        paramDomain.getCoordinateSystem().getReference();
-                } else {
-                    paramRef = ((SetType) paramDomain.getType()).getDomain();
-                }
-                if (topoDomain.getCoordinateSystem() != null) {
-                    topoRef = topoDomain.getCoordinateSystem().getReference();
-                } else {
-                    topoRef = ((SetType) topoDomain.getType()).getDomain();
-                }
-                // System.err.println("paramRef = " + paramRef);
-                // System.err.println("topoRef = " + topoRef);
                 if ( !paramRef.equals(topoRef)) {
                     GriddedSet newSet = null;
                     if (topoDomain instanceof Linear2DSet) {
@@ -1839,7 +1841,8 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl createPotentialVorticity(FieldImpl temperFI, FieldImpl vector)
+    public static FieldImpl createPotentialVorticity(FieldImpl temperFI,
+            FieldImpl vector)
             throws VisADException, RemoteException {
 
         return createIPV(
@@ -1847,8 +1850,8 @@ public class DerivedGridFactory {
             createPressureGridFromDomain(
                 (GridUtil.isTimeSequence(temperFI) == true)
                 ? (FlatField) temperFI.getSample(0)
-                : (FlatField) temperFI), 
-            createAbsoluteVorticity(getUComponent(vector), getVComponent(vector)));
+                : (FlatField) temperFI), createAbsoluteVorticity(
+                    getUComponent(vector), getVComponent(vector)));
     }
 
     /**
