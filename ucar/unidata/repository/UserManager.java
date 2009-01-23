@@ -1627,7 +1627,8 @@ public class UserManager extends RepositoryManager {
             tips.add(msg("Logout"));
             extras.add("");
             urls.add(request.url(getRepositoryBase().URL_USER_HOME));
-            labels.add(user.getLabel());
+            String label = user.getLabel().replace(" ","&nbsp;");
+            labels.add(label);
             tips.add(msg("Go to user settings"));
         }
 
