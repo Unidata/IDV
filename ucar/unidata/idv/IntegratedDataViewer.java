@@ -336,8 +336,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
 
 
+
         //Set the default directory property
         FileManager.setStore(getStore(), PREF_FILEWRITEDIR, PREF_FILEREADDIR);
+
+        startMonitor();
         getJythonManager();
         getDataManager();
         getPublishManager().initPublisher();
@@ -549,6 +552,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             });
         */
 
+
         getIdvUIManager().doBasicInitialization();
 
         if (argsManager.traceMode) {
@@ -693,7 +697,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                 }
             });
         }
-        startMonitor();
     }
 
 
