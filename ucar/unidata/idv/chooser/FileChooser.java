@@ -442,6 +442,17 @@ public class FileChooser extends IdvChooser {
         }
 
         /**
+         * Override JFileChooser method to set the property FileChooser.useShellFolder to false
+         * to fix some performance and lockup problems that are showing up in 1.6
+         */
+        public void updateUI() {
+            putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
+            super.updateUI();
+        }
+
+
+
+        /**
          * Approve the selection
          */
         public void approveSelection() {
