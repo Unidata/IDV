@@ -384,5 +384,11 @@
     </categories>
     <operands categories=""/>
   </derived>
+  <derived description="Make slice 2D" formula="make2D(slice)" id="Make slice 2D" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids"/>
+    </categories>
+    <operands/>
+  </derived>
 
 </derived_parameters>
