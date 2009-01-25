@@ -1530,6 +1530,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         }
 
         try {
+            Hashtable imageProperties =  new Hashtable();
             synchronized (MUTEX) {
                 if (viewManager != null) {
                     if (viewManager.useDisplay()) {
@@ -1590,10 +1591,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         imageGenerator.putIndex(props,
                                 ImageGenerator.PROP_IMAGEINDEX,
                                 images.size());
-                        Hashtable returnProps =  new Hashtable();
                         imageGenerator.processImage(image, path,
-                                scriptingNode, props, viewManager,returnProps);
-                        subsetBounds(bounds, returnProps);
+                                scriptingNode, props, viewManager,imageProperties);
+                        System.err.println("IP1:" + imageProperties);
+                        subsetBounds(bounds, imageProperties);
                     } else {
                         Component comp;
                         if (fullWindowBtn.isSelected()) {
@@ -1620,21 +1621,21 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
                     }
                 }
-                //TODO
+                System.err.println("IP2:" + imageProperties);
+                ImageWrapper imageWrapper;
                 if (viewManager != null) {
-                    images.add(new ImageWrapper(path, time,bounds,viewManager.getDisplayMatrix()));
+                    imageWrapper = new ImageWrapper(path, time,bounds,viewManager.getDisplayMatrix());
                 } else {
-                    images.add(new ImageWrapper(path, time));
+                    imageWrapper = new ImageWrapper(path, time);
                 }
+                imageWrapper.setProperties(imageProperties);
+                images.add(new ImageWrapper(path, time));
                 imagesChanged();
             }
         } catch (Throwable exc) {
             stopAnimationCapture(false);
             LogUtil.logException("Error capturing image", exc);
         }
-
-
-
 
     }
 
@@ -1922,7 +1923,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             TimeZone tz = TimeZone.getTimeZone("GMT");
 
 
+            boolean didKmlFiles = false;
             for (ImageWrapper imageWrapper: images) {
+                List kmlFiles = (List) imageWrapper.getProperty("kmlfiles");
+                if(!didKmlFiles && kmlFiles!=null) {
+                    didKmlFiles = true;
+                    for(String kmlFile: (List<String>)kmlFiles) {
+                        String tail  = IOUtil.getFileTail(kmlFile);
+                        if (zos != null) {
+                            zos.putNextEntry(new ZipEntry(tail));
+                            byte[] imageBytes =
+                                IOUtil.readBytes(new FileInputStream(kmlFile));
+                            zos.write(imageBytes, 0, imageBytes.length);
+                        }
+                    }
+                }
+
+
+                String extraKml = (String)imageWrapper.getProperty("kml");
                 String image = imageWrapper.getPath();
                 String tail  = IOUtil.getFileTail(image);
                 //      System.err.println("tail:" + tail);
@@ -1934,6 +1952,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
                 DateTime        dttm   = imageWrapper.getDttm();
                 GeoLocationInfo bounds = imageWrapper.getBounds();
+                if(extraKml!=null) {
+                    sb.append(extraKml);
+                }
                 sb.append("<GroundOverlay>\n");
                 sb.append("<name>" + ((dttm == null)
                                       ? image

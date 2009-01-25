@@ -34,6 +34,7 @@ import visad.DateTime;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import java.util.List;
 
@@ -58,6 +59,8 @@ public class ImageWrapper {
 
     /** the viewpoint */
     private double[] position;
+
+    private Hashtable properties;
 
     /**
      * ctor
@@ -233,6 +236,28 @@ public class ImageWrapper {
     }
 
 
+    /**
+       Set the Properties property.
+
+       @param value The new value for Properties
+    **/
+    public void setProperties (Hashtable value) {
+	properties = value;
+    }
+
+    /**
+       Get the Properties property.
+
+       @return The Properties
+    **/
+    public Hashtable getProperties () {
+	return properties;
+    }
+
+    public Object getProperty (Object key) {
+        if(properties == null) return null;
+        return properties.get(key);
+    }
 
 
 }

@@ -250,6 +250,8 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String TAG_KML = "kml";
 
+    public static final String TAG_KML_COLORBAR = "kmlcolorbar";
+
     /** isl tag */
     public static final String TAG_KMZFILE = "kmzfile";
 
@@ -266,6 +268,8 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_TRANSPARENT = "transparent";
 
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
+
+    public static final String ATTR_SUFFIX = "suffix";
 
     public static final String ATTR_TRANSPARENCY = "transparency";
 
@@ -3301,6 +3305,7 @@ public class ImageGenerator extends IdvManager {
      */
     private void captureImage(String filename, Element scriptingNode)
             throws Throwable {
+        Hashtable imageProperties = new Hashtable();
 
         //See if we're in test mode
         if ((scriptingNode != null)
@@ -3311,7 +3316,7 @@ public class ImageGenerator extends IdvManager {
                           BufferedImage.TYPE_INT_RGB);
             String loopFilename = applyMacros(filename);
             lastImage = processImage((BufferedImage) tmpImage, loopFilename,
-                                     scriptingNode, getAllProperties(), null,new Hashtable());
+                                     scriptingNode, getAllProperties(), null,imageProperties);
             return;
         }
 
@@ -3327,7 +3332,7 @@ public class ImageGenerator extends IdvManager {
             lastImage = display.getImage(applyMacros(scriptingNode,
                     ATTR_WHAT, (String) null));
             lastImage = processImage((BufferedImage) lastImage, loopFilename,
-                                     scriptingNode, getAllProperties(), null,new Hashtable());
+                                     scriptingNode, getAllProperties(), null,imageProperties);
             return;
         }
 
@@ -3374,7 +3379,7 @@ public class ImageGenerator extends IdvManager {
                 //                System.err.println("TASK CNT:" + taskCnt);
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
-                                         getAllProperties(), viewManager,new Hashtable());
+                                         getAllProperties(), viewManager,imageProperties);
             }
         }
         popProperties();
@@ -3484,7 +3489,7 @@ public class ImageGenerator extends IdvManager {
                                          Element node,
                                          Hashtable props,
                                          ViewManager viewManager,
-                                         Hashtable returnProps)
+                                         Hashtable imageProps)
             throws Throwable {
 
         if (node == null) {
@@ -3543,7 +3548,7 @@ public class ImageGenerator extends IdvManager {
                     viewManager.paintDisplayList((Graphics2D)g,null, imageWidth,imageHeight,
                                                  valign.equals(VALUE_BOTTOM),c,font);
                 }
-            } else if (tagName.equals(TAG_COLORBAR)) {
+            } else if (tagName.equals(TAG_COLORBAR)||tagName.equals(TAG_KML_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
 
                 List    controls  = ((viewManager != null)
@@ -3579,7 +3584,6 @@ public class ImageGenerator extends IdvManager {
                                ATTR_ANCHOR, "ll"), new Rectangle(0, 0, width,
                                    height));
 
-                boolean showUnit = applyMacros(child, "showunit", false);
                 String orientation = applyMacros(child, ATTR_ORIENTATION,
                                          VALUE_BOTTOM);
                 boolean vertical = orientation.equals(VALUE_RIGHT)
@@ -3589,6 +3593,11 @@ public class ImageGenerator extends IdvManager {
                                            : height);
                 int baseX = pp.x - ap.x;
 
+                List colorTables = new ArrayList();
+                List ranges = new ArrayList();
+                List units = new ArrayList();
+
+                boolean forKml = tagName.equals(TAG_KML_COLORBAR);
 
                 for (int i = 0; i < controls.size(); i++) {
                     DisplayControlImpl control =
@@ -3604,8 +3613,29 @@ public class ImageGenerator extends IdvManager {
                         continue;
                     }
                     seenColorTable.put(key, key);
-                    newImage = ImageUtils.toBufferedImage(image);
-                    Graphics g = newImage.getGraphics();
+                    colorTables.add(colorTable);
+                    ranges.add(range);
+                    units.add(control.getDisplayUnit());
+                }
+
+                for (int i = 0; i < colorTables.size(); i++) {
+                    ColorTable colorTable = (ColorTable)colorTables.get(i);
+                    Range range  = (Range) ranges.get(i);
+                    Unit unit = (Unit) units.get(i);
+                    Image imageToDrawIn;
+                    if(forKml) {
+                        baseX = 0;
+                        baseY = height;
+                        imageToDrawIn =new  BufferedImage(width,height+applyMacros(child, ATTR_SPACE,height),BufferedImage.TYPE_INT_RGB);
+                    } else {
+                        imageToDrawIn = newImage = ImageUtils.toBufferedImage(image);
+                    }
+                    Graphics g = imageToDrawIn.getGraphics();
+                    if(forKml) {
+                        Color bgColor  = applyMacros(child, ATTR_BACKGROUND, Color.white);
+                        g.setColor(bgColor);
+                        g.fillRect(0, 0, width,height+applyMacros(child, ATTR_SPACE,height));
+                    }
                     ColorPreview preview =
                         new ColorPreview(
                             new BaseRGBMap(colorTable.getNonAlphaTable()),
@@ -3633,21 +3663,25 @@ public class ImageGenerator extends IdvManager {
                         tmpG.drawImage(previewImage, 0, 0 - width, null);
                         previewImage = tmpImage;
                     }
-                    g.drawImage(previewImage, baseX, (vertical
-                            ? baseY
-                            : baseY - height), null);
+                    if(forKml) {
+                        g.drawImage(previewImage, 0,0,null);
+                    } else {
+                        g.drawImage(previewImage, baseX, (vertical
+                                                          ? baseY
+                                                          : baseY - height), null);
+                    }
                     if (showLines) {
                         g.setColor(lineColor);
                         g.drawRect(baseX, (vertical
                                            ? baseY
-                                           : baseY - height), width, height);
+                                           : baseY - height), width-1, height);
                     }
                     setFont(g, child);
                     FontMetrics fm         = g.getFontMetrics();
                     List        values     = new ArrayList();
-                    String      tickSuffix = "";
-                    if (control.getDisplayUnit() != null) {
-                        tickSuffix = " " + control.getDisplayUnit();
+                    String      labelSuffix = applyMacros(child,ATTR_SUFFIX," %unit%");
+                    if (unit!=null) {
+                        labelSuffix = labelSuffix.replace("%unit%",""+unit);
                     }
                     if (valuesStr != null) {
                         double[] valueArray = Misc.parseDoubles(valuesStr,
@@ -3708,9 +3742,7 @@ public class ImageGenerator extends IdvManager {
                         }
                         String tickLabel =
                             getIdv().getDisplayConventions().format(value)
-                            + (showUnit
-                               ? tickSuffix
-                               : "");
+                            +  labelSuffix;
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
                         if (orientation.equals(VALUE_RIGHT)) {
@@ -3734,20 +3766,28 @@ public class ImageGenerator extends IdvManager {
                                 g.drawLine(x, y, x, y + height);
                             }
                         }
-
                         g.setColor(c);
                         if (orientation.equals(VALUE_RIGHT)) {
                             g.drawString(tickLabel, x + 2,
                                          y + (int) (rect.getHeight() / 2)
                                          - 2);
                         } else if (orientation.equals(VALUE_LEFT)) {
+                            int xLoc =  x - 2 - (int) rect.getWidth();
                             g.drawString(tickLabel,
-                                         x - 2 - (int) rect.getWidth(),
+                                         xLoc,
                                          y + (int) (rect.getHeight() / 2)
                                          - 2);
                         } else if (orientation.equals(VALUE_BOTTOM)) {
+                            int xLoc =  x - (int) (rect.getWidth() / 2);
+                            if(forKml) {
+                                if(valueIdx==0) {
+                                    xLoc = x+2;
+                                } else if(valueIdx==values.size()-1) {
+                                    xLoc = x-(int)rect.getWidth()-2;
+                                }
+                            }
                             g.drawString(tickLabel,
-                                         x - (int) (rect.getWidth() / 2),
+                                         xLoc,
                                          y + (int) rect.getHeight() + 2);
                         } else {
                             g.drawString(tickLabel,
@@ -3760,7 +3800,40 @@ public class ImageGenerator extends IdvManager {
                     } else {
                         baseY += height + 30;
                     }
+                    if(forKml) {
+                        String tmpImageFile = applyMacros(child,ATTR_FILE,getIdv().getStore().getTmpFile("testcolorbar.png"));
+                        String template  ="<ScreenOverlay><name>${kml.name}</name><Icon><href>${icon}</href></Icon>\n"+
+                            "<overlayXY x=\"${kml.overlayXY.x}\" y=\"${kml.overlayXY.y}\" xunits=\"${kml.overlayXY.xunits}\" yunits=\"${kml.overlayXY.yunits}\"/>\n" +
+                            "<screenXY x=\"${kml.screenXY.x}\" y=\"${kml.screenXY.y}\" xunits=\"${kml.screenXY.xunits}\" yunits=\"${kml.screenXY.yunits}\"/>\n" +
+                            "<size x=\"${kml.size.x}\" y=\"${kml.size.y}\" xunits=\"${kml.size.xunits}\" yunits=\"${kml.size.yunits}\"/>\n" +
+                            "</ScreenOverlay>\n";
+                        String []macros = {"kml.name","kml.overlayXY.x","kml.overlayXY.y","kml.overlayXY.xunits","kml.overlayXY.yunits",
+                                           "kml.screenXY.x","kml.screenXY.y","kml.screenXY.xunits","kml.screenXY.yunits",
+                                           "kml.size.x", "kml.size.y","kml.size.xunits","kml.size.yunits"};
+                        String []macroValues = {"",
+                                                "0","1","fraction","fraction",
+                                                "0","1","fraction","fraction",
+                                           "-1", "-1","pixels","pixels"};
+
+                        for(int macroIdx=0;macroIdx<macros.length;macroIdx++) {
+                            template = template.replace("${" +macros[macroIdx]+"}",applyMacros(child,macros[macroIdx],macroValues[macroIdx]));
+                        }
+                        template = template.replace("${icon}",IOUtil.getFileTail(tmpImageFile));
+                        imageProps.put("kml",template);
+                        List kmlFiles = (List) imageProps.get("kmlfiles");
+                        //TODO: Only do the first one for now
+                        if(kmlFiles == null) {
+                            kmlFiles = new ArrayList();
+                            imageProps.put("kmlfiles", kmlFiles);
+                            kmlFiles.add(tmpImageFile);
+                        }
+
+                        //                        System.out.println(template);
+                        ImageUtils.writeImageToFile(
+                                                    imageToDrawIn, tmpImageFile);
+                    }
                 }
+
 
             } else if (tagName.equals(TAG_TRANSPARENT) || tagName.equals(TAG_BGTRANSPARENT)) {
                 Color c=null;
@@ -3862,10 +3935,10 @@ public class ImageGenerator extends IdvManager {
                         display.getSpatialCoordinates(el1, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(el2, null));
-                    returnProps.put(ATTR_NORTH, new Double(el1.getLatitude().getValue()));
-                    returnProps.put(ATTR_WEST, new Double(el1.getLongitude().getValue()));
-                    returnProps.put(ATTR_SOUTH, new Double(el2.getLatitude().getValue()));
-                    returnProps.put(ATTR_EAST, new Double(el2.getLongitude().getValue()));
+                    imageProps.put(ATTR_NORTH, new Double(el1.getLatitude().getValue()));
+                    imageProps.put(ATTR_WEST, new Double(el1.getLongitude().getValue()));
+                    imageProps.put(ATTR_SOUTH, new Double(el2.getLatitude().getValue()));
+                    imageProps.put(ATTR_EAST, new Double(el2.getLongitude().getValue()));
                 } else if (XmlUtil.hasAttribute(child, ATTR_LEFT)) {
                     ul = new int[] {
                         (int) toDouble(child, ATTR_LEFT, imageWidth),
@@ -4031,11 +4104,12 @@ public class ImageGenerator extends IdvManager {
                     GeoLocationInfo bounds = null;
                     if (viewManager != null) {
                         bounds  = viewManager.getVisibleGeoBounds();
-                        ImageSequenceGrabber.subsetBounds(bounds, returnProps);
+                        ImageSequenceGrabber.subsetBounds(bounds, imageProps);
                         String tail = IOUtil.getFileTail(file);
                         String tmpImageFile = getIdv().getStore().getTmpFile(tail+".png");
                         ImageUtils.writeImageToFile(image, tmpImageFile, quality);
                         ImageWrapper imageWrapper = new ImageWrapper(tmpImageFile,null,bounds,null);
+                        imageWrapper.setProperties(imageProps);
                         new ImageSequenceGrabber(file,getIdv(), this, node,(List<ImageWrapper>)Misc.newList(imageWrapper),
                                                  null,1);
                     }
