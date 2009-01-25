@@ -325,6 +325,7 @@ return new Result(title, sb);
 
     public Result addEntryHeader(Request request, Entry entry, Result result) throws Exception {
         if (result.getShouldDecorate()) {
+            //            if(entry.getDescription().indexOf("<noentryheader>")>=0) return result;
             String output = request.getString(ARG_OUTPUT, (String) "");
             request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
