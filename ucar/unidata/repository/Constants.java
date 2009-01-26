@@ -80,15 +80,16 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_LCURVE = "/icons/blc.gif";
 
+
     public static final String ICON_FAVORITE = "/icons/favorite.gif";
 
     public static final String ICON_LOG = "/icons/log.gif";
 
     /** _more_          */
-    public static final String ICON_CATALOG = "/icons/catalog.gif";
+    public static final String ICON_CATALOG = "/icons/book_open.png";
 
     /** _more_ */
-    public static final String ICON_CHAT = "/icons/chat.gif";
+    public static final String ICON_CHAT = "/icons/user_comment.png";
 
     /** _more_ */
     public static final String ICON_HEADER = "/images/header.jpg";
@@ -97,7 +98,7 @@ public interface Constants {
     public static final String ICON_RCURVE = "/icons/brc.gif";
 
     /** _more_ */
-    public static final String ICON_MAP = "/icons/map.gif";
+    public static final String ICON_MAP = "/icons/map.png";
 
 
     /** _more_ */
@@ -110,12 +111,12 @@ public interface Constants {
     public static final String ICON_OPENDAP = "/icons/opendap.gif";
 
     /** _more_ */
-    public static final String ICON_CART = "/icons/cart.gif";
+    public static final String ICON_CART = "/icons/cart.png";
 
     /** _more_ */
     public static final String ICON_CLOUD = "/icons/cloud.gif";
 
-    public static final String ICON_CLOCK = "/icons/clock.gif";
+    public static final String ICON_CLOCK = "/icons/clock.png";
 
     /** _more_ */
     public static final String ICON_LIST = "/icons/list.gif";
@@ -124,12 +125,12 @@ public interface Constants {
     public static final String ICON_RANGE = "/icons/range.gif";
 
     /** _more_ */
-    public static final String ICON_CALENDAR = "/icons/calendar.gif";
+    public static final String ICON_CALENDAR = "/icons/calendar.png";
 
     public static final String ICON_DATEGRID = "/icons/dategrid.gif";
 
     /** _more_ */
-    public static final String ICON_RSS = "/icons/rss.gif";
+    public static final String ICON_RSS = "/icons/rss.png";
 
     /** _more_ */
     public static final String ICON_ZIP = "/icons/zip.png";
@@ -141,10 +142,10 @@ public interface Constants {
     public static final String ICON_CLOSE = "/icons/close.gif";
 
     /** _more_ */
-    public static final String ICON_MOVE = "/icons/move.gif";
+    public static final String ICON_MOVE = "/icons/move.png";
 
     /** _more_ */
-    public static final String ICON_COMMENTS = "/icons/comments.gif";
+    public static final String ICON_COMMENTS = "/icons/comment.png";
 
     /** _more_ */
     public static final String ICON_DOWNARROW = "/icons/downarrow.gif";
@@ -178,25 +179,27 @@ public interface Constants {
     public static final String ICON_PROGRESS = "/icons/progress.gif";
 
     /** _more_ */
-    public static final String ICON_INFORMATION = "/icons/information.gif";
+    public static final String ICON_INFORMATION = "/icons/information.png";
 
     /** _more_ */
     public static final String ICON_RIGHTARROW = "/icons/rightarrow.gif";
 
     /** _more_ */
-    public static final String ICON_FOLDER = "/icons/folder.gif";
+    public static final String ICON_FOLDER = "/icons/folder.png";
+
+    public static final String ICON_ENTRY_UPLOAD = "/icons/flaggedentry.png";
 
     /** _more_ */
-    public static final String ICON_FOLDER_OPEN = "/icons/folderopen.gif";
+    public static final String ICON_FOLDER_OPEN = "/icons/folderopen.png";
 
     /** _more_ */
-    public static final String ICON_FOLDER_CLOSED = "/icons/folderclosed.gif";
+    public static final String ICON_FOLDER_CLOSED = "/icons/folderclosed.png";
 
     /** _more_ */
-    public static final String ICON_FOLDER_CLOSED_LOCKED = "/icons/folderclosedlocked.gif";
+    public static final String ICON_FOLDER_CLOSED_LOCKED = "/icons/folderclosedlocked.png";
 
     /** _more_ */
-    public static final String ICON_FILE = "/icons/file.gif";
+    public static final String ICON_FILE = "/icons/page.png";
 
     /** _more_ */
     public static final String ICON_IMAGE = "/icons/image.gif";
@@ -215,7 +218,7 @@ public interface Constants {
     public static final String ICON_ADD = "/icons/add.gif";
 
     /** _more_ */
-    public static final String ICON_DELETE = "/icons/delete.gif";
+    public static final String ICON_DELETE = "/icons/delete.png";
 
     /** _more_ */
     public static final String ICON_FETCH = "/icons/fetch.gif";
@@ -230,13 +233,15 @@ public interface Constants {
     public static final String ICON_ASSOCIATION = "/icons/association.gif";
 
     /** _more_ */
-    public static final String ICON_GRAPH = "/icons/graph.gif";
+    public static final String ICON_GRAPH = "/icons/vector.png";
 
     /** _more_ */
-    public static final String ICON_EDIT = "/icons/edit.gif";
+    public static final String ICON_EDIT = "/icons/edit.png";
 
     /** _more_ */
-    public static final String ICON_NEW = "/icons/new.gif";
+    public static final String ICON_NEW = "/icons/add.png";
+
+    public static final String ICON_UPLOAD = "/icons/uploads.gif";
 
     /** _more_ */
     public static final String ICON_ARROW = "/icons/arrow.gif";
@@ -521,6 +526,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_PREVIOUS = "previous";
+
+    public static final String ARG_PUBLISH = "publish";
 
 
     /** _more_ */

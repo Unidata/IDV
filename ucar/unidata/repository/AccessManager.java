@@ -363,16 +363,26 @@ public class AccessManager extends RepositoryManager {
                 && Misc.equals(entry.getResource().getType(),
                                Resource.TYPE_FILE)) {
             if ( !entry.getResource().getFile().exists()) {
-                //TODO                return null;
+                return null;
             }
         }
         if ( !canDoAction(request, entry, Permission.ACTION_VIEW)) {
             return null;
         }
+        
+
         Group parent = entry.getParentGroup();
         if(parent!=null && !canDoAction(request, parent, Permission.ACTION_VIEWCHILDREN)) {
             return null;
         }
+
+        if(entry.isUploaded()) {
+            if(!canDoAction(request,parent,Permission.ACTION_NEW)) {
+                return null;
+            }
+        }
+
+
         return entry;
     }
 

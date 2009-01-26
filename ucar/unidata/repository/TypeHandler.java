@@ -621,15 +621,25 @@ public class TypeHandler extends RepositoryManager {
                                  List<Link> links)
             throws Exception {
 
-        if (entry.isGroup()
-                && getAccessManager().canDoAction(request, entry,
-                    Permission.ACTION_NEW)) {
-            links.add(
-                new Link(
-                    request.url(
-                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
-                        entry.getId()), getRepository().fileUrl(ICON_NEW),
-                                        "New Entry or Group"));
+        if (entry.isGroup()) {
+            if(getAccessManager().canDoAction(request, entry,
+                                              Permission.ACTION_NEW)) {
+                links.add(
+                          new Link(
+                                   request.url(
+                                               getRepository().URL_ENTRY_NEW, ARG_GROUP,
+                                               entry.getId()), getRepository().fileUrl(ICON_NEW),
+                                   "New Entry or Group"));
+            } else  if(getAccessManager().canDoAction(request, entry,
+                                              Permission.ACTION_UPLOAD)) {
+                links.add(
+                          new Link(
+                                   request.url(
+                                               getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
+                                               entry.getId()), getRepository().fileUrl(ICON_UPLOAD),
+                                   "Upload a file"));
+            }
+
         }
 
         if (getAccessManager().canEditEntry(request, entry)) {

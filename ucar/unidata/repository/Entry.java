@@ -48,6 +48,8 @@ public class Entry extends Entity {
     /** _more_ */
     public static final double NONGEO = -999999;
 
+    public final static String DATATYPE_UPLOAD = "upload";
+
     /** _more_ */
     Object[] values;
 
@@ -150,7 +152,11 @@ public class Entry extends Entity {
 
 
 
-    /**
+    public boolean isUploaded() {
+        return Misc.equals(dataType,DATATYPE_UPLOAD);
+    }
+
+   /**
      * _more_
      *
      * @param template _more_

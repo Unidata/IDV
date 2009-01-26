@@ -451,6 +451,11 @@ return new Result(title, sb);
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+                if(entry.isUploaded()) {
+                    String msg  =HtmlUtil.space(2) +msg("Is this entry ok to be viewed?");
+                    sb.append(HtmlUtil.formEntry(msgLabel("Publish"),
+                                                 HtmlUtil.checkbox(ARG_PUBLISH,"true",false)+msg));
+                }
             } else {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
@@ -524,6 +529,7 @@ return new Result(title, sb);
                         "Cannot edit local files"));
 
             }
+
             typeHandler = entry.getTypeHandler();
             newEntry    = false;
 
@@ -558,6 +564,9 @@ return new Result(title, sb);
                     request.entryUrl(
                         getRepository().URL_ENTRY_DELETE, entry));
             }
+
+
+
         } else {
             typeHandler =
                 getRepository().getTypeHandler(request.getString(ARG_TYPE,
@@ -844,7 +853,11 @@ return new Result(title, sb);
                 entry.setName(newName);
                 entry.setDescription(request.getString(ARG_DESCRIPTION,
                         entry.getDescription()));
-                entry.setDataType(dataType);
+                if(request.get(ARG_PUBLISH,false) && entry.isUploaded()) {
+                    entry.setDataType("");
+                } else {
+                    entry.setDataType(dataType);
+                }
                 if (request.defined(ARG_URL)) {
                     entry.setResource(new Resource(request.getString(ARG_URL,
                             BLANK)));
@@ -886,6 +899,7 @@ return new Result(title, sb);
             if (newEntry && request.get(ARG_ADDMETADATA, false)) {
                 addInitialMetadata(request, entries);
             }
+
             insertEntries(entries, newEntry);
         }
         if (entries.size() == 1) {
@@ -1321,6 +1335,28 @@ return new Result(title, sb);
 
 
 
+
+    public Result processEntryUploadOk(Request request) throws Exception {
+        StringBuffer sb    = new StringBuffer();
+        Entry        entry = getEntry(request);
+        //We use the datatype on the entry to flag the uploaded entries
+        entry.setDataType("");
+        insertEntries((List<Entry>)Misc.newList(entry),true);
+        return new Result(
+                          request.entryUrl(getRepository().URL_ENTRY_SHOW,entry));
+    }
+
+
+    public Result processEntryUpload(Request request) throws Exception {
+
+
+
+
+
+        Group        group = findGroup(request);
+        StringBuffer sb    = new StringBuffer();
+        return makeEntryEditResult(request, group, "Create Entry", sb);
+    }
 
 
     /**
@@ -4418,6 +4454,10 @@ return new Result(title, sb);
      * @return _more_
      */
     public String getIconUrl(Request request,Entry entry) throws Exception {
+        if(entry.isUploaded()) {
+            return fileUrl(ICON_ENTRY_UPLOAD);
+        }
+
         return entry.getTypeHandler().getIconUrl(request,entry);
     }
 

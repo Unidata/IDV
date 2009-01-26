@@ -407,7 +407,7 @@ function Tooltip () {
 		" onMouseOut=\"tooltip.onMouseOut(event,'" + id +"')\" " +
 		" onMouseMove=\"tooltip.onMouseMove(event,'" + id +"')\" " +
 		" onClick=\"tooltip.onClick(event,'" + id +"')\" ";
-	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src=${urlroot}/icons/tooltip.gif></div>";
+	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src=${urlroot}/icons/information.png></div>";
         showObject(obj);
     }
 
@@ -518,7 +518,7 @@ function folderClick(entryId, uid, output,args,changeImg) {
             if(originalImages[uid]) {
                 img.obj.src = originalImages[uid];
             } else 
-                img.obj.src = "${urlroot}/icons/folderclosed.gif";
+                img.obj.src = "${urlroot}/icons/folderclosed.png";
         }
         block.obj.isOpen = 0;
         hideObject(block);
@@ -541,7 +541,7 @@ function  handleFolderList(request, uid) {
     //    alert(img + ' ' + uid + ' ' + changeImages[uid]);
     if(img) {
         if(changeImages[uid]) {
-            img.obj.src = "${urlroot}/icons/folderopen.gif";
+            img.obj.src = "${urlroot}/icons/folderopen.png";
         } else {
             img.obj.src = originalImages[uid];
         }

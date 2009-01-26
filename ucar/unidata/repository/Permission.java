@@ -87,6 +87,8 @@ public class Permission {
     /** _more_ */
     public static final String ACTION_NEW = "new";
 
+    public static final String ACTION_UPLOAD = "upload";
+
     /** _more_ */
     public static final String ACTION_DELETE = "delete";
 
@@ -97,12 +99,14 @@ public class Permission {
     /** _more_ */
     public static final String[] ACTIONS = { ACTION_VIEW, ACTION_VIEWCHILDREN,
                                              ACTION_EDIT,
-                                             ACTION_NEW, ACTION_DELETE,
+                                             ACTION_NEW, 
+                                             ACTION_UPLOAD,
+                                             ACTION_DELETE,
                                              ACTION_COMMENT };
 
     /** _more_ */
-    public static final String[] ACTION_NAMES = { "View", "View Children", "Edit", "New",
-            "Delete", "Comment" };
+    public static final String[] ACTION_NAMES = { "View", "View Children", "Edit", "New","Upload",
+                                                  "Delete", "Comment" };
 
 
     /** _more_ */

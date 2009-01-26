@@ -1,7 +1,7 @@
 <types>
 
   <type name="link"  description="Link" >
-     <property name="icon" value="/icons/link.gif"/>
+     <property name="icon" value="/icons/link.png"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.file" value="false"/>
@@ -58,7 +58,7 @@
 
 
   <type name="chatroom"  description="Chat Room">
-     <property name="icon" value="/icons/chat.gif"/>
+     <property name="icon" value="/icons/chat.png"/>
      <property name="form.rows.desc" value="10"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
