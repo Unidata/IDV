@@ -58,7 +58,7 @@
 
 
   <type name="chatroom"  description="Chat Room">
-     <property name="icon" value="/icons/chat.png"/>
+     <property name="icon" value="/icons/user_comment.png"/>
      <property name="form.rows.desc" value="10"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
