@@ -531,12 +531,12 @@ public class RepositoryBase implements Constants, RepositorySource {
     public String getMessage(String h, String icon, boolean showClose) {
         String close =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("hide('messageblock')"),
-                            HtmlUtil.img(fileUrl(Constants.ICON_CLOSE)));
+                            HtmlUtil.img(iconUrl(Constants.ICON_CLOSE)));
         if ( !showClose) {
             close = "&nbsp;";
         }
         h = "<div class=\"innernote\"><table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
-            + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2)
+            + HtmlUtil.img(iconUrl(icon)) + HtmlUtil.space(2)
             + "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
             + "</span></td></tr></table></div>";
         return "\n<table border=\"0\" id=\"messageblock\"><tr><td><div class=\"note\"><table><tr valign=top><td>"
@@ -555,6 +555,11 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public static String fileUrl(String f) {
         return urlBase + f;
+    }
+
+    public  String iconUrl(String f) {
+        String path = getProperty(f,f);
+        return urlBase + path;
     }
 
 

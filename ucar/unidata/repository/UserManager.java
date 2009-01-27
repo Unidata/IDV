@@ -1275,7 +1275,7 @@ public class UserManager extends RepositoryManager {
             String userLogLink =
                 HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
                                           ARG_USER_ID,
-                                          user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log") ));
+                                          user.getId()), HtmlUtil.img(getRepository().iconUrl(ICON_LOG),msg("View user log") ));
 
 
             String row = (user.getAdmin()
@@ -1518,7 +1518,7 @@ public class UserManager extends RepositoryManager {
         }
         //            sb.append("<br>");
         sb.append("<ul style=\"list-style-image : url("
-                  + getRepository().fileUrl(ICON_FILE) + ")\">");
+                  + getRepository().iconUrl(ICON_FILE) + ")\">");
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
         for (Entry entry : entries) {
@@ -1530,7 +1530,7 @@ public class UserManager extends RepositoryManager {
                             getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
                             request.getString(ARG_FROM, ""), ARG_TO,
                             entry.getId()), HtmlUtil.img(
-                                getRepository().fileUrl(ICON_ASSOCIATION),
+                                getRepository().iconUrl(ICON_ASSOCIATION),
                                 msg("Create an association"))));
             } else {
                 String links = HtmlUtil.checkbox("entry_" + entry.getId(),
@@ -1542,7 +1542,7 @@ public class UserManager extends RepositoryManager {
                         request.url(
                             getRepositoryBase().URL_USER_CART, ARG_FROM,
                             entry.getId()), HtmlUtil.img(
-                                getRepository().fileUrl(ICON_ASSOCIATION),
+                                getRepository().iconUrl(ICON_ASSOCIATION),
                                 msg("Create an association"))));
 
                 if(!request.getUser().getAnonymous()) {
@@ -1553,7 +1553,7 @@ public class UserManager extends RepositoryManager {
                                                         ARG_FAVORITE_ADD,"true",
                                                         ARG_ENTRYID,
                                                         entry.getId()), HtmlUtil.img(
-                                                                                     getRepository().fileUrl(ICON_FAVORITE),
+                                                                                     getRepository().iconUrl(ICON_FAVORITE),
                                                                                      msg("Add as a favorite"))));
                 }
             }
@@ -1607,7 +1607,7 @@ public class UserManager extends RepositoryManager {
 
         extras.add("");
         urls.add(request.url(getRepositoryBase().URL_USER_CART));
-        labels.add(HtmlUtil.img(getRepository().fileUrl(ICON_CART),
+        labels.add(HtmlUtil.img(getRepository().iconUrl(ICON_CART),
                                 msg("Data Cart")));
         tips.add(msg("View data cart"));
 
@@ -1743,7 +1743,7 @@ public class UserManager extends RepositoryManager {
                                           ARG_FAVORITE_ID,
                                           favorite.getId(),
                                           ARG_FAVORITE_DELETE,"true"), 
-                              HtmlUtil.img(getRepository().fileUrl(ICON_DELETE),msg("Delete this favorite") ));
+                              HtmlUtil.img(getRepository().iconUrl(ICON_DELETE),msg("Delete this favorite") ));
             sb.append(removeLink);
             sb.append(HtmlUtil.space(1));
             sb.append(getEntryManager().getBreadCrumbs(request, favorite.getEntry()));
@@ -1771,7 +1771,7 @@ public class UserManager extends RepositoryManager {
                           HtmlUtil.url(
                                        request.url(getRepository().URL_ENTRY_SEARCH),
                                        ARG_USER_ID,
-                                       user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_SEARCH),
+                                       user.getId()), HtmlUtil.img(getRepository().iconUrl(ICON_SEARCH),
                                                                    msg("Search for entries created by this user")));
 
         sb.append(HtmlUtil.formTable());
@@ -2252,7 +2252,7 @@ public class UserManager extends RepositoryManager {
                     } else {
                         firstCol = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
                                                              ARG_USER_ID,
-                                                             user.getId()), HtmlUtil.img(getRepository().fileUrl(ICON_LOG),msg("View user log")) +" " + user.getLabel());
+                                                             user.getId()), HtmlUtil.img(getRepository().iconUrl(ICON_LOG),msg("View user log")) +" " + user.getLabel());
                     }
 
                 }

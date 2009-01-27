@@ -335,7 +335,7 @@ public class DataOutputHandler extends OutputHandler {
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
         String opendapUrl = request.getRequestPath() + "/"
                             + request.getPathEmbeddedArgs() + "/dodsC/entry.das";
-        links.add(new Link(opendapUrl, getRepository().fileUrl(ICON_OPENDAP),
+        links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
                            "OpenDAP", OUTPUT_OPENDAP));
         request.put(ARG_OUTPUT, oldOutput);
 
@@ -975,8 +975,7 @@ public class DataOutputHandler extends OutputHandler {
                                     + HtmlUtil.select(
                                         ARG_FROMDATE, formattedDates,
                                         fromDate) + HtmlUtil.img(
-                                            getRepository().fileUrl(
-                                                ICON_ARROW)) + HtmlUtil.select(
+                                            iconUrl(ICON_ARROW)) + HtmlUtil.select(
                                                     ARG_TODATE,
                                                         formattedDates,
                                                             toDate)));
@@ -1080,7 +1079,7 @@ public class DataOutputHandler extends OutputHandler {
             Iterator dataIterator   = pod.getDataIterator(16384);
             int      cnt            = 0;
             int      total          = 0;
-            String   icon = getRepository().fileUrl("/icons/pointdata.gif");
+            String   icon = iconUrl("/icons/pointdata.gif");
 
             List     columnDataList = new ArrayList();
             while (dataIterator.hasNext()) {

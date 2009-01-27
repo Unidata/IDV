@@ -78,180 +78,179 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String ICON_LCURVE = "/icons/blc.gif";
+    public static final String ICON_LCURVE = "ramadda.icon.lcurve";
 
 
-    public static final String ICON_FAVORITE = "/icons/favorite.gif";
+    public static final String ICON_FAVORITE = "ramadda.icon.favorite";
 
-    public static final String ICON_LOG = "/icons/log.gif";
-
-    /** _more_          */
-    public static final String ICON_CATALOG = "/icons/book_open.png";
-
-    /** _more_ */
-    public static final String ICON_CHAT = "/icons/user_comment.png";
-
-    /** _more_ */
-    public static final String ICON_HEADER = "/images/header.jpg";
-
-    /** _more_ */
-    public static final String ICON_RCURVE = "/icons/brc.gif";
-
-    /** _more_ */
-    public static final String ICON_MAP = "/icons/map.png";
-
-
-    /** _more_ */
-    public static final String ICON_CSV = "/icons/xls.png";
-
-    /** _more_ */
-    public static final String ICON_KML = "/icons/kml.png";
-
-    /** _more_ */
-    public static final String ICON_OPENDAP = "/icons/opendap.gif";
-
-    /** _more_ */
-    public static final String ICON_CART = "/icons/cart.png";
-
-    /** _more_ */
-    public static final String ICON_CLOUD = "/icons/cloud.gif";
-
-    public static final String ICON_CLOCK = "/icons/clock.png";
-
-    /** _more_ */
-    public static final String ICON_LIST = "/icons/list.gif";
-
-    /** _more_ */
-    public static final String ICON_RANGE = "/icons/range.gif";
-
-    /** _more_ */
-    public static final String ICON_CALENDAR = "/icons/calendar.png";
-
-    public static final String ICON_DATEGRID = "/icons/dategrid.gif";
-
-    /** _more_ */
-    public static final String ICON_RSS = "/icons/rss.png";
-
-    /** _more_ */
-    public static final String ICON_ZIP = "/icons/zip.png";
-
-    /** _more_ */
-    public static final String ICON_METADATA = "/icons/metadata.gif";
-
-    /** _more_ */
-    public static final String ICON_CLOSE = "/icons/close.gif";
-
-    /** _more_ */
-    public static final String ICON_MOVE = "/icons/move.png";
-
-    /** _more_ */
-    public static final String ICON_COMMENTS = "/icons/comment.png";
-
-    /** _more_ */
-    public static final String ICON_DOWNARROW = "/icons/downarrow.gif";
-
-    /** _more_ */
-    public static final String ICON_GRAYRECT = "/icons/grayrect.gif";
-
-    /** _more_ */
-    public static final String ICON_GRAYRECTARROW =
-        "/icons/grayrectarrow.gif";
-
-    /** _more_ */
-    public static final String ICON_TOOLS = "/icons/tools.gif";
-
-    /** _more_ */
-    public static final String ICON_ERROR = "/icons/error.png";
-
-    /** _more_ */
-    public static final String ICON_PLUS = "/icons/plus.gif";
-
-    /** _more_ */
-    public static final String ICON_QUESTION = "/icons/question.png";
+    public static final String ICON_LOG = "ramadda.icon.log";
 
     /** _more_          */
-    public static final String ICON_WIKI = "/icons/wiki.gif";
+    public static final String ICON_CATALOG = "ramadda.icon.catalog";
 
     /** _more_ */
-    public static final String ICON_WARNING = "/icons/warning.png";
+    public static final String ICON_CHAT = "ramadda.icon.chat";
 
     /** _more_ */
-    public static final String ICON_PROGRESS = "/icons/progress.gif";
+    public static final String ICON_HEADER = "ramadda.icon.header";
 
     /** _more_ */
-    public static final String ICON_INFORMATION = "/icons/information.png";
+    public static final String ICON_RCURVE = "ramadda.icon.rcurve";
 
     /** _more_ */
-    public static final String ICON_RIGHTARROW = "/icons/rightarrow.gif";
-
-    /** _more_ */
-    public static final String ICON_FOLDER = "/icons/folder.png";
-
-    public static final String ICON_ENTRY_UPLOAD = "/icons/flaggedentry.png";
-
-    /** _more_ */
-    public static final String ICON_FOLDER_OPEN = "/icons/folderopen.png";
-
-    /** _more_ */
-    public static final String ICON_FOLDER_CLOSED = "/icons/folderclosed.png";
-
-    /** _more_ */
-    public static final String ICON_FOLDER_CLOSED_LOCKED = "/icons/folderclosedlocked.png";
-
-    /** _more_ */
-    public static final String ICON_FILE = "/icons/page.png";
-
-    /** _more_ */
-    public static final String ICON_IMAGE = "/icons/image.gif";
-
-    /** _more_ */
-    public static final String ICON_DATA = "/icons/data.gif";
-
-    /** _more_ */
-    public static final String ICON_SUBSET = "/icons/subset.gif";
+    public static final String ICON_MAP = "ramadda.icon.map";
 
 
     /** _more_ */
-    public static final String ICON_MINUS = "/icons/minus.gif";
+    public static final String ICON_CSV = "ramadda.icon.csv";
 
     /** _more_ */
-    public static final String ICON_ADD = "/icons/add.gif";
+    public static final String ICON_KML = "ramadda.icon.kml";
 
     /** _more_ */
-    public static final String ICON_DELETE = "/icons/delete.png";
+    public static final String ICON_OPENDAP = "ramadda.icon.opendap";
 
     /** _more_ */
-    public static final String ICON_FETCH = "/icons/fetch.gif";
+    public static final String ICON_CART = "ramadda.icon.cart";
 
     /** _more_ */
-    public static final String ICON_SEARCH = "/icons/search.gif";
+    public static final String ICON_CLOUD = "ramadda.icon.cloud";
+
+    public static final String ICON_CLOCK = "ramadda.icon.clock";
 
     /** _more_ */
-    public static final String ICON_RIGHT = "/icons/right.gif";
+    public static final String ICON_LIST = "ramadda.icon.list";
 
     /** _more_ */
-    public static final String ICON_ASSOCIATION = "/icons/association.gif";
+    public static final String ICON_RANGE = "ramadda.icon.range";
 
     /** _more_ */
-    public static final String ICON_GRAPH = "/icons/vector.png";
+    public static final String ICON_CALENDAR = "ramadda.icon.calendar";
+
+    public static final String ICON_DATEGRID = "ramadda.icon.dategrid";
 
     /** _more_ */
-    public static final String ICON_EDIT = "/icons/edit.png";
+    public static final String ICON_RSS = "ramadda.icon.rss";
 
     /** _more_ */
-    public static final String ICON_NEW = "/icons/add.png";
-
-    public static final String ICON_UPLOAD = "/icons/uploads.gif";
+    public static final String ICON_ZIP = "ramadda.icon.zip";
 
     /** _more_ */
-    public static final String ICON_ARROW = "/icons/arrow.gif";
+    public static final String ICON_METADATA = "ramadda.icon.metadata";
+
+    /** _more_ */
+    public static final String ICON_CLOSE = "ramadda.icon.close";
+
+    /** _more_ */
+    public static final String ICON_MOVE = "ramadda.icon.move";
+
+    /** _more_ */
+    public static final String ICON_COMMENTS = "ramadda.icon.comments";
+
+    /** _more_ */
+    public static final String ICON_DOWNARROW = "ramadda.icon.downarrow";
+
+    /** _more_ */
+    public static final String ICON_GRAYRECT = "ramadda.icon.grayrect";
+
+    /** _more_ */
+    public static final String ICON_GRAYRECTARROW =  "ramadda.icon.grayrectarrow";
+
+    /** _more_ */
+    public static final String ICON_TOOLS = "ramadda.icon.tools";
+
+    /** _more_ */
+    public static final String ICON_ERROR = "ramadda.icon.error";
+
+    /** _more_ */
+    public static final String ICON_PLUS = "ramadda.icon.plus";
+
+    /** _more_ */
+    public static final String ICON_QUESTION = "ramadda.icon.question";
+
+    /** _more_          */
+    public static final String ICON_WIKI = "ramadda.icon.wiki";
+
+    /** _more_ */
+    public static final String ICON_WARNING = "ramadda.icon.warning";
+
+    /** _more_ */
+    public static final String ICON_PROGRESS = "ramadda.icon.progress";
+
+    /** _more_ */
+    public static final String ICON_INFORMATION = "ramadda.icon.information";
+
+    /** _more_ */
+    public static final String ICON_RIGHTARROW = "ramadda.icon.rightarrow";
+
+    /** _more_ */
+    public static final String ICON_FOLDER = "ramadda.icon.folder";
+
+    public static final String ICON_ENTRY_UPLOAD = "ramadda.icon.entry_UPLOAD";
+
+    /** _more_ */
+    public static final String ICON_FOLDER_OPEN = "ramadda.icon.folder_OPEN";
+
+    /** _more_ */
+    public static final String ICON_FOLDER_CLOSED = "ramadda.icon.folder_closed";
+
+    /** _more_ */
+    public static final String ICON_FOLDER_CLOSED_LOCKED = "ramadda.icon.folder_closed_locked";
+
+    /** _more_ */
+    public static final String ICON_FILE = "ramadda.icon.file";
+
+    /** _more_ */
+    public static final String ICON_IMAGE = "ramadda.icon.image";
+
+    /** _more_ */
+    public static final String ICON_DATA = "ramadda.icon.data";
+
+    /** _more_ */
+    public static final String ICON_SUBSET = "ramadda.icon.subset";
 
 
     /** _more_ */
-    public static final String ICON_BLANK = "/icons/blank.gif";
+    public static final String ICON_MINUS = "ramadda.icon.minus";
 
     /** _more_ */
-    public static final String ICON_LEFT = "/icons/left.gif";
+    public static final String ICON_ADD = "ramadda.icon.add";
+
+    /** _more_ */
+    public static final String ICON_DELETE = "ramadda.icon.delete";
+
+    /** _more_ */
+    public static final String ICON_FETCH = "ramadda.icon.fetch";
+
+    /** _more_ */
+    public static final String ICON_SEARCH = "ramadda.icon.search";
+
+    /** _more_ */
+    public static final String ICON_RIGHT = "ramadda.icon.right";
+
+    /** _more_ */
+    public static final String ICON_ASSOCIATION = "ramadda.icon.association";
+
+    /** _more_ */
+    public static final String ICON_GRAPH = "ramadda.icon.graph";
+
+    /** _more_ */
+    public static final String ICON_EDIT = "ramadda.icon.edit";
+
+    /** _more_ */
+    public static final String ICON_NEW = "ramadda.icon.new";
+
+    public static final String ICON_UPLOAD = "ramadda.icon.upload";
+
+    /** _more_ */
+    public static final String ICON_ARROW = "ramadda.icon.arrow";
+
+
+    /** _more_ */
+    public static final String ICON_BLANK = "ramadda.icon.blank";
+
+    /** _more_ */
+    public static final String ICON_LEFT = "ramadda.icon.left";
 
 
     /** _more_ */

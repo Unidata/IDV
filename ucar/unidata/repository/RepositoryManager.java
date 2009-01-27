@@ -142,6 +142,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().fileUrl(url);
     }
 
+    public String iconUrl(String url) {
+        return getRepository().iconUrl(url);
+    }
+
     /**
      * _more_
      *
@@ -286,7 +290,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      */
     public String subHeaderLink(String url, String label, boolean toggle) {
         //        if(true) return "x";
-        String img = HtmlUtil.img(getRepository().fileUrl(toggle
+        String img = HtmlUtil.img(iconUrl(toggle
                 ? ICON_MINUS
                 : ICON_PLUS));
         label = img + HtmlUtil.space(1) + label;

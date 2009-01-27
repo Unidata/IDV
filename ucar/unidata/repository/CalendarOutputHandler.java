@@ -576,7 +576,7 @@ public class CalendarOutputHandler extends OutputHandler {
                 HtmlUtil.href(
                     navUrls.get(i),
                     HtmlUtil.img(
-                        getRepository().fileUrl(navIcons[i]), navLabels[i],
+                        iconUrl(navIcons[i]), navLabels[i],
                         " border=\"0\"")));
         }
 

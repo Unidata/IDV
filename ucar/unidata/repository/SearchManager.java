@@ -137,7 +137,7 @@ public class SearchManager extends RepositoryManager {
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(fileUrl(ICON_BLANK), "submit"));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), "submit"));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         OutputType  output      = request.getOutput(BLANK);
         String      buttons     = HtmlUtil.submit(msg("Search"), "submit");
@@ -180,7 +180,7 @@ public class SearchManager extends RepositoryManager {
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(fileUrl(ICON_BLANK), "submit"));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), "submit"));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
 
         String      what        = (String) request.getWhat(BLANK);
@@ -352,7 +352,7 @@ public class SearchManager extends RepositoryManager {
             String header = HtmlUtil.href(
                                 url,
                                 HtmlUtil.img(
-                                    fileUrl(ICON_SEARCH),
+                                    iconUrl(ICON_SEARCH),
                                     "Search Again")) + "Search Criteria";
             request.setLeftMessage(HtmlUtil.br(header) + s);
         }

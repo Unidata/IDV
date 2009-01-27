@@ -624,7 +624,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             fos.close();
         }
 
-        HtmlUtil.setHideShowImage(fileUrl(ICON_MINUS), fileUrl(ICON_PLUS));
+        HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
 
     }
 
@@ -2135,7 +2135,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         String   html    = template;
         String[] macros  = new String[] {
-            MACRO_HEADER_IMAGE, fileUrl(ICON_HEADER), MACRO_HEADER_TITLE,
+            MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_USERLINK,
             getUserManager().getUserLinks(request), MACRO_REPOSITORY_NAME,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_FOOTER,
@@ -3974,7 +3974,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                + "',document.forms['" + formName + "']." + fieldName + ",'"
                + anchorName + "','yyyy-MM-dd'); return false;\"   NAME=\""
                + anchorName + "\" ID=\"" + anchorName + "\">"
-               + HtmlUtil.img(fileUrl(ICON_CALENDAR), " Choose date", " border=0")
+               + HtmlUtil.img(iconUrl(ICON_CALENDAR), " Choose date", " border=0")
                + "</A>" + "<DIV ID=\"" + divName
                + "\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
     }
@@ -4144,7 +4144,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         StringBuffer menu   = new StringBuffer();
         if(makeClose) {
             String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"), 
-                                                                      HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
+                                                                      HtmlUtil.img(iconUrl(ICON_CLOSE)),"");
             contents = closeLink+HtmlUtil.br()+contents;
         }
 

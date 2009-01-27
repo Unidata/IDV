@@ -482,8 +482,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         int linkType = OutputType.TYPE_ACTION;
         return new Link(url, (outputType.getIcon() == null)
                              ? null
-                             : getRepository()
-                                 .fileUrl(outputType.getIcon()), outputType
+                             : iconUrl(outputType.getIcon()), outputType
                                      .getLabel(), outputType);
 
     }
@@ -506,7 +505,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             new Link(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    type), getRepository().fileUrl(type.getIcon()),
+                    type), iconUrl(type.getIcon()),
                            type.getLabel(), type));
 
     }
@@ -710,16 +709,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         link = new Link(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    output, ARG_PREVIOUS, "true"), getRepository().fileUrl(
-                        ICON_LEFT), msg("View Previous Entry"));
+                    output, ARG_PREVIOUS, "true"), iconUrl(ICON_LEFT), 
+                msg("View Previous Entry"));
 
         link.setLinkType(OutputType.TYPE_NONHTML);
         links.add(link);
         link = new Link(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    output, ARG_NEXT, "true"), getRepository().fileUrl(
-                        ICON_RIGHT), msg("View Next Entry"));
+                    output, ARG_NEXT, "true"), iconUrl(ICON_RIGHT), msg("View Next Entry"));
         link.setLinkType(OutputType.TYPE_NONHTML);
         links.add(link);
         return links;
@@ -784,7 +782,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
         String arrowImg =
-            HtmlUtil.img(getRepository().fileUrl(ICON_DOWNARROW),
+            HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW),
                          msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
         String link = HtmlUtil.space(2)
                       + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base
@@ -847,10 +845,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         }
         sb.append("<ul" + HtmlUtil.cssClass("folderblock")
                   + HtmlUtil.style("list-style-image : url("
-                                   + getRepository().fileUrl(ICON_BLANK)
+                                   + getRepository().iconUrl(ICON_BLANK)
                                    + ")") + ">");
 
-        //        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
+        //        String img = HtmlUtil.img(getRepository().iconUrl(ICON_FILE));
         int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
@@ -1549,14 +1547,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
         String propertyMenuLabel =
-            HtmlUtil.img(fileUrl("/icons/wiki/button_property.png"),
+            HtmlUtil.img(iconUrl("/icons/wiki/button_property.png"),
                          "Add Entry Property");
         String propertyButton =
             getRepository().makePopupLink(propertyMenuLabel,
                 propertyMenu.toString());
         buttons.append(propertyButton);
         String importMenuLabel =
-            HtmlUtil.img(fileUrl("/icons/wiki/button_import.png"),
+            HtmlUtil.img(iconUrl("/icons/wiki/button_import.png"),
                          "Import Entry Property");
         String importButton =
             getRepository().makePopupLink(importMenuLabel,
@@ -1596,7 +1594,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                  + ");";
         }
         return HtmlUtil.href(js,
-                             HtmlUtil.img(fileUrl("/icons/wiki/" + icon),
+                             HtmlUtil.img(iconUrl("/icons/wiki/" + icon),
                                           label));
 
     }

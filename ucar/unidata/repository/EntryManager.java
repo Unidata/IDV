@@ -2399,9 +2399,7 @@ return new Result(title, sb);
                                                   entry.getId(),
                                                   ARG_COMMENT_ID,
                                                   comment.getId()), HtmlUtil
-                                                      .img(getRepository()
-                                                          .fileUrl(
-                                                              ICON_DELETE), msg(
+                                                      .img(iconUrl(ICON_DELETE), msg(
                                                               "Delete comment"))));
             if (canEdit) {
                 //                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
@@ -2550,7 +2548,7 @@ return new Result(title, sb);
                 event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                                                             HtmlUtil.squote(entryId) + ","
                                                             + HtmlUtil.squote(uid) +",null,null,"+
-                                                            HtmlUtil.squote(fileUrl(ICON_FOLDER_OPEN))));
+                                                            HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))));
             } else if(!forTreeNavigation) {
                 event = HtmlUtil.onMouseClick("showMenu(event,"
                                               + HtmlUtil.squote(linkId) + ","
@@ -4455,7 +4453,7 @@ return new Result(title, sb);
      */
     public String getIconUrl(Request request,Entry entry) throws Exception {
         if(entry.isUploaded()) {
-            return fileUrl(ICON_ENTRY_UPLOAD);
+            return iconUrl(ICON_ENTRY_UPLOAD);
         }
 
         return entry.getTypeHandler().getIconUrl(request,entry);
@@ -4691,7 +4689,7 @@ return new Result(title, sb);
         sb.append(associations.get(0).getName());
         sb.append(HtmlUtil.br());
         sb.append(fromEntry.getLabel());
-        sb.append(HtmlUtil.pad(HtmlUtil.img(fileUrl(ICON_ARROW))));
+        sb.append(HtmlUtil.pad(HtmlUtil.img(iconUrl(ICON_ARROW))));
         sb.append(toEntry.getLabel());
         return new Result(msg("Delete Associations"), sb);
     }
@@ -4835,7 +4833,7 @@ return new Result(title, sb);
                                 ARG_ASSOCIATION,
                                 getRepository().encode(
                                     association)), HtmlUtil.img(
-                                        fileUrl(ICON_SEARCH),
+                                        iconUrl(ICON_SEARCH),
                                         msg("Search in association")));
 
         return search;

@@ -492,7 +492,7 @@ public class HarvesterManager extends RepositoryManager {
                     .href(request
                         .url(URL_HARVESTERS_EDIT, ARG_HARVESTER_ID,
                              harvester.getId()), HtmlUtil
-                                 .img(getRepository().fileUrl(ICON_EDIT),
+                                 .img(getRepository().iconUrl(ICON_EDIT),
                                       msg("Edit")));
             }
             cnt++;

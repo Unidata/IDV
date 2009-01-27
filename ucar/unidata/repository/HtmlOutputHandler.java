@@ -208,7 +208,7 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer("<content>\n");
         String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
         String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"), 
-                                            HtmlUtil.img(fileUrl(ICON_CLOSE)),"");
+                                            HtmlUtil.img(iconUrl(ICON_CLOSE)),"");
         sb.append(closeLink+HtmlUtil.br());
         sb.append(links);
         sb.append("\n</content>");
@@ -323,7 +323,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                 getRepository().URL_ASSOCIATION_DELETE,
                                 ARG_ASSOCIATION,
                                 association.getId()), HtmlUtil.img(
-                                    getRepository().fileUrl(ICON_DELETE),
+                                    getRepository().iconUrl(ICON_DELETE),
                                     msg("Delete association")))));
             }
             List args = Misc.newList(ARG_SHOW_ASSOCIATIONS, "true");
@@ -336,7 +336,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("</td><td>");
             sb.append(HtmlUtil.bold(association.getLabel()));
             sb.append("</td><td>");
-            sb.append(HtmlUtil.img(getRepository().fileUrl(ICON_ARROW)));
+            sb.append(HtmlUtil.img(getRepository().iconUrl(ICON_ARROW)));
             sb.append("&nbsp;&nbsp;");
             sb.append("</td><td>");
             sb.append(((toEntry == entry)
@@ -397,7 +397,7 @@ public class HtmlOutputHandler extends OutputHandler {
                         request.url(
                             getRepository().URL_SEARCH_FORM, ARG_TYPE,
                             theTypeHandler.getType()), HtmlUtil.img(
-                                getRepository().fileUrl(ICON_SEARCH),
+                                getRepository().iconUrl(ICON_SEARCH),
                                 msg("Search in Group"))));
                                 sb.append(" ");*/
                 sb.append(HtmlUtil
@@ -687,12 +687,10 @@ public class HtmlOutputHandler extends OutputHandler {
                             new Link(
                                 request.entryUrl(
                                     getRepository().URL_ENTRY_FORM,
-                                    entry), getRepository().fileUrl(
-                                        ICON_EDIT), msg("Edit Entry")));
+                                    entry), iconUrl(ICON_EDIT), msg("Edit Entry")));
                         sb.append(new Link(request
                             .entryUrl(getRepository().getMetadataManager()
-                                .URL_METADATA_ADDFORM, entry), getRepository()
-                                    .fileUrl(ICON_ADD), msg("Add Metadata")));
+                                .URL_METADATA_ADDFORM, entry), iconUrl(ICON_ADD), msg("Add Metadata")));
                         if (decorate) {
                             sb.append("</td></tr>");
                         }
@@ -774,7 +772,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                  List<Entry> entries)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
+        String       folder = iconUrl(ICON_FOLDER_CLOSED);
         for (Group subGroup : subGroups) {
             sb.append(getEntryManager().getAjaxLink(request, subGroup));
         }
@@ -819,7 +817,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         String       target     = request.getString(ATTR_TARGET, "");
         StringBuffer sb         = new StringBuffer();
-        String       folder     = getRepository().fileUrl(ICON_FOLDER_CLOSED);
+        String       folder     = iconUrl(ICON_FOLDER_CLOSED);
 
 
         boolean      allEntries = request.get("allentries", false);

@@ -504,7 +504,7 @@ public class MetadataHandler extends RepositoryManager {
         return HtmlUtil.href(
             getSearchUrl(request, metadata),
             HtmlUtil.img(
-                getRepository().fileUrl(ICON_SEARCH),
+                getRepository().iconUrl(ICON_SEARCH),
                 "Search for entries with this metadata", " border=0 "));
     }
 
@@ -528,7 +528,7 @@ public class MetadataHandler extends RepositoryManager {
                 request.url(
                     getRepository().getMetadataManager().URL_METADATA_LIST,
                     ARG_METADATA_TYPE, type.toString()), HtmlUtil.img(
-                        getRepository().fileUrl(ICON_LIST), "View Listing"));
+                        getRepository().iconUrl(ICON_LIST), "View Listing"));
         String url = request.url(getRepository().URL_ENTRY_SEARCH);
         String[] values = getMetadataManager().getDistinctValues(request,
                               this, type);

@@ -302,7 +302,7 @@ public class WikiPageOutputHandler extends OutputHandler {
                             getRepository().URL_ENTRY_FORM, entry,
                             ARG_WIKI_EDITWITH,
                             wph.getDate().getTime() + ""), HtmlUtil
-                                .img(getRepository().fileUrl(ICON_EDIT),
+                                .img(getRepository().iconUrl(ICON_EDIT),
                                      msg("Edit with this version")));
             }
             String view = HtmlUtil.href(
@@ -310,7 +310,7 @@ public class WikiPageOutputHandler extends OutputHandler {
                                   getRepository().URL_ENTRY_SHOW, entry,
                                   ARG_WIKI_VERSION,
                                   wph.getDate().getTime() + ""), HtmlUtil.img(
-                                      getRepository().fileUrl(ICON_WIKI),
+                                      getRepository().iconUrl(ICON_WIKI),
                                       msg("View this page")));
             String btns =
                 HtmlUtil.radio(ARG_WIKI_COMPARE1,

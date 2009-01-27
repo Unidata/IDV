@@ -628,7 +628,7 @@ public class TypeHandler extends RepositoryManager {
                           new Link(
                                    request.url(
                                                getRepository().URL_ENTRY_NEW, ARG_GROUP,
-                                               entry.getId()), getRepository().fileUrl(ICON_NEW),
+                                               entry.getId()), getRepository().iconUrl(ICON_NEW),
                                    "New Entry or Group"));
             } else  if(getAccessManager().canDoAction(request, entry,
                                               Permission.ACTION_UPLOAD)) {
@@ -636,7 +636,7 @@ public class TypeHandler extends RepositoryManager {
                           new Link(
                                    request.url(
                                                getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
-                                               entry.getId()), getRepository().fileUrl(ICON_UPLOAD),
+                                               entry.getId()), getRepository().iconUrl(ICON_UPLOAD),
                                    "Upload a file"));
             }
 
@@ -646,19 +646,19 @@ public class TypeHandler extends RepositoryManager {
             links.add(
                 new Link(
                     request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
-                    getRepository().fileUrl(ICON_EDIT), msg("Edit Entry")));
+                    getRepository().iconUrl(ICON_EDIT), msg("Edit Entry")));
             /*
             links.add(new Link(request
                 .entryUrl(getRepository().getMetadataManager()
                     .URL_METADATA_ADDFORM, entry), getRepository()
-                    .fileUrl(ICON_ADD), msg("Add Metadata")));*/
+                    .iconUrl(ICON_ADD), msg("Add Metadata")));*/
 
             /*
               links.add(
                     new Link(
                         request.entryUrl(
                             getMetadataManager().URL_METADATA_FORM,
-                            entry), getRepository().fileUrl(ICON_METADATA),
+                            entry), getRepository().iconUrl(ICON_METADATA),
                                     msg("Edit Metadata")));
 
                                     */
@@ -670,7 +670,7 @@ public class TypeHandler extends RepositoryManager {
                 new Link(
                     request.entryUrl(
                         getRepository().URL_ENTRY_DELETE,
-                        entry), getRepository().fileUrl(ICON_DELETE),
+                        entry), getRepository().iconUrl(ICON_DELETE),
                                 msg("Delete Entry")));
 
         }
@@ -689,7 +689,7 @@ public class TypeHandler extends RepositoryManager {
         links.add(
             new Link(
                 request.entryUrl(getRepository().URL_COMMENTS_SHOW, entry),
-                getRepository().fileUrl(ICON_COMMENTS),
+                getRepository().iconUrl(ICON_COMMENTS),
                 msg("Add/View Comments")));
 
         if ( !request.getUser().getAnonymous()) {
@@ -697,7 +697,7 @@ public class TypeHandler extends RepositoryManager {
                 new Link(
                     request.entryUrl(
                         getRepository().URL_ENTRY_COPY, entry,
-                        ARG_FROM), getRepository().fileUrl(ICON_MOVE),
+                        ARG_FROM), getRepository().iconUrl(ICON_MOVE),
                                    msg("Copy/Move Entry")));
         }
 
@@ -751,12 +751,12 @@ public class TypeHandler extends RepositoryManager {
         String size = " (" + f.length() + " bytes)";
         if (getRepository().getProperty(PROP_DOWNLOAD_ASFILES, false)) {
             return new Link("file://" + entry.getResource(),
-                            getRepository().fileUrl(ICON_FETCH),
+                            getRepository().iconUrl(ICON_FETCH),
                             "Download file" + size);
         } else {
             String fileTail = getStorageManager().getFileTail(entry);
             return new Link(getEntryManager().getEntryResourceUrl(request,
-                    entry), getRepository().fileUrl(ICON_FETCH),
+                    entry), getRepository().iconUrl(ICON_FETCH),
                             "Download file" + size);
         }
     }
@@ -873,7 +873,7 @@ public class TypeHandler extends RepositoryManager {
                         HtmlUtil.href(
                             searchUrl,
                             HtmlUtil.img(
-                                getRepository().fileUrl(ICON_SEARCH),
+                                getRepository().iconUrl(ICON_SEARCH),
                                 "Search for entries with this date range",
                                 " border=0 "));
                     sb.append(
@@ -882,8 +882,7 @@ public class TypeHandler extends RepositoryManager {
                             searchLink + HtmlUtil.space(1) + startDate
                             + HtmlUtil.space(1)
                             + HtmlUtil.img(
-                                getRepository().fileUrl(
-                                    ICON_RANGE)) + HtmlUtil.space(1)
+                                iconUrl(ICON_RANGE)) + HtmlUtil.space(1)
                                         + endDate));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
@@ -1323,9 +1322,7 @@ public class TypeHandler extends RepositoryManager {
                         getRepository().makeDateInput(
                             request, ARG_FROMDATE, "entryform",
                             fromDate) + HtmlUtil.space(1)
-                                      + HtmlUtil.img(
-                                          getRepository().fileUrl(
-                                              ICON_RANGE)) + HtmlUtil.space(
+                                      + HtmlUtil.img(iconUrl(ICON_RANGE)) + HtmlUtil.space(
                                                   1) +
                 //                        " <b>--</b> " +
                 getRepository().makeDateInput(request, ARG_TODATE,
@@ -1398,10 +1395,10 @@ public class TypeHandler extends RepositoryManager {
         if (entry.isGroup()) {
             if(getAccessManager().hasPermissionSet(entry,Permission.ACTION_VIEWCHILDREN)) {
                 if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_VIEWCHILDREN)) {
-                    return fileUrl(ICON_FOLDER_CLOSED_LOCKED);
+                    return iconUrl(ICON_FOLDER_CLOSED_LOCKED);
                 }
             }
-            return fileUrl(ICON_FOLDER_CLOSED);
+            return iconUrl(ICON_FOLDER_CLOSED);
         }
         String img = ICON_FILE;
         if (path != null) {
@@ -1411,7 +1408,7 @@ public class TypeHandler extends RepositoryManager {
                 img = prop;
             }
         }
-        return fileUrl(img);
+        return iconUrl(img);
     }
 
 
@@ -1560,7 +1557,7 @@ public class TypeHandler extends RepositoryManager {
                     msgLabel("Type"),
                     typeSelect + HtmlUtil.space(1)
                     + HtmlUtil.submitImage(
-                        getRepository().fileUrl(ICON_SEARCH), "submit_type",
+                        getRepository().iconUrl(ICON_SEARCH), "submit_type",
                         msg(
                         "Show search form with this type")) + HtmlUtil.space(
                             1) + groupCbx));
@@ -1613,7 +1610,7 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().makeDateInput(
                     request, ARG_FROMDATE, "searchform",
                     null) + HtmlUtil.space(1)
-                          + HtmlUtil.img(getRepository().fileUrl(ICON_RANGE))
+                          + HtmlUtil.img(getRepository().iconUrl(ICON_RANGE))
                           + HtmlUtil.space(1)
                           + getRepository().makeDateInput(
                               request, ARG_TODATE, "searchform",
