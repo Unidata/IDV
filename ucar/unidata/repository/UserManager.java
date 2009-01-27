@@ -1531,7 +1531,7 @@ public class UserManager extends RepositoryManager {
                             request.getString(ARG_FROM, ""), ARG_TO,
                             entry.getId()), HtmlUtil.img(
                                 getRepository().iconUrl(ICON_ASSOCIATION),
-                                msg("Create an association"))));
+                                msg("Create an association"))+HtmlUtil.space(1)+entry.getLabel()));
             } else {
                 String links = HtmlUtil.checkbox("entry_" + entry.getId(),
                                    "true");
@@ -1558,8 +1558,12 @@ public class UserManager extends RepositoryManager {
                 }
             }
             sb.append(HtmlUtil.space(1));
-            sb.append(getEntryManager().getAjaxLink(request, entry,
-                    entry.getLabel(), false));
+            if (haveFrom) {
+                //                sb.append(entry.getLabel());
+            } else {
+                sb.append(getEntryManager().getAjaxLink(request, entry,
+                                                        entry.getLabel(), false));
+            }
         }
         sb.append("</ul>");
         if ( !haveFrom) {
