@@ -186,10 +186,10 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FOLDER = "ramadda.icon.folder";
 
-    public static final String ICON_ENTRY_UPLOAD = "ramadda.icon.entry_UPLOAD";
+    public static final String ICON_ENTRY_UPLOAD = "ramadda.icon.entry_upload";
 
     /** _more_ */
-    public static final String ICON_FOLDER_OPEN = "ramadda.icon.folder_OPEN";
+    public static final String ICON_FOLDER_OPEN = "ramadda.icon.folder_open";
 
     /** _more_ */
     public static final String ICON_FOLDER_CLOSED = "ramadda.icon.folder_closed";

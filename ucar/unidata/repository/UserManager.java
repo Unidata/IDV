@@ -549,7 +549,7 @@ public class UserManager extends RepositoryManager {
                 HtmlUtil.href(
                     request.url(getRepositoryBase().URL_USER_FINDUSERID),
                     msg("Forget your user ID?")));
-            sb.append(HtmlUtil.br());
+            sb.append(HtmlUtil.p());
             sb.append(
                 HtmlUtil.href(
                     request.url(getRepositoryBase().URL_USER_RESETPASSWORD),
@@ -1270,7 +1270,15 @@ public class UserManager extends RepositoryManager {
             String userEditLink =
                 HtmlUtil.href(request.url(getRepositoryBase().URL_USER_EDIT,
                                           ARG_USER_ID,
-                                          user.getId()), user.getId());
+                                          user.getId()), HtmlUtil.img(iconUrl(ICON_EDIT),msg("Edit user")));
+
+            String userProfileLink =
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        request.url(getRepository().URL_USER_PROFILE),
+                        ARG_USER_ID,
+                        user.getId()), user.getLabel(),
+                            "title=\"View user profile\"");
 
             String userLogLink =
                 HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
@@ -1281,7 +1289,8 @@ public class UserManager extends RepositoryManager {
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtil.cols(
-                                                                    userLogLink,   userEditLink, user.getName(),
+                                                                    userLogLink+ userEditLink, userProfileLink,
+                                                                    user.getName(),
                                                                     /*user.getRolesAsString("<br>"),*/
                                                                     user.getEmail(),
                               "" + user.getAdmin()) + "</tr>";
@@ -1522,7 +1531,8 @@ public class UserManager extends RepositoryManager {
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
         for (Entry entry : entries) {
-            sb.append("<li> ");
+            sb.append(HtmlUtil.tag(HtmlUtil.TAG_LI));
+            sb.append(HtmlUtil.space(1));
             if (haveFrom) {
                 sb.append(
                     HtmlUtil.href(
