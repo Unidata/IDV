@@ -284,6 +284,11 @@ public class HtmlUtil {
         return "</" + comp + ">";
     }
 
+    public static String tag(String comp) {
+        return "<" + comp + "/>";
+    }
+
+
     /**
      * _more_
      *
