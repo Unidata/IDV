@@ -269,7 +269,7 @@ public class ImageOutputHandler extends OutputHandler {
                 String thumburl =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
                                  + entry.getName(), ARG_ENTRYID,
-                                     entry.getId(), ARG_IMAGEWIDTH, "" + 50);
+                                     entry.getId(), ARG_IMAGEWIDTH, "" + 100);
                 String entryUrl = getEntryLink(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
                 String title = entry.getTypeHandler().getEntryContent(entry,

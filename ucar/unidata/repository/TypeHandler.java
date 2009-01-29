@@ -77,7 +77,6 @@ public class TypeHandler extends RepositoryManager {
     public static final String TYPE_GROUP = Constants.TYPE_GROUP;
 
 
-
     /** _more_ */
     public static final String TAG_COLUMN = "column";
 

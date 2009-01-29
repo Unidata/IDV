@@ -1,4 +1,11 @@
 
+var icon_close = "${urlroot}/icons/close.gif";
+var icon_rightarrow = "${urlroot}/icons/rightarrow.gif";
+var icon_downarrow ="${urlroot}/icons/downarrow.gif";
+var icon_progress = "${urlroot}/icons/progress.gif";
+var icon_information = "${urlroot}/icons/information.png"
+var icon_folderclosed = "${urlroot}/icons/folderclosed.png";
+var icon_folderopen = "${urlroot}/icons/folderopen.png";
 
 
 function Util () {
@@ -407,14 +414,14 @@ function Tooltip () {
 		" onMouseOut=\"tooltip.onMouseOut(event,'" + id +"')\" " +
 		" onMouseMove=\"tooltip.onMouseMove(event,'" + id +"')\" " +
 		" onClick=\"tooltip.onClick(event,'" + id +"')\" ";
-	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src=${urlroot}/icons/information.png></div>";
+	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src="+icon_information +"></div>";
         showObject(obj);
     }
 
     function handleTooltip(request, obj) {
         var xmlDoc=request.responseXML.documentElement;
         text = getChildText(xmlDoc);
-        obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=${urlroot}/icons/close.gif></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+        obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
         showObject(obj);
     }
 
@@ -450,9 +457,10 @@ function groupToggleVisibility () {
 	    var img = util.getDomObject(this.toggleImg);
             if(img) {
 		if(this.on) {
-   		    img.obj.src =  "${urlroot}/icons/downarrow.gif";
+   		    img.obj.src =  icon_downarrow;
 		} else {
-	            img.obj.src =  "${urlroot}/icons/rightarrow.gif";
+	            img.obj.src =  icon_rightarrow;
+
 		}
             }
     }
@@ -510,7 +518,7 @@ function folderClick(entryId, uid, output,args,changeImg) {
 	originalImages[uid] = img.obj.src;
         block.obj.isOpen = 1;
         showObject(block);
-        if(img) img.obj.src = "${urlroot}/icons/progress.gif";
+        if(img) img.obj.src = icon_progress;
         url = "${urlroot}/entry/show?entryid=" + entryId +"&output=" + output+args;
 	util.loadXML( url, handleFolderList,uid);
     } else {
@@ -518,7 +526,7 @@ function folderClick(entryId, uid, output,args,changeImg) {
             if(originalImages[uid]) {
                 img.obj.src = originalImages[uid];
             } else 
-                img.obj.src = "${urlroot}/icons/folderclosed.png";
+                img.obj.src = icon_folderclosed;
         }
         block.obj.isOpen = 0;
         hideObject(block);
@@ -541,7 +549,7 @@ function  handleFolderList(request, uid) {
     //    alert(img + ' ' + uid + ' ' + changeImages[uid]);
     if(img) {
         if(changeImages[uid]) {
-            img.obj.src = "${urlroot}/icons/folderopen.png";
+            img.obj.src = icon_folderopen;
         } else {
             img.obj.src = originalImages[uid];
         }
@@ -623,7 +631,7 @@ function handleSelect(request, id) {
     selector = selectors[id];
     var xmlDoc=request.responseXML.documentElement;
     text = getChildText(xmlDoc);
-    var close = "<a href=\"javascript:selectCancel();\"><img border=0 src=${urlroot}/icons/close.gif></a>";
+    var close = "<a href=\"javascript:selectCancel();\"><img border=0 src=" + icon_close + "></a>";
     selector.div.obj.innerHTML = "<table width=100%><tr><td align=right>" + close +"</table>" +text;
 }
 
@@ -663,7 +671,7 @@ function handleAjaxPopup(request, srcId) {
         text = getChildText(xmlDoc);
 	var srcObj = util.getDomObject(srcId);
         var obj = util.getDomObject("tooltipdiv");
-	obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=${urlroot}/icons/close.gif></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+	obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
         showObject(obj);
 }
 

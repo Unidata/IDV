@@ -486,7 +486,7 @@ return new Result(title, sb);
         if (download) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
-                    Result result = doProcessEntryChange(request, actionId);
+                    Result result = doProcessEntryChange(request, false, actionId);
                     getActionManager().setContinueHtml(actionId,
                             HtmlUtil.href(result.getRedirectUrl(),
                                           msg("Continue")));
@@ -496,7 +496,7 @@ return new Result(title, sb);
                     "Downloading file", "");
 
         }
-        return doProcessEntryChange(request, null);
+        return doProcessEntryChange(request, false, null);
     }
 
 
@@ -512,16 +512,27 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private Result doProcessEntryChange(Request request, Object actionId)
+    private Result doProcessEntryChange(Request request, boolean forUpload, Object actionId)
             throws Exception {
-
         boolean     download    = request.get(ARG_RESOURCE_DOWNLOAD, false);
-
         Entry       entry       = null;
         TypeHandler typeHandler = null;
         boolean     newEntry    = true;
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
+            if(entry == null) {
+                throw new IllegalArgumentException(
+                                                   "Cannot find entry");
+            }
+            if(forUpload) {
+                throw new IllegalArgumentException(
+                                                   "Cannot edit when doing an upload");
+            }
+            if ( !getAccessManager().canDoAction(request, entry,
+                                                 Permission.ACTION_EDIT)) {
+                    throw new RepositoryUtil.AccessException("Cannot edit:"
+                                                             + entry.getLabel());
+            }
             if (entry.getIsLocalFile()) {
                 return new Result(
                     request.entryUrl(
@@ -532,7 +543,6 @@ return new Result(title, sb);
 
             typeHandler = entry.getTypeHandler();
             newEntry    = false;
-
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(
@@ -558,361 +568,350 @@ return new Result(title, sb);
                         "Entry is deleted"));
             }
 
-
             if (request.exists(ARG_DELETE)) {
                 return new Result(
                     request.entryUrl(
                         getRepository().URL_ENTRY_DELETE, entry));
             }
-
-
-
+        } else if(forUpload) {
+            typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
         } else {
             typeHandler =
                 getRepository().getTypeHandler(request.getString(ARG_TYPE,
                     TypeHandler.TYPE_ANY));
-
         }
 
 
         List<Entry> entries = new ArrayList<Entry>();
-
-        //Synchronize  in case we need to create a group
-        //There is a possible case where we can get two groups with the same id
-        Object mutex = new Object();
-        if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
-            mutex = MUTEX_GROUP;
-        }
         String dataType = "";
-        if (request.defined(ARG_DATATYPE)) {
+        if(forUpload) {
+            dataType = Entry.DATATYPE_UPLOAD;
+        } else  if (request.defined(ARG_DATATYPE)) {
             dataType = request.getString(ARG_DATATYPE, "");
         } else {
             dataType = request.getString(ARG_DATATYPE_SELECT, "");
         }
 
-        synchronized (mutex) {
-            if (entry == null) {
-                List<String> resources    = new ArrayList();
-                List<String> origNames    = new ArrayList();
-                String       resource     = request.getString(ARG_URL, BLANK);
-                String       filename     = request.getUploadedFile(ARG_FILE);
-                boolean      unzipArchive = false;
 
-                boolean      isFile       = false;
-                String       resourceName = request.getString(ARG_FILE,
-                                                BLANK);
-                if (resourceName.length() == 0) {
-                    resourceName = IOUtil.getFileTail(resource);
-                }
+        if (entry == null) {
+            List<String> resources    = new ArrayList();
+            List<String> origNames    = new ArrayList();
+            String       resource     = request.getString(ARG_URL, BLANK);
+            String       filename     = request.getUploadedFile(ARG_FILE);
+            boolean      unzipArchive = false;
 
-                String groupId = request.getString(ARG_GROUP, (String) null);
-                if (groupId == null) {
+            boolean      isFile       = false;
+            String       resourceName = request.getString(ARG_FILE,
+                                                          BLANK);
+            if (resourceName.length() == 0) {
+                resourceName = IOUtil.getFileTail(resource);
+            }
+
+            String groupId = request.getString(ARG_GROUP, (String) null);
+            if (groupId == null) {
+                throw new IllegalArgumentException(
+                                                   "You must specify a parent group");
+            }
+            Group parentGroup = findGroup(request);
+            if ( !getAccessManager().canDoAction(request, parentGroup,
+                                                 (forUpload?Permission.ACTION_UPLOAD:
+                                                  Permission.ACTION_NEW))) {
+                throw new RepositoryUtil.AccessException("Cannot add:"
+                                                         + entry.getLabel());
+            }
+
+            if (filename != null) {
+                isFile       = true;
+                unzipArchive = request.get(ARG_FILE_UNZIP, false);
+                resource     = filename;
+            } else if (download) {
+                String url = resource;
+                if ( !url.startsWith("http:")
+                     && !url.startsWith("https:")
+                     && !url.startsWith("ftp:")) {
                     throw new IllegalArgumentException(
-                        "You must specify a parent group");
+                                                       "Cannot download url:" + url);
                 }
-                Group parentGroup = findGroup(request);
-                if (filename != null) {
-                    isFile       = true;
-                    unzipArchive = request.get(ARG_FILE_UNZIP, false);
-                    resource     = filename;
-                } else if (download) {
-                    String url = resource;
-                    if ( !url.startsWith("http:")
-                            && !url.startsWith("https:")
-                            && !url.startsWith("ftp:")) {
-                        throw new IllegalArgumentException(
-                            "Cannot download url:" + url);
+                isFile = true;
+                String tail = IOUtil.getFileTail(resource);
+                File newFile = getStorageManager().getTmpFile(request,
+                                                              tail);
+                RepositoryUtil.checkFilePath(newFile.toString());
+                resourceName = tail;
+                resource     = newFile.toString();
+                URL           fromUrl    = new URL(url);
+                URLConnection connection = fromUrl.openConnection();
+                InputStream   fromStream = connection.getInputStream();
+                //                Object startLoad(String name) {
+                if (actionId != null) {
+                    JobManager.getManager().startLoad("File copy",
+                                                      actionId);
+                }
+                int length = connection.getContentLength();
+                if (length > 0 & actionId != null) {
+                    getActionManager().setActionMessage(actionId,
+                                                        msg("Downloading") + " " + length + " "
+                                                        + msg("bytes"));
+                }
+                FileOutputStream toStream = new FileOutputStream(newFile);
+                try {
+                    int bytes = IOUtil.writeTo(fromStream, toStream, actionId, length);
+                    //System.err.println ("getting url " + resource +"\nread " + bytes);
+                    if (bytes < 0) {
+                        return new Result(
+                                          request.entryUrl(
+                                                           getRepository().URL_ENTRY_SHOW,
+                                                           parentGroup));
                     }
-                    isFile = true;
-                    String tail = IOUtil.getFileTail(resource);
-                    File newFile = getStorageManager().getTmpFile(request,
-                                       tail);
-                    RepositoryUtil.checkFilePath(newFile.toString());
-                    resourceName = tail;
-                    resource     = newFile.toString();
-                    URL           fromUrl    = new URL(url);
-                    URLConnection connection = fromUrl.openConnection();
-                    InputStream   fromStream = connection.getInputStream();
-                    //                Object startLoad(String name) {
-                    if (actionId != null) {
-                        JobManager.getManager().startLoad("File copy",
-                                actionId);
-                    }
-                    int length = connection.getContentLength();
-                    if (length > 0 & actionId != null) {
-                        getActionManager().setActionMessage(actionId,
-                                msg("Downloading") + " " + length + " "
-                                + msg("bytes"));
-                    }
-                    FileOutputStream toStream = new FileOutputStream(newFile);
+                } finally {
                     try {
-                        int bytes = IOUtil.writeTo(fromStream, toStream, actionId, length);
-                        //System.err.println ("getting url " + resource +"\nread " + bytes);
-                        if (bytes < 0) {
-                            return new Result(
-                                request.entryUrl(
-                                    getRepository().URL_ENTRY_SHOW,
-                                    parentGroup));
-                        }
-                    } finally {
-                        try {
-                            toStream.close();
-                            fromStream.close();
-                        } catch (Exception exc) {}
-                    }
+                        toStream.close();
+                        fromStream.close();
+                    } catch (Exception exc) {}
                 }
+            }
 
-                if ( !unzipArchive) {
-                    resources.add(resource);
-                    origNames.add(resourceName);
-                } else {
-                    ZipInputStream zin =
-                        new ZipInputStream(new FileInputStream(resource));
-                    ZipEntry ze = null;
-                    while ((ze = zin.getNextEntry()) != null) {
-                        if (ze.isDirectory()) {
-                            continue;
-                        }
-                        String name =
-                            IOUtil.getFileTail(ze.getName().toLowerCase());
-                        File f = getStorageManager().getTmpFile(request,
-                                     name);
-                        RepositoryUtil.checkFilePath(f.toString());
-                        FileOutputStream fos = new FileOutputStream(f);
-
-                        IOUtil.writeTo(zin, fos);
-                        fos.close();
-                        resources.add(f.toString());
-                        origNames.add(name);
-                    }
-                }
-
-                if (request.exists(ARG_CANCEL)) {
-                    return new Result(
-                        request.entryUrl(
-                            getRepository().URL_ENTRY_SHOW, parentGroup));
-                }
-
-
-                String description = request.getString(ARG_DESCRIPTION,
-                                         BLANK);
-
-                Date createDate = new Date();
-                Date[] dateRange = request.getDateRange(ARG_FROMDATE,
-                                       ARG_TODATE, createDate);
-                if (dateRange[0] == null) {
-                    dateRange[0] = ((dateRange[1] == null)
-                                    ? createDate
-                                    : dateRange[1]);
-                }
-                if (dateRange[1] == null) {
-                    dateRange[1] = dateRange[0];
-                }
-
-
-
-                for (int resourceIdx = 0; resourceIdx < resources.size();
-                        resourceIdx++) {
-                    String theResource = (String) resources.get(resourceIdx);
-                    String origName    = (String) origNames.get(resourceIdx);
-                    if (isFile) {
-                        theResource =
-                            getStorageManager().moveToStorage(request,
-                                new File(theResource)).toString();
-                    }
-                    String name = request.getString(ARG_NAME, BLANK);
-                    if (name.indexOf("${") >= 0) {}
-
-                    if (name.trim().length() == 0) {
-                        name = IOUtil.getFileTail(origName);
-                    }
-                    if (name.trim().length() == 0) {
-                        //                        throw new IllegalArgumentException(
-                        //                            "You must specify a name");
-                    }
-
-                    if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
-                        if (name.indexOf("/") >= 0) {
-                            throw new IllegalArgumentException(
-                                "Cannot have a '/' in group name: '" + name
-                                + "'");
-                        }
-                        Entry existing = findEntryWithName(request,
-                                             parentGroup, name);
-                        if ((existing != null) && existing.isGroup()) {
-                            throw new IllegalArgumentException(
-                                "A group with the given name already exists");
-
-                        }
-                    }
-
-                    Date[] theDateRange = { dateRange[0], dateRange[1] };
-
-                    if (request.defined(ARG_DATE_PATTERN)) {
-                        String format =
-                            request.getUnsafeString(ARG_DATE_PATTERN, BLANK);
-                        String pattern = null;
-                        for (int i = 0; i < DateUtil.DATE_PATTERNS.length;
-                                i++) {
-                            if (format.equals(DateUtil.DATE_FORMATS[i])) {
-                                pattern = DateUtil.DATE_PATTERNS[i];
-                                break;
-                            }
-                        }
-                        //                    System.err.println("format:" + format);
-                        //                    System.err.println("orignName:" + origName);
-                        //                    System.err.println("pattern:" + pattern);
-
-                        if (pattern != null) {
-                            Pattern datePattern = Pattern.compile(pattern);
-                            Matcher matcher = datePattern.matcher(origName);
-                            if (matcher.find()) {
-                                String dateString = matcher.group(0);
-                                Date dttm = RepositoryUtil.makeDateFormat(
-                                                format).parse(dateString);
-                                theDateRange[0] = dttm;
-                                theDateRange[1] = dttm;
-                                //                            System.err.println("got it");
-                            } else {
-                                //                            System.err.println("not found");
-                            }
-                        }
-                    }
-
-                    String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
-                                 ? getGroupId(parentGroup)
-                                 : getRepository().getGUID());
-
-                    String resourceType = Resource.TYPE_UNKNOWN;
-                    if (isFile) {
-                        resourceType = Resource.TYPE_STOREDFILE;
-                    } else {
-                        try {
-                            new URL(theResource);
-                            resourceType = Resource.TYPE_URL;
-                        } catch (Exception exc) {}
-
-                    }
-
-                    if ( !typeHandler.canBeCreatedBy(request)) {
-                        throw new IllegalArgumentException(
-                            "Cannot create an entry of type "
-                            + typeHandler.getDescription());
-                    }
-
-                    entry = typeHandler.createEntry(id);
-                    entry.initEntry(name, description, parentGroup,
-                                    request.getUser(),
-                                    new Resource(theResource, resourceType),
-                                    dataType, createDate.getTime(),
-                                    theDateRange[0].getTime(),
-                                    theDateRange[1].getTime(), null);
-                    setEntryState(request, entry);
-                    entries.add(entry);
-                }
+            if (!unzipArchive) {
+                resources.add(resource);
+                origNames.add(resourceName);
             } else {
-                String       filename     = request.getUploadedFile(ARG_FILE);
-                //Did they upload a new file???
-                if(filename !=null && entry.getResource().isStoredFile()) {
-                    filename =
-                        getStorageManager().moveToStorage(request,
-                                                          new File(filename)).toString();
-                    getStorageManager().removeFile(entry.getResource());
-                    entry.setResource(new Resource(filename, Resource.TYPE_STOREDFILE));
-                }
-
-                if (entry.isTopGroup()) {
-                    //                    throw new IllegalArgumentException(
-                    //                        "Cannot edit top-level group");
-                }
-                Date[] dateRange = request.getDateRange(ARG_FROMDATE,
-                                       ARG_TODATE, new Date());
-                String newName = request.getString(ARG_NAME,
-                                     entry.getLabel());
-
-
-
-                if (entry.isGroup()) {
-                    if (newName.indexOf(Group.IDDELIMITER) >= 0) {
-                        throw new IllegalArgumentException(
-                            "Cannot have a '/' in group name:" + newName);
+                ZipInputStream zin =
+                    new ZipInputStream(new FileInputStream(resource));
+                ZipEntry ze = null;
+                while ((ze = zin.getNextEntry()) != null) {
+                    if (ze.isDirectory()) {
+                        continue;
                     }
+                    String name =
+                        IOUtil.getFileTail(ze.getName().toLowerCase());
+                    File f = getStorageManager().getTmpFile(request,
+                                                            name);
+                    RepositoryUtil.checkFilePath(f.toString());
+                    FileOutputStream fos = new FileOutputStream(f);
 
-                    /**
-                     * TODO Do we want to not allow 2 or more groups with the same name?
-                     * Entry existing = findEntryWithName(request,
-                     *                                  entry.getParentGroup(), newName);
-                     * if ((existing != null) && existing.isGroup()
-                     *       && !existing.getId().equals(entry.getId())) {
-                     *   throw new IllegalArgumentException(
-                     *       "A group with the given name already exists");
-                     * }
-                     */
+                    IOUtil.writeTo(zin, fos);
+                    fos.close();
+                    resources.add(f.toString());
+                    origNames.add(name);
+                }
+            }
+
+            if (request.exists(ARG_CANCEL)) {
+                return new Result(
+                                  request.entryUrl(
+                                                   getRepository().URL_ENTRY_SHOW, parentGroup));
+            }
+
+
+            String description = request.getString(ARG_DESCRIPTION,
+                                                   BLANK);
+
+            Date createDate = new Date();
+            Date[] dateRange = request.getDateRange(ARG_FROMDATE,
+                                                    ARG_TODATE, createDate);
+            if (dateRange[0] == null) {
+                dateRange[0] = ((dateRange[1] == null)
+                                ? createDate
+                                : dateRange[1]);
+            }
+            if (dateRange[1] == null) {
+                dateRange[1] = dateRange[0];
+            }
+
+
+
+
+
+            for (int resourceIdx = 0; resourceIdx < resources.size();
+                 resourceIdx++) {
+                String theResource = (String) resources.get(resourceIdx);
+                String origName    = (String) origNames.get(resourceIdx);
+                if (isFile) {
+                    theResource =
+                        getStorageManager().moveToStorage(request,
+                                                          new File(theResource)).toString();
+                }
+                String name = request.getString(ARG_NAME, BLANK);
+                if (name.indexOf("${") >= 0) {}
+
+                if (name.trim().length() == 0) {
+                    name = IOUtil.getFileTail(origName);
                 }
 
-                entry.setName(newName);
-                entry.setDescription(request.getString(ARG_DESCRIPTION,
-                        entry.getDescription()));
-                if(request.get(ARG_PUBLISH,false) && entry.isUploaded()) {
-                    entry.setDataType("");
+                Date[] theDateRange = { dateRange[0], dateRange[1] };
+
+                if (request.defined(ARG_DATE_PATTERN)) {
+                    String format =
+                        request.getUnsafeString(ARG_DATE_PATTERN, BLANK);
+                    String pattern = null;
+                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length;
+                         i++) {
+                        if (format.equals(DateUtil.DATE_FORMATS[i])) {
+                            pattern = DateUtil.DATE_PATTERNS[i];
+                            break;
+                        }
+                    }
+                    //                    System.err.println("format:" + format);
+                    //                    System.err.println("orignName:" + origName);
+                    //                    System.err.println("pattern:" + pattern);
+
+                    if (pattern != null) {
+                        Pattern datePattern = Pattern.compile(pattern);
+                        Matcher matcher = datePattern.matcher(origName);
+                        if (matcher.find()) {
+                            String dateString = matcher.group(0);
+                            Date dttm = RepositoryUtil.makeDateFormat(
+                                                                      format).parse(dateString);
+                            theDateRange[0] = dttm;
+                            theDateRange[1] = dttm;
+                            //                            System.err.println("got it");
+                        } else {
+                            //                            System.err.println("not found");
+                        }
+                    }
+                }
+
+                String id =  getRepository().getGUID();
+                String resourceType = Resource.TYPE_UNKNOWN;
+                if (isFile) {
+                    resourceType = Resource.TYPE_STOREDFILE;
                 } else {
-                    entry.setDataType(dataType);
-                }
-                if (request.defined(ARG_URL)) {
-                    entry.setResource(new Resource(request.getString(ARG_URL,
-                            BLANK)));
+                    try {
+                        new URL(theResource);
+                        resourceType = Resource.TYPE_URL;
+                    } catch (Exception exc) {}
+
                 }
 
-                //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);
-
-                if (dateRange[0] != null) {
-                    entry.setStartDate(dateRange[0].getTime());
-                }
-                if (dateRange[1] == null) {
-                    dateRange[1] = dateRange[0];
+                if ( !typeHandler.canBeCreatedBy(request)) {
+                    throw new IllegalArgumentException(
+                                                       "Cannot create an entry of type "
+                                                       + typeHandler.getDescription());
                 }
 
-                if (dateRange[1] != null) {
-                    entry.setEndDate(dateRange[1].getTime());
-                }
+                entry = typeHandler.createEntry(id);
+                entry.initEntry(name, description, parentGroup,
+                                request.getUser(),
+                                new Resource(theResource, resourceType),
+                                dataType, createDate.getTime(),
+                                theDateRange[0].getTime(),
+                                theDateRange[1].getTime(), null);
                 setEntryState(request, entry);
                 entries.add(entry);
             }
+        } else {
+            String       filename     = request.getUploadedFile(ARG_FILE);
+            //Did they upload a new file???
+            if(filename !=null && entry.getResource().isStoredFile()) {
+                filename =
+                    getStorageManager().moveToStorage(request,
+                                                      new File(filename)).toString();
+                getStorageManager().removeFile(entry.getResource());
+                entry.setResource(new Resource(filename, Resource.TYPE_STOREDFILE));
+            }
+
+            if (entry.isTopGroup()) {
+                //                    throw new IllegalArgumentException(
+                //                        "Cannot edit top-level group");
+            }
+            Date[] dateRange = request.getDateRange(ARG_FROMDATE,
+                                                    ARG_TODATE, new Date());
+            String newName = request.getString(ARG_NAME,
+                                               entry.getLabel());
 
 
-            if (request.getUser().getAdmin()
-                    && request.defined(ARG_USER_ID)) {
 
-                User newUser =
-                    getUserManager().findUser(request.getString(ARG_USER_ID,
-                        "").trim());
-                if (newUser == null) {
+            if (entry.isGroup()) {
+                if (newName.indexOf(Group.IDDELIMITER) >= 0) {
                     throw new IllegalArgumentException(
-                        "Could not find user: "
-                        + request.getString(ARG_USER_ID, ""));
+                                                       "Cannot have a '/' in group name:" + newName);
                 }
-                for (Entry theEntry : entries) {
-                    theEntry.setUser(newUser);
-                }
+
+                /**
+                 * TODO Do we want to not allow 2 or more groups with the same name?
+                 * Entry existing = findEntryWithName(request,
+                 *                                  entry.getParentGroup(), newName);
+                 * if ((existing != null) && existing.isGroup()
+                 *       && !existing.getId().equals(entry.getId())) {
+                 *   throw new IllegalArgumentException(
+                 *       "A group with the given name already exists");
+                 * }
+                 */
             }
 
-            if (newEntry && request.get(ARG_ADDMETADATA, false)) {
-                addInitialMetadata(request, entries);
+            entry.setName(newName);
+            entry.setDescription(request.getString(ARG_DESCRIPTION,
+                                                   entry.getDescription()));
+            if(request.get(ARG_PUBLISH,false) && entry.isUploaded()) {
+                entry.setDataType("");
+            } else {
+                entry.setDataType(dataType);
+            }
+            if (request.defined(ARG_URL)) {
+                entry.setResource(new Resource(request.getString(ARG_URL,
+                                                                 BLANK)));
             }
 
-            insertEntries(entries, newEntry);
+            //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);
+
+            if (dateRange[0] != null) {
+                entry.setStartDate(dateRange[0].getTime());
+            }
+            if (dateRange[1] == null) {
+                dateRange[1] = dateRange[0];
+            }
+
+            if (dateRange[1] != null) {
+                entry.setEndDate(dateRange[1].getTime());
+            }
+            setEntryState(request, entry);
+            entries.add(entry);
         }
+
+
+        if (request.getUser().getAdmin()
+            && request.defined(ARG_USER_ID)) {
+
+            User newUser =
+                getUserManager().findUser(request.getString(ARG_USER_ID,
+                                                            "").trim());
+            if (newUser == null) {
+                throw new IllegalArgumentException(
+                                                   "Could not find user: "
+                                                   + request.getString(ARG_USER_ID, ""));
+            }
+            for (Entry theEntry : entries) {
+                theEntry.setUser(newUser);
+            }
+        }
+
+        if (newEntry && request.get(ARG_ADDMETADATA, false)) {
+            addInitialMetadata(request, entries);
+        }
+
+        insertEntries(entries, newEntry);
+
+
+        if(forUpload) {
+            entry = (Entry) entries.get(0);
+            return new Result(
+                              request.entryUrl(
+                                               getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
+                                               ARG_MESSAGE,
+                                               "File has been uploaded"));
+        }
+
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
             return new Result(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
+                              request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
             return new Result(
-                request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
-                    ARG_MESSAGE,
-                    entries.size() + HtmlUtil.pad(msg("files uploaded"))));
+                              request.entryUrl(
+                                               getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
+                                               ARG_MESSAGE,
+                                               entries.size() + HtmlUtil.pad(msg("files uploaded"))));
         } else {
             return new Result(BLANK,
                               new StringBuffer(msg("No entries created")));
@@ -1348,14 +1347,23 @@ return new Result(title, sb);
 
 
     public Result processEntryUpload(Request request) throws Exception {
-
-
-
-
-
+        TypeHandler typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
-        return makeEntryEditResult(request, group, "Create Entry", sb);
+        if(!request.exists(ARG_NAME)) {
+            sb.append(request.uploadForm(getRepository().URL_ENTRY_UPLOAD,
+                                         HtmlUtil.attr("name", "entryform")));
+            sb.append(HtmlUtil.submit(msg("Upload")));
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
+            typeHandler.addToEntryForm(request,  sb, null);
+            sb.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.submit(msg("Upload")));
+            sb.append(HtmlUtil.formClose());
+        } else {
+            return doProcessEntryChange(request, true, null);
+        }
+        return makeEntryEditResult(request, group, msg("Upload"), sb);
     }
 
 
@@ -1431,35 +1439,27 @@ return new Result(title, sb);
         }
         //        System.err.println("request:" + request);
 
+        String path = entry.getResource().getPath();
         if (request.defined(ARG_IMAGEWIDTH)
-                && ImageUtils.isImage(entry.getResource().getPath())) {
+                && ImageUtils.isImage(path)) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
             String thumbDir = getStorageManager().getThumbDir();
             String thumb = IOUtil.joinDir(thumbDir,
-                                          "entry" + entry.getId() + "_"
-                                          + width + ".jpg");
-            if ( !new File(thumb).exists()) {
-                Image image =
-                    ImageUtils.readImage(entry.getResource().getPath());
-                Image resizedImage = image.getScaledInstance(width, -1,
-                                         Image.SCALE_AREA_AVERAGING);
-                ImageUtils.waitOnImage(resizedImage);
-                ImageUtils.writeImageToFile(resizedImage, thumb);
+                                          "entry" + IOUtil.cleanFileName(entry.getId()) + "_"
+                                          + width + IOUtil.getFileExtension(path));
+            if (!new File(thumb).exists()) {
+                Image image = ImageUtils.readImage(entry.getResource().getPath());
+                image = ImageUtils.resize(image, width,-1);
+                ImageUtils.waitOnImage(image);
+                ImageUtils.writeImageToFile(image, thumb);
             }
-            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb,
-                               getClass()));
             return new Result(
-                BLANK, bytes,
+                BLANK, IOUtil.getInputStream(thumb,
+                                             getClass()),
                 IOUtil.getFileExtension(entry.getResource().getPath()));
         } else {
-            //            System.err.println ("entry get -4 ");
-            //            Image image = ImageUtils.readImage(entry.getResource().getPath());
-            //            ucar.unidata.util.GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(image)),null);
-
             InputStream inputStream =  IOUtil.getInputStream(entry.getResource()
                                                     .getPath(), getClass());
-            //            System.err.println ("args:" + request.getHttpHeaderArgs());
-            //inputStream
             return new Result(BLANK,
                               inputStream, IOUtil
                                       .getFileExtension(entry.getResource()
