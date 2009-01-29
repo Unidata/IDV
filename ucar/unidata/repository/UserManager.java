@@ -1277,7 +1277,7 @@ public class UserManager extends RepositoryManager {
                     HtmlUtil.url(
                         request.url(getRepository().URL_USER_PROFILE),
                         ARG_USER_ID,
-                        user.getId()), user.getLabel(),
+                        user.getId()), user.getId(),
                             "title=\"View user profile\"");
 
             String userLogLink =

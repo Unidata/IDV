@@ -1192,57 +1192,64 @@ public class TypeHandler extends RepositoryManager {
         }
 
         boolean showFile  = okToShowInForm(ARG_FILE);
+        boolean showLocalFile  = showFile && request.getUser().getAdmin();
         boolean showUrl   = okToShowInForm(ARG_URL);
         if (okToShowInForm(ARG_RESOURCE)) {
-            List tabTitles  = new ArrayList();
-            List tabContent = new ArrayList();
+            List<String>  tabTitles  = new ArrayList<String> ();
+            List<String>  tabContent = new ArrayList<String> ();
             if (entry == null) {
                 String  urlLabel  = getFormLabel(ARG_URL, "URL");
                 String  fileLabel = getFormLabel(ARG_FILE, "File");
                 if (showFile) {
-                    String addMetadata = HtmlUtil.space(2)
-                                         + HtmlUtil.checkbox(ARG_ADDMETADATA,
-                                             "true",
-                                             false) + HtmlUtil.space(1)
-                                                 + msg("Add Metadata");
-
-                    String formContent = HtmlUtil.fileInput(ARG_FILE, size)
-                                         + HtmlUtil.checkbox(ARG_FILE_UNZIP,
-                                             "true",
-                                             false) + HtmlUtil.space(1)
-                                                 + msg("Unzip archive")
-                                                 + addMetadata;
-                    if ( !showUrl) {
-                        sb.append(HtmlUtil.formEntry(msgLabel(fileLabel),
-                                formContent));
-                    } else {
-                        tabTitles.add(msg(fileLabel));
-                        tabContent.add(HtmlUtil.inset(formContent, 8));
-                    }
+                    String formContent = HtmlUtil.fileInput(ARG_FILE, size);
+                    tabTitles.add(msg(fileLabel));
+                    tabContent.add(HtmlUtil.inset(formContent, 8));
                 }
                 if (showUrl) {
                     String download = !okToShowInForm(ARG_RESOURCE_DOWNLOAD)
                                       ? ""
-                                      : HtmlUtil.space(1)
-                                        + HtmlUtil.checkbox(
-                                            ARG_RESOURCE_DOWNLOAD, "true",
-                                            false) + HtmlUtil.space(1)
-                                                + msg("Download");
+                        : HtmlUtil.space(1)
+                        + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD) + 
+                        HtmlUtil.space(1)
+                        + msg("Download");
                     String formContent = HtmlUtil.input(ARG_URL, "", size)
                                          + BLANK + download;
-                    if ( !showFile) {
-                        sb.append(HtmlUtil.formEntry(msgLabel(urlLabel),
-                                formContent));
-                    } else {
-                        tabTitles.add(urlLabel);
-                        tabContent.add(HtmlUtil.inset(msgLabel(urlLabel)
-                                + formContent, 8));
-                    }
+                    tabTitles.add(urlLabel);
+                    tabContent.add(HtmlUtil.inset(formContent, 8));
                 }
+
+                if (showLocalFile) {
+                    String formContent = HtmlUtil.input(ARG_LOCALFILE, "", size);
+                    tabTitles.add(msg("Local File"));
+                    tabContent.add(HtmlUtil.inset(formContent, 8));
+                }
+
+                String addMetadata = 
+                    HtmlUtil.checkbox(ARG_ADDMETADATA) + HtmlUtil.space(1)
+                    + msg("Add Metadata");
+
+                List datePatterns = new ArrayList();
+                datePatterns.add(new TwoFacedObject("", BLANK));
+                for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
+                    datePatterns.add(DateUtil.DATE_FORMATS[i]);
+                }
+
+                String unzip=  HtmlUtil.checkbox(ARG_FILE_UNZIP) + HtmlUtil.space(1)
+                    + msg("Unzip archive") + HtmlUtil.space(3) +
+                    msgLabel("Date Pattern") +
+                    HtmlUtil.space(1) +  
+                    HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) + " (" + msg("use file name")+")";
+
+                String extra =  addMetadata + HtmlUtil.space(3)+unzip;
+
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             HtmlUtil.makeTabs(tabTitles, tabContent, true,
-                                "tab_content", "tab_contents_noborder")));
+                                              "tab_content", "tab_contents_noborder")+
+                                                 extra));
+                } else {
+                    sb.append(HtmlUtil.formEntry(tabTitles.get(0)+":",
+                                                 tabContent.get(0)+extra));
                 }
 
             } else {
@@ -1327,20 +1334,7 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().makeDateInput(request, ARG_TODATE,
                         "entryform", toDate) + HtmlUtil.space(2)));
             }
-            if (entry == null) {
-                List datePatterns = new ArrayList();
 
-                datePatterns.add(new TwoFacedObject("", BLANK));
-                for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
-                    datePatterns.add(DateUtil.DATE_FORMATS[i]);
-                }
-                if (okToShowInForm(ARG_RESOURCE)) {
-                    sb.append(HtmlUtil.formEntry("Date Pattern:",
-                            HtmlUtil.select(ARG_DATE_PATTERN, datePatterns)
-                            + " (use file name)"));
-                }
-
-            }
         }
 
 

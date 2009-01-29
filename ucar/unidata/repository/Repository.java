@@ -3728,6 +3728,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return localFilePaths;
     }
 
+    public void checkLocalFile(File file) throws Exception {
+        boolean ok = false;
+        for (File parent : getLocalFilePaths()) {
+            if (IOUtil.isADescendent(parent, file)) {
+                ok = true;
+                break;
+            }
+        }
+        if ( !ok) {
+            if (getLocalFilePaths().size() == 0) {
+                throw new IllegalArgumentException(
+                    "For security you must specify the allowable  file paths in the Administration screen");
+            }
+            throw new IllegalArgumentException(
+                "The specified file is not under one of the allowable file system directories");
+        }
+    }
 
 
 

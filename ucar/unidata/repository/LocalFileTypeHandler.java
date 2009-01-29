@@ -136,22 +136,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             throw new IllegalArgumentException("Bad file path:" + subPath);
         }
 
-        boolean ok = false;
-        for (File parent : getRepository().getLocalFilePaths()) {
-            if (IOUtil.isADescendent(parent, file)) {
-                ok = true;
-                break;
-            }
-        }
-        if ( !ok) {
-            if (getRepository().getLocalFilePaths().size() == 0) {
-                throw new IllegalArgumentException(
-                    "For security you must specify the allowable  file paths in the Administration screen");
-            }
-            throw new IllegalArgumentException(
-                "The specified file is not under one of the allowable file system directories");
-        }
-
+        getRepository().checkLocalFile(file);
 
         return file;
     }

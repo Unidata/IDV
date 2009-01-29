@@ -594,19 +594,6 @@ return new Result(title, sb);
 
 
         if (entry == null) {
-            List<String> resources    = new ArrayList();
-            List<String> origNames    = new ArrayList();
-            String       resource     = request.getString(ARG_URL, BLANK);
-            String       filename     = request.getUploadedFile(ARG_FILE);
-            boolean      unzipArchive = false;
-
-            boolean      isFile       = false;
-            String       resourceName = request.getString(ARG_FILE,
-                                                          BLANK);
-            if (resourceName.length() == 0) {
-                resourceName = IOUtil.getFileTail(resource);
-            }
-
             String groupId = request.getString(ARG_GROUP, (String) null);
             if (groupId == null) {
                 throw new IllegalArgumentException(
@@ -620,55 +607,97 @@ return new Result(title, sb);
                                                          + entry.getLabel());
             }
 
-            if (filename != null) {
+
+            List<String> resources    = new ArrayList();
+            List<String> origNames    = new ArrayList();
+
+            String       resource     = request.getString(ARG_URL, BLANK);
+            String       filename     = request.getUploadedFile(ARG_FILE);
+            String       localFilename   = null;
+            boolean      unzipArchive = false;
+
+            boolean      isFile       = false;
+            boolean      isLocalFile       = false;
+            String       resourceName = request.getString(ARG_FILE,
+                                                          BLANK);
+
+            if(request.defined(ARG_LOCALFILE)) {
+                filename = request.getString(ARG_LOCALFILE,(String)null);
+                if(!request.getUser().getAdmin()) {
+                    throw new IllegalArgumentException ("Only administrators can add a local file");
+                }
+                getRepository().checkLocalFile(new File(filename));
+                isLocalFile = true;
+            }
+
+
+            if (resourceName.length() == 0) {
+                resourceName = IOUtil.getFileTail(resource);
+            }
+
+            unzipArchive = request.get(ARG_FILE_UNZIP, false);
+
+            if(isLocalFile) {
                 isFile       = true;
-                unzipArchive = request.get(ARG_FILE_UNZIP, false);
                 resource     = filename;
-            } else if (download) {
-                String url = resource;
-                if ( !url.startsWith("http:")
-                     && !url.startsWith("https:")
-                     && !url.startsWith("ftp:")) {
-                    throw new IllegalArgumentException(
-                                                       "Cannot download url:" + url);
-                }
-                isFile = true;
-                String tail = IOUtil.getFileTail(resource);
-                File newFile = getStorageManager().getTmpFile(request,
-                                                              tail);
-                RepositoryUtil.checkFilePath(newFile.toString());
-                resourceName = tail;
-                resource     = newFile.toString();
-                URL           fromUrl    = new URL(url);
-                URLConnection connection = fromUrl.openConnection();
-                InputStream   fromStream = connection.getInputStream();
-                //                Object startLoad(String name) {
-                if (actionId != null) {
-                    JobManager.getManager().startLoad("File copy",
-                                                      actionId);
-                }
-                int length = connection.getContentLength();
-                if (length > 0 & actionId != null) {
-                    getActionManager().setActionMessage(actionId,
-                                                        msg("Downloading") + " " + length + " "
-                                                        + msg("bytes"));
-                }
-                FileOutputStream toStream = new FileOutputStream(newFile);
-                try {
-                    int bytes = IOUtil.writeTo(fromStream, toStream, actionId, length);
-                    //System.err.println ("getting url " + resource +"\nread " + bytes);
-                    if (bytes < 0) {
-                        return new Result(
-                                          request.entryUrl(
-                                                           getRepository().URL_ENTRY_SHOW,
-                                                           parentGroup));
+            } else  if (filename != null) {
+                isFile       = true;
+                resource     = filename;
+            }  else {
+                if(!download) {
+                    unzipArchive = false;
+                } else {
+                    String url = resource;
+                    if ( !url.startsWith("http:")
+                         && !url.startsWith("https:")
+                         && !url.startsWith("ftp:")) {
+                        throw new IllegalArgumentException(
+                                                           "Cannot download url:" + url);
                     }
-                } finally {
+                    isFile = true;
+                    String tail = IOUtil.getFileTail(resource);
+                    File newFile = getStorageManager().getTmpFile(request,
+                                                                  tail);
+                    RepositoryUtil.checkFilePath(newFile.toString());
+                    resourceName = tail;
+                    resource     = newFile.toString();
+                    URL           fromUrl    = new URL(url);
+                    URLConnection connection = fromUrl.openConnection();
+                    InputStream   fromStream = connection.getInputStream();
+                    //                Object startLoad(String name) {
+                    if (actionId != null) {
+                        JobManager.getManager().startLoad("File copy",
+                                                          actionId);
+                    }
+                    int length = connection.getContentLength();
+                    if (length > 0 & actionId != null) {
+                        getActionManager().setActionMessage(actionId,
+                                                            msg("Downloading") + " " + length + " "
+                                                            + msg("bytes"));
+                    }
+                    FileOutputStream toStream = new FileOutputStream(newFile);
                     try {
-                        toStream.close();
-                        fromStream.close();
-                    } catch (Exception exc) {}
+                        int bytes = IOUtil.writeTo(fromStream, toStream, actionId, length);
+                        //System.err.println ("getting url " + resource +"\nread " + bytes);
+                        if (bytes < 0) {
+                            return new Result(
+                                              request.entryUrl(
+                                                               getRepository().URL_ENTRY_SHOW,
+                                                               parentGroup));
+                        }
+                    } finally {
+                        try {
+                            toStream.close();
+                            fromStream.close();
+                        } catch (Exception exc) {}
+                    }
                 }
+            }
+
+
+            if(unzipArchive && !(resource.endsWith(".zip") ||
+                                 resource.endsWith(".jar"))) {
+                unzipArchive = false;
             }
 
             if (!unzipArchive) {
@@ -726,7 +755,7 @@ return new Result(title, sb);
                  resourceIdx++) {
                 String theResource = (String) resources.get(resourceIdx);
                 String origName    = (String) origNames.get(resourceIdx);
-                if (isFile) {
+                if (isFile && !isLocalFile) {
                     theResource =
                         getStorageManager().moveToStorage(request,
                                                           new File(theResource)).toString();
@@ -773,7 +802,9 @@ return new Result(title, sb);
 
                 String id =  getRepository().getGUID();
                 String resourceType = Resource.TYPE_UNKNOWN;
-                if (isFile) {
+                if(isLocalFile) {
+                    resourceType=Resource.TYPE_LOCAL_FILE;
+                } else if (isFile) {
                     resourceType = Resource.TYPE_STOREDFILE;
                 } else {
                     try {

@@ -981,6 +981,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_URL = "url";
 
+    public static final String ARG_LOCALFILE = "localfile";
+
     /** _more_ */
     public static final String ARG_RESOURCE_DOWNLOAD = "resource.download";
 
