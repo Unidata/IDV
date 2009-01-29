@@ -1007,6 +1007,10 @@ public class HtmlUtil {
     }
 
 
+    public static String checkbox(String name) {
+        return checkbox(name,"true",false);
+    }
+
     /**
      * _more_
      *
