@@ -44,7 +44,9 @@ import java.rmi.RemoteException;
 
 
 /**
- * Class for controlling the display of images.
+ * Class for controlling the display of images.  Designed for brightness
+ * images with range of 0 to 255.
+ *
  * @author IDV Development Group
  */
 public class ImagePlanViewControl extends PlanViewControl {
@@ -129,7 +131,9 @@ public class ImagePlanViewControl extends PlanViewControl {
 
 
     /**
-     * Get the initial range for the data and color table.
+     * Get the initial range for the data and color table.  
+     * Optimized for brightness images with range of 0 to 255.
+     *
      * @return  initial range
      *
      * @throws RemoteException  Java RMI error
@@ -154,9 +158,11 @@ public class ImagePlanViewControl extends PlanViewControl {
         boolean usingImage = false;
         Range imageRange = getDisplayConventions().getParamRange("image",
                                getDisplayUnit());
+        /*
         if (range == null) {
             range = imageRange;
         }
+        */
         if ((range != null) && Misc.equals(range, imageRange)) {
             usingImage = true;
         }
