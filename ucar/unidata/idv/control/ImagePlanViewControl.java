@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -45,7 +46,6 @@ import java.rmi.RemoteException;
 /**
  * Class for controlling the display of images.
  * @author IDV Development Group
- * @version $Revision: 1.3 $
  */
 public class ImagePlanViewControl extends PlanViewControl {
 
@@ -136,9 +136,13 @@ public class ImagePlanViewControl extends PlanViewControl {
      * @throws VisADException   VisAD Error
      */
     protected Range getInitialRange() throws RemoteException, VisADException {
+
+        // WARNING:  Twisty-turny logic below
+        // try for the parameter.
         Range range = getDisplayConventions().getParamRange(paramName,
                           getDisplayUnit());
-        //Don't do this for now
+
+        // see if one is defined for the color table.
         if (range == null) {
             range = getRangeFromColorTable();
             if ((range != null) && (range.getMin() == range.getMax())) {
@@ -146,13 +150,22 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
         }
 
+        // look for the default for "image" - hopefully it never changes
+        boolean usingImage = false;
+        Range imageRange = getDisplayConventions().getParamRange("image",
+                               getDisplayUnit());
         if (range == null) {
-            range = getDisplayConventions().getParamRange("image",
-                    getDisplayUnit());
+            range = imageRange;
         }
+        if ((range != null) && Misc.equals(range, imageRange)) {
+            usingImage = true;
+        }
+
         // check to see if the range of the data is outside the range
-        // of the data
-        if ((range != null) && (getGridDataInstance() != null)) {
+        // of the default. This will be wrong if someone redefined what image
+        // is supposed to be (0-255).
+        if ((range != null) && usingImage
+                && (getGridDataInstance() != null)) {
             Range dataRange = getDataRangeInColorUnits();
             if (dataRange != null) {
                 if ((range.getMin() > dataRange.getMin())
@@ -162,7 +175,6 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
         }
         if (range == null) {
-            //    return new Range(0, 255);
             range = super.getInitialRange();
         }
         return range;
