@@ -24,8 +24,10 @@
 package ucar.unidata.view.geoloc;
 
 
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.ProjectionRect;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
