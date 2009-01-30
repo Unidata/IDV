@@ -92,6 +92,14 @@
      label="Upsonde/Dropsonde files"/>
 
   <datasource
+     id="NetCDF.POINTFEATURE"
+     factory="ucar.unidata.data.point.NetcdfPointFeatureDataSource"
+     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc$"
+     doesmultiples="true"
+     fileselection="true"
+     label="netCDF Point Feature files"/>
+
+  <datasource
      id="NetCDF.POINT"
      factory="ucar.unidata.data.point.NetcdfPointDataSource"
      patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc$"
@@ -117,7 +125,7 @@
      patterns="\.area$,\.gini$"
      fileselection="true"
      doesmultiples="true"
-     label="Image files (area/gini)">
+     label="Image files (AREA/GINI)">
   </datasource>
 
   <datasource
