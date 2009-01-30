@@ -240,6 +240,12 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
                                            "NONE"));
             buf.append("&WSTN=");
             buf.append(station.getID());
+            // further refine the search; Major  hack
+            String apro = ti.fileExtension;
+            if (apro.length() == 3) {
+                buf.append("&APRO=");
+                buf.append(apro);
+            }
         }
         buf.append("&dtime=");
         buf.append(dtime);
