@@ -20,57 +20,42 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.storm;
 
 
 import ucar.unidata.data.grid.GridUtil;
-
-
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
-
-
-
-import ucar.unidata.data.storm.*;
+import ucar.unidata.data.storm.StormParam;
+import ucar.unidata.data.storm.StormTrack;
+import ucar.unidata.data.storm.StormTrackPoint;
+import ucar.unidata.data.storm.Way;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.FlatEarth;
 import ucar.unidata.geoloc.projection.LatLonProjection;
 import ucar.unidata.gis.SpatialGrid;
-import ucar.unidata.idv.NavigatedViewManager;
-import ucar.unidata.idv.ViewManager;
-
 import ucar.unidata.ui.colortable.ColorTableDefaults;
-import ucar.unidata.ui.colortable.ColorTableManager;
-
-import ucar.unidata.ui.symbol.*;
-
+import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
 import ucar.visad.Util;
-import ucar.visad.display.*;
-
+import ucar.visad.display.CompositeDisplayable;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.StationModelDisplayable;
+import ucar.visad.display.TrackDisplayable;
 import visad.*;
 import visad.Set;
-
-
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.Color;
-import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
-
 import java.rmi.RemoteException;
-
 import java.text.DecimalFormat;
-
 import java.util.*;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 
 /**
@@ -198,8 +183,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected CompositeDisplayable getHolder()
-            throws VisADException, RemoteException {
+    protected CompositeDisplayable getHolder() throws VisADException,
+            RemoteException {
         if (holder == null) {
             holder = new CompositeDisplayable("way  holder");
             stormDisplayState.addDisplayable(holder);
@@ -262,8 +247,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    private void removeObsPointDisplay()
-            throws VisADException, RemoteException {
+    private void removeObsPointDisplay() throws VisADException,
+            RemoteException {
         if (obsPointDisplay != null) {
             removeDisplayable(obsPointDisplay);
             obsPointDisplay = null;
@@ -554,8 +539,9 @@ public class WayDisplayState {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private FieldImpl doDeclutter(FieldImpl obs, StationModel sModel)
-            throws VisADException, RemoteException {
+    private FieldImpl doDeclutter(FieldImpl obs,
+                                  StationModel sModel) throws VisADException,
+                                      RemoteException {
 
 
         //  long      millis           = System.currentTimeMillis();
@@ -607,8 +593,7 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     private FieldImpl doTheActualDecluttering(FieldImpl pointObs,
-            StationModel sm)
-            throws VisADException, RemoteException {
+            StationModel sm) throws VisADException, RemoteException {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
         }
@@ -769,8 +754,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public StationModelDisplayable getObsPointDisplay()
-            throws VisADException, RemoteException {
+    public StationModelDisplayable getObsPointDisplay() throws VisADException,
+            RemoteException {
         if (obsPointDisplay == null) {
             obsPointDisplay = new StationModelDisplayable("dots");
             obsPointDisplay.setUseTimesInAnimation(false);
@@ -857,8 +842,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public TrackDisplayable makeConeDisplay(StormParam param, int mode)
-            throws Exception {
+    public TrackDisplayable makeConeDisplay(StormParam param,
+                                            int mode) throws Exception {
         FieldImpl field = makeConeField(param, mode);
         if (field == null) {
             return null;
@@ -883,8 +868,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public TrackDisplayable makeRingDisplay(StormParam param, int mode)
-            throws Exception {
+    public TrackDisplayable makeRingDisplay(StormParam param,
+                                            int mode) throws Exception {
         FieldImpl field = makeRingsField(param, mode);
         if (field == null) {
             return null;
@@ -1120,8 +1105,8 @@ public class WayDisplayState {
      * @return _more_
      * @throws Exception _more_
      */
-    protected FieldImpl makeConeField(StormParam stormParam, int mode)
-            throws Exception {
+    protected FieldImpl makeConeField(StormParam stormParam,
+                                      int mode) throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
         Data[]          datas  = new Data[tracks.size()];
@@ -1162,8 +1147,8 @@ public class WayDisplayState {
      * @return _more_
      * @throws Exception _more_
      */
-    private List<PointOb> makePointObs(StormTrack track, boolean useStartTime)
-            throws Exception {
+    private List<PointOb> makePointObs(
+            StormTrack track, boolean useStartTime) throws Exception {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
@@ -1342,8 +1327,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void addDisplayable(Displayable displayable)
-            throws VisADException, RemoteException {
+    public void addDisplayable(
+            Displayable displayable) throws VisADException, RemoteException {
         getHolder().addDisplayable(displayable);
     }
 
@@ -1355,8 +1340,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void removeDisplayable(Displayable displayable)
-            throws VisADException, RemoteException {
+    public void removeDisplayable(
+            Displayable displayable) throws VisADException, RemoteException {
         getHolder().removeDisplayable(displayable);
     }
 
@@ -1554,8 +1539,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    protected FieldImpl makeRingsField(StormParam stormParam, int mode)
-            throws Exception {
+    protected FieldImpl makeRingsField(StormParam stormParam,
+                                       int mode) throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
         Data[]          datas  = new Data[tracks.size() * 10];
@@ -1601,8 +1586,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public List makeRingTrackList(StormTrack track, StormParam param)
-            throws Exception {
+    public List makeRingTrackList(StormTrack track,
+                                  StormParam param) throws Exception {
         List<StormTrackPoint> stps = getRealTrackPoints(track, param);
         List<StormTrack>      stracks        = new ArrayList();
 
@@ -1642,8 +1627,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public FieldImpl makeRingTracks(StormTrack track, StormParam param)
-            throws Exception {
+    public FieldImpl makeRingTracks(StormTrack track,
+                                    StormParam param) throws Exception {
         List<StormTrackPoint> stps = getRealTrackPoints(track, param);
         List<StormTrack>      stracks        = new ArrayList();
         int                   size           = stps.size();
@@ -1690,8 +1675,8 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint getCirclePoint(StormTrackPoint stp, double r0,
-                                          double azimuth, DateTime dt)
-            throws VisADException {
+                                          double azimuth,
+                                          DateTime dt) throws VisADException {
         //
 
         EarthLocation el   = stp.getLocation();
@@ -1709,7 +1694,7 @@ public class WayDisplayState {
     }
 
     /**
-     * _more_
+     * old
      *
      * @param track _more_
      * @param param _more_
@@ -1718,8 +1703,8 @@ public class WayDisplayState {
      *
      * @throws VisADException _more_
      */
-    public StormTrack makeConeTrack(StormTrack track, StormParam param)
-            throws VisADException {
+    public StormTrack makeConeTrack_Old(StormTrack track,
+                                     StormParam param) throws VisADException {
         List<StormTrackPoint> stps          = getRealTrackPoints(track,
                                                   param);
         int                   size          = stps.size();
@@ -1788,7 +1773,545 @@ public class WayDisplayState {
     }
 
     /**
-     * _more_
+     * construct the cone track as track of point to circle and circle to circle
+     *
+     * @param track _more_
+     * @param param _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public StormTrack makeConeTrack(StormTrack track,
+                                    StormParam param) throws VisADException {
+
+        List<StormTrackPoint> stps = getRealTrackPoints(track, param);
+        int                   size          = stps.size();
+        int                   numberOfPoint = size * 2 + 100;
+        List<StormTrackPoint> conePointsLeft =
+            new ArrayList<StormTrackPoint>();
+        List<StormTrackPoint> conePointsRight =
+            new ArrayList<StormTrackPoint>();
+
+        StormTrackPoint stp1 = stps.get(0);
+        conePointsRight.add(stp1);  // first point  & last point
+        conePointsLeft.add(stp1);
+        StormTrackPoint stp2 = stps.get(1);
+        StormTrackPoint stp3 = stps.get(2);
+        int             nn   = 3;
+        // first point to circle
+        List<StormTrackPoint> p2c = getPointToCircleTangencyPointA(stp1,
+                                        stp2, stp3, param, true);
+        while (p2c == null) {  // need to find the first point with param value
+            stp2 = stp3;
+            if (nn < size) {
+                stp3 = stps.get(nn);
+            } else {
+                stp3 = null;
+             //   return null;
+            }
+            p2c = getPointToCircleTangencyPointA(stp1, stp2, stp3, param,
+                    true);
+            nn++;
+            if( nn >= size) break;
+        }
+        if (p2c != null) {
+            conePointsRight.addAll(p2c);
+            p2c = getPointToCircleTangencyPointA(stp1, stp2, stp3, param,
+                    false);
+            conePointsLeft.addAll(p2c);
+        }
+
+        // circle  to circle 1 to n
+        stp1 = stp2;
+        stp2 = stp3;
+        for (int i = nn; i < size; i++) {
+            stp3 = stps.get(i);
+            //right point
+            p2c = getCircleToCircleTangencyPointA(stp1, stp2, stp3, param,
+                    true);
+            if (p2c != null) {
+                conePointsRight.addAll(p2c);
+                //left point
+                p2c = getCircleToCircleTangencyPointA(stp1, stp2, stp3,
+                        param, false);
+                conePointsLeft.addAll(p2c);
+                stp1 = stp2;   // update the first point only after the valid second point
+            }
+
+            stp2 = stp3;
+        }
+        // last circle
+        stp3 = null;
+        p2c  = getCircleToCircleTangencyPointA(stp1, stp2, stp3, param, true);
+        if (p2c != null) {
+            conePointsRight.addAll(p2c);
+            //left point
+            p2c = getCircleToCircleTangencyPointA(stp1, stp2, stp3, param,
+                    false);
+            conePointsLeft.addAll(p2c);
+            stp1 = stp2;
+        }
+
+
+        // end point half circle take 11 points
+        StormTrackPoint last = stp2;
+        if (last == null) {
+            last = stp1;
+        }
+        if (last == null) {
+            return null;
+        }
+        EarthLocation lastEl = last.getLocation();
+        StormTrackPoint endSTP = conePointsRight.get(conePointsRight.size()
+                                     - 1);
+        /*   int             ii     = 0;
+           while ((endSTP == null) && (ii < (size - 2))) {
+               ii++;
+               last   = stps.get(size - 1 - ii);
+               lastEl = last.getLocation();
+               endSTP = conePointsRight.get(size - 1 - ii);
+           }
+
+           if ((endSTP == null) || (ii == (size - 2))) {
+               return null;
+           }
+        */
+        if (endSTP == null) {
+            return null;
+        }
+        EarthLocation endEl = endSTP.getLocation();
+
+        double        ang   = getCircleAngleRange(lastEl, endEl);
+
+        Real          r     = last.getAttribute(param);
+        StormTrackPoint[] halfCircle = getHalfCircleTrackPoint(lastEl, ang,
+                                           ((r != null)
+                                            ? r.getValue()
+                                            : 0), last.getTime());
+
+        for (int i = 0; i < 11; i++) {}
+        //merge three lists
+        List<StormTrackPoint> coneList = new ArrayList<StormTrackPoint>();
+        int                   s1       = conePointsRight.size();
+        for (int i = 0; i < s1; i++) {
+            if (conePointsRight.get(i) != null) {
+                coneList.add(conePointsRight.get(i));
+            }
+        }
+        for (int i = 0; i < 11; i++) {
+            coneList.add(halfCircle[i]);
+        }
+        int s2 = conePointsLeft.size();
+        for (int i = s2; i > 0; i--) {
+            if (conePointsLeft.get(i - 1) != null) {
+                coneList.add(conePointsLeft.get(i - 1));
+            }
+        }
+
+        return new StormTrack(track.getStormInfo(),
+                              new Way(getWay() + "_CONE"), coneList, null);
+
+
+    }
+
+    /**
+     * calculate the bearing of two storm track points
+     *
+     * @param sp1 _more_
+     * @param sp2 _more_
+     *
+     * @return _more_
+     */
+    public Bearing getStormPoinsBearing(StormTrackPoint sp1,
+                                        StormTrackPoint sp2) {
+        EarthLocation el1 = sp1.getLocation();
+        EarthLocation el2 = sp2.getLocation();
+        return Bearing.calculateBearing(el1.getLatitude().getValue(),
+                                        el1.getLongitude().getValue(),
+                                        el2.getLatitude().getValue(),
+                                        el2.getLongitude().getValue(), null);
+
+    }
+
+    /**
+     * get the tangency point to the circle of the second point  and the third point
+     * as its direction  of adding additional points
+     *
+     * @param sp1       outside point
+     * @param sp2       the center of the circle
+     * @param sp3 _more_
+     * @param param _more_
+     * @param right _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public List<StormTrackPoint> getPointToCircleTangencyPointA(
+            StormTrackPoint sp1, StormTrackPoint sp2, StormTrackPoint sp3,
+            StormParam param, boolean right) throws VisADException {
+
+        List<StormTrackPoint> trackPoints = new ArrayList<StormTrackPoint>();
+        if (sp3 == null) {
+            return getPointToCircleTangencyPointB(sp1, sp2, param, right);
+        }
+
+        EarthLocation el1 = sp1.getLocation();
+        EarthLocation el2 = sp2.getLocation();
+        EarthLocation el3 = sp3.getLocation();
+
+        Real          rl  = sp2.getAttribute(param);
+        double        r   = rl.getValue();
+
+        if (Float.isNaN((float) r) || (r == 0.0)) {
+            return null;
+        }
+
+        double  lat1  = el1.getLatitude().getValue();
+        double  lon1  = el1.getLongitude().getValue();
+
+        double  lat2  = el2.getLatitude().getValue();
+        double  lon2  = el2.getLongitude().getValue();
+
+        double  lat3  = el3.getLatitude().getValue();
+        double  lon3  = el3.getLongitude().getValue();
+
+
+        Bearing b     = Bearing.calculateBearing(lat1, lon1, lat2, lon2,
+                            null);
+        Bearing c     = Bearing.calculateBearing(lat2, lon2, lat3, lon3,
+                            null);
+        double  dist1 = b.getDistance();
+
+        if (dist1 < r) {  // first point is inside the circle
+            trackPoints.add(getPointToCircleTangencyPoint(sp1, sp2, param,
+                    right));
+            return trackPoints;
+        }
+
+
+        double af  = getCircleAngleRange(el1, el2);
+        double ddt = Math.abs(b.getAngle() - c.getAngle());
+        double bt  = getCircleTangencyAngle(el1, el2, r);
+
+        af = af * 180.0 / Math.PI;
+        bt = bt * 180.0 / Math.PI;
+        if (right) {
+            af = af - 90;
+        } else {
+            af = af + 90;
+        }
+        // change angle to azimuth
+        double az = af;
+        if ((af <= 90) && (af >= 0)) {
+            az = 90 - af;
+        } else if ((af > 90) && (af <= 180)) {
+            az = 360 + (90 - af);
+        } else if ((af < 0) && (af >= -180)) {
+            az = 90 - af;
+        } else if ((af > 180) && (af <= 360)) {
+            az = 450 - af;
+        } else if ((af < -180) && (af >= -360)) {
+            az = -270 - af;
+        }
+        if (right) {
+            az = az + bt;
+        } else {
+            az = az - bt;
+        }
+
+        if (ddt > 270) {
+            ddt = 360 - ddt;
+        } else if (ddt > 180) {
+            ddt = ddt - 180;
+        } else if (ddt > 90) {
+            ddt = ddt - 90;
+        }
+
+        double dt = bt;
+
+        if (right) {
+            if ((c.getAngle() < b.getAngle())
+                    && (Math.abs(b.getAngle() - c.getAngle()) < 90)) {
+                dt = bt + ddt;
+            } else if ((c.getAngle() > b.getAngle())
+                       && (Math.abs(b.getAngle() - c.getAngle()) > 180)) {
+                dt = bt + ddt;
+            } else {
+                dt = bt - ddt;
+            }
+        } else {
+            if ((c.getAngle() > b.getAngle())
+                    && (Math.abs(b.getAngle() - c.getAngle()) < 90)) {
+                dt = bt + ddt;
+            } else if ((c.getAngle() < b.getAngle())
+                       && (Math.abs(b.getAngle() - c.getAngle()) > 180)) {
+                dt = bt + ddt;
+            } else {
+                dt = bt - ddt;
+            }
+
+        }
+
+
+        int n = (int) dt / 5 + 1;
+        if (n <= 0) {
+            n = 1;
+        }
+        double dtt = dt / n;
+        if (dtt < 0) {
+            dtt = 0;
+            n   = 1;
+        }
+        for (int i = 0; i < n; i++) {
+
+            LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, az, r, null);
+            //add more points along the circle
+
+            EarthLocation el = new EarthLocationLite(lp1.getLatitude(),
+                                   lp1.getLongitude(), 0);
+            trackPoints.add(new StormTrackPoint(el, sp1.getTime(), 0, null));
+            if (right) {
+                az = az - dtt;
+            } else {
+                az = az + dtt;
+            }
+        }
+
+        return trackPoints;
+    }
+
+    /**
+     * get the tangency point to the circle of the second point
+     *
+     * @param sp1 _more_
+     * @param sp2 _more_
+     * @param param _more_
+     * @param right _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public List<StormTrackPoint> getPointToCircleTangencyPointB(
+            StormTrackPoint sp1, StormTrackPoint sp2, StormParam param,
+            boolean right) throws VisADException {
+
+        List<StormTrackPoint> trackPoints = new ArrayList<StormTrackPoint>();
+
+        if (sp2 == null) {
+            return null;
+        }
+        EarthLocation el1 = sp1.getLocation();
+        EarthLocation el2 = sp2.getLocation();
+
+
+        Real          rl  = sp2.getAttribute(param);
+        double        r   = rl.getValue();
+
+        if (Float.isNaN((float) r) || (r == 0.0)) {
+            return null;
+        }
+
+        double  lat1  = el1.getLatitude().getValue();
+        double  lon1  = el1.getLongitude().getValue();
+
+        double  lat2  = el2.getLatitude().getValue();
+        double  lon2  = el2.getLongitude().getValue();
+
+
+
+
+        Bearing b     = Bearing.calculateBearing(lat1, lon1, lat2, lon2,
+                            null);
+        double  dist1 = b.getDistance();
+
+        if (dist1 < r) {  // first point is inside the circle
+            trackPoints.add(getPointToCircleTangencyPoint(sp1, sp2, param,
+                    right));
+            return trackPoints;
+        }
+
+
+        double af = getCircleAngleRange(el1, el2);
+        double bt = getCircleTangencyAngle(el1, el2, r);
+
+        af = af * 180.0 / Math.PI;
+        bt = bt * 180.0 / Math.PI;
+        if (right) {
+            af = af - 90;
+        } else {
+            af = af + 90;
+        }
+        // change angle to azimuth
+        double az = af;
+        if ((af <= 90) && (af >= 0)) {
+            az = 90 - af;
+        } else if ((af > 90) && (af <= 180)) {
+            az = 360 + (90 - af);
+        } else if ((af < 0) && (af >= -180)) {
+            az = 90 - af;
+        } else if ((af > 180) && (af <= 360)) {
+            az = 450 - af;
+        } else if ((af < -180) && (af >= -360)) {
+            az = -270 - af;
+        }
+        if (right) {
+            az = az + bt;
+        } else {
+            az = az - bt;
+        }
+
+
+        double dt  = bt;
+
+        int    n   = (int) dt / 5 + 1;
+        double dtt = dt / n;
+        for (int i = 0; i < n; i++) {
+
+            LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, az, r, null);
+            //add more points along the circle
+
+            EarthLocation el = new EarthLocationLite(lp1.getLatitude(),
+                                   lp1.getLongitude(), 0);
+            trackPoints.add(new StormTrackPoint(el, sp1.getTime(), 0, null));
+            if (right) {
+                az = az - dtt;
+            } else {
+                az = az + dtt;
+            }
+        }
+
+        return trackPoints;
+    }
+
+    /**
+     * get the approximate tangency points of circle to the circle
+     *
+     * @param sp1       outside point
+     * @param sp2       the center of the circle
+     * @param sp3 _more_
+     * @param param _more_
+     * @param right _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public List<StormTrackPoint> getCircleToCircleTangencyPointA(
+            StormTrackPoint sp1, StormTrackPoint sp2, StormTrackPoint sp3,
+            StormParam param, boolean right) throws VisADException {
+
+        List<StormTrackPoint> trackPoints = new ArrayList<StormTrackPoint>();
+        if (sp3 == null) {
+            if (sp2 == null) {
+                return null;
+            }
+            trackPoints.add(getPointToCircleTangencyPoint(sp1, sp2, param,
+                    right));
+            return trackPoints;
+        }
+
+        EarthLocation el1 = sp1.getLocation();
+        EarthLocation el2 = sp2.getLocation();
+        EarthLocation el3 = sp3.getLocation();
+
+        Real          rl  = sp2.getAttribute(param);
+        double        r   = rl.getValue();
+
+        if (Float.isNaN((float) r) || (r == 0.0)) {
+            return null;
+        }
+
+        double  lat1  = el1.getLatitude().getValue();
+        double  lon1  = el1.getLongitude().getValue();
+
+        double  lat2  = el2.getLatitude().getValue();
+        double  lon2  = el2.getLongitude().getValue();
+
+        double  lat3  = el3.getLatitude().getValue();
+        double  lon3  = el3.getLongitude().getValue();
+
+
+        Bearing b     = Bearing.calculateBearing(lat1, lon1, lat2, lon2,
+                            null);
+        double  dist1 = b.getDistance();
+        Bearing c     = Bearing.calculateBearing(lat2, lon2, lat3, lon3,
+                            null);
+        double  x     = Math.abs(c.getAngle() - b.getAngle());
+
+        if (right) {
+            if ((c.getAngle() > b.getAngle()) || (x > 180)) {
+                trackPoints.add(getPointToCircleTangencyPoint(sp1, sp2,
+                        param, right));
+                return trackPoints;
+            }
+        }
+
+        if ( !right) {
+            if ((c.getAngle() < b.getAngle()) && (x < 90)) {
+                trackPoints.add(getPointToCircleTangencyPoint(sp1, sp2,
+                        param, right));
+                return trackPoints;
+            }
+        }
+        double af = getCircleAngleRange(el1, el2);
+        double dt = 0;  //= Math.abs(b.getAngle() - c.getAngle());
+
+        if (x > 270) {
+            dt = 360 - x;
+        } else if (x > 180) {
+            dt = x - 180;
+        } else if (x > 90) {
+            dt = x - 90;
+        } else {
+            dt = x;
+        }
+
+        af = af * 180.0 / Math.PI;
+        if (right) {
+            af = af - 90;
+        } else {
+            af = af + 90;
+        }
+        // change angle to azimuth
+        double az = af;
+        if ((af <= 90) && (af >= 0)) {
+            az = 90 - af;
+        } else if ((af > 90) && (af <= 180)) {
+            az = 360 + (90 - af);
+        } else if ((af < 0) && (af >= -180)) {
+            az = 90 - af;
+        } else if ((af > 180) && (af <= 360)) {
+            az = 450 - af;
+        } else if ((af < -180) && (af >= -360)) {
+            az = -270 - af;
+        }
+
+        int    n   = (int) dt / 5 + 1;
+        double dtt = dt / n;
+
+        for (int i = 0; i < n; i++) {
+
+            LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, az, r, null);
+            //add more points along the circle
+
+            EarthLocation el = new EarthLocationLite(lp1.getLatitude(),
+                                   lp1.getLongitude(), 0);
+            trackPoints.add(new StormTrackPoint(el, sp1.getTime(), 0, null));
+            if (right) {
+                az = az - dtt;
+            } else {
+                az = az + dtt;
+            }
+        }
+
+        return trackPoints;
+    }
+
+    /**
+     * get the 90 degree point to the line of the two points
      *
      * @param sp1 _more_
      * @param sp2 _more_
@@ -1800,41 +2323,24 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint getPointToCircleTangencyPoint(StormTrackPoint sp1,
-            StormTrackPoint sp2, StormParam param, boolean right)
-            throws VisADException {
+            StormTrackPoint sp2, StormParam param,
+            boolean right) throws VisADException {
 
-        int           sign = 1;
-        EarthLocation el1  = sp1.getLocation();
-        EarthLocation el2  = sp2.getLocation();
 
-        Real          rl   = sp2.getAttribute(param);
-        double        r    = rl.getValue();
+        EarthLocation el1 = sp1.getLocation();
+        EarthLocation el2 = sp2.getLocation();
+
+        Real          rl  = sp2.getAttribute(param);
+        double        r   = rl.getValue();
 
         if (Float.isNaN((float) r) || (r == 0.0)) {
             return null;
         }
 
 
-        double           lat1 = el1.getLatitude().getValue();
-        double           lon1 = el1.getLongitude().getValue();
-        LatLonPointImpl  p1   = new LatLonPointImpl(lat1, lon1);
+        double lat2 = el2.getLatitude().getValue();
+        double lon2 = el2.getLongitude().getValue();
 
-        double           lat2 = el2.getLatitude().getValue();
-        double           lon2 = el2.getLongitude().getValue();
-        LatLonPointImpl  p2   = new LatLonPointImpl(lat2, lon2);
-
-        LatLonProjection pj1  = new LatLonProjection();
-        //ProjectionPoint  pp1  = pj1.latLonToProj(p1);
-        LatLonProjection pj2 = new LatLonProjection();
-        //ProjectionPoint  pp2  = pj2.latLonToProj(p2);
-
-        //Bearing b = Bearing.calculateBearing(lat1, lon1, lat2, lon2, null);
-        //double           dist = b.getDistance();
-
-
-        if ( !right) {
-            sign = -1;
-        }
 
         double af = getCircleAngleRange(el1, el2);
         af = af * 180.0 / Math.PI;
@@ -1859,22 +2365,38 @@ public class WayDisplayState {
 
         LatLonPointImpl lp1 = Bearing.findPoint(lat2, lon2, af, r, null);
 
-        /*        double x = pp2.getX() + sign * r * (pp2.getY() - pp1.getY()) / dist;
-                double y = pp2.getY() + sign * r * (pp1.getX() - pp2.getX()) / dist;
-
-
-                ProjectionPoint  pp   = new ProjectionPointImpl(x, y);
-                LatLonPointImpl  lp   = new LatLonPointImpl();
-                LatLonProjection e3   = new LatLonProjection();
-                LatLonPoint      lp11 = e3.projToLatLon(pp, lp);
-
-                EarthLocation el = new EarthLocationLite(lp11.getLatitude(),
-                                       lp11.getLongitude(), 0);
-                                       */
         EarthLocation el = new EarthLocationLite(lp1.getLatitude(),
                                lp1.getLongitude(), 0);
         StormTrackPoint sp = new StormTrackPoint(el, sp1.getTime(), 0, null);
         return sp;
+    }
+
+    /**
+     * _more_
+     *
+     * @param c _more_
+     * @param d _more_
+     * @param r _more_
+     *
+     * @return _more_
+     */
+    public double getCircleTangencyAngle(EarthLocation c, EarthLocation d,
+                                         double r) {
+
+
+        double  lat1 = c.getLatitude().getValue();
+        double  lon1 = c.getLongitude().getValue();
+
+        double  lat2 = d.getLatitude().getValue();
+        double  lon2 = d.getLongitude().getValue();
+
+
+        Bearing b    = Bearing.calculateBearing(lat1, lon1, lat2, lon2, null);
+        double  dist = b.getDistance();
+        double  a    = Math.asin(r / dist);
+
+        return a;
+
     }
 
     /**
@@ -1921,8 +2443,7 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint[] getHalfCircleTrackPoint(EarthLocation c,
-            double angle, double r, DateTime dt)
-            throws VisADException {
+            double angle, double r, DateTime dt) throws VisADException {
         // return 10 track point
         int               size  = 11;
 
@@ -1974,8 +2495,7 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint[] getHalfCircleTrackPointOld(EarthLocation c,
-            double angle, double r, DateTime dt)
-            throws VisADException {
+            double angle, double r, DateTime dt) throws VisADException {
         // return 10 track point
         int               size  = 11;
 
