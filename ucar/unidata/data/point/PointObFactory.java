@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -41,12 +39,18 @@ import ucar.ma2.StructureMembers;
 import ucar.nc2.Attribute;
 
 import ucar.nc2.VariableSimpleIF;
+import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
-import ucar.nc2.dt.Station;
 import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.*;
+import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.FeatureDatasetFactory;
+import ucar.nc2.ft.PointFeature;
+import ucar.nc2.ft.PointFeatureCollection;
+import ucar.nc2.ft.PointFeatureIterator;
+import ucar.nc2.ft.point.*;
 
 import ucar.nc2.ft.point.writer.CFPointObWriter;
 import ucar.nc2.ft.point.writer.PointObVar;
@@ -59,8 +63,8 @@ import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.Station;
 
-import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.JobManager;
 
 import ucar.unidata.util.LogUtil;
@@ -1085,7 +1089,7 @@ public class PointObFactory {
         //        Trace.call1("loop-2");
         while (dataIterator.hasNext()) {
             PointObsDatatype po = (PointObsDatatype) dataIterator.next();
-            ucar.nc2.dt.EarthLocation el = po.getLocation();
+            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
             if (el == null) {
                 continue;
             }
@@ -1112,8 +1116,290 @@ public class PointObFactory {
         int size = pos.size();
 
         for (int i = 0; i < size; i++) {
-            PointObsDatatype          po = (PointObsDatatype) pos.get(i);
-            ucar.nc2.dt.EarthLocation el = po.getLocation();
+            PointObsDatatype po = (PointObsDatatype) pos.get(i);
+            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+            elt = new EarthLocationLite(lat.cloneButValue(el.getLatitude()),
+                                        lon.cloneButValue(el.getLongitude()),
+                                        alt.cloneButValue(el.getAltitude()));
+            double[] realArray   = new double[numReals];
+            String[] stringArray = ((numStrings == 0)
+                                    ? null
+                                    : new String[numStrings]);
+
+            // make the VisAD data object
+            StructureData structure = po.getData();
+            int           stringCnt = 0;
+            int           realCnt   = 0;
+            if (needToAddStationId) {
+                StationObsDatatype sod = (StationObsDatatype) po;
+                stringArray[stringCnt++] = sod.getStation().getName();
+            }
+            for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
+                member = structure.findMember((String) shortNames[varIdx]);
+                if ( !isVarNumeric[varIdx]) {
+                    stringArray[stringCnt++] =
+                        structure.getScalarString(member);
+                } else {
+                    realArray[realCnt++] =
+                        structure.convertScalarFloat(member);
+                }
+            }
+
+
+            Tuple tuple = (allReals
+                           ? (Tuple) new DoubleTuple(
+                               (RealTupleType) allTupleType, realArray,
+                               allUnits)
+                           : new DoubleStringTuple(allTupleType, realArray,
+                               stringArray, allUnits));
+
+
+            if (finalTT == null) {
+                pot = new PointObTuple(elt, (DateTime) times.get(i), tuple);
+                finalTT = Tuple.buildTupleType(pot.getComponents());
+            } else {
+                pot = new PointObTuple(elt, (DateTime) times.get(i), tuple,
+                                       finalTT, false);
+
+            }
+            obs[obIdx++] = pot;
+            if (obIdx % NUM == 0) {
+                if ( !JobManager.getManager().canContinue(loadId)) {
+                    LogUtil.message("");
+                    return null;
+                }
+                if (llr == null) {
+                    LogUtil.message("Read " + obIdx + "/" + total
+                                    + " observations");
+                } else {
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+            }
+        }
+
+        //        Trace.call2("loop-3");
+
+
+        LogUtil.message("Read " + obIdx + " observations");
+
+
+        LogUtil.message("Done processing point data");
+
+        Integer1DSet indexSet =
+            new Integer1DSet(RealType.getRealType("index"), obs.length);
+        FieldImpl retField =
+            new FieldImpl(
+                new FunctionType(
+                    ((SetType) indexSet.getType()).getDomain(),
+                    obs[0].getType()), indexSet);
+        retField.setSamples(obs, false, false);
+        return retField;
+    }
+
+    /**
+     * Make point obs
+     *
+     * @param input the data set
+     * @param binRoundTo bin round to
+     * @param binWidth time bin size
+     * @param llr bounding box
+     * @param sample If true then just sample the data, i.e., read the first ob
+     *
+     * @return The field
+     *
+     * @throws Exception On badness
+     */
+    public static FieldImpl makePointObs(PointDatasetImpl input,
+                                         double binRoundTo, double binWidth,
+                                         LatLonRect llr, boolean sample)
+            throws Exception {
+
+
+
+        Object  loadId = JobManager.getManager().startLoad("PointObFactory");
+
+        List    actualVariables    = input.getDataVariables();
+        int     numVars            = actualVariables.size();
+
+        boolean needToAddStationId = false;
+        String  stationFieldName   = null;
+
+        //Is this station data
+        if (input instanceof StationObsDataset) {
+            //TODO: Get the variable name used for the station id:
+            //stationFieldName = ((StationObsDataset)input).getStationVarName();
+
+            //If it is we need to see if there is already a station id in the data itself
+            needToAddStationId = true;
+
+            /**
+             * For now don't do this...
+             * for (Iterator iter = actualVariables.iterator(); needToAddStationId&&iter.hasNext(); ) {
+             *   VariableSimpleIF var = (VariableSimpleIF) iter.next();
+             *   String name = var.getShortName();
+             *   if (Misc.equals(name,PointOb.PARAM_ID) || Misc.equals(name,PointOb.PARAM_IDN)) {
+             *       needToAddStationId = false;
+             *   }
+             *   String canonical = DataAlias.aliasToCanonical(name);
+             *   if (Misc.equals(canonical,PointOb.PARAM_ID) || Misc.equals(canonical,PointOb.PARAM_IDN)) {
+             *       System.err.println ("Don't need to add id. Already have it in the data:" + name);
+             *       needToAddStationId = false;
+             *   }
+             * }
+             */
+        }
+
+
+
+        int varIdxBase = 0;
+        if (needToAddStationId) {
+            numVars++;
+            varIdxBase = 1;
+        }
+
+        List shortNamesList = new ArrayList();
+
+        log_.debug("number of data variables = " + numVars);
+        boolean[]    isVarNumeric = new boolean[numVars];
+        boolean      allReals     = true;
+        ScalarType[] types        = new ScalarType[numVars];
+        Unit[]       varUnits     = new Unit[numVars];
+
+
+
+        List         numericTypes = new ArrayList();
+        List         numericUnits = new ArrayList();
+        List         stringTypes  = new ArrayList();
+
+        //If we really have a StationObsDataset then we need to add in the station id
+        //into the data fields 
+        if (needToAddStationId) {
+            isVarNumeric[0] = false;
+            if (stationFieldName == null) {
+                stationFieldName = PointOb.PARAM_ID;
+            }
+            shortNamesList.add(stationFieldName);
+            types[0] = TextType.getTextType(stationFieldName);
+            stringTypes.add(types[0]);
+            allReals = false;
+        }
+
+
+        //        Trace.call1("loop-1");
+        int varIdx = varIdxBase;
+        for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
+            VariableSimpleIF var = (VariableSimpleIF) iter.next();
+            shortNamesList.add(var.getShortName());
+            isVarNumeric[varIdx] = !((var.getDataType() == DataType.STRING)
+                                     || (var.getDataType() == DataType.CHAR));
+            if ( !isVarNumeric[varIdx]) {
+                allReals = false;
+            }
+
+            DataChoice.addCurrentName(new TwoFacedObject("Point Data" + ">"
+                    + var.getShortName(), var.getShortName()));
+
+            // now make types
+            if (isVarNumeric[varIdx]) {  // RealType
+                Unit unit = DataUtil.parseUnit(var.getUnitsString());
+                types[varIdx] = DataUtil.makeRealType(var.getShortName(),
+                        unit);
+                varUnits[varIdx] = unit;
+                numericTypes.add(types[varIdx]);
+                numericUnits.add(unit);
+            } else {
+                types[varIdx]    = TextType.getTextType(var.getShortName());
+                varUnits[varIdx] = null;
+                stringTypes.add(types[varIdx]);
+            }
+            varIdx++;
+        }
+        //        Trace.call2("loop-1");
+
+
+        String[] shortNames = (String[]) shortNamesList.toArray(
+                                  new String[shortNamesList.size()]);
+
+
+        int    numReals   = numericTypes.size();
+        int    numStrings = stringTypes.size();
+        Data[] firstTuple = null;
+        int    obIdx      = 0;
+        List<FeatureCollection> collectionList =
+            input.getPointFeatureCollectionList();
+        if (collectionList.size() > 1) {
+            throw new IllegalArgumentException(
+                "Can't handle point data with multiple collections");
+        }
+        PointFeatureCollection collection =
+            (PointFeatureCollection) collectionList.get(0);
+        //System.out.println("number of obs = " + collection.size());
+        if (llr != null) {
+            //System.out.println("subsetting to: " + llr);
+            collection = collection.subset(llr, null);
+            //System.out.println("new number of obs = " + collection.size());
+        }
+        //        System.err.println("#obs:" + total +" #vars:" +  numVars);
+        int total = collection.size();
+        PointFeatureIterator dataIterator =
+            collection.getPointFeatureIterator(16384);
+        int       NUM          = 500;
+        TupleType allTupleType = (allReals
+                                  ? new RealTupleType(
+                                      (RealType[]) numericTypes.toArray(
+                                          new RealType[numericTypes.size()]))
+                                  : DoubleStringTuple.makeTupleType(
+                                      numericTypes, stringTypes));
+        Unit[] allUnits =
+            (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+
+
+        Real              lat      = new Real(RealType.Latitude, 40);
+        Real              lon      = new Real(RealType.Longitude, -100);
+        Real              alt      = new Real(RealType.Altitude, 0);
+        DateTime          dateTime = null;
+        EarthLocationLite elt;
+        TupleType         finalTT = null;
+        PointObTuple      pot     = null;
+        List              pos     = new ArrayList(100000);
+        List              times   = new ArrayList(1000000);
+
+        //First do spatial subset and collect times
+        //First collect times
+        //        Trace.call1("loop-2");
+        while (dataIterator.hasNext()) {
+            PointFeature po = (PointFeature) dataIterator.next();
+            /*
+            ucar.nc2.ft.EarthLocation el = po.getLocation();
+            if (el == null) {
+                continue;
+            }
+            if ((llr != null)
+                    && !llr.contains(el.getLatitude(), el.getLongitude())) {
+                continue;
+            }
+            */
+            pos.add(po);
+            times.add(new DateTime(po.getNominalTimeAsDate()));
+            if (sample) {
+                break;
+            }
+        }
+        //        Trace.call2("loop-2");
+
+
+        //Bin times
+        times = binTimes(times, binRoundTo, binWidth);
+
+        StructureMembers.Member member;
+        PointOb[]               obs = new PointOb[pos.size()];
+        //Make the obs
+        //        Trace.call1("loop-3");
+        int size = pos.size();
+
+        for (int i = 0; i < size; i++) {
+            PointFeature                      po = (PointFeature) pos.get(i);
+            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
             elt = new EarthLocationLite(lat.cloneButValue(el.getLatitude()),
                                         lon.cloneButValue(el.getLongitude()),
                                         alt.cloneButValue(el.getAltitude()));
@@ -1837,5 +2123,4 @@ public class PointObFactory {
 
 
 }
-
 

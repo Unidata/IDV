@@ -36,10 +36,10 @@ import java.util.Hashtable;
 
 
 /**
- * A data source for netCDF point data
+ * A data source for netCDF METAR data
  *
  * @author Don Murray
- * @version $Revision: 1.19 $ $Date: 2006/12/01 20:42:34 $
+ * @deprecated  use NetcdfPointDataSource
  */
 public class NetcdfMetarDataSource extends NetcdfPointDataSource {
 
