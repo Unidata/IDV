@@ -2251,6 +2251,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return false;
     }
 
+
+
     /**
      * Get the intial BooleanProperties
      *
@@ -4479,6 +4481,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    private Object MASTER_MUTEX = new Object();
 
     /**
      * Get the {@link ucar.visad.display.DisplayMaster}.
@@ -4488,44 +4491,48 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public DisplayMaster getMaster() {
         if (master == null) {
             try {
-                // might need these for the display initialization
-                if (initProperties != null) {
-                    String tmp = initProperties;
-                    initProperties = null;
-                    parseProperties(tmp);
-                }
-                master = doMakeDisplayMaster();
-                DisplayRenderer renderer =
-                    master.getDisplay().getDisplayRenderer();
-                if (renderer instanceof DisplayRendererJ3D) {
-                    initLights((DisplayRendererJ3D) renderer);
-                }
+                //we want to synchronize here so we don't make 2 (or more) versions of the displaymaster
+                synchronized(MASTER_MUTEX) {
+                    // might need these for the display initialization
+                    if (initProperties != null) {
+                        String tmp = initProperties;
+                        initProperties = null;
+                        parseProperties(tmp);
+                    }
+                    //Use a local tmpMaster variable so we don't set the master member before we're ready to
+                    DisplayMaster tmpMaster = doMakeDisplayMaster();
+                    DisplayRenderer renderer =
+                        tmpMaster.getDisplay().getDisplayRenderer();
+                    if (renderer instanceof DisplayRendererJ3D) {
+                        initLights((DisplayRendererJ3D) renderer);
+                    }
 
-                if ( !getIdv().getInteractiveMode()) {
-                    master.setDisplayInactive();
-                } else {
-                    master.setMouseFunctions(
-                        getIdv().getPreferenceManager().getMouseMap());
-                    master.setKeyboardEventMap(
-                        getIdv().getPreferenceManager().getKeyboardMap());
-                    master.setWheelEventMap(
-                        getIdv().getPreferenceManager().getWheelMap());
-                }
-                GraphicsModeControl gmc =
-                    master.getDisplay().getGraphicsModeControl();
-                gmc.setCacheAppearances(true);
-                gmc.setMergeGeometries(true);
-                setDisplayMaster(master);
+                    if ( !getIdv().getInteractiveMode()) {
+                        tmpMaster.setDisplayInactive();
+                    } else {
+                        tmpMaster.setMouseFunctions(
+                                                    getIdv().getPreferenceManager().getMouseMap());
+                        tmpMaster.setKeyboardEventMap(
+                                                      getIdv().getPreferenceManager().getKeyboardMap());
+                        tmpMaster.setWheelEventMap(
+                                                   getIdv().getPreferenceManager().getWheelMap());
+                    }
+                    GraphicsModeControl gmc =
+                        tmpMaster.getDisplay().getGraphicsModeControl();
+                    gmc.setCacheAppearances(true);
+                    gmc.setMergeGeometries(true);
+                    setDisplayMaster(tmpMaster);
 
-                if (isInteractive()) {
-                    Trace.call1("ViewManager.getMaster master.draw");
-                    master.draw();
-                    Trace.call2("ViewManager.getMaster master.draw");
-                    Trace.call1("ViewManager.getMaster updateDisplayList");
-                    updateDisplayList();
-                    Trace.call2("ViewManager.getMaster updateDisplayList");
+                    if (isInteractive()) {
+                        Trace.call1("ViewManager.getMaster master.draw");
+                        tmpMaster.draw();
+                        Trace.call2("ViewManager.getMaster master.draw");
+                        Trace.call1("ViewManager.getMaster updateDisplayList");
+                        updateDisplayList();
+                        Trace.call2("ViewManager.getMaster updateDisplayList");
+                    }
+                    master = tmpMaster;
                 }
-
             } catch (Exception exc) {
                 logException("Creating display master", exc);
             }
@@ -4579,6 +4586,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param master The display master
      */
     protected void setDisplayMaster(DisplayMaster master) {
+        if(this.master!=null) {
+            //TODO: How should we handle this?
+            //throw new IllegalArgumentException ("Already have one display master set");
+        }
         this.master = master;
         DisplayImpl display = (DisplayImpl) master.getDisplay();
         display.addDisplayListener(this);
