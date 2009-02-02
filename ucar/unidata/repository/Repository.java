@@ -1561,7 +1561,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             protected void getEntryLinks(Request request, State state,
                                          List<Link> links)
                     throws Exception {
-                if(request.getUser().getAnonymous()) return;
+                if(request.getUser()==null || request.getUser().getAnonymous()) return;
                 if (!state.isDummyGroup()) {
                     return;
                 }
@@ -1626,6 +1626,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         long   t1 = System.currentTimeMillis();
         Result result;
 
+        //        System.err.println("request:" + request);
         if (debug) {
             debug("user:" + request.getUser() + " -- " + request.toString());
         }
@@ -1790,6 +1791,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         ApiMethod apiMethod = findMethod(request);
         //        System.err.println("Request:" + request);
         if (apiMethod == null) {
+            //            System.err.println("no api method");
             return getHtdocsFile(request);
         }
 

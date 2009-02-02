@@ -175,10 +175,13 @@ public class CatalogHarvester extends Harvester {
             if (root == null) {
                 System.err.println("Could not load catalog:" + url);
             } else {
+                //                System.err.println("loaded:" + url);
                 Node child = XmlUtil.findChild(root,
                                  CatalogOutputHandler.TAG_DATASET);
-                if (child != null) {
+                if (false && child != null) {
                     recurseCatalog((Element) child, parent, url, 0, depth);
+                } else {
+                    recurseCatalog((Element) root, parent, url, 0, depth);
                 }
             }
             return true;
@@ -413,6 +416,7 @@ public class CatalogHarvester extends Harvester {
                         url = IOUtil.getFileRoot(catalogUrlPath) + "/" + url;
                     }
                 }
+                //                System.err.println("url:" + url);
                 if ( !importCatalog(url, group, recurseDepth + 1)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);

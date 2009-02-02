@@ -691,7 +691,7 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().iconUrl(ICON_COMMENTS),
                 msg("Add/View Comments")));
 
-        if ( !request.getUser().getAnonymous()) {
+        if (request.getUser()!=null &&  !request.getUser().getAnonymous()) {
             links.add(
                 new Link(
                     request.entryUrl(

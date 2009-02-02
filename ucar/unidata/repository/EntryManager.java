@@ -1446,24 +1446,25 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryGet(Request request) throws Exception {
-        //        System.err.println ("entry get:" + request);
+        System.err.println ("entry get:" + request);
         String entryId = (String) request.getId((String) null);
 
         if (entryId == null) {
-            //            System.err.println ("entry get -1 ");
+            System.err.println ("entry get -1 ");
             throw new IllegalArgumentException("No " + ARG_ENTRYID
                     + " given");
         }
         Entry entry = getEntry(request, entryId);
-        //            System.err.println ("entry get -2 ");
+        System.err.println ("entry get -2 ");
         if (entry == null) {
+            System.err.println ("entry get -3 ");
             throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry with id:" + entryId);
         }
 
         if ( !entry.getResource().isUrl()) {
             if ( !getAccessManager().canDownload(request, entry)) {
-                //            System.err.println ("entry get -3 ");
+                System.err.println ("entry get -4 ");
                 throw new IllegalArgumentException(
                     "Cannot download file with id:" + entryId);
             }
@@ -2881,6 +2882,7 @@ return new Result(title, sb);
             throws Exception {
         if (request == null) {
             request = new Request(getRepository(), "", new Hashtable());
+            request.setUser(getUserManager().getAnonymousUser());
         }
 
         List breadcrumbs = new ArrayList();
@@ -2924,7 +2926,6 @@ return new Result(title, sb);
             nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
-
             String img  = getRepository().makePopupLink(HtmlUtil.img(getIconUrl(request, entry)),links, true);
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar =getEntryToolbar(request, entry,true); 

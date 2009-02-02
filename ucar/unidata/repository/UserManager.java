@@ -78,7 +78,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final OutputType OUTPUT_CART = new OutputType("Add to Cart",
                                                      "user.cart",
-                                                     OutputType.TYPE_NONHTML,"",ICON_CART);
+                                                     OutputType.TYPE_NONHTML,"",ICON_CART_ADD);
 
     /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";

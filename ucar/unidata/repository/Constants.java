@@ -113,6 +113,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CART = "ramadda.icon.cart";
 
+    public static final String ICON_CART_ADD = "ramadda.icon.cart.add";
+
     /** _more_ */
     public static final String ICON_CLOUD = "ramadda.icon.cloud";
 

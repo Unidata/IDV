@@ -584,11 +584,7 @@ public class ChatOutputHandler extends OutputHandler {
         chatAppletTemplate = chatAppletTemplate.replace("${root}",
                 getRepository().getUrlBase());
         if(entry.getResource().isImage()) {
-            String url =
-                HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                             + entry.getName(), ARG_ENTRYID,
-                             entry.getId());
-
+            String url = getEntryManager().getEntryResourceUrl(request, entry);
             params += HtmlUtil.open("PARAM", HtmlUtil.attrs("NAME","whiteboard.bgimage", "VALUE",
                                                             url));
 

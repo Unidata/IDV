@@ -258,6 +258,8 @@ public class AccessManager extends RepositoryManager {
         }
         //        System.err.println ("cando:" + user + " " + user.getAdmin());
         //The admin can do anything
+        if(user == null) return false;
+
         if (user.getAdmin()) {
             return true;
         }
