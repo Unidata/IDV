@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -85,17 +87,6 @@ public class RadarSweepControl extends ColorPlanViewControl {
      *  Do we request 3d or 2d data.
      */
     private boolean use3D = true;
-
-    /**
-     * the texture quality  (1= best, 10= moderate)
-     */
-    private int textureQuality = 10;
-
-    /**
-     * quality slider
-     */
-    private JSlider textureSlider = null;
-
 
     /**
      * Default constructor.
@@ -176,21 +167,6 @@ public class RadarSweepControl extends ColorPlanViewControl {
         return props;
     }
 
-    /**
-     * Method to create the particular <code>DisplayableData</code> that
-     * this this instance uses for data depictions.
-     * @return Contour2DDisplayable for this instance.
-     *
-     * @throws VisADException   VisAD error
-     * @throws RemoteException   RMI error
-     */
-    protected DisplayableData createPlanDisplay()
-            throws VisADException, RemoteException {
-        Grid2DDisplayable gridDisplay =
-            (Grid2DDisplayable) super.createPlanDisplay();
-        gridDisplay.setCurvedSize(textureQuality);
-        return gridDisplay;
-    }
 
     /**
      * If we have a volume then we'll add in an angles choosing combobox.
@@ -204,31 +180,10 @@ public class RadarSweepControl extends ColorPlanViewControl {
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
         controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("Quality:"),
-                                             doMakeTextureSlider()));
-        controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Station:"),
                                              stationLabel));
     }
 
-    /**
-     * Make a slider for the texture quality
-     *
-     * @return the slider
-     */
-    private JSlider doMakeTextureSlider() {
-        if (textureSlider == null) {
-            textureSlider = GuiUtils.makeSlider(1, 21, textureQuality, this,
-                    "setTextureQuality");
-            Hashtable labels = new Hashtable();
-            labels.put(new Integer(1), GuiUtils.lLabel("High"));
-            labels.put(new Integer(10), GuiUtils.cLabel("Medium"));
-            labels.put(new Integer(21), GuiUtils.rLabel("Low"));
-            textureSlider.setLabelTable(labels);
-            textureSlider.setPaintLabels(true);
-        }
-        return textureSlider;
-    }
 
     /**
      * We got a new angle or sweep tilt - from the user.
@@ -276,8 +231,8 @@ public class RadarSweepControl extends ColorPlanViewControl {
     }
 
     /**
-     * Overwrite base class method to determine if the display and gui should have a
-     * Z position.
+     * Overwrite base class method to determine if the display and
+     * gui should have a Z position.
      *
      * @return Should use z position
      */
@@ -408,25 +363,5 @@ public class RadarSweepControl extends ColorPlanViewControl {
         return "Use Radar Projection";
     }
 
-    /**
-     * Set the texture quality
-     *
-     * @param quality  1=high, &gt; 1 lower
-     */
-    public void setTextureQuality(int quality) {
-        textureQuality = quality;
-        if (getGridDisplay() != null) {
-            getGridDisplay().setCurvedSize(quality);
-        }
-    }
-
-    /**
-     * Get the texture quality
-     *
-     * @return the  texture quality
-     */
-    public int getTextureQuality() {
-        return textureQuality;
-    }
 }
 

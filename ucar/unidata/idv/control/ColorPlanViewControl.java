@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -69,7 +71,7 @@ public class ColorPlanViewControl extends PlanViewControl {
      */
     public ColorPlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
-                          | FLAG_SELECTRANGE);
+                          | FLAG_SELECTRANGE | FLAG_TEXTUREQUALITY);
     }
 
     /**
@@ -100,7 +102,21 @@ public class ColorPlanViewControl extends PlanViewControl {
         gridDisplay.setTextureEnable( !isSmoothed);
         addAttributedDisplayable(gridDisplay);
         gridDisplay.setUseRGBTypeForSelect(true);
+        gridDisplay.setCurvedSize(getTextureQuality());
         return gridDisplay;
+    }
+
+    /**
+     *  Use the value of the texture quality to set the value on the display
+     *
+     * @throws RemoteException  problem with Java RMI
+     * @throws VisADException   problem setting attribute on Displayable
+     */
+    protected void applyTextureQuality()
+            throws VisADException, RemoteException {
+        if (getGridDisplay() != null) {
+            getGridDisplay().setCurvedSize(getTextureQuality());
+        }
     }
 
     /**

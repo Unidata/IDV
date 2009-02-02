@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -51,13 +53,17 @@ import java.rmi.RemoteException;
  */
 public class ImagePlanViewControl extends PlanViewControl {
 
+    //  NB: For now, we don't subclass ColorPlanViewControl because we get
+    //  the DataRange widget from getControlWidgets.  Might want this in
+    //  the future.  It would be simpler if we wanted to include that.
+
     /**
      * Default constructor.  Sets the attribute flags used by
      * this particular <code>PlanViewControl</code>
      */
     public ImagePlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_ZPOSITION
-                          | FLAG_SKIPFACTOR);
+                          | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
     }
 
     /**
@@ -76,6 +82,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                                      ? datachoice.toString()
                                      : ""), true);
         gridDisplay.setTextureEnable(true);
+        gridDisplay.setCurvedSize(getTextureQuality());
         /* TODO: Find out why this causes redisplays
         if (BaseImageControl.EMPTY_IMAGE != null) {
             gridDisplay.loadData(BaseImageControl.EMPTY_IMAGE);
@@ -84,6 +91,19 @@ public class ImagePlanViewControl extends PlanViewControl {
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
         return gridDisplay;
+    }
+
+    /**
+     *  Use the value of the texture quality to set the value on the display
+     *
+     * @throws RemoteException  problem with Java RMI
+     * @throws VisADException   problem setting attribute on Displayable
+     */
+    protected void applyTextureQuality()
+            throws VisADException, RemoteException {
+        if (getGridDisplay() != null) {
+            getGridDisplay().setCurvedSize(getTextureQuality());
+        }
     }
 
     /**
@@ -120,6 +140,16 @@ public class ImagePlanViewControl extends PlanViewControl {
         return colorTable;
     }
 
+    /**
+     * Return the color display used by this object.  A wrapper
+     * around {@link #getPlanDisplay()}.
+     * @return this instance's Grid2Ddisplayable.
+     * @see #createPlanDisplay()
+     */
+    Grid2DDisplayable getGridDisplay() {
+        return (Grid2DDisplayable) getPlanDisplay();
+    }
+
 
     /**
      * Get whether this display should allow smoothing
@@ -131,7 +161,7 @@ public class ImagePlanViewControl extends PlanViewControl {
 
 
     /**
-     * Get the initial range for the data and color table.  
+     * Get the initial range for the data and color table.
      * Optimized for brightness images with range of 0 to 255.
      *
      * @return  initial range

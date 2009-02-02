@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -303,6 +304,9 @@ public abstract class DisplayControlBase extends SharableImpl {
 
     /** Bitmask for controls allow skip factor setting */
     public static final int FLAG_SKIPFACTOR = 1 << 11;
+
+    /** Bitmask for controls allow skip factor setting */
+    public static final int FLAG_TEXTUREQUALITY = 1 << 12;
 
     /** No-op for attributeFlags */
     public static final int FLAG_NONE = 0;

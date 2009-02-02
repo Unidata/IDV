@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -813,6 +814,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** Data selection components from the data source for the properties dialog */
     private List<DataSelectionComponent> dataSelectionComponents;
 
+    /**
+     * the texture quality  (1= best, 10= moderate)
+     */
+    private int textureQuality = 10;
+
+    /**
+     * quality slider
+     */
+    private JSlider textureSlider = null;
 
     /**
      * Default constructor. This is called when the control is
@@ -1449,6 +1459,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         applyUseFastRendering();
         applyLineWidth();
         applySkipFactor();
+        applyTextureQuality();
         activateDisplays();
         //        Trace.call2("DisplayControlImpl.applyAttributes");
     }
@@ -5396,6 +5407,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                  SETTINGS_GROUP_DISPLAY);
         }
 
+        if (checkFlag(FLAG_TEXTUREQUALITY) && (color != null)) {
+            dsd.addPropertyValue(new Integer(textureQuality),
+                                 "textureQuality", getTextureQualityLabel(),
+                                 SETTINGS_GROUP_DISPLAY);
+        }
 
         dsd.addPropertyValue(new Boolean(getDisplayVisibility()),
                              "displayVisibility", "Visibility",
@@ -6889,6 +6905,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    /**
+     * Make a slider for the texture quality
+     *
+     * @return the slider
+     */
+    protected JSlider doMakeTextureSlider() {
+        if (textureSlider == null) {
+            textureSlider = GuiUtils.makeSlider(1, 21, textureQuality, this,
+                    "setTextureQuality");
+            Hashtable labels = new Hashtable();
+            labels.put(new Integer(1), GuiUtils.lLabel("High"));
+            labels.put(new Integer(10), GuiUtils.cLabel("Medium"));
+            labels.put(new Integer(21), GuiUtils.rLabel("Low"));
+            textureSlider.setLabelTable(labels);
+            textureSlider.setPaintLabels(true);
+        }
+        return textureSlider;
+    }
+
+
 
     /**
      * Create the z position slider panel
@@ -6969,6 +7005,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel(getSkipWidgetLabel() + ":"),
                     doMakeSkipFactorSlider()));
+        }
+
+        if (checkFlag(FLAG_TEXTUREQUALITY)) {
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel(getTextureQualityLabel() + ":"),
+                    doMakeTextureSlider()));
         }
 
     }
@@ -8100,7 +8142,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Get the list of menus associated with this control.
      *
      *
-     * @param comp _more_
+     * @param comp  the  component to place the menus near
      * @return  The menus
      */
     public List getControlMenus(final JComponent comp) {
@@ -11145,6 +11187,50 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return doCursorReadout;
     }
 
+    /**
+     * Set the texture quality
+     *
+     * @param quality  1=high, &gt; 1 lower
+     */
+    public void setTextureQuality(int quality) {
+        textureQuality = quality;
+        if (getHaveInitialized()) {
+            try {
+                applyTextureQuality();
+            } catch (Exception exc) {
+                logException("Applying z position", exc);
+            }
+        }
+    }
+
+    /**
+     * Get the texture quality
+     *
+     * @return the  texture quality
+     */
+    public int getTextureQuality() {
+        return textureQuality;
+    }
+
+    /**
+     * Return the label that is to be used for the texture quality widget
+     * This allows derived classes to override this and provide their
+     * own name,
+     *
+     * @return Label used for the color widget
+     */
+    public String getTextureQualityLabel() {
+        return "Texture Quality";
+    }
+
+    /**
+     *  Use the value of the texture quality to set the value on the display
+     *
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD error
+     */
+    protected void applyTextureQuality()
+            throws VisADException, RemoteException {}
 
 
 }
