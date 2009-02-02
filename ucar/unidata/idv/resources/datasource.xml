@@ -91,6 +91,7 @@
      doesmultiples="true"
      label="Upsonde/Dropsonde files"/>
 
+<!--
   <datasource
      id="NetCDF.POINTFEATURE"
      factory="ucar.unidata.data.point.NetcdfPointFeatureDataSource"
@@ -98,6 +99,7 @@
      doesmultiples="true"
      fileselection="true"
      label="netCDF Point Feature files"/>
+-->
 
   <datasource
      id="NetCDF.POINT"
