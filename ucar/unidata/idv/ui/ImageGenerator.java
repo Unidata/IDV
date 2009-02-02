@@ -3921,11 +3921,11 @@ public class ImageGenerator extends IdvManager {
                                              new Real(RealType.Altitude, 0));
                     EarthLocation lrEl = new EarthLocationTuple(llplr,
                                              new Real(RealType.Altitude, 0));
-                    System.err.println("ulEl:" + ulEl);
                     ul = display.getScreenCoordinates(
                         display.getSpatialCoordinates(ulEl, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(lrEl, null));
+                    System.err.println("ul:" + ulEl + " lr:" + lrEl);
                     if (ul[0] > lr[0]) {
                         int tmp = ul[0];
                         ul[0] = lr[0];
@@ -3936,6 +3936,10 @@ public class ImageGenerator extends IdvManager {
                         ul[1] = lr[1];
                         lr[1] = tmp;
                     }
+                    imageProps.put(ATTR_NORTH, new Double(ulEl.getLatitude().getValue()));
+                    imageProps.put(ATTR_WEST, new Double(ulEl.getLongitude().getValue()));
+                    imageProps.put(ATTR_SOUTH, new Double(lrEl.getLatitude().getValue()));
+                    imageProps.put(ATTR_EAST, new Double(lrEl.getLongitude().getValue()));
                 } else if ((viewManager != null)
                            && XmlUtil.hasAttribute(child, ATTR_NORTH)) {
                     NavigatedDisplay display =
@@ -3977,6 +3981,17 @@ public class ImageGenerator extends IdvManager {
                 } else {
                     continue;
                 }
+
+
+                for(String attr: (List<String>)Misc.newList(ATTR_NORTH,ATTR_SOUTH,ATTR_EAST,ATTR_WEST)) {
+                    String kmlAttr= "kml." + attr;
+                    if(XmlUtil.hasAttribute(child, kmlAttr)) {
+                        imageProps.put(attr, new Double(applyMacros(child,kmlAttr,0.0)));
+                    }
+                }
+
+
+
                 ul[0] = Math.max(0, ul[0]);
                 ul[1] = Math.max(0, ul[1]);
                 
