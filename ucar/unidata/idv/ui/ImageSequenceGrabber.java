@@ -1593,7 +1593,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                 images.size());
                         imageGenerator.processImage(image, path,
                                 scriptingNode, props, viewManager,imageProperties);
-                        System.err.println("IP1:" + imageProperties);
                         subsetBounds(bounds, imageProperties);
                     } else {
                         Component comp;
@@ -1621,7 +1620,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
                     }
                 }
-                System.err.println("IP2:" + imageProperties);
                 ImageWrapper imageWrapper;
                 if (viewManager != null) {
                     imageWrapper = new ImageWrapper(path, time,bounds,viewManager.getDisplayMatrix());
@@ -1629,7 +1627,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     imageWrapper = new ImageWrapper(path, time);
                 }
                 imageWrapper.setProperties(imageProperties);
-                images.add(new ImageWrapper(path, time));
+                images.add(imageWrapper);
                 imagesChanged();
             }
         } catch (Throwable exc) {

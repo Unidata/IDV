@@ -308,6 +308,7 @@ public class MapViewManager extends NavigatedViewManager {
                                         : aspect);
 
             navDisplay = mapDisplay;
+            navDisplay.setPerspectiveView(getPerspectiveView());
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
         }
         return navDisplay;

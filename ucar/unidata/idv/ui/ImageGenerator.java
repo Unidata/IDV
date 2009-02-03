@@ -3624,9 +3624,15 @@ public class ImageGenerator extends IdvManager {
                     Unit unit = (Unit) units.get(i);
                     Image imageToDrawIn;
                     if(forKml) {
-                        baseX = 0;
-                        baseY = height;
-                        imageToDrawIn =new  BufferedImage(width,height+applyMacros(child, ATTR_SPACE,height),BufferedImage.TYPE_INT_RGB);
+                        if(vertical) {
+                            baseX = 0;
+                            baseY = 0;
+                        } else {
+                            baseX = 0;
+                            baseY = height;
+                        }
+                        int space = applyMacros(child, ATTR_SPACE,(vertical?width:height));
+                        imageToDrawIn =new  BufferedImage(width+(vertical?space:0),height+(vertical?0:space),BufferedImage.TYPE_INT_RGB);
                     } else {
                         imageToDrawIn = newImage = ImageUtils.toBufferedImage(image);
                     }
@@ -3634,7 +3640,7 @@ public class ImageGenerator extends IdvManager {
                     if(forKml) {
                         Color bgColor  = applyMacros(child, ATTR_BACKGROUND, Color.white);
                         g.setColor(bgColor);
-                        g.fillRect(0, 0, width,height+applyMacros(child, ATTR_SPACE,height));
+                        g.fillRect(0, 0, imageToDrawIn.getWidth(null),imageToDrawIn.getHeight(null));
                     }
                     ColorPreview preview =
                         new ColorPreview(
@@ -3674,7 +3680,7 @@ public class ImageGenerator extends IdvManager {
                         g.setColor(lineColor);
                         g.drawRect(baseX, (vertical
                                            ? baseY
-                                           : baseY - height), width-1, height);
+                                           : baseY - height), width-1, height-(vertical?1:0));
                     }
                     setFont(g, child);
                     FontMetrics fm         = g.getFontMetrics();
@@ -3682,6 +3688,8 @@ public class ImageGenerator extends IdvManager {
                     String      labelSuffix = applyMacros(child,ATTR_SUFFIX," %unit%");
                     if (unit!=null) {
                         labelSuffix = labelSuffix.replace("%unit%",""+unit);
+                    } else {
+                        labelSuffix = labelSuffix.replace("%unit%","");
                     }
                     if (valuesStr != null) {
                         double[] valueArray = Misc.parseDoubles(valuesStr,
@@ -3768,9 +3776,16 @@ public class ImageGenerator extends IdvManager {
                         }
                         g.setColor(c);
                         if (orientation.equals(VALUE_RIGHT)) {
+                            int yLoc = y + (int) (rect.getHeight() / 2)- 2;
+                            if(forKml) {
+                                if(valueIdx==0) {
+                                    yLoc = y + (int) (rect.getHeight())- 2;
+                                } else if(valueIdx==values.size()-1) {
+                                    yLoc = y - (int) (rect.getHeight())+6;
+                                }
+                            }
                             g.drawString(tickLabel, x + 2,
-                                         y + (int) (rect.getHeight() / 2)
-                                         - 2);
+                                         yLoc);
                         } else if (orientation.equals(VALUE_LEFT)) {
                             int xLoc =  x - 2 - (int) rect.getWidth();
                             g.drawString(tickLabel,
@@ -3783,7 +3798,7 @@ public class ImageGenerator extends IdvManager {
                                 if(valueIdx==0) {
                                     xLoc = x+2;
                                 } else if(valueIdx==values.size()-1) {
-                                    xLoc = x-(int)rect.getWidth()-2;
+                                    xLoc = x-(int)rect.getWidth()+2;
                                 }
                             }
                             g.drawString(tickLabel,
@@ -3906,11 +3921,11 @@ public class ImageGenerator extends IdvManager {
                                              new Real(RealType.Altitude, 0));
                     EarthLocation lrEl = new EarthLocationTuple(llplr,
                                              new Real(RealType.Altitude, 0));
-                    System.err.println("ulEl:" + ulEl);
                     ul = display.getScreenCoordinates(
                         display.getSpatialCoordinates(ulEl, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(lrEl, null));
+                    System.err.println("ul:" + ulEl + " lr:" + lrEl);
                     if (ul[0] > lr[0]) {
                         int tmp = ul[0];
                         ul[0] = lr[0];
@@ -3921,6 +3936,10 @@ public class ImageGenerator extends IdvManager {
                         ul[1] = lr[1];
                         lr[1] = tmp;
                     }
+                    imageProps.put(ATTR_NORTH, new Double(ulEl.getLatitude().getValue()));
+                    imageProps.put(ATTR_WEST, new Double(ulEl.getLongitude().getValue()));
+                    imageProps.put(ATTR_SOUTH, new Double(lrEl.getLatitude().getValue()));
+                    imageProps.put(ATTR_EAST, new Double(lrEl.getLongitude().getValue()));
                 } else if ((viewManager != null)
                            && XmlUtil.hasAttribute(child, ATTR_NORTH)) {
                     NavigatedDisplay display =
@@ -3962,6 +3981,17 @@ public class ImageGenerator extends IdvManager {
                 } else {
                     continue;
                 }
+
+
+                for(String attr: (List<String>)Misc.newList(ATTR_NORTH,ATTR_SOUTH,ATTR_EAST,ATTR_WEST)) {
+                    String kmlAttr= "kml." + attr;
+                    if(XmlUtil.hasAttribute(child, kmlAttr)) {
+                        imageProps.put(attr, new Double(applyMacros(child,kmlAttr,0.0)));
+                    }
+                }
+
+
+
                 ul[0] = Math.max(0, ul[0]);
                 ul[1] = Math.max(0, ul[1]);
                 

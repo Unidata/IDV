@@ -450,18 +450,23 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected ViewpointControl getViewpointControl() {
         if (viewpointControl == null) {
-            viewpointControl = new ViewpointControl(getNavigatedDisplay()) {
+            ViewpointControl tmp =  new ViewpointControl(getNavigatedDisplay()) {
                 public void changePerspectiveView(boolean v) {
+                    if(viewpointControl==null) return;
                     super.changePerspectiveView(v);
                     perspectiveViewChanged(v);
                 }
 
                 protected void applyVerticalScale(VertScaleInfo transfer)
                         throws Exception {
+                    if(viewpointControl==null) return;
                     super.applyVerticalScale(transfer);
                     verticalScaleChanged();
                 }
             };
+            //            System.err.println("making viewpoint control " +getPerspectiveView());
+            tmp.setPerspectiveView(getPerspectiveView());
+            viewpointControl = tmp;
         }
         return viewpointControl;
     }

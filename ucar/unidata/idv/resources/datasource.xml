@@ -114,10 +114,10 @@
   <datasource
      id="ImageGrid"
      factory="ucar.unidata.data.grid.ImageGridDataSource"
-     patterns="\.area$,\.gini$"
+     patterns="\.gini$"
      fileselection="true"
      doesmultiples="true"
-     label="Image files (area/gini)">
+     label="Image files (AREA/GINI)">
   </datasource>
 
   <datasource
