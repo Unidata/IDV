@@ -162,27 +162,43 @@ public class CatalogHarvester extends Harvester {
             System.err.println("Catalogs go too deep:" + url);
             return true;
         }
+        if(url.indexOf("hyrax/LBA")>=0) {
+            //            System.err.println ("Skipping bad one");
+            return true;
+        }
+
+
         catalogCnt++;
         if (catalogCnt % 10 == 0) {
             System.err.print(".");
         }
-        //        http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
-        //        if(catalogCnt>100) return true;
         seen.put(url, url);
-        //        System.err.println(url);
         try {
             Element root = XmlUtil.getRoot(url, getClass());
             if (root == null) {
                 System.err.println("Could not load catalog:" + url);
-            } else {
-                //                System.err.println("loaded:" + url);
-                Node child = XmlUtil.findChild(root,
-                                 CatalogOutputHandler.TAG_DATASET);
-                if (false && child != null) {
-                    recurseCatalog((Element) child, parent, url, 0, depth);
-                } else {
-                    recurseCatalog((Element) root, parent, url, 0, depth);
+                return true;
+            }
+            //                System.err.println("loaded:" + url);
+            NodeList  children = XmlUtil.getElements(root);
+            int cnt = 0;
+            Element datasetNode = null;
+            for (int i = 0; i < children.getLength(); i++) {
+                Element child = (Element)children.item(i);
+                if(child.getTagName().equals(CatalogUtil.TAG_DATASET) ||
+                   child.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
+                    if(child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
+                        datasetNode = (Element) child;
+                    }
+                    cnt++;
                 }
+            }
+
+            //If there is just one top-level dataset node then just load that
+            if (cnt==1 && datasetNode!=null) {
+                recurseCatalog((Element) datasetNode, parent, url, 0, depth);
+            } else {
+                recurseCatalog((Element) root, parent, url, 0, depth);
             }
             return true;
         } catch (Exception exc) {
@@ -244,16 +260,11 @@ public class CatalogHarvester extends Harvester {
         for (int i = 0; i < xmlDepth; i++) {
             tab = tab + "  ";
         }
-        URL catalogUrl = new URL(catalogUrlPath);
-        //        if (xmlDepth > 1) {
-        //            return;
-        //        }
-
-
         if ( !getActive()) {
             return;
         }
-        String   name     = XmlUtil.getAttribute(node, ATTR_NAME);
+        URL catalogUrl = new URL(catalogUrlPath);
+        String   name     = XmlUtil.getAttribute(node, ATTR_NAME,IOUtil.getFileTail(catalogUrlPath));
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node,
                              CatalogOutputHandler.ATTR_URLPATH,
@@ -364,7 +375,7 @@ public class CatalogHarvester extends Harvester {
         name = name.replace("'", "");
         Group group = null;
         Entry newGroup = getEntryManager().findEntryWithName(null, parent,
-                             name);
+                                                             name);
         if ((newGroup != null) && newGroup.isGroup()) {
             group = (Group) newGroup;
         }
@@ -393,31 +404,20 @@ public class CatalogHarvester extends Harvester {
         }
 
 
-
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+            String tag = child.getTagName();
+            if (tag.equals(CatalogUtil.TAG_DATASET)) {
                 recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
                                recurseDepth);
-            } else if (child.getTagName().equals(
-                    CatalogUtil.TAG_CATALOGREF)) {
+            } else if (tag.equals(CatalogUtil.TAG_CATALOGREF)) {
                 if ( !recurse) {
                     continue;
                 }
                 String url = XmlUtil.getAttribute(child, "xlink:href");
-                if ( !url.startsWith("http")) {
-                    if (url.startsWith("/")) {
-                        url = catalogUrl.getProtocol() + "://"
-                              + catalogUrl.getHost() + ":"
-                              + catalogUrl.getPort() + url;
-                    } else {
-                        //                        System.err.println("url:" + url +" catalog:" +
-                        //                                           catalogUrlPath +  " root: " + IOUtil.getFileRoot(catalogUrlPath));
-                        url = IOUtil.getFileRoot(catalogUrlPath) + "/" + url;
-                    }
-                }
-                //                System.err.println("url:" + url);
-                if ( !importCatalog(url, group, recurseDepth + 1)) {
+                URL newCatalogUrl = new URL(catalogUrl, url);
+                //                System.err.println("url:" + newCatalogUrl);
+                if ( !importCatalog(newCatalogUrl.toString(), group, recurseDepth + 1)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);
                     System.err.println("Base URL:"
