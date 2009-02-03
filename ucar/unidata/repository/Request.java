@@ -213,6 +213,10 @@ public class Request implements Constants {
                 name  =  java.net.URLEncoder.encode(name, "UTF-8");
                 name = name.replace("_FORWARDSLASH_","/");
                 url = url + "/" + name;
+                //A hack because the browser thinks this a zipped page
+                if(name.endsWith(".gz")) {
+                    name = name.replace(".gz","");
+                }
                 //                url = url + "/" + entry.getFullName();
             } catch(Exception ignore){}
         }
