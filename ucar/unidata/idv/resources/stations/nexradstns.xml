@@ -147,7 +147,7 @@
 <station idn="000330" id="ICX" name="Salt Lake City/Cedar City" st="UT" co="US" lat="37:35:27" lon="-112:51:44" elev="3231"/>
 <station idn="000534" id="FCX" name="Roanoke/Floyd County" st="VA" co="US" lat="37:01:28" lon="-80:16:26" elev="874"/>
 <station idn="000516" id="AKQ" name="Wakefield" st="VA" co="US" lat="36:59:02" lon="-77:00:26" elev="34"/>
-<station idn="000326" id="CXX" name="Burlington/Colchester" st="VT" co="US" lat="44:30:40" lon="-73:10:01" elev="97"/>
+<station idn="000326" id="CXX" name="Burlington/Colchester" st="VT" co="US" lat="44:30:40" lon="-73:09:59" elev="97"/>
 <station idn="000542" id="ATX" name="Seattle/Tacoma/Camano Island" st="WA" co="US" lat="48:11:40" lon="-122:29:45" elev="151"/>
 <station idn="000547" id="OTX" name="Spokane" st="WA" co="US" lat="47:40:49" lon="-117:37:36" elev="727"/>
 <station idn="000371" id="GRB" name="Green Bay/Ashwaubenon" st="WI" co="US" lat="44:29:54" lon="-88:06:41" elev="208"/>
