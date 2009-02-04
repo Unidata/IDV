@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.data.grid;
 
 
@@ -3837,16 +3839,17 @@ public class GridUtil {
             return indices;
         }
 
-        long         t1          = System.currentTimeMillis();
-        SampledSet[] sets        = map.getSets();
-        List[]       indexLists  = new List[sets.length];
-        List         pts         = new ArrayList();
-        float[]      lonLow      = new float[sets.length];
-        float[]      lonHi       = new float[sets.length];
-        float[]      latLow      = new float[sets.length];
-        float[]      latHi       = new float[sets.length];
+        long         t1            = System.currentTimeMillis();
+        SampledSet[] sets          = map.getSets();
+        List[]       indexLists    = new List[sets.length];
+        List         pts           = new ArrayList();
+        float[]      lonLow        = new float[sets.length];
+        float[]      lonHi         = new float[sets.length];
+        float[]      latLow        = new float[sets.length];
+        float[]      latHi         = new float[sets.length];
 
-        boolean      latLonOrder = isLatLonOrder(map);
+        boolean      latLonOrder   = isLatLonOrder(map);
+        int          numPolygonPts = 0;
         for (int j = 0; j < sets.length; j++) {
             Gridded2DSet g   = (Gridded2DSet) sets[j];
             float[]      low = g.getLow();
@@ -3863,10 +3866,13 @@ public class GridUtil {
             latHi[j]  = (latLonOrder
                          ? hi[0]
                          : hi[1]);
-            pts.add(g.getSamples(false));
-
+            float[][] sample = g.getSamples(false);
+            numPolygonPts = sample[0].length;
+            pts.add(sample);
         }
 
+
+        int ptCnt = 0;
 
         for (int i = 0; i < numPoints; i++) {
             float lat = latlon[0][i];
@@ -3893,6 +3899,8 @@ public class GridUtil {
                     }
                 }
 
+                ptCnt++;
+                /*
                 boolean pointInside =
                     DelaunayCustom.inside((float[][]) pts.get(mapIdx),
                                           (latLonOrder
@@ -3900,9 +3908,27 @@ public class GridUtil {
                                            : lon), (latLonOrder
                         ? lon
                         : lat));
-                boolean ok = (inside
-                              ? pointInside
-                              : !pointInside);
+                */
+
+
+                boolean pointInside2 =
+                    DataUtil.pointInside((float[][]) pts.get(mapIdx),
+                                         (latLonOrder
+                                          ? lat
+                                          : lon), (latLonOrder
+                        ? lon
+                        : lat));
+                /*
+                if(pointInside!=pointInside2) {
+                    System.err.println("bad point:" + lon + " " + lat);
+                    }*/
+
+                boolean pointInside = pointInside2;
+
+
+                boolean ok          = (inside
+                                       ? pointInside
+                                       : !pointInside);
                 if (ok) {
                     if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList();
@@ -3912,6 +3938,8 @@ public class GridUtil {
                 }
             }
         }
+        System.err.println("total pts:" + numPoints + "  points inside box:"
+                           + ptCnt + " # polygon points:" + numPolygonPts);
         int[][] indices = new int[sets.length][];
         for (int mapIdx = 0; mapIdx < indexLists.length; mapIdx++) {
             if (indexLists[mapIdx] == null) {
@@ -3932,6 +3960,8 @@ public class GridUtil {
 
 
     }
+
+
 
     /**
      * _more_

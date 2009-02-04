@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -380,8 +381,8 @@ public class DataUtil {
     /**
      * If the originalValues < given value then set the newValues = value
      *
-     * @param originalValues  originalValues 
-     * @param newValues  newValues 
+     * @param originalValues  originalValues
+     * @param newValues  newValues
      * @param indexArray indices
      * @param value value
      */
@@ -495,6 +496,7 @@ public class DataUtil {
      *
      * @param filename file
      * @param rows data
+     * @param rowsList _more_
      * @param names sheet names
      *
      * @throws Exception On badness
@@ -576,6 +578,43 @@ public class DataUtil {
         return sb.toString();
     }
 
+
+
+    /**
+     * Determine if the given point is inside the given polygon
+     *
+     * Code originally taken from: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+     *
+     *
+     *     Copyright (c) 1970-2003, Wm. Randolph Franklin
+     * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+     *     1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
+     *     2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided with the distribution.
+     *     3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission.
+     *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+     *
+     *
+     * @param pts _more_
+     * @param x _more_
+     * @param y _more_
+     *
+     * @return _more_
+     */
+    public static boolean pointInside(float[][] pts, float x, float y) {
+        int     i, j;
+        boolean isPointInside = false;
+        int     numPoints     = pts[0].length;
+        float[] vertx         = pts[0];
+        float[] verty         = pts[1];
+        for (i = 0, j = numPoints - 1; i < numPoints; j = i++) {
+            if (((verty[i] > y) != (verty[j] > y))
+                    && (x < (vertx[j] - vertx[i]) * (y - verty[i])
+                        / (verty[j] - verty[i]) + vertx[i])) {
+                isPointInside = !isPointInside;
+            }
+        }
+        return isPointInside;
+    }
 
 
 }
