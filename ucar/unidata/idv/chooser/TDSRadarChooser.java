@@ -29,28 +29,37 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+
 import org.w3c.dom.Element;
+
 import thredds.catalog.XMLEntityResolver;
-import ucar.unidata.geoloc.StationImpl;
+
 import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
+
 import ucar.unidata.data.radar.RadarQuery;
+import ucar.unidata.geoloc.StationImpl;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
+
 import visad.CommonUnit;
 import visad.DateTime;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import java.io.IOException;
+
 import java.net.URI;
+
 import java.util.*;
 import java.util.List;
+
+import javax.swing.*;
 
 
 /**
@@ -118,10 +127,10 @@ public class TDSRadarChooser extends TimesChooser {
     /** Command for connecting */
     protected static final String CMD_CONNECT = "cmd.connect";
 
-    /** _more_          */
+    /** is this level 3 */
     private boolean isLevel3;
 
-    /** _more_          */
+    /** level 3 extension names */
     public static final String[] level3_ExName = { "NVW", "DPA" };
 
 
@@ -317,7 +326,7 @@ public class TDSRadarChooser extends TimesChooser {
     protected static final String LABEL_SELECT = " -- Select -- ";
 
     /**
-     * _more_
+     * The product changed
      */
     protected void productChanged() {
         stationOrProductChanged();
@@ -376,9 +385,9 @@ public class TDSRadarChooser extends TimesChooser {
     }
 
     /**
-     * _more_
+     * Set the level 3 collection
      *
-     * @param s _more_
+     * @param s  the path to the collection
      */
     private void setLevel3Collection(String s) {
         isLevel3 = true;
@@ -521,7 +530,6 @@ public class TDSRadarChooser extends TimesChooser {
 
             getStationMap().setStations(stations);
         } catch (Exception exc) {
-            exc.printStackTrace();
             userMessage("Unable to load stations");
             return;
         }
@@ -529,17 +537,17 @@ public class TDSRadarChooser extends TimesChooser {
     }
 
     /**
-     * _more_
+     * Initialize the Level 3 Collection
      *
-     * @param url _more_
+     * @param url URL of the collection
      */
     public void initializeLevel3Collection(String url) {
 
         List          stations = new ArrayList();
         List<Product> products;
-        List<String> exProducts = new ArrayList();
+        List<String>  exProducts = new ArrayList();
 
-        for(String ename: level3_ExName){
+        for (String ename : level3_ExName) {
             exProducts.add(ename);
         }
 
@@ -568,8 +576,8 @@ public class TDSRadarChooser extends TimesChooser {
             }
             List<TwoFacedObject> productNames = new ArrayList();
             for (Product product : products) {
-               // if ( !product.getID().contains("DPA")
-                 //       && !product.getID().contains("NVW")) {
+                // if ( !product.getID().contains("DPA")
+                //       && !product.getID().contains("NVW")) {
                 if ( !exProducts.contains(product.getID())) {
                     String lable = product.getName() + " (" + product.getID()
                                    + ")";
@@ -596,10 +604,12 @@ public class TDSRadarChooser extends TimesChooser {
     public void stationOrProductChanged() {
         Vector times = new Vector();
         setHaveData(false);
-        if ((!isLevel3 && selectedStation != null) ||
-                (isLevel3 && selectedStation != null && selectedProduct != null)) {
+        if (( !isLevel3 && (selectedStation != null))
+                || (isLevel3 && (selectedStation != null)
+                    && (selectedProduct != null))) {
             List timeSpan = collection.getRadarTimeSpan();
-            Date fromDate =  DateUnit.getStandardOrISO((String) timeSpan.get(0));
+            Date fromDate =
+                DateUnit.getStandardOrISO((String) timeSpan.get(0));
             //Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
             Date toDate = new Date(System.currentTimeMillis()
                                    + DateUtil.daysToMillis(1));
@@ -614,20 +624,21 @@ public class TDSRadarChooser extends TimesChooser {
                 //                LogUtil.message("Reading times for station: "
                 //                                + selectedStation);
                 String pid = null;
-                if(isLevel3)
+                if (isLevel3) {
                     pid = TwoFacedObject.getIdString(
-                                 productComboBox.getSelectedItem());
+                        productComboBox.getSelectedItem());
+                }
                 List allTimes =
                     collection.getRadarStationTimes(selectedStation.getID(),
                         pid, fromDate, toDate);
 
-             //   if(allTimes.size() == 0) {
-             //       toDate = new Date(System.currentTimeMillis()
-             //                + DateUtil.daysToMillis(1));
-             //       allTimes =
-             //       collection.getRadarStationTimes(selectedStation.getID(),
-             //           pid, fromDate, toDate);
-             //   }
+                //   if(allTimes.size() == 0) {
+                //       toDate = new Date(System.currentTimeMillis()
+                //                + DateUtil.daysToMillis(1));
+                //       allTimes =
+                //       collection.getRadarStationTimes(selectedStation.getID(),
+                //           pid, fromDate, toDate);
+                //   }
 
                 for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
                     Object timeObj = allTimes.get(timeIdx);
