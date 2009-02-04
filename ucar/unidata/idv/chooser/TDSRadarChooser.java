@@ -31,7 +31,7 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.w3c.dom.Element;
 import thredds.catalog.XMLEntityResolver;
-import ucar.nc2.dt.StationImpl;
+import ucar.unidata.geoloc.StationImpl;
 import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 import ucar.unidata.data.radar.RadarQuery;
@@ -521,6 +521,7 @@ public class TDSRadarChooser extends TimesChooser {
 
             getStationMap().setStations(stations);
         } catch (Exception exc) {
+            exc.printStackTrace();
             userMessage("Unable to load stations");
             return;
         }
