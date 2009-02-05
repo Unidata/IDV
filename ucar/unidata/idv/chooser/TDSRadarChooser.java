@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.chooser;
 
 
@@ -46,7 +45,9 @@ import ucar.unidata.util.*;
 import visad.CommonUnit;
 import visad.DateTime;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -56,10 +57,16 @@ import java.io.IOException;
 
 import java.net.URI;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 /**
@@ -72,15 +79,14 @@ import javax.swing.*;
 public class TDSRadarChooser extends TimesChooser {
 
     /**
-     *  Holds the main gui contents. We keep this around so we can replace it with an error message
-     *  when the connection to the service fails.
+     * Holds the main gui contents. We keep this around so we can
+     * replace it with an error message when the connection to the
+     * service fails.
      */
     private JComponent outerContents;
 
-
     /** The collection */
     private TDSRadarDatasetCollection collection;
-
 
     /** The currently selected station */
     private NamedStation selectedStation;
@@ -89,12 +95,8 @@ public class TDSRadarChooser extends TimesChooser {
     private String selectedProduct;
 
     /** Those urls we connect to */
-    //"http://motherlode.ucar.edu:8080/thredds/radarServer/catalog.xml";
+    // e.g. "http://motherlode.ucar.edu:8080/thredds/radarServer/catalog.xml";
     private String serverUrl;
-
-    /** Each dataset collection URL */
-    //"http://motherlode.ucar.edu:8080/thredds/radarServer/level2/idd/dataset.xml";
-    //private String collectionUrl;
 
     /** Component to hold collections */
     private JComboBox collectionSelector;
@@ -105,12 +107,12 @@ public class TDSRadarChooser extends TimesChooser {
     /** descriptor label */
     private JComponent productLabel;
 
+    /** components that need a server for activation */
+    private List<Component> compsThatNeedServer = new ArrayList<Component>();
 
     /** components that need a server for activation */
-    private List compsThatNeedServer = new ArrayList();
-
-    /** components that need a server for activation */
-    private List level3CompsThatNeedServer = new ArrayList();
+    private List<Component> level3CompsThatNeedServer =
+        new ArrayList<Component>();
 
     /** persistent holder for catalog URLS */
     private PreferenceList urlListHandler;
@@ -133,6 +135,16 @@ public class TDSRadarChooser extends TimesChooser {
     /** level 3 extension names */
     public static final String[] level3_ExName = { "NVW", "DPA" };
 
+    /** Flag to keep from infinite looping */
+    private boolean ignoreProductChange = false;
+
+    /** Selection label text */
+    protected static final String LABEL_SELECT = " -- Select -- ";
+
+    /** the select object */
+    private static final TwoFacedObject SELECT_OBJECT =
+        new TwoFacedObject(LABEL_SELECT, LABEL_SELECT);
+
 
     /**
      * Create the RadarChooser
@@ -152,7 +164,7 @@ public class TDSRadarChooser extends TimesChooser {
      */
     public void doUpdate() {
         if ((serverUrl == null) || (datasetList == null)
-                || (datasetList.size() == 0) || (selectedProduct == null)) {
+                || (datasetList.size() == 0) || ( !haveSelectedProduct())) {
             if (urlBox != null) {
                 setServer((String) urlBox.getSelectedItem());
             }
@@ -173,12 +185,12 @@ public class TDSRadarChooser extends TimesChooser {
             setStatus("Please select a station", "stations");
             return;
         }
-        if (isLevel3 && (selectedProduct == null)) {
+        if (isLevel3 && ( !haveSelectedProduct())) {
             setHaveData(false);
             setStatus("Please select a level 3 product", "products");
             return;
         }
-        boolean haveTimesSelected;
+        boolean haveTimesSelected = false;
         if (getDoAbsoluteTimes()) {
             haveTimesSelected = getSelectedAbsoluteTimes().size() > 0;
         } else {
@@ -193,7 +205,15 @@ public class TDSRadarChooser extends TimesChooser {
         }
     }
 
-
+    /**
+     * Do we have a product selected
+     *
+     * @return true if we have a product and it's not the SELECT one
+     */
+    private boolean haveSelectedProduct() {
+        return (selectedProduct != null)
+               && !selectedProduct.equals(SELECT_OBJECT);
+    }
 
     /**
      * Handle when there are newly selected stations
@@ -259,12 +279,13 @@ public class TDSRadarChooser extends TimesChooser {
         productComboBox = new JComboBox();
         productComboBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                if (productComboBox.getSelectedItem() == null) {
+                Object selected = productComboBox.getSelectedItem();
+                if ((selected == null) || selected.equals(SELECT_OBJECT)) {
+                    selectedProduct = null;
                     return;
                 }
-                selectedProduct =
-                    productComboBox.getSelectedItem().toString();
-                resetProductBox();
+                selectedProduct = selected.toString();
+                //resetProductBox();
                 productChanged();
             }
 
@@ -300,37 +321,25 @@ public class TDSRadarChooser extends TimesChooser {
         addServerComp(stationMap);
         addServerComp(timesPanel);
         JComponent contents = GuiUtils.doLayout(new Component[] { top, topb,
-        //  stationMap, timesPanel }, 1, GuiUtils.WT_YYY, ,GuiUtils.WT_NYY);
-        stationMap, timesPanel }, 1, GuiUtils.WT_Y, new double[] { 0.5, 0.25,
-                4.0, 1.0 });
+                stationMap, timesPanel }, 1, GuiUtils.WT_Y,
+                                          new double[] { 0.5,
+                0.25, 4.0, 1.0 });
 
         contents = GuiUtils.inset(contents, 5);
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
-        productLabel.setVisible(false);
-        productComboBox.setVisible(false);
-        //  Misc.run(this, "initializeCollection");
+        showProductWidgets(false);
         outerContents =
             GuiUtils.center(GuiUtils.topCenterBottom(getStatusComponent(),
                 contents, buttons));
         return outerContents;
     }
 
-    /** A widget for the list of dataset descriptors */
-
-
-    /** Flag to keep from infinite looping */
-    private boolean ignoreProductChange = false;
-
-    /** Selection label text */
-    protected static final String LABEL_SELECT = " -- Select -- ";
-
     /**
      * The product changed
      */
     protected void productChanged() {
-        stationOrProductChanged();
-        // updateStatus();
+        Misc.run(this, "stationOrProductChanged");
     }
 
     /**
@@ -338,7 +347,7 @@ public class TDSRadarChooser extends TimesChooser {
      */
     private void resetProductBox() {
         ignoreProductChange = true;
-        productComboBox.setSelectedItem(LABEL_SELECT);
+        productComboBox.setSelectedItem(SELECT_OBJECT);
         ignoreProductChange = false;
     }
 
@@ -374,8 +383,7 @@ public class TDSRadarChooser extends TimesChooser {
      */
     private void setCollection(String s) {
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
-        productComboBox.setVisible(false);
-        productLabel.setVisible(false);
+        showProductWidgets(false);
         isLevel3 = false;
         GuiUtils.enableComponents(compsThatNeedServer, true);
         setAbsoluteTimes(new ArrayList());
@@ -392,13 +400,25 @@ public class TDSRadarChooser extends TimesChooser {
     private void setLevel3Collection(String s) {
         isLevel3 = true;
         GuiUtils.enableComponents(level3CompsThatNeedServer, true);
-        productComboBox.setVisible(true);
-        productLabel.setVisible(true);
         GuiUtils.enableComponents(compsThatNeedServer, true);
         setAbsoluteTimes(new ArrayList());
         selectedProduct = null;
         selectedStation = null;
         Misc.run(this, "initializeLevel3Collection", s);
+    }
+
+    /**
+     * Show or hide the product widgets
+     *
+     * @param show  true to show, false to hide
+     */
+    private void showProductWidgets(boolean show) {
+        if (productLabel != null) {
+            productLabel.setVisible(show);
+        }
+        if (productComboBox != null) {
+            productComboBox.setVisible(show);
+        }
     }
 
     /**
@@ -437,7 +457,7 @@ public class TDSRadarChooser extends TimesChooser {
         Document          doc  = null;
         XMLEntityResolver jaxp = new XMLEntityResolver(true);
         builder = jaxp.getSAXBuilder();
-        List collections = new ArrayList();
+        List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
 
         try {
             doc = builder.build(radarServerURL);
@@ -503,7 +523,7 @@ public class TDSRadarChooser extends TimesChooser {
      */
     public void initializeCollection(String url) {
 
-        List stations = new ArrayList();
+        List<NamedStationImpl> stations = new ArrayList<NamedStationImpl>();
         try {
             StringBuffer errlog = new StringBuffer();
             try {
@@ -543,9 +563,9 @@ public class TDSRadarChooser extends TimesChooser {
      */
     public void initializeLevel3Collection(String url) {
 
-        List          stations = new ArrayList();
-        List<Product> products;
-        List<String>  exProducts = new ArrayList();
+        List<NamedStationImpl> stations = new ArrayList<NamedStationImpl>();
+        List<Product>          products;
+        List<String>           exProducts = new ArrayList<String>();
 
         for (String ename : level3_ExName) {
             exProducts.add(ename);
@@ -574,7 +594,10 @@ public class TDSRadarChooser extends TimesChooser {
                 stations.add(station);
 
             }
-            List<TwoFacedObject> productNames = new ArrayList();
+            productComboBox.removeAllItems();
+            List<TwoFacedObject> productNames =
+                new ArrayList<TwoFacedObject>();
+            productNames.add(SELECT_OBJECT);
             for (Product product : products) {
                 // if ( !product.getID().contains("DPA")
                 //       && !product.getID().contains("NVW")) {
@@ -587,6 +610,7 @@ public class TDSRadarChooser extends TimesChooser {
                 }
             }
             GuiUtils.setListData(productComboBox, productNames);
+            showProductWidgets(true);
 
             // GuiUtils.setListData(dataTypeComboBox, dataTypes);
             getStationMap().setStations(stations);
@@ -602,11 +626,21 @@ public class TDSRadarChooser extends TimesChooser {
      * Handle when the user has selected a new station
      */
     public void stationOrProductChanged() {
-        Vector times = new Vector();
         setHaveData(false);
-        if (( !isLevel3 && (selectedStation != null))
+        readTimes();
+        updateStatus();
+    }
+
+
+    /**
+     *  Do what needs to be done to read in the times.  Subclasses
+     *  need to implement this.
+     */
+    protected void readTimes() {
+        Vector<DateTime> times = new Vector<DateTime>();
+        if ((( !isLevel3 && (selectedStation != null))
                 || (isLevel3 && (selectedStation != null)
-                    && (selectedProduct != null))) {
+                    && (haveSelectedProduct()))) && getDoAbsoluteTimes()) {
             List timeSpan = collection.getRadarTimeSpan();
             Date fromDate =
                 DateUnit.getStandardOrISO((String) timeSpan.get(0));
@@ -655,17 +689,13 @@ public class TDSRadarChooser extends TimesChooser {
             } catch (Exception exc) {
                 userMessage("Error reading times for station: "
                             + selectedStation);
-                //logException("Getting times for station: " + selectedStation,
-                //             exc);
                 setStatus("Select a different collection", "collections");
                 showNormalCursor();
                 return;
             }
         }
         setAbsoluteTimes(times);
-        updateStatus();
     }
-
 
 
 
@@ -683,7 +713,7 @@ public class TDSRadarChooser extends TimesChooser {
             LogUtil.userMessage("No Station selected");
         }
 
-        if (isLevel3 && (selectedProduct == null)) {
+        if (isLevel3 && !haveSelectedProduct()) {
 
             LogUtil.userMessage("No Product selected");
         }
@@ -706,10 +736,10 @@ public class TDSRadarChooser extends TimesChooser {
                                             dateSelection);
             }
 
-            List urls = new ArrayList();
+            List<String> urls = new ArrayList<String>();
 
             if (getDoAbsoluteTimes()) {
-                List times    = new ArrayList();
+                List<Date> times = new ArrayList<Date>();
                 List selected = makeDatedObjects(getSelectedAbsoluteTimes());
                 for (int i = 0; i < selected.size(); i++) {
                     DatedThing datedThing = (DatedThing) selected.get(i);
