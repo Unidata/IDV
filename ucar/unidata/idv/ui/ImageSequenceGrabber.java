@@ -405,6 +405,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** The IDV */
     private IntegratedDataViewer idv;
 
+    Dimension imageSize;
+
     /**
      * Create me with the given {@link ucar.unidata.idv.ViewManager}
      *
@@ -1610,6 +1612,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         BufferedImage image =
                             robot.createScreenCapture(new Rectangle(loc.x,
                                 loc.y, dim.width, dim.height));
+                        imageSize = new Dimension(dim.width, dim.height);
 
                         if (backgroundTransparentBtn.isSelected()) {
                             image = ImageUtils.makeColorTransparent(image,
@@ -1685,9 +1688,16 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param movieFile Where to write the movie
      */
     private void createMovie(String movieFile) {
-        Component comp = viewManager.getMaster().getDisplayComponent();
-        //Get the size of the display
-        Dimension size = comp.getSize();
+        Dimension size = imageSize;
+        if(size ==null && viewManager!=null) {
+            Component comp = viewManager.getMaster().getDisplayComponent();
+            //Get the size of the display
+            size = comp.getSize();
+        }
+        if(size == null) {
+            size = new Dimension(600,400);
+        }
+
         double displayRate =
             (new Double(displayRateFld.getText())).doubleValue();
 
@@ -1816,6 +1826,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     //                    System.err.println("mov:" + movieFile);
                     SecurityManager backup = System.getSecurityManager();
                     System.setSecurityManager(null);
+                    if(size==null) {
+                        size=new Dimension(600,400);
+                    }
+
                     JpegImagesToMovie.createMovie(movieFile, size.width,
                             size.height, (int) displayRate,
                                                   new Vector(ImageWrapper.makeFileList(images)));
