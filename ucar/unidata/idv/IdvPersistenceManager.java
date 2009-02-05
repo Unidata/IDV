@@ -1376,13 +1376,14 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             if (doZidv) {
                 GuiUtils.ProgressDialog dialog =
-                    new GuiUtils.ProgressDialog("Writing ZIDV", true);
-                dialog.setText("Writing ZIDV");
+                    new GuiUtils.ProgressDialog("Creating Zipped Bundle", true);
+                dialog.setText("Writing " + filename);
                 String tail =
                     IOUtil.stripExtension(IOUtil.getFileTail(filename));
                 ZipOutputStream zos =
                     new ZipOutputStream(new FileOutputStream(filename));
-                zos.putNextEntry(new ZipEntry(tail + ".xidv"));
+                String fileSuffix = getArgsManager().getXidvFileFilter().getPreferredSuffix();
+                zos.putNextEntry(new ZipEntry(tail + fileSuffix));
                 byte[] bytes = xml.getBytes();
                 zos.write(bytes, 0, bytes.length);
                 zos.closeEntry();
