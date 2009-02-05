@@ -5211,6 +5211,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                     Dimension dim = comp.getSize();
                     Point     loc = comp.getLocationOnScreen();
+                    GraphicsConfiguration gc = comp.getGraphicsConfiguration();
+                    Robot robot = new Robot(gc.getDevice());
+                    
+                    if(gc.getBounds().x>0 || gc.getBounds().y>0) {
+                        System.err.println("Offsetting location:" + loc +" by gc bounds: " + gc.getBounds().x + " " + 
+                                           gc.getBounds().y);
+                        loc.x-= gc.getBounds().x;
+                        loc.y-= gc.getBounds().y;
+                        System.err.println("new location:" + loc);
+                    }
 
                     if ((dim.width <= 0) || (dim.height <= 0)) {
                         throw new IllegalStateException("Bad component size:"
@@ -5218,19 +5228,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                 + " for component:" + whichComponent);
                     }
 
-                    /*
-                if(true) {
-                    FileOutputStream fos= new FileOutputStream("/home/jeffmc/test.pdf");
-                    JComponent pdfComp = (JComponent)getMaster().getComponent();
-                    System.err.println("pdfComp:" + pdfComp.getClass().getName());
-                    pdfComp.invalidate();
-                    ImageUtils.writeChartAsPDF(fos,pdfComp,pdfComp.getWidth(),pdfComp.getHeight());
-                    fos.close();
-                    return;
-                }
-                    */
-
-                    Robot robot = new Robot();
                     toFront();
                     Misc.sleep(250);
                     BufferedImage image;
