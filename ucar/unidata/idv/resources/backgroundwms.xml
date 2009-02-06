@@ -27,6 +27,15 @@
      version="1.1.1"
      bbox="71.0,-168.0, 17.0,-65.0"/>
   <wms
+     server="http://toposervices.cr.usgs.gov/wmsconnector/com.esri.wms.Esrimap/USGS_EDNA_geo"
+     layer="SRTM_2000_SHADEDRELIEF"
+     title="Shaded Relief"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="49.99997399808, -125.0, 23.99999999808, -65.99561456"/>
+
+  <wms
      server="http://terraserver-usa.com/ogcmap.ashx"
      layer="UrbanArea"
      title="Urban Area"
@@ -34,12 +43,4 @@
      format="image/jpeg"
      version="1.1.1"
      bbox="71.0,-168.0, 17.0,-65.0"/>
-  <wms
-     server="http://ims.cr.usgs.gov:80/servlet/com.esri.wms.Esrimap/USGS_WMS_NED"
-     layer="US_NED_Shaded_Relief"
-     title="Shaded Relief"
-     srs="EPSG:4326"
-     format="image/jpeg"
-     version="1.1.1"
-     bbox="49.99997399808, -125.0, 23.99999999808, -65.99561456"/>
 </backgroundwms>
