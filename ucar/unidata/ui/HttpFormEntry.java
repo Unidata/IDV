@@ -274,6 +274,7 @@ public class HttpFormEntry {
             guiComps.add(GuiUtils.top(GuiUtils.rLabel(label)));
             if (component == null) {
                 component = new JTextArea(value, rows, cols);
+                ((JTextArea)component).setLineWrap(true);
             }
             JScrollPane sp = new JScrollPane(component);
             sp.setPreferredSize(new Dimension(500, 200));
