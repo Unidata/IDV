@@ -1446,25 +1446,20 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryGet(Request request) throws Exception {
-        System.err.println ("entry get:" + request);
         String entryId = (String) request.getId((String) null);
 
         if (entryId == null) {
-            System.err.println ("entry get -1 ");
             throw new IllegalArgumentException("No " + ARG_ENTRYID
                     + " given");
         }
         Entry entry = getEntry(request, entryId);
-        System.err.println ("entry get -2 ");
         if (entry == null) {
-            System.err.println ("entry get -3 ");
             throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry with id:" + entryId);
         }
 
         if ( !entry.getResource().isUrl()) {
             if ( !getAccessManager().canDownload(request, entry)) {
-                System.err.println ("entry get -4 ");
                 throw new IllegalArgumentException(
                     "Cannot download file with id:" + entryId);
             }
@@ -1472,7 +1467,9 @@ return new Result(title, sb);
         //        System.err.println("request:" + request);
 
         String path = entry.getResource().getPath();
-        if (request.defined(ARG_IMAGEWIDTH)
+        String mimeType = getRepository().getMimeTypeFromSuffix(IOUtil.getFileExtension(entry.getResource().getPath()));
+
+          if (request.defined(ARG_IMAGEWIDTH)
                 && ImageUtils.isImage(path)) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
             String thumbDir = getStorageManager().getThumbDir();
@@ -1487,15 +1484,12 @@ return new Result(title, sb);
             }
             return new Result(
                 BLANK, IOUtil.getInputStream(thumb,
-                                             getClass()),
-                IOUtil.getFileExtension(entry.getResource().getPath()));
+                                             getClass()),mimeType);
         } else {
             InputStream inputStream =  IOUtil.getInputStream(entry.getResource()
                                                     .getPath(), getClass());
             return new Result(BLANK,
-                              inputStream, IOUtil
-                                      .getFileExtension(entry.getResource()
-                                          .getPath()));
+                              inputStream, mimeType);
         }
 
     }
