@@ -166,6 +166,11 @@ public class JobManager {
         /** _more_          */
         Object jobId;
 
+        boolean modal;
+
+        String name;
+
+
         /**
          * _more_
          *
@@ -175,43 +180,53 @@ public class JobManager {
          */
         public DialogInfo(Object id, String name, boolean modal) {
             jobId  = id;
-            dialog = GuiUtils.createDialog(null, name, modal);
-            JButton cancelBtn = new JButton("Cancel");
-            cancelBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    stopLoad(jobId);
-                    dialog.dispose();
-                }
-            });
-            JLabel waitLbl =
-                new JLabel(
-                    new ImageIcon(
-                        GuiUtils.getImage(
-                            "/ucar/unidata/idv/images/wait.gif")));
-            label1 = new JLabel("                                   ");
-            label2 = new JLabel("                                   ");
-            JComponent contents = LayoutUtil.vbox(
-                                      LayoutUtil.hbox(
-                                          new JLabel(name),
-                                          LayoutUtil.inset(
-                                              waitLbl, 5)), LayoutUtil.vbox(
-                                                  LayoutUtil.filler(300, 5),
-                                                  label1,
-                                                  label2), LayoutUtil.wrap(
-                                                      LayoutUtil.inset(
-                                                          cancelBtn, 10)));
-
-            dialog.getContentPane().add(LayoutUtil.inset(contents, 5));
-            dialog.pack();
-            GuiUtils.packInCenter(dialog);
+            this.modal = modal;
+            this.name = name;
         }
 
         /**
          * _more_
          */
         public void showDialog() {
-            dialog.show();
+            getDialog().show();
         }
+
+        public JDialog getDialog() {
+            if(dialog == null) {
+
+                dialog = GuiUtils.createDialog(null, name, modal);
+                JButton cancelBtn = new JButton("Cancel");
+                cancelBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            stopLoad(jobId);
+                            dialog.dispose();
+                        }
+                    });
+                JLabel waitLbl =
+                    new JLabel(
+                               new ImageIcon(
+                                             GuiUtils.getImage(
+                                                               "/ucar/unidata/idv/images/wait.gif")));
+                label1 = new JLabel("                                   ");
+                label2 = new JLabel("                                   ");
+                JComponent contents = LayoutUtil.vbox(
+                                                      LayoutUtil.hbox(
+                                                                      new JLabel(name),
+                                                                      LayoutUtil.inset(
+                                                                                       waitLbl, 5)), LayoutUtil.vbox(
+                                                                                                                     LayoutUtil.filler(300, 5),
+                                                                                                                     label1,
+                                                                                                                     label2), LayoutUtil.wrap(
+                                                                                                                                              LayoutUtil.inset(
+                                                                                                                                                               cancelBtn, 10)));
+
+                dialog.getContentPane().add(LayoutUtil.inset(contents, 5));
+                dialog.pack();
+                GuiUtils.packInCenter(dialog);
+            }
+            return dialog;
+        }
+
 
 
     }
