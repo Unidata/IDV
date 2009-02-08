@@ -452,7 +452,7 @@ return new Result(title, sb);
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-                if(entry.isUploaded()) {
+                if(isAnonymousUpload(entry)) {
                     String msg  =HtmlUtil.space(2) +msg("Is this entry ok to be viewed?");
                     sb.append(HtmlUtil.formEntry(msgLabel("Publish"),
                                                  HtmlUtil.checkbox(ARG_PUBLISH,"true",false)+msg));
@@ -585,8 +585,8 @@ return new Result(title, sb);
 
         List<Entry> entries = new ArrayList<Entry>();
         String dataType = "";
-        if(forUpload) {
-            dataType = Entry.DATATYPE_UPLOAD;
+        if(false && forUpload) {
+            //            dataType = DATATYPE_UPLOAD;
         } else  if (request.defined(ARG_DATATYPE)) {
             dataType = request.getString(ARG_DATATYPE, "");
         } else {
@@ -822,12 +822,17 @@ return new Result(title, sb);
                 }
 
                 entry = typeHandler.createEntry(id);
+             
                 entry.initEntry(name, description, parentGroup,
                                 request.getUser(),
                                 new Resource(theResource, resourceType),
                                 dataType, createDate.getTime(),
                                 theDateRange[0].getTime(),
                                 theDateRange[1].getTime(), null);
+                if(forUpload) {
+                    initUploadedEntry(request, entry,parentGroup);
+                }
+
                 setEntryState(request, entry);
                 entries.add(entry);
             }
@@ -874,8 +879,9 @@ return new Result(title, sb);
             entry.setName(newName);
             entry.setDescription(request.getString(ARG_DESCRIPTION,
                                                    entry.getDescription()));
-            if(request.get(ARG_PUBLISH,false) && entry.isUploaded()) {
-                entry.setDataType("");
+            
+            if(request.get(ARG_PUBLISH,false) && isAnonymousUpload(entry)) {
+                publishAnonymousEntry(entry);
             } else {
                 entry.setDataType(dataType);
             }
@@ -1375,6 +1381,35 @@ return new Result(title, sb);
         insertEntries((List<Entry>)Misc.newList(entry),true);
         return new Result(
                           request.entryUrl(getRepository().URL_ENTRY_SHOW,entry));
+    }
+
+    public final static String DATATYPE_UPLOAD = "upload";
+
+    private void publishAnonymousEntry(Entry entry) {
+        entry.setDataType("");
+    }
+
+    public boolean isAnonymousUpload(Entry entry) {
+        return Misc.equals(entry.getDataType(),DATATYPE_UPLOAD);
+    }
+
+    private void initUploadedEntry(Request request, Entry entry,Group parentGroup) throws Exception {
+        entry.setDataType(DATATYPE_UPLOAD);
+        User parentUser = parentGroup.getUser();
+        if (true || getAdmin().isEmailCapable()) {
+            StringBuffer  contents = new StringBuffer("A new entry has been uploaded to the RAMADDA server under the group: ");
+            String url1 = HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),ARG_ENTRYID,parentGroup.getId());
+
+            contents.append(HtmlUtil.href(url1,parentGroup.getFullName()));
+            contents.append("<br>\n");
+            String url = HtmlUtil.url(getRepository().URL_ENTRY_FORM.getFullUrl(),ARG_ENTRYID,entry.getId());
+            contents.append(HtmlUtil.href(url,entry.getLabel()));
+            System.err.println ("Contents:" + contents);
+            if ( getAdmin().isEmailCapable()) {
+                getAdmin().sendEmail(parentUser.getEmail(), "Uploaded Entry", contents.toString(),
+                                     true);
+            }
+        }
     }
 
 
@@ -2104,7 +2139,6 @@ return new Result(title, sb);
                 if ( getAccessManager().canDoAction(request, parentGroup,
                                                     Permission.ACTION_UPLOAD)) {
                     doAnonymousUpload = true;
-                    dataType = Entry.DATATYPE_UPLOAD;
                 } else {
                     throw new IllegalArgumentException(
                                                        "Cannot add to parent group:" + parentId);
@@ -2174,6 +2208,9 @@ return new Result(title, sb);
                         resource, dataType, createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), null);
 
+        if(doAnonymousUpload) {
+            initUploadedEntry(request, entry,parentGroup);
+        }
         entry.setNorth(Misc.decodeLatLon(XmlUtil.getAttribute(node,
                 ATTR_NORTH, entry.getNorth() + "")));
         entry.setSouth(Misc.decodeLatLon(XmlUtil.getAttribute(node,
@@ -4506,7 +4543,7 @@ return new Result(title, sb);
      * @return _more_
      */
     public String getIconUrl(Request request,Entry entry) throws Exception {
-        if(entry.isUploaded()) {
+        if(isAnonymousUpload(entry)) {
             return iconUrl(ICON_ENTRY_UPLOAD);
         }
 

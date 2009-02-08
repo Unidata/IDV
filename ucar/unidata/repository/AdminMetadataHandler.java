@@ -65,6 +65,10 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_LOCALFILE_PATTERN =
         new Metadata.Type("admin.localfile.pattern", "Local File Pattern");
 
+    //TODO:
+    public static Metadata.Type TYPE_ANONYMOUS_UPLOAD =
+        new Metadata.Type("admin.anonymousupload", "Anonymous Upload");
+
 
 
     /**

@@ -378,7 +378,7 @@ public class AccessManager extends RepositoryManager {
             return null;
         }
 
-        if(entry.isUploaded()) {
+        if(getEntryManager().isAnonymousUpload(entry)) {
             if(!canDoAction(request,parent,Permission.ACTION_NEW)) {
                 return null;
             }
