@@ -30,7 +30,6 @@ import org.w3c.dom.*;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -43,10 +42,6 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.awt.*;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.*;
 
 import java.io.*;
 
@@ -82,7 +77,6 @@ import java.util.TimeZone;
 import java.util.zip.*;
 
 
-import javax.swing.*;
 
 
 /**

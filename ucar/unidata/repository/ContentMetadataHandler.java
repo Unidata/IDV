@@ -28,8 +28,8 @@ import org.w3c.dom.*;
 import ucar.unidata.sql.SqlUtil;
 import java.net.URL;
 import java.net.URLConnection;
-import java.awt.Image;
 import ucar.unidata.ui.ImageUtils;
+import java.awt.Image;
 
 
 import ucar.unidata.util.DateUtil;

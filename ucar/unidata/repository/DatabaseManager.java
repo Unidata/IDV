@@ -45,10 +45,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.awt.*;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.*;
+
 
 import java.io.*;
 
@@ -83,7 +80,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 
-import javax.swing.*;
+
 
 
 /**

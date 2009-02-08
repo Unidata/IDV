@@ -34,7 +34,6 @@ import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -48,8 +47,6 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.awt.*;
-import java.awt.Image;
 
 import java.io.*;
 
@@ -86,7 +83,6 @@ import java.util.regex.*;
 import java.util.zip.*;
 
 
-import javax.swing.*;
 
 
 /**

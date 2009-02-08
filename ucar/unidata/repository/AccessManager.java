@@ -45,8 +45,6 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.awt.*;
-import java.awt.Image;
 
 import java.io.*;
 
@@ -83,7 +81,6 @@ import java.util.regex.*;
 import java.util.zip.*;
 
 
-import javax.swing.*;
 
 
 /**

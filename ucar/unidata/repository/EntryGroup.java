@@ -45,10 +45,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.awt.*;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.*;
+
 
 import java.io.*;
 
@@ -85,7 +82,6 @@ import java.util.regex.*;
 
 import java.util.zip.*;
 
-import javax.swing.*;
 
 
 /**

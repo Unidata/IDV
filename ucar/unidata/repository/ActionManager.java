@@ -284,6 +284,7 @@ public class ActionManager extends RepositoryManager {
                     runnable.run(actionId);
                 } catch (Exception exc) {
                     //TODO: handle the error better
+                    exc.printStackTrace();
                     handleError(actionId, exc);
                     return;
                 }
