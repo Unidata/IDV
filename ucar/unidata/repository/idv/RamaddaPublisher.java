@@ -189,13 +189,20 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     /**
      * _more_
      */
-    public boolean configure() {
+    public boolean configurexxx() {
         if (repositoryClient == null) {
             repositoryClient = new InteractiveRepositoryClient();
         }
         return repositoryClient.showConfigDialog();
     }
 
+
+    public void configure() {
+        if (repositoryClient == null) {
+            repositoryClient = new InteractiveRepositoryClient();
+        }
+        repositoryClient.showConfigDialog();
+    }
 
     /**
      * Do the configuration
