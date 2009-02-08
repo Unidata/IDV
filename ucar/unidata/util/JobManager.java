@@ -182,6 +182,8 @@ public class JobManager {
             jobId  = id;
             this.modal = modal;
             this.name = name;
+            label1 = new JLabel("                                   ");
+            label2 = new JLabel("                                   ");
         }
 
         /**
@@ -207,8 +209,6 @@ public class JobManager {
                                new ImageIcon(
                                              GuiUtils.getImage(
                                                                "/ucar/unidata/idv/images/wait.gif")));
-                label1 = new JLabel("                                   ");
-                label2 = new JLabel("                                   ");
                 JComponent contents = LayoutUtil.vbox(
                                                       LayoutUtil.hbox(
                                                                       new JLabel(name),
