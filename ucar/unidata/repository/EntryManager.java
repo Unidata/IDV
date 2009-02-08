@@ -453,7 +453,15 @@ return new Result(title, sb);
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
                 if(isAnonymousUpload(entry)) {
-                    String msg  =HtmlUtil.space(2) +msg("Is this entry ok to be viewed?");
+                    Metadata metadata = 
+                        getMetadataManager().findMetadata(entry, AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
+                                                          false);
+                    String extra="";
+                    if(metadata!=null) {
+                        String user = metadata.getAttr1();
+                        extra = "<br><b>From user:</b> " + metadata.getAttr1()+ " <b>From ip:</b> " + metadata.getAttr2();
+                    }
+                    String msg  =HtmlUtil.space(2) +msg("Make public?")+extra;
                     sb.append(HtmlUtil.formEntry(msgLabel("Publish"),
                                                  HtmlUtil.checkbox(ARG_PUBLISH,"true",false)+msg));
                 }
@@ -1385,26 +1393,53 @@ return new Result(title, sb);
 
     public final static String DATATYPE_UPLOAD = "upload";
 
-    private void publishAnonymousEntry(Entry entry) {
-        entry.setDataType("");
+    private void publishAnonymousEntry(Entry entry) throws Exception {
+        Metadata metadata = 
+            getMetadataManager().findMetadata(entry, AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
+                                              false);
+        //Reset the datatype
+        if(metadata!=null) {
+            User newUser = getUserManager().findUser(metadata.getAttr1());
+            if(newUser!=null) {
+                entry.setUser(newUser);
+            } else {
+                entry.setUser(entry.getParentGroup().getUser());
+            }
+            entry.setDataType(metadata.getAttr3());
+        } else {
+            entry.setDataType("");
+        }
+
     }
 
     public boolean isAnonymousUpload(Entry entry) {
         return Misc.equals(entry.getDataType(),DATATYPE_UPLOAD);
     }
 
+
     private void initUploadedEntry(Request request, Entry entry,Group parentGroup) throws Exception {
+        String oldType = entry.getDataType();
         entry.setDataType(DATATYPE_UPLOAD);
+
+        String user = request.getUser().getId();
+        if(user.length()==0) {
+            user = "anonymous";
+        }
+        entry.addMetadata(new Metadata(getRepository().getGUID(),entry.getId(),
+                                       AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD.getType(),
+                                       false,
+                                       user,
+                                       request.getIp(),(oldType!=null?oldType:""),""));
         User parentUser = parentGroup.getUser();
         if (true || getAdmin().isEmailCapable()) {
             StringBuffer  contents = new StringBuffer("A new entry has been uploaded to the RAMADDA server under the group: ");
             String url1 = HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),ARG_ENTRYID,parentGroup.getId());
 
             contents.append(HtmlUtil.href(url1,parentGroup.getFullName()));
-            contents.append("<br>\n");
+            contents.append("<p>\n\n");
             String url = HtmlUtil.url(getRepository().URL_ENTRY_FORM.getFullUrl(),ARG_ENTRYID,entry.getId());
+            contents.append("Edit to confirm: ");
             contents.append(HtmlUtil.href(url,entry.getLabel()));
-            System.err.println ("Contents:" + contents);
             if ( getAdmin().isEmailCapable()) {
                 getAdmin().sendEmail(parentUser.getEmail(), "Uploaded Entry", contents.toString(),
                                      true);

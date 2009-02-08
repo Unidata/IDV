@@ -10,7 +10,7 @@
  * your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * WITHOUT ANY WARRANTYP; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
  *
@@ -83,8 +83,8 @@ public class AdminMetadataHandler extends MetadataHandler {
         super(repository, node);
         addType(TYPE_TEMPLATE);
         nonLocalTypes.add(TYPE_TEMPLATE);
-
         addType(TYPE_LOCALFILE_PATTERN);
+        addType(TYPE_ANONYMOUS_UPLOAD);
 
         //        addType(TYPE_CONTENTTEMPLATE);
     }
@@ -143,6 +143,11 @@ public class AdminMetadataHandler extends MetadataHandler {
         if (type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {
             return new String[] { lbl, "Has template" };
         }
+
+        if (type.equals(TYPE_ANONYMOUS_UPLOAD)) {
+            return new String[] { lbl, "From:" + metadata.getAttr1() + " IP: " + metadata.getAttr2()}; 
+        }
+       
         if (type.equals(TYPE_LOCALFILE_PATTERN)) {
             return new String[] { lbl, "Local File Pattern" };
         }
@@ -212,6 +217,11 @@ public class AdminMetadataHandler extends MetadataHandler {
             content = HtmlUtil.row(HtmlUtil.colspan(submit, 2))
                       + HtmlUtil.formEntry(lbl, input);
         }
+        if(type.equals(TYPE_ANONYMOUS_UPLOAD)) {
+            content = "From:" + metadata.getAttr1() + " IP: " + metadata.getAttr2(); 
+        }
+
+
         if ( !forEdit) {
             content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));
         }

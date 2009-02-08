@@ -193,6 +193,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
+
     public Metadata findMetadata(Entry entry, Metadata.Type type,
                                  boolean checkInherited)
             throws Exception {
