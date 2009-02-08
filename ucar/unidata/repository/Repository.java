@@ -2882,6 +2882,20 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    public Result processPing(Request request) throws Exception {
+        if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
+            Document  resultDoc  = XmlUtil.makeDocument();
+            Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
+                                                new String[] { ATTR_CODE,
+                                                               "ok" });
+            String xml = XmlUtil.toString(resultRoot);
+            return new Result(xml, MIME_XML);
+        }
+        StringBuffer sb = new StringBuffer("OK");
+        return new Result("", sb);
+    }
+
+
     public Result processHelp(Request request) throws Exception {
         String path = request.getRequestPath();
         path = path.substring((getUrlBase()+"/help").length());

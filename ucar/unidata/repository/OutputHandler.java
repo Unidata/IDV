@@ -745,6 +745,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static int entryCnt = 0;
 
+
+
     /**
      * _more_
      *
@@ -759,6 +761,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             throws Exception {
         String       base   = "toggleentry" + (entryCnt++);
         StringBuffer formSB = new StringBuffer();
+
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        "getentries"));
 

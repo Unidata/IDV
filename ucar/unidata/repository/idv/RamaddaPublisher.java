@@ -189,11 +189,11 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     /**
      * _more_
      */
-    public void configure() {
+    public boolean configure() {
         if (repositoryClient == null) {
             repositoryClient = new InteractiveRepositoryClient();
         }
-        repositoryClient.showConfigDialog();
+        return repositoryClient.showConfigDialog();
     }
 
 
@@ -203,7 +203,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
      * @return Configuration ok
      */
     public boolean doInitNew() {
-        return isConfigured();
+        if (repositoryClient == null) {
+            repositoryClient = new InteractiveRepositoryClient();
+        }
+        return repositoryClient.showConfigDialog();
     }
 
 
@@ -268,7 +271,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         comps = Misc.toList(new Component[] {
             GuiUtils.rLabel("Name:"), nameFld,
             GuiUtils.top(GuiUtils.rLabel("Description:")), descScroller,
-            GuiUtils.rLabel("Tags:"), tagFld,
+            GuiUtils.rLabel("Tags:"), GuiUtils.centerRight(tagFld,new JLabel(" (optional)")),
             GuiUtils.rLabel("Parent Group:"), treeComp,
             GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
             GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)

@@ -406,7 +406,7 @@ public class RepositoryClient extends RepositoryBase {
                                           new String[] {});
             Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
                                     new String[] {
-                ATTR_ID, "1234", ATTR_TYPE, TYPE_GROUP,
+                ATTR_ID, "123456789", ATTR_TYPE, TYPE_GROUP,
                 ATTR_PARENT, parentId, ATTR_NAME, name
             });
 
@@ -445,7 +445,7 @@ public class RepositoryClient extends RepositoryBase {
      */
     public void addUrlArgs(List entries) {
         entries.add(HttpFormEntry.hidden(ARG_SESSIONID, getSessionId()));
-        entries.add(HttpFormEntry.hidden(ARG_OUTPUT, "xml"));
+        entries.add(HttpFormEntry.hidden(ARG_RESPONSE, RESPONSE_XML));
     }
 
 
@@ -457,8 +457,12 @@ public class RepositoryClient extends RepositoryBase {
      * @return _more_
      */
     public String getSessionId() {
+        if(isAnonymous()) return "";
         return sessionId;
     }
+
+
+
 
 
 
@@ -472,6 +476,7 @@ public class RepositoryClient extends RepositoryBase {
      */
     public boolean isValidSession(boolean doLogin, String[] msg) {
         if ( !isValidSession(msg)) {
+            if(isAnonymous()) return false;
             if (doLogin) {
                 return doLogin(msg);
             }
@@ -490,15 +495,23 @@ public class RepositoryClient extends RepositoryBase {
      *
      */
     public boolean isValidSession(String[] msg) {
-        if (sessionId == null) {
-            msg[0] = "No session id";
-            return false;
-        }
         try {
-            String url = HtmlUtil.url(URL_USER_HOME.getFullUrl(),
-                                      new String[] { ARG_OUTPUT,
-                    "xml", ARG_SESSIONID, sessionId });
+            String url;
+            if(isAnonymous()) {
+                url = HtmlUtil.url(URL_PING.getFullUrl(),
+                                   new String[] { ARG_RESPONSE,
+                                                  RESPONSE_XML});
+            } else {
+                if (sessionId == null) {
+                    msg[0] = "No session id";
+                    return false;
+                }
+                url = HtmlUtil.url(URL_USER_HOME.getFullUrl(),
+                                   new String[] { ARG_RESPONSE,
+                                                  RESPONSE_XML, ARG_SESSIONID, sessionId });
+            }
             String  contents = IOUtil.readContents(url, getClass());
+            //            System.err.println ("contents:" + contents);
             Element root     = XmlUtil.getRoot(contents);
             if (responseOk(root)) {
                 return true;
@@ -507,7 +520,8 @@ public class RepositoryClient extends RepositoryBase {
                 return false;
             }
         } catch (Exception exc) {
-            msg[0] = "Could not connect to server:" + getHostname()+"\n" + exc;
+            System.err.println ("error:" + exc);
+            msg[0] = "Could not connect to server: " + getHostname();
             return false;
         }
     }
@@ -534,14 +548,15 @@ public class RepositoryClient extends RepositoryBase {
      *
      */
     public boolean doLogin(String[] msg) {
+        if(isAnonymous()) return true;
         try {
             List   entries = Misc.toList(new Object[]{
-                HttpFormEntry.hidden(ARG_OUTPUT, "xml"),
+                HttpFormEntry.hidden(ARG_RESPONSE, RESPONSE_XML),
                 HttpFormEntry.hidden(ARG_USER_PASSWORD, getPassword()),
                 HttpFormEntry.hidden(ARG_USER_ID, getUser())});
             String[] result = doPost(URL_USER_LOGIN,entries);
             if (result[0] != null) {
-                msg[0] = "Error logging in:" + result[0];
+                msg[0] = "Error logging in: " + result[0];
                 return false;
             }
             String  contents = result[1];
@@ -555,8 +570,11 @@ public class RepositoryClient extends RepositoryBase {
                 msg[0] = body;
                 return false;
             }
+        } catch (java.io.IOException exc) {
+            msg[0] = "Could not connect to server: " + getHostname();
+
         } catch (Exception exc) {
-            msg[0] = "Could not connect to server:" + getHostname()+"\n" + exc;
+            msg[0] = "An error occurred: " + exc+"\n";
         }
         return false;
     }
@@ -645,6 +663,16 @@ public class RepositoryClient extends RepositoryBase {
     protected void setPassword(String s) {
         password = s;
     }
+    /**
+       Get the Anonymous property.
+
+       @return The Anonymous
+    **/
+    public boolean isAnonymous () {
+	return user!=null && user.trim().length()==0;
+    }
+
+
 
 
 }

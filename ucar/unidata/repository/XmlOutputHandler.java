@@ -337,9 +337,14 @@ public class XmlOutputHandler extends OutputHandler {
             throws Exception {
         boolean canDoNew = getAccessManager().canDoAction(request, group,
                                Permission.ACTION_NEW);
+        boolean canDoUpload = getAccessManager().canDoAction(request, group,
+                               Permission.ACTION_UPLOAD);
         return XmlUtil.create(doc, TAG_GROUP, parent, new String[] {
-            ATTR_NAME, group.getName(), ATTR_ID, group.getId(), ATTR_CANDONEW,
-            "" + canDoNew
+            ATTR_NAME, group.getName(), ATTR_ID, group.getId(), 
+            ATTR_CANDONEW,
+            "" + canDoNew,
+            ATTR_CANDOUPLOAD,
+            "" + canDoUpload
         });
 
     }

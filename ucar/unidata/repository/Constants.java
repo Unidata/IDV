@@ -934,6 +934,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_CANDONEW = "candonew";
+    public static final String ATTR_CANDOUPLOAD = "candoupload";
 
     /** _more_ */
     public static final String TAG_METADATA = "metadata";
@@ -979,6 +980,11 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
+
+    public static final String ARG_RESPONSE = "response";
+    public static final String RESPONSE_XML = "xml";
+    public static final String CODE_OK = "ok";
+    public static final String CODE_ERROR = "error";
 
     /** _more_ */
     public static final String ARG_URL = "url";

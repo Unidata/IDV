@@ -84,8 +84,8 @@
         >
             <include name="ucar/unidata/repository/**/*.class"/>
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
-            <include name="ucar/unidata/repository/htdocs/folderopen.gif"/>
-            <include name="ucar/unidata/repository/htdocs/folderclosed.gif"/>
+            <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
+            <include name="ucar/unidata/repository/htdocs/icons/folderclosed.png"/>
 	    </jar>
 
         <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">

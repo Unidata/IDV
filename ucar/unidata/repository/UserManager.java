@@ -80,6 +80,10 @@ public class UserManager extends RepositoryManager {
                                                      "user.cart",
                                                      OutputType.TYPE_NONHTML,"",ICON_CART_ADD);
 
+    public static final OutputType OUTPUT_FAVORITE = new OutputType("Add as Favorite",
+                                                     "user.addfavorite",
+                                                     OutputType.TYPE_NONHTML,"",ICON_FAVORITE);
+
     /** _more_ */
     public static final String COOKIE_NAME = "repositorysession";
 
@@ -1505,27 +1509,10 @@ public class UserManager extends RepositoryManager {
 
 
         if ( !haveFrom) {
-            sb.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
-                                       "getentries"));
-            sb.append(HtmlUtil.submit(msg("Get selected"), "getselected"));
-            sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(msgLabel("As"));
-            sb.append(HtmlUtil.space(1));
-            List<Link> links = getRepository().getOutputLinks(request,
-                                   new OutputHandler.State(getEntryManager().getDummyGroup(),entries));
-            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-            for (Link link : links) {
-                OutputType outputType = link.getOutputType();
-                if (outputType == null) {
-                    continue;
-                }
-                tfos.add(new TwoFacedObject(outputType.getLabel(),
-                                            outputType.getId()));
-            }
-            sb.append(HtmlUtil.select(ARG_OUTPUT, tfos));
+            String[] formTuple = getRepository().getHtmlOutputHandler().getEntryFormStart(request,entries);
+
+            sb.append(formTuple[2]);
         }
-        //            sb.append("<br>");
         sb.append("<ul style=\"list-style-image : url("
                   + getRepository().iconUrl(ICON_FILE) + ")\">");
         OutputHandler outputHandler =
@@ -1555,24 +1542,11 @@ public class UserManager extends RepositoryManager {
                                 getRepository().iconUrl(ICON_ASSOCIATION),
                                 msg("Create an association"))));
 
-                if(!request.getUser().getAnonymous()) {
-                    sb.append(
-                              HtmlUtil.href(
-                                            request.url(
-                                                        getRepositoryBase().URL_USER_FAVORITE, 
-                                                        ARG_FAVORITE_ADD,"true",
-                                                        ARG_ENTRYID,
-                                                        entry.getId()), HtmlUtil.img(
-                                                                                     getRepository().iconUrl(ICON_FAVORITE),
-                                                                                     msg("Add as a favorite"))));
-                }
             }
             sb.append(HtmlUtil.space(1));
             if (haveFrom) {
-                //                sb.append(entry.getLabel());
             } else {
-                sb.append(getEntryManager().getAjaxLink(request, entry,
-                                                        entry.getLabel(), false));
+                sb.append(getEntryManager().getBreadCrumbs(request, entry));
             }
         }
         sb.append("</ul>");
@@ -1677,16 +1651,7 @@ public class UserManager extends RepositoryManager {
                 return new Result(msg("Favorites"), new StringBuffer(getRepository().error("Cannot find or access entry")));
             }
 
-            //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME
-            String name = "";
-            String category = "";
-            getDatabaseManager().executeInsert(Tables.FAVORITES.INSERT,
-                                           new Object[] {
-                                               getRepository().getGUID(),
-                                               user.getId(), 
-                                               entry.getId(),
-                                               name,category});
-            user.setFavorites(null);
+            addFavorites(request,user, (List<Entry>)Misc.newList(entry));
             message = msg("Favorite added");
         } else if(request.get(ARG_FAVORITE_DELETE,false)) {
             getDatabaseManager().delete(Tables.FAVORITES.NAME,
@@ -1708,6 +1673,25 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    private void addFavorites(Request request, User user, List<Entry> entries) throws Exception {
+        List<Entry> favorites = FavoriteEntry.getEntries(getFavorites(request, user));
+        if(user.getAnonymous()) throw new IllegalArgumentException("Need to be logged in to add favorites");
+        for(Entry entry: entries) {
+            if(favorites.contains(entry)) continue;
+            //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME
+            String name = "";
+            String category = "";
+            getDatabaseManager().executeInsert(Tables.FAVORITES.INSERT,
+                                               new Object[] {
+                                                   getRepository().getGUID(),
+                                                   user.getId(), 
+                                                   entry.getId(),
+                                                   name,category});
+        }
+        user.setFavorites(null);
+    }
+
+
     /**
      * _more_
      *
@@ -1718,12 +1702,13 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processHome(Request request) throws Exception {
+        boolean responseAsXml  = request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML);
         StringBuffer sb   = new StringBuffer();
         User         user = request.getUser();
         if (user.getAnonymous()) {
-            if (request.getString(ARG_OUTPUT, "").equals("xml")) {
+            if (responseAsXml) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
-                        XmlUtil.attr(ATTR_CODE, "error"),
+                        XmlUtil.attr(ATTR_CODE, CODE_ERROR),
                         "No user defined"), MIME_XML);
             }
             String msg = msg("No user defined");
@@ -1738,7 +1723,8 @@ public class UserManager extends RepositoryManager {
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
         }
-        if (request.getString(ARG_OUTPUT, "").equals("xml")) {
+
+        if (responseAsXml) {
             return new Result(XmlUtil.tag(TAG_RESPONSE,
                                           XmlUtil.attr(ATTR_CODE, "ok"),
                                           user.getId()), MIME_XML);
@@ -2049,6 +2035,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processLogin(Request request) throws Exception {
+        boolean responseAsXml  = request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML);
         StringBuffer sb     = new StringBuffer();
         User         user   = null;
         String       output = request.getString(ARG_OUTPUT, "");
@@ -2069,9 +2056,9 @@ public class UserManager extends RepositoryManager {
                 user = getUser(results);
                 addActivity(request, user,"login","");
                 setUserSession(request, user);
-                if (output.equals("xml")) {
+                if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
-                            XmlUtil.attr(ATTR_CODE, "ok"),
+                            XmlUtil.attr(ATTR_CODE, CODE_OK),
                             request.getSessionId()), MIME_XML);
                 }
                 if (request.exists(ARG_REDIRECT)) {
@@ -2097,9 +2084,9 @@ public class UserManager extends RepositoryManager {
                                                    "true", ARG_MESSAGE, msg("You are logged in")));
                 }
             } else {
-                if (output.equals("xml")) {
+                if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
-                            XmlUtil.attr(ATTR_CODE, "error"),
+                            XmlUtil.attr(ATTR_CODE, CODE_ERROR),
                             "Incorrect user name or password"), MIME_XML);
                 }
                 //TODO: what to do when we have ssl here?
@@ -2156,24 +2143,46 @@ public class UserManager extends RepositoryManager {
                     Link link = makeLink(request, state.getEntry(), OUTPUT_CART);
                     link.setLinkType(OutputType.TYPE_ACTION);
                     links.add(link);
+                    if(!request.getUser().getAnonymous()) {
+                        link = makeLink(request, state.getEntry(), OUTPUT_FAVORITE);
+                        link.setLinkType(OutputType.TYPE_ACTION);
+                        links.add(link);
+                    }
                 }            
             }
 
             public boolean canHandleOutput(OutputType output) {
-                return output.equals(OUTPUT_CART);
+                return output.equals(OUTPUT_CART) ||  output.equals(OUTPUT_FAVORITE);
             }
 
             public Result outputGroup(Request request, Group group,
                                       List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
-                if(group.isDummy()) {
-                    addToCart(request, entries);
-                    addToCart(request, (List<Entry>)new ArrayList(subGroups));
+                OutputType output = request.getOutput();
+                if(output.equals(OUTPUT_CART)) {
+                    if(group.isDummy()) {
+                        addToCart(request, entries);
+                        addToCart(request, (List<Entry>)new ArrayList(subGroups));
+                    } else {
+                        addToCart(request, (List<Entry>)Misc.newList(group));
+                    } 
+                    return showCart(request);
                 } else {
-                    addToCart(request, (List<Entry>)Misc.newList(group));
+                    User user = request.getUser();
+                    if(group.isDummy()) {
+                        addFavorites(request,user, entries);
+                        addFavorites(request,user, (List<Entry>)new ArrayList(subGroups));
+                    } else {
+                        addFavorites(request,user, (List<Entry>)Misc.newList(group));
+                    } 
+                    String redirect = getRepositoryBase().URL_USER_HOME.toString();
+                    return new Result(HtmlUtil.url(redirect,
+                                                   ARG_MESSAGE,
+                                                   msg("Favorites Added")));
+
                 }
-                return showCart(request);
+
             }
         };
 

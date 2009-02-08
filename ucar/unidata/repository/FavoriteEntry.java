@@ -65,6 +65,15 @@ public class FavoriteEntry {
         this.category = category;
     }
     
+    public static List<Entry> getEntries(List<FavoriteEntry> favorites) {
+        List<Entry> entries = new ArrayList<Entry>();
+        for(FavoriteEntry favorite: favorites) {
+            entries.add(favorite.entry);
+        }
+        return entries;
+    }
+
+
     /**
        Set the Id property.
 

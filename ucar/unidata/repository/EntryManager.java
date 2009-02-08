@@ -73,6 +73,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1548,6 +1549,8 @@ return new Result(title, sb);
     }
 
 
+
+
     /**
      * _more_
      *
@@ -1591,18 +1594,20 @@ return new Result(title, sb);
             StringBuffer sb     = new StringBuffer();
             List<Entry>  cart   = getUserManager().getCart(request);
             boolean      didOne = false;
-            //            sb.append(makeEntryHeader(request, fromEntry));
-            for (Entry entry : cart) {
-                if ( !getAccessManager().canDoAction(request, entry,
+            List<Entry> favorites = FavoriteEntry.getEntries(getUserManager().getFavorites(request,                                    request.getUser()));
+            List<Group> groups = getGroups(cart);
+            groups.addAll(getGroups(favorites));
+            HashSet seen = new HashSet();
+            for (Group group: groups) {
+                if(seen.contains(group.getId())) continue;
+                seen.add(group.getId());
+                if ( !getAccessManager().canDoAction(request, group,
                         Permission.ACTION_NEW)) {
-                    continue;
-                }
-                if ( !entry.isGroup()) {
                     continue;
                 }
                 boolean ok = true;
                 for(Entry fromEntry: entries) {
-                    if ( !okToMove(fromEntry, entry)) {
+                    if ( !okToMove(fromEntry, group)) {
                         ok = false;
                     }
                 }
@@ -1612,15 +1617,17 @@ return new Result(title, sb);
                     sb.append(header("Please select a group to copy/move the given entries to:"));
                     sb.append("<ul>");
                 }
-                sb.append("<li> ");
+                sb.append(HtmlUtil.img(getIconUrl(request, group)));
+                sb.append(HtmlUtil.space(1));
                 sb.append(
                     HtmlUtil.href(
                         request.url(
                             getRepository().URL_ENTRY_COPY, ARG_FROM,
-                            fromIds, ARG_TO, entry.getId()), entry.getLabel()));
+                            fromIds, ARG_TO, group.getId()), group.getLabel()));
                 sb.append(HtmlUtil.br());
                 didOne = true;
             }
+
             if ( !didOne) {
                 sb.append(
                     getRepository().note(
@@ -1931,9 +1938,9 @@ return new Result(title, sb);
             return processEntryXmlCreateInner(request);
         } catch (Exception exc) {
             exc.printStackTrace();
-            if (request.getString(ARG_OUTPUT, "").equals("xml")) {
+            if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
-                        XmlUtil.attr(ATTR_CODE, "error"),
+                        XmlUtil.attr(ATTR_CODE, CODE_ERROR),
                         "" + exc.getMessage()), MIME_XML);
             }
             return new Result("Error:" + exc, Result.TYPE_XML);
@@ -2000,7 +2007,7 @@ return new Result(title, sb);
         Document  resultDoc  = XmlUtil.makeDocument();
         Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
                                             new String[] { ATTR_CODE,
-                "ok" });
+                                                           CODE_OK });
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
@@ -2010,7 +2017,7 @@ return new Result(title, sb);
 
                 XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
                                new String[] { ATTR_ID,
-                        entry.getId() });
+                                              entry.getId() });
                 newEntries.add(entry);
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
@@ -2033,13 +2040,13 @@ return new Result(title, sb);
 
         insertEntries(newEntries, true);
 
-        if (request.getString(ARG_OUTPUT, "").equals("xml")) {
+        if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             //TODO: Return a list of the newly created entries
             String xml = XmlUtil.toString(resultRoot);
             return new Result(xml, MIME_XML);
         }
 
-        StringBuffer sb = new StringBuffer("OK");
+        StringBuffer sb = new StringBuffer(CODE_OK);
         return new Result("", sb);
 
     }
@@ -2079,6 +2086,33 @@ return new Result(title, sb);
             description = "";
         }
 
+        String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
+                              getTopGroup().getId());
+        Group parentGroup = (Group) entries.get(parentId);
+        if (parentGroup == null) {
+            parentGroup = (Group) getEntry(request, parentId);
+            if (parentGroup == null) {
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find parent:" + parentId);
+            }
+        }
+        boolean doAnonymousUpload = false;
+
+        if (checkAccess) {
+            if ( !getAccessManager().canDoAction(request, parentGroup,
+                                                 Permission.ACTION_NEW)) {
+                if ( getAccessManager().canDoAction(request, parentGroup,
+                                                    Permission.ACTION_UPLOAD)) {
+                    doAnonymousUpload = true;
+                    dataType = Entry.DATATYPE_UPLOAD;
+                } else {
+                    throw new IllegalArgumentException(
+                                                       "Cannot add to parent group:" + parentId);
+                }
+            }
+        }
+
+
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
             String tmp = (String) files.get(file);
@@ -2090,23 +2124,6 @@ return new Result(title, sb);
         String localFile   = XmlUtil.getAttribute(node, ATTR_LOCALFILE, (String) null);
         String localFileToMove   = XmlUtil.getAttribute(node, ATTR_LOCALFILETOMOVE, (String) null);
         String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
-        String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
-                              getTopGroup().getId());
-        Group parentGroup = (Group) entries.get(parentId);
-        if (parentGroup == null) {
-            parentGroup = (Group) getEntry(request, parentId);
-            if (parentGroup == null) {
-                throw new RepositoryUtil.MissingEntryException(
-                    "Could not find parent:" + parentId);
-            }
-        }
-        if (checkAccess) {
-            if ( !getAccessManager().canDoAction(request, parentGroup,
-                    Permission.ACTION_NEW)) {
-                throw new IllegalArgumentException(
-                    "Cannot add to parent group:" + parentId);
-            }
-        }
 
         TypeHandler typeHandler = getRepository().getTypeHandler(type);
         if (typeHandler == null) {
@@ -2599,10 +2616,10 @@ return new Result(title, sb);
                         : "");
             }
             String img = HtmlUtil.img(icon, (entry.isGroup()&&forTreeNavigation
-                                             ? "Click to open group; "
-                                             : "Click to view actions; ") + (okToMove
-                    ? "Drag to move"
-                    : ""), HtmlUtil.id("img_" + uid) + event);
+                                             ? msg("Click to open group") +"; "
+                                             : "") + (okToMove
+                                                      ? msg("Drag to move")
+                                                      : ""), HtmlUtil.id("img_" + uid) + event);
 
 
 
@@ -4295,6 +4312,17 @@ return new Result(title, sb);
             getDatabaseManager().select(Tables.ENTRIES.COL_ID,
                                         Tables.ENTRIES.NAME, clauses);
         return getGroups(request, SqlUtil.readString(statement, 1));
+    }
+
+
+    public List<Group> getGroups(List<Entry> entries) {
+        List<Group> groupList = new ArrayList<Group>();
+        for(Entry entry: entries) {
+            if(entry.isGroup()) {
+                groupList.add((Group) entry);
+            }
+        }
+        return groupList;
     }
 
     /**

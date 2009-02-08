@@ -5,6 +5,7 @@
 
   <group handler="repository">
      <api request="/help/*"           method="processHelp"/>
+     <api request="/ping"             method="processPing"/>
   </group>
 
   <group handler="entrymanager">
