@@ -145,28 +145,32 @@ public abstract class IdvPublisher implements Cloneable {
      */
     public abstract String getTypeName();
 
-    public void configure(){}
+    public boolean configurexxx(){
+        return true;
+    }
+
+    public void configure(){
+    }
 
 
 
+    /**
+       Set the Name property.
 
-/**
-Set the Name property.
-
-@param value The new value for Name
-**/
-public void setName (String value) {
+       @param value The new value for Name
+    **/
+    public void setName (String value) {
 	name = value;
-}
+    }
 
-/**
-Get the Name property.
+    /**
+       Get the Name property.
 
-@return The Name
-**/
-public String getName () {
+       @return The Name
+    **/
+    public String getName () {
 	return name;
-}
+    }
 
 
     public String toString() {

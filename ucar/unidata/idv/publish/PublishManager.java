@@ -188,11 +188,18 @@ public class PublishManager extends IdvManager {
             //            menu.addSeparator();
             for(IdvPublisher publisher:(List<IdvPublisher>) publishers) {
                 deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
-                configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),publisher,"configure", null));
+                configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"configurePublisher", publisher));
                 //                publisher.initMenu(menu);
             }
         }
     }
+
+    public void configurePublisher(IdvPublisher publisher) {
+        //        if(publisher.configure()) updatePublishers(true);
+        publisher.configure();
+        updatePublishers(true);
+    }
+
 
     public void deletePublisher(IdvPublisher publisher) {
         publishers.remove(publisher);
