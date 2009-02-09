@@ -614,10 +614,9 @@ public class GeoSelectionPanel extends JPanel {
             this.geoPanel = geoPanel;
             NavigatedPanel np = getNavigatedPanel();
 
-
             if (sampleProjection != null) {
                 setProjectionImpl(sampleProjection);
-                ProjectionRect r = sampleProjection.getDefaultMapArea();
+                ProjectionRect r = np.normalizeRectangle(sampleProjection.getDefaultMapArea());
                 np.setSelectedRegionBounds(r);
                 points.add(new ProjectionPointImpl(r.getX(), r.getY()));
                 points.add(new ProjectionPointImpl(r.getX() + r.getWidth(),
